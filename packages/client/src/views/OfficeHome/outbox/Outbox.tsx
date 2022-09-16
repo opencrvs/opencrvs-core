@@ -28,7 +28,13 @@ import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { StatusWaiting } from '@client/../../components/lib/icons'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
+import { formatLongDate } from '@client/utils/date-formatting'
+import styled from '@client/styledComponents'
 
+const IconContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`
 export function Outbox() {
   const intl = useIntl()
   const [width, setWidth] = React.useState(window.innerWidth)
@@ -198,6 +204,9 @@ export function Outbox() {
         declaration.submissionStatus || '',
         index
       )
+      const dateOfEvent =
+        (declaration.data.child?.childBirthDate as string) ||
+        (declaration.data.deathEvent?.deathDate as string)
 
       return {
         id: declaration.id,
@@ -209,7 +218,8 @@ export function Outbox() {
           '',
         name,
         submissionStatus: statusText || '',
-        statusIndicator: icon ? [icon()] : null
+        statusIndicator: icon ? <IconContainer>{icon()}</IconContainer> : null,
+        dateOfEvent: dateOfEvent ? formatLongDate(dateOfEvent) : ''
       }
     })
   }
@@ -220,29 +230,33 @@ export function Outbox() {
       isMobileSize={width < theme.grid.breakpoints.lg}
     >
       <GridTable
-        hideTableHeader={true}
         content={transformDeclarationsReadyToSend()}
         columns={[
           {
-            label: intl.formatMessage(constantsMessages.type),
-            width: 15,
-            key: 'event'
-          },
-          {
-            width: 45,
+            width: 25,
             label: intl.formatMessage(constantsMessages.name),
             key: 'name'
           },
           {
-            label: intl.formatMessage(messages.statusWaitingToRegister),
-            width: 35,
+            label: intl.formatMessage(constantsMessages.event),
+            width: 25,
+            key: 'event'
+          },
+          {
+            label: intl.formatMessage(constantsMessages.eventDate),
+            width: 25,
+            key: 'dateOfEvent'
+          },
+          {
+            label: '',
+            width: 21,
             key: 'submissionStatus',
+            alignment: ColumnContentAlignment.RIGHT,
             color: getTheme().colors.supportingCopy
           },
           {
             label: '',
-            width: 5,
-            alignment: ColumnContentAlignment.CENTER,
+            width: 4,
             key: 'statusIndicator'
           }
         ]}
