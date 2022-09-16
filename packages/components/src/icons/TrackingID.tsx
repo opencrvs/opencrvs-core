@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { colors } from '../colors'
 
 export const TrackingID = (props: React.HTMLAttributes<SVGElement>) => {
   return (

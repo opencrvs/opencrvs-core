@@ -75,6 +75,7 @@ itemConfiguration.args = {
   isSelected: true
 }
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
   title: 'Layout/Side navigation/Side navigation item',
   component: NavigationItem

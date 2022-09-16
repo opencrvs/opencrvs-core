@@ -193,12 +193,6 @@ const ErrorText = styled.div<{ isFullPage?: boolean }>`
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
   color: ${({ theme }) => theme.colors.copy};
 `
-const H3 = styled.div`
-  padding-left: 12px;
-  margin-bottom: 8px;
-  ${({ theme }) => theme.fonts.h4};
-  color: ${({ theme }) => theme.colors.copy};
-`
 export const LoadingGrey = styled.span<{
   width?: number
 }>`

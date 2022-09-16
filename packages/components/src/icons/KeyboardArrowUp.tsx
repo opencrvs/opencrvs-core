@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { colors } from '../colors'
 
 export const KeyboardArrowUp = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={24} height={24} fill="none" {...props}>
