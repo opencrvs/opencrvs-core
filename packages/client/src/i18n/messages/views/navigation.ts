@@ -95,6 +95,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Vsreports label in navigation',
     id: 'navigation.vsreports'
   },
+  performanceDashboard: {
+    defaultMessage: 'dashboard',
+    description: 'Dashboard label in navigation',
+    id: 'navigation.performanceDashboard'
+  },
   completenessRates: {
     defaultMessage: 'Completeness rates',
     description: 'Completeness rates in navigation',

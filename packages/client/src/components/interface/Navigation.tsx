@@ -33,7 +33,8 @@ import {
   goToPerformanceView,
   goToTeamView,
   goToFormConfigHome,
-  goToApplicationConfig
+  goToApplicationConfig,
+  goToPerfomanceVSReport
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -279,6 +280,10 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.certificate,
     WORKQUEUE_TABS.declarationForms
   ]
+  const perfromanceTab: string[] = [
+    WORKQUEUE_TABS.performanceDashboard,
+    WORKQUEUE_TABS.vsreports
+  ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -510,19 +515,14 @@ export const NavigationView = (props: IFullProps) => {
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.performance]
                         )}
-                        onClick={
-                          () => setIsPerformExpanded(!isPerformExpanded)
-                          // props.goToPerformanceViewAction(userDetails)
-                        }
+                        onClick={() => setIsPerformExpanded(!isPerformExpanded)}
                         isSelected={
                           enableMenuSelection &&
-                          configTab.includes(activeMenuItem)
-
-                          // activeMenuItem === WORKQUEUE_TABS.performance
+                          perfromanceTab.includes(activeMenuItem)
                         }
                         expandableIcon={() =>
-                          isConfigExpanded ||
-                          configTab.includes(activeMenuItem) ? (
+                          isPerformExpanded ||
+                          perfromanceTab.includes(activeMenuItem) ? (
                             <Expandable selected={true} />
                           ) : (
                             <Expandable />
@@ -530,19 +530,22 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       {(isPerformExpanded ||
-                        configTab.includes(activeMenuItem)) && (
+                        perfromanceTab.includes(activeMenuItem)) && (
                         <>
                           <NavigationSubItem
                             label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.performance]
+                              navigationMessages[
+                                WORKQUEUE_TABS.performanceDashboard
+                              ]
                             )}
-                            id={`navigation_${WORKQUEUE_TABS.performance}`}
+                            id={`navigation_${WORKQUEUE_TABS.performanceDashboard}`}
                             onClick={() =>
                               props.goToPerformanceViewAction(userDetails)
                             }
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.performance
+                              activeMenuItem ===
+                                WORKQUEUE_TABS.performanceDashboard
                             }
                           />
 
