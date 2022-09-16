@@ -196,10 +196,10 @@ export const influx = new Influx.InfluxDB({
     {
       measurement: 'user_audit_event',
       fields: {
-        compositionId: Influx.FieldType.STRING,
-        data: Influx.FieldType.STRING
+        practitionerId: Influx.FieldType.STRING,
+        action: Influx.FieldType.STRING
       },
-      tags: ['practitionerId', 'action']
+      tags: ['action', 'practitionerId']
     }
   ]
 })
