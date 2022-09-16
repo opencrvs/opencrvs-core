@@ -40,13 +40,6 @@ const Wrapper = styled.div<{
       : `padding: 24px;
     ${theme.shadows.light};`}
 `
-const TableTitleLoading = styled.span`
-  background: ${({ theme }) => theme.colors.background};
-  width: 176px;
-  height: 32px;
-  display: block;
-  margin-bottom: 10px;
-`
 const TableHeader = styled.div<{
   isSortable?: boolean
   totalWidth?: number
@@ -301,7 +294,6 @@ interface IListTableProps {
   totalItems?: number
   currentPage?: number
   isLoading?: boolean
-  tableTitle?: string
   hideBoxShadow?: boolean
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
@@ -391,7 +383,6 @@ export class ListTable extends React.Component<
       pageSize = defaultConfiguration.pageSize,
       currentPage = defaultConfiguration.currentPage,
       isLoading = false,
-      tableTitle,
       tableHeight,
       rowStyle,
       hideBoxShadow,
@@ -417,8 +408,6 @@ export class ListTable extends React.Component<
             fixedWidth={fixedWidth}
             ref={this.tableRef}
           >
-            {tableTitle && <H3>{tableTitle}</H3>}
-
             <TableScrollerHorizontal
               disableScrollOnOverflow={this.props.disableScrollOnOverflow}
             >
@@ -524,7 +513,6 @@ export class ListTable extends React.Component<
         )}
         {isLoading && (
           <LoadingContainer totalWidth={totalWidth} fixedWidth={fixedWidth}>
-            {tableTitle && <TableTitleLoading />}
             <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
               {columns.map((preference, index) => (
                 <ContentWrapper

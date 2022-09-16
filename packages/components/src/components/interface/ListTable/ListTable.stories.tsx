@@ -33,7 +33,6 @@ interface IProps {
   totalItems?: number
   currentPage?: number
   isLoading?: boolean
-  tableTitle?: string
   hideBoxShadow?: boolean
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
@@ -152,7 +151,6 @@ const footerColumns = [
 const Template: Story<IProps> = (args) => <ListTable {...args} />
 export const ListView = Template.bind({})
 ListView.args = {
-  tableTitle: 'Table Title',
   content: list,
   columns,
   noResultText: 'No result to display',

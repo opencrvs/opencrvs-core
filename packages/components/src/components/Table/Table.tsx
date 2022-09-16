@@ -31,13 +31,6 @@ const Wrapper = styled.div<{
   }
   background: ${({ theme }) => theme.colors.white};
 `
-const TableTitleLoading = styled.span`
-  background: ${({ theme }) => theme.colors.background};
-  width: 176px;
-  height: 32px;
-  display: block;
-  margin-bottom: 10px;
-`
 const TableHeader = styled.div<{
   isSortable?: boolean
   totalWidth?: number
@@ -207,12 +200,6 @@ const ErrorText = styled.div<{ isFullPage?: boolean }>`
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
   color: ${({ theme }) => theme.colors.copy};
 `
-const H3 = styled.div`
-  padding-left: 12px;
-  margin-bottom: 8px;
-  ${({ theme }) => theme.fonts.h4};
-  color: ${({ theme }) => theme.colors.copy};
-`
 export const LoadingTableGrey = styled.span<{
   width?: number
 }>`
@@ -304,7 +291,6 @@ export interface ITableProps {
   totalItems?: number
   currentPage?: number
   isLoading?: boolean
-  tableTitle?: string
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
   alignItemCenter?: boolean
@@ -390,7 +376,6 @@ export class Table extends React.Component<ITableProps, ITableState> {
       pageSize = defaultPageSize,
       currentPage = defaultConfiguration.currentPage,
       isLoading = false,
-      tableTitle,
       tableHeight,
       rowStyle,
       hideTableHeader,
@@ -414,8 +399,6 @@ export class Table extends React.Component<ITableProps, ITableState> {
             fixedWidth={fixedWidth}
             ref={this.tableRef}
           >
-            {tableTitle && <H3>{tableTitle}</H3>}
-
             <TableScrollerHorizontal
               disableScrollOnOverflow={this.props.disableScrollOnOverflow}
             >
@@ -524,7 +507,6 @@ export class Table extends React.Component<ITableProps, ITableState> {
         )}
         {isLoading && (
           <LoadingContainer totalWidth={totalWidth} fixedWidth={fixedWidth}>
-            {tableTitle && <TableTitleLoading />}
             <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
               {columns.map((preference, index) => (
                 <ContentWrapper
