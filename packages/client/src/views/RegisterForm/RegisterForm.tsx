@@ -27,12 +27,12 @@ import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
   EventTopBar,
   IEventTopBarProps,
-  IEventTopBarMenuAction,
-  ResponsiveModal,
-  Spinner,
-  Warning
-} from '@opencrvs/components/lib/interface'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+  IEventTopBarMenuAction
+} from '@opencrvs/components/lib/EventTopBar'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {
   deleteDeclaration,
   IDeclaration,
@@ -790,7 +790,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         >
                           {isFileSizeExceeded(declaration) &&
                             isDocumentUploadPage && (
-                              <Warning
+                              <Alert
                                 label={intl.formatMessage(
                                   constantsMessages.totalFileSizeExceed,
                                   {

@@ -51,6 +51,7 @@ export const getRoutes = () => {
   // add all routes from all modules to the routes array manually or write your routes inside a folder inside the server folder
   // with suffix as -routes.ts
   glob.sync(join(__dirname, '../routes/**/*-route.[t|j]s')).forEach((file) => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     routes.push(require(resolve(file)).default)
   })
   return routes

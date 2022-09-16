@@ -10,17 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  CheckboxGroup,
-  DateField,
-  RadioGroup,
-  Select,
-  TextArea,
-  TextInput,
-  WarningMessage,
-  RadioSize
-} from '@opencrvs/components/lib/forms'
-import { Paragraph, Link } from '@opencrvs/components/lib/typography'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
+import { CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { Select } from '@opencrvs/components/lib/Select'
+import { DateField } from '@opencrvs/components/lib/DateField'
+import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
+import { Link } from '@opencrvs/components/lib/Link'
+import { Text } from '@opencrvs/components/lib/Text'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -114,7 +112,7 @@ import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/declarations'
-import { LocationSearch } from '@opencrvs/components/lib/interface'
+import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -129,22 +127,10 @@ const fadeIn = keyframes`
 
 const FormItem = styled.div<{
   ignoreBottomMargin?: boolean
-  hideFakeMarginTop?: boolean
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
     ignoreBottomMargin ? '0px' : '40px'};
-
-  ${({ hideFakeMarginTop }) =>
-    !hideFakeMarginTop &&
-    `& > div::before {
-    content: ' ';
-    height: 80px;
-    margin-top: -80px;
-    display: block;
-    visibility: hidden;
-    pointer-events: none;
-  }`}
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.reg16};
@@ -431,14 +417,14 @@ function GeneratedInputField({
     const label = fieldDefinition.label as unknown as MessageDescriptor
 
     return (
-      <Paragraph fontSize={fieldDefinition.fontSize}>
+      <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
         <FormattedMessage
           {...label}
           values={{
             [fieldDefinition.name]: value as any
           }}
         />
-      </Paragraph>
+      </Text>
     )
   }
   if (fieldDefinition.type === LIST) {
@@ -998,7 +984,6 @@ class FormSectionComponent extends React.Component<Props> {
                     <FormItem
                       key={nestedFieldName}
                       ignoreBottomMargin={field.ignoreBottomMargin}
-                      hideFakeMarginTop
                     >
                       <FastField name={nestedFieldName}>
                         {(formikFieldProps: FieldProps<any>) => (

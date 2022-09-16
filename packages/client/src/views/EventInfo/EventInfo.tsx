@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
-import { Container, BodyContent } from '@opencrvs/components/lib/layout'
+import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {
   WrappedComponentProps as IntlShapeProps,
   MessageDescriptor,
@@ -19,7 +19,7 @@ import {
 } from 'react-intl'
 import { Event } from '@client/utils/gateway'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { FixedEventTopBar } from '@opencrvs/components/lib/interface'
+import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
 import { messages } from '@client/i18n/messages/views/eventInfo'
 import styled from '@client/styledComponents'
 import {
@@ -28,7 +28,7 @@ import {
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import { BulletList } from '@opencrvs/components/lib/typography'
+import { BulletList } from '@opencrvs/components/lib/BulletList'
 import { connect } from 'react-redux'
 import {
   goBack,

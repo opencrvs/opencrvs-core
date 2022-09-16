@@ -11,7 +11,7 @@
  */
 import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
-import { TriLineChart } from '@opencrvs/components/lib/charts'
+import { LineChart } from '@opencrvs/components/lib/LineChart'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -443,7 +443,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
       legendLayout
     } = this.state
     return (
-      <TriLineChart
+      <LineChart
         data={data}
         dataKeys={[
           'totalEstimate',

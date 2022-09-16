@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import Sticky from 'react-stickynode'
-import { IFormTabs, FormTabs } from '@opencrvs/components/lib/forms'
+import { IFormTabs, FormTabs } from '@opencrvs/components/lib/FormTabs'
 import styled from '@client/styledComponents'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 

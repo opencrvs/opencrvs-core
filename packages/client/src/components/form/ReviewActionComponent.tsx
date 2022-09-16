@@ -21,7 +21,7 @@ import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { SubmissionAction } from '@client/forms'
 import styled from '@client/styledComponents'
 import * as React from 'react'
@@ -244,9 +244,6 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             modal: {
               title: {
                 message: messages.registerConfirmationTitle
-              },
-              description: {
-                message: constantsMessages.areYouSure
               }
             }
           },
@@ -273,9 +270,6 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             modal: {
               title: {
                 message: messages.registerConfirmationTitle
-              },
-              description: {
-                message: constantsMessages.registerConfirmModalDesc
               }
             }
           },
@@ -456,10 +450,11 @@ class ReviewActionComponent extends React.Component<
             show={this.state.showSubmitModal}
             handleClose={this.toggleSubmitModalOpen}
           >
-            {intl.formatMessage(actionContent.modal.description.message, {
-              ...actionContent.modal.description.payload,
-              event: declaration.event
-            })}
+            {actionContent.modal.description &&
+              intl.formatMessage(actionContent.modal.description.message, {
+                ...actionContent.modal.description.payload,
+                event: declaration.event
+              })}
           </ResponsiveModal>
         )}
       </Container>

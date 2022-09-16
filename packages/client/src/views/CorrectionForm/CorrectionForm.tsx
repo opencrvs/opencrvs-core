@@ -21,7 +21,7 @@ import {
 import { CorrectionSection } from '@client/forms'
 import { CorrectionReasonForm } from './CorrectionReasonForm'
 import { CorrectionSummary } from './CorrectionSummary'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import styled from '@client/styledComponents'
 import { TimeMounted } from '@client/components/TimeMounted'
 

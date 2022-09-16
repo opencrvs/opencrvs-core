@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { buttonMessages, errorMessages } from '@client/i18n/messages'
-import { ErrorToastNotification } from '@opencrvs/components/lib/interface'
+import { ErrorToastNotification } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 

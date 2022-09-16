@@ -14,12 +14,10 @@ import styled, { keyframes } from '@client/styledComponents'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import {
-  FixedEventTopBar,
-  RadioButton
-} from '@opencrvs/components/lib/interface'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { FixedEventTopBar } from '@opencrvs/components/lib/EventTopBar'
+import { RadioButton } from '@opencrvs/components/lib/Radio'
+import { BodyContent, Container } from '@opencrvs/components/lib/Content'
 import { Event } from '@client/utils/gateway'
 import {
   goBack,

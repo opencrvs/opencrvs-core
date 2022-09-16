@@ -16,13 +16,11 @@ import {
 } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  TextInput,
-  WarningMessage
-} from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'

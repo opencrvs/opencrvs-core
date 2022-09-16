@@ -20,7 +20,7 @@ import {
 import { createStore } from '@client/store'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
-import { DataSection } from '@opencrvs/components/lib/interface'
+import { DataSection } from '@opencrvs/components/lib/ViewData'
 import { ReactWrapper } from 'enzyme'
 import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
 import { changeAvatarMutation, AvatarChangeModal } from './AvatarChangeModal'

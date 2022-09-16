@@ -27,7 +27,8 @@ import {
 import {
   IDeclaration,
   DOWNLOAD_STATUS,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  ITaskHistory
 } from '@client/declarations'
 import {
   goToPage as goToPageAction,
@@ -60,12 +61,12 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { DownloadAction } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { FormTabs } from '@opencrvs/components/lib/forms'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { IAction } from '@opencrvs/components/lib/common-types'
 import {
   IconWithName,
@@ -75,6 +76,7 @@ import {
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
@@ -181,8 +183,11 @@ export class InProgressComponent extends React.Component<
       const regId = reg.id
       const event = reg.type
       const lastModificationDate =
-        (reg && reg.registration && reg.registration.modifiedAt) ||
-        (reg && reg.registration && reg.registration.createdAt) ||
+        (reg.operationHistories &&
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories as ITaskHistory[],
+            RegStatus.InProgress
+          )) ||
         ''
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
 
@@ -291,8 +296,7 @@ export class InProgressComponent extends React.Component<
           />
         ),
         dateOfEvent,
-        notificationSent:
-          (lastModificationDate && parseInt(lastModificationDate)) || '',
+        notificationSent: lastModificationDate || '',
         actions
       }
     })

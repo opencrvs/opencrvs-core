@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/forms'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
   CorrectionSection,
   IFormSection,
@@ -62,18 +62,6 @@ export const CollectorRelationLabelArray = [
   {
     value: CorrectorRelationship.OTHER,
     label: messages.others
-  },
-  {
-    value: CorrectorRelationship.LOCAL_REGISTRAR,
-    label: userMessages.LOCAL_REGISTRAR
-  },
-  {
-    value: CorrectorRelationship.NATIONAL_REGISTRAR,
-    label: userMessages.NATIONAL_REGISTRAR
-  },
-  {
-    value: CorrectorRelationship.REGISTRATION_AGENT,
-    label: userMessages.REGISTRATION_AGENT
   }
 ]
 

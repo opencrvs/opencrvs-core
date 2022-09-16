@@ -14,8 +14,7 @@ import * as Joi from 'joi'
 import {
   storeRetrievalStepInformation,
   getRetrievalStepInformation,
-  RetrievalSteps,
-  IRetrievalStepInformation
+  RetrievalSteps
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { checkVerificationCode } from '@auth/features/verifyCode/service'
 import { unauthorized } from '@hapi/boom'
@@ -36,13 +35,13 @@ export default async function verifyNumberHandler(
   h: Hapi.ResponseToolkit
 ): Promise<IVerifyNumberResponse> {
   const payload = request.payload as IVerifyNumberPayload
-  let retrievalStepInfo: IRetrievalStepInformation
+
   // Looks for step1 data. Throws exception if not found
-  retrievalStepInfo = await getRetrievalStepInformation(payload.nonce).catch(
-    () => {
-      throw unauthorized()
-    }
-  )
+  const retrievalStepInfo = await getRetrievalStepInformation(
+    payload.nonce
+  ).catch(() => {
+    throw unauthorized()
+  })
   // Throws exception if not ready for step2
   if (
     retrievalStepInfo.status !==
