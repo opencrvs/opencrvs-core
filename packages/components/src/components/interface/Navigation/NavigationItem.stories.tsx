@@ -57,7 +57,8 @@ export const itemPerformance = Template.bind({})
 
 itemPerformance.args = {
   icon: () => <Activity stroke={'#595C5F'} height={15} width={15} />,
-  label: 'Performance'
+  label: 'Performance',
+  isSelected: true
 }
 
 export const itemTeam = Template.bind({})

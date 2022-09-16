@@ -13,7 +13,7 @@
 import * as Hapi from '@hapi/hapi'
 import { uploadFileToMinio } from '@metrics/api'
 import { VS_EXPORT_SCRIPT_PATH } from '@metrics/constants'
-import VS_Export, { Event } from '@metrics/models/vsExports'
+import VS_Export, { Event, IVSExport } from '@metrics/models/vsExports'
 import { fork } from 'child_process'
 import * as fs from 'fs'
 import { join } from 'path'
@@ -117,4 +117,17 @@ function formatBytes(bytes: number, decimals = 2) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
+
+export async function getAllVSExport(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  let vsexports: IVSExport[]
+  try {
+    vsexports = await VS_Export.find()
+  } catch (error) {
+    throw internal(error.message)
+  }
+  return vsexports
 }

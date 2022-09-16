@@ -28,6 +28,9 @@ export const resolvers: GQLResolver = {
     async getTotalMetrics(_, variables, authHeader) {
       return getMetrics('/totalMetrics', variables, authHeader)
     },
+    async getTotalVSExport(_, variables, authHeader) {
+      return {}
+    },
     async getTotalPayments(
       _,
       { timeStart, timeEnd, locationId, event },

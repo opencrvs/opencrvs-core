@@ -34,7 +34,7 @@ import {
   goToTeamView,
   goToFormConfigHome,
   goToApplicationConfig,
-  goToPerfomanceVSReport
+  goToPerfomanceVSExport
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -71,6 +71,7 @@ export const WORKQUEUE_TABS = {
   dashboard: 'dashboard',
   performanceDashboard: 'performanceDashboard',
   performance: 'performance',
+  vsexports: 'vsexports',
   team: 'team',
   config: 'config',
   application: 'application',
@@ -134,8 +135,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.dashboard,
-    WORKQUEUE_TABS.performanceDashboard,
-    WORKQUEUE_TABS.vsreports,
+    WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
@@ -150,8 +150,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
     WORKQUEUE_TABS.dashboard,
-    WORKQUEUE_TABS.performanceDashboard,
-    WORKQUEUE_TABS.vsreports,
+    WORKQUEUE_TABS.vsexports,
     GROUP_ID.menuGroup
   ],
   PERFORMANCE_MANAGEMENT: [WORKQUEUE_TABS.performance, GROUP_ID.menuGroup]
@@ -187,7 +186,7 @@ interface IProps {
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
-  goToVSReportConfigAction: typeof goToPerfomanceVSReport
+  goToVSReportConfigAction: typeof goToPerfomanceVSExport
   goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
@@ -280,9 +279,9 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.certificate,
     WORKQUEUE_TABS.declarationForms
   ]
-  const perfromanceTab: string[] = [
-    WORKQUEUE_TABS.performanceDashboard,
-    WORKQUEUE_TABS.vsreports
+  const performanceTab: string[] = [
+    WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.vsexports
   ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
@@ -515,14 +514,17 @@ export const NavigationView = (props: IFullProps) => {
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.performance]
                         )}
-                        onClick={() => setIsPerformExpanded(!isPerformExpanded)}
+                        onClick={() => {
+                          props.goToPerformanceViewAction(userDetails)
+                          setIsPerformExpanded(!isPerformExpanded)
+                        }}
                         isSelected={
                           enableMenuSelection &&
-                          perfromanceTab.includes(activeMenuItem)
+                          performanceTab.includes(activeMenuItem)
                         }
                         expandableIcon={() =>
                           isPerformExpanded ||
-                          perfromanceTab.includes(activeMenuItem) ? (
+                          performanceTab.includes(activeMenuItem) ? (
                             <Expandable selected={true} />
                           ) : (
                             <Expandable />
@@ -530,7 +532,7 @@ export const NavigationView = (props: IFullProps) => {
                         }
                       />
                       {(isPerformExpanded ||
-                        perfromanceTab.includes(activeMenuItem)) && (
+                        performanceTab.includes(activeMenuItem)) && (
                         <>
                           <NavigationSubItem
                             label={intl.formatMessage(
@@ -538,26 +540,25 @@ export const NavigationView = (props: IFullProps) => {
                                 WORKQUEUE_TABS.performanceDashboard
                               ]
                             )}
-                            id={`navigation_${WORKQUEUE_TABS.performanceDashboard}`}
+                            id={`navigation_${WORKQUEUE_TABS.performance}`}
                             onClick={() =>
                               props.goToPerformanceViewAction(userDetails)
                             }
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem ===
-                                WORKQUEUE_TABS.performanceDashboard
+                              activeMenuItem === WORKQUEUE_TABS.performance
                             }
                           />
 
                           <NavigationSubItem
                             label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.vsreports]
+                              navigationMessages[WORKQUEUE_TABS.vsexports]
                             )}
-                            id={`navigation_${WORKQUEUE_TABS.vsreports}`}
+                            id={`navigation_${WORKQUEUE_TABS.vsexports}`}
                             onClick={goToVSReportConfigAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.vsreports
+                              activeMenuItem === WORKQUEUE_TABS.vsexports
                             }
                           />
                         </>
@@ -679,10 +680,14 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     workqueue: state.workqueueState.workqueue,
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
-    activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
+    activeMenuItem: window.location.href.includes(
+      `${WORKQUEUE_TABS.performance}?`
+    )
       ? WORKQUEUE_TABS.performance
       : window.location.href.includes(WORKQUEUE_TABS.team)
       ? WORKQUEUE_TABS.team
+      : window.location.href.includes(WORKQUEUE_TABS.vsexports)
+      ? WORKQUEUE_TABS.vsexports
       : window.location.href.includes(WORKQUEUE_TABS.application)
       ? WORKQUEUE_TABS.application
       : window.location.href.includes(WORKQUEUE_TABS.settings)
@@ -705,7 +710,7 @@ export const Navigation = connect<
   goToCertificateConfigAction: goToCertificateConfig,
   goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
-  goToVSReportConfigAction: goToPerfomanceVSReport,
+  goToVSReportConfigAction: goToPerfomanceVSExport,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
