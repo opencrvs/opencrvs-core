@@ -491,7 +491,7 @@ export function getQueryData(
   return queryData
 }
 
-function getSelectedInformantAndContactType(draftData?: IFormData) {
+export function getSelectedInformantAndContactType(draftData?: IFormData) {
   // IFormFieldValue is a union with primitives - usually a top-level string in this function like this section.fieldValue
   // informantType is a special case where both the nested field and the selected parent are required
   // this means an object was required for the fieldValue

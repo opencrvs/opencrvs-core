@@ -84,7 +84,8 @@ import {
   getConditionalActionsForField,
   getSectionFields,
   getVisibleSectionGroupsBasedOnConditions,
-  getListOfLocations
+  getListOfLocations,
+  getSelectedInformantAndContactType
 } from '@client/forms/utils'
 import {
   Errors,
@@ -1738,30 +1739,33 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 }
 
 function motherDoesNotExistAndStateIsMother(
-  declaration: {
-    data: any
-  },
+  declaration: IDeclaration,
   activeState: string
 ) {
+  const selectedInformantAndContactType = getSelectedInformantAndContactType(
+    declaration.data
+  )
+
   return (
     !Boolean(declaration.data.mother?.detailsExist) &&
     activeState === 'mother' &&
-    declaration.data.registration?.informantType?.value !== 'MOTHER' &&
-    declaration.data.registration?.contactPoint?.value !== 'MOTHER'
+    selectedInformantAndContactType.selectedInformantType !== 'MOTHER' &&
+    selectedInformantAndContactType.selectedContactType !== 'MOTHER'
   )
 }
 
 function fatherDoesNotExistAndStateIsFather(
-  declaration: {
-    data: any
-  },
+  declaration: IDeclaration,
   activeState: string
 ) {
+  const selectedInformantAndContactType = getSelectedInformantAndContactType(
+    declaration.data
+  )
   return (
     !Boolean(declaration.data.father?.detailsExist) &&
     activeState === 'father' &&
-    declaration.data.registration?.informantType?.value !== 'FATHER' &&
-    declaration.data.registration?.contactPoint?.value !== 'FATHER'
+    selectedInformantAndContactType.selectedInformantType !== 'FATHER' &&
+    selectedInformantAndContactType.selectedContactType !== 'FATHER'
   )
 }
 
