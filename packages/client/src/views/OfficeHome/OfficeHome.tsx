@@ -29,7 +29,6 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import {
   FloatingActionButton,
   IButtonProps
@@ -490,7 +489,6 @@ export class OfficeHomeView extends React.Component<
             icon={() => <PlusTransparentWhite />}
           />
         </FABContainer>
-        <NotificationToast showPaginated={this.showPaginated} />
 
         {this.state.showCertificateToast && (
           <FloatingNotification

@@ -90,7 +90,6 @@ import { buttonMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
@@ -776,7 +775,6 @@ const RecordAuditComp = (props: IFullProps) => {
       <DesktopHeader />
       <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       <BodyContainer>{getBodyContent(props)}</BodyContainer>
-      <NotificationToast />
     </>
   )
 }
