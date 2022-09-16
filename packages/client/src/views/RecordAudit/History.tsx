@@ -26,14 +26,13 @@ import {
   getIndividualNameObj,
   IUserDetails
 } from '@client/utils/userUtils'
-import { goToUserProfile } from '@client/navigation'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, HumanName } from '@client/utils/gateway'
+import { History } from '@client/utils/gateway'
 
 const TableDiv = styled.div`
   overflow: auto;

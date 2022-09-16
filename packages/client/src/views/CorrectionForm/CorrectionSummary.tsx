@@ -47,7 +47,7 @@ import {
   SubmissionAction
 } from '@client/forms'
 import { lookup } from 'country-data'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Content } from '@opencrvs/components/lib/Content'
 import {
