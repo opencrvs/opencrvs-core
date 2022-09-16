@@ -25,13 +25,34 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import format from '@client/utils/date-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
-import { Loader, LoadingGrey } from '@client/../../components/lib'
+import { userMessages } from '@client/i18n/messages'
+import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
 import { LANG_EN } from '@client/utils/constants'
+import { Loader } from '@opencrvs/components/lib/Loader'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { useDispatch, useSelector } from 'react-redux'
+import { goToReviewUserDetails, goToTeamUserList } from '@client/navigation'
+import { Status } from '@client/views/SysAdmin/Team/user/UserList'
+import { VerticalThreeDots } from '@client/../../components/lib/icons'
+import { IStoreState } from '@client/store'
+import { getScope } from '@client/profile/profileSelectors'
+import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
+import { constant } from 'lodash'
+import { userMutations } from '@client/user/mutations'
+import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+import { useState } from 'react'
+import {
+  Toast,
+  NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
+} from '@opencrvs/components/lib/Toast'
+import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -66,6 +87,10 @@ const InformationValue = styled.div`
   ${({ theme }) => theme.fonts.reg16};
 `
 
+const LinkButtonWithoutSpacing = styled(LinkButton)`
+  height: auto !important;
+`
+
 const LoadingTitle = styled.span<{ width: number; marginRight: number }>`
   background: ${({ theme }) => theme.colors.background};
   display: inline-block;
@@ -95,6 +120,69 @@ interface IRouteProps {
 export const UserAudit = () => {
   const intl = useIntl()
   const { userId } = useParams<IRouteProps>()
+  const dispatch = useDispatch()
+  const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
+  const [showResendSMSError, setShowResendSMSError] = useState(false)
+  const [modalVisible, setmodalVisible] = useState(false)
+
+  const scope = useSelector((store: IStoreState) => getScope(store))
+
+  const toggleUserActivationModal = () => {
+    setmodalVisible(true)
+  }
+
+  const resendSMS = async (userId: string) => {
+    try {
+      const res = await userMutations.resendSMSInvite(userId, [
+        {
+          query: GET_USER,
+          variables: {
+            userId: userId
+          }
+        }
+      ])
+      if (res && res.data && res.data.resendSMSInvite) {
+        setShowResendSMSSuccess(true)
+        // setState({ showResendSMSSuccess: true })
+      }
+    } catch (err) {
+      setShowResendSMSError(true)
+      // setState({ showResendSMSError: true })
+    }
+  }
+
+  const getMenuItems = (userId: string, status: string) => {
+    const menuItems: { label: string; handler: () => void }[] = [
+      {
+        label: intl.formatMessage(sysMessages.editUserDetailsTitle),
+        handler: () => dispatch(goToReviewUserDetails(userId))
+      }
+    ]
+
+    if (status !== 'deactivated' && status !== 'disabled') {
+      menuItems.push({
+        label: intl.formatMessage(sysMessages.resendSMS),
+        handler: () => {
+          resendSMS(userId)
+        }
+      })
+    }
+
+    if (status === 'active') {
+      menuItems.push({
+        label: intl.formatMessage(sysMessages.deactivate),
+        handler: () => toggleUserActivationModal()
+      })
+    }
+
+    if (status === 'deactivated') {
+      menuItems.push({
+        label: intl.formatMessage(sysMessages.reactivate),
+        handler: () => toggleUserActivationModal()
+      })
+    }
+    return menuItems
+  }
 
   const transformUserQueryResult = (userData?: GQLUser) => {
     if (!userData) {
@@ -159,10 +247,22 @@ export const UserAudit = () => {
               <Content
                 title={user.name}
                 showTitleOnMobile={true}
-                // titleColor={declaration.name ? 'copy' : 'grey600'}
                 icon={() => (
                   <UserAvatar name={user.name} avatar={user.avatar} />
                 )}
+                topActionButtons={[
+                  <Status status={user.status || 'pending'} />,
+
+                  <ToggleMenu
+                    id={`sub-page-header-munu-button`}
+                    toggleButton={<VerticalThreeDots />}
+                    menuItems={getMenuItems(
+                      user.id as string,
+                      user.status as string
+                    )}
+                    hide={(scope && !scope.includes('sysadmin')) || false}
+                  />
+                ]}
                 size={ContentSize.LARGE}
               >
                 <ContentWrapper>
@@ -171,7 +271,14 @@ export const UserAudit = () => {
                       {intl.formatMessage(userSetupMessages.assignedOffice)}
                     </InformationTitle>
                     <InformationValue>
-                      {user.primaryOffice && user.primaryOffice.displayLabel}
+                      <LinkButtonWithoutSpacing
+                        id="office-link"
+                        onClick={() =>
+                          dispatch(goToTeamUserList(user.primaryOffice!.id))
+                        }
+                      >
+                        {user.primaryOffice && user.primaryOffice.displayLabel}
+                      </LinkButtonWithoutSpacing>
                     </InformationValue>
                   </InformationHolder>
                   <InformationHolder>
@@ -202,6 +309,41 @@ export const UserAudit = () => {
                     </InformationTitle>
                     <InformationValue>{user.startDate}</InformationValue>
                   </InformationHolder>
+
+                  <UserAuditActionModal
+                    show={modalVisible}
+                    user={data && data.getUser}
+                    onClose={() => toggleUserActivationModal()}
+                    onConfirmRefetchQueries={[
+                      {
+                        query: GET_USER,
+                        variables: {
+                          userId: userId
+                        }
+                      }
+                    ]}
+                  />
+                  {showResendSMSSuccess && (
+                    <Toast
+                      id="resend_invite_success"
+                      type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
+                      show={showResendSMSSuccess}
+                      callback={() => setShowResendSMSSuccess(false)}
+                    >
+                      {intl.formatMessage(sysMessages.resendSMSSuccess)}
+                    </Toast>
+                  )}
+                  {showResendSMSError && (
+                    <Toast
+                      id="resend_invite_error"
+                      type={FLOATING_NOTIFICATION_TYPE.ERROR}
+                      show={showResendSMSError}
+                      callback={() => setShowResendSMSError(false)}
+                    >
+                      {intl.formatMessage(sysMessages.resendSMSError)}
+                    </Toast>
+                  )}
+                  <UserAuditList user={user} />
                 </ContentWrapper>
               </Content>
             )
