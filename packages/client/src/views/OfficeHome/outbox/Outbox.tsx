@@ -30,11 +30,30 @@ import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { formatLongDate } from '@client/utils/date-formatting'
 import styled from '@client/styledComponents'
+import {
+  IconWithName,
+  NameContainer,
+  NoNameContainer
+} from '@client/views/OfficeHome/components'
 
 const IconContainer = styled.div`
   display: flex;
   justify-content: flex-end;
 `
+function getFullName(firstName?: string, lastName?: string) {
+  let fullName = ''
+  if (firstName) {
+    fullName += firstName
+  }
+  if (lastName) {
+    if (fullName) {
+      fullName += ' '
+    }
+    fullName += lastName
+  }
+  return fullName
+}
+
 export function Outbox() {
   const intl = useIntl()
   const [width, setWidth] = React.useState(window.innerWidth)
@@ -161,53 +180,46 @@ export function Outbox() {
   function transformDeclarationsReadyToSend() {
     return declarations.map((declaration, index) => {
       let name
+      let dateOfEvent
       if (declaration.event && declaration.event.toString() === 'birth') {
         name =
-          (declaration.data &&
-            declaration.data.child &&
-            declaration.data.child.familyNameEng &&
-            (!declaration.data.child.firstNamesEng
-              ? ''
-              : declaration.data.child.firstNamesEng + ' ') +
-              declaration.data.child.familyNameEng) ||
-          (declaration.data &&
-            declaration.data.child &&
-            declaration.data.child.familyName &&
-            (!declaration.data.child.firstNames
-              ? ''
-              : declaration.data.child.firstNames + ' ') +
-              declaration.data.child.familyName) ||
-          ''
+          getFullName(
+            declaration.data?.child?.firstNamesEng as string,
+            declaration.data?.child?.familyNameEng as string
+          ) ||
+          getFullName(
+            declaration.data?.child?.firstNames as string,
+            declaration.data?.child?.familyName as string
+          )
+        dateOfEvent = declaration.data?.child?.childBirthDate as string
       } else if (
         declaration.event &&
         declaration.event.toString() === 'death'
       ) {
         name =
-          (declaration.data &&
-            declaration.data.deceased &&
-            declaration.data.deceased.familyNameEng &&
-            (!declaration.data.deceased.firstNamesEng
-              ? ''
-              : declaration.data.deceased.firstNamesEng + ' ') +
-              declaration.data.deceased.familyNameEng) ||
-          (declaration.data &&
-            declaration.data.deceased &&
-            declaration.data.deceased.familyName &&
-            (!declaration.data.deceased.firstNames
-              ? ''
-              : declaration.data.deceased.firstNames + ' ') +
-              declaration.data.deceased.familyName) ||
-          ''
+          getFullName(
+            declaration.data?.deceased?.firstNamesEng as string,
+            declaration.data?.deceased?.familyNameEng as string
+          ) ||
+          getFullName(
+            declaration.data?.deceased?.firstNames as string,
+            declaration.data?.deceased?.familyName as string
+          )
+        dateOfEvent = declaration.data?.deathEvent?.deathDate as string
       }
 
       const { statusText, icon } = submissionStatusMap(
         declaration.submissionStatus || '',
         index
       )
-      const dateOfEvent =
-        (declaration.data.child?.childBirthDate as string) ||
-        (declaration.data.deathEvent?.deathDate as string)
 
+      const NameComponent = name ? (
+        <NameContainer isBoldLink>{name}</NameContainer>
+      ) : (
+        <NoNameContainer>
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         id: declaration.id,
         event:
@@ -216,7 +228,12 @@ export function Outbox() {
               dynamicConstantsMessages[declaration.event.toLowerCase()]
             )) ||
           '',
-        name,
+        statusIconAndName: (
+          <IconWithName
+            status={declaration.registrationStatus || 'IN_PROGRESS'}
+            name={NameComponent}
+          />
+        ),
         submissionStatus: statusText || '',
         statusIndicator: icon ? <IconContainer>{icon()}</IconContainer> : null,
         dateOfEvent: dateOfEvent ? formatLongDate(dateOfEvent) : ''
@@ -235,7 +252,7 @@ export function Outbox() {
           {
             width: 25,
             label: intl.formatMessage(constantsMessages.name),
-            key: 'name'
+            key: 'statusIconAndName'
           },
           {
             label: intl.formatMessage(constantsMessages.event),
