@@ -1,33 +1,37 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+
 import React from 'react'
 import { Header } from '@client/components/Header/Header'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { userMessages as messages } from '@client/i18n/messages'
 import { Navigation } from '@client/components/interface/Navigation'
-import { Content } from '@opencrvs/components/lib/Content'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { useIntl } from 'react-intl'
-import { UserList } from '../SysAdmin/Team/user/UserList'
 import { Query } from '@client/components/Query'
-import { RouteComponentProps, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { GET_USER } from '@client/user/queries'
-import {
-  SysAdminContentWrapper,
-  SysAdminPageVariant
-} from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { GQLUser, GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
-import { SearchRed, VerticalThreeDots } from '@opencrvs/components/lib/icons'
-import { Avatar } from '@client/components/Avatar'
-import styled from 'styled-components'
-import { LoadingGrey } from '@client/../../components/lib'
-import { LinkButton } from '@client/../../components/lib/buttons'
-import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
-import { IUserData } from '../SysAdmin/Team/user/userProfilie/UserProfile'
-import { LANG_EN } from '@client/utils/constants'
-import { getJurisdictionLocationIdFromUserDetails } from '../SysAdmin/Performance/utils'
-import { IUserDetails } from '@client/utils/userUtils'
 import format from '@client/utils/date-formatting'
+import { AvatarSmall } from '@client/components/Avatar'
+import styled from 'styled-components'
+import { Loader, LoadingGrey } from '@client/../../components/lib'
+import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
+import { LANG_EN } from '@client/utils/constants'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { IUserDetails } from '@client/utils/userUtils'
+import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -37,15 +41,7 @@ const ContentWrapper = styled.div`
   color: ${({ theme }) => theme.colors.copy};
 `
 
-const UserAvatar = styled(Avatar)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
-  }
-`
-
-const NameHolder = styled.div`
-  ${({ theme }) => theme.fonts.h1};
-  margin: 20px auto 30px;
+const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
@@ -92,13 +88,6 @@ const HeaderMenuHolder = styled.div`
     margin: auto 8px;
   }
 `
-const LinkButtonWithoutSpacing = styled(LinkButton)`
-  & > * {
-    padding: 0;
-  }
-  height: auto !important;
-`
-
 interface IRouteProps {
   userId: string
 }
@@ -152,49 +141,43 @@ export const UserAudit = () => {
       header={<Header title={intl.formatMessage(messages.settingsTitle)} />}
       navigation={<Navigation />}
     >
-      <Content
-        title={intl.formatMessage(messages.settingsTitle)}
-        showTitleOnMobile={true}
+      <Query
+        query={GET_USER}
+        variables={{
+          userId: userId
+        }}
+        fetchPolicy={'cache-and-network'}
       >
-        <Query
-          query={GET_USER}
-          variables={{
-            userId: userId
-          }}
-          // fetchPolicy={'cache-and-network'}
-        >
-          {({ data, loading, error }) => {
-            console.log(data)
-            console.log(error)
-            if (data) {
-              const user = transformUserQueryResult(data && data.getUser)
-              console.log(user, 'USER')
-              const userRole = getUserRole(user, intl)
-              const userType = getUserType(user, intl)
-
-              return (
-                <ContentWrapper>
+        {({ data, loading, error }) => {
+          if (loading) {
+            return <Loader id="user_loader" marginPercent={35} />
+          } else {
+            const user = transformUserQueryResult(data && data.getUser)
+            const userRole = getUserRole(user, intl)
+            const userType = getUserType(user, intl)
+            return (
+              <Content
+                title={user.name}
+                showTitleOnMobile={true}
+                // titleColor={declaration.name ? 'copy' : 'grey600'}
+                icon={() => (
                   <UserAvatar name={user.name} avatar={user.avatar} />
-                  <NameHolder>{user.name}</NameHolder>
-                  {/* <InformationHolder>
-                        <InformationTitle>
-                          {intl.formatMessage(messages.assignedOffice)}
-                        </InformationTitle>
-                        <InformationValue>
-                          <LinkButtonWithoutSpacing
-                            id="office-link"
-                            onClick={() =>
-                              this.props.goToTeamUserList(user.primaryOffice!.id)
-                            }
-                          >
-                            {user.primaryOffice &&
-                              user.primaryOffice.displayLabel}
-                          </LinkButtonWithoutSpacing>
-                        </InformationValue>
-                      </InformationHolder> */}
+                )}
+                size={ContentSize.LARGE}
+              >
+                <ContentWrapper>
                   <InformationHolder>
                     <InformationTitle>
-                      {(userType && intl.formatMessage(messages.roleType)) ||
+                      {intl.formatMessage(userSetupMessages.assignedOffice)}
+                    </InformationTitle>
+                    <InformationValue>
+                      {user.primaryOffice && user.primaryOffice.displayLabel}
+                    </InformationValue>
+                  </InformationHolder>
+                  <InformationHolder>
+                    <InformationTitle>
+                      {(userType &&
+                        intl.formatMessage(userSetupMessages.roleType)) ||
                         intl.formatMessage(userFormMessages.type)}
                     </InformationTitle>
                     <InformationValue>
@@ -203,67 +186,28 @@ export const UserAudit = () => {
                   </InformationHolder>
                   <InformationHolder>
                     <InformationTitle>
-                      {intl.formatMessage(messages.phoneNumber)}
+                      {intl.formatMessage(userSetupMessages.phoneNumber)}
                     </InformationTitle>
                     <InformationValue>{user.number}</InformationValue>
                   </InformationHolder>
                   <InformationHolder>
                     <InformationTitle>
-                      {intl.formatMessage(messages.userName)}
+                      {intl.formatMessage(userSetupMessages.userName)}
                     </InformationTitle>
                     <InformationValue>{user.username}</InformationValue>
                   </InformationHolder>
                   <InformationHolder>
                     <InformationTitle>
-                      {intl.formatMessage(messages.startDate)}
+                      {intl.formatMessage(userSetupMessages.startDate)}
                     </InformationTitle>
                     <InformationValue>{user.startDate}</InformationValue>
                   </InformationHolder>
-                  {/* <UserAuditActionModal
-                        show={this.state.modalVisible}
-                        user={data && data.getUser}
-                        onClose={() => this.toggleUserActivationModal()}
-                        onConfirmRefetchQueries={[
-                          {
-                            query: GET_USER,
-                            variables: {
-                              userId: match.params.userId
-                            }
-                          }
-                        ]}
-                      />
-                      {showResendSMSSuccess && (
-                        <Toast
-                          id="resend_invite_success"
-                          type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
-                          show={showResendSMSSuccess}
-                          callback={() =>
-                            this.setState({ showResendSMSSuccess: false })
-                          }
-                        >
-                          {intl.formatMessage(sysMessages.resendSMSSuccess)}
-                        </Toast>
-                      )}
-                      {showResendSMSError && (
-                        <Toast
-                          id="resend_invite_error"
-                          type={FLOATING_NOTIFICATION_TYPE.ERROR}
-                          show={showResendSMSError}
-                          callback={() =>
-                            this.setState({ showResendSMSError: false })
-                          }
-                        >
-                          {intl.formatMessage(sysMessages.resendSMSError)}
-                        </Toast>
-                      )}
-                      <UserAuditList user={user} /> */}
                 </ContentWrapper>
-              )
-            }
-          }}
-        </Query>
-      </Content>
+              </Content>
+            )
+          }
+        }}
+      </Query>
     </Frame>
   )
-  // }
 }
