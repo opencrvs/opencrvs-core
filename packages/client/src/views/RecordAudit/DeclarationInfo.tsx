@@ -134,9 +134,9 @@ export const GetDeclarationInfo = ({
               ? format(new Date(value), 'MMMM dd, yyyy')
               : value)
 
-          const placeholder = intl.formatMessage(
+          const message =
             recordAuditMessages[`no${key[0].toUpperCase()}${key.slice(1)}`]
-          )
+          const placeholder = message && intl.formatMessage(message)
 
           return (
             <Summary.Row
