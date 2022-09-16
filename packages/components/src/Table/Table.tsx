@@ -20,7 +20,6 @@ import {
 import { Pagination } from '../Pagination'
 
 const Wrapper = styled.div<{
-  isFullPage?: boolean
   fixedWidth: number | undefined
 }>`
   ${({ fixedWidth }) =>
@@ -32,7 +31,6 @@ const Wrapper = styled.div<{
   background: ${({ theme }) => theme.colors.white};
 `
 const TableHeader = styled.div<{
-  isSortable?: boolean
   totalWidth?: number
   fixedWidth?: number
 }>`
@@ -106,7 +104,12 @@ const RowWrapper = styled.div<{
     ${({ height }) => height && `min-height: ${height.md}px;`};
   }
 `
-const TableFooter = styled(RowWrapper)`
+const TableFooter = styled(RowWrapper)<{
+  totalWidth?: number
+  fixedWidth?: number
+}>`
+  ${({ fixedWidth, totalWidth }) =>
+    fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
   display: flex;
   align-items: top;
   background: ${({ theme }) => theme.colors.grey100};
@@ -356,7 +359,6 @@ export class Table extends React.Component<ITableProps, ITableState> {
         {!isLoading && (
           <Wrapper
             id={`listTable-${id}`}
-            isFullPage={isFullPage}
             fixedWidth={fixedWidth}
             ref={this.tableRef}
           >
@@ -448,6 +450,7 @@ export class Table extends React.Component<ITableProps, ITableState> {
                 <TableFooter
                   id={'Table-' + id + '-footer'}
                   totalWidth={totalWidth}
+                  fixedWidth={fixedWidth}
                   columns={columns}
                 >
                   {footerColumns.map((preference, index) => (
