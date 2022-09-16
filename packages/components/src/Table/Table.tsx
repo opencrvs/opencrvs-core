@@ -374,7 +374,6 @@ export class Table extends React.Component<ITableProps, ITableState> {
       rowStyle,
       hideTableHeader,
       hideTableBottomBorder,
-      alignItemCenter,
       footerColumns,
       highlightRowOnMouseOver,
       isFullPage,
@@ -454,7 +453,6 @@ export class Table extends React.Component<ITableProps, ITableState> {
                           height={rowStyle?.height}
                           horizontalPadding={rowStyle?.horizontalPadding}
                           hideTableBottomBorder={hideTableBottomBorder}
-                          alignItemCenter={alignItemCenter}
                           columns={columns}
                         >
                           {columns.map((preference, indx) => {

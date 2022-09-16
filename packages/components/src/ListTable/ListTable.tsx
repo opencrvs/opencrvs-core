@@ -86,7 +86,6 @@ const RowWrapper = styled.div<{
   height?: IBreakpoint
   horizontalPadding?: IBreakpoint
   hideTableBottomBorder?: boolean
-  alignItemCenter?: boolean
 }>`
   width: 100%;
   /* min-height: 48px; */
@@ -100,15 +99,13 @@ const RowWrapper = styled.div<{
   }
 
   display: flex;
-  ${({ alignItemCenter }) => alignItemCenter && `align-items: start`};
+
   ${({ height }) =>
-    height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
+    height ? `min-height:${height.lg}px;` : `min-height: 48px;`};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ height }) =>
-      height ? `min-height:${height.md}px` : `min-height: 48px)`};
+      height ? `min-height:${height.md}px;` : `min-height: 48px;`};
   }
-  ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.grey100};}`}
 
   & span:first-child {
     ${({ horizontalPadding }) =>
@@ -287,7 +284,6 @@ interface IListTableProps {
   hideBoxShadow?: boolean
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
-  alignItemCenter?: boolean
   loadMoreText?: string
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
@@ -378,7 +374,6 @@ export class ListTable extends React.Component<
       hideBoxShadow,
       hideTableHeader,
       hideTableBottomBorder,
-      alignItemCenter,
       footerColumns,
       loadMoreText,
       highlightRowOnMouseOver,
@@ -458,7 +453,6 @@ export class ListTable extends React.Component<
                           height={rowStyle?.height}
                           horizontalPadding={rowStyle?.horizontalPadding}
                           hideTableBottomBorder={hideTableBottomBorder || false}
-                          alignItemCenter={alignItemCenter}
                         >
                           {columns.map((preference, indx) => {
                             return (

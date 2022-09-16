@@ -299,7 +299,6 @@ export const GetHistory = ({
           noResultText=""
           columns={columns}
           content={historyData}
-          alignItemCenter={true}
           highlightRowOnMouseOver
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
