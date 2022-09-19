@@ -142,6 +142,8 @@ SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
 
+SHARED_COMPOSE_FILES="docker-compose.deps.yml docker-compose.yml docker-compose.deploy.yml"
+
 # Rotate MongoDB credentials
 # https://unix.stackexchange.com/a/230676
 generate_password() {
@@ -219,44 +221,124 @@ rotate_secrets() {
 # Setup configuration files and compose file for the deployment domain
 ssh $SSH_USER@$SSH_HOST "SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME=$SMTP_USERNAME SMTP_PASSWORD=$SMTP_PASSWORD ALERT_EMAIL=$ALERT_EMAIL /opt/opencrvs/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
 
+# Takes in a space separated string of docker-compose.yml files
+# returns a new line separated list of images defined in those files
+get_docker_tags_from_compose_files() {
+   COMPOSE_FILES=$1
+
+   SPACE_SEPARATED_COMPOSE_FILE_LIST=$(printf " %s" "${COMPOSE_FILES[@]}")
+   SPACE_SEPARATED_COMPOSE_FILE_LIST=${SPACE_SEPARATED_COMPOSE_FILE_LIST:1}
+
+   IMAGE_TAG_LIST=$(cat $SPACE_SEPARATED_COMPOSE_FILE_LIST \
+   `# Select rows with the image tag` \
+   | grep image: \
+   `# Only keep the image version` \
+   | sed "s/image://")
+
+   # SOME_VARIABLE:-some-default VERSION:-latest
+   IMAGE_TAGS_WITH_VARIABLE_SUBSTITUTIONS_WITH_DEFAULTS=$(echo $IMAGE_TAG_LIST \
+   `# Matches variables with default values like VERSION:-latest` \
+   | grep -o "[A-Za-z_0-9]\+:-[A-Za-z_0-9.-]\+" \
+   | sort --unique)
+
+   # This reads Docker image tag definitions with a variable substitution
+   # and defines the environment variables with the defaults unles the variable is already present.
+   # Done as a preprosessing step for envsubs
+   for VARIABLE_NAME_WITH_DEFAULT_VALUE in ${IMAGE_TAGS_WITH_VARIABLE_SUBSTITUTIONS_WITH_DEFAULTS[@]}; do
+      IFS=':' read -r -a variable_and_default <<< "$VARIABLE_NAME_WITH_DEFAULT_VALUE"
+      VARIABLE_NAME="${variable_and_default[0]}"
+      # Read default value and remove the leading hyphen
+      DEFAULT_VALUE=$(echo ${variable_and_default[1]} | sed "s/^-//")
+      CURRENT_VALUE=$(echo "${!VARIABLE_NAME}")
+
+      if [ -z "${!VARIABLE_NAME}" ]; then
+         IMAGE_TAG_LIST=$(echo $IMAGE_TAG_LIST | sed "s/\${$VARIABLE_NAME:-$DEFAULT_VALUE}/$DEFAULT_VALUE/g")
+      else
+         IMAGE_TAG_LIST=$(echo $IMAGE_TAG_LIST | sed "s/\${$VARIABLE_NAME:-$DEFAULT_VALUE}/$CURRENT_VALUE/g")
+      fi
+   done
+
+   IMAGE_TAG_LIST_WITHOUT_VARIABLE_SUBSTITUTION_DEFAULT_VALUES=$(echo $IMAGE_TAG_LIST \
+   | sed -E "s/:-[A-Za-z_0-9]+//g" \
+   | sed -E "s/[{}]//g")
+
+   echo $IMAGE_TAG_LIST_WITHOUT_VARIABLE_SUBSTITUTION_DEFAULT_VALUES \
+   | envsubst \
+   | sed 's/ /\n/g'
+}
+
+split_and_join() {
+   separator_for_splitting=$1
+   separator_for_joining=$2
+   text=$3
+   SPLIT=$(echo $text | sed -e "s/$separator_for_splitting/$separator_for_joining/g")
+   echo $SPLIT
+}
+
 docker_stack_deploy() {
   environment_compose=$1
   replicas_compose=$2
   echo "DEPLOYING THIS ENVIRONMENT: $environment_compose"
   echo "DEPLOYING THESE REPLICAS: $replicas_compose"
+
+
+  ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS=$(echo "$environment_compose" | sed "s|docker-compose.countryconfig|$COUNTRY_CONFIG_PATH/docker-compose.countryconfig|")
+
+  ENV_VARIABLES="HOSTNAME=$HOST
+  VERSION=$VERSION
+  COUNTRY_CONFIG_VERSION=$COUNTRY_CONFIG_VERSION
+  PAPERTRAIL=$PAPERTRAIL
+  USER_MGNT_MONGODB_PASSWORD=$USER_MGNT_MONGODB_PASSWORD
+  HEARTH_MONGODB_PASSWORD=$HEARTH_MONGODB_PASSWORD
+  CONFIG_MONGODB_PASSWORD=$CONFIG_MONGODB_PASSWORD
+  OPENHIM_MONGODB_PASSWORD=$OPENHIM_MONGODB_PASSWORD
+  WEBHOOKS_MONGODB_PASSWORD=$WEBHOOKS_MONGODB_PASSWORD
+  MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER
+  MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD
+  DOCKERHUB_ACCOUNT=$DOCKERHUB_ACCOUNT
+  DOCKERHUB_REPO=$DOCKERHUB_REPO
+  ELASTICSEARCH_SUPERUSER_PASSWORD=$ELASTICSEARCH_SUPERUSER_PASSWORD
+  ROTATING_METRICBEAT_ELASTIC_PASSWORD=$ROTATING_METRICBEAT_ELASTIC_PASSWORD
+  ROTATING_APM_ELASTIC_PASSWORD=$ROTATING_APM_ELASTIC_PASSWORD
+  ROTATING_SEARCH_ELASTIC_PASSWORD=$ROTATING_SEARCH_ELASTIC_PASSWORD
+  KIBANA_USERNAME=$KIBANA_USERNAME
+  KIBANA_PASSWORD=$KIBANA_PASSWORD"
+
+  echo "Pulling all docker images. This might take a while"
+
+  EXISTING_IMAGES=$(ssh $SSH_USER@$SSH_HOST "docker images --format '{{.Repository}}:{{.Tag}}'")
+  IMAGE_TAGS_TO_DOWNLOAD=$(get_docker_tags_from_compose_files "$SHARED_COMPOSE_FILES $ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS $replicas_compose")
+
+  for tag in ${IMAGE_TAGS_TO_DOWNLOAD[@]}; do
+    if [[ $EXISTING_IMAGES == *"$tag"* ]]; then
+      echo "$tag already exists on the machine. Skipping..."
+      continue
+    fi
+
+    echo "Downloading $tag"
+
+    until ssh $SSH_USER@$SSH_HOST "cd /opt/opencrvs && docker pull $tag"
+    do
+      echo "Server failed to download $tag. Retrying..."
+      sleep 5
+    done
+  done
+
+  echo "Updating docker swarm stack with new compose files"
   ssh $SSH_USER@$SSH_HOST 'cd /opt/opencrvs && \
-    HOSTNAME='$HOST' \
-    VERSION='$VERSION' \
-    COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' \
-    PAPERTRAIL='$PAPERTRAIL' \
-    USER_MGNT_MONGODB_PASSWORD='$USER_MGNT_MONGODB_PASSWORD' \
-    HEARTH_MONGODB_PASSWORD='$HEARTH_MONGODB_PASSWORD' \
-    CONFIG_MONGODB_PASSWORD='$CONFIG_MONGODB_PASSWORD' \
-    OPENHIM_MONGODB_PASSWORD='$OPENHIM_MONGODB_PASSWORD' \
-    WEBHOOKS_MONGODB_PASSWORD='$WEBHOOKS_MONGODB_PASSWORD' \
-    MONGODB_ADMIN_USER='$MONGODB_ADMIN_USER' \
-    MONGODB_ADMIN_PASSWORD='$MONGODB_ADMIN_PASSWORD' \
-    DOCKERHUB_ACCOUNT='$DOCKERHUB_ACCOUNT' \
-    DOCKERHUB_REPO='$DOCKERHUB_REPO' \
-    ELASTICSEARCH_SUPERUSER_PASSWORD='$ELASTICSEARCH_SUPERUSER_PASSWORD' \
-    ROTATING_METRICBEAT_ELASTIC_PASSWORD='$ROTATING_METRICBEAT_ELASTIC_PASSWORD' \
-    ROTATING_APM_ELASTIC_PASSWORD='$ROTATING_APM_ELASTIC_PASSWORD' \
-    ROTATING_SEARCH_ELASTIC_PASSWORD='$ROTATING_SEARCH_ELASTIC_PASSWORD' \
-    KIBANA_USERNAME='$KIBANA_USERNAME' \
-    KIBANA_PASSWORD='$KIBANA_PASSWORD' \
-    docker stack deploy --prune -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml '$environment_compose' '$replicas_compose' --with-registry-auth opencrvs'
+    '$ENV_VARIABLES' docker stack deploy --prune -c '$(split_and_join " " " -c " "$SHARED_COMPOSE_FILES $environment_compose $replicas_compose")' --with-registry-auth opencrvs'
 }
 
 FILES_TO_ROTATE="/opt/opencrvs/docker-compose.deploy.yml"
 
 if [ "$REPLICAS" = "3" ]; then
-  REPLICAS_COMPOSE="-c docker-compose.replicas-3.yml -c docker-compose.countryconfig.replicas-3.yml"
+  REPLICAS_COMPOSE="docker-compose.replicas-3.yml docker-compose.countryconfig.replicas-3.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.replicas-3.yml"
 elif [ "$REPLICAS" = "5" ]; then
-  REPLICAS_COMPOSE="-c docker-compose.replicas-5.yml -c docker-compose.countryconfig.replicas-5.yml"
+  REPLICAS_COMPOSE="docker-compose.replicas-5.yml docker-compose.countryconfig.replicas-5.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.replicas-5.yml"
 elif [ "$REPLICAS" = "1" ]; then
-  REPLICAS_COMPOSE="-c docker-compose.countryconfig.replicas-1.yml"
+  REPLICAS_COMPOSE="docker-compose.countryconfig.replicas-1.yml"
 else
   echo "Unknown error running docker-compose on server as REPLICAS is not 1, 3 or 5."
   exit 1
@@ -264,16 +346,16 @@ fi
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
-  ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.staging-deploy.yml -c docker-compose.staging-deploy.yml"
+  ENVIRONMENT_COMPOSE="docker-compose.countryconfig.staging-deploy.yml docker-compose.staging-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.staging-deploy.yml /opt/opencrvs/docker-compose.staging-deploy.yml"
 elif [[ "$ENV" = "qa" ]]; then
-  ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.qa-deploy.yml -c docker-compose.qa-deploy.yml"
+  ENVIRONMENT_COMPOSE="docker-compose.countryconfig.qa-deploy.yml docker-compose.qa-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.qa-deploy.yml /opt/opencrvs/docker-compose.qa-deploy.yml"
 elif [[ "$ENV" = "production" ]]; then
-  ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.prod-deploy.yml -c docker-compose.prod-deploy.yml"
+  ENVIRONMENT_COMPOSE="docker-compose.countryconfig.prod-deploy.yml docker-compose.prod-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.prod-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 elif [[ "$ENV" = "demo" ]]; then
-  ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.demo-deploy.yml -c docker-compose.prod-deploy.yml"
+  ENVIRONMENT_COMPOSE="docker-compose.countryconfig.demo-deploy.yml docker-compose.prod-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.demo-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 else
   echo "Unknown error running docker-compose on server as ENV is not staging, qa or production."
