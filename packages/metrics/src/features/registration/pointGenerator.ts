@@ -144,9 +144,6 @@ export const generateCertificationPoint = async (
   payload: fhir.Bundle,
   authHeader: IAuthHeader
 ): Promise<IPoints> => {
-  console.log(payload)
-  console.log(payload)
-
   const composition = getComposition(payload)
 
   if (!composition) {
