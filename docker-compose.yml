@@ -167,3 +167,4 @@ services:
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
+      - WAIT_HOSTS=mongo1:27017,influxdb:8086
