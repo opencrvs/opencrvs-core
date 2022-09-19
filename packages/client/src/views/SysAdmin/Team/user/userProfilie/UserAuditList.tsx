@@ -53,6 +53,13 @@ import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
 import format from '@client/utils/date-formatting'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import {
+  IOnlineStatusProps,
+  LoadingIndicator,
+  withOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -102,7 +109,7 @@ interface IBaseProp {
   isLoading?: boolean
 }
 
-type Props = WrappedComponentProps & IBaseProp
+type Props = WrappedComponentProps & IBaseProp & IOnlineStatusProps
 
 type State = {
   timeStart: Date
@@ -151,7 +158,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
     })
   }
 
-  setCurrentPage(currentPage: number) {
+  setCurrentPage = (currentPage: number) => {
     this.setState({ currentPageNumber: currentPage })
   }
 
@@ -180,7 +187,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
       columns = [
         {
           label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 47,
+          width: 48,
           key: 'actionDescription'
         },
         {
@@ -258,8 +265,6 @@ class UserAuditListComponent extends React.Component<Props, State> {
   }
 
   getAuditData(data: GQLQuery, user?: IUserData) {
-    console.log('data', data)
-    console.log('user', user)
     if (
       !user ||
       !data ||
@@ -351,9 +356,9 @@ class UserAuditListComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, user, theme, isLoading } = this.props
-    const { timeStart, timeEnd } = this.state
-    const recordCount = DEFAULT_LIST_SIZE * this.state.currentPageNumber
+    const { intl, user, theme, isLoading, isOnline } = this.props
+    const { timeStart, timeEnd, currentPageNumber } = this.state
+    const recordCount = DEFAULT_LIST_SIZE * currentPageNumber
 
     return (
       <RecentActionsHolder id="user-audit-list">
@@ -380,7 +385,8 @@ class UserAuditListComponent extends React.Component<Props, State> {
                   timeEnd: timeEnd.toISOString(),
                   practitionerId: user && user.practitionerId,
                   locationId: user && user.locationId,
-                  count: recordCount
+                  count: DEFAULT_LIST_SIZE,
+                  skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1)
                 }}
                 fetchPolicy={'no-cache'}
               >
@@ -388,36 +394,46 @@ class UserAuditListComponent extends React.Component<Props, State> {
                   if (error) {
                     return this.getLoadingAuditListView(true)
                   } else {
-                    const totalItems =
+                    const totalItems = Number(
                       (data &&
                         data.fetchTimeLoggedMetricsByPractitioner &&
                         data.fetchTimeLoggedMetricsByPractitioner.totalItems) ||
-                      0
+                        0
+                    )
 
                     return (
-                      <TableView
-                        columns={this.getAuditColumns()}
-                        content={this.getAuditData(data, user)}
-                        noResultText={intl.formatMessage(messages.noAuditFound)}
-                        isLoading={loading}
-                        hideBoxShadow={true}
-                        hideTableHeader={
-                          this.state.viewportWidth <= theme.grid.breakpoints.md
-                        }
-                        currentPage={this.state.currentPageNumber}
-                        pageSize={recordCount}
-                        totalItems={totalItems}
-                        onPageChange={(currentPage: number) => {
-                          this.setCurrentPage(currentPage)
-                        }}
-                        loadMoreText={intl.formatMessage(
-                          messages.showMoreAuditList,
-                          {
-                            pageSize: DEFAULT_LIST_SIZE,
-                            totalItems: totalItems
+                      <>
+                        <TableView
+                          columns={this.getAuditColumns()}
+                          content={this.getAuditData(data, user)}
+                          noResultText={intl.formatMessage(
+                            messages.noAuditFound
+                          )}
+                          hideBoxShadow={true}
+                          hideTableHeader={
+                            this.state.viewportWidth <=
+                            theme.grid.breakpoints.md
                           }
+                          currentPage={currentPageNumber}
+                          onPageChange={(currentPage: number) => {
+                            this.setCurrentPage(currentPage)
+                          }}
+                        />
+                        {totalItems > DEFAULT_LIST_SIZE && isOnline && (
+                          <Pagination
+                            initialPage={currentPageNumber}
+                            totalPages={Math.ceil(
+                              totalItems / DEFAULT_LIST_SIZE
+                            )}
+                            onPageChange={this.setCurrentPage}
+                          />
                         )}
-                      />
+
+                        <LoadingIndicator
+                          loading={loading ? true : false}
+                          hasError={error ? true : false}
+                        />
+                      </>
                     )
                   }
                 }}
@@ -430,4 +446,6 @@ class UserAuditListComponent extends React.Component<Props, State> {
   }
 }
 
-export const UserAuditList = withTheme(injectIntl(UserAuditListComponent))
+export const UserAuditList = withTheme(
+  injectIntl(withOnlineStatus(UserAuditListComponent))
+)
