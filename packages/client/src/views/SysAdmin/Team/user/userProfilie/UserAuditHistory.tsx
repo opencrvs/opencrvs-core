@@ -119,7 +119,7 @@ type State = {
   currentPageNumber: number
 }
 
-class UserAuditListComponent extends React.Component<Props, State> {
+class UserAuditHistoryComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     window.__localeId__ = props.intl.locale
@@ -446,6 +446,6 @@ class UserAuditListComponent extends React.Component<Props, State> {
   }
 }
 
-export const UserAuditList = withTheme(
-  injectIntl(withOnlineStatus(UserAuditListComponent))
+export const UserAuditHistory = withTheme(
+  injectIntl(withOnlineStatus(UserAuditHistoryComponent))
 )

@@ -46,7 +46,7 @@ import {
   Toast,
   NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/Toast'
-import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
+import { UserAuditHistory } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditHistory'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -317,7 +317,7 @@ export const UserAudit = () => {
                       {intl.formatMessage(sysMessages.resendSMSError)}
                     </Toast>
                   )}
-                  <UserAuditList user={user} />
+                  <UserAuditHistory user={user} />
                 </ContentWrapper>
               </Content>
             )
