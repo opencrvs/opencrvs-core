@@ -55,7 +55,8 @@ import {
   getRegLastOffice,
   getEncounterLocationType,
   getPractitionerIdFromBundle,
-  fetchDeclarationsBeginnerRole, USER_ACTION
+  fetchDeclarationsBeginnerRole,
+  IUserAuditBody
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -625,16 +626,14 @@ export async function generateRejectedPoints(
 }
 
 export const generateAuditPoint = async (
-  payload: fhir.Bundle,
-  action: USER_ACTION,
-  authHeader: IAuthHeader
+  payload: IUserAuditBody
 ): Promise<IPoints> => {
   const tags: IUserAuditTags = {
-    action: action,
-    practitionerId: getPractitionerIdFromBundle(payload)
+    action: payload.action,
+    practitionerId: getPractitionerIdFromBundle(payload.bundle)
   }
   const fields: IUserAuditFields = {
-    data: undefined
+    data: payload.additionalData
   }
   return {
     measurement: 'user_audit_event',

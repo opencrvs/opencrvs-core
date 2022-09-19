@@ -75,6 +75,12 @@ export type USER_ACTION =
   | 'LOGGED_IN'
   | 'LOGGED_OUT'
 
+export interface IUserAuditBody {
+  bundle: fhir.Bundle
+  action: USER_ACTION
+  additionalData?: string
+}
+
 export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'
 
 function findPreviousTask(

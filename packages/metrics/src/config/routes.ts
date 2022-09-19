@@ -46,6 +46,7 @@ import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
 import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import { newAuditHandler } from '@metrics/features/audit/handler'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -523,6 +524,15 @@ export const getRoutes = () => {
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         },
+        tags: ['api']
+      }
+    },
+    // new Audit handler
+    {
+      method: 'POST',
+      path: '/new/audit/event',
+      handler: newAuditHandler,
+      config: {
         tags: ['api']
       }
     }
