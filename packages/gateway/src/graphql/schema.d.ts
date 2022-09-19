@@ -1917,6 +1917,7 @@ export interface QueryToFetchTimeLoggedMetricsByPractitionerArgs {
   practitionerId: string
   locationId: string
   count: number
+  skip: number
 }
 export interface QueryToFetchTimeLoggedMetricsByPractitionerResolver<
   TParent = any,

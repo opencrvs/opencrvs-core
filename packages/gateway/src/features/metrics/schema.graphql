@@ -152,5 +152,6 @@ type Query {
     practitionerId: String!
     locationId: String!
     count: Int!
+    skip: Int!
   ): TimeLoggedMetricsResultSet
 }

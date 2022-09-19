@@ -92,6 +92,7 @@ export const FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER = gql`
     $practitionerId: String!
     $locationId: String!
     $count: Int!
+    $skip: Int!
   ) {
     fetchTimeLoggedMetricsByPractitioner(
       timeStart: $timeStart
@@ -99,6 +100,7 @@ export const FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER = gql`
       practitionerId: $practitionerId
       locationId: $locationId
       count: $count
+      skip: $skip
     ) {
       results {
         status
