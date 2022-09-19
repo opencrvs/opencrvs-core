@@ -21,6 +21,7 @@ import {
 import {
   ColumnContentAlignment,
   GridTable,
+  NoResultText,
   Spinner
 } from '@client/../../components/lib/interface'
 import { messages } from '@client/i18n/messages/views/notifications'
@@ -54,6 +55,9 @@ function getFullName(firstName?: string, lastName?: string) {
   return fullName
 }
 
+const NoResultContainer = styled(NoResultText)`
+  color: ${({ theme }) => theme.colors.placeholderCopy};
+`
 export function Outbox() {
   const intl = useIntl()
   const [width, setWidth] = React.useState(window.innerWidth)
@@ -277,7 +281,11 @@ export function Outbox() {
             key: 'statusIndicator'
           }
         ]}
-        noResultText={intl.formatMessage(constantsMessages.noResults)}
+        noResultComponent={
+          <NoResultContainer>
+            {intl.formatMessage(constantsMessages.noResultsOutbox)}
+          </NoResultContainer>
+        }
         hideLastBorder={true}
       />
     </WQContentWrapper>
