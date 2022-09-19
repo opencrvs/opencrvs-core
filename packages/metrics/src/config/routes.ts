@@ -530,7 +530,7 @@ export const getRoutes = () => {
     // new Audit handler
     {
       method: 'POST',
-      path: '/new/audit/event',
+      path: '/audit/events',
       handler: newAuditHandler,
       config: {
         tags: ['api']

@@ -237,4 +237,3 @@ export type IPoints =
   | IDeclarationsStartedPoints
   | IRejectedPoints
   | IUserAuditPoints
-

@@ -78,7 +78,7 @@ export type USER_ACTION =
 export interface IUserAuditBody {
   bundle: fhir.Bundle
   action: USER_ACTION
-  additionalData?: string
+  additionalData?: Record<string, any>
 }
 
 export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'

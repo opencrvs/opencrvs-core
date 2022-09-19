@@ -19,8 +19,6 @@ export async function newAuditHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  //TODO: get user action type and data from request and pass to generateAuditPoint
-
   const points = []
   try {
     points.push(await generateAuditPoint(request.payload as IUserAuditBody))
@@ -28,5 +26,5 @@ export async function newAuditHandler(
   } catch (err) {
     return internal(err)
   }
-  return h.response().code(200)
+  return h.response().code(201)
 }

@@ -633,7 +633,7 @@ export const generateAuditPoint = async (
     practitionerId: getPractitionerIdFromBundle(payload.bundle)
   }
   const fields: IUserAuditFields = {
-    data: payload.additionalData
+    data: JSON.stringify(payload.additionalData)
   }
   return {
     measurement: 'user_audit_event',
