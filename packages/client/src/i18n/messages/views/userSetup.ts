@@ -39,6 +39,7 @@ interface IUserSetupMessages
   roleType: MessageDescriptor
   phoneNumber: MessageDescriptor
   userName: MessageDescriptor
+  nid: MessageDescriptor
   startDate: MessageDescriptor
   auditSectionTitle: MessageDescriptor
   auditActionColumnTitle: MessageDescriptor
@@ -189,6 +190,11 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Username',
     description: 'Title for userName field',
     id: 'user.profile.userName'
+  },
+  nid: {
+    defaultMessage: 'National ID',
+    description: 'Title for nid',
+    id: 'user.profile.nid'
   },
   startDate: {
     defaultMessage: 'Start date',

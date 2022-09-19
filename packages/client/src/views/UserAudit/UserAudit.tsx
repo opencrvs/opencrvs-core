@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { userMessages as messages } from '@client/i18n/messages'
@@ -22,16 +22,12 @@ import { useParams } from 'react-router'
 import { GET_USER } from '@client/user/queries'
 import { GQLUser, GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
-import format from '@client/utils/date-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
-import { userMessages } from '@client/i18n/messages'
-import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
-import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
-import { LANG_EN } from '@client/utils/constants'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -44,10 +40,8 @@ import { VerticalThreeDots } from '@client/../../components/lib/icons'
 import { IStoreState } from '@client/store'
 import { getScope } from '@client/profile/profileSelectors'
 import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
-import { constant } from 'lodash'
 import { userMutations } from '@client/user/mutations'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { useState } from 'react'
 import {
   Toast,
   NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
@@ -90,29 +84,6 @@ const InformationValue = styled.div`
 const LinkButtonWithoutSpacing = styled(LinkButton)`
   height: auto !important;
 `
-
-const LoadingTitle = styled.span<{ width: number; marginRight: number }>`
-  background: ${({ theme }) => theme.colors.background};
-  display: inline-block;
-  height: 24px;
-  width: ${({ width }) => `${width}px`};
-  margin-right: ${({ marginRight }) => `${marginRight}px`};
-`
-
-const LoadingValue = styled(LoadingGrey)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
-  }
-`
-const HeaderMenuHolder = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  & > :not(:last-child) {
-    margin: auto 8px;
-  }
-`
 interface IRouteProps {
   userId: string
 }
@@ -121,14 +92,13 @@ export const UserAudit = () => {
   const intl = useIntl()
   const { userId } = useParams<IRouteProps>()
   const dispatch = useDispatch()
-  const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
-  const [showResendSMSError, setShowResendSMSError] = useState(false)
-  const [modalVisible, setmodalVisible] = useState(false)
-
+  const [showResendSMSSuccess, setShowResendSMSSuccess] =
+    useState<boolean>(false)
+  const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
+  const [modalVisible, setModalVisible] = useState(false)
   const scope = useSelector((store: IStoreState) => getScope(store))
-
   const toggleUserActivationModal = () => {
-    setmodalVisible(true)
+    setModalVisible(!modalVisible)
   }
 
   const resendSMS = async (userId: string) => {
@@ -143,11 +113,9 @@ export const UserAudit = () => {
       ])
       if (res && res.data && res.data.resendSMSInvite) {
         setShowResendSMSSuccess(true)
-        // setState({ showResendSMSSuccess: true })
       }
     } catch (err) {
       setShowResendSMSError(true)
-      // setState({ showResendSMSError: true })
     }
   }
 
@@ -211,16 +179,16 @@ export const UserAudit = () => {
       status: userData.status,
       underInvestigation: userData.underInvestigation,
       username: userData.username,
+      nid:
+        userData.identifier?.system === 'NATIONAL_ID'
+          ? userData.identifier.value
+          : EMPTY_STRING,
       practitionerId: userData.practitionerId,
       locationId:
         getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) ||
         '0',
-      startDate: userData.creationDate
-        ? Number.isNaN(Number(userData.creationDate))
-          ? format(new Date(userData.creationDate), 'MMMM dd, yyyy')
-          : format(new Date(Number(userData.creationDate)), 'MMMM dd, yyyy')
-        : '',
-      avatar: userData.avatar
+      avatar: userData.avatar,
+      device: userData.device
     }
   }
 
@@ -285,7 +253,7 @@ export const UserAudit = () => {
                     <InformationTitle>
                       {(userType &&
                         intl.formatMessage(userSetupMessages.roleType)) ||
-                        intl.formatMessage(userFormMessages.type)}
+                        intl.formatMessage(userFormMessages.labelRole)}
                     </InformationTitle>
                     <InformationValue>
                       {(userType && `${userRole} / ${userType}`) || userRole}
@@ -299,15 +267,21 @@ export const UserAudit = () => {
                   </InformationHolder>
                   <InformationHolder>
                     <InformationTitle>
+                      {intl.formatMessage(userSetupMessages.nid)}
+                    </InformationTitle>
+                    <InformationValue>{user.nid}</InformationValue>
+                  </InformationHolder>
+                  <InformationHolder>
+                    <InformationTitle>
                       {intl.formatMessage(userSetupMessages.userName)}
                     </InformationTitle>
                     <InformationValue>{user.username}</InformationValue>
                   </InformationHolder>
                   <InformationHolder>
                     <InformationTitle>
-                      {intl.formatMessage(userSetupMessages.startDate)}
+                      {intl.formatMessage(userFormMessages.userDevice)}
                     </InformationTitle>
-                    <InformationValue>{user.startDate}</InformationValue>
+                    <InformationValue>{user.device}</InformationValue>
                   </InformationHolder>
 
                   <UserAuditActionModal

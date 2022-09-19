@@ -23,7 +23,8 @@ import {
   goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
   goToTeamSearch,
-  goToTeamUserList
+  goToTeamUserList,
+  goToUserProfile
 } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -114,6 +115,9 @@ const Loading = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     height: calc(100vh - 104px);
   }
+`
+const LinkButtonWithoutSpacing = styled(LinkButton)`
+  height: auto !important;
 `
 
 const StatusBox = styled.div`
@@ -224,6 +228,7 @@ type BaseProps = {
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
   goToTeamUserList: typeof goToTeamUserList
+  goToUserProfile: typeof goToUserProfile
 }
 
 type IProps = BaseProps &
@@ -281,6 +286,7 @@ function UserListComponent(props: IProps) {
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToTeamSearch,
+    goToUserProfile,
     offlineOffices,
     isOnline,
     location: { search }
@@ -306,6 +312,8 @@ function UserListComponent(props: IProps) {
 
   const toggleUserActivationModal = useCallback(
     function toggleUserActivationModal(user?: GQLUser) {
+      console.log('true', user)
+
       if (user !== undefined) {
         setToggleActivation({
           ...toggleActivation,
@@ -476,7 +484,14 @@ function UserListComponent(props: IProps) {
 
             return {
               image: <AvatarSmall name={name} avatar={avatar} />,
-              label: <Name>{name}</Name>,
+              label: (
+                <LinkButtonWithoutSpacing
+                  id="prifile-link"
+                  onClick={() => goToUserProfile(String(user.id))}
+                >
+                  {name}
+                </LinkButtonWithoutSpacing>
+              ),
               value: <Value>{role}</Value>,
               actions: (
                 <StatusMenu
@@ -497,7 +512,7 @@ function UserListComponent(props: IProps) {
         }
       )
     },
-    [StatusMenu, intl]
+    [StatusMenu, intl, goToUserProfile]
   )
 
   const onClickAddUser = useCallback(
@@ -740,6 +755,7 @@ export const UserList = connect(
     goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
     goToTeamSearch,
+    goToUserProfile,
     goToTeamUserList
   }
 )(withTheme(injectIntl(withOnlineStatus(UserListComponent))))
