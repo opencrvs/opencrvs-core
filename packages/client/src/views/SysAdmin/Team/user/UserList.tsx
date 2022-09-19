@@ -710,7 +710,6 @@ function UserListComponent(props: IProps) {
         <Toast
           id="resend_invite_success"
           type="success"
-          show={showResendSMSSuccess}
           onClose={() => setShowResendSMSSuccess(false)}
         >
           {intl.formatMessage(messages.resendSMSSuccess)}
@@ -720,7 +719,6 @@ function UserListComponent(props: IProps) {
         <Toast
           id="resend_invite_error"
           type="warning"
-          show={showResendSMSError}
           onClose={() => setShowResendSMSError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}

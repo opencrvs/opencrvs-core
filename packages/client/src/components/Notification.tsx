@@ -114,7 +114,6 @@ class Component extends React.Component<
         {backgroundSyncMessageVisible && (
           <Toast
             id="backgroundSyncShowNotification"
-            show={backgroundSyncMessageVisible}
             onClose={this.hideBackgroundSyncedNotification}
           >
             {intl.formatMessage(messages.declarationsSynced)}
@@ -124,7 +123,6 @@ class Component extends React.Component<
           <Toast
             type="warning"
             id="configErrorShowNotification"
-            show={configurationErrorVisible}
             onClose={this.hideConfigurationErrorNotification}
           >
             OpenCRVS has been only partially configured - Awaiting facilities
@@ -134,7 +132,6 @@ class Component extends React.Component<
         {saveDraftClicked && (
           <Toast
             id="draftsSavedNotification"
-            show={saveDraftClicked}
             onClose={this.hideDraftsSavedNotification}
           >
             {intl.formatMessage(messages.draftsSaved)}
@@ -144,7 +141,6 @@ class Component extends React.Component<
         {submitFormSuccessToast && (
           <Toast
             id="submissionSuccessToast"
-            show={Boolean(submitFormSuccessToast)}
             type="success"
             onClose={this.hideSubmitFormSuccessToast}
           >
@@ -157,7 +153,6 @@ class Component extends React.Component<
         {submitFormErrorToast && (
           <Toast
             id="submissionErrorToast"
-            show={Boolean(submitFormErrorToast)}
             type="warning"
             onClose={this.hideSubmitFormErrorToast}
           >
@@ -167,7 +162,6 @@ class Component extends React.Component<
         {userAuditSuccessToast.visible && (
           <Toast
             id="userAuditSuccessToast"
-            show={userAuditSuccessToast.visible}
             type="success"
             onClose={this.hideUserAuditSuccessToast}
           >
@@ -180,7 +174,6 @@ class Component extends React.Component<
         {showPINUpdateSuccess && (
           <Toast
             id="PINUpdateSuccessToast"
-            show={showPINUpdateSuccess}
             type="success"
             onClose={this.props.hidePINUpdateSuccessToast}
           >
@@ -190,7 +183,6 @@ class Component extends React.Component<
         {downloadDeclarationFailedToast && (
           <Toast
             id="PINUpdateSuccessToast"
-            show={Boolean(downloadDeclarationFailedToast)}
             type="warning"
             onClose={this.props.hideDownloadDeclarationFailedToast}
           >
@@ -200,7 +192,6 @@ class Component extends React.Component<
         {unassignedModal !== null && (
           <Toast
             id="unassignedModal"
-            show
             type="warning"
             onClose={this.props.hideUnassignedModal}
           >
@@ -212,7 +203,6 @@ class Component extends React.Component<
         {userCreateDuplicateMobileFailedToast.visible && (
           <Toast
             id="createUserDuplicateMobileFailedToast"
-            show={Boolean(userCreateDuplicateMobileFailedToast.visible)}
             type="warning"
             onClose={this.hideCreateUserFormErrorToast}
           >

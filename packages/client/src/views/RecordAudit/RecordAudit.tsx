@@ -633,7 +633,7 @@ function RecordAuditBody({
   )
 }
 
-function getBodyContent({
+const BodyContent = ({
   declarationId,
   draft,
   intl,
@@ -645,7 +645,9 @@ function getBodyContent({
   workqueueDeclaration,
   goBack,
   ...actionProps
-}: IFullProps) {
+}: IFullProps) => {
+  const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
+
   if (
     tab === 'search' ||
     (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
@@ -665,14 +667,19 @@ function getBodyContent({
               return <Loader id="search_loader" marginPercent={35} />
             } else if (error) {
               return (
-                <Toast
-                  type="warning"
-                  actionText={intl.formatMessage(buttonMessages.retry)}
-                  onActionClick={() => refetch()}
-                  show={true}
-                >
-                  {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-                </Toast>
+                !isErrorDismissed && (
+                  <Toast
+                    type="warning"
+                    actionText={intl.formatMessage(buttonMessages.retry)}
+                    onActionClick={() => {
+                      refetch()
+                      setIsErrorDismissed(false)
+                    }}
+                    onClose={() => setIsErrorDismissed(true)}
+                  >
+                    {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+                  </Toast>
+                )
               )
             }
 
@@ -767,8 +774,7 @@ const RecordAuditComp = (props: IFullProps) => {
         <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       }
     >
-      {getBodyContent(props)}
-
+      <BodyContent {...props} />
       <NotificationToast />
     </Frame>
   )

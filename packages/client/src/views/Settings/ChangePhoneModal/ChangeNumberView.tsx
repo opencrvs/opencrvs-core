@@ -124,16 +124,17 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           onChange={onChangePhoneNumber}
         />
       </InputField>
-      <Toast
-        id="duplicate-mobile-error-notification"
-        type="warning"
-        show={showDuplicateMobileErrorNotification}
-        onClose={() => toggleDuplicateMobileErrorNotification()}
-      >
-        {intl.formatMessage(messages.duplicateUserMobileErrorMessege, {
-          number: phoneNumber
-        })}
-      </Toast>
+      {showDuplicateMobileErrorNotification && (
+        <Toast
+          id="duplicate-mobile-error-notification"
+          type="warning"
+          onClose={() => toggleDuplicateMobileErrorNotification()}
+        >
+          {intl.formatMessage(messages.duplicateUserMobileErrorMessege, {
+            number: phoneNumber
+          })}
+        </Toast>
+      )}
     </ResponsiveModal>
   )
 }

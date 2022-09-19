@@ -23,6 +23,7 @@ import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
 import { constantsMessages } from '@client/i18n/messages'
+import { noop } from 'lodash'
 
 export function ActionsNotification() {
   const {
@@ -35,20 +36,25 @@ export function ActionsNotification() {
   )
 
   return (
-    <Toast
-      type={isNotifiable(status) ? NOTIFICATION_TYPE_MAP[status] : 'warning'}
-      show={isNotifiable(status)}
-      onClose={
-        status !== ActionStatus.PROCESSING
-          ? () => setAction({ status: ActionStatus.IDLE })
-          : undefined
-      }
-    >
-      {isNotifiable(status) &&
-        intl.formatMessage(statusChangeActionMessages(action)[status], {
-          event: intl.formatMessage(constantsMessages[event]),
-          version
-        })}
-    </Toast>
+    <>
+      {isNotifiable(status) && (
+        <Toast
+          type={
+            isNotifiable(status) ? NOTIFICATION_TYPE_MAP[status] : 'warning'
+          }
+          onClose={
+            status !== ActionStatus.PROCESSING
+              ? () => setAction({ status: ActionStatus.IDLE })
+              : noop // Toast isn't closable when status is "loading"
+          }
+        >
+          {isNotifiable(status) &&
+            intl.formatMessage(statusChangeActionMessages(action)[status], {
+              event: intl.formatMessage(constantsMessages[event]),
+              version
+            })}
+        </Toast>
+      )}
+    </>
   )
 }

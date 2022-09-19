@@ -479,7 +479,6 @@ export class OfficeHomeView extends React.Component<
           <Toast
             id="print-cert-notification"
             type="success"
-            show={this.state.showCertificateToast}
             onClose={() => {
               this.setState({ showCertificateToast: false })
             }}

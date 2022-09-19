@@ -143,26 +143,27 @@ export function ApplicationName() {
         </Content>
       </ResponsiveModal>
 
-      <Toast
-        id="appNamenotification"
-        type={
-          notificationStatus === NOTIFICATION_STATUS.SUCCESS
-            ? 'success'
-            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? 'loading'
-            : 'warning'
-        }
-        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
-        onClose={() => {
-          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
-        }}
-      >
-        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
-          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
-          ? intl.formatMessage(messages.applicationNameChangeNotification)
-          : intl.formatMessage(messages.applicationConfigChangeError)}
-      </Toast>
+      {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
+        <Toast
+          id="appNamenotification"
+          type={
+            notificationStatus === NOTIFICATION_STATUS.SUCCESS
+              ? 'success'
+              : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+              ? 'loading'
+              : 'warning'
+          }
+          onClose={() => {
+            setNotificationStatus(NOTIFICATION_STATUS.IDLE)
+          }}
+        >
+          {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+            : notificationStatus === NOTIFICATION_STATUS.SUCCESS
+            ? intl.formatMessage(messages.applicationNameChangeNotification)
+            : intl.formatMessage(messages.applicationConfigChangeError)}
+        </Toast>
+      )}
     </>
   )
 }

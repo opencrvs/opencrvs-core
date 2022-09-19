@@ -288,20 +288,21 @@ function FormConfigSettingsComponent() {
           </ErrorContent>
         )}
       </ResponsiveModal>
-      <Toast
-        id="form-settings-notification"
-        type={
-          notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? 'loading'
-            : 'success'
-        }
-        show={showNotification}
-        onClose={() => {
-          setShowNotification(false)
-        }}
-      >
-        {notificationMessages}
-      </Toast>
+      {showNotification && (
+        <Toast
+          id="form-settings-notification"
+          type={
+            notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+              ? 'loading'
+              : 'success'
+          }
+          onClose={() => {
+            setShowNotification(false)
+          }}
+        >
+          {notificationMessages}
+        </Toast>
+      )}
     </Containter>
   )
 }

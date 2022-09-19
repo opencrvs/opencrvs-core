@@ -169,28 +169,29 @@ export function DeathFeeOnTime() {
         </Content>
       </ResponsiveModal>
 
-      <Toast
-        id={`${id}_notification`}
-        type={
-          notificationStatus === NOTIFICATION_STATUS.SUCCESS
-            ? 'success'
-            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? 'loading'
-            : 'warning'
-        }
-        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
-        onClose={() => {
-          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
-        }}
-      >
-        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
-          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
-          ? intl.formatMessage(
-              messages.applicationDeathOnTimeFeeChangeNotification
-            )
-          : intl.formatMessage(messages.applicationConfigChangeError)}
-      </Toast>
+      {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
+        <Toast
+          id={`${id}_notification`}
+          type={
+            notificationStatus === NOTIFICATION_STATUS.SUCCESS
+              ? 'success'
+              : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+              ? 'loading'
+              : 'warning'
+          }
+          onClose={() => {
+            setNotificationStatus(NOTIFICATION_STATUS.IDLE)
+          }}
+        >
+          {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+            : notificationStatus === NOTIFICATION_STATUS.SUCCESS
+            ? intl.formatMessage(
+                messages.applicationDeathOnTimeFeeChangeNotification
+              )
+            : intl.formatMessage(messages.applicationConfigChangeError)}
+        </Toast>
+      )}
     </>
   )
 }

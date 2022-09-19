@@ -8,19 +8,19 @@ export const ToastToggler = ({ type, dismissable, actionable, children }) => {
   const [isVisible, setVisible] = useState(false)
   return (
     <>
-      <br />
       <SecondaryButton onClick={() => setVisible(!isVisible)}>
         {isVisible ? 'Close' : 'Open'}
       </SecondaryButton>
-      <Toast
-        type={type}
-        onClose={dismissable ? () => setVisible(false) : undefined}
-        show={isVisible}
-        onActionClick={actionable ? () => alert('Retried') : undefined}
-        actionText="Retry"
-      >
-        {children}
-      </Toast>
+      {isVisible && (
+        <Toast
+          type={type}
+          onClose={() => setVisible(false)}
+          onActionClick={actionable ? () => alert('Retried') : undefined}
+          actionText="Retry"
+        >
+          {children}
+        </Toast>
+      )}
     </>
   )
 }
@@ -32,7 +32,11 @@ export const ToastToggler = ({ type, dismissable, actionable, children }) => {
 Toast is a message that pop ups from the bottom of the interface on a desktop, and from the top of the interface on mobile. It provides feedback on the outcome of an action.
 Toast can be used inside any view, it doesn't have to be on the application root level element. Toast is an animated and position fixed `<Alert>`.
 
+Toast automatically closes after 10 seconds, unless `timeout` -prop is set to `null`.
+
 ## Success
+
+<br />
 
 <Story name="Success" storyName="Success">
   <ToastToggler type="success">Hello! I'm a success toast</ToastToggler>
@@ -41,13 +45,16 @@ Toast can be used inside any view, it doesn't have to be on the application root
 <Source
   dark
   code={`
-<Toast type="success" show={isVisible}>
-  Hello! I'm a success toast
-</Toast>
-    `}
+{isVisible && (
+  <Toast type="success" onClose={() => setVisible(false)}>
+    Hello! I'm a success toast
+  </Toast>
+)}`}
 />
 
 ## Warning
+
+<br />
 
 <Story name="Warning" storyName="Warning">
   <ToastToggler type="warning">Hello! I'm a warning toast</ToastToggler>
@@ -56,13 +63,16 @@ Toast can be used inside any view, it doesn't have to be on the application root
 <Source
   dark
   code={`
-<Toast type="warning" show={isVisible}>
-Hello! I'm a warning toast
-</Toast>
-  `}
+{isVisible && (
+  <Toast type="warning" onClose={() => setVisible(false)}>
+  Hello! I'm a warning toast
+  </Toast>
+)}`}
 />
 
 ## Error
+
+<br />
 
 <Story name="Error" storyName="Error">
   <ToastToggler type="error">Hello! I'm a error toast</ToastToggler>
@@ -71,13 +81,16 @@ Hello! I'm a warning toast
 <Source
   dark
   code={`
-<Toast type="error" show={isVisible}>
-  Hello! I'm an error toast
-</Toast>
-    `}
+{isVisible && (
+  <Toast type="error" onClose={() => setVisible(false)}>
+    Hello! I'm an error toast
+  </Toast>
+)}`}
 />
 
 ## Loading
+
+Loading toasts cannot be dismissed.
 
 <Story name="Loading" storyName="Loading">
   <ToastToggler type="loading">Hello! I'm a loading toast</ToastToggler>
@@ -86,34 +99,15 @@ Hello! I'm a warning toast
 <Source
   dark
   code={`
-<Toast type="loading" show={isVisible}>
+<Toast type="loading">
   Hello! I'm a loading toast
 </Toast>
-    `}
-/>
-
-## Dismissable
-
-<Story name="Dismissable" storyName="Dismissable">
-  <ToastToggler type="loading" dismissable>
-    Hello! I'm a dismissbale toast
-  </ToastToggler>
-</Story>
-
-<Source
-  dark
-  code={`
-<Toast
-  type="success"
-  show={isVisible}
-  onClose={() => setVisible(false)}
->
-  Hello! I'm a dismissbale toast
-</Toast>
-    `}
+`}
 />
 
 ## With action
+
+<br />
 
 <Story name="With Action" storyName="With Action">
   <ToastToggler type="error" actionable>
@@ -124,18 +118,22 @@ Hello! I'm a warning toast
 <Source
   dark
   code={`
-<Toast
-  type="success"
-  show={isVisible}
-  onActionClick={() => alert('Retried')}
-  actionText="Retry"
->
-  Hello! I'm a toast with an action button
-</Toast>
+{isVisible && (
+  <Toast
+    type="success"
+    onActionClick={() => alert('Retried')}
+    actionText="Retry"
+    onClose={() => setVisible(false)}
+  >
+    Hello! I'm a toast with an action button
+  </Toast>
+)}
     `}
 />
 
 ## With action and dismiss
+
+<br />
 
 <Story name="With Action And Dismiss" storyName="With Action And Dismiss">
   <ToastToggler type="error" actionable dismissable>
@@ -146,19 +144,22 @@ Hello! I'm a warning toast
 <Source
   dark
   code={`
-<Toast
-  type="success"
-  show={isVisible}
-  onActionClick={() => alert('Retried')}
-  actionText="Retry"
-  onClose={() => setVisible(false)}
->
-  Hello! I'm a toast with an action and dismiss button
-</Toast>
+{isVisible && (
+  <Toast
+    type="success"
+    onActionClick={() => alert('Retried')}
+    actionText="Retry"
+    onClose={() => setVisible(false)}
+  >
+    Hello! I'm a toast with an action and dismiss button
+  </Toast>
+)}
     `}
 />
 
 ## Multiple lines
+
+<br />
 
 <Story name="Multiple Lines" storyName="Multiple Lines">
   <ToastToggler type="error" actionable dismissable>
@@ -171,16 +172,17 @@ Hello! I'm a warning toast
 <Source
   dark
   code={`
-<Toast
-  type="success"
-  show={isVisible}
-  onActionClick={() => alert('Retried')}
-  actionText="Retry"
-  onClose={() => setVisible(false)}
->
-  Hello! I'm a toast with an action and dismiss button. I also have a very
-  long text within the toast. This illustrates how the toast stretches when
-  the content is lengthy.
-</Toast>
+{isVisible && (
+  <Toast
+    type="success"
+    onActionClick={() => alert('Retried')}
+    actionText="Retry"
+    onClose={() => setVisible(false)}
+  >
+    Hello! I'm a toast with an action and dismiss button. I also have a very
+    long text within the toast. This illustrates how the toast stretches when
+    the content is lengthy.
+  </Toast>
+)}
     `}
 />

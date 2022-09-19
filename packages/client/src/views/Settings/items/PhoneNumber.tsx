@@ -73,13 +73,11 @@ export function PhoneNumber() {
         onClose={toggleChangePhoneModal}
         onSuccess={handleSuccess}
       />
-      <Toast
-        type="success"
-        show={showSuccessNotification}
-        onClose={toggleSuccessNotification}
-      >
-        <FormattedMessage {...userMessages.phoneNumberUpdated} />
-      </Toast>
+      {showSuccessNotification && (
+        <Toast type="success" onClose={toggleSuccessNotification}>
+          <FormattedMessage {...userMessages.phoneNumberUpdated} />
+        </Toast>
+      )}
     </>
   )
 }

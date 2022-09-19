@@ -121,7 +121,7 @@ export const Alert = ({
       </ActionButton>
     )}
 
-    {onClose && (
+    {onClose && type !== 'loading' && (
       <Close id={props.id + 'Cancel'} onClick={onClose}>
         <Cross color="currentColor" />
       </Close>

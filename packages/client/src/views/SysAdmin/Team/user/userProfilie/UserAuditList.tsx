@@ -33,10 +33,7 @@ import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import { TableView } from '@opencrvs/components/lib/Table'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -356,7 +353,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
             this.state.viewportWidth <= this.props.theme.grid.breakpoints.md
           }
         />
-        {hasError && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+        {hasError && <GenericErrorToast />}
       </>
     )
   }

@@ -10,10 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { DateRangePicker } from '@client/components/DateRangePicker'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
@@ -501,7 +498,7 @@ function FieldAgentListComponent(props: IProps) {
                     columns={getColumns(data && data.searchFieldAgents)}
                     content={getContent(data && data.searchFieldAgents)}
                   />
-                  <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                  <GenericErrorToast />
                 </>
               )
             } else {

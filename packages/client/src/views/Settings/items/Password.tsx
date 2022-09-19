@@ -67,13 +67,11 @@ export function Password() {
         showPasswordChange={showModal}
         passwordChanged={changePassword}
       />
-      <Toast
-        type="success"
-        show={showSuccessNotification}
-        onClose={toggleSuccessNotification}
-      >
-        <FormattedMessage {...userMessages.passwordUpdated} />
-      </Toast>
+      {showSuccessNotification && (
+        <Toast type="success" onClose={toggleSuccessNotification}>
+          <FormattedMessage {...userMessages.passwordUpdated} />
+        </Toast>
+      )}
     </>
   )
 }

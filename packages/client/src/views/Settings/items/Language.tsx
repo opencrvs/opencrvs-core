@@ -141,18 +141,16 @@ export function Language() {
           placeholder=""
         />
       </ResponsiveModal>
-      <Toast
-        type="success"
-        show={showSuccessNotification}
-        onClose={toggleSuccessNotification}
-      >
-        <FormattedMessage
-          {...userMessages.changeLanguageSuccessMessage}
-          values={{
-            language: languages[selectedLanguage].displayName
-          }}
-        />
-      </Toast>
+      {showSuccessNotification && (
+        <Toast type="success" onClose={toggleSuccessNotification}>
+          <FormattedMessage
+            {...userMessages.changeLanguageSuccessMessage}
+            values={{
+              language: languages[selectedLanguage].displayName
+            }}
+          />
+        </Toast>
+      )}
     </>
   )
 }
