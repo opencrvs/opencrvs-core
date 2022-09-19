@@ -2052,7 +2052,7 @@ describe('Registration root resolvers', () => {
               relationship: 'MOTHER'
             },
             hasShowedVerifiedDocument: true,
-            data: 'DUMMY'
+            data: 'data:image/png;base64,2324256'
           }
         ]
       }
@@ -2154,7 +2154,7 @@ describe('Registration root resolvers', () => {
               relationship: 'INFORMANT'
             },
             hasShowedVerifiedDocument: true,
-            data: 'DUMMY'
+            data: 'data:image/png;base64,2324256'
           }
         ]
       }

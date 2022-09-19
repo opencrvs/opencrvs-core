@@ -183,7 +183,7 @@ test('should build a minimal FHIR registration document without error', async ()
               relationship: 'OTHER',
               affidavit: {
                 contentType: 'image/jpg',
-                data: 'ExampleData'
+                data: 'data:image/png;base64,2324256'
               },
               individual: {
                 name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
@@ -201,7 +201,7 @@ test('should build a minimal FHIR registration document without error', async ()
                 date: '2018-10-22'
               }
             ],
-            data: 'DUMMY-DATA'
+            data: 'data:image/png;base64,2324256'
           }
         ]
       },
