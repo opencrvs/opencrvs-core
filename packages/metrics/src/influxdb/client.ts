@@ -196,7 +196,9 @@ export const influx = new Influx.InfluxDB({
     {
       measurement: 'user_audit_event',
       fields: {
-        data: Influx.FieldType.STRING
+        data: Influx.FieldType.STRING,
+        ipAddress: Influx.FieldType.STRING,
+        userAgent: Influx.FieldType.STRING
       },
       tags: ['action', 'practitionerId']
     }

@@ -24,6 +24,8 @@ export interface IDeathRegistrationFields extends IPoint {
 
 export interface IUserAuditFields extends IPoint {
   data: string | undefined
+  userAgent: string
+  ipAddress: string
 }
 
 export interface IPoint {

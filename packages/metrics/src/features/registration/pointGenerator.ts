@@ -626,14 +626,18 @@ export async function generateRejectedPoints(
 }
 
 export const generateAuditPoint = async (
-  payload: IUserAuditBody
+  payload: IUserAuditBody,
+  ipAddress: string,
+  userAgent: string
 ): Promise<IPoints> => {
   const tags: IUserAuditTags = {
     action: payload.action,
     practitionerId: getPractitionerIdFromBundle(payload.bundle)
   }
   const fields: IUserAuditFields = {
-    data: JSON.stringify(payload.additionalData)
+    data: JSON.stringify(payload.additionalData),
+    ipAddress: ipAddress,
+    userAgent: userAgent
   }
   return {
     measurement: 'user_audit_event',

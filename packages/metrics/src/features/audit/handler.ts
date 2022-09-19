@@ -21,7 +21,16 @@ export async function newAuditHandler(
 ) {
   const points = []
   try {
-    points.push(await generateAuditPoint(request.payload as IUserAuditBody))
+    const remoteAddress =
+      request.headers['x-real-ip'] || request.info.remoteAddress
+    const userAgent = request.headers['user-agent']
+    points.push(
+      await generateAuditPoint(
+        request.payload as IUserAuditBody,
+        remoteAddress,
+        userAgent
+      )
+    )
     await writePoints(points)
   } catch (err) {
     return internal(err)
