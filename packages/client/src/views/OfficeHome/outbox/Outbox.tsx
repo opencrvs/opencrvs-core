@@ -282,7 +282,7 @@ export function Outbox() {
           }
         ]}
         noResultComponent={
-          <NoResultContainer>
+          <NoResultContainer id="no-record">
             {intl.formatMessage(constantsMessages.noResultsOutbox)}
           </NoResultContainer>
         }
