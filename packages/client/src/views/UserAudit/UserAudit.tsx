@@ -194,7 +194,7 @@ export const UserAudit = () => {
 
   return (
     <Frame
-      header={<Header title={intl.formatMessage(messages.settingsTitle)} />}
+      header={<Header title={intl.formatMessage(messages.profileTitle)} />}
       navigation={<Navigation />}
     >
       <Query
