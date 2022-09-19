@@ -68,6 +68,13 @@ export type DECLARATION_STATUS =
   | 'REQUESTED_CORRECTION'
   | 'CERTIFIED'
 
+export type USER_ACTION =
+  | 'DOWNLOADED'
+  | 'ARCHIVED'
+  | 'ASSIGNED'
+  | 'LOGGED_IN'
+  | 'LOGGED_OUT'
+
 export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'
 
 function findPreviousTask(

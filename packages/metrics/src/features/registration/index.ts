@@ -22,6 +22,10 @@ export interface IDeathRegistrationFields extends IPoint {
   deathDays: number | undefined
 }
 
+export interface IUserAuditFields extends IPoint {
+  data: string | undefined
+}
+
 export interface IPoint {
   time?: string
 }
@@ -55,6 +59,11 @@ export interface IBirthRegistrationTags {
   locationLevel4?: string
   locationLevel3?: string
   locationLevel2?: string
+}
+
+export interface IUserAuditTags {
+  action: string
+  practitionerId: string | undefined
 }
 
 export interface IDeathRegistrationTags {
@@ -163,6 +172,12 @@ export interface IBirthRegistrationPoints {
   timestamp: number | undefined
 }
 
+export interface IUserAuditPoints {
+  measurement: string
+  tags: IUserAuditTags
+  fields: IUserAuditFields
+  timestamp: number | undefined
+}
 export interface IPaymentPoints {
   measurement: string
   tags: ILocationTags & {
@@ -219,6 +234,7 @@ export type IPoints =
   | IPaymentPoints
   | IBirthRegistrationPoints
   | IDeathRegistrationPoints
-  | IPaymentPoints
   | IDeclarationsStartedPoints
   | IRejectedPoints
+  | IUserAuditPoints
+

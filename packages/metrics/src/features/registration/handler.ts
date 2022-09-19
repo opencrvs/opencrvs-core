@@ -130,6 +130,7 @@ export async function newDeclarationHandler(
         'x-correlation-id': request.headers['x-correlation-id']
       })
     )
+    console.log(request.payload)
     points.push(
       await generateDeclarationStartedPoint(
         request.payload as fhir.Bundle,
@@ -229,6 +230,8 @@ export async function newBirthRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  console.log('i came here')
+  console.log(request.payload)
   const points = []
   try {
     points.push(

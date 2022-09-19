@@ -30,7 +30,9 @@ import {
   IPaymentPoints,
   IDeclarationsStartedPoints,
   IRejectedPoints,
-  ICorrectionPoint
+  ICorrectionPoint,
+  IUserAuditTags,
+  IUserAuditFields
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -53,7 +55,7 @@ import {
   getRegLastOffice,
   getEncounterLocationType,
   getPractitionerIdFromBundle,
-  fetchDeclarationsBeginnerRole
+  fetchDeclarationsBeginnerRole, USER_ACTION
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -130,7 +132,7 @@ export const generateInCompleteFieldPoints = async (
     })
 }
 
-function toInfluxTimestamp(date?: Date | string) {
+export function toInfluxTimestamp(date?: Date | string) {
   if (!date) {
     return undefined
   }
@@ -141,6 +143,9 @@ export const generateCertificationPoint = async (
   payload: fhir.Bundle,
   authHeader: IAuthHeader
 ): Promise<IPoints> => {
+  console.log(payload)
+  console.log(payload)
+
   const composition = getComposition(payload)
 
   if (!composition) {
@@ -181,9 +186,7 @@ export const generateBirthRegPoint = async (
   if (!child) {
     throw new Error('No child found!')
   }
-
   const composition = getComposition(payload)
-
   if (!composition) {
     throw new Error('Composition not found')
   }
@@ -618,5 +621,25 @@ export async function generateRejectedPoints(
     tags,
     fields,
     timestamp: toInfluxTimestamp(task.lastModified)
+  }
+}
+
+export const generateAuditPoint = async (
+  payload: fhir.Bundle,
+  action: USER_ACTION,
+  authHeader: IAuthHeader
+): Promise<IPoints> => {
+  const tags: IUserAuditTags = {
+    action: action,
+    practitionerId: getPractitionerIdFromBundle(payload)
+  }
+  const fields: IUserAuditFields = {
+    data: undefined
+  }
+  return {
+    measurement: 'user_audit_event',
+    tags,
+    fields,
+    timestamp: toInfluxTimestamp(new Date())
   }
 }
