@@ -394,11 +394,12 @@ class UserAuditListComponent extends React.Component<Props, State> {
                   if (error) {
                     return this.getLoadingAuditListView(true)
                   } else {
-                    const totalItems =
+                    const totalItems = Number(
                       (data &&
                         data.fetchTimeLoggedMetricsByPractitioner &&
                         data.fetchTimeLoggedMetricsByPractitioner.totalItems) ||
-                      0
+                        0
+                    )
 
                     return (
                       <>
