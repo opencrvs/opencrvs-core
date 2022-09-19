@@ -2407,15 +2407,18 @@ export const builders: IFieldBuilders = {
           if (!certDocResource.content) {
             certDocResource.content = []
           }
-          const docUploadResponse = await uploadBase64ToMinio(
-            fieldValue,
-            context.authHeader
-          )
+          if (isBase64FileString(fieldValue)) {
+            const docUploadResponse = await uploadBase64ToMinio(
+              fieldValue,
+              context.authHeader
+            )
+            fieldValue = docUploadResponse
+          }
 
           certDocResource.content.push({
             attachment: {
               contentType: 'image/jpg',
-              data: docUploadResponse
+              data: fieldValue
             }
           })
         }
@@ -2504,15 +2507,18 @@ export const builders: IFieldBuilders = {
         if (!certDocResource.content) {
           certDocResource.content = []
         }
-        const docUploadResponse = await uploadBase64ToMinio(
-          fieldValue,
-          context.authHeader
-        )
+        if (isBase64FileString(fieldValue)) {
+          const docUploadResponse = await uploadBase64ToMinio(
+            fieldValue,
+            context.authHeader
+          )
+          fieldValue = docUploadResponse
+        }
 
         certDocResource.content.push({
           attachment: {
             contentType: 'application/pdf',
-            data: docUploadResponse
+            data: fieldValue
           }
         })
       },
@@ -2759,10 +2765,9 @@ export const builders: IFieldBuilders = {
             fieldValue,
             context.authHeader
           )
-          docRef.content[0].attachment.data = docUploadResponse
-        } else {
-          docRef.content[0].attachment.data = fieldValue
+          fieldValue = docUploadResponse
         }
+        docRef.content[0].attachment.data = fieldValue
       },
       subject: (
         fhirBundle: ITemplatedBundle,
@@ -2912,21 +2917,24 @@ export const builders: IFieldBuilders = {
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
-            const docUploadResponse = await uploadBase64ToMinio(
-              fieldValue,
-              context.authHeader
-            )
+            if (isBase64FileString(fieldValue)) {
+              const docUploadResponse = await uploadBase64ToMinio(
+                fieldValue,
+                context.authHeader
+              )
+              fieldValue = docUploadResponse
+            }
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
                 valueAttachment: {
-                  data: docUploadResponse
+                  data: fieldValue
                 }
               })
             } else {
               hasAffidavit.valueAttachment = {
                 ...hasAffidavit.valueAttachment,
-                data: docUploadResponse
+                data: fieldValue
               }
             }
           }
@@ -3185,10 +3193,13 @@ export const builders: IFieldBuilders = {
           EVENT_TYPE.BIRTH
         )
 
-        const docUploadResponse = await uploadBase64ToMinio(
-          fieldValue,
-          context.authHeader
-        )
+        if (isBase64FileString(fieldValue)) {
+          const docUploadResponse = await uploadBase64ToMinio(
+            fieldValue,
+            context.authHeader
+          )
+          fieldValue = docUploadResponse
+        }
         if (!certDocResource.content) {
           certDocResource.content = [
             {
@@ -3198,7 +3209,7 @@ export const builders: IFieldBuilders = {
             }
           ]
         }
-        certDocResource.content[0].attachment.data = docUploadResponse
+        certDocResource.content[0].attachment.data = fieldValue
       }
     }
   },

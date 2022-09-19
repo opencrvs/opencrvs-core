@@ -65,3 +65,4 @@ export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS = process.env
   ? parseInt(process.env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS, 10)
   : 600
 export const DEFAULT_TIMEOUT = 600000
+export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'
