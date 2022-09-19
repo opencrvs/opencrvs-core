@@ -317,8 +317,10 @@ describe('Registraion Rates error state tests', () => {
   })
 
   it('renders the error toast notification and component loader', async () => {
-    await waitForElement(component, '#error-toast')
-    expect(component.find('#error-toast').hostNodes()).toHaveLength(1)
+    await waitForElement(component, '[data-testid=error-toast]')
+    expect(
+      component.find({ 'data-testid': 'error-toast' }).hostNodes()
+    ).toHaveLength(1)
     expect(
       component.find('#reg-rates-line-chart-loader').hostNodes()
     ).toHaveLength(1)

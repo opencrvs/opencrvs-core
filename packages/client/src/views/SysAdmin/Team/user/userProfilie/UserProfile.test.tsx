@@ -164,7 +164,9 @@ describe('User audit list tests', () => {
       />,
       { store, history }
     )
-    expect(await waitForElement(testComponent, '#error-toast')).toBeDefined()
+    expect(
+      await waitForElement(testComponent, '[data-testid=error-toast]')
+    ).toBeDefined()
   })
   it('redirects to edit user view on clicking edit details menu option', async () => {
     const menuLink = await waitForElement(

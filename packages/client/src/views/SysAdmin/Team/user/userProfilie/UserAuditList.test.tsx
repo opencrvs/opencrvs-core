@@ -180,7 +180,9 @@ describe('User audit list tests', () => {
       />,
       { store, history }
     )
-    expect(await waitForElement(testComponent, '#error-toast')).toBeDefined()
+    expect(
+      await waitForElement(testComponent, '[data-testid=error-toast]')
+    ).toBeDefined()
   })
   it('toggles sorting order of the list', async () => {
     const firstRowElement = await waitForElement(component, '#row_0')

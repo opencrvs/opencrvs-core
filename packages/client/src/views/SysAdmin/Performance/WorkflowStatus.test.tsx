@@ -344,7 +344,10 @@ describe('Workflow status tests', () => {
     })
 
     it('renders error notification toast', async () => {
-      const notificationToast = await waitForElement(component, '#error-toast')
+      const notificationToast = await waitForElement(
+        component,
+        '[data-testid=error-toast]'
+      )
       expect(notificationToast.hostNodes().text()).toBe(
         "Sorry, we couldn't load the content for this pageRetry"
       )
