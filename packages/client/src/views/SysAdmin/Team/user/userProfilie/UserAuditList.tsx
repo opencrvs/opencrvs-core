@@ -68,6 +68,10 @@ const AuditDescTimeContainer = styled.div`
     padding-top: 5px;
   }
 `
+const HistoryHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
 
 const RecentActionsHolder = styled.div`
   margin-top: 40px;
@@ -82,10 +86,6 @@ const RecentActionsHolder = styled.div`
 const SectionTitle = styled.div`
   ${({ theme }) => theme.fonts.h2};
   margin-bottom: 10px;
-`
-
-const AuditListHolder = styled.div`
-  margin-top: 30px;
 `
 
 const StatusIcon = styled.div`
@@ -165,14 +165,8 @@ class UserAuditListComponent extends React.Component<Props, State> {
     if (this.state.viewportWidth <= theme.grid.breakpoints.md) {
       columns = [
         {
-          label: '',
-          width: 12,
-          key: 'statusIcon',
-          alignment: ColumnContentAlignment.CENTER
-        },
-        {
           label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 68,
+          width: 80,
           key: 'actionDescriptionWithAuditTime'
         },
         {
@@ -186,24 +180,18 @@ class UserAuditListComponent extends React.Component<Props, State> {
       columns = [
         {
           label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 43,
+          width: 47,
           key: 'actionDescription'
-        },
-        {
-          label: '',
-          width: 5,
-          key: 'statusIcon',
-          alignment: ColumnContentAlignment.CENTER
-        },
-        {
-          label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
-          width: 15,
-          key: 'trackingId'
         },
         {
           label: intl.formatMessage(messages.auditEventTypeColumnTitle),
           width: 15,
           key: 'eventType'
+        },
+        {
+          label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
+          width: 15,
+          key: 'trackingId'
         },
         {
           label: intl.formatMessage(messages.auditDateColumnTitle),
@@ -270,6 +258,8 @@ class UserAuditListComponent extends React.Component<Props, State> {
   }
 
   getAuditData(data: GQLQuery, user?: IUserData) {
+    console.log('data', data)
+    console.log('user', user)
     if (
       !user ||
       !data ||
@@ -309,13 +299,12 @@ class UserAuditListComponent extends React.Component<Props, State> {
               </InformationCaption>
             </AuditDescTimeContainer>
           ),
-          statusIcon: this.getWorkflowStatusIcon(timeLoggedMetrics.status),
-          trackingId: (timeLoggedMetrics.trackingId && (
-            <LinkButton>{timeLoggedMetrics.trackingId}</LinkButton>
-          )) || <></>,
           eventType: this.props.intl.formatMessage(
             constantsMessages[timeLoggedMetrics.eventType.toLowerCase()]
           ),
+          trackingId: (timeLoggedMetrics.trackingId && (
+            <LinkButton>{timeLoggedMetrics.trackingId}</LinkButton>
+          )) || <></>,
           auditTime: format(
             new Date(timeLoggedMetrics.time),
             'MMMM dd, yyyy hh:mm a'
@@ -371,17 +360,19 @@ class UserAuditListComponent extends React.Component<Props, State> {
         {isLoading && this.getLoadingView()}
         {!isLoading && (
           <>
-            <SectionTitle>
-              {intl.formatMessage(messages.auditSectionTitle)}
-            </SectionTitle>
-            <DateRangePicker
-              startDate={timeStart}
-              endDate={timeEnd}
-              onDatesChange={({ startDate, endDate }) => {
-                this.setDateRangePickerValues(startDate, endDate)
-              }}
-            />
-            <AuditListHolder>
+            <HistoryHeader>
+              <SectionTitle>
+                {intl.formatMessage(messages.auditSectionTitle)}
+              </SectionTitle>
+              <DateRangePicker
+                startDate={timeStart}
+                endDate={timeEnd}
+                onDatesChange={({ startDate, endDate }) => {
+                  this.setDateRangePickerValues(startDate, endDate)
+                }}
+              />
+            </HistoryHeader>
+            <>
               <Query
                 query={FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER}
                 variables={{
@@ -431,7 +422,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
                   }
                 }}
               </Query>
-            </AuditListHolder>
+            </>
           </>
         )}
       </RecentActionsHolder>

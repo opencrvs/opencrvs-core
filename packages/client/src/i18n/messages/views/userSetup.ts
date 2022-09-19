@@ -202,7 +202,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.startDate'
   },
   auditSectionTitle: {
-    defaultMessage: 'Audit',
+    defaultMessage: 'History',
     description: 'Title for audit section',
     id: 'user.profile.sectionTitle.audit'
   },
@@ -212,12 +212,12 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.audit.column.action'
   },
   auditTrackingIDColumnTitle: {
-    defaultMessage: 'Tracking ID',
+    defaultMessage: 'Record',
     description: 'Title for audit tracking id column',
     id: 'user.profile.audit.column.trackingId'
   },
   auditEventTypeColumnTitle: {
-    defaultMessage: 'Event type',
+    defaultMessage: 'Event',
     description: 'Title for audit event type column',
     id: 'user.profile.audit.column.eventType'
   },
