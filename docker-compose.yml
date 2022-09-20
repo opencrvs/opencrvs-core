@@ -95,6 +95,13 @@ services:
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
   # END User facing services
+  scheduler:
+    image: opencrvs/ocrvs-scheduler:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/scheduler/Dockerfile
+    environment:
+      - METRICS_URL=http://metrics:1050
   auth:
     image: opencrvs/ocrvs-auth:${VERSION:-latest}
     build:
