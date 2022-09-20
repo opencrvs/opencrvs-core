@@ -114,7 +114,10 @@ export const Alert = ({
     <NotificationMessage>{children}</NotificationMessage>
 
     {onActionClick && (
-      <ActionButton onClick={onActionClick}>
+      <ActionButton
+        onClick={onActionClick}
+        data-testid={props['data-testid'] && `${props['data-testid']}-action`}
+      >
         <ButtonText variant="bold14" element="span">
           {actionText}
         </ButtonText>
@@ -122,7 +125,11 @@ export const Alert = ({
     )}
 
     {onClose && type !== 'loading' && (
-      <Close id={props.id + 'Cancel'} onClick={onClose}>
+      <Close
+        id={props.id + 'Cancel'}
+        data-testid={props['data-testid'] && `${props['data-testid']}-close`}
+        onClick={onClose}
+      >
         <Cross color="currentColor" />
       </Close>
     )}
