@@ -476,33 +476,34 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               </ListViewContainer>
             </Content>
           )}
-          <Toast
-            type={
-              imageLoadingError
-                ? 'warning'
-                : this.state.imageUploading
-                ? 'loading'
-                : 'success'
-            }
-            show={showNotification}
-            onClose={
-              imageUploading ? undefined : () => this.toggleNotification()
-            }
-          >
-            <FormattedMessage
-              {...(this.state.imageUploading
-                ? messages.certificateUploading
-                : !!this.state.imageLoadingError
-                ? messages.certificateValidationError
-                : messages.certificateUpdated)}
-              values={{
-                eventName: !this.state.imageUploading
-                  ? eventName.toUpperCase()[0] +
-                    eventName.toLowerCase().slice(1)
-                  : eventName
-              }}
-            />
-          </Toast>
+          {showNotification && (
+            <Toast
+              type={
+                imageLoadingError
+                  ? 'warning'
+                  : this.state.imageUploading
+                  ? 'loading'
+                  : 'success'
+              }
+              onClose={
+                imageUploading ? undefined : () => this.toggleNotification()
+              }
+            >
+              <FormattedMessage
+                {...(this.state.imageUploading
+                  ? messages.certificateUploading
+                  : !!this.state.imageLoadingError
+                  ? messages.certificateValidationError
+                  : messages.certificateUpdated)}
+                values={{
+                  eventName: !this.state.imageUploading
+                    ? eventName.toUpperCase()[0] +
+                      eventName.toLowerCase().slice(1)
+                    : eventName
+                }}
+              />
+            </Toast>
+          )}
           <ResponsiveModal
             id="withoutVerificationPrompt"
             show={showPrompt}

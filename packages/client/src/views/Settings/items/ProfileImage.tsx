@@ -119,17 +119,20 @@ export function ProfileImage() {
         onConfirmAvatarChange={handleConfirmAvatarChange}
         onAvatarChanged={changeAvatar}
       />
-      <Toast
-        type={imageUploading ? 'loading' : 'success'}
-        show={showSuccessNotification}
-        onClose={imageUploading ? undefined : () => toggleSuccessNotification()}
-      >
-        <FormattedMessage
-          {...(imageUploading
-            ? userMessages.avatarUpdating
-            : userMessages.avatarUpdated)}
-        />
-      </Toast>
+      {showSuccessNotification && (
+        <Toast
+          type={imageUploading ? 'loading' : 'success'}
+          onClose={
+            imageUploading ? undefined : () => toggleSuccessNotification()
+          }
+        >
+          <FormattedMessage
+            {...(imageUploading
+              ? userMessages.avatarUpdating
+              : userMessages.avatarUpdated)}
+          />
+        </Toast>
+      )}
     </>
   )
 }
