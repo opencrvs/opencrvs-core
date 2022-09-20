@@ -158,9 +158,12 @@ export async function generateAndSendVerificationCode(
   scope: string[]
 ) {
   const isDemoUser = scope.indexOf('demo') > -1
-  logger.info('isDemoUser', {
-    isDemoUser: isDemoUser
-  })
+  logger.info(
+    'isDemoUser, ' +
+      JSON.stringify({
+        isDemoUser: isDemoUser
+      })
+  )
   let verificationCode
   if (isDemoUser) {
     verificationCode = '000000'
@@ -169,10 +172,13 @@ export async function generateAndSendVerificationCode(
     verificationCode = await generateVerificationCode(nonce, mobile)
   }
   if (!PRODUCTION || QA_ENV) {
-    logger.info('Sending a verification SMS', {
-      mobile: mobile,
-      verificationCode
-    })
+    logger.info(
+      'Sending a verification SMS, ' +
+        JSON.stringify({
+          mobile: mobile,
+          verificationCode
+        })
+    )
   } else {
     if (isDemoUser) {
       throw unauthorized()
