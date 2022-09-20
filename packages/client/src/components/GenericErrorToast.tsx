@@ -24,7 +24,7 @@ export const GenericErrorToast = () => {
 
   return isVisible ? (
     <Toast
-      data-testid="error-toast"
+      id="error-toast"
       type="warning"
       actionText={intl.formatMessage(buttonMessages.retry)}
       onActionClick={notificationActionButtonHandler}

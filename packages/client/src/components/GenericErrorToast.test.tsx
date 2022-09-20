@@ -23,8 +23,6 @@ describe('Test toast notification', () => {
       history
     })
 
-    expect(
-      component.find({ 'data-testid': 'error-toast' }).hostNodes()
-    ).toHaveLength(1)
+    expect(component.find('#error-toast').hostNodes()).toHaveLength(1)
   })
 })
