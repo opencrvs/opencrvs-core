@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
+import { DocsContainer } from '@storybook/addon-docs'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import WebFont from 'webfontloader'
 import { getTheme } from '@opencrvs/components/lib/theme'
@@ -86,6 +87,13 @@ export const parameters = {
       color: /(background|color)$/i,
       date: /Date$/
     }
+  },
+  docs: {
+    container: ({ children, context }) => (
+      <DocsContainer context={context}>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </DocsContainer>
+    )
   },
   options: {
     storySort: {

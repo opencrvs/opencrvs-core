@@ -1,0 +1,60 @@
+<!--This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+graphic logo are (registered/a) trademark(s) of Plan International.-->
+
+import { Meta, DocsContainer } from '@storybook/addon-docs'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { ThemeProvider } from 'styled-components'
+import { getTheme } from '@opencrvs/components/lib/theme'
+
+<Meta
+  title="Welcome"
+  parameters={{
+    docs: {
+      container: ({ children, context }) => {
+        const theme = getTheme()
+        return (
+          <DocsContainer context={context}>
+            <ThemeProvider theme={theme}>
+              <div style={{ maxWidth: '640px' }}>{children}</div>
+            </ThemeProvider>
+          </DocsContainer>
+        )
+      }
+    }
+  }}
+/>
+
+# OpenUI
+
+<Pill label="v1.0.0" type="default" size="small" />
+
+OpenUI provides you with guidelines, components and templates to build new features for OpenCRVS and high quality branded applications, faster and better.
+
+The guide is a living document created to meet the needs of OpenCRVS front-end developers and designers. If there is a component or pattern you need or you have any other feedback, question or comment please contact us.
+
+<br />
+
+### Design resources
+
+---
+
+OpenUI is available as a Figma library for rapid design and prototyping of web based applications. It contains all the resources you need to get started consisting of three interconnected libraries of styles, components and templates.
+
+<br />
+
+### Accessibility
+
+<br />
+
+### Support and feedback
+
+If you have any questions or concerns, please feel free to reach out to the Design Team on Slack (#design-system). One of our missions is build tools to make your job easier and you more successful, so please don't hesitate to reach out.
+
+<br />
