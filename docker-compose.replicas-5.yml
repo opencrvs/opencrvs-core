@@ -18,6 +18,10 @@ services:
     environment:
       - MONGO_URL=mongodb://webhooks:${WEBHOOKS_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/webhooks?replicaSet=rs0
 
+  metrics:
+    environment:
+      - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/hearth-dev?replicaSet=rs0
+
   config:
     environment:
       - MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/application-config?replicaSet=rs0
