@@ -49,7 +49,7 @@ import {
 } from '@client/components/interface/ToastNotification'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
+import { UserAuditHistory } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditHistory'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { userMutations } from '@client/user/mutations'
@@ -319,7 +319,7 @@ class UserProfileComponent extends React.Component<Props, State> {
           <LoadingTitle width={120} marginRight={112} />
           <LoadingValue width={15} />
         </InformationHolder>
-        <UserAuditList isLoading={true} />
+        <UserAuditHistory isLoading={true} />
         {hasError && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
       </SysAdminContentWrapper>
     )
@@ -452,7 +452,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                         {intl.formatMessage(sysMessages.resendSMSError)}
                       </Toast>
                     )}
-                    <UserAuditList user={user} />
+                    <UserAuditHistory user={user} />
                   </ContentWrapper>
                 </SysAdminContentWrapper>
               )

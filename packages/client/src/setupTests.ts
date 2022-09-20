@@ -235,6 +235,7 @@ vi.mock('react-router', async () => ({
   ...((await vi.importActual('react-router')) as any),
   useParams: () => ({
     event: 'birth',
-    section: 'child'
+    section: 'child',
+    userId: '5d08e102542c7a19fc55b790'
   })
 }))
