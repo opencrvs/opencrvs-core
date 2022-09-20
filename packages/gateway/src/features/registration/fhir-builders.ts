@@ -3581,6 +3581,7 @@ export async function updateFHIRTaskBundle(
 ) {
   const taskResource = taskEntry.resource
   taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
+  taskEntry.resource.lastModified = new Date().toISOString()
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
