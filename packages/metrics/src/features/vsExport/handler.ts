@@ -11,9 +11,14 @@
  */
 
 import * as Hapi from '@hapi/hapi'
+import { uploadBase64ToMinio } from '@metrics/api'
 import { VS_EXPORT_SCRIPT_PATH } from '@metrics/constants'
-import { logger } from '@metrics/logger'
 import { fork } from 'child_process'
+import * as fs from 'fs'
+import { join } from 'path'
+
+const BIRTH_REPORT_PATH = join(__dirname, '../../../scripts/Birth_Report.csv')
+const DEATH_REPORT_PATH = join(__dirname, '../../../scripts/Death_Report.csv')
 
 export async function vsExportHandler(
   request: Hapi.Request,
@@ -32,8 +37,30 @@ export async function vsExportHandler(
 
   const childArgv = [startDate, endDate]
   const script = fork(VS_EXPORT_SCRIPT_PATH, childArgv)
-  script.on('close', (code) => {
-    logger.info(`child process exited with code ${code}`)
+
+  script.on('close', async (code) => {
+    console.log(`child process exited with code ${code}`)
+    try {
+      if (
+        fs.existsSync(BIRTH_REPORT_PATH) &&
+        fs.existsSync(DEATH_REPORT_PATH)
+      ) {
+        //convert csv files to base64
+        const birthContents = fs.readFileSync(BIRTH_REPORT_PATH, {
+          encoding: 'base64'
+        })
+        const deathContents = fs.readFileSync(DEATH_REPORT_PATH, {
+          encoding: 'base64'
+        })
+        //upload files to minio
+        const birthUploadResponse = await uploadBase64ToMinio(birthContents)
+        const deathUploadResponse = await uploadBase64ToMinio(deathContents)
+        console.log(birthUploadResponse)
+        console.log(deathUploadResponse)
+      }
+    } catch (err) {
+      console.error(err)
+    }
   })
   return h
     .response({
