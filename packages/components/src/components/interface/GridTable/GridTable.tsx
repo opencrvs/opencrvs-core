@@ -119,7 +119,6 @@ interface IGridTableProps {
   columns: IColumn[]
   renderExpandedComponent?: (eventId: string) => React.ReactNode
   noResultText?: string
-  noResultComponent?: React.ReactNode
   hideTableHeader?: boolean
   clickable?: boolean
   loading?: boolean
@@ -174,14 +173,8 @@ export class GridTableComp extends React.Component<
   }
 
   render() {
-    const {
-      columns,
-      content,
-      noResultText,
-      hideTableHeader,
-      sortOrder,
-      noResultComponent
-    } = this.props
+    const { columns, content, noResultText, hideTableHeader, sortOrder } =
+      this.props
     const { width } = this.state
     const isMobileView = this.state.width < this.props.theme.grid.breakpoints.lg
     return (
@@ -229,12 +222,9 @@ export class GridTableComp extends React.Component<
             renderActionBlock={this.renderActionBlock}
           />
         )}
-        {!this.props.loading &&
-          content.length <= 0 &&
-          ((noResultText && (
-            <NoResultText id="no-record">{noResultText}</NoResultText>
-          )) ||
-            noResultComponent)}
+        {!this.props.loading && noResultText && content.length <= 0 && (
+          <NoResultText id="no-record">{noResultText}</NoResultText>
+        )}
       </Wrapper>
     )
   }
