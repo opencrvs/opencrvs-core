@@ -26,6 +26,8 @@
           - mongodb_admin_username is defined
           - mongodb_admin_password is defined
           - elasticsearch_superuser_password is defined
+          - minio_access_key is defined
+          - minio_secret_key is defined
           - country_config_path is defined
 
     - name: Setting global variables accessed by country configuration playbook
@@ -197,6 +199,22 @@
         group: 1000
         owner: 1000
         mode: ugo+rwx
+
+    - name: 'Create minio data directory'
+      file:
+        path: /data/minio
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
+    - name: 'Create minio backup directory'
+      file:
+        path: /data/backups/minio
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
 
     - name: 'Install UFW'
       apt:
