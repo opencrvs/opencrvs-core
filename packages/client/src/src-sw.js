@@ -53,6 +53,7 @@ self.addEventListener('message', (event) => {
 
   switch (event.data) {
     case 'skipWaiting':
+      // About caches variable: https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage/delete
       caches.keys().then((cs) => cs.forEach((c) => caches.delete(c)))
       self.skipWaiting()
       break
