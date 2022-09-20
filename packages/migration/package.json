@@ -8,8 +8,10 @@
   "scripts": {
     "start": "./runMigrations.sh",
     "start:prod": "./runMigrations.sh",
-    "new:migration": "migrate-mongo create",
-    "status": "migrate-mongo status",
+    "create:hearth": "migrate-mongo create -f migrate-mongo-config-hearth.js",
+    "create:openhim": "migrate-mongo create -f migrate-mongo-config-hearth.js",
+    "status:hearth": "migrate-mongo status -f migrate-mongo-config-hearth.js",
+    "status:openhim": "migrate-mongo status -f migrate-mongo-config-openhim.js",
     "precommit": "lint-staged"
   },
   "dependencies": {
