@@ -17,25 +17,25 @@ export const Template = (args) => <Button {...args}>Click here</Button>
 
 export const Variants = () => (
   <Stack wrap>
-    <Button primary>Primary</Button>
-    <Button positive>Positive</Button>
-    <Button negative>Negative</Button>
-    <Button secondary>Secondary</Button>
-    <Button tertiary size="small">
+    <Button type="primary">Primary</Button>
+    <Button type="positive">Positive</Button>
+    <Button type="negative">Negative</Button>
+    <Button type="secondary">Secondary</Button>
+    <Button type="tertiary" size="small">
       Tertiary
     </Button>
-    <Button icon size="medium">
+    <Button type="primary" size="medium" icon>
       <Activity />
     </Button>
-    <Button primary>
+    <Button type="primary">
       <Activity stroke="#ffffff" />
       Primary
     </Button>
-    <Button secondary>
+    <Button type="secondary">
       <Activity stroke="#4972bb" />
       Secondary
     </Button>
-    <Button tertiary size="small">
+    <Button type="tertiary" size="small">
       <Activity stroke="#4972bb" />
       Primary
     </Button>
@@ -44,13 +44,13 @@ export const Variants = () => (
 
 export const Sizes = () => (
   <Stack>
-    <Button primary size="large">
+    <Button type="primary" size="large">
       Large
     </Button>
-    <Button primary size="medium">
+    <Button type="primary" size="medium">
       Default
     </Button>
-    <Button primary size="small">
+    <Button type="primary" size="small">
       Small
     </Button>
   </Stack>
@@ -72,13 +72,13 @@ export const Icon = () => (
 
 export const Loading = () => (
   <Stack>
-    <Button primary loading>
+    <Button type="primary" loading>
       Primary
     </Button>
-    <Button secondary loading>
+    <Button type="secondary" loading>
       Secondary
     </Button>
-    <Button tertiary loading>
+    <Button type="tertiary" loading>
       Tertiary
     </Button>
   </Stack>
@@ -86,13 +86,13 @@ export const Loading = () => (
 
 export const Disabled = () => (
   <Stack>
-    <Button primary disabled>
+    <Button type="primary" disabled>
       Primary
     </Button>
-    <Button secondary disabled>
+    <Button type="secondary" disabled>
       Secondary
     </Button>
-    <Button tertiary disabled>
+    <Button type="tertiary" disabled>
       Tertiary
     </Button>
   </Stack>
@@ -113,15 +113,33 @@ Buttons are used primarily for actions. For buttons that need to look like links
 <Canvas>
   <Story
     args={{
-      primary: true,
-      secondary: false,
-      tertiary: false,
-      positive: false,
-      negative: false,
+      type: 'primary',
       size: 'medium',
       icon: false,
       disabled: false,
       loading: false
+    }}
+    argTypes={{
+      type: {
+        control: {
+          type: 'radio'
+        }
+      },
+      disabled: {
+        table: {
+          category: 'Modifiers'
+        }
+      },
+      loading: {
+        table: {
+          category: 'Modifiers'
+        }
+      },
+      icon: {
+        table: {
+          category: 'Modifiers'
+        }
+      }
     }}
     name="Button"
   >

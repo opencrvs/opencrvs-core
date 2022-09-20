@@ -15,35 +15,25 @@ import styled from 'styled-components'
 import { Spinner } from '../Spinner'
 import * as styles from './Button.styles'
 
-const BUTTON_SIZES = ['small', 'medium', 'large'] as const
-const BUTTON_VARIANTS = [
-  'primary',
-  'secondary',
-  'tertiary',
-  'positive',
-  'negative'
-] as const
-const BUTTON_MODIFIERS = ['disabled', 'loading', 'icon'] as const
-
-type ButtonSize = typeof BUTTON_SIZES[number]
-type ButtonVariant = typeof BUTTON_VARIANTS[number]
-type ButtonModifier = typeof BUTTON_MODIFIERS[number]
+type ButtonSize = 'small' | 'medium' | 'large'
+type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'positive' | 'negative'
+type ButtonModifier = 'disabled' | 'loading' | 'icon'
 
 interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
   /** Size of the button */
   size?: ButtonSize
   /** Element the button renders as */
   element?: 'a' | 'button'
+  /** Button type */
+  type: ButtonType
 }
 
 export type ButtonProps = ButtonCustomization & {
-  [variant in ButtonVariant]: boolean
-} & {
   [modifier in ButtonModifier]: boolean
 }
 
-type StyledButtonProps = Omit<ButtonProps, ButtonVariant> & {
-  variant: ButtonVariant
+type StyledButtonProps = Omit<ButtonProps, 'type'> & {
+  variant: ButtonType
 }
 const StyledButton = styled.button.withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
@@ -71,16 +61,15 @@ const StyledButton = styled.button.withConfig({
 export const Button = ({
   size = 'medium',
   element = 'button',
+  type,
   loading,
   children,
   ...props
 }: ButtonProps) => {
-  const variant = BUTTON_VARIANTS.find((variant) => props[variant]) ?? 'primary'
-
   return (
     <StyledButton
       size={size}
-      variant={variant}
+      variant={type}
       loading={loading}
       as={element}
       {...props}
