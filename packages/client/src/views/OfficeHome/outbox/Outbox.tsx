@@ -20,7 +20,9 @@ import {
 } from '@client/i18n/messages'
 import {
   ColumnContentAlignment,
+  COLUMNS,
   GridTable,
+  SORT_ORDER,
   Spinner
 } from '@client/../../components/lib/interface'
 import { messages } from '@client/i18n/messages/views/notifications'
@@ -35,6 +37,7 @@ import {
   NameContainer,
   NoNameContainer
 } from '@client/views/OfficeHome/components'
+import { changeSortedColumn } from '@client/views/OfficeHome/utils'
 
 const IconContainer = styled.div`
   display: flex;
@@ -57,6 +60,8 @@ function getFullName(firstName?: string, lastName?: string) {
 export function Outbox() {
   const intl = useIntl()
   const [width, setWidth] = React.useState(window.innerWidth)
+  const [sortedColumn, setSortedColumn] = React.useState(COLUMNS.ICON_WITH_NAME)
+  const [sortOrder, setSortOrder] = React.useState(SORT_ORDER.ASCENDING)
   const theme = getTheme()
   const declarations = useSelector<IStoreState, IDeclaration[]>(
     (state) => state.declarationsState && state.declarationsState.declarations
@@ -77,7 +82,9 @@ export function Outbox() {
       statusWaitingToBeReinstated,
       statusWaitingToRegister,
       statusWaitingToValidate,
+      statusWaitingToCertify,
       statusArchiving,
+      statusCertifying,
       statusRegistering,
       statusWaitingToReject,
       statusRejecting,
@@ -159,6 +166,16 @@ export function Outbox() {
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(statusArchiving)
         break
+      case SUBMISSION_STATUS.READY_TO_CERTIFY:
+        iconId = `waiting${index}`
+        icon = () => <StatusWaiting id={iconId} key={iconId} />
+        statusText = formatMessage(statusWaitingToCertify)
+        break
+      case SUBMISSION_STATUS.CERTIFYING:
+        iconId = `waiting${index}`
+        icon = () => <Spinner id={iconId} key={iconId} size={24} />
+        statusText = formatMessage(statusCertifying)
+        break
       case SUBMISSION_STATUS.FAILED_NETWORK:
         iconId = `failed${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
@@ -220,6 +237,7 @@ export function Outbox() {
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
       )
+
       return {
         id: declaration.id,
         event:
@@ -228,7 +246,7 @@ export function Outbox() {
               dynamicConstantsMessages[declaration.event.toLowerCase()]
             )) ||
           '',
-        statusIconAndName: (
+        iconWithName: (
           <IconWithName
             status={declaration.registrationStatus || 'IN_PROGRESS'}
             name={NameComponent}
@@ -241,6 +259,16 @@ export function Outbox() {
     })
   }
 
+  const onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      sortedColumn,
+      sortOrder
+    )
+    setSortedColumn(newSortedCol)
+    setSortOrder(newSortOrder)
+  }
+
   return (
     <WQContentWrapper
       title={intl.formatMessage(navigationMessages.outbox)}
@@ -251,25 +279,31 @@ export function Outbox() {
         columns={[
           {
             width: 25,
-            label: intl.formatMessage(constantsMessages.name),
-            key: 'statusIconAndName'
+            label: intl.formatMessage(constantsMessages.record),
+            key: COLUMNS.ICON_WITH_NAME,
+            isSorted: sortedColumn === COLUMNS.ICON_WITH_NAME,
+            sortFunction: onColumnClick
           },
           {
             label: intl.formatMessage(constantsMessages.event),
             width: 25,
-            key: 'event'
+            key: COLUMNS.EVENT,
+            isSorted: sortedColumn === COLUMNS.EVENT,
+            sortFunction: onColumnClick
           },
           {
             label: intl.formatMessage(constantsMessages.eventDate),
             width: 25,
-            key: 'dateOfEvent'
+            key: COLUMNS.DATE_OF_EVENT,
+            isSorted: sortedColumn === COLUMNS.DATE_OF_EVENT,
+            sortFunction: onColumnClick
           },
           {
             label: '',
             width: 21,
             key: 'submissionStatus',
             alignment: ColumnContentAlignment.RIGHT,
-            color: getTheme().colors.supportingCopy
+            color: theme.colors.supportingCopy
           },
           {
             label: '',

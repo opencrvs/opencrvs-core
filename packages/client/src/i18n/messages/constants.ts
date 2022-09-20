@@ -550,6 +550,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for Reason the declaration was rejected',
     id: 'constants.reason'
   },
+  record: {
+    defaultMessage: 'Record',
+    description: 'Label for header table header Record',
+    id: 'constants.record'
+  },
   requestReason: {
     defaultMessage: 'Reason for request',
     description: 'Label for Reason the declaration was corrected',
