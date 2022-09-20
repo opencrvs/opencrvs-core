@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { documentUploadHandler } from '@documents/features/uploadDocument/handler'
+import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -19,6 +20,16 @@ export const getRoutes = () => {
       path: '/upload',
       handler: documentUploadHandler,
       config: {
+        tags: ['api']
+      }
+    },
+    // upload vs export
+    {
+      method: 'POST',
+      path: '/upload-vs-export',
+      handler: vsExportUploaderHandler,
+      config: {
+        auth: false,
         tags: ['api']
       }
     },
