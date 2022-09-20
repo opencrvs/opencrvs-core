@@ -13,9 +13,11 @@
 import * as Hapi from '@hapi/hapi'
 import { uploadBase64ToMinio } from '@metrics/api'
 import { VS_EXPORT_SCRIPT_PATH } from '@metrics/constants'
+import VS_Export, { Event } from '@metrics/models/vsExports'
 import { fork } from 'child_process'
 import * as fs from 'fs'
 import { join } from 'path'
+import { internal } from '@hapi/boom'
 
 const BIRTH_REPORT_PATH = join(__dirname, '../../../scripts/Birth_Report.csv')
 const DEATH_REPORT_PATH = join(__dirname, '../../../scripts/Death_Report.csv')
@@ -45,18 +47,44 @@ export async function vsExportHandler(
         fs.existsSync(BIRTH_REPORT_PATH) &&
         fs.existsSync(DEATH_REPORT_PATH)
       ) {
+        //get year
+        const year = startDate.split('-')[0]
+
+        //get files stats
+        const fileStats = {
+          [Event.BIRTH]: fs.statSync(BIRTH_REPORT_PATH),
+          [Event.DEATH]: fs.statSync(DEATH_REPORT_PATH)
+        }
+
         //convert csv files to base64
-        const birthContents = fs.readFileSync(BIRTH_REPORT_PATH, {
-          encoding: 'base64'
-        })
-        const deathContents = fs.readFileSync(DEATH_REPORT_PATH, {
-          encoding: 'base64'
-        })
+        const fileContents = {
+          [Event.BIRTH]: fs.readFileSync(BIRTH_REPORT_PATH, {
+            encoding: 'base64'
+          }),
+          [Event.DEATH]: fs.readFileSync(DEATH_REPORT_PATH, {
+            encoding: 'base64'
+          })
+        }
+
         //upload files to minio
-        const birthUploadResponse = await uploadBase64ToMinio(birthContents)
-        const deathUploadResponse = await uploadBase64ToMinio(deathContents)
-        console.log(birthUploadResponse)
-        console.log(deathUploadResponse)
+        const uploadResponse = {
+          [Event.BIRTH]: await uploadBase64ToMinio(fileContents.birth),
+          [Event.DEATH]: await uploadBase64ToMinio(fileContents.death)
+        }
+
+        try {
+          await VS_Export.create(
+            [Event.BIRTH, Event.DEATH].map((event) => ({
+              event,
+              year,
+              fileSize: formatBytes(fileStats[event].size),
+              url: uploadResponse[event],
+              createdOn: Date.now()
+            }))
+          )
+        } catch (e) {
+          throw internal(e.message)
+        }
       }
     } catch (err) {
       console.error(err)
@@ -81,4 +109,13 @@ function isValidDate(date: string) {
     return false // NaN value, Invalid date
   }
   return d.toISOString().slice(0, 10) === date
+}
+
+function formatBytes(bytes: number, decimals = 2) {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
