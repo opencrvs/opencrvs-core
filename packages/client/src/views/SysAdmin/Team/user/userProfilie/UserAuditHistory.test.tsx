@@ -15,7 +15,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER } from '@client/user/queries'
-import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
+import { UserAuditHistory } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditHistory'
 import { History } from 'history'
 import { vi } from 'vitest'
 
@@ -125,7 +125,7 @@ describe('User audit list tests', () => {
 
   beforeEach(async () => {
     component = await createTestComponent(
-      <UserAuditList
+      <UserAuditHistory
         user={{
           id: '12345',
           name: 'Dummy User',
@@ -154,7 +154,7 @@ describe('User audit list tests', () => {
 
   it('renders in loading mode', async () => {
     const testComponent = await createTestComponent(
-      <UserAuditList isLoading={true} />,
+      <UserAuditHistory isLoading={true} />,
       {
         store,
         history
@@ -166,7 +166,7 @@ describe('User audit list tests', () => {
   })
   it('renders with a error toast for graphql error', async () => {
     const testComponent = await createTestComponent(
-      <UserAuditList
+      <UserAuditHistory
         user={{
           id: '12345',
           name: 'Dummy User',
@@ -199,7 +199,7 @@ describe('User audit list tests', () => {
 
   it('renders next page of audits after clicking load more link', async () => {
     const testComponent = await createTestComponent(
-      <UserAuditList
+      <UserAuditHistory
         user={{
           id: '12345',
           name: 'Dummy User',
