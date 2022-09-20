@@ -46,7 +46,7 @@ import {
   Toast,
   NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/Toast'
-import { UserAuditHistory } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditHistory'
+import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;

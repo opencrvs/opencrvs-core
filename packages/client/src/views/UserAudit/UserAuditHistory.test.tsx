@@ -15,7 +15,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER } from '@client/user/queries'
-import { UserAuditHistory } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditHistory'
+import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { History } from 'history'
 import { vi } from 'vitest'
 

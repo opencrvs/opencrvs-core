@@ -49,7 +49,7 @@ import {
 } from '@client/components/interface/ToastNotification'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { UserAuditHistory } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditHistory'
+import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { userMutations } from '@client/user/mutations'
