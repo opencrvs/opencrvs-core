@@ -11,6 +11,7 @@
  */
 import { AppStore } from '@client/store'
 import {
+  createRouterProps,
   createTestComponent,
   createTestStore,
   flushPromises
@@ -27,6 +28,7 @@ import { UserAudit } from '@client/views/UserAudit/UserAudit'
 import { USER_PROFILE } from '@client/navigation/routes'
 import { userMutations } from '@client/user/mutations'
 import { vi, Mock } from 'vitest'
+import { formatUrl } from '@client/navigation'
 
 describe('User audit list tests', () => {
   userMutations.resendSMSInvite = vi.fn()
@@ -87,7 +89,6 @@ describe('User audit list tests', () => {
                 ]
               }
             ],
-            signature: null,
             creationDate: '2019-03-31T18:00:00.000Z'
           }
         }
@@ -101,7 +102,8 @@ describe('User audit list tests', () => {
           timeStart: new Date(1484398308000).toISOString(),
           practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
           locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-          count: 10
+          count: 10,
+          skip: 0
         }
       },
       result: {
@@ -131,19 +133,20 @@ describe('User audit list tests', () => {
     component = await createTestComponent(
       // @ts-ignore
       <UserAudit
-        match={{
-          params: {
+        {...createRouterProps(
+          formatUrl(USER_PROFILE, {
             userId: '5d08e102542c7a19fc55b790'
-          },
-          isExact: true,
-          path: USER_PROFILE,
-          url: ''
-        }}
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              userId: '5d08e102542c7a19fc55b790'
+            }
+          }
+        )}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
-
-    expect(await waitForElement(component, '#user-profile')).toBeDefined()
   })
 
   it('renders without crashing', async () => {
@@ -153,14 +156,17 @@ describe('User audit list tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <UserAudit
-        match={{
-          params: {
+        {...createRouterProps(
+          formatUrl(USER_PROFILE, {
             userId: '5d08e102542c7a19fc55b790'
-          },
-          isExact: true,
-          path: USER_PROFILE,
-          url: ''
-        }}
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              userId: '5d08e102542c7a19fc55b790'
+            }
+          }
+        )}
       />,
       { store, history }
     )
@@ -172,7 +178,6 @@ describe('User audit list tests', () => {
       '#sub-page-header-munu-buttonToggleButton'
     )
     menuLink.hostNodes().simulate('click')
-
     const editUserLink = await waitForElement(
       component,
       '#sub-page-header-munu-buttonItem0'
@@ -245,6 +250,7 @@ describe('User audit list tests', () => {
       await waitForElement(component, '#resend_invite_error')
     ).toBeDefined()
   })
+  //NEED TO FIX
   it('opens deactivation modal on clicking deactivate menu option', async () => {
     const menuLink = await waitForElement(
       component,
@@ -260,20 +266,32 @@ describe('User audit list tests', () => {
 
     expect(await waitForElement(component, '#deactivate-action')).toBeDefined()
   })
+  //NEED TO FIX
   it('opens activation modal on clicking deactivate menu option', async () => {
     // @ts-ignore
     graphqlMock[0].result.data.getUser.status = 'deactivated'
     component = await createTestComponent(
       // @ts-ignore
       <UserAudit
-        match={{
-          params: {
+        {...createRouterProps(
+          formatUrl(USER_PROFILE, {
             userId: '5d08e102542c7a19fc55b790'
-          },
-          isExact: true,
-          path: USER_PROFILE,
-          url: ''
-        }}
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              userId: '5d08e102542c7a19fc55b790'
+            }
+          }
+        )}
+        // match={{
+        //   params: {
+        //     userId: '5d08e102542c7a19fc55b790'
+        //   },
+        //   isExact: true,
+        //   path: USER_PROFILE,
+        //   url: ''
+        // }}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
