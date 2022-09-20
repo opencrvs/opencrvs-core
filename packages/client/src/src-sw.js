@@ -53,6 +53,7 @@ self.addEventListener('message', (event) => {
 
   switch (event.data) {
     case 'skipWaiting':
+      caches.keys().then((cs) => cs.forEach((c) => caches.delete(c)))
       self.skipWaiting()
       break
     default:
