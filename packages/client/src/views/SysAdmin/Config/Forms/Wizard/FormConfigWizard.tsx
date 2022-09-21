@@ -53,8 +53,7 @@ const Container = styled.div`
 `
 
 const WizardContainer = styled.div`
-  margin-top: 56px;
-  height: calc(100% - 56px);
+  height: 100%;
   overflow: hidden;
   display: flex;
   justify-content: space-between;

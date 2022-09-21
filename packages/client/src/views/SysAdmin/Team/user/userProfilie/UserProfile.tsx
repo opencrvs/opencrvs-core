@@ -34,19 +34,13 @@ import { LANG_EN } from '@client/utils/constants'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import {
-  Toast,
-  NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
@@ -320,7 +314,7 @@ class UserProfileComponent extends React.Component<Props, State> {
           <LoadingValue width={15} />
         </InformationHolder>
         <UserAuditList isLoading={true} />
-        {hasError && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+        {hasError && <GenericErrorToast />}
       </SysAdminContentWrapper>
     )
   }
@@ -431,9 +425,8 @@ class UserProfileComponent extends React.Component<Props, State> {
                     {showResendSMSSuccess && (
                       <Toast
                         id="resend_invite_success"
-                        type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
-                        show={showResendSMSSuccess}
-                        callback={() =>
+                        type="success"
+                        onClose={() =>
                           this.setState({ showResendSMSSuccess: false })
                         }
                       >
@@ -443,9 +436,8 @@ class UserProfileComponent extends React.Component<Props, State> {
                     {showResendSMSError && (
                       <Toast
                         id="resend_invite_error"
-                        type={FLOATING_NOTIFICATION_TYPE.ERROR}
-                        show={showResendSMSError}
-                        callback={() =>
+                        type="warning"
+                        onClose={() =>
                           this.setState({ showResendSMSError: false })
                         }
                       >

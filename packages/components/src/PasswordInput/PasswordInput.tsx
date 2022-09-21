@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { EyeOn, EyeOff } from '../icons'
-import { TertiaryButton, CircleButton } from '../buttons'
+import { CircleButton } from '../buttons'
 
 interface ICustomProps {
   error?: boolean

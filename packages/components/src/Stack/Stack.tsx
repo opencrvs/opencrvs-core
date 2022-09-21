@@ -12,27 +12,30 @@
 
 import React from 'react'
 import styled from 'styled-components'
+import type { Property } from 'csstype'
 
 export interface IStackProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Gap between the stack items in pixels  */
   gap?: number
   /** Stack direction */
-  direction?: 'row' | 'column'
+  direction?: Property.FlexDirection
   /** Defines how space is distributed between the main direction */
-  justifyContent?: 'flex-start' | 'flex-end' | 'center' | undefined
+  justifyContent?: Property.JustifyContent
   /** Controls the alignment of items on the cross direction */
-  alignItems?: 'flex-start' | 'flex-end' | 'center' | undefined
+  alignItems?: Property.AlignItems
   /** Wraps stack to multiple rows */
   wrap?: boolean
 }
 
-export const StyledStack = styled.div<IStackProps>`
+export const StyledStack = styled.div<{
+  [Property in keyof IStackProps as `$${Property}`]: IStackProps[Property]
+}>`
   display: flex;
-  flex-wrap: ${({ wrap }) => (wrap ? 'wrap' : 'nowrap')};
-  flex-direction: ${({ direction }) => direction};
-  justify-content: ${({ justifyContent }) => justifyContent};
-  align-items: ${({ alignItems }) => alignItems};
-  gap: ${({ gap }) => `${gap}px`};
+  flex-wrap: ${({ $wrap }) => ($wrap ? 'wrap' : 'nowrap')};
+  flex-direction: ${({ $direction }) => $direction};
+  justify-content: ${({ $justifyContent }) => $justifyContent};
+  align-items: ${({ $alignItems }) => $alignItems};
+  gap: ${({ $gap }) => `${$gap}px`};
 `
 
 /**
@@ -49,11 +52,11 @@ export const Stack = ({
   ...props
 }: IStackProps) => (
   <StyledStack
-    direction={direction}
-    justifyContent={justifyContent}
-    alignItems={alignItems}
-    gap={gap}
-    wrap={wrap}
+    $direction={direction}
+    $justifyContent={justifyContent}
+    $alignItems={alignItems}
+    $gap={gap}
+    $wrap={wrap}
     {...props}
   />
 )

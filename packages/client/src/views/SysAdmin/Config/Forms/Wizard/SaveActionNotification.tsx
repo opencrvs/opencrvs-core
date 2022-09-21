@@ -16,29 +16,29 @@ import {
   NOTIFICATION_TYPE_MAP,
   isNotifiable
 } from '@client/views/SysAdmin/Config/Forms/utils'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { useIntl } from 'react-intl'
 import { saveActionMessages } from '@client/i18n/messages/views/formConfig'
+import { noop } from 'lodash'
 
 export function SaveActionNotification() {
   const intl = useIntl()
   const { status, setStatus } = React.useContext(SaveActionContext)
 
   return (
-    <Toast
-      type={
-        isNotifiable(status)
-          ? NOTIFICATION_TYPE_MAP[status]
-          : NOTIFICATION_TYPE.ERROR
-      }
-      show={isNotifiable(status)}
-      callback={
-        status !== ActionStatus.PROCESSING
-          ? () => setStatus(ActionStatus.IDLE)
-          : undefined
-      }
-    >
-      {isNotifiable(status) && intl.formatMessage(saveActionMessages[status])}
-    </Toast>
+    <>
+      {isNotifiable(status) && (
+        <Toast
+          type={NOTIFICATION_TYPE_MAP[status]}
+          onClose={
+            status !== ActionStatus.PROCESSING
+              ? () => setStatus(ActionStatus.IDLE)
+              : noop // Toast isn't closable when status is "loading"
+          }
+        >
+          {intl.formatMessage(saveActionMessages[status])}
+        </Toast>
+      )}
+    </>
   )
 }

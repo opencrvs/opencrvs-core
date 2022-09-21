@@ -1611,12 +1611,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
               {totalFileSizeExceeded && (
-                <Alert
-                  label={intl.formatMessage(
-                    constantsMessages.totalFileSizeExceed,
-                    { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
-                  )}
-                />
+                <Alert type="warning">
+                  {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
+                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
+                  })}
+                </Alert>
               )}
               {!isCorrection(declaration) ? (
                 <>

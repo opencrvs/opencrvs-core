@@ -9,21 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Story, Meta } from '@storybook/react'
-import { FloatingActionButton, IButtonProps } from '.'
 import React from 'react'
+import { Meta, Story } from '@storybook/react'
+import { Help } from '.'
 
 export default {
-  title: 'Deprecated/Button/Floating action button',
-  component: FloatingActionButton
+  title: 'Styles/Icons/Help',
+  component: Help
 } as Meta
 
-const Template: Story<IButtonProps> = (args) => (
-  <FloatingActionButton {...args} />
-)
-export const SampleFloatButton = Template.bind({})
-SampleFloatButton.args = {
-  id: 'myButton',
-  onClick: () => alert('Hello'),
-  icon: () => <span style={{ color: '#fff', fontSize: '40px' }}>+</span>
-}
+const Template: Story<{}> = () => <Help />
+
+export const HelpView = Template.bind({})

@@ -17,7 +17,7 @@ import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { NOTIFICATION_TYPE, Toast } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import {
   hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
@@ -114,18 +114,16 @@ class Component extends React.Component<
         {backgroundSyncMessageVisible && (
           <Toast
             id="backgroundSyncShowNotification"
-            show={backgroundSyncMessageVisible}
-            callback={this.hideBackgroundSyncedNotification}
+            onClose={this.hideBackgroundSyncedNotification}
           >
             {intl.formatMessage(messages.declarationsSynced)}
           </Toast>
         )}
         {configurationErrorVisible && (
           <Toast
-            type={NOTIFICATION_TYPE.ERROR}
+            type="warning"
             id="configErrorShowNotification"
-            show={configurationErrorVisible}
-            callback={this.hideConfigurationErrorNotification}
+            onClose={this.hideConfigurationErrorNotification}
           >
             OpenCRVS has been only partially configured - Awaiting facilities
             and locations
@@ -134,8 +132,7 @@ class Component extends React.Component<
         {saveDraftClicked && (
           <Toast
             id="draftsSavedNotification"
-            show={saveDraftClicked}
-            callback={this.hideDraftsSavedNotification}
+            onClose={this.hideDraftsSavedNotification}
           >
             {intl.formatMessage(messages.draftsSaved)}
           </Toast>
@@ -144,9 +141,8 @@ class Component extends React.Component<
         {submitFormSuccessToast && (
           <Toast
             id="submissionSuccessToast"
-            show={Boolean(submitFormSuccessToast)}
-            type={NOTIFICATION_TYPE.SUCCESS}
-            callback={this.hideSubmitFormSuccessToast}
+            type="success"
+            onClose={this.hideSubmitFormSuccessToast}
           >
             {submitFormSuccessToast === TOAST_MESSAGES.UPDATE_SUCCESS
               ? intl.formatMessage(messages.userFormUpdateSuccess)
@@ -157,9 +153,8 @@ class Component extends React.Component<
         {submitFormErrorToast && (
           <Toast
             id="submissionErrorToast"
-            show={Boolean(submitFormErrorToast)}
-            type={NOTIFICATION_TYPE.ERROR}
-            callback={this.hideSubmitFormErrorToast}
+            type="warning"
+            onClose={this.hideSubmitFormErrorToast}
           >
             {intl.formatMessage(messages.userFormFail)}
           </Toast>
@@ -167,9 +162,8 @@ class Component extends React.Component<
         {userAuditSuccessToast.visible && (
           <Toast
             id="userAuditSuccessToast"
-            show={userAuditSuccessToast.visible}
-            type={NOTIFICATION_TYPE.SUCCESS}
-            callback={this.hideUserAuditSuccessToast}
+            type="success"
+            onClose={this.hideUserAuditSuccessToast}
           >
             {intl.formatMessage(messages.userAuditSuccess, {
               name: userAuditSuccessToast.userFullName,
@@ -180,9 +174,8 @@ class Component extends React.Component<
         {showPINUpdateSuccess && (
           <Toast
             id="PINUpdateSuccessToast"
-            show={showPINUpdateSuccess}
-            type={NOTIFICATION_TYPE.SUCCESS}
-            callback={this.props.hidePINUpdateSuccessToast}
+            type="success"
+            onClose={this.props.hidePINUpdateSuccessToast}
           >
             {intl.formatMessage(messages.updatePINSuccess)}
           </Toast>
@@ -190,9 +183,8 @@ class Component extends React.Component<
         {downloadDeclarationFailedToast && (
           <Toast
             id="PINUpdateSuccessToast"
-            show={Boolean(downloadDeclarationFailedToast)}
-            type={NOTIFICATION_TYPE.ALTERNATE_ERROR}
-            callback={this.props.hideDownloadDeclarationFailedToast}
+            type="warning"
+            onClose={this.props.hideDownloadDeclarationFailedToast}
           >
             {intl.formatMessage(messages.downloadDeclarationFailed)}
           </Toast>
@@ -200,9 +192,8 @@ class Component extends React.Component<
         {unassignedModal !== null && (
           <Toast
             id="unassignedModal"
-            show
-            type={NOTIFICATION_TYPE.ALTERNATE_ERROR}
-            callback={this.props.hideUnassignedModal}
+            type="warning"
+            onClose={this.props.hideUnassignedModal}
           >
             {intl.formatMessage(messages.unassigned, {
               trackingId: unassignedModal.trackingId
@@ -212,9 +203,8 @@ class Component extends React.Component<
         {userCreateDuplicateMobileFailedToast.visible && (
           <Toast
             id="createUserDuplicateMobileFailedToast"
-            show={Boolean(userCreateDuplicateMobileFailedToast.visible)}
-            type={NOTIFICATION_TYPE.ERROR}
-            callback={this.hideCreateUserFormErrorToast}
+            type="warning"
+            onClose={this.hideCreateUserFormErrorToast}
           >
             {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
               number: userCreateDuplicateMobileFailedToast.mobile
