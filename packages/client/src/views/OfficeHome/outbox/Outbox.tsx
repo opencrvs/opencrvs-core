@@ -27,7 +27,7 @@ import {
 } from '@client/../../components/lib/interface'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import { StatusWaiting } from '@client/../../components/lib/icons'
+import { StatusSubmissionWaiting as StatusWaiting } from '@client/../../components/lib/icons'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -37,7 +37,14 @@ import {
   NameContainer,
   NoNameContainer
 } from '@client/views/OfficeHome/components'
-import { changeSortedColumn } from '@client/views/OfficeHome/utils'
+import {
+  changeSortedColumn,
+  getSortedItems
+} from '@client/views/OfficeHome/utils'
+import {
+  ALLOWED_STATUS_FOR_RETRY,
+  INPROGRESS_STATUS
+} from '@client/SubmissionController'
 
 const IconContainer = styled.div`
   display: flex;
@@ -63,8 +70,17 @@ export function Outbox() {
   const [sortedColumn, setSortedColumn] = React.useState(COLUMNS.ICON_WITH_NAME)
   const [sortOrder, setSortOrder] = React.useState(SORT_ORDER.ASCENDING)
   const theme = getTheme()
-  const declarations = useSelector<IStoreState, IDeclaration[]>(
-    (state) => state.declarationsState && state.declarationsState.declarations
+  const declarations = useSelector<IStoreState, IDeclaration[]>((state) =>
+    state.declarationsState?.declarations.filter(
+      (declaration) =>
+        declaration.submissionStatus &&
+        (
+          [
+            ...ALLOWED_STATUS_FOR_RETRY,
+            ...INPROGRESS_STATUS
+          ] as SUBMISSION_STATUS[]
+        ).includes(declaration.submissionStatus as SUBMISSION_STATUS)
+    )
   )
 
   React.useEffect(() => {
@@ -91,6 +107,7 @@ export function Outbox() {
       statusReinstating,
       statusWaitingToSubmit,
       statusSubmitting,
+      statusSendingForApproval,
       waitingToRetry,
       statusRequestingCorrection,
       statusWaitingToRequestCorrection
@@ -119,7 +136,7 @@ export function Outbox() {
       case SUBMISSION_STATUS.APPROVING:
         iconId = `registering${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusSubmitting)
+        statusText = formatMessage(statusSendingForApproval)
         break
       case SUBMISSION_STATUS.SUBMITTING:
         iconId = `registering${index}`
@@ -194,8 +211,18 @@ export function Outbox() {
     }
   }
 
+  const onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      sortedColumn,
+      sortOrder
+    )
+    setSortedColumn(newSortedCol)
+    setSortOrder(newSortOrder)
+  }
+
   function transformDeclarationsReadyToSend() {
-    return declarations.map((declaration, index) => {
+    const items = declarations.map((declaration, index) => {
       let name
       let dateOfEvent
       if (declaration.event && declaration.event.toString() === 'birth') {
@@ -240,6 +267,7 @@ export function Outbox() {
 
       return {
         id: declaration.id,
+        name,
         event:
           (declaration.event &&
             intl.formatMessage(
@@ -254,19 +282,18 @@ export function Outbox() {
         ),
         submissionStatus: statusText || '',
         statusIndicator: icon ? <IconContainer>{icon()}</IconContainer> : null,
-        dateOfEvent: dateOfEvent ? formatLongDate(dateOfEvent) : ''
+        dateOfEvent
       }
     })
-  }
 
-  const onColumnClick = (columnName: string) => {
-    const { newSortedCol, newSortOrder } = changeSortedColumn(
-      columnName,
-      sortedColumn,
-      sortOrder
-    )
-    setSortedColumn(newSortedCol)
-    setSortOrder(newSortOrder)
+    const sortedItems = getSortedItems(items, sortedColumn, sortOrder)
+    return sortedItems.map((item) => ({
+      ...item,
+      dateOfEvent:
+        item.dateOfEvent && typeof item.dateOfEvent === 'string'
+          ? formatLongDate(item.dateOfEvent)
+          : ''
+    }))
   }
 
   return (
@@ -281,7 +308,7 @@ export function Outbox() {
             width: 25,
             label: intl.formatMessage(constantsMessages.record),
             key: COLUMNS.ICON_WITH_NAME,
-            isSorted: sortedColumn === COLUMNS.ICON_WITH_NAME,
+            isSorted: sortedColumn === COLUMNS.NAME,
             sortFunction: onColumnClick
           },
           {
@@ -313,6 +340,8 @@ export function Outbox() {
         ]}
         noResultText={intl.formatMessage(constantsMessages.noResultsOutbox)}
         hideLastBorder={true}
+        sortOrder={sortOrder}
+        sortedCol={sortedColumn}
       />
     </WQContentWrapper>
   )

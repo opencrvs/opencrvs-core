@@ -102,6 +102,11 @@ const messagesToDefine: INotificationsMessages = {
     description: 'Label for declaration status submitting',
     id: 'regHome.outbox.statusSubmitting'
   },
+  statusSendingForApproval: {
+    defaultMessage: 'Sending for approval...',
+    description: 'Label for declaration status waiting for validate',
+    id: 'regHome.outbox.statusSendingForApproval'
+  },
   statusWaitingToBeArchived: {
     defaultMessage: 'Waiting to be archived',
     description: 'Label for application status waiting to be archived',
@@ -118,7 +123,7 @@ const messagesToDefine: INotificationsMessages = {
     id: 'regHome.outbox.statusWaitingToCertify'
   },
   statusWaitingToValidate: {
-    defaultMessage: 'Sending for approval',
+    defaultMessage: 'Waiting to send',
     description: 'Label for declaration status waiting for validate',
     id: 'regHome.outbox.statusWaitingToValidate'
   },
