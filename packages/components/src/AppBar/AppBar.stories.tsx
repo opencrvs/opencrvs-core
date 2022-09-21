@@ -30,7 +30,14 @@ import { noop } from 'lodash'
 
 export default {
   title: 'Layout/AppBar',
-  component: AppBar
+  component: AppBar,
+  argTypes: {
+    desktopLeft: { control: 'null' },
+    desktopRight: { control: 'null' },
+    desktopCenter: { control: 'null' },
+    mobileLeft: { control: 'null' },
+    mobileRight: { control: 'null' }
+  }
 } as ComponentMeta<typeof AppBar>
 
 const Template: ComponentStory<typeof AppBar> = (args) => (
