@@ -29,17 +29,14 @@ export function SaveActionNotification() {
     <>
       {isNotifiable(status) && (
         <Toast
-          type={
-            isNotifiable(status) ? NOTIFICATION_TYPE_MAP[status] : 'warning'
-          }
+          type={NOTIFICATION_TYPE_MAP[status]}
           onClose={
             status !== ActionStatus.PROCESSING
               ? () => setStatus(ActionStatus.IDLE)
               : noop // Toast isn't closable when status is "loading"
           }
         >
-          {isNotifiable(status) &&
-            intl.formatMessage(saveActionMessages[status])}
+          {intl.formatMessage(saveActionMessages[status])}
         </Toast>
       )}
     </>
