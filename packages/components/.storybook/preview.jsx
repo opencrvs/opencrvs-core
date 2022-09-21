@@ -60,10 +60,20 @@ fieldset, legend
 }
 `
 export const decorators = [
-  (Story) => (
+  (Story, context) => (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <Story />
+
+      {
+        // Allows adding { parameters: { storyHeight: 200 }} inside stories
+        context?.parameters?.storyHeight ? (
+          <div style={{ height: context?.parameters?.storyHeight + 'px' }}>
+            <Story />
+          </div>
+        ) : (
+          <Story />
+        )
+      }
     </ThemeProvider>
   )
 ]

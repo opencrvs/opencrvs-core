@@ -15,17 +15,26 @@ import { Select, ISelectProps } from './Select'
 
 export default {
   title: 'Input/Select',
-  component: Select
+  component: Select,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Select is used for collecting user selection from a list of options.'
+      }
+    },
+    storyHeight: 170
+  }
 } as Meta
 
 const Template: Story<ISelectProps> = (args) => <Select {...args} />
 
-export const SelectView = Template.bind({})
-SelectView.args = {
+export const Default = Template.bind({})
+Default.args = {
   options: [
     { value: 'chocolate', label: 'Chocolate' },
     { value: 'strawberry', label: 'Strawberry' },
     { value: 'vanilla', label: 'Vanilla' }
   ],
-  placeholder: ''
+  placeholder: 'Select a flavour'
 }

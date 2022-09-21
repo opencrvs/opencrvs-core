@@ -28,14 +28,13 @@ interface ISearchToolProps {
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
   title: 'Controls/Search',
-  component: SearchTool
+  component: SearchTool,
+  parameters: {
+    storyHeight: 130
+  }
 }
 
-const Template: Story<ISearchToolProps> = (args) => (
-  <div style={{ height: '150px' }}>
-    <SearchTool {...args} />
-  </div>
-)
+const Template: Story<ISearchToolProps> = (args) => <SearchTool {...args} />
 export const SearchToolView = Template.bind({})
 SearchToolView.args = {
   searchTypeList: [
