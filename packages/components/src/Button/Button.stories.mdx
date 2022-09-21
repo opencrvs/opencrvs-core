@@ -1,11 +1,4 @@
-import {
-  Meta,
-  Story,
-  Canvas,
-  ArgsTable,
-  Source,
-  Preview
-} from '@storybook/addon-docs'
+import { Meta, Story, Canvas, ArgsTable, Preview } from '@storybook/addon-docs'
 import dedent from 'ts-dedent'
 import { Button } from './Button'
 import { Stack } from '../Stack'
@@ -14,33 +7,6 @@ import { Activity } from '../icons'
 <Meta title="Controls / Button" component={Button} />
 
 export const Template = (args) => <Button {...args}>Click here</Button>
-
-export const Variants = () => (
-  <Stack wrap>
-    <Button type="primary">Primary</Button>
-    <Button type="positive">Positive</Button>
-    <Button type="negative">Negative</Button>
-    <Button type="secondary">Secondary</Button>
-    <Button type="tertiary" size="small">
-      Tertiary
-    </Button>
-    <Button type="primary" size="medium" icon>
-      <Activity />
-    </Button>
-    <Button type="primary">
-      <Activity stroke="#ffffff" />
-      Primary
-    </Button>
-    <Button type="secondary">
-      <Activity stroke="#4972bb" />
-      Secondary
-    </Button>
-    <Button type="tertiary" size="small">
-      <Activity stroke="#4972bb" />
-      Primary
-    </Button>
-  </Stack>
-)
 
 export const Sizes = () => (
   <Stack>
@@ -56,15 +22,32 @@ export const Sizes = () => (
   </Stack>
 )
 
+export const WithIcon = () => (
+  <Stack>
+    <Button type="primary">
+      <Activity stroke="#ffffff" />
+      Primary
+    </Button>
+    <Button type="secondary">
+      <Activity stroke="#4972bb" />
+      Secondary
+    </Button>
+    <Button type="tertiary" size="small">
+      <Activity stroke="#4972bb" />
+      Primary
+    </Button>
+  </Stack>
+)
+
 export const Icon = () => (
   <Stack>
-    <Button icon size="large">
+    <Button icon size="large" aria-label="View performance data">
       <Activity />
     </Button>
-    <Button icon size="medium">
+    <Button icon size="medium" aria-label="View performance data">
       <Activity />
     </Button>
-    <Button icon size="small">
+    <Button icon size="small" aria-label="View performance data">
       <Activity />
     </Button>
   </Stack>
@@ -102,13 +85,7 @@ export const Disabled = () => (
 
 Buttons are used primarily for actions. For buttons that need to look like links, see [LinkButton component.](/docs/controls-link-button--link-button-view)
 
-## Variants
-
-<Canvas withSource="none">
-  <Story story={Variants} />
-</Canvas>
-
-## Example
+Use the `aria-label`-prop when the button's visible text doesn't fully convey the meaning of the action. For example "Add" or "Remove" doesn't tell what is being added or removed. Make sure that your button is accessible by keyboard tab navigation.
 
 <Canvas>
   <Story
@@ -155,6 +132,12 @@ Buttons are used primarily for actions. For buttons that need to look like links
   <Story name="Sizes">{Sizes.bind({})}</Story>
 </Canvas>
 
+## With icon
+
+<Canvas>
+  <Story name="With icon">{WithIcon.bind({})}</Story>
+</Canvas>
+
 ## Icon
 
 <Canvas>
@@ -172,26 +155,3 @@ Buttons are used primarily for actions. For buttons that need to look like links
 <Canvas>
   <Story name="Disabled">{Disabled.bind({})}</Story>
 </Canvas>
-
-## Best practices
-
-`aria-label`-prop adds an accessible label for a button that doesn't have accessible content.
-Use `aria-label` when:
-
-- the button has no text or uses an icon alone
-- the button's visible text doesn't fully convey the meaning of the action. For example "Add" or "Remove" doesn't tell what is being added or removed.
-
-Make sure that your button is accessible by keyboard tab navigation.
-
-<Source
-  language="ts"
-  code={dedent`
-    <Button
-      icon
-      aria-label="Print a birth declaration for John Doe"
-      onClick={printBirthDeclaration}
-    >
-      <DeclarationIcon />
-    </Button>
-  `}
-/>
