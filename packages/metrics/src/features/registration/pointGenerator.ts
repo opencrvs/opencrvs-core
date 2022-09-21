@@ -55,8 +55,7 @@ import {
   getRegLastOffice,
   getEncounterLocationType,
   getPractitionerIdFromBundle,
-  fetchDeclarationsBeginnerRole,
-  IUserAuditBody
+  fetchDeclarationsBeginnerRole
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -623,16 +622,18 @@ export async function generateRejectedPoints(
 }
 
 export const generateAuditPoint = async (
-  payload: IUserAuditBody,
+  practitionerId: string,
+  action: string,
   ipAddress: string,
-  userAgent: string
+  userAgent: string,
+  additionalData?: string
 ): Promise<IPoints> => {
   const tags: IUserAuditTags = {
-    action: payload.action,
-    practitionerId: getPractitionerIdFromBundle(payload.bundle)
+    action: action,
+    practitionerId: practitionerId
   }
   const fields: IUserAuditFields = {
-    data: JSON.stringify(payload.additionalData),
+    data: additionalData,
     ipAddress: ipAddress,
     userAgent: userAgent
   }

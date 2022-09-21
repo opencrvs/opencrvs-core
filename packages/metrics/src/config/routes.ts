@@ -46,7 +46,10 @@ import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
 import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
-import { newAuditHandler } from '@metrics/features/audit/handler'
+import {
+  getUserAuditsHandler,
+  newAuditHandler
+} from '@metrics/features/audit/handler'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -533,6 +536,21 @@ export const getRoutes = () => {
       path: '/audit/events',
       handler: newAuditHandler,
       config: {
+        tags: ['api']
+      }
+    },
+
+    // GET user audit events
+    {
+      method: 'GET',
+      path: '/audit/events',
+      handler: getUserAuditsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            practitionerId: Joi.string().required()
+          })
+        },
         tags: ['api']
       }
     }

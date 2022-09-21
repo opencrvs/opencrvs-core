@@ -109,6 +109,7 @@ type Query {
     locationId: String!
     count: Int!
   ): TimeLoggedMetricsResultSet
+  getUserAuditLog(practitionerId: String!): UserLoggedMetricsResultSet
   searchEvents(
     userId: String
     locationIds: [String!]
@@ -436,6 +437,11 @@ type LocationWiseEstimationMetric {
 type TimeLoggedMetricsResultSet {
   results: [TimeLoggedMetrics]
   totalItems: Int
+}
+
+type UserLoggedMetricsResultSet {
+  total: Int!
+  results: [UserLogMetrics!]!
 }
 
 type EventSearchResultSet {
@@ -889,6 +895,15 @@ type TimeLoggedMetrics {
   trackingId: String
   eventType: String!
   time: String!
+}
+
+type UserLogMetrics {
+  time: String!
+  data: String
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
 }
 
 interface EventSearchSet {

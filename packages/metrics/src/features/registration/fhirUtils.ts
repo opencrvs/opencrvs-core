@@ -19,6 +19,13 @@ import {
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
+import { GQLRegStatus } from '@opencrvs/gateway/src/graphql/schema'
+
+import {
+  DOWNLOADED_EXTENSION_URL,
+  OPENCRVS_SPECIFICATION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
+} from '@opencrvs/gateway/src/features/fhir/constants'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
@@ -53,7 +60,6 @@ export function getSectionBySectionCode(
   }
   return personEntry.resource as fhir.Patient
 }
-
 function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
   return resource.resourceType === 'Task'
 }
@@ -74,12 +80,8 @@ export type USER_ACTION =
   | 'ASSIGNED'
   | 'LOGGED_IN'
   | 'LOGGED_OUT'
-
-export interface IUserAuditBody {
-  bundle: fhir.Bundle
-  action: USER_ACTION
-  additionalData?: Record<string, any>
-}
+  | 'DECLARED'
+  | 'REGISTERED'
 
 export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'
 
@@ -134,9 +136,33 @@ export function getPaymentReconciliation(bundle: fhir.Bundle) {
 export function getTask(bundle: fhir.Bundle) {
   return getResourceByType<Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
 }
+export function getDownloadedExtensionStatus(task: fhir.Task) {
+  const extension =
+    task.extension && findExtension(DOWNLOADED_EXTENSION_URL, task.extension)
+  return extension?.valueString
+}
+
+export function findExtension(
+  url: string,
+  extensions: fhir.Extension[]
+): fhir.Extension | undefined {
+  const extension =
+    extensions &&
+    extensions.find((obj: fhir.Extension) => {
+      return obj.url === url
+    })
+  return extension
+}
 
 export function getComposition(bundle: fhir.Bundle) {
   return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+}
+
+export function hasRequestCorrectionExtension(task: fhir.Task) {
+  const extension =
+    task.extension &&
+    findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
+  return extension
 }
 
 export async function getPreviousTask(
@@ -154,6 +180,25 @@ export function getPractitionerIdFromBundle(bundle: fhir.Bundle) {
     throw new Error('Task not found in bundle')
   }
   return getPractionerIdFromTask(task)
+}
+
+export function getActionFromTask(task: fhir.Task) {
+  const businessStatus = getStatusFromTask(task)
+  const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
+  if (businessStatus === extensionStatusWhileDownloaded) {
+    return GQLRegStatus.DOWNLOADED
+  } else if (hasRequestCorrectionExtension(task)) {
+    return GQLRegStatus.REQUESTED_CORRECTION
+  }
+  return businessStatus
+}
+
+export function getStatusFromTask(task: fhir.Task) {
+  const statusType = task.businessStatus?.coding?.find(
+    (coding: fhir.Coding) =>
+      coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+  )
+  return statusType && statusType.code
 }
 
 export function getPractionerIdFromTask(task: fhir.Task) {

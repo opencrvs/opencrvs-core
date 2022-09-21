@@ -153,6 +153,13 @@ export const resolvers: GQLResolver = {
         authHeader
       )
     },
+    async getUserAuditLog(_, params, authHeader) {
+      return await getMetrics(
+        '/audit/events',
+        { practitionerId: params.practitionerId },
+        authHeader
+      )
+    },
     async getLocationStatistics(_, { locationId, populationYear }, authHeader) {
       return getMetrics(
         '/locationStatistics',

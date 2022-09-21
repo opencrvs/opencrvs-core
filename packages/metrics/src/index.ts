@@ -16,5 +16,4 @@ import '@opencrvs/commons/monitoring'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import { createServer } from '@metrics/server'
-
 createServer().then((server) => server.start())
