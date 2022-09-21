@@ -111,11 +111,19 @@ interface IBaseProp {
 
 type Props = WrappedComponentProps & IBaseProp & IOnlineStatusProps
 
+export enum SORTED_COLUMN {
+  ACTION = 'actionDescriptionString',
+  EVENT = 'eventType',
+  RECORD = 'trackingIdString',
+  DATE = 'auditTime'
+}
+
 type State = {
   timeStart: Date
   timeEnd: Date
   viewportWidth: number
-  auditTimeSortOrder: SORT_ORDER
+  sortOrder: SORT_ORDER
+  sortedColumn: SORTED_COLUMN
   currentPageNumber: number
 }
 
@@ -128,7 +136,8 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
       timeEnd: new Date(Date.now()),
       viewportWidth: 0,
       currentPageNumber: 1,
-      auditTimeSortOrder: SORT_ORDER.DESCENDING
+      sortOrder: SORT_ORDER.DESCENDING,
+      sortedColumn: SORTED_COLUMN.DATE
     }
     this.updateViewPort = this.updateViewPort.bind(this)
   }
@@ -149,10 +158,11 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     })
   }
 
-  toggleAuditListSortOrder() {
+  toggleSortOrder(columnName: SORTED_COLUMN) {
     this.setState({
-      auditTimeSortOrder:
-        this.state.auditTimeSortOrder === SORT_ORDER.DESCENDING
+      sortedColumn: columnName,
+      sortOrder:
+        this.state.sortOrder === SORT_ORDER.DESCENDING
           ? SORT_ORDER.ASCENDING
           : SORT_ORDER.DESCENDING
     })
@@ -188,17 +198,26 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         {
           label: intl.formatMessage(messages.auditActionColumnTitle),
           width: 48,
-          key: 'actionDescription'
+          isSortable: true,
+          icon: <ArrowDownBlue />,
+          key: 'actionDescription',
+          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.ACTION)
         },
         {
           label: intl.formatMessage(messages.auditEventTypeColumnTitle),
           width: 15,
-          key: 'eventType'
+          isSortable: true,
+          icon: <ArrowDownBlue />,
+          key: 'eventType',
+          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.EVENT)
         },
         {
           label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
           width: 15,
-          key: 'trackingId'
+          isSortable: true,
+          icon: <ArrowDownBlue />,
+          key: 'trackingId',
+          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.RECORD)
         },
         {
           label: intl.formatMessage(messages.auditDateColumnTitle),
@@ -208,7 +227,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           isSorted: true,
           icon: <ArrowDownBlue />,
           alignment: ColumnContentAlignment.RIGHT,
-          sortFunction: () => this.toggleAuditListSortOrder()
+          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DATE)
         }
       ]
     }
@@ -289,6 +308,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                 ''}
             </InformationTitle>
           ),
+          actionDescriptionString: actionDescriptor
+            ? this.props.intl.formatMessage(actionDescriptor)
+            : '',
           actionDescriptionWithAuditTime: (
             <AuditDescTimeContainer>
               <InformationTitle>
@@ -310,6 +332,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           trackingId: timeLoggedMetrics.trackingId && (
             <LinkButton>{timeLoggedMetrics.trackingId}</LinkButton>
           ),
+          trackingIdString: timeLoggedMetrics.trackingId,
           auditTime: format(
             new Date(timeLoggedMetrics.time),
             'MMMM dd, yyyy hh:mm a'
@@ -319,7 +342,11 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     )
     return (
       (auditList &&
-        orderBy(auditList, ['auditTime'], [this.state.auditTimeSortOrder])) ||
+        orderBy(
+          auditList,
+          [this.state.sortedColumn],
+          [this.state.sortOrder]
+        )) ||
       []
     )
   }
