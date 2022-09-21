@@ -27,19 +27,17 @@ const RowLabelContainer = styled.th`
 `
 
 const RowValueContainer = styled.td`
-  width: 325px;
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 280px;
     display: block;
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
-    width: auto;
   }
 `
 
 const LockedBox = styled.div`
+  width: 320px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    width: 100%;
+  }
   height: 24px;
   border-radius: 4px;
   cursor: not-allowed;

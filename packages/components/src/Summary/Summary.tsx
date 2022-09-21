@@ -15,6 +15,7 @@ import { Row } from './components/Row'
 import styled from 'styled-components'
 
 const SummaryTable = styled.table`
+  width: 100%;
   border-spacing: 0 16px;
 `
 
