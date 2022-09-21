@@ -48,6 +48,15 @@ mongo <<EOF
 EOF
 
 mongo <<EOF
+  use reports
+  db.createUser({
+    user: 'metrics',
+    pwd: '$METRICS_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'application-config' }]
+  })
+EOF
+
+mongo <<EOF
   use webhooks
   db.createUser({
     user: 'webhooks',
