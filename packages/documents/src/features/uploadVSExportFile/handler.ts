@@ -23,22 +23,20 @@ export async function vsExportUploaderHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const payload = request.payload as IDocumentPayload
+  const payload = request.payload
   const ref = uuid()
   try {
-    const base64String = payload.fileData
-    const base64Decoded = Buffer.from(base64String, 'base64')
+    const bufferData = payload as Buffer
     const generateFileName = `${ref}.csv`
 
-    await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
-      'content-type': 'text/csv',
-      ...payload.metaData
+    minioClient.putObject(MINIO_BUCKET, generateFileName, bufferData, {
+      'content-type': 'text/csv'
     })
 
     return h
       .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
       .code(200)
   } catch (error) {
-    return Promise.reject(new Error(`Request failed: ${error.message}`))
+    return h.response(error).code(400)
   }
 }
