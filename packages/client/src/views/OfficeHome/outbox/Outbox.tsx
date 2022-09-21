@@ -27,7 +27,10 @@ import {
 } from '@client/../../components/lib/interface'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import { StatusSubmissionWaiting as StatusWaiting } from '@client/../../components/lib/icons'
+import {
+  ConnectionError,
+  StatusSubmissionWaiting as StatusWaiting
+} from '@client/../../components/lib/icons'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -45,6 +48,7 @@ import {
   ALLOWED_STATUS_FOR_RETRY,
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 const IconContainer = styled.div`
   display: flex;
@@ -69,6 +73,7 @@ export function Outbox() {
   const [width, setWidth] = React.useState(window.innerWidth)
   const [sortedColumn, setSortedColumn] = React.useState(COLUMNS.ICON_WITH_NAME)
   const [sortOrder, setSortOrder] = React.useState(SORT_ORDER.ASCENDING)
+  const isOnline = useOnlineStatus()
   const theme = getTheme()
   const declarations = useSelector<IStoreState, IDeclaration[]>((state) =>
     state.declarationsState?.declarations.filter(
@@ -205,6 +210,10 @@ export function Outbox() {
         statusText = formatMessage(statusWaitingToRegister)
     }
 
+    if (!isOnline) {
+      iconId = `noConnection${index}`
+      icon = () => <ConnectionError id={iconId} key={iconId} />
+    }
     return {
       icon,
       statusText
