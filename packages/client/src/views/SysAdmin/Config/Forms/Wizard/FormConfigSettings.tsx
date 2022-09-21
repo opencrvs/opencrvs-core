@@ -30,7 +30,7 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import styled from 'styled-components'
-import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
+import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { RadioGroup } from '@opencrvs/components/lib/Radio'
 import {
   callApplicationConfigMutation,

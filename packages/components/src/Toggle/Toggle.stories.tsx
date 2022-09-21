@@ -10,19 +10,28 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Toggle } from './Toggle'
 
 export default {
   title: 'Controls/Toggle',
-  component: Toggle
-} as Meta
+  component: Toggle,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+\`<Toggle>\` is used to quickly switch between enabled or disabled states.
+`
+      }
+    }
+  }
+} as ComponentMeta<typeof Toggle>
 
-const Template: Story<{}> = () => {
+const Template: ComponentStory<typeof Toggle> = () => {
   const [selected, setSelected] = React.useState(true)
   return (
     <Toggle defaultChecked={selected} onChange={() => setSelected(!selected)} />
   )
 }
 
-export const ActivityView = Template.bind({})
+export const Default = Template.bind({})
