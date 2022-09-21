@@ -17,38 +17,20 @@ import {
   IFooterFColumn,
   ColumnContentAlignment
 } from '../Workqueue'
-import { LoadMore } from '../Workqueue/components/LoadMore'
 import { Pagination } from '../Pagination'
 
 const Wrapper = styled.div<{
-  hideBoxShadow?: boolean
-  isFullPage?: boolean
   fixedWidth: number | undefined
 }>`
   ${({ fixedWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
 
-  @media (max-width: ${({ fixedWidth, theme }) => fixedWidth}px) {
+  @media (max-width: ${({ fixedWidth }) => fixedWidth}px) {
     width: 100%;
   }
   background: ${({ theme }) => theme.colors.white};
-  ${({ hideBoxShadow, isFullPage, theme }) =>
-    isFullPage
-      ? `padding-bottom: 24px;`
-      : hideBoxShadow
-      ? `padding: 24px 0;`
-      : `padding: 24px;
-    ${theme.shadows.light};`}
-`
-const TableTitleLoading = styled.span`
-  background: ${({ theme }) => theme.colors.background};
-  width: 176px;
-  height: 32px;
-  display: block;
-  margin-bottom: 10px;
 `
 const TableHeader = styled.div<{
-  isSortable?: boolean
   totalWidth?: number
   fixedWidth?: number
 }>`
@@ -57,7 +39,7 @@ const TableHeader = styled.div<{
   background: ${({ theme }) => theme.colors.grey100};
   padding: 10px 0px;
   display: flex;
-  align-items: flex-start;
+  align-items: top;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 2px 2px 0 0;
 
@@ -70,9 +52,7 @@ const TableHeader = styled.div<{
   }
 `
 
-const TableHeaderText = styled.div<{
-  isSorted?: boolean
-}>`
+const TableHeaderText = styled.div`
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.grey600};
 `
@@ -104,73 +84,46 @@ const RowWrapper = styled.div<{
   height?: IBreakpoint
   horizontalPadding?: IBreakpoint
   hideTableBottomBorder?: boolean
-  alignItemCenter?: boolean
   columns: IColumn[]
 }>`
+  display: flex;
   width: 100%;
   min-height: 48px;
   padding-top: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid
-    ${({ theme, columns }) =>
-      columns.length > 5 ? theme.colors.grey100 : theme.colors.grey200};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 
   &:last-child {
     ${({ hideTableBottomBorder }) =>
       hideTableBottomBorder && `border-bottom: 0`};
   }
 
-  display: flex;
-  ${({ alignItemCenter }) =>
-    alignItemCenter ? `align-items: center` : `align-items: start`};
-  ${({ height }) =>
-    height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    ${({ height }) =>
-      height ? `min-height:${height.md}px` : `min-height: 48px)`};
-  }
-  ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.grey100};}`}
-
-  & span:first-child {
-    ${({ horizontalPadding }) =>
-      horizontalPadding
-        ? `padding-left:${horizontalPadding.lg}px;`
-        : `padding-left: 8px;`}
-  }
-
-  & span:last-child {
-    ${({ horizontalPadding }) =>
-      horizontalPadding
-        ? `padding-right:${horizontalPadding.lg}px;`
-        : `padding-right: 8px;`}
-  }
+  ${({ height }) => height && `min-height: ${height.lg}px;`};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    & span:first-child {
-      text-align: right;
-      ${({ horizontalPadding }) =>
-        horizontalPadding
-          ? `padding-left:${horizontalPadding.md}px;`
-          : `padding-left: 8px;`}
-    }
-
-    & span:last-child {
-      ${({ horizontalPadding }) =>
-        horizontalPadding
-          ? `padding-right:${horizontalPadding.md}px;`
-          : `padding-right: 8px;`}
-    }
+    ${({ height }) => height && `min-height: ${height.md}px;`};
   }
 `
-const TableFooter = styled(RowWrapper)`
-  padding-right: 10px;
-  background: ${({ theme }) => theme.colors.grey200};
-  border-top: 2px solid ${({ theme }) => theme.colors.grey500};
+const TableFooter = styled(RowWrapper)<{
+  totalWidth?: number
+  fixedWidth?: number
+}>`
+  ${({ fixedWidth, totalWidth }) =>
+    fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
+  display: flex;
+  align-items: top;
+  background: ${({ theme }) => theme.colors.grey100};
+  border-top: 2px solid ${({ theme }) => theme.colors.grey300};
   border-bottom: none;
   & span {
     color: ${({ theme }) => theme.colors.copy};
-    ${({ theme }) => theme.fonts.bold16};
+    ${({ theme }) => theme.fonts.bold14};
+  }
+  & span:first-child {
+    padding-left: 8px;
+  }
+  & span:last-child {
+    padding-right: 8px;
   }
 `
 
@@ -211,12 +164,6 @@ const ErrorText = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h3};
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
-  color: ${({ theme }) => theme.colors.copy};
-`
-const H3 = styled.div`
-  padding-left: 12px;
-  margin-bottom: 8px;
-  ${({ theme }) => theme.fonts.h4};
   color: ${({ theme }) => theme.colors.copy};
 `
 export const LoadingTableGrey = styled.span<{
@@ -272,7 +219,7 @@ const TableHeaderWrapper = styled.div`
 const ToggleSortIcon = styled.div<{
   toggle?: boolean
 }>`
-  margin-left: 5px;
+  margin-left: 6px;
   display: inline;
   svg {
     transform: ${({ toggle }) => (toggle ? 'rotate(180deg)' : 'none')};
@@ -293,12 +240,12 @@ const defaultConfiguration = {
   currentPage: 1
 }
 
-interface ITableViewProps {
+export interface ITableProps {
   id?: string
   content: IDynamicValues[]
   columns: IColumn[]
   footerColumns?: IFooterFColumn[]
-  noResultText: string
+  noResultText?: string
   tableHeight?: number
   rowStyle?: {
     height: IBreakpoint
@@ -310,19 +257,15 @@ interface ITableViewProps {
   totalItems?: number
   currentPage?: number
   isLoading?: boolean
-  tableTitle?: string
-  hideBoxShadow?: boolean
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
-  alignItemCenter?: boolean
-  loadMoreText?: string
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
   fixedWidth?: number
   noPagination?: boolean
 }
 
-interface ITableViewState {
+interface ITableState {
   sortIconInverted: boolean
   sortKey: string | null
   tableOffsetTop: number
@@ -333,10 +276,7 @@ interface IBreakpoint {
   md: number
 }
 
-export class TableView extends React.Component<
-  ITableViewProps,
-  ITableViewState
-> {
+export class Table extends React.Component<ITableProps, ITableState> {
   tableRef = React.createRef<HTMLDivElement>()
   state = {
     sortIconInverted: false,
@@ -378,7 +318,7 @@ export class TableView extends React.Component<
     return true
   }
 
-  componentDidUpdate(prevProps: ITableViewProps) {
+  componentDidUpdate(prevProps: ITableProps) {
     if (prevProps.isLoading && !this.props.isLoading) {
       this.setState({
         tableOffsetTop:
@@ -401,15 +341,11 @@ export class TableView extends React.Component<
       pageSize = defaultPageSize,
       currentPage = defaultConfiguration.currentPage,
       isLoading = false,
-      tableTitle,
       tableHeight,
       rowStyle,
-      hideBoxShadow,
       hideTableHeader,
       hideTableBottomBorder,
-      alignItemCenter,
       footerColumns,
-      loadMoreText,
       highlightRowOnMouseOver,
       isFullPage,
       fixedWidth,
@@ -423,13 +359,9 @@ export class TableView extends React.Component<
         {!isLoading && (
           <Wrapper
             id={`listTable-${id}`}
-            hideBoxShadow={hideBoxShadow}
-            isFullPage={isFullPage}
             fixedWidth={fixedWidth}
             ref={this.tableRef}
           >
-            {tableTitle && <H3>{tableTitle}</H3>}
-
             <TableScrollerHorizontal
               disableScrollOnOverflow={this.props.disableScrollOnOverflow}
             >
@@ -451,7 +383,7 @@ export class TableView extends React.Component<
                           preference.sortFunction(preference.key)
                         }
                       >
-                        <TableHeaderText isSorted={preference.isSorted}>
+                        <TableHeaderText>
                           {preference.label}
                           <ToggleSortIcon
                             toggle={
@@ -491,7 +423,6 @@ export class TableView extends React.Component<
                           height={rowStyle?.height}
                           horizontalPadding={rowStyle?.horizontalPadding}
                           hideTableBottomBorder={hideTableBottomBorder}
-                          alignItemCenter={alignItemCenter}
                           columns={columns}
                         >
                           {columns.map((preference, indx) => {
@@ -517,8 +448,9 @@ export class TableView extends React.Component<
               </TableScroller>
               {footerColumns && content.length > 1 && (
                 <TableFooter
-                  id={'TableView-' + id + '-footer'}
+                  id={'Table-' + id + '-footer'}
                   totalWidth={totalWidth}
+                  fixedWidth={fixedWidth}
                   columns={columns}
                 >
                   {footerColumns.map((preference, index) => (
@@ -529,7 +461,7 @@ export class TableView extends React.Component<
                 </TableFooter>
               )}
             </TableScrollerHorizontal>
-            {content.length <= 0 && (
+            {content.length <= 0 && noResultText && (
               <ErrorText id="no-record" isFullPage={isFullPage}>
                 {noResultText}
               </ErrorText>
@@ -538,7 +470,6 @@ export class TableView extends React.Component<
         )}
         {isLoading && (
           <LoadingContainer totalWidth={totalWidth} fixedWidth={fixedWidth}>
-            {tableTitle && <TableTitleLoading />}
             <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
               {columns.map((preference, index) => (
                 <ContentWrapper
@@ -565,24 +496,12 @@ export class TableView extends React.Component<
             </TableHeader>
           </LoadingContainer>
         )}
-        {totalItems > pageSize && (
-          <>
-            {!loadMoreText && !noPagination && (
-              <Pagination
-                initialPage={currentPage}
-                totalPages={Math.ceil(totalItems / pageSize)}
-                onPageChange={this.onPageChange}
-              />
-            )}
-            {loadMoreText && (
-              <LoadMore
-                initialPage={currentPage}
-                loadMoreText={loadMoreText}
-                onLoadMore={this.onPageChange}
-                usageTableType={'list'}
-              />
-            )}
-          </>
+        {totalItems > pageSize && !noPagination && (
+          <Pagination
+            initialPage={currentPage}
+            totalPages={Math.ceil(totalItems / pageSize)}
+            onPageChange={this.onPageChange}
+          />
         )}
       </>
     )

@@ -36,13 +36,6 @@ const Wrapper = styled.div<{
       : `padding: 24px;
     ${theme.shadows.light};`}
 `
-const TableTitleLoading = styled.span`
-  background: ${({ theme }) => theme.colors.background};
-  width: 176px;
-  height: 32px;
-  display: block;
-  margin-bottom: 10px;
-`
 const TableHeader = styled.div<{
   isSortable?: boolean
   totalWidth?: number
@@ -93,7 +86,6 @@ const RowWrapper = styled.div<{
   height?: IBreakpoint
   horizontalPadding?: IBreakpoint
   hideTableBottomBorder?: boolean
-  alignItemCenter?: boolean
 }>`
   width: 100%;
   /* min-height: 48px; */
@@ -107,15 +99,13 @@ const RowWrapper = styled.div<{
   }
 
   display: flex;
-  ${({ alignItemCenter }) => alignItemCenter && `align-items: start`};
+
   ${({ height }) =>
-    height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
+    height ? `min-height:${height.lg}px;` : `min-height: 48px;`};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ height }) =>
-      height ? `min-height:${height.md}px` : `min-height: 48px)`};
+      height ? `min-height:${height.md}px;` : `min-height: 48px;`};
   }
-  ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.grey100};}`}
 
   & span:first-child {
     ${({ horizontalPadding }) =>
@@ -198,12 +188,6 @@ const ErrorText = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h3};
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
-  color: ${({ theme }) => theme.colors.copy};
-`
-const H3 = styled.div`
-  padding-left: 12px;
-  margin-bottom: 8px;
-  ${({ theme }) => theme.fonts.h4};
   color: ${({ theme }) => theme.colors.copy};
 `
 export const LoadingGrey = styled.span<{
@@ -297,11 +281,9 @@ interface IListTableProps {
   totalItems?: number
   currentPage?: number
   isLoading?: boolean
-  tableTitle?: string
   hideBoxShadow?: boolean
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
-  alignItemCenter?: boolean
   loadMoreText?: string
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
@@ -319,6 +301,9 @@ interface IBreakpoint {
   md: number
 }
 
+/**
+ * @deprecated in favour of `<Table>`
+ */
 export class ListTable extends React.Component<
   IListTableProps,
   IListTableState
@@ -384,13 +369,11 @@ export class ListTable extends React.Component<
       pageSize = defaultConfiguration.pageSize,
       currentPage = defaultConfiguration.currentPage,
       isLoading = false,
-      tableTitle,
       tableHeight,
       rowStyle,
       hideBoxShadow,
       hideTableHeader,
       hideTableBottomBorder,
-      alignItemCenter,
       footerColumns,
       loadMoreText,
       highlightRowOnMouseOver,
@@ -410,8 +393,6 @@ export class ListTable extends React.Component<
             fixedWidth={fixedWidth}
             ref={this.tableRef}
           >
-            {tableTitle && <H3>{tableTitle}</H3>}
-
             <TableScrollerHorizontal
               disableScrollOnOverflow={this.props.disableScrollOnOverflow}
             >
@@ -472,7 +453,6 @@ export class ListTable extends React.Component<
                           height={rowStyle?.height}
                           horizontalPadding={rowStyle?.horizontalPadding}
                           hideTableBottomBorder={hideTableBottomBorder || false}
-                          alignItemCenter={alignItemCenter}
                         >
                           {columns.map((preference, indx) => {
                             return (
@@ -517,7 +497,6 @@ export class ListTable extends React.Component<
         )}
         {isLoading && (
           <LoadingContainer totalWidth={totalWidth} fixedWidth={fixedWidth}>
-            {tableTitle && <TableTitleLoading />}
             <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
               {columns.map((preference, index) => (
                 <ContentWrapper
