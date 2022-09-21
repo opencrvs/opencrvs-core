@@ -61,7 +61,7 @@ import {
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 
-const DEFAULT_LIST_SIZE = 1
+const DEFAULT_LIST_SIZE = 10
 
 const InformationCaption = styled.div`
   ${({ theme }) => theme.fonts.reg12};
@@ -307,9 +307,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           eventType: this.props.intl.formatMessage(
             constantsMessages[timeLoggedMetrics.eventType.toLowerCase()]
           ),
-          trackingId: (timeLoggedMetrics.trackingId && (
+          trackingId: timeLoggedMetrics.trackingId && (
             <LinkButton>{timeLoggedMetrics.trackingId}</LinkButton>
-          )) || <></>,
+          ),
           auditTime: format(
             new Date(timeLoggedMetrics.time),
             'MMMM dd, yyyy hh:mm a'
@@ -358,7 +358,6 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   render() {
     const { intl, user, theme, isLoading, isOnline } = this.props
     const { timeStart, timeEnd, currentPageNumber } = this.state
-    const recordCount = DEFAULT_LIST_SIZE * currentPageNumber
 
     return (
       <RecentActionsHolder id="user-audit-list">

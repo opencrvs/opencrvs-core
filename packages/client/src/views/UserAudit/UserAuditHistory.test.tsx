@@ -33,7 +33,8 @@ describe('User audit list tests', () => {
           timeStart: new Date(1484398308000).toISOString(),
           practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
           locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-          count: 10
+          count: 10,
+          skip: 0
         }
       },
       result: {
@@ -224,7 +225,8 @@ describe('User audit list tests', () => {
                 timeStart: new Date(1484398308000).toISOString(),
                 practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
                 locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-                count: 20
+                count: 20,
+                skip: 0
               }
             },
             result: {
@@ -248,16 +250,13 @@ describe('User audit list tests', () => {
       }
     )
 
-    const loadMoreLink = await waitForElement(
-      testComponent,
-      '#load_more_button'
-    )
-    expect(loadMoreLink.hostNodes()).toHaveLength(1)
-    loadMoreLink.hostNodes().simulate('click')
+    const loadMoreLink = await waitForElement(testComponent, '#page-number-1')
+    expect(loadMoreLink.hostNodes()).toHaveLength(2)
+    loadMoreLink.hostNodes().first().simulate('click')
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.update()
-    expect(testComponent.find('#load_more_button').hostNodes()).toHaveLength(0)
+    expect(testComponent.find('#page-number-1').hostNodes()).toHaveLength(0)
   })
 })
