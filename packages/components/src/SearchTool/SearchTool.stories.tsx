@@ -30,7 +30,9 @@ export default {
   title: 'Controls/Search',
   component: SearchTool,
   parameters: {
-    storyHeight: 130
+    storyCss: {
+      height: '130px'
+    }
   }
 }
 

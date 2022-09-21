@@ -23,7 +23,9 @@ export default {
           'Select is used for collecting user selection from a list of options.'
       }
     },
-    storyHeight: 170
+    storyCss: {
+      height: '170px'
+    }
   }
 } as Meta
 

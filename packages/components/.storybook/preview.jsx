@@ -65,9 +65,9 @@ export const decorators = [
       <GlobalStyle />
 
       {
-        // Allows adding { parameters: { storyHeight: 200 }} inside stories
-        context?.parameters?.storyHeight ? (
-          <div style={{ height: context?.parameters?.storyHeight + 'px' }}>
+        // Allows adding { parameters: { storyCss: { ... } }} inside stories
+        context?.parameters?.storyCss ? (
+          <div style={context?.parameters?.storyCss}>
             <Story />
           </div>
         ) : (
