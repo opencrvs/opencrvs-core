@@ -1,6 +1,6 @@
 {
   "ignore": [
-    "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub)",
+    "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub|cjs)",
     ".git",
     "**/patches",
     ".secrets",
