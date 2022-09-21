@@ -57,7 +57,8 @@
           "password": ""
         }
       ],
-      "priority": 2
+      "priority": 2,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -114,7 +115,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -185,7 +187,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -256,7 +259,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -327,7 +331,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -398,7 +403,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -469,7 +475,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -540,7 +547,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -611,7 +619,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -682,7 +691,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -753,7 +763,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -824,7 +835,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -910,7 +922,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -981,7 +994,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1052,7 +1066,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1109,7 +1124,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1166,7 +1182,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1237,7 +1254,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1308,7 +1326,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1379,7 +1398,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1450,7 +1470,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1521,7 +1542,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1592,7 +1614,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1663,7 +1686,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1720,7 +1744,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1777,7 +1802,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1834,7 +1860,8 @@
           "username": "",
           "password": ""
         }
-      ]
+      ],
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1905,7 +1932,8 @@
         }
       ],
       "priority": 1,
-      "name": "New Birth InProgress"
+      "name": "New Birth InProgress",
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -1976,7 +2004,8 @@
       "tcpPort": null,
       "alerts": [],
       "priority": 1,
-      "name": "New Death InProgress"
+      "name": "New Death InProgress",
+      "maxBodyAgeDays": 30
     },
     {
       "methods": ["POST"],
@@ -2023,7 +2052,8 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "alerts": []
+      "alerts": [],
+      "maxBodyAgeDays": 30
     },
     {
       "methods": ["POST"],
@@ -2070,7 +2100,8 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "alerts": []
+      "alerts": [],
+      "maxBodyAgeDays": 30
     },
     {
       "methods": ["POST"],
@@ -2117,7 +2148,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "name": "DHIS2 death notification mediator"
+      "name": "DHIS2 death notification mediator",
+      "maxBodyAgeDays": 30
     },
     {
       "methods": ["POST"],
@@ -2164,7 +2196,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": ["GET"],
@@ -2211,7 +2244,8 @@
           "password": ""
         }
       ],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [],
@@ -2258,7 +2292,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [],
@@ -2305,7 +2340,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": ["POST"],
@@ -2352,7 +2388,8 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "alerts": []
+      "alerts": [],
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -2409,7 +2446,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -2466,7 +2504,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     },
     {
       "methods": [
@@ -2523,7 +2562,8 @@
       "tcpHost": null,
       "tcpPort": null,
       "alerts": [],
-      "priority": 1
+      "priority": 1,
+      "maxBodyAgeDays": 30
     }
   ],
   "Mediators": [],
