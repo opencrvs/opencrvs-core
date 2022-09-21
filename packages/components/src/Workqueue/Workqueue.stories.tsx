@@ -14,7 +14,8 @@ import { Workqueue } from './Workqueue'
 import { DeclarationIcon, Download, Downloaded } from '../icons'
 import React from 'react'
 import { Stack } from '../Stack'
-import { CircleButton, LinkButton } from '../buttons'
+import { LinkButton } from '../buttons'
+import { Button } from '../Button'
 
 export default {
   title: 'Data/Workqueue',
@@ -49,9 +50,9 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
         },
         {
           actionComponent: (
-            <CircleButton>
+            <Button type="primary" icon>
               <Downloaded />
-            </CircleButton>
+            </Button>
           )
         }
       ]
@@ -65,9 +66,9 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <CircleButton>
+            <Button type="primary" icon>
               <Download />
-            </CircleButton>
+            </Button>
           )
         }
       ]
@@ -85,9 +86,9 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
         },
         {
           actionComponent: (
-            <CircleButton>
+            <Button type="primary" icon>
               <Downloaded />
-            </CircleButton>
+            </Button>
           )
         }
       ]
@@ -105,9 +106,9 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
         },
         {
           actionComponent: (
-            <CircleButton>
+            <Button type="primary" icon>
               <Downloaded />
-            </CircleButton>
+            </Button>
           )
         }
       ]
@@ -121,9 +122,9 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <CircleButton>
+            <Button type="primary" icon>
               <Download />
-            </CircleButton>
+            </Button>
           )
         }
       ]
@@ -137,9 +138,9 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <CircleButton>
+            <Button type="primary" icon>
               <Download />
-            </CircleButton>
+            </Button>
           )
         }
       ]
@@ -153,9 +154,9 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <CircleButton>
+            <Button type="primary" icon>
               <Download />
-            </CircleButton>
+            </Button>
           )
         }
       ]
