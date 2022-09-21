@@ -29,7 +29,7 @@ interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
 }
 
 export type ButtonProps = ButtonCustomization & {
-  [modifier in ButtonModifier]: boolean
+  [modifier in ButtonModifier]?: boolean
 }
 
 type StyledButtonProps = Omit<ButtonProps, 'type'> & {

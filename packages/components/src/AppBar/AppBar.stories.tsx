@@ -12,7 +12,7 @@
 import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { AppBar } from './AppBar'
-import { CircleButton, SecondaryButton } from '../buttons'
+import { Button } from '../Button'
 import {
   BackArrowDeepBlue,
   ForwardArrowDeepBlue,
@@ -51,25 +51,25 @@ Default.args = {
   desktopTitle: 'OpenCRVS',
   mobileTitle: 'OpenCRVS',
   desktopLeft: (
-    <CircleButton>
+    <Button type="primary" size="small" icon aria-label="Go back">
       <BackArrowDeepBlue />
-    </CircleButton>
+    </Button>
   ),
   mobileLeft: (
-    <CircleButton>
+    <Button type="primary" size="small" icon aria-label="Go back">
       <BackArrowDeepBlue />
-    </CircleButton>
+    </Button>
   ),
   desktopRight: (
     <Stack gap={8}>
-      <CircleButton>
+      <Button type="primary" icon>
         <HelpBlue>Button</HelpBlue>
-      </CircleButton>
-      <SecondaryButton>Button</SecondaryButton>
-      <SecondaryButton>Button</SecondaryButton>
+      </Button>
+      <Button type="secondary">Button</Button>
+      <Button type="secondary">Button</Button>
     </Stack>
   ),
-  mobileRight: <SecondaryButton>Button</SecondaryButton>
+  mobileRight: <Button type="secondary">Button</Button>
 }
 Default.parameters = {
   layout: 'fullscreen'
@@ -78,20 +78,20 @@ Default.parameters = {
 export const Home = Template.bind({}) as ComponentStory<typeof AppBar>
 Home.args = {
   mobileLeft: (
-    <CircleButton>
+    <Button type="primary" icon aria-label="Go back">
       <Hamburger />
-    </CircleButton>
+    </Button>
   ),
   mobileTitle: 'Search',
   mobileRight: <SearchBlue />,
   desktopLeft: (
     <Stack gap={8}>
-      <CircleButton>
+      <Button type="primary" size="small" icon aria-label="Go back">
         <BackArrowDeepBlue />
-      </CircleButton>
-      <CircleButton>
+      </Button>
+      <Button type="primary" size="small" icon aria-label="Go forward">
         <ForwardArrowDeepBlue />
-      </CircleButton>
+      </Button>
     </Stack>
   ),
   desktopCenter: (
@@ -124,7 +124,7 @@ Home.args = {
       ]}
     />
   ),
-  desktopRight: <SecondaryButton>Button</SecondaryButton>
+  desktopRight: <Button type="secondary">Button</Button>
 }
 
 Home.parameters = {
@@ -141,8 +141,8 @@ Declaration.args = {
   mobileRight: <Hamburger />,
   desktopRight: (
     <Stack gap={8}>
-      <SecondaryButton>Save</SecondaryButton>
-      <SecondaryButton>Exit</SecondaryButton>
+      <Button type="secondary">Save</Button>
+      <Button type="secondary">Exit</Button>
     </Stack>
   )
 }
