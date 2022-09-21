@@ -9,4 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from './Toast'
+import { useEffect } from 'react'
+
+type ToastVisibilityProps = {
+  duration: number | null
+  onClose?: () => void
+}
+
+export function useToastVisibility({
+  duration,
+  onClose
+}: ToastVisibilityProps) {
+  useEffect(() => {
+    if (duration === null) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      onClose?.()
+    }, duration)
+
+    return () => clearTimeout(timer)
+  }, [duration, onClose])
+}

@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
   LabelContainer,
@@ -67,13 +67,11 @@ export function Password() {
         showPasswordChange={showModal}
         passwordChanged={changePassword}
       />
-      <Toast
-        type={NOTIFICATION_TYPE.SUCCESS}
-        show={showSuccessNotification}
-        callback={toggleSuccessNotification}
-      >
-        <FormattedMessage {...userMessages.passwordUpdated} />
-      </Toast>
+      {showSuccessNotification && (
+        <Toast type="success" onClose={toggleSuccessNotification}>
+          <FormattedMessage {...userMessages.passwordUpdated} />
+        </Toast>
+      )}
     </>
   )
 }
