@@ -96,6 +96,7 @@ export class Radio extends React.Component<IRadio> {
     this.props.onChange(this.props.value)
   }
   render() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, name, selected, label, value, onChange } = this.props
     return (
       <Wrapper>

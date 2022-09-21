@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from 'styled-components'
 
 export const HeaderLogo = (props: React.HTMLAttributes<SVGElement>) => (
   <svg width={109} height={47} fill="none" {...props}>

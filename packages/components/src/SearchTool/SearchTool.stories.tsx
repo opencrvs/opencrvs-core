@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
+import { Story } from '@storybook/react'
 import { PlusTransparent } from '../icons'
 import { SearchTool, ISearchType } from './SearchTool'
 import React from 'react'
@@ -25,6 +25,7 @@ interface ISearchToolProps {
   onClearText?: () => void
 }
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
   title: 'Controls/Search',
   component: SearchTool
