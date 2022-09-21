@@ -109,8 +109,8 @@ export async function sendSMS(
   message: string,
   convertUnicode?: boolean
 ) {
-  logger.info('Using the following provider: ' + JSON.stringify(SMS_PROVIDER))
-  logger.info('Sending the following message: ' + JSON.stringify(message))
+  logger.info(`Using the following provider:  ${JSON.stringify(SMS_PROVIDER)}`)
+  logger.info(`Sending the following message:  ${JSON.stringify(message)}`)
   switch (SMS_PROVIDER) {
     case 'clickatell':
       return sendSMSClickatell(msisdn, message, convertUnicode)

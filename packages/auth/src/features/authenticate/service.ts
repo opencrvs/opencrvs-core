@@ -159,10 +159,10 @@ export async function generateAndSendVerificationCode(
 ) {
   const isDemoUser = scope.indexOf('demo') > -1
   logger.info(
-    'isDemoUser, ' +
-      JSON.stringify({
+    `isDemoUser,
+      ${JSON.stringify({
         isDemoUser: isDemoUser
-      })
+      })}`
   )
   let verificationCode
   if (isDemoUser) {
@@ -173,11 +173,11 @@ export async function generateAndSendVerificationCode(
   }
   if (!PRODUCTION || QA_ENV) {
     logger.info(
-      'Sending a verification SMS, ' +
-        JSON.stringify({
+      `Sending a verification SMS,
+        ${JSON.stringify({
           mobile: mobile,
           verificationCode
-        })
+        })}`
     )
   } else {
     if (isDemoUser) {
