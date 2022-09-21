@@ -131,6 +131,9 @@ export interface IListViewItemSimplifiedProps {
   className?: string
 }
 
+/**
+ * Use the list view to summarise information, for example a user’s responce at the declaration form or for showing performance data
+ */
 export function ListViewItemSimplified({
   image,
   label,

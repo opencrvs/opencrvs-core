@@ -10,30 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { ArrowForward } from '../icons'
 import { ImageUploader } from './ImageUploader'
 
 export default {
   title: 'Input/File upload',
   component: ImageUploader
-} as Meta
+} as ComponentMeta<typeof ImageUploader>
 
-interface IImagePickerProps {
-  id: string
-  title: string
-  icon?: () => React.ReactNode
-  handleFileChange: (file: File) => void
-  onClick?: (event: React.MouseEvent<HTMLElement>) => void
-  disabled?: boolean
-}
+const Template: ComponentStory<typeof ImageUploader> = (args) => (
+  <ImageUploader {...args} />
+)
 
-const Template: Story<IImagePickerProps> = (args) => <ImageUploader {...args} />
-
-export const Image = Template.bind({})
-Image.args = {
+export const Default = Template.bind({})
+Default.args = {
   title: 'Upload',
-  icon: () => <ArrowForward />,
   handleFileChange: () => {
     alert('Uploaded!')
   }
