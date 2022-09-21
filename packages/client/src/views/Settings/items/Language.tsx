@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
@@ -141,18 +141,16 @@ export function Language() {
           placeholder=""
         />
       </ResponsiveModal>
-      <Toast
-        type={NOTIFICATION_TYPE.SUCCESS}
-        show={showSuccessNotification}
-        callback={toggleSuccessNotification}
-      >
-        <FormattedMessage
-          {...userMessages.changeLanguageSuccessMessage}
-          values={{
-            language: languages[selectedLanguage].displayName
-          }}
-        />
-      </Toast>
+      {showSuccessNotification && (
+        <Toast type="success" onClose={toggleSuccessNotification}>
+          <FormattedMessage
+            {...userMessages.changeLanguageSuccessMessage}
+            values={{
+              language: languages[selectedLanguage].displayName
+            }}
+          />
+        </Toast>
+      )}
     </>
   )
 }

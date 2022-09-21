@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 
-export const TrackingID = (props: React.HTMLAttributes<SVGElement>) => {
+export const TrackingID = () => {
   return (
     <svg
       width="24"

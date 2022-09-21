@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
@@ -788,7 +785,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   noPagination
                   isFullPage
                 />
-                {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+                {error && <GenericErrorToast />}
                 {total > pageSize && (
                   <Pagination
                     initialPage={currentPageNumber}

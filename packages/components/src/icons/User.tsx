@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 
-export const User = (props: React.HTMLAttributes<SVGElement>) => {
+export const User = () => {
   return (
     <svg
       width="24"

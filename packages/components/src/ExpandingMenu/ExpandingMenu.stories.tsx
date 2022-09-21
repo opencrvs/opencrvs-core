@@ -12,20 +12,7 @@
 import { Meta, Story } from '@storybook/react'
 import React, { useState } from 'react'
 import { ExpandingMenu } from './ExpandingMenu'
-import styled from 'styled-components'
-import {
-  DeclarationBlack,
-  DeclarationBlue,
-  StatsBlack,
-  StatsBlue,
-  SettingsBlack,
-  SettingsBlue,
-  HelpBlack,
-  HelpBlue,
-  LogoutBlack,
-  LogoutBlue,
-  Hamburger
-} from '../icons'
+import { Hamburger } from '../icons'
 
 interface IUserDetails {
   name: string

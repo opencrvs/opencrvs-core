@@ -11,7 +11,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Content } from '../Content'
 
 const Page = styled.div`
   display: flex;
@@ -25,6 +24,14 @@ const Page = styled.div`
 const Wrapper = styled.div`
   margin: auto;
   max-width: ${({ theme }) => theme.grid.breakpoints.lg}px;
+`
+
+const Content = styled.section`
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 export class PageWrapper extends React.Component {

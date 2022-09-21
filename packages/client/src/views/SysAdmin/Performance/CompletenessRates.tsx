@@ -11,10 +11,7 @@
  */
 import { RegRatesLineChart } from '@client/components/charts/RegRatesLineChart'
 import { DateRangePicker } from '@client/components/DateRangePicker'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/utils/gateway'
@@ -294,7 +291,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                     base={base}
                     completenessRateTime={time}
                   />
-                  <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                  <GenericErrorToast />
                 </>
               )
             } else {

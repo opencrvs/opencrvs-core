@@ -34,7 +34,11 @@ module.exports = {
     '../@(src|stories)/**/*.stories.@(js|jsx|ts|tsx)'
   ],
   core: { builder: '@storybook/builder-vite' },
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/addon-docs'
+  ],
   staticDirs: ['../public'],
   framework: '@storybook/react',
 

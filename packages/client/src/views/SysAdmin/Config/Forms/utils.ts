@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
-
 export const REDIRECT_DELAY = 2000
 
 export enum ActionStatus {
@@ -33,9 +31,9 @@ export const NOTIFIABLE_STATUSES = [
 ]
 
 export const NOTIFICATION_TYPE_MAP = {
-  [ActionStatus.ERROR]: NOTIFICATION_TYPE.ERROR,
-  [ActionStatus.PROCESSING]: NOTIFICATION_TYPE.IN_PROGRESS,
-  [ActionStatus.COMPLETED]: NOTIFICATION_TYPE.SUCCESS
+  [ActionStatus.ERROR]: 'warning' as const,
+  [ActionStatus.PROCESSING]: 'loading' as const,
+  [ActionStatus.COMPLETED]: 'success' as const
 }
 
 export function isNotifiable(

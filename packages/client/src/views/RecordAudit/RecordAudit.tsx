@@ -53,7 +53,7 @@ import { IStoreState } from '@client/store'
 import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { ErrorToastNotification } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
@@ -633,7 +633,7 @@ function RecordAuditBody({
   )
 }
 
-function getBodyContent({
+const BodyContent = ({
   declarationId,
   draft,
   intl,
@@ -645,7 +645,9 @@ function getBodyContent({
   workqueueDeclaration,
   goBack,
   ...actionProps
-}: IFullProps) {
+}: IFullProps) => {
+  const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
+
   if (
     tab === 'search' ||
     (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
@@ -665,12 +667,19 @@ function getBodyContent({
               return <Loader id="search_loader" marginPercent={35} />
             } else if (error) {
               return (
-                <ErrorToastNotification
-                  retryButtonText={intl.formatMessage(buttonMessages.retry)}
-                  retryButtonHandler={() => refetch()}
-                >
-                  {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-                </ErrorToastNotification>
+                !isErrorDismissed && (
+                  <Toast
+                    type="warning"
+                    actionText={intl.formatMessage(buttonMessages.retry)}
+                    onActionClick={() => {
+                      refetch()
+                      setIsErrorDismissed(false)
+                    }}
+                    onClose={() => setIsErrorDismissed(true)}
+                  >
+                    {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+                  </Toast>
+                )
               )
             }
 
@@ -765,8 +774,7 @@ const RecordAuditComp = (props: IFullProps) => {
         <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       }
     >
-      {getBodyContent(props)}
-
+      <BodyContent {...props} />
       <NotificationToast />
     </Frame>
   )

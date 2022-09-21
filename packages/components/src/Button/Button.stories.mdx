@@ -1,0 +1,197 @@
+import {
+  Meta,
+  Story,
+  Canvas,
+  ArgsTable,
+  Source,
+  Preview
+} from '@storybook/addon-docs'
+import dedent from 'ts-dedent'
+import { Button } from './Button'
+import { Stack } from '../Stack'
+import { Activity } from '../icons'
+
+<Meta title="Controls / Button" component={Button} />
+
+export const Template = (args) => <Button {...args}>Click here</Button>
+
+export const Variants = () => (
+  <Stack wrap>
+    <Button type="primary">Primary</Button>
+    <Button type="positive">Positive</Button>
+    <Button type="negative">Negative</Button>
+    <Button type="secondary">Secondary</Button>
+    <Button type="tertiary" size="small">
+      Tertiary
+    </Button>
+    <Button type="primary" size="medium" icon>
+      <Activity />
+    </Button>
+    <Button type="primary">
+      <Activity stroke="#ffffff" />
+      Primary
+    </Button>
+    <Button type="secondary">
+      <Activity stroke="#4972bb" />
+      Secondary
+    </Button>
+    <Button type="tertiary" size="small">
+      <Activity stroke="#4972bb" />
+      Primary
+    </Button>
+  </Stack>
+)
+
+export const Sizes = () => (
+  <Stack>
+    <Button type="primary" size="large">
+      Large
+    </Button>
+    <Button type="primary" size="medium">
+      Default
+    </Button>
+    <Button type="primary" size="small">
+      Small
+    </Button>
+  </Stack>
+)
+
+export const Icon = () => (
+  <Stack>
+    <Button icon size="large">
+      <Activity />
+    </Button>
+    <Button icon size="medium">
+      <Activity />
+    </Button>
+    <Button icon size="small">
+      <Activity />
+    </Button>
+  </Stack>
+)
+
+export const Loading = () => (
+  <Stack>
+    <Button type="primary" loading>
+      Primary
+    </Button>
+    <Button type="secondary" loading>
+      Secondary
+    </Button>
+    <Button type="tertiary" loading>
+      Tertiary
+    </Button>
+  </Stack>
+)
+
+export const Disabled = () => (
+  <Stack>
+    <Button type="primary" disabled>
+      Primary
+    </Button>
+    <Button type="secondary" disabled>
+      Secondary
+    </Button>
+    <Button type="tertiary" disabled>
+      Tertiary
+    </Button>
+  </Stack>
+)
+
+# Button
+
+Buttons are used primarily for actions. For buttons that need to look like links, see [LinkButton component.](/docs/controls-link-button--link-button-view)
+
+## Variants
+
+<Canvas withSource="none">
+  <Story story={Variants} />
+</Canvas>
+
+## Example
+
+<Canvas>
+  <Story
+    args={{
+      type: 'primary',
+      size: 'medium',
+      icon: false,
+      disabled: false,
+      loading: false
+    }}
+    argTypes={{
+      type: {
+        control: {
+          type: 'radio'
+        }
+      },
+      disabled: {
+        table: {
+          category: 'Modifiers'
+        }
+      },
+      loading: {
+        table: {
+          category: 'Modifiers'
+        }
+      },
+      icon: {
+        table: {
+          category: 'Modifiers'
+        }
+      }
+    }}
+    name="Button"
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Button" />
+
+## Sizes
+
+<Canvas>
+  <Story name="Sizes">{Sizes.bind({})}</Story>
+</Canvas>
+
+## Icon
+
+<Canvas>
+  <Story name="Icon">{Icon.bind({})}</Story>
+</Canvas>
+
+## Loading
+
+<Canvas>
+  <Story name="Loading">{Loading.bind({})}</Story>
+</Canvas>
+
+## Disabled
+
+<Canvas>
+  <Story name="Disabled">{Disabled.bind({})}</Story>
+</Canvas>
+
+## Best practices
+
+`aria-label`-prop adds an accessible label for a button that doesn't have accessible content.
+Use `aria-label` when:
+
+- the button has no text or uses an icon alone
+- the button's visible text doesn't fully convey the meaning of the action. For example "Add" or "Remove" doesn't tell what is being added or removed.
+
+Make sure that your button is accessible by keyboard tab navigation.
+
+<Source
+  language="ts"
+  code={dedent`
+    <Button
+      icon
+      aria-label="Print a birth declaration for John Doe"
+      onClick={printBirthDeclaration}
+    >
+      <DeclarationIcon />
+    </Button>
+  `}
+/>

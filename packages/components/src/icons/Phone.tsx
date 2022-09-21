@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 
-export const Phone = (props: React.HTMLAttributes<SVGElement>) => {
+export const Phone = () => {
   return (
     <svg
       width="24"

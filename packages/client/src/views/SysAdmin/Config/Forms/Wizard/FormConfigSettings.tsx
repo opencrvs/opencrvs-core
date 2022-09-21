@@ -18,7 +18,7 @@ import {
   ListViewItemSimplified,
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/formConfig'
@@ -288,20 +288,21 @@ function FormConfigSettingsComponent() {
           </ErrorContent>
         )}
       </ResponsiveModal>
-      <Toast
-        id="form-settings-notification"
-        type={
-          notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? NOTIFICATION_TYPE.IN_PROGRESS
-            : NOTIFICATION_TYPE.SUCCESS
-        }
-        show={showNotification}
-        callback={() => {
-          setShowNotification(false)
-        }}
-      >
-        {notificationMessages}
-      </Toast>
+      {showNotification && (
+        <Toast
+          id="form-settings-notification"
+          type={
+            notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+              ? 'loading'
+              : 'success'
+          }
+          onClose={() => {
+            setShowNotification(false)
+          }}
+        >
+          {notificationMessages}
+        </Toast>
+      )}
     </Containter>
   )
 }
