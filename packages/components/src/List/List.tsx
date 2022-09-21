@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-const StyledList = styled.ul`
+const StyledList = styled.ol`
   width: 100%;
   ${({ theme }) => theme.fonts.reg16};
 `

@@ -10,14 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { Link } from './Link'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { Divider } from './Divider'
 
 export default {
-  title: 'Controls/Link',
-  component: Link
-} as Meta
+  title: 'Layout/Divider',
+  component: Divider
+} as ComponentMeta<typeof Divider>
 
-const Template: Story<{}> = () => <Link>Hello</Link>
+const Template: ComponentStory<typeof Divider> = (args) => <Divider {...args} />
 
-export const LinkView = Template.bind({})
+export const Default = Template.bind({})
+Default.args = {}

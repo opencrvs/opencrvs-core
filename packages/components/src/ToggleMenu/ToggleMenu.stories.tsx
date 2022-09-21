@@ -12,7 +12,7 @@
 import { Story, Meta } from '@storybook/react'
 import styled from 'styled-components'
 import { IToggleMenuItem, ToggleMenu } from './ToggleMenu'
-import { SettingsBlack, LogoutBlack, Avatar } from '../icons'
+import { SettingsBlack, LogoutBlack, VerticalThreeDots } from '../icons'
 import React from 'react'
 
 interface IProps {
@@ -36,14 +36,18 @@ const header = (
   </>
 )
 
-const Template: Story<IProps> = (args) => <ToggleMenu {...args} />
+const Template: Story<IProps> = (args) => (
+  <div style={{ position: 'relative', width: '300px', height: '200px' }}>
+    <ToggleMenu {...args} />
+  </div>
+)
 
 export const ToggleMenuView = Template.bind({})
 
 ToggleMenuView.args = {
   id: 'birth',
   menuHeader: header,
-  toggleButton: <Avatar />,
+  toggleButton: <VerticalThreeDots />,
   menuItems: [
     {
       icon: <SettingsBlack />,
@@ -60,6 +64,6 @@ ToggleMenuView.args = {
 }
 
 export default {
-  title: 'Controls/Profile menu',
+  title: 'Controls/Toggle menu',
   component: ToggleMenu
 } as Meta

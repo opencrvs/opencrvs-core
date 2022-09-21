@@ -11,6 +11,7 @@
  */
 import styled from 'styled-components'
 
+/** @deprecated in favor of `<Toast>` / `<Alert>` */
 export const ErrorMessage = styled.p`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.negative};

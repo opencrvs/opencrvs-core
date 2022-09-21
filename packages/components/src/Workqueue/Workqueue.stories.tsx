@@ -28,7 +28,7 @@ const onReviewClick = () => {
 const IconWithName = ({ children }: { children: string }) => (
   <Stack gap={16}>
     <DeclarationIcon color="orange" />
-    <LinkButton onClick={() => alert('John Doe clicked')}>
+    <LinkButton isBoldLink onClick={() => alert('John Doe clicked')}>
       {children}
     </LinkButton>
   </Stack>
