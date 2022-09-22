@@ -26,6 +26,6 @@ export const DateFieldView = Template.bind({})
 DateFieldView.args = {
   id: 'date-field',
   onChange: (value: string) => {
-    alert(value)
+    console.log('Value is:', value)
   }
 }

@@ -15,7 +15,14 @@ import { FormTabs, IFormTabs } from './FormTabs'
 
 export default {
   title: 'Controls/Tabs',
-  component: FormTabs
+  component: FormTabs,
+  parameters: {
+    docs: {
+      description: {
+        component: `Tabs organize and allow navigation between groups of content that are within the same context.`
+      }
+    }
+  }
 } as Meta
 
 interface IProps {

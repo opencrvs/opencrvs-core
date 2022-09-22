@@ -18,7 +18,7 @@ const Template: Story<IButtonProps> = (args) => (
 )
 
 export default {
-  title: 'Controls/Button/DangerButton',
+  title: 'Deprecated/Button/DangerButton',
   component: DangerButton,
   argTypes: {
     icon: {

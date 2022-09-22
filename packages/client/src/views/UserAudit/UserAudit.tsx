@@ -41,13 +41,10 @@ import { IStoreState } from '@client/store'
 import { getScope } from '@client/profile/profileSelectors'
 import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { userMutations } from '@client/user/mutations'
-import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import {
-  Toast,
-  NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/Toast'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { Summary } from '@opencrvs/components/lib/Summary'
+import { Toast } from '@client/../../components/lib'
+import { UserAuditActionModal } from '../SysAdmin/Team/user/UserAuditActionModal'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -271,9 +268,8 @@ export const UserAudit = () => {
                 {showResendSMSSuccess && (
                   <Toast
                     id="resend_invite_success"
-                    type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
-                    show={showResendSMSSuccess}
-                    callback={() => setShowResendSMSSuccess(false)}
+                    type="success"
+                    onClose={() => setShowResendSMSSuccess(false)}
                   >
                     {intl.formatMessage(sysMessages.resendSMSSuccess)}
                   </Toast>
@@ -281,9 +277,8 @@ export const UserAudit = () => {
                 {showResendSMSError && (
                   <Toast
                     id="resend_invite_error"
-                    type={FLOATING_NOTIFICATION_TYPE.ERROR}
-                    show={showResendSMSError}
-                    callback={() => setShowResendSMSError(false)}
+                    type="error"
+                    onClose={() => setShowResendSMSError(false)}
                   >
                     {intl.formatMessage(sysMessages.resendSMSError)}
                   </Toast>

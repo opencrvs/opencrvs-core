@@ -10,14 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { Link } from './Link'
+import { ComponentStory, ComponentMeta } from '@storybook/react'
+import { Notification } from './Notification'
 
 export default {
-  title: 'Controls/Link',
-  component: Link
-} as Meta
+  title: 'Styles/Icons/Notification',
+  component: Notification
+} as ComponentMeta<typeof Notification>
 
-const Template: Story<{}> = () => <Link>Hello</Link>
+const Template: ComponentStory<typeof Notification> = () => (
+  <span style={{ color: '#000' }}>
+    <Notification />
+  </span>
+)
 
-export const LinkView = Template.bind({})
+export const NotificationIcon = Template.bind({})

@@ -50,10 +50,6 @@ const Required = styled.span<
   flex-grow: 0;
 `
 
-const ToolTipContainer = styled.span`
-  text-align: center;
-`
-
 export class InputLabel extends React.Component<IInputLabel> {
   render() {
     const { inputDescriptor, required, hideAsterisk, children, tooltip } =

@@ -32,11 +32,8 @@ import {
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
-import { TableView } from '@opencrvs/components/lib/Table'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { Table } from '@opencrvs/components/lib/Table'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -366,18 +363,17 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   getLoadingAuditListView(hasError?: boolean) {
     return (
       <>
-        <TableView
+        <Table
           id="loading-audit-list"
           isLoading={true}
           columns={this.getAuditColumns()}
           content={[]}
           noResultText={this.props.intl.formatMessage(messages.noAuditFound)}
-          hideBoxShadow={true}
           hideTableHeader={
             this.state.viewportWidth <= this.props.theme.grid.breakpoints.md
           }
         />
-        {hasError && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+        {hasError && <GenericErrorToast />}
       </>
     )
   }
@@ -385,6 +381,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   render() {
     const { intl, user, theme, isLoading, isOnline } = this.props
     const { timeStart, timeEnd, currentPageNumber } = this.state
+    const recordCount = DEFAULT_LIST_SIZE * this.state.currentPageNumber
 
     return (
       <RecentActionsHolder id="user-audit-list">
@@ -411,7 +408,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                   timeEnd: timeEnd.toISOString(),
                   practitionerId: user && user.practitionerId,
                   locationId: user && user.locationId,
-                  count: DEFAULT_LIST_SIZE,
+                  count: recordCount,
                   skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1)
                 }}
                 fetchPolicy={'no-cache'}
@@ -428,38 +425,21 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                     )
 
                     return (
-                      <>
-                        <TableView
-                          columns={this.getAuditColumns()}
-                          content={this.getAuditData(data, user)}
-                          noResultText={intl.formatMessage(
-                            messages.noAuditFound
-                          )}
-                          hideBoxShadow={true}
-                          hideTableHeader={
-                            this.state.viewportWidth <=
-                            theme.grid.breakpoints.md
-                          }
-                          currentPage={currentPageNumber}
-                          onPageChange={(currentPage: number) => {
-                            this.setCurrentPage(currentPage)
-                          }}
-                        />
-                        {totalItems > DEFAULT_LIST_SIZE && isOnline && (
-                          <Pagination
-                            initialPage={currentPageNumber}
-                            totalPages={Math.ceil(
-                              totalItems / DEFAULT_LIST_SIZE
-                            )}
-                            onPageChange={this.setCurrentPage}
-                          />
-                        )}
-
-                        <LoadingIndicator
-                          loading={loading ? true : false}
-                          hasError={error ? true : false}
-                        />
-                      </>
+                      <Table
+                        columns={this.getAuditColumns()}
+                        content={this.getAuditData(data, user)}
+                        noResultText={intl.formatMessage(messages.noAuditFound)}
+                        isLoading={loading}
+                        hideTableHeader={
+                          this.state.viewportWidth <= theme.grid.breakpoints.md
+                        }
+                        currentPage={this.state.currentPageNumber}
+                        pageSize={recordCount}
+                        totalItems={totalItems}
+                        onPageChange={(currentPage: number) => {
+                          this.setCurrentPage(currentPage)
+                        }}
+                      />
                     )
                   }
                 }}

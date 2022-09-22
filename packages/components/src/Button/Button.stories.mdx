@@ -1,0 +1,174 @@
+<!--This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+graphic logo are (registered/a) trademark(s) of Plan International.-->
+
+import {
+  Meta,
+  Story,
+  Canvas,
+  ArgsTable,
+  Source,
+  Preview
+} from '@storybook/addon-docs'
+import dedent from 'ts-dedent'
+import { Button } from './Button'
+import { Stack } from '../Stack'
+import { Activity } from '../icons'
+
+<Meta title="Controls / Button" component={Button} />
+
+export const Template = (args) => <Button {...args}>Click here</Button>
+
+export const Sizes = () => (
+  <Stack>
+    <Button type="primary" size="large">
+      Large
+    </Button>
+    <Button type="primary" size="medium">
+      Default
+    </Button>
+    <Button type="primary" size="small">
+      Small
+    </Button>
+  </Stack>
+)
+
+export const WithIcon = () => (
+  <Stack>
+    <Button type="primary">
+      <Activity stroke="#ffffff" />
+      Primary
+    </Button>
+    <Button type="secondary">
+      <Activity stroke="#4972bb" />
+      Secondary
+    </Button>
+    <Button type="tertiary" size="small">
+      <Activity stroke="#4972bb" />
+      Primary
+    </Button>
+  </Stack>
+)
+
+export const Icon = () => (
+  <Stack>
+    <Button icon size="large" aria-label="View performance data">
+      <Activity />
+    </Button>
+    <Button icon size="medium" aria-label="View performance data">
+      <Activity />
+    </Button>
+    <Button icon size="small" aria-label="View performance data">
+      <Activity />
+    </Button>
+  </Stack>
+)
+
+export const Loading = () => (
+  <Stack>
+    <Button type="primary" loading>
+      Primary
+    </Button>
+    <Button type="secondary" loading>
+      Secondary
+    </Button>
+    <Button type="tertiary" loading>
+      Tertiary
+    </Button>
+  </Stack>
+)
+
+export const Disabled = () => (
+  <Stack>
+    <Button type="primary" disabled>
+      Primary
+    </Button>
+    <Button type="secondary" disabled>
+      Secondary
+    </Button>
+    <Button type="tertiary" disabled>
+      Tertiary
+    </Button>
+  </Stack>
+)
+
+# Button
+
+Buttons are used primarily for actions. For buttons that need to look like links, see [LinkButton component.](/docs/controls-link-button--link-button-view)
+
+Use the `aria-label`-prop when the button's visible text doesn't fully convey the meaning of the action. For example "Add" or "Remove" doesn't tell what is being added or removed. Make sure that your button is accessible by keyboard tab navigation.
+
+<Canvas>
+  <Story
+    args={{
+      type: 'primary',
+      size: 'medium',
+      icon: false,
+      disabled: false,
+      loading: false
+    }}
+    argTypes={{
+      type: {
+        control: {
+          type: 'radio'
+        }
+      },
+      disabled: {
+        table: {
+          category: 'Modifiers'
+        }
+      },
+      loading: {
+        table: {
+          category: 'Modifiers'
+        }
+      },
+      icon: {
+        table: {
+          category: 'Modifiers'
+        }
+      }
+    }}
+    name="Button"
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Button" />
+
+## Sizes
+
+<Canvas>
+  <Story name="Sizes">{Sizes.bind({})}</Story>
+</Canvas>
+
+## With icon
+
+<Canvas>
+  <Story name="With icon">{WithIcon.bind({})}</Story>
+</Canvas>
+
+## Icon
+
+<Canvas>
+  <Story name="Icon">{Icon.bind({})}</Story>
+</Canvas>
+
+## Loading
+
+<Canvas>
+  <Story name="Loading">{Loading.bind({})}</Story>
+</Canvas>
+
+## Disabled
+
+<Canvas>
+  <Story name="Disabled">{Disabled.bind({})}</Story>
+</Canvas>

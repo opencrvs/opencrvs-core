@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ErrorMessage } from './ErrorMessage'
 
 export default {
-  title: 'Data/Error message',
+  title: 'Deprecated/Error message',
   component: ErrorMessage
 } as Meta
 

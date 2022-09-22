@@ -25,7 +25,7 @@ import {
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
@@ -143,26 +143,27 @@ export function ApplicationName() {
         </Content>
       </ResponsiveModal>
 
-      <Toast
-        id="appNamenotification"
-        type={
-          notificationStatus === NOTIFICATION_STATUS.SUCCESS
-            ? NOTIFICATION_TYPE.SUCCESS
-            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? NOTIFICATION_TYPE.IN_PROGRESS
-            : NOTIFICATION_TYPE.ERROR
-        }
-        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
-        callback={() => {
-          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
-        }}
-      >
-        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
-          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
-          ? intl.formatMessage(messages.applicationNameChangeNotification)
-          : intl.formatMessage(messages.applicationConfigChangeError)}
-      </Toast>
+      {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
+        <Toast
+          id="appNamenotification"
+          type={
+            notificationStatus === NOTIFICATION_STATUS.SUCCESS
+              ? 'success'
+              : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+              ? 'loading'
+              : 'warning'
+          }
+          onClose={() => {
+            setNotificationStatus(NOTIFICATION_STATUS.IDLE)
+          }}
+        >
+          {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+            : notificationStatus === NOTIFICATION_STATUS.SUCCESS
+            ? intl.formatMessage(messages.applicationNameChangeNotification)
+            : intl.formatMessage(messages.applicationConfigChangeError)}
+        </Toast>
+      )}
     </>
   )
 }

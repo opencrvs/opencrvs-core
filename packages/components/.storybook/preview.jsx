@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
+import { DocsContainer } from '@storybook/addon-docs'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import WebFont from 'webfontloader'
 import { getTheme } from '@opencrvs/components/lib/theme'
@@ -27,6 +28,7 @@ body,
 #__next,
 #__layout,
 #default-layout {
+  font-family: ${theme.fontFamily};
   width: 100%;
   height: 100%;
   overflow-x: hidden;
@@ -37,14 +39,8 @@ body,
       height: 100%;
     }
   }
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${theme.fontFamily};
-    font-style: normal;
-    font-weight: 400;
-  }
-  *:not(i) {
-    font-family: ${theme.fontFamily};
+  .os-padding {
+    z-index: 0;
   }
 }
 
@@ -64,10 +60,20 @@ fieldset, legend
 }
 `
 export const decorators = [
-  (Story) => (
+  (Story, context) => (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <Story />
+
+      {
+        // Allows adding { parameters: { storyCss: { ... } }} inside stories
+        context?.parameters?.storyCss ? (
+          <div style={context?.parameters?.storyCss}>
+            <Story />
+          </div>
+        ) : (
+          <Story />
+        )
+      }
     </ThemeProvider>
   )
 ]
@@ -87,10 +93,17 @@ export const parameters = {
       date: /Date$/
     }
   },
+  docs: {
+    container: ({ children, context }) => (
+      <DocsContainer context={context}>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </DocsContainer>
+    )
+  },
   options: {
     storySort: {
       order: [
-        'Welcome',
+        'Introduction',
         'Styles',
         'Typography',
         'Layout',

@@ -14,7 +14,7 @@ import React from 'react'
 import { ProgressBar } from './ProgressBar'
 
 export default {
-  title: 'Data/Charts/Horizontal bar',
+  title: 'Data/Horizontal bar chart',
   component: ProgressBar
 } as Meta
 
@@ -34,8 +34,8 @@ type ProgressBarShape = 'square' | 'round' | 'butt'
 
 const Template: Story<IProgressBarProps> = (args) => <ProgressBar {...args} />
 
-export const ProgressBarView = Template.bind({})
-ProgressBarView.args = {
+export const Default = Template.bind({})
+Default.args = {
   totalPoints: 900,
   currentPoints: 100
 }

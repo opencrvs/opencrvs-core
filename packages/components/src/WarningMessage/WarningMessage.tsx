@@ -35,6 +35,7 @@ const StyledParagraph = styled.div`
   ${({ theme }) => theme.fonts.bold16};
 `
 
+/** @deprecated in favor of `<ErrorText>` */
 export function WarningMessage(props: IWarningProps) {
   return (
     <Container ignoreMediaQuery={props.ignoreMediaQuery}>

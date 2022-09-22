@@ -12,20 +12,7 @@
 import { Meta, Story } from '@storybook/react'
 import React, { useState } from 'react'
 import { ExpandingMenu } from './ExpandingMenu'
-import styled from 'styled-components'
-import {
-  DeclarationBlack,
-  DeclarationBlue,
-  StatsBlack,
-  StatsBlue,
-  SettingsBlack,
-  SettingsBlue,
-  HelpBlack,
-  HelpBlue,
-  LogoutBlack,
-  LogoutBlue,
-  Hamburger
-} from '../icons'
+import { Hamburger } from '../icons'
 
 interface IUserDetails {
   name: string
@@ -59,53 +46,6 @@ export default {
   }
 } as Meta
 
-const menuItems = [
-  {
-    icon: <DeclarationBlack />,
-    iconHover: <DeclarationBlue />,
-    label: 'Declarations',
-    onClick: () => alert('on Click Event')
-  },
-  {
-    icon: <StatsBlack />,
-    iconHover: <StatsBlue />,
-    label: 'Performance',
-    onClick: () => alert('on Click Event')
-  },
-  {
-    icon: <SettingsBlack />,
-    iconHover: <SettingsBlue />,
-    label: 'Settings',
-    onClick: () => alert('on Click Event')
-  },
-  {
-    icon: <HelpBlack />,
-    iconHover: <HelpBlue />,
-    label: 'Help',
-    onClick: () => alert('on Click Event')
-  },
-  {
-    icon: <LogoutBlack />,
-    iconHover: <LogoutBlue />,
-    label: 'Logout',
-    secondary: true,
-    onClick: () => alert('Logout')
-  }
-]
-const AvatarImage = styled.img`
-  border-radius: 50%;
-  &.clickable {
-    cursor: pointer;
-  }
-`
-const userDetails = { name: 'Yeasin', role: 'Field agent' }
-const avatar = (
-  <AvatarImage
-    width={64}
-    height={64}
-    src={`https:/eu.ui-avatars.com/api/?name=Yeasin`}
-  />
-)
 const Template: Story<IProps> = () => {
   const [showMenu, setMenu] = useState(false)
   return (
