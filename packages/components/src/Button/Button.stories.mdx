@@ -25,18 +25,22 @@ import { Activity } from '../icons'
 
 export const Template = (args) => <Button {...args}>Click here</Button>
 
-export const Variants = () => (
-  <Stack wrap>
-    <Button type="primary">Primary</Button>
-    <Button type="positive">Positive</Button>
-    <Button type="negative">Negative</Button>
-    <Button type="secondary">Secondary</Button>
-    <Button type="tertiary" size="small">
-      Tertiary
+export const Sizes = () => (
+  <Stack>
+    <Button type="primary" size="large">
+      Large
     </Button>
-    <Button type="primary" size="medium" icon>
-      <Activity />
+    <Button type="primary" size="medium">
+      Default
     </Button>
+    <Button type="primary" size="small">
+      Small
+    </Button>
+  </Stack>
+)
+
+export const WithIcon = () => (
+  <Stack>
     <Button type="primary">
       <Activity stroke="#ffffff" />
       Primary
@@ -52,29 +56,15 @@ export const Variants = () => (
   </Stack>
 )
 
-export const Sizes = () => (
-  <Stack>
-    <Button type="primary" size="large">
-      Large
-    </Button>
-    <Button type="primary" size="medium">
-      Default
-    </Button>
-    <Button type="primary" size="small">
-      Small
-    </Button>
-  </Stack>
-)
-
 export const Icon = () => (
   <Stack>
-    <Button type="primary" size="large" icon>
+    <Button icon size="large" aria-label="View performance data">
       <Activity />
     </Button>
-    <Button type="primary" size="medium" icon>
+    <Button icon size="medium" aria-label="View performance data">
       <Activity />
     </Button>
-    <Button type="primary" size="small" icon>
+    <Button icon size="small" aria-label="View performance data">
       <Activity />
     </Button>
   </Stack>
@@ -112,13 +102,7 @@ export const Disabled = () => (
 
 Buttons are used primarily for actions. For buttons that need to look like links, see [LinkButton component.](/docs/controls-link-button--link-button-view)
 
-## Variants
-
-<Canvas withSource="none">
-  <Story story={Variants} />
-</Canvas>
-
-## Example
+Use the `aria-label`-prop when the button's visible text doesn't fully convey the meaning of the action. For example "Add" or "Remove" doesn't tell what is being added or removed. Make sure that your button is accessible by keyboard tab navigation.
 
 <Canvas>
   <Story
@@ -165,6 +149,12 @@ Buttons are used primarily for actions. For buttons that need to look like links
   <Story name="Sizes">{Sizes.bind({})}</Story>
 </Canvas>
 
+## With icon
+
+<Canvas>
+  <Story name="With icon">{WithIcon.bind({})}</Story>
+</Canvas>
+
 ## Icon
 
 <Canvas>
@@ -182,26 +172,3 @@ Buttons are used primarily for actions. For buttons that need to look like links
 <Canvas>
   <Story name="Disabled">{Disabled.bind({})}</Story>
 </Canvas>
-
-## Best practices
-
-`aria-label`-prop adds an accessible label for a button that doesn't have accessible content.
-Use `aria-label` when:
-
-- the button has no text or uses an icon alone
-- the button's visible text doesn't fully convey the meaning of the action. For example "Add" or "Remove" doesn't tell what is being added or removed.
-
-Make sure that your button is accessible by keyboard tab navigation.
-
-<Source
-  language="ts"
-  code={dedent`
-    <Button
-      icon
-      aria-label="Print a birth declaration for John Doe"
-      onClick={printBirthDeclaration}
-    >
-      <DeclarationIcon />
-    </Button>
-  `}
-/>
