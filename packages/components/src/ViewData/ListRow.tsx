@@ -169,8 +169,6 @@ export class ListRow extends React.Component<IListRowProps> {
       nameWithAvatar
     } = this.props
 
-    const labelType = typeof label
-
     return (
       <Container id={id}>
         {label && (

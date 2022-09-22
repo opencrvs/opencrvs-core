@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { TableView } from '@opencrvs/components/lib/Table'
+import { Table } from '@opencrvs/components/lib/Table'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -26,14 +26,13 @@ import {
   getIndividualNameObj,
   IUserDetails
 } from '@client/utils/userUtils'
-import { goToUserProfile } from '@client/navigation'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, HumanName } from '@client/utils/gateway'
+import { History } from '@client/utils/gateway'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -294,14 +293,12 @@ export const GetHistory = ({
       <Divider />
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableDiv>
-        <TableView
+        <Table
           id="task-history"
           fixedWidth={1088}
           noResultText=""
-          hideBoxShadow={true}
           columns={columns}
           content={historyData}
-          alignItemCenter={true}
           highlightRowOnMouseOver
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />

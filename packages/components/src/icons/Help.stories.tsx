@@ -9,26 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import { Toast, NOTIFICATION_TYPE } from './Toast'
 import React from 'react'
-
-interface IProps {
-  id?: string
-  show: boolean
-  type?: NOTIFICATION_TYPE
-  callback?: (event: React.MouseEvent<HTMLDivElement>) => void
-  className?: string
-}
-
-const Template: Story<IProps> = (args) => <Toast {...args}>Test</Toast>
-export const ToastView = Template.bind({})
-ToastView.args = {
-  show: true,
-  type: NOTIFICATION_TYPE.SUCCESS
-}
+import { Meta, Story } from '@storybook/react'
+import { Help } from '.'
 
 export default {
-  title: 'Data/Toast',
-  component: Toast
+  title: 'Styles/Icons/Help',
+  component: Help
 } as Meta
+
+const Template: Story<{}> = () => <Help />
+
+export const HelpView = Template.bind({})

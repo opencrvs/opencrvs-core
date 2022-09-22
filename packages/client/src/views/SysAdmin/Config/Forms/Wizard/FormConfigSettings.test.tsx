@@ -16,6 +16,7 @@ import { ReactWrapper } from 'enzyme'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { FormConfigSettings } from './FormConfigSettings'
 import { vi } from 'vitest'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 const { store, history } = createStore()
 let testComponent: ReactWrapper
@@ -106,6 +107,7 @@ describe('Introduction page settings update test', () => {
     testComponent.find('#apply').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
+    await waitForElement(testComponent, '#form-settings-notification')
     expect(
       testComponent.find('#form-settings-notification').hostNodes().text()
     ).toBe('Introduction page has been Disabled')
@@ -145,7 +147,7 @@ describe('Addresses settings update test', () => {
     ).toBe('1')
   })
 
-  it('should show success notification if appliction name change', async () => {
+  it('should show success notification if application name change', async () => {
     testComponent
       .find('#addressesSettings')
       .hostNodes()
@@ -163,6 +165,7 @@ describe('Addresses settings update test', () => {
     testComponent.find('#apply').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
+    await waitForElement(testComponent, '#form-settings-notification')
     expect(
       testComponent.find('#form-settings-notification').hostNodes().text()
     ).toBe('The number of address has been updated')

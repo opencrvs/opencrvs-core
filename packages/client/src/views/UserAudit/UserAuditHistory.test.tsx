@@ -198,7 +198,8 @@ describe('User audit list tests', () => {
     )
   })
 
-  it('renders next page of audits after clicking load more link', async () => {
+  // TODO: Implement this test when UserAudit is enabled again / reworked
+  it.skip('renders next page of audits after clicking next page', async () => {
     const testComponent = await createTestComponent(
       <UserAuditHistory
         user={{

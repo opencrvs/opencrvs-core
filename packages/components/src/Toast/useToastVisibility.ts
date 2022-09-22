@@ -9,20 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { Toggle } from './Toggle'
+import { useEffect } from 'react'
 
-export default {
-  title: 'Controls/Toggle',
-  component: Toggle
-} as Meta
-
-const Template: Story<{}> = () => {
-  const [selected, setSelected] = React.useState(true)
-  return (
-    <Toggle defaultChecked={selected} onChange={() => setSelected(!selected)} />
-  )
+type ToastVisibilityProps = {
+  duration: number | null
+  onClose?: () => void
 }
 
-export const ActivityView = Template.bind({})
+export function useToastVisibility({
+  duration,
+  onClose
+}: ToastVisibilityProps) {
+  useEffect(() => {
+    if (duration === null) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      onClose?.()
+    }, duration)
+
+    return () => clearTimeout(timer)
+  }, [duration, onClose])
+}

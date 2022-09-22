@@ -25,7 +25,14 @@ const Template: Story<IPillProps> = (args) => {
 
 export default {
   title: 'Data/Pill',
-  component: Pill
+  component: Pill,
+  parameters: {
+    docs: {
+      description: {
+        component: 'Pill helps label, organize and categorize items.'
+      }
+    }
+  }
 } as Meta
 
 export const Default = Template.bind({})

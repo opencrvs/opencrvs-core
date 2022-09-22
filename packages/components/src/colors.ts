@@ -102,8 +102,12 @@ export const colors = {
   yellowLighter: lighten(0.3)(config.yellow),
 
   positiveDark: darken(0.2)(config.positive),
+  positiveLight: lighten(0.2)(config.positive),
+
   neutralDark: darken(0.2)(config.neutral),
-  negativeDark: darken(0.2)(config.negative)
+
+  negativeDark: darken(0.2)(config.negative),
+  negativeLight: lighten(0.2)(config.negative)
 }
 
 export type IColor = keyof typeof colors

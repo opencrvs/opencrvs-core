@@ -32,11 +32,8 @@ import {
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
-import { TableView } from '@opencrvs/components/lib/Table'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { Table } from '@opencrvs/components/lib/Table'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -45,21 +42,15 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
-import {
-  IUserData,
-  InformationTitle
-} from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
 import format from '@client/utils/date-formatting'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import {
   IOnlineStatusProps,
-  LoadingIndicator,
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -103,6 +94,24 @@ const AdjustedStatusIcon = styled.div`
   margin-left: 3px;
 `
 
+const InformationTitle = styled.div`
+  ${({ theme }) => theme.fonts.bold16};
+  width: 320px;
+`
+export interface IUserData {
+  id?: string
+  primaryOffice?: ISearchLocation
+  name?: string
+  role?: string
+  type?: string
+  number?: string
+  status?: string
+  underInvestigation?: boolean
+  username?: string
+  practitionerId?: string
+  locationId?: string
+  startDate?: string
+}
 interface IBaseProp {
   theme: ITheme
   user?: IUserData
@@ -366,18 +375,17 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   getLoadingAuditListView(hasError?: boolean) {
     return (
       <>
-        <TableView
+        <Table
           id="loading-audit-list"
           isLoading={true}
           columns={this.getAuditColumns()}
           content={[]}
           noResultText={this.props.intl.formatMessage(messages.noAuditFound)}
-          hideBoxShadow={true}
           hideTableHeader={
             this.state.viewportWidth <= this.props.theme.grid.breakpoints.md
           }
         />
-        {hasError && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+        {hasError && <GenericErrorToast />}
       </>
     )
   }
@@ -385,6 +393,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   render() {
     const { intl, user, theme, isLoading, isOnline } = this.props
     const { timeStart, timeEnd, currentPageNumber } = this.state
+    const recordCount = DEFAULT_LIST_SIZE * this.state.currentPageNumber
 
     return (
       <RecentActionsHolder id="user-audit-list">
@@ -411,7 +420,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                   timeEnd: timeEnd.toISOString(),
                   practitionerId: user && user.practitionerId,
                   locationId: user && user.locationId,
-                  count: DEFAULT_LIST_SIZE,
+                  count: recordCount,
                   skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1)
                 }}
                 fetchPolicy={'no-cache'}
@@ -428,38 +437,21 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                     )
 
                     return (
-                      <>
-                        <TableView
-                          columns={this.getAuditColumns()}
-                          content={this.getAuditData(data, user)}
-                          noResultText={intl.formatMessage(
-                            messages.noAuditFound
-                          )}
-                          hideBoxShadow={true}
-                          hideTableHeader={
-                            this.state.viewportWidth <=
-                            theme.grid.breakpoints.md
-                          }
-                          currentPage={currentPageNumber}
-                          onPageChange={(currentPage: number) => {
-                            this.setCurrentPage(currentPage)
-                          }}
-                        />
-                        {totalItems > DEFAULT_LIST_SIZE && isOnline && (
-                          <Pagination
-                            initialPage={currentPageNumber}
-                            totalPages={Math.ceil(
-                              totalItems / DEFAULT_LIST_SIZE
-                            )}
-                            onPageChange={this.setCurrentPage}
-                          />
-                        )}
-
-                        <LoadingIndicator
-                          loading={loading ? true : false}
-                          hasError={error ? true : false}
-                        />
-                      </>
+                      <Table
+                        columns={this.getAuditColumns()}
+                        content={this.getAuditData(data, user)}
+                        noResultText={intl.formatMessage(messages.noAuditFound)}
+                        isLoading={loading}
+                        hideTableHeader={
+                          this.state.viewportWidth <= theme.grid.breakpoints.md
+                        }
+                        currentPage={this.state.currentPageNumber}
+                        pageSize={recordCount}
+                        totalItems={totalItems}
+                        onPageChange={(currentPage: number) => {
+                          this.setCurrentPage(currentPage)
+                        }}
+                      />
                     )
                   }
                 }}

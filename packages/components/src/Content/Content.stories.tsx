@@ -15,6 +15,21 @@ import React, { ReactElement } from 'react'
 import { LinkButton, PrimaryButton, SecondaryButton } from '../buttons'
 import { DeclarationIcon } from '../icons'
 
+export default {
+  title: 'Layout/Content',
+  component: Content,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+\`<Content>\` adds styling and actions to a page body content.
+Content is often used by \`<Frame>\` where you can find more complex examples of layouting.
+`
+      }
+    }
+  }
+} as Meta
+
 interface IProps {
   icon?: () => React.ReactNode
   title?: string
@@ -57,8 +72,3 @@ Default.args = {
   ],
   size: 'normal'
 }
-
-export default {
-  title: 'Layout/Content',
-  component: Content
-} as Meta

@@ -10,33 +10,29 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { buttonMessages, errorMessages } from '@client/i18n/messages'
-import { ErrorToastNotification } from '@opencrvs/components/lib/Toast'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
-
-export enum NOTIFICATION_TYPE {
-  ERROR
-}
+import { Toast } from '@opencrvs/components/lib/Toast'
+import React, { useState } from 'react'
+import { useIntl } from 'react-intl'
 
 const notificationActionButtonHandler = () => {
   window.location.reload()
 }
 
-function getErrorNotification(intl: any) {
-  return (
-    <ErrorToastNotification
-      retryButtonText={intl.formatMessage(buttonMessages.retry)}
-      retryButtonHandler={notificationActionButtonHandler}
+export const GenericErrorToast = () => {
+  const intl = useIntl()
+  const [isVisible, setIsVisible] = useState(true)
+
+  return isVisible ? (
+    <Toast
+      id="error-toast"
+      type="warning"
+      actionText={intl.formatMessage(buttonMessages.retry)}
+      onActionClick={notificationActionButtonHandler}
+      onClose={() => setIsVisible(false)}
     >
       {intl.formatMessage(errorMessages.pageLoadFailed)}
-    </ErrorToastNotification>
+    </Toast>
+  ) : (
+    <></>
   )
 }
-
-export const ToastNotification = injectIntl(
-  (props: WrappedComponentProps & { type: NOTIFICATION_TYPE }) => {
-    const { intl, type } = props
-
-    return <>{type === NOTIFICATION_TYPE.ERROR && getErrorNotification(intl)}</>
-  }
-)

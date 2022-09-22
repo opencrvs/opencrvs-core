@@ -16,10 +16,28 @@ import { ComponentMeta, ComponentStory } from '@storybook/react'
 
 export default {
   title: 'Data/Summary',
-  component: Summary
+  component: Summary,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Summary helps visualize data in a two-column table. Summary row values can also be hidden, to indicate data that the user has no access to.'
+      }
+    }
+  }
 } as ComponentMeta<typeof Summary>
 
-export const Default: ComponentStory<typeof Summary> = () => (
+export const Row: ComponentStory<typeof Summary.Row> = (args) => (
+  <Summary.Row {...args} />
+)
+Row.args = {
+  label: 'Event',
+  value: 'Birth',
+  placeholder: 'No event',
+  locked: false
+}
+
+export const SummaryTable: ComponentStory<typeof Summary> = () => (
   <Summary>
     <Summary.Row
       data-testid="status"
@@ -34,3 +52,4 @@ export const Default: ComponentStory<typeof Summary> = () => (
     <Summary.Row label="Informant" locked={true} />
   </Summary>
 )
+SummaryTable.storyName = 'Summary'
