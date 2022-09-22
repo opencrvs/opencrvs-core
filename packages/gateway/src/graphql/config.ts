@@ -113,7 +113,9 @@ export const getApolloConfig = (): Config => {
 
       return {
         Authorization: request.headers.authorization,
-        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId()
+        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
+        'x-real-ip': request.info.remoteAddress,
+        'x-real-user-agent': request.headers['user-agent']
       }
     }
   }
