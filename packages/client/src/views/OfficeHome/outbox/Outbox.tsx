@@ -34,9 +34,9 @@ import {
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { formatLongDate } from '@client/utils/date-formatting'
-import styled from '@client/styledComponents'
 import {
   IconWithName,
+  IconWithNameEvent,
   NameContainer,
   NoNameContainer
 } from '@client/views/OfficeHome/components'
@@ -50,10 +50,6 @@ import {
 } from '@client/SubmissionController'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
-const IconContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`
 function getFullName(firstName?: string, lastName?: string) {
   let fullName = ''
   if (firstName) {
@@ -289,8 +285,15 @@ export function Outbox() {
             name={NameComponent}
           />
         ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={declaration.registrationStatus || 'IN_PROGRESS'}
+            name={NameComponent}
+            event={statusText || ''}
+          />
+        ),
         submissionStatus: statusText || '',
-        statusIndicator: icon ? <IconContainer>{icon()}</IconContainer> : null,
+        statusIndicator: icon ? [{ actionComponent: icon() }] : null,
         dateOfEvent
       }
     })
@@ -305,14 +308,22 @@ export function Outbox() {
     }))
   }
 
-  return (
-    <WQContentWrapper
-      title={intl.formatMessage(navigationMessages.outbox)}
-      isMobileSize={width < theme.grid.breakpoints.lg}
-    >
-      <GridTable
-        content={transformDeclarationsReadyToSend()}
-        columns={[
+  function getColumns() {
+    return width < theme.grid.breakpoints.lg
+      ? [
+          {
+            label: intl.formatMessage(constantsMessages.record),
+            width: 70,
+            key: COLUMNS.ICON_WITH_NAME_EVENT
+          },
+          {
+            width: 30,
+            alignment: ColumnContentAlignment.RIGHT,
+            key: 'statusIndicator',
+            isActionColumn: true
+          }
+        ]
+      : [
           {
             width: 25,
             label: intl.formatMessage(constantsMessages.record),
@@ -344,9 +355,20 @@ export function Outbox() {
           {
             label: '',
             width: 4,
-            key: 'statusIndicator'
+            key: 'statusIndicator',
+            isActionColumn: true
           }
-        ]}
+        ]
+  }
+
+  return (
+    <WQContentWrapper
+      title={intl.formatMessage(navigationMessages.outbox)}
+      isMobileSize={width < theme.grid.breakpoints.lg}
+    >
+      <GridTable
+        content={transformDeclarationsReadyToSend()}
+        columns={getColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResultsOutbox)}
         hideLastBorder={true}
         sortOrder={sortOrder}
