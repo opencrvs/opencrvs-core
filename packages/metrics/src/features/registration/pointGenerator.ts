@@ -626,14 +626,14 @@ export const generateAuditPoint = async (
   action: string,
   ipAddress: string,
   userAgent: string,
-  additionalData?: string
+  additionalData?: Record<string, any>
 ): Promise<IPoints> => {
   const tags: IUserAuditTags = {
     action: action,
     practitionerId: practitionerId
   }
   const fields: IUserAuditFields = {
-    data: additionalData,
+    data: additionalData && JSON.stringify(additionalData),
     ipAddress: ipAddress,
     userAgent: userAgent
   }

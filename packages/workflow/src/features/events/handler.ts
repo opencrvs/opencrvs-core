@@ -15,7 +15,8 @@ import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
   hasDeathRegistrationNumber,
-  forwardToHearth
+  forwardToHearth,
+  getCompositionIdFromTask
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   createRegistrationHandler,
@@ -41,11 +42,14 @@ import { logger } from '@workflow/logger'
 import {
   hasDeclareScope,
   hasRegisterScope,
-  hasValidateScope
+  hasValidateScope,
+  getToken
 } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { createUserAuditEvent } from '@workflow/features/audit'
+import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
@@ -244,6 +248,7 @@ export async function fhirWorkflowEventHandler(
     return h.response().code(401)
   }
 
+  const practitioner = await getLoggedInPractitionerResource(getToken(request))
   let response
 
   switch (event) {
@@ -422,6 +427,17 @@ export async function fhirWorkflowEventHandler(
         request,
         h
       )
+
+      await createUserAuditEvent(
+        practitioner.id!,
+        'DOWNLOADED',
+        {
+          compositionId: getCompositionIdFromTask(
+            request.payload as fhir.Bundle
+          )
+        },
+        request
+      )
       break
     case Events.DOWNLOADED_ASSIGNED_EVENT:
       response = await markDownloadedEventAsAssignedOrUnassignedHandler(
@@ -433,6 +449,17 @@ export async function fhirWorkflowEventHandler(
         request.payload,
         request.headers
       )
+
+      await createUserAuditEvent(
+        practitioner.id!,
+        'ASSIGNED',
+        {
+          compositionId: getCompositionIdFromTask(
+            request.payload as fhir.Bundle
+          )
+        },
+        request
+      )
       break
     case Events.UNASSIGNED_EVENT:
       response = await markDownloadedEventAsAssignedOrUnassignedHandler(
@@ -443,6 +470,17 @@ export async function fhirWorkflowEventHandler(
         Events.UNASSIGNED_EVENT,
         request.payload,
         request.headers
+      )
+
+      await createUserAuditEvent(
+        practitioner.id!,
+        'UNASSIGNED',
+        {
+          compositionId: getCompositionIdFromTask(
+            request.payload as fhir.Bundle
+          )
+        },
+        request
       )
       break
     default:

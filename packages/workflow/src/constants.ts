@@ -19,6 +19,8 @@ export const VALIDATING_EXTERNALLY = process.env.VALIDATING_EXTERNALLY || false
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
 
+export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050/'
+
 export const RESOURCE_SERVICE_URL =
   process.env.RESOURCE_SERVICE_URL || `http://localhost:3040/`
 export const CERT_PUBLIC_KEY_PATH =
