@@ -11,6 +11,7 @@
  */
 import styled from 'styled-components'
 
+/** @deprecated for LinkButton */
 export const Link = styled.a<{ error?: boolean }>`
   width: auto;
   min-height: 44px;

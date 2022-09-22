@@ -9,19 +9,58 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { CheckboxGroup, ICheckboxGroup } from './CheckboxGroup'
+import React, { useState } from 'react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { CheckboxGroup } from './CheckboxGroup'
+import { Checkbox } from './Checkbox'
 
 export default {
   title: 'Input/Checkbox',
-  component: CheckboxGroup
-} as Meta
+  component: Checkbox,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Checkboxes allow the user to select one or more items from a set.'
+      }
+    }
+  }
+} as ComponentMeta<typeof Checkbox>
 
-const Template: Story<ICheckboxGroup> = (args) => <CheckboxGroup {...args} />
+export const Default: ComponentStory<typeof Checkbox> = (args) => (
+  <Checkbox {...args} />
+)
+Default.args = {
+  name: 'Banana',
+  label: 'Banana',
+  value: 'banana',
+  selected: true
+}
 
-export const CheckboxGroupView = Template.bind({})
-CheckboxGroupView.args = {
+export const Group: ComponentStory<typeof CheckboxGroup> = () => {
+  const [selectedItems, setSelectedItems] = useState(['bananas'])
+
+  return (
+    <CheckboxGroup
+      id="test-checkbox-group1"
+      options={[
+        {
+          label: 'Bananas',
+          value: 'bananas'
+        },
+        {
+          label: 'Oranges',
+          value: 'oranges'
+        }
+      ]}
+      name="test-checkbox-group1"
+      value={selectedItems}
+      onChange={(newValue) => setSelectedItems(newValue)}
+    />
+  )
+}
+
+Group.args = {
   options: [
     {
       label: 'Bananas',

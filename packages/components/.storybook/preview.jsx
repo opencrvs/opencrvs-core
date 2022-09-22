@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
+import { DocsContainer } from '@storybook/addon-docs'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import WebFont from 'webfontloader'
 import { getTheme } from '@opencrvs/components/lib/theme'
@@ -59,10 +60,20 @@ fieldset, legend
 }
 `
 export const decorators = [
-  (Story) => (
+  (Story, context) => (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <Story />
+
+      {
+        // Allows adding { parameters: { storyCss: { ... } }} inside stories
+        context?.parameters?.storyCss ? (
+          <div style={context?.parameters?.storyCss}>
+            <Story />
+          </div>
+        ) : (
+          <Story />
+        )
+      }
     </ThemeProvider>
   )
 ]
@@ -82,10 +93,17 @@ export const parameters = {
       date: /Date$/
     }
   },
+  docs: {
+    container: ({ children, context }) => (
+      <DocsContainer context={context}>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </DocsContainer>
+    )
+  },
   options: {
     storySort: {
       order: [
-        'Welcome',
+        'Introduction',
         'Styles',
         'Typography',
         'Layout',

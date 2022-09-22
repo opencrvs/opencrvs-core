@@ -44,7 +44,7 @@ export const base = css`
   }
 `
 
-export const primary = ({ loading }: { loading: boolean }) => css`
+export const primary = ({ loading }: { loading?: boolean }) => css`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
 
@@ -121,7 +121,7 @@ export const negative = css`
   }
 `
 
-export const small = ({ loading }: { loading: boolean }) => css`
+export const small = ({ loading }: { loading?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold14};
 
   height: 32px;

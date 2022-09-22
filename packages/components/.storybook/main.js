@@ -13,7 +13,7 @@
 const { mergeConfig } = require('vite')
 
 const BRAND_BLUE =
-  '#0058E0' /* See `theme.ts`. Cannot be imported from there due to 'Cannot use import statement outside a module' */
+  '#0058E0' /* See `theme.js`. Cannot be imported from there due to 'Cannot use import statement outside a module' */
 
 const viteFinal = async (config) => {
   // return the customized config

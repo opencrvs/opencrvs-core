@@ -20,6 +20,7 @@ const RowContainer = styled.tr``
 const RowLabelContainer = styled.th`
   width: 190px;
   text-align: left;
+  vertical-align: middle;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: block;
@@ -27,23 +28,21 @@ const RowLabelContainer = styled.th`
 `
 
 const RowValueContainer = styled.td`
-  width: 325px;
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 280px;
     display: block;
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
-    width: auto;
   }
 `
 
 const LockedBox = styled.div`
+  width: 320px;
   height: 24px;
   border-radius: 4px;
   cursor: not-allowed;
   background-color: ${colors.grey200};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+  }
 `
 
 export interface ISummaryRowProps
