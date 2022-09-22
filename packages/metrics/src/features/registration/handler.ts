@@ -42,7 +42,7 @@ export async function waitingExternalValidationHandler(
   try {
     const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
     const userAgent =
-      request.headers['user-agent'] || request.headers['x-real-user-agent']
+      request.headers['x-real-user-agent'] || request.headers['user-agent']
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
         Authorization: request.headers.authorization,
@@ -84,7 +84,7 @@ export async function requestForRegistrarValidationHandler(
   const points = []
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -127,7 +127,7 @@ export async function registrarRegistrationWaitingExternalValidationHandler(
   const points = []
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -170,7 +170,7 @@ export async function newDeclarationHandler(
   const points = []
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -212,7 +212,7 @@ export async function inProgressHandler(
 ) {
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     const points = await generateInCompleteFieldPoints(
       request.payload as fhir.Bundle,
@@ -261,7 +261,7 @@ export async function markRejectedHandler(
 ) {
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     const points: IPoints[] = []
     points.push(
@@ -315,7 +315,7 @@ export async function newBirthRegistrationHandler(
 ) {
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   const points = []
   try {
     points.push(
@@ -356,7 +356,7 @@ export async function markBirthRegisteredHandler(
 ) {
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     const bundle = await populateBundleFromPayload(
       request.payload as fhir.Bundle | fhir.Task,
@@ -403,7 +403,7 @@ export async function newDeathRegistrationHandler(
 ) {
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   const points = []
   try {
     points.push(
@@ -441,7 +441,7 @@ export async function markDeathRegisteredHandler(
 ) {
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     const bundle = await populateBundleFromPayload(
       request.payload as fhir.Bundle | fhir.Task,
@@ -525,7 +525,7 @@ export async function markValidatedHandler(
 ) {
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     const points = await Promise.all([
       generateEventDurationPoint(
@@ -564,7 +564,7 @@ export async function requestCorrectionHandler(
 ) {
   const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
-    request.headers['user-agent'] || request.headers['x-real-user-agent']
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     const points = await Promise.all([
       generatePaymentPoint(

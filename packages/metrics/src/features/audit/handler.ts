@@ -25,7 +25,7 @@ export async function newAuditHandler(
     const remoteAddress =
       request.headers['x-real-ip'] || request.info.remoteAddress
     const userAgent =
-      request.headers['user-agent'] || request.headers['x-real-user-agent']
+      request.headers['x-real-user-agent'] || request.headers['user-agent']
     const payload = request.payload as IUserAuditBody
     points.push(
       await generateAuditPoint(

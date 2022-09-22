@@ -19,13 +19,6 @@ import {
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
-import { GQLRegStatus } from '@opencrvs/gateway/src/graphql/schema'
-
-import {
-  DOWNLOADED_EXTENSION_URL,
-  OPENCRVS_SPECIFICATION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
-} from '@opencrvs/gateway/src/features/fhir/constants'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
@@ -62,6 +55,24 @@ export function getSectionBySectionCode(
 }
 function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
   return resource.resourceType === 'Task'
+}
+
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
+export const REQUEST_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/requestCorrection`
+
+export const enum GQLRegStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  ARCHIVED = 'ARCHIVED',
+  DECLARED = 'DECLARED',
+  DECLARATION_UPDATED = 'DECLARATION_UPDATED',
+  WAITING_VALIDATION = 'WAITING_VALIDATION',
+  VALIDATED = 'VALIDATED',
+  REGISTERED = 'REGISTERED',
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED',
+  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
+  DOWNLOADED = 'DOWNLOADED'
 }
 
 export type DECLARATION_STATUS =
