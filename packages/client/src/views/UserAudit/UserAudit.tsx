@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { userMessages as messages } from '@client/i18n/messages'
@@ -47,14 +47,7 @@ import {
   NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/Toast'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
-
-const ContentWrapper = styled.div`
-  margin: 40px auto 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 0px auto 0;
-  }
-  color: ${({ theme }) => theme.colors.copy};
-`
+import { Summary } from '@opencrvs/components/lib/Summary'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -62,23 +55,9 @@ const UserAvatar = styled(AvatarSmall)`
   }
 `
 
-const InformationHolder = styled.div`
-  display: flex;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    flex-direction: column;
-  }
-  margin-bottom: 14px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-bottom: 16px;
-  }
-`
-
 export const InformationTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   width: 320px;
-`
-const InformationValue = styled.div`
-  ${({ theme }) => theme.fonts.reg16};
 `
 
 const LinkButtonWithoutSpacing = styled(LinkButton)`
@@ -233,12 +212,11 @@ export const UserAudit = () => {
                 ]}
                 size={ContentSize.LARGE}
               >
-                <ContentWrapper>
-                  <InformationHolder>
-                    <InformationTitle>
-                      {intl.formatMessage(userSetupMessages.assignedOffice)}
-                    </InformationTitle>
-                    <InformationValue>
+                <Summary>
+                  <Summary.Row
+                    data-testid="office-link"
+                    label={intl.formatMessage(userSetupMessages.assignedOffice)}
+                    value={
                       <LinkButtonWithoutSpacing
                         id="office-link"
                         onClick={() =>
@@ -247,78 +225,70 @@ export const UserAudit = () => {
                       >
                         {user.primaryOffice && user.primaryOffice.displayLabel}
                       </LinkButtonWithoutSpacing>
-                    </InformationValue>
-                  </InformationHolder>
-                  <InformationHolder>
-                    <InformationTitle>
-                      {(userType &&
-                        intl.formatMessage(userSetupMessages.roleType)) ||
-                        intl.formatMessage(userFormMessages.labelRole)}
-                    </InformationTitle>
-                    <InformationValue>
-                      {(userType && `${userRole} / ${userType}`) || userRole}
-                    </InformationValue>
-                  </InformationHolder>
-                  <InformationHolder>
-                    <InformationTitle>
-                      {intl.formatMessage(userSetupMessages.phoneNumber)}
-                    </InformationTitle>
-                    <InformationValue>{user.number}</InformationValue>
-                  </InformationHolder>
-                  <InformationHolder>
-                    <InformationTitle>
-                      {intl.formatMessage(userSetupMessages.nid)}
-                    </InformationTitle>
-                    <InformationValue>{user.nid}</InformationValue>
-                  </InformationHolder>
-                  <InformationHolder>
-                    <InformationTitle>
-                      {intl.formatMessage(userSetupMessages.userName)}
-                    </InformationTitle>
-                    <InformationValue>{user.username}</InformationValue>
-                  </InformationHolder>
-                  <InformationHolder>
-                    <InformationTitle>
-                      {intl.formatMessage(userFormMessages.userDevice)}
-                    </InformationTitle>
-                    <InformationValue>{user.device}</InformationValue>
-                  </InformationHolder>
-
-                  <UserAuditActionModal
-                    show={modalVisible}
-                    user={data && data.getUser}
-                    onClose={() => toggleUserActivationModal()}
-                    onConfirmRefetchQueries={[
-                      {
-                        query: GET_USER,
-                        variables: {
-                          userId: userId
-                        }
-                      }
-                    ]}
+                    }
                   />
-                  {showResendSMSSuccess && (
-                    <Toast
-                      id="resend_invite_success"
-                      type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
-                      show={showResendSMSSuccess}
-                      callback={() => setShowResendSMSSuccess(false)}
-                    >
-                      {intl.formatMessage(sysMessages.resendSMSSuccess)}
-                    </Toast>
-                  )}
-                  {showResendSMSError && (
-                    <Toast
-                      id="resend_invite_error"
-                      type={FLOATING_NOTIFICATION_TYPE.ERROR}
-                      show={showResendSMSError}
-                      callback={() => setShowResendSMSError(false)}
-                    >
-                      {intl.formatMessage(sysMessages.resendSMSError)}
-                    </Toast>
-                  )}
-                  <UserAuditHistory user={user} />
-                </ContentWrapper>
+                  <Summary.Row
+                    label={
+                      (userType &&
+                        intl.formatMessage(userSetupMessages.roleType)) ||
+                      intl.formatMessage(userFormMessages.labelRole)
+                    }
+                    value={
+                      (userType && `${userRole} / ${userType}`) || userRole
+                    }
+                  />
+                  <Summary.Row
+                    label={intl.formatMessage(userSetupMessages.phoneNumber)}
+                    value={user.number}
+                  />
+                  <Summary.Row
+                    label={intl.formatMessage(userSetupMessages.nid)}
+                    value={user.nid}
+                  />
+                  <Summary.Row
+                    label={intl.formatMessage(userSetupMessages.userName)}
+                    value={user.username}
+                  />
+                  <Summary.Row
+                    label={intl.formatMessage(userFormMessages.userDevice)}
+                    value={user.device}
+                  />
+                </Summary>
+
+                <UserAuditActionModal
+                  show={modalVisible}
+                  user={data && data.getUser}
+                  onClose={() => toggleUserActivationModal()}
+                  onConfirmRefetchQueries={[
+                    {
+                      query: GET_USER,
+                      variables: {
+                        userId: userId
+                      }
+                    }
+                  ]}
+                />
+                {showResendSMSSuccess && (
+                  <Toast
+                    id="resend_invite_success"
+                    type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
+                    show={showResendSMSSuccess}
+                    callback={() => setShowResendSMSSuccess(false)}
+                  >
+                    {intl.formatMessage(sysMessages.resendSMSSuccess)}
+                  </Toast>
+                )}
+                {showResendSMSError && (
+                  <Toast
+                    id="resend_invite_error"
+                    type={FLOATING_NOTIFICATION_TYPE.ERROR}
+                    show={showResendSMSError}
+                    callback={() => setShowResendSMSError(false)}
+                  >
+                    {intl.formatMessage(sysMessages.resendSMSError)}
+                  </Toast>
+                )}
+                <UserAuditHistory user={user} />
               </Content>
             )
           }
