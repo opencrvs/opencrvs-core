@@ -33,12 +33,12 @@
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
-    "mongoose": "^5.11.0",
+    "mongoose": "^6.6.1",
     "node-fetch": "^2.6.7",
     "pino": "^6.0.0",
     "redis": "^3.0.2",
-    "tsconfig-paths": "^3.13.0",
     "short-uid": "^0.1.0",
+    "tsconfig-paths": "^3.13.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
