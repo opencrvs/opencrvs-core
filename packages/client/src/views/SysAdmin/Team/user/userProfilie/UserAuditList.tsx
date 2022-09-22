@@ -32,7 +32,7 @@ import {
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
-import { TableView } from '@opencrvs/components/lib/Table'
+import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -342,13 +342,12 @@ class UserAuditListComponent extends React.Component<Props, State> {
   getLoadingAuditListView(hasError?: boolean) {
     return (
       <>
-        <TableView
+        <Table
           id="loading-audit-list"
           isLoading={true}
           columns={this.getAuditColumns()}
           content={[]}
           noResultText={this.props.intl.formatMessage(messages.noAuditFound)}
-          hideBoxShadow={true}
           hideTableHeader={
             this.state.viewportWidth <= this.props.theme.grid.breakpoints.md
           }
@@ -401,12 +400,11 @@ class UserAuditListComponent extends React.Component<Props, State> {
                       0
 
                     return (
-                      <TableView
+                      <Table
                         columns={this.getAuditColumns()}
                         content={this.getAuditData(data, user)}
                         noResultText={intl.formatMessage(messages.noAuditFound)}
                         isLoading={loading}
-                        hideBoxShadow={true}
                         hideTableHeader={
                           this.state.viewportWidth <= theme.grid.breakpoints.md
                         }
@@ -416,13 +414,6 @@ class UserAuditListComponent extends React.Component<Props, State> {
                         onPageChange={(currentPage: number) => {
                           this.setCurrentPage(currentPage)
                         }}
-                        loadMoreText={intl.formatMessage(
-                          messages.showMoreAuditList,
-                          {
-                            pageSize: DEFAULT_LIST_SIZE,
-                            totalItems: totalItems
-                          }
-                        )}
                       />
                     )
                   }
