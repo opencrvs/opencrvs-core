@@ -1250,6 +1250,7 @@ describe('markEventAsRequestedForCorrection handler', () => {
     server = await createServer()
     fetch.mockResponses(
       [userMock, { status: 200 }],
+      [patientMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
