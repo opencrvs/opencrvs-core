@@ -232,6 +232,31 @@ services:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'elasticsearch'
 
+  # Configure elasticsearch
+  minio:
+    environment:
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_REGION=${MINIO_BUCKET_REGION}
+    volumes:
+      - '/data/minio:/data/minio'
+      - '/data/backups/minio:/data/backups/minio'
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    command: server --address ":9000" --console-address ":9001" /data/minio
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: documents.{{hostname}}'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.port=80'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+    networks:
+      - overlay_net
+
   setup-elasticsearch-users:
     image: ubuntu:bionic
     entrypoint: ['bash', '/usr/app/setup.sh']

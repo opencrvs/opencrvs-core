@@ -33,6 +33,15 @@ services:
       - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
       - bootstrap.system_call_filter=false
 
+  minio:
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - './data/minio:/data/minio'
+      - '/data/backups/minio:/data/backups/minio'
+    command: server --address ":9000" --console-address ":9001" /data/minio
+
   influxdb:
     ports:
       - '8086:8086'
