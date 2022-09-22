@@ -10,7 +10,7 @@ graphic logo are (registered/a) trademark(s) of Plan International.-->
 
 import { useEffect } from 'react'
 import { Meta, Story } from '@storybook/addon-docs'
-import { ListTable } from '@opencrvs/components/lib/ListTable'
+import { Table } from '@opencrvs/components/lib/Table'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { useStorybookState, useStorybookApi } from '@storybook/api'
@@ -274,20 +274,20 @@ export const componentStatuses = [
 <Summary>
   <Summary.Row
     label="Figma"
-    value="All use cases have been designed and ready to be used by designers."
+    value="All use cases have been designed and ready to be used by designers"
   />
   <Summary.Row
     label="Storybook"
-    value=" Guidelines are exhaustive and all variants are docume"
+    value=" Guidelines are exhaustive and all variants are documented"
   />
   <Summary.Row
     label="React"
-    value="Component is WCAG 2.1 compliant ready to be used by developers in their projects"
+    value="Component is ready to be used by developers in their projects"
   />
 </Summary>
 
 <br />
-<ListTable
+<Table
   columns={[
     {
       key: 'name',
