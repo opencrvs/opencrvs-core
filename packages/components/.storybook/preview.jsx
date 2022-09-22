@@ -103,7 +103,7 @@ export const parameters = {
   options: {
     storySort: {
       order: [
-        'Welcome',
+        'Introduction',
         'Styles',
         'Typography',
         'Layout',
