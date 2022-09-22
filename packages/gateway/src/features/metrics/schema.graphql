@@ -44,7 +44,6 @@ type UserLoggedMetricsResultSet {
   total: Int!
   results: [UserLogMetrics!]!
 }
-
 type UserLogMetrics {
   time: String!
   data: String
