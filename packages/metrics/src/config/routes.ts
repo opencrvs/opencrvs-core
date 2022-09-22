@@ -46,6 +46,7 @@ import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
 import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import { vsExportHandler } from '@metrics/features/vsExport/handler'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -484,6 +485,15 @@ export const getRoutes = () => {
           })
         },
         tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/vsExport',
+      handler: vsExportHandler,
+      config: {
+        tags: ['api'],
+        auth: false
       }
     },
     // used for tests to check JWT auth

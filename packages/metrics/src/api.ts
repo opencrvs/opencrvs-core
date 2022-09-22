@@ -15,7 +15,8 @@ import {
   fhirUrl,
   COUNTRY_CONFIG_URL,
   SEARCH_URL,
-  USER_MANAGEMENT_URL
+  USER_MANAGEMENT_URL,
+  DOCUMENTS_URL
 } from '@metrics/constants'
 
 export function fetchFHIR<T = any>(
@@ -215,4 +216,22 @@ export async function countUsersByLocation(
     }
   )
   return res.json()
+}
+
+export async function uploadBase64ToMinio(fileData: string): Promise<string> {
+  try {
+    const result = await fetch(`${DOCUMENTS_URL}/upload-vs-export`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ fileData: fileData })
+    })
+    const res = await result.json()
+    console.log('result', res)
+    return res.refUrl
+  } catch (err) {
+    console.log(err)
+    return err
+  }
 }

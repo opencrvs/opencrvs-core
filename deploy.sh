@@ -118,6 +118,21 @@ if [ -z "$ELASTICSEARCH_SUPERUSER_PASSWORD" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$MINIO_ACCESS_KEY" ] ; then
+    echo 'Error: Missing environment variable MINIO_ACCESS_KEY.'
+    print_usage_and_exit
+fi
+
+if [ -z "$MINIO_SECRET_KEY" ] ; then
+    echo 'Error: Missing environment variable MINIO_SECRET_KEY.'
+    print_usage_and_exit
+fi
+
+if [ -z "$MINIO_BUCKET_REGION" ] ; then
+    echo 'Error: Missing environment variable MINIO_BUCKET_REGION.'
+    print_usage_and_exit
+fi
+
 if [ -z "$MONGODB_ADMIN_USER" ] ; then
     echo 'Error: Missing environment variable MONGODB_ADMIN_USER.'
     print_usage_and_exit
@@ -164,6 +179,7 @@ generate_password() {
 USER_MGNT_MONGODB_PASSWORD=`generate_password`
 HEARTH_MONGODB_PASSWORD=`generate_password`
 CONFIG_MONGODB_PASSWORD=`generate_password`
+METRICS_MONGODB_PASSWORD=`generate_password`
 OPENHIM_MONGODB_PASSWORD=`generate_password`
 WEBHOOKS_MONGODB_PASSWORD=`generate_password`
 
@@ -242,10 +258,14 @@ docker_stack_deploy() {
     USER_MGNT_MONGODB_PASSWORD='$USER_MGNT_MONGODB_PASSWORD' \
     HEARTH_MONGODB_PASSWORD='$HEARTH_MONGODB_PASSWORD' \
     CONFIG_MONGODB_PASSWORD='$CONFIG_MONGODB_PASSWORD' \
+    METRICS_MONGODB_PASSWORD='$METRICS_MONGODB_PASSWORD' \
     OPENHIM_MONGODB_PASSWORD='$OPENHIM_MONGODB_PASSWORD' \
     WEBHOOKS_MONGODB_PASSWORD='$WEBHOOKS_MONGODB_PASSWORD' \
     MONGODB_ADMIN_USER='$MONGODB_ADMIN_USER' \
     MONGODB_ADMIN_PASSWORD='$MONGODB_ADMIN_PASSWORD' \
+    MINIO_ACCESS_KEY='$MINIO_ACCESS_KEY' \
+    MINIO_SECRET_KEY='$MINIO_SECRET_KEY' \
+    MINIO_BUCKET_REGION='$MINIO_BUCKET_REGION' \
     DOCKERHUB_ACCOUNT='$DOCKERHUB_ACCOUNT' \
     DOCKERHUB_REPO='$DOCKERHUB_REPO' \
     ELASTICSEARCH_SUPERUSER_PASSWORD='$ELASTICSEARCH_SUPERUSER_PASSWORD' \

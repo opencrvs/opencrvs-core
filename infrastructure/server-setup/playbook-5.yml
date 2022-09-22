@@ -26,6 +26,8 @@
           - mongodb_admin_username is defined
           - mongodb_admin_password is defined
           - elasticsearch_superuser_password is defined
+          - minio_access_key is defined
+          - minio_secret_key is defined
           - country_config_path is defined
 
     - name: Setting global variables accessed by country configuration playbook
