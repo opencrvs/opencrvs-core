@@ -90,7 +90,7 @@
     "opener": "^1.5.1",
     "prettier": "2.5.1",
     "ts-jest": "^26.4.4",
-    "typescript": "^3.7.2",
+    "typescript": "^4.8.3",
     "typestyle": "^1.3.7"
   },
   "lint-staged": {

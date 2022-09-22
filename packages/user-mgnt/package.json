@@ -34,8 +34,8 @@
     "lodash": "^4.17.11",
     "mongoose": "^5.11.0",
     "node-fetch": "^2.6.7",
-    "tsconfig-paths": "^3.13.0",
     "pino": "^6.0.0",
+    "tsconfig-paths": "^3.13.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
@@ -54,7 +54,7 @@
     "prettier": "^2.5.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
-    "typescript": "^3.7.2"
+    "typescript": "^4.8.3"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
