@@ -39,7 +39,7 @@ services:
       - '9001:9001'
     volumes:
       - './data/minio:/data/minio'
-      - '/data/backups/minio:/data/backups/minio'
+      - './data/backups/minio:/data/backups/minio'
     command: server --address ":9000" --console-address ":9001" /data/minio
 
   influxdb:
