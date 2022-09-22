@@ -241,7 +241,7 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET_REGION=${MINIO_BUCKET_REGION}
     volumes:
-      - '/data/minio:/usr/share/minio/data'
+      - '/data/minio:/data/minio'
       - '/data/backups/minio:/data/backups/minio'
     ports:
       - '9000:9000'

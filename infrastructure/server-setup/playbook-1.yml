@@ -206,7 +206,7 @@
         state: directory
         group: 1000
         owner: 1000
-        mode: g+rwx
+        mode: ugo+rwx
 
     - name: 'Create minio backup directory'
       file:
@@ -214,7 +214,7 @@
         state: directory
         group: 1000
         owner: 1000
-        mode: g+rwx
+        mode: ugo+rwx
 
     - name: 'Install UFW'
       apt:
