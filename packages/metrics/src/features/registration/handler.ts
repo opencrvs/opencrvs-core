@@ -40,9 +40,6 @@ export async function waitingExternalValidationHandler(
 ) {
   const points = []
   try {
-    const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
-    const userAgent =
-      request.headers['x-real-user-agent'] || request.headers['user-agent']
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
         Authorization: request.headers.authorization,
@@ -59,16 +56,7 @@ export async function waitingExternalValidationHandler(
         }
       )
     )
-    points.push(
-      await generateAuditPoint(
-        getPractitionerIdFromBundle(request.payload as fhir.Bundle)!,
-        getActionFromTask(
-          getTask(request.payload as fhir.Bundle) as fhir.Task
-        )!,
-        ipAddress,
-        userAgent
-      )
-    )
+
     await writePoints(points)
   } catch (err) {
     return internal(err)
