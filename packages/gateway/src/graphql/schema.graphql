@@ -109,7 +109,7 @@ type Query {
     locationId: String!
     count: Int!
   ): TimeLoggedMetricsResultSet
-  getUserAuditLog(practitionerId: String!): UserLoggedMetricsResultSet
+  getUserAuditLog(practitionerId: String!): UserAuditResultSet
   searchEvents(
     userId: String
     locationIds: [String!]
@@ -439,9 +439,9 @@ type TimeLoggedMetricsResultSet {
   totalItems: Int
 }
 
-type UserLoggedMetricsResultSet {
+type UserAuditResultSet {
   total: Int!
-  results: [UserLogMetrics!]!
+  results: [UserAuditItem!]!
 }
 
 type EventSearchResultSet {

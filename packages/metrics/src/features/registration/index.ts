@@ -26,7 +26,7 @@ export interface IDeathRegistrationFields extends IPoint {
 }
 
 export interface IUserAuditFields extends IPoint {
-  data: string | undefined | Record<string, any>
+  data: string | undefined
   userAgent: string
   ipAddress: string
 }
@@ -67,7 +67,7 @@ export interface IBirthRegistrationTags {
 }
 
 export interface IUserAuditTags {
-  action: DECLARATION_STATUS | null | string
+  action: string | USER_ACTION
   practitionerId: string | undefined
 }
 

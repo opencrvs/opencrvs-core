@@ -40,6 +40,9 @@ export async function waitingExternalValidationHandler(
 ) {
   const points = []
   try {
+    const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+    const userAgent =
+      request.headers['user-agent'] || request.headers['x-real-user-agent']
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
         Authorization: request.headers.authorization,
@@ -62,8 +65,8 @@ export async function waitingExternalValidationHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     )
     await writePoints(points)
@@ -79,6 +82,9 @@ export async function requestForRegistrarValidationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -102,8 +108,8 @@ export async function requestForRegistrarValidationHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     )
     await writePoints(points)
@@ -119,6 +125,9 @@ export async function registrarRegistrationWaitingExternalValidationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -142,8 +151,8 @@ export async function registrarRegistrationWaitingExternalValidationHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     )
     await writePoints(points)
@@ -159,6 +168,9 @@ export async function newDeclarationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -182,8 +194,8 @@ export async function newDeclarationHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     )
     await writePoints(points)
@@ -198,6 +210,9 @@ export async function inProgressHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   try {
     const points = await generateInCompleteFieldPoints(
       request.payload as fhir.Bundle,
@@ -228,8 +243,8 @@ export async function inProgressHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     )
     await writePoints(points)
@@ -244,6 +259,9 @@ export async function markRejectedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   try {
     const points: IPoints[] = []
     points.push(
@@ -268,8 +286,8 @@ export async function markRejectedHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     )
     points.push(
@@ -295,6 +313,9 @@ export async function newBirthRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   const points = []
   try {
     points.push(
@@ -317,8 +338,8 @@ export async function newBirthRegistrationHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     )
     await writePoints(points)
@@ -333,6 +354,9 @@ export async function markBirthRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   try {
     const bundle = await populateBundleFromPayload(
       request.payload as fhir.Bundle | fhir.Task,
@@ -361,8 +385,8 @@ export async function markBirthRegisteredHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     ])
 
@@ -377,6 +401,9 @@ export async function newDeathRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   const points = []
   try {
     points.push(
@@ -397,8 +424,8 @@ export async function newDeathRegistrationHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     )
     await writePoints(points)
@@ -412,6 +439,9 @@ export async function markDeathRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   try {
     const bundle = await populateBundleFromPayload(
       request.payload as fhir.Bundle | fhir.Task,
@@ -440,8 +470,8 @@ export async function markDeathRegisteredHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     ])
 
@@ -493,6 +523,9 @@ export async function markValidatedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   try {
     const points = await Promise.all([
       generateEventDurationPoint(
@@ -512,8 +545,8 @@ export async function markValidatedHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     ])
 
@@ -529,6 +562,9 @@ export async function requestCorrectionHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['user-agent'] || request.headers['x-real-user-agent']
   try {
     const points = await Promise.all([
       generatePaymentPoint(
@@ -556,8 +592,8 @@ export async function requestCorrectionHandler(
         getActionFromTask(
           getTask(request.payload as fhir.Bundle) as fhir.Task
         )!,
-        request.headers['x-real-ip'] || request.info.remoteAddress,
-        request.headers['user-agent']
+        ipAddress,
+        userAgent
       )
     ])
 

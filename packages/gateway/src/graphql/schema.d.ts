@@ -41,7 +41,7 @@ export interface GQLQuery {
   fetchMonthWiseEventMetrics?: Array<GQLMonthWiseEstimationMetric>
   fetchLocationWiseEventMetrics?: Array<GQLLocationWiseEstimationMetric>
   fetchTimeLoggedMetricsByPractitioner?: GQLTimeLoggedMetricsResultSet
-  getUserAuditLog?: GQLUserLoggedMetricsResultSet
+  getUserAuditLog?: GQLUserAuditResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getRoles?: Array<GQLRole | null>
@@ -315,7 +315,7 @@ export interface GQLTimeLoggedMetricsResultSet {
   totalItems?: number
 }
 
-export interface GQLUserLoggedMetricsResultSet {
+export interface GQLUserAuditResultSet {
   total: number
   results: Array<GQLUserLogMetrics>
 }
@@ -1380,7 +1380,7 @@ export interface GQLResolver {
   MonthWiseEstimationMetric?: GQLMonthWiseEstimationMetricTypeResolver
   LocationWiseEstimationMetric?: GQLLocationWiseEstimationMetricTypeResolver
   TimeLoggedMetricsResultSet?: GQLTimeLoggedMetricsResultSetTypeResolver
-  UserLoggedMetricsResultSet?: GQLUserLoggedMetricsResultSetTypeResolver
+  UserAuditResultSet?: GQLUserAuditResultSetTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   Role?: GQLRoleTypeResolver
@@ -3637,19 +3637,19 @@ export interface TimeLoggedMetricsResultSetToTotalItemsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLUserLoggedMetricsResultSetTypeResolver<TParent = any> {
-  total?: UserLoggedMetricsResultSetToTotalResolver<TParent>
-  results?: UserLoggedMetricsResultSetToResultsResolver<TParent>
+export interface GQLUserAuditResultSetTypeResolver<TParent = any> {
+  total?: UserAuditResultSetToTotalResolver<TParent>
+  results?: UserAuditResultSetToResultsResolver<TParent>
 }
 
-export interface UserLoggedMetricsResultSetToTotalResolver<
+export interface UserAuditResultSetToTotalResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserLoggedMetricsResultSetToResultsResolver<
+export interface UserAuditResultSetToResultsResolver<
   TParent = any,
   TResult = any
 > {

@@ -24,7 +24,8 @@ export async function newAuditHandler(
   try {
     const remoteAddress =
       request.headers['x-real-ip'] || request.info.remoteAddress
-    const userAgent = request.headers['user-agent']
+    const userAgent =
+      request.headers['user-agent'] || request.headers['x-real-user-agent']
     const payload = request.payload as IUserAuditBody
     points.push(
       await generateAuditPoint(
@@ -44,15 +45,16 @@ export async function newAuditHandler(
 
 export async function getUserAuditsHandler(request: Hapi.Request) {
   const practitionerId = request.query[PRACTITIONER_ID]
-  const results = await getUserAuditEvent(practitionerId)
+  const results = await getUserAuditEvents(practitionerId)
   return {
     results,
     total: results.length
   }
 }
 
-export async function getUserAuditEvent(practitionerId: string) {
+export async function getUserAuditEvents(practitionerId: string) {
   return await query(
-    `SELECT * from user_audit_event where practitionerId = '${practitionerId}'`
+    `SELECT * from user_audit_event where practitionerId = $practitionerId`,
+    { placeholders: { practitionerId: practitionerId } }
   )
 }
