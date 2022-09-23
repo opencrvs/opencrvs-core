@@ -168,5 +168,7 @@ type Query {
   ): TimeLoggedMetricsResultSet
   getUserAuditLog(
      practitionerId: String!
+     skip: Int
+     count: Int!
    ): UserLoggedMetricsResultSet
 }

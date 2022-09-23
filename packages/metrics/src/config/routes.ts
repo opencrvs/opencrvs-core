@@ -539,7 +539,6 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
-
     // GET user audit events
     {
       method: 'GET',
@@ -548,7 +547,9 @@ export const getRoutes = () => {
       config: {
         validate: {
           query: Joi.object({
-            practitionerId: Joi.string().required()
+            practitionerId: Joi.string().required(),
+            skip: Joi.number(),
+            count: Joi.number()
           })
         },
         tags: ['api']

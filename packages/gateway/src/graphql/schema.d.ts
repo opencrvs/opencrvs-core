@@ -1950,6 +1950,8 @@ export interface QueryToFetchTimeLoggedMetricsByPractitionerResolver<
 
 export interface QueryToGetUserAuditLogArgs {
   practitionerId: string
+  skip?: number
+  count: number
 }
 export interface QueryToGetUserAuditLogResolver<TParent = any, TResult = any> {
   (

@@ -45,16 +45,24 @@ export async function newAuditHandler(
 
 export async function getUserAuditsHandler(request: Hapi.Request) {
   const practitionerId = request.query[PRACTITIONER_ID]
-  const results = await getUserAuditEvents(practitionerId)
+  const skip = request.query['skip'] || 0
+  const size = request.query['count']
+
+  const results = await getUserAuditEvents(practitionerId, size, skip)
   return {
     results,
     total: results.length
   }
 }
-
-export async function getUserAuditEvents(practitionerId: string) {
+export async function getUserAuditEvents(
+  practitionerId: string,
+  size: number,
+  skip: number
+) {
   return await query(
-    `SELECT * from user_audit_event where practitionerId = $practitionerId`,
-    { placeholders: { practitionerId: practitionerId } }
+    `SELECT * from user_audit_event where practitionerId = $practitionerId limit ${size} offset ${skip}`,
+    {
+      placeholders: { practitionerId: practitionerId }
+    }
   )
 }
