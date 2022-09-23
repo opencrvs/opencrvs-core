@@ -9,26 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const path = require('path')
-const { ESLINT_MODES } = require('@craco/craco')
-
-process.env.REACT_APP_COUNTRY_CONFIG_URL =
-  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
-
 module.exports = {
-  eslint: {
-    mode: ESLINT_MODES.file
+  extends: '../../.eslintrc.js',
+  env: {
+    es6: true
   },
-  webpack: {
-    alias: {
-      '@client': path.resolve(__dirname, 'src/')
-    }
-  },
-  jest: {
-    configure: {
-      moduleNameMapper: {
-        '^@client(.*)$': '<rootDir>/src/$1'
+  overrides: [
+    {
+      files: ['*.ts'],
+      parserOptions: {
+        project: ['./tsconfig.json', './tsconfig.eslint.json']
       }
     }
-  }
+  ]
 }

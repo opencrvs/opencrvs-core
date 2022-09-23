@@ -22,6 +22,7 @@ import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal/Change
 import { changePhoneMutation } from '@client/views/Settings/mutations'
 import { queriesForUser } from '@client/views/Settings/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { vi } from 'vitest'
 
 const graphqlMocks = [
   {
@@ -42,7 +43,7 @@ const graphqlMocks = [
 
 describe('Change phone modal tests', () => {
   let component: ReactWrapper
-  const onSuccessMock = jest.fn()
+  const onSuccessMock = vi.fn()
   const { history } = createRouterProps('/settings')
   const { store } = createStore(history)
   beforeEach(async () => {
@@ -52,7 +53,7 @@ describe('Change phone modal tests', () => {
       <ChangePhoneModal
         show={true}
         onSuccess={onSuccessMock}
-        onClose={jest.fn()}
+        onClose={vi.fn()}
       />,
       {
         store,
@@ -80,7 +81,7 @@ describe('Change phone modal tests', () => {
   })
 
   it('should render verify code view', async () => {
-    queriesForUser.fetchUserDetails = jest.fn(() =>
+    queriesForUser.fetchUserDetails = vi.fn(() =>
       Promise.resolve({
         data: {
           getUserByMobile: {
@@ -102,7 +103,7 @@ describe('Change phone modal tests', () => {
   })
 
   it('should trigger onSuccess callback after change phone number', async () => {
-    queriesForUser.fetchUserDetails = jest.fn(() =>
+    queriesForUser.fetchUserDetails = vi.fn(() =>
       Promise.resolve({
         data: {
           getUserByMobile: {

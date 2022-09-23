@@ -15,11 +15,12 @@ import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { FormConfigSettings } from './FormConfigSettings'
+import { vi } from 'vitest'
 
 const { store, history } = createStore()
 let testComponent: ReactWrapper
 beforeEach(async () => {
-  configApplicationMutations.mutateApplicationConfig = jest.fn(
+  configApplicationMutations.mutateApplicationConfig = vi.fn(
     () =>
       new Promise((resolve) =>
         resolve({

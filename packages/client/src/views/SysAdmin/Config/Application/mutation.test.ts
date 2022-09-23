@@ -12,13 +12,14 @@
 import { configApplicationMutations } from './mutations'
 import { createStore } from '@client/store'
 import { createClient } from '@client/utils/apolloClient'
+import { vi } from 'vitest'
 
 describe('When calling mutateApplicationConfig', () => {
   const { store } = createStore()
   const client = createClient(store)
 
   beforeEach(() => {
-    const mock = jest.fn()
+    const mock = vi.fn()
     mock.mockResolvedValueOnce({
       data: {
         updateApplicationConfig: {

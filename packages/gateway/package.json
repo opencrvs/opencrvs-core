@@ -17,8 +17,8 @@
     "gen:schema:watch": "nodemon --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
     "gen:types:watch": "nodemon --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "tslint --project ./tsconfig.json",
-    "precommit": "tslint --project ./tsconfig.json && lint-staged"
+    "lint": "eslint -c .eslintrc.js --fix ./src",
+    "precommit": "yarn lint && lint-staged"
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.17.0",
@@ -90,9 +90,6 @@
     "opener": "^1.5.1",
     "prettier": "2.5.1",
     "ts-jest": "^26.4.4",
-    "tslint": "^5.17.0",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "^3.7.2",
     "typestyle": "^1.3.7"
   },

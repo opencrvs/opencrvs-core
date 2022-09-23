@@ -32,3 +32,6 @@ export async function validateApplicationVersion() {
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))
   }
 }
+export function isNavigatorOnline() {
+  return navigator.onLine
+}

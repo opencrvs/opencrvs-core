@@ -12,6 +12,26 @@
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/interface'
 import { orderBy } from 'lodash'
+import { ITaskHistory } from '@client/declarations'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+export interface IQueryData {
+  inProgressTab: GQLEventSearchResultSet
+  notificationTab: GQLEventSearchResultSet
+  reviewTab: GQLEventSearchResultSet
+  rejectTab: GQLEventSearchResultSet
+  approvalTab: GQLEventSearchResultSet
+  printTab: GQLEventSearchResultSet
+  externalValidationTab: GQLEventSearchResultSet
+}
+
+export const EVENT_STATUS = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  DECLARED: 'DECLARED',
+  VALIDATED: 'VALIDATED',
+  REGISTERED: 'REGISTERED',
+  REJECTED: 'REJECTED',
+  WAITING_VALIDATION: 'WAITING_VALIDATION'
+}
 
 export const getSortedItems = (
   items: IDynamicValues[],
@@ -79,4 +99,37 @@ export const changeSortedColumn = (
     newSortedCol: newSortedCol,
     newSortOrder: newSortOrder
   }
+}
+
+export const getPreviousOperationDateByOperationType = (
+  operationHistories: ITaskHistory[],
+  operationType: string
+): Date | null => {
+  const prevOperationHistoriesByType =
+    operationHistories &&
+    operationHistories
+      .filter((e) => e.operationType === operationType)
+      .sort((a, b) => {
+        if (!a.operatedOn || !b.operatedOn) {
+          return -1
+        }
+        if (a.operatedOn > b.operatedOn) {
+          return -1
+        }
+        if (a.operatedOn < b.operatedOn) {
+          return 1
+        }
+        return 0
+      })
+
+  const prevOperationHistory =
+    prevOperationHistoriesByType &&
+    prevOperationHistoriesByType.length > 0 &&
+    prevOperationHistoriesByType[0]
+
+  if (!prevOperationHistory || !prevOperationHistory.operatedOn) {
+    return null
+  }
+
+  return new Date(prevOperationHistory.operatedOn)
 }

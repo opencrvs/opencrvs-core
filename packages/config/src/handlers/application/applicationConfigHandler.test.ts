@@ -33,7 +33,7 @@ const fetch = fetchMock as fetchMock.FetchMock
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
-let mockConfig = {
+const mockConfig = {
   APPLICATION_NAME: 'Farajaland CRVS',
   BIRTH: {
     REGISTRATION_TARGET: 45,

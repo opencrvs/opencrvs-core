@@ -45,12 +45,13 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { vi, Mock } from 'vitest'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzMzQzMTMzLCJleHAiOjE1NjM5NDc5MzMsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDI1ZWM4YTI0YjExMGMyNWEyN2JhNjcifQ.C5v0fboxhawmzrHrO2kzdwfe9pNrF23UedkiPo_4PTBLuS6dm1UgPZWV7SXT9_JVS7djpH2lh-wZ24CR6S-QWI1QgGdvXGrzyUsayJxCdh2FSBnmgLpsD-LTvbDefpmliWzjLk_glbcqeoFX54hwjORZrsH6JMac4GSRRq2vL_Lq7bBUae7IdmB8itoZQLJJHi29bsCvGr3h1njV5BUvQ4N0Q9-w7QAd-ZPjTz4hYf_biFn52fWMwYaxY6_zA5GB6Bm_6ibI8cz14wY4fEME2cv33x4DwVRD8z4UL_Qq14nqWMO5EEf5mb_YKH-wTPl3kUzofngRsMY8cKI_YTr_1Q'
-const getItem = window.localStorage.getItem as jest.Mock
+const getItem = window.localStorage.getItem as Mock
 
-const mockFetchUserDetails = jest.fn()
+const mockFetchUserDetails = vi.fn()
 
 const nameObj = {
   data: {
@@ -72,8 +73,8 @@ merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
+storage.getItem = vi.fn()
+storage.setItem = vi.fn()
 
 const { store, history } = createStore()
 beforeAll(async () => {
@@ -302,7 +303,7 @@ describe('In Progress tab', () => {
     })
 
     it('Should render pagination in progress tab if data is more than 10', async () => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       const drafts: IDeclaration[] = []
       for (let i = 0; i < 12; i++) {
         drafts.push(createDeclaration(Event.Birth))
@@ -550,7 +551,7 @@ describe('In Progress tab', () => {
     })
 
     it('Should render pagination in progress tab if data is more than 10', async () => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.Birth))
       const testComponent = await createTestComponent(
@@ -590,7 +591,7 @@ describe('In Progress tab', () => {
     })
 
     it('redirects to recordAudit page when item is clicked', async () => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.Birth))
@@ -819,6 +820,7 @@ describe('In Progress tab', () => {
   describe('When Notification (Hospital) tab is selected', () => {
     it('Should render all items returned from graphQL', async () => {
       const TIME_STAMP = '1562912635549'
+      const birthNotificationSentDateStr = '2019-10-20T11:03:20.660Z'
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.Birth))
       const testComponent = await createTestComponent(
@@ -836,6 +838,27 @@ describe('In Progress tab', () => {
                     trackingId: 'BQ2IDOP',
                     modifiedAt: TIME_STAMP
                   },
+                  operationHistories: [
+                    {
+                      operationType: 'IN_PROGRESS',
+                      operatedOn: birthNotificationSentDateStr,
+                      operatorRole: 'LOCAL_REGISTRAR',
+                      operatorName: [
+                        {
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful',
+                          use: 'en'
+                        },
+                        {
+                          firstNames: '',
+                          familyName: '',
+                          use: 'bn'
+                        }
+                      ],
+                      operatorOfficeName: 'Alokbali Union Parishad',
+                      operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                    }
+                  ],
                   childName: [
                     {
                       use: 'en',
@@ -881,7 +904,9 @@ describe('In Progress tab', () => {
       })
       testComponent.update()
       const data = testComponent.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
+      const EXPECTED_DATE_OF_REJECTION = formattedDuration(
+        new Date(birthNotificationSentDateStr)
+      )
 
       expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
       expect(data[0].name).toBe('anik hoque')
@@ -905,7 +930,7 @@ describe('Tablet tests', () => {
   })
 
   it('redirects to recordAudit page if item is clicked', async () => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     const TIME_STAMP = '1562912635549'
     const drafts: IDeclaration[] = []
     drafts.push(createDeclaration(Event.Birth))

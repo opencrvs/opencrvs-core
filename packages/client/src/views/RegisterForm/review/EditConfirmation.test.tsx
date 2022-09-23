@@ -14,10 +14,11 @@ import { EditConfirmation } from '@client/views/RegisterForm/review/EditConfirma
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
+import { vi } from 'vitest'
 
 const { store, history } = createStore()
-const mockHandleEdit = jest.fn()
-const mockHandleClose = jest.fn()
+const mockHandleEdit = vi.fn()
+const mockHandleClose = vi.fn()
 
 describe('when user is in the review page', () => {
   let editComponent: ReactWrapper<{}, {}>
