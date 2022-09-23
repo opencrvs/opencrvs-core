@@ -43,8 +43,8 @@ import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { userMutations } from '@client/user/mutations'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { Summary } from '@opencrvs/components/lib/Summary'
-import { Toast } from '@client/../../components/lib'
-import { UserAuditActionModal } from '../SysAdmin/Team/user/UserAuditActionModal'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {

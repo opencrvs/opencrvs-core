@@ -42,21 +42,15 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
-import {
-  IUserData,
-  InformationTitle
-} from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
 import format from '@client/utils/date-formatting'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import {
   IOnlineStatusProps,
-  LoadingIndicator,
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -100,6 +94,24 @@ const AdjustedStatusIcon = styled.div`
   margin-left: 3px;
 `
 
+const InformationTitle = styled.div`
+  ${({ theme }) => theme.fonts.bold16};
+  width: 320px;
+`
+export interface IUserData {
+  id?: string
+  primaryOffice?: ISearchLocation
+  name?: string
+  role?: string
+  type?: string
+  number?: string
+  status?: string
+  underInvestigation?: boolean
+  username?: string
+  practitionerId?: string
+  locationId?: string
+  startDate?: string
+}
 interface IBaseProp {
   theme: ITheme
   user?: IUserData
