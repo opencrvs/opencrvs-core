@@ -9,11 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { SerializedFormField } from '@client/forms/index'
+import { SerializedFormField, BirthSection } from '@client/forms/index'
 import { IMessage, ICustomQuestionConfig } from '@client/forms/questionConfig'
 import { find } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import { getDefaultLanguage } from '@client/i18n/utils'
+import { getConfigFieldIdentifiers } from './formConfig/utils'
+import {
+  FATHER_DETAILS_DONT_EXIST,
+  MOTHER_DETAILS_DONT_EXIST
+} from './administrative/addresses'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
 
@@ -57,6 +62,16 @@ export function createCustomField({
       }
       /* TODO: Add template mapping so that handlebars work */
     }
+  }
+  const { sectionId } = getConfigFieldIdentifiers(fieldId)
+  if (sectionId === BirthSection.Father) {
+    baseField.conditionals = [
+      { action: 'hide', expression: FATHER_DETAILS_DONT_EXIST }
+    ]
+  } else if (sectionId === BirthSection.Mother) {
+    baseField.conditionals = [
+      { action: 'hide', expression: MOTHER_DETAILS_DONT_EXIST }
+    ]
   }
   if (
     baseField.type === 'TEXT' ||

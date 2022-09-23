@@ -122,6 +122,7 @@ describe('back button behavior tests of review certificate action', () => {
       // @ts-ignore
       storeDeclaration(birthDeclaration)
     )
+    await flushPromises()
     component = await createTestComponent(
       <ReviewCertificateAction
         location={location}
@@ -194,7 +195,8 @@ describe('when user wants to review birth certificate', () => {
       }
     }
     await loginAsFieldAgent(store)
-    await store.dispatch(
+    await flushPromises()
+    store.dispatch(
       storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
         data: {

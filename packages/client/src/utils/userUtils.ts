@@ -19,6 +19,8 @@ import {
 import { storage } from '@opencrvs/client/src/storage'
 import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
+import { useSelector } from 'react-redux'
+import { IStoreState } from '@client/store'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -175,4 +177,11 @@ export function getUserName(userDetails: IUserDetails | null) {
       )[LANG_EN]) ||
     ''
   )
+}
+
+export function useUserName() {
+  return useSelector<IStoreState, string>((state) => {
+    const { userDetails } = state.profile
+    return getUserName(userDetails)
+  })
 }

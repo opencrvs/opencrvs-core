@@ -45,6 +45,7 @@ interface IConfigMessages
   applicationDeathOnTimeFeeChangeNotification: MessageDescriptor
   applicationDeathDelayedFeeChangeNotification: MessageDescriptor
   applicationCurrencyChangeMessage: MessageDescriptor
+  applicationConfigUpdatingMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   birthLegallySpecifiedDialogTitle: MessageDescriptor
   birthDelayedDialogTitle: MessageDescriptor
@@ -287,6 +288,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.currencyChangeMessage',
     defaultMessage: 'Select your currency for your CRVS system',
     description: 'Message for application currency change modal'
+  },
+  applicationConfigUpdatingMessage: {
+    id: 'config.application.updatingeMessage',
+    defaultMessage: 'Updating...',
+    description: 'Message for application config updated modal'
   },
   phoneNumberLabel: {
     id: 'config.application.phoneNumberLabel',

@@ -44,7 +44,7 @@ import {
   IFormData,
   IPreviewGroup,
   REVIEW_OVERRIDE_POSITION,
-  Action
+  SubmissionAction
 } from '@client/forms'
 import { lookup } from 'country-data'
 import {
@@ -87,6 +87,7 @@ import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IGQLLocation } from '@client/utils/userUtils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -140,11 +141,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         this.props.declaration.data
       )
     }
-    const currency = lookup.currencies({
-      code:
-        this.props.offlineResources.config.CURRENCY &&
-        this.props.offlineResources.config.CURRENCY['isoCode']
-    })[0].symbol
+    const currency = getCurrencySymbol(
+      this.props.offlineResources.config.CURRENCY
+    )
 
     ;(
       this.group.fields[0].nestedFields as any
@@ -930,7 +929,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 
   makeCorrection = () => {
     const declaration = this.props.declaration
-    declaration.action = Action.REQUEST_CORRECTION_DECLARATION
+    declaration.action = SubmissionAction.REQUEST_CORRECTION_DECLARATION
     declaration.submissionStatus = SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
     updateDeclarationRegistrationWithCorrection(declaration, {
       userPrimaryOffice: this.props.userPrimaryOffice

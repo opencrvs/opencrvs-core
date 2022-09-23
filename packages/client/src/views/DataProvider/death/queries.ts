@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import gql from 'graphql-tag'
-import { Action } from '@client/forms'
+import { Action, DownloadAction } from '@client/forms'
 
 export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
   query fetchDeathRegistrationForReview($id: ID!) {
@@ -484,17 +484,17 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
 
 export function getDeathQueryMappings(action: Action) {
   switch (action) {
-    case Action.LOAD_REVIEW_DECLARATION:
+    case DownloadAction.LOAD_REVIEW_DECLARATION:
       return {
         query: GET_DEATH_REGISTRATION_FOR_REVIEW,
         dataKey: 'fetchDeathRegistration'
       }
-    case Action.LOAD_CERTIFICATE_DECLARATION:
+    case DownloadAction.LOAD_CERTIFICATE_DECLARATION:
       return {
         query: GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
         dataKey: 'fetchDeathRegistration'
       }
-    case Action.LOAD_REQUESTED_CORRECTION_DECLARATION:
+    case DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION:
       // TODO: Apply seperate query; currently using it
       // because the actual query is yet to be developed
       return {

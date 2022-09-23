@@ -16,7 +16,8 @@ import {
   mockDeclarationData,
   mockDeathDeclarationData,
   validToken,
-  mockUserResponse
+  mockUserResponse,
+  flushPromises
 } from '@client/tests/util'
 import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
@@ -66,6 +67,7 @@ describe('verify collector tests', () => {
     beforeAll(async () => {
       getItem.mockReturnValue(validToken)
       await store.dispatch(checkAuth())
+      await flushPromises()
       // @ts-ignore
       store.dispatch(storeDeclaration(birthDeclaration))
     })

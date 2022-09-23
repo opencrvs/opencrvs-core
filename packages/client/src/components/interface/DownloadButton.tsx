@@ -27,7 +27,8 @@ import { connect } from 'react-redux'
 import {
   downloadDeclaration,
   DOWNLOAD_STATUS,
-  unassignDeclaration
+  unassignDeclaration,
+  deleteDeclaration as deleteDeclarationAction
 } from '@client/declarations'
 import { Action } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -37,7 +38,6 @@ import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
 import {
-  ROLE_LOCAL_REGISTRAR,
   FIELD_AGENT_ROLES,
   ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
@@ -79,6 +79,7 @@ interface IConnectProps {
 interface IDispatchProps {
   downloadDeclaration: typeof downloadDeclaration
   unassignDeclaration: typeof unassignDeclaration
+  deleteDeclaration: typeof deleteDeclarationAction
 }
 
 type HOCProps = IConnectProps & IDispatchProps & WithApolloClient<{}>
@@ -226,6 +227,7 @@ function DownloadButtonComponent(
     userRole,
     userId,
     unassignDeclaration,
+    deleteDeclaration,
     isOnline
   } = props
   const { assignment, compositionId } = downloadConfigs
@@ -243,8 +245,18 @@ function DownloadButtonComponent(
   }, [downloadConfigs, client, downloadDeclaration])
   const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
-    unassignDeclaration(compositionId, client)
-  }, [compositionId, client, unassignDeclaration])
+    if (assignment) {
+      unassignDeclaration(compositionId, client)
+    } else {
+      deleteDeclaration(compositionId)
+    }
+  }, [
+    compositionId,
+    client,
+    unassignDeclaration,
+    assignment,
+    deleteDeclaration
+  ])
   const isFailed = useMemo(
     () =>
       status === DOWNLOAD_STATUS.FAILED ||
@@ -377,9 +389,10 @@ const mapDispatchToProps = (
   downloadDeclaration: (
     event: Event,
     compositionId: string,
-    action: string,
+    action: Action,
     client: ApolloClient<any>
   ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
+  deleteDeclaration: (id: string) => dispatch(deleteDeclarationAction(id)),
   unassignDeclaration: (id: string, client: ApolloClient<any>) =>
     dispatch(
       unassignDeclaration(id, client, ownProps.downloadConfigs.refetchQueries)

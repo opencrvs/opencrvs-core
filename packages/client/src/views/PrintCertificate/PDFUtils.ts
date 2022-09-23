@@ -138,6 +138,17 @@ function getPDFTemplateWithSVG(
   return pdfTemplate
 }
 
+export function downloadFile(
+  contentType: string,
+  data: string,
+  fileName: string
+) {
+  const linkSource = `data:${contentType};base64,${window.btoa(data)}`
+  const downloadLink = document.createElement('a')
+  downloadLink.setAttribute('href', linkSource)
+  downloadLink.setAttribute('download', fileName)
+  downloadLink.click()
+}
 function updatePDFTemplateWithSVGContent(
   template: IPDFTemplate,
   svg: string,

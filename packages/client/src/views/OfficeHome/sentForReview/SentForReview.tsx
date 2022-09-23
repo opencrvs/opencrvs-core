@@ -49,7 +49,7 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { Action } from '@client/forms'
+import { DownloadAction } from '@client/forms'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -196,8 +196,9 @@ class SentForReviewComponent extends React.Component<
               downloadConfigs={{
                 event: reg.event,
                 compositionId: reg.id,
-                action: Action.LOAD_REVIEW_DECLARATION,
-                declarationStatus: reg.declarationStatus
+                action: DownloadAction.LOAD_REVIEW_DECLARATION,
+                declarationStatus: reg.declarationStatus,
+                assignment: reg.assignment
               }}
               key={`DownloadButton-${index}`}
               status={downloadStatus as DOWNLOAD_STATUS}

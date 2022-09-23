@@ -22,10 +22,12 @@ import {
 import { GQLPaymentMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
+import { getAmountWithCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
+import { ICurrency } from '@client/utils/referenceApi'
 
 interface PaymentsAmountProps {
   data: Array<GQLPaymentMetric>
-  currency: string
+  currency: ICurrency
 }
 
 const enum PAYMENT_TYPE {
@@ -34,7 +36,7 @@ const enum PAYMENT_TYPE {
 }
 
 export function PaymentsAmountComponent(props: PaymentsAmountProps) {
-  const { data } = props
+  const { data, currency } = props
   const intl = useIntl()
   return (
     <ListContainer>
@@ -56,7 +58,15 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
           }
           value={
             <PerformanceValue>
-              {props.currency} {calculateTotalPaymentAmount(data)}
+              <span>
+                {getAmountWithCurrencySymbol(
+                  {
+                    isoCode: currency.isoCode,
+                    languagesAndCountry: currency.languagesAndCountry
+                  },
+                  calculateTotalPaymentAmount(data)
+                )}
+              </span>
             </PerformanceValue>
           }
         />
@@ -68,13 +78,20 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
           }
           value={
             <PerformanceValue>
-              {props.currency}{' '}
-              {calculateTotalPaymentAmount(
-                data.filter(
-                  (payment) =>
-                    payment.paymentType === PAYMENT_TYPE.CERTIFICATION
-                )
-              )}
+              <span>
+                {getAmountWithCurrencySymbol(
+                  {
+                    isoCode: currency.isoCode,
+                    languagesAndCountry: currency.languagesAndCountry
+                  },
+                  calculateTotalPaymentAmount(
+                    data.filter(
+                      (payment) =>
+                        payment.paymentType === PAYMENT_TYPE.CERTIFICATION
+                    )
+                  )
+                )}
+              </span>
             </PerformanceValue>
           }
         />
@@ -86,12 +103,20 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
           }
           value={
             <PerformanceValue>
-              {props.currency}{' '}
-              {calculateTotalPaymentAmount(
-                data.filter(
-                  (payment) => payment.paymentType === PAYMENT_TYPE.CORRECTION
-                )
-              )}
+              <span>
+                {getAmountWithCurrencySymbol(
+                  {
+                    isoCode: currency.isoCode,
+                    languagesAndCountry: currency.languagesAndCountry
+                  },
+                  calculateTotalPaymentAmount(
+                    data.filter(
+                      (payment) =>
+                        payment.paymentType === PAYMENT_TYPE.CORRECTION
+                    )
+                  )
+                )}
+              </span>
             </PerformanceValue>
           }
         />

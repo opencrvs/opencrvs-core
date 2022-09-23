@@ -25,7 +25,8 @@ import {
   getRegistrationIds,
   getDeclarationIds,
   getStatusFromTask,
-  findExtension
+  findExtension,
+  setCertificateCollector
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -540,10 +541,6 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsCertified(_, { id, details }, authHeader) {
-      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-      if (!hasAssignedToThisUser) {
-        throw new UnassignError('User has been unassigned')
-      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
       } else {
@@ -551,10 +548,6 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsCertified(_, { id, details }, authHeader) {
-      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-      if (!hasAssignedToThisUser) {
-        throw new UnassignError('User has been unassigned')
-      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
       } else {
@@ -780,6 +773,7 @@ async function markEventAsCertified(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
+  await setCertificateCollector(details, authHeader)
   const doc = await buildFHIRBundle(details, event, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))

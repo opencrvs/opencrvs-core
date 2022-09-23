@@ -265,7 +265,7 @@ describe('modifyDraftStatus mutation', () => {
         authHeaderRegister
       )
     ).rejects.toThrowError(
-      'Update form draft status is only allowed for natlsysadmin'
+      'Modifying form draft status is only allowed for natlsysadmin'
     )
   })
 

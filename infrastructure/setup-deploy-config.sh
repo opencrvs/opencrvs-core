@@ -12,22 +12,22 @@ echo
 echo "Setting up deployment config for $1 - `date --iso-8601=ns`"
 
 # Set hostname in traefik config
-sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/traefik.toml
+sed -i "s/{{hostname}}/$1/g" /opt/opencrvs/infrastructure/traefik.toml
 
 # Set hostname in openhim-console config
-sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/openhim-console-config.deploy.json
+sed -i "s/{{hostname}}/$1/g" /opt/opencrvs/infrastructure/openhim-console-config.deploy.json
 
 # Set hostname in compose file
-sed -i "s/{{hostname}}/$1/g" /tmp/compose/docker-compose.deploy.yml
+sed -i "s/{{hostname}}/$1/g" /opt/opencrvs/docker-compose.deploy.yml
 
 # Setup an encryption key for Kibana
 KIBANA_ENCRYPTION_KEY=`uuidgen`
-sed -i "s/{{KIBANA_ENCRYPTION_KEY}}/$KIBANA_ENCRYPTION_KEY/g" /tmp/compose/infrastructure/monitoring/kibana/kibana.yml
-sed -i -e "s%{{SMTP_HOST}}%$SMTP_HOST%" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
-sed -i -e "s%{{SMTP_PORT}}%$SMTP_PORT%" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
-sed -i -e "s%{{ALERT_EMAIL}}%$ALERT_EMAIL%" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
-sed -i -e "s%{{SMTP_USERNAME}}%$SMTP_USERNAME%" /tmp/compose/infrastructure/monitoring/elastalert/rules/auth.yaml
-sed -i -e "s%{{SMTP_PASSWORD}}%$SMTP_PASSWORD%" /tmp/compose/infrastructure/monitoring/elastalert/rules/auth.yaml
+sed -i "s/{{KIBANA_ENCRYPTION_KEY}}/$KIBANA_ENCRYPTION_KEY/g" /opt/opencrvs/infrastructure/monitoring/kibana/kibana.yml
+sed -i -e "s%{{SMTP_HOST}}%$SMTP_HOST%" /opt/opencrvs/infrastructure/monitoring/elastalert/rules/alert.yaml
+sed -i -e "s%{{SMTP_PORT}}%$SMTP_PORT%" /opt/opencrvs/infrastructure/monitoring/elastalert/rules/alert.yaml
+sed -i -e "s%{{ALERT_EMAIL}}%$ALERT_EMAIL%" /opt/opencrvs/infrastructure/monitoring/elastalert/rules/alert.yaml
+sed -i -e "s%{{SMTP_USERNAME}}%$SMTP_USERNAME%" /opt/opencrvs/infrastructure/monitoring/elastalert/rules/auth.yaml
+sed -i -e "s%{{SMTP_PASSWORD}}%$SMTP_PASSWORD%" /opt/opencrvs/infrastructure/monitoring/elastalert/rules/auth.yaml
 
 
 echo "DONE - `date --iso-8601=ns`"

@@ -79,6 +79,9 @@ const Key = styled.span`
     padding: 20px 40px;
     ${({ theme }) => theme.fonts.h1};
   }
+  @media (max-height: 780px) {
+    ${({ theme }) => theme.fonts.h2};
+  }
 `
 
 export class PINKeypad extends React.Component<IProps, IState> {

@@ -11,7 +11,7 @@
  */
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const HOST = process.env.HOST || 'localhost'
-export const HOSTNAME = process.env.HOSTNAME || '*'
+export const HOSTNAME = process.env.DOMAIN || '*'
 export const PORT = process.env.PORT || 2021
 // Services
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
@@ -20,9 +20,7 @@ export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const MONGO_URL =
   process.env.MONGO_URL || 'mongodb://localhost/application-config'
-export const SENTRY_DSN =
-  process.env.SENTRY_DSN ||
-  'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551'
+export const SENTRY_DSN = process.env.SENTRY_DSN
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'

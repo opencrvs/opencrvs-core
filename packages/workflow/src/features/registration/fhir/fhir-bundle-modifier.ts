@@ -22,7 +22,8 @@ import {
 import {
   getFromFhir,
   getRegStatusCode,
-  fetchExistingRegStatusCode
+  fetchExistingRegStatusCode,
+  mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateBirthTrackingId,
@@ -35,7 +36,8 @@ import {
   getLoggedInPractitionerResource,
   getPractitionerOffice,
   getPractitionerPrimaryLocation,
-  getPractitionerRef
+  getPractitionerRef,
+  getUserByToken
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
 import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
@@ -131,6 +133,7 @@ export async function markBundleAsRequestedForCorrection(
   const taskResource = getTaskResource(bundle)
   const practitioner = await getLoggedInPractitionerResource(token)
   const regStatusCode = await fetchExistingRegStatusCode(taskResource.id)
+  await mergePatientIdentifier(bundle)
 
   if (!taskResource.extension) {
     taskResource.extension = []
@@ -167,7 +170,7 @@ export async function invokeRegistrationValidation(
   token: string
 ) {
   try {
-    fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
+    await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
       method: 'POST',
       body: JSON.stringify(bundle),
       headers: {
@@ -307,7 +310,8 @@ export async function touchBundle(
   setupLastRegUser(taskResource, practitioner)
 
   /* setting regAssigned valueReference here if regAssigned extension exists */
-  setupRegAssigned(taskResource, practitioner)
+  await setupRegAssigned(taskResource, practitioner, token)
+
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
@@ -518,10 +522,11 @@ export function setupLastRegUser(
   return taskResource
 }
 
-export function setupRegAssigned(
+export async function setupRegAssigned(
   taskResource: fhir.Task,
-  practitioner: fhir.Practitioner
-): fhir.Task {
+  practitioner: fhir.Practitioner,
+  token: string
+) {
   if (!taskResource.extension) {
     taskResource.extension = []
   }
@@ -531,6 +536,16 @@ export function setupRegAssigned(
     )
   })
   if (setupRegAssignedExtension) {
+    const practitionerDetails = await getUserByToken(token)
+    if (
+      (setupRegAssignedExtension.valueString === RegStatus.REJECTED &&
+        practitionerDetails.role === 'FIELD_AGENT') ||
+      (practitionerDetails.role === 'REGISTRATION_AGENT' &&
+        setupRegAssignedExtension.valueString === RegStatus.VALIDATED)
+    ) {
+      return taskResource
+    }
+
     if (!setupRegAssignedExtension.valueReference) {
       setupRegAssignedExtension.valueReference = {}
     }

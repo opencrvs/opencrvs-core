@@ -42,7 +42,6 @@ const mockUser = {
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   role: 'LOCAL_REGISTRAR',
-  type: 'SOME_TYPE',
   primaryOfficeId: '321',
   catchmentAreaIds: [],
   scope: ['register'],
@@ -118,7 +117,8 @@ describe('createUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        type: 'SOME_TYPE',
+        role: 'FIELD_AGENT',
+        type: 'HEALTHCARE_WORKER',
         primaryOfficeId: '321',
         catchmentAreaIds: [],
         deviceId: 'D444',
@@ -153,7 +153,10 @@ describe('createUser handler', () => {
         },
         {
           coding: [
-            { system: 'http://opencrvs.org/specs/types', code: 'SOME_TYPE' }
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'HEALTHCARE_WORKER'
+            }
           ]
         }
       ],

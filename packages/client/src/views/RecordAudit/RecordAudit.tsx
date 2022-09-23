@@ -77,7 +77,8 @@ import {
   DECLARED,
   VALIDATED,
   REJECTED,
-  FIELD_AGENT_ROLES
+  FIELD_AGENT_ROLES,
+  IN_PROGRESS
 } from '@client/utils/constants'
 import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import { Query } from '@client/components/Query'
@@ -122,7 +123,6 @@ import {
   REINSTATE_DEATH_DECLARATION
 } from './mutations'
 import { selectDeclaration } from '@client/declarations/selectors'
-import { OperationVariables } from 'apollo-client'
 import { errorMessages } from '@client/i18n/messages/errors'
 
 const DesktopHeader = styled(Header)`
@@ -222,14 +222,12 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   SUBMITTING: 'orange'
 }
 
-const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
+const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
 
 function ReinstateButton({
-  toggleDisplayDialog,
-  refetch
+  toggleDisplayDialog
 }: {
   toggleDisplayDialog: () => void
-  refetch: ((variables?: OperationVariables) => void) | undefined
 }) {
   const { declarationId } = useParams<{ declarationId: string }>()
   const intl = useIntl()
@@ -253,17 +251,20 @@ function ReinstateButton({
           ? REINSTATE_BIRTH_DECLARATION
           : REINSTATE_DEATH_DECLARATION
       }
-      onCompleted={() => {
-        if (refetch) {
-          refetch({ id: declaration.id })
+      refetchQueries={[
+        {
+          query: FETCH_DECLARATION_SHORT_INFO,
+          variables: { id: declaration.id }
         }
+      ]}
+      onCompleted={() =>
         dispatch(
           modifyDeclaration({
             ...declaration,
             submissionStatus: ''
           })
         )
-      }}
+      }
     >
       {(reinstateDeclaration) => (
         <PrimaryButton
@@ -304,7 +305,6 @@ function RecordAuditBody({
   scope,
   userDetails,
   registerForm,
-  refetch,
   goToUserProfile,
   goToTeamUserList,
   goBack,
@@ -319,16 +319,20 @@ function RecordAuditBody({
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
   tab: IRecordAuditTabs
-  refetch?: (variables?: OperationVariables) => void
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
+  const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
-  const toggleActionDetails = (actionItem: IActionDetailsData | null) => {
+  const toggleActionDetails = (
+    actionItem: IActionDetailsData | null,
+    itemIndex = -1
+  ) => {
     actionItem && setActionDetailsData(actionItem)
+    setActionDetailsIndex(itemIndex)
     setActionDetails((prevValue) => !prevValue)
   }
   const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
@@ -508,11 +512,13 @@ function RecordAuditBody({
   const actionDetailsModalProps = {
     show: showActionDetails,
     actionDetailsData,
+    actionDetailsIndex,
     toggleActionDetails,
     intl,
     goToUser: goToUserProfile,
     registerForm: regForm,
-    offlineData
+    offlineData,
+    draft
   }
 
   const mobileProps: IPageHeaderProps = {
@@ -611,10 +617,7 @@ function RecordAuditBody({
             {intl.formatMessage(buttonMessages.cancel)}
           </TertiaryButton>,
           declaration.status && ARCHIVED.includes(declaration.status) ? (
-            <ReinstateButton
-              toggleDisplayDialog={toggleDisplayDialog}
-              refetch={refetch}
-            />
+            <ReinstateButton toggleDisplayDialog={toggleDisplayDialog} />
           ) : (
             <DangerButton
               id="archive_confirm"
@@ -713,7 +716,6 @@ function getBodyContent({
                 duplicates={getPotentialDuplicateIds(data.fetchRegistration)}
                 intl={intl}
                 scope={scope}
-                refetch={refetch}
                 userDetails={userDetails}
                 goBack={goBack}
               />
@@ -730,7 +732,10 @@ function getBodyContent({
 
     let declaration =
       draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
-        ? getDraftDeclarationData(draft, resources, intl, trackingId)
+        ? {
+            ...getDraftDeclarationData(draft, resources, intl, trackingId),
+            assignment: workqueueDeclaration?.registration?.assignment
+          }
         : getWQDeclarationData(
             workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
             language,
@@ -769,7 +774,7 @@ const RecordAuditComp = (props: IFullProps) => {
   return (
     <>
       <DesktopHeader />
-      <Navigation deselectAllTabs={true} />
+      <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       <BodyContainer>{getBodyContent(props)}</BodyContainer>
       <NotificationToast />
     </>
@@ -782,9 +787,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     declarationId,
     draft:
       state.declarationsState.declarations.find(
-        (declaration) =>
-          declaration.id === declarationId ||
-          declaration.compositionId === declarationId
+        (declaration) => declaration.id === declarationId
       ) || null,
     language: getLanguage(state),
     resources: getOfflineData(state),

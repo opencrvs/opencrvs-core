@@ -35,6 +35,13 @@ export interface IUserName {
   given: string[]
 }
 
+export enum FIELD_AGENT_TYPES {
+  HEALTHCARE_WORKER = 'HEALTHCARE_WORKER',
+  POLICE_OFFICER = 'POLICE_OFFICER',
+  SOCIAL_WORKER = 'SOCIAL_WORKER',
+  LOCAL_LEADER = 'LOCAL_LEADER'
+}
+
 interface IIdentifier {
   system: string
   value: string
@@ -72,7 +79,7 @@ export interface IUser {
   passwordHash: string
   salt: string
   role?: string
-  type?: string
+  type?: FIELD_AGENT_TYPES
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]

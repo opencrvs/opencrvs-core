@@ -379,6 +379,32 @@ describe('Registration type resolvers', () => {
       fetch.mockResponses(
         [
           JSON.stringify({
+            resourceType: 'QuestionnaireResponse',
+            status: 'finished',
+            subject: {
+              reference: 'Encounter/ffff5cb3-8c36-4d24-90d7-13563ac3eb24'
+            },
+            id: '3c7de8da-6ecc-4d40-bf3f-857b852d432e',
+            item: [
+              {
+                text: 'birth.child.child-view-group.childCustom',
+                linkId: '',
+                answer: [
+                  {
+                    valueString: 'Random value'
+                  }
+                ]
+              }
+            ],
+            meta: {
+              lastUpdated: '2022-07-29T11:59:31.833+00:00',
+              versionId: '4cb6f36f-8e97-46af-916a-3a27150e3611'
+            }
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
             resourceType: 'Bundle',
             entry: [
               {

@@ -12,7 +12,7 @@
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
 export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 7070
-export const HOSTNAME = process.env.HOSTNAME || '*'
+export const HOSTNAME = process.env.DOMAIN || '*'
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
@@ -30,9 +30,7 @@ export const NOTIFICATION_URL =
 export const WORKFLOW_URL = process.env.WORKFLOW_URL || 'http://localhost:5050/'
 export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
-export const SENTRY_DSN =
-  process.env.SENTRY_DSN ||
-  'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551'
+export const SENTRY_DSN = process.env.SENTRY_DSN
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
 export const QA_ENV = process.env.QA_ENV || false

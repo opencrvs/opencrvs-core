@@ -11,11 +11,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { useIntl } from 'react-intl'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { IUserDetails } from '@client/utils/userUtils'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { userMessages, buttonMessages } from '@client/i18n/messages'
@@ -26,12 +24,16 @@ import {
 } from '@client/components/ProtectedAccount'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { useSelector } from 'react-redux'
 
 export const Page = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.gray500};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -42,7 +44,7 @@ export const Container = styled.div`
   height: auto;
   padding: 0px;
   margin: 125px auto 0px auto;
-  max-width: 460px;
+  max-width: auto;
 `
 export const LogoContainer = styled.div`
   flex-direction: row;
@@ -86,22 +88,17 @@ interface IOwnProps {
   ) => void
 }
 
-interface IStateData {
-  userDetails: IUserDetails | null
-  offlineCountryConfig: IOfflineData
-}
+export function UserSetupPage({ setupData, goToStep }: IOwnProps) {
+  const intl = useIntl()
+  const userDetails = useSelector((store: IStoreState) => getUserDetails(store))
+  const offlineCountryConfig = useSelector((store: IStoreState) =>
+    getOfflineData(store)
+  )
 
-type IUserSetupPageProp = IOwnProps & IStateData
-
-export class UserSetupView extends React.Component<
-  IUserSetupPageProp & IntlShapeProps
-> {
-  render() {
-    const { intl, userDetails, goToStep, offlineCountryConfig } = this.props
-
-    return (
-      <Page>
-        <Container id="user-setup-landing-page">
+  return (
+    <Page>
+      <Container id="user-setup-landing-page">
+        <Content size={ContentSize.LARGE}>
           <LogoContainer>
             <CountryLogo src={offlineCountryConfig.config.COUNTRY_LOGO.file} />
           </LogoContainer>
@@ -110,29 +107,6 @@ export class UserSetupView extends React.Component<
               applicationName: offlineCountryConfig.config.APPLICATION_NAME
             })}
           </TitleHolder>
-          <InfoHolder>
-            <NameHolder id="user-setup-name-holder">
-              {(userDetails &&
-                userDetails.name &&
-                (createNamesMap(userDetails.name as GQLHumanName[])[
-                  intl.locale
-                ] as string)) ||
-                ''}
-            </NameHolder>
-            <RoleHolder id="user-setup-role-holder">
-              {(userDetails &&
-                (userDetails.type
-                  ? `${intl.formatMessage(
-                      userMessages[userDetails.type as string]
-                    )} - ${intl.formatMessage(
-                      userMessages[userDetails.role as string]
-                    )}`
-                  : `${intl.formatMessage(
-                      userMessages[userDetails.role as string]
-                    )}`)) ||
-                ''}
-            </RoleHolder>
-          </InfoHolder>
           <InstructionHolder>
             {intl.formatMessage(messages.userSetupIntroduction)}
           </InstructionHolder>
@@ -140,24 +114,15 @@ export class UserSetupView extends React.Component<
             id="user-setup-start-button"
             onClick={() =>
               goToStep(ProtectedAccoutStep.PASSWORD, {
-                ...this.props.setupData,
+                ...setupData,
                 userId: (userDetails && userDetails.userMgntUserID) || ''
               })
             }
           >
             {intl.formatMessage(buttonMessages.start)}
           </NextButton>
-        </Container>
-      </Page>
-    )
-  }
+        </Content>
+      </Container>
+    </Page>
+  )
 }
-
-export const UserSetupPage = connect<IStateData, {}, IOwnProps, IStoreState>(
-  (state: IStoreState) => {
-    return {
-      userDetails: getUserDetails(state),
-      offlineCountryConfig: getOfflineData(state)
-    }
-  }
-)(injectIntl(UserSetupView))

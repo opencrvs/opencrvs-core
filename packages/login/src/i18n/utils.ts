@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { storage } from '@login/storage'
+import { useLocation } from 'react-router'
 
 export function getAvailableLanguages() {
   return window.config.LANGUAGES.split(',')
@@ -25,4 +26,8 @@ export function storeLanguage(language: string) {
 
 export async function retrieveLanguage() {
   return (await storage.getItem('language')) || getDefaultLanguage()
+}
+
+export const useSearchQuery = (key: string) => {
+  return new URLSearchParams(useLocation().search).get(key)
 }

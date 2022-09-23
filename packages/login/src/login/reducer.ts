@@ -184,7 +184,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
             window.location.assign(
               `${window.config.CLIENT_APP_URL}?token=${
                 action.payload.token
-              }&language=${getState().i18n.language}`
+              }&lang=${getState().i18n.language}`
             )
           },
           { args: [Cmd.getState] }

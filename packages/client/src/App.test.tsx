@@ -52,7 +52,7 @@ it('renders without crashing', () =>
 
 it("redirects user to SSO if user doesn't have a token", async () => {
   await createTestApp({ waitUntilOfflineCountryConfigLoaded: false })
-  await waitFor(() => assign.mock.calls[0][0] === window.config.LOGIN_URL)
+  await waitFor(() => assign.mock.calls[0][0].includes(window.config.LOGIN_URL))
 })
 
 describe('when user has a valid token in url but an expired one in localStorage', () => {

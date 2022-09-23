@@ -34,6 +34,7 @@ import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
+import { IStoreState } from '@client/store'
 
 export type ProfileState = {
   authenticated: boolean
@@ -77,9 +78,14 @@ export const profileReducer: LoopReducer<
           Cmd.run(() => {
             removeUserDetails()
           }),
-          Cmd.run(() => {
-            window.location.assign(window.config.LOGIN_URL)
-          })
+          Cmd.run(
+            (getState: () => IStoreState) => {
+              window.location.assign(
+                `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
+              )
+            },
+            { args: [Cmd.getState] }
+          )
         ])
       )
     case actions.CHECK_AUTH:

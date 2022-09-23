@@ -39,10 +39,10 @@ export enum AddressCopyConfigCases {
 }
 
 // if the informant or contact is mother
-const mothersDetailsExistBasedOnContactAndInformant =
+const mothersDetailsDontExistBasedOnContactAndInformant =
   '!mothersDetailsExistBasedOnContactAndInformant'
 // if the informant or contact is father
-const fathersDetailsExistBasedOnContactAndInformant =
+const fathersDetailsDontExistBasedOnContactAndInformant =
   '!fathersDetailsExistBasedOnContactAndInformant'
 
 // if mothers details do not exist on other page
@@ -61,6 +61,10 @@ const primaryAddressSameAsOtherPrimaryAddress =
 
 // secondary addresses are not enabled
 const secondaryAddressesDisabled = 'window.config.ADDRESSES!=2'
+
+export const MOTHER_DETAILS_DONT_EXIST = `(${mothersDetailsDontExist} && ${mothersDetailsDontExistBasedOnContactAndInformant})`
+
+export const FATHER_DETAILS_DONT_EXIST = `(${fathersDetailsDontExist} && ${fathersDetailsDontExistBasedOnContactAndInformant})`
 
 export enum AddressSubsections {
   PRIMARY_ADDRESS_SUBSECTION = 'primaryAddress',
@@ -120,22 +124,22 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.primaryAddress,
-        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant})`
+        conditionalCase: `${MOTHER_DETAILS_DONT_EXIST}`
       },
       {
         config: AddressCases.PRIMARY_ADDRESS,
         informant: false,
-        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant})`
+        conditionalCase: `${MOTHER_DETAILS_DONT_EXIST}`
       },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.secondaryAddress,
-        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant}) || (${secondaryAddressesDisabled})`
+        conditionalCase: `${MOTHER_DETAILS_DONT_EXIST} || (${secondaryAddressesDisabled})`
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: false,
-        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant}) || (${secondaryAddressesDisabled})`
+        conditionalCase: `${MOTHER_DETAILS_DONT_EXIST} || (${secondaryAddressesDisabled})`
       }
     ]
   },
@@ -145,7 +149,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.primaryAddress,
-        conditionalCase: `(${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant})`
+        conditionalCase: `${FATHER_DETAILS_DONT_EXIST}`
       },
       {
         config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
@@ -157,17 +161,17 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressCases.PRIMARY_ADDRESS,
         informant: false,
-        conditionalCase: `(((${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant}) || ${primaryAddressSameAsOtherPrimaryAddress}) && !(${mothersDetailsDontExistOnOtherPage}) || ((${fathersDetailsDontExist}) && (${mothersDetailsDontExistOnOtherPage})))`
+        conditionalCase: `((${FATHER_DETAILS_DONT_EXIST} || ${primaryAddressSameAsOtherPrimaryAddress}) && !(${mothersDetailsDontExistOnOtherPage}) || ((${fathersDetailsDontExist}) && (${mothersDetailsDontExistOnOtherPage})))`
       },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.secondaryAddress,
-        conditionalCase: `${fathersDetailsDontExist} || ${secondaryAddressesDisabled}`
+        conditionalCase: `${FATHER_DETAILS_DONT_EXIST} || ${secondaryAddressesDisabled}`
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: false,
-        conditionalCase: `${fathersDetailsDontExist} || ${secondaryAddressesDisabled}`
+        conditionalCase: `${FATHER_DETAILS_DONT_EXIST} || ${secondaryAddressesDisabled}`
       }
     ]
   },

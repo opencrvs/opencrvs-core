@@ -32,7 +32,8 @@ import {
   getSharedContactMsisdn,
   postToHearth,
   generateEmptyBundle,
-  forwardToHearth
+  forwardToHearth,
+  mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
@@ -191,6 +192,7 @@ export async function createRegistrationHandler(
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
+
     if (
       event ===
         Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||
@@ -414,6 +416,7 @@ export async function markEventAsCertifiedHandler(
       request.payload as fhir.Bundle,
       getToken(request)
     )
+    await mergePatientIdentifier(payload)
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)

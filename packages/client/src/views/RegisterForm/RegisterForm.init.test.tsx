@@ -125,7 +125,7 @@ describe('when user logs in', () => {
       const { store } = await createTestStore()
       await deleteDeclarationByUser(
         currentUserData.userID,
-        draft,
+        draft.id,
         store.getState().declarationsState
       )
 
