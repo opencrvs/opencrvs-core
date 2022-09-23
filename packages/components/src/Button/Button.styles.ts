@@ -40,7 +40,8 @@ export const base = css`
   }
 
   &:focus-visible {
-    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.yellow};
+    background: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.grey600};
   }
 `
 
@@ -73,6 +74,11 @@ export const secondary = css`
   &:active {
     background: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.primaryDarker};
+  }
+  &:focus-visible {
+    border: 2px solid ${({ theme }) => theme.colors.grey600};
+    background: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.grey600};
   }
 `
 
