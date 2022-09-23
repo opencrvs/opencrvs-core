@@ -83,7 +83,7 @@ const messagesToDefine: INotificationsMessages = {
     id: 'regHome.outbox.statusRegistering'
   },
   statusRejecting: {
-    defaultMessage: 'Rejecting...',
+    defaultMessage: 'Sending for updates...',
     description: 'Label for declaration status Rejecting',
     id: 'regHome.outbox.statusRejecting'
   },
@@ -93,12 +93,12 @@ const messagesToDefine: INotificationsMessages = {
     id: 'regHome.outbox.statusReinstating'
   },
   statusRequestingCorrection: {
-    defaultMessage: 'Requesting correction...',
+    defaultMessage: 'Correcting...',
     description: 'Label for declaration status Requesting correction',
     id: 'regHome.outbox.statusRequestingCorrection'
   },
   statusSubmitting: {
-    defaultMessage: 'Submitting...',
+    defaultMessage: 'Sending...',
     description: 'Label for declaration status submitting',
     id: 'regHome.outbox.statusSubmitting'
   },
@@ -123,7 +123,7 @@ const messagesToDefine: INotificationsMessages = {
     id: 'regHome.outbox.statusWaitingToCertify'
   },
   statusWaitingToValidate: {
-    defaultMessage: 'Waiting to send',
+    defaultMessage: 'Waiting to send for approval',
     description: 'Label for declaration status waiting for validate',
     id: 'regHome.outbox.statusWaitingToValidate'
   },
@@ -133,17 +133,17 @@ const messagesToDefine: INotificationsMessages = {
     id: 'regHome.outbox.statusWaitingToRegister'
   },
   statusWaitingToReject: {
-    defaultMessage: 'Waiting to reject',
+    defaultMessage: 'Waiting to send for updates',
     description: 'Label for declaration status waiting for reject',
     id: 'regHome.outbox.statusWaitingToReject'
   },
   statusWaitingToRequestCorrection: {
-    defaultMessage: 'Waiting to request correction',
+    defaultMessage: 'Waiting to correct',
     description: 'Label for declaration status waiting for request correction',
     id: 'regHome.outbox.statusWaitingToRequestCorrection'
   },
   statusWaitingToSubmit: {
-    defaultMessage: 'Waiting to submit',
+    defaultMessage: 'Waiting to send',
     description: 'Label for declaration status waiting for reject',
     id: 'regHome.outbox.statusWaitingToSubmit'
   },

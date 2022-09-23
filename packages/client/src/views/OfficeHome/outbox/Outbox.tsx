@@ -49,6 +49,7 @@ import {
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { getScope } from '@client/profile/profileSelectors'
 
 function getFullName(firstName?: string, lastName?: string) {
   let fullName = ''
@@ -71,6 +72,7 @@ export function Outbox() {
   const [sortOrder, setSortOrder] = React.useState(SORT_ORDER.ASCENDING)
   const isOnline = useOnlineStatus()
   const theme = getTheme()
+  const scope = useSelector(getScope)
   const declarations = useSelector<IStoreState, IDeclaration[]>((state) =>
     state.declarationsState?.declarations.filter(
       (declaration) =>
@@ -120,30 +122,47 @@ export function Outbox() {
 
     switch (status) {
       case SUBMISSION_STATUS.READY_TO_SUBMIT:
-        iconId = `waiting${index}`
-        icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusWaitingToSubmit)
-        break
+        if (!(scope?.includes('register') || scope?.includes('validate'))) {
+          iconId = `waiting${index}`
+          icon = () => <StatusWaiting id={iconId} key={iconId} />
+          statusText = formatMessage(statusWaitingToSubmit)
+          break
+        }
+      // eslint-disable-next-line no-fallthrough
       case SUBMISSION_STATUS.READY_TO_APPROVE:
+        if (!scope?.includes('register')) {
+          iconId = `waiting${index}`
+          icon = () => <StatusWaiting id={iconId} key={iconId} />
+          statusText = formatMessage(statusWaitingToValidate)
+          break
+        }
+      // eslint-disable-next-line no-fallthrough
+      case SUBMISSION_STATUS.READY_TO_REGISTER:
         iconId = `waiting${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusWaitingToValidate)
+        statusText = formatMessage(statusWaitingToRegister)
         break
       case SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION:
         iconId = `waiting${index}`
         icon = () => <StatusWaiting id={iconId} key={iconId} />
         statusText = formatMessage(statusWaitingToRequestCorrection)
         break
-      case SUBMISSION_STATUS.APPROVING:
-        iconId = `registering${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusSendingForApproval)
-        break
       case SUBMISSION_STATUS.SUBMITTING:
-        iconId = `registering${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusSubmitting)
-        break
+        if (!(scope?.includes('register') || scope?.includes('validate'))) {
+          iconId = `registering${index}`
+          icon = () => <Spinner id={iconId} key={iconId} size={24} />
+          statusText = formatMessage(statusSubmitting)
+          break
+        }
+      // eslint-disable-next-line no-fallthrough
+      case SUBMISSION_STATUS.APPROVING:
+        if (!scope?.includes('register')) {
+          iconId = `registering${index}`
+          icon = () => <Spinner id={iconId} key={iconId} size={24} />
+          statusText = formatMessage(statusSendingForApproval)
+          break
+        }
+      // eslint-disable-next-line no-fallthrough
       case SUBMISSION_STATUS.REGISTERING:
         iconId = `registering${index}`
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
