@@ -15,7 +15,7 @@ import { LineChart } from './LineChart'
 import { ITheme } from '../theme'
 
 export default {
-  title: 'Data/Charts/Line graph',
+  title: 'Data/Line chart',
   component: LineChart
 } as Meta
 
@@ -45,8 +45,8 @@ interface ILineDataPoint {
 
 const Template: Story<IProps> = (args) => <LineChart {...args} />
 
-export const SampleLineChart = Template.bind({})
-SampleLineChart.args = {
+export const Default = Template.bind({})
+Default.args = {
   data: [
     {
       label: 'Oct',

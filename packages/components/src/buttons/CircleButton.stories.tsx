@@ -26,7 +26,7 @@ const Template: Story<IProps> = ({ size }) => (
 )
 
 export default {
-  title: 'Controls/Button/CircleButton',
+  title: 'Deprecated/Button/CircleButton',
   component: CircleButton,
   argTypes: {
     size: {

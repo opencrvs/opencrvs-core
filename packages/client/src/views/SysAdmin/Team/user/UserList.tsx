@@ -50,7 +50,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import {
   BodyContent,
   Content,
@@ -724,9 +724,8 @@ function UserListComponent(props: IProps) {
       {showResendSMSSuccess && (
         <Toast
           id="resend_invite_success"
-          type={NOTIFICATION_TYPE.SUCCESS}
-          show={showResendSMSSuccess}
-          callback={() => setShowResendSMSSuccess(false)}
+          type="success"
+          onClose={() => setShowResendSMSSuccess(false)}
         >
           {intl.formatMessage(messages.resendSMSSuccess)}
         </Toast>
@@ -734,9 +733,8 @@ function UserListComponent(props: IProps) {
       {showResendSMSError && (
         <Toast
           id="resend_invite_error"
-          type={NOTIFICATION_TYPE.ERROR}
-          show={showResendSMSError}
-          callback={() => setShowResendSMSError(false)}
+          type="warning"
+          onClose={() => setShowResendSMSError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}
         </Toast>

@@ -42,7 +42,6 @@ import { CompletenessRates } from '@client/views/SysAdmin/Performance/Completene
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { UserProfile } from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import ApolloClient from 'apollo-client'
 import { ConnectedRouter } from 'connected-react-router'

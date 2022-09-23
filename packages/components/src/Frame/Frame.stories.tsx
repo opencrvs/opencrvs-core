@@ -26,7 +26,17 @@ import { AppBar } from '../AppBar'
 
 export default {
   title: 'Layout/Frame',
-  component: Frame
+  component: Frame,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+\`<Frame>\` provides a structure for the application itself, but doesn't add components such as headers, side navigations or main content.
+Frame defines a grid and minimal styling.
+`
+      }
+    }
+  }
 } as ComponentMeta<typeof Frame>
 
 export const PageTemplateContentLarge = () => (

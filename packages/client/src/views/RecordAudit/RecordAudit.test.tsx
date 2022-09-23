@@ -426,8 +426,22 @@ describe('Record audit summary for GQLQuery', () => {
     expect(
       component.find({ 'data-testid': 'type-value' }).hostNodes().text()
     ).toBe('Death')
-    expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(0)
-    expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(1)
+    expect(
+      component
+        .find({
+          'data-testid': 'placeOfBirth-value',
+          'data-testclass': 'locked'
+        })
+        .hostNodes()
+    ).toHaveLength(0)
+    expect(
+      component
+        .find({
+          'data-testid': 'placeOfDeath-value',
+          'data-testclass': 'locked'
+        })
+        .hostNodes()
+    ).toHaveLength(1)
   })
 })
 

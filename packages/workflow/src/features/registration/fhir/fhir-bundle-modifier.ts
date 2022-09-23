@@ -22,7 +22,8 @@ import {
 import {
   getFromFhir,
   getRegStatusCode,
-  fetchExistingRegStatusCode
+  fetchExistingRegStatusCode,
+  mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateBirthTrackingId,
@@ -131,6 +132,7 @@ export async function markBundleAsRequestedForCorrection(
   const taskResource = getTaskResource(bundle)
   const practitioner = await getLoggedInPractitionerResource(token)
   const regStatusCode = await fetchExistingRegStatusCode(taskResource.id)
+  await mergePatientIdentifier(bundle)
 
   if (!taskResource.extension) {
     taskResource.extension = []

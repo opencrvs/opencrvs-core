@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import { ArrowBack } from './ArrowBack'
-import styled, { StyledComponentBase } from 'styled-components'
+import styled from 'styled-components'
 
 export const ArrowForward = styled(ArrowBack)`
   transform: rotate(180deg);

@@ -16,13 +16,14 @@ import {
   isNotifiable,
   NOTIFICATION_TYPE_MAP
 } from '@client/views/SysAdmin/Config/Forms/utils'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { useIntl } from 'react-intl'
 import { statusChangeActionMessages } from '@client/i18n/messages/views/formConfig'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
 import { constantsMessages } from '@client/i18n/messages'
+import { noop } from 'lodash'
 
 export function ActionsNotification() {
   const {
@@ -35,24 +36,22 @@ export function ActionsNotification() {
   )
 
   return (
-    <Toast
-      type={
-        isNotifiable(status)
-          ? NOTIFICATION_TYPE_MAP[status]
-          : NOTIFICATION_TYPE.ERROR
-      }
-      show={isNotifiable(status)}
-      callback={
-        status !== ActionStatus.PROCESSING
-          ? () => setAction({ status: ActionStatus.IDLE })
-          : undefined
-      }
-    >
-      {isNotifiable(status) &&
-        intl.formatMessage(statusChangeActionMessages(action)[status], {
-          event: intl.formatMessage(constantsMessages[event]),
-          version
-        })}
-    </Toast>
+    <>
+      {isNotifiable(status) && (
+        <Toast
+          type={NOTIFICATION_TYPE_MAP[status]}
+          onClose={
+            status !== ActionStatus.PROCESSING
+              ? () => setAction({ status: ActionStatus.IDLE })
+              : noop // Toast isn't closable when status is "loading"
+          }
+        >
+          {intl.formatMessage(statusChangeActionMessages(action)[status], {
+            event: intl.formatMessage(constantsMessages[event]),
+            version
+          })}
+        </Toast>
+      )}
+    </>
   )
 }

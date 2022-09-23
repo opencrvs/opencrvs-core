@@ -388,7 +388,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <TrackingID />,
-        invertIcon: <TrackingID color="#4972BB" />,
+        invertIcon: <TrackingID />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
@@ -396,21 +396,21 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
         icon: <BRN />,
-        invertIcon: <BRN color="#4972BB" />,
+        invertIcon: <BRN />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Phone />,
-        invertIcon: <Phone color="#4972BB" />,
+        invertIcon: <Phone />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       },
       {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
         icon: <User />,
-        invertIcon: <User color="#4972BB" />,
+        invertIcon: <User />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]

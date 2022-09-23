@@ -41,10 +41,7 @@ import {
   PERFORMANCE_STATS
 } from './metricsQuery'
 import { ApolloError } from 'apollo-client'
-import {
-  ToastNotification,
-  NOTIFICATION_TYPE
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
 import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
 import {
@@ -457,11 +454,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       data?: IMetricsQueryResult
                     }) => {
                       if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
+                        return <GenericErrorToast />
                       }
 
                       if (this.isQueriesInProgress()) {
@@ -539,11 +532,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       data?: ICorrectionsQueryResult
                     }) => {
                       if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
+                        return <GenericErrorToast />
                       }
 
                       if (this.isQueriesInProgress()) {
@@ -571,11 +560,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   >
                     {({ data, error }) => {
                       if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
+                        return <GenericErrorToast />
                       }
                       if (this.isQueriesInProgress()) {
                         return null
@@ -629,9 +614,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             {({ loading, data, error }) => {
               return (
                 <>
-                  {error && (
-                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                  )}
+                  {error && <GenericErrorToast />}
                   <ResponsiveModal
                     title={intl.formatMessage(constantsMessages.status)}
                     show={toggleStatus}

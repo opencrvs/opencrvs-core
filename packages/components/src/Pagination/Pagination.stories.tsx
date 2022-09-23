@@ -15,7 +15,14 @@ import React from 'react'
 
 export default {
   title: 'Controls/Pagination',
-  component: Pagination
+  component: Pagination,
+  parameters: {
+    docs: {
+      description: {
+        component: `Pagination allows moving between pages in an ordered collection of items. Pagination is usually used by tables and lists.`
+      }
+    }
+  }
 } as Meta
 
 const Template: Story<IPaginationProps> = (args) => <Pagination {...args} />

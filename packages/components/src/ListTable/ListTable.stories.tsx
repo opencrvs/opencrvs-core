@@ -16,7 +16,7 @@ import { ArrowDownBlue } from '../icons'
 import React from 'react'
 
 export default {
-  title: 'Data/Table',
+  title: 'Deprecated/Table',
   component: ListTable
 } as Meta
 
@@ -33,7 +33,6 @@ interface IProps {
   totalItems?: number
   currentPage?: number
   isLoading?: boolean
-  tableTitle?: string
   hideBoxShadow?: boolean
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
@@ -152,7 +151,6 @@ const footerColumns = [
 const Template: Story<IProps> = (args) => <ListTable {...args} />
 export const ListView = Template.bind({})
 ListView.args = {
-  tableTitle: 'Table Title',
   content: list,
   columns,
   noResultText: 'No result to display',

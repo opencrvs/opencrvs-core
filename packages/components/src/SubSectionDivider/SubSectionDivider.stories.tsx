@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { SubSectionDivider, ISubSectionProps } from './SubSectionDivider'
 
 export default {
-  title: 'Layout/Divider/Divider with heading',
+  title: 'Deprecated/Divider/Divider with heading',
   component: SubSectionDivider
 } as Meta
 
