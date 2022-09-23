@@ -86,10 +86,10 @@ Home.args = {
   mobileRight: <SearchBlue />,
   desktopLeft: (
     <Stack gap={4}>
-      <Button type="icon" size="medium" icon aria-label="Go back">
+      <Button type="icon" size="medium" aria-label="Go back">
         <BackArrow />
       </Button>
-      <Button type="icon" size="medium" icon aria-label="Go forward">
+      <Button type="icon" size="medium" aria-label="Go forward">
         <ForwardArrowDeepBlue />
       </Button>
     </Stack>

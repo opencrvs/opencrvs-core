@@ -66,10 +66,12 @@ export const secondary = css`
   color: ${({ theme }) => theme.colors.primary};
 
   &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
     border: 2px solid ${({ theme }) => theme.colors.primaryDark};
     color: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
+    background: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.primaryDarker};
   }
 `
@@ -140,8 +142,8 @@ export const small = ({ loading }: { loading?: boolean }) => css`
   padding: 8px;
 
   svg {
-    height: 20px;
-    width: 20px;
+    height: 18px;
+    width: 18px;
     margin-right: 6px;
     margin-left: -1px;
   }
@@ -160,8 +162,8 @@ export const medium = css`
   padding: 0 12px;
 
   svg {
-    height: 24px;
-    width: 24px;
+    height: 20px;
+    width: 20px;
   }
 `
 
