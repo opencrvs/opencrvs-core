@@ -423,12 +423,3 @@ export async function mergePatientIdentifier(bundle: fhir.Bundle) {
       })
   }
 }
-
-export function getCompositionIdFromTask(bundle: fhir.Bundle) {
-  const currentTask = getTaskResource(bundle)
-
-  if (currentTask && currentTask.focus && currentTask.focus.reference) {
-    return currentTask.focus.reference.split('/')[1]
-  }
-  return undefined
-}

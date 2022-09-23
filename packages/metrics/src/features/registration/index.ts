@@ -187,7 +187,7 @@ export interface IUserAuditPoints {
 export interface IUserAuditBody {
   practitionerId: string
   action: USER_ACTION | string
-  additionalData?: Record<string, any>
+  additionalData?: string
 }
 export interface IPaymentPoints {
   measurement: string

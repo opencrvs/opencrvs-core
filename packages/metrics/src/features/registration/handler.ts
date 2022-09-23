@@ -113,7 +113,9 @@ export async function registrarRegistrationWaitingExternalValidationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
-
+  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -131,7 +133,16 @@ export async function registrarRegistrationWaitingExternalValidationHandler(
         Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
       )
     )
-
+    points.push(
+      await generateAuditPoint(
+        getPractitionerIdFromBundle(request.payload as fhir.Bundle)!,
+        getActionFromTask(
+          getTask(request.payload as fhir.Bundle) as fhir.Task
+        )!,
+        ipAddress,
+        userAgent
+      )
+    )
     await writePoints(points)
   } catch (err) {
     return internal(err)
