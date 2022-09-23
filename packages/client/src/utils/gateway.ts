@@ -1225,6 +1225,7 @@ export type Query = {
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchTimeLoggedMetricsByPractitioner?: Maybe<TimeLoggedMetricsResultSet>
+  getUserAuditLog?: Maybe<UserLoggedMetricsResultSet>
   getActiveCertificatesSVG?: Maybe<Array<Maybe<CertificateSvg>>>
   getCertificateSVG?: Maybe<CertificateSvg>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
@@ -1705,6 +1706,11 @@ export type TimeLoggedMetrics = {
 
 export type TimeLoggedMetricsResultSet = {
   __typename?: 'TimeLoggedMetricsResultSet'
+  results?: Maybe<Array<Maybe<TimeLoggedMetrics>>>
+  totalItems?: Maybe<Scalars['Int']>
+}
+export type UserLoggedMetricsResultSet = {
+  __typename?: 'UserLoggedMetricsResultSet'
   results?: Maybe<Array<Maybe<TimeLoggedMetrics>>>
   totalItems?: Maybe<Scalars['Int']>
 }

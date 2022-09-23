@@ -30,7 +30,9 @@ import {
   IPaymentPoints,
   IDeclarationsStartedPoints,
   IRejectedPoints,
-  ICorrectionPoint
+  ICorrectionPoint,
+  IUserAuditTags,
+  IUserAuditFields
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -130,7 +132,7 @@ export const generateInCompleteFieldPoints = async (
     })
 }
 
-function toInfluxTimestamp(date?: Date | string) {
+export function toInfluxTimestamp(date?: Date | string) {
   if (!date) {
     return undefined
   }
@@ -181,9 +183,7 @@ export const generateBirthRegPoint = async (
   if (!child) {
     throw new Error('No child found!')
   }
-
   const composition = getComposition(payload)
-
   if (!composition) {
     throw new Error('Composition not found')
   }
@@ -618,5 +618,29 @@ export async function generateRejectedPoints(
     tags,
     fields,
     timestamp: toInfluxTimestamp(task.lastModified)
+  }
+}
+
+export const generateAuditPoint = async (
+  practitionerId: string,
+  action: string,
+  ipAddress: string,
+  userAgent: string,
+  additionalData?: string
+): Promise<IPoints> => {
+  const tags: IUserAuditTags = {
+    action: action,
+    practitionerId: practitionerId
+  }
+  const fields: IUserAuditFields = {
+    data: additionalData,
+    ipAddress: ipAddress,
+    userAgent: userAgent
+  }
+  return {
+    measurement: 'user_audit_event',
+    tags,
+    fields,
+    timestamp: toInfluxTimestamp(new Date())
   }
 }

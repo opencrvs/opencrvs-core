@@ -53,9 +53,26 @@ export function getSectionBySectionCode(
   }
   return personEntry.resource as fhir.Patient
 }
-
 function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
   return resource.resourceType === 'Task'
+}
+
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
+export const REQUEST_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/requestCorrection`
+
+export const enum GQLRegStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  ARCHIVED = 'ARCHIVED',
+  DECLARED = 'DECLARED',
+  DECLARATION_UPDATED = 'DECLARATION_UPDATED',
+  WAITING_VALIDATION = 'WAITING_VALIDATION',
+  VALIDATED = 'VALIDATED',
+  REGISTERED = 'REGISTERED',
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED',
+  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
+  DOWNLOADED = 'DOWNLOADED'
 }
 
 export type DECLARATION_STATUS =
@@ -67,6 +84,15 @@ export type DECLARATION_STATUS =
   | 'REJECTED'
   | 'REQUESTED_CORRECTION'
   | 'CERTIFIED'
+
+export type USER_ACTION =
+  | 'DOWNLOADED'
+  | 'ARCHIVED'
+  | 'ASSIGNED'
+  | 'LOGGED_IN'
+  | 'LOGGED_OUT'
+  | 'DECLARED'
+  | 'REGISTERED'
 
 export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'
 
@@ -121,9 +147,33 @@ export function getPaymentReconciliation(bundle: fhir.Bundle) {
 export function getTask(bundle: fhir.Bundle) {
   return getResourceByType<Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
 }
+export function getDownloadedExtensionStatus(task: fhir.Task) {
+  const extension =
+    task.extension && findExtension(DOWNLOADED_EXTENSION_URL, task.extension)
+  return extension?.valueString
+}
+
+export function findExtension(
+  url: string,
+  extensions: fhir.Extension[]
+): fhir.Extension | undefined {
+  const extension =
+    extensions &&
+    extensions.find((obj: fhir.Extension) => {
+      return obj.url === url
+    })
+  return extension
+}
 
 export function getComposition(bundle: fhir.Bundle) {
   return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+}
+
+export function hasRequestCorrectionExtension(task: fhir.Task) {
+  const extension =
+    task.extension &&
+    findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
+  return extension
 }
 
 export async function getPreviousTask(
@@ -141,6 +191,25 @@ export function getPractitionerIdFromBundle(bundle: fhir.Bundle) {
     throw new Error('Task not found in bundle')
   }
   return getPractionerIdFromTask(task)
+}
+
+export function getActionFromTask(task: fhir.Task) {
+  const businessStatus = getStatusFromTask(task)
+  const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
+  if (businessStatus === extensionStatusWhileDownloaded) {
+    return GQLRegStatus.DOWNLOADED
+  } else if (hasRequestCorrectionExtension(task)) {
+    return GQLRegStatus.REQUESTED_CORRECTION
+  }
+  return businessStatus
+}
+
+export function getStatusFromTask(task: fhir.Task) {
+  const statusType = task.businessStatus?.coding?.find(
+    (coding: fhir.Coding) =>
+      coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+  )
+  return statusType && statusType.code
 }
 
 export function getPractionerIdFromTask(task: fhir.Task) {

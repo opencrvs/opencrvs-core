@@ -41,6 +41,7 @@ export interface GQLQuery {
   fetchMonthWiseEventMetrics?: Array<GQLMonthWiseEstimationMetric>
   fetchLocationWiseEventMetrics?: Array<GQLLocationWiseEstimationMetric>
   fetchTimeLoggedMetricsByPractitioner?: GQLTimeLoggedMetricsResultSet
+  getUserAuditLog?: GQLUserLoggedMetricsResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getRoles?: Array<GQLRole | null>
@@ -312,6 +313,11 @@ export interface GQLLocationWiseEstimationMetric {
 export interface GQLTimeLoggedMetricsResultSet {
   results?: Array<GQLTimeLoggedMetrics | null>
   totalItems?: number
+}
+
+export interface GQLUserLoggedMetricsResultSet {
+  total: number
+  results: Array<GQLUserLogMetrics>
 }
 
 export interface GQLEventSearchResultSet {
@@ -765,6 +771,15 @@ export interface GQLTimeLoggedMetrics {
   trackingId?: string
   eventType: string
   time: string
+}
+
+export interface GQLUserLogMetrics {
+  time: string
+  data?: string
+  ipAddress: string
+  userAgent: string
+  action: string
+  practitionerId: string
 }
 
 export interface GQLEventSearchSet {
@@ -1365,6 +1380,7 @@ export interface GQLResolver {
   MonthWiseEstimationMetric?: GQLMonthWiseEstimationMetricTypeResolver
   LocationWiseEstimationMetric?: GQLLocationWiseEstimationMetricTypeResolver
   TimeLoggedMetricsResultSet?: GQLTimeLoggedMetricsResultSetTypeResolver
+  UserLoggedMetricsResultSet?: GQLUserLoggedMetricsResultSetTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   Role?: GQLRoleTypeResolver
@@ -1394,6 +1410,7 @@ export interface GQLResolver {
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
   TimeLoggedMetrics?: GQLTimeLoggedMetricsTypeResolver
+  UserLogMetrics?: GQLUserLogMetricsTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
   }
@@ -1449,6 +1466,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
   fetchTimeLoggedMetricsByPractitioner?: QueryToFetchTimeLoggedMetricsByPractitionerResolver<TParent>
+  getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
@@ -1926,6 +1944,20 @@ export interface QueryToFetchTimeLoggedMetricsByPractitionerResolver<
   (
     parent: TParent,
     args: QueryToFetchTimeLoggedMetricsByPractitionerArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetUserAuditLogArgs {
+  practitionerId: string
+  skip?: number
+  count: number
+}
+export interface QueryToGetUserAuditLogResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetUserAuditLogArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3608,6 +3640,25 @@ export interface TimeLoggedMetricsResultSetToTotalItemsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLUserLoggedMetricsResultSetTypeResolver<TParent = any> {
+  total?: UserLoggedMetricsResultSetToTotalResolver<TParent>
+  results?: UserLoggedMetricsResultSetToResultsResolver<TParent>
+}
+
+export interface UserLoggedMetricsResultSetToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserLoggedMetricsResultSetToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLEventSearchResultSetTypeResolver<TParent = any> {
   results?: EventSearchResultSetToResultsResolver<TParent>
   totalItems?: EventSearchResultSetToTotalItemsResolver<TParent>
@@ -4694,6 +4745,48 @@ export interface TimeLoggedMetricsToEventTypeResolver<
 }
 
 export interface TimeLoggedMetricsToTimeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLUserLogMetricsTypeResolver<TParent = any> {
+  time?: UserLogMetricsToTimeResolver<TParent>
+  data?: UserLogMetricsToDataResolver<TParent>
+  ipAddress?: UserLogMetricsToIpAddressResolver<TParent>
+  userAgent?: UserLogMetricsToUserAgentResolver<TParent>
+  action?: UserLogMetricsToActionResolver<TParent>
+  practitionerId?: UserLogMetricsToPractitionerIdResolver<TParent>
+}
+
+export interface UserLogMetricsToTimeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserLogMetricsToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserLogMetricsToIpAddressResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserLogMetricsToUserAgentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserLogMetricsToActionResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserLogMetricsToPractitionerIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

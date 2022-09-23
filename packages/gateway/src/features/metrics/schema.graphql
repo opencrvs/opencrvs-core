@@ -40,6 +40,19 @@ type CertificationMetric {
   eventType: String!
 }
 
+type UserLoggedMetricsResultSet {
+  total: Int!
+  results: [UserLogMetrics!]!
+}
+type UserLogMetrics {
+  time: String!
+  data: String
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
 type CorrectionMetric {
   total: Float!
   reason: String!
@@ -154,4 +167,9 @@ type Query {
     count: Int!
     skip: Int!
   ): TimeLoggedMetricsResultSet
+  getUserAuditLog(
+     practitionerId: String!
+     skip: Int
+     count: Int!
+   ): UserLoggedMetricsResultSet
 }
