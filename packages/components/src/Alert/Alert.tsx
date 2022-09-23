@@ -12,8 +12,8 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Check, Help, Cross, NotificationError, Notification } from '../icons'
-import { CircleButton, TertiaryButton } from '../buttons'
 import { Spinner } from '../Spinner'
+import { Button } from '../Button'
 import { Text } from '../Text'
 import { colors } from '../colors'
 
@@ -52,13 +52,13 @@ const IconContainer = styled.div`
   color: ${({ theme }) => theme.colors.white};
 `
 
-const Close = styled(CircleButton)`
+const Close = styled(Button)`
   color: var(--color) !important;
   margin-top: 4px;
   margin-right: 4px;
 `
 
-const ActionButton = styled(TertiaryButton)`
+const ActionButton = styled(Button)`
   margin-top: 8px;
   margin-right: 8px;
 `
@@ -115,6 +115,7 @@ export const Alert = ({
 
     {onActionClick && (
       <ActionButton
+        type="tertiary"
         onClick={onActionClick}
         data-testid={props['data-testid'] && `${props['data-testid']}-action`}
       >
@@ -126,6 +127,7 @@ export const Alert = ({
 
     {onClose && type !== 'loading' && (
       <Close
+        type="icon"
         id={props.id + 'Cancel'}
         data-testid={props['data-testid'] && `${props['data-testid']}-close`}
         onClick={onClose}
