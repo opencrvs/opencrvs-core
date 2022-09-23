@@ -121,6 +121,7 @@ export function Outbox() {
     let iconId: string
 
     switch (status) {
+      // @ts-ignore
       case SUBMISSION_STATUS.READY_TO_SUBMIT:
         if (!(scope?.includes('register') || scope?.includes('validate'))) {
           iconId = `waiting${index}`
@@ -128,6 +129,7 @@ export function Outbox() {
           statusText = formatMessage(statusWaitingToSubmit)
           break
         }
+      // @ts-ignore
       // eslint-disable-next-line no-fallthrough
       case SUBMISSION_STATUS.READY_TO_APPROVE:
         if (!scope?.includes('register')) {
@@ -147,6 +149,7 @@ export function Outbox() {
         icon = () => <StatusWaiting id={iconId} key={iconId} />
         statusText = formatMessage(statusWaitingToRequestCorrection)
         break
+      // @ts-ignore
       case SUBMISSION_STATUS.SUBMITTING:
         if (!(scope?.includes('register') || scope?.includes('validate'))) {
           iconId = `registering${index}`
@@ -154,6 +157,7 @@ export function Outbox() {
           statusText = formatMessage(statusSubmitting)
           break
         }
+      // @ts-ignore
       // eslint-disable-next-line no-fallthrough
       case SUBMISSION_STATUS.APPROVING:
         if (!scope?.includes('register')) {
