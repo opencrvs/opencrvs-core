@@ -14,7 +14,7 @@ import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { AppBar } from './AppBar'
 import { Button } from '../Button'
 import {
-  BackArrowDeepBlue,
+  BackArrow,
   ForwardArrowDeepBlue,
   Hamburger,
   HelpBlue,
@@ -51,18 +51,18 @@ Default.args = {
   desktopTitle: 'OpenCRVS',
   mobileTitle: 'OpenCRVS',
   desktopLeft: (
-    <Button type="primary" size="small" icon aria-label="Go back">
-      <BackArrowDeepBlue />
+    <Button type="icon" size="medium" aria-label="Go back">
+      <BackArrow />
     </Button>
   ),
   mobileLeft: (
-    <Button type="primary" size="small" icon aria-label="Go back">
-      <BackArrowDeepBlue />
+    <Button type="icon" size="medium" aria-label="Go back">
+      <BackArrow />
     </Button>
   ),
   desktopRight: (
     <Stack gap={8}>
-      <Button type="primary" icon>
+      <Button type="icon">
         <HelpBlue>Button</HelpBlue>
       </Button>
       <Button type="secondary">Button</Button>
@@ -78,18 +78,18 @@ Default.parameters = {
 export const Home = Template.bind({}) as ComponentStory<typeof AppBar>
 Home.args = {
   mobileLeft: (
-    <Button type="primary" icon aria-label="Go back">
+    <Button type="icon" aria-label="Go back">
       <Hamburger />
     </Button>
   ),
   mobileTitle: 'Search',
   mobileRight: <SearchBlue />,
   desktopLeft: (
-    <Stack gap={8}>
-      <Button type="primary" size="small" icon aria-label="Go back">
-        <BackArrowDeepBlue />
+    <Stack gap={4}>
+      <Button type="icon" size="medium" icon aria-label="Go back">
+        <BackArrow />
       </Button>
-      <Button type="primary" size="small" icon aria-label="Go forward">
+      <Button type="icon" size="medium" icon aria-label="Go forward">
         <ForwardArrowDeepBlue />
       </Button>
     </Stack>
