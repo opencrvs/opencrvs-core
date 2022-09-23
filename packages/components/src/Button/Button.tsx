@@ -23,7 +23,7 @@ type ButtonType =
   | 'positive'
   | 'negative'
   | 'icon'
-type ButtonModifier = 'disabled' | 'loading' | 'icon'
+type ButtonModifier = 'disabled' | 'loading'
 
 interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
   /** Size of the button */
@@ -60,7 +60,6 @@ const StyledButton = styled.button.withConfig({
   ${(props) => props.variant === 'negative' && styles.negative}
   ${(props) => props.variant === 'icon' && styles.icon}
 
-  ${(props) => props.icon && styles.icon}
   ${(props) => props.loading && styles.loading}
   ${(props) => props.disabled && styles.disabled}
 `
