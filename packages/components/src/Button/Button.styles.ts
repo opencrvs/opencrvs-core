@@ -125,11 +125,11 @@ export const small = ({ loading }: { loading?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold14};
 
   height: 32px;
-  padding: 0 12px;
+  padding: 0 8px;
 
   svg {
-    height: 20px;
-    width: 20px;
+    height: 18px;
+    width: 18px;
     margin-right: 6px;
     margin-left: -1px;
   }
