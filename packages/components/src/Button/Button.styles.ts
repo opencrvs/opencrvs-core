@@ -77,10 +77,6 @@ export const secondary = css`
 `
 
 export const tertiary = css`
-  ${({ theme }) => theme.fonts.bold14};
-
-  height: 32px;
-  padding: 0 8px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.primary};
 
