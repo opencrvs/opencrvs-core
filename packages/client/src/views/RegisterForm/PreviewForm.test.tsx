@@ -344,6 +344,7 @@ describe('when user is previewing the form data', () => {
     it('successfully submits the review form', async () => {
       vi.doMock('react-apollo', () => ({ default: ReactApollo }))
       app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
+      app.update()
       app.update().find('#submit_confirm').hostNodes().simulate('click')
     })
 
