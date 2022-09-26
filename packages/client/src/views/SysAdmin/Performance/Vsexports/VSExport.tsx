@@ -1,23 +1,24 @@
 import React from 'react'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-// import { FormTabs } from '@opencrvs/components/lib/forms'
+import { FormTabs } from '@opencrvs/components/lib/forms'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { BodyContent, Content } from '@opencrvs/components/lib/layout'
-// import { Content } from '@opencrvs/components/lib/interface/Content'
+import { BodyContent } from '@opencrvs/components/lib/layout'
+import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
-// import { ListViewSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import {
-  BirthDelayedRegistrationTarget,
-  BirthLateRegistrationPeriod,
-  BirthRegistrationTarget
-} from '@client/views/SysAdmin/Config/Application/Tabs/BirthProperties'
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { Query } from '@client/components/Query'
+import { GET_TOTAL_VSEXPORT } from './queries'
 import {
-  DeathDelayedRegistrationTarget,
-  DeathRegistrationTarget
-} from '@client/views/SysAdmin/Config/Application/Tabs/DeathProperties'
-import { TopAlignedListViewItemSimplified } from '@client/views/Settings/items/components'
-import { StickyFormTabs } from '@client/views/RegisterForm/StickyFormTabs'
+  Label,
+  Value
+} from '@client/views/SysAdmin/Config/Application/Components'
+// import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { MINIO_URL } from '@client/utils/constants'
+import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -26,31 +27,94 @@ const UserTable = styled(BodyContent)`
     padding: 0px;
   }
 `
-
+type VsExportInterface = {
+  event: string
+  year: number
+  url: string
+  createdOn: string
+  fileSize: string
+}
 export enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
 
-function BirthTabContent() {
+function downloadURI(uri: string, name: string) {
+  const link = document.createElement('a')
+  link.href = uri
+  link.download = name
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+function BirthTabContent(props: any) {
+  const items: VsExportInterface[] = props.items
   return (
     <>
-      <TopAlignedListViewItemSimplified>
-        <BirthRegistrationTarget />
-        <BirthLateRegistrationPeriod />
-        <BirthDelayedRegistrationTarget />
-      </TopAlignedListViewItemSimplified>
+      {items.map((item: VsExportInterface) => {
+        if (item.event === TabId.BIRTH) {
+          const sizeValue = `${item.year}-Farajaland-${item.event}-event-statistics.csv (${item.fileSize})`
+          const fileName = `${item.year}-Farajaland-${item.event}-event-statistics.csv`
+          return (
+            <ListViewSimplified key={`${item.createdOn}_${item.event}`}>
+              <ListViewItemSimplified
+                label={<Label id={`${item.year}_label`}>{item.year}</Label>}
+                value={
+                  <Value id={`${item.createdOn}_value`}>{sizeValue}</Value>
+                }
+                actions={
+                  <DynamicHeightLinkButton
+                    id={item.url}
+                    disabled={false}
+                    onClick={() =>
+                      downloadURI(`${MINIO_URL}${item.url}`, fileName)
+                    }
+                  >
+                    {'Export'}
+                  </DynamicHeightLinkButton>
+                }
+              />
+            </ListViewSimplified>
+          )
+        }
+      })}
     </>
   )
 }
 
-function DeathTabContent() {
+function DeathTabContent(props: any) {
+  const items: VsExportInterface[] = props.items
+
   return (
     <>
-      <TopAlignedListViewItemSimplified>
-        <DeathRegistrationTarget />
-        <DeathDelayedRegistrationTarget />
-      </TopAlignedListViewItemSimplified>
+      {items.map((item: VsExportInterface) => {
+        if (item.event === TabId.DEATH) {
+          const sizeValue = `${item.year}-Farajaland-${item.event}-event-statistics.csv (${item.fileSize})`
+          const fileName = `${item.year}-Farajaland-${item.event}-event-statistics.csv`
+          return (
+            <ListViewSimplified key={`${item.createdOn}_${item.event}`}>
+              <ListViewItemSimplified
+                label={<Label id={`${item.year}_label`}>{item.year}</Label>}
+                value={
+                  <Value id={`${item.createdOn}_value`}>{sizeValue}</Value>
+                }
+                actions={
+                  <DynamicHeightLinkButton
+                    id={item.url}
+                    disabled={false}
+                    onClick={() =>
+                      downloadURI(`${MINIO_URL}${item.url}`, fileName)
+                    }
+                  >
+                    {'Export'}
+                  </DynamicHeightLinkButton>
+                }
+              />
+            </ListViewSimplified>
+          )
+        }
+      })}
     </>
   )
 }
@@ -70,6 +134,7 @@ const VSExport = () => {
   ]
 
   // TODO: Reflace with Frame component */
+
   return (
     <>
       <SysAdminContentWrapper
@@ -82,15 +147,35 @@ const VSExport = () => {
             title={intl.formatMessage(messages.vsexport)}
             titleColor={'copy'}
             tabBarContent={
-              <StickyFormTabs
+              <FormTabs
                 sections={tabSections}
                 activeTabId={activeTabId}
                 onTabClick={(id: TabId) => setActiveTabId(id)}
               />
             }
           >
-            {activeTabId === TabId.BIRTH && <BirthTabContent />}
-            {activeTabId === TabId.DEATH && <DeathTabContent />}
+            <Query query={GET_TOTAL_VSEXPORT} fetchPolicy={'no-cache'}>
+              {({ data, loading, error }) => {
+                if (error) {
+                  return <>Hello Error</>
+                } else if (loading) {
+                  return <>Loading</>
+                } else {
+                  const totalData: VsExportInterface[] =
+                    data.getTotalVSExport.results
+                  return (
+                    <>
+                      {activeTabId === TabId.BIRTH && (
+                        <BirthTabContent items={totalData} />
+                      )}
+                      {activeTabId === TabId.DEATH && (
+                        <DeathTabContent items={totalData} />
+                      )}
+                    </>
+                  )
+                }
+              }}
+            </Query>
           </Content>
         </UserTable>
       </SysAdminContentWrapper>

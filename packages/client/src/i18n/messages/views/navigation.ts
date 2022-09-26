@@ -91,9 +91,9 @@ const messagesToDefine: INavigationMessages = {
     id: 'navigation.certificate'
   },
   vsexports: {
-    defaultMessage: 'Vsexports',
-    description: 'Vsexports label in navigation',
-    id: 'navigation.vsexports'
+    defaultMessage: 'Reports',
+    description: 'Reports label in navigation',
+    id: 'navigation.Reports'
   },
   performanceDashboard: {
     defaultMessage: 'dashboard',

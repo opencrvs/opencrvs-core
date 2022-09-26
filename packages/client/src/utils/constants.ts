@@ -105,5 +105,6 @@ export const ACCUMULATED_FILE_SIZE = 20480000
 export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 export const INFORMANT_MINIMUM_AGE = 16
 export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
+export const MINIO_URL = process.env.MINIO_URL || 'http://localhost:9000'
 
 export const APPLICATION_VERSION = '1.1.0'
