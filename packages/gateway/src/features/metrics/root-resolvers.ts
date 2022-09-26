@@ -29,7 +29,10 @@ export const resolvers: GQLResolver = {
       return getMetrics('/totalMetrics', variables, authHeader)
     },
     async getTotalVSExport(_, variables, authHeader) {
-      return {}
+      const results = await getMetrics('/fetchVSExport', variables, authHeader)
+      return {
+        results
+      }
     },
     async getTotalPayments(
       _,
