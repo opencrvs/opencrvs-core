@@ -174,7 +174,7 @@ export function checkIfLocalLanguageProvided() {
 }
 
 export function getUserRole(
-  user: IUserData,
+  user: { role?: string | null },
   intl: IntlShape
 ): string | undefined {
   switch (user.role) {
@@ -198,7 +198,7 @@ export function getUserRole(
 }
 
 export function getUserType(
-  user: IUserData,
+  user: { type?: string | null },
   intl: IntlShape
 ): string | undefined {
   if (user.type) {

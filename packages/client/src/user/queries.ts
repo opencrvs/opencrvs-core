@@ -37,9 +37,13 @@ export const SEARCH_USERS = gql`
   }
 `
 
-export const GET_USER = gql`
-  query GetUserAuditLog($userId: String!, $count: Int!, $skip: Int!) {
-    getUserAuditLog(practitionerId: $userId, count: $count, skip: $skip) {
+export const GET_USER_AUDIT_LOG = gql`
+  query getUserAuditLog($practitionerId: String!, $count: Int!, $skip: Int!) {
+    getUserAuditLog(
+      practitionerId: $practitionerId
+      count: $count
+      skip: $skip
+    ) {
       results {
         ... on UserAuditLogItem {
           time
@@ -58,6 +62,54 @@ export const GET_USER = gql`
             compositionId
           }
         }
+      }
+    }
+  }
+`
+
+export const GET_USER = gql`
+  query getUser($userId: String) {
+    getUser(userId: $userId) {
+      id
+      name {
+        use
+        firstNames
+        familyName
+      }
+      username
+      mobile
+      identifier {
+        system
+        value
+      }
+      role
+      type
+      status
+      underInvestigation
+      practitionerId
+      primaryOffice {
+        id
+        name
+        alias
+      }
+      catchmentArea {
+        id
+        name
+        alias
+        identifier {
+          system
+          value
+        }
+      }
+      creationDate
+      signature {
+        type
+        data
+      }
+      device
+      avatar {
+        type
+        data
       }
     }
   }

@@ -2299,7 +2299,7 @@ export type SearchUsersQuery = {
 }
 
 export type GetUserAuditLogQueryVariables = Exact<{
-  userId: Scalars['String']
+  practitionerId: Scalars['String']
   count: Scalars['Int']
   skip: Scalars['Int']
 }>
@@ -2330,6 +2330,61 @@ export type GetUserAuditLogQuery = {
           }
         }
     >
+  } | null
+}
+
+export type GetUserQueryVariables = Exact<{
+  userId?: InputMaybe<Scalars['String']>
+}>
+
+export type GetUserQuery = {
+  __typename?: 'Query'
+  getUser?: {
+    __typename?: 'User'
+    id?: string | null
+    username?: string | null
+    mobile?: string | null
+    role?: string | null
+    type?: string | null
+    status?: string | null
+    underInvestigation?: boolean | null
+    practitionerId?: string | null
+    creationDate?: string | null
+    device?: string | null
+    name?: Array<{
+      __typename?: 'HumanName'
+      use?: string | null
+      firstNames?: string | null
+      familyName?: string | null
+    } | null> | null
+    identifier?: {
+      __typename?: 'Identifier'
+      system?: string | null
+      value?: string | null
+    } | null
+    primaryOffice?: {
+      __typename?: 'Location'
+      id: string
+      name?: string | null
+      alias?: Array<string | null> | null
+    } | null
+    catchmentArea?: Array<{
+      __typename?: 'Location'
+      id: string
+      name?: string | null
+      alias?: Array<string | null> | null
+      identifier?: Array<{
+        __typename?: 'Identifier'
+        system?: string | null
+        value?: string | null
+      } | null> | null
+    } | null> | null
+    signature?: {
+      __typename?: 'Signature'
+      type?: string | null
+      data?: string | null
+    } | null
+    avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
   } | null
 }
 
