@@ -36,6 +36,11 @@ export type Scalars = {
   Map: any
 }
 
+export type AdditionalIdWithCompositionId = {
+  __typename?: 'AdditionalIdWithCompositionId'
+  compositionId: Scalars['String']
+}
+
 export type Address = {
   __typename?: 'Address'
   city?: Maybe<Scalars['String']>
@@ -188,6 +193,14 @@ export enum AttendantType {
   OtherParamedicalPersonnel = 'OTHER_PARAMEDICAL_PERSONNEL',
   Physician = 'PHYSICIAN',
   TraditionalBirthAttendant = 'TRADITIONAL_BIRTH_ATTENDANT'
+}
+
+export type AuditLogItemBase = {
+  action: Scalars['String']
+  ipAddress: Scalars['String']
+  practitionerId: Scalars['String']
+  time: Scalars['String']
+  userAgent: Scalars['String']
 }
 
 export type Avatar = {
@@ -1225,7 +1238,6 @@ export type Query = {
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchTimeLoggedMetricsByPractitioner?: Maybe<TimeLoggedMetricsResultSet>
-  getUserAuditLog?: Maybe<UserLoggedMetricsResultSet>
   getActiveCertificatesSVG?: Maybe<Array<Maybe<CertificateSvg>>>
   getCertificateSVG?: Maybe<CertificateSvg>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
@@ -1238,6 +1250,7 @@ export type Query = {
   getTotalMetrics?: Maybe<TotalMetricsResult>
   getTotalPayments?: Maybe<Array<PaymentMetric>>
   getUser?: Maybe<User>
+  getUserAuditLog?: Maybe<UserAuditLogResultSet>
   getUserByMobile?: Maybe<User>
   hasChildLocation?: Maybe<Location>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
@@ -1363,6 +1376,12 @@ export type QueryGetTotalPaymentsArgs = {
 
 export type QueryGetUserArgs = {
   userId?: InputMaybe<Scalars['String']>
+}
+
+export type QueryGetUserAuditLogArgs = {
+  count: Scalars['Int']
+  practitionerId: Scalars['String']
+  skip?: InputMaybe<Scalars['Int']>
 }
 
 export type QueryGetUserByMobileArgs = {
@@ -1709,11 +1728,6 @@ export type TimeLoggedMetricsResultSet = {
   results?: Maybe<Array<Maybe<TimeLoggedMetrics>>>
   totalItems?: Maybe<Scalars['Int']>
 }
-export type UserLoggedMetricsResultSet = {
-  __typename?: 'UserLoggedMetricsResultSet'
-  results?: Maybe<Array<Maybe<TimeLoggedMetrics>>>
-  totalItems?: Maybe<Scalars['Int']>
-}
 
 export type TotalMetricsResult = {
   __typename?: 'TotalMetricsResult'
@@ -1742,6 +1756,35 @@ export type User = {
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID?: Maybe<Scalars['ID']>
   username?: Maybe<Scalars['String']>
+}
+
+export type UserAuditLogItem = AuditLogItemBase & {
+  __typename?: 'UserAuditLogItem'
+  action: Scalars['String']
+  ipAddress: Scalars['String']
+  practitionerId: Scalars['String']
+  time: Scalars['String']
+  userAgent: Scalars['String']
+}
+
+export type UserAuditLogItemWithComposition = AuditLogItemBase & {
+  __typename?: 'UserAuditLogItemWithComposition'
+  action: Scalars['String']
+  data: AdditionalIdWithCompositionId
+  ipAddress: Scalars['String']
+  practitionerId: Scalars['String']
+  time: Scalars['String']
+  userAgent: Scalars['String']
+}
+
+export type UserAuditLogResultItem =
+  | UserAuditLogItem
+  | UserAuditLogItemWithComposition
+
+export type UserAuditLogResultSet = {
+  __typename?: 'UserAuditLogResultSet'
+  results: Array<UserAuditLogResultItem>
+  total: Scalars['Int']
 }
 
 export type UserIdentifierInput = {
@@ -2255,58 +2298,38 @@ export type SearchUsersQuery = {
   } | null
 }
 
-export type GetUserQueryVariables = Exact<{
-  userId?: InputMaybe<Scalars['String']>
+export type GetUserAuditLogQueryVariables = Exact<{
+  userId: Scalars['String']
+  count: Scalars['Int']
+  skip: Scalars['Int']
 }>
 
-export type GetUserQuery = {
+export type GetUserAuditLogQuery = {
   __typename?: 'Query'
-  getUser?: {
-    __typename?: 'User'
-    id?: string | null
-    username?: string | null
-    mobile?: string | null
-    role?: string | null
-    type?: string | null
-    status?: string | null
-    underInvestigation?: boolean | null
-    practitionerId?: string | null
-    creationDate?: string | null
-    device?: string | null
-    name?: Array<{
-      __typename?: 'HumanName'
-      use?: string | null
-      firstNames?: string | null
-      familyName?: string | null
-    } | null> | null
-    identifier?: {
-      __typename?: 'Identifier'
-      system?: string | null
-      value?: string | null
-    } | null
-    primaryOffice?: {
-      __typename?: 'Location'
-      id: string
-      name?: string | null
-      alias?: Array<string | null> | null
-    } | null
-    catchmentArea?: Array<{
-      __typename?: 'Location'
-      id: string
-      name?: string | null
-      alias?: Array<string | null> | null
-      identifier?: Array<{
-        __typename?: 'Identifier'
-        system?: string | null
-        value?: string | null
-      } | null> | null
-    } | null> | null
-    signature?: {
-      __typename?: 'Signature'
-      type?: string | null
-      data?: string | null
-    } | null
-    avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
+  getUserAuditLog?: {
+    __typename?: 'UserAuditLogResultSet'
+    results: Array<
+      | {
+          __typename?: 'UserAuditLogItem'
+          time: string
+          userAgent: string
+          practitionerId: string
+          ipAddress: string
+          action: string
+        }
+      | {
+          __typename?: 'UserAuditLogItemWithComposition'
+          time: string
+          userAgent: string
+          practitionerId: string
+          ipAddress: string
+          action: string
+          data: {
+            __typename?: 'AdditionalIdWithCompositionId'
+            compositionId: string
+          }
+        }
+    >
   } | null
 }
 
@@ -2492,7 +2515,6 @@ export type FetchBirthRegistrationForReviewQuery = {
     child?: {
       __typename?: 'Person'
       id?: string | null
-      multipleBirth?: number | null
       birthDate?: string | null
       gender?: string | null
       name?: Array<{
@@ -2540,6 +2562,7 @@ export type FetchBirthRegistrationForReviewQuery = {
     mother?: {
       __typename?: 'Person'
       id?: string | null
+      multipleBirth?: number | null
       birthDate?: string | null
       maritalStatus?: MaritalStatusType | null
       occupation?: string | null

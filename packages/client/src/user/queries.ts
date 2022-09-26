@@ -38,29 +38,29 @@ export const SEARCH_USERS = gql`
 `
 
 export const GET_USER = gql`
-query GetUserAuditLog() {
-  getUserAuditLog(practitionerId: $userId, count: $count, skip: $skip) {
-    results {
-      ...on UserAuditLogItem {
-        time
-        userAgent
-        practitionerId
-        ipAddress
-        action
-      }
-      ...on UserAuditLogItemWithComposition {
-        time
-        userAgent
-        practitionerId
-        ipAddress
-        action
-        data {
-          compositionId
+  query GetUserAuditLog($userId: String!, $count: Int!, $skip: Int!) {
+    getUserAuditLog(practitionerId: $userId, count: $count, skip: $skip) {
+      results {
+        ... on UserAuditLogItem {
+          time
+          userAgent
+          practitionerId
+          ipAddress
+          action
         }
-      }      
+        ... on UserAuditLogItemWithComposition {
+          time
+          userAgent
+          practitionerId
+          ipAddress
+          action
+          data {
+            compositionId
+          }
+        }
+      }
     }
   }
-}
 `
 
 export const FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER = gql`
