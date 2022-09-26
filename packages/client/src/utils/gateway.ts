@@ -600,6 +600,7 @@ export type Estimation = {
 }
 
 export enum Event {
+  All = '',
   Birth = 'birth',
   Death = 'death'
 }
