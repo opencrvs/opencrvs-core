@@ -1139,7 +1139,7 @@ export interface GQLUserAuditLogItemWithComposition
   userAgent: string
   action: string
   practitionerId: string
-  data?: GQLAdditionalIdWithCompositionId
+  data: GQLAdditionalIdWithCompositionId
 }
 
 export interface GQLUserAuditLogItem extends GQLAuditLogItemBase {

@@ -66,7 +66,7 @@ type UserAuditLogItemWithComposition implements AuditLogItemBase {
   userAgent: String!
   action: String!
   practitionerId: String!
-  data: AdditionalIdWithCompositionId
+  data: AdditionalIdWithCompositionId!
 }
 
 union UserAuditLogResultItem =
