@@ -59,6 +59,11 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { goToSearchResult } from '@client/navigation'
+
+type IDispatchProps = {
+  goToSearchResult: typeof goToSearchResult
+}
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -177,6 +182,7 @@ function isPrimaryContact(contact: string): contact is PrimaryContact {
 interface DispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToWorkflowStatus: typeof goToWorkflowStatus
+  goToSearchResult: typeof goToSearchResult
 }
 interface ISearchParams {
   locationId: string
@@ -227,6 +233,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         label: intl.formatMessage(constantsMessages.trackingId),
         key: 'id',
         width: 12,
+        // handler: (text: any, type: any) => goToSearchResult(text, type, isMobile),
         isSortable: true,
         sortFunction: () => toggleSort('id'),
         icon: columnToBeSort === 'id' ? <ArrowDownBlue /> : <></>,
@@ -620,7 +627,15 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     ).map((row, idx) => {
       return {
         ...row,
-        id: <LinkButton>{row.id}</LinkButton>,
+        id: (
+          <LinkButton
+            onClick={() =>
+              props.goToSearchResult(row.id as string, 'tracking-id')
+            }
+          >
+            {row.id}
+          </LinkButton>
+        ),
         declarationStartedBy: (
           <DoubleLineValueWrapper>
             {row.declarationStartedBy}
@@ -804,5 +819,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 
 export const WorkflowStatus = connect(null, {
   goToPerformanceHome,
+  goToSearchResult,
   goToWorkflowStatus
 })(injectIntl(WorkflowStatusComponent))
