@@ -1,0 +1,34 @@
+{
+  "name": "@opencrvs/migration",
+  "version": "1.0.2",
+  "description": "OpenCRVS migration microservice",
+  "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
+  "type": "module",
+  "license": "MPL-2.0",
+  "scripts": {
+    "start": "./runMigrations.sh",
+    "start:prod": "./runMigrations.sh",
+    "create:hearth": "migrate-mongo create -f migrate-mongo-config-hearth.js",
+    "create:openhim": "migrate-mongo create -f migrate-mongo-config-openhim.js",
+    "status:hearth": "migrate-mongo status -f migrate-mongo-config-hearth.js",
+    "status:openhim": "migrate-mongo status -f migrate-mongo-config-openhim.js",
+    "precommit": "lint-staged"
+  },
+  "dependencies": {
+    "migrate-mongo": "^9.0.0",
+    "influx": "^5.0.7"
+  },
+  "devDependencies": {
+    "prettier": "^2.5.0"
+  },
+  "lint-staged": {
+    "src/**/*.{js}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "keywords": [
+    "migration",
+    "nodejs"
+  ]
+}
