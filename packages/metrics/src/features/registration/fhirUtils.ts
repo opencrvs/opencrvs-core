@@ -169,6 +169,17 @@ export function getComposition(bundle: fhir.Bundle) {
   return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
 }
 
+export function getCompositionIdFromCompositionOrTask(bundle: fhir.Bundle) {
+  const composition = getComposition(bundle)
+
+  if (composition) {
+    return composition.id
+  }
+
+  const task = getTask(bundle)
+  return task?.focus?.reference?.split('/')[1]
+}
+
 export function hasRequestCorrectionExtension(task: fhir.Task) {
   const extension =
     task.extension &&

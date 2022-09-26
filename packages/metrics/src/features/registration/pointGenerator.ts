@@ -621,19 +621,19 @@ export async function generateRejectedPoints(
   }
 }
 
-export const generateAuditPoint = async (
+export const generateAuditPoint = (
   practitionerId: string,
   action: string,
   ipAddress: string,
   userAgent: string,
-  additionalData?: string
-): Promise<IPoints> => {
+  additionalData?: Record<string, any>
+): IPoints => {
   const tags: IUserAuditTags = {
     action: action,
     practitionerId: practitionerId
   }
   const fields: IUserAuditFields = {
-    data: additionalData,
+    data: JSON.stringify(additionalData),
     ipAddress: ipAddress,
     userAgent: userAgent
   }

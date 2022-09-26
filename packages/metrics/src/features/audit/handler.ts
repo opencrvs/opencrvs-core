@@ -11,10 +11,11 @@
  */
 import * as Hapi from '@hapi/hapi'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
-import { query, writePoints } from '@metrics/influxdb/client'
+import { writePoints } from '@metrics/influxdb/client'
 import { internal } from '@hapi/boom'
 import { IUserAuditBody } from '@metrics/features/registration'
 import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
+import { getUserAuditEvents } from './service'
 
 export async function newAuditHandler(
   request: Hapi.Request,
@@ -28,7 +29,7 @@ export async function newAuditHandler(
       request.headers['x-real-user-agent'] || request.headers['user-agent']
     const payload = request.payload as IUserAuditBody
     points.push(
-      await generateAuditPoint(
+      generateAuditPoint(
         payload.practitionerId,
         payload.action,
         remoteAddress,
@@ -53,16 +54,4 @@ export async function getUserAuditsHandler(request: Hapi.Request) {
     results,
     total: results.length
   }
-}
-export async function getUserAuditEvents(
-  practitionerId: string,
-  size: number,
-  skip: number
-) {
-  return await query(
-    `SELECT * from user_audit_event where practitionerId = $practitionerId limit ${size} offset ${skip}`,
-    {
-      placeholders: { practitionerId: practitionerId }
-    }
-  )
 }
