@@ -40,17 +40,42 @@ type CertificationMetric {
   eventType: String!
 }
 
-type UserLoggedMetricsResultSet {
-  total: Int!
-  results: [UserLogMetrics!]!
+type AdditionalIdWithCompositionId {
+  compositionId: String!
 }
-type UserLogMetrics {
+
+interface AuditLogItemBase {
   time: String!
-  data: String
   ipAddress: String!
   userAgent: String!
   action: String!
   practitionerId: String!
+}
+
+type UserAuditLogItem implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
+type UserAuditLogItemWithComposition implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+  data: AdditionalIdWithCompositionId
+}
+
+union UserAuditLogResultItem =
+    UserAuditLogItemWithComposition
+  | UserAuditLogItem
+
+type UserAuditLogResultSet {
+  total: Int!
+  results: [UserAuditLogResultItem!]!
 }
 
 type CorrectionMetric {
@@ -168,8 +193,8 @@ type Query {
     skip: Int!
   ): TimeLoggedMetricsResultSet
   getUserAuditLog(
-     practitionerId: String!
-     skip: Int
-     count: Int!
-   ): UserLoggedMetricsResultSet
+    practitionerId: String!
+    skip: Int
+    count: Int!
+  ): UserAuditLogResultSet
 }

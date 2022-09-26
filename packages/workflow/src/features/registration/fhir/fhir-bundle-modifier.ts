@@ -537,8 +537,10 @@ export async function setupRegAssigned(
   if (setupRegAssignedExtension) {
     const practitionerDetails = await getUserByToken(token)
     if (
-      setupRegAssignedExtension.valueString === RegStatus.REJECTED &&
-      practitionerDetails.role === 'FIELD_AGENT'
+      (setupRegAssignedExtension.valueString === RegStatus.REJECTED &&
+        practitionerDetails.role === 'FIELD_AGENT') ||
+      (practitionerDetails.role === 'REGISTRATION_AGENT' &&
+        setupRegAssignedExtension.valueString === RegStatus.VALIDATED)
     ) {
       return taskResource
     }
