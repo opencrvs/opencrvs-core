@@ -1096,6 +1096,7 @@ input QuestionInput {
   required: Boolean
   enabled: String
   custom: Boolean
+  conditionals: [ConditionalInput]
 }
 
 enum InformantType {
@@ -1389,6 +1390,11 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+}
+
+input ConditionalInput {
+  fieldId: String
+  regexp: String
 }
 
 type Payment {

@@ -30,6 +30,16 @@ input MesssageInput {
   descriptor: MesssageDescriptorInput!
 }
 
+type Conditional {
+  fieldId: String
+  regexp: String
+}
+
+input ConditionalInput {
+  fieldId: String
+  regexp: String
+}
+
 enum CustomFieldType {
   TEXT
   TEL
@@ -53,4 +63,5 @@ input QuestionInput {
   required: Boolean
   enabled: String
   custom: Boolean
+  conditionals: [ConditionalInput]
 }
