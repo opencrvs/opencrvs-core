@@ -18,12 +18,14 @@ import {
   DeathSection,
   IFormField
 } from '@client/forms'
-import { IMessage } from '@client/forms/questionConfig'
+import {
+  getIdentifiersFromFieldId,
+  IMessage
+} from '@client/forms/questionConfig'
 import { Event } from '@client/utils/gateway'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
   getCertificateHandlebar,
-  getConfigFieldIdentifiers,
   ICustomConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import { buttonMessages } from '@client/i18n/messages'
@@ -247,7 +249,7 @@ class CustomFieldToolsComp extends React.Component<
   }
 
   generateNewFieldID() {
-    const { event, sectionId, groupId } = getConfigFieldIdentifiers(
+    const { event, sectionId, groupId } = getIdentifiersFromFieldId(
       this.props.selectedField.fieldId
     )
 

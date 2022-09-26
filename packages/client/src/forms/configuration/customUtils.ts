@@ -10,11 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { SerializedFormField, BirthSection } from '@client/forms/index'
-import { IMessage, ICustomQuestionConfig } from '@client/forms/questionConfig'
+import {
+  IMessage,
+  ICustomQuestionConfig,
+  getIdentifiersFromFieldId
+} from '@client/forms/questionConfig'
 import { find } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { getConfigFieldIdentifiers } from './formConfig/utils'
 import {
   FATHER_DETAILS_DONT_EXIST,
   MOTHER_DETAILS_DONT_EXIST
@@ -63,7 +66,7 @@ export function createCustomField({
       /* TODO: Add template mapping so that handlebars work */
     }
   }
-  const { sectionId } = getConfigFieldIdentifiers(fieldId)
+  const { sectionId } = getIdentifiersFromFieldId(fieldId)
   if (sectionId === BirthSection.Father) {
     baseField.conditionals = [
       { action: 'hide', expression: FATHER_DETAILS_DONT_EXIST }

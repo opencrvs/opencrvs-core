@@ -12,15 +12,15 @@
 import {
   IConfigField,
   isPreviewGroupConfigField,
-  previewGroupToQuestionConfig,
-  getConfigFieldIdentifiers
+  previewGroupToQuestionConfig
 } from '@client/forms/configuration/formConfig/utils'
 import {
   IDefaultQuestionConfig,
   ICustomQuestionConfig,
   IFieldIdentifiers,
   getFieldIdentifiers,
-  IQuestionConfig
+  IQuestionConfig,
+  getIdentifiersFromFieldId
 } from '.'
 import { ISerializedForm, BirthSection, DeathSection } from '@client/forms'
 import {
@@ -144,7 +144,7 @@ export function questionsTransformer(
         } as ICustomQuestionConfig
       }
 
-      const { event } = getConfigFieldIdentifiers(fieldId)
+      const { event } = getIdentifiersFromFieldId(fieldId)
 
       const defaultQuestionConfig: IDefaultQuestionConfig = {
         fieldId,
