@@ -770,7 +770,7 @@ export interface GQLVSEstimation {
   year?: number
   fileSize?: string
   url?: string
-  createdOn?: number
+  createdOn?: string
 }
 
 export interface GQLTimeLoggedMetrics {
