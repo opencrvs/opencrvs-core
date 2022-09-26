@@ -13,7 +13,8 @@ import { SerializedFormField, BirthSection } from '@client/forms/index'
 import {
   IMessage,
   ICustomQuestionConfig,
-  getIdentifiersFromFieldId
+  getIdentifiersFromFieldId,
+  IConditionalConfig
 } from '@client/forms/questionConfig'
 import { find } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
@@ -33,6 +34,23 @@ function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   return defaultMessage?.descriptor
 }
 
+function getConditionals(
+  fieldId: string,
+  conditionals: IConditionalConfig[] | undefined
+) {
+  if (!conditionals) return []
+  return conditionals.map((condition) => {
+    const escapeRegExpValue = escapeRegExp(condition.regexp)
+    const { fieldName, sectionId } = getIdentifiersFromFieldId(
+      condition.fieldId
+    )
+    return {
+      action: 'hide',
+      expression: `new RegExp("${escapeRegExpValue}").test(draftData && draftData.${sectionId} && draftData.${sectionId}.${fieldName})`
+    }
+  })
+}
+
 export function createCustomField({
   fieldName,
   fieldId,
@@ -43,7 +61,8 @@ export function createCustomField({
   tooltip,
   placeholder,
   required,
-  maxLength
+  maxLength,
+  conditionals
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -67,14 +86,24 @@ export function createCustomField({
     }
   }
   const { sectionId } = getIdentifiersFromFieldId(fieldId)
+  const othersConditionals = conditionals
+    ? getConditionals(fieldId, conditionals)
+    : []
   if (sectionId === BirthSection.Father) {
-    baseField.conditionals = [
+    const fatherConditionals = [
       { action: 'hide', expression: FATHER_DETAILS_DONT_EXIST }
     ]
+    baseField.conditionals = [...fatherConditionals, ...othersConditionals]
   } else if (sectionId === BirthSection.Mother) {
-    baseField.conditionals = [
-      { action: 'hide', expression: MOTHER_DETAILS_DONT_EXIST }
+    const motherConditionals = [
+      {
+        action: 'hide',
+        expression: MOTHER_DETAILS_DONT_EXIST
+      }
     ]
+    baseField.conditionals = [...motherConditionals, ...othersConditionals]
+  } else {
+    baseField.conditionals = othersConditionals
   }
   if (
     baseField.type === 'TEXT' ||
@@ -95,4 +124,8 @@ export function createCustomField({
     baseField.maxLength = maxLength
   }
   return baseField
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
