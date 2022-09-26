@@ -22,6 +22,10 @@ DotEnv.config({
   path: `${process.cwd()}/.env`
 })
 
-createServer().then((app) => {
-  app.start()
-})
+console.log('init==')
+createServer()
+  .then((app) => {
+    console.log('starting up')
+    app.start()
+  })
+  .catch((err) => console.log(err))

@@ -176,7 +176,9 @@ export const UserAudit = () => {
       <Query
         query={GET_USER}
         variables={{
-          userId: userId
+          practitionerId: userId,
+          count: 100,
+          skip: 0
         }}
         fetchPolicy={'cache-and-network'}
       >
@@ -260,7 +262,7 @@ export const UserAudit = () => {
                     {
                       query: GET_USER,
                       variables: {
-                        userId: userId
+                        practitionerId: userId
                       }
                     }
                   ]}

@@ -38,51 +38,29 @@ export const SEARCH_USERS = gql`
 `
 
 export const GET_USER = gql`
-  query getUser($userId: String) {
-    getUser(userId: $userId) {
-      id
-      name {
-        use
-        firstNames
-        familyName
+query GetUserAuditLog() {
+  getUserAuditLog(practitionerId: $userId, count: $count, skip: $skip) {
+    results {
+      ...on UserAuditLogItem {
+        time
+        userAgent
+        practitionerId
+        ipAddress
+        action
       }
-      username
-      mobile
-      identifier {
-        system
-        value
-      }
-      role
-      type
-      status
-      underInvestigation
-      practitionerId
-      primaryOffice {
-        id
-        name
-        alias
-      }
-      catchmentArea {
-        id
-        name
-        alias
-        identifier {
-          system
-          value
+      ...on UserAuditLogItemWithComposition {
+        time
+        userAgent
+        practitionerId
+        ipAddress
+        action
+        data {
+          compositionId
         }
-      }
-      creationDate
-      signature {
-        type
-        data
-      }
-      device
-      avatar {
-        type
-        data
-      }
+      }      
     }
   }
+}
 `
 
 export const FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER = gql`
