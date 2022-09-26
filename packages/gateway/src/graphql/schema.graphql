@@ -113,7 +113,7 @@ type Query {
     practitionerId: String!
     skip: Int
     count: Int!
-  ): UserLoggedMetricsResultSet
+  ): UserAuditLogResultSet
   searchEvents(
     userId: String
     locationIds: [String!]
@@ -443,9 +443,9 @@ type TimeLoggedMetricsResultSet {
   totalItems: Int
 }
 
-type UserLoggedMetricsResultSet {
+type UserAuditLogResultSet {
   total: Int!
-  results: [UserLogMetrics!]!
+  results: [UserAuditLogResultItem!]!
 }
 
 type EventSearchResultSet {
@@ -901,14 +901,9 @@ type TimeLoggedMetrics {
   time: String!
 }
 
-type UserLogMetrics {
-  time: String!
-  data: String
-  ipAddress: String!
-  userAgent: String!
-  action: String!
-  practitionerId: String!
-}
+union UserAuditLogResultItem =
+    UserAuditLogItemWithComposition
+  | UserAuditLogItem
 
 interface EventSearchSet {
   id: ID!
@@ -1243,6 +1238,23 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
 }
 
+type UserAuditLogItemWithComposition implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+  data: AdditionalIdWithCompositionId
+}
+
+type UserAuditLogItem implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
 type RegistrationSearchSet {
   status: String
   contactNumber: String
@@ -1417,6 +1429,18 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+interface AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
+type AdditionalIdWithCompositionId {
+  compositionId: String!
 }
 
 input CommentInput {

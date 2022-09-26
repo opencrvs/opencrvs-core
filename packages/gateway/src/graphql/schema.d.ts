@@ -41,7 +41,7 @@ export interface GQLQuery {
   fetchMonthWiseEventMetrics?: Array<GQLMonthWiseEstimationMetric>
   fetchLocationWiseEventMetrics?: Array<GQLLocationWiseEstimationMetric>
   fetchTimeLoggedMetricsByPractitioner?: GQLTimeLoggedMetricsResultSet
-  getUserAuditLog?: GQLUserLoggedMetricsResultSet
+  getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getRoles?: Array<GQLRole | null>
@@ -315,9 +315,9 @@ export interface GQLTimeLoggedMetricsResultSet {
   totalItems?: number
 }
 
-export interface GQLUserLoggedMetricsResultSet {
+export interface GQLUserAuditLogResultSet {
   total: number
-  results: Array<GQLUserLogMetrics>
+  results: Array<GQLUserAuditLogResultItem>
 }
 
 export interface GQLEventSearchResultSet {
@@ -773,13 +773,19 @@ export interface GQLTimeLoggedMetrics {
   time: string
 }
 
-export interface GQLUserLogMetrics {
-  time: string
-  data?: string
-  ipAddress: string
-  userAgent: string
-  action: string
-  practitionerId: string
+export type GQLUserAuditLogResultItem =
+  | GQLUserAuditLogItemWithComposition
+  | GQLUserAuditLogItem
+
+/** Use this to resolve union type UserAuditLogResultItem */
+export type GQLPossibleUserAuditLogResultItemTypeNames =
+  | 'UserAuditLogItemWithComposition'
+  | 'UserAuditLogItem'
+
+export interface GQLUserAuditLogResultItemNameMap {
+  UserAuditLogResultItem: GQLUserAuditLogResultItem
+  UserAuditLogItemWithComposition: GQLUserAuditLogItemWithComposition
+  UserAuditLogItem: GQLUserAuditLogItem
 }
 
 export interface GQLEventSearchSet {
@@ -1126,6 +1132,24 @@ export const enum GQLAttachmentSubject {
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF'
 }
 
+export interface GQLUserAuditLogItemWithComposition
+  extends GQLAuditLogItemBase {
+  time: string
+  ipAddress: string
+  userAgent: string
+  action: string
+  practitionerId: string
+  data?: GQLAdditionalIdWithCompositionId
+}
+
+export interface GQLUserAuditLogItem extends GQLAuditLogItemBase {
+  time: string
+  ipAddress: string
+  userAgent: string
+  action: string
+  practitionerId: string
+}
+
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
@@ -1302,6 +1326,29 @@ export interface GQLPayment {
   date?: GQLDate
 }
 
+export interface GQLAuditLogItemBase {
+  time: string
+  ipAddress: string
+  userAgent: string
+  action: string
+  practitionerId: string
+}
+
+/** Use this to resolve interface type AuditLogItemBase */
+export type GQLPossibleAuditLogItemBaseTypeNames =
+  | 'UserAuditLogItemWithComposition'
+  | 'UserAuditLogItem'
+
+export interface GQLAuditLogItemBaseNameMap {
+  AuditLogItemBase: GQLAuditLogItemBase
+  UserAuditLogItemWithComposition: GQLUserAuditLogItemWithComposition
+  UserAuditLogItem: GQLUserAuditLogItem
+}
+
+export interface GQLAdditionalIdWithCompositionId {
+  compositionId: string
+}
+
 export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
@@ -1380,7 +1427,7 @@ export interface GQLResolver {
   MonthWiseEstimationMetric?: GQLMonthWiseEstimationMetricTypeResolver
   LocationWiseEstimationMetric?: GQLLocationWiseEstimationMetricTypeResolver
   TimeLoggedMetricsResultSet?: GQLTimeLoggedMetricsResultSetTypeResolver
-  UserLoggedMetricsResultSet?: GQLUserLoggedMetricsResultSetTypeResolver
+  UserAuditLogResultSet?: GQLUserAuditLogResultSetTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   Role?: GQLRoleTypeResolver
@@ -1410,7 +1457,10 @@ export interface GQLResolver {
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
   TimeLoggedMetrics?: GQLTimeLoggedMetricsTypeResolver
-  UserLogMetrics?: GQLUserLogMetricsTypeResolver
+  UserAuditLogResultItem?: {
+    __resolveType: GQLUserAuditLogResultItemTypeResolver
+  }
+
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
   }
@@ -1427,6 +1477,8 @@ export interface GQLResolver {
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
+  UserAuditLogItemWithComposition?: GQLUserAuditLogItemWithCompositionTypeResolver
+  UserAuditLogItem?: GQLUserAuditLogItemTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   OperationHistorySearchSet?: GQLOperationHistorySearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
@@ -1435,6 +1487,11 @@ export interface GQLResolver {
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
+  AuditLogItemBase?: {
+    __resolveType: GQLAuditLogItemBaseTypeResolver
+  }
+
+  AdditionalIdWithCompositionId?: GQLAdditionalIdWithCompositionIdTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
@@ -3639,19 +3696,19 @@ export interface TimeLoggedMetricsResultSetToTotalItemsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLUserLoggedMetricsResultSetTypeResolver<TParent = any> {
-  total?: UserLoggedMetricsResultSetToTotalResolver<TParent>
-  results?: UserLoggedMetricsResultSetToResultsResolver<TParent>
+export interface GQLUserAuditLogResultSetTypeResolver<TParent = any> {
+  total?: UserAuditLogResultSetToTotalResolver<TParent>
+  results?: UserAuditLogResultSetToResultsResolver<TParent>
 }
 
-export interface UserLoggedMetricsResultSetToTotalResolver<
+export interface UserAuditLogResultSetToTotalResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserLoggedMetricsResultSetToResultsResolver<
+export interface UserAuditLogResultSetToResultsResolver<
   TParent = any,
   TResult = any
 > {
@@ -4747,48 +4804,12 @@ export interface TimeLoggedMetricsToTimeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLUserLogMetricsTypeResolver<TParent = any> {
-  time?: UserLogMetricsToTimeResolver<TParent>
-  data?: UserLogMetricsToDataResolver<TParent>
-  ipAddress?: UserLogMetricsToIpAddressResolver<TParent>
-  userAgent?: UserLogMetricsToUserAgentResolver<TParent>
-  action?: UserLogMetricsToActionResolver<TParent>
-  practitionerId?: UserLogMetricsToPractitionerIdResolver<TParent>
+export interface GQLUserAuditLogResultItemTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'UserAuditLogItemWithComposition'
+    | 'UserAuditLogItem'
+    | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>
 }
-
-export interface UserLogMetricsToTimeResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserLogMetricsToDataResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserLogMetricsToIpAddressResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserLogMetricsToUserAgentResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserLogMetricsToActionResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface UserLogMetricsToPractitionerIdResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface GQLEventSearchSetTypeResolver<TParent = any> {
   (parent: TParent, context: any, info: GraphQLResolveInfo):
     | 'BirthEventSearchSet'
@@ -5110,6 +5131,97 @@ export interface InputOutputToValueIdResolver<TParent = any, TResult = any> {
 }
 
 export interface InputOutputToValueStringResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLUserAuditLogItemWithCompositionTypeResolver<TParent = any> {
+  time?: UserAuditLogItemWithCompositionToTimeResolver<TParent>
+  ipAddress?: UserAuditLogItemWithCompositionToIpAddressResolver<TParent>
+  userAgent?: UserAuditLogItemWithCompositionToUserAgentResolver<TParent>
+  action?: UserAuditLogItemWithCompositionToActionResolver<TParent>
+  practitionerId?: UserAuditLogItemWithCompositionToPractitionerIdResolver<TParent>
+  data?: UserAuditLogItemWithCompositionToDataResolver<TParent>
+}
+
+export interface UserAuditLogItemWithCompositionToTimeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToIpAddressResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToUserAgentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToActionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToPractitionerIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToDataResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLUserAuditLogItemTypeResolver<TParent = any> {
+  time?: UserAuditLogItemToTimeResolver<TParent>
+  ipAddress?: UserAuditLogItemToIpAddressResolver<TParent>
+  userAgent?: UserAuditLogItemToUserAgentResolver<TParent>
+  action?: UserAuditLogItemToActionResolver<TParent>
+  practitionerId?: UserAuditLogItemToPractitionerIdResolver<TParent>
+}
+
+export interface UserAuditLogItemToTimeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemToIpAddressResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemToUserAgentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemToActionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemToPractitionerIdResolver<
   TParent = any,
   TResult = any
 > {
@@ -5522,5 +5634,22 @@ export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
 }
 
 export interface PaymentToDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLAuditLogItemBaseTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'UserAuditLogItemWithComposition'
+    | 'UserAuditLogItem'
+    | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>
+}
+export interface GQLAdditionalIdWithCompositionIdTypeResolver<TParent = any> {
+  compositionId?: AdditionalIdWithCompositionIdToCompositionIdResolver<TParent>
+}
+
+export interface AdditionalIdWithCompositionIdToCompositionIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
