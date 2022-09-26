@@ -130,7 +130,9 @@ export const UserAudit = () => {
     return menuItems
   }
 
-  const transformUserQueryResult = (userData?: GetUserQuery['getUser']) => {
+  const transformUserQueryResult = (
+    userData: NonNullable<GetUserQuery['getUser']>
+  ) => {
     const locale = intl.locale
     return {
       id: userData.id,
@@ -161,7 +163,7 @@ export const UserAudit = () => {
       locationId:
         getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) ||
         '0',
-      avatar: userData.avatar,
+      avatar: userData.avatar || undefined,
       device: userData.device
     }
   }
@@ -181,51 +183,49 @@ export const UserAudit = () => {
         {({ data: userQueryData, loading, error }) => {
           if (loading || !userQueryData?.getUser) {
             return <Loader id="user_loader" marginPercent={35} />
-          } else {
-            const user = transformUserQueryResult(
-              userQueryData && userQueryData.getUser
-            )
-            const userRole = getUserRole(user, intl)
-            const userType = getUserType(user, intl)
-            return (
-              <Query<GetUserAuditLogQuery>
-                query={GET_USER_AUDIT_LOG}
-                variables={{
-                  practitionerId: user.practitionerId,
-                  count: 100,
-                  skip: 0
-                }}
-                fetchPolicy={'cache-and-network'}
-              >
-                {(auditLogData) => {
-                  console.log(auditLogData)
-                  return (
-                    <Content
-                      title={user.name}
-                      showTitleOnMobile={true}
-                      icon={() => (
-                        <UserAvatar name={user.name} avatar={user.avatar} />
-                      )}
-                      topActionButtons={[
-                        <Status status={user.status || 'pending'} />,
-
-                        <ToggleMenu
-                          id={`sub-page-header-munu-button`}
-                          toggleButton={<VerticalThreeDots />}
-                          menuItems={getMenuItems(
-                            user.id as string,
-                            user.status as string
-                          )}
-                          hide={(scope && !scope.includes('sysadmin')) || false}
-                        />
-                      ]}
-                      size={ContentSize.LARGE}
-                    ></Content>
-                  )
-                }}
-              </Query>
-            )
           }
+
+          const user = transformUserQueryResult(userQueryData.getUser)
+          const userRole = getUserRole(user, intl)
+          const userType = getUserType(user, intl)
+          return (
+            <Query<GetUserAuditLogQuery>
+              query={GET_USER_AUDIT_LOG}
+              variables={{
+                practitionerId: user.practitionerId,
+                count: 100,
+                skip: 0
+              }}
+              fetchPolicy={'cache-and-network'}
+            >
+              {(auditLogData) => {
+                console.log(auditLogData)
+                return (
+                  <Content
+                    title={user.name}
+                    showTitleOnMobile={true}
+                    icon={() => (
+                      <UserAvatar name={user.name} avatar={user.avatar} />
+                    )}
+                    topActionButtons={[
+                      <Status status={user.status || 'pending'} />,
+
+                      <ToggleMenu
+                        id={`sub-page-header-munu-button`}
+                        toggleButton={<VerticalThreeDots />}
+                        menuItems={getMenuItems(
+                          user.id as string,
+                          user.status as string
+                        )}
+                        hide={(scope && !scope.includes('sysadmin')) || false}
+                      />
+                    ]}
+                    size={ContentSize.LARGE}
+                  ></Content>
+                )
+              }}
+            </Query>
+          )
         }}
       </Query>
     </Frame>
