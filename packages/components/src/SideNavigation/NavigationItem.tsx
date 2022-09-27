@@ -34,6 +34,10 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   :hover {
     background-color: ${({ theme }) => theme.colors.grey100};
   }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 3px ${({ theme }) => theme.colors.yellow};
+  }
 `
 const ItemContentContainer = styled.div<{ isSelected?: boolean }>`
   display: flex;
