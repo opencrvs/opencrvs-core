@@ -25,7 +25,7 @@ const TopBar = styled.div`
   align-items: center;
   top: 0;
   width: 100%;
-  position: relative;
+  position: sticky;
   z-index: 1;
 `
 const TopBarTitle = styled.h4`
