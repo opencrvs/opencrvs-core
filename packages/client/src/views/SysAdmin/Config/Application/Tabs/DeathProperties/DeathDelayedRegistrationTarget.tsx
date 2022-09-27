@@ -17,7 +17,7 @@ import {
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { IStoreState } from '@client/store'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { DeathActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
