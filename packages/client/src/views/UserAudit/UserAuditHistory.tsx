@@ -46,11 +46,20 @@ import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
 import format from '@client/utils/date-formatting'
+import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
+import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
+
 import {
   IOnlineStatusProps,
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import { Event } from '@client/utils/gateway'
+import { ILocation } from '@client/offline/reducer'
+import { ICurrency } from '@client/utils/referenceApi'
+import { RouteComponentProps } from 'react-router'
+import { IUserDetails } from '@client/utils/userUtils'
+import { REGISTRAR_ROLES } from '@client/utils/constants'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -112,13 +121,25 @@ export interface IUserData {
   locationId?: string
   startDate?: string
 }
+
 interface IBaseProp {
   theme: ITheme
   user?: IUserData
   isLoading?: boolean
 }
 
-type Props = WrappedComponentProps & IBaseProp & IOnlineStatusProps
+interface IConnectProps {
+  locations: { [key: string]: ILocation }
+  offices: { [key: string]: ILocation }
+  currency: ICurrency
+}
+
+type Props = WrappedComponentProps &
+  IBaseProp &
+  IOnlineStatusProps &
+  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
+    theme: ITheme
+  }
 
 export enum SORTED_COLUMN {
   ACTION = 'actionDescriptionString',
@@ -128,12 +149,16 @@ export enum SORTED_COLUMN {
 }
 
 type State = {
+  selectedLocation?: ISearchLocation
   timeStart: Date
   timeEnd: Date
   viewportWidth: number
   sortOrder: SORT_ORDER
   sortedColumn: SORTED_COLUMN
   currentPageNumber: number
+  event: Event
+  officeSelected?: boolean
+  isAccessibleOffice?: boolean
 }
 
 class UserAuditHistoryComponent extends React.Component<Props, State> {
@@ -146,7 +171,8 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
       viewportWidth: 0,
       currentPageNumber: 1,
       sortOrder: SORT_ORDER.DESCENDING,
-      sortedColumn: SORTED_COLUMN.DATE
+      sortedColumn: SORTED_COLUMN.DATE,
+      event: Event.All
     }
     this.updateViewPort = this.updateViewPort.bind(this)
   }
@@ -372,6 +398,45 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     )
   }
 
+  isOfficeSelected(selectedLocation?: ISearchLocation) {
+    if (selectedLocation) {
+      return Object.keys(this.props.offices).some(
+        (id) => id === selectedLocation.id
+      )
+    }
+    return false
+  }
+
+  isAccessibleOfficeSelected(selectedLocation?: ISearchLocation) {
+    if (
+      selectedLocation &&
+      this.isOfficeSelected(selectedLocation) &&
+      this.props.userDetails &&
+      this.props.userDetails.role
+    ) {
+      if (this.props.userDetails?.role === 'NATIONAL_REGISTRAR') {
+        return true
+      } else if (
+        REGISTRAR_ROLES.includes(this.props.userDetails?.role) &&
+        this.props.userDetails.primaryOffice?.id === selectedLocation.id
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
+  componentDidUpdate(_: Props, prevState: State) {
+    if (this.state.selectedLocation !== prevState.selectedLocation) {
+      this.setState({
+        officeSelected: this.isOfficeSelected(this.state.selectedLocation),
+        isAccessibleOffice: this.isAccessibleOfficeSelected(
+          this.state.selectedLocation
+        )
+      })
+    }
+  }
+
   getLoadingAuditListView(hasError?: boolean) {
     return (
       <>
@@ -404,6 +469,35 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
               <SectionTitle>
                 {intl.formatMessage(messages.auditSectionTitle)}
               </SectionTitle>
+              <PerformanceSelect
+                onChange={(option: { value: Event }) =>
+                  this.setState({ event: option.value as Event })
+                }
+                id="eventSelect"
+                withLightTheme={true}
+                defaultWidth={110}
+                value={this.state.event}
+                options={[
+                  {
+                    label: intl.formatMessage(
+                      performanceMessages.eventOptionForAll
+                    ),
+                    value: Event.All
+                  },
+                  {
+                    label: intl.formatMessage(
+                      performanceMessages.eventOptionForBirths
+                    ),
+                    value: Event.Birth
+                  },
+                  {
+                    label: intl.formatMessage(
+                      performanceMessages.eventOptionForDeaths
+                    ),
+                    value: Event.Death
+                  }
+                ]}
+              />
               <DateRangePicker
                 startDate={timeStart}
                 endDate={timeEnd}
