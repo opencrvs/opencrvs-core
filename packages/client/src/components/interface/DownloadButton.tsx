@@ -15,12 +15,7 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { IActionObject } from '@opencrvs/components/lib/Workqueue'
 import { Download } from '@opencrvs/components/lib/icons'
-import {
-  CircleButton,
-  TertiaryButton,
-  SuccessButton,
-  DangerButton
-} from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { connect } from 'react-redux'
 import {
   downloadDeclaration,
@@ -92,7 +87,7 @@ const StatusIndicator = styled.div<{
   justify-content: ${({ isLoading }) =>
     isLoading ? `space-between` : `flex-end`};
 `
-const DownloadAction = styled(CircleButton)`
+const DownloadAction = styled(Button)`
   border-radius: 50%;
   height: 40px;
   width: 40px;
@@ -188,16 +183,17 @@ const NoConnectionViewContainer = styled.div`
 `
 
 function renderModalAction(action: IModalAction, intl: IntlShape): JSX.Element {
-  let Button
+  let buttonType: 'positive' | 'negative' | 'tertiary'
   if (action.type === 'success') {
-    Button = SuccessButton
+    buttonType = 'positive' as const
   } else if (action.type === 'danger') {
-    Button = DangerButton
+    buttonType = 'negative'
   } else {
-    Button = TertiaryButton
+    buttonType = 'tertiary'
   }
+
   return (
-    <Button id={action.id} onClick={action.handler}>
+    <Button id={action.id} type={buttonType} onClick={action.handler}>
       {intl.formatMessage(action.label)}
     </Button>
   )
@@ -338,6 +334,7 @@ function DownloadButtonComponent(
   return (
     <>
       <DownloadAction
+        type="icon"
         id={`${id}-icon${isFailed ? `-failed` : ``}`}
         onClick={onClickDownload}
         className={className}
