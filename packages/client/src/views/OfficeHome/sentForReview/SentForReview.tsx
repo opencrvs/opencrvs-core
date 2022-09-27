@@ -231,7 +231,6 @@ class SentForReviewComponent extends React.Component<
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          isBoldLink={true}
           onClick={() =>
             this.isFieldAgent
               ? this.props.goToDeclarationRecordAudit('reviewTab', reg.id)

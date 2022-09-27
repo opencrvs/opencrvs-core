@@ -80,7 +80,6 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface IQueryData {
@@ -249,7 +248,6 @@ export class InProgressComponent extends React.Component<
       const NameComponent = name ? (
         <NameContainer
           id={`name_${index}`}
-          isBoldLink={true}
           onClick={() =>
             this.props.goToDeclarationRecordAudit(
               this.props.selectorId === SELECTOR_ID.hospitalDrafts
@@ -378,7 +376,6 @@ export class InProgressComponent extends React.Component<
       const NameComponent = name ? (
         <NameContainer
           id={`name_${index}`}
-          isBoldLink={true}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
           }

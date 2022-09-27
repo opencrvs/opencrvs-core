@@ -378,7 +378,6 @@ export class SearchResultView extends React.Component<
         const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
         const NameComponent = reg.name ? (
           <NameContainer
-            isBoldLink={true}
             id={`name_${index}`}
             onClick={() =>
               this.props.goToDeclarationRecordAudit('search', reg.id)

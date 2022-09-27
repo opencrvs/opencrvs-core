@@ -19,7 +19,7 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { WaitingToSent } from '@opencrvs/components/lib/icons/WaitingToSent'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Link } from '@opencrvs/components/lib/Link'
 
 const Flex = styled.div`
   display: flex;
@@ -30,7 +30,7 @@ const Flex = styled.div`
   }
 `
 
-export const NameContainer = styled(LinkButton)`
+export const NameContainer = styled(Link)`
   height: auto;
   margin-left: 0;
   div {
