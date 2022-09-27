@@ -58,13 +58,13 @@ export const WithIcon = () => (
 
 export const Icon = () => (
   <Stack>
-    <Button icon size="large" aria-label="View performance data">
+    <Button type="icon" size="large" aria-label="View performance data">
       <Activity />
     </Button>
-    <Button icon size="medium" aria-label="View performance data">
+    <Button type="icon" size="medium" aria-label="View performance data">
       <Activity />
     </Button>
-    <Button icon size="small" aria-label="View performance data">
+    <Button type="icon" size="small" aria-label="View performance data">
       <Activity />
     </Button>
   </Stack>
@@ -109,7 +109,6 @@ Use the `aria-label`-prop when the button's visible text doesn't fully convey th
     args={{
       type: 'primary',
       size: 'medium',
-      icon: false,
       disabled: false,
       loading: false
     }}

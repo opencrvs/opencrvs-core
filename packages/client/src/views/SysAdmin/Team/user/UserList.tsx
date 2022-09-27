@@ -276,9 +276,8 @@ export const Status = (statusProps: IStatusProps) => {
 }
 
 function UserListComponent(props: IProps) {
-  const [showResendSMSSuccess, setShowResendSMSSuccess] =
-    useState<boolean>(false)
-  const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
+  const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
+  const [showResendSMSError, setShowResendSMSError] = useState(false)
   const {
     intl,
     userDetails,
@@ -549,7 +548,7 @@ function UserListComponent(props: IProps) {
           onChangeLocation={(locationId) => {
             props.goToTeamUserList(locationId)
           }}
-          requiredJurisdictionTypes={'CRVS_OFFICE'}
+          requiredLocationTypes={'CRVS_OFFICE'}
         />
       )
       buttons.push(<AddUserIcon id="add-user" onClick={onClickAddUser} />)

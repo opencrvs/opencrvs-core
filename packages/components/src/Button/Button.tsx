@@ -16,8 +16,14 @@ import { Spinner } from '../Spinner'
 import * as styles from './Button.styles'
 
 type ButtonSize = 'small' | 'medium' | 'large'
-type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'positive' | 'negative'
-type ButtonModifier = 'disabled' | 'loading' | 'icon'
+type ButtonType =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'positive'
+  | 'negative'
+  | 'icon'
+type ButtonModifier = 'disabled' | 'loading'
 
 interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
   /** Size of the button */
@@ -52,8 +58,8 @@ const StyledButton = styled.button.withConfig({
   ${(props) => props.variant === 'tertiary' && styles.tertiary}
   ${(props) => props.variant === 'positive' && styles.positive}
   ${(props) => props.variant === 'negative' && styles.negative}
+  ${(props) => props.variant === 'icon' && styles.icon}
 
-  ${(props) => props.icon && styles.icon}
   ${(props) => props.loading && styles.loading}
   ${(props) => props.disabled && styles.disabled}
 `
