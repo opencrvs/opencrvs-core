@@ -50,7 +50,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
         },
         {
           actionComponent: (
-            <Button type="primary" icon>
+            <Button type="icon">
               <Downloaded />
             </Button>
           )
@@ -66,7 +66,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <Button type="primary" icon>
+            <Button type="icon">
               <Download />
             </Button>
           )
@@ -86,7 +86,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
         },
         {
           actionComponent: (
-            <Button type="primary" icon>
+            <Button type="icon">
               <Downloaded />
             </Button>
           )
@@ -106,7 +106,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
         },
         {
           actionComponent: (
-            <Button type="primary" icon>
+            <Button type="icon">
               <Downloaded />
             </Button>
           )
@@ -122,7 +122,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <Button type="primary" icon>
+            <Button type="icon">
               <Download />
             </Button>
           )
@@ -138,7 +138,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <Button type="primary" icon>
+            <Button type="icon">
               <Download />
             </Button>
           )
@@ -154,7 +154,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <Button type="primary" icon>
+            <Button type="icon">
               <Download />
             </Button>
           )
@@ -175,7 +175,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       key: 'event'
     },
     {
-      label: 'Date of Declaration',
+      label: 'Date of declaration',
       width: 20,
       key: 'date_of_declaration'
     },

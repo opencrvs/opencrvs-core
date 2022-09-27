@@ -10,6 +10,7 @@ graphic logo are (registered/a) trademark(s) of Plan International.-->
 
 import { Meta, DocsContainer } from '@storybook/addon-docs'
 import { Pill } from '@opencrvs/components/lib/Pill'
+import { Button } from '@opencrvs/components/lib/Button'
 import { ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
 
@@ -33,17 +34,20 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 
 export const ExternalLinkIcon = () => (
   <svg
-    ariaHidden="true"
-    width="14"
-    focusable="false"
-    role="img"
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 576 512"
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#4972BB"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class="feather feather-external-link"
   >
-    <path
-      fill="currentColor"
-      d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z"
-    ></path>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+    <polyline points="15 3 21 3 21 9"></polyline>
+    <line x1="10" y1="14" x2="21" y2="3"></line>
   </svg>
 )
 
@@ -53,26 +57,7 @@ export const ExternalLinkIcon = () => (
 
 # OpenUI-Kit
 
-OpenUI-Kit provides you with guidelines, components and templates to build new features for OpenCRVS and high-quality branded applications, faster and better.
-
-The guide is a living document created to meet the needs of OpenCRVS front-end developers and designers. If there is a component or pattern you need or you have any other feedback, question or comment please contact us.
-
-<a href="https://github.com/opencrvs/opencrvs-core" target="_blank">
-  <svg
-    height="32"
-    aria-hidden="true"
-    viewBox="0 0 16 16"
-    version="1.1"
-    width="32"
-    data-view-component="true"
-    class="octicon octicon-mark-github v-align-middle"
-  >
-    <path
-      fill-rule="evenodd"
-      d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
-    ></path>
-  </svg>
-</a>
+The OpenCRVS UI-Kit is a collection of guidelines, components and templates to build new features for OpenCRVS and high-quality branded applications faster.
 
 <br />
 <br />
@@ -81,25 +66,15 @@ The guide is a living document created to meet the needs of OpenCRVS front-end d
 
 ---
 
-OpenUI-Kit is available as a Figma library for rapid design and prototyping of web-based applications. It contains all the resources you need to get started consisting of three interconnected libraries of styles, components and templates.
+Use the <a href="https://www.figma.com/file/SsqCzO2eherXXCKyixmli9/OpenCRVS-Design-System-v2-WIP?node-id=0%3A1" target="_blank">Figma OpenUI-Kit <ExternalLinkIcon /></a> for rapid design and prototyping of web-based applications. It contains all the resources you need to get started consisting of three libraries of styles, components, and templates.
 
-<a
-  href="https://www.figma.com/file/SsqCzO2eherXXCKyixmli9/OpenCRVS-Design-System-v2-WIP?node-id=0%3A1"
-  target="_blank"
->
-  Figma OpenUI-Kit <ExternalLinkIcon />
-</a>
-
-<br />
 <br />
 
 ### Accessibility
 
 ---
 
-Accessible design not only helps users with disabilities; it provides a better user experience for everyone. The OpenCRVS team strives to write perceivable, operable, and understandable patterns for all users—including those employing a screen reader or other assistive technology.
-
-OpenCRVS components aim to achieve WCAG 2.1 level. Please refer to the current [status of components](?path=/docs/components-status--page) to review which components are compliant.
+Accessible design not only helps users with disabilities, it provides a better user experience for everyone. The OpenCRVS team strives to write perceivable, understandable, and navigable components and screens for all users (WCAG 2.1). Including those employing a screen reader or other assistive technology.
 
 <br />
 
@@ -107,7 +82,7 @@ OpenCRVS components aim to achieve WCAG 2.1 level. Please refer to the current [
 
 ---
 
-OpenUI-Kit is being developed on <a href="https://github.com/opencrvs/opencrvs-core" target="_blank">GitHub <ExternalLinkIcon /></a>, where pull requests and issues are welcomed to make the component library even better. More information about contributing can be found in the README.
+OpenCRVS UI-Kit is being developed with <a href="https://github.com/opencrvs/opencrvs-core" target="_blank">GitHub <ExternalLinkIcon /></a>, where pull requests and issues are welcomed to make the component library even better. More information about contributing can be found in the README.
 
 <br />
 
@@ -115,6 +90,10 @@ OpenUI-Kit is being developed on <a href="https://github.com/opencrvs/opencrvs-c
 
 ---
 
-If you have any questions or concerns, please feel free to reach out to the Design Team on Slack (#design-system). One of our missions is to build tools to make your job easier and you more successful, so please don't hesitate to reach out.
+One of our missions is to build tools to make your job easier and you more successful. If there is a component or pattern you need or you have any other feedback, question or comment please reach contact us.
+
+jonathan@opencrvs.org
+
+We look forward to building an amazing open source community with you!
 
 <br />
