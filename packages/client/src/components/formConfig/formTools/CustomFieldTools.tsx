@@ -52,8 +52,16 @@ import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
-import { Title, Label, RequiredToggleAction, ToolTip } from './components'
+import {
+  Title,
+  Label,
+  RequiredToggleAction,
+  ToolTip,
+  ConditionalToggleAction,
+  TitleWrapper
+} from './components'
 import { messages } from '@client/i18n/messages/views/formConfig'
+import { Condition } from '@opencrvs/components/lib/icons'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -437,6 +445,46 @@ class CustomFieldToolsComp extends React.Component<
             }
             actions={<RequiredToggleAction {...selectedField} />}
           />
+          <ListViewItemSimplified
+            label={
+              <Label>
+                {intl.formatMessage(
+                  customFieldFormMessages.conditionalFieldLabel
+                )}
+                <ToolTip
+                  label={intl.formatMessage(
+                    messages.conditionalForRegistrationTooltip
+                  )}
+                  id={'conditional-field-label'}
+                />
+              </Label>
+            }
+            actions={<ConditionalToggleAction {...selectedField} />}
+          />
+        </ListViewSimplified>
+      </ListContainer>
+    )
+  }
+
+  conditionalParameters() {
+    const { intl } = this.props
+    return (
+      <ListContainer>
+        <TitleWrapper>
+          <Condition color="grey600" />
+          <Title>
+            {intl.formatMessage(
+              customFieldFormMessages.conditionalFieldHeaderLabel
+            )}
+          </Title>
+        </TitleWrapper>
+        <ListViewSimplified bottomBorder>
+          <ListViewItemSimplified
+            label={intl.formatMessage(
+              customFieldFormMessages.conditionalFieldDesc
+            )}
+            actions={<></>}
+          />
         </ListViewSimplified>
       </ListContainer>
     )
@@ -620,10 +668,11 @@ class CustomFieldToolsComp extends React.Component<
   }
 
   render(): React.ReactNode {
-    const { intl } = this.props
+    const { intl, selectedField } = this.props
     return (
       <>
         {this.toggleButtons()}
+        {selectedField.conditionals ? this.conditionalParameters() : null}
         {this.getLanguageDropDown()}
         {this.inputFields()}
         {this.state.isFieldDuplicate && (

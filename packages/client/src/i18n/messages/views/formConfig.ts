@@ -18,6 +18,7 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   requiredForRegistrationTooltip: MessageDescriptor
+  conditionalForRegistrationTooltip: MessageDescriptor
   contentKeyTooltip: MessageDescriptor
   certHandelbarsTooltip: MessageDescriptor
   showHiddenFields: MessageDescriptor
@@ -134,6 +135,12 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage:
       'Select if this field is mandatory to complete registration',
     description: 'Default tooltip message for required for registration'
+  },
+  conditionalForRegistrationTooltip: {
+    id: 'config.form.tooltip.conditionalForRegistration',
+    defaultMessage:
+      'Select if this field is conditional to complete registration',
+    description: 'Default tooltip message for conditional for registration'
   },
   contentKeyTooltip: {
     id: 'config.form.tooltip.contentKey',

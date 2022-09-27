@@ -54,7 +54,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   maxLength?: number
   fieldName: string
   fieldType: CustomFieldType
-  conditionals: IConditionalConfig[]
+  conditionals?: IConditionalConfig[]
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig

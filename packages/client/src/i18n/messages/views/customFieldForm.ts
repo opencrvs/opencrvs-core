@@ -20,6 +20,9 @@ interface ICustomFieldFormMessages
   customPhoneFieldHeading: MessageDescriptor
   hideFieldLabel: MessageDescriptor
   requiredFieldLabel: MessageDescriptor
+  conditionalFieldHeaderLabel: MessageDescriptor
+  conditionalFieldLabel: MessageDescriptor
+  conditionalFieldDesc: MessageDescriptor
   label: MessageDescriptor
   placeholderLabel: MessageDescriptor
   descriptionLabel: MessageDescriptor
@@ -64,6 +67,22 @@ const messagesToDefine: ICustomFieldFormMessages = {
     id: 'custom.field.form.requiredField',
     defaultMessage: 'Required for registration',
     description: 'Heading of Custom FieldForm'
+  },
+  conditionalFieldHeaderLabel: {
+    id: 'custom.field.form.conditionalFieldHeader',
+    defaultMessage: 'Conditional parameters',
+    description: 'Heading of Custom FieldForm'
+  },
+  conditionalFieldLabel: {
+    id: 'custom.field.form.conditionalField',
+    defaultMessage: 'Conditional field',
+    description: 'Heading of Custom FieldForm'
+  },
+  conditionalFieldDesc: {
+    id: 'custom.field.form.conditionalFieldDesc',
+    defaultMessage:
+      'Select the field and the conditions on which this field should show',
+    description: 'Description of Conditonal Custom FieldForm'
   },
   label: {
     id: 'custom.field.form.label',

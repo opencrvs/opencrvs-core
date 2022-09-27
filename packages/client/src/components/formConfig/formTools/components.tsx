@@ -21,6 +21,12 @@ import {
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import ReactTooltip from 'react-tooltip'
 
+export const TitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
 export const Title = styled.h3`
   margin: 0;
   ${({ theme }) => theme.fonts.h3}
@@ -67,6 +73,25 @@ export function RequiredToggleAction({
         dispatch(
           modifyConfigField(fieldId, {
             required: !required
+          })
+        )
+      }
+    />
+  )
+}
+
+export function ConditionalToggleAction({
+  fieldId,
+  conditionals
+}: ICustomConfigField) {
+  const dispatch = useDispatch()
+  return (
+    <CenteredToggle
+      defaultChecked={!!conditionals}
+      onChange={() =>
+        dispatch(
+          modifyConfigField(fieldId, {
+            conditionals: conditionals ? undefined : []
           })
         )
       }
