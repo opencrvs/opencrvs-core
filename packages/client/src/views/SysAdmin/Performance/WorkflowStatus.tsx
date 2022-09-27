@@ -21,7 +21,11 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToPerformanceHome, goToWorkflowStatus } from '@client/navigation'
+import {
+  goToPerformanceHome,
+  goToWorkflowStatus,
+  goToSearchResult
+} from '@client/navigation'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
@@ -59,7 +63,6 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { goToSearchResult } from '@client/navigation'
 
 type IDispatchProps = {
   goToSearchResult: typeof goToSearchResult
