@@ -27,7 +27,7 @@ import {
 } from '@client/tests/util'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { merge } from 'lodash'
 import * as React from 'react'
 

@@ -11,7 +11,7 @@
  */
 import styled from '@client/styledComponents'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { TextInput } from '@opencrvs/components/lib/forms'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
 
 export const Content = styled.div`
   display: flex;

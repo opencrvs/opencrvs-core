@@ -13,7 +13,7 @@ import React from 'react'
 import styled from '@client/styledComponents'
 import { useDispatch } from 'react-redux'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
-import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
+import { Toggle } from '@opencrvs/components/lib/Toggle'
 import {
   IDefaultConfigField,
   ICustomConfigField

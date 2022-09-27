@@ -9,29 +9,28 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import React from 'react'
+import { DocsContainer } from '@storybook/addon-docs'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
-import { getTheme } from '../src/components/theme'
 import WebFont from 'webfontloader'
+import { getTheme } from '@opencrvs/components/lib/theme'
+
+const theme = getTheme()
 
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:400']
   }
 })
-const language = process.env.VITE_APP_LANGUAGE
-  ? process.env.VITE_APP_LANGUAGE
-  : 'en'
-
 const GlobalStyle = createGlobalStyle`
 html,
 body,
 #__next,
 #__layout,
 #default-layout {
+  font-family: ${theme.fontFamily};
   width: 100%;
   height: 100%;
-  ${({ theme }) => theme.fonts.text}
-  color: ${({ theme }) => theme.colors.neutralD};
   overflow-x: hidden;
   .page-content {
     position: relative;
@@ -40,14 +39,11 @@ body,
       height: 100%;
     }
   }
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: "Noto Sans";
-  }
-  *:not(i) {
-    font-family: "Noto Sans";
+  .os-padding {
+    z-index: 0;
   }
 }
+
 body,
 h1, h2, h3, h4, h5, h6,
 blockquote, p, pre, code,
@@ -64,20 +60,57 @@ fieldset, legend
 }
 `
 export const decorators = [
-  (Story) => (
-    <ThemeProvider theme={getTheme(language)}>
+  (Story, context) => (
+    <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <Story />
+
+      {
+        // Allows adding { parameters: { storyCss: { ... } }} inside stories
+        context?.parameters?.storyCss ? (
+          <div style={context?.parameters?.storyCss}>
+            <Story />
+          </div>
+        ) : (
+          <Story />
+        )
+      }
     </ThemeProvider>
   )
 ]
 
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:400']
+  }
+})
+
 export const parameters = {
+  viewMode: 'docs',
   actions: { argTypesRegex: '^on[A-Z].*' },
   controls: {
     matchers: {
       color: /(background|color)$/i,
       date: /Date$/
+    }
+  },
+  docs: {
+    container: ({ children, context }) => (
+      <DocsContainer context={context}>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </DocsContainer>
+    )
+  },
+  options: {
+    storySort: {
+      order: [
+        'Introduction',
+        'Styles',
+        'Typography',
+        'Layout',
+        'Controls',
+        'Input',
+        'Data'
+      ]
     }
   }
 }

@@ -14,7 +14,7 @@ import styled from '@client/styledComponents'
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { useIntl } from 'react-intl'
 import {

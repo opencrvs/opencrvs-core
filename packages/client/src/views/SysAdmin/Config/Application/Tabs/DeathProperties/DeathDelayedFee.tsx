@@ -22,14 +22,11 @@ import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
-import {
-  FloatingNotification,
-  ListViewItemSimplified,
-  NOTIFICATION_TYPE,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { DeathActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -42,7 +39,7 @@ import {
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
+import { Currency } from '@opencrvs/components/lib/Currency'
 
 export function DeathDelayedFee() {
   const intl = useIntl()
@@ -96,7 +93,7 @@ export function DeathDelayedFee() {
   const item = {
     label: intl.formatMessage(messages.delayedRegistrationLabel),
     value: (
-      <FormattedNumberCurrency
+      <Currency
         value={offlineCountryConfiguration.config.DEATH.FEE.DELAYED}
         currency={offlineCountryConfiguration.config.CURRENCY.isoCode}
         languagesAndCountry={
@@ -175,28 +172,29 @@ export function DeathDelayedFee() {
         </Content>
       </ResponsiveModal>
 
-      <FloatingNotification
-        id={`${id}_notification`}
-        type={
-          notificationStatus === NOTIFICATION_STATUS.SUCCESS
-            ? NOTIFICATION_TYPE.SUCCESS
-            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? NOTIFICATION_TYPE.IN_PROGRESS
-            : NOTIFICATION_TYPE.ERROR
-        }
-        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
-        callback={() => {
-          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
-        }}
-      >
-        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
-          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
-          ? intl.formatMessage(
-              messages.applicationDeathDelayedFeeChangeNotification
-            )
-          : intl.formatMessage(messages.applicationConfigChangeError)}
-      </FloatingNotification>
+      {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
+        <Toast
+          id={`${id}_notification`}
+          type={
+            notificationStatus === NOTIFICATION_STATUS.SUCCESS
+              ? 'success'
+              : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+              ? 'loading'
+              : 'warning'
+          }
+          onClose={() => {
+            setNotificationStatus(NOTIFICATION_STATUS.IDLE)
+          }}
+        >
+          {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+            : notificationStatus === NOTIFICATION_STATUS.SUCCESS
+            ? intl.formatMessage(
+                messages.applicationDeathDelayedFeeChangeNotification
+              )
+            : intl.formatMessage(messages.applicationConfigChangeError)}
+        </Toast>
+      )}
     </>
   )
 }

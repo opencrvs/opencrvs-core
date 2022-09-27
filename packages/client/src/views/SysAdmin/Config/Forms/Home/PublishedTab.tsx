@@ -13,7 +13,7 @@ import React from 'react'
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
@@ -24,7 +24,7 @@ import {
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
 import { Value, DraftVersion } from './components'
-import { Pill } from '@opencrvs/components/lib/interface'
+import { Pill } from '@opencrvs/components/lib/Pill'
 import { isDefaultDraft } from '@client/views/SysAdmin/Config/Forms/utils'
 
 function EventDrafts({ event }: { event: Event }) {

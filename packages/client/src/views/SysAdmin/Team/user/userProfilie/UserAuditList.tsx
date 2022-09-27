@@ -31,18 +31,15 @@ import {
 } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import {
-  LoadingGrey,
-  ColumnContentAlignment,
-  TableView
-} from '@opencrvs/components/lib/interface'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
+import { Table } from '@opencrvs/components/lib/Table'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  IColumn,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import {
@@ -345,18 +342,17 @@ class UserAuditListComponent extends React.Component<Props, State> {
   getLoadingAuditListView(hasError?: boolean) {
     return (
       <>
-        <TableView
+        <Table
           id="loading-audit-list"
           isLoading={true}
           columns={this.getAuditColumns()}
           content={[]}
           noResultText={this.props.intl.formatMessage(messages.noAuditFound)}
-          hideBoxShadow={true}
           hideTableHeader={
             this.state.viewportWidth <= this.props.theme.grid.breakpoints.md
           }
         />
-        {hasError && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+        {hasError && <GenericErrorToast />}
       </>
     )
   }
@@ -404,12 +400,11 @@ class UserAuditListComponent extends React.Component<Props, State> {
                       0
 
                     return (
-                      <TableView
+                      <Table
                         columns={this.getAuditColumns()}
                         content={this.getAuditData(data, user)}
                         noResultText={intl.formatMessage(messages.noAuditFound)}
                         isLoading={loading}
-                        hideBoxShadow={true}
                         hideTableHeader={
                           this.state.viewportWidth <= theme.grid.breakpoints.md
                         }
@@ -419,13 +414,6 @@ class UserAuditListComponent extends React.Component<Props, State> {
                         onPageChange={(currentPage: number) => {
                           this.setCurrentPage(currentPage)
                         }}
-                        loadMoreText={intl.formatMessage(
-                          messages.showMoreAuditList,
-                          {
-                            pageSize: DEFAULT_LIST_SIZE,
-                            totalItems: totalItems
-                          }
-                        )}
                       />
                     )
                   }
