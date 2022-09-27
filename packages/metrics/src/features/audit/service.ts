@@ -4,7 +4,7 @@ import { query, writePoints } from '@metrics/influxdb/client'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import {
   getPractitionerIdFromBundle,
-  getCompositionIdFromCompositionOrTask
+  getCompositionIdFromCompositionOrTask, getTrackingId, getTask
 } from '@metrics/features/registration/fhirUtils'
 
 type UserAuditAction =
@@ -58,7 +58,10 @@ export async function createUserAuditPointFromFHIR(
       action,
       ipAddress,
       userAgent,
-      { compositionId: getCompositionIdFromCompositionOrTask(bundle) }
+      {
+        compositionId: getCompositionIdFromCompositionOrTask(bundle),
+        trackingId: getTrackingId(getTask(bundle)!)
+      }
     )
   ])
 }
