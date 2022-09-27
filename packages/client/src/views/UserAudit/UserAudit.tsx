@@ -130,7 +130,9 @@ export const UserAudit = () => {
     return menuItems
   }
 
-  const transformUserQueryResult = (userData?: GetUserQuery['getUser']) => {
+  const transformUserQueryResult = (
+    userData: NonNullable<GetUserQuery['getUser']>
+  ) => {
     const locale = intl.locale
     return {
       id: userData.id,
@@ -161,7 +163,7 @@ export const UserAudit = () => {
       locationId:
         getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) ||
         '0',
-      avatar: userData.avatar,
+      avatar: userData.avatar || undefined,
       device: userData.device
     }
   }
@@ -187,6 +189,7 @@ export const UserAudit = () => {
             )
             const userRole = getUserRole(user, intl)
             const userType = getUserType(user, intl)
+
             return (
               <Query<GetUserAuditLogQuery>
                 query={GET_USER_AUDIT_LOG}
@@ -198,7 +201,6 @@ export const UserAudit = () => {
                 fetchPolicy={'cache-and-network'}
               >
                 {(auditLogData) => {
-                  console.log(auditLogData)
                   return (
                     <Content
                       title={user.name}
@@ -220,7 +222,93 @@ export const UserAudit = () => {
                         />
                       ]}
                       size={ContentSize.LARGE}
-                    ></Content>
+                    >
+                      <Summary>
+                        <Summary.Row
+                          data-testid="office-link"
+                          label={intl.formatMessage(
+                            userSetupMessages.assignedOffice
+                          )}
+                          value={
+                            <LinkButtonWithoutSpacing
+                              id="office-link"
+                              onClick={() =>
+                                dispatch(
+                                  goToTeamUserList(user.primaryOffice!.id)
+                                )
+                              }
+                            >
+                              {user.primaryOffice &&
+                                user.primaryOffice.displayLabel}
+                            </LinkButtonWithoutSpacing>
+                          }
+                        />
+                        <Summary.Row
+                          label={
+                            (userType &&
+                              intl.formatMessage(userSetupMessages.roleType)) ||
+                            intl.formatMessage(userFormMessages.labelRole)
+                          }
+                          value={
+                            (userType && `${userRole} / ${userType}`) ||
+                            userRole
+                          }
+                        />
+                        <Summary.Row
+                          label={intl.formatMessage(
+                            userSetupMessages.phoneNumber
+                          )}
+                          value={user.number}
+                        />
+                        <Summary.Row
+                          label={intl.formatMessage(userSetupMessages.nid)}
+                          value={user.nid}
+                        />
+                        <Summary.Row
+                          label={intl.formatMessage(userSetupMessages.userName)}
+                          value={user.username}
+                        />
+                        <Summary.Row
+                          label={intl.formatMessage(
+                            userFormMessages.userDevice
+                          )}
+                          value={user.device}
+                        />
+                      </Summary>
+
+                      <UserAuditActionModal
+                        show={modalVisible}
+                        user={userQueryData && userQueryData.getUser}
+                        onClose={() => toggleUserActivationModal()}
+                        onConfirmRefetchQueries={[
+                          {
+                            query: GET_USER,
+                            variables: {
+                              userId: userId
+                            }
+                          }
+                        ]}
+                      />
+                      {showResendSMSSuccess && (
+                        <Toast
+                          id="resend_invite_success"
+                          type="success"
+                          onClose={() => setShowResendSMSSuccess(false)}
+                        >
+                          {intl.formatMessage(sysMessages.resendSMSSuccess)}
+                        </Toast>
+                      )}
+                      {showResendSMSError && (
+                        <Toast
+                          id="resend_invite_error"
+                          type="error"
+                          onClose={() => setShowResendSMSError(false)}
+                        >
+                          {intl.formatMessage(sysMessages.resendSMSError)}
+                        </Toast>
+                      )}
+                      <UserAuditHistory user={user} />
+                    </Content>
                   )
                 }}
               </Query>
