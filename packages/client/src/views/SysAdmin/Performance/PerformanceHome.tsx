@@ -199,7 +199,6 @@ interface State {
   timeStart: Date
   timeEnd: Date
   toggleStatus: boolean
-  queriesLoading: string[]
   officeSelected: boolean
   isAccessibleOffice: boolean
 }
@@ -259,7 +258,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.Birth,
       toggleStatus: false,
-      queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS'],
       officeSelected: this.isOfficeSelected(selectedLocation),
       isAccessibleOffice: this.isAccessibleOfficeSelected(selectedLocation)
     }
@@ -361,16 +359,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     this.props.goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
   }
 
-  markFinished = (query: string) => {
-    this.setState({
-      queriesLoading: this.state.queriesLoading.filter((q) => q !== query)
-    })
-  }
-
-  isQueriesInProgress = () => {
-    return this.state.queriesLoading.length > 0
-  }
-
   isOfficeSelected(selectedLocation?: ISearchLocation) {
     if (selectedLocation) {
       return Object.keys(this.props.offices).some(
@@ -433,8 +421,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   <Query
                     query={PERFORMANCE_METRICS}
                     fetchPolicy="no-cache"
-                    onCompleted={() => this.markFinished('PERFORMANCE_METRICS')}
-                    onError={() => this.markFinished('PERFORMANCE_METRICS')}
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -446,6 +432,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }
                   >
                     {({
+                      loading,
                       error,
                       data
                     }: {
@@ -457,7 +444,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         return <GenericErrorToast />
                       }
 
-                      if (this.isQueriesInProgress()) {
+                      if (loading) {
                         return (
                           <Spinner id="performance-home-loading" size={24} />
                         )
@@ -510,8 +497,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   <Query
                     fetchPolicy="no-cache"
                     query={CORRECTION_TOTALS}
-                    onCompleted={() => this.markFinished('CORRECTION_TOTALS')}
-                    onError={() => this.markFinished('CORRECTION_TOTALS')}
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -535,7 +520,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         return <GenericErrorToast />
                       }
 
-                      if (this.isQueriesInProgress()) {
+                      if (loading) {
                         return null
                       }
                       return (
@@ -546,8 +531,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   <Query
                     fetchPolicy="no-cache"
                     query={GET_TOTAL_PAYMENTS}
-                    onCompleted={() => this.markFinished('GET_TOTAL_PAYMENTS')}
-                    onError={() => this.markFinished('GET_TOTAL_PAYMENTS')}
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -558,11 +541,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         : queryVariablesWithoutLocationId
                     }
                   >
-                    {({ data, error }) => {
+                    {({ loading, data, error }) => {
                       if (error) {
                         return <GenericErrorToast />
                       }
-                      if (this.isQueriesInProgress()) {
+                      if (loading) {
                         return null
                       }
                       if (data && data.getTotalPayments) {

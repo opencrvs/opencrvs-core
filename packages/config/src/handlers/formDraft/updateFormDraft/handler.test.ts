@@ -137,6 +137,21 @@ describe('modifyDraftStatusHandler test', () => {
   })
 
   it('should update form draft status using mongoose', async () => {
+    fetch.mockResponse(
+      JSON.stringify([
+        {
+          status: 'ok'
+        },
+
+        {
+          status: 'ok'
+        }
+      ])
+    )
+    // @ts-ignore
+    jest.spyOn(fhirService, 'fetchFHIR').mockReturnValue(taskBundleMock)
+    // @ts-ignore
+    jest.spyOn(fhirService, 'deleteFHIR').mockReturnValue({ status: 'ok' })
     mockingoose(FormDraft).toReturn(birthMockFormDraft, 'findOne')
     mockingoose(FormDraft).toReturn(birthUpdatedMockFormDraft, 'updateOne')
 

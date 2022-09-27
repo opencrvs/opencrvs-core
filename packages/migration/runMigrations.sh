@@ -1,3 +1,4 @@
+#!/bin/sh
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -7,14 +8,11 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-cluster.name: 'docker-cluster'
-network.host: 0.0.0.0
 
-# minimum_master_nodes need to be explicitly set when bound on a public IP
-# set to 1 to allow single node clusters
-# Details: https://github.com/elastic/elasticsearch/pull/17288
-discovery.zen.minimum_master_nodes: 1
-path.repo: ['/data/backups/elasticsearch']
-discovery.type: single-node
-xpack.security.enabled: true
-xpack.security.authc.api_key.enabled: true
+# hearth migrations
+yarn migrate-mongo up --file migrate-mongo-config-hearth.js
+yarn migrate-mongo status --file migrate-mongo-config-hearth.js
+
+#openhim migrations
+yarn migrate-mongo up --file migrate-mongo-config-openhim.js
+yarn migrate-mongo status --file migrate-mongo-config-openhim.js

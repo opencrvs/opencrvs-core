@@ -24,9 +24,11 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 export function Password() {
   const intl = useIntl()
+  const isOnline = useOnlineStatus()
   const [showModal, setShowModal] = React.useState(false)
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState(false)
@@ -57,6 +59,7 @@ export function Password() {
           <DynamicHeightLinkButton
             id="BtnChangePassword"
             onClick={togglePasswordChangeModal}
+            disabled={!isOnline}
           >
             {intl.formatMessage(buttonMessages.change)}
           </DynamicHeightLinkButton>
