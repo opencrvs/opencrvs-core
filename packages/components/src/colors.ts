@@ -69,44 +69,55 @@ export const shadows = {
 export const colors = {
   ...config,
 
-  primaryDark: darken(0.2)(config.primary),
+  primaryDarker: darken(0.2)(config.primary),
+  primaryDark: darken(0.1)(config.primary),
   primaryLight: lighten(0.2)(config.primary),
   primaryLighter: lighten(0.4)(config.primary),
 
-  purpleDark: darken(0.2)(config.purple),
+  purpleDarker: darken(0.2)(config.purple),
+  purpleDark: darken(0.1)(config.purple),
   purpleLight: lighten(0.2)(config.purple),
   purpleLighter: lighten(0.4)(config.purple),
 
-  orangeDark: darken(0.2)(config.orange),
+  orangeDarker: darken(0.2)(config.orange),
+  orangeDark: darken(0.1)(config.orange),
   orangeLight: lighten(0.2)(config.orange),
   orangeLighter: lighten(0.3)(config.orange),
 
-  redDark: darken(0.2)(config.red),
+  redDarker: darken(0.2)(config.red),
+  redDark: darken(0.1)(config.red),
   redLight: lighten(0.2)(config.red),
   redLighter: lighten(0.4)(config.red),
 
-  greenDark: darken(0.2)(config.green),
+  greenDarker: darken(0.2)(config.green),
+  greenDark: darken(0.1)(config.green),
   greenLight: lighten(0.2)(config.green),
   greenLighter: lighten(0.4)(config.green),
 
-  blueDark: darken(0.2)(config.blue),
+  blueDarker: darken(0.2)(config.blue),
+  blueDark: darken(0.1)(config.blue),
   blueLight: lighten(0.2)(config.blue),
   blueLighter: lighten(0.35)(config.blue),
 
-  tealDark: darken(0.2)(config.teal),
+  tealDarker: darken(0.2)(config.teal),
+  tealDark: darken(0.1)(config.teal),
   tealLight: lighten(0.2)(config.teal),
   tealLighter: lighten(0.4)(config.teal),
 
-  yellowDark: darken(0.2)(config.yellow),
+  yellowDarker: darken(0.2)(config.yellow),
+  yellowDark: darken(0.1)(config.yellow),
   yellowLight: lighten(0.2)(config.yellow),
   yellowLighter: lighten(0.3)(config.yellow),
 
-  positiveDark: darken(0.2)(config.positive),
+  positiveDarker: darken(0.2)(config.positive),
+  positiveDark: darken(0.1)(config.positive),
   positiveLight: lighten(0.2)(config.positive),
 
-  neutralDark: darken(0.2)(config.neutral),
+  neutralDarker: darken(0.2)(config.neutral),
+  neutralDark: darken(0.1)(config.neutral),
 
-  negativeDark: darken(0.2)(config.negative),
+  negativeDarker: darken(0.2)(config.negative),
+  negativeDark: darken(0.1)(config.negative),
   negativeLight: lighten(0.2)(config.negative)
 }
 

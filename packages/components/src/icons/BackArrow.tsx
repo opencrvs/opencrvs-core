@@ -22,14 +22,14 @@ export const BackArrow = (props: React.HTMLAttributes<SVGElement>) => (
   >
     <path
       d="M20 12H4"
-      stroke="currentColor"
+      stroke="#4972BB"
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M10 18L4 12L10 6"
-      stroke="currentColor"
+      stroke="#4972BB"
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"

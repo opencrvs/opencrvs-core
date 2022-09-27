@@ -42,6 +42,7 @@ import {
 import { buttonMessages, errorMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
+  formatUrl,
   goBack,
   goToHomeTab,
   goToPrintCertificate,
@@ -49,7 +50,10 @@ import {
   goToReviewCertificate,
   goToVerifyCollector
 } from '@client/navigation'
-import { CERTIFICATE_COLLECTOR } from '@client/navigation/routes'
+import {
+  CERTIFICATE_COLLECTOR,
+  REGISTRAR_HOME_TAB
+} from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
 import { gqlToDraftTransformer } from '@client/transformer'
@@ -71,7 +75,7 @@ import { flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -354,54 +358,14 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       declaration
     )
     const declarationToBeCertified = declaration
-
-    if (
-      !declarationToBeCertified ||
-      !declarationToBeCertified.data.registration.regStatus
-    ) {
+    if (!declarationToBeCertified) {
       return (
-        <QueryProvider
-          event={event}
-          action={DownloadAction.LOAD_CERTIFICATE_DECLARATION}
-          payload={{ id: declarationId }}
-          fetchPolicy="no-cache"
-        >
-          <QueryContext.Consumer>
-            {({ loading, error, data, dataKey }) => {
-              if (loading) {
-                return <StyledSpinner id="print-certificate-spinner" />
-              }
-              if (error) {
-                Sentry.captureException(error)
-
-                return (
-                  <ErrorText id="print-certificate-queue-error-text">
-                    {intl.formatMessage(errorMessages.printQueryError)}
-                  </ErrorText>
-                )
-              }
-              if (data) {
-                const retrievedData = data[dataKey as keyof typeof data]
-                const transformedData: IFormData = gqlToDraftTransformer(
-                  registerForm,
-                  retrievedData
-                )
-
-                const newDeclarationToBeCertified = createReviewDeclaration(
-                  declarationId,
-                  transformedData,
-                  event
-                )
-
-                if (declarationToBeCertified) {
-                  this.props.modifyDeclaration(newDeclarationToBeCertified)
-                } else {
-                  this.props.storeDeclaration(newDeclarationToBeCertified)
-                }
-              }
-            }}
-          </QueryContext.Consumer>
-        </QueryProvider>
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToPrint,
+            selectorId: ''
+          })}
+        />
       )
     }
     return (
