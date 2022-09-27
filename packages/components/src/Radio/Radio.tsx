@@ -102,7 +102,6 @@ export class Radio extends React.Component<IRadio> {
       <Wrapper>
         <Input
           {...this.props}
-          role="radio"
           checked={value === selected}
           type="radio"
           name={name}

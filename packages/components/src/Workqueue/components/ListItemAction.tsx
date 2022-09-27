@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ExpansionButton } from '../../buttons/ExpansionButton'
 import { ArrowExpansionButton } from '../../buttons/ArrowExpansionButton'
-import { PrimaryButton } from '../../buttons/PrimaryButton'
+import { Button } from '../../Button'
 import { ColumnContentAlignment, IAction } from '../../common-types'
 import { IActionComponent } from '..'
 const Container = styled.div`
@@ -46,7 +46,7 @@ const ListItemActionsContainer = styled.div<{
     }
   }};
 `
-const ListItemSingleAction = styled(PrimaryButton)<{
+const ListItemSingleAction = styled(Button)<{
   isFullHeight?: boolean
 }>`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
@@ -110,15 +110,15 @@ export function ListItemAction(props: IListItemActionProps) {
               </ActionButtonContainer>
             ) : (
               <ListItemSingleAction
+                type="primary"
                 isFullHeight={isFullHeight}
                 key={action.label as string}
                 id={`${id}-${action.label as string}`}
                 size={'medium'}
                 onClick={action.handler}
-                icon={action.icon}
                 disabled={action.disabled}
               >
-                {action.label}
+                {action.icon} {action.label}
               </ListItemSingleAction>
             )
           )}
