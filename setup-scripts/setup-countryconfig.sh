@@ -64,6 +64,14 @@ echo
 yarn db:clear:all
 yarn db:backup:restore
 echo
+echo -e "\033[32m::::::::::::::::::::: Running migration scripts :::::::::::::::::::::\033[0m"
+echo
+cd $PATH_TO_OPEN_CRVS_CORE_DIRECTORY/packages/migration
+bash runMigrations.sh
+echo
 echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::::::::::::::::\033[0m"
 echo
+cd $PATH_TO_OPEN_CRVS_CORE_DIRECTORY
+cd ../
+cd opencrvs-farajaland
 yarn start
