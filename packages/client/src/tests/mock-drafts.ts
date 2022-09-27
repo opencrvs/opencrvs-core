@@ -248,6 +248,7 @@ const informantDetailsForDeath = {
   informantID: '951951951',
   firstNamesEng: 'Lesley',
   familyNameEng: 'Styles',
+  informantBirthDate: '1996-01-01',
   primaryAddressSameAsOtherPrimary: true,
   primaryAddress: '',
   countryPrimary: 'FAR',

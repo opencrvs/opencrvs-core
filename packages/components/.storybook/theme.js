@@ -21,8 +21,8 @@ export default create({
   base: 'light',
   colorPrimary: BRAND_BLUE,
   colorSecondary: BRAND_BLUE,
-  brandTitle: 'OpenCRVS Design System',
-  brandUrl: 'https://opencrvs.org',
+  brandTitle: 'OpenUi-Kit',
+  brandUrl: '/',
   brandImage: 'logo.png',
   brandTarget: '_self',
   fontBase: theme.fontFamily

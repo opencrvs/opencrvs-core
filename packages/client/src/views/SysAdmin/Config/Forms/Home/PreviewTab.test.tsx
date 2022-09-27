@@ -46,7 +46,7 @@ function WrappedPreviewTab() {
 const inPreviewDraft: IFormDraft = {
   event: Event.Birth,
   status: DraftStatus.InPreview,
-  version: 1,
+  version: 0,
   history: [],
   updatedAt: Date.now(),
   createdAt: Date.now()

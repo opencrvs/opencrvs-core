@@ -40,7 +40,8 @@ export const base = css`
   }
 
   &:focus-visible {
-    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.yellow};
+    background: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.grey600};
   }
 `
 
@@ -52,8 +53,7 @@ export const primary = ({ loading }: { loading?: boolean }) => css`
     background: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
-    background-color: ${({ theme }) => theme.colors.primaryDark};
-    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.primaryLight};
+    background-color: ${({ theme }) => theme.colors.primaryDarker};
   }
 
   ${loading &&
@@ -67,31 +67,31 @@ export const secondary = css`
   color: ${({ theme }) => theme.colors.primary};
 
   &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
     border: 2px solid ${({ theme }) => theme.colors.primaryDark};
     color: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
-    color: ${({ theme }) => theme.colors.primaryDark};
-    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.primaryLight};
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDarker};
+  }
+  &:focus-visible {
+    border: 2px solid ${({ theme }) => theme.colors.grey600};
+    background: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.grey600};
   }
 `
 
 export const tertiary = css`
-  ${({ theme }) => theme.fonts.bold14};
-
-  height: 32px;
-  padding: 0 8px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.primary};
 
   &:hover {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${({ theme }) => theme.colors.grey100};
     color: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
     background: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.primaryDark};
-    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.primaryLighter};
   }
 `
 
@@ -103,8 +103,7 @@ export const positive = css`
     background: ${({ theme }) => theme.colors.positiveDark};
   }
   &:active {
-    background-color: ${({ theme }) => theme.colors.positiveDark};
-    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.positiveLight};
+    background-color: ${({ theme }) => theme.colors.positiveDarker};
   }
 `
 
@@ -116,8 +115,25 @@ export const negative = css`
     background: ${({ theme }) => theme.colors.negativeDark};
   }
   &:active {
-    background-color: ${({ theme }) => theme.colors.negativeDark};
-    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.negativeLight};
+    background-color: ${({ theme }) => theme.colors.negativeDarker};
+  }
+`
+
+export const icon = css`
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.primary};
+  border-radius: 100%;
+  aspect-ratio: 1 / 1;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+  }
+  svg {
+    margin-left: -8px;
+    margin-right: -8px;
   }
 `
 
@@ -125,11 +141,11 @@ export const small = ({ loading }: { loading?: boolean }) => css`
   ${({ theme }) => theme.fonts.bold14};
 
   height: 32px;
-  padding: 0 12px;
+  padding: 8px;
 
   svg {
-    height: 20px;
-    width: 20px;
+    height: 18px;
+    width: 18px;
     margin-right: 6px;
     margin-left: -1px;
   }
@@ -145,41 +161,21 @@ export const small = ({ loading }: { loading?: boolean }) => css`
 
 export const medium = css`
   height: 40px;
-  padding: 0 16px;
+  padding: 0 12px;
 
   svg {
-    height: 24px;
-    width: 24px;
+    height: 20px;
+    width: 20px;
   }
 `
 
 export const large = css`
   height: 48px;
-  padding: 0 20px;
+  padding: 0 16px;
 
   svg {
     height: 24px;
     width: 24px;
-  }
-`
-
-export const icon = css`
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.primary};
-  border-radius: 100%;
-  aspect-ratio: 1 / 1;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.primaryDark};
-  }
-  &:active {
-    background: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.primaryDark};
-  }
-  svg {
-    margin-left: -8px;
-    margin-right: -8px;
   }
 `
 
