@@ -14,7 +14,8 @@ import { fonts, IFont } from '../fonts'
 import { colors, IColor } from '../colors'
 import styled from 'styled-components'
 
-export interface LinkProps extends React.HTMLAttributes<HTMLButtonElement> {
+export interface LinkProps
+  extends React.HTMLProps<HTMLAnchorElement | HTMLButtonElement> {
   /** Typographic variant. Defines how the text looks like */
   font?: IFont
   /** Element the button renders as */
@@ -25,7 +26,7 @@ export interface LinkProps extends React.HTMLAttributes<HTMLButtonElement> {
   disabled?: boolean
 }
 
-const StyledLink = styled.a<{ $font: IFont; $color: IColor }>`
+const StyledLink = styled.button<{ $font: IFont; $color: IColor }>`
   ${({ $font }) => fonts[$font]};
   ${({ $color }) => `color: ${colors[$color]};`}
   cursor: pointer;
@@ -58,10 +59,11 @@ const StyledLink = styled.a<{ $font: IFont; $color: IColor }>`
 `
 
 export const Link = ({
-  element = 'button',
+  element,
   font = 'bold16',
   color = 'primary',
   ...props
 }: LinkProps) => (
-  <StyledLink $font={font} $color={color} as={element} {...props} />
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  <StyledLink $font={font} $color={color} as={element as any} {...props} />
 )

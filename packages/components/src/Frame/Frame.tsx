@@ -13,6 +13,10 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Layout, LayoutCentered } from './components/Layout'
 import { Section } from './components/Section'
+import {
+  SkipToContent,
+  MAIN_CONTENT_ANCHOR_ID
+} from './components/SkipToContent'
 
 export interface IFrameProps {
   /** Accepts a header component that will be rendered at the top-most portion of an application frame */
@@ -50,9 +54,12 @@ const FrameMainContent = styled.main`
 export function Frame({ header, navigation, children }: IFrameProps) {
   return (
     <FrameGrid>
+      <SkipToContent />
       <FrameNavigation>{navigation}</FrameNavigation>
       <FrameHeader>{header}</FrameHeader>
-      <FrameMainContent>{children}</FrameMainContent>
+      <FrameMainContent id={MAIN_CONTENT_ANCHOR_ID}>
+        {children}
+      </FrameMainContent>
     </FrameGrid>
   )
 }
