@@ -248,14 +248,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           key: 'actionDescription',
           sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.ACTION)
         },
-        {
-          label: intl.formatMessage(messages.auditEventTypeColumnTitle),
-          width: 15,
-          isSortable: true,
-          icon: <ArrowDownBlue />,
-          key: 'eventType',
-          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.EVENT)
-        },
+
         {
           label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
           width: 15,
