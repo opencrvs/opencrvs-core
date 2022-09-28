@@ -339,6 +339,8 @@ mkdir -p data/mongo
 chmod 775 data/mongo
 mkdir -p data/influxdb
 chmod 775 data/influxdb
+mkdir -p data/minio
+chmod 775 data/minio
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
