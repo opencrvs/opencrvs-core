@@ -731,7 +731,7 @@ const transformAddressTemplateArray = (
   ] = addressName
 
   transformedData[sectionId][camelCase(`${nameKey}_${addressLocationLevel}`)] =
-    addressName
+    addressName as string | Record<string, string>
 }
 
 export const addressOfflineTransformer =

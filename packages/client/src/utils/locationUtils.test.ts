@@ -13,7 +13,8 @@ import { mockOfflineData } from '@client/tests/util'
 import {
   filterLocations,
   generateLocationName,
-  getJurisidictionType
+  getJurisidictionType,
+  getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
 import { LocationType } from '@client/offline/reducer'
 import { createIntl } from 'react-intl'
@@ -145,5 +146,55 @@ describe('locationUtil tests', () => {
       messages: language.messages
     })
     expect(generateLocationName(undefined, intl)).toEqual('')
+  })
+  describe('getLocationNameMapOfFacility()', () => {
+    const locations = {
+      'f244b79e-16e7-40b2-834f-c1c57bd7eae8': {
+        id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
+        name: 'Abwe',
+        alias: 'Abwe',
+        physicalType: 'Jurisdiction',
+        jurisdictionType: 'DISTRICT',
+        type: 'ADMIN_STRUCTURE',
+        partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
+      },
+      'ecc5a78b-e7d9-4640-ac65-e591a6a9590f': {
+        id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
+        name: 'Ibombo',
+        alias: 'Ibombo',
+        physicalType: 'Jurisdiction',
+        jurisdictionType: 'DISTRICT',
+        type: 'ADMIN_STRUCTURE',
+        partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
+      },
+      'df669feb-61a3-4984-ab24-4b28511b472a': {
+        id: 'df669feb-61a3-4984-ab24-4b28511b472a',
+        name: 'Central',
+        alias: 'Central',
+        physicalType: 'Jurisdiction',
+        jurisdictionType: 'STATE',
+        type: 'ADMIN_STRUCTURE',
+        partOf: 'Location/0'
+      }
+    }
+    it('returns a mapping object of jurisdictionType vs name of a given facility', () => {
+      const facilityLocation = {
+        id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
+        name: 'ARK Private Clinic',
+        alias: 'ARK Private Clinic',
+        address: '',
+        physicalType: 'Building',
+        type: 'HEALTH_FACILITY',
+        partOf: 'Location/f244b79e-16e7-40b2-834f-c1c57bd7eae8'
+      }
+
+      const map = getLocationNameMapOfFacility(facilityLocation, locations)
+      expect(map).toEqual({
+        DISTRICT: 'Abwe',
+        STATE: 'Central',
+        country: undefined,
+        facility: 'ARK Private Clinic'
+      })
+    })
   })
 })
