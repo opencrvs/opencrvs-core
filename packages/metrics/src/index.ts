@@ -16,4 +16,14 @@ import '@opencrvs/commons/monitoring'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import { createServer } from '@metrics/server'
-createServer().then((server) => server.start())
+import { PRODUCTION } from './constants'
+
+createServer().then((server) => {
+  server.start().catch((err) => {
+    if (PRODUCTION) {
+      throw err
+    }
+    // This causes Nodemon to restart the server
+    process.kill(process.pid, 'SIGUSR2')
+  })
+})
