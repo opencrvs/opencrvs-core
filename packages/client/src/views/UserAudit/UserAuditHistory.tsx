@@ -60,6 +60,7 @@ import { ICurrency } from '@client/utils/referenceApi'
 import { RouteComponentProps } from 'react-router'
 import { IUserDetails } from '@client/utils/userUtils'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
+import { NameContainer } from '../OfficeHome/components'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -352,11 +353,11 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
 
       return {
         actionDescription: (
-          <InformationTitle>
+          <NameContainer isBoldLink={true}>
             {(actionDescriptor &&
               this.props.intl.formatMessage(actionDescriptor)) ||
               ''}
-          </InformationTitle>
+          </NameContainer>
         ),
         actionDescriptionString: actionDescriptor
           ? this.props.intl.formatMessage(actionDescriptor)
