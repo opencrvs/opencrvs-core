@@ -12,7 +12,7 @@
 
 import { logger } from '@user-mgnt/logger'
 import System, { ISystemModel } from '@user-mgnt/model/system'
-import User, { IUserModel } from '@user-mgnt/model/user'
+import User, { IUserModel, IUserName } from '@user-mgnt/model/user'
 import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
 import { statuses, systemScopeMapping } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
@@ -27,7 +27,6 @@ import {
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { IUserName } from '@user-mgnt/model/user'
 
 interface IRegisterSystemPayload {
   name: IUserName[]
