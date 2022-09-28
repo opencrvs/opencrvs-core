@@ -338,6 +338,7 @@ function DownloadButtonComponent(
         id={`${id}-icon${isFailed ? `-failed` : ``}`}
         onClick={onClickDownload}
         className={className}
+        aria-label={intl.formatMessage(constantsMessages.assignRecord)}
       >
         {status === DOWNLOAD_STATUS.DOWNLOADED ? (
           <Downloaded />

@@ -600,6 +600,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'A label from the review button',
     id: 'constants.review'
   },
+  assignRecord: {
+    defaultMessage: 'Assign record',
+    description: 'A label for the Assign record -button',
+    id: 'constants.assignRecord'
+  },
   search: {
     defaultMessage: 'Search',
     description: 'The title of the page',
