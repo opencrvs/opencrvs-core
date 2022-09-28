@@ -185,7 +185,7 @@ class OfficeHomeView extends React.Component<
           pageId !== inProgressTab
         ) {
           this.props.updateWorkqueuePagination({ inProgressTab: pageId })
-          this.syncWorkqueue()
+          this.updateWorkqueue()
         } else if (
           selectorId === SELECTOR_ID.hospitalDrafts &&
           pageId !== notificationTab
@@ -193,13 +193,13 @@ class OfficeHomeView extends React.Component<
           this.props.updateWorkqueuePagination({
             notificationTab: pageId
           })
-          this.syncWorkqueue()
+          this.updateWorkqueue()
         } else if (
           selectorId === SELECTOR_ID.ownDrafts &&
           pageId !== this.state.draftCurrentPage
         ) {
           this.setState({ draftCurrentPage: pageId }, () => {
-            this.syncWorkqueue()
+            this.updateWorkqueue()
           })
         }
       }
@@ -207,7 +207,7 @@ class OfficeHomeView extends React.Component<
         this.props.updateWorkqueuePagination({
           [WORKQUEUE_TABS_PAGINATION[tabId]]: pageId
         })
-        this.syncWorkqueue()
+        this.updateWorkqueue()
       }
     }
   }
