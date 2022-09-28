@@ -788,7 +788,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 {error && <GenericErrorToast />}
                 {total > pageSize && (
                   <Pagination
-                    initialPage={currentPageNumber}
+                    currentPage={currentPageNumber}
                     totalPages={Math.ceil(total / pageSize)}
                     onPageChange={onPageChange}
                   />

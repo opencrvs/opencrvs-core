@@ -28,7 +28,7 @@ export default {
 const Template: Story<IPaginationProps> = (args) => <Pagination {...args} />
 export const PaginationView = Template.bind({})
 PaginationView.args = {
-  initialPage: 1,
+  currentPage: 1,
   totalPages: 10,
   onPageChange: (pageNo: number) => alert(`${pageNo}`)
 }
