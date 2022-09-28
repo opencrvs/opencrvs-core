@@ -44,6 +44,7 @@ interface IUserSetupMessages
   auditSectionTitle: MessageDescriptor
   auditActionColumnTitle: MessageDescriptor
   auditTrackingIDColumnTitle: MessageDescriptor
+  auditDeviceIpAddressColumnTitle: MessageDescriptor
   auditEventTypeColumnTitle: MessageDescriptor
   auditDateColumnTitle: MessageDescriptor
   noAuditFound: MessageDescriptor
@@ -215,6 +216,11 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Record',
     description: 'Title for audit tracking id column',
     id: 'user.profile.audit.column.trackingId'
+  },
+  auditDeviceIpAddressColumnTitle: {
+    defaultMessage: 'Device/IP Address',
+    description: 'Title for audit Device/IP Address column',
+    id: 'user.profile.audit.column.deviceIPAddress'
   },
   auditEventTypeColumnTitle: {
     defaultMessage: 'Event',
