@@ -438,6 +438,9 @@ export class SearchResultView extends React.Component<
           />
         }
         navigation={<Navigation />}
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
       >
         {searchText && searchType && (
           <Query<SearchEventsQuery>
