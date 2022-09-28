@@ -39,7 +39,7 @@
 
     - name: 'Add docker repository'
       apt_repository:
-        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} edge'
+        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable'
         state: present
         update_cache: yes
 
@@ -204,7 +204,7 @@
         state: directory
         group: 1000
         owner: 1000
-        mode: g+rwx
+        mode: ugo+rwx
 
     - name: 'Create minio backup directory'
       file:
@@ -212,7 +212,7 @@
         state: directory
         group: 1000
         owner: 1000
-        mode: g+rwx
+        mode: ugo+rwx
 
     - name: 'Install UFW'
       apt:

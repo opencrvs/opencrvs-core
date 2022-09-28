@@ -2059,29 +2059,23 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
         [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ],
         [
           JSON.stringify({
             refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
           })
         ]
-      )
-      fetch.mockResponseOnce([
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
-        })
-      ])
-      fetch.mockResponse(
-        JSON.stringify({
-          refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
-        })
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const result = await resolvers.Mutation.markBirthAsCertified(
@@ -2100,7 +2094,6 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
         [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)]
       )
@@ -2161,25 +2154,25 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
         [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ],
         [
           JSON.stringify({
             refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
           })
         ]
       )
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Task/12423/_history/1' }
-            }
-          ]
-        })
-      )
+
       const result = await resolvers.Mutation.markDeathAsCertified(
         {},
         { details },

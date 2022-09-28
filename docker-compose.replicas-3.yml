@@ -35,6 +35,16 @@ services:
       - mongo2
       - mongo3
 
+  migration:
+    environment:
+      - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/hearth-dev?replicaSet=rs0
+      - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/openhim-dev?replicaSet=rs0
+      - WAIT_HOSTS=mongo1:27017,mongo2:27017,mongo3:27017,influxdb:8086
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+
   openhim-core:
     environment:
       - mongo_url=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/openhim-dev?replicaSet=rs0

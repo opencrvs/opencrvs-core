@@ -45,7 +45,7 @@
 
     - name: 'Add docker repository'
       apt_repository:
-        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} edge'
+        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable'
         state: present
         update_cache: yes
 
@@ -200,13 +200,26 @@
         owner: 1000
         mode: ugo+rwx
 
+    - name: 'Create influxdb data directory'
+      file:
+        path: /data/influxdb
+        state: directory
+
+    - name: 'Create influxdb backup directory'
+      file:
+        path: /data/backups/influxdb
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
     - name: 'Create minio data directory'
       file:
         path: /data/minio
         state: directory
         group: 1000
         owner: 1000
-        mode: g+rwx
+        mode: ugo+rwx
 
     - name: 'Create minio backup directory'
       file:
@@ -214,7 +227,7 @@
         state: directory
         group: 1000
         owner: 1000
-        mode: g+rwx
+        mode: ugo+rwx
 
     - name: 'Install UFW'
       apt:
@@ -292,19 +305,6 @@
         name: vm.max_map_count
         value: 262144
         state: present
-
-    - name: 'Create influxdb data directory'
-      file:
-        path: /data/influxdb
-        state: directory
-
-    - name: 'Create influxdb backup directory'
-      file:
-        path: /data/backups/influxdb
-        state: directory
-        group: 1000
-        owner: 1000
-        mode: g+rwx
 
     - name: 'Create acme file for traefik'
       file:

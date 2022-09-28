@@ -49,7 +49,8 @@ services:
       - '9000:9000'
       - '9001:9001'
     volumes:
-      - './data/minio:/usr/share/minio/data'
+      - './data/minio:/data/minio'
+      - './data/backups/minio:/data/backups/minio'
     command: server --address ":9000" --console-address ":9001" /data/minio
 
   # elasticsearch browser.  Uncomment during development, along with the environment variables for elastic above, to browse Elastic via a GUI at http://localhost:1358/
