@@ -23,7 +23,9 @@ import {
   newDeclarationHandler,
   registrarRegistrationWaitingExternalValidationHandler,
   requestForRegistrarValidationHandler,
-  requestCorrectionHandler
+  requestCorrectionHandler,
+  declarationAssignedHandler,
+  declarationUnassignedHandler
 } from '@metrics/features/registration/handler'
 import {
   metricsDeleteMeasurementHandler,
@@ -246,6 +248,23 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/death/request-correction',
       handler: requestCorrectionHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    // Event assigned / unassigned
+    {
+      method: 'POST',
+      path: '/events/assigned',
+      handler: declarationAssignedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/unassigned',
+      handler: declarationUnassignedHandler,
       config: {
         tags: ['api']
       }

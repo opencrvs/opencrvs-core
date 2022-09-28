@@ -473,3 +473,18 @@ export async function requestCorrectionHandler(
   }
   return h.response().code(200)
 }
+
+export async function declarationAssignedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ASSIGNED', request)
+  return h.response().code(200)
+}
+export async function declarationUnassignedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('UNASSIGNED', request)
+  return h.response().code(200)
+}

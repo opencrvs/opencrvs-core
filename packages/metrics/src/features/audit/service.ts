@@ -24,6 +24,8 @@ type UserAuditAction =
   | 'REJECTED'
   | 'CORRECTED'
   | 'VALIDATED'
+  | 'ASSIGNED'
+  | 'UNASSIGNED'
 
 type RawUserAuditDataPoint = {
   practitionerId: number
@@ -52,6 +54,8 @@ type UserAuditDataPoint =
   | UserAuditDataPointWithComposition<'REJECTED'>
   | UserAuditDataPointWithComposition<'CORRECTED'>
   | UserAuditDataPointWithComposition<'VALIDATED'>
+  | UserAuditDataPointWithComposition<'ASSIGNED'>
+  | UserAuditDataPointWithComposition<'UNASSIGNED'>
 
 export async function createUserAuditPointFromFHIR(
   action: UserAuditAction,
