@@ -91,6 +91,11 @@ const RecentActionsHolder = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
+const AlignedDateRangePicker = styled(DateRangePicker)`
+  position: absolute;
+  bottom: 10px;
+`
+
 const SectionTitle = styled.div`
   ${({ theme }) => theme.fonts.h2};
   margin-bottom: 10px;
@@ -497,7 +502,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
               <SectionTitle>
                 {intl.formatMessage(messages.auditSectionTitle)}
               </SectionTitle>
-              <DateRangePicker
+              <AlignedDateRangePicker
                 startDate={timeStart}
                 endDate={timeEnd}
                 onDatesChange={({ startDate, endDate }) => {

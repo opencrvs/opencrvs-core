@@ -89,6 +89,7 @@ function isPresetNavButton(button: IPresetButton): button is IPresetNavButton {
 
 interface IDateRangePickerProps extends WrappedComponentProps, IDateRange {
   onDatesChange: ({ startDate, endDate }: IDateRange) => void
+  className?: string
 }
 
 interface PresetSelectorProps {
@@ -667,10 +668,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
       </PickerButton>
       {modalVisible && (
         <>
-          <ModalContainer
-            style={{ position: 'absolute', top: 20 }}
-            id="picker-modal"
-          >
+          <ModalContainer className={props.className} id="picker-modal">
             <ModalHeader hide={routes[activeRoute].hideHeader}>
               <TitleContent>
                 <CalendarGrey />
