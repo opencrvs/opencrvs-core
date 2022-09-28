@@ -33,17 +33,15 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  Select,
-  TextArea,
-  TextInput
-} from '@opencrvs/components/lib/forms'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { Select } from '@opencrvs/components/lib/Select'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { camelCase, debounce } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
@@ -107,7 +105,7 @@ const ListRow = styled.div`
 
 const LanguageSelect = styled(Select)`
   width: 175px;
-  border: solid 2px ${({ theme }) => theme.colors.indigoDark};
+  border: solid 2px ${({ theme }) => theme.colors.primaryDark};
   border-radius: 2px;
   .react-select__control {
     max-height: 32px;
@@ -118,7 +116,7 @@ const LanguageSelect = styled(Select)`
   }
   div {
     ${({ theme }) => theme.fonts.reg14};
-    color: ${({ theme }) => theme.colors.indigoDark};
+    color: ${({ theme }) => theme.colors.primaryDark};
   }
 `
 

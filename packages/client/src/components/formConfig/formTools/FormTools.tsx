@@ -18,7 +18,7 @@ import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ListViewItemSimplified,
   ListViewSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import React from 'react'
 import { useIntl, MessageDescriptor } from 'react-intl'
 import { useDispatch } from 'react-redux'

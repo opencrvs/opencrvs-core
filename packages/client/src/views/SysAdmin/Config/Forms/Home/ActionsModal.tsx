@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React, { useContext } from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { useIntl, MessageDescriptor } from 'react-intl'
 import {
   actionsModalTitleMessages,

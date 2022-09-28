@@ -13,7 +13,7 @@ import React from 'react'
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
@@ -25,7 +25,8 @@ import {
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ToggleMenu, Pill } from '@opencrvs/components/lib/interface'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+import { Pill } from '@opencrvs/components/lib/Pill'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { goToFormConfigWizard } from '@client/navigation'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'

@@ -11,10 +11,7 @@
  */
 import { RegRatesLineChart } from '@client/components/charts/RegRatesLineChart'
 import { DateRangePicker } from '@client/components/DateRangePicker'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/utils/gateway'
@@ -45,10 +42,7 @@ import {
 } from './queries'
 import { CompletenessDataTable } from './reports/completenessRates/CompletenessDataTable'
 import { useCallback } from 'react'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import format from '@client/utils/date-formatting'
 import { SegmentedControl } from '@client/components/SegmentedControl'
@@ -297,7 +291,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                     base={base}
                     completenessRateTime={time}
                   />
-                  <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                  <GenericErrorToast />
                 </>
               )
             } else {
