@@ -155,7 +155,9 @@ const AuditDescriptionMapping: {
   WAITING_VALIDATION: messages.waitingForValidationAuditAction,
   REGISTERED: messages.registeredAuditAction,
   REJECTED: messages.rejectedAuditAction,
-  CERTIFIED: messages.certifiedAuditAction
+  CERTIFIED: messages.certifiedAuditAction,
+  ASSIGNED: messages.assignedAuditAction,
+  UNASSIGNED: messages.unAssignedAuditAction
 }
 
 export function getUserAuditDescription(

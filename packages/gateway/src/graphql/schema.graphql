@@ -1422,6 +1422,7 @@ interface AuditLogItemBase {
 
 type AdditionalIdWithCompositionId {
   compositionId: String!
+  trackingId: String!
 }
 
 input CommentInput {

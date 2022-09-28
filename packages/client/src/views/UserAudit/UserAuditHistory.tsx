@@ -15,10 +15,11 @@ import * as React from 'react'
 import Bowser from 'bowser'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Query } from '@client/components/Query'
-import { FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER } from '@client/user/queries'
+import { GET_USER_AUDIT_LOG } from '@client/user/queries'
 import {
-  GQLQuery,
-  GQLTimeLoggedMetrics
+  GQLUserAuditLogItemWithComposition,
+  GQLUserAuditLogResultItem,
+  GQLUserAuditLogResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   ArrowDownBlue,
@@ -47,15 +48,13 @@ import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
 import format from '@client/utils/date-formatting'
-import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
-import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 
 import {
   IOnlineStatusProps,
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
-import { Event } from '@client/utils/gateway'
+import { Event, GetUserAuditLogQuery } from '@client/utils/gateway'
 import { ILocation } from '@client/offline/reducer'
 import { ICurrency } from '@client/utils/referenceApi'
 import { RouteComponentProps } from 'react-router'
@@ -163,9 +162,14 @@ type State = {
   sortOrder: SORT_ORDER
   sortedColumn: SORTED_COLUMN
   currentPageNumber: number
-  event: Event
   officeSelected?: boolean
   isAccessibleOffice?: boolean
+}
+
+const isUserAuditItemWithDeclarationDetials = (
+  item: GQLUserAuditLogResultItem
+): item is GQLUserAuditLogItemWithComposition => {
+  return (item as any).data
 }
 
 class UserAuditHistoryComponent extends React.Component<Props, State> {
@@ -178,8 +182,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
       viewportWidth: 0,
       currentPageNumber: 1,
       sortOrder: SORT_ORDER.DESCENDING,
-      sortedColumn: SORTED_COLUMN.DATE,
-      event: Event.All
+      sortedColumn: SORTED_COLUMN.DATE
     }
     this.updateViewPort = this.updateViewPort.bind(this)
   }
@@ -334,80 +337,59 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     }
   }
 
-  getAuditData(data: GQLQuery, user?: IUserData) {
-    if (
-      !user ||
-      !data ||
-      !data.fetchTimeLoggedMetricsByPractitioner ||
-      !data.fetchTimeLoggedMetricsByPractitioner.results
-    ) {
-      return []
-    }
-    const auditList = data.fetchTimeLoggedMetricsByPractitioner.results.map(
-      (timeLoggedMetrics: GQLTimeLoggedMetrics | null) => {
-        if (timeLoggedMetrics === null) {
-          return {}
-        }
-        const actionDescriptor = getUserAuditDescription(
-          timeLoggedMetrics.status
-        )
+  getAuditData(data: GQLUserAuditLogResultSet, user?: IUserData) {
+    const auditList = data.results.map((userAuditItem) => {
+      if (userAuditItem === null) {
+        return {}
+      }
+      const actionDescriptor = getUserAuditDescription(userAuditItem.action)
 
-        const device = Bowser.getParser(
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
-        ).getResult()
+      const device = Bowser.getParser(userAuditItem.userAgent).getResult()
 
-        const deviceIpAddress =
-          [
-            device.platform.vendor,
-            device.os.name,
-            device.browser ? `(${device.browser.name})` : ''
-          ]
-            .filter(Boolean)
-            .join(' ') +
-          ' • ' +
-          '127.0.0.1'
+      const deviceIpAddress =
+        [
+          device.platform.vendor,
+          device.os.name,
+          device.browser ? `(${device.browser.name})` : ''
+        ]
+          .filter(Boolean)
+          .join(' ') +
+        ' • ' +
+        userAuditItem.ipAddress
 
-        return {
-          actionDescription: (
+      return {
+        actionDescription: (
+          <InformationTitle>
+            {(actionDescriptor &&
+              this.props.intl.formatMessage(actionDescriptor)) ||
+              ''}
+          </InformationTitle>
+        ),
+        actionDescriptionString: actionDescriptor
+          ? this.props.intl.formatMessage(actionDescriptor)
+          : '',
+        actionDescriptionWithAuditTime: (
+          <AuditDescTimeContainer>
             <InformationTitle>
               {(actionDescriptor &&
                 this.props.intl.formatMessage(actionDescriptor)) ||
                 ''}
             </InformationTitle>
-          ),
-          actionDescriptionString: actionDescriptor
-            ? this.props.intl.formatMessage(actionDescriptor)
-            : '',
-          actionDescriptionWithAuditTime: (
-            <AuditDescTimeContainer>
-              <InformationTitle>
-                {(actionDescriptor &&
-                  this.props.intl.formatMessage(actionDescriptor)) ||
-                  ''}
-              </InformationTitle>
-              <InformationCaption>
-                {format(
-                  new Date(timeLoggedMetrics.time),
-                  'MMMM dd, yyyy hh:mm a'
-                )}
-              </InformationCaption>
-            </AuditDescTimeContainer>
-          ),
-          eventType: this.props.intl.formatMessage(
-            constantsMessages[timeLoggedMetrics.eventType.toLowerCase()]
-          ),
-          trackingId: timeLoggedMetrics.trackingId && (
-            <LinkButton>{timeLoggedMetrics.trackingId}</LinkButton>
-          ),
-          deviceIpAddress: deviceIpAddress,
-          trackingIdString: timeLoggedMetrics.trackingId,
-          auditTime: format(
-            new Date(timeLoggedMetrics.time),
-            'MMMM dd, yyyy hh:mm a'
-          )
-        }
+            <InformationCaption>
+              {format(new Date(userAuditItem.time), 'MMMM dd, yyyy hh:mm a')}
+            </InformationCaption>
+          </AuditDescTimeContainer>
+        ),
+        trackingId: isUserAuditItemWithDeclarationDetials(userAuditItem) ? (
+          <LinkButton>{userAuditItem.data.trackingId}</LinkButton>
+        ) : null,
+        deviceIpAddress: deviceIpAddress,
+        trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
+          ? userAuditItem.data.trackingId
+          : null,
+        auditTime: format(new Date(userAuditItem.time), 'MMMM dd, yyyy hh:mm a')
       }
-    )
+    })
     return (
       (auditList &&
         orderBy(
@@ -511,33 +493,30 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
               />
             </HistoryHeader>
             <>
-              <Query
-                query={FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER}
+              <Query<GetUserAuditLogQuery>
+                query={GET_USER_AUDIT_LOG}
                 variables={{
-                  timeStart: timeStart.toISOString(),
-                  timeEnd: timeEnd.toISOString(),
                   practitionerId: user && user.practitionerId,
-                  locationId: user && user.locationId,
                   count: recordCount,
                   skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1)
                 }}
                 fetchPolicy={'no-cache'}
               >
                 {({ data, loading, error }) => {
-                  if (error) {
+                  if (error || !data || !data.getUserAuditLog) {
                     return this.getLoadingAuditListView(true)
                   } else {
                     const totalItems = Number(
                       (data &&
-                        data.fetchTimeLoggedMetricsByPractitioner &&
-                        data.fetchTimeLoggedMetricsByPractitioner.totalItems) ||
+                        data.getUserAuditLog &&
+                        data.getUserAuditLog.total) ||
                         0
                     )
 
                     return (
                       <Table
                         columns={this.getAuditColumns()}
-                        content={this.getAuditData(data, user)}
+                        content={this.getAuditData(data.getUserAuditLog, user)}
                         noResultText={intl.formatMessage(messages.noAuditFound)}
                         isLoading={loading}
                         hideTableHeader={
