@@ -44,6 +44,7 @@ export const GET_USER_AUDIT_LOG = gql`
       count: $count
       skip: $skip
     ) {
+      total
       results {
         ... on UserAuditLogItem {
           time
@@ -60,6 +61,7 @@ export const GET_USER_AUDIT_LOG = gql`
           action
           data {
             compositionId
+            trackingId
           }
         }
       }
@@ -111,34 +113,6 @@ export const GET_USER = gql`
         type
         data
       }
-    }
-  }
-`
-
-export const FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER = gql`
-  query fetchTimeLoggedMetricsByPractitioner(
-    $timeStart: String!
-    $timeEnd: String!
-    $practitionerId: String!
-    $locationId: String!
-    $count: Int!
-    $skip: Int!
-  ) {
-    fetchTimeLoggedMetricsByPractitioner(
-      timeStart: $timeStart
-      timeEnd: $timeEnd
-      practitionerId: $practitionerId
-      locationId: $locationId
-      count: $count
-      skip: $skip
-    ) {
-      results {
-        status
-        trackingId
-        eventType
-        time
-      }
-      totalItems
     }
   }
 `

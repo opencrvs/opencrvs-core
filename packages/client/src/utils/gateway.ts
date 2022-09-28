@@ -39,6 +39,7 @@ export type Scalars = {
 export type AdditionalIdWithCompositionId = {
   __typename?: 'AdditionalIdWithCompositionId'
   compositionId: Scalars['String']
+  trackingId: Scalars['String']
 }
 
 export type Address = {
@@ -613,7 +614,6 @@ export type Estimation = {
 }
 
 export enum Event {
-  All = '',
   Birth = 'birth',
   Death = 'death'
 }
@@ -1238,7 +1238,6 @@ export type Query = {
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
-  fetchTimeLoggedMetricsByPractitioner?: Maybe<TimeLoggedMetricsResultSet>
   getActiveCertificatesSVG?: Maybe<Array<Maybe<CertificateSvg>>>
   getCertificateSVG?: Maybe<CertificateSvg>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
@@ -1303,15 +1302,6 @@ export type QueryFetchRegistrationCountByStatusArgs = {
   event?: InputMaybe<Scalars['String']>
   locationId?: InputMaybe<Scalars['String']>
   status: Array<InputMaybe<Scalars['String']>>
-}
-
-export type QueryFetchTimeLoggedMetricsByPractitionerArgs = {
-  count: Scalars['Int']
-  locationId: Scalars['String']
-  practitionerId: Scalars['String']
-  skip: Scalars['Int']
-  timeEnd: Scalars['String']
-  timeStart: Scalars['String']
 }
 
 export type QueryGetCertificateSvgArgs = {
@@ -1714,20 +1704,6 @@ export type StatusWiseRegistrationCount = {
   __typename?: 'StatusWiseRegistrationCount'
   count: Scalars['Int']
   status: Scalars['String']
-}
-
-export type TimeLoggedMetrics = {
-  __typename?: 'TimeLoggedMetrics'
-  eventType: Scalars['String']
-  status: Scalars['String']
-  time: Scalars['String']
-  trackingId?: Maybe<Scalars['String']>
-}
-
-export type TimeLoggedMetricsResultSet = {
-  __typename?: 'TimeLoggedMetricsResultSet'
-  results?: Maybe<Array<Maybe<TimeLoggedMetrics>>>
-  totalItems?: Maybe<Scalars['Int']>
 }
 
 export type TotalMetricsResult = {
@@ -2309,6 +2285,7 @@ export type GetUserAuditLogQuery = {
   __typename?: 'Query'
   getUserAuditLog?: {
     __typename?: 'UserAuditLogResultSet'
+    total: number
     results: Array<
       | {
           __typename?: 'UserAuditLogItem'
@@ -2328,6 +2305,7 @@ export type GetUserAuditLogQuery = {
           data: {
             __typename?: 'AdditionalIdWithCompositionId'
             compositionId: string
+            trackingId: string
           }
         }
     >
@@ -2386,30 +2364,6 @@ export type GetUserQuery = {
       data?: string | null
     } | null
     avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
-  } | null
-}
-
-export type FetchTimeLoggedMetricsByPractitionerQueryVariables = Exact<{
-  timeStart: Scalars['String']
-  timeEnd: Scalars['String']
-  practitionerId: Scalars['String']
-  locationId: Scalars['String']
-  count: Scalars['Int']
-  skip: Scalars['Int']
-}>
-
-export type FetchTimeLoggedMetricsByPractitionerQuery = {
-  __typename?: 'Query'
-  fetchTimeLoggedMetricsByPractitioner?: {
-    __typename?: 'TimeLoggedMetricsResultSet'
-    totalItems?: number | null
-    results?: Array<{
-      __typename?: 'TimeLoggedMetrics'
-      status: string
-      trackingId?: string | null
-      eventType: string
-      time: string
-    } | null> | null
   } | null
 }
 

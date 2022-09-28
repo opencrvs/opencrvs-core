@@ -1334,6 +1334,7 @@ export interface GQLAuditLogItemBaseNameMap {
 
 export interface GQLAdditionalIdWithCompositionId {
   compositionId: string
+  trackingId: string
 }
 
 export interface GQLCommentInput {
@@ -5559,9 +5560,17 @@ export interface GQLAuditLogItemBaseTypeResolver<TParent = any> {
 }
 export interface GQLAdditionalIdWithCompositionIdTypeResolver<TParent = any> {
   compositionId?: AdditionalIdWithCompositionIdToCompositionIdResolver<TParent>
+  trackingId?: AdditionalIdWithCompositionIdToTrackingIdResolver<TParent>
 }
 
 export interface AdditionalIdWithCompositionIdToCompositionIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AdditionalIdWithCompositionIdToTrackingIdResolver<
   TParent = any,
   TResult = any
 > {

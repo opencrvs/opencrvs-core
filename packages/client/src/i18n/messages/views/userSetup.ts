@@ -56,6 +56,8 @@ interface IUserSetupMessages
   rejectedAuditAction: MessageDescriptor
   certifiedAuditAction: MessageDescriptor
   showMoreAuditList: MessageDescriptor
+  assignedAuditAction: MessageDescriptor
+  unAssignedAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -276,6 +278,16 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Show next {pageSize} of {totalItems}',
     description: 'Label for show more link',
     id: 'user.profile.auditList.showMore'
+  },
+  assignedAuditAction: {
+    defaultMessage: 'Assigned declaration to self',
+    description: 'Description for declaration assignment',
+    id: 'user.profile.auditList.assigned'
+  },
+  unAssignedAuditAction: {
+    defaultMessage: 'Unassigned declaration to self',
+    description: 'Description for declaration not assigned to self',
+    id: 'user.profile.auditList.unAssigned'
   }
 }
 
