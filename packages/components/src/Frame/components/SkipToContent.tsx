@@ -36,12 +36,16 @@ export const SkipToContentContainer = styled(Link)`
 
 export const MAIN_CONTENT_ANCHOR_ID = 'maincontent'
 
+type SkipToContentProps = {
+  children: string
+}
+
 /**
  * A button which skips past the main content.
  * https://web.archive.org/web/20220927150528/https://webaim.org/techniques/skipnav/
  */
-export const SkipToContent = () => (
+export const SkipToContent = ({ children }: SkipToContentProps) => (
   <SkipToContentContainer element="a" href={`#${MAIN_CONTENT_ANCHOR_ID}`}>
-    Skip to main content
+    {children}
   </SkipToContentContainer>
 )

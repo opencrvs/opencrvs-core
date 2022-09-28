@@ -23,6 +23,8 @@ export interface IFrameProps {
   header: React.ReactNode
   /** Accepts a navigation component that will be rendered in the left sidebar of an application frame */
   navigation?: React.ReactNode
+  /** Text inside skip to content -link. Example: "Skip to main content" */
+  skipToContentText: string
   /** The content to display inside the frame. */
   children: React.ReactNode
 }
@@ -51,10 +53,15 @@ const FrameMainContent = styled.main`
   background: ${({ theme }) => theme.colors.background};
 `
 
-export function Frame({ header, navigation, children }: IFrameProps) {
+export function Frame({
+  header,
+  navigation,
+  skipToContentText,
+  children
+}: IFrameProps) {
   return (
     <FrameGrid>
-      <SkipToContent />
+      <SkipToContent>{skipToContentText}</SkipToContent>
       <FrameNavigation>{navigation}</FrameNavigation>
       <FrameHeader>{header}</FrameHeader>
       <FrameMainContent id={MAIN_CONTENT_ANCHOR_ID}>

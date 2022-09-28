@@ -620,6 +620,12 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for rejection date in work queue list item',
     id: 'constants.sentOn'
   },
+  skipToMainContent: {
+    defaultMessage: 'Skip to main content',
+    description:
+      'Label for a keyboard accessibility link which skips to the main content',
+    id: 'constants.skipToMainContent'
+  },
   status: {
     defaultMessage: 'Status',
     description: 'Title for column',

@@ -11,7 +11,6 @@
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import styled from '@client/styledComponents'
 import { Header } from '@client/components/Header/Header'
 import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { userMessages as messages } from '@client/i18n/messages'

@@ -62,6 +62,7 @@ import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
+import { constantsMessages } from '@client/i18n/messages'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -453,6 +454,9 @@ export class OfficeHomeView extends React.Component<
             title={intl.formatMessage(navigationMessages[this.props.tabId])}
           />
         }
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
         navigation={<Navigation loadWorkqueueStatuses={false} />}
       >
         {this.getData(
