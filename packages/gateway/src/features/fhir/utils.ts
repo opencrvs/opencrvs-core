@@ -814,7 +814,7 @@ export function selectOrCreateTaskRefResource(
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,
-  value: string | string[] | object,
+  value: string | string[] | Record<string, unknown>,
   propName: string,
   context: any,
   contextProperty?: string
@@ -1011,7 +1011,7 @@ export function removeDuplicatesFromComposition(
 export const fetchFHIR = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET',
+  method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
   return fetch(`${FHIR_URL}${suffix}`, {
@@ -1035,6 +1035,28 @@ export const postSearch = (
   criteria: ISearchCriteria
 ) => {
   return fetch(`${SEARCH_URL}search`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+export const postAdvancedSearch = (
+  authHeader: IAuthHeader,
+  criteria: ISearchCriteria
+) => {
+  return fetch(`${SEARCH_URL}advancedRecordSearch`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

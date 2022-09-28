@@ -15,7 +15,8 @@ import {
   setupRegistrationWorkflow,
   setupLastRegUser,
   setupLastRegLocation,
-  setupAuthorOnNotes
+  setupAuthorOnNotes,
+  setupRegAssigned
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -32,10 +33,21 @@ import {
   officeMock
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
-
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
+
+const validateToken = jwt.sign(
+  { scope: ['validate'], sub: '123' },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:workflow-user'
+  }
+)
 
 describe('Verify fhir bundle modifier functions', () => {
   describe('setTrackingId', () => {
@@ -206,7 +218,7 @@ describe('Verify fhir bundle modifier functions', () => {
         scope: ['register']
       }
       const fhirBundle = cloneDeep(testFhirBundle)
-      /* tslint:disable:no-string-literal */
+
       if (
         fhirBundle &&
         fhirBundle.entry &&
@@ -221,7 +233,7 @@ describe('Verify fhir bundle modifier functions', () => {
             }
           ]
         }
-        /* tslint:enable:no-string-literal */
+
         const taskResource = await setupRegistrationWorkflow(
           fhirBundle.entry[1].resource as fhir.Task,
           tokenPayload
@@ -363,7 +375,7 @@ describe('Verify fhir bundle modifier functions', () => {
       id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
     }
     const fhirBundle = cloneDeep(testFhirBundle)
-    /* tslint:disable:no-string-literal */
+
     fhirBundle.entry[1].resource['note'] = [
       {
         text: 'this is a test note',
@@ -382,7 +394,6 @@ describe('Verify fhir bundle modifier functions', () => {
         time: '2018-10-31T09:45:05+10:00'
       })
     }
-    /* tslint:enable:no-string-literal */
   })
   describe('setupLastRegLocation', () => {
     beforeEach(() => {
@@ -436,6 +447,85 @@ describe('Verify fhir bundle modifier functions', () => {
           practitioner
         )
       ).rejects.toThrowError('Invalid practitioner data found')
+    })
+  })
+
+  describe('setupRegAssigned', () => {
+    beforeAll(() => {
+      fetch.resetMocks()
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          catchmentAreaIds: [
+            'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
+            'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
+            'b09122df-81f8-41a0-b5c6-68cba4145cab',
+            '7dbf10a9-23d9-4038-8b1c-9f6547ab4877'
+          ],
+          scope: ['validate', 'performance', 'certify', 'demo'],
+          status: 'active',
+          name: [
+            {
+              given: ['Alanna'],
+              use: 'en',
+              family: 'Barrows'
+            }
+          ],
+          role: 'REGISTRATION_AGENT',
+          type: '',
+          identifiers: [
+            {
+              system: 'NATIONAL_ID',
+              value: '583835744'
+            }
+          ],
+          primaryOfficeId: 'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
+          email: 'Olga_Daniel62@hotmail.com',
+          mobile: '+260909522271',
+          salt: '3c8446be-ffa1-4edf-a681-fbaa26b6b8ef',
+          passwordHash:
+            '2f6e767bd59310d8183ed409e1e8c3daf13ce54e4897baadffb7bb2d0fb1482f035d4458902390a5ad57a63f23a46e72eeca206add3f0f7d269415c81adeaee8',
+          practitionerId: 'd1fbae31-1f22-4b30-94a6-964c7b445812',
+          username: 'a.barrows',
+          securityQuestionAnswers: [],
+          creationDate: 1661936216466.0,
+          auditHistory: [],
+          __v: 0
+        })
+      )
+    })
+    afterAll(() => {
+      fetch.resetMocks()
+    })
+
+    const practitioner = {
+      resourceType: 'Practitioner',
+      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
+      telecom: [{ system: 'phone', value: '01711111111' }],
+      name: [
+        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
+        { use: 'bn', family: '', given: [''] }
+      ],
+      gender: 'male',
+      meta: {
+        lastUpdated: '2018-11-25T17:31:08.062+00:00',
+        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+      },
+      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+    }
+
+    it('assignment is not done for reg agent downloading validated declaration', async () => {
+      const taskResource = testFhirBundle.entry[1].resource as fhir.Task
+      taskResource?.extension?.push({
+        url: `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
+        valueString: 'VALIDATED'
+      })
+      const modifiedTaskResource = await setupRegAssigned(
+        taskResource,
+        practitioner,
+        validateToken
+      )
+
+      expect(taskResource).toEqual(modifiedTaskResource)
     })
   })
 })

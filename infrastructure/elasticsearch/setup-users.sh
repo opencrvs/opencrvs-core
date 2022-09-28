@@ -13,9 +13,6 @@
 set -eu
 set -o pipefail
 
-apt-get update
-apt-get install curl -y
-
 source "$(dirname "${BASH_SOURCE[0]}")/setup-helpers.sh"
 
 

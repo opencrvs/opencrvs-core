@@ -1,3 +1,5 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
+
+exports[`PerformanceSelect tests > shallow rendered component matches snapshot 1`] = `ShallowWrapper {}`;
 
 exports[`PerformanceSelect tests shallow rendered component matches snapshot 1`] = `ShallowWrapper {}`;

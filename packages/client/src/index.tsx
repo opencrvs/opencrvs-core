@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+// eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
@@ -54,7 +55,7 @@ if (
   // setup log rocket to ship log messages and record user errors
   if (window.config.LOGROCKET) {
     LogRocket.init(window.config.LOGROCKET, {
-      release: process.env.REACT_APP_VERSION
+      release: import.meta.env.VITE_APP_VERSION
     })
   }
 

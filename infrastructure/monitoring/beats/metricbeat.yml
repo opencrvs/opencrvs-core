@@ -99,5 +99,5 @@ setup.ilm.check_exists: true
 setup.ilm.overwrite: true
 
 #============================== Logging ===============================
-logging.level: info
+logging.level: warning
 logging.to_stderr: true

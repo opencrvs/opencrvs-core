@@ -92,6 +92,7 @@ export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
 export const MONTHS_IN_YEAR = 12
 
+/* change to import.meta.env.mode when migrating to vitest */
 export const LOADER_MIN_DISPLAY_TIME =
   process.env.NODE_ENV !== 'test' ? 3 * 1000 : 0 // 3 seconds except test environment
 
@@ -104,3 +105,5 @@ export const ACCUMULATED_FILE_SIZE = 20480000
 export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 export const INFORMANT_MINIMUM_AGE = 16
 export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
+
+export const APPLICATION_VERSION = '1.1.0'

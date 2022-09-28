@@ -14,7 +14,6 @@ import { createTestApp, wait } from '@login/tests/util'
 import { client } from '@login/utils/authApi'
 import { resolve } from 'url'
 import { ReactWrapper } from 'enzyme'
-import { ErrorMessage } from '@opencrvs/components/lib/forms'
 
 describe('Login app step one', () => {
   let app: any

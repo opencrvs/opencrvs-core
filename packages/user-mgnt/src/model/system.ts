@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { model, Schema, Document } from 'mongoose'
-// tslint:disable-next-line
-import { statuses } from '../utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
 import { IUserName, UserNameSchema } from '@user-mgnt/model/user'
 
 export interface ISystem {
   name: IUserName[]
+  createdBy: IUserName[]
   username: string
   client_id: string
   secretHash: string
@@ -24,6 +24,9 @@ export interface ISystem {
   practitionerId: string
   scope: string[]
   status: string
+  settings: {
+    dailyQuota: number
+  }
   creationDate?: number
 }
 
@@ -31,6 +34,7 @@ export interface ISystemModel extends ISystem, Document {}
 
 const systemSchema = new Schema({
   name: { type: [UserNameSchema], required: true },
+  createdBy: { type: [UserNameSchema], required: true },
   username: { type: String, required: true },
   client_id: { type: String, required: true },
   secretHash: { type: String, required: true },
@@ -42,6 +46,9 @@ const systemSchema = new Schema({
     type: String,
     enum: [statuses.PENDING, statuses.ACTIVE, statuses.DISABLED],
     default: statuses.PENDING
+  },
+  settings: {
+    dailyQuota: { type: String, default: 0 }
   },
   creationDate: { type: Number, default: Date.now }
 })

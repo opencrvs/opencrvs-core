@@ -15,26 +15,151 @@ import {
   selectOption,
   getFileFromBase64String,
   validImageB64String,
-  inValidImageB64String
+  inValidImageB64String,
+  mockDeclarationData,
+  mockDeathDeclarationData
 } from '@client/tests/util'
-import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from '@client/views/DataProvider/birth/queries'
-import { GET_DEATH_REGISTRATION_FOR_CERTIFICATION } from '@client/views/DataProvider/death/queries'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CollectorForm } from './CollectorForm'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { createLocation, History } from 'history'
 import { merge } from 'lodash'
-import {
-  deathCertificationResponse,
-  lateBirthCertificationResponse,
-  lateBirthCertificationResponseWithFather,
-  onTimeBirthCertificationResponse
-} from '@client/tests/mock-graphql-responses'
+import { Event } from '@client/utils/gateway'
+import { storeDeclaration } from '@client/declarations'
+import { lateBirthCertificationResponseWithFather } from '@client/tests/mock-graphql-responses'
+import { vi } from 'vitest'
 
 let store: AppStore
 let history: History
 let location = createLocation('/')
+
+const declarationsHistory = [
+  {
+    date: '2022-04-14T12:52:34.112+00:00',
+    action: 'DOWNLOADED',
+    reinstated: false,
+    statusReason: null,
+    location: {
+      id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+      name: 'Ibombo',
+      __typename: 'Location'
+    },
+    office: {
+      id: '204f706f-e097-4394-9d12-bd50f057f923',
+      name: 'Ibombo District Office',
+      __typename: 'Location'
+    },
+    user: {
+      id: '6241918dd6dc544f60d8f73a',
+      type: 'CHAIRMAN',
+      role: 'LOCAL_REGISTRAR',
+      name: [
+        {
+          firstNames: 'Kennedy',
+          familyName: 'Mweene',
+          use: 'en',
+          __typename: 'HumanName'
+        }
+      ],
+      avatar: null,
+      __typename: 'User'
+    },
+    signature: null,
+    comments: [],
+    input: [],
+    output: [],
+    certificates: null,
+    __typename: 'History'
+  },
+  {
+    date: '2022-04-14T12:52:25.951+00:00',
+    action: 'REGISTERED',
+    reinstated: false,
+    statusReason: null,
+    location: {
+      id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+      name: 'Ibombo',
+      __typename: 'Location'
+    },
+    office: {
+      id: '204f706f-e097-4394-9d12-bd50f057f923',
+      name: 'Ibombo District Office',
+      __typename: 'Location'
+    },
+    user: {
+      id: '6241918dd6dc544f60d8f73a',
+      type: 'CHAIRMAN',
+      role: 'LOCAL_REGISTRAR',
+      name: [
+        {
+          firstNames: 'Kennedy',
+          familyName: 'Mweene',
+          use: 'en',
+          __typename: 'HumanName'
+        }
+      ],
+      avatar: null,
+      __typename: 'User'
+    },
+    comments: [],
+    input: [],
+    output: [],
+    certificates: null,
+    __typename: 'History'
+  },
+  {
+    date: '2022-04-14T12:52:25.798+00:00',
+    action: 'WAITING_VALIDATION',
+    reinstated: false,
+    statusReason: null,
+    location: {
+      id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+      name: 'Ibombo',
+      __typename: 'Location'
+    },
+    office: {
+      id: '204f706f-e097-4394-9d12-bd50f057f923',
+      name: 'Ibombo District Office',
+      __typename: 'Location'
+    },
+    user: {
+      id: '6241918dd6dc544f60d8f73a',
+      type: 'CHAIRMAN',
+      role: 'LOCAL_REGISTRAR',
+      name: [
+        {
+          firstNames: 'Kennedy',
+          familyName: 'Mweene',
+          use: 'en',
+          __typename: 'HumanName'
+        }
+      ],
+      avatar: null,
+      __typename: 'User'
+    },
+    comments: [],
+    input: [],
+    output: [],
+    certificates: null,
+    __typename: 'History'
+  }
+]
+
+//@ts-ignore
+mockDeclarationData['history'] = declarationsHistory
+
+const birthDeclaration = {
+  id: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
+  data: mockDeclarationData,
+  event: Event.Birth
+}
+
+const deathDeclaration = {
+  id: '16ff35e1-3f92-4db3-b812-c402e609fb00',
+  data: mockDeathDeclarationData,
+  event: Event.Death
+}
 
 beforeEach(() => {
   const s = createStore()
@@ -45,12 +170,12 @@ beforeEach(() => {
 })
 
 describe('Certificate collector test for a birth registration without father details', () => {
-  const graphqlMock = lateBirthCertificationResponse
-
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
+      //@ts-ignore
+      store.dispatch(storeDeclaration(birthDeclaration))
       const testComponent = await createTestComponent(
         <CollectorForm
           location={location}
@@ -66,75 +191,62 @@ describe('Certificate collector test for a birth registration without father det
             url: ''
           }}
         />,
-        { history, store, graphqlMocks: graphqlMock }
+        { history, store }
       )
       component = testComponent
       await waitForElement(component, '#collector_form')
     })
 
-    it('father option will not be available', () => {
-      expect(component.find('#type_FATHER').hostNodes()).toHaveLength(0)
+    it('father option will be available', async () => {
+      await waitForElement(component, '#type_FATHER')
+      expect(component.find('#type_FATHER').hostNodes()).toHaveLength(1)
     })
 
     it('prompt error when no option is selected', async () => {
       component.find('#confirm_form').hostNodes().simulate('click')
-
       await waitForElement(component, '#form_error')
-
       expect(component.find('#form_error').hostNodes().text()).toBe(
         'Please select who is collecting the certificate'
       )
     })
 
-    it('redirects to id check component upon MOTHER option selection', async () => {
+    it('redirects to id check component upon FATHER option selection', async () => {
       component
-        .find('#type_MOTHER')
+        .find('#type_FATHER')
         .hostNodes()
-        .simulate('change', { target: { value: 'MOTHER' } })
+        .simulate('change', { target: { value: 'FATHER' } })
 
       await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
-
       component.find('#confirm_form').hostNodes().simulate('click')
-
       await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
-
       expect(history.location.pathname).toBe(
-        '/print/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/mother'
+        '/print/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/father'
       )
     })
 
-    it('should redirects back to certificate collector option selection with mother already selected', async () => {
+    it('should redirects back to certificate collector option selection with father already selected', async () => {
       component
-        .find('#type_MOTHER')
+        .find('#type_FATHER')
         .hostNodes()
-        .simulate('change', { target: { value: 'MOTHER' } })
-
+        .simulate('change', { target: { value: 'FATHER' } })
       await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
-
       component.find('#confirm_form').hostNodes().simulate('click')
-
       await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
-
       component.find('#action_page_back_button').hostNodes().simulate('click')
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500)
-      })
       component.update()
-
-      expect(component.find('#type_MOTHER').hostNodes().props().checked).toBe(
+      expect(component.find('#type_FATHER').hostNodes().props().checked).toBe(
         true
       )
     })
@@ -149,14 +261,11 @@ describe('Certificate collector test for a birth registration without father det
         setTimeout(resolve, 500)
       })
       component.update()
-
       component.find('#confirm_form').hostNodes().simulate('click')
-
       await new Promise((resolve) => {
         setTimeout(resolve, 500)
       })
       component.update()
-
       expect(history.location.pathname).toBe(
         '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/otherCertCollector'
       )
@@ -170,6 +279,7 @@ describe('Certificate collector test for a birth registration without father det
       /*
        * Who is collecting the certificate?
        */
+      store.dispatch(storeDeclaration(birthDeclaration))
       component = await createTestComponent(
         <CollectorForm
           location={location}
@@ -185,7 +295,7 @@ describe('Certificate collector test for a birth registration without father det
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        { store, history }
       )
 
       const form = await waitForElement(component, '#collector_form')
@@ -219,9 +329,7 @@ describe('Certificate collector test for a birth registration without father det
 
     it('show form level error when the mandatory fields are not filled', async () => {
       component.find('#confirm_form').hostNodes().simulate('click')
-
       await waitForElement(component, '#form_error')
-
       expect(component.find('#form_error').hostNodes().text()).toBe(
         'Complete all the mandatory fields'
       )
@@ -279,9 +387,7 @@ describe('Certificate collector test for a birth registration without father det
 
       it('show form level error when the mandatory fields are not filled', async () => {
         component.find('#confirm_form').hostNodes().simulate('click')
-
         await waitForElement(component, '#form_error')
-
         expect(component.find('#form_error').hostNodes().text()).toBe(
           'Upload signed affidavit or click the checkbox if they do not have one.'
         )
@@ -306,7 +412,7 @@ describe('Certificate collector test for a birth registration without father det
       })
 
       it('continue to payment section when the mandatory fields are filled and birth event is between 45 days and 5 years', async () => {
-        Date.now = jest.fn(() => 1538352000000) // 2018-10-01
+        Date.now = vi.fn(() => 1538352000000) // 2018-10-01
         await waitForElement(component, '#noAffidavitAgreementAFFIDAVIT')
         component
           .find('#noAffidavitAgreementAFFIDAVIT')
@@ -316,9 +422,7 @@ describe('Certificate collector test for a birth registration without father det
           })
 
         await waitForElement(component, '#confirm_form')
-
         component.find('#confirm_form').hostNodes().simulate('click')
-
         await waitForElement(
           component,
           '#noAffidavitAgreementConfirmationModal'
@@ -331,6 +435,31 @@ describe('Certificate collector test for a birth registration without father det
 
         expect(history.location.pathname).toBe(
           '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
+        )
+      })
+
+      it('continue to review section when the mandatory fields are filled and birth event is before target days', async () => {
+        birthDeclaration.data.child.childBirthDate = '2022-09-20'
+        store.dispatch(storeDeclaration(birthDeclaration))
+        const comp = await waitForElement(
+          component,
+          '#noAffidavitAgreementAFFIDAVIT'
+        )
+        comp.hostNodes().simulate('change', {
+          checked: true
+        })
+
+        await new Promise((resolve) => {
+          setTimeout(resolve, 500)
+        })
+        component.update()
+        component.find('#confirm_form').hostNodes().simulate('click')
+        expect(
+          component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
+        ).toHaveLength(1)
+        component.find('#submit_confirm').hostNodes().simulate('click')
+        expect(history.location.pathname).toBe(
+          '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
         )
       })
 
@@ -358,70 +487,17 @@ describe('Certificate collector test for a birth registration without father det
   })
 })
 
-describe('Test for a free birth registration', () => {
-  const graphqlMock = onTimeBirthCertificationResponse
-
-  describe('Test affidavit group', () => {
-    let component: ReactWrapper<{}, {}>
-
-    beforeEach(async () => {
-      const testComponent = await createTestComponent(
-        <CollectorForm
-          location={location}
-          history={history}
-          match={{
-            params: {
-              registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
-              eventType: 'birth',
-              groupId: 'affidavit'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMock }
-      )
-
-      component = testComponent
-    })
-
-    it('continue to review section when the mandatory fields are filled and birth event is before target days', async () => {
-      ;(await waitForElement(component, '#noAffidavitAgreementAFFIDAVIT'))
-        .hostNodes()
-        .simulate('change', {
-          checked: true
-        })
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500)
-      })
-      component.update()
-
-      component.find('#confirm_form').hostNodes().simulate('click')
-
-      expect(
-        component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
-      ).toHaveLength(1)
-
-      component.find('#submit_confirm').hostNodes().simulate('click')
-
-      expect(history.location.pathname).toBe(
-        '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
-      )
-    })
-  })
-})
-
 describe('Certificate collector test for a birth registration with father details', () => {
   const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
+  const mockLocation: any = vi.fn()
   const graphqlMock = lateBirthCertificationResponseWithFather
 
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
+      store.dispatch(storeDeclaration(birthDeclaration))
+
       const testComponent = await createTestComponent(
         <CollectorForm
           location={mockLocation}
@@ -437,7 +513,7 @@ describe('Certificate collector test for a birth registration with father detail
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        { store, history }
       )
 
       component = testComponent
@@ -451,12 +527,12 @@ describe('Certificate collector test for a birth registration with father detail
 })
 
 describe('Certificate collector test for a death registration', () => {
-  const graphqlMock = deathCertificationResponse
-
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
+      store.dispatch(storeDeclaration(deathDeclaration))
+
       const testComponent = await createTestComponent(
         <CollectorForm
           location={location}
@@ -472,7 +548,7 @@ describe('Certificate collector test for a death registration', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        { store, history }
       )
 
       component = testComponent
@@ -503,254 +579,20 @@ describe('Certificate collector test for a death registration', () => {
 })
 
 describe('Certificate collector test for a birth registration without father and mother details', () => {
-  const graphqlMock = [
-    {
-      request: {
-        query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
-        variables: { id: '6a5fd35d-01ec-4c37-976e-e055107at5674' }
-      },
-      result: {
-        data: {
-          fetchBirthRegistration: {
-            _fhirIDMap: {
-              composition: '6a5fd35d-01ec-4c37-976e-e055107at5674',
-              encounter: 'cd56d5da-0c9d-471f-8e4a-e1db73856795',
-              observation: {
-                informantType: '1590856c-ece2-456a-9141-24ca5961da63'
-              }
-            },
-            id: '6a5fd35d-01ec-4c37-976e-e055107at5674',
-            child: {
-              id: '8ad1796f-de75-4e62-ad3d-a0b38bbbc281',
-              name: [
-                {
-                  use: 'bn',
-                  firstNames: '',
-                  familyName: 'ইসলাম',
-                  __typename: 'HumanName'
-                },
-                {
-                  use: 'en',
-                  firstNames: '',
-                  familyName: 'Islam',
-                  __typename: 'HumanName'
-                }
-              ],
-              birthDate: '2018-08-01',
-              gender: 'male',
-              __typename: 'Person'
-            },
-            informant: {
-              id: '0df90d42-1615-4ffd-9f47-b6a30a9ddae1',
-              individual: {
-                id: '9c6c68c7-6bb0-4e40-a3bf-8cac6448ac2e',
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: '',
-                    familyName: 'রোয়া',
-                    __typename: 'HumanName'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: '',
-                    familyName: 'Roya',
-                    __typename: 'HumanName'
-                  }
-                ]
-              }
-            },
-            mother: {
-              id: '22aa4ca0-e5ec-49ec-8574-39a799f57a65',
-              name: [
-                {
-                  use: 'bn',
-                  firstNames: '',
-                  familyName: 'রোকেয়া',
-                  __typename: 'HumanName'
-                },
-                {
-                  use: 'en',
-                  firstNames: '',
-                  familyName: 'Rokeya',
-                  __typename: 'HumanName'
-                }
-              ],
-              detailsExist: false,
-              birthDate: null,
-              maritalStatus: 'MARRIED',
-              dateOfMarriage: null,
-              educationalAttainment: null,
-              nationality: ['BGD'],
-              multipleBirth: 1,
-              identifier: [
-                {
-                  id: '1234567890987',
-                  type: 'NATIONAL_ID',
-                  otherType: null,
-                  __typename: 'IdentityType'
-                }
-              ],
-              address: [
-                {
-                  type: 'PRIMARY_ADDRESS',
-                  line: [
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
-                  ],
-                  district: '68ba789b-0e6c-4528-a400-4422e142e3dd',
-                  state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
-                  postalCode: null,
-                  country: 'BGD',
-                  __typename: 'Address'
-                },
-                {
-                  type: 'SECONDARY_ADDRESS',
-                  line: [
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
-                  ],
-                  district: '68ba789b-0e6c-4528-a400-4422e142e3dd',
-                  state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
-                  postalCode: null,
-                  country: 'BGD',
-                  __typename: 'Address'
-                }
-              ],
-              telecom: null,
-              __typename: 'Person'
-            },
-            father: {
-              id: '22aa4ca0-e5ec-49ec-8574-39a799f57aw5',
-              name: [
-                {
-                  use: 'bn',
-                  firstNames: '',
-                  familyName: 'হাসান',
-                  __typename: 'HumanName'
-                },
-                {
-                  use: 'en',
-                  firstNames: '',
-                  familyName: 'hasan',
-                  __typename: 'HumanName'
-                }
-              ],
-              birthDate: null,
-              detailsExist: false,
-              maritalStatus: 'MARRIED',
-              dateOfMarriage: null,
-              educationalAttainment: null,
-              nationality: ['BGD'],
-              multipleBirth: 1,
-              identifier: [
-                {
-                  id: '1234567890934',
-                  type: 'NATIONAL_ID',
-                  otherType: null,
-                  __typename: 'IdentityType'
-                }
-              ],
-              address: [
-                {
-                  type: 'PRIMARY_ADDRESS',
-                  line: [
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
-                  ],
-                  district: '68ba789b-0e6c-4528-a400-4422e142e3dd',
-                  state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
-                  postalCode: null,
-                  country: 'BGD',
-                  __typename: 'Address'
-                },
-                {
-                  type: 'SECONDARY_ADDRESS',
-                  line: [
-                    '',
-                    '',
-                    '',
-                    '',
-                    '',
-                    'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
-                  ],
-                  district: '68ba789b-0e6c-4528-a400-4422e142e3dd',
-                  state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
-                  postalCode: null,
-                  country: 'BGD',
-                  __typename: 'Address'
-                }
-              ],
-              telecom: null,
-              __typename: 'Person'
-            },
-            registration: {
-              id: '1440d427-7890-4a37-8f36-e9f65d725034',
-              informantType: 'MOTHER',
-              contact: 'MOTHER',
-              contactRelationship: 'Contact Relation',
-              contactPhoneNumber: '01711111111',
-              attachments: null,
-              status: [
-                {
-                  comments: null,
-                  type: 'REGISTERED',
-                  location: {
-                    name: 'Moktarpur Union Parishad',
-                    alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                    __typename: 'Location'
-                  },
-                  office: {
-                    name: 'Moktarpur Union Parishad',
-                    alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-                    address: {
-                      district: 'Gazipur',
-                      state: 'Dhaka',
-                      __typename: 'Address'
-                    },
-                    __typename: 'Location'
-                  },
-                  __typename: 'RegWorkflow'
-                }
-              ],
-              trackingId: 'BWOY6PW',
-              registrationNumber: '2019333494BWOY6PW8',
-              __typename: 'Registration'
-            },
-            attendantAtBirth: null,
-            weightAtBirth: null,
-            birthType: null,
-            eventLocation: null,
-            __typename: 'BirthRegistration'
-          }
-        }
-      }
-    }
-  ]
-
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
+      //@ts-ignore
+      delete birthDeclaration['data']['father']
+      store.dispatch(storeDeclaration(birthDeclaration))
       const testComponent = await createTestComponent(
         <CollectorForm
           location={location}
           history={history}
           match={{
             params: {
-              registrationId: '6a5fd35d-01ec-4c37-976e-e055107at5674',
+              registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
               eventType: 'birth',
               groupId: 'certCollector'
             },
@@ -759,7 +601,7 @@ describe('Certificate collector test for a birth registration without father and
             url: ''
           }}
         />,
-        { store, history, graphqlMocks: graphqlMock }
+        { store, history }
       )
       component = testComponent
       await waitForElement(component, '#collector_form')

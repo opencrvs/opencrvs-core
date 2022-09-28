@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import styled from '@client/styledComponents'
-import { ISelectProps } from '@opencrvs/components/lib/select'
+import { ISelect2Props } from '@opencrvs/components/lib/Select/Select2'
 import React from 'react'
 import { IPerformanceSelectOption } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { Button } from '@opencrvs/components/lib/buttons'
@@ -34,6 +34,11 @@ const Segment = styled(Button)<{ isSelected?: boolean }>`
     border-radius: 0 4px 4px 0;
     border-left: none;
   }
+  &:disabled {
+    border: ${({ theme }) => `2px solid ${theme.colors.grey300}`};
+    cursor: not-allowed;
+    color: ${({ theme }) => theme.colors.grey300};
+  }
 `
 
 const Container = styled.div`
@@ -41,8 +46,8 @@ const Container = styled.div`
   height: 32px;
 `
 export function SegmentedControl(
-  props: Omit<ISelectProps, 'options' | 'onChange'> & {
-    options: IPerformanceSelectOption[]
+  props: Omit<ISelect2Props, 'options' | 'onChange'> & {
+    options: (IPerformanceSelectOption & { disabled?: boolean })[]
     onChange: (option: IPerformanceSelectOption) => void
   }
 ) {
@@ -52,6 +57,7 @@ export function SegmentedControl(
         <Segment
           key={`${opt.label}_${i}`}
           id={`${opt.label}_${i}`}
+          disabled={opt.disabled}
           isSelected={opt.value === props.value}
           onClick={() => {
             if (props.onChange) {
