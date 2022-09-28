@@ -108,7 +108,7 @@ const columns = [
     key: 'name',
     isSortable: true,
     icon: <ArrowDownBlue />,
-    sortFunction: (key: any) => alert(`Sort by: ${key}`)
+    sortFunction: (key: unknown) => alert(`Sort by: ${key}`)
   },
   {
     label: 'Role',
@@ -116,7 +116,7 @@ const columns = [
     key: 'role',
     isSortable: true,
     icon: <ArrowDownBlue />,
-    sortFunction: (key: any) => alert(`Sort by: ${key}`)
+    sortFunction: (key: unknown) => alert(`Sort by: ${key}`)
   },
   {
     label: 'Type',
