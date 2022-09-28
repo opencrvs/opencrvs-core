@@ -497,35 +497,6 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
               <SectionTitle>
                 {intl.formatMessage(messages.auditSectionTitle)}
               </SectionTitle>
-              <PerformanceSelect
-                onChange={(option: { value: Event }) =>
-                  this.setState({ event: option.value as Event })
-                }
-                id="eventSelect"
-                withLightTheme={true}
-                defaultWidth={110}
-                value={this.state.event}
-                options={[
-                  {
-                    label: intl.formatMessage(
-                      performanceMessages.eventOptionForAll
-                    ),
-                    value: Event.All
-                  },
-                  {
-                    label: intl.formatMessage(
-                      performanceMessages.eventOptionForBirths
-                    ),
-                    value: Event.Birth
-                  },
-                  {
-                    label: intl.formatMessage(
-                      performanceMessages.eventOptionForDeaths
-                    ),
-                    value: Event.Death
-                  }
-                ]}
-              />
               <DateRangePicker
                 startDate={timeStart}
                 endDate={timeEnd}

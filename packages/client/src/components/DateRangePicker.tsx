@@ -667,7 +667,10 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
       </PickerButton>
       {modalVisible && (
         <>
-          <ModalContainer id="picker-modal">
+          <ModalContainer
+            style={{ position: 'absolute', top: 20 }}
+            id="picker-modal"
+          >
             <ModalHeader hide={routes[activeRoute].hideHeader}>
               <TitleContent>
                 <CalendarGrey />
