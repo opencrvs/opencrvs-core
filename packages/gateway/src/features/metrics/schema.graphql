@@ -121,18 +121,6 @@ type LocationWiseEstimationMetric {
   locationName: String!
 }
 
-type TimeLoggedMetrics {
-  status: String!
-  trackingId: String
-  eventType: String!
-  time: String!
-}
-
-type TimeLoggedMetricsResultSet {
-  results: [TimeLoggedMetrics]
-  totalItems: Int
-}
-
 type LocationStatisticsResponse {
   population: Int
   registrars: Int!
@@ -184,14 +172,6 @@ type Query {
     locationId: String
     event: String!
   ): [LocationWiseEstimationMetric!]
-  fetchTimeLoggedMetricsByPractitioner(
-    timeStart: String!
-    timeEnd: String!
-    practitionerId: String!
-    locationId: String!
-    count: Int!
-    skip: Int!
-  ): TimeLoggedMetricsResultSet
   getUserAuditLog(
     practitionerId: String!
     skip: Int

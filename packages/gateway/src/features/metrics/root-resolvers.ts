@@ -137,23 +137,6 @@ export const resolvers: GQLResolver = {
       )
       return metricsData
     },
-    async fetchTimeLoggedMetricsByPractitioner(
-      _,
-      { timeStart, timeEnd, practitionerId, locationId, count },
-      authHeader
-    ) {
-      return await getMetrics(
-        '/timeLoggedMetricsByPractitioner',
-        {
-          timeStart,
-          timeEnd,
-          practitionerId,
-          locationId,
-          count
-        },
-        authHeader
-      )
-    },
     async getUserAuditLog(_, params, authHeader) {
       return await getMetrics(
         '/audit/events',

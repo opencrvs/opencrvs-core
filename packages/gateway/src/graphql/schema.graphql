@@ -102,14 +102,6 @@ type Query {
     locationId: String
     event: String!
   ): [LocationWiseEstimationMetric!]
-  fetchTimeLoggedMetricsByPractitioner(
-    timeStart: String!
-    timeEnd: String!
-    practitionerId: String!
-    locationId: String!
-    count: Int!
-    skip: Int!
-  ): TimeLoggedMetricsResultSet
   getUserAuditLog(
     practitionerId: String!
     skip: Int
@@ -437,11 +429,6 @@ type LocationWiseEstimationMetric {
   estimated: Int!
   locationId: String!
   locationName: String!
-}
-
-type TimeLoggedMetricsResultSet {
-  results: [TimeLoggedMetrics]
-  totalItems: Int
 }
 
 type UserAuditLogResultSet {
@@ -893,13 +880,6 @@ type EventMetrics {
   eventLocationType: String!
   timeLabel: String!
   practitionerRole: String!
-}
-
-type TimeLoggedMetrics {
-  status: String!
-  trackingId: String
-  eventType: String!
-  time: String!
 }
 
 union UserAuditLogResultItem =
