@@ -15,7 +15,9 @@ import { query, writePoints } from '@metrics/influxdb/client'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import {
   getPractitionerIdFromBundle,
-  getCompositionIdFromCompositionOrTask, getTrackingId, getTask
+  getCompositionIdFromCompositionOrTask,
+  getTrackingId,
+  getTask
 } from '@metrics/features/registration/fhirUtils'
 
 type UserAuditAction =

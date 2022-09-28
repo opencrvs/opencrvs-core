@@ -12,6 +12,7 @@
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { withTheme } from '@client/styledComponents'
 import * as React from 'react'
+import Bowser from 'bowser'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Query } from '@client/components/Query'
 import { FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER } from '@client/user/queries'
@@ -145,7 +146,8 @@ export enum SORTED_COLUMN {
   ACTION = 'actionDescriptionString',
   EVENT = 'eventType',
   RECORD = 'trackingIdString',
-  DATE = 'auditTime'
+  DATE = 'auditTime',
+  DEVICE = 'deviceIpAddress'
 }
 
 type State = {
@@ -255,6 +257,15 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.RECORD)
         },
         {
+          label: intl.formatMessage(messages.auditDeviceIpAddressColumnTitle),
+          width: 20,
+          isSortable: true,
+          icon: <ArrowDownBlue />,
+          key: 'deviceIpAddress',
+          alignment: ColumnContentAlignment.LEFT,
+          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DEVICE)
+        },
+        {
           label: intl.formatMessage(messages.auditDateColumnTitle),
           width: 22,
           key: 'auditTime',
@@ -335,6 +346,22 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         const actionDescriptor = getUserAuditDescription(
           timeLoggedMetrics.status
         )
+
+        const device = Bowser.getParser(
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+        ).getResult()
+
+        const deviceIpAddress =
+          [
+            device.platform.vendor,
+            device.os.name,
+            device.browser ? `(${device.browser.name})` : ''
+          ]
+            .filter(Boolean)
+            .join(' ') +
+          ' • ' +
+          '127.0.0.1'
+
         return {
           actionDescription: (
             <InformationTitle>
@@ -367,6 +394,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           trackingId: timeLoggedMetrics.trackingId && (
             <LinkButton>{timeLoggedMetrics.trackingId}</LinkButton>
           ),
+          deviceIpAddress: deviceIpAddress,
           trackingIdString: timeLoggedMetrics.trackingId,
           auditTime: format(
             new Date(timeLoggedMetrics.time),
