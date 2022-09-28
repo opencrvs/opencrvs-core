@@ -2715,7 +2715,7 @@ export function getPlaceOfEventAddressFields(
         template: {
           fieldName: configCase,
           operation: 'eventLocationAddressOfflineTransformer',
-          parameters: ['country']
+          parameters: ['country', configCase]
         },
         mutation: {
           operation:
@@ -2771,7 +2771,7 @@ export function getPlaceOfEventAddressFields(
         template: {
           fieldName: configCase,
           operation: 'eventLocationAddressOfflineTransformer',
-          parameters: ['state']
+          parameters: ['state', configCase]
         },
         mutation: {
           operation:
@@ -2841,7 +2841,7 @@ export function getPlaceOfEventAddressFields(
         template: {
           fieldName: configCase,
           operation: 'eventLocationAddressOfflineTransformer',
-          parameters: ['district']
+          parameters: ['district', configCase]
         },
         mutation: {
           operation:
@@ -3287,7 +3287,7 @@ export function getPlaceOfEventAddressFields(
         template: {
           fieldName: configCase,
           operation: 'eventLocationAddressOfflineTransformer',
-          parameters: ['state']
+          parameters: ['state', configCase]
         },
         mutation: {
           operation:
@@ -3340,7 +3340,7 @@ export function getPlaceOfEventAddressFields(
         template: {
           fieldName: configCase,
           operation: 'eventLocationAddressOfflineTransformer',
-          parameters: ['district']
+          parameters: ['district', configCase]
         },
         mutation: {
           operation:

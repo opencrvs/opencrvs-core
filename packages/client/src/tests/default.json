@@ -1251,7 +1251,8 @@
                       "fieldName": "placeOfBirth",
                       "operation": "eventLocationNameQueryOfflineTransformer",
                       "parameters": [
-                        "facilities"
+                        "facilities",
+                        "placeOfBirth"
                       ]
                     },
                     "mutation": {
@@ -4492,7 +4493,8 @@
                       "fieldName": "placeOfDeath",
                       "operation": "eventLocationNameQueryOfflineTransformer",
                       "parameters": [
-                        "facilities"
+                        "facilities",
+                        "placeOfDeath"
                       ]
                     },
                     "mutation": {
