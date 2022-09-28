@@ -547,8 +547,10 @@ export async function setupRegAssigned(
       return taskResource
     }
     if (
-      setupRegAssignedExtension.valueString === RegStatus.REJECTED &&
-      practitionerDetails.role === 'FIELD_AGENT'
+      (setupRegAssignedExtension.valueString === RegStatus.REJECTED &&
+        practitionerDetails.role === 'FIELD_AGENT') ||
+      (practitionerDetails.role === 'REGISTRATION_AGENT' &&
+        setupRegAssignedExtension.valueString === RegStatus.VALIDATED)
     ) {
       return taskResource
     }
