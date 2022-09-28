@@ -42,6 +42,7 @@ import { GraphQLSchema } from 'graphql'
 import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
+import { RenderPageOptions } from '@apollographql/graphql-playground-html'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -90,6 +91,38 @@ export const getApolloConfig = (): Config => {
     typeDefs,
     resolvers,
     context: async ({ request, h }) => {
+      try {
+        const userId = getUserId({
+          Authorization: request.headers.authorization
+        })
+        const user: IUserModelData = await getUser(
+          { userId },
+          { Authorization: request.headers.authorization }
+        )
+        if (!user || !['active', 'pending'].includes(user.status)) {
+          throw new AuthenticationError('Authentication failed')
+        }
+        const tokenPayload = getTokenPayload(
+          request.headers.authorization.split(' ')[1]
+        )
+        if (tokenPayload && !isEqual(tokenPayload.scope, user.scope)) {
+          throw new AuthenticationError('Authentication failed')
+        }
+      } catch (err) {
+        throw new AuthenticationError(err)
+      }
+
+      return {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId()
+      }
+    }
+  }
+}
+
+export const getPlaygroundConfig = (): RenderPageOptions => {
+  return {
+    context: async ({ request, h }: any) => {
       try {
         const userId = getUserId({
           Authorization: request.headers.authorization
