@@ -93,12 +93,11 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
-    handler: (request: any, h: any) => {
+    handler: (request: any, h: any) =>
       // Perform any health checks and return true or false for success prop
-      return {
+      ({
         success: true
-      }
-    },
+      }),
     options: {
       auth: false,
       tags: ['api'],

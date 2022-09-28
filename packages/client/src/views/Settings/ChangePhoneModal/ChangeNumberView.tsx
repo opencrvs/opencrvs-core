@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ResponsiveModal,
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { isAValidPhoneNumberFormat } from '@client/utils/validate'
@@ -126,16 +124,17 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           onChange={onChangePhoneNumber}
         />
       </InputField>
-      <FloatingNotification
-        id="duplicate-mobile-error-notification"
-        type={NOTIFICATION_TYPE.ERROR}
-        show={showDuplicateMobileErrorNotification}
-        callback={() => toggleDuplicateMobileErrorNotification()}
-      >
-        {intl.formatMessage(messages.duplicateUserMobileErrorMessege, {
-          number: phoneNumber
-        })}
-      </FloatingNotification>
+      {showDuplicateMobileErrorNotification && (
+        <Toast
+          id="duplicate-mobile-error-notification"
+          type="warning"
+          onClose={() => toggleDuplicateMobileErrorNotification()}
+        >
+          {intl.formatMessage(messages.duplicateUserMobileErrorMessege, {
+            number: phoneNumber
+          })}
+        </Toast>
+      )}
     </ResponsiveModal>
   )
 }

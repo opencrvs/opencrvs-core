@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import {
   createDeclaration,
   IDeclaration,
@@ -292,7 +292,7 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      const data = testComponent.find(GridTable).prop('content')
+      const data = testComponent.find(Workqueue).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(TIME_STAMP)
 
       expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
@@ -542,7 +542,7 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      const data = testComponent.find(GridTable).prop('content')
+      const data = testComponent.find(Workqueue).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
       expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
       expect(data[0].name).toBe('k m abdullah al amin khan')
@@ -820,6 +820,7 @@ describe('In Progress tab', () => {
   describe('When Notification (Hospital) tab is selected', () => {
     it('Should render all items returned from graphQL', async () => {
       const TIME_STAMP = '1562912635549'
+      const birthNotificationSentDateStr = '2019-10-20T11:03:20.660Z'
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.Birth))
       const testComponent = await createTestComponent(
@@ -837,6 +838,27 @@ describe('In Progress tab', () => {
                     trackingId: 'BQ2IDOP',
                     modifiedAt: TIME_STAMP
                   },
+                  operationHistories: [
+                    {
+                      operationType: 'IN_PROGRESS',
+                      operatedOn: birthNotificationSentDateStr,
+                      operatorRole: 'LOCAL_REGISTRAR',
+                      operatorName: [
+                        {
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful',
+                          use: 'en'
+                        },
+                        {
+                          firstNames: '',
+                          familyName: '',
+                          use: 'bn'
+                        }
+                      ],
+                      operatorOfficeName: 'Alokbali Union Parishad',
+                      operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                    }
+                  ],
                   childName: [
                     {
                       use: 'en',
@@ -879,96 +901,98 @@ describe('In Progress tab', () => {
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
+        testComponent.update()
+        const data = testComponent.find(Workqueue).prop('content')
+        const EXPECTED_DATE_OF_REJECTION = formattedDuration(
+          new Date(birthNotificationSentDateStr)
+        )
+
+        expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
+        expect(data[0].name).toBe('anik hoque')
+        expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
+        expect(data[0].event).toBe('Birth')
+      })
+    })
+  })
+
+  describe('Tablet tests', () => {
+    const { store } = createStore()
+
+    beforeAll(async () => {
+      getItem.mockReturnValue(registerScopeToken)
+      await store.dispatch(checkAuth())
+      resizeWindow(800, 1280)
+    })
+
+    afterEach(() => {
+      resizeWindow(1024, 768)
+    })
+
+    it('redirects to recordAudit page if item is clicked', async () => {
+      vi.clearAllMocks()
+      const TIME_STAMP = '1562912635549'
+      const drafts: IDeclaration[] = []
+      drafts.push(createDeclaration(Event.Birth))
+      const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+
+      // @ts-ignore
+      const testComponent = await createTestComponent(
+        <InProgress
+          drafts={drafts}
+          selectorId={SELECTOR_ID.fieldAgentDrafts}
+          queryData={{
+            inProgressData: {
+              totalItems: 1,
+              results: [
+                {
+                  id: declarationId,
+                  type: 'Birth',
+                  registration: {
+                    trackingId: 'BQ2IDOP',
+                    modifiedAt: TIME_STAMP
+                  },
+                  childName: [
+                    {
+                      use: 'en',
+                      firstNames: 'Anik',
+                      familyName: 'Hoque'
+                    }
+                  ]
+                } as GQLBirthEventSearchSet
+              ]
+            },
+            notificationData: {}
+          }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
+        />,
+        { store, history }
+      )
+
+      getItem.mockReturnValue(registerScopeToken)
+      await store.dispatch(checkAuth())
+
+      // wait for mocked data to load mockedProvider
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
       })
       testComponent.update()
-      const data = testComponent.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
+      testComponent.find('#name_0').hostNodes().simulate('click')
 
-      expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
-      expect(data[0].name).toBe('anik hoque')
-      expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
-      expect(data[0].event).toBe('Birth')
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+
+      expect(window.location.href).toContain(
+        '/record-audit/inProgressTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      )
     })
-  })
-})
-
-describe('Tablet tests', () => {
-  const { store } = createStore()
-
-  beforeAll(async () => {
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
-    resizeWindow(800, 1280)
-  })
-
-  afterEach(() => {
-    resizeWindow(1024, 768)
-  })
-
-  it('redirects to recordAudit page if item is clicked', async () => {
-    vi.clearAllMocks()
-    const TIME_STAMP = '1562912635549'
-    const drafts: IDeclaration[] = []
-    drafts.push(createDeclaration(Event.Birth))
-    const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-
-    // @ts-ignore
-    const testComponent = await createTestComponent(
-      <InProgress
-        drafts={drafts}
-        selectorId={SELECTOR_ID.fieldAgentDrafts}
-        queryData={{
-          inProgressData: {
-            totalItems: 1,
-            results: [
-              {
-                id: declarationId,
-                type: 'Birth',
-                registration: {
-                  trackingId: 'BQ2IDOP',
-                  modifiedAt: TIME_STAMP
-                },
-                childName: [
-                  {
-                    use: 'en',
-                    firstNames: 'Anik',
-                    familyName: 'Hoque'
-                  }
-                ]
-              } as GQLBirthEventSearchSet
-            ]
-          },
-          notificationData: {}
-        }}
-        isFieldAgent={false}
-        paginationId={{
-          draftId: 1,
-          fieldAgentId: 1,
-          healthSystemId: 1
-        }}
-        pageSize={10}
-        onPageChange={(pageId: number) => {}}
-      />,
-      { store, history }
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
-
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.update()
-    testComponent.find('#name_0').hostNodes().simulate('click')
-
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.update()
-
-    expect(window.location.href).toContain(
-      '/record-audit/inProgressTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-    )
   })
 })

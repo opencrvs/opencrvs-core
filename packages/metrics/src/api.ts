@@ -21,7 +21,7 @@ import {
 export function fetchFHIR<T = any>(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET',
+  method = 'GET',
   body?: string
 ) {
   const url = [fhirUrl.replace(/\/$/, ''), suffix].join('/')
@@ -122,7 +122,7 @@ export async function fetchChildLocationsWithTypeByParentId(
 export function fetchFromResource(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET',
+  method = 'GET',
   body?: string
 ) {
   const url = [COUNTRY_CONFIG_URL.replace(/\/$/, ''), suffix].join('/')

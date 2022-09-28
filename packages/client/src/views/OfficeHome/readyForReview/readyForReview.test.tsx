@@ -32,7 +32,7 @@ import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { EVENT_STATUS } from '@client/views/OfficeHome/utils'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import ApolloClient from 'apollo-client'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
@@ -150,6 +150,7 @@ for (let i = 0; i < 14; i++) {
 }
 merge(mockUserResponse, nameObj)
 
+const mockDeclarationDateStr = '2019-10-20T11:03:20.660Z'
 const mockReviewTabData = {
   totalItems: 2,
   results: [
@@ -166,6 +167,27 @@ const mockReviewTabData = {
         createdAt: '1544188309380',
         modifiedAt: '1544188309380'
       },
+      operationHistories: [
+        {
+          operationType: 'DECLARED',
+          operatedOn: mockDeclarationDateStr,
+          operatorRole: 'LOCAL_REGISTRAR',
+          operatorName: [
+            {
+              firstNames: 'Mohammad',
+              familyName: 'Ashraful',
+              use: 'en'
+            },
+            {
+              firstNames: '',
+              familyName: '',
+              use: 'bn'
+            }
+          ],
+          operatorOfficeName: 'Alokbali Union Parishad',
+          operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+        }
+      ],
       dateOfBirth: '2010-10-10',
       childName: [
         {
@@ -281,11 +303,11 @@ describe('OfficeHome sent for review tab related tests', () => {
       { store, history }
     )
 
-    const gridTable = await waitForElement(testComponent, GridTable)
+    const workqueue = await waitForElement(testComponent, Workqueue)
 
-    const data = gridTable.prop('content')
+    const data = workqueue.prop('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
-      Number.parseInt(TIME_STAMP)
+      new Date(mockDeclarationDateStr)
     )
 
     expect(data.length).toBe(2)
@@ -318,8 +340,8 @@ describe('OfficeHome sent for review tab related tests', () => {
       { store, history }
     )
 
-    const gridTable = await waitForElement(testComponent, GridTable)
-    const data = gridTable.prop('content')
+    const workqueue = await waitForElement(testComponent, Workqueue)
+    const data = workqueue.prop('content')
     expect(data.length).toBe(0)
   })
 

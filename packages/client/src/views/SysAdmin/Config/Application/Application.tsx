@@ -12,11 +12,11 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import styled from 'styled-components'
-import { FormTabs } from '@opencrvs/components/lib/forms'
-import { ListViewSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import {
   ApplicationName,
   Currency,

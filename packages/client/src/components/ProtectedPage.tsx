@@ -31,7 +31,7 @@ import { connect } from 'react-redux'
 import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
 import styled from 'styled-components'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
 import { StyledText } from './Page'
@@ -89,7 +89,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 
   async componentDidMount() {
     setTimeout(this.setLoadingTimeOut, LOADER_MIN_DISPLAY_TIME)
-    const newState = { ...this.state }
+
+    const { loadingTimeout, ...stateWithoutLoadingTimeout } = this.state
+    const newState = { ...stateWithoutLoadingTimeout }
 
     if (await storage.getItem(SCREEN_LOCK)) {
       newState.secured = false

@@ -25,10 +25,7 @@ import {
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { getOfflineData } from '@client/offline/selectors'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useSelector } from 'react-redux'
 
 export const Page = styled.div`

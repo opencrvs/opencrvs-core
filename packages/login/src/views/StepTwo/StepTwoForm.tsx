@@ -13,12 +13,9 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { Form, Field } from 'react-final-form'
-import {
-  TextInput,
-  InputField,
-  THEME_MODE,
-  ErrorMessage
-} from '@opencrvs/components/lib/forms'
+import { InputField, THEME_MODE } from '@opencrvs/components/lib/InputField'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
 import { Mobile2FA } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
 import {

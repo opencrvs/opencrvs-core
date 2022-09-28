@@ -20,7 +20,10 @@ describe('authenticate handler receives a request', () => {
 
   describe('refresh expiring token', () => {
     it('verifies a token and generates a new token', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const codeService = require('../verifyCode/service')
+
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
@@ -65,7 +68,9 @@ describe('authenticate handler receives a request', () => {
       expect(body.sub).toBe('1')
     })
     it('refreshError returns a 401 to the client if the token is bad', async () => {
+      // eslint-disable-next-line
       const codeService = require('../verifyCode/service')
+      // eslint-disable-next-line
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({

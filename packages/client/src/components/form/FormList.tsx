@@ -15,7 +15,7 @@ import {
   WrappedComponentProps as IntlShapeProps,
   MessageDescriptor
 } from 'react-intl'
-import { List } from '@opencrvs/components/lib/typography'
+import { List } from '@opencrvs/components/lib/List'
 
 export interface IProps {
   list: MessageDescriptor[]

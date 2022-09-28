@@ -46,7 +46,8 @@ if (options.help) {
     },
     { header: 'Options', optionList }
   ])
-  // tslint:disable-next-line:no-console
+
+  // eslint-disable-next-line no-console
   console.log(usage)
   process.exit(0)
 }
@@ -72,8 +73,8 @@ if (options.help) {
 
     let code = '000000'
     if (options.code) {
-      code = await new Promise<string>(resolve => {
-        rl.question('Enter your auth code: ', answer => {
+      code = await new Promise<string>((resolve) => {
+        rl.question('Enter your auth code: ', (answer) => {
           resolve(answer)
         })
       })
@@ -96,13 +97,13 @@ if (options.help) {
 
     const verifyResJson = await verifyRes.json()
 
-    // tslint:disable-next-line no-console
+    // eslint-disable-next-line no-console
     console.log('Token:\n')
-    // tslint:disable-next-line:no-console
+    // eslint-disable-next-line no-console
     console.log(verifyResJson.token, '\n')
     process.exit(0)
   } catch (err) {
-    // tslint:disable-next-line:no-console
+    // eslint-disable-next-line no-console
     console.log(err)
     process.exit(1)
   }
