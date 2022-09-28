@@ -36,7 +36,7 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE } from '@client/utils/constants'
@@ -476,33 +476,34 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               </ListViewContainer>
             </Content>
           )}
-          <Toast
-            type={
-              imageLoadingError
-                ? NOTIFICATION_TYPE.ERROR
-                : this.state.imageUploading
-                ? NOTIFICATION_TYPE.IN_PROGRESS
-                : NOTIFICATION_TYPE.SUCCESS
-            }
-            show={showNotification}
-            callback={
-              imageUploading ? undefined : () => this.toggleNotification()
-            }
-          >
-            <FormattedMessage
-              {...(this.state.imageUploading
-                ? messages.certificateUploading
-                : !!this.state.imageLoadingError
-                ? messages.certificateValidationError
-                : messages.certificateUpdated)}
-              values={{
-                eventName: !this.state.imageUploading
-                  ? eventName.toUpperCase()[0] +
-                    eventName.toLowerCase().slice(1)
-                  : eventName
-              }}
-            />
-          </Toast>
+          {showNotification && (
+            <Toast
+              type={
+                imageLoadingError
+                  ? 'warning'
+                  : this.state.imageUploading
+                  ? 'loading'
+                  : 'success'
+              }
+              onClose={
+                imageUploading ? undefined : () => this.toggleNotification()
+              }
+            >
+              <FormattedMessage
+                {...(this.state.imageUploading
+                  ? messages.certificateUploading
+                  : !!this.state.imageLoadingError
+                  ? messages.certificateValidationError
+                  : messages.certificateUpdated)}
+                values={{
+                  eventName: !this.state.imageUploading
+                    ? eventName.toUpperCase()[0] +
+                      eventName.toLowerCase().slice(1)
+                    : eventName
+                }}
+              />
+            </Toast>
+          )}
           <ResponsiveModal
             id="withoutVerificationPrompt"
             show={showPrompt}

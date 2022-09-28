@@ -28,7 +28,7 @@ import {
   EventTopBar,
   IEventTopBarProps,
   IEventTopBarMenuAction
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/EventTopBar'
 import { Alert } from '@opencrvs/components/lib/Alert'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
@@ -790,14 +790,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         >
                           {isFileSizeExceeded(declaration) &&
                             isDocumentUploadPage && (
-                              <Alert
-                                label={intl.formatMessage(
+                              <Alert type="warning">
+                                {intl.formatMessage(
                                   constantsMessages.totalFileSizeExceed,
                                   {
                                     fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
                                   }
                                 )}
-                              />
+                              </Alert>
                             )}
                           <FormFieldGenerator
                             id={activeSectionGroup.id}

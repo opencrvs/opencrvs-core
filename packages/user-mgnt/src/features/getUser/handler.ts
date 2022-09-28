@@ -35,7 +35,6 @@ export default async function getUser(
   if (mobile) {
     criteria = { ...criteria, mobile }
   }
-  // tslint:disable-next-line
   const user: IUserModel | null = await User.findOne(criteria)
 
   if (!user) {

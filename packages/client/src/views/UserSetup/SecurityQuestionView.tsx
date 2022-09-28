@@ -22,7 +22,7 @@ import { InputError } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { Select } from '@opencrvs/components/lib/Select'
 import { find, at } from 'lodash'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ProtectedAccoutStep,

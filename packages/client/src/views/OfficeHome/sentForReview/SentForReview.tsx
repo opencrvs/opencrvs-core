@@ -38,6 +38,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
@@ -51,7 +52,7 @@ import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-
+import { RegStatus } from '@client/utils/gateway'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
@@ -198,7 +199,8 @@ class SentForReviewComponent extends React.Component<
                 event: reg.event,
                 compositionId: reg.id,
                 action: DownloadAction.LOAD_REVIEW_DECLARATION,
-                declarationStatus: reg.declarationStatus
+                declarationStatus: reg.declarationStatus,
+                assignment: reg.assignment
               }}
               key={`DownloadButton-${index}`}
               status={downloadStatus as DOWNLOAD_STATUS}
@@ -217,9 +219,11 @@ class SentForReviewComponent extends React.Component<
           )) ||
         ''
       const sentForApproval =
-        (reg.createdAt && Number.isNaN(Number(reg.createdAt))
-          ? new Date(reg.createdAt)
-          : new Date(Number(reg.createdAt))) || ''
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          this.isFieldAgent ? RegStatus.Declared : RegStatus.Validated
+        ) || ''
+
       const dateOfEvent =
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&

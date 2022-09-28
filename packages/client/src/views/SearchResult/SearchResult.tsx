@@ -16,7 +16,7 @@ import {
   getProcessingDeclarationIds
 } from '@client/declarations'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { Header } from '@client/components/interface/Header/Header'
+import { Header } from '@client/components/Header/Header'
 import { Query } from '@client/components/Query'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
 import { DownloadAction } from '@client/forms'

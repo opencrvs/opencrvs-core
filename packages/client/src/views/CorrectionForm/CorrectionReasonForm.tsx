@@ -29,7 +29,7 @@ import {
   IForm
 } from '@client/forms'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormFieldGenerator } from '@client/components/form'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'

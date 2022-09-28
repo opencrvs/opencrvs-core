@@ -36,7 +36,6 @@ export const FullBodyContent = styled.div`
   width: 100%;
   height: 100%;
   padding: 24px;
-  margin-top: 56px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0px;
   }

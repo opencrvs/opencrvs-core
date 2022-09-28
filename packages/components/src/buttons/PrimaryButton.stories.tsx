@@ -18,7 +18,7 @@ const Template: Story<IButtonProps> = (args) => (
 )
 
 export default {
-  title: 'Controls/Button/PrimaryButton',
+  title: 'Deprecated/Button/PrimaryButton',
   component: PrimaryButton,
   argTypes: {
     icon: {

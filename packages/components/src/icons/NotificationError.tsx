@@ -12,24 +12,34 @@
 import * as React from 'react'
 
 export const NotificationError = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" {...props}>
+  <svg
+    width="25"
+    height="25"
+    viewBox="0 0 25 25"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M20 30C25.5228 30 30 25.5228 30 20C30 14.4772 25.5228 10 20 10C14.4772 10 10 14.4772 10 20C10 25.5228 14.4772 30 20 30Z"
+      d="M12.375 22.625C17.8978 22.625 22.375 18.1478 22.375 12.625C22.375 7.10215 17.8978 2.625 12.375 2.625C6.85215 2.625 2.375 7.10215 2.375 12.625C2.375 18.1478 6.85215 22.625 12.375 22.625Z"
       stroke="white"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
-      d="M20 16V20"
+      d="M12.375 8.625V12.625"
       stroke="white"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    <circle cx="20" cy="24" r="0.5" fill="white" stroke="white" />
+    <path
+      d="M12.375 16.625H12.385"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 )
 export default NotificationError

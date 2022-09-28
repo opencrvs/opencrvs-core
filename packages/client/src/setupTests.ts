@@ -14,11 +14,14 @@ import { IUserData } from './declarations'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
 import { authApi } from './utils/authApi'
+// eslint-disable-next-line import/no-unassigned-import
 import 'core-js/features/array/flat'
+// eslint-disable-next-line import/no-unassigned-import
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/query/queries'
 import { userQueries } from './user/queries'
 import { mockOfflineData } from './tests/mock-offline-data'
+// eslint-disable-next-line import/no-unassigned-import
 import './tests/queryMock'
 import { vi } from 'vitest'
 import createFetchMock from 'vitest-fetch-mock'

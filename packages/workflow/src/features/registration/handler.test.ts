@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+// eslint-disable-next-line import/no-relative-parent-imports
 import { createServer } from '../../server'
 import {
   testFhirBundle,
@@ -1248,6 +1250,7 @@ describe('markEventAsRequestedForCorrection handler', () => {
     server = await createServer()
     fetch.mockResponses(
       [userMock, { status: 200 }],
+      [patientMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],

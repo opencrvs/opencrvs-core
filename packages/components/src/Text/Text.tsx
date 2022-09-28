@@ -26,9 +26,9 @@ export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
   color?: IColor
 }
 
-const StyledText = styled.span<{ variant: IFont }>`
-  ${({ variant }) => fonts[variant]}
-  ${({ color }) => color && `color: ${colors[color]};`}
+const StyledText = styled.span<{ $variant: IFont; $color: IColor }>`
+  ${({ $variant }) => fonts[$variant]}
+  ${({ $color }) => `color: ${colors[$color]};`}
 `
 
 /** Text helps present your content with correct hierarchy and font sizes */
@@ -38,5 +38,5 @@ export const Text = ({
   color = 'copy',
   ...props
 }: ITextProps) => (
-  <StyledText variant={variant} color={color} as={element} {...props} />
+  <StyledText $variant={variant} $color={color} as={element} {...props} />
 )

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { WarningMessage } from './WarningMessage'
 
 export default {
-  title: 'Data/Warning message',
+  title: 'Deprecated/Warning message',
   component: WarningMessage
 } as Meta
 

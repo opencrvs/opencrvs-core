@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
@@ -60,7 +57,7 @@ import { messages as statusMessages } from '@client/i18n/messages/views/registra
 import { colors } from '@opencrvs/components/lib/colors'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { TableView } from '@opencrvs/components/lib/interface/TableView'
+import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 
 const ToolTipContainer = styled.span`
@@ -776,20 +773,19 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 
             return (
               <>
-                <TableView
+                <Table
                   id="declaration-status-list"
                   content={getContent(data)}
                   columns={getColumns()}
                   isLoading={loading || Boolean(error)}
                   noResultText={intl.formatMessage(constantsMessages.noResults)}
-                  hideBoxShadow
                   fixedWidth={2050}
                   tableHeight={150}
                   highlightRowOnMouseOver
                   noPagination
                   isFullPage
                 />
-                {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+                {error && <GenericErrorToast />}
                 {total > pageSize && (
                   <Pagination
                     initialPage={currentPageNumber}

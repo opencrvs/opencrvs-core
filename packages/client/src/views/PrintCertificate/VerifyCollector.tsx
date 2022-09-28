@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'

@@ -11,34 +11,129 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { Alert as AlertIcon } from '../icons'
+import { Check, Help, Cross, NotificationError, Notification } from '../icons'
+import { Spinner } from '../Spinner'
+import { Button } from '../Button'
+import { Text } from '../Text'
 import { colors } from '../colors'
 
-const Conatiner = styled.div`
-  box-sizing: border-box;
+export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
+
+const Container = styled.div<{
+  $type?: AlertType
+}>`
+  --color: ${({ $type, theme }) => `
+    ${$type === 'success' ? theme.colors.positiveDark : ''}
+    ${$type === 'loading' ? theme.colors.primaryDark : ''}
+    ${$type === 'info' ? theme.colors.primaryDark : ''}
+    ${$type === 'error' ? theme.colors.negativeDark : ''}
+    ${$type === 'warning' ? theme.colors.orangeDark : ''}
+    ${$type === undefined ? theme.colors.positiveDark : ''}
+  `};
+
+  min-height: 52px;
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 0 16px;
-  /* stylelint-disable-next-line color-no-hex */
-  background-color: #fff3f3;
   border-radius: 4px;
-  border: 1px solid ${colors.red};
-  color: ${colors.red};
-  ${({ theme }) => theme.fonts.bold16}
+  border: 2px solid var(--color);
+  border-left-width: 0px;
+  background: linear-gradient(
+    to right,
+    var(--color) 48px,
+    ${({ theme }) => theme.colors.white} 48px
+  );
 `
 
-export function Alert({
-  label,
-  ...props
-}: {
-  label: React.ReactNode
-  hideIcon?: boolean
-} & React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <Conatiner {...props}>
-      {!props.hideIcon && <AlertIcon color="invert" />}
-      <p>{label}</p>
-    </Conatiner>
-  )
+const IconContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+  width: 48px;
+  color: ${({ theme }) => theme.colors.white};
+`
+
+const Close = styled(Button)`
+  color: var(--color) !important;
+  margin-top: 4px;
+  margin-right: 4px;
+`
+
+const ActionButton = styled(Button)`
+  margin-top: 8px;
+  margin-right: 8px;
+`
+
+const ButtonText = styled(Text)`
+  color: var(--color) !important;
+  padding: 0 4px;
+`
+
+const NotificationMessage = styled.div`
+  ${({ theme }) => theme.fonts.bold16};
+  color: var(--color);
+  position: relative;
+  padding: 12px 24px 12px 16px;
+  min-width: 160px;
+  max-width: calc(100% - 48px);
+  flex: 1;
+`
+
+export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
+  type: AlertType
+  onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
+  onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
+  actionText?: string
 }
+
+/**
+ * Alert informs about persistent conditions or important information. See `<Toast>` for informing users about feedback of their actions.
+ */
+export const Alert = ({
+  type,
+  onClose,
+  onActionClick,
+  actionText,
+  children,
+  ...props
+}: IAlertProps) => (
+  <Container $type={type} {...props}>
+    <IconContainer>
+      {type === 'success' && <Check />}
+      {type === 'warning' && <Help />}
+      {type === 'error' && <NotificationError />}
+      {type === 'info' && <Notification />}
+      {type === 'loading' && (
+        <Spinner
+          id="in-progress-floating-notification"
+          baseColor={colors.white}
+          size={20}
+        />
+      )}
+    </IconContainer>
+
+    <NotificationMessage>{children}</NotificationMessage>
+
+    {onActionClick && (
+      <ActionButton
+        type="tertiary"
+        onClick={onActionClick}
+        data-testid={props['data-testid'] && `${props['data-testid']}-action`}
+      >
+        <ButtonText variant="bold14" element="span">
+          {actionText}
+        </ButtonText>
+      </ActionButton>
+    )}
+
+    {onClose && type !== 'loading' && (
+      <Close
+        type="icon"
+        id={props.id + 'Cancel'}
+        data-testid={props['data-testid'] && `${props['data-testid']}-close`}
+        onClick={onClose}
+      >
+        <Cross color="currentColor" />
+      </Close>
+    )}
+  </Container>
+)

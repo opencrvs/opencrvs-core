@@ -16,7 +16,7 @@ import {
   SUBMISSION_STATUS,
   updateRegistrarWorkqueue
 } from '@client/declarations'
-import { Header } from '@client/components/interface/Header/Header'
+import { Header } from '@client/components/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import {
   goToEvents,
@@ -42,7 +42,7 @@ import {
   SYS_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -478,9 +478,8 @@ export class OfficeHomeView extends React.Component<
         {this.state.showCertificateToast && (
           <Toast
             id="print-cert-notification"
-            type={NOTIFICATION_TYPE.SUCCESS}
-            show={this.state.showCertificateToast}
-            callback={() => {
+            type="success"
+            onClose={() => {
               this.setState({ showCertificateToast: false })
             }}
           >

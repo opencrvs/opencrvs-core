@@ -18,10 +18,12 @@ import {
   hasReinstatedExtension
 } from '@workflow/features/task/fhir/utils'
 import { testFhirTaskBundle } from '@workflow/test/utils'
-import { RegStatus } from '@workflow/features/registration/fhir/constants'
+import {
+  RegStatus,
+  EVENT_TYPE
+} from '@workflow/features/registration/fhir/constants'
 import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { cloneDeep } from 'lodash'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 
 const task = testFhirTaskBundle.entry[0].resource
 

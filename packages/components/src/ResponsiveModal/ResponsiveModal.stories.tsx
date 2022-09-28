@@ -9,45 +9,54 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import { PrimaryButton } from '../buttons'
+import { ComponentStory, Meta } from '@storybook/react'
+import { Button } from '../Button'
 import { ResponsiveModal } from './ResponsiveModal'
-import React from 'react'
+import React, { useState } from 'react'
 
-interface IProps {
-  id?: string
-  title: string
-  show: boolean
-  responsive?: boolean
-  width?: number
-  contentHeight?: number
-  contentScrollableY?: boolean
-  actions: JSX.Element[]
-  handleClose?: () => void
-  hideHeaderBoxShadow?: boolean
+const Template: ComponentStory<typeof ResponsiveModal> = (args) => {
+  const [isVisible, setIsVisible] = useState(false)
+
+  return (
+    <>
+      <Button type="primary" onClick={() => setIsVisible(true)}>
+        Open dialog
+      </Button>
+
+      <ResponsiveModal
+        {...args}
+        show={isVisible}
+        handleClose={() => setIsVisible(false)}
+      >
+        Children elements will go here
+      </ResponsiveModal>
+    </>
+  )
 }
-
-const Template: Story<IProps> = (args) => (
-  <ResponsiveModal {...args}>Children elements will go here</ResponsiveModal>
-)
 
 export const ResponsiveModalView = Template.bind({})
 ResponsiveModalView.args = {
   title: 'Are you ready to submit?',
   actions: [
-    <PrimaryButton key="submit" onClick={() => alert('Submit button clicked')}>
+    <Button type="primary" onClick={() => alert('Submit button clicked')}>
       Submit
-    </PrimaryButton>,
-    <button key="preview" onClick={() => alert('Preview Button clicked')}>
+    </Button>,
+    <Button type="secondary" onClick={() => alert('Preview Button clicked')}>
       Preview
-    </button>
-  ],
-  show: true,
-  handleClose: () => {
-    alert('Closed')
-  }
+    </Button>
+  ]
 }
+
 export default {
   title: 'Layout/Dialog',
-  component: ResponsiveModal
+  component: ResponsiveModal,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+\`<Dialog>\` is a modal component which requests an action from a user.
+`
+      }
+    }
+  }
 } as Meta

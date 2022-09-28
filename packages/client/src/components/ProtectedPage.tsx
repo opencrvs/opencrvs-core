@@ -89,7 +89,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 
   async componentDidMount() {
     setTimeout(this.setLoadingTimeOut, LOADER_MIN_DISPLAY_TIME)
-    const newState = { ...this.state }
+
+    const { loadingTimeout, ...stateWithoutLoadingTimeout } = this.state
+    const newState = { ...stateWithoutLoadingTimeout }
 
     if (await storage.getItem(SCREEN_LOCK)) {
       newState.secured = false

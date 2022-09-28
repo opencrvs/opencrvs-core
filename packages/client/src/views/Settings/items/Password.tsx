@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
   LabelContainer,
@@ -24,9 +24,11 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 export function Password() {
   const intl = useIntl()
+  const isOnline = useOnlineStatus()
   const [showModal, setShowModal] = React.useState(false)
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState(false)
@@ -57,6 +59,7 @@ export function Password() {
           <DynamicHeightLinkButton
             id="BtnChangePassword"
             onClick={togglePasswordChangeModal}
+            disabled={!isOnline}
           >
             {intl.formatMessage(buttonMessages.change)}
           </DynamicHeightLinkButton>
@@ -67,13 +70,11 @@ export function Password() {
         showPasswordChange={showModal}
         passwordChanged={changePassword}
       />
-      <Toast
-        type={NOTIFICATION_TYPE.SUCCESS}
-        show={showSuccessNotification}
-        callback={toggleSuccessNotification}
-      >
-        <FormattedMessage {...userMessages.passwordUpdated} />
-      </Toast>
+      {showSuccessNotification && (
+        <Toast type="success" onClose={toggleSuccessNotification}>
+          <FormattedMessage {...userMessages.passwordUpdated} />
+        </Toast>
+      )}
     </>
   )
 }

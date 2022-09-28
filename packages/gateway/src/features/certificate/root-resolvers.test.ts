@@ -13,6 +13,7 @@ import { resolvers } from '@gateway/features/certificate/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+// eslint-disable-next-line import/no-relative-parent-imports
 import mockCertificate from '../../../test/mockCertificate'
 
 const fetch = fetchAny as any

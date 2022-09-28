@@ -11,7 +11,7 @@
  */
 import { ComponentMeta } from '@storybook/react'
 import React from 'react'
-import { AppHeader, PageHeader, EventTopBar } from '../interface'
+import { EventTopBar } from '../EventTopBar'
 import { LeftNavigation } from '../SideNavigation/LeftNavigation'
 import { leftNavigationView } from '../SideNavigation/LeftNavigation.stories'
 import { NavigationGroup } from '../SideNavigation/NavigationGroup'
@@ -22,15 +22,26 @@ import {
 import { Frame } from './Frame'
 import { Content, ContentSize } from '../Content'
 import { Box } from '../Box'
+import { AppBar } from '../AppBar'
 
 export default {
   title: 'Layout/Frame',
-  component: Frame
+  component: Frame,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+\`<Frame>\` provides a structure for the application itself, but doesn't add components such as headers, side navigations or main content.
+Frame defines a grid and minimal styling.
+`
+      }
+    }
+  }
 } as ComponentMeta<typeof Frame>
 
 export const PageTemplateContentLarge = () => (
   <Frame
-    header={<AppHeader title="OpenCRVS" />}
+    header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
         <NavigationGroup {...groupDeclaration.args} />
@@ -50,7 +61,7 @@ PageTemplateContentLarge.parameters = {
 
 export const PageTemplateContentMedium = () => (
   <Frame
-    header={<AppHeader title="OpenCRVS" />}
+    header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
         <NavigationGroup {...groupDeclaration.args} />
@@ -69,15 +80,7 @@ PageTemplateContentMedium.parameters = {
 }
 
 export const PageTemplateFlow = () => (
-  <Frame
-    header={
-      <PageHeader
-        mobileTitle="Page title"
-        desktopTitle="Page title"
-        goBack={() => alert('Go back triggered')}
-      />
-    }
-  >
+  <Frame header={<AppBar mobileTitle="Page title" desktopTitle="Page title" />}>
     <Content title="Content title ">Page content goes here</Content>
   </Frame>
 )
@@ -94,7 +97,7 @@ PageTemplateForm.parameters = { layout: 'fullscreen' }
 
 export const PageTemplateContentSideColumn = () => (
   <Frame
-    header={<AppHeader title="OpenCRVS" />}
+    header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
         <NavigationGroup {...groupDeclaration.args} />
@@ -113,7 +116,7 @@ PageTemplateContentSideColumn.parameters = { layout: 'fullscreen' }
 
 export const PageTemplateContentMultipleSideColumns = () => (
   <Frame
-    header={<AppHeader title="OpenCRVS" />}
+    header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
         <NavigationGroup {...groupDeclaration.args} />
@@ -139,7 +142,7 @@ PageTemplateContentMultipleSideColumns.parameters = { layout: 'fullscreen' }
 
 export const PageTemplateSequentialContents = () => (
   <Frame
-    header={<AppHeader title="OpenCRVS" />}
+    header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
         <NavigationGroup {...groupDeclaration.args} />
@@ -156,7 +159,7 @@ PageTemplateSequentialContents.parameters = { layout: 'fullscreen' }
 
 export const PageTemplateSequentialContentsWrapped = () => (
   <Frame
-    header={<AppHeader title="OpenCRVS" />}
+    header={<AppBar title="OpenCRVS" />}
     navigation={
       <LeftNavigation {...leftNavigationView.args}>
         <NavigationGroup {...groupDeclaration.args} />
@@ -176,7 +179,7 @@ export const PageTemplateSequentialContentsWrapped = () => (
 PageTemplateSequentialContentsWrapped.parameters = { layout: 'fullscreen' }
 
 export const PageTemplateCentered = () => (
-  <Frame header={<AppHeader title="OpenCRVS" />}>
+  <Frame header={<AppBar title="OpenCRVS" />}>
     <Frame.LayoutCentered>
       <Box>Box content goes here</Box>
     </Frame.LayoutCentered>
