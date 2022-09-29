@@ -88,6 +88,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IGQLLocation } from '@client/utils/userUtils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
+import { Redirect } from 'react-router'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -928,6 +929,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   }
 
   makeCorrection = () => {
+    const HOME = '/'
     const declaration = this.props.declaration
     declaration.action = SubmissionAction.REQUEST_CORRECTION_DECLARATION
     declaration.submissionStatus = SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
@@ -935,7 +937,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
     this.props.writeDeclaration(declaration)
-    this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+    if (!declaration) {
+      return <Redirect to={HOME} />
+    }
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
   }
 
   gotoReviewPage = () => {

@@ -390,6 +390,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   isLandingPage = () => {
     const role = this.props.userDetails && this.props.userDetails.role
     const location = this.props.history.location.pathname
+
+    const prevUrl = this.props.location.state
+
     if (
       (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
       (NATL_ADMIN_ROLES.includes(role as string) &&
@@ -397,7 +400,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       (SYS_ADMIN_ROLES.includes(role as string) &&
         PERFORMANCE_HOME.includes(location)) ||
       (REGISTRAR_ROLES.includes(role as string) &&
-        REGISTRAR_HOME.includes(location))
+        REGISTRAR_HOME.includes(location)) ||
+      prevUrl != { from: 'correction summary page' }
     ) {
       return true
     } else {
@@ -496,7 +500,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           id="header-go-back-button"
           disabled={
             (this.props.history.action === 'POP' ||
-              this.props.history.action === 'REPLACE') &&
+              this.props.history.action === 'REPLACE' ||
+              this.props.location.state == '') &&
             this.isLandingPage()
           }
           onClick={() => this.props.goBack()}

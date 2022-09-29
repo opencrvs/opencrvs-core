@@ -75,6 +75,7 @@ import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { useHistory } from 'react-router'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -180,7 +181,9 @@ export function goToApplicationConfig() {
 }
 
 export function goToHomeTab(tabId: IWORKQUEUE_TABS, selectorId = '') {
-  return push(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
+  return push(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }), {
+    from: 'correction summary page'
+  })
 }
 
 type searchedLocation = {
@@ -685,4 +688,12 @@ export function navigationReducer(state: INavigationState, action: any) {
         )
       )
   }
+}
+function state(
+  REGISTRAR_HOME_TAB: string,
+  arg1: { tabId: IWORKQUEUE_TABS; selectorId: string },
+  state: any,
+  arg3: { prevPath: string }
+): string {
+  throw new Error('Function not implemented.')
 }
