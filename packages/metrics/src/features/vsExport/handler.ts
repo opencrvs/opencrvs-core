@@ -11,7 +11,7 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import { uploadBase64ToMinio } from '@metrics/api'
+import { uploadFileToMinio } from '@metrics/api'
 import { VS_EXPORT_SCRIPT_PATH } from '@metrics/constants'
 import VS_Export, { Event } from '@metrics/models/vsExports'
 import { fork } from 'child_process'
@@ -58,18 +58,14 @@ export async function vsExportHandler(
 
         //convert csv files to base64
         const fileContents = {
-          [Event.BIRTH]: fs.readFileSync(BIRTH_REPORT_PATH, {
-            encoding: 'base64'
-          }),
-          [Event.DEATH]: fs.readFileSync(DEATH_REPORT_PATH, {
-            encoding: 'base64'
-          })
+          [Event.BIRTH]: fs.readFileSync(BIRTH_REPORT_PATH),
+          [Event.DEATH]: fs.readFileSync(DEATH_REPORT_PATH)
         }
 
         //upload files to minio
         const uploadResponse = {
-          [Event.BIRTH]: await uploadBase64ToMinio(fileContents.birth),
-          [Event.DEATH]: await uploadBase64ToMinio(fileContents.death)
+          [Event.BIRTH]: await uploadFileToMinio(fileContents.birth),
+          [Event.DEATH]: await uploadFileToMinio(fileContents.death)
         }
 
         try {
@@ -82,8 +78,11 @@ export async function vsExportHandler(
               createdOn: Date.now()
             }))
           )
-        } catch (e) {
-          throw internal(e.message)
+          //delete csv files
+          fs.unlinkSync(BIRTH_REPORT_PATH)
+          fs.unlinkSync(DEATH_REPORT_PATH)
+        } catch (error) {
+          throw internal(error)
         }
       }
     } catch (err) {

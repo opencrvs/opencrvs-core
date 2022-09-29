@@ -218,17 +218,16 @@ export async function countUsersByLocation(
   return res.json()
 }
 
-export async function uploadBase64ToMinio(fileData: string): Promise<string> {
+export async function uploadFileToMinio(fileData: Buffer): Promise<string> {
   try {
     const result = await fetch(`${DOCUMENTS_URL}/upload-vs-export`, {
       method: 'post',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'text/csv'
       },
-      body: JSON.stringify({ fileData: fileData })
+      body: fileData
     })
     const res = await result.json()
-    console.log('result', res)
     return res.refUrl
   } catch (err) {
     console.log(err)
