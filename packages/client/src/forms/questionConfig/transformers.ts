@@ -61,7 +61,7 @@ function fieldIdentifiersToQuestionConfig(
   }
 }
 
-function formSectionToFieldIdentifiers(
+export function formSectionToFieldIdentifiers(
   defaultForm: ISerializedForm,
   section: BirthSection | DeathSection
 ) {

@@ -56,10 +56,13 @@ import {
   RequiredToggleAction,
   ToolTip,
   ConditionalToggleAction,
-  TitleWrapper
+  TitleWrapper,
+  RegisterFormFieldIds
 } from './components'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { Condition } from '@opencrvs/components/lib/icons'
+import { Text } from '@opencrvs/components/lib/Text'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -73,6 +76,13 @@ const CTextInput = styled(TextInput)`
   ${({ theme }) => theme.fonts.reg14};
   height: 32px;
   border: solid 1px ${({ theme }) => theme.colors.grey600};
+`
+const ConditionalWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 const CTextArea = styled(TextArea)`
@@ -129,6 +139,22 @@ const LanguageSelect = styled(Select)`
     color: ${({ theme }) => theme.colors.primaryDark};
   }
 `
+const ConditionalFieldIdSelect = styled(Select)`
+  width: 100%;
+  border: solid 2px ${({ theme }) => theme.colors.primaryDark};
+  border-radius: 2px;
+  .react-select__control {
+    max-height: 32px;
+    min-height: 32px;
+  }
+  .react-select__value-container {
+    display: block;
+  }
+  div {
+    ${({ theme }) => theme.fonts.reg14};
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+`
 
 const ListColumn = styled.div`
   display: flex;
@@ -166,10 +192,15 @@ interface ICustomField {
 interface IFieldForms {
   [key: string]: ICustomField
 }
+interface IConditionalFieldForms {
+  fieldId: string
+  regex: string
+}
 
 interface ICustomFieldState {
   isFieldDuplicate: boolean
   selectedLanguage: string
+  conditionalField: IConditionalFieldForms
   handleBars: string
   maxLength: number
   fieldForms: IFieldForms
@@ -198,8 +229,8 @@ class CustomFieldToolsComp extends React.Component<
     const defaultLanguage = getDefaultLanguage()
     const languages = this.getLanguages()
     const { selectedField, formField } = this.props
-
     const fieldForms: { [key: string]: ICustomField } = {}
+    const conditionalfield = selectedField.conditionals?.[0]
 
     Object.keys(languages).forEach((lang) => {
       const label = this.getIntlMessage(selectedField.label, lang)
@@ -211,12 +242,17 @@ class CustomFieldToolsComp extends React.Component<
         errorMessage: this.getIntlMessage(selectedField.errorMessage, lang)
       }
     })
+
     return {
       isFieldDuplicate: false,
       handleBars:
         getCertificateHandlebar(formField) ||
         camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
+      conditionalField: {
+        fieldId: conditionalfield?.fieldId ?? EMPTY_STRING,
+        regex: conditionalfield?.regexp ?? EMPTY_STRING
+      },
       maxLength: selectedField.maxLength ?? DEFAULT_MAX_LENGTH,
       fieldForms
     }
@@ -232,6 +268,15 @@ class CustomFieldToolsComp extends React.Component<
 
   getLanguages(): ILanguageState {
     return initLanguages()
+  }
+
+  setConditionalFieldId(fieldId: string) {
+    this.setState({
+      conditionalField: {
+        ...this.state.conditionalField,
+        fieldId: fieldId
+      }
+    })
   }
 
   setValue(field: string, value: string) {
@@ -250,6 +295,16 @@ class CustomFieldToolsComp extends React.Component<
   isFormValid(): boolean {
     for (const lang in this.getLanguages()) {
       if (Boolean(this.state.fieldForms[lang].label) === false) return false
+    }
+    return true
+  }
+
+  isConditionalFormValid(): boolean {
+    if (this.props.selectedField.conditionals) {
+      return (
+        !!this.state.conditionalField.fieldId &&
+        !!this.state.conditionalField.regex
+      )
     }
     return true
   }
@@ -302,7 +357,7 @@ class CustomFieldToolsComp extends React.Component<
 
   prepareModifiedFormField(): ICustomConfigField {
     const { selectedField } = this.props
-    const { fieldForms, handleBars } = this.state
+    const { fieldForms, handleBars, conditionalField } = this.state
     const languages = this.getLanguages()
     const newFieldID = this.generateNewFieldID()
 
@@ -354,6 +409,14 @@ class CustomFieldToolsComp extends React.Component<
       errorMessage: optionalContent.errorMessage,
       fieldName: handleBars,
       fieldId: newFieldID,
+      conditionals: selectedField.conditionals
+        ? [
+            {
+              fieldId: conditionalField.fieldId,
+              regexp: conditionalField.regex
+            }
+          ]
+        : [],
       /* We can't let maxlength be 0 as it doesn't make any sense */
       maxLength: this.state.maxLength || DEFAULT_MAX_LENGTH,
       label
@@ -423,8 +486,18 @@ class CustomFieldToolsComp extends React.Component<
     )
   }
 
-  toggleButtons() {
+  toggleButtons(
+    fieldIds: {
+      [key: string]: string
+    }[]
+  ) {
     const { intl, selectedField } = this.props
+    const initConditionals = [
+      {
+        fieldId: fieldIds[0].value,
+        regexp: EMPTY_STRING
+      }
+    ]
     return (
       <ListContainer>
         <Title>{this.getHeadingText()}</Title>
@@ -457,34 +530,82 @@ class CustomFieldToolsComp extends React.Component<
                 />
               </Label>
             }
-            actions={<ConditionalToggleAction {...selectedField} />}
+            actions={
+              <ConditionalToggleAction
+                {...selectedField}
+                initConditionals={initConditionals}
+              />
+            }
           />
         </ListViewSimplified>
       </ListContainer>
     )
   }
 
-  conditionalParameters() {
+  conditionalParameters(
+    fieldIds: {
+      [key: string]: string
+    }[]
+  ) {
     const { intl } = this.props
     return (
-      <ListContainer>
-        <TitleWrapper>
-          <Condition color="grey600" />
-          <Title>
-            {intl.formatMessage(
-              customFieldFormMessages.conditionalFieldHeaderLabel
-            )}
-          </Title>
-        </TitleWrapper>
-        <ListViewSimplified bottomBorder>
-          <ListViewItemSimplified
+      <FieldContainer>
+        <ConditionalWrapper>
+          <TitleWrapper>
+            <Condition color="grey600" />
+            <Title>
+              {intl.formatMessage(
+                customFieldFormMessages.conditionalFieldHeaderLabel
+              )}
+            </Title>
+          </TitleWrapper>
+          <Text variant="reg14" element="span" color="grey500">
+            {intl.formatMessage(customFieldFormMessages.conditionalFieldDesc)}
+          </Text>
+          <>
+            <ConditionalFieldIdSelect
+              id="selectConditionalField"
+              isDisabled={false}
+              onChange={(val: string) => {
+                this.setConditionalFieldId(val)
+                this.props.modifyConfigField(this.props.selectedField.fieldId, {
+                  conditionals: [
+                    {
+                      fieldId: val,
+                      regexp: this.state.conditionalField.regex
+                    }
+                  ]
+                })
+              }}
+              value={
+                this.state.conditionalField.fieldId ||
+                this.setConditionalFieldId(fieldIds[0].value)
+              }
+              options={fieldIds}
+            />
+          </>
+          <CInputField
+            id={`conditional-regex-input`}
+            required={true}
             label={intl.formatMessage(
-              customFieldFormMessages.conditionalFieldDesc
+              customFieldFormMessages.conditionalRegexField
             )}
-            actions={<></>}
-          />
-        </ListViewSimplified>
-      </ListContainer>
+            touched={true}
+          >
+            <CTextInput
+              value={this.state.conditionalField.regex}
+              onChange={(event) =>
+                this.setState({
+                  conditionalField: {
+                    fieldId: this.state.conditionalField.fieldId,
+                    regex: event.target.value
+                  }
+                })
+              }
+            />
+          </CInputField>
+        </ConditionalWrapper>
+      </FieldContainer>
     )
   }
 
@@ -654,7 +775,7 @@ class CustomFieldToolsComp extends React.Component<
                   modifyConfigField(selectedField.fieldId, modifiedField)
                   debouncedNullifySelectedField()
                 }}
-                disabled={!this.isFormValid()}
+                disabled={!this.isFormValid() || !this.isConditionalFormValid()}
               >
                 {intl.formatMessage(buttonMessages.save)}
               </CPrimaryButton>
@@ -669,8 +790,16 @@ class CustomFieldToolsComp extends React.Component<
     const { intl, selectedField } = this.props
     return (
       <>
-        {this.toggleButtons()}
-        {selectedField.conditionals ? this.conditionalParameters() : null}
+        <RegisterFormFieldIds>
+          {(fieldIds) => (
+            <>
+              {this.toggleButtons(fieldIds)}
+              {selectedField.conditionals
+                ? this.conditionalParameters(fieldIds)
+                : null}
+            </>
+          )}
+        </RegisterFormFieldIds>
         {this.getLanguageDropDown()}
         {this.inputFields()}
         {this.state.isFieldDuplicate && (

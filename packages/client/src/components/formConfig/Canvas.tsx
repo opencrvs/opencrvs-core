@@ -38,6 +38,9 @@ import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import ConfigPlaceholder from './ConfigPlaceholder'
+import { Condition } from '@opencrvs/components/lib/icons'
+import { TitleWrapper } from './formTools/components'
+import { Text } from '@opencrvs/components/lib/Text'
 
 const CanvasBox = styled.div`
   display: flex;
@@ -47,6 +50,12 @@ const CanvasBox = styled.div`
   gap: 8px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
+`
+
+const CardContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `
 
 type IRouteProps = {
@@ -129,6 +138,9 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
             isDefaultConfigField(configField) &&
             configField.enabled === FieldEnabled.DISABLED
 
+          const conditionalField = isCustomConfigField(configField)
+            ? configField.conditionals
+            : undefined
           return (
             <FormConfigElementCard
               id={fieldId}
@@ -154,7 +166,17 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
               {isPreviewGroupConfigField(configField) ? (
                 <ConfigPlaceholder label={configField.previewGroupLabel} />
               ) : (
-                <FormField configField={configField} />
+                <CardContentWrapper>
+                  {!!conditionalField && (
+                    <TitleWrapper>
+                      <Condition color="grey400" />
+                      <Text variant="reg14" element="span" color="grey400">
+                        {conditionalField?.[0]?.fieldId}
+                      </Text>
+                    </TitleWrapper>
+                  )}
+                  <FormField configField={configField} />
+                </CardContentWrapper>
               )}
             </FormConfigElementCard>
           )

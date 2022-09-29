@@ -23,6 +23,7 @@ interface ICustomFieldFormMessages
   conditionalFieldHeaderLabel: MessageDescriptor
   conditionalFieldLabel: MessageDescriptor
   conditionalFieldDesc: MessageDescriptor
+  conditionalRegexField: MessageDescriptor
   label: MessageDescriptor
   placeholderLabel: MessageDescriptor
   descriptionLabel: MessageDescriptor
@@ -83,6 +84,11 @@ const messagesToDefine: ICustomFieldFormMessages = {
     defaultMessage:
       'Select the field and the conditions on which this field should show',
     description: 'Description of Conditonal Custom FieldForm'
+  },
+  conditionalRegexField: {
+    id: 'custom.field.form.conditionalRegex',
+    defaultMessage: 'Value RegEx',
+    description: 'Description of Conditonal Regex FieldForm'
   },
   label: {
     id: 'custom.field.form.label',

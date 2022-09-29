@@ -20,6 +20,13 @@ import {
 } from '@client/forms/configuration/formConfig/utils'
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import ReactTooltip from 'react-tooltip'
+import { Event } from '@client/utils/gateway'
+import { BirthSection, DeathSection, ISerializedForm } from '@client/forms'
+import { useDefaultForm } from '@client/views/SysAdmin/Config/Forms/hooks'
+import { formSectionToFieldIdentifiers } from '@client/forms/questionConfig/transformers'
+import { useParams } from 'react-router'
+import { getFieldId } from '@client/forms/configuration/defaultUtils'
+import { IConditionalConfig } from '@client/forms/questionConfig'
 
 export const TitleWrapper = styled.div`
   display: flex;
@@ -82,8 +89,9 @@ export function RequiredToggleAction({
 
 export function ConditionalToggleAction({
   fieldId,
-  conditionals
-}: ICustomConfigField) {
+  conditionals,
+  initConditionals
+}: ICustomConfigField & { initConditionals: IConditionalConfig[] }) {
   const dispatch = useDispatch()
   return (
     <CenteredToggle
@@ -91,7 +99,7 @@ export function ConditionalToggleAction({
       onChange={() =>
         dispatch(
           modifyConfigField(fieldId, {
-            conditionals: conditionals ? undefined : []
+            conditionals: conditionals ? undefined : initConditionals
           })
         )
       }
@@ -108,4 +116,25 @@ export const ToolTip = ({ label, id }: { label: string; id: string }) => {
       </ReactTooltip>
     </TooltipContainer>
   )
+}
+
+export const RegisterFormFieldIds = ({
+  children
+}: {
+  children: (fieldIds: { [key: string]: string }[]) => JSX.Element
+}) => {
+  const defaultForm = useDefaultForm()
+  const { event } = useParams<{ event: Event }>()
+  const sections = Object.values<BirthSection | DeathSection>(
+    event === Event.Birth ? BirthSection : DeathSection
+  )
+  const fieldIds: { [key: string]: string }[] = []
+  sections.forEach((section) => {
+    const identifiers = formSectionToFieldIdentifiers(defaultForm, section)
+    identifiers.forEach((indentifier) => {
+      const fieldId = getFieldId(event, indentifier, defaultForm)
+      fieldIds.push({ value: fieldId, label: fieldId })
+    })
+  })
+  return children(fieldIds)
 }
