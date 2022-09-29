@@ -43,7 +43,7 @@ import {
   ColumnContentAlignment
 } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
-import { constantsMessages } from '@client/i18n/messages/constants'
+
 import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
@@ -54,13 +54,13 @@ import {
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
-import { Event, GetUserAuditLogQuery } from '@client/utils/gateway'
+import { GetUserAuditLogQuery } from '@client/utils/gateway'
 import { ILocation } from '@client/offline/reducer'
 import { ICurrency } from '@client/utils/referenceApi'
 import { RouteComponentProps } from 'react-router'
 import { IUserDetails } from '@client/utils/userUtils'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
-import { NameContainer } from '../OfficeHome/components'
+import { NameContainer } from '@client/views/OfficeHome/components'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -113,24 +113,10 @@ const InformationTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   width: 320px;
 `
-export interface IUserData {
-  id?: string
-  primaryOffice?: ISearchLocation
-  name?: string
-  role?: string
-  type?: string
-  number?: string
-  status?: string
-  underInvestigation?: boolean
-  username?: string
-  practitionerId?: string
-  locationId?: string
-  startDate?: string
-}
 
 interface IBaseProp {
   theme: ITheme
-  user?: IUserData
+  practitionerId: string
   isLoading?: boolean
 }
 
@@ -330,7 +316,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     }
   }
 
-  getAuditData(data: GQLUserAuditLogResultSet, user?: IUserData) {
+  getAuditData(data: GQLUserAuditLogResultSet) {
     const auditList = data.results.map((userAuditItem) => {
       if (userAuditItem === null) {
         return {}
@@ -461,7 +447,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, user, theme, isLoading, isOnline } = this.props
+    const { intl, practitionerId, theme, isLoading } = this.props
     const { timeStart, timeEnd, currentPageNumber } = this.state
     const recordCount = DEFAULT_LIST_SIZE * this.state.currentPageNumber
 
@@ -486,7 +472,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
               <Query<GetUserAuditLogQuery>
                 query={GET_USER_AUDIT_LOG}
                 variables={{
-                  practitionerId: user && user.practitionerId,
+                  practitionerId: practitionerId,
                   count: recordCount,
                   skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1)
                 }}
@@ -506,7 +492,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                     return (
                       <Table
                         columns={this.getAuditColumns()}
-                        content={this.getAuditData(data.getUserAuditLog, user)}
+                        content={this.getAuditData(data.getUserAuditLog)}
                         noResultText={intl.formatMessage(messages.noAuditFound)}
                         isLoading={loading}
                         hideTableHeader={

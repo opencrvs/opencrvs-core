@@ -19,8 +19,8 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { useIntl } from 'react-intl'
 import { Query } from '@client/components/Query'
 import { useParams } from 'react-router'
-import { GET_USER, GET_USER_AUDIT_LOG } from '@client/user/queries'
-import { GQLUser, GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { GET_USER } from '@client/user/queries'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
@@ -45,8 +45,7 @@ import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { GetUserAuditLogQuery, GetUserQuery } from '@client/utils/gateway'
-import { IUserData } from '@client/declarations'
+import { GetUserQuery } from '@client/utils/gateway'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -191,127 +190,105 @@ export const UserAudit = () => {
             const userType = getUserType(user, intl)
 
             return (
-              <Query<GetUserAuditLogQuery>
-                query={GET_USER_AUDIT_LOG}
-                variables={{
-                  practitionerId: user.practitionerId,
-                  count: 100,
-                  skip: 0
-                }}
-                fetchPolicy={'cache-and-network'}
+              <Content
+                title={user.name}
+                showTitleOnMobile={true}
+                icon={() => (
+                  <UserAvatar name={user.name} avatar={user.avatar} />
+                )}
+                topActionButtons={[
+                  <Status status={user.status || 'pending'} />,
+
+                  <ToggleMenu
+                    id={`sub-page-header-munu-button`}
+                    toggleButton={<VerticalThreeDots />}
+                    menuItems={getMenuItems(
+                      user.id as string,
+                      user.status as string
+                    )}
+                    hide={(scope && !scope.includes('sysadmin')) || false}
+                  />
+                ]}
+                size={ContentSize.LARGE}
               >
-                {(auditLogData) => {
-                  return (
-                    <Content
-                      title={user.name}
-                      showTitleOnMobile={true}
-                      icon={() => (
-                        <UserAvatar name={user.name} avatar={user.avatar} />
-                      )}
-                      topActionButtons={[
-                        <Status status={user.status || 'pending'} />,
+                <Summary>
+                  <Summary.Row
+                    data-testid="office-link"
+                    label={intl.formatMessage(userSetupMessages.assignedOffice)}
+                    value={
+                      <LinkButtonWithoutSpacing
+                        id="office-link"
+                        onClick={() =>
+                          dispatch(goToTeamUserList(user.primaryOffice!.id))
+                        }
+                      >
+                        {user.primaryOffice && user.primaryOffice.displayLabel}
+                      </LinkButtonWithoutSpacing>
+                    }
+                  />
+                  <Summary.Row
+                    label={
+                      (userType &&
+                        intl.formatMessage(userSetupMessages.roleType)) ||
+                      intl.formatMessage(userFormMessages.labelRole)
+                    }
+                    value={
+                      (userType && `${userRole} / ${userType}`) || userRole
+                    }
+                  />
+                  <Summary.Row
+                    label={intl.formatMessage(userSetupMessages.phoneNumber)}
+                    value={user.number}
+                  />
+                  <Summary.Row
+                    label={intl.formatMessage(userSetupMessages.nid)}
+                    value={user.nid}
+                  />
+                  <Summary.Row
+                    label={intl.formatMessage(userSetupMessages.userName)}
+                    value={user.username}
+                  />
+                  <Summary.Row
+                    label={intl.formatMessage(userFormMessages.userDevice)}
+                    value={user.device}
+                  />
+                </Summary>
 
-                        <ToggleMenu
-                          id={`sub-page-header-munu-button`}
-                          toggleButton={<VerticalThreeDots />}
-                          menuItems={getMenuItems(
-                            user.id as string,
-                            user.status as string
-                          )}
-                          hide={(scope && !scope.includes('sysadmin')) || false}
-                        />
-                      ]}
-                      size={ContentSize.LARGE}
-                    >
-                      <Summary>
-                        <Summary.Row
-                          data-testid="office-link"
-                          label={intl.formatMessage(
-                            userSetupMessages.assignedOffice
-                          )}
-                          value={
-                            <LinkButtonWithoutSpacing
-                              id="office-link"
-                              onClick={() =>
-                                dispatch(
-                                  goToTeamUserList(user.primaryOffice!.id)
-                                )
-                              }
-                            >
-                              {user.primaryOffice &&
-                                user.primaryOffice.displayLabel}
-                            </LinkButtonWithoutSpacing>
-                          }
-                        />
-                        <Summary.Row
-                          label={
-                            (userType &&
-                              intl.formatMessage(userSetupMessages.roleType)) ||
-                            intl.formatMessage(userFormMessages.labelRole)
-                          }
-                          value={
-                            (userType && `${userRole} / ${userType}`) ||
-                            userRole
-                          }
-                        />
-                        <Summary.Row
-                          label={intl.formatMessage(
-                            userSetupMessages.phoneNumber
-                          )}
-                          value={user.number}
-                        />
-                        <Summary.Row
-                          label={intl.formatMessage(userSetupMessages.nid)}
-                          value={user.nid}
-                        />
-                        <Summary.Row
-                          label={intl.formatMessage(userSetupMessages.userName)}
-                          value={user.username}
-                        />
-                        <Summary.Row
-                          label={intl.formatMessage(
-                            userFormMessages.userDevice
-                          )}
-                          value={user.device}
-                        />
-                      </Summary>
-
-                      <UserAuditActionModal
-                        show={modalVisible}
-                        user={userQueryData && userQueryData.getUser}
-                        onClose={() => toggleUserActivationModal()}
-                        onConfirmRefetchQueries={[
-                          {
-                            query: GET_USER,
-                            variables: {
-                              userId: userId
-                            }
-                          }
-                        ]}
-                      />
-                      {showResendSMSSuccess && (
-                        <Toast
-                          id="resend_invite_success"
-                          type="success"
-                          onClose={() => setShowResendSMSSuccess(false)}
-                        >
-                          {intl.formatMessage(sysMessages.resendSMSSuccess)}
-                        </Toast>
-                      )}
-                      {showResendSMSError && (
-                        <Toast
-                          id="resend_invite_error"
-                          type="error"
-                          onClose={() => setShowResendSMSError(false)}
-                        >
-                          {intl.formatMessage(sysMessages.resendSMSError)}
-                        </Toast>
-                      )}
-                      <UserAuditHistory user={user} />
-                    </Content>
-                  )
-                }}
-              </Query>
+                <UserAuditActionModal
+                  show={modalVisible}
+                  user={userQueryData && userQueryData.getUser}
+                  onClose={() => toggleUserActivationModal()}
+                  onConfirmRefetchQueries={[
+                    {
+                      query: GET_USER,
+                      variables: {
+                        userId: userId
+                      }
+                    }
+                  ]}
+                />
+                {showResendSMSSuccess && (
+                  <Toast
+                    id="resend_invite_success"
+                    type="success"
+                    onClose={() => setShowResendSMSSuccess(false)}
+                  >
+                    {intl.formatMessage(sysMessages.resendSMSSuccess)}
+                  </Toast>
+                )}
+                {showResendSMSError && (
+                  <Toast
+                    id="resend_invite_error"
+                    type="error"
+                    onClose={() => setShowResendSMSError(false)}
+                  >
+                    {intl.formatMessage(sysMessages.resendSMSError)}
+                  </Toast>
+                )}
+                {user.practitionerId && (
+                  <UserAuditHistory practitionerId={user.practitionerId} />
+                )}
+              </Content>
             )
           }
         }}

@@ -28,7 +28,6 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { IStoreState } from '@client/store'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { Roles } from '@client/utils/authUtils'
-import { IUserData } from '@client/views/UserAudit/UserAuditHistory'
 
 export enum UserStatus {
   ACTIVE,
