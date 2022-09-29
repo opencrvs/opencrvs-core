@@ -311,8 +311,6 @@ function UserListComponent(props: IProps) {
 
   const toggleUserActivationModal = useCallback(
     function toggleUserActivationModal(user?: GQLUser) {
-      console.log('true', user)
-
       if (user !== undefined) {
         setToggleActivation({
           ...toggleActivation,
@@ -485,7 +483,7 @@ function UserListComponent(props: IProps) {
               image: <AvatarSmall name={name} avatar={avatar} />,
               label: (
                 <LinkButtonWithoutSpacing
-                  id="prifile-link"
+                  id="profile-link"
                   onClick={() => goToUserProfile(String(user.id))}
                 >
                   {name}

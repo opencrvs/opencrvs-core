@@ -284,14 +284,6 @@ describe('User audit list tests', () => {
             }
           }
         )}
-        // match={{
-        //   params: {
-        //     userId: '5d08e102542c7a19fc55b790'
-        //   },
-        //   isExact: true,
-        //   path: USER_PROFILE,
-        //   url: ''
-        // }}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
