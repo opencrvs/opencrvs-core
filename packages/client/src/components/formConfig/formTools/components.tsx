@@ -75,6 +75,7 @@ export function RequiredToggleAction({
 
   return (
     <CenteredToggle
+      id={'required-toggle-button'}
       defaultChecked={!!required}
       onChange={() =>
         dispatch(
@@ -95,6 +96,7 @@ export function ConditionalToggleAction({
   const dispatch = useDispatch()
   return (
     <CenteredToggle
+      id={'conditional-toggle-button'}
       defaultChecked={!!conditionals}
       onChange={() =>
         dispatch(

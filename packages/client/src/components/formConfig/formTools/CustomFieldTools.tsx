@@ -764,6 +764,7 @@ class CustomFieldToolsComp extends React.Component<
           <ListRow>
             <ListColumn>
               <CPrimaryButton
+                id={'custom-tool-save-button'}
                 onClick={() => {
                   if (this.isFieldNameDuplicate()) {
                     this.setState({
