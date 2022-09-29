@@ -15,7 +15,7 @@ import { writePoints } from '@metrics/influxdb/client'
 import { internal } from '@hapi/boom'
 import { IUserAuditBody } from '@metrics/features/registration'
 import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
-import { getUserAuditEvents } from './service'
+import { countUserAuditEvents, getUserAuditEvents } from './service'
 
 export async function newAuditHandler(
   request: Hapi.Request,
@@ -50,8 +50,9 @@ export async function getUserAuditsHandler(request: Hapi.Request) {
   const size = request.query['count']
 
   const results = await getUserAuditEvents(practitionerId, size, skip)
+  const total = await countUserAuditEvents(practitionerId)
   return {
     results,
-    total: results.length
+    total: total[0].count
   }
 }

@@ -14,10 +14,10 @@ import * as Hapi from '@hapi/hapi'
 import { query, writePoints } from '@metrics/influxdb/client'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import {
-  getPractitionerIdFromBundle,
   getCompositionIdFromCompositionOrTask,
-  getTrackingId,
-  getTask
+  getPractitionerIdFromBundle,
+  getTask,
+  getTrackingId
 } from '@metrics/features/registration/fhirUtils'
 
 type UserAuditAction =
@@ -99,4 +99,13 @@ export async function getUserAuditEvents(
     ...row,
     data: row.data ? JSON.parse(row.data) : {}
   }))
+}
+
+export async function countUserAuditEvents(
+  practitionerId: string
+): Promise<{ time: string; count: number }[]> {
+  return await query(
+    `SELECT COUNT(ipAddress) from user_audit_event where practitionerId = $practitionerId`,
+    { placeholders: { practitionerId: practitionerId } }
+  )
 }

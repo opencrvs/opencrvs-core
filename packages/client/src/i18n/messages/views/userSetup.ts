@@ -58,6 +58,8 @@ interface IUserSetupMessages
   showMoreAuditList: MessageDescriptor
   assignedAuditAction: MessageDescriptor
   unAssignedAuditAction: MessageDescriptor
+  correctedAuditAction: MessageDescriptor
+  archivedAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -260,7 +262,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.audit.description.waiting_validation'
   },
   registeredAuditAction: {
-    defaultMessage: 'Registered vital event',
+    defaultMessage: 'Registered',
     description: 'Description for registered declaration',
     id: 'user.profile.audit.description.registered'
   },
@@ -280,14 +282,24 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.auditList.showMore'
   },
   assignedAuditAction: {
-    defaultMessage: 'Assigned declaration to self',
+    defaultMessage: 'Assigned',
     description: 'Description for declaration assignment',
     id: 'user.profile.auditList.assigned'
   },
   unAssignedAuditAction: {
-    defaultMessage: 'Unassigned declaration to self',
+    defaultMessage: 'Unassigned',
     description: 'Description for declaration not assigned to self',
     id: 'user.profile.auditList.unAssigned'
+  },
+  correctedAuditAction: {
+    defaultMessage: 'Corrected',
+    description: 'Description for declaration corrected',
+    id: 'user.profile.auditList.corrected'
+  },
+  archivedAuditAction: {
+    defaultMessage: 'Archived',
+    description: 'Description for declaration archived',
+    id: 'user.profile.auditList.archived'
   }
 }
 
