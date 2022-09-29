@@ -37,7 +37,7 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 import { Activity, Users } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -272,13 +272,12 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.declarationForms
   ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
-  const { loading, error, data, initialSyncDone } = workqueue
+  const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
     data,
     storedDeclarations
   )
   const runningVer = String(localStorage.getItem('running-version'))
-  const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
