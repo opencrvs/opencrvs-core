@@ -23,8 +23,12 @@ import { IOfflineData } from '@client/offline/reducer'
 import { ListTable } from '@opencrvs/components/lib/ListTable'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { IForm, IFormSection, IFormField } from '@client/forms'
-import { constantsMessages, userMessages } from '@client/i18n/messages'
+import { IForm, IFormSection, IFormField, BirthSection } from '@client/forms'
+import {
+  constantsMessages,
+  dynamicConstantsMessages,
+  userMessages
+} from '@client/i18n/messages'
 import { getIndividualNameObj } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
@@ -230,6 +234,12 @@ export const ActionDetailsModalListTable = ({
         sections,
         (section) => section.id === item.valueCode
       ) as IFormSection
+
+      if (section.id === BirthSection.Documents) {
+        editedValue.valueString = intl.formatMessage(
+          dynamicConstantsMessages.updated
+        )
+      }
 
       const indexes: string[] = item.valueId.split('.')
 
