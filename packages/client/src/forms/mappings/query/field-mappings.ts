@@ -512,6 +512,7 @@ export const eventLocationNameQueryOfflineTransformer =
         })
       }
     }
+    return transformedData
   }
 
 export const nestedValueToFieldTransformer =
