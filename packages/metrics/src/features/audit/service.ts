@@ -104,8 +104,9 @@ export async function getUserAuditEvents(
 export async function countUserAuditEvents(
   practitionerId: string
 ): Promise<{ time: string; count: number }[]> {
-  return await query(
+  const result = await query(
     `SELECT COUNT(ipAddress) from user_audit_event where practitionerId = $practitionerId`,
     { placeholders: { practitionerId: practitionerId } }
   )
+  return result[0].count
 }

@@ -53,6 +53,6 @@ export async function getUserAuditsHandler(request: Hapi.Request) {
   const total = await countUserAuditEvents(practitionerId)
   return {
     results,
-    total: total[0].count
+    total
   }
 }
