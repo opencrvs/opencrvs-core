@@ -392,6 +392,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     const location = this.props.history.location.pathname
 
     const prevUrl = this.props.location.state
+    console.log(prevUrl)
 
     if (
       (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
@@ -500,6 +501,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           id="header-go-back-button"
           disabled={
             (this.props.history.action === 'POP' ||
+              this.props.history.action === 'PUSH' ||
               this.props.history.action === 'REPLACE' ||
               this.props.location.state == '') &&
             this.isLandingPage()
