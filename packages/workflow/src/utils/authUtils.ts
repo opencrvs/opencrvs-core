@@ -16,7 +16,8 @@ export enum USER_SCOPE {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
-  CERTIFY = 'certify'
+  CERTIFY = 'certify',
+  RECORD_SEARCH = 'recordsearch'
 }
 
 export interface ITokenPayload {

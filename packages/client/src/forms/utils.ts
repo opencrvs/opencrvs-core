@@ -64,7 +64,7 @@ import {
   isAValidDateFormat,
   isDateNotInFuture
 } from '@client/utils/validate'
-import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
+import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
 import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'

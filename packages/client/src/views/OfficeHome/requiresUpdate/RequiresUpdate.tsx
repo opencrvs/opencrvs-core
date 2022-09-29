@@ -18,11 +18,11 @@ import { ITheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
-  GridTable,
-  IAction,
+  Workqueue,
   COLUMNS,
   SORT_ORDER
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/Workqueue'
+import { IAction } from '@opencrvs/components/lib/common-types'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -334,12 +334,11 @@ class RequiresUpdateComponent extends React.Component<
         noResultText={intl.formatMessage(wqMessages.noRecordsRequireUpdates)}
         noContent={this.transformRejectedContent(data).length <= 0}
       >
-        <GridTable
+        <Workqueue
           content={this.transformRejectedContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
           hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>

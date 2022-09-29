@@ -28,6 +28,7 @@ import {
   ApolloServer,
   ApolloServerPluginStopHapiServer
 } from 'apollo-server-hapi'
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/features/user/database'
 import { logger } from '@gateway/logger'
@@ -54,7 +55,10 @@ export async function createServer() {
 
   const apolloServer = new ApolloServer({
     ...getApolloConfig(),
-    plugins: [ApolloServerPluginStopHapiServer({ hapiServer: app })]
+    plugins: [
+      ApolloServerPluginStopHapiServer({ hapiServer: app }),
+      ApolloServerPluginLandingPageGraphQLPlayground()
+    ]
   })
   app.auth.strategy('jwt', 'jwt', {
     key: publicCert,
