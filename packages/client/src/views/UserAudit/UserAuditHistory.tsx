@@ -229,7 +229,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
       columns = [
         {
           label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 48,
+          width: 25,
           isSortable: true,
           icon: <ArrowDownBlue />,
           key: 'actionDescription',
@@ -237,7 +237,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         },
         {
           label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
-          width: 15,
+          width: 25,
           isSortable: true,
           icon: <ArrowDownBlue />,
           key: 'trackingId',
@@ -245,7 +245,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         },
         {
           label: intl.formatMessage(messages.auditDeviceIpAddressColumnTitle),
-          width: 20,
+          width: 25,
           isSortable: true,
           icon: <ArrowDownBlue />,
           key: 'deviceIpAddress',
@@ -254,7 +254,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         },
         {
           label: intl.formatMessage(messages.auditDateColumnTitle),
-          width: 22,
+          width: 25,
           key: 'auditTime',
           isSortable: true,
           isSorted: true,
