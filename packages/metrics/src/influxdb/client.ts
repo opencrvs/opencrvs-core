@@ -194,6 +194,13 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
+      measurement: 'search_requests',
+      fields: {
+        clientId: Influx.FieldType.STRING
+      },
+      tags: ['ipAddress']
+    },
+    {
       measurement: 'user_audit_event',
       fields: {
         data: Influx.FieldType.STRING,
