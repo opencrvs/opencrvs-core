@@ -43,6 +43,7 @@ export interface GQLQuery {
   getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
+  searchRecord?: GQLEventProgressResultSet
   getRoles?: Array<GQLRole | null>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
@@ -1511,6 +1512,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
+  searchRecord?: QueryToSearchRecordResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
@@ -2023,6 +2025,43 @@ export interface QueryToGetEventsWithProgressResolver<
   (
     parent: TParent,
     args: QueryToGetEventsWithProgressArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToSearchRecordArgs {
+  event?: string
+  eventLocationId?: string
+  childFirstName?: string
+  childLastName?: string
+  childDoB?: string
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deathDate?: string
+  deathDateStart?: string
+  deathDateEnd?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  motherIdentifier?: string
+  fatherFirstNames?: string
+  fatherFamilyName?: string
+  fatherDoB?: string
+  fatherIdentifier?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  contactNumber?: string
+  registrationNumber?: string
+  trackingId?: string
+  dateOfRegistration?: string
+  dateOfRegistrationStart?: string
+  dateOfRegistrationEnd?: string
+}
+export interface QueryToSearchRecordResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToSearchRecordArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
