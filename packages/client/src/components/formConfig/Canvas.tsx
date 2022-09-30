@@ -39,8 +39,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import ConfigPlaceholder from './ConfigPlaceholder'
 import { Condition } from '@opencrvs/components/lib/icons'
-import { TitleWrapper } from './formTools/components'
 import { Text } from '@opencrvs/components/lib/Text'
+import { Stack } from '@opencrvs/components/lib/Stack'
 
 const CanvasBox = styled.div`
   display: flex;
@@ -52,10 +52,9 @@ const CanvasBox = styled.div`
   border-radius: 4px;
 `
 
-const CardContentWrapper = styled.div`
-  display: flex;
+const CardContentWrapper = styled(Stack)`
   flex-direction: column;
-  gap: 8px;
+  align-items: normal;
 `
 
 type IRouteProps = {
@@ -167,13 +166,13 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
                 <ConfigPlaceholder label={configField.previewGroupLabel} />
               ) : (
                 <CardContentWrapper>
-                  {!!conditionalField && (
-                    <TitleWrapper>
+                  {conditionalField && (
+                    <Stack>
                       <Condition color="grey400" />
                       <Text variant="reg14" element="span" color="grey400">
-                        {conditionalField?.[0]?.fieldId}
+                        {conditionalField[0].fieldId}
                       </Text>
-                    </TitleWrapper>
+                    </Stack>
                   )}
                   <FormField configField={configField} />
                 </CardContentWrapper>

@@ -56,13 +56,13 @@ import {
   RequiredToggleAction,
   ToolTip,
   ConditionalToggleAction,
-  TitleWrapper,
   RegisterFormFieldIds
 } from './components'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { Condition } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { Stack } from '@opencrvs/components/lib/Stack'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -486,15 +486,11 @@ class CustomFieldToolsComp extends React.Component<
     )
   }
 
-  toggleButtons(
-    fieldIds: {
-      [key: string]: string
-    }[]
-  ) {
+  toggleButtons(fieldIds: string[]) {
     const { intl, selectedField } = this.props
     const initConditionals = [
       {
-        fieldId: fieldIds[0].value,
+        fieldId: fieldIds[0],
         regexp: EMPTY_STRING
       }
     ]
@@ -542,23 +538,23 @@ class CustomFieldToolsComp extends React.Component<
     )
   }
 
-  conditionalParameters(
-    fieldIds: {
-      [key: string]: string
-    }[]
-  ) {
+  conditionalParameters(fieldIds: string[]) {
     const { intl } = this.props
+    const fieldIdOptions = fieldIds.map((fieldId) => ({
+      value: fieldId,
+      label: fieldId
+    }))
     return (
       <FieldContainer>
         <ConditionalWrapper>
-          <TitleWrapper>
+          <Stack>
             <Condition color="grey600" />
             <Title>
               {intl.formatMessage(
                 customFieldFormMessages.conditionalFieldHeaderLabel
               )}
             </Title>
-          </TitleWrapper>
+          </Stack>
           <Text variant="reg14" element="span" color="grey500">
             {intl.formatMessage(customFieldFormMessages.conditionalFieldDesc)}
           </Text>
@@ -579,9 +575,9 @@ class CustomFieldToolsComp extends React.Component<
               }}
               value={
                 this.state.conditionalField.fieldId ||
-                this.setConditionalFieldId(fieldIds[0].value)
+                this.setConditionalFieldId(fieldIds[0])
               }
-              options={fieldIds}
+              options={fieldIdOptions}
             />
           </>
           <CInputField
@@ -792,12 +788,11 @@ class CustomFieldToolsComp extends React.Component<
     return (
       <>
         <RegisterFormFieldIds>
-          {(fieldIds) => (
+          {(fieldIds: string[]) => (
             <>
               {this.toggleButtons(fieldIds)}
-              {selectedField.conditionals
-                ? this.conditionalParameters(fieldIds)
-                : null}
+              {selectedField.conditionals &&
+                this.conditionalParameters(fieldIds)}
             </>
           )}
         </RegisterFormFieldIds>

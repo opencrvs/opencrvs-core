@@ -34,8 +34,7 @@ function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   return defaultMessage?.descriptor
 }
 
-function getConditionals(
-  fieldId: string,
+function getOtherConditionalsAction(
   conditionals: IConditionalConfig[] | undefined
 ) {
   if (!conditionals) return []
@@ -86,25 +85,26 @@ export function createCustomField({
     }
   }
   const { sectionId } = getIdentifiersFromFieldId(fieldId)
-  const othersConditionals = conditionals
-    ? getConditionals(fieldId, conditionals)
-    : []
+
+  const othersConditionals = getOtherConditionalsAction(conditionals)
+
   if (sectionId === BirthSection.Father) {
-    const fatherConditionals = [
+    baseField.conditionals = [
       { action: 'hide', expression: FATHER_DETAILS_DONT_EXIST }
     ]
-    baseField.conditionals = [...fatherConditionals, ...othersConditionals]
   } else if (sectionId === BirthSection.Mother) {
-    const motherConditionals = [
-      {
-        action: 'hide',
-        expression: MOTHER_DETAILS_DONT_EXIST
-      }
+    baseField.conditionals = [
+      { action: 'hide', expression: MOTHER_DETAILS_DONT_EXIST }
     ]
-    baseField.conditionals = [...motherConditionals, ...othersConditionals]
-  } else {
-    baseField.conditionals = othersConditionals
   }
+
+  if (othersConditionals) {
+    baseField.conditionals = [
+      ...(baseField.conditionals ?? []),
+      ...othersConditionals
+    ]
+  }
+
   if (
     baseField.type === 'TEXT' ||
     baseField.type === 'NUMBER' ||

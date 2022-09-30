@@ -28,12 +28,6 @@ import { useParams } from 'react-router'
 import { getFieldId } from '@client/forms/configuration/defaultUtils'
 import { IConditionalConfig } from '@client/forms/questionConfig'
 
-export const TitleWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`
-
 export const Title = styled.h3`
   margin: 0;
   ${({ theme }) => theme.fonts.h3}
@@ -123,20 +117,17 @@ export const ToolTip = ({ label, id }: { label: string; id: string }) => {
 export const RegisterFormFieldIds = ({
   children
 }: {
-  children: (fieldIds: { [key: string]: string }[]) => JSX.Element
+  children: (fieldIds: string[]) => JSX.Element
 }) => {
   const defaultForm = useDefaultForm()
   const { event } = useParams<{ event: Event }>()
   const sections = Object.values<BirthSection | DeathSection>(
     event === Event.Birth ? BirthSection : DeathSection
   )
-  const fieldIds: { [key: string]: string }[] = []
-  sections.forEach((section) => {
-    const identifiers = formSectionToFieldIdentifiers(defaultForm, section)
-    identifiers.forEach((indentifier) => {
-      const fieldId = getFieldId(event, indentifier, defaultForm)
-      fieldIds.push({ value: fieldId, label: fieldId })
-    })
-  })
+
+  const fieldIds = sections
+    .flatMap((section) => formSectionToFieldIdentifiers(defaultForm, section))
+    .map((identifier) => getFieldId(event, identifier, defaultForm))
+
   return children(fieldIds)
 }
