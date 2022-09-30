@@ -16,7 +16,7 @@ import {
   SUBMISSION_STATUS,
   updateRegistrarWorkqueue
 } from '@client/declarations'
-import { Header } from '@client/components/interface/Header/Header'
+import { Header } from '@client/components/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import {
   goToEvents,
@@ -41,11 +41,8 @@ import {
   SYS_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import {
-  FloatingNotification,
-  NOTIFICATION_TYPE,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -63,6 +60,7 @@ import {
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { Frame } from '@opencrvs/components/lib/Frame'
 import { Outbox } from './outbox/Outbox'
 
 export interface IProps extends IButtonProps {
@@ -90,14 +88,6 @@ const FABContainer = styled.div`
   bottom: 55px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
-  }
-`
-
-const BodyContainer = styled.div`
-  margin-left: 0px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 250px;
-    padding: 0px 24px;
   }
 `
 
@@ -300,14 +290,8 @@ export class OfficeHomeView extends React.Component<
     externalValidationCurrentPage: number,
     requireUpdateCurrentPage: number
   ) => {
-    const {
-      workqueue,
-      tabId,
-      drafts,
-      selectorId,
-      storedDeclarations,
-      declarationsReadyToSend
-    } = this.props
+    const { workqueue, tabId, drafts, selectorId, storedDeclarations } =
+      this.props
     const { loading, error, data } = workqueue
     const filteredData = filterProcessingDeclarationsFromQuery(
       data,
@@ -331,124 +315,122 @@ export class OfficeHomeView extends React.Component<
             }}
           />
         )}
-        <Navigation loadWorkqueueStatuses={false} />
-        <BodyContainer>
-          {tabId === WORKQUEUE_TABS.inProgress && (
-            <InProgress
-              drafts={drafts}
-              selectorId={selectorId}
-              isFieldAgent={this.isFieldAgent}
-              queryData={{
-                inProgressData: filteredData.inProgressTab,
-                notificationData: filteredData.notificationTab
-              }}
-              paginationId={{
-                draftId: draftCurrentPage,
-                fieldAgentId: progressCurrentPage,
-                healthSystemId: healthSystemCurrentPage
-              }}
-              pageSize={this.pageSize}
-              onPageChange={this.onPageChange}
-              loading={loading}
-              error={error}
-            />
-          )}
-          {!this.isFieldAgent ? (
-            <>
-              {tabId === WORKQUEUE_TABS.readyForReview && (
-                <ReadyForReview
-                  queryData={{
-                    data: filteredData.reviewTab
-                  }}
-                  paginationId={reviewCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
-                  loading={loading}
-                  error={error}
-                />
-              )}
-              {tabId === WORKQUEUE_TABS.requiresUpdate && (
-                <RequiresUpdate
-                  queryData={{
-                    data: filteredData.rejectTab
-                  }}
-                  paginationId={requireUpdateCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
-                  loading={loading}
-                  error={error}
-                />
-              )}
 
-              {tabId === WORKQUEUE_TABS.externalValidation &&
-                window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
-                  <InExternalValidationTab
-                    queryData={{
-                      data: filteredData.externalValidationTab
-                    }}
-                    paginationId={externalValidationCurrentPage}
-                    pageSize={this.pageSize}
-                    onPageChange={this.onPageChange}
-                    loading={loading}
-                    error={error}
-                  />
-                )}
-              {tabId === WORKQUEUE_TABS.sentForApproval && (
-                <SentForReview
+        {tabId === WORKQUEUE_TABS.inProgress && (
+          <InProgress
+            drafts={drafts}
+            selectorId={selectorId}
+            isFieldAgent={this.isFieldAgent}
+            queryData={{
+              inProgressData: filteredData.inProgressTab,
+              notificationData: filteredData.notificationTab
+            }}
+            paginationId={{
+              draftId: draftCurrentPage,
+              fieldAgentId: progressCurrentPage,
+              healthSystemId: healthSystemCurrentPage
+            }}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {!this.isFieldAgent ? (
+          <>
+            {tabId === WORKQUEUE_TABS.readyForReview && (
+              <ReadyForReview
+                queryData={{
+                  data: filteredData.reviewTab
+                }}
+                paginationId={reviewCurrentPage}
+                pageSize={this.pageSize}
+                onPageChange={this.onPageChange}
+                loading={loading}
+                error={error}
+              />
+            )}
+            {tabId === WORKQUEUE_TABS.requiresUpdate && (
+              <RequiresUpdate
+                queryData={{
+                  data: filteredData.rejectTab
+                }}
+                paginationId={requireUpdateCurrentPage}
+                pageSize={this.pageSize}
+                onPageChange={this.onPageChange}
+                loading={loading}
+                error={error}
+              />
+            )}
+
+            {tabId === WORKQUEUE_TABS.externalValidation &&
+              window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
+                <InExternalValidationTab
                   queryData={{
-                    data: filteredData.approvalTab
+                    data: filteredData.externalValidationTab
                   }}
-                  paginationId={approvalCurrentPage}
+                  paginationId={externalValidationCurrentPage}
                   pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
                   loading={loading}
                   error={error}
                 />
               )}
-              {tabId === WORKQUEUE_TABS.readyToPrint && (
-                <ReadyToPrint
-                  queryData={{
-                    data: filteredData.printTab
-                  }}
-                  paginationId={printCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
-                  loading={loading}
-                  error={error}
-                />
-              )}
-              {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
-            </>
-          ) : (
-            <>
-              {tabId === WORKQUEUE_TABS.sentForReview && (
-                <SentForReview
-                  queryData={{
-                    data: filteredData.reviewTab
-                  }}
-                  paginationId={reviewCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
-                  loading={loading}
-                  error={error}
-                />
-              )}
-              {tabId === WORKQUEUE_TABS.requiresUpdate && (
-                <RequiresUpdate
-                  queryData={{
-                    data: filteredData.rejectTab
-                  }}
-                  paginationId={requireUpdateCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
-                  loading={loading}
-                  error={error}
-                />
-              )}
-              {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
-            </>
-          )}
-        </BodyContainer>
+            {tabId === WORKQUEUE_TABS.sentForApproval && (
+              <SentForReview
+                queryData={{
+                  data: filteredData.approvalTab
+                }}
+                paginationId={approvalCurrentPage}
+                pageSize={this.pageSize}
+                onPageChange={this.onPageChange}
+                loading={loading}
+                error={error}
+              />
+            )}
+            {tabId === WORKQUEUE_TABS.readyToPrint && (
+              <ReadyToPrint
+                queryData={{
+                  data: filteredData.printTab
+                }}
+                paginationId={printCurrentPage}
+                pageSize={this.pageSize}
+                onPageChange={this.onPageChange}
+                loading={loading}
+                error={error}
+              />
+            )}
+            {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
+          </>
+        ) : (
+          <>
+            {tabId === WORKQUEUE_TABS.sentForReview && (
+              <SentForReview
+                queryData={{
+                  data: filteredData.reviewTab
+                }}
+                paginationId={reviewCurrentPage}
+                pageSize={this.pageSize}
+                onPageChange={this.onPageChange}
+                loading={loading}
+                error={error}
+              />
+            )}
+            {tabId === WORKQUEUE_TABS.requiresUpdate && (
+              <RequiresUpdate
+                queryData={{
+                  data: filteredData.rejectTab
+                }}
+                paginationId={requireUpdateCurrentPage}
+                pageSize={this.pageSize}
+                onPageChange={this.onPageChange}
+                loading={loading}
+                error={error}
+              />
+            )}
+            {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
+          </>
+        )}
       </>
     )
   }
@@ -467,10 +449,14 @@ export class OfficeHomeView extends React.Component<
     } = this.state
 
     return (
-      <>
-        <Header
-          title={intl.formatMessage(navigationMessages[this.props.tabId])}
-        />
+      <Frame
+        header={
+          <Header
+            title={intl.formatMessage(navigationMessages[this.props.tabId])}
+          />
+        }
+        navigation={<Navigation loadWorkqueueStatuses={false} />}
+      >
         {this.getData(
           draftCurrentPage,
           healthSystemCurrentPage,
@@ -491,18 +477,17 @@ export class OfficeHomeView extends React.Component<
         </FABContainer>
 
         {this.state.showCertificateToast && (
-          <FloatingNotification
+          <Toast
             id="print-cert-notification"
-            type={NOTIFICATION_TYPE.SUCCESS}
-            show={this.state.showCertificateToast}
-            callback={() => {
+            type="success"
+            onClose={() => {
               this.setState({ showCertificateToast: false })
             }}
           >
             {intl.formatMessage(certificateMessage.toastMessage)}
-          </FloatingNotification>
+          </Toast>
         )}
-      </>
+      </Frame>
     )
   }
 }

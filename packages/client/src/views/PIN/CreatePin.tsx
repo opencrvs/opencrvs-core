@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { PINKeypad } from '@opencrvs/components/lib/interface'
+import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
 import { PIN } from '@opencrvs/components/lib/icons'
 import styled from '@client/styledComponents'
 import * as bcrypt from 'bcryptjs'

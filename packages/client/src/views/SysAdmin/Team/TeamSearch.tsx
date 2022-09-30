@@ -20,7 +20,7 @@ import { Header } from '@client/views/SysAdmin/Performance/utils'
 import {
   ISearchLocation,
   LocationSearch
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/LocationSearch'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'

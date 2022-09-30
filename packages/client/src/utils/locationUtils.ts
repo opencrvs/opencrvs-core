@@ -11,7 +11,7 @@
  */
 import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
-import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/forms/countries'

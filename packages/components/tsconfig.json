@@ -15,7 +15,7 @@
     "jsx": "react",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "rootDir": "src/components",
+    "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -35,10 +35,11 @@
   "include": [
     "src/**/*.tsx",
     "src/**/*.ts",
-    "typings",
+    "typings"
   ],
   "exclude": [
     "node_modules",
+    ".storybook",
     "lib"
   ]
 }

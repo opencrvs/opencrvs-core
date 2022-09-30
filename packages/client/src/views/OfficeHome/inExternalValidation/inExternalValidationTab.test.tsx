@@ -23,7 +23,7 @@ import { readFileSync } from 'fs'
 import { checkAuth } from '@client/profile/profileActions'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
 
@@ -93,7 +93,7 @@ describe('Registrar home external validation tab tests', () => {
   })
 
   it('renders data', async () => {
-    const tableElement = await waitForElement(component, GridTable)
+    const tableElement = await waitForElement(component, Workqueue)
     const data = tableElement.prop('content')
 
     expect(data.length).toBe(1)
@@ -105,7 +105,7 @@ describe('Registrar home external validation tab tests', () => {
   })
 
   it('clicking on a row redirect to recordAudit page', async () => {
-    const tableElement = await waitForElement(component, GridTable)
+    const tableElement = await waitForElement(component, Workqueue)
     const dataRow = tableElement.find('#name_0').hostNodes()
     dataRow.simulate('click')
     component.update()
@@ -119,7 +119,7 @@ describe('Registrar home external validation tab tests', () => {
     })
 
     it('clicking on row takes user to details page', async () => {
-      const tableElement = await waitForElement(component, GridTable)
+      const tableElement = await waitForElement(component, Workqueue)
       const dataRow = tableElement.find('#name_0').hostNodes()
       dataRow.simulate('click')
       component.update()

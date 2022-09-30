@@ -10,18 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import styled from 'styled-components'
-import {
-  PaginationWrapper,
-  MobileWrapper,
-  DesktopWrapper
-} from '@opencrvs/components/lib/styleForPagination'
-import { NoResultText } from '@opencrvs/components/lib/interface/GridTable/GridTable'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import { NoResultText } from '@opencrvs/components/lib/Workqueue'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   LoadingIndicator,
   withOnlineStatus,
@@ -82,24 +74,11 @@ const Body = (props: IProps) => {
           totalPages &&
           onPageChange &&
           isOnline && (
-            <PaginationWrapper id="pagination_container">
-              <DesktopWrapper>
-                <PaginationModified
-                  size="small"
-                  initialPage={paginationId}
-                  totalPages={totalPages}
-                  onPageChange={onPageChange}
-                />
-              </DesktopWrapper>
-              <MobileWrapper>
-                <PaginationModified
-                  size="large"
-                  initialPage={paginationId}
-                  totalPages={totalPages}
-                  onPageChange={onPageChange}
-                />
-              </MobileWrapper>
-            </PaginationWrapper>
+            <Pagination
+              initialPage={paginationId}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
           )}
         <LoadingIndicator
           loading={loading ? true : false}
