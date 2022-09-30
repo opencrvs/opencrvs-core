@@ -107,3 +107,5 @@ export const INFORMANT_MINIMUM_AGE = 16
 export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
 
 export const APPLICATION_VERSION = '1.1.0'
+export const APPLICATION_DEBUG_VERSION =
+  import.meta.env.VITE_APP_VERSION ?? 'Development'

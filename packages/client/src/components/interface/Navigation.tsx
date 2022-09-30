@@ -52,6 +52,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import { APPLICATION_DEBUG_VERSION } from '@client/utils/constants'
 import styled from '@client/styledComponents'
 
 const SCREEN_LOCK = 'screenLock'
@@ -320,7 +321,7 @@ export const NavigationView = (props: IFullProps) => {
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       applicationVersion={runningVer}
-      applicationDebugVersion={process.env.VITE_APP_VERSION || 'Development'}
+      applicationDebugVersion={APPLICATION_DEBUG_VERSION}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
