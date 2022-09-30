@@ -325,7 +325,7 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
+      store.dispatch(checkAuth())
       await flushPromises()
       const data = deathReviewDraftData
 

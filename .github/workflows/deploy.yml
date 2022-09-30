@@ -10,6 +10,50 @@
 name: Deploy
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      core-image-tag:
+        type: string
+        required: true
+      farajaland-image-tag:
+        type: string
+        required: true
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+      SSH_KEY:
+        required: true
+      KNOWN_HOSTS:
+        required: true
+      SMTP_PORT:
+        required: true
+      SMTP_HOST:
+        required: true
+      SMTP_USERNAME:
+        required: true
+      SMTP_PASSWORD:
+        required: true
+      ALERT_EMAIL:
+        required: true
+      DOCKERHUB_ACCOUNT:
+        required: true
+      DOCKERHUB_REPO:
+        required: true
+      KIBANA_USERNAME:
+        required: true
+      KIBANA_PASSWORD:
+        required: true
+      MONGODB_ADMIN_USER:
+        required: true
+      MONGODB_ADMIN_PASSWORD:
+        required: true
+      ELASTICSEARCH_SUPERUSER_PASSWORD:
+        required: true
   workflow_dispatch:
     inputs:
       environment:
@@ -30,7 +74,7 @@ on:
         required: false
 jobs:
   deploy:
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ inputs.environment }}
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     strategy:
@@ -39,13 +83,16 @@ jobs:
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - name: Checking out the country config repo
         run: |
           git clone https://github.com/opencrvs/opencrvs-farajaland.git
 
       # Get latest version hashes from repos if they are not given as inputs
       - name: Get COUNTRY_CONFIG_VERSION
-        if: ${{ !github.event.inputs.farajaland-image-tag }}
+        if: ${{ !inputs.farajaland-image-tag }}
         run: |
           cd opencrvs-farajaland
           echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
@@ -53,9 +100,9 @@ jobs:
 
       # Set tag versions if they are given as inputs
       - name: Set COUNTRY_CONFIG_VERSION from inputs
-        if: ${{ github.event.inputs.farajaland-image-tag }}
+        if: ${{ inputs.farajaland-image-tag }}
         run: |
-          echo "COUNTRY_CONFIG_VERSION=${{ github.event.inputs.farajaland-image-tag }}" >> $GITHUB_ENV
+          echo "COUNTRY_CONFIG_VERSION=${{ inputs.farajaland-image-tag }}" >> $GITHUB_ENV
 
       # Checkout farajaland at the commit hash associated in order for yarn deploy to pickup any deploy Docker Compose changes
       - name: Checkout correct Farajaland branch
@@ -63,11 +110,20 @@ jobs:
           cd opencrvs-farajaland
           git checkout ${{ env.COUNTRY_CONFIG_VERSION }}
           cd ../
+
+      # Get latest version hashes from core if they are not given as inputs
+      - name: Get COUNTRY_CONFIG_VERSION
+        if: ${{ !inputs.farajaland-image-tag }}
+        run: echo "CORE_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
+
+      # Set tag version if they are given as inputs
       - name: Set CORE_VERSION from inputs
-        if: ${{ github.event.inputs.core-image-tag }}
-        run: |
-          echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
-          git checkout ${{ env.CORE_VERSION }}
+        if: ${{ inputs.core-image-tag }}
+        run: echo "CORE_VERSION=${{ inputs.core-image-tag }}" >> $GITHUB_ENV
+
+      # Checkout core at the commit hash associated in order for yarn deploy to pickup any deploy Docker Compose changes
+      - name: Checkout correct Core branch
+        run: git checkout ${{ env.CORE_VERSION }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -82,7 +138,7 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
       - name: Deploy to QA
-        if: ${{ github.event.inputs.environment == 'qa' }}
+        if: ${{ inputs.environment == 'qa' }}
         env:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -100,7 +156,7 @@ jobs:
           yarn deploy:qa farajaland-qa.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
 
       - name: Deploy to production
-        if: ${{ github.event.inputs.environment == 'production' }}
+        if: ${{ inputs.environment == 'production' }}
         env:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -118,7 +174,7 @@ jobs:
           yarn deploy:prod farajaland.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 3
 
       - name: Deploy to staging
-        if: ${{ github.event.inputs.environment == 'staging' }}
+        if: ${{ inputs.environment == 'staging' }}
         env:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -136,7 +192,7 @@ jobs:
           yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
 
       - name: Deploy to config
-        if: ${{ github.event.inputs.environment == 'config' }}
+        if: ${{ inputs.environment == 'config' }}
         env:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}

@@ -1,0 +1,58 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+name: Create backup data
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Environment to create backup from
+        required: true
+        default: production
+        options:
+          - production
+      backup_environment:
+        type: choice
+        description: Environment to create backups to
+        required: true
+        default: migrate
+        options:
+          - migrate
+      replicas:
+        description: No of replicas deployed in the environment
+        default: '3'
+        required: true
+      version_label:
+        description: The version label for the backups
+        required: true
+jobs:
+  backup:
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      BACKUP_HOST: farajaland-${{ github.event.inputs.backup_environment }}.opencrvs.org
+      SRC_HOST: farajaland.opencrvs.org
+      REPLICAS: ${{ github.event.inputs.replicas }}
+      VERSION_LABEL: ${{ github.event.inputs.version_label }}
+    steps:
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      - name: Create backup data in given environment and copy it over to the backup environment
+        run: ssh root@$SRC_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD ELASTICSEARCH_ADMIN_USER=$ELASTICSEARCH_ADMIN_USER ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_ADMIN_PASSWORD /opt/opencrvs/infrastructure/emergency-backup-metadata.sh root $BACKUP_HOST 22 $SRC_HOST $REMOTE_DIR $REPLICAS $VERSION_LABEL"
+        env:
+          MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
+          MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
+          ELASTICSEARCH_ADMIN_USER: elastic
+          ELASTICSEARCH_ADMIN_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
+          REMOTE_DIR: /data/backups/
