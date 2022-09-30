@@ -327,11 +327,6 @@ const messagesToDefine = {
     description: 'Label for birth event option'
   },
 
-  eventOptionForAll: {
-    id: 'performance.fieldAgents.options.event.all',
-    defaultMessage: 'All',
-    description: 'Label for all event option'
-  },
   eventOptionForDeaths: {
     id: 'performance.fieldAgents.options.event.deaths',
     defaultMessage: 'Deaths',
