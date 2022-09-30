@@ -13,7 +13,7 @@ import * as React from 'react'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { useIntl } from 'react-intl'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { getTheme } from '@client/../../components/lib/theme'
+import { getTheme } from '@opencrvs/components/lib/theme'
 import {
   constantsMessages,
   dynamicConstantsMessages
@@ -21,16 +21,15 @@ import {
 import {
   ColumnContentAlignment,
   COLUMNS,
-  GridTable,
-  SORT_ORDER,
-  Spinner
-} from '@client/../../components/lib/interface'
+  Workqueue,
+  SORT_ORDER
+} from '@opencrvs/components/lib/Workqueue'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import {
   ConnectionError,
   StatusSubmissionWaiting as StatusWaiting
-} from '@client/../../components/lib/icons'
+} from '@opencrvs/components/lib/icons'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -50,6 +49,7 @@ import {
 } from '@client/SubmissionController'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { getScope } from '@client/profile/profileSelectors'
+import { Spinner } from '@opencrvs/components/lib'
 
 function getFullName(firstName?: string, lastName?: string) {
   let fullName = ''
@@ -389,13 +389,12 @@ export function Outbox() {
       title={intl.formatMessage(navigationMessages.outbox)}
       isMobileSize={width < theme.grid.breakpoints.lg}
     >
-      <GridTable
+      <Workqueue
         content={transformDeclarationsReadyToSend()}
         columns={getColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResultsOutbox)}
         hideLastBorder={true}
         sortOrder={sortOrder}
-        sortedCol={sortedColumn}
       />
     </WQContentWrapper>
   )
