@@ -20,10 +20,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as React from 'react'
-import {
-  GET_USER,
-  FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER
-} from '@client/user/queries'
+import { GET_USER } from '@client/user/queries'
 import { UserAudit } from '@client/views/UserAudit/UserAudit'
 import { USER_PROFILE } from '@client/navigation/routes'
 import { userMutations } from '@client/user/mutations'
@@ -90,35 +87,6 @@ describe('User audit list tests', () => {
               }
             ],
             creationDate: '2019-03-31T18:00:00.000Z'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER,
-        variables: {
-          timeEnd: new Date(1487076708000).toISOString(),
-          timeStart: new Date(1484398308000).toISOString(),
-          practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-          locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-          count: 10,
-          skip: 0
-        }
-      },
-      result: {
-        data: {
-          fetchTimeLoggedMetricsByPractitioner: {
-            totalItems: 1,
-            results: [
-              {
-                status: 'REGISTERED',
-                trackingId: 'B23S555',
-                eventType: 'BIRTH',
-                timeSpentEditing: 50,
-                time: '2019-03-31T18:00:00.000Z'
-              }
-            ]
           }
         }
       }

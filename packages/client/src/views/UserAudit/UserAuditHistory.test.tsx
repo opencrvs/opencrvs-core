@@ -10,14 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { AppStore } from '@client/store'
-import { createTestComponent, createTestStore } from '@client/tests/util'
+import {
+  createRouterProps,
+  createTestComponent,
+  createTestStore
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER } from '@client/user/queries'
+import { GET_USER_AUDIT_LOG } from '@client/user/queries'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { History } from 'history'
 import { vi } from 'vitest'
+import { getTheme } from '@opencrvs/components'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
+import { formatUrl } from '@client/navigation'
 
 describe('User audit list tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -27,90 +34,41 @@ describe('User audit list tests', () => {
   const graphqlMock = [
     {
       request: {
-        query: FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER,
+        query: GET_USER_AUDIT_LOG,
         variables: {
-          timeEnd: new Date(1487076708000).toISOString(),
-          timeStart: new Date(1484398308000).toISOString(),
           practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-          locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
           count: 10,
           skip: 0
         }
       },
       result: {
         data: {
-          fetchTimeLoggedMetricsByPractitioner: {
-            totalItems: 11,
+          getUserAuditLog: {
+            total: 2,
             results: [
               {
-                status: 'DECLARED',
-                trackingId: 'D23S2D0',
-                eventType: 'DEATH',
-                timeSpentEditing: 120,
-                time: '2019-03-31T18:00:00.000Z'
+                ipAddress: 'localhost',
+                practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
+                userAgent:
+                  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
+                action: 'REGISTERED',
+                time: '2019-03-31T18:00:00.000Z',
+                data: {
+                  compositionId: '80b90ac3-1032-4f98-af64-627d2b7443f3',
+                  trackingId: 'D23S2D0'
+                }
               },
               {
-                status: 'IN_PROGRESS',
-                trackingId: 'B23S2D0',
-                eventType: 'BIRTH',
-                timeSpentEditing: 20,
-                time: '2018-03-31T18:00:00.000Z'
-              },
-              {
-                status: 'VALIDATED',
-                trackingId: 'B23S2B2',
-                eventType: 'BIRTH',
-                timeSpentEditing: 110,
-                time: '2019-03-31T18:00:00.000Z'
-              },
-              {
-                status: 'WAITING_VALIDATION',
-                trackingId: 'B23S232',
-                eventType: 'BIRTH',
-                timeSpentEditing: 10,
-                time: '2019-03-31T18:00:00.000Z'
-              },
-              {
-                status: 'REGISTERED',
-                trackingId: 'B23S555',
-                eventType: 'BIRTH',
-                timeSpentEditing: 50,
-                time: '2019-07-30T18:00:00.000Z'
-              },
-              {
-                status: 'REJECTED',
-                trackingId: 'B23S786',
-                eventType: 'BIRTH',
-                timeSpentEditing: 66,
-                time: '2019-03-31T18:00:00.000Z'
-              },
-              {
-                status: 'CERTIFIED',
-                trackingId: 'B23S245',
-                eventType: 'BIRTH',
-                timeSpentEditing: 88,
-                time: '2019-03-29T18:00:00.000Z'
-              },
-              {
-                status: 'VALIDATED',
-                trackingId: 'B23S2B2',
-                eventType: 'BIRTH',
-                timeSpentEditing: 110,
-                time: '2020-03-29T18:00:00.000Z'
-              },
-              {
-                status: 'WAITING_VALIDATION',
-                trackingId: 'B23S232',
-                eventType: 'BIRTH',
-                timeSpentEditing: 10,
-                time: '2019-03-31T18:00:00.000Z'
-              },
-              {
-                status: 'REGISTERED',
-                trackingId: 'B23S555',
-                eventType: 'BIRTH',
-                timeSpentEditing: 50,
-                time: '2019-03-31T18:00:00.000Z'
+                ipAddress: 'localhost',
+                practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
+                userAgent:
+                  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
+                action: 'REGISTERED',
+                time: '2019-03-29T18:00:00.000Z',
+                data: {
+                  compositionId: '80b90ac3-1032-4f98-af64-627d2b7443f3',
+                  trackingId: 'D23S2D01'
+                }
               }
             ]
           }
@@ -119,24 +77,24 @@ describe('User audit list tests', () => {
     }
   ]
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     Date.now = vi.fn(() => 1487076708000)
     ;({ store, history } = await createTestStore())
-  })
-
-  beforeEach(async () => {
     component = await createTestComponent(
+      // @ts-ignore
       <UserAuditHistory
-        user={{
-          id: '12345',
-          name: 'Dummy User',
-          role: 'FIELD_AGENT',
-          type: 'CHA',
-          number: '01622688231',
-          status: 'active',
-          practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-          locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
-        }}
+        practitionerId="94429795-0a09-4de8-8e1e-27dab01877d2"
+        {...createRouterProps(
+          formatUrl(TEAM_USER_LIST, {
+            userId: '5d08e102542c7a19fc55b790'
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              userId: '5d08e102542c7a19fc55b790'
+            }
+          }
+        )}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
@@ -155,6 +113,7 @@ describe('User audit list tests', () => {
 
   it('renders in loading mode', async () => {
     const testComponent = await createTestComponent(
+      // @ts-ignore
       <UserAuditHistory isLoading={true} />,
       {
         store,
@@ -167,33 +126,24 @@ describe('User audit list tests', () => {
   })
   it('renders with a error toast for graphql error', async () => {
     const testComponent = await createTestComponent(
-      <UserAuditHistory
-        user={{
-          id: '12345',
-          name: 'Dummy User',
-          role: 'FIELD_AGENT',
-          type: 'CHA',
-          number: '01622688231',
-          status: 'active',
-          practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-          locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
-        }}
-      />,
+      // @ts-ignore
+      <UserAuditHistory userDetails={null} />,
       { store, history }
     )
     expect(await waitForElement(testComponent, '#error-toast')).toBeDefined()
   })
   it('toggles sorting order of the list', async () => {
+    console.log(component.debug())
     const firstRowElement = await waitForElement(component, '#row_0')
     const toggleSortActionElement = await waitForElement(
       component,
       '#auditTime-label'
     )
-    const firstTrackingId = firstRowElement.hostNodes().childAt(2).text()
+    const firstTrackingId = firstRowElement.hostNodes().childAt(1).text()
 
     toggleSortActionElement.hostNodes().simulate('click')
     const firstRowElementAfterSort = await waitForElement(component, '#row_0')
-    expect(firstRowElementAfterSort.hostNodes().childAt(2).text()).not.toEqual(
+    expect(firstRowElementAfterSort.hostNodes().childAt(1).text()).not.toBe(
       firstTrackingId
     )
   })
@@ -201,17 +151,16 @@ describe('User audit list tests', () => {
   // TODO: Implement this test when UserAudit is enabled again / reworked
   it.skip('renders next page of audits after clicking next page', async () => {
     const testComponent = await createTestComponent(
+      // @ts-ignore
       <UserAuditHistory
-        user={{
-          id: '12345',
-          name: 'Dummy User',
+        userDetails={{
           role: 'FIELD_AGENT',
           type: 'CHA',
-          number: '01622688231',
           status: 'active',
-          practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-          locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+          practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2'
         }}
+        history={history}
+        theme={getTheme()}
       />,
       {
         store,
@@ -220,27 +169,29 @@ describe('User audit list tests', () => {
           graphqlMock[0],
           {
             request: {
-              query: FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER,
+              query: GET_USER_AUDIT_LOG,
               variables: {
-                timeEnd: new Date(1487076708000).toISOString(),
-                timeStart: new Date(1484398308000).toISOString(),
                 practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-                count: 20,
+                count: 10,
                 skip: 0
               }
             },
             result: {
               data: {
-                fetchTimeLoggedMetricsByPractitioner: {
-                  totalItems: 11,
+                getUserAuditLog: {
+                  total: 1,
                   results: [
                     {
-                      status: 'REGISTERED',
-                      trackingId: 'B23S555',
-                      eventType: 'BIRTH',
-                      timeSpentEditing: 50,
-                      time: '2019-03-31T18:00:00.000Z'
+                      ipAddress: 'localhost',
+                      practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
+                      userAgent:
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
+                      action: 'REGISTERED',
+                      time: '2019-03-31T18:00:00.000Z',
+                      data: {
+                        compositionId: '80b90ac3-1032-4f98-af64-627d2b7443f3',
+                        trackingId: 'D23S2D0'
+                      }
                     }
                   ]
                 }
@@ -251,13 +202,13 @@ describe('User audit list tests', () => {
       }
     )
 
-    const loadMoreLink = await waitForElement(testComponent, '#page-number-1')
-    expect(loadMoreLink.hostNodes()).toHaveLength(2)
-    loadMoreLink.hostNodes().first().simulate('click')
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.update()
+    // const loadMoreLink = await waitForElement(testComponent, '#page-number-1')
+    // expect(loadMoreLink.hostNodes()).toHaveLength(2)
+    // loadMoreLink.hostNodes().first().simulate('click')
+    // await new Promise((resolve) => {
+    //   setTimeout(resolve, 100)
+    // })
+    // testComponent.update()
     expect(testComponent.find('#page-number-1').hostNodes()).toHaveLength(0)
   })
 })
