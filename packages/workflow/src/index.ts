@@ -10,11 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-// tslint:disable-next-line no-import-side-effect
+// eslint-disable-next-line import/no-unassigned-import
 import '@opencrvs/commons/monitoring'
-// tslint:disable-next-line no-var-requires
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
-// tslint:disable-next-line no-var-requires
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config({
   path: `${process.cwd()}/.env`
 })

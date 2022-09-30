@@ -36,7 +36,8 @@ export const systemScopeMapping: IRoleScopeMapping = {
   HEALTH: ['declare', 'notification-api'],
   NATIONAL_ID: ['nationalId'],
   EXTERNAL_VALIDATION: ['validator-api'],
-  AGE_CHECK: ['declare', 'age-verification-api']
+  AGE_CHECK: ['declare', 'age-verification-api'],
+  RECORD_SEARCH: ['recordsearch']
 }
 
 export const hasScope = (request: Hapi.Request, scope: string): boolean => {

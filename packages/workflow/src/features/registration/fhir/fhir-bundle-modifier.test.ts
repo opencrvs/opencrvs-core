@@ -218,7 +218,7 @@ describe('Verify fhir bundle modifier functions', () => {
         scope: ['register']
       }
       const fhirBundle = cloneDeep(testFhirBundle)
-      /* tslint:disable:no-string-literal */
+
       if (
         fhirBundle &&
         fhirBundle.entry &&
@@ -233,7 +233,7 @@ describe('Verify fhir bundle modifier functions', () => {
             }
           ]
         }
-        /* tslint:enable:no-string-literal */
+
         const taskResource = await setupRegistrationWorkflow(
           fhirBundle.entry[1].resource as fhir.Task,
           tokenPayload
@@ -375,7 +375,7 @@ describe('Verify fhir bundle modifier functions', () => {
       id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
     }
     const fhirBundle = cloneDeep(testFhirBundle)
-    /* tslint:disable:no-string-literal */
+
     fhirBundle.entry[1].resource['note'] = [
       {
         text: 'this is a test note',
@@ -394,7 +394,6 @@ describe('Verify fhir bundle modifier functions', () => {
         time: '2018-10-31T09:45:05+10:00'
       })
     }
-    /* tslint:enable:no-string-literal */
   })
   describe('setupLastRegLocation', () => {
     beforeEach(() => {

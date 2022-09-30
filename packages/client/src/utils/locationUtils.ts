@@ -11,7 +11,7 @@
  */
 import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
-import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/forms/countries'
@@ -102,7 +102,11 @@ function generateSearchableLocations(
   const generated: ISearchLocation[] = locations.map((location: ILocation) => {
     let locationName = generateLocationName(location, intl)
 
-    if (location.partOf && location.partOf !== 'Location/0') {
+    if (
+      location.partOf &&
+      location.partOf !== 'Location/0' &&
+      location.type !== 'CRVS_OFFICE'
+    ) {
       const locRef = location.partOf.split('/')[1]
       let parent
       if (

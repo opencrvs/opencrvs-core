@@ -22,12 +22,12 @@ import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
 import {
-  GridTable,
+  Workqueue,
   COLUMNS,
   SORT_ORDER,
   ColumnContentAlignment,
   IAction
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -38,6 +38,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
@@ -51,6 +52,7 @@ import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { RegStatus } from '@client/utils/gateway'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
@@ -217,9 +219,11 @@ class SentForReviewComponent extends React.Component<
           )) ||
         ''
       const sentForApproval =
-        (reg.createdAt && Number.isNaN(Number(reg.createdAt))
-          ? new Date(reg.createdAt)
-          : new Date(Number(reg.createdAt))) || ''
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          this.isFieldAgent ? RegStatus.Declared : RegStatus.Validated
+        ) || ''
+
       const dateOfEvent =
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&
@@ -334,12 +338,11 @@ class SentForReviewComponent extends React.Component<
             )}
           </ToolTipContainer>
         </ReactTooltip>
-        <GridTable
+        <Workqueue
           content={this.transformValidatedContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
           hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>

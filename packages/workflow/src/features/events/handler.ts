@@ -455,7 +455,7 @@ export async function fhirWorkflowEventHandler(
 
 export async function triggerEvent(
   event: Events,
-  payload: string | object,
+  payload: Hapi.Request['payload'],
   headers: Record<string, string> = {}
 ) {
   try {

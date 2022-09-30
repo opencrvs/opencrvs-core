@@ -17,6 +17,7 @@ import * as React from 'react'
 import { FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER } from '@client/user/queries'
 import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
 import { History } from 'history'
+import { vi } from 'vitest'
 
 describe('User audit list tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -118,7 +119,7 @@ describe('User audit list tests', () => {
   ]
 
   beforeAll(async () => {
-    Date.now = jest.fn(() => 1487076708000)
+    Date.now = vi.fn(() => 1487076708000)
     ;({ store, history } = await createTestStore())
   })
 
@@ -196,7 +197,8 @@ describe('User audit list tests', () => {
     )
   })
 
-  it('renders next page of audits after clicking load more link', async () => {
+  // TODO: Implement this test when UserAudit is enabled again / reworked
+  it.skip('renders next page of audits after clicking next page', async () => {
     const testComponent = await createTestComponent(
       <UserAuditList
         user={{

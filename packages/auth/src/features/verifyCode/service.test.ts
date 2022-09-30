@@ -26,7 +26,7 @@ describe('verifyCode service', () => {
   describe('generateVerificationCode', () => {
     it('generates a pseudo random 6 digit code', async () => {
       const code = expect.stringMatching(/^\d{6}$/)
-      return generateVerificationCode(nonce, mobile).then(data => {
+      return generateVerificationCode(nonce, mobile).then((data) => {
         expect(data).toEqual(code)
       })
     })
@@ -77,11 +77,10 @@ describe('verifyCode service', () => {
       )
     })
 
-    it('throws error if no verification code was generated', () => {
-      return expect(
+    it('throws error if no verification code was generated', () =>
+      expect(
         checkVerificationCode('abracaDabra7210', 'abcdef')
-      ).rejects.toThrow('sms code not found')
-    })
+      ).rejects.toThrow('sms code not found'))
 
     it('does not throw any error if verification code is ok', async () => {
       const codeCreationTime = 1487076708000

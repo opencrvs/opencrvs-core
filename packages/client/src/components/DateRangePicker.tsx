@@ -25,7 +25,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { IActionObject } from '@opencrvs/components/lib/interface'
+import { IActionObject } from '@opencrvs/components/lib/common-types'
 import format from '@client/utils/date-formatting'
 import subDays from 'date-fns/subDays'
 import subMonths from 'date-fns/subMonths'

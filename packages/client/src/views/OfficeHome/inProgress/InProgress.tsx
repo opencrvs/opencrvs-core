@@ -13,11 +13,11 @@ import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 import {
+  Workqueue,
   ColumnContentAlignment,
-  GridTable,
   COLUMNS,
   SORT_ORDER
-} from '@opencrvs/components/lib/interface/GridTable'
+} from '@opencrvs/components/lib/Workqueue'
 import {
   GQLHumanName,
   GQLEventSearchResultSet,
@@ -27,7 +27,8 @@ import {
 import {
   IDeclaration,
   DOWNLOAD_STATUS,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  ITaskHistory
 } from '@client/declarations'
 import {
   goToPage as goToPageAction,
@@ -60,13 +61,13 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { DownloadAction } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { FormTabs } from '@opencrvs/components/lib/forms'
-import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { IAction } from '@opencrvs/components/lib/common-types'
 import {
   IconWithName,
   IconWithNameEvent,
@@ -75,6 +76,7 @@ import {
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
@@ -181,8 +183,11 @@ export class InProgressComponent extends React.Component<
       const regId = reg.id
       const event = reg.type
       const lastModificationDate =
-        (reg && reg.registration && reg.registration.modifiedAt) ||
-        (reg && reg.registration && reg.registration.createdAt) ||
+        (reg.operationHistories &&
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories as ITaskHistory[],
+            RegStatus.InProgress
+          )) ||
         ''
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
 
@@ -291,8 +296,7 @@ export class InProgressComponent extends React.Component<
           />
         ),
         dateOfEvent,
-        notificationSent:
-          (lastModificationDate && parseInt(lastModificationDate)) || '',
+        notificationSent: lastModificationDate || '',
         actions
       }
     })
@@ -556,12 +560,11 @@ export class InProgressComponent extends React.Component<
     isShowPagination: boolean
   ) => {
     return (
-      <GridTable
+      <Workqueue
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
-        sortedCol={this.state.sortedCol}
         hideLastBorder={!isShowPagination}
       />
     )
@@ -572,12 +575,11 @@ export class InProgressComponent extends React.Component<
     isShowPagination: boolean
   ) => {
     return (
-      <GridTable
+      <Workqueue
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
-        sortedCol={this.state.sortedCol}
         hideLastBorder={!isShowPagination}
       />
     )
@@ -667,11 +669,10 @@ export class InProgressComponent extends React.Component<
         noContent={noContent}
       >
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-          <GridTable
+          <Workqueue
             content={this.transformDraftContent()}
             columns={this.getColumns()}
             loading={isFieldAgent ? false : this.props.loading}
-            sortedCol={this.state.sortedCol}
             sortOrder={this.state.sortOrder}
             hideLastBorder={!isShowPagination}
           />

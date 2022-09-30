@@ -60,7 +60,7 @@ entryPoint = "http"
     "openhim.{{hostname}}",
     "webhooks.{{hostname}}",
     "kibana.{{hostname}}",
-    "styleguide.{{hostname}}"
+    "ui-kit.{{hostname}}"
   ]
 
 [retry]

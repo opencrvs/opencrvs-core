@@ -46,26 +46,26 @@ export const up = async (db) => {
     timestamp: time.getNanoTime()
   }))
 
-  const startedByMap = getCompositionIdToStartedByMap(db, rejectedPoints.map(({ compositionId }) => compositionId))
+  const startedByMap = await getCompositionIdToStartedByMap(db, rejectedPoints.map(({ compositionId }) => compositionId))
 
   const rejectedPointsWithCorrectStartedBy = rejectedPoints
     .map(({ compositionId, timestamp, ...tags }) => ({
       measurement: 'declarations_rejected',
-      tags: {...tags, startedBy: startedByMap[compositionId]},
+      tags: {...tags, startedBy: startedByMap.get(compositionId)},
       fields: { compositionId },
       timestamp
     }))
 
-  influx.dropMeasurement('declarations_rejected')
+  await influx.dropMeasurement('declarations_rejected')
 
-  influx.writePoints(rejectedPointsWithCorrectStartedBy)
+  await influx.writePoints(rejectedPointsWithCorrectStartedBy)
 }
 
 async function getCompositionIdToStartedByMap(db, compositionIds) {
   const extractId = (reference) => reference.split('/')[1]
   const cursor = await getTaskCursor(db, compositionIds)
   const startedByMap = new Map()
-  cursor.forEach((task) => {
+  await cursor.forEach((task) => {
     const compositionId = extractId(task.focus.reference)
     if (startedByMap.has(compositionId)) return
     startedByMap.set(compositionId, extractId(task.extension[0].valueReference.reference))
