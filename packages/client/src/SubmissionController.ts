@@ -19,8 +19,8 @@ import { isNavigatorOnline } from './utils'
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never
 
-type IRetryStatus = ArrayElement<typeof ALLOWED_STATUS_FOR_RETRY>
-type IInProgressStatus = ArrayElement<typeof INPROGRESS_STATUS>
+export type IRetryStatus = ArrayElement<typeof ALLOWED_STATUS_FOR_RETRY>
+export type IInProgressStatus = ArrayElement<typeof INPROGRESS_STATUS>
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15

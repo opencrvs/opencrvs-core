@@ -45,7 +45,9 @@ import {
 } from '@client/views/OfficeHome/utils'
 import {
   ALLOWED_STATUS_FOR_RETRY,
-  INPROGRESS_STATUS
+  IInProgressStatus,
+  INPROGRESS_STATUS,
+  IRetryStatus
 } from '@client/SubmissionController'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { getScope } from '@client/profile/profileSelectors'
@@ -65,6 +67,80 @@ function getFullName(firstName?: string, lastName?: string) {
   return fullName
 }
 
+const statusMessageMap = {
+  [SUBMISSION_STATUS.READY_TO_SUBMIT]: messages.statusWaitingToSubmit,
+  [SUBMISSION_STATUS.READY_TO_APPROVE]: messages.statusWaitingToValidate,
+  [SUBMISSION_STATUS.READY_TO_REGISTER]: messages.statusWaitingToRegister,
+  [SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION]:
+    messages.statusWaitingToRequestCorrection,
+  [SUBMISSION_STATUS.SUBMITTING]: messages.statusSubmitting,
+  [SUBMISSION_STATUS.APPROVING]: messages.statusSendingForApproval,
+  [SUBMISSION_STATUS.REGISTERING]: messages.statusRegistering,
+  [SUBMISSION_STATUS.REQUESTING_CORRECTION]:
+    messages.statusRequestingCorrection,
+  [SUBMISSION_STATUS.READY_TO_REJECT]: messages.statusWaitingToReject,
+  [SUBMISSION_STATUS.REJECTING]: messages.statusRejecting,
+  [SUBMISSION_STATUS.READY_TO_REINSTATE]: messages.statusWaitingToBeReinstated,
+  [SUBMISSION_STATUS.REINSTATING]: messages.statusReinstating,
+  [SUBMISSION_STATUS.READY_TO_ARCHIVE]: messages.statusWaitingToBeArchived,
+  [SUBMISSION_STATUS.ARCHIVING]: messages.statusArchiving,
+  [SUBMISSION_STATUS.READY_TO_CERTIFY]: messages.statusWaitingToCertify,
+  [SUBMISSION_STATUS.CERTIFYING]: messages.statusCertifying,
+  [SUBMISSION_STATUS.FAILED_NETWORK]: messages.waitingToRetry
+} as const
+
+const statusInprogressIconIdMap = {
+  [SUBMISSION_STATUS.SUBMITTING]: 'submitting',
+  [SUBMISSION_STATUS.APPROVING]: 'approving',
+  [SUBMISSION_STATUS.REGISTERING]: 'registering',
+  [SUBMISSION_STATUS.REJECTING]: 'rejecting',
+  [SUBMISSION_STATUS.REQUESTING_CORRECTION]: 'requestingCorrection',
+  [SUBMISSION_STATUS.REINSTATING]: 'reinstating',
+  [SUBMISSION_STATUS.ARCHIVING]: 'archiving',
+  [SUBMISSION_STATUS.CERTIFYING]: 'certifying'
+}
+
+type OutboxSubmissionStatus = IRetryStatus | IInProgressStatus
+
+function isInprogressStatus(
+  status: OutboxSubmissionStatus
+): status is IInProgressStatus {
+  return INPROGRESS_STATUS.includes(status as IInProgressStatus)
+}
+
+function getIcon(
+  status: OutboxSubmissionStatus,
+  index: number,
+  isOnline: boolean
+): React.ReactNode {
+  let id = `waiting${index}`
+
+  if (!isOnline) {
+    id = `noConnection${index}`
+    return <ConnectionError id={id} key={id} />
+  }
+
+  if (status === SUBMISSION_STATUS.FAILED_NETWORK) {
+    id = `failed${index}`
+  }
+
+  if (isInprogressStatus(status)) {
+    id = `${statusInprogressIconIdMap[status] || `registering`}${index}`
+    return <Spinner id={id} key={id} />
+  }
+
+  return <StatusWaiting id={id} key={id} />
+}
+const isOutboxDeclaration = (
+  declaration: IDeclaration
+): declaration is IDeclaration & {
+  submissionStatus: OutboxSubmissionStatus
+} =>
+  Boolean(declaration.submissionStatus) &&
+  (
+    [...ALLOWED_STATUS_FOR_RETRY, ...INPROGRESS_STATUS] as SUBMISSION_STATUS[]
+  ).includes(declaration.submissionStatus as SUBMISSION_STATUS)
+
 export function Outbox() {
   const intl = useIntl()
   const [width, setWidth] = React.useState(window.innerWidth)
@@ -73,17 +149,8 @@ export function Outbox() {
   const isOnline = useOnlineStatus()
   const theme = getTheme()
   const scope = useSelector(getScope)
-  const declarations = useSelector<IStoreState, IDeclaration[]>((state) =>
-    state.declarationsState?.declarations.filter(
-      (declaration) =>
-        declaration.submissionStatus &&
-        (
-          [
-            ...ALLOWED_STATUS_FOR_RETRY,
-            ...INPROGRESS_STATUS
-          ] as SUBMISSION_STATUS[]
-        ).includes(declaration.submissionStatus as SUBMISSION_STATUS)
-    )
+  const declarations = useSelector((state: IStoreState) =>
+    state.declarationsState?.declarations.filter(isOutboxDeclaration)
   )
 
   React.useEffect(() => {
@@ -93,151 +160,6 @@ export function Outbox() {
     window.addEventListener('resize', recordWindowWidth)
     return () => window.removeEventListener('resize', recordWindowWidth)
   }, [])
-
-  function submissionStatusMap(status: string, index: number) {
-    const { formatMessage } = intl
-    const {
-      statusWaitingToBeArchived,
-      statusWaitingToBeReinstated,
-      statusWaitingToRegister,
-      statusWaitingToValidate,
-      statusWaitingToCertify,
-      statusArchiving,
-      statusCertifying,
-      statusRegistering,
-      statusWaitingToReject,
-      statusRejecting,
-      statusReinstating,
-      statusWaitingToSubmit,
-      statusSubmitting,
-      statusSendingForApproval,
-      waitingToRetry,
-      statusRequestingCorrection,
-      statusWaitingToRequestCorrection
-    } = messages
-
-    let icon: () => React.ReactNode
-    let statusText: string
-    let iconId: string
-
-    switch (status) {
-      // @ts-ignore
-      case SUBMISSION_STATUS.READY_TO_SUBMIT:
-        if (!(scope?.includes('register') || scope?.includes('validate'))) {
-          iconId = `waiting${index}`
-          icon = () => <StatusWaiting id={iconId} key={iconId} />
-          statusText = formatMessage(statusWaitingToSubmit)
-          break
-        }
-      // @ts-ignore
-      // eslint-disable-next-line no-fallthrough
-      case SUBMISSION_STATUS.READY_TO_APPROVE:
-        if (!scope?.includes('register')) {
-          iconId = `waiting${index}`
-          icon = () => <StatusWaiting id={iconId} key={iconId} />
-          statusText = formatMessage(statusWaitingToValidate)
-          break
-        }
-      // eslint-disable-next-line no-fallthrough
-      case SUBMISSION_STATUS.READY_TO_REGISTER:
-        iconId = `waiting${index}`
-        icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusWaitingToRegister)
-        break
-      case SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION:
-        iconId = `waiting${index}`
-        icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusWaitingToRequestCorrection)
-        break
-      // @ts-ignore
-      case SUBMISSION_STATUS.SUBMITTING:
-        if (!(scope?.includes('register') || scope?.includes('validate'))) {
-          iconId = `registering${index}`
-          icon = () => <Spinner id={iconId} key={iconId} size={24} />
-          statusText = formatMessage(statusSubmitting)
-          break
-        }
-      // @ts-ignore
-      // eslint-disable-next-line no-fallthrough
-      case SUBMISSION_STATUS.APPROVING:
-        if (!scope?.includes('register')) {
-          iconId = `registering${index}`
-          icon = () => <Spinner id={iconId} key={iconId} size={24} />
-          statusText = formatMessage(statusSendingForApproval)
-          break
-        }
-      // eslint-disable-next-line no-fallthrough
-      case SUBMISSION_STATUS.REGISTERING:
-        iconId = `registering${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusRegistering)
-        break
-      case SUBMISSION_STATUS.REQUESTING_CORRECTION:
-        iconId = `requestingCorrection${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusRequestingCorrection)
-        break
-      case SUBMISSION_STATUS.READY_TO_REJECT:
-        iconId = `waiting${index}`
-        icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusWaitingToReject)
-        break
-      case SUBMISSION_STATUS.REJECTING:
-        iconId = `rejecting${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusRejecting)
-        break
-      case SUBMISSION_STATUS.READY_TO_REINSTATE:
-        iconId = `waiting${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusWaitingToBeReinstated)
-        break
-      case SUBMISSION_STATUS.REINSTATING:
-        iconId = `reinstating${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusReinstating)
-        break
-      case SUBMISSION_STATUS.READY_TO_ARCHIVE:
-        iconId = `waiting${index}`
-        icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusWaitingToBeArchived)
-        break
-      case SUBMISSION_STATUS.ARCHIVING:
-        iconId = `registering${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusArchiving)
-        break
-      case SUBMISSION_STATUS.READY_TO_CERTIFY:
-        iconId = `waiting${index}`
-        icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusWaitingToCertify)
-        break
-      case SUBMISSION_STATUS.CERTIFYING:
-        iconId = `waiting${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        statusText = formatMessage(statusCertifying)
-        break
-      case SUBMISSION_STATUS.FAILED_NETWORK:
-        iconId = `failed${index}`
-        icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(waitingToRetry)
-        break
-      default:
-        // default act as  SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_REGISTER]:
-        iconId = `waiting${index}`
-        icon = () => <StatusWaiting id={iconId} key={iconId} />
-        statusText = formatMessage(statusWaitingToRegister)
-    }
-
-    if (!isOnline) {
-      iconId = `noConnection${index}`
-      icon = () => <ConnectionError id={iconId} key={iconId} />
-    }
-    return {
-      icon,
-      statusText
-    }
-  }
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -280,10 +202,11 @@ export function Outbox() {
         dateOfEvent = declaration.data?.deathEvent?.deathDate as string
       }
 
-      const { statusText, icon } = submissionStatusMap(
-        declaration.submissionStatus || '',
-        index
+      const statusText = intl.formatMessage(
+        statusMessageMap[declaration.submissionStatus] ||
+          messages.statusWaitingToRegister
       )
+      const icon = getIcon(declaration.submissionStatus, index, isOnline)
 
       const NameComponent = name ? (
         <NameContainer isBoldLink>{name}</NameContainer>
@@ -312,11 +235,11 @@ export function Outbox() {
           <IconWithNameEvent
             status={declaration.registrationStatus || 'IN_PROGRESS'}
             name={NameComponent}
-            event={statusText || ''}
+            event={statusText}
           />
         ),
-        submissionStatus: statusText || '',
-        statusIndicator: icon ? [{ actionComponent: icon() }] : null,
+        submissionStatus: statusText,
+        statusIndicator: icon ? [{ actionComponent: icon }] : null,
         dateOfEvent
       }
     })
