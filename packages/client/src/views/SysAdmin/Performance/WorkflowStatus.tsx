@@ -132,10 +132,7 @@ export const StatusMapping: IStatusMapping = {
     labelDescriptor: statusMessages.certified,
     color: colors.blue
   },
-  REQUESTED_CORRECTION: {
-    labelDescriptor: statusMessages.requestedCorrection,
-    color: colors.blue
-  },
+
   ARCHIVED: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
