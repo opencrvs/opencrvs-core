@@ -13,9 +13,12 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { withTheme } from '@client/styledComponents'
 import * as React from 'react'
 import Bowser from 'bowser'
+import { goToDeclarationRecordAudit } from '@client/navigation'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Query } from '@client/components/Query'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
+import { connect } from 'react-redux'
+
 import {
   GQLUserAuditLogItemWithComposition,
   GQLUserAuditLogResultItem,
@@ -120,6 +123,14 @@ interface IBaseProp {
   isLoading?: boolean
 }
 
+interface DispatchProps {
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+}
+
+interface IBasePrintTabProps {
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+}
+
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
@@ -129,6 +140,7 @@ interface IConnectProps {
 type Props = WrappedComponentProps &
   IBaseProp &
   IOnlineStatusProps &
+  DispatchProps &
   RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
     theme: ITheme
   }
@@ -357,7 +369,16 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           </AuditDescTimeContainer>
         ),
         trackingId: isUserAuditItemWithDeclarationDetials(userAuditItem) ? (
-          <LinkButton>{userAuditItem.data.trackingId}</LinkButton>
+          <LinkButton
+            onClick={() =>
+              this.props.goToDeclarationRecordAudit(
+                'printTab',
+                userAuditItem.data.compositionId as string
+              )
+            }
+          >
+            {userAuditItem.data.trackingId}
+          </LinkButton>
         ) : null,
         deviceIpAddress: deviceIpAddress,
         trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
@@ -517,6 +538,10 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   }
 }
 
-export const UserAuditHistory = withTheme(
-  injectIntl(withOnlineStatus(UserAuditHistoryComponent))
-)
+// export const UserAuditHistory = withTheme(
+//   injectIntl(withOnlineStatus(UserAuditHistoryComponent))
+// )
+
+export const UserAuditHistory = connect(null, {
+  goToDeclarationRecordAudit
+})(withTheme(injectIntl(withOnlineStatus(UserAuditHistoryComponent))))
