@@ -26,7 +26,7 @@ import * as pdfjs from 'pdfjs-dist/build/pdf'
 import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
 import WebFont from 'webfontloader'
 import {
-  APPLICATION_DEBUG_VERSION,
+  BUILD_VERSION,
   BACKGROUND_SYNC_BROADCAST_CHANNEL
 } from './utils/constants'
 
@@ -58,7 +58,7 @@ if (
   // setup log rocket to ship log messages and record user errors
   if (window.config.LOGROCKET) {
     LogRocket.init(window.config.LOGROCKET, {
-      release: APPLICATION_DEBUG_VERSION
+      release: BUILD_VERSION
     })
   }
 
