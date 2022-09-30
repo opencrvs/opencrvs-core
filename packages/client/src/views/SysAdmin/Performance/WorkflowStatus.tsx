@@ -236,7 +236,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         label: intl.formatMessage(constantsMessages.trackingId),
         key: 'id',
         width: 12,
-        // handler: (text: any, type: any) => goToSearchResult(text, type, isMobile),
         isSortable: true,
         sortFunction: () => toggleSort('id'),
         icon: columnToBeSort === 'id' ? <ArrowDownBlue /> : <></>,
