@@ -27,7 +27,6 @@ import { NavigationSubItem } from './NavigationSubItem'
 import {
   subItemBranding,
   subItemCertificates,
-  subItemDashboard,
   subItemForms,
   subItemVsexports
 } from './NavigationSubItem.stories'
@@ -49,10 +48,8 @@ groupDeclaration.args = {
 
 const SettingTemplate: Story<INavigationGroup> = (args) => (
   <div {...args}>
-    <NavigationItem {...itemPerformance.args}>
-      <NavigationSubItem {...subItemDashboard.args} />
-      <NavigationSubItem {...subItemVsexports.args} />
-    </NavigationItem>
+    <NavigationItem {...itemPerformance.args} />
+    <NavigationItem {...subItemVsexports.args} />
     <NavigationItem {...itemTeam.args} />
     <NavigationItem {...itemConfiguration.args}>
       <NavigationSubItem {...subItemCertificates.args} />

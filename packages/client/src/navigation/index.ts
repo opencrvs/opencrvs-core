@@ -49,8 +49,7 @@ import {
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
-  // PERFORMANCE_DASHBOARD,
-  PERFORMANCE_VSREPORT
+  VSREPORT
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -172,8 +171,8 @@ export function goToHome() {
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
-export function goToPerfomanceVSExport() {
-  return push(PERFORMANCE_VSREPORT)
+export function goToVSExport() {
+  return push(VSREPORT)
 }
 
 export function goToFormConfigHome() {

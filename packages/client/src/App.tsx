@@ -349,7 +349,7 @@ export class App extends React.Component<IAppProps> {
                                               Roles.NATIONAL_SYSTEM_ADMIN,
                                               Roles.NATIONAL_REGISTRAR
                                             ]}
-                                            path={routes.PERFORMANCE_VSREPORT}
+                                            path={routes.VSREPORT}
                                             component={VSExport}
                                           />
                                           <ProtectedRoute

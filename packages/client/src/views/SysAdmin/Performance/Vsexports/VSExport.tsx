@@ -16,7 +16,6 @@ import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-// import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { MINIO_URL } from '@client/utils/constants'
 import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
 

@@ -91,14 +91,9 @@ const messagesToDefine: INavigationMessages = {
     id: 'navigation.certificate'
   },
   vsexports: {
-    defaultMessage: 'Reports',
+    defaultMessage: 'Vital Statistics Report',
     description: 'Reports label in navigation',
-    id: 'navigation.Reports'
-  },
-  performanceDashboard: {
-    defaultMessage: 'dashboard',
-    description: 'Dashboard label in navigation',
-    id: 'navigation.performanceDashboard'
+    id: 'navigation.reports'
   },
   completenessRates: {
     defaultMessage: 'Completeness rates',
