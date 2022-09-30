@@ -499,7 +499,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                           this.state.viewportWidth <= theme.grid.breakpoints.md
                         }
                         currentPage={this.state.currentPageNumber}
-                        pageSize={recordCount}
+                        pageSize={2}
                         totalItems={totalItems}
                         onPageChange={(currentPage: number) => {
                           this.setCurrentPage(currentPage)
