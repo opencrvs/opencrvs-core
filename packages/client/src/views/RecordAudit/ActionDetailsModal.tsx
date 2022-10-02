@@ -20,7 +20,6 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
-import { ListTable } from '@opencrvs/components/lib/ListTable'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { IForm, IFormSection, IFormField, BirthSection } from '@client/forms'
@@ -43,6 +42,7 @@ import { IActionDetailsData } from './History'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { CorrectionReason } from '@client/forms/correction/reason'
+import { Table } from '@client/../../components/lib'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: IActionDetailsData
@@ -374,9 +374,8 @@ export const ActionDetailsModalListTable = ({
       {/* For Reject Reason */}
       {actionDetailsData.reason &&
         actionDetailsData.action === SUBMISSION_STATUS.REJECTED && (
-          <ListTable
+          <Table
             noResultText=" "
-            hideBoxShadow={true}
             columns={reasonColumn}
             content={[
               {
@@ -391,9 +390,8 @@ export const ActionDetailsModalListTable = ({
       {/* For Correction Reason */}
       {actionDetailsData.reason &&
         actionDetailsData.action === SUBMISSION_STATUS.REQUESTED_CORRECTION && (
-          <ListTable
+          <Table
             noResultText=" "
-            hideBoxShadow={true}
             columns={correctionReasonColumn}
             content={[
               {
@@ -407,18 +405,12 @@ export const ActionDetailsModalListTable = ({
         )}
 
       {/* For Comments */}
-      <ListTable
-        noResultText=" "
-        hideBoxShadow={true}
-        columns={commentsColumn}
-        content={content}
-      />
+      <Table noResultText=" " columns={commentsColumn} content={content} />
 
       {/* For Data Updated */}
       {declarationUpdates.length > 0 && (
-        <ListTable
+        <Table
           noResultText=" "
-          hideBoxShadow={true}
           columns={declarationUpdatedColumns}
           content={declarationUpdates}
           pageSize={10}
@@ -430,9 +422,8 @@ export const ActionDetailsModalListTable = ({
 
       {/* For Certificate */}
       {!isEmpty(collectorData) && (
-        <ListTable
+        <Table
           noResultText=" "
-          hideBoxShadow={true}
           columns={certificateCollector}
           content={[collectorData]}
           pageSize={10}
@@ -442,9 +433,8 @@ export const ActionDetailsModalListTable = ({
         />
       )}
       {!isEmpty(collectorData) && (
-        <ListTable
+        <Table
           noResultText=" "
-          hideBoxShadow={true}
           columns={certificateCollectorVerified}
           content={[collectorData]}
           pageSize={10}
