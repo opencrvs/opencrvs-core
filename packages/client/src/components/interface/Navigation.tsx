@@ -321,7 +321,7 @@ export const NavigationView = (props: IFullProps) => {
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       applicationVersion={runningVer}
-      applicationDebugVersion={BUILD_VERSION}
+      buildVersion={BUILD_VERSION}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}

@@ -28,7 +28,7 @@ export const leftNavigationView = Template.bind({})
 leftNavigationView.args = {
   applicationName: 'OpenCRVS',
   applicationVersion: '1.1.0',
-  applicationDebugVersion: 'Development'
+  buildVersion: 'Development'
 }
 
 export default {
