@@ -107,3 +107,5 @@ export const INFORMANT_MINIMUM_AGE = 16
 export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
 
 export const APPLICATION_VERSION = '1.1.0'
+
+export const MINIO_URL = process.env.MINIO_URL || 'http://localhost:9000'

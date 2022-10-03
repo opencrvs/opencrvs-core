@@ -20,7 +20,7 @@ import {
   Sort,
   FieldValueMap
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, Query } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import {
@@ -41,7 +41,10 @@ import {
   draftToGqlTransformer
 } from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
-import { DECLARED_DECLARATION_SEARCH_QUERY_COUNT } from '@client/utils/constants'
+import {
+  DECLARED_DECLARATION_SEARCH_QUERY_COUNT,
+  MINIO_URL
+} from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
@@ -68,6 +71,8 @@ import { Roles } from '@client/utils/authUtils'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
 import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import { isBase64FileString } from '@client/utils/commonUtils'
+import { at } from 'lodash'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -1282,11 +1287,29 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
+      await fetchAllMinioUrlsInAttachment(data.data as Query)
       resolve({ data, store, client })
     } catch (error) {
       reject(error)
     }
   })
+}
+
+async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
+  const registration =
+    queryResultData.fetchBirthRegistration?.registration ||
+    queryResultData.fetchDeathRegistration?.registration
+
+  const attachments = registration?.attachments
+  if (!attachments) {
+    return
+  }
+
+  for (const attached of attachments) {
+    if (attached?.data && !isBase64FileString(attached.data)) {
+      await fetch(`${MINIO_URL}${attached.data}`)
+    }
+  }
 }
 
 function getDataKey(declaration: IDeclaration) {
