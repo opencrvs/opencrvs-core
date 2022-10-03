@@ -29,17 +29,9 @@ export const resolvers: GQLResolver = {
     async getTotalMetrics(_, variables, authHeader) {
       return getMetrics('/totalMetrics', variables, authHeader)
     },
-    async getTotalVSExport(_, variables, authHeader) {
+    async getVSExports(_, variables, authHeader) {
       let results
-      if (
-        inScope(authHeader, [
-          'register',
-          'performance',
-          'certify',
-          'sysadmin',
-          'validate'
-        ])
-      ) {
+      if (inScope(authHeader, ['natlsysadmin', 'performance'])) {
         results = await getMetrics('/fetchVSExport', variables, authHeader)
         return {
           results

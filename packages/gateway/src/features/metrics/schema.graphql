@@ -25,12 +25,12 @@ type Estimation {
   locationLevel: String!
 }
 
-type VSEstimation {
-  event: String
-  year: Int
-  fileSize: String
-  url: String
-  createdOn: String
+type VSExport {
+  event: String!
+  year: Int!
+  fileSize: String!
+  url: String!
+  createdOn: String!
 }
 
 type TotalMetricsResult {
@@ -38,7 +38,7 @@ type TotalMetricsResult {
   results: [EventMetrics!]!
 }
 type TotalVSExport {
-  results: [VSEstimation!]
+  results: [VSExport!]
 }
 
 type PaymentMetric {
@@ -119,7 +119,7 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
-  getTotalVSExport: TotalVSExport
+  getVSExports: TotalVSExport!
   getTotalPayments(
     timeStart: String!
     timeEnd: String!

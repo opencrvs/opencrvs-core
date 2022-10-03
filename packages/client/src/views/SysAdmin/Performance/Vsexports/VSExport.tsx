@@ -16,8 +16,14 @@ import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+
 import { MINIO_URL } from '@client/utils/constants'
 import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
+import { ErrorToastNotification } from '@opencrvs/components/lib/interface'
+
+import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { GetVsExportsQuery } from '@client/utils/gateway'
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -36,6 +42,10 @@ type VsExportInterface = {
 export enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
+}
+
+const notificationActionButtonHandler = () => {
+  window.location.reload()
 }
 
 function downloadURI(uri: string, name: string) {
@@ -153,15 +163,29 @@ const VSExport = () => {
               />
             }
           >
-            <Query query={GET_TOTAL_VSEXPORT} fetchPolicy={'no-cache'}>
-              {({ data, loading, error }) => {
+            <Query<GetVsExportsQuery>
+              query={GET_TOTAL_VSEXPORT}
+              fetchPolicy={'no-cache'}
+            >
+              {({ data, loading, error, refetch }) => {
                 if (error) {
-                  return <>Hello Error</>
+                  return (
+                    <ErrorToastNotification
+                      retryButtonText={intl.formatMessage(buttonMessages.retry)}
+                      retryButtonHandler={notificationActionButtonHandler}
+                    >
+                      {intl.formatMessage(errorMessages.pageLoadFailed)}
+                    </ErrorToastNotification>
+                  )
                 } else if (loading) {
-                  return <>Loading</>
+                  return (
+                    <>
+                      <LoadingIndicator loading={true} />
+                    </>
+                  )
                 } else {
                   const totalData: VsExportInterface[] =
-                    data.getTotalVSExport.results
+                    data.getVSExports.results
                   return (
                     <>
                       {activeTabId === TabId.BIRTH && (

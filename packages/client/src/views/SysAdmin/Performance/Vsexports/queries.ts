@@ -12,8 +12,8 @@
 import gql from 'graphql-tag'
 
 export const GET_TOTAL_VSEXPORT = gql`
-  query getTotalVSExport {
-    getTotalVSExport {
+  query getVSExports {
+    getVSExports {
       results {
         event
         year
