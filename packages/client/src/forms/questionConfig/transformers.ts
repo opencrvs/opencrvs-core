@@ -150,10 +150,8 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
-        identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
-      }
-      if (required) {
-        defaultQuestionConfig.required = required
+        identifiers: getFieldIdentifiers(fieldId, defaultForms[event]),
+        required: required ?? false
       }
       return defaultQuestionConfig
     }
