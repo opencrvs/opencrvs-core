@@ -133,7 +133,6 @@ describe('User audit list tests', () => {
     expect(await waitForElement(testComponent, '#error-toast')).toBeDefined()
   })
   it('toggles sorting order of the list', async () => {
-    console.log(component.debug())
     const firstRowElement = await waitForElement(component, '#row_0')
     const toggleSortActionElement = await waitForElement(
       component,
