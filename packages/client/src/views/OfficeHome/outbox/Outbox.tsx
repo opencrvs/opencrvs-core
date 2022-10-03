@@ -126,7 +126,7 @@ function getIcon(
 
   if (isInprogressStatus(status)) {
     id = `${statusInprogressIconIdMap[status] || `registering`}${index}`
-    return <Spinner id={id} key={id} />
+    return <Spinner id={id} key={id} size={24} />
   }
 
   return <StatusWaiting id={id} key={id} />

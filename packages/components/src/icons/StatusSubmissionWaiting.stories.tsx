@@ -11,10 +11,10 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { StatusSubmissionWaiting } from '.'
+import { StatusSubmissionWaiting } from './StatusSubmissionWaiting'
 
 export default {
-  title: 'Components/icons/StatusSubmissionWaiting',
+  title: 'Styles/Icons/StatusSubmissionWaiting',
   component: StatusSubmissionWaiting
 } as Meta
 

@@ -11,10 +11,10 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { PaperPlane } from '.'
+import { PaperPlane } from './PaperPlane'
 
 export default {
-  title: 'Components/icons/PaperPlane',
+  title: 'Styles/Icons/PaperPlane',
   component: PaperPlane
 } as Meta
 
