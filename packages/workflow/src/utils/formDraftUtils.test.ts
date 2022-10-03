@@ -22,7 +22,7 @@ import * as fhirModifier from '@workflow/features/registration/fhir/fhir-bundle-
 const fetch = fetchAny as any
 let token: string
 
-const mockFormDraft = [
+export const mockFormDraft = [
   {
     _id: '623f30a18aef60124a72df14',
     status: 'PUBLISHED',

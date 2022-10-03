@@ -14,6 +14,7 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
+  getFileFromBase64String,
   loginAsFieldAgent
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
@@ -24,7 +25,8 @@ import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { SpyInstance, vi } from 'vitest'
 import * as pdfRender from '@client/pdfRenderer'
-
+export const validImageB64String =
+  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
 
@@ -145,18 +147,34 @@ describe('ConfigHome page when already has uploaded certificate template', async
       expect(
         testComponent.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(1)
-      testComponent.find('#send').hostNodes().simulate('click')
+      testComponent.find('#upload_document').hostNodes().simulate('click')
       testComponent
-        .find('#birth_file_uploader_field_undefined')
+        .find('#image_file_uploader_field')
         .hostNodes()
-        .first()
         .simulate('change', {
           target: {
-            files: [new Blob(['<svg></svg>'], { type: 'image/svg+xml' })],
-            id: 'birth_file_uploader_field_undefined'
+            files: [
+              getFileFromBase64String(
+                validImageB64String,
+                'certificate.svg',
+                'image/svg+xml'
+              )
+            ]
           }
         })
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, 50)
+      })
+
       testComponent.update()
+      expect(
+        testComponent.find('#apply_change').hostNodes().props().disabled
+      ).toBeFalsy()
+
+      testComponent.find('#apply_change').hostNodes().simulate('click')
+      testComponent.update()
+
       await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })

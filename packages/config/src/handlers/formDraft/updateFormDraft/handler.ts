@@ -22,12 +22,12 @@ import { Event } from '@config/models/certificate'
 import { clearHearthElasticInfluxData } from '@config/services/formDraftService'
 
 const STATUS_TRANSITION: Record<DraftStatus, DraftStatus[]> = {
-  [DraftStatus.DRAFT]: [DraftStatus.DRAFT, DraftStatus.IN_PREVIEW],
+  [DraftStatus.DRAFT]: [DraftStatus.IN_PREVIEW, DraftStatus.PUBLISHED],
   [DraftStatus.IN_PREVIEW]: [DraftStatus.PUBLISHED, DraftStatus.DRAFT],
   [DraftStatus.PUBLISHED]: []
 }
 
-export function isValidStatusTransition(
+function isValidStatusTransition(
   currentStatus: DraftStatus,
   newStatus: DraftStatus
 ) {
@@ -89,9 +89,7 @@ export async function modifyDraftStatusHandler(
   }
 
   try {
-    if (currentStatus === DraftStatus.IN_PREVIEW) {
-      await clearHearthElasticInfluxData(request)
-    }
+    await clearHearthElasticInfluxData(request)
     draft.status = newStatus
     draft.updatedAt = Date.now()
     await FormDraft.updateOne({ _id: draft._id }, draft)

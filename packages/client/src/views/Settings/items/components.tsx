@@ -11,7 +11,7 @@
  */
 import styled from '@client/styledComponents'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 
 export const LabelContainer = styled.span`
   ${({ theme }) => theme.fonts.bold16}

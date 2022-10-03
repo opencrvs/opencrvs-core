@@ -541,10 +541,6 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsCertified(_, { id, details }, authHeader) {
-      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-      if (!hasAssignedToThisUser) {
-        throw new UnassignError('User has been unassigned')
-      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
       } else {
@@ -552,10 +548,6 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsCertified(_, { id, details }, authHeader) {
-      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-      if (!hasAssignedToThisUser) {
-        throw new UnassignError('User has been unassigned')
-      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
       } else {
@@ -789,7 +781,7 @@ async function markEventAsCertified(
   return getIDFromResponse(res)
 }
 
-async function markRecordAsDownloadedAndAssigned(
+export async function markRecordAsDownloadedAndAssigned(
   id: string,
   authHeader: IAuthHeader
 ) {
