@@ -169,9 +169,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       goBack,
       declaration: { event }
     } = this.props
-    if (!declaration) {
-      return <Redirect to={HOME} />
-    }
     const formSections = getViewableSection(registerForm[event], declaration)
     const backToReviewButton = (
       <SecondaryButton
