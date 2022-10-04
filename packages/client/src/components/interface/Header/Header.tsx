@@ -392,7 +392,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     const location = this.props.history.location.pathname
 
     const prevUrl = this.props.location.state
-    console.log(prevUrl)
 
     if (
       (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
