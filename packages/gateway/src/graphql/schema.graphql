@@ -1096,7 +1096,7 @@ input QuestionInput {
   required: Boolean
   enabled: String
   custom: Boolean
-  conditionals: [ConditionalInput]
+  conditionals: [ConditionalInput!]
 }
 
 enum InformantType {
@@ -1393,8 +1393,8 @@ enum CustomFieldType {
 }
 
 input ConditionalInput {
-  fieldId: String
-  regexp: String
+  fieldId: String!
+  regexp: String!
 }
 
 type Payment {

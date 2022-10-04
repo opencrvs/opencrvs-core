@@ -381,8 +381,8 @@ export type ComparisonInput = {
 }
 
 export type ConditionalInput = {
-  fieldId?: InputMaybe<Scalars['String']>
-  regexp?: InputMaybe<Scalars['String']>
+  fieldId: Scalars['String']
+  regexp: Scalars['String']
 }
 
 export type ContactPoint = {
@@ -1473,7 +1473,7 @@ export type QueryVerifyPasswordByIdArgs = {
 }
 
 export type QuestionInput = {
-  conditionals?: InputMaybe<Array<InputMaybe<ConditionalInput>>>
+  conditionals?: InputMaybe<Array<ConditionalInput>>
   custom?: InputMaybe<Scalars['Boolean']>
   description?: InputMaybe<Array<MesssageInput>>
   enabled?: InputMaybe<Scalars['String']>
@@ -2490,7 +2490,6 @@ export type FetchBirthRegistrationForReviewQuery = {
     child?: {
       __typename?: 'Person'
       id?: string | null
-      multipleBirth?: number | null
       birthDate?: string | null
       gender?: string | null
       name?: Array<{
@@ -2538,6 +2537,7 @@ export type FetchBirthRegistrationForReviewQuery = {
     mother?: {
       __typename?: 'Person'
       id?: string | null
+      multipleBirth?: number | null
       birthDate?: string | null
       maritalStatus?: MaritalStatusType | null
       occupation?: string | null
