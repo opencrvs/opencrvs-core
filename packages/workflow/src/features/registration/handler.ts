@@ -58,7 +58,10 @@ import {
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import {
   REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
+  REQUEST_CORRECTION_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
+  ASSIGNED_EXTENSION_URL,
+  DOWNLOADED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
@@ -423,25 +426,65 @@ export async function markEventAsCertifiedHandler(
   }
 }
 
-export async function markDownloadedEventAsAssignedOrUnassignedHandler(
+export async function markEventAsDownloadedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    let payload = await touchBundle(
-      request.payload as fhir.Bundle,
-      getToken(request)
-    )
+    let payload = request.payload as fhir.Bundle
     payload = removeExtensionFromBundle(payload, [
+      UNASSIGNED_EXTENSION_URL,
+      ASSIGNED_EXTENSION_URL,
       REINSTATED_EXTENSION_URL,
       REQUEST_CORRECTION_EXTENSION_URL
     ])
+    payload = await touchBundle(payload, getToken(request))
     const newRequest = { ...request, payload } as Hapi.Request
     return await forwardToHearth(newRequest, h)
   } catch (error) {
-    logger.error(
-      `Workflow/markDownloadedEventAsAssignedOrUnassignedHandler: error: ${error}`
-    )
+    logger.error(`Workflow/markEventAsDownloaded: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsAssignedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    let payload = request.payload as fhir.Bundle
+    payload = removeExtensionFromBundle(payload, [
+      DOWNLOADED_EXTENSION_URL,
+      UNASSIGNED_EXTENSION_URL,
+      REINSTATED_EXTENSION_URL,
+      REQUEST_CORRECTION_EXTENSION_URL
+    ])
+    payload = await touchBundle(payload, getToken(request))
+    const newRequest = { ...request, payload } as Hapi.Request
+    return await forwardToHearth(newRequest, h)
+  } catch (error) {
+    logger.error(`Workflow/markEventAsUnassigned: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsUnassignedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    let payload = request.payload as fhir.Bundle
+    payload = removeExtensionFromBundle(payload, [
+      DOWNLOADED_EXTENSION_URL,
+      ASSIGNED_EXTENSION_URL,
+      REINSTATED_EXTENSION_URL,
+      REQUEST_CORRECTION_EXTENSION_URL
+    ])
+    payload = await touchBundle(payload, getToken(request))
+    const newRequest = { ...request, payload } as Hapi.Request
+    return await forwardToHearth(newRequest, h)
+  } catch (error) {
+    logger.error(`Workflow/markEventAsUnassigned: error: ${error}`)
     throw new Error(error)
   }
 }
@@ -451,10 +494,16 @@ export async function markEventAsRequestedForCorrectionHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const payload = await markBundleAsRequestedForCorrection(
+    let payload = await markBundleAsRequestedForCorrection(
       request.payload as fhir.Bundle,
       getToken(request)
     )
+    payload = removeExtensionFromBundle(payload, [
+      DOWNLOADED_EXTENSION_URL,
+      ASSIGNED_EXTENSION_URL,
+      UNASSIGNED_EXTENSION_URL,
+      REINSTATED_EXTENSION_URL
+    ])
     return await postToHearth(payload)
   } catch (error) {
     logger.error(

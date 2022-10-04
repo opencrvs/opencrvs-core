@@ -23,7 +23,9 @@ import {
   markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
-  markDownloadedEventAsAssignedOrUnassignedHandler
+  markEventAsUnassignedHandler,
+  markEventAsAssignedHandler,
+  markEventAsDownloadedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
@@ -33,16 +35,11 @@ import {
 import {
   hasReinstatedExtension,
   isRejectedTask,
-  isArchiveTask,
-  hasAssignedExtension
+  isArchiveTask
 } from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
-import {
-  hasDeclareScope,
-  hasRegisterScope,
-  hasValidateScope
-} from '@workflow/utils/authUtils'
+import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
@@ -76,7 +73,7 @@ export enum Events {
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   DOWNLOADED = '/events/downloaded',
-  DOWNLOADED_ASSIGNED_EVENT = '/events/assigned',
+  ASSIGNED_EVENT = '/events/assigned',
   UNASSIGNED_EVENT = '/events/unassigned',
   UNKNOWN = 'unknown'
 }
@@ -162,17 +159,15 @@ function detectEvent(request: Hapi.Request): Events {
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
-        const taskResource = getTaskResource(fhirBundle)
-        if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
-          if (hasAssignedExtension(taskResource) && !hasDeclareScope(request)) {
-            return Events.DOWNLOADED_ASSIGNED_EVENT
-          } else {
+        switch (fhirBundle.signature?.type?.[0]?.code) {
+          case 'downloaded':
             return Events.DOWNLOADED
-          }
-        }
-
-        if (fhirBundle?.signature?.type[0]?.code === 'unassigned') {
-          return Events.UNASSIGNED_EVENT
+          case 'assinged':
+            return Events.ASSIGNED_EVENT
+          case 'unassinged':
+            return Events.UNASSIGNED_EVENT
+          default:
+            break
         }
 
         const eventType = getEventType(fhirBundle)
@@ -418,27 +413,18 @@ export async function fhirWorkflowEventHandler(
       )
       break
     case Events.DOWNLOADED:
-      response = await markDownloadedEventAsAssignedOrUnassignedHandler(
-        request,
-        h
-      )
+      response = await markEventAsDownloadedHandler(request, h)
       break
-    case Events.DOWNLOADED_ASSIGNED_EVENT:
-      response = await markDownloadedEventAsAssignedOrUnassignedHandler(
-        request,
-        h
-      )
+    case Events.ASSIGNED_EVENT:
+      response = await markEventAsAssignedHandler(request, h)
       await triggerEvent(
-        Events.DOWNLOADED_ASSIGNED_EVENT,
+        Events.ASSIGNED_EVENT,
         request.payload,
         request.headers
       )
       break
     case Events.UNASSIGNED_EVENT:
-      response = await markDownloadedEventAsAssignedOrUnassignedHandler(
-        request,
-        h
-      )
+      response = await markEventAsUnassignedHandler(request, h)
       await triggerEvent(
         Events.UNASSIGNED_EVENT,
         request.payload,

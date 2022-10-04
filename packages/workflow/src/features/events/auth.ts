@@ -59,7 +59,7 @@ function getEventToScopeMap() {
       USER_SCOPE.VALIDATE,
       USER_SCOPE.CERTIFY
     ],
-    [Events.DOWNLOADED_ASSIGNED_EVENT]: [
+    [Events.ASSIGNED_EVENT]: [
       USER_SCOPE.VALIDATE,
       USER_SCOPE.REGISTER,
       USER_SCOPE.RECORD_SEARCH
