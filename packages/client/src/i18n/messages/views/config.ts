@@ -90,7 +90,7 @@ const messagesToDefine: IConfigMessages = {
   },
   vsexport: {
     id: 'config.application.vsexport',
-    defaultMessage: 'Visual statistics export',
+    defaultMessage: 'Vital statistics export',
     description: 'VS Export tab'
   },
   applicationNameChangeMessage: {

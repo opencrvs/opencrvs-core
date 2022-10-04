@@ -134,7 +134,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
-    WORKQUEUE_TABS.dashboard,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     GROUP_ID.declarationGroup,
@@ -149,7 +148,6 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
-    WORKQUEUE_TABS.dashboard,
     WORKQUEUE_TABS.vsexports,
     GROUP_ID.menuGroup
   ],
@@ -281,7 +279,6 @@ export const NavigationView = (props: IFullProps) => {
   ]
   const performanceTab: string[] = [WORKQUEUE_TABS.performance]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
-  const [isPerformExpanded, setIsPerformExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
     data,
@@ -513,7 +510,6 @@ export const NavigationView = (props: IFullProps) => {
                       )}
                       onClick={() => {
                         props.goToPerformanceViewAction(userDetails)
-                        setIsPerformExpanded(!isPerformExpanded)
                       }}
                       isSelected={
                         enableMenuSelection &&
@@ -654,9 +650,7 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     workqueue: state.workqueueState.workqueue,
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
-    activeMenuItem: window.location.href.includes(
-      `${WORKQUEUE_TABS.performance}?`
-    )
+    activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
       : window.location.href.includes(WORKQUEUE_TABS.team)
       ? WORKQUEUE_TABS.team

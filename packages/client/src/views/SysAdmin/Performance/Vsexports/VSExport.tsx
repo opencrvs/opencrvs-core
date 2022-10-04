@@ -23,7 +23,7 @@ import { DynamicHeightLinkButton } from '@client/views/Settings/items/components
 import { ErrorToastNotification } from '@opencrvs/components/lib/interface'
 
 import { buttonMessages, errorMessages } from '@client/i18n/messages'
-import { GetVsExportsQuery } from '@client/utils/gateway'
+import { GetVsExportsQuery, VsExport } from '@client/utils/gateway'
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -32,13 +32,10 @@ const UserTable = styled(BodyContent)`
     padding: 0px;
   }
 `
-type VsExportInterface = {
-  event: string
-  year: number
-  url: string
-  createdOn: string
-  fileSize: string
+type VSExportProps = {
+  items: VsExport[]
 }
+
 export enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
@@ -57,11 +54,11 @@ function downloadURI(uri: string, name: string) {
   document.body.removeChild(link)
 }
 
-function BirthTabContent(props: any) {
-  const items: VsExportInterface[] = props.items
+function BirthTabContent(props: VSExportProps) {
+  const items: VsExport[] = props.items
   return (
     <>
-      {items.map((item: VsExportInterface) => {
+      {items.map((item: VsExport) => {
         if (item.event === TabId.BIRTH) {
           const sizeValue = `${item.year}-Farajaland-${item.event}-event-statistics.csv (${item.fileSize})`
           const fileName = `${item.year}-Farajaland-${item.event}-event-statistics.csv`
@@ -92,12 +89,12 @@ function BirthTabContent(props: any) {
   )
 }
 
-function DeathTabContent(props: any) {
-  const items: VsExportInterface[] = props.items
+function DeathTabContent(props: VSExportProps) {
+  const items: VsExport[] = props.items
 
   return (
     <>
-      {items.map((item: VsExportInterface) => {
+      {items.map((item: VsExport) => {
         if (item.event === TabId.DEATH) {
           const sizeValue = `${item.year}-Farajaland-${item.event}-event-statistics.csv (${item.fileSize})`
           const fileName = `${item.year}-Farajaland-${item.event}-event-statistics.csv`
@@ -167,7 +164,7 @@ const VSExport = () => {
               query={GET_TOTAL_VSEXPORT}
               fetchPolicy={'no-cache'}
             >
-              {({ data, loading, error, refetch }) => {
+              {({ data, loading, error }) => {
                 if (error) {
                   return (
                     <ErrorToastNotification
@@ -184,8 +181,7 @@ const VSExport = () => {
                     </>
                   )
                 } else {
-                  const totalData: VsExportInterface[] =
-                    data.getVSExports.results
+                  const totalData: VsExport[] = data.getVSExports.results
                   return (
                     <>
                       {activeTabId === TabId.BIRTH && (
