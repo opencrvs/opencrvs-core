@@ -60,7 +60,7 @@ import {
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
 import { Check, PaperClip } from '@opencrvs/components/lib/icons'
-import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
+import { CERTIFICATE_CORRECTION_REVIEW, HOME } from '@client/navigation/routes'
 import styled from 'styled-components'
 import { FormFieldGenerator } from '@client/components/form'
 import { correctionFeesPaymentSection } from '@client/forms/correction/payment'
@@ -169,6 +169,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       goBack,
       declaration: { event }
     } = this.props
+    if (!declaration) {
+      return <Redirect to={HOME} />
+    }
     const formSections = getViewableSection(registerForm[event], declaration)
     const backToReviewButton = (
       <SecondaryButton
@@ -937,9 +940,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
     this.props.writeDeclaration(declaration)
-    if (!declaration) {
-      return <Redirect to={HOME} />
-    }
     this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
   }
 

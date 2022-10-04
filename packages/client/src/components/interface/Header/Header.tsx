@@ -402,7 +402,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         PERFORMANCE_HOME.includes(location)) ||
       (REGISTRAR_ROLES.includes(role as string) &&
         REGISTRAR_HOME.includes(location)) ||
-      prevUrl != { from: 'correction summary page' }
+      prevUrl !== { from: 'correction summary page' }
     ) {
       return true
     } else {
