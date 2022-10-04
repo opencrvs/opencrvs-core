@@ -18,6 +18,7 @@ import {
   testFhirBundle,
   testFhirTaskBundle,
   testFhirBundleWithIds,
+  mockFormDraft,
   userMock,
   fieldAgentPractitionerMock,
   fieldAgentPractitionerRoleMock,
@@ -43,7 +44,6 @@ import {
 import { cloneDeep } from 'lodash'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
 import * as fetchAny from 'jest-fetch-mock'
-import { mockFormDraft } from '@workflow/utils/formDraftUtils.test'
 
 const fetch = fetchAny as any
 
@@ -1131,7 +1131,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
   })
 })
 
-describe('markEventAsDownloadedAndAssignedHandler', () => {
+describe('markEventAsDownloadedHandler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1178,6 +1178,116 @@ describe('markEventAsDownloadedAndAssignedHandler', () => {
       method: 'POST',
       url: '/fhir',
       payload: bundleWithDownloadSignature,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+})
+
+describe('markEventAsAssignedHandler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    fetch.resetMocks()
+    server = await createServer()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [userResponseMock, { status: 200 }],
+      [hearthResponseMock, { status: 200 }],
+      [mockFormDraft, { status: 200 }]
+    )
+  })
+
+  it('returns OK with full fhir bundle as payload', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+    const bundleWithAssignedSignature: any = cloneDeep(testFhirTaskBundle)
+    bundleWithAssignedSignature.signature = {
+      type: [
+        {
+          code: 'assigned'
+        }
+      ]
+    }
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: bundleWithAssignedSignature,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+})
+
+describe('markEventAsUnassignedHandler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    fetch.resetMocks()
+    server = await createServer()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [userResponseMock, { status: 200 }],
+      [hearthResponseMock, { status: 200 }],
+      [mockFormDraft, { status: 200 }]
+    )
+  })
+
+  it('returns OK with full fhir bundle as payload', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+    const bundleWithUnassignedSignature: any = cloneDeep(testFhirTaskBundle)
+    bundleWithUnassignedSignature.signature = {
+      type: [
+        {
+          code: 'unassigned'
+        }
+      ]
+    }
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: bundleWithUnassignedSignature,
       headers: {
         Authorization: `Bearer ${token}`
       }

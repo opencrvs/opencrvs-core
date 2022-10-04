@@ -162,9 +162,9 @@ function detectEvent(request: Hapi.Request): Events {
         switch (fhirBundle.signature?.type?.[0]?.code) {
           case 'downloaded':
             return Events.DOWNLOADED
-          case 'assinged':
+          case 'assigned':
             return Events.ASSIGNED_EVENT
-          case 'unassinged':
+          case 'unassigned':
             return Events.UNASSIGNED_EVENT
           default:
             break

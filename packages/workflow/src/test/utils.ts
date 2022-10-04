@@ -1794,3 +1794,36 @@ export function wrapInBundle(...resources: [fhir.Resource | string]): string {
     }))
   })
 }
+
+export const mockFormDraft = [
+  {
+    _id: '623f30a18aef60124a72df14',
+    status: 'PUBLISHED',
+    event: 'death',
+    comment: 'Modified previous death question',
+    version: 2,
+    createdAt: 1648308385612,
+    updatedAt: 1648308396432,
+    history: [
+      {
+        status: 'DRAFT',
+        _id: '623f30ac8aef60124a72df1c',
+        version: 1,
+        comment: 'Added new death question',
+        updatedAt: 1648308385612
+      }
+    ],
+    __v: 0
+  },
+  {
+    _id: '623f30c18aef60124a72df28',
+    status: 'DRAFT',
+    event: 'birth',
+    comment: 'Added new birth question',
+    version: 1,
+    createdAt: 1648308417889,
+    updatedAt: 1648308457121,
+    history: [],
+    __v: 0
+  }
+]
