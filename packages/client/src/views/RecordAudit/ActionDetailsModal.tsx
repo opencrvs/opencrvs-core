@@ -22,7 +22,13 @@ import {
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { IForm, IFormSection, IFormField, BirthSection } from '@client/forms'
+import {
+  IForm,
+  IFormSection,
+  IFormField,
+  BirthSection,
+  DeathSection
+} from '@client/forms'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -235,7 +241,10 @@ export const ActionDetailsModalListTable = ({
         (section) => section.id === item.valueCode
       ) as IFormSection
 
-      if (section.id === BirthSection.Documents) {
+      if (
+        section.id === BirthSection.Documents ||
+        section.id === DeathSection.DeathDocuments
+      ) {
         editedValue.valueString = intl.formatMessage(
           dynamicConstantsMessages.updated
         )
