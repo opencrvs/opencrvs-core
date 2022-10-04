@@ -1238,7 +1238,7 @@ export type Query = {
   getTotalPayments?: Maybe<Array<PaymentMetric>>
   getUser?: Maybe<User>
   getUserByMobile?: Maybe<User>
-  getVSExports: TotalVsExport
+  getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   listNotifications?: Maybe<Array<Maybe<Notification>>>
@@ -5440,7 +5440,7 @@ export type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
 
 export type GetVsExportsQuery = {
   __typename?: 'Query'
-  getVSExports: {
+  getVSExports?: {
     __typename?: 'TotalVSExport'
     results?: Array<{
       __typename?: 'VSExport'
@@ -5450,7 +5450,7 @@ export type GetVsExportsQuery = {
       createdOn: string
       fileSize: string
     }> | null
-  }
+  } | null
 }
 
 export type GetTotalCorrectionsQueryVariables = Exact<{

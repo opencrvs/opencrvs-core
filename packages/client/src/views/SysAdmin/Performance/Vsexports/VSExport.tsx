@@ -192,7 +192,8 @@ const VSExport = () => {
                     </>
                   )
                 } else {
-                  const totalData: VsExport[] = data.getVSExports.results
+                  const totalData: VsExport[] =
+                    data?.getVSExports?.results || []
                   return (
                     <>
                       {activeTabId === TabId.BIRTH && (

@@ -33,7 +33,7 @@ export interface GQLQuery {
   searchFieldAgents?: GQLSearchFieldAgentResult
   verifyPasswordById?: GQLVerifyPasswordResult
   getTotalMetrics?: GQLTotalMetricsResult
-  getVSExports: GQLTotalVSExport
+  getVSExports?: GQLTotalVSExport
   getTotalPayments?: Array<GQLPaymentMetric>
   getTotalCertifications?: Array<GQLCertificationMetric>
   getTotalCorrections?: Array<GQLCorrectionMetric>
@@ -264,7 +264,7 @@ export interface GQLTotalMetricsResult {
 }
 
 export interface GQLTotalVSExport {
-  results: Array<GQLVSExport>
+  results?: Array<GQLVSExport>
 }
 
 export interface GQLPaymentMetric {
