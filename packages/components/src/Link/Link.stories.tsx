@@ -28,5 +28,5 @@ export default {
 } as ComponentMeta<typeof Link>
 
 export const Default: ComponentStory<typeof Link> = (args) => (
-  <Link {...args}>Hi, I'm a clickable text!</Link>
+  <Link {...args}>Click here</Link>
 )

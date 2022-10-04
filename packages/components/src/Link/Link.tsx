@@ -54,7 +54,8 @@ const StyledLink = styled.button<{ $font: IFont; $color: IColor }>`
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.grey400};
+    color: ${({ theme }) => theme.colors.grey300};
+    text-decoration: none;
   }
 `
 
