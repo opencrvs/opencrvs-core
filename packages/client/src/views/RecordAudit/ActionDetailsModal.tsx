@@ -20,7 +20,8 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
-import { ResponsiveModal, ListTable } from '@opencrvs/components/lib/interface'
+import { ListTable } from '@opencrvs/components/lib/ListTable'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { IForm, IFormSection, IFormField } from '@client/forms'
 import { constantsMessages, userMessages } from '@client/i18n/messages'

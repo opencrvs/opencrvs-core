@@ -63,7 +63,7 @@ import {
   getJurisdictionLocationIdFromUserDetails,
   CompletenessRateTime
 } from '@client/views/SysAdmin/Performance/utils'
-import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import {
   goBack as back,
   push,

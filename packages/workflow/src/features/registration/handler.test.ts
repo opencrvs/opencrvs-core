@@ -43,6 +43,7 @@ import {
 import { cloneDeep } from 'lodash'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
 import * as fetchAny from 'jest-fetch-mock'
+import { mockFormDraft } from '@workflow/utils/formDraftUtils.test'
 
 const fetch = fetchAny as any
 
@@ -1149,8 +1150,9 @@ describe('markEventAsDownloadedAndAssignedHandler', () => {
       [upazilaMock, { status: 200 }],
       [unionMock, { status: 200 }],
       [officeMock, { status: 200 }],
+      [userResponseMock, { status: 200 }],
       [hearthResponseMock, { status: 200 }],
-      [userResponseMock, { status: 200 }]
+      [mockFormDraft, { status: 200 }]
     )
   })
 
@@ -1250,6 +1252,7 @@ describe('markEventAsRequestedForCorrection handler', () => {
     server = await createServer()
     fetch.mockResponses(
       [userMock, { status: 200 }],
+      [patientMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],

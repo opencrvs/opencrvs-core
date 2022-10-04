@@ -69,7 +69,7 @@ export async function createServer() {
   })
 
   async function start() {
-    influx
+    return influx
       .getDatabaseNames()
       .then((names: any) => {
         if (!names.includes(INFLUX_DB)) {

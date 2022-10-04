@@ -21,10 +21,10 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
-import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/LeftNavigation'
-import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
-import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
-import { NavigationSubItem } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
+import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
+import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
+import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
+import { NavigationSubItem } from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
 import { connect } from 'react-redux'
 import {
   goToHomeTab,
@@ -51,7 +51,8 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { UnbuplishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import styled from '@client/styledComponents'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -201,7 +202,7 @@ type IFullProps = IProps &
   IStateProps &
   IDispatchProps &
   IntlShapeProps &
-  RouteComponentProps<{ tabId: string }>
+  RouteComponentProps<{ tabId: string }> & { className?: string }
 
 const getSettingsAndLogout = (props: IFullProps) => {
   const {
@@ -255,7 +256,8 @@ export const NavigationView = (props: IFullProps) => {
     menuCollapse,
     userInfo,
     offlineCountryConfiguration,
-    updateRegistrarWorkqueue
+    updateRegistrarWorkqueue,
+    className
   } = props
   const tabId = deselectAllTabs
     ? ''
@@ -275,7 +277,7 @@ export const NavigationView = (props: IFullProps) => {
     data,
     storedDeclarations
   )
-
+  const runningVer = String(localStorage.getItem('running-version'))
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
 
   React.useEffect(() => {
@@ -318,11 +320,13 @@ export const NavigationView = (props: IFullProps) => {
   return (
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
+      applicationVersion={runningVer}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
       avatar={() => userInfo && userInfo.avatar}
-      warning={isMobileDevice() ? <></> : <UnbuplishedWarning hideIcon />}
+      warning={isMobileDevice() ? <></> : <UnpublishedWarning compact={true} />}
+      className={className}
     >
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>
@@ -654,3 +658,8 @@ export const Navigation = connect<
   goToSettings,
   updateRegistrarWorkqueue
 })(injectIntl(withRouter(NavigationView)))
+
+/** @deprecated since the introduction of `<Frame>` */
+export const FixedNavigation = styled(Navigation)`
+  position: fixed;
+`

@@ -15,7 +15,7 @@ import { createDuplicateDetailsQuery } from './utils'
 import { createStore } from '@client/store'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { DuplicateWarning } from './DuplicateWarning'
-import { Warning } from '@opencrvs/components/lib/interface'
+import { Alert } from '@opencrvs/components/lib/Alert'
 
 const duplicateIds = [
   '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
@@ -56,7 +56,7 @@ describe('Review Duplicates component', () => {
       { store, history, graphqlMocks: graphqlMock }
     )
 
-    const warning = await waitForElement(testComponent, Warning)
+    const warning = await waitForElement(testComponent, Alert)
     expect(warning).toHaveLength(2)
   })
 })

@@ -10,14 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Header } from '@client/components/interface/Header/Header'
+import { MarginedHeader } from '@client/components/Header/Header'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { BackArrowDeepBlue } from '@opencrvs/components/lib/icons'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
-import { LoadingGrey } from '@opencrvs/components/lib/interface'
+import { BodyContent, Container } from '@opencrvs/components/lib/Content'
+import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import * as React from 'react'
 import styled from 'styled-components'
-import { Navigation } from '@client/components/interface/Navigation'
+import { FixedNavigation } from '@client/components/interface/Navigation'
 
 const DynamicContainer = styled.div<{
   marginLeft?: number
@@ -224,14 +224,14 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
     )
   } else {
     pageHeader = (
-      <Header
+      <MarginedHeader
         changeTeamLocation={props.changeTeamLocation}
         mapPerformanceClickHandler={props.mapPerformanceClickHandler}
       />
     )
     pageContent = (
       <>
-        <Navigation />
+        <FixedNavigation />
         <BodyContainer>
           <DynamicContainer
             marginLeft={props.marginLeft}

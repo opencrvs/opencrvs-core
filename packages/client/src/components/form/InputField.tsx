@@ -14,8 +14,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   IInputFieldProps,
   InputField as InputFieldComponent
-} from '@opencrvs/components/lib/forms'
-import { Omit } from '@opencrvs/client/src/utils'
+} from '@opencrvs/components/lib/InputField'
 import { formMessages } from '@client/i18n/messages'
 
 export const InputField = injectIntl(function FormInputField(

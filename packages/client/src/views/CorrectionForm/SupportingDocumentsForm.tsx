@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import {
   modifyDeclaration,
   IDeclaration,
@@ -34,10 +34,7 @@ import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { supportingDocumentsSection } from '@client/forms/correction/supportDocument'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 

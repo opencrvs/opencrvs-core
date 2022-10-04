@@ -1,0 +1,61 @@
+<!--This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+graphic logo are (registered/a) trademark(s) of Plan International.-->
+
+import { Meta, DocsContainer } from '@storybook/addon-docs'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { Text } from '@opencrvs/components/lib/Text'
+import { ThemeProvider } from 'styled-components'
+import { getTheme } from '@opencrvs/components/lib/theme'
+
+<Meta
+  title="Releases"
+  parameters={{
+    docs: {
+      container: ({ children, context }) => {
+        const theme = getTheme()
+        return (
+          <DocsContainer context={context}>
+            <ThemeProvider theme={theme}>
+              <div style={{ maxWidth: '640px' }}>{children}</div>
+            </ThemeProvider>
+          </DocsContainer>
+        )
+      }
+    }
+  }}
+/>
+
+# Releases
+
+<br />
+<Stack gap={16}>
+  <Text variant="bold16" element="bold16">
+    September 2022
+  </Text>
+<Pill label="v 1.1.0" type="default" size="small" />
+
+</Stack>
+
+- 🎉 First release of OpenUi-Kit
+- Added component status page
+- Added colours and typography documentation
+- Refactored [Alert](?path=/docs/data-alert--success)
+- Refactored headers into [AppBar](?path=/docs/layout-appbar--default)
+- Refactored buttons into [Button](?path=/docs/controls-button--button)
+- Refactored [Pagination](?path=/docs/controls-pagination--pagination-view)
+- Refactored [Table](?path=/docs/data-table--one-column-one-row)
+- Refactored [Toast](?path=/docs/data-toast--success)
+- Refactored [Summary](?path=/docs/data-summary--row)
+- Refactored [Workqueue](?path=/docs/data-workqueue--default)
+- Created [Frame](?path=/docs/layout-frame--page-template-content-large)
+- Created [Divider](?path=/docs/layout-divider--templater)
+- Created [Text](?path=/docs/typography-text--default)
+- Created [Stack](?path=/docs/layout-stack--default)
