@@ -26,4 +26,3 @@ createServer()
   .then((app) => {
     app.start()
   })
-  .catch((err) => console.log('err', err))
