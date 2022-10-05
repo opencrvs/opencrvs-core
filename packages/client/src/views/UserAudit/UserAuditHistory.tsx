@@ -96,7 +96,7 @@ const RecentActionsHolder = styled.div`
 
 const AlignedDateRangePicker = styled(DateRangePicker)`
   position: absolute;
-  bottom: 10px;
+  top: 6px;
 `
 
 const SectionTitle = styled.div`
@@ -520,7 +520,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                           this.state.viewportWidth <= theme.grid.breakpoints.md
                         }
                         currentPage={this.state.currentPageNumber}
-                        pageSize={recordCount}
+                        pageSize={DEFAULT_LIST_SIZE}
                         totalItems={totalItems}
                         onPageChange={(currentPage: number) => {
                           this.setCurrentPage(currentPage)
