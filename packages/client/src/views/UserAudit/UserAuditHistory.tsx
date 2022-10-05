@@ -96,7 +96,7 @@ const RecentActionsHolder = styled.div`
 
 const AlignedDateRangePicker = styled(DateRangePicker)`
   position: absolute;
-  bottom: 10px;
+  top: 6px;
 `
 
 const SectionTitle = styled.div`
