@@ -30,13 +30,7 @@ const Flex = styled.div`
   }
 `
 
-export const NameContainer = styled(Link)`
-  height: auto;
-  margin-left: 0;
-  div {
-    padding: 0;
-  }
-`
+export const NameContainer = styled(Link)``
 
 export const NoNameContainer = styled.span`
   color: ${({ theme }) => theme.colors.negative};
