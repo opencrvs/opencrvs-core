@@ -821,7 +821,7 @@ export const lateBirthCertificationResponseNoMotherOrFather = [
           },
           informant: {
             id: '7ac5c5de-ecfb-40e4-bf02-53c7f726ca18',
-            relationship: 'GRANDMOTHER',
+            relationship: 'PATERNAL_GRANDMOTHER',
             otherRelationship: null,
             individual: null,
             __typename: 'RelatedPerson'
@@ -836,9 +836,9 @@ export const lateBirthCertificationResponseNoMotherOrFather = [
           },
           registration: {
             id: '850a6503-5f86-4412-8496-b91eb1cdd34f',
-            informantType: 'GRANDMOTHER',
+            informantType: 'PATERNAL_GRANDMOTHER',
             otherInformantType: null,
-            contact: 'GRANDMOTHER',
+            contact: 'PATERNAL_GRANDMOTHER',
             contactRelationship: null,
             contactPhoneNumber: '+260787877877',
             attachments: null,

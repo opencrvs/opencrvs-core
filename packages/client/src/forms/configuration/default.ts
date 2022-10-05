@@ -70,12 +70,20 @@ export const registerForms: IDefaultRegisterForms = {
                     label: informantMessageDescriptors.father
                   },
                   {
-                    value: 'GRANDFATHER',
-                    label: informantMessageDescriptors.grandfather
+                    value: 'PATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.paternalGrandfather
                   },
                   {
-                    value: 'GRANDMOTHER',
-                    label: informantMessageDescriptors.grandmother
+                    value: 'PATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.paternalGrandmother
+                  },
+                  {
+                    value: 'MATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.maternalGrandfather
+                  },
+                  {
+                    value: 'MATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.maternalGrandmother
                   },
                   {
                     value: 'BROTHER',
@@ -102,8 +110,10 @@ export const registerForms: IDefaultRegisterForms = {
                 nestedFields: {
                   MOTHER: [],
                   FATHER: [],
-                  GRANDFATHER: [],
-                  GRANDMOTHER: [],
+                  PATERNAL_GRANDFATHER: [],
+                  PATERNAL_GRANDMOTHER: [],
+                  MATERNAL_GRANDFATHER: [],
+                  MATERNAL_GRANDMOTHER: [],
                   BROTHER: [],
                   SISTER: [],
                   OTHER_FAMILY_MEMBER: [],
@@ -186,12 +196,20 @@ export const registerForms: IDefaultRegisterForms = {
                     label: informantMessageDescriptors.father
                   },
                   {
-                    value: 'GRANDFATHER',
-                    label: informantMessageDescriptors.grandfather
+                    value: 'PATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.paternalGrandfather
                   },
                   {
-                    value: 'GRANDMOTHER',
-                    label: informantMessageDescriptors.grandmother
+                    value: 'PATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.paternalGrandmother
+                  },
+                  {
+                    value: 'MATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.maternalGrandfather
+                  },
+                  {
+                    value: 'MATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.maternalGrandmother
                   },
                   {
                     value: 'BROTHER',
@@ -287,7 +305,7 @@ export const registerForms: IDefaultRegisterForms = {
                       }
                     }
                   ],
-                  GRANDFATHER: [
+                  MATERNAL_GRANDFATHER: [
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
@@ -323,7 +341,79 @@ export const registerForms: IDefaultRegisterForms = {
                       }
                     }
                   ],
-                  GRANDMOTHER: [
+                  MATERNAL_GRANDMOTHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  PATERNAL_GRANDFATHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  PATERNAL_GRANDMOTHER: [
                     {
                       name: 'registrationPhone',
                       type: 'TEL',

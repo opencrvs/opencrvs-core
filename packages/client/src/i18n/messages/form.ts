@@ -282,8 +282,10 @@ interface IFormMessages
   sonInLaw: MessageDescriptor
   grandson: MessageDescriptor
   spouse: MessageDescriptor
-  grandfather: MessageDescriptor
-  grandmother: MessageDescriptor
+  maternalGrandfather: MessageDescriptor
+  maternalGrandmother: MessageDescriptor
+  paternalGrandfather: MessageDescriptor
+  paternalGrandmother: MessageDescriptor
   brother: MessageDescriptor
   sister: MessageDescriptor
   legalGuardian: MessageDescriptor
@@ -1790,20 +1792,30 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for option Grandson',
     id: 'form.field.label.informantRelation.grandson'
   },
-  grandfather: {
-    defaultMessage: 'Grandfather',
+  paternalGrandfather: {
+    defaultMessage: 'Paternal grandfather',
     description: 'Label for option Grandfather',
-    id: 'form.field.label.informantRelation.grandfather'
+    id: 'form.field.label.informantRelation.paternal.grandfather'
+  },
+  paternalGrandmother: {
+    defaultMessage: 'Paternal grandmother',
+    description: 'Label for option Grandmother',
+    id: 'form.field.label.informantRelation.paternal.grandmother'
+  },
+  maternalGrandfather: {
+    defaultMessage: 'Maternal grandfather',
+    description: 'Label for option Grandfather',
+    id: 'form.field.label.informantRelation.maternal.grandfather'
+  },
+  maternalGrandmother: {
+    defaultMessage: 'Maternal grandmother',
+    description: 'Label for option Grandmother',
+    id: 'form.field.label.informantRelation.maternal.grandmother'
   },
   otherFamilyMember: {
     defaultMessage: 'Other family member',
     description: 'Label for option Other family member',
     id: 'form.field.label.relationOtherFamilyMember'
-  },
-  grandmother: {
-    defaultMessage: 'Grandmother',
-    description: 'Label for option Grandmother',
-    id: 'form.field.label.informantRelation.grandmother'
   },
   brother: {
     defaultMessage: 'Brother',

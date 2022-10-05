@@ -169,8 +169,10 @@ const PrimaryContactLabelMapping = {
   INFORMANT: formMessages.contactDetailsInformant,
   OTHER_FAMILY_MEMBER: formMessages.otherFamilyMember,
   LEGAL_GUARDIAN: formMessages.legalGuardian,
-  GRANDMOTHER: formMessages.grandmother,
-  GRANDFATHER: formMessages.grandfather,
+  PATERNAL_GRANDMOTHER: formMessages.paternalGrandmother,
+  PATERNAL_GRANDFATHER: formMessages.paternalGrandfather,
+  MATERNAL_GRANDMOTHER: formMessages.maternalGrandmother,
+  MATERNAL_GRANDFATHER: formMessages.maternalGrandfather,
   BROTHER: formMessages.brother,
   SISTER: formMessages.sister
 }
