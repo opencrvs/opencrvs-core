@@ -47,11 +47,7 @@ import {
 import { RESOURCE_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
-import {
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
+import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -155,11 +151,6 @@ export async function markBundleAsRequestedForCorrection(
     getTokenPayload(token),
     regStatusCode?.code
   )
-
-  removeExtensionFromBundle(bundle, [
-    DOWNLOADED_EXTENSION_URL,
-    REINSTATED_EXTENSION_URL
-  ])
 
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
@@ -318,28 +309,6 @@ export async function touchBundle(
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
-}
-
-export function removeExtensionFromBundle(
-  fhirBundle: fhir.Bundle,
-  urls: string[]
-): fhir.Bundle {
-  if (
-    fhirBundle &&
-    fhirBundle.entry &&
-    fhirBundle.entry[0] &&
-    fhirBundle.entry[0].resource
-  ) {
-    let extensions: fhir.Extension[] =
-      (fhirBundle.entry[0].resource as fhir.Element).extension || []
-
-    extensions = extensions.filter(
-      (ext: fhir.Extension) => !urls.includes(ext.url)
-    )
-    ;(fhirBundle.entry[0].resource as fhir.Element).extension = extensions
-  }
-
-  return fhirBundle
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {

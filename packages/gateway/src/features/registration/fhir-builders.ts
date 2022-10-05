@@ -3590,44 +3590,17 @@ export async function updateFHIRTaskBundle(
   return fhirBundle
 }
 
-export function addOrUpdateExtension(
+export function taskBundleWithExtension(
   taskEntry: ITaskBundleEntry,
-  extensions: fhir.Extension[],
-  code: 'downloaded' | 'reinstated'
+  extension: fhir.Extension
 ) {
   const task = taskEntry.resource
-
-  if (!task.extension) {
-    task.extension = []
-  }
-
-  for (const extension of extensions) {
-    const previousExtension = findExtension(extension.url, task.extension)
-
-    if (!previousExtension) {
-      task.extension.push(extension)
-    } else {
-      previousExtension.valueString = extension.valueString
-    }
-  }
-
-  taskEntry.request = {
-    method: 'PUT',
-    url: `Task/${taskEntry.resource.id}`
-  } as fhir.BundleEntryRequest
-
+  task.lastModified = new Date().toISOString()
+  task.extension = [...(task.extension ?? []), extension]
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [taskEntry],
-    signature: {
-      type: [
-        {
-          code
-        }
-      ],
-      when: Date().toString()
-    }
+    entry: [taskEntry]
   }
   return fhirBundle
 }

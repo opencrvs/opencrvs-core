@@ -21,7 +21,7 @@ export default function getPlugins() {
     {
       plugin: Pino,
       options: {
-        prettyPrint: false,
+        prettyPrint: true,
         logPayload: false,
         instance: logger
       }

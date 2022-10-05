@@ -22,8 +22,7 @@ import {
   updatePatientIdentifierWithRN,
   touchBundle,
   markBundleAsDeclarationUpdated,
-  markBundleAsRequestedForCorrection,
-  removeExtensionFromBundle
+  markBundleAsRequestedForCorrection
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -32,7 +31,6 @@ import {
   getSharedContactMsisdn,
   postToHearth,
   generateEmptyBundle,
-  forwardToHearth,
   mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
@@ -56,13 +54,6 @@ import {
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
-import {
-  REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  ASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -426,65 +417,24 @@ export async function markEventAsCertifiedHandler(
   }
 }
 
-export async function markEventAsDownloadedHandler(
+export async function actionEventHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  event: Events
 ) {
   try {
     let payload = request.payload as fhir.Bundle
-    payload = removeExtensionFromBundle(payload, [
-      UNASSIGNED_EXTENSION_URL,
-      ASSIGNED_EXTENSION_URL,
-      REINSTATED_EXTENSION_URL,
-      REQUEST_CORRECTION_EXTENSION_URL
-    ])
     payload = await touchBundle(payload, getToken(request))
-    const newRequest = { ...request, payload } as Hapi.Request
-    return await forwardToHearth(newRequest, h)
+    const taskResource = payload.entry?.[0].resource as fhir.Task
+    return await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(taskResource),
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    })
   } catch (error) {
-    logger.error(`Workflow/markEventAsDownloaded: error: ${error}`)
-    throw new Error(error)
-  }
-}
-
-export async function markEventAsAssignedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    let payload = request.payload as fhir.Bundle
-    payload = removeExtensionFromBundle(payload, [
-      DOWNLOADED_EXTENSION_URL,
-      UNASSIGNED_EXTENSION_URL,
-      REINSTATED_EXTENSION_URL,
-      REQUEST_CORRECTION_EXTENSION_URL
-    ])
-    payload = await touchBundle(payload, getToken(request))
-    const newRequest = { ...request, payload } as Hapi.Request
-    return await forwardToHearth(newRequest, h)
-  } catch (error) {
-    logger.error(`Workflow/markEventAsUnassigned: error: ${error}`)
-    throw new Error(error)
-  }
-}
-
-export async function markEventAsUnassignedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    let payload = request.payload as fhir.Bundle
-    payload = removeExtensionFromBundle(payload, [
-      DOWNLOADED_EXTENSION_URL,
-      ASSIGNED_EXTENSION_URL,
-      REINSTATED_EXTENSION_URL,
-      REQUEST_CORRECTION_EXTENSION_URL
-    ])
-    payload = await touchBundle(payload, getToken(request))
-    const newRequest = { ...request, payload } as Hapi.Request
-    return await forwardToHearth(newRequest, h)
-  } catch (error) {
-    logger.error(`Workflow/markEventAsUnassigned: error: ${error}`)
+    logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
     throw new Error(error)
   }
 }
@@ -494,16 +444,10 @@ export async function markEventAsRequestedForCorrectionHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    let payload = await markBundleAsRequestedForCorrection(
+    const payload = await markBundleAsRequestedForCorrection(
       request.payload as fhir.Bundle,
       getToken(request)
     )
-    payload = removeExtensionFromBundle(payload, [
-      DOWNLOADED_EXTENSION_URL,
-      ASSIGNED_EXTENSION_URL,
-      UNASSIGNED_EXTENSION_URL,
-      REINSTATED_EXTENSION_URL
-    ])
     return await postToHearth(payload)
   } catch (error) {
     logger.error(

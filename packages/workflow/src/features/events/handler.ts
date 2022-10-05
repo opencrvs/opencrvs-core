@@ -23,9 +23,7 @@ import {
   markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
-  markEventAsUnassignedHandler,
-  markEventAsAssignedHandler,
-  markEventAsDownloadedHandler
+  actionEventHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
@@ -33,7 +31,7 @@ import {
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
-  hasReinstatedExtension,
+  hasExtension,
   isRejectedTask,
   isArchiveTask
 } from '@workflow/features/task/fhir/utils'
@@ -43,6 +41,12 @@ import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import {
+  ASSIGNED_EXTENSION_URL,
+  DOWNLOADED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
@@ -159,17 +163,6 @@ function detectEvent(request: Hapi.Request): Events {
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
-        switch (fhirBundle.signature?.type?.[0]?.code) {
-          case 'downloaded':
-            return Events.DOWNLOADED
-          case 'assigned':
-            return Events.ASSIGNED_EVENT
-          case 'unassigned':
-            return Events.UNASSIGNED_EVENT
-          default:
-            break
-        }
-
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
           if (hasValidateScope(request)) {
@@ -192,6 +185,15 @@ function detectEvent(request: Hapi.Request): Events {
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
     const taskResource = getTaskResource(fhirBundle)
+    if (hasExtension(taskResource, ASSIGNED_EXTENSION_URL)) {
+      return Events.ASSIGNED_EVENT
+    }
+    if (hasExtension(taskResource, UNASSIGNED_EXTENSION_URL)) {
+      return Events.UNASSIGNED_EVENT
+    }
+    if (hasExtension(taskResource, DOWNLOADED_EXTENSION_URL)) {
+      return Events.DOWNLOADED
+    }
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
       if (isRejectedTask(taskResource)) {
@@ -200,7 +202,7 @@ function detectEvent(request: Hapi.Request): Events {
       if (isArchiveTask(taskResource)) {
         return Events.BIRTH_MARK_ARCHIVED
       }
-      if (hasReinstatedExtension(taskResource)) {
+      if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
         return Events.BIRTH_MARK_REINSTATED
       }
     } else if (eventType === EVENT_TYPE.DEATH) {
@@ -210,7 +212,7 @@ function detectEvent(request: Hapi.Request): Events {
       if (isArchiveTask(taskResource)) {
         return Events.DEATH_MARK_ARCHIVED
       }
-      if (hasReinstatedExtension(taskResource)) {
+      if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
         return Events.DEATH_MARK_REINSTATED
       }
     }
@@ -413,23 +415,12 @@ export async function fhirWorkflowEventHandler(
       )
       break
     case Events.DOWNLOADED:
-      response = await markEventAsDownloadedHandler(request, h)
+      response = await actionEventHandler(request, h, event)
       break
     case Events.ASSIGNED_EVENT:
-      response = await markEventAsAssignedHandler(request, h)
-      await triggerEvent(
-        Events.ASSIGNED_EVENT,
-        request.payload,
-        request.headers
-      )
-      break
     case Events.UNASSIGNED_EVENT:
-      response = await markEventAsUnassignedHandler(request, h)
-      await triggerEvent(
-        Events.UNASSIGNED_EVENT,
-        request.payload,
-        request.headers
-      )
+      response = await actionEventHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers)
       break
     default:
       // forward as-is to hearth
