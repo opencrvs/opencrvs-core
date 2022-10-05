@@ -20,7 +20,6 @@ import { useIntl } from 'react-intl'
 import { Query } from '@client/components/Query'
 import { useParams } from 'react-router'
 import { GET_USER } from '@client/user/queries'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
@@ -45,7 +44,8 @@ import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { GetUserQuery } from '@client/utils/gateway'
+import { GetUserQuery, HumanName } from '@client/utils/gateway'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -68,6 +68,7 @@ interface IRouteProps {
 export const UserAudit = () => {
   const intl = useIntl()
   const { userId } = useParams<IRouteProps>()
+
   const dispatch = useDispatch()
   const [showResendSMSSuccess, setShowResendSMSSuccess] =
     useState<boolean>(false)
@@ -147,7 +148,7 @@ export const UserAudit = () => {
                 '')) ||
           ''
       },
-      name: createNamesMap(userData.name as GQLHumanName[])[locale],
+      name: createNamesMap(userData.name as HumanName[])[locale],
       role: userData.role,
       type: userData.type,
       number: userData.mobile,
@@ -180,37 +181,42 @@ export const UserAudit = () => {
         fetchPolicy={'cache-and-network'}
       >
         {({ data: userQueryData, loading, error }) => {
-          if (loading || !userQueryData?.getUser) {
+          if (loading) {
             return <Loader id="user_loader" marginPercent={35} />
-          } else {
-            const user = transformUserQueryResult(
-              userQueryData && userQueryData.getUser
-            )
-            const userRole = getUserRole(user, intl)
-            const userType = getUserType(user, intl)
+          }
 
-            return (
-              <Content
-                title={user.name}
-                showTitleOnMobile={true}
-                icon={() => (
-                  <UserAvatar name={user.name} avatar={user.avatar} />
-                )}
-                topActionButtons={[
-                  <Status status={user.status || 'pending'} />,
+          if (error) {
+            return <GenericErrorToast />
+          }
 
-                  <ToggleMenu
-                    id={`sub-page-header-munu-button`}
-                    toggleButton={<VerticalThreeDots />}
-                    menuItems={getMenuItems(
-                      user.id as string,
-                      user.status as string
-                    )}
-                    hide={(scope && !scope.includes('sysadmin')) || false}
-                  />
-                ]}
-                size={ContentSize.LARGE}
-              >
+          if (!userQueryData?.getUser) {
+            return <GenericErrorToast />
+          }
+
+          const user = transformUserQueryResult(userQueryData.getUser)
+          const userRole = getUserRole(user, intl)
+          const userType = getUserType(user, intl)
+          return (
+            <Content
+              title={user.name}
+              showTitleOnMobile={true}
+              icon={() => <UserAvatar name={user.name} avatar={user.avatar} />}
+              topActionButtons={[
+                <Status status={user.status || 'pending'} />,
+
+                <ToggleMenu
+                  id={`sub-page-header-munu-button`}
+                  toggleButton={<VerticalThreeDots />}
+                  menuItems={getMenuItems(
+                    user.id as string,
+                    user.status as string
+                  )}
+                  hide={(scope && !scope.includes('sysadmin')) || false}
+                />
+              ]}
+              size={ContentSize.LARGE}
+            >
+              <>
                 <Summary>
                   <Summary.Row
                     data-testid="office-link"
@@ -254,43 +260,43 @@ export const UserAudit = () => {
                   />
                 </Summary>
 
-                <UserAuditActionModal
-                  show={modalVisible}
-                  user={userQueryData && userQueryData.getUser}
-                  onClose={() => toggleUserActivationModal()}
-                  onConfirmRefetchQueries={[
-                    {
-                      query: GET_USER,
-                      variables: {
-                        userId: userId
-                      }
-                    }
-                  ]}
-                />
-                {showResendSMSSuccess && (
-                  <Toast
-                    id="resend_invite_success"
-                    type="success"
-                    onClose={() => setShowResendSMSSuccess(false)}
-                  >
-                    {intl.formatMessage(sysMessages.resendSMSSuccess)}
-                  </Toast>
-                )}
-                {showResendSMSError && (
-                  <Toast
-                    id="resend_invite_error"
-                    type="error"
-                    onClose={() => setShowResendSMSError(false)}
-                  >
-                    {intl.formatMessage(sysMessages.resendSMSError)}
-                  </Toast>
-                )}
                 {user.practitionerId && (
                   <UserAuditHistory practitionerId={user.practitionerId} />
                 )}
-              </Content>
-            )
-          }
+              </>
+              <UserAuditActionModal
+                show={modalVisible}
+                user={userQueryData.getUser}
+                onClose={() => toggleUserActivationModal()}
+                onConfirmRefetchQueries={[
+                  {
+                    query: GET_USER,
+                    variables: {
+                      userId: userId
+                    }
+                  }
+                ]}
+              />
+              {showResendSMSSuccess && (
+                <Toast
+                  id="resend_invite_success"
+                  type="success"
+                  onClose={() => setShowResendSMSSuccess(false)}
+                >
+                  {intl.formatMessage(sysMessages.resendSMSSuccess)}
+                </Toast>
+              )}
+              {showResendSMSError && (
+                <Toast
+                  id="resend_invite_error"
+                  type="error"
+                  onClose={() => setShowResendSMSError(false)}
+                >
+                  {intl.formatMessage(sysMessages.resendSMSError)}
+                </Toast>
+              )}
+            </Content>
+          )
         }}
       </Query>
     </Frame>
