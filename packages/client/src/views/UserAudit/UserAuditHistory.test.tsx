@@ -245,21 +245,7 @@ describe('User audit list tests', () => {
   // TODO: Implement this test when UserAudit is enabled again / reworked
   it('renders next page of audits after clicking next page', async () => {
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <UserAuditHistory
-        practitionerId="94429795-0a09-4de8-8e1e-27dab01877d2"
-        {...createRouterProps(
-          formatUrl(TEAM_USER_LIST, {
-            userId: '5d08e102542c7a19fc55b790'
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              userId: '5d08e102542c7a19fc55b790'
-            }
-          }
-        )}
-      />,
+      <UserAuditHistory practitionerId="94429795-0a09-4de8-8e1e-27dab01877d2" />,
       {
         store,
         history,
