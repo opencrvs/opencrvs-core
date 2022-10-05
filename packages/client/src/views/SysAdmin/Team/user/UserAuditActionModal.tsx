@@ -39,6 +39,7 @@ import {
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 import { withApollo, WithApolloClient } from 'react-apollo'
+import { User } from '@client/utils/gateway'
 
 const { useState, useEffect } = React
 
@@ -55,7 +56,7 @@ interface ToggleUserActivationModalProps
   extends WrappedComponentProps,
     ConnectProps,
     DispatchProps {
-  user: GQLUser | null
+  user: User | null
   show: boolean
   onConfirmRefetchQueries?: RefetchQueryDescription
   onClose: () => void

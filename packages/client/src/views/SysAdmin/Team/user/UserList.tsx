@@ -57,11 +57,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  GQLHumanName,
-  GQLQuery,
-  GQLUser
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
 import {
@@ -86,6 +82,7 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { ApolloError } from 'apollo-client'
+import { Query as QueryType, User } from '@client/utils/gateway'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -242,7 +239,7 @@ interface IStatusProps {
 
 interface ToggleUserActivation {
   modalVisible: boolean
-  selectedUser: GQLUser | null
+  selectedUser: User | null
 }
 
 export const Status = (statusProps: IStatusProps) => {
@@ -310,7 +307,7 @@ function UserListComponent(props: IProps) {
   )
 
   const toggleUserActivationModal = useCallback(
-    function toggleUserActivationModal(user?: GQLUser) {
+    function toggleUserActivationModal(user?: User) {
       if (user !== undefined) {
         setToggleActivation({
           ...toggleActivation,
@@ -348,7 +345,7 @@ function UserListComponent(props: IProps) {
   )
 
   const getMenuItems = useCallback(
-    function getMenuItems(user: GQLUser) {
+    function getMenuItems(user: User) {
       const menuItems = [
         {
           label: intl.formatMessage(messages.editUserDetailsTitle),
@@ -422,7 +419,7 @@ function UserListComponent(props: IProps) {
     }: {
       userDetails: IUserDetails | null
       locationId: string
-      user: GQLUser
+      user: User
       index: number
       status?: string
       underInvestigation?: boolean
@@ -453,7 +450,7 @@ function UserListComponent(props: IProps) {
 
   const generateUserContents = useCallback(
     function generateUserContents(
-      data: GQLQuery,
+      data: QueryType,
       locationId: string,
       userDetails: IUserDetails | null
     ) {
@@ -462,7 +459,7 @@ function UserListComponent(props: IProps) {
       }
 
       return data.searchUsers.results.map(
-        (user: GQLUser | null, index: number) => {
+        (user: User | null, index: number) => {
           if (user !== null) {
             const name =
               (user &&
@@ -480,7 +477,7 @@ function UserListComponent(props: IProps) {
             const avatar = user.avatar
 
             return {
-              image: <AvatarSmall name={name} avatar={avatar} />,
+              image: <AvatarSmall name={name} avatar={avatar || undefined} />,
               label: (
                 <LinkButtonWithoutSpacing
                   id="profile-link"
@@ -496,8 +493,8 @@ function UserListComponent(props: IProps) {
                   locationId={locationId}
                   user={user}
                   index={index}
-                  status={user.status}
-                  underInvestigation={user.underInvestigation}
+                  status={user.status || undefined}
+                  underInvestigation={user.underInvestigation || false}
                 />
               )
             }
