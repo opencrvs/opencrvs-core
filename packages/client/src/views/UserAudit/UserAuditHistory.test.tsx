@@ -242,7 +242,6 @@ describe('User audit list tests', () => {
     )
   })
 
-  // TODO: Implement this test when UserAudit is enabled again / reworked
   it('renders next page of audits after clicking next page', async () => {
     const testComponent = await createTestComponent(
       <UserAuditHistory practitionerId="94429795-0a09-4de8-8e1e-27dab01877d2" />,
@@ -257,7 +256,7 @@ describe('User audit list tests', () => {
               variables: {
                 practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
                 count: 20,
-                skip: 0
+                skip: 10
               }
             },
             result: {
@@ -287,6 +286,13 @@ describe('User audit list tests', () => {
     )
 
     const nextPageButton = await waitForElement(testComponent, '#page-number-1')
+    const firstRowElementOnFirstPage = await waitForElement(
+      testComponent,
+      '#row_0'
+    )
+    expect(firstRowElementOnFirstPage.hostNodes().childAt(1).text()).toBe(
+      'D23S2D1'
+    )
     expect(nextPageButton.hostNodes()).toHaveLength(2)
     nextPageButton.hostNodes().find('button').first().simulate('click')
     await new Promise((resolve) => {
@@ -297,10 +303,8 @@ describe('User audit list tests', () => {
       testComponent,
       '#row_0'
     )
-    const firstTrackingIdOnSecondPage = firstRowElementOnSecondPage
-      .hostNodes()
-      .childAt(1)
-      .text()
-    expect(firstTrackingIdOnSecondPage).toBe('D23S2D10')
+    expect(firstRowElementOnSecondPage.hostNodes().childAt(1).text()).toBe(
+      'D23S2D10'
+    )
   })
 })

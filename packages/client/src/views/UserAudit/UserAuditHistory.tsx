@@ -414,18 +414,6 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     return (
       <RecentActionsHolder id="user-audit-list">
         <>
-          <HistoryHeader>
-            <SectionTitle>
-              {intl.formatMessage(messages.auditSectionTitle)}
-            </SectionTitle>
-            <AlignedDateRangePicker
-              startDate={timeStart}
-              endDate={timeEnd}
-              onDatesChange={({ startDate, endDate }) => {
-                this.setDateRangePickerValues(startDate, endDate)
-              }}
-            />
-          </HistoryHeader>
           <>
             <HistoryHeader>
               <SectionTitle>
