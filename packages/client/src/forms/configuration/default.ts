@@ -976,41 +976,6 @@ export const registerForms: IDefaultRegisterForms = {
             ],
             fields: [
               {
-                name: 'nationality',
-                type: 'SELECT_WITH_OPTIONS',
-                label: formMessageDescriptors.nationality,
-                required: true,
-                initialValue:
-                  typeof window !== 'undefined'
-                    ? (window as any).config.COUNTRY.toUpperCase()
-                    : 'FAR',
-                validate: [],
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                options: {
-                  resource: 'countries'
-                },
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldToArrayTransformer'
-                      }
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'arrayToFieldTransformer'
-                      }
-                    ]
-                  }
-                }
-              },
-              {
                 name: 'informantID',
                 type: 'TEXT',
                 label: formMessageDescriptors.iDTypeNationalID,
@@ -1046,47 +1011,6 @@ export const registerForms: IDefaultRegisterForms = {
                       {
                         operation: 'identityToFieldTransformer',
                         parameters: ['id', 'NATIONAL_ID']
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'informantBirthDate',
-                type: 'DATE',
-                label: formMessageDescriptors.motherDateOfBirth,
-                required: true,
-                customisable: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'dateFormatIsCorrect',
-                    parameters: []
-                  },
-                  {
-                    operation: 'dateInPast',
-                    parameters: []
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'longDateTransformer',
-                        parameters: ['birthDate']
-                      },
-                      'birthDate'
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldValueTransformer',
-                        parameters: ['birthDate']
                       }
                     ]
                   }
