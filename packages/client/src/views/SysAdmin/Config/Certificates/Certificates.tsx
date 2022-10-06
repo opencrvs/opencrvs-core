@@ -291,6 +291,13 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
   togglePrompt = () => {
     this.setState((prevState) => ({ showPrompt: !prevState.showPrompt }))
+    this.setState({
+      imageFile: {
+        name: EMPTY_STRING,
+        type: EMPTY_STRING,
+        data: EMPTY_STRING
+      }
+    })
   }
 
   closePreviewSection = () => {
