@@ -601,30 +601,32 @@ export const registerForms: IDefaultRegisterForms = {
             id: 'child-view-group',
             fields: [
               {
-                name: 'childBirthDate',
+                name: 'familyNameEng',
+                previewGroup: 'childNameInEnglish',
                 customisable: false,
-                type: 'DATE',
-                label: formMessageDescriptors.childDateOfBirth,
+                type: 'TEXT',
+                label: formMessageDescriptors.childFamilyName,
+                maxLength: 32,
                 required: true,
                 initialValue: '',
                 validate: [
                   {
-                    operation: 'isValidChildBirthDate'
+                    operation: 'englishOnlyNameFormat'
                   }
                 ],
                 mapping: {
                   template: {
-                    operation: 'dateFormatTransformer',
-                    fieldName: 'eventDate',
-                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                    fieldName: 'childFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
                   },
                   mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: ['birthDate']
+                    operation: 'fieldToNameTransformer',
+                    parameters: ['en', 'familyName']
                   },
                   query: {
-                    operation: 'fieldValueTransformer',
-                    parameters: ['birthDate']
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
                   }
                 }
               },
@@ -659,32 +661,30 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'familyNameEng',
-                previewGroup: 'childNameInEnglish',
+                name: 'childBirthDate',
                 customisable: false,
-                type: 'TEXT',
-                label: formMessageDescriptors.childFamilyName,
-                maxLength: 32,
+                type: 'DATE',
+                label: formMessageDescriptors.childDateOfBirth,
                 required: true,
                 initialValue: '',
                 validate: [
                   {
-                    operation: 'englishOnlyNameFormat'
+                    operation: 'isValidChildBirthDate'
                   }
                 ],
                 mapping: {
                   template: {
-                    fieldName: 'childFamilyName',
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'eventDate',
+                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
                   },
                   mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'familyName']
+                    operation: 'longDateTransformer',
+                    parameters: ['birthDate']
                   },
                   query: {
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
+                    operation: 'fieldValueTransformer',
+                    parameters: ['birthDate']
                   }
                 }
               },
@@ -717,6 +717,91 @@ export const registerForms: IDefaultRegisterForms = {
                     label: formMessageDescriptors.childSexUnknown
                   }
                 ]
+              },
+              {
+                name: 'placeOfBirthTitle',
+                type: 'SUBSECTION',
+                label: formMessageDescriptors.placeOfBirthPreview,
+                previewGroup: 'placeOfBirth',
+                ignoreBottomMargin: true,
+                initialValue: '',
+                validate: []
+              },
+              {
+                name: 'placeOfBirth',
+                customisable: false,
+                type: 'SELECT_WITH_OPTIONS',
+                previewGroup: 'placeOfBirth',
+                ignoreFieldLabelOnErrorMessage: true,
+                label: formMessageDescriptors.placeOfBirth,
+                required: true,
+                initialValue: '',
+                validate: [],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: [
+                  {
+                    value: 'HEALTH_FACILITY',
+                    label: formMessageDescriptors.healthInstitution
+                  },
+                  {
+                    value: 'PRIVATE_HOME',
+                    label: formMessageDescriptors.privateHome
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.otherInstitution
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'birthEventLocationMutationTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'eventLocationTypeQueryTransformer',
+                    parameters: []
+                  }
+                }
+              },
+              {
+                name: 'birthLocation',
+                customisable: false,
+                type: 'LOCATION_SEARCH_INPUT',
+                label: formMessageDescriptors.healthInstitution,
+                previewGroup: 'placeOfBirth',
+                required: true,
+                initialValue: '',
+                searchableResource: 'facilities',
+                searchableType: 'HEALTH_FACILITY',
+                dynamicOptions: {
+                  resource: 'facilities'
+                },
+                validate: [
+                  {
+                    operation: 'facilityMustBeSelected'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '(values.placeOfBirth!="HEALTH_FACILITY")'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationNameQueryOfflineTransformer',
+                    parameters: ['facilities']
+                  },
+                  mutation: {
+                    operation: 'birthEventLocationMutationTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'eventLocationIDQueryTransformer',
+                    parameters: []
+                  }
+                }
               },
               {
                 name: 'seperator',
@@ -856,91 +941,6 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 },
                 inputFieldWidth: '78px'
-              },
-              {
-                name: 'placeOfBirthTitle',
-                type: 'SUBSECTION',
-                label: formMessageDescriptors.placeOfBirthPreview,
-                previewGroup: 'placeOfBirth',
-                ignoreBottomMargin: true,
-                initialValue: '',
-                validate: []
-              },
-              {
-                name: 'placeOfBirth',
-                customisable: false,
-                type: 'SELECT_WITH_OPTIONS',
-                previewGroup: 'placeOfBirth',
-                ignoreFieldLabelOnErrorMessage: true,
-                label: formMessageDescriptors.placeOfBirth,
-                required: true,
-                initialValue: '',
-                validate: [],
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                options: [
-                  {
-                    value: 'HEALTH_FACILITY',
-                    label: formMessageDescriptors.healthInstitution
-                  },
-                  {
-                    value: 'PRIVATE_HOME',
-                    label: formMessageDescriptors.privateHome
-                  },
-                  {
-                    value: 'OTHER',
-                    label: formMessageDescriptors.otherInstitution
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'birthEventLocationMutationTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'eventLocationTypeQueryTransformer',
-                    parameters: []
-                  }
-                }
-              },
-              {
-                name: 'birthLocation',
-                customisable: false,
-                type: 'LOCATION_SEARCH_INPUT',
-                label: formMessageDescriptors.healthInstitution,
-                previewGroup: 'placeOfBirth',
-                required: true,
-                initialValue: '',
-                searchableResource: 'facilities',
-                searchableType: 'HEALTH_FACILITY',
-                dynamicOptions: {
-                  resource: 'facilities'
-                },
-                validate: [
-                  {
-                    operation: 'facilityMustBeSelected'
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression: '(values.placeOfBirth!="HEALTH_FACILITY")'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    fieldName: 'placeOfBirth',
-                    operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
-                  },
-                  mutation: {
-                    operation: 'birthEventLocationMutationTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'eventLocationIDQueryTransformer',
-                    parameters: []
-                  }
-                }
               }
             ],
             previewGroups: [
