@@ -941,6 +941,27 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: []
                   }
                 }
+              },
+              {
+                name: 'multipleBirth',
+                type: 'NUMBER',
+                label: {
+                  defaultMessage: 'No. of previous births',
+                  description: 'Label for form field: multipleBirth',
+                  id: 'form.field.label.multipleBirth'
+                },
+                customisable: true,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'greaterThanZero'
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [2]
+                  }
+                ]
               }
             ],
             previewGroups: [
