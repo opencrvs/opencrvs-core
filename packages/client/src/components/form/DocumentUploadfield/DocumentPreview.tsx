@@ -73,21 +73,6 @@ type IProps = {
 }
 
 export class DocumentPreview extends React.Component<IProps> {
-  getScreenWidth = () => {
-    if (window.innerWidth >= 1024) {
-      return true
-    } else {
-      return false
-    }
-  }
-  componentDidMount() {
-    window.addEventListener('resize', this.getScreenWidth)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.getScreenWidth)
-  }
-
   render = () => {
     const { previewImage, title, goBack, onDelete, disableDelete } = this.props
     return (
@@ -97,7 +82,7 @@ export class DocumentPreview extends React.Component<IProps> {
             <ArrowBack />
             <Title>{title}</Title>
           </BackButton>
-          {!disableDelete && this.getScreenWidth() && (
+          {!disableDelete && (
             <span>
               <Button
                 id="preview_delete"
