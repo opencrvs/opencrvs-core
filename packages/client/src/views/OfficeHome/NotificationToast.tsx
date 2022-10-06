@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { ExpandableNotification } from '@opencrvs/components/lib/interface'
+import { ExpandableNotification } from '@opencrvs/components/lib/ExpandableNotification'
 import styled from '@client/styledComponents'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'

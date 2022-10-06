@@ -14,7 +14,7 @@ import styled from '@client/styledComponents'
 import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { ArrowBack, Delete } from '@opencrvs/components/lib/icons'
-import PanViewer from '@opencrvs/components/lib/interface/components/PanViewer'
+import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 const PreviewContainer = styled.div`
   position: fixed;
   top: 0;

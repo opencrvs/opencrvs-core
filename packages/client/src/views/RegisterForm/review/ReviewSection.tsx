@@ -14,18 +14,16 @@ import {
   TertiaryButton,
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  ISelectOption as SelectComponentOptions,
-  TextArea
-} from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/Select'
+import { Alert } from '@opencrvs/components/lib/Alert'
 import {
   DocumentViewer,
-  IDocumentViewerOptions,
-  ResponsiveModal,
-  Warning
-} from '@opencrvs/components/lib/interface'
-import { FullBodyContent } from '@opencrvs/components/lib/layout'
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/DocumentViewer'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { FullBodyContent } from '@opencrvs/components/lib/Content'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
@@ -128,7 +126,7 @@ import {
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 
 const Deleted = styled.del`
@@ -1602,12 +1600,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
               {totalFileSizeExceeded && (
-                <Warning
-                  label={intl.formatMessage(
-                    constantsMessages.totalFileSizeExceed,
-                    { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
-                  )}
-                />
+                <Alert type="warning">
+                  {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
+                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
+                  })}
+                </Alert>
               )}
               {!isCorrection(declaration) ? (
                 <>

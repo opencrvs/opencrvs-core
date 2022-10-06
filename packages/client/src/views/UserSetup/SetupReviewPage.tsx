@@ -13,14 +13,11 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import {
-  ActionPageLight,
-  DataRow,
-  IDataProps,
-  Loader
-} from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { WarningMessage } from '@opencrvs/components/lib/forms'
+import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
+import { Loader } from '@opencrvs/components/lib/Loader'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData,
@@ -41,7 +38,7 @@ import {
 import { Check } from '@opencrvs/components/lib/icons'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { Content } from '@opencrvs/components/lib/Content'
 import {
   SubmitActivateUserMutation,
   SubmitActivateUserMutationVariables
