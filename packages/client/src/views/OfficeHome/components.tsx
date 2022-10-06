@@ -31,16 +31,9 @@ const Flex = styled.div`
 `
 
 export const NameContainer = styled(Link)``
-
-export const NoNameContainer = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
-  cursor: pointer;
-  &:hover {
-    color: ${({ theme }) => theme.colors.negative};
-    text-decoration-line: underline;
-    text-underline-offset: 4px;
-  }
-`
+export const NoNameContainer = styled(Link).attrs({
+  color: 'negative'
+})``
 
 const Event = styled.div`
   color: ${({ theme }) => theme.colors.grey500};
