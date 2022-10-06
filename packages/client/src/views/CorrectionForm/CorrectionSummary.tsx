@@ -938,7 +938,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
     this.props.writeDeclaration(declaration)
-    this.props.goToHomeFromCorrectionTab(WORKQUEUE_TABS.readyToPrint)
+    this.props.goToHomeFromCorrectionTab(WORKQUEUE_TABS.readyForReview)
   }
 
   gotoReviewPage = () => {
