@@ -1239,22 +1239,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 }
               },
-              {
-                name: 'reasonNotApplying',
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      'mothersDetailsExistBasedOnContactAndInformant || values.detailsExist'
-                  }
-                ],
-                type: 'TEXT',
-                label: formMessageDescriptors.reasonMNA,
-                validate: [],
-                initialValue: '',
-                customisable: true,
-                required: true
-              },
+
               {
                 name: 'nationality',
                 type: 'SELECT_WITH_OPTIONS',
@@ -1733,22 +1718,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 }
               },
-              {
-                name: 'reasonNotApplying',
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      'fathersDetailsExistBasedOnContactAndInformant || values.detailsExist'
-                  }
-                ],
-                type: 'TEXT',
-                label: formMessageDescriptors.reasonFNA,
-                customisable: true,
-                validate: [],
-                initialValue: '',
-                required: true
-              },
+
               {
                 name: 'nationality',
                 type: 'SELECT_WITH_OPTIONS',
