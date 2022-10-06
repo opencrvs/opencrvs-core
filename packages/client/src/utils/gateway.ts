@@ -170,6 +170,7 @@ export enum AttachmentType {
   MedicallyCertifiedCauseOfDeath = 'MEDICALLY_CERTIFIED_CAUSE_OF_DEATH',
   NationalId = 'NATIONAL_ID',
   NotificationOfBirth = 'NOTIFICATION_OF_BIRTH',
+  B1Form = 'B1_FORM',
   Other = 'OTHER',
   Passport = 'PASSPORT',
   PoliceCertificateOfDeath = 'POLICE_CERTIFICATE_OF_DEATH',

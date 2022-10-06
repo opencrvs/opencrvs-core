@@ -2186,6 +2186,10 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [],
                 options: [
                   {
+                    value: birthDocumentTypeFhirMapping.B1_FORM,
+                    label: formMessageDescriptors.docTypeB1Form
+                  },
+                  {
                     value: birthDocumentTypeFhirMapping.NOTIFICATION_OF_BIRTH,
                     label: formMessageDescriptors.docTypeChildBirthProof
                   }

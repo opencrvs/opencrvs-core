@@ -129,6 +129,7 @@ interface IFormMessages
   docTypeBirthCert: MessageDescriptor
   docTypeChildAgeProof: MessageDescriptor
   docTypeChildBirthProof: MessageDescriptor
+  docTypeB1Form: MessageDescriptor
   docTypeCopyOfBurialReceipt: MessageDescriptor
   docTypeDeathCertificate: MessageDescriptor
   docTypePoliceCertificate: MessageDescriptor
@@ -1027,6 +1028,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Notification of birth',
     description: 'Label for select option Notification of birth',
     id: 'form.field.label.docTypeChildBirthProof'
+  },
+  docTypeB1Form: {
+    defaultMessage: 'B1 Form',
+    description: 'Label for select option B1 Form',
+    id: 'form.field.label.docTypeB1Form'
   },
   docTypeCopyOfBurialReceipt: {
     defaultMessage: 'Certified copy of burial receipt',
