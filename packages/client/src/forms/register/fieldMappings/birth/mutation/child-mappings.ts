@@ -38,10 +38,22 @@ export const birthEventLocationMutationTransformer =
       if (transformedData.eventLocation && transformedData.eventLocation.type) {
         defaultLocation['type'] = transformedData.eventLocation.type
       }
+      if (
+        transformedData.eventLocation &&
+        transformedData.eventLocation.description
+      ) {
+        defaultLocation['description'] =
+          transformedData.eventLocation.description
+      }
+
       transformedData.eventLocation = defaultLocation
     }
     if (lineNumber > 0) {
       transformedData.eventLocation.address.line[lineNumber - 1] = `${
+        draftData[sectionId][field.name]
+      }`
+    } else if (field.name === 'otherType' && transformedData.eventLocation) {
+      transformedData.eventLocation.description = `${
         draftData[sectionId][field.name]
       }`
     } else if (field.name === 'placeOfBirth' && transformedData.eventLocation) {
