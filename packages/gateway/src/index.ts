@@ -22,7 +22,6 @@ DotEnv.config({
   path: `${process.cwd()}/.env`
 })
 
-createServer()
-  .then((app) => {
-    app.start()
-  })
+createServer().then((app) => {
+  app.start()
+})
