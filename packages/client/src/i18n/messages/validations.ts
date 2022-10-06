@@ -33,6 +33,7 @@ interface IValidationMessages
   maxLength: MessageDescriptor
   minLength: MessageDescriptor
   notGreaterThan: MessageDescriptor
+  isInBetween: MessageDescriptor
   numberRequired: MessageDescriptor
   phoneNumberFormat: MessageDescriptor
   range: MessageDescriptor
@@ -175,6 +176,12 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message that appears on numeric fields that exceed a limit',
     id: 'validations.notGreaterThan'
+  },
+  isInBetween: {
+    defaultMessage: 'Must be in between {minValue} - {maxValue}',
+    description:
+      'The error message that appears on numeric fields that are not in between a range',
+    id: 'validations.isInBetween'
   },
   numberRequired: {
     defaultMessage: 'Must be a number',

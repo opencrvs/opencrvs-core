@@ -18,7 +18,8 @@ import {
   IFormSectionData,
   IFormFieldMutationMapFunction
 } from '@client/forms'
-import { set } from 'lodash'
+import subYears from 'date-fns/subYears'
+import { get, set } from 'lodash'
 
 interface IPersonName {
   [key: string]: string
@@ -565,6 +566,33 @@ function formatDate(dateString: string) {
     return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-')
   } else return null
 }
+
+export const ageAtBirthOfChildTransformer =
+  (transformedFieldName: string, pathToChildsBirthdate: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const fieldName = transformedFieldName || field.name
+    const sectionData = draftData[sectionId][field.name] as string
+
+    const childsBirthDate = get(draftData, pathToChildsBirthdate)
+
+    if (!childsBirthDate) {
+      return transformedData
+    }
+
+    if (sectionData) {
+      const childsDoB = new Date(childsBirthDate as unknown as string)
+
+      transformedData[sectionId][fieldName] = formatDate(
+        subYears(childsDoB, Number.parseInt(sectionData)).toISOString()
+      )
+    }
+    return transformedData
+  }
 
 export const longDateTransformer =
   (transformedFieldName?: string) =>

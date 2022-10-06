@@ -1330,12 +1330,12 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'motherBirthDate',
-                type: 'DATE',
+                name: 'ageAtBirthOfChild',
+                type: 'NUMBER',
                 label: {
-                  defaultMessage: 'Date of birth',
-                  description: 'Label for form field: Date of birth',
-                  id: 'form.field.label.motherDateOfBirth'
+                  defaultMessage: 'Age at birth of child',
+                  description: 'Label for form field: ageAtBirthOfChild',
+                  id: 'form.field.label.ageAtBirthOfChild'
                 },
                 conditionals: [
                   {
@@ -1344,34 +1344,26 @@ export const registerForms: IDefaultRegisterForms = {
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
+                customisable: true,
                 required: true,
                 initialValue: '',
                 validate: [
                   {
-                    operation: 'dateFormatIsCorrect',
-                    parameters: []
+                    operation: 'isInBetween',
+                    parameters: [6, 99]
                   },
                   {
-                    operation: 'dateInPast',
-                    parameters: []
-                  },
-                  {
-                    operation: 'isValidParentsBirthDate',
-                    parameters: [5]
+                    operation: 'maxLength',
+                    parameters: [2]
                   }
                 ],
                 mapping: {
-                  template: {
-                    operation: 'dateFormatTransformer',
-                    fieldName: 'motherBirthDate',
-                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
-                  },
                   mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: ['birthDate']
+                    operation: 'ageAtBirthOfChildTransformer',
+                    parameters: ['birthDate', 'child.childBirthDate']
                   },
                   query: {
-                    operation: 'fieldValueTransformer',
+                    operation: 'ageAtBirthOfChildQueryTransformer',
                     parameters: ['birthDate']
                   }
                 }
