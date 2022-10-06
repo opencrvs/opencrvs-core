@@ -527,7 +527,7 @@ export class ListTable extends React.Component<
           <>
             {!loadMoreText && (
               <Pagination
-                initialPage={currentPage}
+                currentPage={currentPage}
                 totalPages={Math.ceil(totalItems / pageSize)}
                 onPageChange={this.onPageChange}
               />

@@ -29,9 +29,7 @@ import {
   storeDeclaration,
   IDeclaration,
   SUBMISSION_STATUS,
-  DOWNLOAD_STATUS,
-  IWorkqueue,
-  getCurrentUserWorkqueuSuccess
+  DOWNLOAD_STATUS
 } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
@@ -40,6 +38,11 @@ import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { checkAuth } from '@client/profile/profileActions'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
+import {
+  getCurrentUserWorkqueuSuccess,
+  IWorkqueue,
+  workqueueInitialState
+} from '@client/workqueue'
 
 const declaration: IDeclaration = createDeclaration(
   Event.Birth,
@@ -72,6 +75,7 @@ declaration.data.history = [
 ]
 
 const workqueue: IWorkqueue = {
+  ...workqueueInitialState.workqueue,
   data: {
     inProgressTab: {},
     notificationTab: {},
