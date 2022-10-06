@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
-import { ApolloQueryResult } from '@apollo/client'
+import { ApolloQueryResult, gql } from '@apollo/client'
 import {
   GQLQuery,
   GQLBirthRegistration

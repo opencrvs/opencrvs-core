@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import TimeoutLink from '@client/utils/timeoutLink'
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import {
   ApolloLink,
   Observable,
