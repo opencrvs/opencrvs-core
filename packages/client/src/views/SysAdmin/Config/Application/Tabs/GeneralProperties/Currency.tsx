@@ -21,14 +21,11 @@ import {
   Message,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { InputField, Select } from '@opencrvs/components/lib/forms'
+import { Select } from '@opencrvs/components/lib/Select'
 import { IStoreState } from '@client/store'
-import {
-  FloatingNotification,
-  ListViewItemSimplified,
-  NOTIFICATION_TYPE,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -43,6 +40,7 @@ import {
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { lookup } from 'country-data'
 import { ICurrency } from '@client/utils/referenceApi'
+import { InputField } from '@opencrvs/components/lib/InputField'
 
 export function Currency() {
   const intl = useIntl()
@@ -149,26 +147,27 @@ export function Currency() {
         </Content>
       </ResponsiveModal>
 
-      <FloatingNotification
-        id="currencyNotification"
-        type={
-          notificationStatus === NOTIFICATION_STATUS.SUCCESS
-            ? NOTIFICATION_TYPE.SUCCESS
-            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? NOTIFICATION_TYPE.IN_PROGRESS
-            : NOTIFICATION_TYPE.ERROR
-        }
-        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
-        callback={() => {
-          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
-        }}
-      >
-        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
-          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
-          ? intl.formatMessage(messages.applicationCurrencyChangeNotification)
-          : intl.formatMessage(messages.applicationConfigChangeError)}
-      </FloatingNotification>
+      {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
+        <Toast
+          id="currencyNotification"
+          type={
+            notificationStatus === NOTIFICATION_STATUS.SUCCESS
+              ? 'success'
+              : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+              ? 'loading'
+              : 'warning'
+          }
+          onClose={() => {
+            setNotificationStatus(NOTIFICATION_STATUS.IDLE)
+          }}
+        >
+          {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+            : notificationStatus === NOTIFICATION_STATUS.SUCCESS
+            ? intl.formatMessage(messages.applicationCurrencyChangeNotification)
+            : intl.formatMessage(messages.applicationConfigChangeError)}
+        </Toast>
+      )}
     </>
   )
 }
