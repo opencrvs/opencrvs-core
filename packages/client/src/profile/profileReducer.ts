@@ -29,7 +29,7 @@ import {
 } from '@client/utils/authUtils'
 
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import { ApolloQueryResult } from 'apollo-client'
+import { ApolloQueryResult } from '@apollo/client'
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'

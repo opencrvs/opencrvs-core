@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import gql from 'graphql-tag'
-import { ApolloQueryResult } from 'apollo-client'
+import { ApolloQueryResult } from '@apollo/client'
 import { GQLQuery, GQLPerson } from '@opencrvs/gateway/src/graphql/schema.d'
 
 export const FETCH_PERSON = gql`

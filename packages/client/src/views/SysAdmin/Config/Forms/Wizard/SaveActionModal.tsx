@@ -24,7 +24,7 @@ import {
   Mutation as GQLMutation,
   CreateFormDraftMutationVariables
 } from '@client/utils/gateway'
-import { Mutation } from 'react-apollo'
+import { Mutation } from '@apollo/client/react/components'
 import {
   SecondaryButton,
   PrimaryButton

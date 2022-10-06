@@ -11,7 +11,7 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
-import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import { InternalRefetchQueriesInclude } from '@apollo/client'
 
 const RESEND_SMS_INVITE = gql`
   mutation resendSMSInvite($userId: String!) {
@@ -20,7 +20,7 @@ const RESEND_SMS_INVITE = gql`
 `
 async function resendSMSInvite(
   userId: string,
-  refetchQueries: RefetchQueryDescription
+  refetchQueries: InternalRefetchQueriesInclude
 ) {
   return (
     client &&

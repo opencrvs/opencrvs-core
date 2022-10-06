@@ -84,7 +84,6 @@ import {
   LoadingIndicator
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
-import { ApolloError } from 'apollo-client'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React

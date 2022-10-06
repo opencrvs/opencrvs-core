@@ -24,7 +24,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import gql from 'graphql-tag'
 import { get } from 'lodash'
 import * as React from 'react'
-import { Mutation } from 'react-apollo'
+import { Mutation } from '@apollo/client/react/components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 

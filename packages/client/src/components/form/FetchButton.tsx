@@ -11,8 +11,7 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { ApolloError, ApolloQueryResult } from 'apollo-client'
-import { ApolloConsumer } from 'react-apollo'
+import { ApolloError, ApolloQueryResult, ApolloConsumer } from '@apollo/client'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
