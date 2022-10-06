@@ -413,7 +413,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
 
     return (
       <RecentActionsHolder id="user-audit-list">
-       
+        <>
           <>
             <HistoryHeader>
               <SectionTitle>
