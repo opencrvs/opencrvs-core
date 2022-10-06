@@ -23,6 +23,7 @@ interface INavigationMessages
   application: MessageDescriptor
   performance: MessageDescriptor
   team: MessageDescriptor
+  vsexports: MessageDescriptor
   config: MessageDescriptor
   certificate: MessageDescriptor
   completenessRates: MessageDescriptor

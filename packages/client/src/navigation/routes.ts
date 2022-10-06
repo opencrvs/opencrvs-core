@@ -68,7 +68,7 @@ export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const PERFORMANCE_HOME = '/performance'
 
-export const VSREPORT = '/vital-statistics'
+export const VS_EXPORTS = '/vsexports'
 
 export const EVENT_COMPLETENESS_RATES =
   '/performance/operations/completenessRates/:eventType'

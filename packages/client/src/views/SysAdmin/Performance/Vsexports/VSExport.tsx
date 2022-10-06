@@ -34,7 +34,7 @@ import { DynamicHeightLinkButton } from '@client/views/Settings/items/components
 import { ErrorToastNotification } from '@opencrvs/components/lib/interface'
 
 import { buttonMessages, errorMessages } from '@client/i18n/messages'
-import { GetVsExportsQuery, VsExport } from '@client/utils/gateway'
+import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -45,11 +45,6 @@ const UserTable = styled(BodyContent)`
 `
 type VSExportProps = {
   items: VsExport[]
-}
-
-export enum TabId {
-  BIRTH = 'birth',
-  DEATH = 'death'
 }
 
 const notificationActionButtonHandler = () => {
@@ -65,92 +60,55 @@ function downloadURI(uri: string, name: string) {
   document.body.removeChild(link)
 }
 
-function BirthTabContent(props: VSExportProps) {
+function TabContent(props: VSExportProps) {
   const items: VsExport[] = props.items
   return (
     <>
       {items.map((item: VsExport) => {
-        if (item.event === TabId.BIRTH) {
-          const sizeValue = `${item.year}-Farajaland-${item.event}-event-statistics.csv (${item.fileSize})`
-          const fileName = `${item.year}-Farajaland-${item.event}-event-statistics.csv`
-          return (
-            <ListViewSimplified key={`${item.createdOn}_${item.event}`}>
-              <ListViewItemSimplified
-                label={<Label id={`${item.year}_label`}>{item.year}</Label>}
-                value={
-                  <Value id={`${item.createdOn}_value`}>{sizeValue}</Value>
-                }
-                actions={
-                  <DynamicHeightLinkButton
-                    id={item.url}
-                    disabled={false}
-                    onClick={() =>
-                      downloadURI(`${MINIO_URL}${item.url}`, fileName)
-                    }
-                  >
-                    {'Export'}
-                  </DynamicHeightLinkButton>
-                }
-              />
-            </ListViewSimplified>
-          )
-        }
+        /* TODO: These need to be content managed */
+        const sizeValue = `${item.year}-Farajaland-${item.event}-event-statistics.csv (${item.fileSize})`
+        const fileName = `${item.year}-Farajaland-${item.event}-event-statistics.csv`
+        return (
+          <ListViewSimplified key={`${item.createdOn}_${item.event}`}>
+            <ListViewItemSimplified
+              label={<Label id={`${item.year}_label`}>{item.year}</Label>}
+              value={<Value id={`${item.createdOn}_value`}>{sizeValue}</Value>}
+              actions={
+                <DynamicHeightLinkButton
+                  id={item.url}
+                  disabled={false}
+                  onClick={() =>
+                    downloadURI(`${MINIO_URL}${item.url}`, fileName)
+                  }
+                >
+                  {/* TODO: This need to be content managed */}
+                  {'Export'}
+                </DynamicHeightLinkButton>
+              }
+            />
+          </ListViewSimplified>
+        )
       })}
     </>
   )
 }
 
-function DeathTabContent(props: VSExportProps) {
-  const items: VsExport[] = props.items
-
-  return (
-    <>
-      {items.map((item: VsExport) => {
-        if (item.event === TabId.DEATH) {
-          const sizeValue = `${item.year}-Farajaland-${item.event}-event-statistics.csv (${item.fileSize})`
-          const fileName = `${item.year}-Farajaland-${item.event}-event-statistics.csv`
-          return (
-            <ListViewSimplified key={`${item.createdOn}_${item.event}`}>
-              <ListViewItemSimplified
-                label={<Label id={`${item.year}_label`}>{item.year}</Label>}
-                value={
-                  <Value id={`${item.createdOn}_value`}>{sizeValue}</Value>
-                }
-                actions={
-                  <DynamicHeightLinkButton
-                    id={item.url}
-                    disabled={false}
-                    onClick={() =>
-                      downloadURI(`${MINIO_URL}${item.url}`, fileName)
-                    }
-                  >
-                    {'Export'}
-                  </DynamicHeightLinkButton>
-                }
-              />
-            </ListViewSimplified>
-          )
-        }
-      })}
-    </>
-  )
-}
 const VSExport = () => {
   const intl = useIntl()
 
-  const [activeTabId, setActiveTabId] = React.useState(TabId.BIRTH)
+  const [activeTabId, setActiveTabId] = React.useState(Event.Birth)
   const tabSections = [
     {
-      id: TabId.BIRTH,
+      id: Event.Birth,
       title: intl.formatMessage(messages.birthTabTitleExport)
     },
     {
-      id: TabId.DEATH,
+      id: Event.Death,
       title: intl.formatMessage(messages.deathTabTitleExport)
     }
   ]
 
-  // TODO: Reflace with Frame component */
+  // TODO: Replace with Frame component */
 
   return (
     <>
@@ -167,7 +125,7 @@ const VSExport = () => {
               <FormTabs
                 sections={tabSections}
                 activeTabId={activeTabId}
-                onTabClick={(id: TabId) => setActiveTabId(id)}
+                onTabClick={(id) => setActiveTabId(id)}
               />
             }
           >
@@ -192,17 +150,13 @@ const VSExport = () => {
                     </>
                   )
                 } else {
-                  const totalData: VsExport[] =
-                    data?.getVSExports?.results || []
+                  const vsExports = data?.getVSExports?.results || []
                   return (
-                    <>
-                      {activeTabId === TabId.BIRTH && (
-                        <BirthTabContent items={totalData} />
+                    <TabContent
+                      items={vsExports.filter(
+                        ({ event }) => event === activeTabId
                       )}
-                      {activeTabId === TabId.DEATH && (
-                        <DeathTabContent items={totalData} />
-                      )}
-                    </>
+                    />
                   )
                 }
               }}

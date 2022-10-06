@@ -49,7 +49,7 @@ import {
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
-  VSREPORT
+  VS_EXPORTS
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -172,7 +172,7 @@ export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
 export function goToVSExport() {
-  return push(VSREPORT)
+  return push(VS_EXPORTS)
 }
 
 export function goToFormConfigHome() {

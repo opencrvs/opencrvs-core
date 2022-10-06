@@ -38,7 +38,7 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 import { Activity, Users, Export } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -68,10 +68,8 @@ export const WORKQUEUE_TABS = {
   sentForApproval: 'approvals',
   readyToPrint: 'print',
   externalValidation: 'waitingValidation',
-  dashboard: 'dashboard',
   performance: 'performance',
   vsexports: 'vsexports',
-  vitalstatistics: 'vital-statistics',
   team: 'team',
   config: 'config',
   application: 'application',
@@ -184,7 +182,7 @@ interface IProps {
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
-  goToVSReportConfigAction: typeof goToVSExport
+  goToVSExportsAction: typeof goToVSExport
   goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
@@ -253,7 +251,7 @@ export const NavigationView = (props: IFullProps) => {
     loadWorkqueueStatuses = true,
     activeMenuItem,
     goToCertificateConfigAction,
-    goToVSReportConfigAction,
+    goToVSExportsAction,
     goToFormConfigAction,
     goToApplicationConfigAction,
     navigationWidth,
@@ -277,15 +275,13 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.certificate,
     WORKQUEUE_TABS.declarationForms
   ]
-  const performanceTab: string[] = [WORKQUEUE_TABS.performance]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
-  const { loading, error, data, initialSyncDone } = workqueue
+  const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
     data,
     storedDeclarations
   )
   const runningVer = String(localStorage.getItem('running-version'))
-  const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
@@ -513,7 +509,7 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                       isSelected={
                         enableMenuSelection &&
-                        performanceTab.includes(activeMenuItem)
+                        activeMenuItem === WORKQUEUE_TABS.performance
                       }
                     />
                   )}
@@ -527,7 +523,7 @@ export const NavigationView = (props: IFullProps) => {
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.vsexports]
                       )}
-                      onClick={goToVSReportConfigAction}
+                      onClick={goToVSExportsAction}
                       isSelected={
                         enableMenuSelection &&
                         activeMenuItem === WORKQUEUE_TABS.vsexports
@@ -654,7 +650,7 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.performance
       : window.location.href.includes(WORKQUEUE_TABS.team)
       ? WORKQUEUE_TABS.team
-      : window.location.href.includes(WORKQUEUE_TABS.vitalstatistics)
+      : window.location.href.includes(WORKQUEUE_TABS.vsexports)
       ? WORKQUEUE_TABS.vsexports
       : window.location.href.includes(WORKQUEUE_TABS.application)
       ? WORKQUEUE_TABS.application
@@ -678,7 +674,7 @@ export const Navigation = connect<
   goToCertificateConfigAction: goToCertificateConfig,
   goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
-  goToVSReportConfigAction: goToVSExport,
+  goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
