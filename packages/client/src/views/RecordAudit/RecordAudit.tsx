@@ -73,7 +73,7 @@ import {
   FIELD_AGENT_ROLES,
   IN_PROGRESS
 } from '@client/utils/constants'
-import { IQueryData } from '@client/views/OfficeHome/utils'
+import { IQueryData } from '@client/workqueue'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'

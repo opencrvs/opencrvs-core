@@ -579,7 +579,7 @@ function UserListComponent(props: IProps) {
             </ListViewSimplified>
             {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
               <Pagination
-                initialPage={currentPageNumber}
+                currentPage={currentPageNumber}
                 totalPages={Math.ceil(
                   totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
                 )}
