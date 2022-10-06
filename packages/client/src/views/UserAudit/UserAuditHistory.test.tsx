@@ -288,11 +288,19 @@ describe('User audit list tests', () => {
 
     const nextPageButton = await waitForElement(testComponent, '#page-number-1')
     expect(nextPageButton.hostNodes()).toHaveLength(2)
-    nextPageButton.hostNodes().first().simulate('click')
+    nextPageButton.hostNodes().find('button').first().simulate('click')
     await new Promise((resolve) => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 2000)
     })
     testComponent.update()
-    expect(testComponent.find('#page-number-1').hostNodes()).toHaveLength(0)
+    const firstRowElementOnSecondPage = await waitForElement(
+      testComponent,
+      '#row_0'
+    )
+    const firstTrackingIdOnSecondPage = firstRowElementOnSecondPage
+      .hostNodes()
+      .childAt(1)
+      .text()
+    expect(firstTrackingIdOnSecondPage).toBe('D23S2D10')
   })
 })
