@@ -30,6 +30,10 @@ export interface IMessage {
     defaultMessage: string
   }
 }
+export interface ICondition {
+  fieldId: string
+  regexp: string
+}
 export interface IQuestion {
   // fieldId is in the format:
   // event.sectionId.groupId.fieldName
@@ -49,6 +53,7 @@ export interface IQuestion {
   // wanted to use disabled, but this prop is already in use in IFormField
   enabled?: string
   custom?: boolean
+  conditionals?: ICondition[]
 }
 
 export interface IQuestionModel extends IQuestion, Document {}
@@ -66,6 +71,14 @@ export const message = new Schema(
   {
     lang: { type: String, required: true },
     descriptor: { type: messageDescriptor, required: true }
+  },
+  { _id: false }
+)
+
+export const conditionals = new Schema(
+  {
+    fieldId: { type: String },
+    regexp: { type: String }
   },
   { _id: false }
 )
@@ -107,7 +120,8 @@ const questionSchema = new Schema({
   precedingFieldId: { type: String, required: true },
   required: { type: Boolean },
   enabled: { type: String },
-  custom: { type: Boolean, default: false }
+  custom: { type: Boolean, default: false },
+  conditionals: [{ type: conditionals, required: false }]
 })
 
 export default model<IQuestionModel>('Question', questionSchema)

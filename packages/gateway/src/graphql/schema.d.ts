@@ -984,6 +984,7 @@ export interface GQLQuestionInput {
   required?: boolean
   enabled?: string
   custom?: boolean
+  conditionals?: Array<GQLConditionalInput>
 }
 
 export const enum GQLInformantType {
@@ -1277,6 +1278,11 @@ export const enum GQLCustomFieldType {
   NUMBER = 'NUMBER',
   SUBSECTION = 'SUBSECTION',
   PARAGRAPH = 'PARAGRAPH'
+}
+
+export interface GQLConditionalInput {
+  fieldId: string
+  regexp: string
 }
 
 export interface GQLPayment {
