@@ -240,7 +240,7 @@ export const GetHistory = ({
         />
       ),
     type: intl.formatMessage(
-      item.dhis2Notification && !item.user?.role
+      (item.dhis2Notification && !item.user?.role) || null === item.user?.role
         ? userMessages.healthSystem
         : userMessages[item?.user?.role as string]
     ),
@@ -304,7 +304,7 @@ export const GetHistory = ({
         />
         {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
-            initialPage={currentPageNumber}
+            currentPage={currentPageNumber}
             totalPages={Math.ceil(
               allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}

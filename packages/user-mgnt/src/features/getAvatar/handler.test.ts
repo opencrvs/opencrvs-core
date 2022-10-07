@@ -11,7 +11,7 @@
  */
 import User from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 import * as fetchAny from 'jest-fetch-mock'
 
 const dummyUser = {
@@ -84,6 +84,7 @@ describe('getUserAvatar tests', () => {
     expect(parsedResult).toBeDefined()
   })
   it('returns 200 for if has no avatar for userId', async () => {
+    //@ts-ignore
     delete dummyUser.avatar
     mockingoose(User).toReturn(dummyUser, 'findOne')
     fetch.mockResponse(JSON.stringify({ data: 'buffer' }))

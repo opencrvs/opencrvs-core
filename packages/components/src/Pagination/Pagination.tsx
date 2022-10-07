@@ -18,7 +18,7 @@ import { CircleButton } from '../buttons'
 export type IPaginationVariant = 'small' | 'large' // small for desktop and large for mobile
 
 export interface IPaginationProps {
-  initialPage: number
+  currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
   siblingCount?: number
@@ -83,24 +83,13 @@ const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
   color: ${({ theme, isCurrentPage }) =>
     isCurrentPage ? theme.colors.grey600 : theme.colors.grey400};
 `
-interface IState {
-  canPrevious: boolean
-  canNext: boolean
-  currentPage: number
-}
-
-export class Pagination extends React.Component<IPaginationProps, IState> {
-  constructor(props: IPaginationProps) {
-    super(props)
-
-    const { initialPage, totalPages } = props
-    this.state = {
-      canPrevious: false,
-      canNext: false,
-      currentPage:
-        totalPages > 0 ? (initialPage && initialPage > 0 ? initialPage : 1) : 0
-    }
-  }
+export class Pagination extends React.Component<IPaginationProps> {
+  currentPage = () =>
+    this.props.totalPages > 0
+      ? this.props.currentPage && this.props.currentPage > 0
+        ? this.props.currentPage
+        : 1
+      : 0
 
   pageRange = (start: number, end: number) => {
     const length = end - start + 1
@@ -141,27 +130,24 @@ export class Pagination extends React.Component<IPaginationProps, IState> {
     return this.pageRange(1, totalPages)
   }
 
-  canGoToPreviousPage = () => this.state.currentPage > 1
+  canGoToPreviousPage = () => this.currentPage() > 1
 
-  canGoToNextPage = () => this.state.currentPage + 1 <= this.props.totalPages
+  canGoToNextPage = () => this.currentPage() + 1 <= this.props.totalPages
 
   changePage = (page: any) => {
     if (typeof page === 'number') {
-      this.setState(
-        () => ({ currentPage: page }),
-        () => this.props.onPageChange(page)
-      )
+      this.props.onPageChange(page)
     }
   }
 
   renderPages(size: IPaginationVariant) {
     const { totalPages } = this.props
-    const { currentPage } = this.state
+    const currentPage = this.currentPage()
 
     if (currentPage > totalPages) {
       this.changePage(totalPages)
     }
-    const pages = this.paginationRow(this.state.currentPage, totalPages, 1)
+    const pages = this.paginationRow(currentPage, totalPages, 1)
     return (
       <PaginationContainer id="pagination">
         <CircleButton
@@ -186,9 +172,7 @@ export class Pagination extends React.Component<IPaginationProps, IState> {
             >
               <StyledPageNumber
                 size={size}
-                isCurrentPage={
-                  typeof page === 'number' && page === this.state.currentPage
-                }
+                isCurrentPage={typeof page === 'number' && page === currentPage}
               >
                 {page}
               </StyledPageNumber>

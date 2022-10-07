@@ -15,9 +15,7 @@ import { storage } from '@client/storage'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
-  IWorkqueue,
-  filterProcessingDeclarationsFromQuery,
-  updateRegistrarWorkqueue
+  filterProcessingDeclarationsFromQuery
 } from '@client/declarations'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
@@ -37,7 +35,7 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 import { Activity, Users } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -52,7 +50,9 @@ import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import { BUILD_VERSION } from '@client/utils/constants'
 import styled from '@client/styledComponents'
+import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -272,13 +272,12 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.declarationForms
   ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
-  const { loading, error, data, initialSyncDone } = workqueue
+  const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
     data,
     storedDeclarations
   )
   const runningVer = String(localStorage.getItem('running-version'))
-  const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
@@ -321,6 +320,7 @@ export const NavigationView = (props: IFullProps) => {
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       applicationVersion={runningVer}
+      buildVersion={BUILD_VERSION}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
