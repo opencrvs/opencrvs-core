@@ -294,30 +294,32 @@ export const registerForms: IDefaultRegisterForms = {
             id: 'child-view-group',
             fields: [
               {
-                name: 'childBirthDate',
+                name: 'familyNameEng',
+                previewGroup: 'childNameInEnglish',
                 customisable: false,
-                type: 'DATE',
-                label: formMessageDescriptors.childDateOfBirth,
+                type: 'TEXT',
+                label: formMessageDescriptors.childFamilyName,
+                maxLength: 32,
                 required: true,
                 initialValue: '',
                 validate: [
                   {
-                    operation: 'isValidChildBirthDate'
+                    operation: 'englishOnlyNameFormat'
                   }
                 ],
                 mapping: {
                   template: {
-                    operation: 'dateFormatTransformer',
-                    fieldName: 'eventDate',
-                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                    fieldName: 'childFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
                   },
                   mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: ['birthDate']
+                    operation: 'fieldToNameTransformer',
+                    parameters: ['en', 'familyName']
                   },
                   query: {
-                    operation: 'fieldValueTransformer',
-                    parameters: ['birthDate']
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
                   }
                 }
               },
@@ -352,32 +354,30 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'familyNameEng',
-                previewGroup: 'childNameInEnglish',
+                name: 'childBirthDate',
                 customisable: false,
-                type: 'TEXT',
-                label: formMessageDescriptors.childFamilyName,
-                maxLength: 32,
+                type: 'DATE',
+                label: formMessageDescriptors.childDateOfBirth,
                 required: true,
                 initialValue: '',
                 validate: [
                   {
-                    operation: 'englishOnlyNameFormat'
+                    operation: 'isValidChildBirthDate'
                   }
                 ],
                 mapping: {
                   template: {
-                    fieldName: 'childFamilyName',
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'eventDate',
+                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
                   },
                   mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'familyName']
+                    operation: 'longDateTransformer',
+                    parameters: ['birthDate']
                   },
                   query: {
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
+                    operation: 'fieldValueTransformer',
+                    parameters: ['birthDate']
                   }
                 }
               },
@@ -410,66 +410,6 @@ export const registerForms: IDefaultRegisterForms = {
                     label: formMessageDescriptors.childSexUnknown
                   }
                 ]
-              },
-              {
-                name: 'seperator',
-                type: 'SUBSECTION',
-                label: {
-                  defaultMessage: ' ',
-                  description: 'empty string',
-                  id: 'form.field.label.empty'
-                },
-                initialValue: '',
-                ignoreBottomMargin: true,
-                validate: [],
-                conditionals: []
-              },
-              {
-                name: 'birthType',
-                customisable: true,
-                type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Type of birth',
-                  description: 'Label for form field: Type of birth',
-                  id: 'form.field.label.birthType'
-                },
-                required: false,
-                initialValue: '',
-                validate: [],
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                options: [
-                  {
-                    value: 'SINGLE',
-                    label: formMessageDescriptors.birthTypeSingle
-                  },
-                  {
-                    value: 'TWIN',
-                    label: formMessageDescriptors.birthTypeTwin
-                  },
-                  {
-                    value: 'TRIPLET',
-                    label: formMessageDescriptors.birthTypeTriplet
-                  },
-                  {
-                    value: 'QUADRUPLET',
-                    label: formMessageDescriptors.birthTypeQuadruplet
-                  },
-                  {
-                    value: 'HIGHER_MULTIPLE_DELIVERY',
-                    label:
-                      formMessageDescriptors.birthTypeHigherMultipleDelivery
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'sectionFieldToBundleFieldTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'bundleFieldToSectionFieldTransformer',
-                    parameters: []
-                  }
-                }
               },
               {
                 name: 'placeOfBirthTitle',
@@ -555,6 +495,93 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: []
                   }
                 }
+              },
+              {
+                name: 'seperator',
+                type: 'SUBSECTION',
+                label: {
+                  defaultMessage: ' ',
+                  description: 'empty string',
+                  id: 'form.field.label.empty'
+                },
+                initialValue: '',
+                ignoreBottomMargin: true,
+                validate: [],
+                conditionals: []
+              },
+              {
+                name: 'birthType',
+                customisable: true,
+                type: 'SELECT_WITH_OPTIONS',
+                label: {
+                  defaultMessage: 'Type of birth',
+                  description: 'Label for form field: Type of birth',
+                  id: 'form.field.label.birthType'
+                },
+                required: false,
+                initialValue: '',
+                validate: [],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: [
+                  {
+                    value: 'SINGLE',
+                    label: formMessageDescriptors.birthTypeSingle
+                  },
+                  {
+                    value: 'TWIN',
+                    label: formMessageDescriptors.birthTypeTwin
+                  },
+                  {
+                    value: 'TRIPLET',
+                    label: formMessageDescriptors.birthTypeTriplet
+                  },
+                  {
+                    value: 'QUADRUPLET',
+                    label: formMessageDescriptors.birthTypeQuadruplet
+                  },
+                  {
+                    value: 'HIGHER_MULTIPLE_DELIVERY',
+                    label:
+                      formMessageDescriptors.birthTypeHigherMultipleDelivery
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'sectionFieldToBundleFieldTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'bundleFieldToSectionFieldTransformer',
+                    parameters: []
+                  }
+                }
+              },
+              {
+                name: 'weightAtBirth',
+                type: 'NUMBER',
+                step: 0.01,
+                label: formMessageDescriptors.weightAtBirth,
+                customisable: true,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [0, 6]
+                  }
+                ],
+                postfix: 'Kg',
+                mapping: {
+                  mutation: {
+                    operation: 'sectionFieldToBundleFieldTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'bundleFieldToSectionFieldTransformer',
+                    parameters: []
+                  }
+                },
+                inputFieldWidth: '78px'
               }
             ],
             previewGroups: [
