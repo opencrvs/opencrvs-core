@@ -1173,9 +1173,41 @@ export const registerForms: IDefaultRegisterForms = {
                     ]
                   }
                 }
+              },
+              {
+                name: 'registrationPhone',
+                type: 'TEL',
+                label: formMessageDescriptors.phoneNumber,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'phoneNumberFormat'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'changeHirerchyMutationTransformer',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      {
+                        operation: 'msisdnTransformer',
+                        parameters: ['registration.contactPhoneNumber']
+                      }
+                    ]
+                  },
+                  query: {
+                    operation: 'changeHirerchyQueryTransformer',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      {
+                        operation: 'localPhoneTransformer',
+                        parameters: ['registration.contactPhoneNumber']
+                      }
+                    ]
+                  }
+                }
               }
-              // PRIMARY ADDRESS SUBSECTION
-              // PRIMARY ADDRESS
             ],
             previewGroups: [
               {

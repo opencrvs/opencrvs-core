@@ -191,6 +191,23 @@ export const changeHirerchyQueryTransformer =
     field: IFormField,
     nestedField: IFormField
   ) => {
+    if (!nestedField && transformedFieldName) {
+      transformedData[sectionId][field.name] = get(
+        queryData,
+        transformedFieldName
+      )
+
+      if (transformerMethod) {
+        const clonedTransformedData = cloneDeep(transformedData)
+        transformerMethod(clonedTransformedData, queryData, sectionId, field)
+
+        transformedData[sectionId][field.name] =
+          clonedTransformedData[sectionId][field.name]
+      }
+
+      return transformedData
+    }
+
     if (transformedFieldName) {
       transformedData[sectionId][field.name]['nestedFields'][nestedField.name] =
         get(queryData, transformedFieldName)
