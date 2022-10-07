@@ -61,13 +61,22 @@ function downloadURI(uri: string, name: string) {
 }
 
 function TabContent(props: VSExportProps) {
+  const intl = useIntl()
   const items: VsExport[] = props.items
   return (
     <>
       {items.map((item: VsExport) => {
-        /* TODO: These need to be content managed */
-        const sizeValue = `${item.year}-Farajaland-${item.event}-event-statistics.csv (${item.fileSize})`
-        const fileName = `${item.year}-Farajaland-${item.event}-event-statistics.csv`
+        const fileName = intl.formatMessage(messages.vitalStatisticsExport, {
+          year: item.year,
+          event: item.event,
+          fileSize: ''
+        })
+        const sizeValue = intl.formatMessage(messages.vitalStatisticsExport, {
+          year: item.year,
+          event: item.event,
+          fileSize: item.fileSize
+        })
+
         return (
           <ListViewSimplified key={`${item.createdOn}_${item.event}`}>
             <ListViewItemSimplified
@@ -81,8 +90,7 @@ function TabContent(props: VSExportProps) {
                     downloadURI(`${MINIO_URL}${item.url}`, fileName)
                   }
                 >
-                  {/* TODO: This need to be content managed */}
-                  {'Export'}
+                  {messages.export.defaultMessage}
                 </DynamicHeightLinkButton>
               }
             />
