@@ -203,6 +203,24 @@ export const typeResolvers: GQLResolver = {
           educationalAttainmentExtension.valueString) ||
         null
       )
+    },
+    stateOfOrigin: (person) => {
+      const stateOfOriginExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/state-of-origin`,
+        person.extension
+      )
+      return (
+        (stateOfOriginExtension && stateOfOriginExtension.valueString) || null
+      )
+    },
+    ethnicOrigin: (person) => {
+      const ethnicOriginExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/ethnic-origin`,
+        person.extension
+      )
+      return (
+        (ethnicOriginExtension && ethnicOriginExtension.valueString) || null
+      )
     }
   },
   RelatedPerson: {

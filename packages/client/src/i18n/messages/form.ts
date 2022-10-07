@@ -9,383 +9,2150 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IFormMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  accountDetails: MessageDescriptor
-  addressLine1: MessageDescriptor
-  addressLine2: MessageDescriptor
-  addressLine3: MessageDescriptor
-  addressLine3UrbanOption: MessageDescriptor
-  addressLine4: MessageDescriptor
-  answer: MessageDescriptor
-  proofOfInformantsID: MessageDescriptor
-  informantName: MessageDescriptor
-  otherInformantType: MessageDescriptor
-  informantsDateOfBirth: MessageDescriptor
-  informantsFamilyName: MessageDescriptor
-  informantsFamilyNameEng: MessageDescriptor
-  informantsGivenNames: MessageDescriptor
-  informantsGivenNamesEng: MessageDescriptor
-  informantsIdType: MessageDescriptor
-  informantsNationality: MessageDescriptor
-  informantsRelationWithChild: MessageDescriptor
-  informantsRelationWithDeceased: MessageDescriptor
-  informantTitle: MessageDescriptor
-  assignedRegistrationOffice: MessageDescriptor
-  assignedRegistrationOfficeGroupTitle: MessageDescriptor
-  attendantAtBirth: MessageDescriptor
-  attendantAtBirthLayperson: MessageDescriptor
-  attendantAtBirthMidwife: MessageDescriptor
-  attendantAtBirthTraditionalBirthAttendant: MessageDescriptor
-  attendantAtBirthNone: MessageDescriptor
-  attendantAtBirthNurse: MessageDescriptor
-  attendantAtBirthOther: MessageDescriptor
-  attendantAtBirthOtherParamedicalPersonnel: MessageDescriptor
-  physician: MessageDescriptor
-  attestedBirthRecord: MessageDescriptor
-  attestedVaccination: MessageDescriptor
-  birthAttendant: MessageDescriptor
-  birthLocation: MessageDescriptor
-  birthMedicalInstitution: MessageDescriptor
-  birthType: MessageDescriptor
-  birthTypeHigherMultipleDelivery: MessageDescriptor
-  birthTypeQuadruplet: MessageDescriptor
-  birthTypeSingle: MessageDescriptor
-  birthTypeTriplet: MessageDescriptor
-  birthTypeTwin: MessageDescriptor
-  causeOfDeathMethod: MessageDescriptor
-  causeOfDeathEstablished: MessageDescriptor
-  causeOfDeathName: MessageDescriptor
-  causeOfDeathNotice: MessageDescriptor
-  causeOfDeathTitle: MessageDescriptor
-  certification: MessageDescriptor
-  changeButtonLabel: MessageDescriptor
-  childDateOfBirth: MessageDescriptor
-  childFamilyName: MessageDescriptor
-  childFamilyNameEng: MessageDescriptor
-  childFirstNames: MessageDescriptor
-  childFirstNamesEng: MessageDescriptor
-  childSex: MessageDescriptor
-  childSexFemale: MessageDescriptor
-  childSexMale: MessageDescriptor
-  childSexOther: MessageDescriptor
-  childSexUnknown: MessageDescriptor
-  childTab: MessageDescriptor
-  childTitle: MessageDescriptor
-  commentsOrNotesDescription: MessageDescriptor
-  commentsOrNotesLabel: MessageDescriptor
-  confirm: MessageDescriptor
-  confirmMotherDetails: MessageDescriptor
-  contactDetailsInformant: MessageDescriptor
-  contactDetailsBoth: MessageDescriptor
-  contactDetailsFather: MessageDescriptor
-  contactDetailsMother: MessageDescriptor
-  country: MessageDescriptor
-  secondaryAddress: MessageDescriptor
-  dateOfMarriage: MessageDescriptor
-  daughter: MessageDescriptor
-  daughterInLaw: MessageDescriptor
-  granddaughter: MessageDescriptor
-  deathAtFacility: MessageDescriptor
-  deathAtOtherLocation: MessageDescriptor
-  deathAtPrivateHome: MessageDescriptor
-  deathDate: MessageDescriptor
-  deathEventName: MessageDescriptor
-  deathEventTitle: MessageDescriptor
-  deathPlace: MessageDescriptor
-  placeOfDeath: MessageDescriptor
-  placeOfDeathOther: MessageDescriptor
-  placeOfDeathSameAsCurrent: MessageDescriptor
-  placeOfDeathSameAsPrimary: MessageDescriptor
-  placeOfDeathType: MessageDescriptor
-  deceasedCurrentAddressSameAsPrimary: MessageDescriptor
-  deceasedDateOfBirth: MessageDescriptor
-  deceasedDeathProof: MessageDescriptor
-  deceasedDoBProof: MessageDescriptor
-  deceasedFamilyName: MessageDescriptor
-  deceasedFamilyNameEng: MessageDescriptor
-  deceasedGivenNames: MessageDescriptor
-  deceasedGivenNamesEng: MessageDescriptor
-  deceasedIDProof: MessageDescriptor
-  deceasedIdType: MessageDescriptor
-  deceasedName: MessageDescriptor
-  deceasedParagraph: MessageDescriptor
-  deceasedPrimaryAddressProof: MessageDescriptor
-  deceasedSex: MessageDescriptor
-  deceasedSexFemale: MessageDescriptor
-  deceasedSexMale: MessageDescriptor
-  nameInEnglishPreviewGroup: MessageDescriptor
-  deceasedSexOther: MessageDescriptor
-  deceasedSexUnknown: MessageDescriptor
-  deceasedTitle: MessageDescriptor
-  defaultLabel: MessageDescriptor
-  deliveryAddress: MessageDescriptor
-  deliveryInstitution: MessageDescriptor
-  deny: MessageDescriptor
-  district: MessageDescriptor
-  docTaxReceipt: MessageDescriptor
-  docTypeBirthCert: MessageDescriptor
-  docTypeChildAgeProof: MessageDescriptor
-  docTypeChildBirthProof: MessageDescriptor
-  docTypeCopyOfBurialReceipt: MessageDescriptor
-  docTypeDeathCertificate: MessageDescriptor
-  docTypePoliceCertificate: MessageDescriptor
-  docTypeDoctorCertificate: MessageDescriptor
-  docTypeEPICard: MessageDescriptor
-  docTypeEPIStaffCertificate: MessageDescriptor
-  docTypeFuneralReceipt: MessageDescriptor
-  docTypeLetterOfDeath: MessageDescriptor
-  docTypeNID: MessageDescriptor
-  docTypeOther: MessageDescriptor
-  docTypePassport: MessageDescriptor
-  docTypePostMortemReport: MessageDescriptor
-  docTypeSC: MessageDescriptor
-  documentNumber: MessageDescriptor
-  documentsName: MessageDescriptor
-  documentsTitle: MessageDescriptor
-  documentsUploadName: MessageDescriptor
-  educationAttainmentISCED1: MessageDescriptor
-  educationAttainmentISCED4: MessageDescriptor
-  educationAttainmentISCED5: MessageDescriptor
-  educationAttainmentNone: MessageDescriptor
-  enterResponse: MessageDescriptor
-  familyName: MessageDescriptor
-  father: MessageDescriptor
-  fatherDateOfBirth: MessageDescriptor
-  fatherEducationAttainment: MessageDescriptor
-  fatherFamilyName: MessageDescriptor
-  fatherFamilyNameEng: MessageDescriptor
-  fatherFirstNames: MessageDescriptor
-  fatherFirstNamesEng: MessageDescriptor
-  fatherName: MessageDescriptor
-  fathersDetailsExist: MessageDescriptor
-  mothersDetailsExist: MessageDescriptor
-  fatherTitle: MessageDescriptor
-  fetchDeceasedDetails: MessageDescriptor
-  fetchFatherDetails: MessageDescriptor
-  fetchIdentifierModalErrorTitle: MessageDescriptor
-  fetchIdentifierModalSuccessTitle: MessageDescriptor
-  fetchIdentifierModalTitle: MessageDescriptor
-  fetchInformantDetails: MessageDescriptor
-  fetchMotherDetails: MessageDescriptor
-  fetchPersonByNIDModalErrorText: MessageDescriptor
-  fetchPersonByNIDModalNetworkErrorText: MessageDescriptor
-  fetchPersonByNIDModalInfo: MessageDescriptor
-  fetchRegistrationModalErrorText: MessageDescriptor
-  fetchRegistrationModalInfo: MessageDescriptor
-  firstNameBn: MessageDescriptor
-  firstNameEn: MessageDescriptor
-  givenNames: MessageDescriptor
-  healthInstitution: MessageDescriptor
-  hospital: MessageDescriptor
-  internationalState: MessageDescriptor
-  internationalDistrict: MessageDescriptor
-  internationalCity: MessageDescriptor
-  internationalAddressLine1: MessageDescriptor
-  internationalAddressLine2: MessageDescriptor
-  internationalAddressLine3: MessageDescriptor
-  internationalPostcode: MessageDescriptor
-  iD: MessageDescriptor
-  iDType: MessageDescriptor
-  iDTypeAlienNumber: MessageDescriptor
-  iDTypeBRN: MessageDescriptor
-  iDTypeDrivingLicense: MessageDescriptor
-  iDTypeDRN: MessageDescriptor
-  iDTypeNationalID: MessageDescriptor
-  iDTypeNoId: MessageDescriptor
-  iDTypeOther: MessageDescriptor
-  iDTypeOtherLabel: MessageDescriptor
-  iDTypePassport: MessageDescriptor
-  iDTypeRefugeeNumber: MessageDescriptor
-  informantAttestation: MessageDescriptor
-  lastNameEn: MessageDescriptor
-  manner: MessageDescriptor
-  mannerAccident: MessageDescriptor
-  mannerHomicide: MessageDescriptor
-  mannerNatural: MessageDescriptor
-  mannerSuicide: MessageDescriptor
-  mannerUndetermined: MessageDescriptor
-  maritalStatus: MessageDescriptor
-  maritalStatusDivorced: MessageDescriptor
-  maritalStatusMarried: MessageDescriptor
-  maritalStatusNotStated: MessageDescriptor
-  maritalStatusSeparated: MessageDescriptor
-  maritalStatusSingle: MessageDescriptor
-  maritalStatusWidowed: MessageDescriptor
-  medicallyCertified: MessageDescriptor
-  deathDescription: MessageDescriptor
-  methodOfCauseOfDeath: MessageDescriptor
-  mother: MessageDescriptor
-  motherDateOfBirth: MessageDescriptor
-  motherEducationAttainment: MessageDescriptor
-  motherFamilyName: MessageDescriptor
-  motherFamilyNameEng: MessageDescriptor
-  motherFirstNames: MessageDescriptor
-  motherFirstNamesEng: MessageDescriptor
-  motherName: MessageDescriptor
-  motherTitle: MessageDescriptor
-  multipleBirth: MessageDescriptor
-  nationality: MessageDescriptor
-  nationalityBangladesh: MessageDescriptor
-  NID: MessageDescriptor
-  officeLocationId: MessageDescriptor
-  optionalLabel: MessageDescriptor
-  otherDocuments: MessageDescriptor
-  otherHealthInstitution: MessageDescriptor
-  otherInstitution: MessageDescriptor
-  otherOption: MessageDescriptor
-  paragraphTargetDaysTo5Years: MessageDescriptor
-  documentsParagraph: MessageDescriptor
-  paragraphAbove5Years: MessageDescriptor
-  deceasedPrimaryAddress: MessageDescriptor
-  primaryAddressSameAsCurrent: MessageDescriptor
-  primaryAddressSameAsOtherPrimary: MessageDescriptor
-  primaryAddressSameAsDeceasedsPrimary: MessageDescriptor
-  phoneNumber: MessageDescriptor
-  phoneVerificationWarning: MessageDescriptor
-  placeOfBirth: MessageDescriptor
-  postCode: MessageDescriptor
-  presentBoth: MessageDescriptor
-  presentFather: MessageDescriptor
-  presentMother: MessageDescriptor
-  presentOther: MessageDescriptor
-  privateHome: MessageDescriptor
-  prompt: MessageDescriptor
-  proofOfBirth: MessageDescriptor
-  proofOfDocCertificateOfChild: MessageDescriptor
-  proofOfEPICardOfChild: MessageDescriptor
-  proofOfFathersID: MessageDescriptor
-  otherBirthSupportingDocuments: MessageDescriptor
-  legalGuardianProof: MessageDescriptor
-  proofOfMothersID: MessageDescriptor
-  proofOfParentPrimaryAddress: MessageDescriptor
-  placeOfBirthPreview: MessageDescriptor
-  registrationName: MessageDescriptor
-  registrationOffice: MessageDescriptor
-  registrationPhoneLabel: MessageDescriptor
-  registrationTitle: MessageDescriptor
-  relationExtendedFamily: MessageDescriptor
-  relationOther: MessageDescriptor
-  relationshipPlaceHolder: MessageDescriptor
-  searchFieldModalTitle: MessageDescriptor
-  searchFieldPlaceHolderText: MessageDescriptor
-  securityQuestionLabel: MessageDescriptor
-  select: MessageDescriptor
-  selectOne: MessageDescriptor
-  selectSecurityQuestion: MessageDescriptor
-  self: MessageDescriptor
-  signedAffidavitConfirmation: MessageDescriptor
-  someoneElse: MessageDescriptor
-  son: MessageDescriptor
-  sonInLaw: MessageDescriptor
-  grandson: MessageDescriptor
-  spouse: MessageDescriptor
-  grandfather: MessageDescriptor
-  grandmother: MessageDescriptor
-  brother: MessageDescriptor
-  sister: MessageDescriptor
-  legalGuardian: MessageDescriptor
-  headOfTheInstitute: MessageDescriptor
-  driverOfTheVehicle: MessageDescriptor
-  ownerOfTheHouse: MessageDescriptor
-  officerInCharge: MessageDescriptor
-  state: MessageDescriptor
-  typeOfDocument: MessageDescriptor
-  uploadDocForChild: MessageDescriptor
-  uploadDocForFather: MessageDescriptor
-  uploadDocForMother: MessageDescriptor
-  uploadDocForOther: MessageDescriptor
-  uploadDocForWhom: MessageDescriptor
-  uploadImage: MessageDescriptor
-  userDetails: MessageDescriptor
-  userDevice: MessageDescriptor
-  userFormReviewTitle: MessageDescriptor
-  userFormSecurityQuestionsDescription: MessageDescriptor
-  userFormSecurityQuestionsHeading: MessageDescriptor
-  userFormSecurityQuestionsTitle: MessageDescriptor
-  userFormTitle: MessageDescriptor
-  verbalAutopsy: MessageDescriptor
-  verbalAutopsyReport: MessageDescriptor
-  warningNotVerified: MessageDescriptor
-  weightAtBirth: MessageDescriptor
-  whatDocToUpload: MessageDescriptor
-  whoIsPresentLabel: MessageDescriptor
-  whoseContactDetailsLabel: MessageDescriptor
-  uploadedList: MessageDescriptor
-  userSignatureAttachmentTitle: MessageDescriptor
-  docTypeCoronersReport: MessageDescriptor
-  userSignatureAttachment: MessageDescriptor
-  userAttachmentSection: MessageDescriptor
-  userSignatureAttachmentDesc: MessageDescriptor
-  addFile: MessageDescriptor
-  uploadFile: MessageDescriptor
-  fileUploadError: MessageDescriptor
-  typeOfId: MessageDescriptor
-  firstName: MessageDescriptor
-  lastName: MessageDescriptor
-  relationship: MessageDescriptor
-  primaryAddress: MessageDescriptor
-  parentDetailsType: MessageDescriptor
-  motherRadioButton: MessageDescriptor
-  fatherRadioButton: MessageDescriptor
-  reasonMNA: MessageDescriptor
-  reasonFNA: MessageDescriptor
-  reasonParentsNotApplying: MessageDescriptor
-  motherDeceasedLabel: MessageDescriptor
-  fatherDeceasedLabel: MessageDescriptor
-  motherCaregiverTypeLabel: MessageDescriptor
-  fatherCaregiverTypeLabel: MessageDescriptor
-  legalGuardianCaregiverTypeLabel: MessageDescriptor
-  parentsCaregiverTypeLabel: MessageDescriptor
-  informantCaregiverTypeLabel: MessageDescriptor
-  otherCaregiverTypeLabel: MessageDescriptor
-  nameFieldLabel: MessageDescriptor
-  reasonNotApplyingFieldLabel: MessageDescriptor
-  reasonMNAPreview: MessageDescriptor
-  reasonFNAPreview: MessageDescriptor
-  tooltipNationalID: MessageDescriptor
-  deceasedFatherSectionName: MessageDescriptor
-  deceasedFatherSectionTitle: MessageDescriptor
-  deceasedFathersFamilyName: MessageDescriptor
-  deceasedFathersFamilyNameEng: MessageDescriptor
-  deceasedFathersGivenNames: MessageDescriptor
-  deceasedFathersGivenNamesEng: MessageDescriptor
-  deceasedMotherSectionName: MessageDescriptor
-  deceasedMotherSectionTitle: MessageDescriptor
-  deceasedMothersFamilyName: MessageDescriptor
-  deceasedMothersFamilyNameEng: MessageDescriptor
-  deceasedMothersGivenNames: MessageDescriptor
-  deceasedMothersGivenNamesEng: MessageDescriptor
-  deceasedSpouseSectionName: MessageDescriptor
-  deceasedSpouseSectionTitle: MessageDescriptor
-  deceasedHasSpouseDetails: MessageDescriptor
-  deceasedHasNoSpouseDetails: MessageDescriptor
-  deceasedSpousesFamilyName: MessageDescriptor
-  deceasedSpousesFamilyNameEng: MessageDescriptor
-  deceasedSpousesGivenNames: MessageDescriptor
-  deceasedSpousesGivenNamesEng: MessageDescriptor
-  certificatePrintInAdvance: MessageDescriptor
-  nationalIdOption: MessageDescriptor
-  brnOption: MessageDescriptor
-  helperTextNID: MessageDescriptor
-  formSelectPlaceholder: MessageDescriptor
-  selectContactPoint: MessageDescriptor
-  reviewLabelMainContact: MessageDescriptor
-  deceasedSecondaryAddressSameAsPrimary: MessageDescriptor
-  deceasedSecondaryAddress: MessageDescriptor
-  informantSecondaryAddressSameAsPrimary: MessageDescriptor
-  informantSecondaryAddress: MessageDescriptor
-  emptyStringForSubSection: MessageDescriptor
-  assignedResponsibilityProof: MessageDescriptor
-}
+export const formMessageDescriptors = {
+  abua: {
+    id: 'form.field.label.ethnicity.abua',
+    description: '',
+    defaultMessage: 'Abua'
+  },
+  adraAdarawa: {
+    id: 'form.field.label.ethnicity.adraAdarawa',
+    description: '',
+    defaultMessage: 'Adra/Adarawa'
+  },
+  adun: {
+    id: 'form.field.label.ethnicity.adun',
+    description: '',
+    defaultMessage: 'Adun'
+  },
+  afcabeya: {
+    id: 'form.field.label.ethnicity.afcabeya',
+    description: '',
+    defaultMessage: 'Afcabeya'
+  },
+  afemai: {
+    id: 'form.field.label.ethnicity.afemai',
+    description: '',
+    defaultMessage: 'Afemai'
+  },
+  afizire: {
+    id: 'form.field.label.ethnicity.afizire',
+    description: '',
+    defaultMessage: 'Afizire'
+  },
+  agatu: {
+    id: 'form.field.label.ethnicity.agatu',
+    description: '',
+    defaultMessage: 'Agatu'
+  },
+  agbassa: {
+    id: 'form.field.label.ethnicity.agbassa',
+    description: '',
+    defaultMessage: 'Agbassa'
+  },
+  agbor: {
+    id: 'form.field.label.ethnicity.agbor',
+    description: '',
+    defaultMessage: 'Agbor'
+  },
+  afo: {
+    id: 'form.field.label.ethnicity.afo',
+    description: '',
+    defaultMessage: 'Afo'
+  },
+  ajowa: {
+    id: 'form.field.label.ethnicity.ajowa',
+    description: '',
+    defaultMessage: 'Ajowa'
+  },
+  akpa: {
+    id: 'form.field.label.ethnicity.akpa',
+    description: '',
+    defaultMessage: 'Akpa'
+  },
+  akwai: {
+    id: 'form.field.label.ethnicity.akwai',
+    description: '',
+    defaultMessage: 'Akwai'
+  },
+  akye: {
+    id: 'form.field.label.ethnicity.akye',
+    description: '',
+    defaultMessage: 'Akye'
+  },
+  alago: {
+    id: 'form.field.label.ethnicity.alago',
+    description: '',
+    defaultMessage: 'Alago'
+  },
+  amamong: {
+    id: 'form.field.label.ethnicity.amamong',
+    description: '',
+    defaultMessage: 'Amamong'
+  },
+  amo: {
+    id: 'form.field.label.ethnicity.amo',
+    description: '',
+    defaultMessage: 'Amo'
+  },
+  ana: {
+    id: 'form.field.label.ethnicity.ana',
+    description: '',
+    defaultMessage: 'Ana'
+  },
+  anaguta: {
+    id: 'form.field.label.ethnicity.anaguta',
+    description: '',
+    defaultMessage: 'Anaguta'
+  },
+  ankwai: {
+    id: 'form.field.label.ethnicity.ankwai',
+    description: '',
+    defaultMessage: 'Ankwai'
+  },
+  annang: {
+    id: 'form.field.label.ethnicity.annang',
+    description: '',
+    defaultMessage: 'Annang'
+  },
+  arab: {
+    id: 'form.field.label.ethnicity.arab',
+    description: '',
+    defaultMessage: 'Arab'
+  },
+  arabo: {
+    id: 'form.field.label.ethnicity.arabo',
+    description: '',
+    defaultMessage: 'Arabo'
+  },
+  arbar: {
+    id: 'form.field.label.ethnicity.arbar',
+    description: '',
+    defaultMessage: 'Arbar'
+  },
+  arugu: {
+    id: 'form.field.label.ethnicity.arugu',
+    description: '',
+    defaultMessage: 'Arugu'
+  },
+  atenAtam: {
+    id: 'form.field.label.ethnicity.atenAtam',
+    description: '',
+    defaultMessage: 'Aten/Atam'
+  },
+  attakar: {
+    id: 'form.field.label.ethnicity.attakar',
+    description: '',
+    defaultMessage: 'Attakar'
+  },
+  auchi: {
+    id: 'form.field.label.ethnicity.auchi',
+    description: '',
+    defaultMessage: 'Auchi'
+  },
+  aulliminden: {
+    id: 'form.field.label.ethnicity.aulliminden',
+    description: '',
+    defaultMessage: 'Aulliminden'
+  },
+  awo: {
+    id: 'form.field.label.ethnicity.awo',
+    description: '',
+    defaultMessage: 'Awo'
+  },
+  ayetoroGbede: {
+    id: 'form.field.label.ethnicity.ayetoroGbede',
+    description: '',
+    defaultMessage: 'Ayetoro Gbede'
+  },
+  badarare: {
+    id: 'form.field.label.ethnicity.badarare',
+    description: '',
+    defaultMessage: 'Badarare'
+  },
+  badeBadawe: {
+    id: 'form.field.label.ethnicity.badeBadawe',
+    description: '',
+    defaultMessage: 'Bade/Badawe'
+  },
+  bafeke: {
+    id: 'form.field.label.ethnicity.bafeke',
+    description: '',
+    defaultMessage: 'Bafeke'
+  },
+  bagathiya: {
+    id: 'form.field.label.ethnicity.bagathiya',
+    description: '',
+    defaultMessage: 'Bagathiya'
+  },
+  baggara: {
+    id: 'form.field.label.ethnicity.baggara',
+    description: '',
+    defaultMessage: 'Baggara'
+  },
+  bagungeBadagire: {
+    id: 'form.field.label.ethnicity.bagungeBadagire',
+    description: '',
+    defaultMessage: 'Bagunge/Badagire'
+  },
+  bahnake: {
+    id: 'form.field.label.ethnicity.bahnake',
+    description: '',
+    defaultMessage: 'Bahnake'
+  },
+  bajiBiji: {
+    id: 'form.field.label.ethnicity.bajiBiji',
+    description: '',
+    defaultMessage: 'Baji/Biji'
+  },
+  bajju: {
+    id: 'form.field.label.ethnicity.bajju',
+    description: '',
+    defaultMessage: 'Bajju'
+  },
+  bambaro: {
+    id: 'form.field.label.ethnicity.bambaro',
+    description: '',
+    defaultMessage: 'Bambaro'
+  },
+  bambuka: {
+    id: 'form.field.label.ethnicity.bambuka',
+    description: '',
+    defaultMessage: 'Bambuka'
+  },
+  bandawa: {
+    id: 'form.field.label.ethnicity.bandawa',
+    description: '',
+    defaultMessage: 'Bandawa'
+  },
+  banguji: {
+    id: 'form.field.label.ethnicity.banguji',
+    description: '',
+    defaultMessage: 'Banguji'
+  },
+  bankalawa: {
+    id: 'form.field.label.ethnicity.bankalawa',
+    description: '',
+    defaultMessage: 'Bankalawa'
+  },
+  bchama: {
+    id: 'form.field.label.ethnicity.bchama',
+    description: '',
+    defaultMessage: 'Bchama'
+  },
+  barabaci: {
+    id: 'form.field.label.ethnicity.barabaci',
+    description: '',
+    defaultMessage: 'Barabaci'
+  },
+  barawa: {
+    id: 'form.field.label.ethnicity.barawa',
+    description: '',
+    defaultMessage: 'Barawa'
+  },
+  bargawa: {
+    id: 'form.field.label.ethnicity.bargawa',
+    description: '',
+    defaultMessage: 'Bargawa'
+  },
+  bassa: {
+    id: 'form.field.label.ethnicity.bassa',
+    description: '',
+    defaultMessage: 'Bassa'
+  },
+  bekworas: {
+    id: 'form.field.label.ethnicity.bekworas',
+    description: '',
+    defaultMessage: 'Bekworas'
+  },
+  berom: {
+    id: 'form.field.label.ethnicity.berom',
+    description: '',
+    defaultMessage: 'Berom'
+  },
+  biniEdo: {
+    id: 'form.field.label.ethnicity.biniEdo',
+    description: '',
+    defaultMessage: 'Bini/Edo'
+  },
+  bogom: {
+    id: 'form.field.label.ethnicity.bogom',
+    description: '',
+    defaultMessage: 'Bogom'
+  },
+  boiyawaBozaya: {
+    id: 'form.field.label.ethnicity.boiyawaBozaya',
+    description: '',
+    defaultMessage: 'Boiyawa/Bozaya'
+  },
+  bolawaBolewa: {
+    id: 'form.field.label.ethnicity.bolawaBolewa',
+    description: '',
+    defaultMessage: 'Bolawa/Bolewa'
+  },
+  buduma: {
+    id: 'form.field.label.ethnicity.buduma',
+    description: '',
+    defaultMessage: 'Buduma'
+  },
+  buko: {
+    id: 'form.field.label.ethnicity.buko',
+    description: '',
+    defaultMessage: 'Buko'
+  },
+  buraBabur: {
+    id: 'form.field.label.ethnicity.buraBabur',
+    description: '',
+    defaultMessage: 'Bura/Babur'
+  },
+  buzu: {
+    id: 'form.field.label.ethnicity.buzu',
+    description: '',
+    defaultMessage: 'Buzu'
+  },
+  byazhi: {
+    id: 'form.field.label.ethnicity.byazhi',
+    description: '',
+    defaultMessage: 'Byazhi'
+  },
+  calabar: {
+    id: 'form.field.label.ethnicity.calabar',
+    description: '',
+    defaultMessage: 'Calabar'
+  },
+  chala: {
+    id: 'form.field.label.ethnicity.chala',
+    description: '',
+    defaultMessage: 'Chala'
+  },
+  chamba: {
+    id: 'form.field.label.ethnicity.chamba',
+    description: '',
+    defaultMessage: 'Chamba'
+  },
+  chiba: {
+    id: 'form.field.label.ethnicity.chiba',
+    description: '',
+    defaultMessage: 'Chiba'
+  },
+  chibokG: {
+    id: 'form.field.label.ethnicity.chibokG',
+    description: '',
+    defaultMessage: 'Chibok(g)'
+  },
+  chip: {
+    id: 'form.field.label.ethnicity.chip',
+    description: '',
+    defaultMessage: 'Chip'
+  },
+  dadiya: {
+    id: 'form.field.label.ethnicity.dadiya',
+    description: '',
+    defaultMessage: 'Dadiya'
+  },
+  badakareDakarkari: {
+    id: 'form.field.label.ethnicity.badakareDakarkari',
+    description: '',
+    defaultMessage: 'Badakare/Dakarkari'
+  },
+  dakkaDoka: {
+    id: 'form.field.label.ethnicity.dakkaDoka',
+    description: '',
+    defaultMessage: 'Dakka/Doka'
+  },
+  dangula: {
+    id: 'form.field.label.ethnicity.dangula',
+    description: '',
+    defaultMessage: 'Dangula'
+  },
+  daurawaDagarawa: {
+    id: 'form.field.label.ethnicity.daurawaDagarawa',
+    description: '',
+    defaultMessage: 'Daurawa/Dagarawa'
+  },
+  defaka: {
+    id: 'form.field.label.ethnicity.defaka',
+    description: '',
+    defaultMessage: 'Defaka'
+  },
+  degima: {
+    id: 'form.field.label.ethnicity.degima',
+    description: '',
+    defaultMessage: 'Degima'
+  },
+  deltaIbo: {
+    id: 'form.field.label.ethnicity.deltaIbo',
+    description: '',
+    defaultMessage: 'Delta Ibo'
+  },
+  dibo: {
+    id: 'form.field.label.ethnicity.dibo',
+    description: '',
+    defaultMessage: 'Dibo'
+  },
+  diguza: {
+    id: 'form.field.label.ethnicity.diguza',
+    description: '',
+    defaultMessage: 'Diguza'
+  },
+  djerma: {
+    id: 'form.field.label.ethnicity.djerma',
+    description: '',
+    defaultMessage: 'Djerma'
+  },
+  dmoko: {
+    id: 'form.field.label.ethnicity.dmoko',
+    description: '',
+    defaultMessage: 'Dmoko'
+  },
+  dolchi: {
+    id: 'form.field.label.ethnicity.dolchi',
+    description: '',
+    defaultMessage: 'Dolchi'
+  },
+  ebiraIgbira: {
+    id: 'form.field.label.ethnicity.ebiraIgbira',
+    description: '',
+    defaultMessage: 'Ebira/Igbira'
+  },
+  ebu: {
+    id: 'form.field.label.ethnicity.ebu',
+    description: '',
+    defaultMessage: 'Ebu'
+  },
+  efik: {
+    id: 'form.field.label.ethnicity.efik',
+    description: '',
+    defaultMessage: 'Efik'
+  },
+  egba: {
+    id: 'form.field.label.ethnicity.egba',
+    description: '',
+    defaultMessage: 'Egba'
+  },
+  egbado: {
+    id: 'form.field.label.ethnicity.egbado',
+    description: '',
+    defaultMessage: 'Egbado'
+  },
+  eggon: {
+    id: 'form.field.label.ethnicity.eggon',
+    description: '',
+    defaultMessage: 'Eggon'
+  },
+  egun: {
+    id: 'form.field.label.ethnicity.egun',
+    description: '',
+    defaultMessage: 'Egun'
+  },
+  eket: {
+    id: 'form.field.label.ethnicity.eket',
+    description: '',
+    defaultMessage: 'Eket'
+  },
+  ekoi: {
+    id: 'form.field.label.ethnicity.ekoi',
+    description: '',
+    defaultMessage: 'Ekoi'
+  },
+  ekpeyeAfisaEpie: {
+    id: 'form.field.label.ethnicity.ekpeyeAfisaEpie',
+    description: '',
+    defaultMessage: 'Ekpeye/Afisa/Epie'
+  },
+  ekulu: {
+    id: 'form.field.label.ethnicity.ekulu',
+    description: '',
+    defaultMessage: 'Ekulu'
+  },
+  eleme: {
+    id: 'form.field.label.ethnicity.eleme',
+    description: '',
+    defaultMessage: 'Eleme'
+  },
+  emu: {
+    id: 'form.field.label.ethnicity.emu',
+    description: '',
+    defaultMessage: 'Emu'
+  },
+  esan: {
+    id: 'form.field.label.ethnicity.esan',
+    description: '',
+    defaultMessage: 'Esan'
+  },
+  etina: {
+    id: 'form.field.label.ethnicity.etina',
+    description: '',
+    defaultMessage: 'Etina'
+  },
+  etsako: {
+    id: 'form.field.label.ethnicity.etsako',
+    description: '',
+    defaultMessage: 'Etsako'
+  },
+  etulo: {
+    id: 'form.field.label.ethnicity.etulo',
+    description: '',
+    defaultMessage: 'Etulo'
+  },
+  hadejawa: {
+    id: 'form.field.label.ethnicity.hadejawa',
+    description: '',
+    defaultMessage: 'Hadejawa'
+  },
+  fanso: {
+    id: 'form.field.label.ethnicity.fanso',
+    description: '',
+    defaultMessage: 'Fanso'
+  },
+  femawa: {
+    id: 'form.field.label.ethnicity.femawa',
+    description: '',
+    defaultMessage: 'Femawa'
+  },
+  fer: {
+    id: 'form.field.label.ethnicity.fer',
+    description: '',
+    defaultMessage: 'Fer'
+  },
+  filiyaFali: {
+    id: 'form.field.label.ethnicity.filiyaFali',
+    description: '',
+    defaultMessage: 'Filiya/Fali'
+  },
+  fon: {
+    id: 'form.field.label.ethnicity.fon',
+    description: '',
+    defaultMessage: 'Fon'
+  },
+  foron: {
+    id: 'form.field.label.ethnicity.foron',
+    description: '',
+    defaultMessage: 'Foron'
+  },
+  french: {
+    id: 'form.field.label.ethnicity.french',
+    description: '',
+    defaultMessage: 'French'
+  },
+  fulani: {
+    id: 'form.field.label.ethnicity.fulani',
+    description: '',
+    defaultMessage: 'Fulani'
+  },
+  gamaku: {
+    id: 'form.field.label.ethnicity.gamaku',
+    description: '',
+    defaultMessage: 'Gamaku'
+  },
+  gamaru: {
+    id: 'form.field.label.ethnicity.gamaru',
+    description: '',
+    defaultMessage: 'Gamaru'
+  },
+  gamuni: {
+    id: 'form.field.label.ethnicity.gamuni',
+    description: '',
+    defaultMessage: 'Gamuni'
+  },
+  ganaGana: {
+    id: 'form.field.label.ethnicity.ganaGana',
+    description: '',
+    defaultMessage: 'Gana Gana'
+  },
+  ganawuri: {
+    id: 'form.field.label.ethnicity.ganawuri',
+    description: '',
+    defaultMessage: 'Ganawuri'
+  },
+  gbajuGbagi: {
+    id: 'form.field.label.ethnicity.gbajuGbagi',
+    description: '',
+    defaultMessage: 'Gbaju/Gbagi'
+  },
+  gedeGudeGai: {
+    id: 'form.field.label.ethnicity.gedeGudeGai',
+    description: '',
+    defaultMessage: 'Gede/Gude/Gai'
+  },
+  gerawa: {
+    id: 'form.field.label.ethnicity.gerawa',
+    description: '',
+    defaultMessage: 'Gerawa'
+  },
+  gizmawa: {
+    id: 'form.field.label.ethnicity.gizmawa',
+    description: '',
+    defaultMessage: 'Gizmawa'
+  },
+  glauda: {
+    id: 'form.field.label.ethnicity.glauda',
+    description: '',
+    defaultMessage: 'Glauda'
+  },
+  gmenchi: {
+    id: 'form.field.label.ethnicity.gmenchi',
+    description: '',
+    defaultMessage: 'Gmenchi'
+  },
+  gomoGamoyaya: {
+    id: 'form.field.label.ethnicity.gomoGamoyaya',
+    description: '',
+    defaultMessage: 'Gomo/Gamoyaya'
+  },
+  gobiriGobirawaBogobiri: {
+    id: 'form.field.label.ethnicity.gobiriGobirawaBogobiri',
+    description: '',
+    defaultMessage: 'Gobiri/Gobirawa/Bogobiri'
+  },
+  gujjurawa: {
+    id: 'form.field.label.ethnicity.gujjurawa',
+    description: '',
+    defaultMessage: 'Gujjurawa'
+  },
+  guemai: {
+    id: 'form.field.label.ethnicity.guemai',
+    description: '',
+    defaultMessage: 'Guemai'
+  },
+  gumbarawa: {
+    id: 'form.field.label.ethnicity.gumbarawa',
+    description: '',
+    defaultMessage: 'Gumbarawa'
+  },
+  gunganchi: {
+    id: 'form.field.label.ethnicity.gunganchi',
+    description: '',
+    defaultMessage: 'Gunganchi'
+  },
+  gwandara: {
+    id: 'form.field.label.ethnicity.gwandara',
+    description: '',
+    defaultMessage: 'Gwandara'
+  },
+  gwantu: {
+    id: 'form.field.label.ethnicity.gwantu',
+    description: '',
+    defaultMessage: 'Gwantu'
+  },
+  hankwe: {
+    id: 'form.field.label.ethnicity.hankwe',
+    description: '',
+    defaultMessage: 'Hankwe'
+  },
+  hausa: {
+    id: 'form.field.label.ethnicity.hausa',
+    description: '',
+    defaultMessage: 'Hausa'
+  },
+  higgi: {
+    id: 'form.field.label.ethnicity.higgi',
+    description: '',
+    defaultMessage: 'Higgi'
+  },
+  ibariba: {
+    id: 'form.field.label.ethnicity.ibariba',
+    description: '',
+    defaultMessage: 'Ibariba'
+  },
+  ibibio: {
+    id: 'form.field.label.ethnicity.ibibio',
+    description: '',
+    defaultMessage: 'Ibibio'
+  },
+  ichen: {
+    id: 'form.field.label.ethnicity.ichen',
+    description: '',
+    defaultMessage: 'Ichen'
+  },
+  idanre: {
+    id: 'form.field.label.ethnicity.idanre',
+    description: '',
+    defaultMessage: 'Idanre'
+  },
+  idoma: {
+    id: 'form.field.label.ethnicity.idoma',
+    description: '',
+    defaultMessage: 'Idoma'
+  },
+  igala: {
+    id: 'form.field.label.ethnicity.igala',
+    description: '',
+    defaultMessage: 'Igala'
+  },
+  igboIbo: {
+    id: 'form.field.label.ethnicity.igboIbo',
+    description: '',
+    defaultMessage: 'Igbo/Ibo'
+  },
+  igede: {
+    id: 'form.field.label.ethnicity.igede',
+    description: '',
+    defaultMessage: 'Igede'
+  },
+  ijawIzon: {
+    id: 'form.field.label.ethnicity.ijawIzon',
+    description: '',
+    defaultMessage: 'Ijaw/Izon'
+  },
+  ijede: {
+    id: 'form.field.label.ethnicity.ijede',
+    description: '',
+    defaultMessage: 'Ijede'
+  },
+  ijeme: {
+    id: 'form.field.label.ethnicity.ijeme',
+    description: '',
+    defaultMessage: 'Ijeme'
+  },
+  ika: {
+    id: 'form.field.label.ethnicity.ika',
+    description: '',
+    defaultMessage: 'Ika'
+  },
+  ikajo: {
+    id: 'form.field.label.ethnicity.ikajo',
+    description: '',
+    defaultMessage: 'Ikajo'
+  },
+  ikara: {
+    id: 'form.field.label.ethnicity.ikara',
+    description: '',
+    defaultMessage: 'Ikara'
+  },
+  ikpeshi: {
+    id: 'form.field.label.ethnicity.ikpeshi',
+    description: '',
+    defaultMessage: 'Ikpeshi'
+  },
+  ikpide: {
+    id: 'form.field.label.ethnicity.ikpide',
+    description: '',
+    defaultMessage: 'Ikpide'
+  },
+  ikulu: {
+    id: 'form.field.label.ethnicity.ikulu',
+    description: '',
+    defaultMessage: 'Ikulu'
+  },
+  ikwere: {
+    id: 'form.field.label.ethnicity.ikwere',
+    description: '',
+    defaultMessage: 'Ikwere'
+  },
+  ilaje: {
+    id: 'form.field.label.ethnicity.ilaje',
+    description: '',
+    defaultMessage: 'Ilaje'
+  },
+  irigwe: {
+    id: 'form.field.label.ethnicity.irigwe',
+    description: '',
+    defaultMessage: 'Irigwe'
+  },
+  ishan: {
+    id: 'form.field.label.ethnicity.ishan',
+    description: '',
+    defaultMessage: 'Ishan'
+  },
+  isoko: {
+    id: 'form.field.label.ethnicity.isoko',
+    description: '',
+    defaultMessage: 'Isoko'
+  },
+  itsekiri: {
+    id: 'form.field.label.ethnicity.itsekiri',
+    description: '',
+    defaultMessage: 'Itsekiri'
+  },
+  jaba: {
+    id: 'form.field.label.ethnicity.jaba',
+    description: '',
+    defaultMessage: 'Jaba'
+  },
+  jajiri: {
+    id: 'form.field.label.ethnicity.jajiri',
+    description: '',
+    defaultMessage: 'Jajiri'
+  },
+  jakatoe: {
+    id: 'form.field.label.ethnicity.jakatoe',
+    description: '',
+    defaultMessage: 'Jakatoe'
+  },
+  jaku: {
+    id: 'form.field.label.ethnicity.jaku',
+    description: '',
+    defaultMessage: 'Jaku'
+  },
+  jara: {
+    id: 'form.field.label.ethnicity.jara',
+    description: '',
+    defaultMessage: 'Jara'
+  },
+  jarawa: {
+    id: 'form.field.label.ethnicity.jarawa',
+    description: '',
+    defaultMessage: 'Jarawa'
+  },
+  jibu: {
+    id: 'form.field.label.ethnicity.jibu',
+    description: '',
+    defaultMessage: 'Jibu'
+  },
+  jonjo: {
+    id: 'form.field.label.ethnicity.jonjo',
+    description: '',
+    defaultMessage: 'Jonjo'
+  },
+  jukun: {
+    id: 'form.field.label.ethnicity.jukun',
+    description: '',
+    defaultMessage: 'Jukun'
+  },
+  kabawa: {
+    id: 'form.field.label.ethnicity.kabawa',
+    description: '',
+    defaultMessage: 'Kabawa'
+  },
+  kadara: {
+    id: 'form.field.label.ethnicity.kadara',
+    description: '',
+    defaultMessage: 'Kadara'
+  },
+  kagoma: {
+    id: 'form.field.label.ethnicity.kagoma',
+    description: '',
+    defaultMessage: 'Kagoma'
+  },
+  kagoro: {
+    id: 'form.field.label.ethnicity.kagoro',
+    description: '',
+    defaultMessage: 'Kagoro'
+  },
+  kaka: {
+    id: 'form.field.label.ethnicity.kaka',
+    description: '',
+    defaultMessage: 'Kaka'
+  },
+  kakanda: {
+    id: 'form.field.label.ethnicity.kakanda',
+    description: '',
+    defaultMessage: 'Kakanda'
+  },
+  kamantam: {
+    id: 'form.field.label.ethnicity.kamantam',
+    description: '',
+    defaultMessage: 'Kamantam'
+  },
+  kambari: {
+    id: 'form.field.label.ethnicity.kambari',
+    description: '',
+    defaultMessage: 'Kambari'
+  },
+  kambuKangu: {
+    id: 'form.field.label.ethnicity.kambuKangu',
+    description: '',
+    defaultMessage: 'Kambu/Kangu'
+  },
+  kamuku: {
+    id: 'form.field.label.ethnicity.kamuku',
+    description: '',
+    defaultMessage: 'Kamuku'
+  },
+  kanakuru: {
+    id: 'form.field.label.ethnicity.kanakuru',
+    description: '',
+    defaultMessage: 'Kanakuru'
+  },
+  kanawa: {
+    id: 'form.field.label.ethnicity.kanawa',
+    description: '',
+    defaultMessage: 'Kanawa'
+  },
+  kaninko: {
+    id: 'form.field.label.ethnicity.kaninko',
+    description: '',
+    defaultMessage: 'Kaninko'
+  },
+  kantanawa: {
+    id: 'form.field.label.ethnicity.kantanawa',
+    description: '',
+    defaultMessage: 'Kantanawa'
+  },
+  kanuriBeriberi: {
+    id: 'form.field.label.ethnicity.kanuriBeriberi',
+    description: '',
+    defaultMessage: 'Kanuri/Beriberi'
+  },
+  manga: {
+    id: 'form.field.label.ethnicity.manga',
+    description: '',
+    defaultMessage: 'Manga'
+  },
+  katafAtyap: {
+    id: 'form.field.label.ethnicity.katafAtyap',
+    description: '',
+    defaultMessage: 'Kataf/Atyap'
+  },
+  kento: {
+    id: 'form.field.label.ethnicity.kento',
+    description: '',
+    defaultMessage: 'Kento'
+  },
+  kibaku: {
+    id: 'form.field.label.ethnicity.kibaku',
+    description: '',
+    defaultMessage: 'Kibaku'
+  },
+  kilba: {
+    id: 'form.field.label.ethnicity.kilba',
+    description: '',
+    defaultMessage: 'Kilba'
+  },
+  kirdi: {
+    id: 'form.field.label.ethnicity.kirdi',
+    description: '',
+    defaultMessage: 'Kirdi'
+  },
+  kodki: {
+    id: 'form.field.label.ethnicity.kodki',
+    description: '',
+    defaultMessage: 'Kodki'
+  },
+  kofyar: {
+    id: 'form.field.label.ethnicity.kofyar',
+    description: '',
+    defaultMessage: 'Kofyar'
+  },
+  kona: {
+    id: 'form.field.label.ethnicity.kona',
+    description: '',
+    defaultMessage: 'Kona'
+  },
+  koro: {
+    id: 'form.field.label.ethnicity.koro',
+    description: '',
+    defaultMessage: 'Koro'
+  },
+  koto: {
+    id: 'form.field.label.ethnicity.koto',
+    description: '',
+    defaultMessage: 'Koto'
+  },
+  kuenuem: {
+    id: 'form.field.label.ethnicity.kuenuem',
+    description: '',
+    defaultMessage: 'Kuenuem'
+  },
+  kumbo: {
+    id: 'form.field.label.ethnicity.kumbo',
+    description: '',
+    defaultMessage: 'Kumbo'
+  },
+  kunkawaKawa: {
+    id: 'form.field.label.ethnicity.kunkawaKawa',
+    description: '',
+    defaultMessage: 'Kunkawa/Kawa'
+  },
+  kurama: {
+    id: 'form.field.label.ethnicity.kurama',
+    description: '',
+    defaultMessage: 'Kurama'
+  },
+  kuteb: {
+    id: 'form.field.label.ethnicity.kuteb',
+    description: '',
+    defaultMessage: 'Kuteb'
+  },
+  kuturm: {
+    id: 'form.field.label.ethnicity.kuturm',
+    description: '',
+    defaultMessage: 'Kuturm'
+  },
+  kwaleUkwuani: {
+    id: 'form.field.label.ethnicity.kwaleUkwuani',
+    description: '',
+    defaultMessage: 'Kwale/Ukwuani'
+  },
+  kwanzo: {
+    id: 'form.field.label.ethnicity.kwanzo',
+    description: '',
+    defaultMessage: 'Kwanzo'
+  },
+  lagelu: {
+    id: 'form.field.label.ethnicity.lagelu',
+    description: '',
+    defaultMessage: 'Lagelu'
+  },
+  lantang: {
+    id: 'form.field.label.ethnicity.lantang',
+    description: '',
+    defaultMessage: 'Lantang'
+  },
+  lemoro: {
+    id: 'form.field.label.ethnicity.lemoro',
+    description: '',
+    defaultMessage: 'Lemoro'
+  },
+  loh: {
+    id: 'form.field.label.ethnicity.loh',
+    description: '',
+    defaultMessage: 'Loh'
+  },
+  lunguda: {
+    id: 'form.field.label.ethnicity.lunguda',
+    description: '',
+    defaultMessage: 'Lunguda'
+  },
+  mabaMbadowa: {
+    id: 'form.field.label.ethnicity.mabaMbadowa',
+    description: '',
+    defaultMessage: 'Maba/Mbadowa'
+  },
+  mada: {
+    id: 'form.field.label.ethnicity.mada',
+    description: '',
+    defaultMessage: 'Mada'
+  },
+  mafaMakaMaga: {
+    id: 'form.field.label.ethnicity.mafaMakaMaga',
+    description: '',
+    defaultMessage: 'Mafa/Maka/Maga'
+  },
+  mambila: {
+    id: 'form.field.label.ethnicity.mambila',
+    description: '',
+    defaultMessage: 'Mambila'
+  },
+  mandara: {
+    id: 'form.field.label.ethnicity.mandara',
+    description: '',
+    defaultMessage: 'Mandara'
+  },
+  mangusManju: {
+    id: 'form.field.label.ethnicity.mangusManju',
+    description: '',
+    defaultMessage: 'Mangus/Manju'
+  },
+  marghiMangi: {
+    id: 'form.field.label.ethnicity.marghiMangi',
+    description: '',
+    defaultMessage: 'Marghi/mangi'
+  },
+  mbwa: {
+    id: 'form.field.label.ethnicity.mbwa',
+    description: '',
+    defaultMessage: 'Mbwa'
+  },
+  mingo: {
+    id: 'form.field.label.ethnicity.mingo',
+    description: '',
+    defaultMessage: 'Mingo'
+  },
+  mirnang: {
+    id: 'form.field.label.ethnicity.mirnang',
+    description: '',
+    defaultMessage: 'Mirnang'
+  },
+  montor: {
+    id: 'form.field.label.ethnicity.montor',
+    description: '',
+    defaultMessage: 'Montor'
+  },
+  mtchigaMichika: {
+    id: 'form.field.label.ethnicity.mtchigaMichika',
+    description: '',
+    defaultMessage: 'Mtchiga/Michika'
+  },
+  mumuye: {
+    id: 'form.field.label.ethnicity.mumuye',
+    description: '',
+    defaultMessage: 'Mumuye'
+  },
+  munga: {
+    id: 'form.field.label.ethnicity.munga',
+    description: '',
+    defaultMessage: 'Munga'
+  },
+  mupung: {
+    id: 'form.field.label.ethnicity.mupung',
+    description: '',
+    defaultMessage: 'Mupung'
+  },
+  mushere: {
+    id: 'form.field.label.ethnicity.mushere',
+    description: '',
+    defaultMessage: 'Mushere'
+  },
+  mwagavol: {
+    id: 'form.field.label.ethnicity.mwagavol',
+    description: '',
+    defaultMessage: 'Mwagavol'
+  },
+  naiawum: {
+    id: 'form.field.label.ethnicity.naiawum',
+    description: '',
+    defaultMessage: 'Naiawum'
+  },
+  namoen: {
+    id: 'form.field.label.ethnicity.namoen',
+    description: '',
+    defaultMessage: 'Namoen'
+  },
+  ndokwa: {
+    id: 'form.field.label.ethnicity.ndokwa',
+    description: '',
+    defaultMessage: 'Ndokwa'
+  },
+  ndola: {
+    id: 'form.field.label.ethnicity.ndola',
+    description: '',
+    defaultMessage: 'Ndola'
+  },
+  ngamo: {
+    id: 'form.field.label.ethnicity.ngamo',
+    description: '',
+    defaultMessage: 'Ngamo'
+  },
+  ukale: {
+    id: 'form.field.label.ethnicity.ukale',
+    description: '',
+    defaultMessage: 'Ukale'
+  },
+  ngoshe: {
+    id: 'form.field.label.ethnicity.ngoshe',
+    description: '',
+    defaultMessage: 'Ngoshe'
+  },
+  nili: {
+    id: 'form.field.label.ethnicity.nili',
+    description: '',
+    defaultMessage: 'Nili'
+  },
+  ninnma: {
+    id: 'form.field.label.ethnicity.ninnma',
+    description: '',
+    defaultMessage: 'Ninnma'
+  },
+  ninzom: {
+    id: 'form.field.label.ethnicity.ninzom',
+    description: '',
+    defaultMessage: 'Ninzom'
+  },
+  nkoroo: {
+    id: 'form.field.label.ethnicity.nkoroo',
+    description: '',
+    defaultMessage: 'Nkoroo'
+  },
+  nnebe: {
+    id: 'form.field.label.ethnicity.nnebe',
+    description: '',
+    defaultMessage: 'Nnebe'
+  },
+  numana: {
+    id: 'form.field.label.ethnicity.numana',
+    description: '',
+    defaultMessage: 'Numana'
+  },
+  nungu: {
+    id: 'form.field.label.ethnicity.nungu',
+    description: '',
+    defaultMessage: 'Nungu'
+  },
+  nunku: {
+    id: 'form.field.label.ethnicity.nunku',
+    description: '',
+    defaultMessage: 'nunku'
+  },
+  nupe: {
+    id: 'form.field.label.ethnicity.nupe',
+    description: '',
+    defaultMessage: 'Nupe'
+  },
+  obubua: {
+    id: 'form.field.label.ethnicity.obubua',
+    description: '',
+    defaultMessage: 'Obubua'
+  },
+  odu: {
+    id: 'form.field.label.ethnicity.odu',
+    description: '',
+    defaultMessage: 'Odu'
+  },
+  ogoja: {
+    id: 'form.field.label.ethnicity.ogoja',
+    description: '',
+    defaultMessage: 'Ogoja'
+  },
+  ogoni: {
+    id: 'form.field.label.ethnicity.ogoni',
+    description: '',
+    defaultMessage: 'Ogoni'
+  },
+  ogugu: {
+    id: 'form.field.label.ethnicity.ogugu',
+    description: '',
+    defaultMessage: 'Ogugu'
+  },
+  okoriOgori: {
+    id: 'form.field.label.ethnicity.okoriOgori',
+    description: '',
+    defaultMessage: 'Okori/Ogori'
+  },
+  omele: {
+    id: 'form.field.label.ethnicity.omele',
+    description: '',
+    defaultMessage: 'Omele'
+  },
+  ora: {
+    id: 'form.field.label.ethnicity.ora',
+    description: '',
+    defaultMessage: 'Ora'
+  },
+  oron: {
+    id: 'form.field.label.ethnicity.oron',
+    description: '',
+    defaultMessage: 'Oron'
+  },
+  owan: {
+    id: 'form.field.label.ethnicity.owan',
+    description: '',
+    defaultMessage: 'Owan'
+  },
+  owo: {
+    id: 'form.field.label.ethnicity.owo',
+    description: '',
+    defaultMessage: 'Owo'
+  },
+  paAwa: {
+    id: 'form.field.label.ethnicity.paAwa',
+    description: '',
+    defaultMessage: "Pa'awa"
+  },
+  paburi: {
+    id: 'form.field.label.ethnicity.paburi',
+    description: '',
+    defaultMessage: 'Paburi'
+  },
+  paibun: {
+    id: 'form.field.label.ethnicity.paibun',
+    description: '',
+    defaultMessage: 'Paibun'
+  },
+  panya: {
+    id: 'form.field.label.ethnicity.panya',
+    description: '',
+    defaultMessage: 'Panya'
+  },
+  pasama: {
+    id: 'form.field.label.ethnicity.pasama',
+    description: '',
+    defaultMessage: 'Pasama'
+  },
+  pero: {
+    id: 'form.field.label.ethnicity.pero',
+    description: '',
+    defaultMessage: 'Pero'
+  },
+  piya: {
+    id: 'form.field.label.ethnicity.piya',
+    description: '',
+    defaultMessage: 'Piya'
+  },
+  pyem: {
+    id: 'form.field.label.ethnicity.pyem',
+    description: '',
+    defaultMessage: 'Pyem'
+  },
+  rukuba: {
+    id: 'form.field.label.ethnicity.rukuba',
+    description: '',
+    defaultMessage: 'Rukuba'
+  },
+  rulere: {
+    id: 'form.field.label.ethnicity.rulere',
+    description: '',
+    defaultMessage: 'Rulere'
+  },
+  rundawa: {
+    id: 'form.field.label.ethnicity.rundawa',
+    description: '',
+    defaultMessage: 'Rundawa'
+  },
+  sayawaSiyawa: {
+    id: 'form.field.label.ethnicity.sayawaSiyawa',
+    description: '',
+    defaultMessage: 'Sayawa/Siyawa'
+  },
+  sekere: {
+    id: 'form.field.label.ethnicity.sekere',
+    description: '',
+    defaultMessage: 'Sekere'
+  },
+  sharawa: {
+    id: 'form.field.label.ethnicity.sharawa',
+    description: '',
+    defaultMessage: 'Sharawa'
+  },
+  shomo: {
+    id: 'form.field.label.ethnicity.shomo',
+    description: '',
+    defaultMessage: 'Shomo'
+  },
+  shuwa: {
+    id: 'form.field.label.ethnicity.shuwa',
+    description: '',
+    defaultMessage: 'Shuwa'
+  },
+  somunka: {
+    id: 'form.field.label.ethnicity.somunka',
+    description: '',
+    defaultMessage: 'Somunka'
+  },
+  sullubawa: {
+    id: 'form.field.label.ethnicity.sullubawa',
+    description: '',
+    defaultMessage: 'Sullubawa'
+  },
+  sura: {
+    id: 'form.field.label.ethnicity.sura',
+    description: '',
+    defaultMessage: 'Sura'
+  },
+  taira: {
+    id: 'form.field.label.ethnicity.taira',
+    description: '',
+    defaultMessage: 'Taira'
+  },
+  tangale: {
+    id: 'form.field.label.ethnicity.tangale',
+    description: '',
+    defaultMessage: 'Tangale'
+  },
+  tarok: {
+    id: 'form.field.label.ethnicity.tarok',
+    description: '',
+    defaultMessage: 'Tarok'
+  },
+  tera: {
+    id: 'form.field.label.ethnicity.tera',
+    description: '',
+    defaultMessage: 'Tera'
+  },
+  teskwa: {
+    id: 'form.field.label.ethnicity.teskwa',
+    description: '',
+    defaultMessage: 'Teskwa'
+  },
+  tiguni: {
+    id: 'form.field.label.ethnicity.tiguni',
+    description: '',
+    defaultMessage: 'Tiguni ( ? )'
+  },
+  tiv: {
+    id: 'form.field.label.ethnicity.tiv',
+    description: '',
+    defaultMessage: 'Tiv'
+  },
+  tiyari: {
+    id: 'form.field.label.ethnicity.tiyari',
+    description: '',
+    defaultMessage: 'Tiyari'
+  },
+  tula: {
+    id: 'form.field.label.ethnicity.tula',
+    description: '',
+    defaultMessage: 'Tula'
+  },
+  ubaija: {
+    id: 'form.field.label.ethnicity.ubaija',
+    description: '',
+    defaultMessage: 'Ubaija'
+  },
+  ugbia: {
+    id: 'form.field.label.ethnicity.ugbia',
+    description: '',
+    defaultMessage: 'Ugbia'
+  },
+  uhionigbe: {
+    id: 'form.field.label.ethnicity.uhionigbe',
+    description: '',
+    defaultMessage: 'Uhionigbe'
+  },
+  ukwuani: {
+    id: 'form.field.label.ethnicity.ukwuani',
+    description: '',
+    defaultMessage: 'Ukwuani'
+  },
+  urhobo: {
+    id: 'form.field.label.ethnicity.urhobo',
+    description: '',
+    defaultMessage: 'Urhobo'
+  },
+  uyo: {
+    id: 'form.field.label.ethnicity.uyo',
+    description: '',
+    defaultMessage: 'Uyo'
+  },
+  uzaurue: {
+    id: 'form.field.label.ethnicity.uzaurue',
+    description: '',
+    defaultMessage: 'Uzaurue'
+  },
+  uzeba: {
+    id: 'form.field.label.ethnicity.uzeba',
+    description: '',
+    defaultMessage: 'Uzeba'
+  },
+  waja: {
+    id: 'form.field.label.ethnicity.waja',
+    description: '',
+    defaultMessage: 'Waja'
+  },
+  waka: {
+    id: 'form.field.label.ethnicity.waka',
+    description: '',
+    defaultMessage: 'Waka'
+  },
+  wanu: {
+    id: 'form.field.label.ethnicity.wanu',
+    description: '',
+    defaultMessage: 'Wanu'
+  },
+  wari: {
+    id: 'form.field.label.ethnicity.wari',
+    description: '',
+    defaultMessage: 'Wari'
+  },
+  warjawa: {
+    id: 'form.field.label.ethnicity.warjawa',
+    description: '',
+    defaultMessage: 'Warjawa'
+  },
+  wodaabe: {
+    id: 'form.field.label.ethnicity.wodaabe',
+    description: '',
+    defaultMessage: 'Wodaabe'
+  },
+  wurkum: {
+    id: 'form.field.label.ethnicity.wurkum',
+    description: '',
+    defaultMessage: 'Wurkum'
+  },
+  yakurr: {
+    id: 'form.field.label.ethnicity.yakurr',
+    description: '',
+    defaultMessage: 'Yakurr'
+  },
+  yandang: {
+    id: 'form.field.label.ethnicity.yandang',
+    description: '',
+    defaultMessage: 'Yandang'
+  },
+  yendre: {
+    id: 'form.field.label.ethnicity.yendre',
+    description: '',
+    defaultMessage: 'Yendre'
+  },
+  yonubi: {
+    id: 'form.field.label.ethnicity.yonubi',
+    description: '',
+    defaultMessage: 'Yonubi'
+  },
+  yoruba: {
+    id: 'form.field.label.ethnicity.yoruba',
+    description: '',
+    defaultMessage: 'Yoruba'
+  },
+  zabarmawa: {
+    id: 'form.field.label.ethnicity.zabarmawa',
+    description: '',
+    defaultMessage: 'Zabarmawa'
+  },
+  kaje: {
+    id: 'form.field.label.ethnicity.kaje',
+    description: '',
+    defaultMessage: 'Kaje'
+  },
+  igbanko: {
+    id: 'form.field.label.ethnicity.igbanko',
+    description: '',
+    defaultMessage: 'Igbanko'
+  },
+  migili: {
+    id: 'form.field.label.ethnicity.migili',
+    description: '',
+    defaultMessage: 'Migili'
+  },
+  gwari: {
+    id: 'form.field.label.ethnicity.gwari',
+    description: '',
+    defaultMessage: 'Gwari'
+  },
+  uru: {
+    id: 'form.field.label.ethnicity.uru',
+    description: '',
+    defaultMessage: 'Uru'
+  },
+  okirika: {
+    id: 'form.field.label.ethnicity.okirika',
+    description: '',
+    defaultMessage: 'Okirika'
+  },
+  egi: {
+    id: 'form.field.label.ethnicity.egi',
+    description: '',
+    defaultMessage: 'Egi'
+  },
+  ogba: {
+    id: 'form.field.label.ethnicity.ogba',
+    description: '',
+    defaultMessage: 'Ogba'
+  },
+  moroa: {
+    id: 'form.field.label.ethnicity.moroa',
+    description: '',
+    defaultMessage: 'Moroa'
+  },
+  marwa: {
+    id: 'form.field.label.ethnicity.marwa',
+    description: '',
+    defaultMessage: 'Marwa'
+  },
+  toff: {
+    id: 'form.field.label.ethnicity.toff',
+    description: '',
+    defaultMessage: 'Toff'
+  },
+  fulfulde: {
+    id: 'form.field.label.ethnicity.fulfulde',
+    description: '',
+    defaultMessage: 'Fulfulde'
+  },
+  kabbaOkun: {
+    id: 'form.field.label.ethnicity.kabbaOkun',
+    description: '',
+    defaultMessage: 'Kabba/Okun'
+  },
+  bakabe: {
+    id: 'form.field.label.ethnicity.bakabe',
+    description: '',
+    defaultMessage: 'Bakabe'
+  },
+  burmanch: {
+    id: 'form.field.label.ethnicity.burmanch',
+    description: '',
+    defaultMessage: 'Burmanch'
+  },
+  kalabari: {
+    id: 'form.field.label.ethnicity.kalabari',
+    description: '',
+    defaultMessage: 'Kalabari'
+  },
+  miship: {
+    id: 'form.field.label.ethnicity.miship',
+    description: '',
+    defaultMessage: 'Miship'
+  },
+  karimjo: {
+    id: 'form.field.label.ethnicity.karimjo',
+    description: '',
+    defaultMessage: 'Karimjo'
+  },
+  kwa: {
+    id: 'form.field.label.ethnicity.kwa',
+    description: '',
+    defaultMessage: 'Kwa'
+  },
+  angas: {
+    id: 'form.field.label.ethnicity.angas',
+    description: '',
+    defaultMessage: 'Angas'
+  },
+  bobari: {
+    id: 'form.field.label.ethnicity.bobari',
+    description: '',
+    defaultMessage: 'Bobari'
+  },
+  yarimawa: {
+    id: 'form.field.label.ethnicity.yarimawa',
+    description: '',
+    defaultMessage: 'Yarimawa'
+  },
+  bakenga: {
+    id: 'form.field.label.ethnicity.bakenga',
+    description: '',
+    defaultMessage: 'Bakenga'
+  },
+  agazawa: {
+    id: 'form.field.label.ethnicity.agazawa',
+    description: '',
+    defaultMessage: 'Agazawa'
+  },
+  gwoza: {
+    id: 'form.field.label.ethnicity.gwoza',
+    description: '',
+    defaultMessage: 'Gwoza'
+  },
+  zalidva: {
+    id: 'form.field.label.ethnicity.zalidva',
+    description: '',
+    defaultMessage: 'Zalidva'
+  },
+  nyangdang: {
+    id: 'form.field.label.ethnicity.nyangdang',
+    description: '',
+    defaultMessage: 'Nyangdang'
+  },
+  ngezim: {
+    id: 'form.field.label.ethnicity.ngezim',
+    description: '',
+    defaultMessage: 'Ngezim'
+  },
+  hanbagda: {
+    id: 'form.field.label.ethnicity.hanbagda',
+    description: '',
+    defaultMessage: 'Hanbagda'
+  },
+  njanyi: {
+    id: 'form.field.label.ethnicity.njanyi',
+    description: '',
+    defaultMessage: 'Njanyi'
+  },
+  dumak: {
+    id: 'form.field.label.ethnicity.dumak',
+    description: '',
+    defaultMessage: 'Dumak'
+  },
+  kwalla: {
+    id: 'form.field.label.ethnicity.kwalla',
+    description: '',
+    defaultMessage: 'Kwalla'
+  },
+  yeskwaAndMubula: {
+    id: 'form.field.label.ethnicity.yeskwaAndMubula',
+    description: '',
+    defaultMessage: 'Yeskwa and Mubula'
+  },
+  bile: {
+    id: 'form.field.label.ethnicity.bile',
+    description: '',
+    defaultMessage: 'Bile'
+  },
+  offa: {
+    id: 'form.field.label.ethnicity.offa',
+    description: '',
+    defaultMessage: 'Offa'
+  },
+  yungur: {
+    id: 'form.field.label.ethnicity.yungur',
+    description: '',
+    defaultMessage: 'Yungur'
+  },
+  puraPura: {
+    id: 'form.field.label.ethnicity.puraPura',
+    description: '',
+    defaultMessage: 'Pura Pura'
+  },
+  rindre: {
+    id: 'form.field.label.ethnicity.rindre',
+    description: '',
+    defaultMessage: 'Rindre'
+  },
+  dukawa: {
+    id: 'form.field.label.ethnicity.dukawa',
+    description: '',
+    defaultMessage: 'Dukawa'
+  },
+  ningi: {
+    id: 'form.field.label.ethnicity.ningi',
+    description: '',
+    defaultMessage: 'Ningi'
+  },
+  cham: {
+    id: 'form.field.label.ethnicity.cham',
+    description: '',
+    defaultMessage: 'Cham'
+  },
+  kamo: {
+    id: 'form.field.label.ethnicity.kamo',
+    description: '',
+    defaultMessage: 'Kamo'
+  },
+  lala: {
+    id: 'form.field.label.ethnicity.lala',
+    description: '',
+    defaultMessage: 'Lala'
+  },
+  laru: {
+    id: 'form.field.label.ethnicity.laru',
+    description: '',
+    defaultMessage: 'Laru'
+  },
+  lisa: {
+    id: 'form.field.label.ethnicity.lisa',
+    description: '',
+    defaultMessage: 'Lisa'
+  },
+  gaanda: {
+    id: 'form.field.label.ethnicity.gaanda',
+    description: '',
+    defaultMessage: 'Gaanda'
+  },
+  ezza: {
+    id: 'form.field.label.ethnicity.ezza',
+    description: '',
+    defaultMessage: 'Ezza'
+  },
+  kubasawa: {
+    id: 'form.field.label.ethnicity.kubasawa',
+    description: '',
+    defaultMessage: 'Kubasawa.'
+  },
+  gusu: {
+    id: 'form.field.label.ethnicity.gusu',
+    description: '',
+    defaultMessage: 'Gusu'
+  },
+  ikpoma: {
+    id: 'form.field.label.ethnicity.ikpoma',
+    description: '',
+    defaultMessage: 'Ikpoma'
+  },
+  buh: {
+    id: 'form.field.label.ethnicity.buh',
+    description: '',
+    defaultMessage: 'Buh'
+  },
+  chakeem: {
+    id: 'form.field.label.ethnicity.chakeem',
+    description: '',
+    defaultMessage: 'Chakeem'
+  },
+  jipal: {
+    id: 'form.field.label.ethnicity.jipal',
+    description: '',
+    defaultMessage: 'Jipal'
+  },
+  ugeb: {
+    id: 'form.field.label.ethnicity.ugeb',
+    description: '',
+    defaultMessage: 'Ugeb'
+  },
+  koma: {
+    id: 'form.field.label.ethnicity.koma',
+    description: '',
+    defaultMessage: 'Koma'
+  },
+  verreKila: {
+    id: 'form.field.label.ethnicity.verreKila',
+    description: '',
+    defaultMessage: 'Verre/Kila'
+  },
+  zuru: {
+    id: 'form.field.label.ethnicity.zuru',
+    description: '',
+    defaultMessage: 'Zuru'
+  },
+  honna: {
+    id: 'form.field.label.ethnicity.honna',
+    description: '',
+    defaultMessage: 'Honna'
+  },
+  kapsiki: {
+    id: 'form.field.label.ethnicity.kapsiki',
+    description: '',
+    defaultMessage: 'Kapsiki'
+  },
+  jere: {
+    id: 'form.field.label.ethnicity.jere',
+    description: '',
+    defaultMessage: 'Jere'
+  },
+  giziYobe: {
+    id: 'form.field.label.ethnicity.giziYobe',
+    description: '',
+    defaultMessage: 'Gizi Yobe'
+  },
+  karekare: {
+    id: 'form.field.label.ethnicity.karekare',
+    description: '',
+    defaultMessage: 'Karekare'
+  },
+  kulere: {
+    id: 'form.field.label.ethnicity.kulere',
+    description: '',
+    defaultMessage: 'Kulere'
+  },
+  beteer: {
+    id: 'form.field.label.ethnicity.beteer',
+    description: '',
+    defaultMessage: 'Beteer'
+  },
+  bashama: {
+    id: 'form.field.label.ethnicity.bashama',
+    description: '',
+    defaultMessage: 'Bashama'
+  },
+  antocha: {
+    id: 'form.field.label.ethnicity.antocha',
+    description: '',
+    defaultMessage: 'Antocha'
+  },
+  barubaBaruntin: {
+    id: 'form.field.label.ethnicity.barubaBaruntin',
+    description: '',
+    defaultMessage: 'Baruba/Baruntin'
+  },
+  nezou: {
+    id: 'form.field.label.ethnicity.nezou',
+    description: '',
+    defaultMessage: 'Nezou'
+  },
+  dibba: {
+    id: 'form.field.label.ethnicity.dibba',
+    description: '',
+    defaultMessage: 'Dibba'
+  },
+  kanum: {
+    id: 'form.field.label.ethnicity.kanum',
+    description: '',
+    defaultMessage: 'Kanum'
+  },
+  gasawa: {
+    id: 'form.field.label.ethnicity.gasawa',
+    description: '',
+    defaultMessage: 'Gasawa'
+  },
+  muryan: {
+    id: 'form.field.label.ethnicity.muryan',
+    description: '',
+    defaultMessage: 'Muryan'
+  },
+  bageri: {
+    id: 'form.field.label.ethnicity.bageri',
+    description: '',
+    defaultMessage: 'Bageri'
+  },
+  ahu: {
+    id: 'form.field.label.ethnicity.ahu',
+    description: '',
+    defaultMessage: 'Ahu'
+  },
+  basange: {
+    id: 'form.field.label.ethnicity.basange',
+    description: '',
+    defaultMessage: 'Basange'
+  },
+  nakere: {
+    id: 'form.field.label.ethnicity.nakere',
+    description: '',
+    defaultMessage: 'Nakere'
+  },
+  batunu: {
+    id: 'form.field.label.ethnicity.batunu',
+    description: '',
+    defaultMessage: 'Batunu'
+  },
+  sanga: {
+    id: 'form.field.label.ethnicity.sanga',
+    description: '',
+    defaultMessage: 'Sanga'
+  },
+  ohari: {
+    id: 'form.field.label.ethnicity.ohari',
+    description: '',
+    defaultMessage: 'Ohari'
+  },
+  numuro: {
+    id: 'form.field.label.ethnicity.numuro',
+    description: '',
+    defaultMessage: 'Numuro'
+  },
 
-export const formMessageDescriptors: IFormMessages = {
+  guruma: {
+    id: 'form.field.label.ethnicity.guruma',
+    description: '',
+    defaultMessage: 'Guruma'
+  },
+  otuwo: {
+    id: 'form.field.label.ethnicity.otuwo',
+    description: '',
+    defaultMessage: 'Otuwo'
+  },
+  batala: {
+    id: 'form.field.label.ethnicity.batala',
+    description: '',
+    defaultMessage: 'Batala'
+  },
+  ogbo: {
+    id: 'form.field.label.ethnicity.ogbo',
+    description: '',
+    defaultMessage: 'Ogbo'
+  },
+  egbema: {
+    id: 'form.field.label.ethnicity.egbema',
+    description: '',
+    defaultMessage: 'Egbema'
+  },
+  dara: {
+    id: 'form.field.label.ethnicity.dara',
+    description: '',
+    defaultMessage: 'Dara'
+  },
+  andoni: {
+    id: 'form.field.label.ethnicity.andoni',
+    description: '',
+    defaultMessage: 'Andoni'
+  },
+  obolo: {
+    id: 'form.field.label.ethnicity.obolo',
+    description: '',
+    defaultMessage: 'Obolo'
+  },
+  pegan: {
+    id: 'form.field.label.ethnicity.pegan',
+    description: '',
+    defaultMessage: 'Pegan'
+  },
+  iyala: {
+    id: 'form.field.label.ethnicity.iyala',
+    description: '',
+    defaultMessage: 'Iyala'
+  },
+  jibawa: {
+    id: 'form.field.label.ethnicity.jibawa',
+    description: '',
+    defaultMessage: 'Jibawa'
+  },
+  mungaduso: {
+    id: 'form.field.label.ethnicity.mungaduso',
+    description: '',
+    defaultMessage: 'Mungaduso'
+  },
+  okobo: {
+    id: 'form.field.label.ethnicity.okobo',
+    description: '',
+    defaultMessage: 'Okobo'
+  },
+  others: {
+    id: 'form.field.label.ethnicity.others',
+    description: '',
+    defaultMessage: 'Others'
+  },
+  dk: {
+    id: 'form.field.label.ethnicity.dk',
+    description: '',
+    defaultMessage: 'DK'
+  },
+  missing: {
+    id: 'form.field.label.ethnicity.missing',
+    description: '',
+    defaultMessage: 'Missing'
+  },
+
+  abia: {
+    id: 'form.field.label.state.abia',
+    defaultMessage: 'Abia',
+    description: 'Label for Abia state'
+  },
+  adamawa: {
+    id: 'form.field.label.state.adamawa',
+    defaultMessage: 'Adamawa',
+    description: 'Label for Adamawa state'
+  },
+  akwa: {
+    id: 'form.field.label.state.akwa',
+    defaultMessage: 'Akwa',
+    description: 'Label for Akwa state'
+  },
+  anambra: {
+    id: 'form.field.label.state.anambra',
+    defaultMessage: 'Anambra',
+    description: 'Label for Anambra state'
+  },
+  bauchi: {
+    id: 'form.field.label.state.bauchi',
+    defaultMessage: 'Bauchi',
+    description: 'Label for Bauchi state'
+  },
+  bayelsa: {
+    id: 'form.field.label.state.bayelsa',
+    defaultMessage: 'Bayelsa',
+    description: 'Label for Bayelsa state'
+  },
+  benue: {
+    id: 'form.field.label.state.benue',
+    defaultMessage: 'Benue',
+    description: 'Label for Benue state'
+  },
+  borno: {
+    id: 'form.field.label.state.borno',
+    defaultMessage: 'Borno',
+    description: 'Label for Borno state'
+  },
+  cross: {
+    id: 'form.field.label.state.cross',
+    defaultMessage: 'Cross',
+    description: 'Label for Cross state'
+  },
+  delta: {
+    id: 'form.field.label.state.delta',
+    defaultMessage: 'Delta',
+    description: 'Label for Delta state'
+  },
+  ebonyi: {
+    id: 'form.field.label.state.ebonyi',
+    defaultMessage: 'Ebonyi',
+    description: 'Label for Ebonyi state'
+  },
+  edo: {
+    id: 'form.field.label.state.edo',
+    defaultMessage: 'Edo',
+    description: 'Label for Edo state'
+  },
+  ekiti: {
+    id: 'form.field.label.state.ekiti',
+    defaultMessage: 'Ekiti',
+    description: 'Label for Ekiti state'
+  },
+  enugu: {
+    id: 'form.field.label.state.enugu',
+    defaultMessage: 'Enugu',
+    description: 'Label for Enugu state'
+  },
+  federal: {
+    id: 'form.field.label.state.federal',
+    defaultMessage: 'Federal',
+    description: 'Label for Federal state'
+  },
+  gombe: {
+    id: 'form.field.label.state.gombe',
+    defaultMessage: 'Gombe',
+    description: 'Label for Gombe state'
+  },
+  imo: {
+    id: 'form.field.label.state.imo',
+    defaultMessage: 'Imo',
+    description: 'Label for Imo state'
+  },
+  jigawa: {
+    id: 'form.field.label.state.jigawa',
+    defaultMessage: 'Jigawa',
+    description: 'Label for Jigawa state'
+  },
+  kaduna: {
+    id: 'form.field.label.state.kaduna',
+    defaultMessage: 'Kaduna',
+    description: 'Label for Kaduna state'
+  },
+  kano: {
+    id: 'form.field.label.state.kano',
+    defaultMessage: 'Kano',
+    description: 'Label for Kano state'
+  },
+  katsina: {
+    id: 'form.field.label.state.katsina',
+    defaultMessage: 'Katsina',
+    description: 'Label for Katsina state'
+  },
+  kebbi: {
+    id: 'form.field.label.state.kebbi',
+    defaultMessage: 'Kebbi',
+    description: 'Label for Kebbi state'
+  },
+  kogi: {
+    id: 'form.field.label.state.kogi',
+    defaultMessage: 'Kogi',
+    description: 'Label for Kogi state'
+  },
+  kwara: {
+    id: 'form.field.label.state.kwara',
+    defaultMessage: 'Kwara',
+    description: 'Label for Kwara state'
+  },
+  lagos: {
+    id: 'form.field.label.state.lagos',
+    defaultMessage: 'Lagos',
+    description: 'Label for Lagos state'
+  },
+  nasarawa: {
+    id: 'form.field.label.state.nasarawa',
+    defaultMessage: 'Nasarawa',
+    description: 'Label for Nasarawa state'
+  },
+  niger: {
+    id: 'form.field.label.state.niger',
+    defaultMessage: 'Niger',
+    description: 'Label for Niger state'
+  },
+  ogun: {
+    id: 'form.field.label.state.ogun',
+    defaultMessage: 'Ogun',
+    description: 'Label for Ogun state'
+  },
+  ondo: {
+    id: 'form.field.label.state.ondo',
+    defaultMessage: 'Ondo',
+    description: 'Label for Ondo state'
+  },
+  osun: {
+    id: 'form.field.label.state.osun',
+    defaultMessage: 'Osun',
+    description: 'Label for Osun state'
+  },
+  oyo: {
+    id: 'form.field.label.state.oyo',
+    defaultMessage: 'Oyo',
+    description: 'Label for Oyo state'
+  },
+  plateau: {
+    id: 'form.field.label.state.plateau',
+    defaultMessage: 'Plateau',
+    description: 'Label for Plateau state'
+  },
+  rivers: {
+    id: 'form.field.label.state.rivers',
+    defaultMessage: 'Rivers',
+    description: 'Label for Rivers state'
+  },
+  sokoto: {
+    id: 'form.field.label.state.sokoto',
+    defaultMessage: 'Sokoto',
+    description: 'Label for Sokoto state'
+  },
+  taraba: {
+    id: 'form.field.label.state.taraba',
+    defaultMessage: 'Taraba',
+    description: 'Label for Taraba state'
+  },
+  yobe: {
+    id: 'form.field.label.state.yobe',
+    defaultMessage: 'Yobe',
+    description: 'Label for Yobe state'
+  },
+  zamfara: {
+    id: 'form.field.label.state.zamfara',
+    defaultMessage: 'Zamfara  ',
+    description: 'Label for Zamfara state'
+  },
   docTypeCoronersReport: {
     defaultMessage: "Coroner's report",
     description: "Label for select option Coroner's report",
     id: 'form.field.label.docTypeCoronersReport'
+  },
+  stateOfOrigin: {
+    defaultMessage: 'State of origin',
+    description: 'Label for select option state of origin',
+    id: 'form.field.label.stateOfOrigin'
+  },
+  ethnicOrigin: {
+    defaultMessage: 'Ethnic origin',
+    description: 'Label for select option ethnic origin',
+    id: 'form.field.label.ethnicOrigin'
   },
   docTypePoliceCertificate: {
     defaultMessage: 'Police certificate of death',
@@ -2286,6 +4053,4 @@ export const formMessageDescriptors: IFormMessages = {
   }
 }
 
-export const formMessages: IFormMessages = defineMessages(
-  formMessageDescriptors
-)
+export const formMessages = defineMessages(formMessageDescriptors)

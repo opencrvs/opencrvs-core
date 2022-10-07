@@ -71,6 +71,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         detailsExist
         reasonNotApplying
         dateOfMarriage
+        stateOfOrigin
+        ethnicOrigin
         educationalAttainment
         nationality
         identifier {
@@ -106,6 +108,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         reasonNotApplying
         dateOfMarriage
         educationalAttainment
+        stateOfOrigin
+        ethnicOrigin
         nationality
         identifier {
           id
@@ -286,6 +290,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         maritalStatus
         dateOfMarriage
         educationalAttainment
+        stateOfOrigin
+        ethnicOrigin
         nationality
         occupation
         detailsExist
@@ -320,6 +326,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         maritalStatus
         dateOfMarriage
         educationalAttainment
+        stateOfOrigin
+        ethnicOrigin
         nationality
         occupation
         detailsExist

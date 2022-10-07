@@ -297,6 +297,8 @@ type Person {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  stateOfOrigin: String
+  ethnicOrigin: String
   dateOfMarriage: Date
   multipleBirth: Int
   address: [Address]
@@ -940,6 +942,8 @@ input PersonInput {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  stateOfOrigin: String
+  ethnicOrigin: String
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]
