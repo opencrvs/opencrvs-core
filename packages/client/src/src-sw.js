@@ -81,6 +81,14 @@ workbox.routing.registerRoute(
   new workbox.strategies.NetworkFirst()
 )
 
+// This caches the minio urls
+workbox.routing.registerRoute(
+  import.meta.env.PROD
+    ? /http(.+)document\.opencrvs\.org\/+/
+    : /http(.+)localhost:9000\/+/,
+  new workbox.strategies.NetworkFirst()
+)
+
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
