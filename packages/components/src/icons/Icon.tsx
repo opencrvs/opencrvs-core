@@ -11,7 +11,7 @@
  */
 
 import * as React from 'react'
-import { colors } from '@opencrvs/components/lib/colors'
+import { colors } from '../colors'
 import { IconSize, IPropsIcon } from './utils'
 import * as FeatherIcons from 'react-feather'
 
