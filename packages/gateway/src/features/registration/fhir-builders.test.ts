@@ -1061,6 +1061,7 @@ describe('checkUserAssignment()', () => {
     fetch.mockResponseOnce(JSON.stringify(mockTaskBundle))
     mockUserDetails.practitionerId = '1325'
     fetch.mockResponse(JSON.stringify(mockUserDetails))
+    //@ts-ignore
     delete authHeaderRegCert.Authorization
     const bundle = await checkUserAssignment(
       '5d027bc403b93b17526323f6',
@@ -1073,6 +1074,7 @@ describe('checkUserAssignment()', () => {
     fetch.mockResponseOnce(JSON.stringify(mockTask))
     mockUserDetails.practitionerId = '1325'
     fetch.mockResponse(JSON.stringify(mockUserDetails))
+    //@ts-ignore
     delete authHeaderRegCert.Authorization
     const bundle = await checkUserAssignment(
       '5d027bc403b93b17526323f6',

@@ -130,7 +130,7 @@ describe('In Progress tab', () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    expect(history.location.pathname).toBe(
+    expect(history.location.pathname).toContain(
       formatUrl(REGISTRAR_HOME_TAB, {
         tabId: WORKQUEUE_TABS.inProgress,
         selectorId: SELECTOR_ID.ownDrafts
@@ -143,7 +143,7 @@ describe('In Progress tab', () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    expect(history.location.pathname).toBe(
+    expect(history.location.pathname).toContain(
       formatUrl(REGISTRAR_HOME_TAB, {
         tabId: WORKQUEUE_TABS.inProgress,
         selectorId: SELECTOR_ID.fieldAgentDrafts

@@ -16,7 +16,7 @@ import { declarationReadyForStatusChange } from './declarations/submissionMiddle
 import { Action, SubmissionAction } from '@client/forms'
 import { isNavigatorOnline } from './utils'
 
-type ArrayElement<ArrayType extends readonly unknown[]> =
+export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never
 
 export type IRetryStatus = ArrayElement<typeof ALLOWED_STATUS_FOR_RETRY>
