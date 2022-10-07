@@ -10,15 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import TimeoutLink from '@client/utils/timeoutLink'
-import { gql } from '@apollo/client'
 import {
+  gql,
   ApolloLink,
   Observable,
   Operation,
   execute,
   GraphQLRequest,
   FetchResult
-} from 'apollo-link'
+} from '@apollo/client'
 
 const testOperation: GraphQLRequest = {
   query: gql`

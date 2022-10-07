@@ -39,7 +39,6 @@ describe('ForgotPIN tests', () => {
       setUserDetails({
         loading: false,
         networkStatus: NetworkStatus.ready,
-        stale: false,
         data: {
           getUser: {
             userMgntUserID: '5eba726866458970cf2e23c2',
