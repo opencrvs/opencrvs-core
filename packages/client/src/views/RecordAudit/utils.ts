@@ -378,7 +378,7 @@ export const getDraftDeclarationData = (
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
           ?.nestedFields as IContactPointPhone
-      )?.registrationPhone.toString() || EMPTY_STRING
+      )?.registrationPhone?.toString() || EMPTY_STRING
   }
 }
 

@@ -584,91 +584,6 @@ export const registerForms: IDefaultRegisterForms = {
                 inputFieldWidth: '78px'
               },
               {
-                name: 'placeOfBirthTitle',
-                type: 'SUBSECTION',
-                label: formMessageDescriptors.placeOfBirthPreview,
-                previewGroup: 'placeOfBirth',
-                ignoreBottomMargin: true,
-                initialValue: '',
-                validate: []
-              },
-              {
-                name: 'placeOfBirth',
-                customisable: false,
-                type: 'SELECT_WITH_OPTIONS',
-                previewGroup: 'placeOfBirth',
-                ignoreFieldLabelOnErrorMessage: true,
-                label: formMessageDescriptors.placeOfBirth,
-                required: true,
-                initialValue: '',
-                validate: [],
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                options: [
-                  {
-                    value: 'HEALTH_FACILITY',
-                    label: formMessageDescriptors.healthInstitution
-                  },
-                  {
-                    value: 'PRIVATE_HOME',
-                    label: formMessageDescriptors.privateHome
-                  },
-                  {
-                    value: 'OTHER',
-                    label: formMessageDescriptors.otherInstitution
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'birthEventLocationMutationTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'eventLocationTypeQueryTransformer',
-                    parameters: []
-                  }
-                }
-              },
-              {
-                name: 'birthLocation',
-                customisable: false,
-                type: 'LOCATION_SEARCH_INPUT',
-                label: formMessageDescriptors.healthInstitution,
-                previewGroup: 'placeOfBirth',
-                required: true,
-                initialValue: '',
-                searchableResource: 'facilities',
-                searchableType: 'HEALTH_FACILITY',
-                dynamicOptions: {
-                  resource: 'facilities'
-                },
-                validate: [
-                  {
-                    operation: 'facilityMustBeSelected'
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression: '(values.placeOfBirth!="HEALTH_FACILITY")'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    fieldName: 'placeOfBirth',
-                    operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
-                  },
-                  mutation: {
-                    operation: 'birthEventLocationMutationTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'eventLocationIDQueryTransformer',
-                    parameters: []
-                  }
-                }
-              },
-              {
                 name: 'multipleBirth',
                 type: 'NUMBER',
                 label: {
@@ -722,47 +637,6 @@ export const registerForms: IDefaultRegisterForms = {
               }
             ],
             fields: [
-              {
-                name: 'informantID',
-                type: 'TEXT',
-                label: formMessageDescriptors.iDTypeNationalID,
-                required: false,
-                customisable: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'validIDNumber',
-                    parameters: ['NATIONAL_ID']
-                  },
-                  {
-                    operation: 'duplicateIDNumber',
-                    parameters: ['deceased.iD']
-                  }
-                ],
-                conditionals: [],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldToIdentityTransformer',
-                        parameters: ['id', 'NATIONAL_ID']
-                      }
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'identityToFieldTransformer',
-                        parameters: ['id', 'NATIONAL_ID']
-                      }
-                    ]
-                  }
-                }
-              },
               {
                 name: 'firstNamesEng',
                 previewGroup: 'informantNameInEnglish',
@@ -846,6 +720,19 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
+                name: 'seperator',
+                type: 'SUBSECTION',
+                label: {
+                  defaultMessage: ' ',
+                  description: 'empty string',
+                  id: 'form.field.label.empty'
+                },
+                initialValue: '',
+                ignoreBottomMargin: true,
+                validate: [],
+                conditionals: []
+              },
+              {
                 name: 'registrationPhone',
                 type: 'TEL',
                 label: formMessageDescriptors.phoneNumber,
@@ -874,6 +761,47 @@ export const registerForms: IDefaultRegisterForms = {
                       {
                         operation: 'localPhoneTransformer',
                         parameters: ['registration.contactPhoneNumber']
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'informantID',
+                type: 'TEXT',
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: false,
+                customisable: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'validIDNumber',
+                    parameters: ['NATIONAL_ID']
+                  },
+                  {
+                    operation: 'duplicateIDNumber',
+                    parameters: ['deceased.iD']
+                  }
+                ],
+                conditionals: [],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToIdentityTransformer',
+                        parameters: ['id', 'NATIONAL_ID']
+                      }
+                    ]
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'identityToFieldTransformer',
+                        parameters: ['id', 'NATIONAL_ID']
                       }
                     ]
                   }
