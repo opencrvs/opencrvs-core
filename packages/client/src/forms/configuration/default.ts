@@ -732,58 +732,6 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: []
               },
               {
-                name: 'attendantAtBirth',
-                customisable: true,
-                type: 'SELECT_WITH_OPTIONS',
-                label: formMessageDescriptors.attendantAtBirth,
-                required: false,
-                initialValue: '',
-                validate: [],
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                options: [
-                  {
-                    value: 'PHYSICIAN',
-                    label: formMessageDescriptors.physician
-                  },
-                  {
-                    value: 'NURSE',
-                    label: formMessageDescriptors.attendantAtBirthNurse
-                  },
-                  {
-                    value: 'MIDWIFE',
-                    label: formMessageDescriptors.attendantAtBirthMidwife
-                  },
-                  {
-                    value: 'OTHER_PARAMEDICAL_PERSONNEL',
-                    label:
-                      formMessageDescriptors.attendantAtBirthOtherParamedicalPersonnel
-                  },
-                  {
-                    value: 'LAYPERSON',
-                    label: formMessageDescriptors.attendantAtBirthLayperson
-                  },
-                  {
-                    value: 'TRADITIONAL_BIRTH_ATTENDANT',
-                    label:
-                      formMessageDescriptors.attendantAtBirthTraditionalBirthAttendant
-                  },
-                  {
-                    value: 'NONE',
-                    label: formMessageDescriptors.attendantAtBirthNone
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'sectionFieldToBundleFieldTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'bundleFieldToSectionFieldTransformer',
-                    parameters: []
-                  }
-                }
-              },
-              {
                 name: 'birthType',
                 customisable: true,
                 type: 'SELECT_WITH_OPTIONS',
@@ -829,33 +777,6 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: []
                   }
                 }
-              },
-              {
-                name: 'weightAtBirth',
-                type: 'NUMBER',
-                step: 0.01,
-                label: formMessageDescriptors.weightAtBirth,
-                customisable: true,
-                required: false,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'range',
-                    parameters: [0, 6]
-                  }
-                ],
-                postfix: 'Kg',
-                mapping: {
-                  mutation: {
-                    operation: 'sectionFieldToBundleFieldTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'bundleFieldToSectionFieldTransformer',
-                    parameters: []
-                  }
-                },
-                inputFieldWidth: '78px'
               },
               {
                 name: 'placeOfBirthTitle',
