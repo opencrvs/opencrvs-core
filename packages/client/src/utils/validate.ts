@@ -654,6 +654,18 @@ export const greaterThanZero: Validation = (value: IFormFieldValue) => {
     : { message: messages.greaterThanZero }
 }
 
+export const isInBetween =
+  (minValue: number, maxValue: number): Validation =>
+  (value: IFormFieldValue) => {
+    const numericValue = Number.parseInt(value as string)
+    return value &&
+      !Number.isNaN(numericValue) &&
+      numericValue <= maxValue &&
+      numericValue >= minValue
+      ? undefined
+      : { message: messages.isInBetween, props: { maxValue, minValue } }
+  }
+
 export const notGreaterThan =
   (maxValue: number): Validation =>
   (value: IFormFieldValue) => {
