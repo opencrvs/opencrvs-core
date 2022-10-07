@@ -636,6 +636,48 @@ function createMaritalStatusBuilder(
   }
 }
 
+function createEthnicOriginBuilder(resource: fhir.Patient, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+
+  const hasEthnicOrigin = resource.extension.find(
+    (extention) =>
+      extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/ethnic-origin`
+  )
+
+  if (hasEthnicOrigin) {
+    hasEthnicOrigin.valueString = fieldValue
+  } else {
+    resource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/ethnic-origin`,
+      valueString: fieldValue
+    })
+  }
+}
+
+function createStateOfOriginBuilder(
+  resource: fhir.Patient,
+  fieldValue: string
+) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+
+  const hasStateOfOrigin = resource.extension.find(
+    (extention) =>
+      extention.url === `${OPENCRVS_SPECIFICATION_URL}extension/state-of-origin`
+  )
+
+  if (hasStateOfOrigin) {
+    hasStateOfOrigin.valueString = fieldValue
+  } else {
+    resource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/state-of-origin`,
+      valueString: fieldValue
+    })
+  }
+}
 function createOccupationBulder(resource: fhir.Patient, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
@@ -1155,6 +1197,22 @@ export const builders: IFieldBuilders = {
       )
       return createMaritalStatusBuilder(person, fieldValue as string)
     },
+    stateOfOrigin: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
+      return createStateOfOriginBuilder(person, fieldValue as string)
+    },
+    ethnicOrigin: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
+      return createEthnicOriginBuilder(person, fieldValue as string)
+    },
     occupation: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         MOTHER_CODE,
@@ -1277,6 +1335,22 @@ export const builders: IFieldBuilders = {
         fhirBundle
       )
       return createOccupationBulder(person, fieldValue as string)
+    },
+    stateOfOrigin: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
+      return createStateOfOriginBuilder(person, fieldValue as string)
+    },
+    ethnicOrigin: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
+      return createEthnicOriginBuilder(person, fieldValue as string)
     },
     detailsExist: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(

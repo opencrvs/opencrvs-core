@@ -162,6 +162,8 @@ export interface GQLPerson {
   occupation?: string
   detailsExist?: boolean
   reasonNotApplying?: string
+  stateOfOrigin?: string
+  ethnicOrigin?: string
   dateOfMarriage?: GQLDate
   multipleBirth?: number
   address?: Array<GQLAddress | null>
@@ -828,6 +830,8 @@ export interface GQLPersonInput {
   occupation?: string
   detailsExist?: boolean
   reasonNotApplying?: string
+  stateOfOrigin?: string
+  ethnicOrigin?: string
   dateOfMarriage?: GQLDate
   multipleBirth?: number
   address?: Array<GQLAddressInput | null>
@@ -2938,6 +2942,8 @@ export interface GQLPersonTypeResolver<TParent = any> {
   occupation?: PersonToOccupationResolver<TParent>
   detailsExist?: PersonToDetailsExistResolver<TParent>
   reasonNotApplying?: PersonToReasonNotApplyingResolver<TParent>
+  stateOfOrigin?: PersonToStateOfOriginResolver<TParent>
+  ethnicOrigin?: PersonToEthnicOriginResolver<TParent>
   dateOfMarriage?: PersonToDateOfMarriageResolver<TParent>
   multipleBirth?: PersonToMultipleBirthResolver<TParent>
   address?: PersonToAddressResolver<TParent>
@@ -2995,6 +3001,14 @@ export interface PersonToReasonNotApplyingResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToStateOfOriginResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToEthnicOriginResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
