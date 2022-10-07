@@ -146,6 +146,18 @@ export const changeHirerchyMutationTransformer =
     field: IFormField,
     nestedField: IFormField
   ) => {
+    if (!nestedField && transformedFieldName) {
+      set(
+        transformedData,
+        transformedFieldName,
+        draftData[sectionId][field.name] || ''
+      )
+
+      if (transformerMethod) {
+        transformerMethod(transformedData, draftData, sectionId, field)
+      }
+      return
+    }
     const nestedFieldValueObj: IFormSectionData = (
       draftData[sectionId][field.name] as IFormSectionData
     ).nestedFields as IFormSectionData
