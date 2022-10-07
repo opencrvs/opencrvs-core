@@ -582,6 +582,112 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 },
                 inputFieldWidth: '78px'
+              },
+              {
+                name: 'placeOfBirthTitle',
+                type: 'SUBSECTION',
+                label: formMessageDescriptors.placeOfBirthPreview,
+                previewGroup: 'placeOfBirth',
+                ignoreBottomMargin: true,
+                initialValue: '',
+                validate: []
+              },
+              {
+                name: 'placeOfBirth',
+                customisable: false,
+                type: 'SELECT_WITH_OPTIONS',
+                previewGroup: 'placeOfBirth',
+                ignoreFieldLabelOnErrorMessage: true,
+                label: formMessageDescriptors.placeOfBirth,
+                required: true,
+                initialValue: '',
+                validate: [],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: [
+                  {
+                    value: 'HEALTH_FACILITY',
+                    label: formMessageDescriptors.healthInstitution
+                  },
+                  {
+                    value: 'PRIVATE_HOME',
+                    label: formMessageDescriptors.privateHome
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.otherInstitution
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'birthEventLocationMutationTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'eventLocationTypeQueryTransformer',
+                    parameters: []
+                  }
+                }
+              },
+              {
+                name: 'birthLocation',
+                customisable: false,
+                type: 'LOCATION_SEARCH_INPUT',
+                label: formMessageDescriptors.healthInstitution,
+                previewGroup: 'placeOfBirth',
+                required: true,
+                initialValue: '',
+                searchableResource: 'facilities',
+                searchableType: 'HEALTH_FACILITY',
+                dynamicOptions: {
+                  resource: 'facilities'
+                },
+                validate: [
+                  {
+                    operation: 'facilityMustBeSelected'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '(values.placeOfBirth!="HEALTH_FACILITY")'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'placeOfBirth',
+                    operation: 'eventLocationNameQueryOfflineTransformer',
+                    parameters: ['facilities']
+                  },
+                  mutation: {
+                    operation: 'birthEventLocationMutationTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'eventLocationIDQueryTransformer',
+                    parameters: []
+                  }
+                }
+              },
+              {
+                name: 'multipleBirth',
+                type: 'NUMBER',
+                label: {
+                  defaultMessage: 'No. of previous births',
+                  description: 'Label for form field: multipleBirth',
+                  id: 'form.field.label.multipleBirth'
+                },
+                customisable: true,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'greaterThanZero'
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [2]
+                  }
+                ]
               }
             ],
             previewGroups: [
