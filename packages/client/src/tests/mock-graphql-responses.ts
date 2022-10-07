@@ -72,7 +72,7 @@ export const birthDeclarationForReview = {
     detailsExist: true,
     reasonNotApplying: null,
     dateOfMarriage: null,
-    educationalAttainment: 'FIRST_STAGE_TERTIARY_ISCED_5',
+    educationalAttainment: 'KORANIC',
     nationality: ['FAR'],
     identifier: [
       {
@@ -113,7 +113,7 @@ export const birthDeclarationForReview = {
     detailsExist: true,
     reasonNotApplying: null,
     dateOfMarriage: null,
-    educationalAttainment: 'FIRST_STAGE_TERTIARY_ISCED_5',
+    educationalAttainment: 'KORANIC',
     nationality: ['FAR'],
     identifier: [
       {

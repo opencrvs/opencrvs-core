@@ -1273,6 +1273,12 @@
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "TRADITIONAL_BIRTH_ATTENDANT",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "possibleTypes": null
@@ -4622,49 +4628,55 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "FIRST_STAGE_TERTIARY_ISCED_5",
+            "name": "HIGHER_SCHOOL",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "LOWER_SECONDARY_ISCED_2",
+            "name": "KORANIC",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "NOT_STATED",
+            "name": "MODERN",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "NO_SCHOOLING",
+            "name": "NO_EDUCATION",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "POST_SECONDARY_ISCED_4",
+            "name": "N_A",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "PRIMARY_ISCED_1",
+            "name": "POLYTECNIC_NCE",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "SECOND_STAGE_TERTIARY_ISCED_6",
+            "name": "PRIMARY",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "UPPER_SECONDARY_ISCED_3",
+            "name": "SECONDARY",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "UNIVERSITY",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
