@@ -18,16 +18,11 @@ import {
 } from '@auth/features/verifyCode/service'
 import {
   getStoredUserInformation,
-  createToken
+  createToken,
+  postUserActionToMetrics
 } from '@auth/features/authenticate/service'
 import { logger } from '@auth/logger'
-import {
-  WEB_USER_JWT_AUDIENCES,
-  JWT_ISSUER,
-  METRICS_URL
-} from '@auth/constants'
-import { resolve } from 'url'
-import fetch from 'node-fetch'
+import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IVerifyPayload {
   nonce: string
@@ -52,7 +47,6 @@ export default async function authenticateHandler(
   const { userId, scope, practitionerId } = await getStoredUserInformation(
     nonce
   )
-  console.log(userId, scope, practitionerId)
   const token = await createToken(
     userId,
     scope,
@@ -62,20 +56,7 @@ export default async function authenticateHandler(
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
 
-  // Log user audit event for logged in
-  const url = resolve(METRICS_URL, '/audit/events')
-  const body = { practitionerId: practitionerId, action: 'LOGGED_IN' }
-  const authentication = 'Bearer ' + response.token
-
-  await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authentication
-    }
-  })
-
+  await postUserActionToMetrics('LOGGED_IN', practitionerId, response.token)
   return response
 }
 

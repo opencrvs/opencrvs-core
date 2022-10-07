@@ -17,7 +17,8 @@ import {
   CONFIG_TOKEN_EXPIRY_SECONDS,
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   PRODUCTION,
-  QA_ENV
+  QA_ENV,
+  METRICS_URL
 } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -214,4 +215,22 @@ export function verifyToken(token: string): ITokenPayload {
 
 export function getPublicKey() {
   return publicCert
+}
+
+export async function postUserActionToMetrics(
+  action: string,
+  practitionerId: string,
+  token: string
+) {
+  const url = resolve(METRICS_URL, '/audit/events')
+  const body = { practitionerId: practitionerId, action: action }
+  const authentication = 'Bearer ' + token
+  await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authentication
+    }
+  })
 }

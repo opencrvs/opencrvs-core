@@ -13,18 +13,20 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
 import { invalidateToken } from '@auth/features/invalidateToken/service'
+import { postUserActionToMetrics } from '@auth/features/authenticate/service'
 
 interface IInvalidateTokenPayload {
   token: string
+  practitionerId: string
 }
 
 export default async function invalidateTokenHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { token } = request.payload as IInvalidateTokenPayload
-
+  const { token, practitionerId } = request.payload as IInvalidateTokenPayload
   try {
+    await postUserActionToMetrics('LOGGED_OUT', practitionerId, token)
     await invalidateToken(token)
   } catch (err) {
     throw internal('Failed to invalidate token', err)
@@ -34,5 +36,6 @@ export default async function invalidateTokenHandler(
 }
 
 export const reqInvalidateTokenSchema = Joi.object({
-  token: Joi.string()
+  token: Joi.string(),
+  practitionerId: Joi.string()
 })

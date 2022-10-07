@@ -60,6 +60,8 @@ interface IUserSetupMessages
   unAssignedAuditAction: MessageDescriptor
   correctedAuditAction: MessageDescriptor
   archivedAuditAction: MessageDescriptor
+  loggedInAuditAction: MessageDescriptor
+  loggedOutAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -300,6 +302,16 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Archived',
     description: 'Description for declaration archived',
     id: 'user.profile.auditList.archived'
+  },
+  loggedInAuditAction: {
+    defaultMessage: 'Logged In',
+    description: 'Description for user logged in',
+    id: 'user.profile.auditList.loggedIn'
+  },
+  loggedOutAuditAction: {
+    defaultMessage: 'Logged Out',
+    description: 'Description for user logged out',
+    id: 'user.profile.auditList.loggedOut'
   }
 }
 

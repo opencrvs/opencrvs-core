@@ -158,7 +158,9 @@ const AuditDescriptionMapping: {
   ASSIGNED: messages.assignedAuditAction,
   UNASSIGNED: messages.unAssignedAuditAction,
   CORRECTED: messages.correctedAuditAction,
-  ARCHIVED: messages.archivedAuditAction
+  ARCHIVED: messages.archivedAuditAction,
+  LOGGED_IN: messages.loggedInAuditAction,
+  LOGGED_OUT: messages.loggedOutAuditAction
 }
 
 export function getUserAuditDescription(
