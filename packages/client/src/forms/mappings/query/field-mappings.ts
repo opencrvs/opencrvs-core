@@ -421,6 +421,24 @@ export const eventLocationTypeQueryTransformer =
     return transformedData
   }
 
+export const eventLocationOtherTypeQueryTransformer =
+  () =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    if (!queryData.eventLocation || queryData.eventLocation.type !== 'OTHER') {
+      return transformedData
+    }
+    if (queryData.eventLocation.description) {
+      transformedData[sectionId][field.name] =
+        queryData.eventLocation.description
+    }
+    return transformedData
+  }
+
 export const eventLocationIDQueryTransformer =
   () =>
   (

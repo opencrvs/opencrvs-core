@@ -3184,6 +3184,27 @@ export const builders: IFieldBuilders = {
       )
       encounterLocationRef.reference = `Location/${fieldValue}`
     },
+    description: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      let location
+      if (context.event === EVENT_TYPE.BIRTH) {
+        location = selectOrCreateLocationRefResource(
+          BIRTH_ENCOUNTER_CODE,
+          fhirBundle,
+          context
+        )
+      } else {
+        location = selectOrCreateLocationRefResource(
+          DEATH_ENCOUNTER_CODE,
+          fhirBundle,
+          context
+        )
+      }
+      location.description = fieldValue
+    },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       let location
       if (context.event === EVENT_TYPE.BIRTH) {

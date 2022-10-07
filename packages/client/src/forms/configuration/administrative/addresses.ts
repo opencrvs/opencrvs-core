@@ -18,7 +18,7 @@ import {
   ISerializedForm,
   IPreviewGroup
 } from '@client/forms/index'
-import { formMessageDescriptors } from '@client/i18n/messages'
+import { formMessageDescriptors, formMessages } from '@client/i18n/messages'
 import { MessageDescriptor } from 'react-intl'
 import { cloneDeep } from 'lodash'
 import { getFieldIdentifiers } from '@client/forms/questionConfig'
@@ -2684,6 +2684,60 @@ export function getPlaceOfEventAddressFields(
   configCase: EventLocationAddressCases
 ): SerializedFormField[] {
   return [
+    {
+      name: 'otherType',
+      customisable: false,
+      type: 'SELECT_WITH_OPTIONS',
+      label: {
+        defaultMessage: 'Type of place',
+        description: 'Title for "other" type select',
+        id: 'form.field.labedl.country'
+      },
+      previewGroup: configCase,
+      required: true,
+      initialValue: '',
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
+      },
+      options: [
+        {
+          value: 'TRADITIONAL_DOCTORS',
+          label: formMessages.placeOfBirthTraditionalDoctors
+        },
+        { value: 'CAR_TAXI', label: formMessages.placeOfBirthCarTaxi },
+        { value: 'BUS', label: formMessages.placeOfBirthBus },
+        { value: 'TRAIN', label: formMessages.placeOfBirthTrain },
+        { value: 'ROADSIDE', label: formMessages.placeOfBirthRoadside },
+        { value: 'AEROPLANE', label: formMessages.placeOfBirthAeroplane },
+        { value: 'SHIP', label: formMessages.placeOfBirthShip },
+        {
+          value: 'TRADITIONAL_MATERNITY_HOMES',
+          label: formMessages.placeOfBirthTraditionalMaternityHomes
+        }
+      ],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: `values.${configCase}!="OTHER"`
+        }
+      ],
+      mapping: {
+        mutation: {
+          operation:
+            configCase === EventLocationAddressCases.PLACE_OF_BIRTH
+              ? 'birthEventLocationMutationTransformer'
+              : 'deathEventLocationMutationTransformer',
+          parameters: []
+        },
+        query: {
+          operation: 'eventLocationOtherTypeQueryTransformer',
+          parameters: []
+        }
+      }
+    },
     {
       name: 'country',
       customisable: false,

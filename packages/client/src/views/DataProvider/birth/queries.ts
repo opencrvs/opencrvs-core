@@ -165,6 +165,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       eventLocation {
         id
         type
+        description
         address {
           line
           district
@@ -411,6 +412,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       eventLocation {
         id
         type
+        description
         address {
           line
           district

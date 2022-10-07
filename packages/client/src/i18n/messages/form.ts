@@ -381,6 +381,14 @@ interface IFormMessages
   informantSecondaryAddress: MessageDescriptor
   emptyStringForSubSection: MessageDescriptor
   assignedResponsibilityProof: MessageDescriptor
+  placeOfBirthTraditionalDoctors: MessageDescriptor
+  placeOfBirthCarTaxi: MessageDescriptor
+  placeOfBirthBus: MessageDescriptor
+  placeOfBirthTrain: MessageDescriptor
+  placeOfBirthRoadside: MessageDescriptor
+  placeOfBirthAeroplane: MessageDescriptor
+  placeOfBirthShip: MessageDescriptor
+  placeOfBirthTraditionalMaternityHomes: MessageDescriptor
 }
 
 export const formMessageDescriptors: IFormMessages = {
@@ -1608,6 +1616,48 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Location',
     description: 'Label for form field: Place of delivery',
     id: 'form.field.label.placeOfBirth'
+  },
+  placeOfBirthTraditionalDoctors: {
+    defaultMessage: 'Traditional Doctors',
+    description:
+      'Label for place of delivery other option "Traditional Doctors"',
+    id: 'form.field.label.placeOfBirth.traditionalDoctors'
+  },
+  placeOfBirthCarTaxi: {
+    defaultMessage: 'Car/Taxi',
+    description: 'Label for place of delivery other option "Car/Taxi"',
+    id: 'form.field.label.placeOfBirth.carTaxi'
+  },
+  placeOfBirthBus: {
+    defaultMessage: 'Bus',
+    description: 'Label for place of delivery other option "Bus"',
+    id: 'form.field.label.placeOfBirth.bus'
+  },
+  placeOfBirthTrain: {
+    defaultMessage: 'Train',
+    description: 'Label for place of delivery other option "Train"',
+    id: 'form.field.label.placeOfBirth.train'
+  },
+  placeOfBirthRoadside: {
+    defaultMessage: 'Roadside',
+    description: 'Label for place of delivery other option "Roadside"',
+    id: 'form.field.label.placeOfBirth.roadside'
+  },
+  placeOfBirthAeroplane: {
+    defaultMessage: 'Aeroplane',
+    description: 'Label for place of delivery other option "Aeroplane"',
+    id: 'form.field.label.placeOfBirth.aeroplane'
+  },
+  placeOfBirthShip: {
+    defaultMessage: 'Ship',
+    description: 'Label for place of delivery other option "Ship"',
+    id: 'form.field.label.placeOfBirth.ship'
+  },
+  placeOfBirthTraditionalMaternityHomes: {
+    defaultMessage: 'Traditional Maternity Homes',
+    description:
+      'Label for place of delivery other option "Traditional Maternity Homes"',
+    id: 'form.field.label.placeOfBirth.traditionalMaternityHomes'
   },
   nameInEnglishPreviewGroup: {
     defaultMessage: 'English name',

@@ -147,6 +147,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       eventLocation {
         id
         type
+        description
         address {
           type
           line
@@ -385,6 +386,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       eventLocation {
         id
         type
+        description
         address {
           type
           line
