@@ -24,7 +24,7 @@ import {
   DOWNLOAD_STATUS
 } from '@client/declarations'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { EVENT_STATUS } from '@client/views/OfficeHome/utils'
+import { EVENT_STATUS } from '@client/workqueue'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,

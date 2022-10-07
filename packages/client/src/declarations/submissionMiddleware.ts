@@ -16,9 +16,9 @@ import {
   deleteDeclaration,
   IDeclaration,
   modifyDeclaration,
-  writeDeclaration,
-  updateRegistrarWorkqueue
+  writeDeclaration
 } from '@client/declarations'
+import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { client } from '@client/utils/apolloClient'
 import { getBirthMutation } from '@client/views/DataProvider/birth/mutations'

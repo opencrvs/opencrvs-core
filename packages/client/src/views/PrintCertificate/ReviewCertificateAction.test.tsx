@@ -174,7 +174,7 @@ describe('back button behavior tests of review certificate action', () => {
 
     component.find('#action_page_back_button').hostNodes().simulate('click')
     await flushPromises()
-    expect(history.location.pathname).toBe('/registration-home/print/')
+    expect(history.location.pathname).toContain('/registration-home/print/')
   })
 })
 

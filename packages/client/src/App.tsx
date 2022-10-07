@@ -204,6 +204,13 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            path={
+                                              routes.REGISTRAR_HOME_TAB_PAGE
+                                            }
+                                            component={OfficeHome}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             roles={[
                                               Roles.NATIONAL_SYSTEM_ADMIN
                                             ]}
