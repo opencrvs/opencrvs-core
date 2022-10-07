@@ -31,6 +31,7 @@ interface IAuthResponse {
   mobile: string
   status: string
   token?: string
+  practitionerId: string
 }
 
 export default async function authenticateHandler(
@@ -53,7 +54,8 @@ export default async function authenticateHandler(
   const response: IAuthResponse = {
     mobile: result.mobile,
     status: result.status,
-    nonce
+    nonce,
+    practitionerId: result.practitionerId
   }
 
   const isPendingUser = response.status && response.status === 'pending'
@@ -70,7 +72,8 @@ export default async function authenticateHandler(
       nonce,
       result.userId,
       result.scope,
-      result.mobile
+      result.mobile,
+      result.practitionerId
     )
 
     await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
@@ -87,5 +90,6 @@ export const responseSchema = Joi.object({
   nonce: Joi.string(),
   mobile: Joi.string(),
   status: Joi.string(),
-  token: Joi.string().optional()
+  token: Joi.string().optional(),
+  practitionerId: Joi.string()
 })
