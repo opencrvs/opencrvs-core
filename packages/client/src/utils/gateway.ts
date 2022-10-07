@@ -186,7 +186,8 @@ export enum AttendantType {
   NurseMidwife = 'NURSE_MIDWIFE',
   Other = 'OTHER',
   OtherParamedicalPersonnel = 'OTHER_PARAMEDICAL_PERSONNEL',
-  Physician = 'PHYSICIAN'
+  Physician = 'PHYSICIAN',
+  TraditionalBirthAttendant = 'TRADITIONAL_BIRTH_ATTENDANT'
 }
 
 export type Avatar = {
@@ -576,14 +577,15 @@ export type Dummy = {
 }
 
 export enum EducationType {
-  FirstStageTertiaryIsced_5 = 'FIRST_STAGE_TERTIARY_ISCED_5',
-  LowerSecondaryIsced_2 = 'LOWER_SECONDARY_ISCED_2',
-  NotStated = 'NOT_STATED',
-  NoSchooling = 'NO_SCHOOLING',
-  PostSecondaryIsced_4 = 'POST_SECONDARY_ISCED_4',
-  PrimaryIsced_1 = 'PRIMARY_ISCED_1',
-  SecondStageTertiaryIsced_6 = 'SECOND_STAGE_TERTIARY_ISCED_6',
-  UpperSecondaryIsced_3 = 'UPPER_SECONDARY_ISCED_3'
+  HigherSchool = 'HIGHER_SCHOOL',
+  Koranic = 'KORANIC',
+  Modern = 'MODERN',
+  NoEducation = 'NO_EDUCATION',
+  NA = 'N_A',
+  PolytecnicNce = 'POLYTECNIC_NCE',
+  Primary = 'PRIMARY',
+  Secondary = 'SECONDARY',
+  University = 'UNIVERSITY'
 }
 
 export type Estimation = {
@@ -2394,7 +2396,6 @@ export type FetchBirthRegistrationForReviewQuery = {
     child?: {
       __typename?: 'Person'
       id?: string | null
-      multipleBirth?: number | null
       birthDate?: string | null
       gender?: string | null
       name?: Array<{
@@ -2442,6 +2443,7 @@ export type FetchBirthRegistrationForReviewQuery = {
     mother?: {
       __typename?: 'Person'
       id?: string | null
+      multipleBirth?: number | null
       birthDate?: string | null
       maritalStatus?: MaritalStatusType | null
       occupation?: string | null
@@ -4573,6 +4575,7 @@ export type FetchDeclarationShortInfoQuery = {
         id: string
         child?: {
           __typename?: 'Person'
+          id?: string | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -4582,6 +4585,7 @@ export type FetchDeclarationShortInfoQuery = {
         } | null
         registration?: {
           __typename?: 'Registration'
+          id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
           duplicates?: Array<string | null> | null
@@ -4603,6 +4607,7 @@ export type FetchDeclarationShortInfoQuery = {
         id: string
         deceased?: {
           __typename?: 'Person'
+          id?: string | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -4612,6 +4617,7 @@ export type FetchDeclarationShortInfoQuery = {
         } | null
         registration?: {
           __typename?: 'Registration'
+          id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
           duplicates?: Array<string | null> | null

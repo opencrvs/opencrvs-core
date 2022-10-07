@@ -1622,44 +1622,79 @@ export const registerForms: IDefaultRegisterForms = {
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
-                    value: 'NO_SCHOOLING',
+                    value: 'KORANIC',
                     label: {
-                      defaultMessage: 'No schooling',
-                      description: 'Option for form field: no education',
-                      id: 'form.field.label.educationAttainmentNone'
+                      defaultMessage: 'Koranic',
+                      description: 'Label for education option Koranic',
+                      id: 'form.field.label.educationAttainment.koranic'
                     }
                   },
                   {
-                    value: 'PRIMARY_ISCED_1',
+                    value: 'PRIMARY',
                     label: {
                       defaultMessage: 'Primary',
-                      description: 'Option for form field: ISCED1 education',
-                      id: 'form.field.label.educationAttainmentISCED1'
+                      description: 'Label for education option Primary',
+                      id: 'form.field.label.educationAttainment.primary'
                     }
                   },
                   {
-                    value: 'POST_SECONDARY_ISCED_4',
+                    value: 'MODERN',
+                    label: {
+                      defaultMessage: 'Modern',
+                      description: 'Label for education option Modern',
+                      id: 'form.field.label.educationAttainment.modern'
+                    }
+                  },
+                  {
+                    value: 'SECONDARY',
                     label: {
                       defaultMessage: 'Secondary',
-                      description: 'Option for form field: ISCED4 education',
-                      id: 'form.field.label.educationAttainmentISCED4'
+                      description: 'Label for education option Secondary',
+                      id: 'form.field.label.educationAttainment.secondary'
                     }
                   },
                   {
-                    value: 'FIRST_STAGE_TERTIARY_ISCED_5',
+                    value: 'HIGHER_SCHOOL',
                     label: {
-                      defaultMessage: 'Tertiary',
-                      description: 'Option for form field: ISCED5 education',
-                      id: 'form.field.label.educationAttainmentISCED5'
+                      defaultMessage: 'Higher School',
+                      description: 'Label for education option Higher School',
+                      id: 'form.field.label.educationAttainment.higherSchool'
+                    }
+                  },
+                  {
+                    value: 'POLYTECNIC_NCE',
+                    label: {
+                      defaultMessage: 'Polytecnic/NCE',
+                      description: 'Label for education option Polytecnic/NCE',
+                      id: 'form.field.label.educationAttainment.polytecnicNce'
+                    }
+                  },
+                  {
+                    value: 'UNIVERSITY',
+                    label: {
+                      defaultMessage: 'University',
+                      description: 'Label for education option University',
+                      id: 'form.field.label.educationAttainment.university'
+                    }
+                  },
+                  {
+                    value: 'NO_EDUCATION',
+                    label: {
+                      defaultMessage: 'No Education',
+                      description: 'Label for education option No Education',
+                      id: 'form.field.label.educationAttainment.noEducation'
+                    }
+                  },
+                  {
+                    value: 'N_A',
+                    label: {
+                      defaultMessage: 'N/A',
+                      description: 'Label for education option N/A',
+                      id: 'form.field.label.educationAttainment.nA'
                     }
                   }
                 ]
               }
-              // PRIMARY ADDRESS SUBSECTION
-              // PRIMARY ADDRESS
-              // SECONDARY ADDRESS SAME AS PRIMARY
-              // SECONDARY ADDRESS SUBSECTION
-              // SECONDARY ADDRESS
             ],
             previewGroups: [
               {
@@ -2088,45 +2123,79 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 options: [
                   {
-                    value: 'NO_SCHOOLING',
+                    value: 'KORANIC',
                     label: {
-                      defaultMessage: 'No schooling',
-                      description: 'Option for form field: no education',
-                      id: 'form.field.label.educationAttainmentNone'
+                      defaultMessage: 'Koranic',
+                      description: 'Label for education option Koranic',
+                      id: 'form.field.label.educationAttainment.koranic'
                     }
                   },
                   {
-                    value: 'PRIMARY_ISCED_1',
+                    value: 'PRIMARY',
                     label: {
                       defaultMessage: 'Primary',
-                      description: 'Option for form field: ISCED1 education',
-                      id: 'form.field.label.educationAttainmentISCED1'
+                      description: 'Label for education option Primary',
+                      id: 'form.field.label.educationAttainment.primary'
                     }
                   },
                   {
-                    value: 'POST_SECONDARY_ISCED_4',
+                    value: 'MODERN',
+                    label: {
+                      defaultMessage: 'Modern',
+                      description: 'Label for education option Modern',
+                      id: 'form.field.label.educationAttainment.modern'
+                    }
+                  },
+                  {
+                    value: 'SECONDARY',
                     label: {
                       defaultMessage: 'Secondary',
-                      description: 'Option for form field: ISCED4 education',
-                      id: 'form.field.label.educationAttainmentISCED4'
+                      description: 'Label for education option Secondary',
+                      id: 'form.field.label.educationAttainment.secondary'
                     }
                   },
                   {
-                    value: 'FIRST_STAGE_TERTIARY_ISCED_5',
+                    value: 'HIGHER_SCHOOL',
                     label: {
-                      defaultMessage: 'Tertiary',
-                      description: 'Option for form field: ISCED5 education',
-                      id: 'form.field.label.educationAttainmentISCED5'
+                      defaultMessage: 'Higher School',
+                      description: 'Label for education option Higher School',
+                      id: 'form.field.label.educationAttainment.higherSchool'
+                    }
+                  },
+                  {
+                    value: 'POLYTECNIC_NCE',
+                    label: {
+                      defaultMessage: 'Polytecnic/NCE',
+                      description: 'Label for education option Polytecnic/NCE',
+                      id: 'form.field.label.educationAttainment.polytecnicNce'
+                    }
+                  },
+                  {
+                    value: 'UNIVERSITY',
+                    label: {
+                      defaultMessage: 'University',
+                      description: 'Label for education option University',
+                      id: 'form.field.label.educationAttainment.university'
+                    }
+                  },
+                  {
+                    value: 'NO_EDUCATION',
+                    label: {
+                      defaultMessage: 'No Education',
+                      description: 'Label for education option No Education',
+                      id: 'form.field.label.educationAttainment.noEducation'
+                    }
+                  },
+                  {
+                    value: 'N_A',
+                    label: {
+                      defaultMessage: 'N/A',
+                      description: 'Label for education option N/A',
+                      id: 'form.field.label.educationAttainment.nA'
                     }
                   }
                 ]
               }
-              // PRIMARY ADDRESS SAME AS MOTHER
-              // PRIMARY ADDRESS SUBSECTION
-              // PRIMARY ADDRESS
-              // SECONDARY ADDRESS SAME AS MOTHER
-              // SECONDARY ADDRESS SUBSECTION
-              // SECONDARY ADDRESS
             ],
             previewGroups: [
               {
