@@ -1,0 +1,231 @@
+<!--This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+graphic logo are (registered/a) trademark(s) of Plan International.-->
+
+import { Meta, IconGallery, IconItem } from '@storybook/addon-docs'
+import dedent from 'ts-dedent'
+import { Icon } from './Icon'
+import { ClearText } from './ClearText'
+import { ConnectionError } from './ConnectionError'
+import { Duplicate } from './Duplicate'
+import { Offline } from './Offline'
+import { Online } from './Online'
+import { StatusGray } from './StatusGray'
+import { StatusGreen } from './StatusGreen'
+import { StatusOrange } from './StatusOrange'
+import { StatusProgress } from './StatusProgress'
+import { StatusRejected } from './StatusRejected'
+import { StatusWaiting } from './StatusWaiting'
+import { Validate } from './Validate'
+import { StatusWaitingValidation } from './StatusWaitingValidation'
+import { Tick } from './Tick'
+import { TickOn } from './TickOn'
+import { TickOff } from './TickOff'
+import { IconName } from './utils'
+
+<Meta title="Styles/Iconography" />
+
+# Iconography
+
+#
+
+<IconGallery>
+  <IconItem name="Activity">
+    <Icon name={IconName.Activity} />
+  </IconItem>
+  <IconItem name="AlertCircle">
+    <Icon name={IconName.AlertCircle} />
+  </IconItem>
+  <IconItem name="Archive">
+    <Icon name={IconName.Archive} />
+  </IconItem>
+  <IconItem name="ArrowLeft">
+    <Icon name={IconName.ArrowLeft} />
+  </IconItem>
+  <IconItem name="ArrowRight">
+    <Icon name={IconName.ArrowRight} />
+  </IconItem>
+  <IconItem name="ArrowUp">
+    <Icon name={IconName.ArrowUp} />
+  </IconItem>
+  <IconItem name="ArrowDown">
+    <Icon name={IconName.ArrowDown} />
+  </IconItem>
+  <IconItem name="ArrowDownCircle">
+    <Icon name={IconName.ArrowDownCircle} />
+  </IconItem>
+  <IconItem name="ArrowUpCircle">
+    <Icon name={IconName.ArrowUpCircle} />
+  </IconItem>
+  <IconItem name="Award">
+    <Icon name={IconName.Award} />
+  </IconItem>
+  <IconItem name="Bell">
+    <Icon name={IconName.Bell} />
+  </IconItem>
+  <IconItem name="Box">
+    <Icon name={IconName.Box} />
+  </IconItem>
+  <IconItem name="Calender">
+    <Icon name={IconName.Calendar} />
+  </IconItem>
+  <IconItem name="Check">
+    <Icon name={IconName.Check} />
+  </IconItem>
+  <IconItem name="ChevronLeft">
+    <Icon name={IconName.ChevronLeft} />
+  </IconItem>
+  <IconItem name="ChevronRight">
+    <Icon name={IconName.ChevronRight} />
+  </IconItem>
+  <IconItem name="ChevronUp">
+    <Icon name={IconName.ChevronUp} />
+  </IconItem>
+  <IconItem name="ChevronDown">
+    <Icon name={IconName.ChevronDown} />
+  </IconItem>
+  <IconItem name="ClearText">
+    <ClearText />
+  </IconItem>
+  <IconItem name="Compass">
+    <Icon name={IconName.Compass} />
+  </IconItem>
+  <IconItem name="ConnectionError">
+    <ConnectionError />
+  </IconItem>
+  <IconItem name="Delete">
+    <Icon name={IconName.Delete} />
+  </IconItem>
+  <IconItem name="Duplicate">
+    <Duplicate />
+  </IconItem>
+  <IconItem name="Edit">
+    <Icon name={IconName.Edit} />
+  </IconItem>
+  <IconItem name="Eye">
+    <Icon name={IconName.Eye} />
+  </IconItem>
+  <IconItem name="EyeOff">
+    <Icon name={IconName.EyeOff} />
+  </IconItem>
+  <IconItem name="File">
+    <Icon name={IconName.File} />
+  </IconItem>
+  <IconItem name="HelpCircle">
+    <Icon name={IconName.HelpCircle} />
+  </IconItem>
+  <IconItem name="LogOut">
+    <Icon name={IconName.LogOut} />
+  </IconItem>
+  <IconItem name="MapPin">
+    <Icon name={IconName.MapPin} />
+  </IconItem>
+  <IconItem name="Menu">
+    <Icon name={IconName.Menu} />
+  </IconItem>
+  <IconItem name="Minus">
+    <Icon name={IconName.Minus} />
+  </IconItem>
+  <IconItem name="MoreVertical">
+    <Icon name={IconName.MoreVertical} />
+  </IconItem>
+  <IconItem name="Paperclip">
+    <Icon name={IconName.Paperclip} />
+  </IconItem>
+  <IconItem name="Phone">
+    <Icon name={IconName.Phone} />
+  </IconItem>
+  <IconItem name="Plus">
+    <Icon name={IconName.Plus} />
+  </IconItem>
+  <IconItem name="Printer">
+    <Icon name={IconName.Printer} />
+  </IconItem>
+  <IconItem name="RotateCcw">
+    <Icon name={IconName.RotateCcw} />
+  </IconItem>
+  <IconItem name="RotateCw">
+    <Icon name={IconName.RotateCw} />
+  </IconItem>
+  <IconItem name="Online">
+    <Online />
+  </IconItem>
+  <IconItem name="Offline">
+    <Offline />
+  </IconItem>
+  <IconItem name="Search">
+    <Icon name={IconName.Search} />
+  </IconItem>
+  <IconItem name="Settings">
+    <Icon name={IconName.Settings} />
+  </IconItem>
+  <IconItem name="Share">
+    <Icon name={IconName.Share} />
+  </IconItem>
+  <IconItem name="StatusGray">
+    <StatusGray />
+  </IconItem>
+  <IconItem name="StatusGreen">
+    <StatusGreen />
+  </IconItem>
+  <IconItem name="StatusOrange">
+    <StatusOrange />
+  </IconItem>
+  <IconItem name="StatusProgress">
+    <StatusProgress />
+  </IconItem>
+  <IconItem name="StatusRejected">
+    <StatusRejected />
+  </IconItem>
+  <IconItem name="StatusWaiting">
+    <StatusWaiting />
+  </IconItem>
+  <IconItem name="StatusWaitingValidation">
+    <StatusWaitingValidation />
+  </IconItem>
+  <IconItem name="Target">
+    <Icon name={IconName.Target} />
+  </IconItem>
+  <IconItem name="Tick">
+    <Tick />
+  </IconItem>
+  <IconItem name="TickOn">
+    <TickOn />
+  </IconItem>
+  <IconItem name="TickOff">
+    <TickOff />
+  </IconItem>
+  <IconItem name="Trash2">
+    <Icon name={IconName.Trash2} />
+  </IconItem>
+  <IconItem name="TrendingUp">
+    <Icon name={IconName.TrendingUp} />
+  </IconItem>
+  <IconItem name="User">
+    <Icon name={IconName.User} />
+  </IconItem>
+  <IconItem name="Users">
+    <Icon name={IconName.Users} />
+  </IconItem>
+  <IconItem name="UserPlus">
+    <Icon name={IconName.UserPlus} />
+  </IconItem>
+  <IconItem name="Validate">
+    <Validate />
+  </IconItem>
+  <IconItem name="WifiOff">
+    <Icon name={IconName.WifiOff} />
+  </IconItem>
+  <IconItem name="X">
+    <Icon name={IconName.X} />
+  </IconItem>
+  <IconItem name="XCircle">
+    <Icon name={IconName.XCircle} />
+  </IconItem>
+</IconGallery>
