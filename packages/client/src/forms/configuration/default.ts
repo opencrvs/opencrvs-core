@@ -550,47 +550,6 @@ export const registerForms: IDefaultRegisterForms = {
             ],
             fields: [
               {
-                name: 'firstNamesEng',
-                previewGroup: 'informantNameInEnglish',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'First name(s)',
-                  description: 'Label for form field: Given names',
-                  id: 'form.field.label.childFirstNames'
-                },
-                maxLength: 32,
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'firstNames']
-                      },
-                      'name'
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['en', 'firstNames']
-                      }
-                    ]
-                  }
-                }
-              },
-              {
                 name: 'familyNameEng',
                 previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
@@ -626,6 +585,47 @@ export const registerForms: IDefaultRegisterForms = {
                       {
                         operation: 'nameToFieldTransformer',
                         parameters: ['en', 'familyName']
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'firstNamesEng',
+                previewGroup: 'informantNameInEnglish',
+                type: 'TEXT',
+                label: {
+                  defaultMessage: 'First name(s)',
+                  description: 'Label for form field: Given names',
+                  id: 'form.field.label.childFirstNames'
+                },
+                maxLength: 32,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'firstNames']
+                      },
+                      'name'
+                    ]
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'firstNames']
                       }
                     ]
                   }

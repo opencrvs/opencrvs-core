@@ -99,7 +99,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     configurations: [{ config: EventLocationAddressCases.PLACE_OF_DEATH }]
   },
   {
-    precedingFieldId: 'birth.informant.informant-view-group.familyNameEng',
+    precedingFieldId: 'birth.informant.informant-view-group.firstNamesEng',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
