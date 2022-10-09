@@ -45,6 +45,8 @@ export const birthSectionTitle = {
 }
 
 export const birthDocumentTypeFhirMapping = {
+  VACCINATION_CARD: 'VACCINATION_CARD',
+  BAPTISMAL_CARD: 'BAPTISMAL_CARD',
   BIRTH_CERTIFICATE: 'BIRTH_CERTIFICATE',
   NATIONAL_ID: 'NATIONAL_ID',
   PASSPORT: 'PASSPORT',

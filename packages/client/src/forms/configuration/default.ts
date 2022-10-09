@@ -3088,6 +3088,29 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: []
               },
+              // {
+              //   name: 'uploadDocForB1Form',
+              //   type: 'DOCUMENT_UPLOADER_WITH_OPTION',
+              //   label: formMessageDescriptors.docTypeB1Form,
+              //   initialValue: '',
+              //   extraValue: birthDocumentForWhomFhirMapping.B1_FORM,
+              //   hideAsterisk: true,
+              //   validate: [],
+              //   options: [
+              //     {
+              //       value: birthDocumentTypeFhirMapping.B1_FORM,
+              //       label: formMessageDescriptors.docTypeB1Form
+              //     }
+              //   ],
+              //   mapping: {
+              //     mutation: {
+              //       operation: 'birthFieldToAttachmentTransformer'
+              //     },
+              //     query: {
+              //       operation: 'birthAttachmentToFieldTransformer'
+              //     }
+              //   }
+              // },
               {
                 name: 'uploadDocForChildDOB',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
@@ -3098,12 +3121,22 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [],
                 options: [
                   {
+                    value: birthDocumentTypeFhirMapping.NOTIFICATION_OF_BIRTH,
+                    label: formMessageDescriptors.docTypeChildBirthProof
+                  },
+                  {
                     value: birthDocumentTypeFhirMapping.B1_FORM,
                     label: formMessageDescriptors.docTypeB1Form
                   },
                   {
-                    value: birthDocumentTypeFhirMapping.NOTIFICATION_OF_BIRTH,
-                    label: formMessageDescriptors.docTypeChildBirthProof
+                    value: birthDocumentTypeFhirMapping.VACCINATION_CARD,
+                    label:
+                      formMessageDescriptors.docTypeChildBirthProofVaccinationCard
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.BAPTISMAL_CARD,
+                    label:
+                      formMessageDescriptors.docTypeChildBirthProofBaptismalCard
                   }
                 ],
                 mapping: {
