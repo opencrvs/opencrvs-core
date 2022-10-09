@@ -21,7 +21,12 @@ import { userMessages } from '@client/i18n/messages'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
-import { Event, History, RegStatus } from '@client/utils/gateway'
+import {
+  ContactPointInput,
+  Event,
+  History,
+  RegStatus
+} from '@client/utils/gateway'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
   GQLRegStatus,
@@ -159,6 +164,27 @@ const convertToLocal = (
     )
   )
 }
+
+export const telecomToFieldTransformer =
+  () =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const telecom = queryData[sectionId]?.telecom as
+      | ContactPointInput[]
+      | undefined
+    if (telecom && telecom[0].value) {
+      transformedData[sectionId][field.name] = convertToLocal(
+        telecom[0].value,
+        window.config.COUNTRY
+      )
+    }
+
+    return transformedData
+  }
 
 export const localPhoneTransformer =
   (transformedFieldName?: string, codeReplacement?: string) =>

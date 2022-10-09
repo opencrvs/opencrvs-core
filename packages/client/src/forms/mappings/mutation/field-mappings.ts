@@ -18,6 +18,7 @@ import {
   IFormSectionData,
   IFormFieldMutationMapFunction
 } from '@client/forms'
+import { convertToMSISDN } from '@client/forms/utils'
 import subYears from 'date-fns/subYears'
 import { get, set } from 'lodash'
 
@@ -91,6 +92,25 @@ export const fieldToIdentifierTransformer =
     }
     sectionData.identifier[0][identifierField] =
       draftData[sectionId][field.name]
+    return transformedData
+  }
+
+export const fieldToTelecomTransformer =
+  () =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    transformedData[sectionId].telecom = [
+      {
+        system: 'phone',
+        use: 'mobile',
+        value: convertToMSISDN(draftData[sectionId][field.name].toString())
+      }
+    ]
+
     return transformedData
   }
 

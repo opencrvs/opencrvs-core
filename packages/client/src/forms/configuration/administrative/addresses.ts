@@ -119,7 +119,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    precedingFieldId: 'birth.mother.mother-view-group.educationalAttainment',
+    precedingFieldId: 'birth.mother.mother-view-group.phoneNumber',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -144,7 +144,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    precedingFieldId: 'birth.father.father-view-group.educationalAttainment',
+    precedingFieldId: 'birth.father.father-view-group.phoneNumber',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
