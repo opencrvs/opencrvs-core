@@ -31,7 +31,7 @@ services:
       - --log.level=DEBUG
       - --certificatesresolvers.certResolver.acme.email=yeasin.hossain@dsinnovators.com
       - --certificatesresolvers.certResolver.acme.storage=acme.json
-      - --certificatesresolvers.certResolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.certResolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
       - --certificatesresolvers.certResolver.acme.httpchallenge.entrypoint=web
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
