@@ -83,7 +83,6 @@ import { buttonMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
@@ -119,6 +118,7 @@ import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -311,6 +311,7 @@ function RecordAuditBody({
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
+  const isOnline = useOnlineStatus()
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
@@ -389,6 +390,7 @@ function RecordAuditBody({
         align={ICON_ALIGNMENT.LEFT}
         id="reinstate_button"
         key="reinstate_button"
+        disabled={!isOnline}
         icon={() => <RotateLeft />}
         onClick={toggleDisplayDialog}
       >
@@ -775,7 +777,6 @@ const RecordAuditComp = (props: IFullProps) => {
       }
     >
       <BodyContent {...props} />
-      <NotificationToast />
     </Frame>
   )
 }
