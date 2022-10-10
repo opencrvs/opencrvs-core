@@ -55,7 +55,6 @@ export function storeToken(token: string) {
 }
 
 export function removeToken(practitionerId: string | null | undefined) {
-  console.log('I am inside here ......' + practitionerId)
   const token = getToken()
   if (token) {
     try {

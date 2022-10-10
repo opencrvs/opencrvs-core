@@ -16,6 +16,7 @@ import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import { statuses } from '@user-mgnt/utils/userUtils'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 interface IChangePasswordPayload {
   userId: string
@@ -61,6 +62,11 @@ export default async function changePasswordHandler(
 
   try {
     await User.update({ _id: user._id }, user)
+    await postUserActionToMetrics(
+      'PASSWORD_CHANGED',
+      user.practitionerId,
+      request.headers.authorization
+    )
   } catch (err) {
     logger.error(err.message)
     // return 400 if there is a validation error when updating to mongo

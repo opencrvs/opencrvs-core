@@ -62,6 +62,8 @@ interface IUserSetupMessages
   archivedAuditAction: MessageDescriptor
   loggedInAuditAction: MessageDescriptor
   loggedOutAuditAction: MessageDescriptor
+  phoneNumberChangedAuditAction: MessageDescriptor
+  passwordChangedAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -312,6 +314,16 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Logged Out',
     description: 'Description for user logged out',
     id: 'user.profile.auditList.loggedOut'
+  },
+  phoneNumberChangedAuditAction: {
+    defaultMessage: 'Phone Number Changed',
+    description: 'Description for user change phoneNumber',
+    id: 'user.profile.auditList.phoneNumberChanged'
+  },
+  passwordChangedAuditAction: {
+    defaultMessage: 'Password Changed',
+    description: 'Description for user change password',
+    id: 'user.profile.auditList.passwordChanged'
   }
 }
 
