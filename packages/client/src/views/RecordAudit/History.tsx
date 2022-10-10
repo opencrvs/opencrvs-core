@@ -240,7 +240,7 @@ export const GetHistory = ({
         />
       ),
     type: intl.formatMessage(
-      item.dhis2Notification && !item.user?.role
+      (item.dhis2Notification && !item.user?.role) || null === item.user?.role
         ? userMessages.healthSystem
         : userMessages[item?.user?.role as string]
     ),
