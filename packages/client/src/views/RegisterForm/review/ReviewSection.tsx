@@ -111,7 +111,15 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
+import {
+  flatten,
+  isArray,
+  flattenDeep,
+  get,
+  clone,
+  flatMap,
+  camelCase
+} from 'lodash'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import {
@@ -531,14 +539,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.hasChangesBeenMade = false
   }
 
-  componentDidMount() {
-    !isMobileDevice() && window.addEventListener('scroll', this.onScroll)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.onScroll)
-  }
-
   getVisibleSections = (formSections: IFormSection[]) => {
     const { draft } = this.props
     return formSections.filter(
@@ -571,41 +571,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   docSections = this.getDocumentSections(
     this.props.registerForm[this.props.draft.event]
   )
-
-  onScroll = () => {
-    const scrollY = window.scrollY + window.innerHeight / 2
-    let minDistance = 100000
-    let sectionYTop = 0
-    let sectionYBottom = 0
-    let distance = 0
-    let sectionElement: HTMLElement
-    let activeSection = this.state.activeSection
-
-    const node = findDOMNode(this) as HTMLElement
-
-    this.docSections.forEach((section: IFormSection) => {
-      sectionElement = node.querySelector(
-        '#Section_' + section.id
-      ) as HTMLElement
-      sectionYTop = sectionElement.offsetTop
-      sectionYBottom = sectionElement.offsetTop + sectionElement.offsetHeight
-
-      distance = Math.abs(sectionYTop - scrollY)
-      if (distance < minDistance) {
-        minDistance = distance
-        activeSection = section.id
-      }
-
-      distance = Math.abs(sectionYBottom - scrollY)
-      if (distance < minDistance) {
-        minDistance = distance
-        activeSection = section.id
-      }
-    })
-    this.setState({
-      activeSection
-    })
-  }
 
   getLabelForDocType = (_: string, docType: string) => {
     const { intl } = this.props
@@ -653,16 +618,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     uploadedDocuments = uploadedDocuments.filter((document) => {
       const sectionMapping = SECTION_MAPPING[draft.event]
-      const sectionTitle = SECTION_TITLE[draft.event]
+      const sectionTitle = SECTION_TITLE[draft.event] as Record<string, string>
 
       const allowedDocumentType: string[] =
-        sectionMapping[activeSection as keyof typeof sectionMapping] || []
+        flatMap(Object.values(sectionMapping)) || []
 
       if (
         allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
       ) {
-        const title: string =
-          sectionTitle[activeSection as keyof typeof sectionMapping]
+        const title =
+          sectionTitle[camelCase(document.optionValues[0]!.toString())] || ''
         const label =
           intl.formatMessage(messages.documentForWhom, {
             section: title.toLowerCase()
