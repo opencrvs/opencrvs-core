@@ -26,11 +26,14 @@ import {
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { formatUrl } from '@client/navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+
 interface INameField {
   firstNamesField: string
   familyNameField: string
@@ -159,7 +162,17 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
 
   render() {
     const { corrector } = this.props.match.params
-    const { intl } = this.props
+    const { intl, declaration } = this.props
+    if (!declaration) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyForReview,
+            selectorId: ''
+          })}
+        />
+      )
+    }
     const correctorInfo = this.getGenericCorrectorInfo(corrector)
     const hasNoInfo = Object.values(correctorInfo).every(
       (property) => property === undefined || property === ''

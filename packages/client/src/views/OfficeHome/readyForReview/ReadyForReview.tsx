@@ -100,6 +100,10 @@ class ReadyForReviewComponent extends React.Component<
     }
   }
 
+  getPresentState = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
   componentDidMount() {
     window.addEventListener('resize', this.recordWindowWidth)
   }

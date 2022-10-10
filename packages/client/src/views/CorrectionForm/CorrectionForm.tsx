@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { IDeclaration, modifyDeclaration } from '@client/declarations'
 import {
   CorrectorForm,
@@ -24,6 +24,9 @@ import { CorrectionSummary } from './CorrectionSummary'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import styled from '@client/styledComponents'
 import { TimeMounted } from '@client/components/TimeMounted'
+import { formatUrl } from '@client/navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const SpinnerWrapper = styled.div`
   height: 80vh;
@@ -88,6 +91,16 @@ function mapStateToProps(state: IStoreState, props: IRouteProps) {
   if (!declaration) {
     throw new Error(`Draft "${declarationId}" missing!`)
   }
+  // if (!declaration) {
+  //   return (
+  //     <Redirect
+  //       to={formatUrl(REGISTRAR_HOME_TAB, {
+  //         tabId: WORKQUEUE_TABS.readyForReview,
+  //         selectorId: ''
+  //       })}
+  //     />
+  //   )
+  // }
 
   return {
     declaration,
