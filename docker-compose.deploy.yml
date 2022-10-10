@@ -134,7 +134,7 @@ services:
         # - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         # - 'traefik.frontend.headers.STSPreload=true'
         - 'traefik.enable=true'
-        - 'traefik.http.routers.kibana.rule=Host(`kibana.{{hostname}})'
+        - 'traefik.http.routers.kibana.rule=Host(`kibana.{{hostname}}`)'
         - 'traefik.http.services.kibana.loadbalancer.server.port=5601'
         - 'traefik.http.routers.kibana.tls=true'
         - 'traefik.http.routers.kibana.tls.certresolver=certResolver'
