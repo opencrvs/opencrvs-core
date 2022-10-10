@@ -164,7 +164,9 @@ const AuditDescriptionMapping: {
   PHONE_NUMBER_CHANGED: messages.phoneNumberChangedAuditAction,
   PASSWORD_CHANGED: messages.passwordChangedAuditAction,
   DEACTIVATE: messages.deactivateAuditAction,
-  REACTIVATE: messages.reactivateAuditAction
+  REACTIVATE: messages.reactivateAuditAction,
+  EDIT_USER: messages.editUserAuditAction,
+  CREATE_USER: messages.createUserAuditAction
 }
 
 export function getUserAuditDescription(

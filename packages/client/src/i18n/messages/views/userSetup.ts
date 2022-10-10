@@ -66,6 +66,8 @@ interface IUserSetupMessages
   passwordChangedAuditAction: MessageDescriptor
   reactivateAuditAction: MessageDescriptor
   deactivateAuditAction: MessageDescriptor
+  createUserAuditAction: MessageDescriptor
+  editUserAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -336,6 +338,16 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Deactivated User',
     description: 'Description for User deactivated',
     id: 'user.profile.auditList.userDeactivated'
+  },
+  createUserAuditAction: {
+    defaultMessage: 'Created User',
+    description: 'Description for User created action',
+    id: 'user.profile.auditList.userCreated'
+  },
+  editUserAuditAction: {
+    defaultMessage: 'Edit User',
+    description: 'Description for User edited action',
+    id: 'user.profile.auditList.userEdited'
   }
 }
 
