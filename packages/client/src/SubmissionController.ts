@@ -19,13 +19,13 @@ import { isNavigatorOnline } from './utils'
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never
 
-type IRetryStatus = ArrayElement<typeof ALLOWED_STATUS_FOR_RETRY>
-type IInProgressStatus = ArrayElement<typeof INPROGRESS_STATUS>
+export type IRetryStatus = ArrayElement<typeof ALLOWED_STATUS_FOR_RETRY>
+export type IInProgressStatus = ArrayElement<typeof INPROGRESS_STATUS>
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
 
-const ALLOWED_STATUS_FOR_RETRY = [
+export const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_SUBMIT,
   SUBMISSION_STATUS.READY_TO_APPROVE,
   SUBMISSION_STATUS.READY_TO_REGISTER,
@@ -36,7 +36,7 @@ const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.FAILED_NETWORK
 ] as const
 
-const INPROGRESS_STATUS = [
+export const INPROGRESS_STATUS = [
   SUBMISSION_STATUS.SUBMITTING,
   SUBMISSION_STATUS.APPROVING,
   SUBMISSION_STATUS.REGISTERING,

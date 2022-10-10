@@ -32,7 +32,6 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import {
@@ -62,6 +61,7 @@ import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
+import { Outbox } from './outbox/Outbox'
 import { ArrayElement } from '@client/SubmissionController'
 
 export const StyledSpinner = styled(Spinner)`
@@ -381,6 +381,7 @@ class OfficeHomeView extends React.Component<
                 error={error}
               />
             )}
+            {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
           </>
         ) : (
           <>
@@ -408,6 +409,7 @@ class OfficeHomeView extends React.Component<
                 error={error}
               />
             )}
+            {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
           </>
         )}
       </>
@@ -455,7 +457,6 @@ class OfficeHomeView extends React.Component<
             icon={() => <PlusTransparentWhite />}
           />
         </FABContainer>
-        <NotificationToast showPaginated={this.showPaginated} />
 
         {this.state.showCertificateToast && (
           <Toast
