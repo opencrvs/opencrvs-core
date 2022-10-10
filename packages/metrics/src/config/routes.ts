@@ -9,7 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Joi from 'joi'
+import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
+import {
+  declarationsStartedHandler,
+  declarationStartedMetricsByPractitionersHandler
+} from '@metrics/features/declarationsStarted/handler'
+import {
+  exportHandler,
+  monthlyExportHandler
+} from '@metrics/features/export/handler'
+import { getEventDurationHandler } from '@metrics/features/getEventDuration/handler'
+import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
+import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
+import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
+import {
+  metricsDeleteMeasurementHandler,
+  metricsHandler
+} from '@metrics/features/metrics/handler'
+import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
+import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import {
   inProgressHandler,
   markBirthRegisteredHandler,
@@ -22,30 +41,16 @@ import {
   newDeathRegistrationHandler,
   newDeclarationHandler,
   registrarRegistrationWaitingExternalValidationHandler,
-  requestForRegistrarValidationHandler,
-  requestCorrectionHandler
+  requestCorrectionHandler,
+  requestForRegistrarValidationHandler
 } from '@metrics/features/registration/handler'
-import {
-  metricsDeleteMeasurementHandler,
-  metricsHandler
-} from '@metrics/features/metrics/handler'
-import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
-import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
-import {
-  declarationsStartedHandler,
-  declarationStartedMetricsByPractitionersHandler
-} from '@metrics/features/declarationsStarted/handler'
-import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
-import {
-  exportHandler,
-  monthlyExportHandler
-} from '@metrics/features/export/handler'
-import { getEventDurationHandler } from '@metrics/features/getEventDuration/handler'
 import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
-import { totalPaymentsHandler } from '@metrics/features/payments/handler'
-import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
-import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
-import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import {
+  getAdvancedSearchByClient,
+  postAdvancedSearchByClient,
+  responseSchema
+} from '@metrics/features/searchMetrics/handler'
+import * as Joi from 'joi'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -206,6 +211,27 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/death/mark-certified',
       handler: markCertifiedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+
+    // Advanced Search quota
+    {
+      method: 'GET',
+      path: '/advancedSearch',
+      handler: getAdvancedSearchByClient,
+      config: {
+        tags: ['api'],
+        response: {
+          schema: responseSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/advancedSearch',
+      handler: postAdvancedSearchByClient,
       config: {
         tags: ['api']
       }

@@ -16,12 +16,18 @@ import {
 import { logger } from '@search/logger'
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
+import { getTokenPayload } from '@search/utils/authUtils'
+import { RouteScope } from '@search/config/routes'
 
 export async function assignEventHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
+    const tokenPayload = getTokenPayload(request.headers.authorization)
+    if (tokenPayload.scope.includes(RouteScope.RECORD_SEARCH)) {
+      return h.response().code(200)
+    }
     await updateEventToAddAssignment(request)
   } catch (error) {
     logger.error(`Search/assignEventHandler: error: ${error}`)

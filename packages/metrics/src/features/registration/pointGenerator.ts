@@ -130,7 +130,7 @@ export const generateInCompleteFieldPoints = async (
     })
 }
 
-function toInfluxTimestamp(date?: Date | string) {
+export function toInfluxTimestamp(date?: Date | string) {
   if (!date) {
     return undefined
   }
