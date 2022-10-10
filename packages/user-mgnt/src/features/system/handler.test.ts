@@ -118,11 +118,7 @@ describe('registerSystemClient handler', () => {
       method: 'POST',
       url: '/registerSystemClient',
       payload: {
-        scope: 'NATIONAL_ID',
-        name: [{ use: 'en', family: 'Health complex' }],
-        settings: {
-          dailyQuota: 50
-        }
+        scope: 'NATIONAL_ID'
       },
       headers: {
         Authorization: `Bearer ${token}`

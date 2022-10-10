@@ -40,11 +40,7 @@ import {
   getUserByToken
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
-import {
-  getTokenPayload,
-  ITokenPayload,
-  USER_SCOPE
-} from '@workflow/utils/authUtils'
+import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
 import { RESOURCE_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
@@ -306,11 +302,8 @@ export async function touchBundle(
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
-  const payload = getTokenPayload(token)
   /* setting lastRegLocation here */
-  if (!payload.scope.includes(USER_SCOPE.RECORD_SEARCH)) {
-    await setupLastRegLocation(taskResource, practitioner)
-  }
+  await setupLastRegLocation(taskResource, practitioner)
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
@@ -543,9 +536,6 @@ export async function setupRegAssigned(
   })
   if (setupRegAssignedExtension) {
     const practitionerDetails = await getUserByToken(token)
-    if (practitionerDetails.scope.includes(USER_SCOPE.RECORD_SEARCH)) {
-      return taskResource
-    }
     if (
       (setupRegAssignedExtension.valueString === RegStatus.REJECTED &&
         practitionerDetails.role === 'FIELD_AGENT') ||

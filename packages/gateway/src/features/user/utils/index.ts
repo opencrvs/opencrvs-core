@@ -11,10 +11,7 @@
  */
 import { IAuthHeader } from '@gateway/common-types'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import {
-  ISystemModelData,
-  IUserModelData
-} from '@gateway/features/user/type-resolvers'
+import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { logger } from '@gateway/logger'
 import { callingCountries } from 'country-data'
 import * as decode from 'jwt-decode'
@@ -42,21 +39,6 @@ export async function getUser(
   authHeader: IAuthHeader
 ): Promise<IUserModelData> {
   const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-  return await res.json()
-}
-
-export async function getSystem(
-  body: { [key: string]: string | undefined },
-  authHeader: IAuthHeader
-): Promise<ISystemModelData> {
-  const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {

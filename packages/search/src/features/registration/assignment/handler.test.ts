@@ -119,15 +119,11 @@ describe('assignEventHandler', () => {
   it('should return status code 200 if the composition indexed correctly', async () => {
     fetch.mockResponses([JSON.stringify(dummyUser), { status: 200 }])
 
-    const token = jwt.sign(
-      { scope: [] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      }
-    )
+    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:search-user'
+    })
 
     const res = await server.server.inject({
       method: 'POST',
