@@ -89,7 +89,7 @@ export async function getUserAuditEvents(
   skip: number
 ): Promise<Array<UserAuditDataPoint>> {
   const results = await query<Array<RawUserAuditDataPoint>>(
-    `SELECT * from user_audit_event where practitionerId = $practitionerId limit ${size} offset ${skip}`,
+    `SELECT * from user_audit_event where practitionerId = $practitionerId order by time desc limit ${size} offset ${skip}`,
     {
       placeholders: { practitionerId: practitionerId }
     }
