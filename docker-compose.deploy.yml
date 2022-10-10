@@ -31,7 +31,7 @@ services:
       - --log.level=DEBUG
       - --certificatesresolvers.certResolver.acme.email=yeasin.hossain@dsinnovators.com
       - --certificatesresolvers.certResolver.acme.storage=acme.json
-      - --certificatesresolvers.certResolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.certResolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
       - --certificatesresolvers.certResolver.acme.httpchallenge.entrypoint=web
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
@@ -40,7 +40,9 @@ services:
     deploy:
       replicas: 1
       labels:
-        - 'traefik.http.routers.traefik.tls.certresolver=certResolver'
+        - traefik.http.routers.traefik.tls.certresolver=certResolver
+        - traefik.http.routers.traefik.tls.domains[0].main={{hostname}}
+        - traefik.http.routers.traefik.tls.domains[0].sans=register.{{hostname}},config.{{hostname}},login.{{hostname}},auth.{{hostname}},gateway.{{hostname}},countryconfig.{{hostname}},openhim-api.{{hostname}},api.{{hostname}},openhim.{{hostname}},webhooks.{{hostname}},kibana.{{hostname}},ui-kit.{{hostname}}
       placement:
         constraints:
           - node.role == manager
@@ -828,8 +830,6 @@ secrets:
 configs:
   openhim-console-conf.{{ts}}:
     file: ./infrastructure/openhim-console-config.deploy.json
-  # traefik.{{ts}}:
-  #   file: ./infrastructure/traefik.toml
   hearth-check-dupe-plugin.{{ts}}:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
   hearth-queryparam-extensions-conf.{{ts}}:
