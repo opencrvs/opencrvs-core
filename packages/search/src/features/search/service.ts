@@ -11,16 +11,8 @@
  */
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
-import {
-  IAdvancedSearchParam,
-  ISearchQuery,
-  SortOrder
-} from '@search/features/search/types'
-import {
-  queryBuilder,
-  EMPTY_STRING,
-  advancedQueryBuilder
-} from '@search/features/search/utils'
+import { ISearchQuery, SortOrder } from '@search/features/search/types'
+import { queryBuilder, EMPTY_STRING } from '@search/features/search/utils'
 import { logger } from '@search/logger'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
@@ -97,20 +89,4 @@ export function formatSearchParams(params: ISearchQuery) {
       sort: [{ [sortColumn]: sort }]
     }
   }
-}
-
-export const advancedSearch = async (params: IAdvancedSearchParam) => {
-  const response = await client.search({
-    index: OPENCRVS_INDEX_NAME,
-    type: 'compositions',
-    body: {
-      query: advancedQueryBuilder(params)
-    }
-  })
-
-  if (response.body.hits.total.value > 5) {
-    throw new Error('Too many results Please narrow your search')
-  }
-
-  return response
 }

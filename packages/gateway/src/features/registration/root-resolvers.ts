@@ -781,7 +781,7 @@ async function markEventAsCertified(
   return getIDFromResponse(res)
 }
 
-export async function markRecordAsDownloadedAndAssigned(
+async function markRecordAsDownloadedAndAssigned(
   id: string,
   authHeader: IAuthHeader
 ) {

@@ -212,21 +212,6 @@ export interface IRejectedPoints {
   timestamp: number | undefined
 }
 
-export interface IAdvancedSearchFields {
-  clientId: string
-}
-
-export interface IAdvancedSearchTags {
-  ipAddress: string
-}
-
-export interface IAdvancedSearchPoints {
-  measurement: string
-  tags: IAdvancedSearchTags
-  fields: IAdvancedSearchFields
-  timestamp: number | undefined
-}
-
 export type IPoints =
   | IDurationPoints
   | ITimeLoggedPoints
@@ -237,4 +222,3 @@ export type IPoints =
   | IPaymentPoints
   | IDeclarationsStartedPoints
   | IRejectedPoints
-  | IAdvancedSearchPoints

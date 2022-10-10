@@ -56,20 +56,6 @@ export interface IUserModelData {
   avatar?: IAvatar
 }
 
-export interface ISystemModelData {
-  scope?: string[]
-  name: string
-  createdBy: string
-  client_id: string
-  username: string
-  status: string
-  sha_secret: string
-  practitionerId: string
-  settings: {
-    dailyQuota: number
-  }
-}
-
 export interface IUserPayload
   extends Omit<
     IUserModelData,
