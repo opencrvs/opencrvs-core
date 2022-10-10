@@ -15,10 +15,6 @@ import React, {
   ChangeEvent,
   useState
 } from 'react'
-import {
-  PageWrapper as UnlockPageWrapper,
-  LogoutHeader as LogoutContainer
-} from '@client/views/Unlock/Unlock'
 import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { storage } from '@client/storage'
@@ -48,6 +44,10 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getUserName } from '@client/utils/userUtils'
+import {
+  PageWrapper as UnlockPageWrapper,
+  LogoutHeader as LogoutContainer
+} from '@client/views/Unlock/Unlock'
 
 interface IForgotPINProps {
   goBack: () => void
