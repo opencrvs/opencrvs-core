@@ -64,6 +64,8 @@ interface IUserSetupMessages
   loggedOutAuditAction: MessageDescriptor
   phoneNumberChangedAuditAction: MessageDescriptor
   passwordChangedAuditAction: MessageDescriptor
+  reactivateAuditAction: MessageDescriptor
+  deactivateAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -321,9 +323,19 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.auditList.phoneNumberChanged'
   },
   passwordChangedAuditAction: {
-    defaultMessage: 'Password Changed',
+    defaultMessage: 'Changed Password',
     description: 'Description for user change password',
     id: 'user.profile.auditList.passwordChanged'
+  },
+  reactivateAuditAction: {
+    defaultMessage: 'Reactivates User',
+    description: 'Description for User reactivated',
+    id: 'user.profile.auditList.userReactivated'
+  },
+  deactivateAuditAction: {
+    defaultMessage: 'Deactivated User',
+    description: 'Description for User deactivated',
+    id: 'user.profile.auditList.userDeactivated'
   }
 }
 

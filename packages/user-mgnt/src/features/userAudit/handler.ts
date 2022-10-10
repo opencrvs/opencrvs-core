@@ -20,6 +20,7 @@ import { statuses } from '@user-mgnt/utils/userUtils'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 interface IAuditUserPayload {
   userId: string
@@ -36,6 +37,10 @@ export async function userAuditHandler(
   const auditUserPayload = request.payload as IAuditUserPayload
 
   const user: IUserModel | null = await User.findById(auditUserPayload.userId)
+  const systemAdminUser: IUserModel | null = await User.findById(
+    auditUserPayload.auditedBy
+  )
+
   if (!user) {
     logger.error(
       `No user details found for requested userId: ${auditUserPayload.userId}`
@@ -87,6 +92,22 @@ export async function userAuditHandler(
       user.auditHistory = [auditData]
     }
 
+    if (
+      AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE ||
+      AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.DEACTIVATE
+    ) {
+      let action
+      if (AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE) {
+        action = 'REACTIVATE'
+      } else {
+        action = 'DEACTIVATE'
+      }
+      await postUserActionToMetrics(
+        action,
+        systemAdminUser!.practitionerId,
+        request.headers.authorization
+      )
+    }
     try {
       await User.update({ _id: user._id }, user)
     } catch (err) {

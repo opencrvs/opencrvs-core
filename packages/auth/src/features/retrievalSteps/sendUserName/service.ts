@@ -30,6 +30,7 @@ export async function sendUserName(mobile: string, username: string) {
     }
   })
 
+  console.log('sending username ......... ')
   if (res.status !== 200) {
     throw Error(`Unable to send username`)
   }
