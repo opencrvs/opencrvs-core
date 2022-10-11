@@ -30,17 +30,9 @@ import {
   alterRolesBasedOnUserRole,
   transformRoleDataToDefinitions
 } from '@client/views/SysAdmin/Team/utils'
-import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
+import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
 import { Action } from 'redux'
-import {
-  ActionCmd,
-  Cmd,
-  CmdType,
-  Loop,
-  loop,
-  LoopReducer,
-  RunCmd
-} from 'redux-loop'
+import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
 import {
   GQLQuery,
   GQLUser,
@@ -52,7 +44,6 @@ import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { IUserDetails } from '@client/utils/userUtils'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'

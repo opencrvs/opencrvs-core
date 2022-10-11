@@ -50,19 +50,23 @@ export function DuplicateWarning({
           )}
         >
           {({ data }) => {
-            return duplicateIds.map((_, idx) => {
-              const duplicateQuery = data?.[`duplicate${idx}`]
-              if (duplicateQuery?.registration?.trackingId) {
-                return (
-                  <Alert type="warning">
-                    {intl.formatMessage(errorMessages.duplicateWarning, {
-                      trackingId: duplicateQuery.registration.trackingId
-                    })}
-                  </Alert>
-                )
-              }
-              return <></>
-            })
+            return (
+              <>
+                {duplicateIds.map((_, idx) => {
+                  const duplicateQuery = data?.[`duplicate${idx}`]
+                  if (duplicateQuery?.registration?.trackingId) {
+                    return (
+                      <Alert type="warning">
+                        {intl.formatMessage(errorMessages.duplicateWarning, {
+                          trackingId: duplicateQuery.registration.trackingId
+                        })}
+                      </Alert>
+                    )
+                  }
+                  return <></>
+                })}
+              </>
+            )
           }}
         </Query>
       )}
