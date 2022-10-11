@@ -25,10 +25,7 @@ import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
 import WebFont from 'webfontloader'
-import {
-  BUILD_VERSION,
-  BACKGROUND_SYNC_BROADCAST_CHANNEL
-} from './utils/constants'
+import { BACKGROUND_SYNC_BROADCAST_CHANNEL } from './utils/constants'
 
 WebFont.load({
   google: {
@@ -58,7 +55,7 @@ if (
   // setup log rocket to ship log messages and record user errors
   if (window.config.LOGROCKET) {
     LogRocket.init(window.config.LOGROCKET, {
-      release: BUILD_VERSION
+      release: import.meta.env.VITE_APP_VERSION
     })
   }
 
