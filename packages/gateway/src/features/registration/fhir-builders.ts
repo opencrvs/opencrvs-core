@@ -2121,13 +2121,7 @@ export const builders: IFieldBuilders = {
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      let mosipAid
-      if (context.event === EVENT_TYPE.BIRTH) {
-        mosipAid = 'mosip-aid'
-      } else {
-        mosipAid = 'mosip-aid'
-      }
-      return setResourceIdentifier(taskResource, `${mosipAid}`, fieldValue)
+      return setResourceIdentifier(taskResource, 'mosip-aid', fieldValue)
     },
     registrationNumber: (
       fhirBundle: ITemplatedBundle,
