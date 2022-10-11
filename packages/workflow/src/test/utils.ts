@@ -1766,9 +1766,10 @@ export const hearthResponseMock = JSON.stringify({
   type: 'transaction-response'
 })
 
-export const userResponseMock = {
-  role: 'FIELD_AGENT'
-}
+export const userResponseMock = JSON.stringify({
+  role: 'FIELD_AGENT',
+  scope: []
+})
 
 export const relatedPersonMock = JSON.stringify({
   resourceType: 'RelatedPerson',

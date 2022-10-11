@@ -103,6 +103,38 @@ describe('FormConfigWizard', () => {
       )
     })
 
+    it('should show conditional fieldids and regex input when click toggle button', async () => {
+      component
+        .find('#conditional-toggle-button')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { checked: true } })
+      component.update()
+      expect(
+        component.find('#conditional-toggle-button').hostNodes().first().props()
+          .defaultChecked
+      ).toBeTruthy()
+      expect(component.find('#selectConditionalField').hostNodes().length).toBe(
+        1
+      )
+      expect(
+        component.find('#conditional-regex-input').find('input').hostNodes()
+          .length
+      ).toBe(1)
+    })
+
+    it('should disable the save button if conditional regex input is empty', async () => {
+      component
+        .find('#conditional-toggle-button')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { checked: true } })
+      component.update()
+      expect(
+        component.find('#custom-tool-save-button').hostNodes().prop('disabled')
+      ).toEqual(true)
+    })
+
     it('should remove the field', () => {
       component
         .find('[id="birth.child.child-view-group.customField1_remove"]')

@@ -13,7 +13,6 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
-import { Event } from '@client/utils/gateway'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   OptionalData,
@@ -122,12 +121,8 @@ function getPDFTemplateWithSVG(
   declaration: IDeclaration,
   pageSize: PageSize
 ): IPDFTemplate {
-  let svgTemplate
-  if (declaration.event === Event.Birth) {
-    svgTemplate = offlineResource.templates.certificates!.birth.definition
-  } else {
-    svgTemplate = offlineResource.templates.certificates!.death.definition
-  }
+  const svgTemplate =
+    offlineResource.templates.certificates![declaration.event].definition
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
     declaration.data.template
@@ -149,6 +144,7 @@ export function downloadFile(
   downloadLink.setAttribute('download', fileName)
   downloadLink.click()
 }
+
 function updatePDFTemplateWithSVGContent(
   template: IPDFTemplate,
   svg: string,

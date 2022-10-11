@@ -15,10 +15,6 @@ import React, {
   ChangeEvent,
   useState
 } from 'react'
-import {
-  PageWrapper as UnlockPageWrapper,
-  LogoutHeader as LogoutContainer
-} from '@client/views/Unlock/Unlock'
 import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { storage } from '@client/storage'
@@ -33,12 +29,9 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import {
-  InputField,
-  PasswordInput,
-  THEME_MODE,
-  ErrorMessage
-} from '@opencrvs/components/lib/forms'
+import { InputField, THEME_MODE } from '@opencrvs/components/lib/InputField'
+import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
+import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
 import { injectIntl, WrappedComponentProps, useIntl } from 'react-intl'
 import {
   constantsMessages,
@@ -47,10 +40,14 @@ import {
   buttonMessages
 } from '@client/i18n/messages'
 import { userQueries } from '@client/user/queries'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getUserName } from '@client/utils/userUtils'
+import {
+  PageWrapper as UnlockPageWrapper,
+  LogoutHeader as LogoutContainer
+} from '@client/views/Unlock/Unlock'
 
 interface IForgotPINProps {
   goBack: () => void

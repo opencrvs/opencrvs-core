@@ -17,12 +17,10 @@ import {
   IFormData,
   IFormFieldValue,
   IContactPoint,
-  Sort,
   FieldValueMap
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import {
   Action as NavigationAction,
   GO_TO_PAGE,
@@ -32,26 +30,23 @@ import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
 } from '@client/profile/profileActions'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { SEARCH_DECLARATIONS_USER_WISE } from '@client/search/queries'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import {
   gqlToDraftTransformer,
   draftToGqlTransformer
 } from '@client/transformer'
-import { client } from '@client/utils/apolloClient'
-import { DECLARED_DECLARATION_SEARCH_QUERY_COUNT } from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import { EVENT_STATUS, IQueryData } from '@client/views/OfficeHome/utils'
 import {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
-  GQLRegistrationSearchSet
+  GQLRegistrationSearchSet,
+  GQLHumanName
 } from '@opencrvs/gateway/src/graphql/schema'
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
@@ -67,6 +62,12 @@ import { Roles } from '@client/utils/authUtils'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
 import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import {
+  UpdateRegistrarWorkqueueAction,
+  updateRegistrarWorkqueue,
+  IQueryData,
+  IWorkqueue
+} from '@client/workqueue'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -80,13 +81,6 @@ const DELETE_DECLARATION_SUCCESS = 'DECLARATION/DELETE_DRAFT_SUCCESS'
 const DELETE_DECLARATION_FAILED = 'DECLARATION/DELETE_DRAFT_FAILED'
 const GET_DECLARATIONS_SUCCESS = 'DECLARATION/GET_DRAFTS_SUCCESS'
 const GET_DECLARATIONS_FAILED = 'DECLARATION/GET_DRAFTS_FAILED'
-const GET_WORKQUEUE_SUCCESS = 'DECLARATION/GET_WORKQUEUE_SUCCESS'
-const GET_WORKQUEUE_FAILED = 'DECLARATION/GET_WORKQUEUE_FAILED'
-const UPDATE_REGISTRAR_WORKQUEUE = 'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE'
-const UPDATE_REGISTRAR_WORKQUEUE_SUCCESS =
-  'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE_SUCCESS'
-const UPDATE_REGISTRAR_WORKQUEUE_FAIL =
-  'DECLARATION/UPDATE_REGISTRAR_WORKQUEUE_FAIL'
 const ENQUEUE_DOWNLOAD_DECLARATION = 'DECLARATION/ENQUEUE_DOWNLOAD_DECLARATION'
 const DOWNLOAD_DECLARATION_SUCCESS = 'DECLARATION/DOWNLOAD_DECLARATION_SUCCESS'
 const DOWNLOAD_DECLARATION_FAIL = 'DECLARATION/DOWNLOAD_DECLARATION_FAIL'
@@ -178,6 +172,19 @@ export interface IVisitedGroupId {
   groupId: string
 }
 
+export interface ITaskHistory {
+  operationType?: string
+  operatedOn?: string
+  operatorRole?: string
+  operatorName?: Array<GQLHumanName | null>
+  operatorOfficeName?: string
+  operatorOfficeAlias?: Array<string | null>
+  notificationFacilityName?: string
+  notificationFacilityAlias?: Array<string | null>
+  rejectReason?: string
+  rejectComment?: string
+}
+
 export interface IDeclaration {
   id: string
   data: IFormData
@@ -200,26 +207,7 @@ export interface IDeclaration {
   visitedGroupIds?: IVisitedGroupId[]
   timeLoggedMS?: number
   writingDraft?: boolean
-}
-
-export interface IWorkqueue {
-  loading?: boolean
-  error?: boolean
-  data: IQueryData
-  initialSyncDone: boolean
-}
-
-interface IWorkqueuePaginationParams {
-  userId?: string
-  pageSize: number
-  isFieldAgent: boolean
-  inProgressSkip: number
-  healthSystemSkip: number
-  reviewSkip: number
-  rejectSkip: number
-  approvalSkip: number
-  externalValidationSkip: number
-  printSkip: number
+  operationHistories?: ITaskHistory[]
 }
 
 type Relation =
@@ -355,24 +343,6 @@ interface IGetStorageDeclarationsFailedAction {
   type: typeof GET_DECLARATIONS_FAILED
 }
 
-interface IGetWorkqueueOfCurrentUserSuccessAction {
-  type: typeof GET_WORKQUEUE_SUCCESS
-  payload: string
-}
-
-interface IGetWorkqueueOfCurrentUserFailedAction {
-  type: typeof GET_WORKQUEUE_FAILED
-}
-
-interface UpdateRegistrarWorkQueueSuccessAction {
-  type: typeof UPDATE_REGISTRAR_WORKQUEUE_SUCCESS
-  payload: string
-}
-
-interface UpdateRegistrarWorkQueueFailAction {
-  type: typeof UPDATE_REGISTRAR_WORKQUEUE_FAIL
-}
-
 interface IDeleteDeclarationSuccessAction {
   type: typeof DELETE_DECLARATION_SUCCESS
   payload: string
@@ -409,22 +379,6 @@ interface IDownloadDeclarationFail {
     error: ApolloError
     declaration: IDeclaration
     client: ApolloClient<{}>
-  }
-}
-
-interface UpdateRegistrarWorkqueueAction {
-  type: typeof UPDATE_REGISTRAR_WORKQUEUE
-  payload: {
-    pageSize: number
-    userId?: string
-    isFieldAgent: boolean
-    inProgressSkip: number
-    healthSystemSkip: number
-    reviewSkip: number
-    rejectSkip: number
-    approvalSkip: number
-    externalValidationSkip: number
-    printSkip: number
   }
 }
 
@@ -469,15 +423,11 @@ export type Action =
   | IDeleteDeclarationFailedAction
   | IGetStorageDeclarationsSuccessAction
   | IGetStorageDeclarationsFailedAction
-  | IGetWorkqueueOfCurrentUserSuccessAction
-  | IGetWorkqueueOfCurrentUserFailedAction
   | IDownloadDeclaration
   | IDownloadDeclarationSuccess
   | IDownloadDeclarationFail
   | UserDetailsAvailable
   | UpdateRegistrarWorkqueueAction
-  | UpdateRegistrarWorkQueueSuccessAction
-  | UpdateRegistrarWorkQueueFailAction
   | ShowDownloadDeclarationFailedToast
   | IEnqueueUnassignDeclaration
   | IUnassignDeclaration
@@ -495,27 +445,6 @@ export interface IDeclarationsState {
   declarations: IDeclaration[]
   initialDeclarationsLoaded: boolean
   isWritingDraft: boolean
-}
-
-export interface WorkqueueState {
-  workqueue: IWorkqueue
-}
-
-const workqueueInitialState: WorkqueueState = {
-  workqueue: {
-    loading: true,
-    error: false,
-    data: {
-      inProgressTab: { totalItems: 0, results: [] },
-      notificationTab: { totalItems: 0, results: [] },
-      reviewTab: { totalItems: 0, results: [] },
-      rejectTab: { totalItems: 0, results: [] },
-      approvalTab: { totalItems: 0, results: [] },
-      printTab: { totalItems: 0, results: [] },
-      externalValidationTab: { totalItems: 0, results: [] }
-    },
-    initialSyncDone: false
-  }
 }
 
 const initialState: IDeclarationsState = {
@@ -606,18 +535,6 @@ export const getStorageDeclarationsSuccess = (
   payload: response
 })
 
-export const getCurrentUserWorkqueueFailed =
-  (): IGetWorkqueueOfCurrentUserFailedAction => ({
-    type: GET_WORKQUEUE_FAILED
-  })
-
-export const getCurrentUserWorkqueuSuccess = (
-  response: string
-): IGetWorkqueueOfCurrentUserSuccessAction => ({
-  type: GET_WORKQUEUE_SUCCESS,
-  payload: response
-})
-
 export const getStorageDeclarationsFailed =
   (): IGetStorageDeclarationsFailedAction => ({
     type: GET_DECLARATIONS_FAILED
@@ -680,7 +597,7 @@ export async function getCurrentUserID(): Promise<string> {
   return (JSON.parse(userDetails) as IUserDetails).userMgntUserID || ''
 }
 
-async function getUserData(userId: string) {
+export async function getUserData(userId: string) {
   const userData = await storage.getItem('USER_DATA')
   const allUserData: IUserData[] = !userData
     ? []
@@ -688,52 +605,6 @@ async function getUserData(userId: string) {
   const currentUserData = allUserData.find((uData) => uData.userID === userId)
 
   return { allUserData, currentUserData }
-}
-
-async function getFieldAgentDeclaredDeclarations(userDetails: IUserDetails) {
-  const userId = userDetails.practitionerId
-  const locationIds = (userDetails && [getUserLocation(userDetails).id]) || []
-
-  let result
-  try {
-    const response = await client.query({
-      query: SEARCH_DECLARATIONS_USER_WISE,
-      variables: {
-        userId,
-        status: [EVENT_STATUS.DECLARED],
-        locationIds,
-        count: DECLARED_DECLARATION_SEARCH_QUERY_COUNT,
-        sort: Sort.ASC
-      },
-      fetchPolicy: 'no-cache'
-    })
-    result = response.data && response.data.searchEvents
-  } catch (exception) {
-    result = undefined
-  }
-  return result
-}
-
-async function getFieldAgentRejectedDeclarations(userDetails: IUserDetails) {
-  const userId = userDetails.practitionerId
-  const locationIds = (userDetails && [getUserLocation(userDetails).id]) || []
-
-  let result
-  try {
-    const response = await client.query({
-      query: SEARCH_DECLARATIONS_USER_WISE,
-      variables: {
-        userId,
-        status: [EVENT_STATUS.REJECTED],
-        locationIds
-      },
-      fetchPolicy: 'no-cache'
-    })
-    result = response.data && response.data.searchEvents
-  } catch (exception) {
-    result = undefined
-  }
-  return result
 }
 
 export function mergeDeclaredDeclarations(
@@ -751,33 +622,6 @@ export function mergeDeclaredDeclarations(
     }
   )
   declarations.push(...transformedDeclaredDeclarations)
-}
-
-export async function getWorkqueueOfCurrentUser(): Promise<string> {
-  // returns a 'stringified' IWorkqueue
-  const initialWorkqueue = workqueueInitialState.workqueue
-
-  const storageTable = await storage.getItem('USER_DATA')
-  if (!storageTable) {
-    return JSON.stringify(initialWorkqueue)
-  }
-
-  const currentUserID = await getCurrentUserID()
-
-  const allUserData = JSON.parse(storageTable) as IUserData[]
-
-  if (!allUserData.length) {
-    // No user-data at all
-    return JSON.stringify(initialWorkqueue)
-  }
-
-  const currentUserData = allUserData.find(
-    (uData) => uData.userID === currentUserID
-  )
-  const currentUserWorkqueue: IWorkqueue =
-    (currentUserData && currentUserData.workqueue) ||
-    workqueueInitialState.workqueue
-  return JSON.stringify(currentUserWorkqueue)
 }
 
 export async function getDeclarationsOfCurrentUser(): Promise<string> {
@@ -841,7 +685,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   return JSON.stringify(payload)
 }
 
-async function updateWorkqueueData(
+export async function updateWorkqueueData(
   state: IStoreState,
   declaration: IDeclaration,
   workQueueId: keyof IQueryData,
@@ -988,166 +832,6 @@ export async function writeDeclarationByUser(
   return declaration
 }
 
-function mergeWorkQueueData(
-  state: IStoreState,
-  workQueueIds: (keyof IQueryData)[],
-  currentApplications: IDeclaration[] | undefined,
-  destinationWorkQueue: IWorkqueue
-) {
-  if (!currentApplications) {
-    return destinationWorkQueue
-  }
-  workQueueIds.forEach((workQueueId) => {
-    if (
-      !(
-        destinationWorkQueue.data &&
-        destinationWorkQueue.data[workQueueId]?.results
-      )
-    ) {
-      return
-    }
-    ;(
-      destinationWorkQueue.data[workQueueId].results as GQLEventSearchSet[]
-    ).forEach((declaration) => {
-      if (declaration == null) {
-        return
-      }
-      const declarationIndex = currentApplications.findIndex(
-        (app) => app && app.id === declaration.id
-      )
-      if (declarationIndex >= 0) {
-        const isDownloadFailed =
-          currentApplications[declarationIndex].submissionStatus ===
-            SUBMISSION_STATUS.FAILED_NETWORK ||
-          currentApplications[declarationIndex].submissionStatus ===
-            SUBMISSION_STATUS.FAILED
-
-        if (!isDownloadFailed) {
-          updateWorkqueueData(
-            state,
-            currentApplications[declarationIndex],
-            workQueueId,
-            destinationWorkQueue
-          )
-        }
-      }
-    })
-  })
-  return destinationWorkQueue
-}
-async function getWorkqueueData(
-  state: IStoreState,
-  userDetails: IUserDetails,
-  workqueuePaginationParams: IWorkqueuePaginationParams
-) {
-  const registrationLocationId =
-    (userDetails && getUserLocation(userDetails).id) || ''
-
-  const scope = getScope(state)
-  const reviewStatuses =
-    scope && scope.includes('register')
-      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
-      : [EVENT_STATUS.DECLARED]
-
-  const {
-    userId,
-    pageSize,
-    isFieldAgent,
-    inProgressSkip,
-    healthSystemSkip,
-    reviewSkip,
-    rejectSkip,
-    approvalSkip,
-    externalValidationSkip,
-    printSkip
-  } = workqueuePaginationParams
-
-  const result = await syncRegistrarWorkqueue(
-    registrationLocationId,
-    reviewStatuses,
-    pageSize,
-    isFieldAgent,
-    inProgressSkip,
-    healthSystemSkip,
-    reviewSkip,
-    rejectSkip,
-    approvalSkip,
-    externalValidationSkip,
-    printSkip,
-    userId
-  )
-  let workqueue
-  const { currentUserData } = await getUserData(
-    userDetails.userMgntUserID || ''
-  )
-  const currentWorkqueue = currentUserData?.workqueue
-  if (result) {
-    workqueue = {
-      loading: false,
-      error: false,
-      data: result,
-      initialSyncDone: true
-    }
-  } else {
-    workqueue = {
-      loading: false,
-      error: true,
-      data:
-        (currentWorkqueue && currentWorkqueue.data) ||
-        (state.workqueueState && state.workqueueState.workqueue.data),
-      initialSyncDone: false
-    }
-  }
-  if (isFieldAgent) {
-    return mergeWorkQueueData(
-      state,
-      ['reviewTab', 'rejectTab'],
-      currentUserData && currentUserData.declarations,
-      workqueue
-    )
-  }
-  return mergeWorkQueueData(
-    state,
-    ['inProgressTab', 'notificationTab', 'reviewTab', 'rejectTab'],
-    currentUserData && currentUserData.declarations,
-    workqueue
-  )
-}
-
-export async function writeRegistrarWorkqueueByUser(
-  getState: () => IStoreState,
-  workqueuePaginationParams: IWorkqueuePaginationParams
-): Promise<string> {
-  const state = getState()
-  const userDetails = getUserDetails(state) as IUserDetails
-
-  const workqueue = await getWorkqueueData(
-    state,
-    userDetails,
-    workqueuePaginationParams
-  )
-
-  const uID = userDetails.userMgntUserID || ''
-  const userData = await getUserData(uID)
-  const { allUserData } = userData
-  let { currentUserData } = userData
-
-  if (currentUserData) {
-    currentUserData.workqueue = workqueue
-  } else {
-    currentUserData = {
-      userID: uID,
-      declarations: [],
-      workqueue
-    }
-    allUserData.push(currentUserData)
-  }
-  return Promise.all([
-    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
-    JSON.stringify(currentUserData.workqueue)
-  ]).then(([_, currentUserWorkqueueData]) => currentUserWorkqueueData)
-}
-
 export async function deleteDeclarationByUser(
   userId: string,
   declarationId: string,
@@ -1194,47 +878,6 @@ export function downloadDeclaration(
     }
   }
 }
-
-export function updateRegistrarWorkqueue(
-  userId?: string,
-  pageSize = 10,
-  isFieldAgent = false,
-  inProgressSkip = 0,
-  healthSystemSkip = 0,
-  reviewSkip = 0,
-  rejectSkip = 0,
-  approvalSkip = 0,
-  externalValidationSkip = 0,
-  printSkip = 0
-): UpdateRegistrarWorkqueueAction {
-  return {
-    type: UPDATE_REGISTRAR_WORKQUEUE,
-    payload: {
-      userId,
-      pageSize,
-      isFieldAgent,
-      inProgressSkip,
-      healthSystemSkip,
-      reviewSkip,
-      rejectSkip,
-      approvalSkip,
-      externalValidationSkip,
-      printSkip
-    }
-  }
-}
-
-export const updateRegistrarWorkqueueSuccessActionCreator = (
-  response: string
-): UpdateRegistrarWorkQueueSuccessAction => ({
-  type: UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
-  payload: response
-})
-
-export const updateRegistrarWorkqueueFailActionCreator =
-  (): UpdateRegistrarWorkQueueFailAction => ({
-    type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
-  })
 
 function createRequestForDeclaration(
   declaration: IDeclaration,
@@ -1937,65 +1580,6 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           { sequence: true }
         )
       )
-    default:
-      return state
-  }
-}
-
-export const registrarWorkqueueReducer: LoopReducer<WorkqueueState, Action> = (
-  state: WorkqueueState = workqueueInitialState,
-  action: Action
-): WorkqueueState | Loop<WorkqueueState, Action> => {
-  switch (action.type) {
-    case UPDATE_REGISTRAR_WORKQUEUE:
-      return loop(
-        {
-          workqueue: {
-            ...state.workqueue,
-            loading: true
-          }
-        },
-        Cmd.run(writeRegistrarWorkqueueByUser, {
-          successActionCreator: updateRegistrarWorkqueueSuccessActionCreator,
-          failActionCreator: updateRegistrarWorkqueueFailActionCreator,
-          args: [Cmd.getState, action.payload]
-        })
-      )
-
-    case USER_DETAILS_AVAILABLE:
-      return loop(
-        {
-          ...state
-        },
-        Cmd.run<
-          IGetWorkqueueOfCurrentUserFailedAction,
-          IGetWorkqueueOfCurrentUserSuccessAction
-        >(getWorkqueueOfCurrentUser, {
-          successActionCreator: getCurrentUserWorkqueuSuccess,
-          failActionCreator: getCurrentUserWorkqueueFailed,
-          args: []
-        })
-      )
-
-    case GET_WORKQUEUE_SUCCESS:
-      if (action.payload) {
-        const workqueue = JSON.parse(action.payload) as IWorkqueue
-        return {
-          workqueue
-        }
-      }
-      return state
-
-    case UPDATE_REGISTRAR_WORKQUEUE_SUCCESS:
-      if (action.payload) {
-        const workqueue = JSON.parse(action.payload) as IWorkqueue
-
-        return {
-          workqueue
-        }
-      }
-      return state
-
     default:
       return state
   }

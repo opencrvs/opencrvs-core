@@ -11,17 +11,17 @@
  */
 import * as React from 'react'
 import {
-  ISelectOption,
-  ISelectProps,
-  Select
-} from '@opencrvs/components/lib/select'
+  ISelect2Option,
+  ISelect2Props,
+  Select2
+} from '@opencrvs/components/lib/Select/Select2'
 
-export interface IPerformanceSelectOption extends ISelectOption {
+export interface IPerformanceSelectOption extends ISelect2Option {
   type?: string
 }
 interface IOperationalSelectProps
-  extends ISelectProps<IPerformanceSelectOption> {}
+  extends ISelect2Props<IPerformanceSelectOption> {}
 
 export function PerformanceSelect(props: IOperationalSelectProps) {
-  return <Select {...props} />
+  return <Select2 {...props} />
 }

@@ -14,13 +14,10 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { Form, Field } from 'react-final-form'
 import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  TextInput,
-  PasswordInput,
-  THEME_MODE,
-  ErrorMessage
-} from '@opencrvs/components/lib/forms'
+import { InputField, THEME_MODE } from '@opencrvs/components/lib/InputField'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
+import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
 import { stepOneFields } from '@login/views/StepOne/stepOneFields'
 import { messages } from '@login/i18n/messages/views/stepOneForm'
 

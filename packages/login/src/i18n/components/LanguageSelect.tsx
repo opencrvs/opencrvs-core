@@ -12,7 +12,10 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { changeLanguage } from '@login/i18n/actions'
-import { ISelectOption, Select } from '@opencrvs/components/lib/select'
+import {
+  ISelect2Option,
+  Select2
+} from '@opencrvs/components/lib/Select/Select2'
 import styled from 'styled-components'
 import {
   retrieveLanguage,
@@ -40,7 +43,7 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const dispatch = useDispatch()
   const languages = useSelector(getLanguages)
 
-  const languageOptions: ISelectOption[] = Object.values(languages)
+  const languageOptions: ISelect2Option[] = Object.values(languages)
     .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
     .filter(({ value }) => applicationLangauges.includes(value))
 
@@ -59,7 +62,7 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const onChange = ({ value }: ISelectOption) => {
+  const onChange = ({ value }: ISelect2Option) => {
     if (paramLanguage) {
       history.replace({
         pathname: location.pathname,
@@ -83,7 +86,7 @@ export function LanguageSelect({ children }: IProps) {
     <>
       {languageOptions.length > 1 && (
         <SelectContainer>
-          <Select
+          <Select2
             value={selectedLanguage}
             options={languageOptions}
             onChange={onLanguageChange}

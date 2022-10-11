@@ -33,15 +33,13 @@ import {
   getSharedContactMsisdn,
   postToHearth,
   generateEmptyBundle,
-  forwardToHearth
+  forwardToHearth,
+  mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable,
-  getEventType,
-  getComposition,
-  getPatientBySection
+  isEventNonNotifiable
 } from '@workflow/features/registration/utils'
 import {
   taskHasInput,
@@ -58,10 +56,7 @@ import {
   BIRTH_REG_NUMBER_SYSTEM,
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
-import {
-  getSectionEntryBySectionCode,
-  getTaskResource
-} from '@workflow/features/registration/fhir/fhir-template'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import {
   REINSTATED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL
@@ -359,7 +354,6 @@ export async function markEventAsRegisteredCallbackHandler(
     // have time to complete indexing the previous waiting for external validation state before we update the search index with a BRN / DRN
     // If an external system is being used, then its processing time will mean a wait is not required.
     if (!VALIDATING_EXTERNALLY) {
-      // tslint:disable-next-line
       await new Promise((resolve) => setTimeout(resolve, 2000))
     }
     // Trigger an event for the registration
@@ -429,32 +423,7 @@ export async function markEventAsCertifiedHandler(
       request.payload as fhir.Bundle,
       getToken(request)
     )
-
-    const event = getEventType(request.payload as fhir.Bundle)
-    const composition = getComposition(payload)
-
-    const section = getSectionEntryBySectionCode(
-      composition,
-      event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE
-    )
-    const patient = getPatientBySection(payload, section)
-
-    const patientFromFhir: fhir.Patient =
-      patient && (await getFromFhir(`/Patient/${patient.id}`))
-
-    if (patientFromFhir) {
-      payload.entry =
-        payload &&
-        payload.entry &&
-        payload.entry.map((e) => {
-          if (e.resource?.id === patientFromFhir.id) {
-            return { resource: patientFromFhir }
-          } else {
-            return e
-          }
-        })
-    }
-
+    await mergePatientIdentifier(payload)
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)

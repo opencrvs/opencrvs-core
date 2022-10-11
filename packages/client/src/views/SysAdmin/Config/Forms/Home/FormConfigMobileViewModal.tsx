@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import styled from '@client/styledComponents'
 

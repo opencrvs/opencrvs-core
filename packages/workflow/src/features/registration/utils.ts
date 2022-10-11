@@ -77,7 +77,6 @@ export async function sendEventNotification(
   authHeader: { Authorization: string }
 ) {
   logger.info(`sendEventNotification method for event: ${event}`)
-  // tslint:disable-next-line
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       await sendNotification('birthInProgressSMS', msisdn, authHeader, {
@@ -335,7 +334,7 @@ export interface IMosipSeederResponse {
 export async function getMosipUINToken(
   patient: fhir.Patient
 ): Promise<IMosipSeederResponse> {
-  let submittedNationalIDInForm: string = ''
+  let submittedNationalIDInForm = ''
   const identifiers = patient?.identifier?.filter(
     (identifier: fhir.Identifier) => {
       return identifier.type === 'NATIONAL_ID'

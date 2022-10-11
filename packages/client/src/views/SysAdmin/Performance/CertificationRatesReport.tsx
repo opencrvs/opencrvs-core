@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import * as React from 'react'
 import {
   ListContainer,
@@ -24,11 +24,8 @@ import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
 import { Query } from '@client/components/Query'
 import { GET_TOTAL_CERTIFICATIONS } from './queries'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { GQLCertificationMetric } from '@opencrvs/gateway/src/graphql/schema.d'
 interface ICertificationRateData {
   label: string
@@ -57,11 +54,7 @@ export function CertificationRatesReport(props: ICertificationRateProps) {
     >
       {({ data, loading, error }) => {
         if (error) {
-          return (
-            <>
-              <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-            </>
-          )
+          return <GenericErrorToast />
         }
 
         if (loading) {

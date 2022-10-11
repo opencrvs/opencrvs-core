@@ -15,7 +15,7 @@ import User, { AUDIT_ACTION, AUDIT_REASON, IUser } from '@user-mgnt/model/user'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
