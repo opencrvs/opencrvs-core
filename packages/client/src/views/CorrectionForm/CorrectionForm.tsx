@@ -25,7 +25,8 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import styled from '@client/styledComponents'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { formatUrl } from '@client/navigation'
-import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { HOME } from '@client/navigation/routes'
+
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const SpinnerWrapper = styled.div`
@@ -43,17 +44,23 @@ function CorrectionFormComponent({ sectionId, ...props }: IProps) {
   const { declaration, modifyDeclaration } = props
   const logTime = React.useCallback(
     (timeMs: number) => {
-      const declarationUpdated = declaration
-      if (!declarationUpdated.timeLoggedMS) {
-        declarationUpdated.timeLoggedMS = 0
+      if (declaration) {
+        const declarationUpdated = declaration
+        if (!declarationUpdated.timeLoggedMS) {
+          declarationUpdated.timeLoggedMS = 0
+        }
+        declarationUpdated.timeLoggedMS += timeMs
+        modifyDeclaration(declarationUpdated)
       }
-      declarationUpdated.timeLoggedMS += timeMs
-      modifyDeclaration(declarationUpdated)
     },
     [modifyDeclaration, declaration]
   )
 
-  if (props.isWritingDraft) {
+  if (!declaration) {
+    return <Redirect to={HOME} />
+  }
+
+  if (declaration!.writingDraft) {
     return (
       <SpinnerWrapper>
         <Spinner id="draft_write_loading" />
@@ -63,12 +70,19 @@ function CorrectionFormComponent({ sectionId, ...props }: IProps) {
 
   return (
     <TimeMounted onUnmount={logTime}>
-      <FormSection sectionId={sectionId} {...props} />
+      <FormSection
+        sectionId={sectionId}
+        declaration={declaration!}
+        {...props}
+      />
     </TimeMounted>
   )
 }
 
-function FormSection({ sectionId, ...props }: IProps) {
+function FormSection({
+  sectionId,
+  ...props
+}: IProps & { declaration: IDeclaration }) {
   switch (sectionId) {
     case CorrectionSection.Corrector:
       return <CorrectorForm {...props} />
@@ -88,31 +102,27 @@ function mapStateToProps(state: IStoreState, props: IRouteProps) {
     ({ id }) => id === declarationId
   )
 
-  if (!declaration) {
-    throw new Error(`Draft "${declarationId}" missing!`)
-  }
   // if (!declaration) {
-  //   return (
-  //     <Redirect
-  //       to={formatUrl(REGISTRAR_HOME_TAB, {
-  //         tabId: WORKQUEUE_TABS.readyForReview,
-  //         selectorId: ''
-  //       })}
-  //     />
-  //   )
+  //   throw new Error(`Draft "${declarationId}" missing!`)
+  // }
+
+  // if (!declaration) {
+  //   return <Redirect to={HOME} />
   // }
 
   return {
     declaration,
-    sectionId,
-    isWritingDraft: declaration.writingDraft ?? false
+    // sectionId,
+    // isWritingDraft: declaration.writingDraft ?? false
+    sectionId
   }
 }
 
 type IStateProps = {
-  declaration: IDeclaration
+  // declaration: IDeclaration
+  declaration?: IDeclaration
   sectionId: string
-  isWritingDraft: boolean
+  // isWritingDraft: boolean
 }
 
 type IDispatchProps = {

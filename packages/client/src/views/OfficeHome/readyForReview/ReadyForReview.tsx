@@ -62,6 +62,7 @@ import { RegStatus } from '@client/utils/gateway'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
+
 interface IBaseReviewTabProps {
   theme: ITheme
   scope: Scope | null
