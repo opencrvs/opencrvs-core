@@ -49,8 +49,8 @@ if (
   // setup error reporting using sentry
   if (window.config.SENTRY) {
     Sentry.init({
-      release: process.env.REACT_APP_VERSION,
-      environment: process.env.NODE_ENV,
+      release: import.meta.env.REACT_APP_VERSION,
+      environment: import.meta.env.NODE_ENV,
       dsn: window.config.SENTRY
     })
   }

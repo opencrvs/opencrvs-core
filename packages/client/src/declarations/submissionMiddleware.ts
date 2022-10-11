@@ -32,7 +32,7 @@ import { Dispatch } from 'redux'
 import { IForm, SubmissionAction } from '@client/forms'
 import { showUnassigned } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { ApolloError } from 'apollo-client'
+import { ApolloError } from '@apollo/client'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
