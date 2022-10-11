@@ -109,8 +109,6 @@ export class LoadingIndicatorComp extends React.Component<IProps> {
 export function withOnlineStatus<T>(
   WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
 ) {
-  const ONLINE_CHECK_INTERVAL = 500
-
   return function WithOnlineStatus(props: T) {
     const isOnline = useOnlineStatus()
     return <WrappedComponent isOnline={isOnline} {...props} />
