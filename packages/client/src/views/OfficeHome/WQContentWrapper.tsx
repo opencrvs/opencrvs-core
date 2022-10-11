@@ -75,7 +75,7 @@ const Body = (props: IProps) => {
           onPageChange &&
           isOnline && (
             <Pagination
-              initialPage={paginationId}
+              currentPage={paginationId}
               totalPages={totalPages}
               onPageChange={onPageChange}
             />

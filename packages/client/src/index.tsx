@@ -25,7 +25,10 @@ import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
 import WebFont from 'webfontloader'
-import { BACKGROUND_SYNC_BROADCAST_CHANNEL } from './utils/constants'
+import {
+  BUILD_VERSION,
+  BACKGROUND_SYNC_BROADCAST_CHANNEL
+} from './utils/constants'
 
 WebFont.load({
   google: {
@@ -46,8 +49,8 @@ if (
   // setup error reporting using sentry
   if (window.config.SENTRY) {
     Sentry.init({
-      release: process.env.REACT_APP_VERSION,
-      environment: process.env.NODE_ENV,
+      release: import.meta.env.REACT_APP_VERSION,
+      environment: import.meta.env.NODE_ENV,
       dsn: window.config.SENTRY
     })
   }
@@ -55,7 +58,7 @@ if (
   // setup log rocket to ship log messages and record user errors
   if (window.config.LOGROCKET) {
     LogRocket.init(window.config.LOGROCKET, {
-      release: import.meta.env.VITE_APP_VERSION
+      release: BUILD_VERSION
     })
   }
 

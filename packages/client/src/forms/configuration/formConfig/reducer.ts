@@ -26,11 +26,11 @@ import {
   generateConfigFields,
   IConfigFieldMap,
   ISectionFieldMap,
-  getConfigFieldIdentifiers,
   prepareNewCustomFieldConfig
 } from './utils'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default'
+import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 
 export type IFormConfigState =
   | {
@@ -169,7 +169,7 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
 
     case actions.MODIFY_CONFIG_FIELD: {
       const { fieldId, modifiedProps } = action.payload
-      const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
+      const { event, sectionId } = getIdentifiersFromFieldId(fieldId)
       const { [fieldId]: originalField, ...fields } =
         state[event].configFields[sectionId]
 
@@ -224,7 +224,7 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
 
     case actions.REMOVE_CUSTOM_FIELD: {
       const { fieldId } = action.payload
-      const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
+      const { event, sectionId } = getIdentifiersFromFieldId(fieldId)
 
       const { [fieldId]: fieldToRemove, ...fields } =
         state[event].configFields[sectionId]
@@ -256,7 +256,7 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
 
     case actions.SHIFT_CONFIG_FIELD_UP: {
       const { fieldId } = action.payload
-      const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
+      const { event, sectionId } = getIdentifiersFromFieldId(fieldId)
       const fields = state[event].configFields[sectionId]
 
       const currentField = fields[fieldId]
@@ -282,7 +282,7 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
 
     case actions.SHIFT_CONFIG_FIELD_DOWN: {
       const { fieldId } = action.payload
-      const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
+      const { event, sectionId } = getIdentifiersFromFieldId(fieldId)
       const fields = state[event].configFields[sectionId]
 
       const currentField = fields[fieldId]
