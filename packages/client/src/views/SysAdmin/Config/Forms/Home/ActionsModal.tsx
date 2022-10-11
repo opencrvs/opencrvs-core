@@ -24,7 +24,7 @@ import {
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
 import { useDispatch } from 'react-redux'
-import { Mutation } from 'react-apollo'
+import { Mutation } from '@apollo/client/react/components'
 import {
   CHANGE_FORM_DRAFT_STATUS,
   DELETE_FORM_DRAFT

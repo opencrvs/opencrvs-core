@@ -48,7 +48,12 @@ import {
   GQLRegistrationSearchSet,
   GQLHumanName
 } from '@opencrvs/gateway/src/graphql/schema'
-import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
+import {
+  ApolloClient,
+  ApolloError,
+  ApolloQueryResult,
+  InternalRefetchQueriesInclude
+} from '@apollo/client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 import { getOfflineData } from '@client/offline/selectors'
@@ -61,7 +66,6 @@ import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { Roles } from '@client/utils/authUtils'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
-import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 import {
   UpdateRegistrarWorkqueueAction,
   updateRegistrarWorkqueue,
@@ -387,7 +391,7 @@ interface IUnassignDeclaration {
   payload: {
     id: string
     client: ApolloClient<{}>
-    refetchQueries?: RefetchQueryDescription
+    refetchQueries?: InternalRefetchQueriesInclude
   }
 }
 
@@ -396,7 +400,7 @@ interface IEnqueueUnassignDeclaration {
   payload: {
     id: string
     client: ApolloClient<{}>
-    refetchQueries?: RefetchQueryDescription
+    refetchQueries?: InternalRefetchQueriesInclude
   }
 }
 
@@ -968,7 +972,7 @@ function downloadDeclarationFail(
 export function executeUnassignDeclaration(
   id: string,
   client: ApolloClient<{}>,
-  refetchQueries?: RefetchQueryDescription
+  refetchQueries?: InternalRefetchQueriesInclude
 ): IUnassignDeclaration {
   return {
     type: UNASSIGN_DECLARATION,
@@ -983,7 +987,7 @@ export function executeUnassignDeclaration(
 export function unassignDeclaration(
   id: string,
   client: ApolloClient<{}>,
-  refetchQueries?: RefetchQueryDescription
+  refetchQueries?: InternalRefetchQueriesInclude
 ): IEnqueueUnassignDeclaration {
   return {
     type: ENQUEUE_UNASSIGN_DECLARATION,
