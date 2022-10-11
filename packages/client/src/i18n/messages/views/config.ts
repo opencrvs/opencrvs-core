@@ -96,7 +96,7 @@ const messagesToDefine: IConfigMessages = {
     description: 'VS Export tab'
   },
   vitalStatisticsExport: {
-    id: 'config.application.vitalStatisticsDeath',
+    id: 'config.application.vitalStatistics',
     defaultMessage:
       '{year}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
     description: 'Vital Statistics Export'
