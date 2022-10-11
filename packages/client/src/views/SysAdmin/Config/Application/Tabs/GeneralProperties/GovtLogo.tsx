@@ -194,7 +194,6 @@ export function GovtLogo() {
           </Field>
         </Content>
       </ResponsiveModal>
-
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast
           id="print-cert-notification"
@@ -213,7 +212,7 @@ export function GovtLogo() {
             ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
             : notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? intl.formatMessage(messages.govtLogoChangeNotification)
-            : errorMessages}
+            : intl.formatMessage(messages.govtLogoChangeError)}
         </Toast>
       )}
     </>
