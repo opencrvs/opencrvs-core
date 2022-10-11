@@ -81,7 +81,7 @@ const currencySchema = new Schema<ICurrency>({
 
 interface IIntegration {
   name: string
-  enabled: string
+  status: string
 }
 
 export const statuses = {
