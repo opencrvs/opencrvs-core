@@ -201,7 +201,6 @@ echo "Deploying COUNTRY_CONFIG_VERSION $COUNTRY_CONFIG_VERSION to $SSH_HOST..."
 echo
 
 mkdir -p /tmp/opencrvs/infrastructure/default_backups
-mkdir -p /tmp/opencrvs/infrastructure/default_updates
 mkdir -p /tmp/opencrvs/infrastructure/cryptfs
 
 # Copy selected country default backups to infrastructure default_backups folder
