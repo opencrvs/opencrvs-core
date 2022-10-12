@@ -83,7 +83,11 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessageDescriptors
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -342,12 +346,15 @@ const getCheckBoxGroupFieldValue = (
   intl: IntlShape
 ) => {
   const option = field.options.find((option) => {
-    return value.length > 0 && option.value === value[0]
+    if (!field.initialValue) {
+      return value.length > 0 && option.value === value[0]
+    }
+    return value.length > 0 && option.value === value[1]
   })
   if (option) {
-    return intl.formatMessage(option.label)
+    return intl.formatMessage(formMessageDescriptors.confirm)
   }
-  return ''
+  return intl.formatMessage(formMessageDescriptors.deny)
 }
 
 const getFormFieldValue = (

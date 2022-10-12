@@ -3335,21 +3335,18 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'causeOfDeathEstablished',
-                type: 'RADIO_GROUP',
+                type: 'CHECKBOX_GROUP',
                 label: formMessageDescriptors.causeOfDeathEstablished,
                 required: true,
                 customisable: true,
-                initialValue: 'true',
-                size: RadioSize.NORMAL,
+                hideHeader: true,
+                initialValue: ['false'],
                 validate: [],
                 options: [
                   {
                     value: 'true',
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: 'false',
-                    label: formMessageDescriptors.deny
+                    label:
+                      formMessageDescriptors.CauseOfDeathEstablishedMessages
                   }
                 ],
                 mapping: {
