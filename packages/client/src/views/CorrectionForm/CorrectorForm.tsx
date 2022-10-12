@@ -13,7 +13,8 @@ import * as React from 'react'
 import {
   modifyDeclaration,
   IDeclaration,
-  writeDeclaration
+  writeDeclaration,
+  clearCorrectionChange
 } from '@client/declarations'
 import {
   CorrectorRelationship,
@@ -56,6 +57,7 @@ type IDispatchProps = {
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
   goToHomeTab: typeof goToHomeTab
+  clearCorrectionChange: typeof clearCorrectionChange
 }
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
@@ -180,7 +182,10 @@ function CorrectorFormComponent(props: IFullProps) {
         id="corrector_form"
         title={intl.formatMessage(section.title)}
         hideBackground
-        goBack={props.goBack}
+        goBack={() => {
+          props.clearCorrectionChange(declaration.id)
+          props.goBack()
+        }}
         goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
       >
         <Content
@@ -214,5 +219,6 @@ export const CorrectorForm = connect(undefined, {
   writeDeclaration,
   goToVerifyCorrector,
   goToPageGroup,
-  goToHomeTab
+  goToHomeTab,
+  clearCorrectionChange
 })(injectIntl(CorrectorFormComponent))
