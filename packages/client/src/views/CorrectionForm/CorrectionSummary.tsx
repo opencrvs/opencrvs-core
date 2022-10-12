@@ -263,25 +263,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               isLoading={false}
               content={[
                 {
-                  idCheck: this.getIdCheck()
-                }
-              ]}
-              columns={[
-                {
-                  label: intl.formatMessage(messages.correctionSummaryIdCheck),
-                  width: 100,
-                  alignment: ColumnContentAlignment.LEFT,
-                  key: 'idCheck'
-                }
-              ]}
-              noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></Table>
-
-            <Table
-              hideTableBottomBorder={true}
-              isLoading={false}
-              content={[
-                {
                   reasonForRequest: this.getReasonForRequest()
                 }
               ]}
