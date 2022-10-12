@@ -46,8 +46,16 @@ self.addEventListener('fetch', (event) => {
   }
 })
 
-self.addEventListener('message', (event) => {
+self.addEventListener('message', async (event) => {
   if (!event.data) {
+    return
+  }
+
+  if (
+    typeof event.data === 'object' &&
+    event.data.hasOwnProperty('minioUrls')
+  ) {
+    await removeCache(event.data.minioUrls)
     return
   }
 
@@ -95,3 +103,17 @@ workbox.routing.registerRoute(
 workbox.routing.registerNavigationRoute('/index.html', {
   blacklist: [/^\/__.*$/]
 })
+
+const removeCache = async (minioUrls) => {
+  const runTimeCacheKey = (await caches.keys()).find((e) =>
+    e.includes('workbox-runtime')
+  )
+  if (!runTimeCacheKey) {
+    return
+  }
+  const runtimecache = await caches.open(runTimeCacheKey)
+  for (let minioUrl of minioUrls) {
+    const cacheDeletionSuccess = await runtimecache.delete(minioUrl)
+    console.log(`Deleted cache for ${minioUrl} : ${cacheDeletionSuccess}`)
+  }
+}
