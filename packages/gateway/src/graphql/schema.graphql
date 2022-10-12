@@ -735,10 +735,10 @@ enum BirthRegType {
 type History {
   user: User
   date: Date
-  action: RegStatus
+  regStatus: RegStatus
+  action: RegAction
   statusReason: StatusReason
   reason: String
-  reinstated: Boolean
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -1041,8 +1041,6 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
-  REQUESTED_CORRECTION
-  DOWNLOADED
 }
 
 input MedicalPractitionerInput {
@@ -1176,6 +1174,14 @@ type Certificate {
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
   data: String
+}
+
+enum RegAction {
+  ASSIGNED
+  UNASSIGNED
+  REINSTATED
+  REQUESTED_CORRECTION
+  DOWNLOADED
 }
 
 type StatusReason {
