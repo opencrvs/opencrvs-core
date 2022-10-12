@@ -17,7 +17,8 @@ import {
   getAllDocumentsHandler,
   getStatusWiseRegistrationCountHandler,
   populateHierarchicalLocationIdsHandler,
-  advancedRecordSearch
+  advancedRecordSearch,
+  searchAssignment
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import {
@@ -81,6 +82,18 @@ export const getRoutes = () => {
           ]
         },
         description: 'Handles searching from declarations'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/search/assignment',
+      handler: searchAssignment,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
+        },
+        description: 'Handles searching declaration assignment'
       }
     },
     {

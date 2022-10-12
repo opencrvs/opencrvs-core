@@ -74,17 +74,16 @@ import {
   selectOrCreateEncounterPartitioner,
   selectOrCreateEncounterParticipant,
   selectOrCreateQuestionnaireResource,
-  findExtension,
-  setQuestionnaireItem
+  setQuestionnaireItem,
+  postAssignmentSearch
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
   FHIR_SPECIFICATION_URL,
-  EVENT_TYPE,
-  ASSIGNED_EXTENSION_URL
+  EVENT_TYPE
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
-import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import { getTokenPayload } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput
@@ -3614,34 +3613,8 @@ export async function checkUserAssignment(
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   const userId = tokenPayload.sub
-  const taskBundle: ITaskBundle = await fetchFHIR(
-    `/Task?focus=Composition/${id}`,
-    authHeader
-  )
-  const taskEntryData = taskBundle.entry[0]
-  if (
-    !taskEntryData ||
-    !taskEntryData.resource ||
-    !taskEntryData.resource.extension
-  ) {
-    return false
-  }
-  const assignedExtensionData = findExtension(
-    ASSIGNED_EXTENSION_URL,
-    taskEntryData.resource.extension
-  )
-  if (!assignedExtensionData) {
-    return false
-  }
-  const practitionerId =
-    assignedExtensionData?.valueReference?.reference?.split('/')[1]
-
-  const userDetails = await getUser({ userId }, authHeader)
-
-  if (practitionerId === userDetails.practitionerId) {
-    return true
-  }
-  return false
+  const res: { userId?: string } = await postAssignmentSearch(authHeader, id)
+  return userId === res?.userId
 }
 
 export interface ITemplatedComposition extends fhir.Composition {
