@@ -57,7 +57,7 @@ interface IFormMessages
   birthTypeTwin: MessageDescriptor
   causeOfDeathMethod: MessageDescriptor
   causeOfDeathEstablished: MessageDescriptor
-  CauseOfDeathEstablishedMessages: MessageDescriptor
+  causeOfDeathEstablishedMessages: MessageDescriptor
   causeOfDeathName: MessageDescriptor
   causeOfDeathNotice: MessageDescriptor
   causeOfDeathTitle: MessageDescriptor
@@ -659,9 +659,9 @@ export const formMessageDescriptors: IFormMessages = {
   causeOfDeathEstablished: {
     defaultMessage: 'Has a cause of death been established ?',
     description: 'Label for form field: Cause of Death Established',
-    id: 'form.field.label.causeOfDeathEstablished'
+    id: 'form.field.label.CauseOfDeathEstablishedMessages'
   },
-  CauseOfDeathEstablishedMessages: {
+  causeOfDeathEstablishedMessages: {
     defaultMessage: 'Cause of death has been established',
     description: 'Has a cause of death been established',
     id: 'form.field.label.CauseOfDeathEstablishedMessages'
