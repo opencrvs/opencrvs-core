@@ -243,7 +243,8 @@ export const registrarNameUserTransformer = (
   }
 
   const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
+    ({ action, regStatus }: History) =>
+      !action && regStatus === RegStatus.Registered
   )
   transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
     history?.user ? getUserName(history.user) : ''
@@ -263,7 +264,8 @@ export const roleUserTransformer = (
   }
 
   const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
+    ({ action, regStatus }: History) =>
+      !action && regStatus === RegStatus.Registered
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
@@ -309,7 +311,8 @@ export const registrarSignatureUserTransformer = (
   }
 
   const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
+    ({ action, regStatus }: History) =>
+      !action && regStatus === RegStatus.Registered
   )
 
   transformedData[targetSectionId || sectionId][

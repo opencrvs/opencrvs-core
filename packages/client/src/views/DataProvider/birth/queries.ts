@@ -181,7 +181,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       history {
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text
@@ -423,7 +423,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       history {
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text

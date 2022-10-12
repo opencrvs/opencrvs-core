@@ -692,7 +692,7 @@ export type FormDraftStatusModifyInput = {
 
 export type History = {
   __typename?: 'History'
-  action?: Maybe<RegStatus>
+  action?: Maybe<RegAction>
   certificates?: Maybe<Array<Maybe<Certificate>>>
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
@@ -702,7 +702,7 @@ export type History = {
   office?: Maybe<Location>
   output?: Maybe<Array<Maybe<InputOutput>>>
   reason?: Maybe<Scalars['String']>
-  reinstated?: Maybe<Scalars['Boolean']>
+  regStatus?: Maybe<RegStatus>
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
   user?: Maybe<User>
@@ -1255,6 +1255,7 @@ export type Query = {
   searchDeathRegistrations?: Maybe<Array<Maybe<DeathRegistration>>>
   searchEvents?: Maybe<EventSearchResultSet>
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
+  searchRecord?: Maybe<EventProgressResultSet>
   searchUsers?: Maybe<SearchUserResult>
   verifyPasswordById?: Maybe<VerifyPasswordResult>
 }
@@ -1455,6 +1456,35 @@ export type QuerySearchFieldAgentsArgs = {
   timeStart: Scalars['String']
 }
 
+export type QuerySearchRecordArgs = {
+  childDoB?: InputMaybe<Scalars['String']>
+  childFirstName?: InputMaybe<Scalars['String']>
+  childLastName?: InputMaybe<Scalars['String']>
+  contactNumber?: InputMaybe<Scalars['String']>
+  dateOfRegistration?: InputMaybe<Scalars['String']>
+  dateOfRegistrationEnd?: InputMaybe<Scalars['String']>
+  dateOfRegistrationStart?: InputMaybe<Scalars['String']>
+  deathDate?: InputMaybe<Scalars['String']>
+  deathDateEnd?: InputMaybe<Scalars['String']>
+  deathDateStart?: InputMaybe<Scalars['String']>
+  deceasedFamilyName?: InputMaybe<Scalars['String']>
+  deceasedFirstNames?: InputMaybe<Scalars['String']>
+  event?: InputMaybe<Scalars['String']>
+  eventLocationId?: InputMaybe<Scalars['String']>
+  fatherDoB?: InputMaybe<Scalars['String']>
+  fatherFamilyName?: InputMaybe<Scalars['String']>
+  fatherFirstNames?: InputMaybe<Scalars['String']>
+  fatherIdentifier?: InputMaybe<Scalars['String']>
+  informantFamilyName?: InputMaybe<Scalars['String']>
+  informantFirstNames?: InputMaybe<Scalars['String']>
+  motherDoB?: InputMaybe<Scalars['String']>
+  motherFamilyName?: InputMaybe<Scalars['String']>
+  motherFirstNames?: InputMaybe<Scalars['String']>
+  motherIdentifier?: InputMaybe<Scalars['String']>
+  registrationNumber?: InputMaybe<Scalars['String']>
+  trackingId?: InputMaybe<Scalars['String']>
+}
+
 export type QuerySearchUsersArgs = {
   count?: InputMaybe<Scalars['Int']>
   locationId?: InputMaybe<Scalars['String']>
@@ -1500,16 +1530,22 @@ export type QuestionnaireQuestionInput = {
   value?: InputMaybe<Scalars['String']>
 }
 
+export enum RegAction {
+  Assigned = 'ASSIGNED',
+  Downloaded = 'DOWNLOADED',
+  Reinstated = 'REINSTATED',
+  RequestedCorrection = 'REQUESTED_CORRECTION',
+  Unassigned = 'UNASSIGNED'
+}
+
 export enum RegStatus {
   Archived = 'ARCHIVED',
   Certified = 'CERTIFIED',
   DeclarationUpdated = 'DECLARATION_UPDATED',
   Declared = 'DECLARED',
-  Downloaded = 'DOWNLOADED',
   InProgress = 'IN_PROGRESS',
   Registered = 'REGISTERED',
   Rejected = 'REJECTED',
-  RequestedCorrection = 'REQUESTED_CORRECTION',
   Validated = 'VALIDATED',
   WaitingValidation = 'WAITING_VALIDATION'
 }
@@ -2674,8 +2710,8 @@ export type FetchBirthRegistrationForReviewQuery = {
     history?: Array<{
       __typename?: 'History'
       date?: any | null
-      action?: RegStatus | null
-      reinstated?: boolean | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       reason?: string | null
       statusReason?: {
@@ -2956,8 +2992,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
     history?: Array<{
       __typename?: 'History'
       date?: any | null
-      action?: RegStatus | null
-      reinstated?: boolean | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       statusReason?: {
         __typename?: 'StatusReason'
@@ -3316,8 +3352,8 @@ export type FetchDeathRegistrationForReviewQuery = {
     history?: Array<{
       __typename?: 'History'
       date?: any | null
-      action?: RegStatus | null
-      reinstated?: boolean | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       reason?: string | null
       statusReason?: {
@@ -3587,8 +3623,8 @@ export type FetchDeathRegistrationForCertificationQuery = {
     history?: Array<{
       __typename?: 'History'
       date?: any | null
-      action?: RegStatus | null
-      reinstated?: boolean | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       statusReason?: {
         __typename?: 'StatusReason'
