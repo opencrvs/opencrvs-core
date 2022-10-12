@@ -62,7 +62,6 @@ import { RegStatus } from '@client/utils/gateway'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-
 interface IBaseReviewTabProps {
   theme: ITheme
   scope: Scope | null
@@ -99,10 +98,6 @@ class ReadyForReviewComponent extends React.Component<
       sortedCol: COLUMNS.SENT_FOR_REVIEW,
       sortOrder: SORT_ORDER.DESCENDING
     }
-  }
-
-  getPresentState = () => {
-    this.setState({ width: window.innerWidth })
   }
 
   componentDidMount() {

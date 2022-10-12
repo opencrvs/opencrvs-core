@@ -102,27 +102,15 @@ function mapStateToProps(state: IStoreState, props: IRouteProps) {
     ({ id }) => id === declarationId
   )
 
-  // if (!declaration) {
-  //   throw new Error(`Draft "${declarationId}" missing!`)
-  // }
-
-  // if (!declaration) {
-  //   return <Redirect to={HOME} />
-  // }
-
   return {
     declaration,
-    // sectionId,
-    // isWritingDraft: declaration.writingDraft ?? false
     sectionId
   }
 }
 
 type IStateProps = {
-  // declaration: IDeclaration
   declaration?: IDeclaration
   sectionId: string
-  // isWritingDraft: boolean
 }
 
 type IDispatchProps = {

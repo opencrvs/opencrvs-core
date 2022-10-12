@@ -73,9 +73,6 @@ import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { createBrowserHistory } from 'history'
-import { IHistoryStateProps } from '@client/views/SysAdmin/Performance/WorkflowStatus'
-
 export interface IDynamicValues {
   [key: string]: any
 }
@@ -87,14 +84,6 @@ export function formatUrl(url: string, props: { [key: string]: string }) {
   )
   return formattedUrl.endsWith('?') ? formattedUrl.slice(0, -1) : formattedUrl
 }
-
-// export function componentDidUpdate()  {
-//   window.history.pushState(null, document.title, window.location.href);
-//   window.addEventListener('popstate', function(event) {
-//     window.history.pushState(null, document.title, window.location.href);
-//   });
-// }
-
 export const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
 type GoToPageAction = {
   type: typeof GO_TO_PAGE
@@ -209,21 +198,6 @@ export function goToHomeTab(
 }
 
 export function goToHomeTabReplace(tabId: IWORKQUEUE_TABS, selectorId = '') {
-  // function componentDidUpdate() {
-  //   window.history.pushState(null, document.title, window.location.href)
-  //   window.addEventListener('popstate', function (event) {
-  //     window.history.pushState(null, document.title, window.location.href)
-  //   })
-  // }
-  // const history = createBrowserHistory()
-  // console.log(history)
-
-  // history.replaceState(null, '', location.href)
-  // window.onpopstate = function (event) {
-  //   history.go(1)
-  // }
-
-  window.history.replaceState(null, '', '/')
   return replace(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
 }
 
