@@ -28,7 +28,7 @@ import { IStoreState } from '@client/store'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { getUserName, IUserDetails } from '@client/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { Mutation } from 'react-apollo'
+import { Mutation } from '@apollo/client/react/components'
 import {
   userMessages,
   buttonMessages,

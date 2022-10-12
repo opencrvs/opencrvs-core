@@ -15,7 +15,7 @@ module.exports = {
   env: {
     es6: true,
     browser: true,
-    node: true,
+    node: true
   },
   rules: {
     'react-hooks/exhaustive-deps': 'error',
@@ -29,7 +29,7 @@ module.exports = {
 Query component now sends errors automatically to Sentry.`
           },
           {
-            name: 'react-apollo',
+            name: '@apollo/client/react/components',
             importNames: ['Query'],
             message: `Please use our own <Query /> component instead from components/Query.tsx`
           },
