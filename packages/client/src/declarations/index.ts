@@ -89,6 +89,7 @@ const ENQUEUE_DOWNLOAD_DECLARATION = 'DECLARATION/ENQUEUE_DOWNLOAD_DECLARATION'
 const DOWNLOAD_DECLARATION_SUCCESS = 'DECLARATION/DOWNLOAD_DECLARATION_SUCCESS'
 const DOWNLOAD_DECLARATION_FAIL = 'DECLARATION/DOWNLOAD_DECLARATION_FAIL'
 const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
+const CLEAR_COLLECTOR_INFO = 'CLEAR_COLLECTOR_INFO'
 const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
 const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
 const UNASSIGN_DECLARATION_SUCCESS = 'DECLARATION/UNASSIGN_SUCCESS'
@@ -308,6 +309,12 @@ interface IClearCorrectionChange {
     declarationId: string
   }
 }
+interface IClearCollectorInfo {
+  type: typeof CLEAR_COLLECTOR_INFO
+  payload: {
+    declarationId: string
+  }
+}
 interface IWriteDeclarationAction {
   type: typeof WRITE_DECLARATION
   payload: {
@@ -417,6 +424,7 @@ export type Action =
   | IStoreDeclarationAction
   | IModifyDeclarationAction
   | IClearCorrectionChange
+  | IClearCollectorInfo
   | ISetInitialDeclarationsAction
   | IWriteDeclarationAction
   | IWriteDeclarationSuccessAction
@@ -528,6 +536,10 @@ export function clearCorrectionChange(
 ): IClearCorrectionChange {
   return { type: CLEAR_CORRECTION_CHANGE, payload: { declarationId } }
 }
+export function clearCollectorInfo(declarationId: string): IClearCollectorInfo {
+  return { type: CLEAR_COLLECTOR_INFO, payload: { declarationId } }
+}
+
 export function setInitialDeclarations() {
   return { type: SET_INITIAL_DECLARATION }
 }
@@ -1094,6 +1106,36 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         ...correction,
         data: {
           ...correction.originalData
+        }
+      }
+
+      return loop(state, Cmd.action(writeDeclaration(orignalAppliation)))
+    }
+
+    case CLEAR_COLLECTOR_INFO: {
+      const declarationIndex = state.declarations.findIndex(
+        (declaration) => declaration.id === action.payload.declarationId
+      )
+      const correction = state.declarations[declarationIndex]
+      const certificates = correction.data.registration
+        .certificates as ICertificate[]
+      const newCertificates = certificates.map((cetificate) => {
+        return {
+          collector: {
+            type: cetificate.collector?.type
+          },
+          hasShowedVerifiedDocument: false
+        }
+      })
+
+      const orignalAppliation: IDeclaration = {
+        ...correction,
+        data: {
+          ...correction.data,
+          registration: {
+            ...correction.data.registration,
+            certificates: newCertificates
+          }
         }
       }
 
