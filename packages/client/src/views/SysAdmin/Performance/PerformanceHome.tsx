@@ -40,7 +40,7 @@ import {
   PERFORMANCE_METRICS,
   PERFORMANCE_STATS
 } from './metricsQuery'
-import { ApolloError } from 'apollo-client'
+import { ApolloError } from '@apollo/client'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
 import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'

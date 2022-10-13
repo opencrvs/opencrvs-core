@@ -22,7 +22,7 @@ import { Event } from '@client/utils/gateway'
 import { SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '.'
 import { client } from '@client/utils/apolloClient'
-import { ApolloError } from 'apollo-client'
+import { ApolloError } from '@apollo/client'
 import { GraphQLError } from 'graphql'
 import { vi, SpyInstance } from 'vitest'
 

@@ -304,7 +304,7 @@ export const GetHistory = ({
         />
         {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
-            initialPage={currentPageNumber}
+            currentPage={currentPageNumber}
             totalPages={Math.ceil(
               allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
             )}

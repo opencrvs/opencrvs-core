@@ -555,9 +555,11 @@ export const getConditionalActionsForField = (
 
 export const getVisibleSectionGroupsBasedOnConditions = (
   section: IFormSection,
-  values: IFormSectionData,
+  sectionData: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
+  // eslint-disable-next-line no-unused-vars
+  const values = sectionData
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)

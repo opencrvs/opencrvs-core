@@ -50,7 +50,7 @@ const connect = async (): Promise<void> => {
     logger.error(`Cant create Redis instance: ${err}`)
   }
   try {
-    await mongoose.connect(MONGO_URL, { autoReconnect: true })
+    await mongoose.connect(MONGO_URL)
   } catch (err) {
     logger.error(`Cant connect to Mongo: ${err}`)
     await wait(1000)
