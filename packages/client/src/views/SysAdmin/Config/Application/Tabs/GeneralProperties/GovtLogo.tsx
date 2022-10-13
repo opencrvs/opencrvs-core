@@ -110,9 +110,7 @@ export function GovtLogo() {
         )
       } catch {
         setNotificationStatus(NOTIFICATION_STATUS.ERROR)
-        setErrorMessages(
-          intl.formatMessage(messages.govtLogoChangeNotification)
-        )
+        setErrorMessages(intl.formatMessage(messages.govtLogoChangeError))
       }
     }
   }
@@ -212,7 +210,7 @@ export function GovtLogo() {
             ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
             : notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? intl.formatMessage(messages.govtLogoChangeNotification)
-            : intl.formatMessage(messages.govtLogoChangeError)}
+            : errorMessages}
         </Toast>
       )}
     </>
