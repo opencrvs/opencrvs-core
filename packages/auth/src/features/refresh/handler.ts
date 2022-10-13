@@ -20,15 +20,19 @@ interface IRefreshPayload {
   token: string
 }
 
-export default async function refreshHandler(request: Hapi.Request) {
+export default async function refreshHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
   const { token } = request.payload as IRefreshPayload
 
-  const decodedOrError = verifyToken(token)
-  if (decodedOrError._tag === 'Left') {
+  let decoded
+
+  try {
+    decoded = verifyToken(token)
+  } catch (err) {
     return unauthorized()
   }
-
-  const decoded = decodedOrError.right
 
   const newToken = await refreshToken(decoded)
   return { token: newToken }

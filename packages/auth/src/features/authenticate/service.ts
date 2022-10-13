@@ -25,6 +25,7 @@ import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { get, set } from '@auth/database'
 import * as t from 'io-ts'
+import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
 import {
   generateVerificationCode,
   sendVerificationCode,
@@ -32,8 +33,6 @@ import {
 } from '@auth/features/verifyCode/service'
 import { logger } from '@auth/logger'
 import { unauthorized } from '@hapi/boom'
-import { chainW, tryCatch } from 'fp-ts/Either'
-import { pipe } from 'fp-ts/function'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -199,19 +198,14 @@ const tokenPayload = t.type({
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
-function safeVerifyJwt(token: string) {
-  return tryCatch(
-    () =>
-      jwt.verify(token, publicCert, {
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:auth-user'
-      }),
-    (e) => (e instanceof Error ? e : new Error('Unkown error'))
-  )
-}
-
-export function verifyToken(token: string) {
-  return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
+export function verifyToken(token: string): ITokenPayload {
+  const decoded = jwt.verify(token, publicCert, {
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:auth-user'
+  })
+  const result = tokenPayload.decode(decoded)
+  ThrowReporter.report(result)
+  return result.value as ITokenPayload
 }
 
 export function getPublicKey() {

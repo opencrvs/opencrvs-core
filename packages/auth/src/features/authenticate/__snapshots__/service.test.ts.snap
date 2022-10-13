@@ -2,6 +2,6 @@
 
 exports[`authenticate service errors getStoredUserInformation - cannot find a user returns an Error if a user cannot be found 1`] = `"user not found"`;
 
-exports[`authenticate service errors verifyToken - token expired returns a JWT Error for an expired token 1`] = `[TokenExpiredError: jwt expired]`;
+exports[`authenticate service errors verifyToken - token expired returns a JWT Error for an expired token 1`] = `"jwt expired"`;
 
-exports[`authenticate service errors verifyToken - token expired returns an Error for a malformed token 1`] = `[JsonWebTokenError: jwt malformed]`;
+exports[`authenticate service errors verifyToken - token expired returns an Error for a malformed token 1`] = `"jwt malformed"`;

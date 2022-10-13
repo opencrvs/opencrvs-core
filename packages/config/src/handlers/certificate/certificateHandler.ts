@@ -21,8 +21,6 @@ import { badRequest } from '@hapi/boom'
 import { isValidSVGCode } from '@config/services/certificateService'
 import { verifyToken } from '@config/utils/verifyToken'
 import { RouteScope } from '@config/config/routes'
-import { pipe } from 'fp-ts/lib/function'
-
 interface IActivePayload {
   status: Status
   event: Event
@@ -46,11 +44,8 @@ export async function getActiveCertificatesHandler(
   h: Hapi.ResponseToolkit
 ) {
   const token = request.headers.authorization.replace('Bearer ', '')
-  const decodedOrError = pipe(token, verifyToken)
-  if (decodedOrError._tag === 'Left') {
-    return []
-  }
-  const { scope } = decodedOrError.right
+  const tokenDecoded = verifyToken(token)
+  const { scope } = tokenDecoded
 
   if (
     scope &&

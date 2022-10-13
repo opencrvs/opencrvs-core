@@ -15,7 +15,7 @@ import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
 import { logger } from '@user-mgnt/logger'
-import * as mockingoose from 'mockingoose'
+import mockingoose from 'mockingoose'
 import { cloneDeep } from 'lodash'
 
 const fetch = fetchMock as fetchMock.FetchMock

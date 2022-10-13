@@ -13,7 +13,7 @@ import User from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import * as mockingoose from 'mockingoose'
+import mockingoose from 'mockingoose'
 
 let server: any
 

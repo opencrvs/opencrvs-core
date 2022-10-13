@@ -13,7 +13,6 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
 import Role from '@user-mgnt/model/role'
-import { SortOrder } from 'mongoose'
 
 interface IVerifyPayload {
   title?: string
@@ -21,7 +20,7 @@ interface IVerifyPayload {
   type?: string
   active?: boolean
   sortBy?: string
-  sortOrder?: SortOrder
+  sortOrder?: string
 }
 
 export default async function getRoles(

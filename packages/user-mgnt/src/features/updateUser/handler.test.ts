@@ -15,7 +15,7 @@ import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import * as mockingoose from 'mockingoose'
+import mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 

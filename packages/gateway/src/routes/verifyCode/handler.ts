@@ -28,8 +28,6 @@ import { unauthorized } from '@hapi/boom'
 import { logger } from '@gateway/logger'
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 import * as t from 'io-ts'
-import { pipe } from 'fp-ts/function'
-import { chainW, tryCatch } from 'fp-ts/Either'
 
 interface ICodeDetails {
   code: string
@@ -174,12 +172,8 @@ export default async function sendVerifyCodeHandler(
   const payload = request.payload as ISendVerifyCodePayload
   const { phoneNumber } = payload
   const token = request.headers.authorization.replace('Bearer ', '') as string
-  const decodedOrError = verifyToken(token)
-  if (decodedOrError._tag === 'Left') {
-    return unauthorized()
-  }
-  const decoded = decodedOrError.right
-  const { sub: userId, scope } = decoded
+  const tokenDecoded = verifyToken(token)
+  const { sub: userId, scope } = tokenDecoded
   const nonce = generateNonce()
   const response: ISendVerifyCodeResponse = {
     userId,
@@ -212,17 +206,11 @@ const tokenPayload = t.type({
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
-function safeVerifyJwt(token: string) {
-  return tryCatch(
-    () =>
-      jwt.verify(token, publicCert, {
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }),
-    (e) => (e instanceof Error ? e : new Error('Unkown error'))
-  )
-}
-
-export function verifyToken(token: string) {
-  return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
+export function verifyToken(token: string): ITokenPayload {
+  const decoded = jwt.verify(token, publicCert, {
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  })
+  const result = tokenPayload.decode(decoded)
+  return result.value as ITokenPayload
 }

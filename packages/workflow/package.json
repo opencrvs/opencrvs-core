@@ -24,11 +24,11 @@
     "@types/pino": "^6.3.12",
     "app-module-path": "^2.2.0",
     "country-data": "^0.0.31",
-    "dotenv": "^6.1.0",
     "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.1.0",
     "joi": "^17.3.0",
+    "dotenv": "^6.1.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "node-fetch": "^2.6.7",
@@ -55,7 +55,7 @@
     "prettier": "^2.5.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
-    "typescript": "^4.8.3"
+    "typescript": "^3.7.2"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
