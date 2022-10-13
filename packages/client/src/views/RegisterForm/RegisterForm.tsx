@@ -27,12 +27,12 @@ import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
   EventTopBar,
   IEventTopBarProps,
-  IEventTopBarMenuAction,
-  ResponsiveModal,
-  Spinner,
-  Warning
-} from '@opencrvs/components/lib/interface'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+  IEventTopBarMenuAction
+} from '@opencrvs/components/lib/EventTopBar'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {
   deleteDeclaration,
   IDeclaration,
@@ -108,6 +108,7 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { IUserDetails } from '@client/utils/userUtils'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -236,6 +237,14 @@ const StyledContainer = styled(Container)`
     z-index: 999;
   }
 `
+function getDeclarationIconColor(declaration: IDeclaration): string {
+  return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
+    ? 'purple'
+    : declaration.registrationStatus
+    ? STATUSTOCOLOR[declaration.registrationStatus]
+    : 'orange'
+}
+
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -555,10 +564,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       title: intl.formatMessage(messages.newVitalEventRegistration, {
         event: declaration.event
       }),
-      iconColor:
-        declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-          ? 'purple'
-          : 'orange'
+      iconColor: getDeclarationIconColor(declaration)
     }
 
     if (!!activeSectionGroup.showExitButtonOnly) {
@@ -648,11 +654,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         event: declaration.event
                       }
                     )}
-                    iconColor={
-                      declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'purple'
-                        : 'orange'
-                    }
+                    iconColor={getDeclarationIconColor(declaration)}
                     saveAction={{
                       handler: this.onSaveAsDraftClicked,
                       label: intl.formatMessage(buttonMessages.saveExitButton)
@@ -679,11 +681,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           event: declaration.event
                         }
                       )}
-                      iconColor={
-                        declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                          ? 'purple'
-                          : 'orange'
-                      }
+                      iconColor={getDeclarationIconColor(declaration)}
                       saveAction={{
                         handler: () =>
                           this.props.goToHomeTab(
@@ -790,14 +788,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         >
                           {isFileSizeExceeded(declaration) &&
                             isDocumentUploadPage && (
-                              <Warning
-                                label={intl.formatMessage(
+                              <Alert type="warning">
+                                {intl.formatMessage(
                                   constantsMessages.totalFileSizeExceed,
                                   {
                                     fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
                                   }
                                 )}
-                              />
+                              </Alert>
                             )}
                           <FormFieldGenerator
                             id={activeSectionGroup.id}

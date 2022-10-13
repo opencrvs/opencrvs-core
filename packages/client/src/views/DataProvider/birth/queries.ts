@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import { Action, DownloadAction } from '@client/forms'
 
 export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
@@ -19,7 +19,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       id
       child {
         id
-        multipleBirth
         name {
           use
           firstNames
@@ -65,6 +64,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           firstNames
           familyName
         }
+        multipleBirth
         birthDate
         maritalStatus
         occupation

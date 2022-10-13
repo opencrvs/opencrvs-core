@@ -14,6 +14,7 @@
 interface ImportMetaEnv {
   readonly VITE_APP_VERSION?: string
   readonly COUNTRY_CONFIG_URL?: string
+  readonly DECLARED_DECLARATION_SEARCH_QUERY_COUNT?: string
   // more env variables...
 }
 

@@ -13,7 +13,7 @@ import React from 'react'
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
@@ -26,16 +26,18 @@ import {
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { DraftStatus, Event } from '@client/utils/gateway'
 import { Value, DraftVersion } from './components'
-import { Pill } from '@opencrvs/components/lib/interface'
+import { Pill } from '@opencrvs/components/lib/Pill'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { ActionContext, Actions } from './ActionsModal'
 
 function ActionButton({
   action,
-  event
+  event,
+  disabled
 }: {
   action: Actions.EDIT | Actions.PUBLISH
   event: Event
+  disabled?: boolean
 }) {
   const intl = useIntl()
   const { setAction } = React.useContext(ActionContext)
@@ -43,6 +45,7 @@ function ActionButton({
   return (
     <LinkButton
       id={`${action.toLowerCase()}-btn`}
+      disabled={disabled}
       onClick={() => {
         setAction({
           action: action,
@@ -69,7 +72,7 @@ function EventDrafts({ event }: { event: Event }) {
       label={<DraftVersion event={event} version={version} />}
       value={
         <Value>
-          {status === DraftStatus.Draft
+          {version === 0
             ? intl.formatMessage(messages.defaultComment)
             : intl.formatMessage(messages.previewDate, {
                 updatedAt
@@ -84,12 +87,18 @@ function EventDrafts({ event }: { event: Event }) {
             )}
             type="active"
           />
+        ) : status === DraftStatus.InPreview ? (
+          <>
+            <ActionButton action={Actions.EDIT} event={event} />
+            <ActionButton action={Actions.PUBLISH} event={event} />
+          </>
         ) : (
           <>
-            {status === DraftStatus.InPreview && (
-              <ActionButton action={Actions.EDIT} event={event} />
-            )}
-            <ActionButton action={Actions.PUBLISH} event={event} />
+            <ActionButton
+              action={Actions.PUBLISH}
+              event={event}
+              disabled={formDraft.version !== 0}
+            />
           </>
         )
       }

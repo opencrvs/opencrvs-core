@@ -17,7 +17,10 @@ import Question, {
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
-import { messageSchema } from '@config/handlers/question/createQuestion/handler'
+import {
+  conditionalSchema,
+  messageSchema
+} from '@config/handlers/question/createQuestion/handler'
 
 export default async function updateQuestion(
   request: Hapi.Request,
@@ -41,6 +44,7 @@ export default async function updateQuestion(
   existingQuestion.required = question.required
   existingQuestion.enabled = question.enabled
   existingQuestion.custom = question.custom
+  existingQuestion.conditionals = question.conditionals
 
   try {
     await Question.update({ _id: existingQuestion._id }, existingQuestion)
@@ -68,5 +72,6 @@ export const requestSchema = Joi.object({
   required: Joi.boolean(),
   enabled: Joi.string().allow(''),
   custom: Joi.boolean(),
-  initialValue: Joi.string()
+  initialValue: Joi.string(),
+  conditionals: conditionalSchema
 })

@@ -62,7 +62,7 @@ services:
     networks:
       - overlay_net
     configs:
-      - source: metricbeat-conf
+      - source: metricbeat-conf.{{ts}}
         target: /usr/share/metricbeat/metricbeat.yml
       - source: metricbeat-rollover-policy.{{ts}}
         target: /usr/share/metricbeat/rollover-policy.json
@@ -213,8 +213,6 @@ services:
     volumes:
       - '/data/elasticsearch:/usr/share/elasticsearch/data'
       - '/data/backups/elasticsearch:/data/backups/elasticsearch'
-      - '/opt/opencrvs/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
-      - '/opt/opencrvs/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
     deploy:
       replicas: 1
       placement:
@@ -222,6 +220,13 @@ services:
           - node.labels.data1 == true
     environment:
       - ELASTIC_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+      - path.repo=/data/backups/elasticsearch
+      - cluster.name=docker-cluster
+      - network.host=0.0.0.0
+      - discovery.zen.minimum_master_nodes=1
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.security.authc.api_key.enabled=true
     ports:
       - 9200:9200
     networks:
@@ -387,9 +392,9 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: styleguide.{{hostname}},{{hostname}}'
+        - 'traefik.frontend.rule=Host: ui-kit.{{hostname}},{{hostname}}'
         - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
-        - 'traefik.frontend.redirect.replacement=https://styleguide.{{hostname}}/$${1}'
+        - 'traefik.frontend.redirect.replacement=https://ui-kit.{{hostname}}/$${1}'
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
@@ -457,7 +462,7 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PRIVATE_KEY_PATH=/run/secrets/jwt-private-key.{{ts}}
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - HOSTNAME={{hostname}}
+      - DOMAIN={{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -514,7 +519,7 @@ services:
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - HOSTNAME={{hostname}}
+      - DOMAIN={{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -586,7 +591,7 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1/application-config?replicaSet=rs0
-      - HOSTNAME={{hostname}}
+      - DOMAIN={{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -605,6 +610,21 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'config'
+  migration:
+    environment:
+      - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
+      - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'migration'
   # Configure other dependencies with deployment specifc details
   hearth:
     environment:
@@ -715,7 +735,7 @@ configs:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
   hearth-queryparam-extensions-conf.{{ts}}:
     file: ./infrastructure/hearth-queryparam-extensions.json
-  metricbeat-conf:
+  metricbeat-conf.{{ts}}:
     file: ./infrastructure/monitoring/beats/metricbeat.yml
   mongo-init.{{ts}}:
     file: ./infrastructure/mongodb/docker-entrypoint-initdb.d/create-mongo-users.sh

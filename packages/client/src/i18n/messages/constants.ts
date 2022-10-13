@@ -525,6 +525,11 @@ const messagesToDefine: IConstantsMessages = {
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
   },
+  noResultsOutbox: {
+    defaultMessage: 'No records require processing',
+    description: 'Text to display if there is no items in outbox',
+    id: 'constants.noResultsOutbox'
+  },
   over5Years: {
     defaultMessage: 'Over 5 years',
     description: 'Label for registrations over 5 years',
@@ -544,6 +549,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Reason',
     description: 'Label for Reason the declaration was rejected',
     id: 'constants.reason'
+  },
+  record: {
+    defaultMessage: 'Record',
+    description: 'Label for header table header Record',
+    id: 'constants.record'
   },
   requestReason: {
     defaultMessage: 'Reason for request',

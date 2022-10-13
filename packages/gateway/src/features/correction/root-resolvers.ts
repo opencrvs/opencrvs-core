@@ -16,7 +16,10 @@ import {
   GQLDeathRegistrationInput
 } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils'
-import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
+import {
+  buildFHIRBundle,
+  checkUserAssignment
+} from '@gateway/features/registration/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
 import {
@@ -24,11 +27,16 @@ import {
   validateDeathDeclarationAttachments
 } from '@gateway/utils/validators'
 import { UserInputError } from 'apollo-server-hapi'
+import { UnassignError } from '@gateway/utils/unassignError'
 
 export const resolvers: GQLResolver = {
   Mutation: {
     async requestBirthRegistrationCorrection(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
+        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        if (!hasAssignedToThisUser) {
+          throw new UnassignError('User has been unassigned')
+        }
         try {
           await validateBirthDeclarationAttachments(details)
         } catch (error) {
@@ -46,6 +54,10 @@ export const resolvers: GQLResolver = {
     },
     async requestDeathRegistrationCorrection(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
+        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+        if (!hasAssignedToThisUser) {
+          throw new UnassignError('User has been unassigned')
+        }
         try {
           await validateDeathDeclarationAttachments(details)
         } catch (error) {

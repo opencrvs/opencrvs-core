@@ -15,7 +15,7 @@ import System, { ISystem } from '@user-mgnt/model/system'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
 
 const fetch = fetchMock as fetchMock.FetchMock
@@ -118,7 +118,11 @@ describe('registerSystemClient handler', () => {
       method: 'POST',
       url: '/registerSystemClient',
       payload: {
-        scope: 'NATIONAL_ID'
+        scope: 'NATIONAL_ID',
+        name: [{ use: 'en', family: 'Health complex' }],
+        settings: {
+          dailyQuota: 50
+        }
       },
       headers: {
         Authorization: `Bearer ${token}`

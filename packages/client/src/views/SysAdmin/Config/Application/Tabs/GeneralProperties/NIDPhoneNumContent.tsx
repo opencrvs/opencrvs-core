@@ -12,7 +12,7 @@
 
 import React from 'react'
 import styled from '@client/styledComponents'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { IntlShape } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
