@@ -18,7 +18,7 @@ import {
 } from '@opencrvs/components/lib/Radio'
 import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
 import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
-import { ApolloQueryResult } from 'apollo-client'
+import { ApolloQueryResult } from '@apollo/client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { IDynamicValues } from '@opencrvs/client/src/navigation'
 

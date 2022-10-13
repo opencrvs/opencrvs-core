@@ -1706,6 +1706,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             title={intl.formatMessage(buttonMessages.preview)}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}
+            disableDelete={true}
           />
         )}
       </FullBodyContent>
