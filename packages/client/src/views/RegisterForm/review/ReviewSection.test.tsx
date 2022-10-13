@@ -742,19 +742,5 @@ describe('when in device of small viewport', () => {
         reviewSectionComponent.find('#preview_image_field').hostNodes()
       ).toHaveLength(0)
     })
-
-    it('clicking on delete button modifies declaration by removing uploaded file', () => {
-      reviewSectionComponent
-        .find('#preview_image_field')
-        .hostNodes()
-        .find('#preview_delete')
-        .hostNodes()
-        .simulate('click')
-
-      expect(mockHandler).toBeCalled()
-      expect(
-        reviewSectionComponent.find('#preview_image_field').hostNodes()
-      ).toHaveLength(0)
-    })
   })
 })

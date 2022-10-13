@@ -54,7 +54,6 @@ import {
   ALLOWED_STATUS_FOR_RETRY,
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
-import { BUILD_VERSION } from '@client/utils/constants'
 import styled from '@client/styledComponents'
 import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
 
@@ -338,7 +337,7 @@ export const NavigationView = (props: IFullProps) => {
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       applicationVersion={runningVer}
-      buildVersion={BUILD_VERSION}
+      buildVersion={import.meta.env.VITE_APP_VERSION ?? 'Development'}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}

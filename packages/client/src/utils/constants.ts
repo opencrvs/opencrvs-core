@@ -108,5 +108,3 @@ export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
 export const APPLICATION_VERSION = '1.1.0'
-/** Application build version (the latest hash or tag from `git log` / `git describe` ) */
-export const BUILD_VERSION = import.meta.env.VITE_APP_VERSION ?? 'Development'
