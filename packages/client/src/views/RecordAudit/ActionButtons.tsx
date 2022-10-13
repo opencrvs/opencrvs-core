@@ -36,7 +36,7 @@ import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { Roles } from '@client/utils/authUtils'
 
@@ -65,7 +65,7 @@ export const ShowDownloadButton = ({
   if (declaration === null || id === null || type === null) return <></>
 
   const downloadStatus = draft?.downloadStatus || undefined
-  let refetchQueries: RefetchQueryDescription = []
+  let refetchQueries: InternalRefetchQueriesInclude = []
   if (
     userDetails?.role === 'FIELD_AGENT' &&
     draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
