@@ -48,7 +48,8 @@ import {
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
-  FORM_CONFIG_HOME
+  FORM_CONFIG_HOME,
+  VS_EXPORTS
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -169,6 +170,9 @@ export function goToHome() {
 
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+export function goToVSExport() {
+  return push(VS_EXPORTS)
 }
 
 export function goToFormConfigHome() {
