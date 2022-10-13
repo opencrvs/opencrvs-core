@@ -104,7 +104,7 @@ import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
 import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
-import { Mutation } from 'react-apollo'
+import { Mutation } from '@apollo/client/react/components'
 import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
@@ -669,7 +669,7 @@ const BodyContent = ({
               return <Loader id="search_loader" marginPercent={35} />
             } else if (error) {
               return (
-                !isErrorDismissed && (
+                (!isErrorDismissed && (
                   <Toast
                     type="warning"
                     actionText={intl.formatMessage(buttonMessages.retry)}
@@ -681,7 +681,8 @@ const BodyContent = ({
                   >
                     {intl.formatMessage(errorMessages.pleaseTryAgainError)}
                   </Toast>
-                )
+                )) ||
+                null
               )
             }
 

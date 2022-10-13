@@ -18,10 +18,10 @@ import {
   TertiaryButton,
   LinkButton
 } from '@opencrvs/components/lib/buttons'
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import Cropper from 'react-easy-crop'
 import { Point, Area, Size } from 'react-easy-crop/types'
-import { Mutation } from 'react-apollo'
+import { Mutation } from '@apollo/client/react/components'
 import styled from '@client/styledComponents'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'

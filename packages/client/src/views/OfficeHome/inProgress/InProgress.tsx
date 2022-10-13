@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 import {
   Workqueue,
@@ -44,11 +42,7 @@ import { ITheme, withTheme } from '@client/styledComponents'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape
-} from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import {
   buttonMessages,
@@ -80,6 +74,7 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface IQueryData {
@@ -360,7 +355,7 @@ export class InProgressComponent extends React.Component<
         })
       }
       actions.push({
-        actionComponent: <Uploaded />
+        actionComponent: <Downloaded />
       })
       const event =
         (draft.event &&
