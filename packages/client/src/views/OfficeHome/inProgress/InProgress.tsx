@@ -145,9 +145,6 @@ export class InProgressComponent extends React.Component<
   }
 
   componentWillUnmount() {
-    window.removeEventListener('popstate', function (event) {
-      window.history.pushState(null, document.title, window.location.href)
-    })
     window.removeEventListener('resize', this.recordWindowWidth)
   }
 
