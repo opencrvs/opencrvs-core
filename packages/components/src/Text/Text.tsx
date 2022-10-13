@@ -14,6 +14,7 @@ import React from 'react'
 import { fonts, IFont } from '../fonts'
 import { colors, IColor } from '../colors'
 import styled from 'styled-components'
+import type { Property } from 'csstype'
 
 type Element = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span'
 
@@ -24,19 +25,33 @@ export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
   element: Element
   /** Color */
   color?: IColor
+  /** Setting whether the browser should insert line breaks within an otherwise unbreakable string to prevent text from overflowing its line box */
+  overflowWrap?: Property.OverflowWrap
 }
 
-const StyledText = styled.span<{ $variant: IFont; $color: IColor }>`
+const StyledText = styled.span<{
+  $variant: IFont
+  $color: IColor
+  $overflowWrap?: Property.OverflowWrap
+}>`
   ${({ $variant }) => fonts[$variant]}
   ${({ $color }) => `color: ${colors[$color]};`}
+  ${({ $overflowWrap }) => $overflowWrap && `overflow-wrap: ${$overflowWrap}`}
 `
 
 /** Text helps present your content with correct hierarchy and font sizes */
 export const Text = ({
   variant,
   element,
+  overflowWrap,
   color = 'copy',
   ...props
 }: ITextProps) => (
-  <StyledText $variant={variant} $color={color} as={element} {...props} />
+  <StyledText
+    $variant={variant}
+    $color={color}
+    as={element}
+    $overflowWrap={overflowWrap}
+    {...props}
+  />
 )
