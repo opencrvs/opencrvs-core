@@ -36,7 +36,7 @@ const StyledText = styled.span<{
 }>`
   ${({ $variant }) => fonts[$variant]}
   ${({ $color }) => `color: ${colors[$color]};`}
-  ${({ $overflowWrap }) => $overflowWrap && `overflow-wrap: ${$overflowWrap}`}
+  ${({ $overflowWrap }) => $overflowWrap && `overflow-wrap: ${$overflowWrap};`}
 `
 
 /** Text helps present your content with correct hierarchy and font sizes */
