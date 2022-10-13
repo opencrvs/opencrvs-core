@@ -16,7 +16,6 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
-  clearCollectorInfo,
   modifyDeclaration,
   storeDeclaration,
   writeDeclaration,
@@ -116,7 +115,6 @@ interface IBaseProps {
   goToVerifyCollector: typeof goToVerifyCollector
   goToReviewCertificate: typeof goToReviewCertificate
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
-  clearCollectorInfo: typeof clearCollectorInfo
 }
 
 type IProps = IBaseProps & IntlShapeProps
@@ -347,8 +345,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       declaration,
       formSection,
       formGroup,
-      goBack,
-      clearCollectorInfo
+      goBack
     } = this.props
 
     const { showError, showModalForNoSignedAffidavit } = this.state
@@ -375,10 +372,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           id="collector_form"
           hideBackground
           title={intl.formatMessage(formSection.title)}
-          goBack={() => {
-            goBack()
-            clearCollectorInfo(declarationId)
-          }}
+          goBack={goBack}
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
           <Content
@@ -598,6 +592,5 @@ export const CollectorForm = connect(mapStateToProps, {
   goToPrintCertificate,
   goToVerifyCollector,
   goToReviewCertificate,
-  goToPrintCertificatePayment,
-  clearCollectorInfo
+  goToPrintCertificatePayment
 })(injectIntl(withTheme(CollectorFormComponent)))

@@ -458,7 +458,8 @@ function RecordAuditBody({
         userDetails,
         draft,
         goToPrintCertificate,
-        goToTeamUserList
+        goToTeamUserList,
+        clearCorrectionChange
       })
     )
     mobileActions.push(actions[actions.length - 1])
