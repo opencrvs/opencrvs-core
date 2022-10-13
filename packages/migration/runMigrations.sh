@@ -16,3 +16,7 @@ yarn migrate-mongo status --file migrate-mongo-config-hearth.js
 #openhim migrations
 yarn migrate-mongo up --file migrate-mongo-config-openhim.js
 yarn migrate-mongo status --file migrate-mongo-config-openhim.js
+
+#application-config migrations
+yarn migrate-mongo up --file migrate-mongo-config-application-config.js
+yarn migrate-mongo status --file migrate-mongo-config-application-config.js

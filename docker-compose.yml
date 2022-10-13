@@ -164,6 +164,7 @@ services:
     environment:
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
+      - APPLICATION_CONFIG_MONGO_URL=mongodb://mongo1/application-config
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
