@@ -3346,7 +3346,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'true',
                     label:
-                      formMessageDescriptors.CauseOfDeathEstablishedMessages
+                      formMessageDescriptors.causeOfDeathEstablishedMessages
                   }
                 ],
                 mapping: {
