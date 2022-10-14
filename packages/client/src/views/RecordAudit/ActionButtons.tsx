@@ -22,7 +22,7 @@ import {
   IDeclaration,
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
-  clearCorrectionChange
+  clearCorrectionAndPrintChanges
 } from '@client/declarations'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { EVENT_STATUS } from '@client/workqueue'
@@ -46,7 +46,7 @@ export type CMethodParams = {
   intl: IntlShape
   userDetails: IUserDetails | null
   draft: IDeclaration | null
-  clearCorrectionChange: typeof clearCorrectionChange
+  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   goToPage?: typeof goToPage
   goToPrintCertificate?: typeof goToPrintCertificate
   goToUserProfile?: typeof goToUserProfile
@@ -204,7 +204,7 @@ export const ShowPrintButton = ({
   userDetails,
   draft,
   goToPrintCertificate,
-  clearCorrectionChange
+  clearCorrectionAndPrintChanges
 }: CMethodParams) => {
   const { id, type } = declaration || {}
   const role = userDetails ? userDetails.role : ''
@@ -261,7 +261,7 @@ export const ShowPrintButton = ({
         size={'medium'}
         id={`print-${id}`}
         onClick={() => {
-          clearCorrectionChange(declaration.id)
+          clearCorrectionAndPrintChanges(declaration.id)
           goToPrintCertificate &&
             goToPrintCertificate(id, type.toLocaleLowerCase())
         }}

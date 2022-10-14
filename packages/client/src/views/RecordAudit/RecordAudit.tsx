@@ -43,7 +43,7 @@ import {
 } from 'react-intl'
 import {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   IDeclaration,
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
@@ -176,7 +176,7 @@ interface IStateProps {
 
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
-  clearCorrectionChange: typeof clearCorrectionChange
+  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
@@ -280,7 +280,7 @@ function ReinstateButton({
 
 function RecordAuditBody({
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   declaration,
   draft,
   duplicates,
@@ -348,7 +348,7 @@ function RecordAuditBody({
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
         onClick={() => {
-          clearCorrectionChange(declaration.id)
+          clearCorrectionAndPrintChanges(declaration.id)
           goToCertificateCorrection(declaration.id, CorrectionSection.Corrector)
         }}
       >
@@ -459,7 +459,7 @@ function RecordAuditBody({
         draft,
         goToPrintCertificate,
         goToTeamUserList,
-        clearCorrectionChange
+        clearCorrectionAndPrintChanges
       })
     )
     mobileActions.push(actions[actions.length - 1])
@@ -814,7 +814,7 @@ export const RecordAudit = connect<
   IStoreState
 >(mapStateToProps, {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   goToCertificateCorrection,
   goToPage,
   goToPrintCertificate,

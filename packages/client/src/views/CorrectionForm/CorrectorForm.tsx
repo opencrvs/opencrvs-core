@@ -180,9 +180,7 @@ function CorrectorFormComponent(props: IFullProps) {
         id="corrector_form"
         title={intl.formatMessage(section.title)}
         hideBackground
-        goBack={() => {
-          props.goBack()
-        }}
+        goBack={props.goBack}
         goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
       >
         <Content
