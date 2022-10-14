@@ -95,7 +95,6 @@
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "prettier --write",
-      "yarn generate:test:forms",
       "yarn lint:ts",
       "stylelint",
       "yarn extract:translations",

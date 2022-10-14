@@ -76,7 +76,8 @@ import {
   getConditionalActionsForField,
   getSectionFields,
   getVisibleSectionGroupsBasedOnConditions,
-  getListOfLocations
+  getListOfLocations,
+  getSelectedInformantAndContactType
 } from '@client/forms/utils'
 import {
   Errors,
@@ -1661,7 +1662,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   })}
                   <LinkButton
                     id="edit-document"
-                    disabled={isCorrection(declaration)}
+                    disabled={
+                      isCorrection(declaration) ||
+                      motherDoesNotExistAndStateIsMother(
+                        declaration,
+                        sectionName
+                      ) ||
+                      fatherDoesNotExistAndStateIsFather(
+                        declaration,
+                        sectionName
+                      )
+                    }
                     onClick={() =>
                       this.editLinkClickHandlerForDraft(
                         documentsSection.id,
@@ -1719,6 +1730,37 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       </FullBodyContent>
     )
   }
+}
+
+function motherDoesNotExistAndStateIsMother(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  const selectedInformantAndContactType = getSelectedInformantAndContactType(
+    declaration.data
+  )
+
+  return (
+    !Boolean(declaration.data.mother?.detailsExist) &&
+    activeState === 'mother' &&
+    selectedInformantAndContactType.selectedInformantType !== 'MOTHER' &&
+    selectedInformantAndContactType.selectedContactType !== 'MOTHER'
+  )
+}
+
+function fatherDoesNotExistAndStateIsFather(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  const selectedInformantAndContactType = getSelectedInformantAndContactType(
+    declaration.data
+  )
+  return (
+    !Boolean(declaration.data.father?.detailsExist) &&
+    activeState === 'father' &&
+    selectedInformantAndContactType.selectedInformantType !== 'FATHER' &&
+    selectedInformantAndContactType.selectedContactType !== 'FATHER'
+  )
 }
 
 export const ReviewSection = connect(
