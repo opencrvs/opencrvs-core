@@ -3372,7 +3372,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: 'values.causeOfDeathEstablished !== "true"'
+                    expression:
+                      '(values.causeOfDeathEstablished !== undefined && values.causeOfDeathEstablished.length === 1 )'
                   }
                 ],
                 options: [
