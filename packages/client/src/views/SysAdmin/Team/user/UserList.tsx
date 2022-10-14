@@ -38,7 +38,11 @@ import {
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import {
+  LinkButton,
+  TertiaryButton,
+  PrimaryButton
+} from '@opencrvs/components/lib/buttons'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
@@ -51,7 +55,8 @@ import { AvatarSmall } from '@client/components/Avatar'
 import {
   ToggleMenu,
   FloatingNotification,
-  NOTIFICATION_TYPE
+  NOTIFICATION_TYPE,
+  ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -311,6 +316,21 @@ function UserListComponent(props: IProps) {
   const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
   )
+  const [resetPasswordModal, setResetPasswordModal] =
+    useState<ToggleUserActivation>({
+      modalVisible: false,
+      selectedUser: null
+    })
+  const [resetPasswordSuccess, setResetPasswordSuccess] = useState<{
+    visible: boolean
+    user: GQLUser | null
+  }>({ visible: false, user: null })
+
+  const toggleResetPasswordSuccessNotification = (user?: GQLUser) =>
+    setResetPasswordSuccess((prevState) => ({
+      visible: !prevState.visible,
+      user: user ?? null
+    }))
 
   const toggleUserActivationModal = useCallback(
     function toggleUserActivationModal(user?: GQLUser) {
@@ -331,17 +351,30 @@ function UserListComponent(props: IProps) {
     [toggleActivation]
   )
 
+  const toggleResetPasswordModal = (user?: GQLUser) =>
+    setResetPasswordModal((prevState) => ({
+      modalVisible: !prevState.modalVisible,
+      selectedUser: user ?? null
+    }))
+
   const resendSMS = useCallback(
-    async function resendSMS(userId: string) {
+    async function resendSMS(
+      user: GQLUser,
+      resetPasswordOfActiveUser?: boolean
+    ) {
       try {
-        const res = await userMutations.resendSMSInvite(userId, [
+        const res = await userMutations.resendSMSInvite(user.id as string, [
           {
             query: SEARCH_USERS,
             variables: { primaryOfficeId: locationId, count: recordCount }
           }
         ])
         if (res && res.data && res.data.resendSMSInvite) {
-          setShowResendSMSSuccess(true)
+          if (resetPasswordOfActiveUser) {
+            toggleResetPasswordSuccessNotification(user)
+          } else {
+            setShowResendSMSSuccess(true)
+          }
         }
       } catch (err) {
         setShowResendSMSError(true)
@@ -365,16 +398,22 @@ function UserListComponent(props: IProps) {
         menuItems.push({
           label: intl.formatMessage(messages.resendSMS),
           handler: () => {
-            resendSMS(user.id as string)
+            resendSMS(user)
           }
         })
       }
 
       if (user.status === 'active') {
-        menuItems.push({
-          label: intl.formatMessage(messages.deactivate),
-          handler: () => toggleUserActivationModal(user)
-        })
+        menuItems.push(
+          {
+            label: intl.formatMessage(messages.deactivate),
+            handler: () => toggleUserActivationModal(user)
+          },
+          {
+            label: intl.formatMessage(messages.resetPassword),
+            handler: () => toggleResetPasswordModal(user)
+          }
+        )
       }
 
       if (user.status === 'deactivated') {
@@ -628,6 +667,38 @@ function UserListComponent(props: IProps) {
                 }
               ]}
             />
+            <ResponsiveModal
+              show={resetPasswordModal.modalVisible}
+              handleClose={() => toggleResetPasswordModal()}
+              title={intl.formatMessage(messages.resetPasswordModalTitle)}
+              actions={[
+                <TertiaryButton
+                  id="reset-password-cancel"
+                  key="reset-password-cancel"
+                  onClick={() => toggleResetPasswordModal()}
+                >
+                  {intl.formatMessage(buttonMessages.cancel)}
+                </TertiaryButton>,
+                <PrimaryButton
+                  id="reset-password-send"
+                  key="reset-password-send"
+                  onClick={() => {
+                    if (resetPasswordModal.selectedUser?.id) {
+                      resendSMS(resetPasswordModal.selectedUser, true)
+                    }
+                    toggleResetPasswordModal()
+                  }}
+                >
+                  {intl.formatMessage(buttonMessages.send)}
+                </PrimaryButton>
+              ]}
+              responsive={false}
+              autoHeight={true}
+            >
+              {intl.formatMessage(messages.resetPasswordModalMessage, {
+                phoneNumber: resetPasswordModal.selectedUser?.mobile ?? ''
+              })}
+            </ResponsiveModal>
           </UserTable>
         </>
       )
@@ -639,7 +710,10 @@ function UserListComponent(props: IProps) {
       recordCount,
       toggleActivation.modalVisible,
       toggleActivation.selectedUser,
-      toggleUserActivationModal
+      toggleUserActivationModal,
+      resetPasswordModal.modalVisible,
+      resetPasswordModal.selectedUser,
+      resendSMS
     ]
   )
 
@@ -749,6 +823,20 @@ function UserListComponent(props: IProps) {
           callback={() => setShowResendSMSError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}
+        </FloatingNotification>
+      )}
+      {resetPasswordSuccess.visible && (
+        <FloatingNotification
+          id="reset_password_success"
+          type={NOTIFICATION_TYPE.SUCCESS}
+          show={resetPasswordSuccess.visible}
+          callback={() => toggleResetPasswordSuccessNotification()}
+        >
+          {intl.formatMessage(messages.resetPasswordSuccess, {
+            name: createNamesMap(
+              resetPasswordSuccess.user?.name as GQLHumanName[]
+            )[intl.locale]
+          })}
         </FloatingNotification>
       )}
     </SysAdminContentWrapper>

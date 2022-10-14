@@ -45,6 +45,9 @@ interface ISysAdminMessages
   disabled: MessageDescriptor
   deactivated: MessageDescriptor
   totalUsers: MessageDescriptor
+  resetPasswordModalTitle: MessageDescriptor
+  resetPasswordModalMessage: MessageDescriptor
+  resetPasswordSuccess: MessageDescriptor
 }
 
 const messagesToDefine: ISysAdminMessages = {
@@ -206,10 +209,31 @@ const messagesToDefine: ISysAdminMessages = {
     description: 'Pill label for deactivated user',
     id: 'system.user.deactivated'
   },
+  resetPassword: {
+    id: 'system.user.resetPassword',
+    description: 'Label for menu action reset password',
+    defaultMessage: 'Reset password'
+  },
   totalUsers: {
     id: 'system.user.total',
     defaultMessage: '{totalUser} users',
     description: 'User list table header text'
+  },
+  resetPasswordModalTitle: {
+    id: 'system.user.resetPasswordModal.title',
+    defaultMessage: 'Reset password?',
+    description: 'Title for reset password modal'
+  },
+  resetPasswordModalMessage: {
+    id: 'system.user.resetPasswordModal.message',
+    defaultMessage:
+      'The user will recieve a temporary password via SMS sent to {phoneNumber}. They will then be prompted to create a new password on succcessful login',
+    description: 'Message for reset password modal'
+  },
+  resetPasswordSuccess: {
+    id: 'system.user.resetPassword.success',
+    defaultMessage: 'Temporary password sent to {name}',
+    description: 'Success notification message for reset password'
   }
 }
 
