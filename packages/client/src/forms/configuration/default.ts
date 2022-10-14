@@ -3372,8 +3372,9 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
+
                     expression:
-                      '(values.causeOfDeathEstablished !== undefined && values.causeOfDeathEstablished.length === 1 )'
+                      'values.causeOfDeathEstablished && (values.causeOfDeathEstablished.length == 1 ? values.causeOfDeathEstablished[0] !== "true" : values.causeOfDeathEstablished[1] !== "true")'
                   }
                 ],
                 options: [
@@ -3413,7 +3414,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      'values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
+                      'values.causeOfDeathEstablished && (values.causeOfDeathEstablished.length == 1 ? values.causeOfDeathEstablished[0] !== "true" : values.causeOfDeathEstablished[1] !== "true") || (values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY")'
                   }
                 ],
                 initialValue: '',
