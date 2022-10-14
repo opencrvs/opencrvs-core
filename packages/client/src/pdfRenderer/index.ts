@@ -21,6 +21,7 @@ import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IOfflineData } from '@client/offline/reducer'
+import { isMobileDevice } from '@client/utils/commonUtils'
 
 /*
   Converts template definition into actual PDF using defined transformers, declarationData and userDetails
@@ -118,12 +119,17 @@ export function printPDF(
   intl: IntlShape,
   optionalData?: OptionalData
 ) {
-  createPDF(
+  const pdf = createPDF(
     template,
     declaration,
     userDetails,
     offlineResource,
     intl,
     optionalData
-  ).print()
+  )
+  if (isMobileDevice()) {
+    pdf.download(`${declaration.id}`)
+  } else {
+    pdf.print()
+  }
 }
