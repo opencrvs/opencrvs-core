@@ -36,7 +36,8 @@ import {
   TEXTAREA,
   WARNING,
   LOCATION_SEARCH_INPUT,
-  IAttachmentValue
+  IAttachmentValue,
+  Section
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
