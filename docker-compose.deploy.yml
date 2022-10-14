@@ -396,6 +396,8 @@ services:
         - 'traefik.http.routers.client.tls.certresolver=certResolver'
         - 'traefik.http.routers.client.entrypoints=web,websecure'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.http.middlewares.client.redirectregex.regex=^https?://{{hostname}}/(.*)'
+        - 'traefik.http.middlewares.client.redirectregex.replacement=https://register.{{hostname}}/$${1}'
         - 'traefik.http.middlewares.client.headers.customresponseheaders.Pragma=no-cache'
         - 'traefik.http.middlewares.client.headers.customresponseheaders.Cache-control=no-store'
         - 'traefik.http.middlewares.client.headers.customresponseheaders.X-Robots-Tag=none'
