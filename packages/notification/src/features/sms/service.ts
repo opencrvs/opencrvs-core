@@ -45,7 +45,7 @@ async function sendSMSClickatell(
       unicode: 1
     }
   }
-  logger.info('Sending an sms', params)
+  logger.info(`Sending an sms ${params}`)
 
   const url = `https://api.clickatell.com/http/sendmsg?${stringify(params)}`
 
@@ -109,8 +109,8 @@ export async function sendSMS(
   message: string,
   convertUnicode?: boolean
 ) {
-  logger.info('Using the following provider: ', SMS_PROVIDER)
-  logger.info('Sending the following message: ', message)
+  logger.info(`Using the following provider:  ${JSON.stringify(SMS_PROVIDER)}`)
+  logger.info(`Sending the following message:  ${JSON.stringify(message)}`)
   switch (SMS_PROVIDER) {
     case 'clickatell':
       return sendSMSClickatell(msisdn, message, convertUnicode)

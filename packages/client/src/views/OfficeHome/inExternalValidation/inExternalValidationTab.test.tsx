@@ -23,8 +23,9 @@ import { readFileSync } from 'fs'
 import { checkAuth } from '@client/profile/profileActions'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { History } from 'history'
+import { vi, Mock } from 'vitest'
 
 const EVENT_CREATION_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
 const SEND_FOR_VALIDATION_TIME = 1582912800000 // Fri Feb 28 2020 20:00:00 GMT+0200 (Eastern European Standard Time)
@@ -38,7 +39,7 @@ export const registerScopeToken = jwt.sign(
     audience: 'opencrvs:gateway-user'
   }
 )
-const getItem = window.localStorage.getItem as jest.Mock
+const getItem = window.localStorage.getItem as Mock
 
 const birthEventSearchSet: GQLBirthEventSearchSet = {
   id: '956281c9-1f47-4c26-948a-970dd23c4094',
@@ -75,7 +76,7 @@ describe('Registrar home external validation tab tests', () => {
 
   beforeEach(async () => {
     const SECONDARY_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
-    Date.now = jest.fn(() => SECONDARY_TIME)
+    Date.now = vi.fn(() => SECONDARY_TIME)
     const { store: testStore, history: testHistory } = await createTestStore()
     getItem.mockReturnValue(registerScopeToken)
     testStore.dispatch(checkAuth())
@@ -92,7 +93,7 @@ describe('Registrar home external validation tab tests', () => {
   })
 
   it('renders data', async () => {
-    const tableElement = await waitForElement(component, GridTable)
+    const tableElement = await waitForElement(component, Workqueue)
     const data = tableElement.prop('content')
 
     expect(data.length).toBe(1)
@@ -104,7 +105,7 @@ describe('Registrar home external validation tab tests', () => {
   })
 
   it('clicking on a row redirect to recordAudit page', async () => {
-    const tableElement = await waitForElement(component, GridTable)
+    const tableElement = await waitForElement(component, Workqueue)
     const dataRow = tableElement.find('#name_0').hostNodes()
     dataRow.simulate('click')
     component.update()
@@ -118,7 +119,7 @@ describe('Registrar home external validation tab tests', () => {
     })
 
     it('clicking on row takes user to details page', async () => {
-      const tableElement = await waitForElement(component, GridTable)
+      const tableElement = await waitForElement(component, Workqueue)
       const dataRow = tableElement.find('#name_0').hostNodes()
       dataRow.simulate('click')
       component.update()

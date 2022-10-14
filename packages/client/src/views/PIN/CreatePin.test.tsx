@@ -15,8 +15,9 @@ import { CreatePin } from '@client/views/PIN/CreatePin'
 import { createStore } from '@client/store'
 import { storage } from '@opencrvs/client/src/storage'
 import { ReactWrapper } from 'enzyme'
+import { vi } from 'vitest'
 
-storage.setItem = jest.fn()
+storage.setItem = vi.fn()
 
 describe('Create PIN view', () => {
   let c: ReactWrapper

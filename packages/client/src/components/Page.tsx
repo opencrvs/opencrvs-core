@@ -15,7 +15,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { setInitialDeclarations } from '@client/declarations'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import {
   getOfflineData,
   getOfflineDataLoaded,
@@ -34,6 +34,7 @@ import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { isNavigatorOnline } from '@client/utils'
 
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
@@ -115,7 +116,7 @@ class Component extends React.Component<
         }
       }, 0)
     }
-    if (this.props.loadingError && navigator.onLine) {
+    if (this.props.loadingError && isNavigatorOnline()) {
       this.props.showConfigurationErrorNotification()
     }
     if (prevProps.loadingError && !this.props.loadingError) {

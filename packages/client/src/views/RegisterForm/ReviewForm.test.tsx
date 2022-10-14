@@ -34,16 +34,16 @@ import {
 import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import { History } from 'history'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { birthDraftData } from '@client/tests/mock-drafts'
+import { vi, Mock } from 'vitest'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-const getItem = window.localStorage.getItem as jest.Mock
+const getItem = window.localStorage.getItem as Mock
 
 export const mockDeclarationData = {
   child: {
@@ -251,12 +251,12 @@ const deathDeclaration: IDeclaration = {
   timeLoggedMS: 4446
 }
 
-const mockFetchUserDetails = jest.fn()
+const mockFetchUserDetails = vi.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
 describe('ReviewForm tests', () => {
   const scope = ['register']
-  const mock: any = jest.fn()
+  const mock: any = vi.fn()
   let form: IForm
   let store: AppStore
   let history: History
@@ -448,8 +448,7 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    const exitButton = await waitForElement(testComponent, '#save_draft')
-    exitButton.hostNodes().simulate('click')
+    testComponent.find('#save_draft').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain('/progress')
   })
@@ -496,8 +495,7 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    const exitButton = await waitForElement(testComponent, '#save_draft')
-    exitButton.hostNodes().simulate('click')
+    testComponent.find('#save_draft').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
   })
@@ -544,8 +542,7 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    const exitButton = await waitForElement(testComponent, '#save_draft')
-    exitButton.hostNodes().simulate('click')
+    testComponent.find('#save_draft').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
   })
@@ -592,8 +589,7 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    const exitButton = await waitForElement(testComponent, '#save_draft')
-    exitButton.hostNodes().simulate('click')
+    testComponent.find('#save_draft').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain(WORKQUEUE_TABS.requiresUpdate)
   })
@@ -635,8 +631,7 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
-    const exitButton = await waitForElement(testComponent, '#save_draft')
-    exitButton.hostNodes().simulate('click')
+    testComponent.find('#save_draft').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain('/progress')
   })
@@ -669,24 +664,16 @@ describe('ReviewForm tests', () => {
     )
 
     testComponent.update()
-
-    const menuButton = await waitForElement(
-      testComponent,
-      '#eventToggleMenuToggleButton'
-    )
-    menuButton.hostNodes().simulate('click')
+    testComponent
+      .find('#eventToggleMenuToggleButton')
+      .hostNodes()
+      .simulate('click')
     testComponent.update()
-
-    const closeDeclarationButton = await waitForElement(
-      testComponent,
-      '#eventToggleMenuItem0'
-    )
-    closeDeclarationButton.hostNodes().simulate('click')
+    testComponent.find('#eventToggleMenuItem0').hostNodes().simulate('click')
     testComponent.update()
 
     expect(window.location.href).toContain('/progress')
   })
-
   it('it checked if review form is already in store and avoid loading from backend', async () => {
     const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
     declaration.data = birthDraftData
@@ -700,7 +687,6 @@ describe('ReviewForm tests', () => {
       )
     )
     store.dispatch(storeDeclaration(declaration))
-
     const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
@@ -732,6 +718,7 @@ describe('ReviewForm tests', () => {
 
     expect(data.data).toEqual(birthDraftData)
   })
+
   describe('Death review flow', () => {
     it('it returns death registration', async () => {
       store.dispatch(storeDeclaration(deathDeclaration))

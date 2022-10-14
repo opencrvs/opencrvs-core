@@ -34,7 +34,6 @@ export default async function verifyPassHandler(
 ) {
   const { username, password } = request.payload as IVerifyPayload
 
-  // tslint:disable-next-line
   const user: IUserModel | null = await User.findOne({ username })
 
   if (!user) {

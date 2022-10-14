@@ -37,6 +37,7 @@ import {
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { find, merge } from 'lodash'
+import { isNavigatorOnline } from '@client/utils'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
@@ -307,7 +308,7 @@ function reducer(
           },
           Cmd.list([
             // Try loading data regardless as it might have been updated.
-            navigator.onLine ? dataLoadingCmds : Cmd.none
+            isNavigatorOnline() ? dataLoadingCmds : Cmd.none
           ])
         )
       }

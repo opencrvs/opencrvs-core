@@ -26,9 +26,10 @@ import {
 import { UserProfile } from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { USER_PROFILE } from '@client/navigation/routes'
 import { userMutations } from '@client/user/mutations'
+import { vi, Mock } from 'vitest'
 
 describe('User audit list tests', () => {
-  userMutations.resendSMSInvite = jest.fn()
+  userMutations.resendSMSInvite = vi.fn()
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History<any>
@@ -123,7 +124,7 @@ describe('User audit list tests', () => {
   ]
 
   beforeEach(async () => {
-    Date.now = jest.fn(() => 1487076708000)
+    Date.now = vi.fn(() => 1487076708000)
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
@@ -197,7 +198,7 @@ describe('User audit list tests', () => {
     expect(history.location.pathname).toBe('/team/users')
   })
   it('sends invite on clicking resend sms invite menu option', async () => {
-    ;(userMutations.resendSMSInvite as jest.Mock).mockResolvedValueOnce({
+    ;(userMutations.resendSMSInvite as Mock).mockResolvedValueOnce({
       data: { resendSMSInvite: 'true' }
     })
     const menuLink = await waitForElement(
@@ -221,7 +222,7 @@ describe('User audit list tests', () => {
     ).toBeDefined()
   })
   it('shows error on clicking resend sms invite menu option if there is any', async () => {
-    ;(userMutations.resendSMSInvite as jest.Mock).mockRejectedValueOnce(
+    ;(userMutations.resendSMSInvite as Mock).mockRejectedValueOnce(
       new Error('Something went wrong')
     )
     const menuLink = await waitForElement(

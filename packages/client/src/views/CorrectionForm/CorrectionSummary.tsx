@@ -47,12 +47,9 @@ import {
   SubmissionAction
 } from '@client/forms'
 import { lookup } from 'country-data'
-import {
-  ActionPageLight,
-  ColumnContentAlignment,
-  TableView
-} from '@opencrvs/components/lib/interface'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Table } from '@opencrvs/components/lib/Table'
+import { Content } from '@opencrvs/components/lib/Content'
 import {
   SuccessButton,
   SecondaryButton,
@@ -88,6 +85,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IGQLLocation } from '@client/utils/userUtils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -210,11 +208,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             bottomActionButtons={[continueButton]}
             showTitleOnMobile={true}
           >
-            <TableView
+            <Table
               isLoading={false}
               noPagination
               content={this.getChanges(formSections)}
-              hideBoxShadow={true}
               hideTableBottomBorder={true}
               columns={[
                 {
@@ -239,8 +236,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
-            <TableView
+            ></Table>
+            <Table
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -248,7 +245,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   requestedBy: this.getRequestedBy()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(
@@ -260,9 +256,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
 
-            <TableView
+            <Table
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -270,7 +266,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   idCheck: this.getIdCheck()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(messages.correctionSummaryIdCheck),
@@ -280,9 +275,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
 
-            <TableView
+            <Table
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -290,7 +285,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   reasonForRequest: this.getReasonForRequest()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(
@@ -302,9 +296,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
 
-            <TableView
+            <Table
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -312,7 +306,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   comments: this.getComments()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(messages.correctionSummaryComments),
@@ -322,16 +315,15 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
 
-            <TableView
+            <Table
               isLoading={false}
               content={[
                 {
                   supportingDocuments: this.getSupportingDocuments()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(
@@ -343,7 +335,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
             <FormFieldGenerator
               id={this.group.id}
               onChange={(values) => {

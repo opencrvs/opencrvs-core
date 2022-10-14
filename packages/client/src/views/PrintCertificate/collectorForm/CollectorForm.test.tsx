@@ -27,6 +27,8 @@ import { createLocation, History } from 'history'
 import { merge } from 'lodash'
 import { Event } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
+import { lateBirthCertificationResponseWithFather } from '@client/tests/mock-graphql-responses'
+import { vi } from 'vitest'
 
 let store: AppStore
 let history: History
@@ -410,7 +412,7 @@ describe('Certificate collector test for a birth registration without father det
       })
 
       it('continue to payment section when the mandatory fields are filled and birth event is between 45 days and 5 years', async () => {
-        Date.now = jest.fn(() => 1538352000000) // 2018-10-01
+        Date.now = vi.fn(() => 1538352000000) // 2018-10-01
         await waitForElement(component, '#noAffidavitAgreementAFFIDAVIT')
         component
           .find('#noAffidavitAgreementAFFIDAVIT')
@@ -487,7 +489,8 @@ describe('Certificate collector test for a birth registration without father det
 
 describe('Certificate collector test for a birth registration with father details', () => {
   const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
+  const mockLocation: any = vi.fn()
+  const graphqlMock = lateBirthCertificationResponseWithFather
 
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>

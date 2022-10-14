@@ -22,6 +22,7 @@ import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { vi } from 'vitest'
 
 describe('verify corrector tests', () => {
   const { store, history } = createStore()
@@ -142,7 +143,8 @@ describe('verify corrector tests', () => {
     })
 
     it('clicking on yes button takes user to review certificate', () => {
-      Date.now = jest.fn(() => 243885600000)
+      const date = new Date(243885600000)
+      vi.setSystemTime(date)
 
       testComponent
         .find('#idVerifier')
@@ -232,7 +234,8 @@ describe('verify corrector tests', () => {
     })
 
     it('clicking on yes button takes user to review certificate', () => {
-      Date.now = jest.fn(() => 243885600000)
+      const date = new Date(243885600000)
+      vi.setSystemTime(date)
 
       testComponent
         .find('#idVerifier')

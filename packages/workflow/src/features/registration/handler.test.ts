@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+// eslint-disable-next-line import/no-relative-parent-imports
 import { createServer } from '../../server'
 import {
   testFhirBundle,
@@ -41,6 +43,7 @@ import {
 import { cloneDeep } from 'lodash'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
 import * as fetchAny from 'jest-fetch-mock'
+import { mockFormDraft } from '@workflow/utils/formDraftUtils.test'
 
 const fetch = fetchAny as any
 
@@ -1147,8 +1150,9 @@ describe('markEventAsDownloadedAndAssignedHandler', () => {
       [upazilaMock, { status: 200 }],
       [unionMock, { status: 200 }],
       [officeMock, { status: 200 }],
+      [userResponseMock, { status: 200 }],
       [hearthResponseMock, { status: 200 }],
-      [userResponseMock, { status: 200 }]
+      [mockFormDraft, { status: 200 }]
     )
   })
 

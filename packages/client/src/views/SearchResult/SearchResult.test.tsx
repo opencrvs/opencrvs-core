@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -26,11 +27,12 @@ import { goToSearch } from '@client/navigation'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Event } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
+import { vi, Mock } from 'vitest'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-const getItem = window.localStorage.getItem as jest.Mock
-const mockFetchUserDetails = jest.fn()
+const getItem = window.localStorage.getItem as Mock
+const mockFetchUserDetails = vi.fn()
 
 const nameObj = {
   data: {
@@ -322,7 +324,7 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
     testComponent.update()
-    const data = testComponent.find(GridTable).prop('content')
+    const data = testComponent.find(Workqueue).prop('content')
     expect(data.length).toEqual(6)
   })
 
@@ -581,18 +583,11 @@ describe('SearchResult tests', () => {
     })
 
     testComponent.update()
-
     const printButton = await waitForElement(
       testComponent,
       '#ListItemAction-0-Print'
     )
-
     printButton.hostNodes().simulate('click')
-
-    expect(window.location.pathname).toContain(
-      '/cert/collector/bc09200d-0160-43b4-9e2b-5b9e90424e92/death/certCollector'
-    )
-
     expect(printButton.hostNodes()).toHaveLength(1)
   })
 

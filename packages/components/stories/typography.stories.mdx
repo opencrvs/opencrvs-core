@@ -1,0 +1,121 @@
+<!--This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+graphic logo are (registered/a) trademark(s) of Plan International.-->
+
+import { Meta, Typeset, ColorPalette, ColorItem } from '@storybook/addon-docs'
+import styled from 'styled-components'
+import { getTheme } from '@opencrvs/components/lib/theme'
+
+export const theme = getTheme()
+
+<Meta title="Styles/Typography" />
+
+export const typography = {
+  type: {
+    primary: theme.fontFamily
+  },
+  weight: {
+    regular: '400',
+    bold: '600'
+  },
+  size: {
+    s1: 12,
+    s2: 14,
+    m1: 16,
+    m2: 18,
+    m3: 21,
+    l1: 24,
+    l2: 36
+  }
+}
+
+export const SampleText = 'The gold standard for digital civil registration'
+
+# Typography
+
+OpenCRVS’s user interface uses a single font family called [Noto Sans](https://fonts.google.com/noto/fonts).
+
+The Noto font collection is designed for typographically correct and aesthetically pleasing global communication in more than 1,000 languages and over 150 scripts.
+
+Currently OpenCRVS supports Noto Sans in 400 (regular) and 600 (semi-bold). We will add additional Noto Sans scripts based on country implementation requirements.
+
+<br />
+
+### Font sizes
+
+<Typeset
+  fontSizes={[
+    Number(typography.size.l2),
+    Number(typography.size.l1),
+    Number(typography.size.m3),
+    Number(typography.size.m2),
+    Number(typography.size.m1),
+    Number(typography.size.s2),
+    Number(typography.size.s1)
+  ]}
+  fontWeight={typography.weight.bold}
+  sampleText={SampleText}
+  fontFamily={typography.type.primary}
+/>{' '}
+
+### Headings
+
+<Typeset
+  fontSizes={['36px']}
+  sampleText="Heading 1"
+  fontWeight={typography.weight.bold}
+  fontFamily={typography.type.primary}
+/>
+<Typeset
+  fontSizes={['24px']}
+  sampleText="Heading 2"
+  fontWeight={typography.weight.bold}
+  fontFamily={typography.type.primary}
+/>
+<Typeset
+  fontSizes={['21px']}
+  sampleText="Heading 3"
+  fontWeight={typography.weight.bold}
+  fontFamily={typography.type.primary}
+/>
+
+<Typeset
+  fontSizes={['18px']}
+  sampleText="Heading 4"
+  fontWeight={typography.weight.bold}
+  fontFamily={typography.type.primary}
+/>
+
+### Body
+
+<Typeset
+  fontSizes={['18px']}
+  sampleText="Body text 1"
+  fontWeight={typography.weight.regular}
+  fontFamily={typography.type.primary}
+/>
+<Typeset
+  fontSizes={['16px']}
+  sampleText="Body text 2"
+  fontWeight={typography.weight.regular}
+  fontFamily={typography.type.primary}
+/>
+<Typeset
+  fontSizes={['14px']}
+  sampleText="Body text 3"
+  fontWeight={typography.weight.regular}
+  fontFamily={typography.type.primary}
+/>
+
+<Typeset
+  fontSizes={['12px']}
+  sampleText="Body text 4"
+  fontWeight={typography.weight.regular}
+  fontFamily={typography.type.primary}
+/>
