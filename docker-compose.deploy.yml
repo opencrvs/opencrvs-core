@@ -390,7 +390,7 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.client.rule=Host(`register.{{hostname}}`)'
+        - 'traefik.http.routers.client.rule=Host(`register.{{hostname}}`) || Host(`{{hostname}}`)'
         - 'traefik.http.services.client.loadbalancer.server.port=80'
         - 'traefik.http.routers.client.tls=true'
         - 'traefik.http.routers.client.tls.certresolver=certResolver'
