@@ -2160,14 +2160,6 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'documents-view-group',
-            conditionals: [
-              {
-                description: 'Hidden for record correction',
-                action: 'hide',
-                expression:
-                  'draftData && draftData.corrector && draftData.corrector.relationship'
-              }
-            ],
             fields: [
               {
                 name: 'paragraph',
