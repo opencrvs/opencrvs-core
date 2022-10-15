@@ -1213,7 +1213,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'detailsExist',
                 type: 'CHECKBOX_GROUP',
-                label: formMessageDescriptors.mothersDetailsExist,
+                label: formMessageDescriptors.mothersDetailsExistMessage,
                 required: true,
                 customisable: true,
                 hideHeader: true,
@@ -1700,15 +1700,10 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'detailsExist',
                 type: 'CHECKBOX_GROUP',
-                label: {
-                  defaultMessage: "Do you have the father's details?",
-                  description:
-                    "Question to ask the user if they have the father's details",
-                  id: 'form.field.label.fathersDetailsExist'
-                },
+                label: formMessageDescriptors.fathersDetailsExistMessage,
                 required: true,
                 hideHeader: true,
-                initialValue: ['false '],
+                initialValue: ['false'],
                 validate: [],
                 options: [
                   {
