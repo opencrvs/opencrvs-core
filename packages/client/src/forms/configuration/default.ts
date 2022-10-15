@@ -1212,19 +1212,17 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'detailsExist',
-                type: 'RADIO_GROUP',
+                type: 'CHECKBOX_GROUP',
                 label: formMessageDescriptors.mothersDetailsExist,
                 required: true,
-                initialValue: true,
+                customisable: true,
+                hideHeader: true,
+                initialValue: ['false'],
                 validate: [],
                 options: [
                   {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
+                    value: 'true',
+                    label: formMessageDescriptors.mothersDetailsExistMessage
                   }
                 ],
                 conditionals: [
@@ -1245,7 +1243,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      'mothersDetailsExistBasedOnContactAndInformant || values.detailsExist'
+                      'mothersDetailsExistBasedOnContactAndInformant || (values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true"))' // HIDE WHEN = FALSE
                   }
                 ],
                 type: 'TEXT',
@@ -1273,7 +1271,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true")) && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -1310,7 +1308,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true")) && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -1341,7 +1339,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true"))  && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 required: true,
@@ -1397,7 +1395,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true"))  && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -1429,7 +1427,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true"))  && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 maxLength: 32,
@@ -1471,7 +1469,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true"))  && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -1498,7 +1496,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true"))  && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 options: [
@@ -1564,7 +1562,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true"))  && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 customisable: true,
@@ -1596,7 +1594,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true"))  && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -1616,7 +1614,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true"))  && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,

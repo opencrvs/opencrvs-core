@@ -560,6 +560,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
 ): IFormSectionGroup[] => {
   // eslint-disable-next-line no-unused-vars
   const values = sectionData
+  console.log('value', values.detailsExist)
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)
