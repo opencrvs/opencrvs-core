@@ -46,7 +46,7 @@ export type CMethodParams = {
   intl: IntlShape
   userDetails: IUserDetails | null
   draft: IDeclaration | null
-  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
+  clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
   goToPage?: typeof goToPage
   goToPrintCertificate?: typeof goToPrintCertificate
   goToUserProfile?: typeof goToUserProfile
@@ -261,7 +261,8 @@ export const ShowPrintButton = ({
         size={'medium'}
         id={`print-${id}`}
         onClick={() => {
-          clearCorrectionAndPrintChanges(declaration.id)
+          clearCorrectionAndPrintChanges &&
+            clearCorrectionAndPrintChanges(declaration.id)
           goToPrintCertificate &&
             goToPrintCertificate(id, type.toLocaleLowerCase())
         }}
