@@ -31,11 +31,7 @@ import {
   LAST_LIVE_BIRTH_CODE
 } from '@gateway/features/fhir/templates'
 import * as _ from 'lodash'
-import {
-  mockTask,
-  mockTaskBundle,
-  mockUserDetails
-} from '@gateway/utils/testUtils'
+import { mockTask } from '@gateway/utils/testUtils'
 import { findExtension } from '@gateway/features/fhir/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { readFileSync } from 'fs'
@@ -1009,6 +1005,7 @@ describe('checkUserAssignment()', () => {
     { scope: ['register', 'certify'] },
     readFileSync('../auth/test/cert.key'),
     {
+      subject: '121221',
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
@@ -1018,8 +1015,7 @@ describe('checkUserAssignment()', () => {
     Authorization: `Bearer ${registerCertifyToken}`
   }
   it('should return true if user is assigned on task', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockTaskBundle))
-    fetch.mockResponse(JSON.stringify(mockUserDetails))
+    fetch.mockResponseOnce(JSON.stringify({ userId: '121221' }))
     const bundle = await checkUserAssignment(
       '5d027bc403b93b17526323f6',
       authHeaderRegCert
@@ -1028,9 +1024,7 @@ describe('checkUserAssignment()', () => {
   })
 
   it('should return false if user is not assigned on task', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockTaskBundle))
-    mockUserDetails.practitionerId = '1325'
-    fetch.mockResponse(JSON.stringify(mockUserDetails))
+    fetch.mockResponseOnce(JSON.stringify({ userId: '123456' }))
     const bundle = await checkUserAssignment(
       '5d027bc403b93b17526323f6',
       authHeaderRegCert
@@ -1039,22 +1033,7 @@ describe('checkUserAssignment()', () => {
   })
 
   it('should return false if authHeader has no Authorization', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockTaskBundle))
-    mockUserDetails.practitionerId = '1325'
-    fetch.mockResponse(JSON.stringify(mockUserDetails))
-    //@ts-ignore
-    delete authHeaderRegCert.Authorization
-    const bundle = await checkUserAssignment(
-      '5d027bc403b93b17526323f6',
-      authHeaderRegCert
-    )
-    expect(bundle).toBe(false)
-  })
-
-  it('should return false if has no regAssigned extension', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockTask))
-    mockUserDetails.practitionerId = '1325'
-    fetch.mockResponse(JSON.stringify(mockUserDetails))
+    fetch.mockResponse(JSON.stringify({ userId: '121221' }))
     //@ts-ignore
     delete authHeaderRegCert.Authorization
     const bundle = await checkUserAssignment(
