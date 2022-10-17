@@ -77,6 +77,8 @@ const Container = styled.div`
   width: 300px;
   position: relative;
   margin-top: 104px;
+  margin-left: auto;
+  margin-right: auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: 80px;
   }
@@ -171,9 +173,7 @@ export function ForgotPIN(props: IForgotPINProps) {
           (storedName: GQLHumanName) => storedName.use === 'en'
         ) as GQLHumanName)) ||
       {}
-    const fullName = `${String(nameObj.firstNames)} ${String(
-      nameObj.familyName
-    )}`
+    const fullName = `${nameObj.firstNames ?? ''} ${nameObj.familyName ?? ''}`
     return <Name>{fullName}</Name>
   }
 
