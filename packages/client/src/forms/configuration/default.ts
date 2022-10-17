@@ -3344,7 +3344,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [],
                 options: [
                   {
-                    value: 'true',
+                    value: true,
                     label:
                       formMessageDescriptors.causeOfDeathEstablishedMessages
                   }
