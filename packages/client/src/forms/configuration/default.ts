@@ -3325,12 +3325,12 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'causeOfDeathEstablished',
-                type: 'CHECKBOX_GROUP',
-                label: formMessageDescriptors.causeOfDeathEstablished,
+                type: 'CHECKBOX',
+                label: formMessageDescriptors.causeOfDeathEstablishedMessages,
                 required: true,
                 customisable: true,
                 hideHeader: true,
-                initialValue: ['false'],
+                initialValue: false,
                 validate: [],
                 options: [
                   {
@@ -3363,8 +3363,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
 
-                    expression:
-                      'values.causeOfDeathEstablished && (values.causeOfDeathEstablished.length == 1 ? values.causeOfDeathEstablished[0] !== "true" : values.causeOfDeathEstablished[1] !== "true")'
+                    expression: 'values.causeOfDeathEstablished !== true'
                   }
                 ],
                 options: [
@@ -3404,7 +3403,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      'values.causeOfDeathEstablished && (values.causeOfDeathEstablished.length == 1 ? values.causeOfDeathEstablished[0] !== "true" : values.causeOfDeathEstablished[1] !== "true") || (values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY")'
+                      'values.causeOfDeathEstablished !== true || values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
                   }
                 ],
                 initialValue: '',
