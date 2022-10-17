@@ -28,7 +28,7 @@ import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History } from '@client/utils/gateway'
+import { History, RegStatus } from '@client/utils/gateway'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -188,8 +188,8 @@ export const GetHistory = ({
   }
 
   if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
-    allHistoryData = allHistoryData.filter((obj: { [key: string]: any }) => {
-      return obj.action !== 'WAITING_VALIDATION'
+    allHistoryData = allHistoryData.filter(({ regStatus }: History) => {
+      return regStatus !== RegStatus.WaitingValidation
     })
   }
 
