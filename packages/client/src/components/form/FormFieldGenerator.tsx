@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
-import { CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
+import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
@@ -40,6 +40,7 @@ import {
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
+  CHECKBOX,
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION,
   TEXTAREA,
@@ -361,6 +362,26 @@ function GeneratedInputField({
           value={value as string[]}
           onChange={(val: string[]) =>
             onSetFieldValue(fieldDefinition.name, val)
+          }
+        />
+      </InputField>
+    )
+  }
+
+  if (fieldDefinition.type === CHECKBOX) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Checkbox
+          {...inputProps}
+          label={fieldDefinition.label}
+          name={fieldDefinition.name}
+          value={String(value)}
+          selected={value as boolean}
+          onChange={(event) =>
+            onSetFieldValue(
+              fieldDefinition.name,
+              event.target.value === 'true' ? false : true
+            )
           }
         />
       </InputField>
