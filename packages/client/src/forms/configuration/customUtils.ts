@@ -45,7 +45,7 @@ function getOtherConditionalsAction(
     )
     return {
       action: 'hide',
-      expression: `!new RegExp("${escapeRegExpValue}").test(draftData && draftData.${sectionId} && draftData.${sectionId}.${fieldName})`
+      expression: `!(new RegExp("${escapeRegExpValue}").test(draftData && draftData.${sectionId} && draftData.${sectionId}.${fieldName}))`
     }
   })
 }
