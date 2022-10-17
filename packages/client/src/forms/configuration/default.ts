@@ -1221,7 +1221,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [],
                 options: [
                   {
-                    value: true,
+                    value: false,
                     label: formMessageDescriptors.mothersDetailsExistMessage
                   }
                 ],
@@ -1729,7 +1729,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      'fathersDetailsExistBasedOnContactAndInformant || values.detailsExist'
+                      'fathersDetailsExistBasedOnContactAndInformant || !values.detailsExist'
                   }
                 ],
                 type: 'TEXT',
@@ -1757,7 +1757,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist  && !fathersDetailsExistBasedOnContactAndInformant'
+                      'values.detailsExist  && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -1794,7 +1794,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      'values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -1841,7 +1841,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      'values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -1881,7 +1881,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      'values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -1955,7 +1955,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      'values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -1976,7 +1976,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      'values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2073,7 +2073,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      'values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 options: [
