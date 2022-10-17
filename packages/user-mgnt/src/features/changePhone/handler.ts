@@ -68,7 +68,11 @@ export async function postUserActionToMetrics(
   practitionerId: string,
   token: string
 ) {
-  const url = resolve(METRICS_URL, '/audit/events')
+  let url = resolve(METRICS_URL, '/audit/events')
+
+  if (action === 'PASSWORD_RESET' || action === 'USERNAME_REMINDER') {
+    url = resolve(METRICS_URL, '/audit/events/noAuth')
+  }
   const body = { practitionerId: practitionerId, action: action }
   const authentication = 'Bearer ' + token
   await fetch(url, {

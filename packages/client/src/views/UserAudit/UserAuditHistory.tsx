@@ -57,7 +57,8 @@ import {
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { GetUserAuditLogQuery } from '@client/utils/gateway'
-import { NameContainer } from '@client/views/OfficeHome/components'
+import { GetLink, IActionDetailsData } from '../RecordAudit/History'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -141,6 +142,8 @@ type State = {
   sortOrder: SORT_ORDER
   sortedColumn: SORTED_COLUMN
   currentPageNumber: number
+  showModal: boolean
+  actionDetailsData: Record<string, string>
 }
 
 const isUserAuditItemWithDeclarationDetials = (
@@ -159,7 +162,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
       viewportWidth: 0,
       currentPageNumber: 1,
       sortOrder: SORT_ORDER.DESCENDING,
-      sortedColumn: SORTED_COLUMN.DATE
+      sortedColumn: SORTED_COLUMN.DATE,
+      showModal: false,
+      actionDetailsData: {}
     }
     this.updateViewPort = this.updateViewPort.bind(this)
   }
@@ -306,13 +311,23 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     }
   }
 
+  toggleActionDetails = (actionItem: IActionDetailsData | null) => {
+    actionItem &&
+      this.setState({
+        actionDetailsData: actionItem,
+        showModal: !this.state.showModal
+      })
+  }
+
   getAuditData(data: GQLUserAuditLogResultSet) {
     const auditList = data.results.map((userAuditItem) => {
       if (userAuditItem === null) {
         return {}
       }
       const actionDescriptor = getUserAuditDescription(userAuditItem.action)
-
+      const actionMessage = actionDescriptor
+        ? this.props.intl.formatMessage(actionDescriptor)
+        : ''
       const device = Bowser.getParser(userAuditItem.userAgent).getResult()
 
       const deviceIpAddress =
@@ -328,11 +343,15 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
 
       return {
         actionDescription: (
-          <NameContainer isBoldLink={true}>
-            {(actionDescriptor &&
-              this.props.intl.formatMessage(actionDescriptor)) ||
-              ''}
-          </NameContainer>
+          <GetLink
+            status={actionMessage}
+            onClick={() => {
+              this.toggleActionDetails({
+                ...userAuditItem,
+                action: actionMessage
+              })
+            }}
+          />
         ),
         actionDescriptionWithAuditTime: (
           <AuditDescTimeContainer>
@@ -449,21 +468,35 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                     )
 
                     return (
-                      <Table
-                        columns={this.getAuditColumns()}
-                        content={this.getAuditData(data.getUserAuditLog)}
-                        noResultText={intl.formatMessage(messages.noAuditFound)}
-                        isLoading={loading}
-                        hideTableHeader={
-                          this.state.viewportWidth <= theme.grid.breakpoints.md
-                        }
-                        currentPage={this.state.currentPageNumber}
-                        pageSize={DEFAULT_LIST_SIZE}
-                        totalItems={totalItems}
-                        onPageChange={(currentPage: number) => {
-                          this.setCurrentPage(currentPage)
-                        }}
-                      />
+                      <>
+                        <Table
+                          columns={this.getAuditColumns()}
+                          content={this.getAuditData(data.getUserAuditLog)}
+                          noResultText={intl.formatMessage(
+                            messages.noAuditFound
+                          )}
+                          isLoading={loading}
+                          hideTableHeader={
+                            this.state.viewportWidth <=
+                            theme.grid.breakpoints.md
+                          }
+                          currentPage={this.state.currentPageNumber}
+                          pageSize={DEFAULT_LIST_SIZE}
+                          totalItems={totalItems}
+                          onPageChange={(currentPage: number) => {
+                            this.setCurrentPage(currentPage)
+                          }}
+                        />
+                        <ResponsiveModal
+                          actions={[]}
+                          handleClose={() => this.toggleActionDetails({})}
+                          show={this.state.showModal}
+                          responsive={true}
+                          title={this.state.actionDetailsData.action}
+                          width={1024}
+                          autoHeight={true}
+                        ></ResponsiveModal>
+                      </>
                     )
                   }
                 }}

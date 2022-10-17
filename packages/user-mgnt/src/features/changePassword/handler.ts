@@ -62,11 +62,21 @@ export default async function changePasswordHandler(
 
   try {
     await User.update({ _id: user._id }, user)
-    await postUserActionToMetrics(
-      'PASSWORD_CHANGED',
-      user.practitionerId,
-      request.headers.authorization
-    )
+
+    if (request.headers.authorization == undefined) {
+      // TODO: generate authentication token
+      await postUserActionToMetrics(
+        'PASSWORD_RESET',
+        user.practitionerId,
+        request.headers.authorization
+      )
+    } else {
+      await postUserActionToMetrics(
+        'PASSWORD_CHANGED',
+        user.practitionerId,
+        request.headers.authorization
+      )
+    }
   } catch (err) {
     logger.error(err.message)
     // return 400 if there is a validation error when updating to mongo

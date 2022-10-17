@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import { writePoints } from '@metrics/influxdb/client'
-import { internal } from '@hapi/boom'
+import { badRequest, internal } from '@hapi/boom'
 import { IUserAuditBody } from '@metrics/features/registration'
 import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
 import { countUserAuditEvents, getUserAuditEvents } from './service'
@@ -38,6 +38,39 @@ export async function newAuditHandler(
       )
     )
     await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+  return h.response().code(201)
+}
+
+export async function newAuditHandlerWithOutAuth(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const points = []
+  try {
+    const remoteAddress =
+      request.headers['x-real-ip'] || request.info.remoteAddress
+    const userAgent =
+      request.headers['x-real-user-agent'] || request.headers['user-agent']
+    const payload = request.payload as IUserAuditBody
+
+    if (payload.action === 'PASSWORD_RESET') {
+      points.push(
+        generateAuditPoint(
+          payload.practitionerId,
+          payload.action,
+          remoteAddress,
+          userAgent,
+          payload.additionalData
+        )
+      )
+
+      await writePoints(points)
+    } else {
+      throw badRequest('Invalid user action')
+    }
   } catch (err) {
     return internal(err)
   }

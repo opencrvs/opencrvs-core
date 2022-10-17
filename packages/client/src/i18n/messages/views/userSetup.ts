@@ -68,6 +68,8 @@ interface IUserSetupMessages
   deactivateAuditAction: MessageDescriptor
   createUserAuditAction: MessageDescriptor
   editUserAuditAction: MessageDescriptor
+  passwordResetAuditAction: MessageDescriptor
+  userNameReminderAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -310,12 +312,12 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.auditList.archived'
   },
   loggedInAuditAction: {
-    defaultMessage: 'Logged In',
+    defaultMessage: 'Logged in',
     description: 'Description for user logged in',
     id: 'user.profile.auditList.loggedIn'
   },
   loggedOutAuditAction: {
-    defaultMessage: 'Logged Out',
+    defaultMessage: 'Log out',
     description: 'Description for user logged out',
     id: 'user.profile.auditList.loggedOut'
   },
@@ -348,6 +350,16 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Edit User',
     description: 'Description for User edited action',
     id: 'user.profile.auditList.userEdited'
+  },
+  passwordResetAuditAction: {
+    defaultMessage: 'Reset password',
+    description: 'Description for User reset password action',
+    id: 'user.profile.auditList.passwordReset'
+  },
+  userNameReminderAuditAction: {
+    defaultMessage: 'Username Reminder Requested',
+    description: 'Description for User username requested audit action',
+    id: 'user.profile.auditList.usernameRequested'
   }
 }
 

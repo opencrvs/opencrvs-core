@@ -45,7 +45,7 @@ export default async function sendUserNameHandler(
   const isDemoUser = retrievalStepInformation.scope.indexOf('demo') > -1
   if (!PRODUCTION || isDemoUser) {
     logger.info(
-      `Sending a verification SMS, 
+      `Sending a verification SMS,
         ${JSON.stringify({
           mobile: retrievalStepInformation.mobile,
           username: retrievalStepInformation.username

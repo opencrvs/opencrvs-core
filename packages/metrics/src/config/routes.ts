@@ -56,7 +56,7 @@ import { locationStatisticsHandler } from '@metrics/features/locationStatistics/
 import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
 import {
   getUserAuditsHandler,
-  newAuditHandler
+  newAuditHandler, newAuditHandlerWithOutAuth
 } from '@metrics/features/audit/handler'
 import * as Joi from 'joi'
 
@@ -584,6 +584,16 @@ export const getRoutes = () => {
       handler: newAuditHandler,
       config: {
         tags: ['api']
+      }
+    },
+    // TODO: refactor
+    {
+      method: 'POST',
+      path: '/audit/events/noAuth',
+      handler: newAuditHandlerWithOutAuth,
+      config: {
+        tags: ['api'],
+        auth: false
       }
     },
     // GET user audit events
