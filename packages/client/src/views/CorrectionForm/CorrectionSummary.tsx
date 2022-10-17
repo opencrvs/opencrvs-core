@@ -167,6 +167,14 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       declaration: { event }
     } = this.props
     const formSections = getViewableSection(registerForm[event], declaration)
+    const relationShip = (
+      declaration.data.corrector.relationship as IFormSectionData
+    ).value as string
+
+    const noIdCheck =
+      relationShip !== CorrectorRelationship.REGISTRAR &&
+      relationShip !== CorrectorRelationship.ANOTHER_AGENT
+
     const backToReviewButton = (
       <SecondaryButton
         id="back_to_review"
@@ -257,25 +265,28 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
-
-            <Table
-              hideTableBottomBorder={true}
-              isLoading={false}
-              content={[
-                {
-                  idCheck: this.getIdCheck()
-                }
-              ]}
-              columns={[
-                {
-                  label: intl.formatMessage(messages.correctionSummaryIdCheck),
-                  width: 100,
-                  alignment: ColumnContentAlignment.LEFT,
-                  key: 'idCheck'
-                }
-              ]}
-              noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></Table>
+            {noIdCheck && (
+              <Table
+                hideTableBottomBorder={true}
+                isLoading={false}
+                content={[
+                  {
+                    idCheck: this.getIdCheck()
+                  }
+                ]}
+                columns={[
+                  {
+                    label: intl.formatMessage(
+                      messages.correctionSummaryIdCheck
+                    ),
+                    width: 100,
+                    alignment: ColumnContentAlignment.LEFT,
+                    key: 'idCheck'
+                  }
+                ]}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
+              ></Table>
+            )}
 
             <Table
               hideTableBottomBorder={true}
@@ -297,7 +308,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
-
             <Table
               hideTableBottomBorder={true}
               isLoading={false}
@@ -316,7 +326,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
-
             <Table
               isLoading={false}
               content={[
