@@ -110,9 +110,7 @@ export function GovtLogo() {
         )
       } catch {
         setNotificationStatus(NOTIFICATION_STATUS.ERROR)
-        setErrorMessages(
-          intl.formatMessage(messages.govtLogoChangeNotification)
-        )
+        setErrorMessages(intl.formatMessage(messages.govtLogoChangeError))
       }
     }
   }
@@ -194,7 +192,6 @@ export function GovtLogo() {
           </Field>
         </Content>
       </ResponsiveModal>
-
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast
           id="print-cert-notification"
