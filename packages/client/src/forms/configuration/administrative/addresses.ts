@@ -50,12 +50,10 @@ const mothersDetailsDontExistOnOtherPage =
   'draftData && draftData.mother && !draftData.mother.detailsExist'
 
 // if mothers details do not exist
-const mothersDetailsDontExist =
-  '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true")) '
+const mothersDetailsDontExist = '!values.detailsExist'
 
 // if fathers details do not exist
-const fathersDetailsDontExist =
-  '!(values.detailsExist && (values.detailsExist.length == 1 ? values.detailsExist[0] !== "true" : values.detailsExist[1] !== "true")) '
+const fathersDetailsDontExist = '!values.detailsExist'
 
 // primary address same as other primary
 const primaryAddressSameAsOtherPrimaryAddress =
