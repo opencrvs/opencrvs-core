@@ -29,7 +29,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
 import {
   calculatePrice,
@@ -40,6 +40,7 @@ import {
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { HOME } from '@client/navigation/routes'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -207,7 +208,7 @@ function mapStatetoProps(
   ) as IPrintableDeclaration | undefined
 
   if (!declaration) {
-    throw new Error(`Declaration "${registrationId}" missing!`)
+    return <Redirect to={HOME} />
   }
 
   return {

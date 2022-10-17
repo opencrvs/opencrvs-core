@@ -202,7 +202,7 @@ class ReviewCertificateActionComponent extends React.Component<
     this.props.modifyDeclaration(draft)
     this.props.writeDeclaration(draft)
     this.toggleModal()
-    this.props.goToHomeTabReplace(WORKQUEUE_TABS.readyToPrint)
+    this.props.goToHomeTabReplace(WORKQUEUE_TABS.inProgress)
   }
 
   getTitle = () => {

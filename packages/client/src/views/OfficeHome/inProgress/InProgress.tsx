@@ -151,6 +151,13 @@ export class InProgressComponent extends React.Component<
     window.history.pushState(null, document.title, window.location.href)
   }
 
+  componentWillMount() {
+    window.history.pushState(null, '', window.location.href)
+    window.onpopstate = function () {
+      window.history.go(1)
+    }
+  }
+
   recordWindowWidth = () => {
     this.setState({ width: window.innerWidth })
   }
