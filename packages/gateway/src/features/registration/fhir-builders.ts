@@ -157,21 +157,6 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'value',
         context
       )
-      if (!person.id) {
-        const personSearchSet = await fetchFHIR(
-          `/Patient?identifier=${fieldValue}`,
-          context.authHeader
-        )
-        if (
-          person &&
-          personSearchSet &&
-          personSearchSet.entry &&
-          personSearchSet.entry[0] &&
-          personSearchSet.entry[0].resource
-        ) {
-          person.id = personSearchSet.entry[0].resource.id
-        }
-      }
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -2129,6 +2114,14 @@ export const builders: IFieldBuilders = {
         trackingId = 'death-tracking-id'
       }
       return setResourceIdentifier(taskResource, `${trackingId}`, fieldValue)
+    },
+    mosipAid: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return setResourceIdentifier(taskResource, 'mosip-aid', fieldValue)
     },
     registrationNumber: (
       fhirBundle: ITemplatedBundle,
