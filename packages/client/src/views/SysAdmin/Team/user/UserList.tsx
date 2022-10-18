@@ -351,6 +351,15 @@ function UserListComponent(props: IProps) {
         }
       ]
 
+      if (user.status === 'pending' || user.status === 'active') {
+        menuItems.push({
+          label: intl.formatMessage(messages.sendUsernameReminderSMS),
+          handler: () => {
+            resendSMS(user.id as string)
+          }
+        })
+      }
+
       if (user.status === 'pending') {
         menuItems.push({
           label: intl.formatMessage(messages.resendSMS),
