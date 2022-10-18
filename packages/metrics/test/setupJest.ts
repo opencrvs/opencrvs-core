@@ -33,6 +33,13 @@ jest.mock('@metrics/api', () => ({
   fetchPractitionerRole: jest.fn()
 }))
 
+export const statuses = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  DISABLED: 'disabled',
+  DEACTIVATED: 'deactivated'
+}
+
 jest.mock('@metrics/configApi', () => {
   const originalModule = jest.requireActual('@metrics/configApi')
   return {
@@ -56,7 +63,13 @@ jest.mock('@metrics/configApi', () => {
           isoCode: 'ZMW',
           languagesAndCountry: ['en-ZM']
         },
-        ADDRESSES: 1
+        ADDRESSES: 1,
+        INTEGRATIONS: [
+          {
+            name: 'MOSIP',
+            status: statuses.ACTIVE
+          }
+        ]
       })
   }
 })

@@ -48,6 +48,7 @@ export interface IApplicationConfigurationModel extends Document {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
+  INTEGRATIONS: [IIntegration]
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -76,6 +77,32 @@ const countryLogoSchema = new Schema<ICountryLogo>({
 const currencySchema = new Schema<ICurrency>({
   isoCode: { type: String },
   languagesAndCountry: { type: [String] }
+})
+
+interface IIntegration {
+  name: string
+  status: string
+}
+
+export const statuses = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  DISABLED: 'disabled',
+  DEACTIVATED: 'deactivated'
+}
+
+const integrationsSchema = new Schema<IIntegration>({
+  name: String,
+  status: {
+    type: String,
+    enum: [
+      statuses.PENDING,
+      statuses.ACTIVE,
+      statuses.DISABLED,
+      statuses.DEACTIVATED
+    ],
+    default: statuses.PENDING
+  }
 })
 
 const systemSchema = new Schema({
@@ -111,7 +138,8 @@ const systemSchema = new Schema({
     required: false,
     enum: [1, 2],
     default: 1
-  }
+  },
+  INTEGRATIONS: [integrationsSchema]
 })
 
 export default model<IApplicationConfigurationModel>('Config', systemSchema)

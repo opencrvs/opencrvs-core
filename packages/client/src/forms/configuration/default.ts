@@ -561,6 +561,14 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrationNumberTransformer'
             },
             {
+              fieldName: 'mosipAid',
+              operation: 'mosipAidTransformer'
+            },
+            {
+              fieldName: 'mosipAIDLabel',
+              operation: 'mosipAidLabelTransformer'
+            },
+            {
               fieldName: 'certificateDate',
               operation: 'certificateDateTransformer',
               parameters: ['en', 'dd MMMM yyyy']
@@ -3326,19 +3334,12 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'causeOfDeathEstablished',
                 type: 'CHECKBOX',
-                label: formMessageDescriptors.causeOfDeathEstablishedMessages,
+                label: formMessageDescriptors.causeOfDeathEstablishedFieldLabel,
                 required: true,
                 customisable: true,
                 hideHeader: true,
                 initialValue: false,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label:
-                      formMessageDescriptors.causeOfDeathEstablishedMessages
-                  }
-                ],
                 mapping: {
                   mutation: {
                     operation: 'sectionFieldToBundleFieldTransformer',
@@ -3362,7 +3363,6 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-
                     expression: 'values.causeOfDeathEstablished !== true'
                   }
                 ],
