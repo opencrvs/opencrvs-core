@@ -390,14 +390,18 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.client.rule=Host(`register.{{hostname}}`) || Host(`{{hostname}}`)'
+        - 'traefik.http.routers.client.rule=Host(`register.{{hostname}}`,`{{hostname}}`)'
+        - 'traefik.http.routers.client.middlewares=test-replacepathregex'
         - 'traefik.http.services.client.loadbalancer.server.port=80'
         - 'traefik.http.routers.client.tls=true'
         - 'traefik.http.routers.client.tls.certresolver=certResolver'
         - 'traefik.http.routers.client.entrypoints=web,websecure'
         - 'traefik.docker.network=opencrvs_overlay_net'
-        - 'traefik.http.middlewares.client.redirectregex.regex=^https?://{{hostname}}/(.*)'
-        - 'traefik.http.middlewares.client.redirectregex.replacement=https://register.{{hostname}}/$${1}'
+
+        - 'traefik.http.middlewares.test-redirectregex.redirectregex.permanent=true'
+        - 'traefik.http.middlewares.test-redirectregex.redirectregex.regex=^https?://{{hostname}}/(.*)'
+        - 'traefik.http.middlewares.test-redirectregex.redirectregex.replacement=https://register.{{hostname}}/$${1}'
+
         - 'traefik.http.middlewares.client.headers.customresponseheaders.Pragma=no-cache'
         - 'traefik.http.middlewares.client.headers.customresponseheaders.Cache-control=no-store'
         - 'traefik.http.middlewares.client.headers.customresponseheaders.X-Robots-Tag=none'
@@ -713,14 +717,17 @@ services:
         - 'traefik.http.routers.openhimapi.rule=Host(`openhim-api.{{hostname}}`)'
         - 'traefik.http.services.openhimapi.loadbalancer.server.port=8080'
         - 'traefik.http.routers.openhimapi.tls=true'
+        - 'traefik.http.routers.openhimapi.service=openhimapi'
         - 'traefik.http.routers.openhimapi.entrypoints=web,websecure'
         - 'traefik.http.routers.openhimapi.tls.certresolver=certResolver'
+        - 'traefik.http.services.openhimapi.loadbalancer.server.scheme=https'
 
         - 'traefik.http.routers.api.rule=Host(`api.{{hostname}}`)'
-        - 'traefik.http.services.api.loadbalancer.server.port=5001'
         - 'traefik.http.routers.api.tls=true'
+        - 'traefik.http.routers.api.service=api'
         - 'traefik.http.routers.api.tls.certresolver=certResolver'
         - 'traefik.http.routers.api.entrypoints=web,websecure'
+        - 'traefik.http.services.api.loadbalancer.server.port=5001'
 
         - 'traefik.docker.network=opencrvs_overlay_net'
 
