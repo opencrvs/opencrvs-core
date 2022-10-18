@@ -13,6 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
 import Role from '@user-mgnt/model/role'
+import { SortOrder } from 'mongoose'
 
 interface IVerifyPayload {
   title?: string
@@ -20,7 +21,7 @@ interface IVerifyPayload {
   type?: string
   active?: boolean
   sortBy?: string
-  sortOrder?: string
+  sortOrder?: SortOrder
 }
 
 export default async function getRoles(
@@ -49,7 +50,6 @@ export default async function getRoles(
     criteria = { ...criteria, active }
   }
 
-  // tslint:disable-next-line
   return await Role.find(criteria).sort({
     [sortBy]: sortOrder
   })

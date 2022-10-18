@@ -21,6 +21,9 @@ interface IRegisterMessages
   backToReviewButton: MessageDescriptor
   saveDeclarationConfirmModalTitle: MessageDescriptor
   saveDeclarationConfirmModalDescription: MessageDescriptor
+
+  deleteDeclarationConfirmModalTitle: MessageDescriptor
+  deleteDeclarationConfirmModalDescription: MessageDescriptor
 }
 
 const messagesToDefine: IRegisterMessages = {
@@ -63,11 +66,23 @@ const messagesToDefine: IRegisterMessages = {
     defaultMessage: 'Save your changes?',
     description: 'Title for save declaration confirmation modal'
   },
+
   saveDeclarationConfirmModalDescription: {
     id: 'register.form.modal.desc.saveDeclarationConfirm',
     defaultMessage:
       'By clicking save the old information will be deleted and new information will be saved',
     description: 'Description for save declaration confirmation modal'
+  },
+
+  deleteDeclarationConfirmModalTitle: {
+    id: 'register.form.modal.title.deleteDeclarationConfirm',
+    defaultMessage: 'Delete draft?',
+    description: 'Title for delete declaration confirmation modal'
+  },
+  deleteDeclarationConfirmModalDescription: {
+    id: 'register.form.modal.desc.deleteDeclarationConfirm',
+    defaultMessage: 'Are you sure you want to delete this declaration?',
+    description: 'Description for delete declaration confirmation modal'
   }
 }
 

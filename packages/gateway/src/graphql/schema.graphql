@@ -131,6 +131,34 @@ type Query {
     status: [String]
     type: [String]
   ): EventProgressResultSet
+  searchRecord(
+    event: String
+    eventLocationId: String
+    childFirstName: String
+    childLastName: String
+    childDoB: String
+    deceasedFirstNames: String
+    deceasedFamilyName: String
+    deathDate: String
+    deathDateStart: String
+    deathDateEnd: String
+    motherFirstNames: String
+    motherFamilyName: String
+    motherDoB: String
+    motherIdentifier: String
+    fatherFirstNames: String
+    fatherFamilyName: String
+    fatherDoB: String
+    fatherIdentifier: String
+    informantFirstNames: String
+    informantFamilyName: String
+    contactNumber: String
+    registrationNumber: String
+    trackingId: String
+    dateOfRegistration: String
+    dateOfRegistrationStart: String
+    dateOfRegistrationEnd: String
+  ): EventProgressResultSet
   getRoles(
     title: String
     value: ComparisonInput
@@ -606,6 +634,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INTEGRATIONS: [Integration]
 }
 
 input ApplicationConfigurationInput {
@@ -620,6 +649,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INTEGRATIONS: [IntegrationInput]
 }
 
 input FormDraftInput {
@@ -644,6 +674,7 @@ type Registration {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -895,6 +926,7 @@ interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressSet {
@@ -970,6 +1002,7 @@ input RegistrationInput {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -1060,6 +1093,11 @@ type Death {
   FEE: DeathFee
 }
 
+type Integration {
+  name: String
+  status: String
+}
+
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1081,6 +1119,11 @@ input DeathInput {
   FEE: DeathFeeInput
 }
 
+input IntegrationInput {
+  name: String
+  status: String
+}
+
 input QuestionInput {
   fieldId: String!
   label: [MesssageInput!]
@@ -1095,6 +1138,7 @@ input QuestionInput {
   required: Boolean
   enabled: String
   custom: Boolean
+  conditionals: [ConditionalInput!]
 }
 
 enum InformantType {
@@ -1168,6 +1212,9 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
+  MOSIP_UINTOKEN
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
@@ -1240,12 +1287,26 @@ type RegistrationSearchSet {
   assignment: AssignmentData
 }
 
+type OperationHistorySearchSet {
+  operationType: String
+  operatedOn: Date
+  operatorRole: String
+  operatorName: [HumanName]
+  operatorOfficeName: String
+  operatorOfficeAlias: [String]
+  notificationFacilityName: String
+  notificationFacilityAlias: [String]
+  rejectReason: String
+  rejectComment: String
+}
+
 type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -1254,6 +1315,7 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressData {
@@ -1373,6 +1435,11 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+}
+
+input ConditionalInput {
+  fieldId: String!
+  regexp: String!
 }
 
 type Payment {

@@ -10,15 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { Content } from '@opencrvs/components/lib/Content'
 
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
-  ActionPageLight,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
-import {
-  createReviewDeclaration,
   modifyDeclaration,
   storeDeclaration,
   writeDeclaration,
@@ -348,8 +345,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       declaration,
       formSection,
       formGroup,
-      goBack,
-      registerForm
+      goBack
     } = this.props
 
     const { showError, showModalForNoSignedAffidavit } = this.state

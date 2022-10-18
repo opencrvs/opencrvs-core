@@ -65,7 +65,6 @@ import { getUser } from '@gateway/features/user/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
-    // tslint:disable-next-line
     __resolveType(obj) {
       if (obj.type.coding[0].code === 'birth-declaration') {
         return 'BirthRegistration'
@@ -234,7 +233,6 @@ export const typeResolvers: GQLResolver = {
         return
       }
       if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
-        // tslint:disable-next-line
         relatedPerson = await fetchFHIR(
           `/${relatedPerson.patient.reference}`,
           authHeader
@@ -291,6 +289,28 @@ export const typeResolvers: GQLResolver = {
         task.identifier.find(
           (identifier: fhir.Identifier) =>
             identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/${regNoType}`
+        )
+
+      return (foundIdentifier && foundIdentifier.value) || null
+    },
+    async mosipAid(task: fhir.Task) {
+      let mosipAidType =
+        task &&
+        task.code &&
+        task.code.coding &&
+        task.code.coding[0] &&
+        task.code.coding[0].code
+      if (mosipAidType === 'BIRTH') {
+        mosipAidType = 'mosip-aid'
+      } else {
+        return null
+      }
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/${mosipAidType}`
         )
 
       return (foundIdentifier && foundIdentifier.value) || null
@@ -836,7 +856,6 @@ export const typeResolvers: GQLResolver = {
   },
 
   DeathRegistration: {
-    // tslint:disable-next-line
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
       // Preparing Encounter
       const encounterSection = findCompositionSection(
@@ -1251,7 +1270,6 @@ export const typeResolvers: GQLResolver = {
     }
   },
   BirthRegistration: {
-    // tslint:disable-next-line
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
       // Preparing Encounter
       const encounterSection = findCompositionSection(

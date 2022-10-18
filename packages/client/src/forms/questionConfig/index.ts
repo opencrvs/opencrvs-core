@@ -21,6 +21,10 @@ export interface IMessage {
   lang: string
   descriptor: Message
 }
+export interface IConditionalConfig {
+  fieldId: string
+  regexp: string
+}
 
 interface IBaseQuestionConfig {
   fieldId: string
@@ -50,6 +54,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   maxLength?: number
   fieldName: string
   fieldType: CustomFieldType
+  conditionals?: IConditionalConfig[]
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig

@@ -18,7 +18,8 @@ import {
 import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
-  FHIR_OBSERVATION_CATEGORY_URL
+  FHIR_OBSERVATION_CATEGORY_URL,
+  EVENT_TYPE
 } from '@gateway/features/fhir/constants'
 import {
   BIRTH_TYPE_CODE,
@@ -29,7 +30,6 @@ import {
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE
 } from '@gateway/features/fhir/templates'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import * as _ from 'lodash'
 import {
   mockTask,
@@ -40,7 +40,9 @@ import { findExtension } from '@gateway/features/fhir/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+import { IAuthHeader } from '@gateway/common-types'
 
+type AuthHeader = { Authorization?: string } & IAuthHeader
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(
     {
@@ -868,14 +870,14 @@ test('creates task with contact other relationship', async () => {
   expect(simpleFhir).toBeDefined()
 
   const taskResource = (
-    simpleFhir.entry.find(
-      ({ resource }) => resource.resourceType === 'Task'
+    simpleFhir?.entry?.find(
+      ({ resource }) => resource?.resourceType === 'Task'
     ) as fhir.BundleEntry
   ).resource as fhir.Task
 
   expect(taskResource).toBeDefined()
   expect(
-    taskResource.extension.some((taskExtension) =>
+    taskResource?.extension?.some((taskExtension) =>
       _.isEqual(taskExtension, {
         url: 'http://opencrvs.org/specs/extension/contact-person',
         valueString: 'OTHER'
@@ -884,7 +886,7 @@ test('creates task with contact other relationship', async () => {
   ).toBe(true)
 
   expect(
-    taskResource.extension.some((taskExtension) =>
+    taskResource?.extension?.some((taskExtension) =>
       _.isEqual(taskExtension, {
         url: 'http://opencrvs.org/specs/extension/contact-relationship',
         valueString: 'Friend'
@@ -1031,7 +1033,7 @@ describe('checkUserAssignment()', () => {
       audience: 'opencrvs:gateway-user'
     }
   )
-  const authHeaderRegCert = {
+  const authHeaderRegCert: AuthHeader = {
     Authorization: `Bearer ${registerCertifyToken}`
   }
   it('should return true if user is assigned on task', async () => {
@@ -1059,6 +1061,7 @@ describe('checkUserAssignment()', () => {
     fetch.mockResponseOnce(JSON.stringify(mockTaskBundle))
     mockUserDetails.practitionerId = '1325'
     fetch.mockResponse(JSON.stringify(mockUserDetails))
+    //@ts-ignore
     delete authHeaderRegCert.Authorization
     const bundle = await checkUserAssignment(
       '5d027bc403b93b17526323f6',
@@ -1071,6 +1074,7 @@ describe('checkUserAssignment()', () => {
     fetch.mockResponseOnce(JSON.stringify(mockTask))
     mockUserDetails.practitionerId = '1325'
     fetch.mockResponse(JSON.stringify(mockUserDetails))
+    //@ts-ignore
     delete authHeaderRegCert.Authorization
     const bundle = await checkUserAssignment(
       '5d027bc403b93b17526323f6',

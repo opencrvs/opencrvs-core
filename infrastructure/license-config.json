@@ -26,9 +26,12 @@
     "packages/gateway/src/graphql/schema.d.ts",
     "packages/gateway/src/graphql/schema.graphql",
     "infrastructure/configure-file-monitoring.sh",
-    "packages/client/public/index.html",
-    "packages/login/public/index.html",
-    "grafana"
+    "packages/client/index.html",
+    "packages/login/index.html",
+    "packages/components/**/*.mdx",
+    "packages/components/.storybook/preview.jsx",
+    "grafana",
+    ".nvmrc"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {
@@ -37,7 +40,7 @@
         "prepend": "# "
       }
     },
-    "html|xml|svg": {
+    "html|xml|svg|mdx": {
       "prepend": "<!--",
       "append": "-->"
     },

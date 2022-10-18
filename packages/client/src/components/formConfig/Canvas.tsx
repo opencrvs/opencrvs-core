@@ -32,12 +32,15 @@ import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
-import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
+import { FormConfigElementCard } from '@opencrvs/components/lib/FormConfigElementCard'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import ConfigPlaceholder from './ConfigPlaceholder'
+import { Condition } from '@opencrvs/components/lib/icons'
+import { Text } from '@opencrvs/components/lib/Text'
+import { Stack } from '@opencrvs/components/lib/Stack'
 
 const CanvasBox = styled.div`
   display: flex;
@@ -47,6 +50,11 @@ const CanvasBox = styled.div`
   gap: 8px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
+`
+
+const CardContentWrapper = styled(Stack)`
+  flex-direction: column;
+  align-items: normal;
 `
 
 type IRouteProps = {
@@ -129,12 +137,17 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
             isDefaultConfigField(configField) &&
             configField.enabled === FieldEnabled.DISABLED
 
+          const conditionalField = isCustomConfigField(configField)
+            ? configField.conditionals
+            : undefined
           return (
             <FormConfigElementCard
               id={fieldId}
               key={fieldId}
               selected={isSelected}
-              onClick={() => setSelectedField(fieldId)}
+              onClick={() => {
+                setSelectedField(fieldId)
+              }}
               movable={isCustom && isSelected}
               status={
                 isHidden ? intl.formatMessage(messages.hidden) : undefined
@@ -152,7 +165,17 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
               {isPreviewGroupConfigField(configField) ? (
                 <ConfigPlaceholder label={configField.previewGroupLabel} />
               ) : (
-                <FormField configField={configField} />
+                <CardContentWrapper>
+                  {conditionalField && (
+                    <Stack>
+                      <Condition color="grey400" />
+                      <Text variant="reg14" element="span" color="grey400">
+                        {conditionalField[0].fieldId}
+                      </Text>
+                    </Stack>
+                  )}
+                  <FormField configField={configField} />
+                </CardContentWrapper>
               )}
             </FormConfigElementCard>
           )

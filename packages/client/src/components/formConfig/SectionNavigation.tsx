@@ -15,7 +15,7 @@ import styled from '@client/styledComponents'
 import {
   NavigationSubItem,
   LabelContainer
-} from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
+} from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
 import { BirthSection, DeathSection, WizardSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { useIntl } from 'react-intl'

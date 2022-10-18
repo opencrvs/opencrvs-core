@@ -1,4 +1,28 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
+
+exports[`authUtils tests > getAuthorizedToken > when token is in local storage > when it's valid > returns the token 1`] = `
+{
+  "aud": [
+    "gateway",
+  ],
+  "exp": 1543195227,
+  "iat": 1533195228,
+  "role": "admin",
+  "sub": "1",
+}
+`;
+
+exports[`authUtils tests > getAuthorizedToken > when token is in url > when it's valid > returns the token 1`] = `
+{
+  "aud": [
+    "gateway",
+  ],
+  "exp": 1543195227,
+  "iat": 1533195228,
+  "role": "admin",
+  "sub": "1",
+}
+`;
 
 exports[`authUtils tests getAuthorizedToken when token is in local storage when it's valid returns the token 1`] = `
 Object {

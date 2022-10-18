@@ -9,12 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ImageUploader,
-  ISelectOption,
-  Select
-} from '@opencrvs/components/lib/forms'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { ISelectOption, Select } from '@opencrvs/components/lib/Select'
+import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { IFileValue, IFormFieldValue, IAttachmentValue } from '@client/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@client/utils/constants'
@@ -30,7 +27,6 @@ import { remove, clone } from 'lodash'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
-import { FACILITIES_FAILED } from '@client/offline/actions'
 
 const options = {
   maxSizeMB: 0.4,

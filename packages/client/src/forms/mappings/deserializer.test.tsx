@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { referenceApi } from '@client/utils/referenceApi'
 import traverse from 'traverse'
 import { IForm } from '@client/forms'
 import { deserializeForm } from './deserializer'
-import { formConfig } from '@client/tests/mock-offline-data'
 import { registerForms } from '@client/forms/configuration/default'
+import { Mock } from 'vitest'
 
 function isGraphQLTag(item: any) {
   return typeof item === 'object' && item.kind && item.directives
@@ -48,10 +47,8 @@ describe('Form desearializer', () => {
 
     expect(() => deserializeForm(birth)).toThrow()
     /* eslint-disable no-console */
-    expect((console.error as jest.Mock).mock.calls).toHaveLength(1)
-    expect((console.error as jest.Mock).mock.calls[0][0]).toMatch(
-      'non_existing_123'
-    )
+    expect((console.error as Mock).mock.calls).toHaveLength(1)
+    expect((console.error as Mock).mock.calls[0][0]).toMatch('non_existing_123')
     /* eslint-enable no-console */
   })
 })

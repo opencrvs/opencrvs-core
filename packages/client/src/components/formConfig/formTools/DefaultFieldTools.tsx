@@ -14,7 +14,7 @@ import styled from '@client/styledComponents'
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { useIntl } from 'react-intl'
 import {
@@ -101,6 +101,7 @@ export function DefaultFieldTools({
   const handleBar = getCertificateHandlebar(formField)
   const contentKeys = getContentKeys(configField, defaultForm)
   const fieldType = fieldTypeLabel(formField.type)
+  const fieldId = configField.fieldId
 
   return (
     <Container>
@@ -127,7 +128,16 @@ export function DefaultFieldTools({
           />
         </ListViewSimplified>
       )}
-
+      <Content>
+        <Subtitle>
+          {intl.formatMessage(messages.feildId)}
+          <ToolTip
+            label={intl.formatMessage(messages.fieldIdTooltip)}
+            id={'field-id'}
+          />
+        </Subtitle>
+        <Body>{fieldId}</Body>
+      </Content>
       <Content>
         <Subtitle>
           {intl.formatMessage(messages.contentKey)}

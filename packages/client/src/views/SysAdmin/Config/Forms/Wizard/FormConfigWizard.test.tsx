@@ -18,20 +18,12 @@ import {
   natlSysAdminToken
 } from '@client/tests/util'
 import { FormConfigWizard } from './FormConfigWizard'
-import routeData from 'react-router'
-import { BirthSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
 import { FieldEnabled } from '@client/forms/configuration'
 
 let component: ReactWrapper<{}, {}>
-
 describe('FormConfigWizard', () => {
   beforeEach(async () => {
-    jest
-      .spyOn(routeData, 'useParams')
-      .mockReturnValue({ event: Event.Birth, section: BirthSection.Child })
-
     const { store, history } = createStore()
     getItem.mockReturnValue(natlSysAdminToken)
     store.dispatch(checkAuth())
@@ -40,11 +32,9 @@ describe('FormConfigWizard', () => {
       history
     })
   })
-
   it('should load properly', () => {
     expect(component.exists('FormConfigWizard')).toBeTruthy()
   })
-
   describe('for default non customisable fields', () => {
     it('it should not show toggle buttons', () => {
       component
@@ -58,7 +48,6 @@ describe('FormConfigWizard', () => {
       expect(component.exists('Toggle')).toBeFalsy()
     })
   })
-
   describe('for default customisable fields', () => {
     it('should toggle the hidden property', () => {
       component
@@ -68,7 +57,6 @@ describe('FormConfigWizard', () => {
         .childAt(0)
         .simulate('click')
       component.update()
-
       component
         .find('[id="birth.child.child-view-group.attendantAtBirth_hide"]')
         .hostNodes()
@@ -81,7 +69,6 @@ describe('FormConfigWizard', () => {
       )
     })
   })
-
   describe('for custom fields', () => {
     beforeEach(() => {
       component.find('#add-TEXT-btn').hostNodes().first().simulate('click')
@@ -114,6 +101,38 @@ describe('FormConfigWizard', () => {
       expect(component.find('FormConfigElementCard').last().prop('id')).toBe(
         'birth.child.child-view-group.customField1'
       )
+    })
+
+    it('should show conditional fieldids and regex input when click toggle button', async () => {
+      component
+        .find('#conditional-toggle-button')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { checked: true } })
+      component.update()
+      expect(
+        component.find('#conditional-toggle-button').hostNodes().first().props()
+          .defaultChecked
+      ).toBeTruthy()
+      expect(component.find('#selectConditionalField').hostNodes().length).toBe(
+        1
+      )
+      expect(
+        component.find('#conditional-regex-input').find('input').hostNodes()
+          .length
+      ).toBe(1)
+    })
+
+    it('should disable the save button if conditional regex input is empty', async () => {
+      component
+        .find('#conditional-toggle-button')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { checked: true } })
+      component.update()
+      expect(
+        component.find('#custom-tool-save-button').hostNodes().prop('disabled')
+      ).toEqual(true)
     })
 
     it('should remove the field', () => {

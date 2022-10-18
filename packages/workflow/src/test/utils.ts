@@ -1766,9 +1766,10 @@ export const hearthResponseMock = JSON.stringify({
   type: 'transaction-response'
 })
 
-export const userResponseMock = {
-  role: 'FIELD_AGENT'
-}
+export const userResponseMock = JSON.stringify({
+  role: 'FIELD_AGENT',
+  scope: []
+})
 
 export const relatedPersonMock = JSON.stringify({
   resourceType: 'RelatedPerson',
@@ -1793,3 +1794,122 @@ export function wrapInBundle(...resources: [fhir.Resource | string]): string {
     }))
   })
 }
+
+const drnIdentifier = {
+  type: 'DEATH_REGISTRATION_NUMBER',
+  value: '2022DSNEYUG'
+} as fhir.CodeableConcept
+
+const nidIdentifier = {
+  value: '654654666',
+  type: 'NATIONAL_ID'
+} as fhir.CodeableConcept
+
+const brnIdentifier = {
+  type: 'BIRTH_REGISTRATION_NUMBER',
+  value: '2022BSNEYUG'
+} as fhir.CodeableConcept
+
+const mosipUinIdentifier = {
+  type: 'MOSIP_UINTOKEN',
+  value: '257803821990055124230310596669133515'
+} as fhir.CodeableConcept
+
+const birthPatientIdentifier = {
+  type: 'BIRTH_PATIENT_ENTRY',
+  value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
+} as fhir.CodeableConcept
+
+export const mosipDeceasedPatientMock = {
+  resourceType: 'Patient',
+  active: true,
+  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
+  name: [
+    {
+      use: 'bn',
+      given: ['Sakib Al'],
+      family: 'Hasan'
+    }
+  ],
+  gender: 'male',
+  deceased: true,
+  birthDate: '1990-09-01',
+  identifier: [nidIdentifier, drnIdentifier]
+}
+
+export const mosipUpdatedDeceasedPatientMock = {
+  resourceType: 'Patient',
+  active: true,
+  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
+  name: [
+    {
+      use: 'bn',
+      given: ['Sakib Al'],
+      family: 'Hasan'
+    }
+  ],
+  gender: 'male',
+  deceased: true,
+  birthDate: '1990-09-01',
+  identifier: [nidIdentifier, drnIdentifier, birthPatientIdentifier]
+}
+
+export const mosipBirthPatientMock = {
+  resourceType: 'Patient',
+  active: true,
+  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d2',
+  name: [
+    {
+      use: 'bn',
+      given: ['Sakib Al'],
+      family: 'Hasan'
+    }
+  ],
+  gender: 'male',
+  birthDate: '1990-09-01',
+  multipleBirthInteger: 1,
+  identifier: [brnIdentifier, mosipUinIdentifier]
+}
+
+export const mosipBirthPatientBundleMock = JSON.stringify({
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: `urn:uuid:888`,
+      resource: mosipBirthPatientMock
+    }
+  ]
+})
+
+export const mosipErrorMock = JSON.stringify({
+  transactionID: '6810356436',
+  version: '1.0',
+  id: 'mosip.identity.auth',
+  errors: [
+    {
+      errorCode: 'IDA-DEA-001',
+      errorMessage: 'Demographic data dob did not match',
+      actionMessage: 'Please re-enter your dob'
+    }
+  ],
+  responseTime: '2022-08-30T07:52:41.749Z',
+  response: {
+    authStatus: false,
+    authToken: '278978890917620599774520674456334033'
+  }
+})
+export const mosipSuccessMock = JSON.stringify({
+  transactionID: '5763906453',
+  version: '1.0',
+  id: 'mosip.identity.auth',
+  errors: null,
+  responseTime: '2022-08-30T08:15:11.033Z',
+  response: {
+    authStatus: true,
+    authToken: '257803821990055124230310596669133515'
+  }
+})
+export const mosipConfigMock = JSON.stringify({
+  config: { INTEGRATIONS: [{ status: 'active', name: 'MOSIP' }] }
+})
