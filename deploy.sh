@@ -132,6 +132,21 @@ if [ -z "$DOCKERHUB_REPO" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$TOKENSEEDER_MOSIP_AUTH__PARTNER_MISP_LK" ] ; then
+    echo 'Info: Missing optional MOSIP environment variable TOKENSEEDER_MOSIP_AUTH__PARTNER_MISP_LK.'
+    $TOKENSEEDER_MOSIP_AUTH__PARTNER_MISP_LK=''
+fi
+
+if [ -z "$TOKENSEEDER_MOSIP_AUTH__PARTNER_APIKEY" ] ; then
+    echo 'Info: Missing optional MOSIP environment variable TOKENSEEDER_MOSIP_AUTH__PARTNER_APIKEY.'
+    $TOKENSEEDER_MOSIP_AUTH__PARTNER_APIKEY=''
+fi
+
+if [ -z "$TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD" ] ; then
+    echo 'Info: Missing optional MOSIP environment variable TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD.'
+    $TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD=''
+fi
+
 ENV=$3
 HOST=$4
 VERSION=$5
@@ -302,7 +317,10 @@ docker_stack_deploy() {
   ROTATING_APM_ELASTIC_PASSWORD=$ROTATING_APM_ELASTIC_PASSWORD
   ROTATING_SEARCH_ELASTIC_PASSWORD=$ROTATING_SEARCH_ELASTIC_PASSWORD
   KIBANA_USERNAME=$KIBANA_USERNAME
-  KIBANA_PASSWORD=$KIBANA_PASSWORD"
+  KIBANA_PASSWORD=$KIBANA_PASSWORD
+  TOKENSEEDER_MOSIP_AUTH__PARTNER_MISP_LK=$TOKENSEEDER_MOSIP_AUTH__PARTNER_MISP_LK
+  TOKENSEEDER_MOSIP_AUTH__PARTNER_APIKEY=$TOKENSEEDER_MOSIP_AUTH__PARTNER_APIKEY
+  TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD=$TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD"
 
   echo "Pulling all docker images. This might take a while"
 
@@ -358,7 +376,7 @@ elif [[ "$ENV" = "demo" ]]; then
   ENVIRONMENT_COMPOSE="docker-compose.countryconfig.demo-deploy.yml docker-compose.prod-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.demo-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 else
-  echo "Unknown error running docker-compose on server as ENV is not staging, qa or production."
+  echo "Unknown error running docker-compose on server as ENV is not staging, qa, demo or production."
   exit 1
 fi
 
