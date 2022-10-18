@@ -334,15 +334,18 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         notificationTab
       } = state.pagination
 
+      const { pageSize } = action.payload
+
       const paginationParams: IWorkqueuePaginationParams = {
         ...action.payload,
-        inProgressSkip: Math.max(inProgressTab - 1, 0),
-        healthSystemSkip: Math.max(notificationTab - 1, 0),
-        reviewSkip: Math.max(reviewTab - 1, 0),
-        rejectSkip: Math.max(rejectTab - 1, 0),
-        approvalSkip: Math.max(approvalTab - 1, 0),
-        externalValidationSkip: Math.max(externalValidationTab - 1, 0),
-        printSkip: Math.max(printTab - 1, 0)
+        inProgressSkip: Math.max(inProgressTab - 1, 0) * pageSize,
+        healthSystemSkip: Math.max(notificationTab - 1, 0) * pageSize,
+        reviewSkip: Math.max(reviewTab - 1, 0) * pageSize,
+        rejectSkip: Math.max(rejectTab - 1, 0) * pageSize,
+        approvalSkip: Math.max(approvalTab - 1, 0) * pageSize,
+        externalValidationSkip:
+          Math.max(externalValidationTab - 1, 0) * pageSize,
+        printSkip: Math.max(printTab - 1, 0) * pageSize
       }
 
       return loop(

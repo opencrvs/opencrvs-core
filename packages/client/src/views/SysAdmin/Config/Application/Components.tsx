@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { Text } from '@opencrvs/components/lib/Text'
 import styled from '@client/styledComponents'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -78,9 +79,8 @@ export const Message = styled.div`
   margin-bottom: 16px;
 `
 
-export const Label = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
-`
-export const Value = styled.span`
-  ${({ theme }) => theme.fonts.reg16}
-`
+export const Label = styled(Text).attrs({
+  variant: 'bold16',
+  element: 'span'
+})``
+export const Value = styled(Text).attrs({ variant: 'reg16', element: 'span' })``
