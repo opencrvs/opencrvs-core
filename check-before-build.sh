@@ -29,6 +29,7 @@ if [ -z "$3" ] ; then
     print_usage_and_exit
 fi
 
+SHARED_COMPOSE_FILES="docker-compose.yml"
 DOCKERHUB_USERNAME=$1
 DOCKERHUB_PASSWORD=$2
 IMAGE_TAG=$3
@@ -38,15 +39,34 @@ function docker_tag_exists() {
     curl --silent -f --head -lL https://hub.docker.com/v2/repositories/$1/tags/$2/ > /dev/null
 }
 
-images=( "opencrvs/ocrvs-webhooks" "opencrvs/ocrvs-user-mgnt" "opencrvs/ocrvs-auth" "opencrvs/ocrvs-metrics" "opencrvs/ocrvs-search" "opencrvs/ocrvs-workflow" "opencrvs/ocrvs-gateway" "opencrvs/ocrvs-client" "opencrvs/ocrvs-components" "opencrvs/ocrvs-config" "opencrvs/ocrvs-notification")
+# Takes in a space separated string of docker-compose.yml files
+# returns a new line separated list of images defined in those files
+get_docker_tags_from_compose_files() {
+   COMPOSE_FILES=$1
+   SPACE_SEPARATED_COMPOSE_FILE_LIST=$(printf " %s" "${COMPOSE_FILES[@]}")
+   SPACE_SEPARATED_COMPOSE_FILE_LIST=${SPACE_SEPARATED_COMPOSE_FILE_LIST:1}
+
+   IMAGE_TAG_LIST_WITH_VERSION=$(cat $SPACE_SEPARATED_COMPOSE_FILE_LIST \
+   `# Select rows with the image tag` \
+   | grep image: \
+   `# Only keep the image version` \
+   | sed "s/image://")
+   
+   IMAGE_TAG_LIST=$(echo $IMAGE_TAG_LIST_WITH_VERSION | sed s/':${VERSION:-latest}'//g)
+  
+   echo $IMAGE_TAG_LIST \
+   | envsubst \
+   | sed 's/ /\n/g'
+}
+
 imagesAlreadyBuilt="true"
-for i in "${images[@]}"
-do
-   :
-    if docker_tag_exists $i $IMAGE_TAG; then
-        echo -e "OpenCRVS thinks $i is already built.\r"
+IMAGE_TAGS_TO_CHECK=$(get_docker_tags_from_compose_files "$SHARED_COMPOSE_FILES $ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS $replicas_compose")
+
+for tag in ${IMAGE_TAGS_TO_CHECK[@]}; do
+    if docker_tag_exists $tag $IMAGE_TAG; then
+        echo -e "OpenCRVS thinks $tag is already built.\r"
     else
-        echo -e "OpenCRVS thinks $i is not built.\r"
+        echo -e "OpenCRVS thinks $tag is not built.\r"
         imagesAlreadyBuilt="false"
         break
     fi
@@ -55,8 +75,3 @@ done
 if [ $imagesAlreadyBuilt == "false" ]; then
   yarn compose:push:version
 fi
-
-
-
-
-
