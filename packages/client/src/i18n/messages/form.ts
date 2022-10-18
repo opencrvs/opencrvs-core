@@ -162,9 +162,9 @@ interface IFormMessages
   fatherFirstNamesEng: MessageDescriptor
   fatherName: MessageDescriptor
   fathersDetailsExist: MessageDescriptor
-  fathersDetailsExistMessage: MessageDescriptor
+  fathersDetailsExistFieldLabel: MessageDescriptor
   mothersDetailsExist: MessageDescriptor
-  mothersDetailsExistMessage: MessageDescriptor
+  mothersDetailsExistFieldLabel: MessageDescriptor
   fatherTitle: MessageDescriptor
   fetchDeceasedDetails: MessageDescriptor
   fetchFatherDetails: MessageDescriptor
@@ -1196,20 +1196,20 @@ export const formMessageDescriptors: IFormMessages = {
     description: "Question to ask the user if they have the mother's details",
     id: 'form.field.label.mothersDetailsExist'
   },
-  mothersDetailsExistMessage: {
+  mothersDetailsExistFieldLabel: {
     defaultMessage: "Mother's details are not available",
     description: "Question to ask the user if they have the mother's details",
-    id: 'form.field.label.mothersDetailsExistMessage'
+    id: 'form.field.label.mothersDetailsExistFieldLabel'
   },
   fathersDetailsExist: {
     defaultMessage: "Do you have the father's details?",
     description: "Question to ask the user if they have the father's details",
     id: 'form.field.label.fathersDetailsExist'
   },
-  fathersDetailsExistMessage: {
+  fathersDetailsExistFieldLabel: {
     defaultMessage: "Father's details are not available",
     description: "Question to ask the user if they have the father's details",
-    id: 'form.field.label.fathersDetailsExistMessage'
+    id: 'form.field.label.fathersDetailsExistFieldLabel'
   },
   fatherTitle: {
     defaultMessage: "Father's details",

@@ -1221,18 +1221,12 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'detailsExist',
                 type: 'CHECKBOX',
-                label: formMessageDescriptors.mothersDetailsExistMessage,
+                label: formMessageDescriptors.mothersDetailsExistFieldLabel,
                 required: true,
                 customisable: true,
                 hideHeader: true,
                 initialValue: false,
                 validate: [],
-                options: [
-                  {
-                    value: false,
-                    label: formMessageDescriptors.mothersDetailsExistMessage
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1708,17 +1702,11 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'detailsExist',
                 type: 'CHECKBOX',
-                label: formMessageDescriptors.fathersDetailsExistMessage,
+                label: formMessageDescriptors.fathersDetailsExistFieldLabel,
                 required: true,
                 hideHeader: true,
                 initialValue: false,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.fathersDetailsExistMessage
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
