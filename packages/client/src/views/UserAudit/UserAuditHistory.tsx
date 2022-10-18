@@ -111,9 +111,13 @@ const InformationTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   width: 320px;
 `
-
+const AuditContent = styled.div`
+  color: #222222;
+`
 interface IBaseProp {
   practitionerId: string
+  practitionerName: string | null | undefined
+  loggedInUserRole: string | null | undefined
 }
 
 interface DispatchProps {
@@ -179,6 +183,11 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   }
 
   setDateRangePickerValues(startDate: Date, endDate: Date) {
+    console.log(this.state.timeStart + 'timeStart !!!')
+    console.log(this.state.timeEnd + 'timeEnd !!!')
+    console.log(startDate + 'startDate !!!')
+    console.log(endDate + 'endDate !!!')
+    console.log(new Date() + 'new Date !!!')
     this.setState({
       timeStart: startDate,
       timeEnd: endDate
@@ -345,9 +354,15 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         actionDescription: (
           <GetLink
             status={actionMessage}
+            disabled={this.props.loggedInUserRole === 'NATIONAL_SYSTEM_ADMIN'}
             onClick={() => {
               this.toggleActionDetails({
                 ...userAuditItem,
+                formattedDeviceData: deviceIpAddress,
+                formattedActionData: format(
+                  new Date(userAuditItem.time),
+                  'MMMM dd, yyyy hh:mm a'
+                ),
                 action: actionMessage
               })
             }}
@@ -495,7 +510,16 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                           title={this.state.actionDetailsData.action}
                           width={1024}
                           autoHeight={true}
-                        ></ResponsiveModal>
+                        >
+                          <>
+                            <AuditContent>
+                              {this.props.practitionerName} -{' '}
+                              {this.state.actionDetailsData.formattedActionData}{' '}
+                              {' | '}
+                              {this.state.actionDetailsData.formattedDeviceData}
+                            </AuditContent>
+                          </>
+                        </ResponsiveModal>
                       </>
                     )
                   }

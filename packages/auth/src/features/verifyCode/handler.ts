@@ -55,8 +55,18 @@ export default async function authenticateHandler(
   )
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-  await postUserActionToMetrics('LOGGED_IN', practitionerId, response.token)
+  await postUserActionToMetrics(
+    'LOGGED_IN',
+    practitionerId,
+    response.token,
+    remoteAddress,
+    userAgent
+  )
   return response
 }
 

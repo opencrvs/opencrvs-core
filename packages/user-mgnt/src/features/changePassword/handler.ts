@@ -62,19 +62,27 @@ export default async function changePasswordHandler(
 
   try {
     await User.update({ _id: user._id }, user)
+    const remoteAddress =
+      request.headers['x-real-ip'] || request.info.remoteAddress
+    const userAgent =
+      request.headers['x-real-user-agent'] || request.headers['user-agent']
 
     if (request.headers.authorization == undefined) {
       // TODO: generate authentication token
       await postUserActionToMetrics(
         'PASSWORD_RESET',
         user.practitionerId,
-        request.headers.authorization
+        request.headers.authorization,
+        remoteAddress,
+        userAgent
       )
     } else {
       await postUserActionToMetrics(
         'PASSWORD_CHANGED',
         user.practitionerId,
-        request.headers.authorization
+        request.headers.authorization,
+        remoteAddress,
+        userAgent
       )
     }
   } catch (err) {

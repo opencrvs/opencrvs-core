@@ -25,8 +25,18 @@ export default async function invalidateTokenHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { token, practitionerId } = request.payload as IInvalidateTokenPayload
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
-    await postUserActionToMetrics('LOGGED_OUT', practitionerId, token)
+    await postUserActionToMetrics(
+      'LOGGED_OUT',
+      practitionerId,
+      token,
+      remoteAddress,
+      userAgent
+    )
     await invalidateToken(token)
   } catch (err) {
     throw internal('Failed to invalidate token', err)

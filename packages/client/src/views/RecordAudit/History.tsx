@@ -65,14 +65,20 @@ export interface IActionDetailsData {
 
 export const GetLink = ({
   status,
-  onClick
+  onClick,
+  disabled
 }: {
   status: string
+  disabled?: boolean
   onClick: () => void
 }) => {
   return (
     <>
-      <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
+      <LinkButton
+        style={{ textAlign: 'left' }}
+        disabled={disabled}
+        onClick={onClick}
+      >
         {status}
       </LinkButton>
     </>

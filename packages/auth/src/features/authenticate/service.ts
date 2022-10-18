@@ -220,17 +220,22 @@ export function getPublicKey() {
 export async function postUserActionToMetrics(
   action: string,
   practitionerId: string,
-  token: string
+  token: string,
+  remoteAddress: string,
+  userAgent: string
 ) {
   const url = resolve(METRICS_URL, '/audit/events')
   const body = { practitionerId: practitionerId, action: action }
   const authentication = 'Bearer ' + token
+
   await fetch(url, {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
       'Content-Type': 'application/json',
-      Authorization: authentication
+      Authorization: authentication,
+      'x-real-ip': remoteAddress,
+      'x-real-user-agent': userAgent
     }
   })
 }

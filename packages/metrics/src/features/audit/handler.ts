@@ -82,6 +82,8 @@ export async function getUserAuditsHandler(request: Hapi.Request) {
   const skip = request.query['skip'] || 0
   const size = request.query['count']
 
+  console.log('checking if i ran !!!!!!!!!!')
+
   const results = await getUserAuditEvents(practitionerId, size, skip)
   const total = await countUserAuditEvents(practitionerId)
   return {

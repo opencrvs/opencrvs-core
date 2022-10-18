@@ -142,10 +142,16 @@ export default async function createUser(
   const systemUserAdmin: IUserModel | null = await User.findOne({
     _id: systemUserAdminId
   })
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   await postUserActionToMetrics(
     'CREATE_USER',
     systemUserAdmin!.practitionerId,
-    request.headers.authorization
+    request.headers.authorization,
+    remoteAddress,
+    userAgent
   )
 
   const resUser = _.omit(userModelObject.toObject(), ['passwordHash', 'salt'])

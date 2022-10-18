@@ -30,6 +30,10 @@ export default async function changePhoneHandler(
 ) {
   const userUpdateData = request.payload as IChangePasswordPayload
   const user: IUserModel | null = await User.findById(userUpdateData.userId)
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   if (!user) {
     logger.error(
       `No user details found by given userid: ${userUpdateData.userId}`
@@ -54,7 +58,9 @@ export default async function changePhoneHandler(
     await postUserActionToMetrics(
       'PHONE_NUMBER_CHANGED',
       user.practitionerId,
-      request.headers.authorization
+      request.headers.authorization,
+      remoteAddress,
+      userAgent
     )
   } catch (err) {
     // return 400 if there is a validation error when updating to mongo
@@ -66,7 +72,9 @@ export default async function changePhoneHandler(
 export async function postUserActionToMetrics(
   action: string,
   practitionerId: string,
-  token: string
+  token: string,
+  remoteAddress: string,
+  userAgent: string
 ) {
   let url = resolve(METRICS_URL, '/audit/events')
 
@@ -80,7 +88,9 @@ export async function postUserActionToMetrics(
     body: JSON.stringify(body),
     headers: {
       'Content-Type': 'application/json',
-      Authorization: authentication
+      Authorization: authentication,
+      'x-real-ip': remoteAddress,
+      'x-real-user-agent': userAgent
     }
   })
 }

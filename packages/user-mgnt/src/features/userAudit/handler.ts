@@ -35,6 +35,10 @@ export async function userAuditHandler(
   h: Hapi.ResponseToolkit
 ) {
   const auditUserPayload = request.payload as IAuditUserPayload
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   const user: IUserModel | null = await User.findById(auditUserPayload.userId)
   const systemAdminUser: IUserModel | null = await User.findById(
@@ -105,7 +109,9 @@ export async function userAuditHandler(
       await postUserActionToMetrics(
         action,
         systemAdminUser!.practitionerId,
-        request.headers.authorization
+        request.headers.authorization,
+        remoteAddress,
+        userAgent
       )
     }
     try {

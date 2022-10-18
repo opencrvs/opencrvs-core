@@ -161,10 +161,17 @@ export default async function updateUser(
   }
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
 
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
+
   await postUserActionToMetrics(
     'EDIT_USER',
     systemUserAdmin!.practitionerId,
-    request.headers.authorization
+    request.headers.authorization,
+    remoteAddress,
+    userAgent
   )
   return h.response(resUser).code(201)
 }
