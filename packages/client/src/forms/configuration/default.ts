@@ -561,6 +561,14 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrationNumberTransformer'
             },
             {
+              fieldName: 'mosipAid',
+              operation: 'mosipAidTransformer'
+            },
+            {
+              fieldName: 'mosipAIDLabel',
+              operation: 'mosipAidLabelTransformer'
+            },
+            {
               fieldName: 'certificateDate',
               operation: 'certificateDateTransformer',
               parameters: ['en', 'dd MMMM yyyy']

@@ -40,22 +40,9 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   return await getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
 }
 
-export async function getInformantName(
-  fhirBundle: fhir.Bundle,
-  sectionCode: string = CHILD_SECTION_CODE
-) {
-  if (!fhirBundle || !fhirBundle.entry) {
-    throw new Error(
-      'getInformantName: Invalid FHIR bundle found for declaration'
-    )
-  }
+export function concatenateName(fhirNames: fhir.HumanName[]) {
   const language = getDefaultLanguage()
-  const informant = await findPersonEntry(sectionCode, fhirBundle)
-  if (!informant || !informant.name) {
-    throw new Error("Didn't find informant's name information")
-  }
-
-  const name = informant.name.find((humanName: fhir.HumanName) => {
+  const name = fhirNames.find((humanName: fhir.HumanName) => {
     return humanName.use === language
   })
   if (!name || !name.family) {
@@ -65,6 +52,23 @@ export async function getInformantName(
     .concat(name.given ? name.given.join(' ') : '')
     .concat(' ')
     .concat(name.family)
+}
+
+export async function getInformantName(
+  fhirBundle: fhir.Bundle,
+  sectionCode: string = CHILD_SECTION_CODE
+) {
+  if (!fhirBundle || !fhirBundle.entry) {
+    throw new Error(
+      'getInformantName: Invalid FHIR bundle found for declaration'
+    )
+  }
+  const informant = await findPersonEntry(sectionCode, fhirBundle)
+  if (!informant || !informant.name) {
+    throw new Error("Didn't find informant's name information")
+  }
+
+  return concatenateName(informant.name)
 }
 
 export async function getCRVSOfficeName(fhirBundle: fhir.Bundle) {
