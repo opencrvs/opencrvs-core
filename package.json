@@ -32,6 +32,7 @@
     "deploy:staging": "bash deploy.sh --clear-data=yes --restore-metadata=yes development",
     "deploy:qa": "bash deploy.sh --clear-data=no --restore-metadata=no qa",
     "deploy:prod": "bash deploy.sh --clear-data=no --restore-metadata=no qa",
+    "deploy:demo": "bash deploy.sh --clear-data=no --restore-metadata=no demo",
     "deploy": "bash deploy.sh",
     "cov:client": "cd packages/client && yarn open:cov",
     "cov:login": "cd packages/login && yarn open:cov",
