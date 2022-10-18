@@ -208,7 +208,7 @@ function mapStatetoProps(
   ) as IPrintableDeclaration | undefined
 
   if (!declaration) {
-    return <Redirect to={HOME} />
+    throw new Error(`Declaration "${registrationId}" missing!`)
   }
 
   return {
