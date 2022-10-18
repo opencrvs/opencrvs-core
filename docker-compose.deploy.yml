@@ -398,9 +398,9 @@ services:
         - 'traefik.http.routers.client.entrypoints=web,websecure'
         - 'traefik.docker.network=opencrvs_overlay_net'
 
-        - 'traefik.http.middlewares.test-redirectregex.redirectregex.permanent=true'
-        - 'traefik.http.middlewares.test-redirectregex.redirectregex.regex=^https?://{{hostname}}/(.*)'
-        - 'traefik.http.middlewares.test-redirectregex.redirectregex.replacement=https://register.{{hostname}}/$${1}'
+        - 'traefik.http.middlewares.test-replacepathregex.redirectregex.permanent=true'
+        - 'traefik.http.middlewares.test-replacepathregex.redirectregex.regex=^https?://{{hostname}}/(.*)'
+        - 'traefik.http.middlewares.test-replacepathregex.redirectregex.replacement=https://register.{{hostname}}/$${1}'
 
         - 'traefik.http.middlewares.client.headers.customresponseheaders.Pragma=no-cache'
         - 'traefik.http.middlewares.client.headers.customresponseheaders.Cache-control=no-store'
