@@ -1264,6 +1264,7 @@ export type Query = {
   searchDeathRegistrations?: Maybe<Array<Maybe<DeathRegistration>>>
   searchEvents?: Maybe<EventSearchResultSet>
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
+  searchRecord?: Maybe<EventProgressResultSet>
   searchUsers?: Maybe<SearchUserResult>
   verifyPasswordById?: Maybe<VerifyPasswordResult>
 }
@@ -1373,6 +1374,8 @@ export type QueryGetUserAuditLogArgs = {
   count: Scalars['Int']
   practitionerId: Scalars['String']
   skip?: InputMaybe<Scalars['Int']>
+  timeEnd?: InputMaybe<Scalars['String']>
+  timeStart?: InputMaybe<Scalars['String']>
 }
 
 export type QueryGetUserByMobileArgs = {
@@ -1460,6 +1463,35 @@ export type QuerySearchFieldAgentsArgs = {
   status?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
+}
+
+export type QuerySearchRecordArgs = {
+  childDoB?: InputMaybe<Scalars['String']>
+  childFirstName?: InputMaybe<Scalars['String']>
+  childLastName?: InputMaybe<Scalars['String']>
+  contactNumber?: InputMaybe<Scalars['String']>
+  dateOfRegistration?: InputMaybe<Scalars['String']>
+  dateOfRegistrationEnd?: InputMaybe<Scalars['String']>
+  dateOfRegistrationStart?: InputMaybe<Scalars['String']>
+  deathDate?: InputMaybe<Scalars['String']>
+  deathDateEnd?: InputMaybe<Scalars['String']>
+  deathDateStart?: InputMaybe<Scalars['String']>
+  deceasedFamilyName?: InputMaybe<Scalars['String']>
+  deceasedFirstNames?: InputMaybe<Scalars['String']>
+  event?: InputMaybe<Scalars['String']>
+  eventLocationId?: InputMaybe<Scalars['String']>
+  fatherDoB?: InputMaybe<Scalars['String']>
+  fatherFamilyName?: InputMaybe<Scalars['String']>
+  fatherFirstNames?: InputMaybe<Scalars['String']>
+  fatherIdentifier?: InputMaybe<Scalars['String']>
+  informantFamilyName?: InputMaybe<Scalars['String']>
+  informantFirstNames?: InputMaybe<Scalars['String']>
+  motherDoB?: InputMaybe<Scalars['String']>
+  motherFamilyName?: InputMaybe<Scalars['String']>
+  motherFirstNames?: InputMaybe<Scalars['String']>
+  motherIdentifier?: InputMaybe<Scalars['String']>
+  registrationNumber?: InputMaybe<Scalars['String']>
+  trackingId?: InputMaybe<Scalars['String']>
 }
 
 export type QuerySearchUsersArgs = {
@@ -2279,6 +2311,8 @@ export type GetUserAuditLogQueryVariables = Exact<{
   practitionerId: Scalars['String']
   count: Scalars['Int']
   skip: Scalars['Int']
+  timeStart?: InputMaybe<Scalars['String']>
+  timeEnd?: InputMaybe<Scalars['String']>
 }>
 
 export type GetUserAuditLogQuery = {

@@ -1977,6 +1977,8 @@ export interface QueryToGetUserAuditLogArgs {
   practitionerId: string
   skip?: number
   count: number
+  timeStart?: string
+  timeEnd?: string
 }
 export interface QueryToGetUserAuditLogResolver<TParent = any, TResult = any> {
   (

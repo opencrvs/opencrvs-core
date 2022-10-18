@@ -183,11 +183,6 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   }
 
   setDateRangePickerValues(startDate: Date, endDate: Date) {
-    console.log(this.state.timeStart + 'timeStart !!!')
-    console.log(this.state.timeEnd + 'timeEnd !!!')
-    console.log(startDate + 'startDate !!!')
-    console.log(endDate + 'endDate !!!')
-    console.log(new Date() + 'new Date !!!')
     this.setState({
       timeStart: startDate,
       timeEnd: endDate
@@ -467,7 +462,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                 variables={{
                   practitionerId: practitionerId,
                   count: recordCount,
-                  skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1)
+                  skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1),
+                  timeStart: timeStart,
+                  timeEnd: timeEnd
                 }}
                 fetchPolicy={'no-cache'}
               >

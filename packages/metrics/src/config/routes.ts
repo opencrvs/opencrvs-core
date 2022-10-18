@@ -56,7 +56,8 @@ import { locationStatisticsHandler } from '@metrics/features/locationStatistics/
 import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
 import {
   getUserAuditsHandler,
-  newAuditHandler, newAuditHandlerWithOutAuth
+  newAuditHandler,
+  newAuditHandlerWithOutAuth
 } from '@metrics/features/audit/handler'
 import * as Joi from 'joi'
 
@@ -606,7 +607,9 @@ export const getRoutes = () => {
           query: Joi.object({
             practitionerId: Joi.string().required(),
             skip: Joi.number(),
-            count: Joi.number()
+            count: Joi.number(),
+            timeStart: Joi.string(),
+            timeEnd: Joi.string()
           })
         },
         tags: ['api']

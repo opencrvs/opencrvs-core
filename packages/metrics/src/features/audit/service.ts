@@ -12,7 +12,10 @@
 import * as Hapi from '@hapi/hapi'
 
 import { query, writePoints } from '@metrics/influxdb/client'
-import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
+import {
+  generateAuditPoint,
+  toInfluxTimestamp
+} from '@metrics/features/registration/pointGenerator'
 import {
   getCompositionIdFromCompositionOrTask,
   getPractitionerIdFromBundle,
@@ -86,12 +89,30 @@ export async function createUserAuditPointFromFHIR(
 export async function getUserAuditEvents(
   practitionerId: string,
   size: number,
-  skip: number
+  skip: number,
+  timeStart: string,
+  timeEnd: string
 ): Promise<Array<UserAuditDataPoint>> {
+  let startDate
+  let endDate
+  let startDateCondition = ''
+  let endDateCondition = ''
+
+  if (timeStart) {
+    startDate = toInfluxTimestamp(timeStart)
+    startDateCondition = ` and time >= ${startDate}`
+  }
+  if (timeEnd) {
+    endDate = toInfluxTimestamp(timeEnd)
+    endDateCondition = ` and time <= ${endDate}`
+  }
+
   const results = await query<Array<RawUserAuditDataPoint>>(
-    `SELECT * from user_audit_event where practitionerId = $practitionerId order by time desc limit ${size} offset ${skip}`,
+    `SELECT * from user_audit_event where practitionerId = $practitionerId ${startDateCondition} ${endDateCondition} order by time desc limit ${size} offset ${skip}`,
     {
-      placeholders: { practitionerId: practitionerId }
+      placeholders: {
+        practitionerId: practitionerId
+      }
     }
   )
 
@@ -102,12 +123,27 @@ export async function getUserAuditEvents(
 }
 
 export async function countUserAuditEvents(
-  practitionerId: string
+  practitionerId: string,
+  timeStart: string,
+  timeEnd: string
 ): Promise<number> {
+  let startDate
+  let endDate
+  let startDateCondition = ''
+  let endDateCondition = ''
+
+  if (timeStart) {
+    startDate = toInfluxTimestamp(timeStart)
+    startDateCondition = ` and time >= ${startDate}`
+  }
+  if (timeEnd) {
+    endDate = toInfluxTimestamp(timeEnd)
+    endDateCondition = ` and time <= ${endDate}`
+  }
   const result = await query(
     `SELECT COUNT(ipAddress)
      from user_audit_event
-     where practitionerId = $practitionerId`,
+     where practitionerId = $practitionerId ${startDateCondition} ${endDateCondition}`,
     { placeholders: { practitionerId: practitionerId } }
   )
   if (result.length === 0) {

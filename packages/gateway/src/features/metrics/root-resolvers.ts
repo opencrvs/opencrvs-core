@@ -143,7 +143,9 @@ export const resolvers: GQLResolver = {
         {
           practitionerId: params.practitionerId,
           skip: params.skip,
-          count: params.count
+          count: params.count,
+          timeStart: params.timeStart,
+          timeEnd: params.timeEnd
         },
         authHeader
       )
