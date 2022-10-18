@@ -467,6 +467,39 @@ export const resolvers: GQLResolver = {
 
       return true
     }
+    async usernameSMSReminder(_, { userId }, authHeader) {
+      if (!hasScope(authHeader, 'sysadmin')) {
+        return await Promise.reject(
+          new Error(
+            'SMS invite can only be resent by a user with sys admin scope'
+          )
+        )
+      }
+
+      const res = await fetch(
+        `${USER_MANAGEMENT_URL}usernameSMSReminder`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            userId
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
+        }
+      )
+
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            `Something went wrong on user-mgnt service. Couldn't send sms to ${userId}`
+          )
+        )
+      }
+
+      return true
+    }
   }
 }
 

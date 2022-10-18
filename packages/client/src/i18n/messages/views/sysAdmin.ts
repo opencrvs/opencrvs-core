@@ -39,6 +39,7 @@ interface ISysAdminMessages
   resendSMS: MessageDescriptor
   resendSMSSuccess: MessageDescriptor
   resendSMSError: MessageDescriptor
+  sendUsernameReminderSMS: MessageDescriptor
   newUser: MessageDescriptor
   active: MessageDescriptor
   pending: MessageDescriptor
@@ -180,6 +181,11 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Invite could not be sent',
     description: 'The label for error notification of resend sms invite',
     id: 'sysAdHome.resendSMSError'
+  },
+  sendUsernameReminderSMS: {
+    defaultMessage: 'Send username reminder',
+    description: 'The label for menu option send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMS'
   },
   newUser: {
     defaultMessage: 'New User',
