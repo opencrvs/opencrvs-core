@@ -1,6 +1,7 @@
 {
   "description": "OpenCRVS core workspace",
   "license": "MPL-2.0",
+  "version": "1.1.1",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -27,7 +28,7 @@
     "compose:build": "yarn build:image && docker-compose build",
     "compose:push": "yarn compose:build && docker-compose push && yarn compose:push:version",
     "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && yarn compose:build && docker-compose push && unset VERSION",
-    "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && git checkout -b release-`git describe --tags --abbrev=0` && yarn compose:build && docker-compose push && unset VERSION",
+    "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && yarn compose:build && docker-compose push && unset VERSION",
     "deploy:config": "bash deploy.sh --clear-data=yes --restore-metadata=yes development",
     "deploy:staging": "bash deploy.sh --clear-data=yes --restore-metadata=yes development",
     "deploy:qa": "bash deploy.sh --clear-data=no --restore-metadata=no qa",
