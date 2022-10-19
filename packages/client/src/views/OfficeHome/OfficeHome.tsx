@@ -198,12 +198,9 @@ class OfficeHomeView extends React.Component<
           selectorId === SELECTOR_ID.ownDrafts &&
           pageId !== this.state.draftCurrentPage
         ) {
-          this.setState({ draftCurrentPage: pageId }, () => {
-            this.updateWorkqueue()
-          })
+          this.setState({ draftCurrentPage: pageId })
         }
-      }
-      if (pageId !== this.props[WORKQUEUE_TABS_PAGINATION[tabId]]) {
+      } else if (pageId !== this.props[WORKQUEUE_TABS_PAGINATION[tabId]]) {
         this.props.updateWorkqueuePagination({
           [WORKQUEUE_TABS_PAGINATION[tabId]]: pageId
         })
@@ -248,13 +245,13 @@ class OfficeHomeView extends React.Component<
 
     if (isDeclarationWorkqueueTab(tabId)) {
       if (tabId === WORKQUEUE_TABS.inProgress) {
-        if (Object.values(SELECTOR_ID).includes(selectorId)) {
-          this.props.goToHomeTab(
-            WORKQUEUE_TABS.inProgress,
-            selectorId,
-            newPageNumber
-          )
-        }
+        this.props.goToHomeTab(
+          WORKQUEUE_TABS.inProgress,
+          Object.values(SELECTOR_ID).includes(selectorId)
+            ? selectorId
+            : SELECTOR_ID.ownDrafts,
+          newPageNumber
+        )
         return
       }
       this.props.goToHomeTab(tabId, '', newPageNumber)
