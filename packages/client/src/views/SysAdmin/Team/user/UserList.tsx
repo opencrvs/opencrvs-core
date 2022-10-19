@@ -271,7 +271,12 @@ export const Status = (statusProps: IStatusProps) => {
 
 function UserListComponent(props: IProps) {
   const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
+  const [showUsernameSMSReminderSuccess, setShowUsernameSMSReminderSuccess] =
+    useState(false)
+  const [username, setUsername] = useState('')
   const [showResendSMSError, setShowResendSMSError] = useState(false)
+  const [showUsernameSMSReminderError, setShowUsernameSMSReminderError] =
+    useState(false)
   const {
     intl,
     userDetails,
@@ -349,12 +354,11 @@ function UserListComponent(props: IProps) {
         }
       ])
       if (res && res.data && res.data.usernameSMSReminder) {
-        console.log('res.data', res.data)
-        // setShowResendSMSSuccess(true)
+        setUsername(res.data.usernameSMSReminder)
+        setShowUsernameSMSReminderSuccess(true)
       }
     } catch (err) {
-      console.log('Error', err)
-      // setShowResendSMSError(true)
+      setShowUsernameSMSReminderError(true)
     }
   }
 
@@ -747,6 +751,26 @@ function UserListComponent(props: IProps) {
           onClose={() => setShowResendSMSError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}
+        </Toast>
+      )}
+
+      {showUsernameSMSReminderSuccess && (
+        <Toast
+          id="username_reminder_success"
+          type="success"
+          onClose={() => setShowUsernameSMSReminderSuccess(false)}
+        >
+          {intl.formatMessage(messages.sendUsernameReminderSMSSuccess)}
+          {username}
+        </Toast>
+      )}
+      {showUsernameSMSReminderError && (
+        <Toast
+          id="username_reminder_error"
+          type="warning"
+          onClose={() => setShowUsernameSMSReminderError(false)}
+        >
+          {intl.formatMessage(messages.sendUsernameReminderSMSError)}
         </Toast>
       )}
     </SysAdminContentWrapper>
