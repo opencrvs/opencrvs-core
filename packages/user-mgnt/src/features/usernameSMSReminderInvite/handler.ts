@@ -54,7 +54,7 @@ export default async function usernameSMSReminderInvite(
     Authorization: request.headers.authorization
   })
 
-  return h.response().code(200)
+  return h.response(user).code(200)
 }
 
 export const requestSchema = Joi.object({

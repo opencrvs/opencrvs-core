@@ -466,7 +466,7 @@ export const resolvers: GQLResolver = {
       }
 
       return true
-    }
+    },
     async usernameSMSReminder(_, { userId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
@@ -476,19 +476,16 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const res = await fetch(
-        `${USER_MANAGEMENT_URL}usernameSMSReminder`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            userId
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader
-          }
+      const res = await fetch(`${USER_MANAGEMENT_URL}usernameSMSReminder`, {
+        method: 'POST',
+        body: JSON.stringify({
+          userId
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
         }
-      )
+      })
 
       if (res.status !== 200) {
         return await Promise.reject(
@@ -498,7 +495,9 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      return true
+      const result = await res.json()
+
+      return result.username
     }
   }
 }
