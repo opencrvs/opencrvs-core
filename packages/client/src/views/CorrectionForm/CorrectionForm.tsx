@@ -24,10 +24,7 @@ import { CorrectionSummary } from './CorrectionSummary'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import styled from '@client/styledComponents'
 import { TimeMounted } from '@client/components/TimeMounted'
-import { formatUrl } from '@client/navigation'
 import { HOME } from '@client/navigation/routes'
-
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const SpinnerWrapper = styled.div`
   height: 80vh;
@@ -40,8 +37,8 @@ const SpinnerWrapper = styled.div`
 
 type IProps = IStateProps & IDispatchProps
 
-function CorrectionFormComponent({ sectionId, ...props }: IProps) {
-  const { declaration, modifyDeclaration } = props
+function CorrectionFormComponent({ sectionId, declaration, ...props }: IProps) {
+  const { modifyDeclaration } = props
   const logTime = React.useCallback(
     (timeMs: number) => {
       if (declaration) {
@@ -60,7 +57,7 @@ function CorrectionFormComponent({ sectionId, ...props }: IProps) {
     return <Redirect to={HOME} />
   }
 
-  if (declaration!.writingDraft) {
+  if (declaration.writingDraft) {
     return (
       <SpinnerWrapper>
         <Spinner id="draft_write_loading" />
@@ -70,11 +67,7 @@ function CorrectionFormComponent({ sectionId, ...props }: IProps) {
 
   return (
     <TimeMounted onUnmount={logTime}>
-      <FormSection
-        sectionId={sectionId}
-        declaration={declaration!}
-        {...props}
-      />
+      <FormSection sectionId={sectionId} declaration={declaration} {...props} />
     </TimeMounted>
   )
 }
@@ -96,6 +89,7 @@ function FormSection({
       return <></>
   }
 }
+
 function mapStateToProps(state: IStoreState, props: IRouteProps) {
   const { declarationId, pageId: sectionId } = props.match.params
   const declaration = state.declarationsState.declarations.find(
@@ -108,10 +102,7 @@ function mapStateToProps(state: IStoreState, props: IRouteProps) {
   }
 }
 
-type IStateProps = {
-  declaration?: IDeclaration
-  sectionId: string
-}
+type IStateProps = ReturnType<typeof mapStateToProps>
 
 type IDispatchProps = {
   modifyDeclaration: typeof modifyDeclaration

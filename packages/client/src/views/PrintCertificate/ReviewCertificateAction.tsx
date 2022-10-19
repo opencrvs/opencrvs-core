@@ -34,16 +34,16 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   goToHomeTab,
-  goToHomeTabReplace,
   goBack,
-  goToCertificateCorrection
+  goToCertificateCorrection,
+  formatUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { connect, useSelector } from 'react-redux'
+import { Redirect, RouteComponentProps, useParams } from 'react-router'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import {
   previewCertificate,
@@ -64,6 +64,7 @@ import { countries } from '@client/forms/countries'
 import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { hasRegisterScope } from '@client/utils/authUtils'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
@@ -202,7 +203,7 @@ class ReviewCertificateActionComponent extends React.Component<
     this.props.modifyDeclaration(draft)
     this.props.writeDeclaration(draft)
     this.toggleModal()
-    this.props.goToHomeTabReplace(WORKQUEUE_TABS.inProgress)
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
   }
 
   getTitle = () => {
@@ -240,6 +241,17 @@ class ReviewCertificateActionComponent extends React.Component<
 
   render = () => {
     const { intl, scope } = this.props
+
+    if (!this.props.draft.id) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToPrint,
+            selectorId: ''
+          })}
+        />
+      )
+    }
 
     return (
       <ActionPageLight
@@ -373,7 +385,6 @@ const mapDispatchToProps = {
   modifyDeclaration,
   writeDeclaration,
   goToHomeTab,
-  goToHomeTabReplace,
   storeDeclaration,
   goBack,
   goToCertificateCorrection

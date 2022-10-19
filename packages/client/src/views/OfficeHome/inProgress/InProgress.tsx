@@ -138,18 +138,11 @@ export class InProgressComponent extends React.Component<
   }
 
   componentDidMount() {
-    window.history.pushState(null, document.title, window.location.href)
-    window.addEventListener('popstate', this.popStateListener)
     window.addEventListener('resize', this.recordWindowWidth)
   }
 
   componentWillUnmount() {
-    window.addEventListener('popstate', this.popStateListener)
     window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  popStateListener() {
-    window.history.pushState(null, document.title, window.location.href)
   }
 
   recordWindowWidth = () => {

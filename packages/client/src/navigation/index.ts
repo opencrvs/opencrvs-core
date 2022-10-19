@@ -197,10 +197,6 @@ export function goToHomeTab(
   )
 }
 
-export function goToHomeTabReplace(tabId: IWORKQUEUE_TABS, selectorId = '') {
-  return replace(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
-}
-
 type searchedLocation = {
   selectedLocation: ISearchLocation
 }

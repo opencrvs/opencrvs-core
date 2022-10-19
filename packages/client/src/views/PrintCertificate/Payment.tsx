@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Currency } from '@opencrvs/components/lib/Currency'
@@ -18,6 +18,7 @@ import { Event } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
+  formatUrl,
   goBack as goBackAction,
   goToHomeTab,
   goToReviewCertificate as goToReviewCertificateAction
@@ -40,7 +41,7 @@ import {
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { HOME } from '@client/navigation/routes'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -125,6 +126,16 @@ class PaymentComponent extends React.Component<IFullProps> {
   render = () => {
     const { intl, declaration, event, goBack, offlineCountryConfig } =
       this.props
+    if (!declaration) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToPrint,
+            selectorId: ''
+          })}
+        />
+      )
+    }
 
     const registeredDate = getRegisteredDate(declaration.data)
 
@@ -205,11 +216,7 @@ function mapStatetoProps(
   const event = getEvent(eventType)
   const declaration = state.declarationsState.declarations.find(
     (app) => app.id === registrationId && app.event === event
-  ) as IPrintableDeclaration | undefined
-
-  if (!declaration) {
-    throw new Error(`Declaration "${registrationId}" missing!`)
-  }
+  ) as IPrintableDeclaration
 
   return {
     event: declaration.event,

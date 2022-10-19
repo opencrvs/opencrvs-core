@@ -26,7 +26,6 @@ import {
 import {
   goBack,
   goToCertificateCorrection,
-  goToHomeTabReplace,
   goToHomeTab,
   goToPageGroup
 } from '@client/navigation'
@@ -47,7 +46,6 @@ import {
   REVIEW_OVERRIDE_POSITION,
   SubmissionAction
 } from '@client/forms'
-import { lookup } from 'country-data'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Content } from '@opencrvs/components/lib/Content'
@@ -116,7 +114,6 @@ type IDispatchProps = {
   goToPageGroup: typeof goToPageGroup
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToHomeTab: typeof goToHomeTab
-  goToHomeTabReplace: typeof goToHomeTabReplace
   writeDeclaration: typeof writeDeclaration
 }
 
@@ -938,7 +935,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
     this.props.writeDeclaration(declaration)
-    this.props.goToHomeTabReplace(WORKQUEUE_TABS.readyForReview)
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
   }
 
   gotoReviewPage = () => {
@@ -965,7 +962,6 @@ export const CorrectionSummary = connect(
     goBack,
     goToPageGroup,
     goToCertificateCorrection,
-    goToHomeTab,
-    goToHomeTabReplace
+    goToHomeTab
   }
 )(injectIntl(CorrectionSummaryComponent))
