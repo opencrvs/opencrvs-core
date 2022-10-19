@@ -177,5 +177,7 @@ type Query {
     practitionerId: String!
     skip: Int
     count: Int!
+    timeStart: String
+    timeEnd: String
   ): UserAuditLogResultSet
 }
