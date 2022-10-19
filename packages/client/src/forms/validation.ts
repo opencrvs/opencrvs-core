@@ -69,11 +69,7 @@ const getValidationErrors = {
     validators.push(...getFieldValidation(field as IDynamicFormField, values))
 
     if (field.required) {
-      if (field.customRequiredErrorMessage) {
-        validators.push(required(field.customRequiredErrorMessage))
-      } else {
-        validators.push(required(requiredErrorMessage))
-      }
+      validators.push(required(requiredErrorMessage))
     } else if (!value) {
       validators = []
     }

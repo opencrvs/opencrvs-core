@@ -418,7 +418,6 @@ export interface IFormFieldBase {
   tooltip?: MessageDescriptor
   validate: validators.Validation[]
   required?: boolean
-  customRequiredErrorMessage?: MessageDescriptor
   prefix?: string
   postfix?: string
   disabled?: boolean

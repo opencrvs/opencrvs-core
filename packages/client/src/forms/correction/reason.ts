@@ -20,6 +20,8 @@ import {
 import { formMessages } from '@client/i18n/messages/form'
 import { messages } from '@client/i18n/messages/views/correction'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { required as requiredValidation } from '@opencrvs/client/src/utils/validate'
+import { validationMessages } from '@client/i18n/messages'
 
 export enum CorrectionReason {
   CLERICAL_ERROR = 'CLERICAL_ERROR',
@@ -76,14 +78,11 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
               description: 'Label for input Reason for Change'
             },
             required: true,
-            customRequiredErrorMessage: {
-              defaultMessage: 'Please provide a reason for this correction',
-              description:
-                'The error message that appears on required fields for correction reason',
-              id: 'validations.requiredCorrectionReason'
-            },
             initialValue: '',
-            validate: [],
+
+            validate: [
+              requiredValidation(validationMessages.requiredReasonForCorrection)
+            ],
             mapping: {}
           }
         ]
