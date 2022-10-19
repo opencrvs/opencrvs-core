@@ -42,8 +42,8 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect, useSelector } from 'react-redux'
-import { Redirect, RouteComponentProps, useParams } from 'react-router'
+import { connect } from 'react-redux'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import {
   previewCertificate,
@@ -242,6 +242,7 @@ class ReviewCertificateActionComponent extends React.Component<
   render = () => {
     const { intl, scope } = this.props
 
+    /* The id of the draft is an empty string if it's not found in store*/
     if (!this.props.draft.id) {
       return (
         <Redirect
