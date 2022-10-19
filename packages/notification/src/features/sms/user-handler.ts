@@ -24,6 +24,10 @@ interface ICredentialsPayload extends ISMSPayload {
   username: string
   password: string
 }
+interface IResetPasswordPayload extends ISMSPayload {
+  applicationName: string
+  password: string
+}
 
 interface IRetrieveUserNamePayload extends ISMSPayload {
   username: string
@@ -52,6 +56,30 @@ export async function sendUserCredentials(
     },
     getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
+  return h.response().code(200)
+}
+
+export async function sendResetPasswordSMS(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IResetPasswordPayload
+  logger.info(`Application name: ${payload.applicationName}`)
+  logger.info(`Password: ${payload.password}`)
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.resetUserPasswordNotification,
+    {
+      applicationName: payload.applicationName,
+      password: payload.password
+    },
+    getDefaultLanguage()
+  )
+
   await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
@@ -122,6 +150,12 @@ export async function updateUserName(
 export const userCredentialsNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
   username: Joi.string().required(),
+  password: Joi.string().required()
+})
+
+export const userPasswordResetNotificationSchema = Joi.object({
+  msisdn: Joi.string().required(),
+  applicationName: Joi.string().required(),
   password: Joi.string().required()
 })
 
