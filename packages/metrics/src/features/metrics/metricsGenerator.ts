@@ -46,6 +46,7 @@ interface IGroupByEventDate {
 
 interface IMetricsTotalGroup extends IGroupedByGender {
   practitionerRole: string
+  registrarPractitionerId: string
   timeLabel: string
 }
 export interface IBirthKeyFigures {
@@ -917,7 +918,7 @@ export async function getTotalMetrics(
       OR officeLocation = '${locationId}')`
           : ``
       }
-    GROUP BY gender, timeLabel, eventLocationType, practitionerRole`
+    GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`
   )
 
   const estimationOfTimeRange: IEstimation =
