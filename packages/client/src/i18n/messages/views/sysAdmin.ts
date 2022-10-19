@@ -33,6 +33,9 @@ interface ISysAdminMessages
   editUserCommonTitle: MessageDescriptor
   reactivate: MessageDescriptor
   reactivateUserTitle: MessageDescriptor
+  resetUserPasswordTitle: MessageDescriptor
+  resetUserPasswordModalTitle: MessageDescriptor
+  resetUserPasswordModalMessage: MessageDescriptor
   reactivateUserSubtitle: MessageDescriptor
   reactivateReasonReturnedToRole: MessageDescriptor
   reactivateReasonNoLongerInvestigated: MessageDescriptor
@@ -139,6 +142,22 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Edit user',
     description: 'Common title of form view groups when edit user',
     id: 'sysAdHome.user.edit.commonGroupTitle'
+  },
+  resetUserPasswordTitle: {
+    defaultMessage: 'Reset Password',
+    description: 'Title for reset user password',
+    id: 'sysAdHome.user.resetpassword.title'
+  },
+  resetUserPasswordModalTitle: {
+    defaultMessage: 'Reset password?',
+    description: 'Title for reset user password modal',
+    id: 'sysAdHome.user.resetPasswordModal.title'
+  },
+  resetUserPasswordModalMessage: {
+    id: 'sysAdHome.user.resetPasswordModal.message',
+    defaultMessage:
+      'The user will recieve a temporary password via SMS sent to {phoneNumber}. They will then be prompted to create a new password on succcessful login',
+    description: 'Message for reset password modal'
   },
   reactivateUserTitle: {
     id: 'sysAdHome.user.audit.reactivation.title',
