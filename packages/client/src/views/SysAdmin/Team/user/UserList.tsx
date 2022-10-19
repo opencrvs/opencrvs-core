@@ -340,6 +340,24 @@ function UserListComponent(props: IProps) {
     [locationId, recordCount]
   )
 
+  async function usernameSMSReminder(userId: string) {
+    try {
+      const res = await userMutations.usernameSMSReminderSend(userId, [
+        {
+          query: SEARCH_USERS,
+          variables: { primaryOfficeId: locationId, count: recordCount }
+        }
+      ])
+      if (res && res.data && res.data.usernameSMSReminder) {
+        console.log('res.data', res.data)
+        // setShowResendSMSSuccess(true)
+      }
+    } catch (err) {
+      console.log('Error', err)
+      // setShowResendSMSError(true)
+    }
+  }
+
   const getMenuItems = useCallback(
     function getMenuItems(user: GQLUser) {
       const menuItems = [
@@ -355,7 +373,7 @@ function UserListComponent(props: IProps) {
         menuItems.push({
           label: intl.formatMessage(messages.sendUsernameReminderSMS),
           handler: () => {
-            resendSMS(user.id as string)
+            usernameSMSReminder(user.id as string)
           }
         })
       }
