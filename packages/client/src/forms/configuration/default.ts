@@ -1221,7 +1221,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'detailsDontExist',
                 type: 'CHECKBOX',
-                label: formMessageDescriptors.mothersDetailsExistFieldLabel,
+                label: formMessageDescriptors.mothersDetailsDontExist,
                 required: true,
                 customisable: true,
                 hideHeader: true,
@@ -1702,7 +1702,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'detailsDontExist',
                 type: 'CHECKBOX',
-                label: formMessageDescriptors.fathersDetailsExistFieldLabel,
+                label: formMessageDescriptors.fathersDetailsDontExist,
                 required: true,
                 hideHeader: true,
                 initialValue: false,
@@ -2217,7 +2217,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Mother only',
                     action: 'hide',
                     expression:
-                      'draftData && draftData.mother && !draftData.mother.detailsDontExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      'draftData && draftData.mother && draftData.mother.detailsDontExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2261,7 +2261,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Father only',
                     action: 'hide',
                     expression:
-                      'draftData && draftData.father && !draftData.father.detailsDontExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      'draftData && draftData.father && draftData.father.detailsDontExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {

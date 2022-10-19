@@ -47,12 +47,12 @@ const fathersDetailsDontExistBasedOnContactAndInformant =
 
 // if mothers details do not exist on other page
 const mothersDetailsDontExistOnOtherPage =
-  'draftData && draftData.mother && !draftData.mother.detailsDontExist'
+  'draftData && draftData.mother && draftData.mother.detailsDontExist'
 
 // if mothers details do not exist
 const mothersDetailsDontExist = 'values.detailsDontExist'
 
-// if fathers details do not existdraftData.
+// if fathers details do not exist.
 const fathersDetailsDontExist = 'values.detailsDontExist'
 
 // primary address same as other primary
