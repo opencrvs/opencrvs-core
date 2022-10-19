@@ -72,11 +72,7 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
           {
             name: 'reasonForChange',
             type: 'TEXT',
-            label: {
-              defaultMessage: 'Reason for correction',
-              id: 'form.field.label.reasonForChange',
-              description: 'Label for input Reason for Change'
-            },
+            label: messages.reasonForChange,
             required: true,
             initialValue: '',
 
