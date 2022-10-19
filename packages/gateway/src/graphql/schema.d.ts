@@ -79,6 +79,7 @@ export interface GQLMutation {
   changeAvatar?: GQLAvatar
   auditUser?: string
   resendSMSInvite?: string
+  resetPasswordSMS?: string
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
   createFormDraft?: GQLFormDraft
@@ -2109,6 +2110,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
+  resetPasswordSMS?: MutationToResetPasswordSMSResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   createFormDraft?: MutationToCreateFormDraftResolver<TParent>
@@ -2542,6 +2544,22 @@ export interface MutationToResendSMSInviteResolver<
   (
     parent: TParent,
     args: MutationToResendSMSInviteArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToResetPasswordSMSArgs {
+  userId: string
+  applicationName: string
+}
+export interface MutationToResetPasswordSMSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToResetPasswordSMSArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

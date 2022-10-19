@@ -174,4 +174,5 @@ type Mutation {
     comment: String
   ): String
   resendSMSInvite(userId: String!): String
+  resetPasswordSMS(userId: String!, applicationName: String!): String
 }
