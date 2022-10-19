@@ -70,7 +70,6 @@ import {
   selectOrCreateInformantSection,
   selectOrCreateInformantResource,
   setInformantReference,
-  fetchFHIR,
   selectOrCreateEncounterPartitioner,
   selectOrCreateEncounterParticipant,
   selectOrCreateQuestionnaireResource,
