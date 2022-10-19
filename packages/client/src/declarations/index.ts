@@ -88,7 +88,7 @@ const GET_DECLARATIONS_FAILED = 'DECLARATION/GET_DRAFTS_FAILED'
 const ENQUEUE_DOWNLOAD_DECLARATION = 'DECLARATION/ENQUEUE_DOWNLOAD_DECLARATION'
 const DOWNLOAD_DECLARATION_SUCCESS = 'DECLARATION/DOWNLOAD_DECLARATION_SUCCESS'
 const DOWNLOAD_DECLARATION_FAIL = 'DECLARATION/DOWNLOAD_DECLARATION_FAIL'
-const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
+const CLEAR_CORRECTION_AND_PRINT_CHANGES = 'CLEAR_CORRECTION_AND_PRINT_CHANGES'
 const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
 const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
 const UNASSIGN_DECLARATION_SUCCESS = 'DECLARATION/UNASSIGN_SUCCESS'
@@ -302,8 +302,8 @@ interface IModifyDeclarationAction {
   }
 }
 
-interface IClearCorrectionChange {
-  type: typeof CLEAR_CORRECTION_CHANGE
+interface IClearCorrectionAndPrintChanges {
+  type: typeof CLEAR_CORRECTION_AND_PRINT_CHANGES
   payload: {
     declarationId: string
   }
@@ -416,7 +416,7 @@ export type Action =
   | IArchiveDeclarationAction
   | IStoreDeclarationAction
   | IModifyDeclarationAction
-  | IClearCorrectionChange
+  | IClearCorrectionAndPrintChanges
   | ISetInitialDeclarationsAction
   | IWriteDeclarationAction
   | IWriteDeclarationSuccessAction
@@ -523,11 +523,15 @@ export function modifyDeclaration(
   return { type: MODIFY_DECLARATION, payload: { declaration } }
 }
 
-export function clearCorrectionChange(
+export function clearCorrectionAndPrintChanges(
   declarationId: string
-): IClearCorrectionChange {
-  return { type: CLEAR_CORRECTION_CHANGE, payload: { declarationId } }
+): IClearCorrectionAndPrintChanges {
+  return {
+    type: CLEAR_CORRECTION_AND_PRINT_CHANGES,
+    payload: { declarationId }
+  }
 }
+
 export function setInitialDeclarations() {
   return { type: SET_INITIAL_DECLARATION }
 }
@@ -1083,7 +1087,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         ...state,
         declarations: newDeclarations
       }
-    case CLEAR_CORRECTION_CHANGE: {
+    case CLEAR_CORRECTION_AND_PRINT_CHANGES: {
       const declarationIndex = state.declarations.findIndex(
         (declaration) => declaration.id === action.payload.declarationId
       )
@@ -1097,7 +1101,18 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         }
       }
 
-      return loop(state, Cmd.action(writeDeclaration(orignalAppliation)))
+      return loop(
+        {
+          ...state,
+          declarations: state.declarations.map((declaration, index) => {
+            if (index === declarationIndex) {
+              return orignalAppliation
+            }
+            return declaration
+          })
+        },
+        Cmd.action(writeDeclaration(orignalAppliation))
+      )
     }
 
     case WRITE_DECLARATION: {
