@@ -103,7 +103,7 @@ import { IActionDetailsData, GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
-import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { Mutation } from '@apollo/client/react/components'
 import {
   MarkEventAsReinstatedMutation,
@@ -480,7 +480,7 @@ function RecordAuditBody({
     desktopActionsView.push(actions[actions.length - 1])
   } else {
     if (draft?.submissionStatus === SUBMISSION_STATUS.DRAFT) {
-      actions.push(<Uploaded />)
+      actions.push(<Downloaded />)
     } else {
       actions.push(
         ShowDownloadButton({
