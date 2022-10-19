@@ -1178,4 +1178,90 @@ describe('User root resolvers', () => {
       expect(res).toBe(true)
     })
   })
+
+  describe('resetPasswordSMS mutation', () => {
+    let authHeaderSysAdmin: { Authorization: string }
+    let authHeaderRegAgent: { Authorization: string }
+    beforeEach(() => {
+      fetch.resetMocks()
+      const sysAdminToken = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderSysAdmin = {
+        Authorization: `Bearer ${sysAdminToken}`
+      }
+      const validateToken = jwt.sign(
+        { scope: ['validate'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderRegAgent = {
+        Authorization: `Bearer ${validateToken}`
+      }
+    })
+
+    it('throws error for unauthorized user', async () => {
+      await expect(
+        resolvers.Mutation.resetPasswordSMS(
+          {},
+          {
+            userId: '123',
+            applicationName: 'opencrvs'
+          },
+          authHeaderRegAgent
+        )
+      ).rejects.toThrowError(
+        'Reset password can only be sent by a user with sys admin scope'
+      )
+    })
+
+    it('throws error when the user-mgnt response is not 200', async () => {
+      fetch.mockResponses([JSON.stringify({}), { status: 401 }])
+
+      await expect(
+        resolvers.Mutation.resetPasswordSMS(
+          {},
+          {
+            userId: '123',
+            applicationName: 'opencrvs'
+          },
+          authHeaderSysAdmin
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't reset password and send sms to 123"
+      )
+    })
+
+    it('returns true if status from user-mgnt response is 200', async () => {
+      fetch.mockResponses([
+        JSON.stringify({ username: 'sadman' }),
+        { status: 200 }
+      ])
+
+      const res = await resolvers.Mutation.resetPasswordSMS(
+        {},
+        {
+          userId: '123',
+          applicationName: 'opencrvs'
+        },
+        authHeaderSysAdmin
+      )
+
+      console.log(res)
+
+      expect(res).toBe('sadman')
+    })
+  })
 })
