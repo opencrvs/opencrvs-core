@@ -22,7 +22,8 @@ import {
   updatePatientIdentifierWithRN,
   touchBundle,
   markBundleAsDeclarationUpdated,
-  markBundleAsRequestedForCorrection
+  markBundleAsRequestedForCorrection,
+  validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -298,7 +299,7 @@ export async function markEventAsRegisteredCallbackHandler(
     )
 
     /** pushing registrationNumber on related person's identifier */
-    const patient = await updatePatientIdentifierWithRN(
+    let patient = await updatePatientIdentifierWithRN(
       composition,
       event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE,
       event === EVENT_TYPE.BIRTH
@@ -307,10 +308,17 @@ export async function markEventAsRegisteredCallbackHandler(
       registrationNumber
     )
 
+    if (event === EVENT_TYPE.DEATH) {
+      patient = await validateDeceasedDetails(patient, {
+        Authorization: request.headers.authorization
+      })
+    }
+
     //** Making sure db automicity */
     const bundle = generateEmptyBundle()
     bundle.entry?.push({ resource: task })
     bundle.entry?.push({ resource: patient })
+
     await sendBundleToHearth(bundle)
 
     const phoneNo = await getPhoneNo(task, event)

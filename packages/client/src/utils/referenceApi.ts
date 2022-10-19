@@ -46,6 +46,11 @@ export interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
 }
+
+interface IIntegration {
+  name: string
+  status: string
+}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {
@@ -73,6 +78,7 @@ export interface IApplicationConfig {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
+  INTEGRATIONS?: [IIntegration]
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig

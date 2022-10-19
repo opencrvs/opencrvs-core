@@ -40,7 +40,7 @@ describe('Verify handler', () => {
     fetch.mockResponse(JSON.stringify(mockFormDraft))
 
     const response = await getFormDraft(token)
-    expect(response[0].status).toEqual('DRAFT')
+    expect(response[0].status).toEqual('PUBLISHED')
   })
 
   it('getFormDraft returns form draft response', async () => {
@@ -62,7 +62,7 @@ describe('checkFormDraftStatusToAddTestExtension handler', () => {
     )
   })
 
-  it.only('checkFormDraftStatusToAddTestExtension returns form draft response', async () => {
+  it('checkFormDraftStatusToAddTestExtension returns form draft response', async () => {
     fetch.mockResponse(JSON.stringify(mockFormDraft))
     const spy = jest.spyOn(fhirModifier, 'setupTestExtension')
     await checkFormDraftStatusToAddTestExtension(

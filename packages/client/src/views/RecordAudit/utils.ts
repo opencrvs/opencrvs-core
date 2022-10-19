@@ -57,6 +57,7 @@ export interface IDeclarationData {
   informant?: string
   informantContact?: string
   brnDrn?: string
+  nid?: string
   assignment?: GQLAssignmentData
 }
 

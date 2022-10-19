@@ -292,6 +292,28 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
+    async mosipAid(task: fhir.Task) {
+      let mosipAidType =
+        task &&
+        task.code &&
+        task.code.coding &&
+        task.code.coding[0] &&
+        task.code.coding[0].code
+      if (mosipAidType === 'BIRTH') {
+        mosipAidType = 'mosip-aid'
+      } else {
+        return null
+      }
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/${mosipAidType}`
+        )
+
+      return (foundIdentifier && foundIdentifier.value) || null
+    },
     async attachments(task: fhir.Task, _, authHeader) {
       if (!task.focus) {
         throw new Error(
