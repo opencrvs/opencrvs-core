@@ -79,7 +79,6 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
             },
             required: true,
             initialValue: '',
-
             validate: [
               requiredValidation(validationMessages.requiredReasonForCorrection)
             ],
