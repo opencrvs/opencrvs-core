@@ -1246,7 +1246,7 @@ describe('User root resolvers', () => {
 
     it('returns true if status from user-mgnt response is 200', async () => {
       fetch.mockResponses([
-        JSON.stringify({ username: 'sadman' }),
+        JSON.stringify({ userName: 'sadman' }),
         { status: 200 }
       ])
 
@@ -1258,8 +1258,6 @@ describe('User root resolvers', () => {
         },
         authHeaderSysAdmin
       )
-
-      console.log(res)
 
       expect(res).toBe('sadman')
     })

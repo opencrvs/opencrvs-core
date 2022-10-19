@@ -497,7 +497,7 @@ export const resolvers: GQLResolver = {
       }
 
       const response = await res.json()
-      return response.username
+      return response.userName
     }
   }
 }
