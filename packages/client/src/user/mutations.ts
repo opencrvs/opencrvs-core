@@ -37,7 +37,7 @@ async function resendSMSInvite(
   )
 }
 
-async function usernameSMSReminder(
+async function usernameSMSReminderSend(
   userId: string,
   refetchQueries: InternalRefetchQueriesInclude
 ) {
@@ -53,5 +53,5 @@ async function usernameSMSReminder(
 
 export const userMutations = {
   resendSMSInvite,
-  usernameSMSReminder
+  usernameSMSReminderSend
 }
