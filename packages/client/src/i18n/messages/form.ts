@@ -57,7 +57,6 @@ interface IFormMessages
   birthTypeTwin: MessageDescriptor
   causeOfDeathMethod: MessageDescriptor
   causeOfDeathEstablished: MessageDescriptor
-  causeOfDeathEstablishedFieldLabel: MessageDescriptor
   causeOfDeathName: MessageDescriptor
   causeOfDeathNotice: MessageDescriptor
   causeOfDeathTitle: MessageDescriptor
@@ -162,9 +161,7 @@ interface IFormMessages
   fatherFirstNamesEng: MessageDescriptor
   fatherName: MessageDescriptor
   fathersDetailsExist: MessageDescriptor
-  fathersDetailsDontExist: MessageDescriptor
   mothersDetailsExist: MessageDescriptor
-  mothersDetailsDontExist: MessageDescriptor
   fatherTitle: MessageDescriptor
   fetchDeceasedDetails: MessageDescriptor
   fetchFatherDetails: MessageDescriptor
@@ -661,12 +658,7 @@ export const formMessageDescriptors: IFormMessages = {
   causeOfDeathEstablished: {
     defaultMessage: 'Cause of death has been established',
     description: 'Label for form field: Cause of Death Established',
-    id: 'form.field.label.CauseOfDeathEstablished'
-  },
-  causeOfDeathEstablishedFieldLabel: {
-    defaultMessage: 'Cause of death has been established',
-    description: 'Label for cause of death been established field',
-    id: 'form.field.label.causeOfDeathEstablishedFieldLabel'
+    id: 'form.field.label.causeOfDeathEstablished'
   },
   causeOfDeathName: {
     defaultMessage: 'What is the official cause of death?',
@@ -1192,24 +1184,14 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.section.father.name'
   },
   mothersDetailsExist: {
-    defaultMessage: "Do you have the mother's details?",
+    defaultMessage: "Mother's details are not available",
     description: "Question to ask the user if they have the mother's details",
     id: 'form.field.label.mothersDetailsExist'
   },
-  mothersDetailsDontExist: {
-    defaultMessage: "Mother's details are not available",
-    description: "Question to ask the user if they have the mother's details",
-    id: 'form.field.label.mothersDetailsDontExist'
-  },
   fathersDetailsExist: {
-    defaultMessage: "Do you have the father's details?",
-    description: "Question to ask the user if they have the father's details",
-    id: 'form.field.label.fathersDetailsExist'
-  },
-  fathersDetailsDontExist: {
     defaultMessage: "Father's details are not available",
     description: "Question to ask the user if they have the father's details",
-    id: 'form.field.label.fathersDetailsDontExist'
+    id: 'form.field.label.fathersDetailsExist'
   },
   fatherTitle: {
     defaultMessage: "Father's details",
