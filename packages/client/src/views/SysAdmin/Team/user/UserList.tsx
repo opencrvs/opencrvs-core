@@ -679,6 +679,7 @@ function UserListComponent(props: IProps) {
               ]}
             />
             <ResponsiveModal
+              id="user-reset-password-modal"
               show={toggleResetPassword.modalVisible}
               handleClose={() => toggleUserResetPasswordModal()}
               title={intl.formatMessage(messages.resetUserPasswordModalTitle)}
