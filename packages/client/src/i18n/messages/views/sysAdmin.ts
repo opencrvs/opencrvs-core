@@ -42,6 +42,8 @@ interface ISysAdminMessages
   resendSMS: MessageDescriptor
   resendSMSSuccess: MessageDescriptor
   resendSMSError: MessageDescriptor
+  resetPasswordSMSSuccess: MessageDescriptor
+  resetPasswordSMSError: MessageDescriptor
   newUser: MessageDescriptor
   active: MessageDescriptor
   pending: MessageDescriptor
@@ -199,6 +201,18 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Invite could not be sent',
     description: 'The label for error notification of resend sms invite',
     id: 'sysAdHome.resendSMSError'
+  },
+  resetPasswordSMSSuccess: {
+    defaultMessage: 'Temporary password sent to {username}',
+    description:
+      'The label for success notification of reset password sms invite',
+    id: 'sysAdHome.resentPasswordSMSSuccess'
+  },
+  resetPasswordSMSError: {
+    defaultMessage: 'Temporary password could not be sent',
+    description:
+      'The label for error notification of reset password sms invite',
+    id: 'sysAdHome.resentPasswordSMSError'
   },
   newUser: {
     defaultMessage: 'New User',

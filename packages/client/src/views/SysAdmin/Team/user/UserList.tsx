@@ -25,7 +25,7 @@ import {
   goToTeamSearch,
   goToTeamUserList
 } from '@client/navigation'
-import { ILocation } from '@client/offline/reducer'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
@@ -223,6 +223,7 @@ type BaseProps = {
   theme: ITheme
   offlineOffices: ILocation[]
   userDetails: IUserDetails | null
+  offlineCountryConfig: IOfflineData
   goToCreateNewUser: typeof goToCreateNewUser
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
@@ -277,6 +278,9 @@ export const Status = (statusProps: IStatusProps) => {
 function UserListComponent(props: IProps) {
   const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
   const [showResendSMSError, setShowResendSMSError] = useState(false)
+  const [showResetPasswordSMSSuccess, setShowResetPasswordSMSSuccess] =
+    useState(false)
+  const [showResetPasswordSMSError, setResetPasswordSMSError] = useState(false)
   const {
     intl,
     userDetails,
@@ -286,6 +290,7 @@ function UserListComponent(props: IProps) {
     goToTeamSearch,
     offlineOffices,
     isOnline,
+    offlineCountryConfig,
     location: { search }
   } = props
   const isNatlSysAdmin = userDetails?.role
@@ -316,13 +321,12 @@ function UserListComponent(props: IProps) {
         setToggleActivation({
           ...toggleActivation,
           modalVisible: true,
-          selectedUser: user
+          selectedUser: null
         })
       } else {
         setToggleActivation({
           ...toggleActivation,
-          modalVisible: false,
-          selectedUser: null
+          modalVisible: false
         })
       }
     },
@@ -340,8 +344,7 @@ function UserListComponent(props: IProps) {
       } else {
         setToggleResetPassword({
           ...toggleResetPassword,
-          modalVisible: false,
-          selectedUser: null
+          modalVisible: false
         })
       }
     },
@@ -367,24 +370,28 @@ function UserListComponent(props: IProps) {
     [locationId, recordCount]
   )
 
-  const resetPassword = useCallback(async function resetPassword(
-    userId: GQLUser
-  ) {
-    // try {
-    //   const res = await userMutations.resendSMSInvite(userId, [
-    //     {
-    //       query: SEARCH_USERS,
-    //       variables: { primaryOfficeId: locationId, count: recordCount }
-    //     }
-    //   ])
-    //   if (res && res.data && res.data.resendSMSInvite) {
-    //     setShowResendSMSSuccess(true)
-    //   }
-    // } catch (err) {
-    //   setShowResendSMSError(true)
-    // }
-  },
-  [])
+  const resetPassword = useCallback(
+    async function resetPassword(userId: string) {
+      try {
+        const res = await userMutations.sendResetPasswordSMS(
+          userId,
+          offlineCountryConfig.config.APPLICATION_NAME,
+          [
+            {
+              query: SEARCH_USERS,
+              variables: { primaryOfficeId: locationId, count: recordCount }
+            }
+          ]
+        )
+        if (res && res.data && res.data.resetPasswordSMS) {
+          setShowResetPasswordSMSSuccess(true)
+        }
+      } catch (err) {
+        setResetPasswordSMSError(true)
+      }
+    },
+    [recordCount, locationId, offlineCountryConfig.config.APPLICATION_NAME]
+  )
 
   const getMenuItems = useCallback(
     function getMenuItems(user: GQLUser) {
@@ -462,6 +469,16 @@ function UserListComponent(props: IProps) {
     } else {
       return true
     }
+  }
+
+  const getUserName = (user: GQLUser) => {
+    const userName =
+      (user &&
+        user.name &&
+        ((createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
+          (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string))) ||
+      ''
+    return userName
   }
 
   const StatusMenu = useCallback(
@@ -678,7 +695,7 @@ function UserListComponent(props: IProps) {
                   key="reset-password-send"
                   onClick={() => {
                     if (toggleResetPassword.selectedUser?.id) {
-                      resetPassword(toggleResetPassword.selectedUser)
+                      resetPassword(toggleResetPassword.selectedUser.id)
                     }
                     toggleUserResetPasswordModal()
                   }}
@@ -818,6 +835,33 @@ function UserListComponent(props: IProps) {
           {intl.formatMessage(messages.resendSMSError)}
         </Toast>
       )}
+
+      {showResetPasswordSMSSuccess && (
+        <Toast
+          id="reset_password_success"
+          type="success"
+          onClose={() => {
+            setShowResetPasswordSMSSuccess(false)
+            setToggleResetPassword({
+              ...toggleResetPassword,
+              selectedUser: null
+            })
+          }}
+        >
+          {intl.formatMessage(messages.resetPasswordSMSSuccess, {
+            username: getUserName(toggleResetPassword.selectedUser as GQLUser)
+          })}
+        </Toast>
+      )}
+      {showResetPasswordSMSError && (
+        <Toast
+          id="reset_password_error"
+          type="warning"
+          onClose={() => setResetPasswordSMSError(false)}
+        >
+          {intl.formatMessage(messages.resetPasswordSMSError)}
+        </Toast>
+      )}
     </SysAdminContentWrapper>
   )
 }
@@ -825,7 +869,8 @@ function UserListComponent(props: IProps) {
 export const UserList = connect(
   (state: IStoreState) => ({
     offlineOffices: Object.values(getOfflineData(state).offices),
-    userDetails: getUserDetails(state)
+    userDetails: getUserDetails(state),
+    offlineCountryConfig: getOfflineData(state)
   }),
   {
     goToCreateNewUser,
