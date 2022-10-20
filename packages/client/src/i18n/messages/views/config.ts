@@ -14,6 +14,9 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationSettings: MessageDescriptor
+  vsexport: MessageDescriptor
+  vitalStatisticsExport: MessageDescriptor
+  export: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
@@ -86,6 +89,22 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.settings',
     defaultMessage: 'Application',
     description: 'Link Text for Config Application Settings'
+  },
+  vsexport: {
+    id: 'config.application.vsexport',
+    defaultMessage: 'Vital statistics export',
+    description: 'VS Export tab'
+  },
+  vitalStatisticsExport: {
+    id: 'config.application.vitalStatistics',
+    defaultMessage:
+      '{year}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
+    description: 'Vital Statistics Export'
+  },
+  export: {
+    id: 'config.application.export',
+    defaultMessage: 'Export',
+    description: 'Download Export CSV'
   },
   applicationNameChangeMessage: {
     id: 'config.application.nameChangeMessage',
@@ -390,10 +409,20 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Birth',
     description: 'The title for birth tab'
   },
+  birthTabTitleExport: {
+    id: 'config.application.birthTabTitleExport',
+    defaultMessage: 'Births',
+    description: 'The title for birth tab for VSExport'
+  },
   deathTabTitle: {
     id: 'config.application.deathTabTitle',
     defaultMessage: 'Death',
     description: 'The title for death tab'
+  },
+  deathTabTitleExport: {
+    id: 'config.application.deathTabTitleExport',
+    defaultMessage: 'Deaths',
+    description: 'The title for death tab for VSExport'
   },
   registrationTimePeriodsGroupTitle: {
     id: 'config.application.registrationTimePeriodsGroupTitle',

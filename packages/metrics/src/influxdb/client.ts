@@ -192,6 +192,13 @@ export const influx = new Influx.InfluxDB({
         'locationLevel3',
         'locationLevel2'
       ]
+    },
+    {
+      measurement: 'search_requests',
+      fields: {
+        clientId: Influx.FieldType.STRING
+      },
+      tags: ['ipAddress']
     }
   ]
 })

@@ -420,9 +420,9 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: styleguide.{{hostname}},{{hostname}}'
+        - 'traefik.frontend.rule=Host: ui-kit.{{hostname}},{{hostname}}'
         - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
-        - 'traefik.frontend.redirect.replacement=https://styleguide.{{hostname}}/$${1}'
+        - 'traefik.frontend.redirect.replacement=https://ui-kit.{{hostname}}/$${1}'
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'

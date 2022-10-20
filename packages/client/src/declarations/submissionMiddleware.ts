@@ -16,9 +16,9 @@ import {
   deleteDeclaration,
   IDeclaration,
   modifyDeclaration,
-  writeDeclaration,
-  updateRegistrarWorkqueue
+  writeDeclaration
 } from '@client/declarations'
+import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { client } from '@client/utils/apolloClient'
 import { getBirthMutation } from '@client/views/DataProvider/birth/mutations'
@@ -32,7 +32,7 @@ import { Dispatch } from 'redux'
 import { IForm, SubmissionAction } from '@client/forms'
 import { showUnassigned } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { ApolloError } from 'apollo-client'
+import { ApolloError } from '@apollo/client'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction

@@ -55,6 +55,8 @@ export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
 
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
+export const REGISTRAR_HOME_TAB_PAGE =
+  '/registration-home/:tabId/:selectorId/:pageId'
 export const SETTINGS = '/settings'
 export const CERTIFICATE_CONFIG = '/config/certificate'
 export const FORM_CONFIG_HOME = '/config/form'
@@ -67,6 +69,9 @@ export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const PERFORMANCE_HOME = '/performance'
+
+export const VS_EXPORTS = '/vsexports'
+
 export const EVENT_COMPLETENESS_RATES =
   '/performance/operations/completenessRates/:eventType'
 export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'

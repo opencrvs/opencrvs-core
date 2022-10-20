@@ -11,14 +11,14 @@
  */
 import { ValidationInitializer } from '@client/utils/validate'
 import { MessageDescriptor } from 'react-intl'
+import { THEME_MODE } from '@opencrvs/components/lib/InputField'
 import {
-  ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
-  ICheckboxOption as CheckboxComponentOption,
-  THEME_MODE,
   RadioSize
-} from '@opencrvs/components/lib/forms'
-import { ApolloQueryResult } from 'apollo-client'
+} from '@opencrvs/components/lib/Radio'
+import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
+import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
+import { ApolloQueryResult } from '@apollo/client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { IDynamicValues } from '@opencrvs/client/src/navigation'
 
@@ -31,11 +31,12 @@ import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
-import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IQuestionConfig } from './questionConfig'
+import { IFont } from '@opencrvs/components/lib/fonts'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -45,6 +46,7 @@ export const RADIO_GROUP = 'RADIO_GROUP'
 export const RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS'
 export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
+export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
 export const TEXTAREA = 'TEXTAREA'
 export const SUBSECTION = 'SUBSECTION'
@@ -531,6 +533,9 @@ export interface ICheckboxGroupFormField extends IFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: ICheckboxOption[]
 }
+export interface ICheckboxFormField extends IFormFieldBase {
+  type: typeof CHECKBOX
+}
 export interface IDateFormField extends IFormFieldBase {
   type: typeof DATE
   notice?: MessageDescriptor
@@ -560,7 +565,7 @@ export interface IDynamicListFormField extends IFormFieldBase {
 }
 export interface IParagraphFormField extends IFormFieldBase {
   type: typeof PARAGRAPH
-  fontSize?: string
+  fontVariant?: string
 }
 export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
@@ -639,6 +644,7 @@ export type IFormField =
   | IRadioGroupWithNestedFieldsFormField
   | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
+  | ICheckboxFormField
   | IDateFormField
   | ITextareaFormField
   | ISubsectionFormField
@@ -1069,6 +1075,10 @@ export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: CheckboxComponentOption[]
 }
+
+export interface Ii18nCheckboxFormField extends Ii18nFormFieldBase {
+  type: typeof CHECKBOX
+}
 export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE
   notice?: string
@@ -1093,7 +1103,7 @@ export interface Ii18nListFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
   type: typeof PARAGRAPH
-  fontSize?: string
+  fontVariant?: IFont
 }
 export interface Ii18nImageUploaderWithOptionsFormField
   extends Ii18nFormFieldBase {
@@ -1156,6 +1166,7 @@ export type Ii18nFormField =
   | Ii18nRadioGroupWithNestedFieldsFormField
   | Ii18nInformativeRadioGroupFormField
   | Ii18nCheckboxGroupFormField
+  | Ii18nCheckboxFormField
   | Ii18nDateFormField
   | Ii18nTextareaFormField
   | Ii18nSubsectionFormField
@@ -1227,6 +1238,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
     INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
     CHECKBOX_GROUP: messages.checkboxGroup,
+    CHECKBOX: messages.checkbox,
     DATE: messages.date,
     DYNAMIC_LIST: messages.dynamicList
   }

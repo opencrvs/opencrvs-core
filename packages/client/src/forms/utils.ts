@@ -64,7 +64,7 @@ import {
   isAValidDateFormat,
   isDateNotInFuture
 } from '@client/utils/validate'
-import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
+import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
 import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
@@ -491,7 +491,7 @@ export function getQueryData(
   return queryData
 }
 
-function getSelectedInformantAndContactType(draftData?: IFormData) {
+export function getSelectedInformantAndContactType(draftData?: IFormData) {
   // IFormFieldValue is a union with primitives - usually a top-level string in this function like this section.fieldValue
   // informantType is a special case where both the nested field and the selected parent are required
   // this means an object was required for the fieldValue
@@ -555,9 +555,11 @@ export const getConditionalActionsForField = (
 
 export const getVisibleSectionGroupsBasedOnConditions = (
   section: IFormSection,
-  values: IFormSectionData,
+  sectionData: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
+  // eslint-disable-next-line no-unused-vars
+  const values = sectionData
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)

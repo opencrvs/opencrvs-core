@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { Warning } from '@opencrvs/components/lib/interface'
+import { Alert } from '@opencrvs/components/lib/Alert'
 import { Query } from '@client/components/Query'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useIntl } from 'react-intl'
@@ -50,19 +50,23 @@ export function DuplicateWarning({
           )}
         >
           {({ data }) => {
-            return duplicateIds.map((_, idx) => {
-              const duplicateQuery = data?.[`duplicate${idx}`]
-              if (duplicateQuery?.registration?.trackingId) {
-                return (
-                  <Warning
-                    label={intl.formatMessage(errorMessages.duplicateWarning, {
-                      trackingId: duplicateQuery.registration.trackingId
-                    })}
-                  />
-                )
-              }
-              return <></>
-            })
+            return (
+              <>
+                {duplicateIds.map((_, idx) => {
+                  const duplicateQuery = data?.[`duplicate${idx}`]
+                  if (duplicateQuery?.registration?.trackingId) {
+                    return (
+                      <Alert type="warning">
+                        {intl.formatMessage(errorMessages.duplicateWarning, {
+                          trackingId: duplicateQuery.registration.trackingId
+                        })}
+                      </Alert>
+                    )
+                  }
+                  return <></>
+                })}
+              </>
+            )
           }}
         </Query>
       )}

@@ -28,6 +28,7 @@
     "infrastructure/configure-file-monitoring.sh",
     "packages/client/index.html",
     "packages/login/index.html",
+    "packages/components/**/*.mdx",
     "packages/components/.storybook/preview.jsx",
     "grafana",
     "packages/scheduler/start.sh",
@@ -42,7 +43,7 @@
         "prepend": "# "
       }
     },
-    "html|xml|svg": {
+    "html|xml|svg|mdx": {
       "prepend": "<!--",
       "append": "-->"
     },
