@@ -245,20 +245,8 @@ export const UserAudit = () => {
                     }
                   />
                   <Summary.Row
-                    label={intl.formatMessage(userSetupMessages.phoneNumber)}
-                    value={user.number}
-                  />
-                  <Summary.Row
-                    label={intl.formatMessage(userSetupMessages.nid)}
-                    value={user.nid}
-                  />
-                  <Summary.Row
-                    label={intl.formatMessage(userSetupMessages.userName)}
-                    value={user.username}
-                  />
-                  <Summary.Row
                     label={intl.formatMessage(userFormMessages.userDevice)}
-                    value={user.device}
+                    value={user.device === null ? 'N/A' : user.device}
                   />
                 </Summary>
 
