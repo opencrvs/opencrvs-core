@@ -79,7 +79,8 @@ const messagesToDefine: IErrorMessages = {
     id: 'fieldAgentHome.queryError'
   },
   pleaseTryAgainError: {
-    defaultMessage: 'An error occurred. Please try again.',
+    defaultMessage:
+      'You are offline, please reconnect to complete your onboarding.',
     description:
       'The error message that displays if we want the user to try the action again',
     id: 'error.occurred'

@@ -40,8 +40,7 @@ interface INotificationsMessages
 
 const messagesToDefine: INotificationsMessages = {
   declarationsSynced: {
-    defaultMessage:
-      'As you have connectivity, we can synchronize your declarations.',
+    defaultMessage: 'You have reconnected',
     description:
       'The message that appears in notification when background sync takes place',
     id: 'misc.notif.declarationsSynced'

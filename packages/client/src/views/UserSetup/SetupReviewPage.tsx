@@ -43,6 +43,7 @@ import {
   SubmitActivateUserMutation,
   SubmitActivateUserMutationVariables
 } from '@client/utils/gateway'
+import { Toast } from '@client/../../components/lib'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -198,9 +199,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
               >
                 <GlobalError id="GlobalError">
                   {submitError && (
-                    <WarningMessage>
+                    <Toast type="error" onClose={() => setSubmitError(false)}>
                       {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-                    </WarningMessage>
+                    </Toast>
                   )}
                 </GlobalError>
                 <div id="UserSetupData">
