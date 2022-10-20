@@ -192,7 +192,7 @@ const messagesToDefine: ISysAdminMessages = {
     id: 'sysAdHome.sendUsernameReminderSMS'
   },
   sendUsernameReminderSMSSuccess: {
-    defaultMessage: 'Username reminder sent to ',
+    defaultMessage: 'Username reminder sent to {name}',
     description: 'The label for success notification of send username reminder',
     id: 'sysAdHome.sendUsernameReminderSMSSuccess'
   },
@@ -208,7 +208,7 @@ const messagesToDefine: ISysAdminMessages = {
   },
   sendUsernameReminderSMSModalMessage: {
     defaultMessage:
-      'The user will recieve a username reminder via an SMS sent to ',
+      'The user will recieve a username reminder via an SMS sent to {phoneNumber}',
     description: 'Message for send username reminder',
     id: 'sysAdHome.sendUsernameReminderSMSModalMessage'
   },

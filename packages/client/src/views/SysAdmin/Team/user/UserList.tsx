@@ -283,8 +283,6 @@ function UserListComponent(props: IProps) {
   const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
   const [showUsernameSMSReminderSuccess, setShowUsernameSMSReminderSuccess] =
     useState(false)
-  const [username, setUsername] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
   const [showResendSMSError, setShowResendSMSError] = useState(false)
   const [showUsernameSMSReminderError, setShowUsernameSMSReminderError] =
     useState(false)
@@ -344,7 +342,6 @@ function UserListComponent(props: IProps) {
   const toggleUsernameReminderModal = useCallback(
     function toggleUsernameReminderModal(user?: GQLUser) {
       if (user !== undefined) {
-        setPhoneNumber(user?.mobile as string)
         setToggleUsernameReminder({
           ...toggleUsernameReminder,
           modalVisible: true,
@@ -388,7 +385,6 @@ function UserListComponent(props: IProps) {
         }
       ])
       if (res && res.data && res.data.usernameSMSReminder) {
-        setUsername(res.data.usernameSMSReminder)
         setShowUsernameSMSReminderSuccess(true)
       }
     } catch (err) {
@@ -473,6 +469,16 @@ function UserListComponent(props: IProps) {
     } else {
       return true
     }
+  }
+
+  const getUserName = (user: GQLUser) => {
+    const userName =
+      (user &&
+        user.name &&
+        ((createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
+          (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string))) ||
+      ''
+    return userName
   }
 
   const StatusMenu = useCallback(
@@ -705,8 +711,10 @@ function UserListComponent(props: IProps) {
               responsive={false}
               autoHeight={true}
             >
-              {intl.formatMessage(messages.sendUsernameReminderSMSModalMessage)}
-              {phoneNumber}
+              {intl.formatMessage(
+                messages.sendUsernameReminderSMSModalMessage,
+                { phoneNumber: toggleUsernameReminder.selectedUser?.mobile }
+              )}
             </ResponsiveModal>
           </UserTable>
         </>
@@ -837,9 +845,8 @@ function UserListComponent(props: IProps) {
           onClose={() => setShowUsernameSMSReminderSuccess(false)}
         >
           {intl.formatMessage(messages.sendUsernameReminderSMSSuccess, {
-            username: username
+            name: getUserName(toggleUsernameReminder.selectedUser as GQLUser)
           })}
-          {username}
         </Toast>
       )}
       {showUsernameSMSReminderError && (
