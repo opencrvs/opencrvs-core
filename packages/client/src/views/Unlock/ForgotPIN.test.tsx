@@ -41,6 +41,9 @@ describe('ForgotPIN tests', () => {
         networkStatus: NetworkStatus.ready,
         data: {
           getUser: {
+            id: '5eba726866458970cf2e23c2',
+            username: 'a.alhasan',
+            creationDate: '2022-10-03T10:42:46.920Z',
             userMgntUserID: '5eba726866458970cf2e23c2',
             practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             mobile: '+8801711111111',

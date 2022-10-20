@@ -38,7 +38,9 @@ import {
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { ApolloClient, InternalRefetchQueriesInclude } from '@apollo/client'
-import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
+import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import { withApollo, WithApolloClient } from 'react-apollo'
+import { User } from '@client/utils/gateway'
 
 const { useState, useEffect } = React
 
@@ -55,7 +57,7 @@ interface ToggleUserActivationModalProps
   extends WrappedComponentProps,
     ConnectProps,
     DispatchProps {
-  user: GQLUser | null
+  user: User | null
   show: boolean
   onConfirmRefetchQueries?: InternalRefetchQueriesInclude
   onClose: () => void
@@ -155,7 +157,7 @@ function UserAuditActionModalComponent(
   function handleConfirm() {
     if (makeAllFieldsDirty) {
       const touched = props.form.fields.reduce(
-        (memo, field) => ({ ...memo, [field.name]: true }),
+        (memo: any, field: { name: any }) => ({ ...memo, [field.name]: true }),
         {}
       )
       makeAllFieldsDirty(touched)

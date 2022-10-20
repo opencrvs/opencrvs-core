@@ -104,19 +104,14 @@ export async function getUserAuditEvents(
 export async function countUserAuditEvents(
   practitionerId: string
 ): Promise<number> {
-  let result
-  try {
-    result = await query(
-      `SELECT COUNT(ipAddress)
-       from user_audit_event
-       where practitionerId = $practitionerId`,
-      { placeholders: { practitionerId: practitionerId } }
-    )
-    return result[0].count
-    // Error will be thrown when
-    // practitioner has no events recorded in influx
-    // return zero in that case
-  } catch (e) {
+  const result = await query(
+    `SELECT COUNT(ipAddress)
+     from user_audit_event
+     where practitionerId = $practitionerId`,
+    { placeholders: { practitionerId: practitionerId } }
+  )
+  if (result.length === 0) {
     return 0
   }
+  return result[0].count
 }

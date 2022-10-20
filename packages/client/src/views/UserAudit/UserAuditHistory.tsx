@@ -56,13 +56,7 @@ import {
   IOnlineStatusProps,
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
-import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { GetUserAuditLogQuery } from '@client/utils/gateway'
-import { ILocation } from '@client/offline/reducer'
-import { ICurrency } from '@client/utils/referenceApi'
-import { RouteComponentProps } from 'react-router'
-import { IUserDetails } from '@client/utils/userUtils'
-import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { NameContainer } from '@client/views/OfficeHome/components'
 
 const DEFAULT_LIST_SIZE = 10
@@ -96,7 +90,7 @@ const RecentActionsHolder = styled.div`
 
 const AlignedDateRangePicker = styled(DateRangePicker)`
   position: absolute;
-  bottom: 10px;
+  top: 6px;
 `
 
 const SectionTitle = styled.div`
@@ -118,30 +112,17 @@ const InformationTitle = styled.div`
 `
 
 interface IBaseProp {
-  theme: ITheme
   practitionerId: string
-  isLoading?: boolean
 }
 
 interface DispatchProps {
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
-interface IBasePrintTabProps {
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-}
-
-interface IConnectProps {
-  locations: { [key: string]: ILocation }
-  offices: { [key: string]: ILocation }
-  currency: ICurrency
-}
-
 type Props = WrappedComponentProps &
   IBaseProp &
   IOnlineStatusProps &
-  DispatchProps &
-  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
+  DispatchProps & {
     theme: ITheme
   }
 
@@ -154,15 +135,12 @@ export enum SORTED_COLUMN {
 }
 
 type State = {
-  selectedLocation?: ISearchLocation
   timeStart: Date
   timeEnd: Date
   viewportWidth: number
   sortOrder: SORT_ORDER
   sortedColumn: SORTED_COLUMN
   currentPageNumber: number
-  officeSelected?: boolean
-  isAccessibleOffice?: boolean
 }
 
 const isUserAuditItemWithDeclarationDetials = (
@@ -410,45 +388,6 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     )
   }
 
-  isOfficeSelected(selectedLocation?: ISearchLocation) {
-    if (selectedLocation) {
-      return Object.keys(this.props.offices).some(
-        (id) => id === selectedLocation.id
-      )
-    }
-    return false
-  }
-
-  isAccessibleOfficeSelected(selectedLocation?: ISearchLocation) {
-    if (
-      selectedLocation &&
-      this.isOfficeSelected(selectedLocation) &&
-      this.props.userDetails &&
-      this.props.userDetails.role
-    ) {
-      if (this.props.userDetails?.role === 'NATIONAL_REGISTRAR') {
-        return true
-      } else if (
-        REGISTRAR_ROLES.includes(this.props.userDetails?.role) &&
-        this.props.userDetails.primaryOffice?.id === selectedLocation.id
-      ) {
-        return true
-      }
-    }
-    return false
-  }
-
-  componentDidUpdate(_: Props, prevState: State) {
-    if (this.state.selectedLocation !== prevState.selectedLocation) {
-      this.setState({
-        officeSelected: this.isOfficeSelected(this.state.selectedLocation),
-        isAccessibleOffice: this.isAccessibleOfficeSelected(
-          this.state.selectedLocation
-        )
-      })
-    }
-  }
-
   getLoadingAuditListView(hasError?: boolean) {
     return (
       <>
@@ -468,14 +407,13 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, practitionerId, theme, isLoading } = this.props
+    const { intl, practitionerId, theme } = this.props
     const { timeStart, timeEnd, currentPageNumber } = this.state
     const recordCount = DEFAULT_LIST_SIZE * this.state.currentPageNumber
 
     return (
       <RecentActionsHolder id="user-audit-list">
-        {isLoading && this.getLoadingView()}
-        {!isLoading && (
+        <>
           <>
             <HistoryHeader>
               <SectionTitle>
@@ -520,7 +458,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                           this.state.viewportWidth <= theme.grid.breakpoints.md
                         }
                         currentPage={this.state.currentPageNumber}
-                        pageSize={2}
+                        pageSize={DEFAULT_LIST_SIZE}
                         totalItems={totalItems}
                         onPageChange={(currentPage: number) => {
                           this.setCurrentPage(currentPage)
@@ -532,15 +470,11 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
               </Query>
             </>
           </>
-        )}
+        </>
       </RecentActionsHolder>
     )
   }
 }
-
-// export const UserAuditHistory = withTheme(
-//   injectIntl(withOnlineStatus(UserAuditHistoryComponent))
-// )
 
 export const UserAuditHistory = connect(null, {
   goToDeclarationRecordAudit
