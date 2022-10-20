@@ -944,12 +944,11 @@ async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
   if (!attachments) {
     return
   }
+  const urlsWithMinioPath = attachments
+    .filter((a) => a?.data && !isBase64FileString(a.data))
+    .map((a) => a && fetch(`${MINIO_URL}${a.data}`))
 
-  for (const attached of attachments) {
-    if (attached?.data && !isBase64FileString(attached.data)) {
-      await fetch(`${MINIO_URL}${attached.data}`)
-    }
-  }
+  return Promise.all(urlsWithMinioPath)
 }
 
 function getDataKey(declaration: IDeclaration) {

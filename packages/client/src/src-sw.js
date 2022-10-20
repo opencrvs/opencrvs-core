@@ -95,9 +95,7 @@ workbox.routing.registerRoute(
 
 // This caches the minio urls
 workbox.routing.registerRoute(
-  import.meta.env.PROD
-    ? /http(.+)document\.opencrvs\.org\/+/
-    : /http(.+)localhost:9000\/+/,
+  /http(.+)document\.opencrvs\.org\/+/,
   new workbox.strategies.NetworkFirst()
 )
 
