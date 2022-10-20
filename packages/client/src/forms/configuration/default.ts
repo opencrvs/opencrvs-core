@@ -3344,7 +3344,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'causeOfDeathEstablished',
                 type: 'CHECKBOX',
-                label: formMessageDescriptors.causeOfDeathEstablishedFieldLabel,
+                label: formMessageDescriptors.causeOfDeathEstablished,
                 required: true,
                 customisable: true,
                 hideHeader: true,
