@@ -43,24 +43,18 @@ function docker_tag_exists() {
 # returns a new line separated list of images defined in those files
 get_docker_tags_from_compose_files() {
    COMPOSE_FILES=$1
-   SPACE_SEPARATED_COMPOSE_FILE_LIST=$(printf " %s" "${COMPOSE_FILES[@]}")
-   SPACE_SEPARATED_COMPOSE_FILE_LIST=${SPACE_SEPARATED_COMPOSE_FILE_LIST:1}
-
-   IMAGE_TAG_LIST_WITH_VERSION=$(cat $SPACE_SEPARATED_COMPOSE_FILE_LIST \
+   IMAGE_TAG_LIST_WITH_VERSION=$(cat $COMPOSE_FILES \
    `# Select rows with the image tag` \
    | grep image: \
    `# Only keep the image version` \
    | sed "s/image://")
    
    IMAGE_TAG_LIST=$(echo $IMAGE_TAG_LIST_WITH_VERSION | sed s/':${VERSION:-latest}'//g)
-  
-   echo $IMAGE_TAG_LIST \
-   | envsubst \
-   | sed 's/ /\n/g'
+   echo $IMAGE_TAG_LIST
 }
 
 imagesAlreadyBuilt="true"
-IMAGE_TAGS_TO_CHECK=$(get_docker_tags_from_compose_files "$SHARED_COMPOSE_FILES $ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS $replicas_compose")
+IMAGE_TAGS_TO_CHECK=$(get_docker_tags_from_compose_files "$SHARED_COMPOSE_FILES")
 
 for tag in ${IMAGE_TAGS_TO_CHECK[@]}; do
     if docker_tag_exists $tag $IMAGE_TAG; then
