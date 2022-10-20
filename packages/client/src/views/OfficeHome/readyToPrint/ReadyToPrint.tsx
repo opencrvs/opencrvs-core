@@ -35,7 +35,11 @@ import {
   wqMessages
 } from '@client/i18n/messages'
 import { IStoreState } from '@client/store'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  clearCorrectionAndPrintChanges
+} from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -58,6 +62,7 @@ interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -198,6 +203,7 @@ class ReadyToPrintComponent extends React.Component<
           ) => {
             e && e.stopPropagation()
             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
+              this.props.clearCorrectionAndPrintChanges(reg.id)
               this.props.goToPrintCertificate(
                 reg.id,
                 reg.event.toLocaleLowerCase() || ''
@@ -239,7 +245,6 @@ class ReadyToPrintComponent extends React.Component<
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          isBoldLink={true}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('printTab', reg.id)
           }
@@ -336,5 +341,6 @@ function mapStateToProps(state: IStoreState) {
 
 export const ReadyToPrint = connect(mapStateToProps, {
   goToPrintCertificate,
-  goToDeclarationRecordAudit
+  goToDeclarationRecordAudit,
+  clearCorrectionAndPrintChanges
 })(injectIntl(withTheme(ReadyToPrintComponent)))

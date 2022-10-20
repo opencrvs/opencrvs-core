@@ -394,6 +394,11 @@ export type ComparisonInput = {
   nin?: InputMaybe<Array<Scalars['String']>>
 }
 
+export type ConditionalInput = {
+  fieldId: Scalars['String']
+  regexp: Scalars['String']
+}
+
 export type ContactPoint = {
   __typename?: 'ContactPoint'
   system?: Maybe<Scalars['String']>
@@ -671,7 +676,6 @@ export type EventSearchResultSet = {
 
 export type EventSearchSet = {
   id: Scalars['ID']
-  operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
   registration?: Maybe<RegistrationSearchSet>
   type?: Maybe<Scalars['String']>
 }
@@ -1480,6 +1484,7 @@ export type QueryVerifyPasswordByIdArgs = {
 }
 
 export type QuestionInput = {
+  conditionals?: InputMaybe<Array<ConditionalInput>>
   custom?: InputMaybe<Scalars['Boolean']>
   description?: InputMaybe<Array<MesssageInput>>
   enabled?: InputMaybe<Scalars['String']>
@@ -2048,24 +2053,6 @@ export type SearchEventsQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -2096,24 +2083,6 @@ export type SearchEventsQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -2157,24 +2126,6 @@ export type SearchDeclarationsUserWiseQuery = {
             createdAt?: string | null
             status?: string | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -2196,24 +2147,6 @@ export type SearchDeclarationsUserWiseQuery = {
             createdAt?: string | null
             status?: string | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -2525,6 +2458,7 @@ export type FetchBirthRegistrationForReviewQuery = {
     child?: {
       __typename?: 'Person'
       id?: string | null
+      multipleBirth?: number | null
       birthDate?: string | null
       gender?: string | null
       name?: Array<{
@@ -2572,7 +2506,6 @@ export type FetchBirthRegistrationForReviewQuery = {
     mother?: {
       __typename?: 'Person'
       id?: string | null
-      multipleBirth?: number | null
       birthDate?: string | null
       maritalStatus?: MaritalStatusType | null
       occupation?: string | null
@@ -3739,24 +3672,6 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
       officeName?: string | null
     } | null
   } | null
-  operationHistories?: Array<{
-    __typename?: 'OperationHistorySearchSet'
-    operationType?: string | null
-    operatedOn?: any | null
-    operatorRole?: string | null
-    operatorOfficeName?: string | null
-    operatorOfficeAlias?: Array<string | null> | null
-    notificationFacilityName?: string | null
-    notificationFacilityAlias?: Array<string | null> | null
-    rejectReason?: string | null
-    rejectComment?: string | null
-    operatorName?: Array<{
-      __typename?: 'HumanName'
-      firstNames?: string | null
-      familyName?: string | null
-      use?: string | null
-    } | null> | null
-  } | null> | null
 }
 
 type EventSearchFields_DeathEventSearchSet_Fragment = {
@@ -3790,24 +3705,6 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
       officeName?: string | null
     } | null
   } | null
-  operationHistories?: Array<{
-    __typename?: 'OperationHistorySearchSet'
-    operationType?: string | null
-    operatedOn?: any | null
-    operatorRole?: string | null
-    operatorOfficeName?: string | null
-    operatorOfficeAlias?: Array<string | null> | null
-    notificationFacilityName?: string | null
-    notificationFacilityAlias?: Array<string | null> | null
-    rejectReason?: string | null
-    rejectComment?: string | null
-    operatorName?: Array<{
-      __typename?: 'HumanName'
-      firstNames?: string | null
-      familyName?: string | null
-      use?: string | null
-    } | null> | null
-  } | null> | null
 }
 
 export type EventSearchFieldsFragment =
@@ -3866,24 +3763,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -3916,24 +3795,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -3973,24 +3834,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -4023,24 +3866,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -4080,24 +3905,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -4130,24 +3937,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -4187,24 +3976,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -4237,24 +4008,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -4294,24 +4047,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -4344,24 +4079,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -4401,24 +4118,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -4451,24 +4150,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -4508,24 +4189,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -4558,24 +4221,6 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -4627,24 +4272,6 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -4677,24 +4304,6 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -4734,24 +4343,6 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -4784,24 +4375,6 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -4858,24 +4431,6 @@ export type SearchEventsForWorkqueueQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | {
           __typename?: 'DeathEventSearchSet'
@@ -4908,24 +4463,6 @@ export type SearchEventsForWorkqueueQuery = {
               officeName?: string | null
             } | null
           } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-            operatorRole?: string | null
-            operatorOfficeName?: string | null
-            operatorOfficeAlias?: Array<string | null> | null
-            notificationFacilityName?: string | null
-            notificationFacilityAlias?: Array<string | null> | null
-            rejectReason?: string | null
-            rejectComment?: string | null
-            operatorName?: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            } | null> | null
-          } | null> | null
         }
       | null
     > | null
@@ -5100,7 +4637,6 @@ export type FetchDeclarationShortInfoQuery = {
         id: string
         child?: {
           __typename?: 'Person'
-          id?: string | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -5110,7 +4646,6 @@ export type FetchDeclarationShortInfoQuery = {
         } | null
         registration?: {
           __typename?: 'Registration'
-          id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
           duplicates?: Array<string | null> | null
@@ -5132,7 +4667,6 @@ export type FetchDeclarationShortInfoQuery = {
         id: string
         deceased?: {
           __typename?: 'Person'
-          id?: string | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -5142,7 +4676,6 @@ export type FetchDeclarationShortInfoQuery = {
         } | null
         registration?: {
           __typename?: 'Registration'
-          id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
           duplicates?: Array<string | null> | null

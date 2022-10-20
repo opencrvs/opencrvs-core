@@ -218,11 +218,26 @@ class SentForReviewComponent extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
-      const sentForApproval =
-        getPreviousOperationDateByOperationType(
-          reg.operationHistories,
-          this.isFieldAgent ? RegStatus.Declared : RegStatus.Validated
-        ) || ''
+
+      let sentForApproval
+      if (this.isFieldAgent) {
+        sentForApproval =
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories,
+            RegStatus.Declared
+          ) ||
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories,
+            RegStatus.InProgress
+          ) ||
+          ''
+      } else {
+        sentForApproval =
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories,
+            RegStatus.Validated
+          ) || ''
+      }
 
       const dateOfEvent =
         reg.dateOfEvent &&
@@ -231,7 +246,6 @@ class SentForReviewComponent extends React.Component<
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          isBoldLink={true}
           onClick={() =>
             this.isFieldAgent
               ? this.props.goToDeclarationRecordAudit('reviewTab', reg.id)

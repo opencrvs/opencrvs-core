@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { IDeclaration, modifyDeclaration } from '@client/declarations'
 import {
   CorrectorForm,
@@ -24,6 +24,7 @@ import { CorrectionSummary } from './CorrectionSummary'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import styled from '@client/styledComponents'
 import { TimeMounted } from '@client/components/TimeMounted'
+import { HOME } from '@client/navigation/routes'
 
 const SpinnerWrapper = styled.div`
   height: 80vh;
@@ -36,21 +37,27 @@ const SpinnerWrapper = styled.div`
 
 type IProps = IStateProps & IDispatchProps
 
-function CorrectionFormComponent({ sectionId, ...props }: IProps) {
-  const { declaration, modifyDeclaration } = props
+function CorrectionFormComponent({ sectionId, declaration, ...props }: IProps) {
+  const { modifyDeclaration } = props
   const logTime = React.useCallback(
     (timeMs: number) => {
-      const declarationUpdated = declaration
-      if (!declarationUpdated.timeLoggedMS) {
-        declarationUpdated.timeLoggedMS = 0
+      if (declaration) {
+        const declarationUpdated = declaration
+        if (!declarationUpdated.timeLoggedMS) {
+          declarationUpdated.timeLoggedMS = 0
+        }
+        declarationUpdated.timeLoggedMS += timeMs
+        modifyDeclaration(declarationUpdated)
       }
-      declarationUpdated.timeLoggedMS += timeMs
-      modifyDeclaration(declarationUpdated)
     },
     [modifyDeclaration, declaration]
   )
 
-  if (props.isWritingDraft) {
+  if (!declaration) {
+    return <Redirect to={HOME} />
+  }
+
+  if (declaration.writingDraft) {
     return (
       <SpinnerWrapper>
         <Spinner id="draft_write_loading" />
@@ -60,12 +67,15 @@ function CorrectionFormComponent({ sectionId, ...props }: IProps) {
 
   return (
     <TimeMounted onUnmount={logTime}>
-      <FormSection sectionId={sectionId} {...props} />
+      <FormSection sectionId={sectionId} declaration={declaration} {...props} />
     </TimeMounted>
   )
 }
 
-function FormSection({ sectionId, ...props }: IProps) {
+function FormSection({
+  sectionId,
+  ...props
+}: IProps & { declaration: IDeclaration }) {
   switch (sectionId) {
     case CorrectionSection.Corrector:
       return <CorrectorForm {...props} />
@@ -79,28 +89,20 @@ function FormSection({ sectionId, ...props }: IProps) {
       return <></>
   }
 }
+
 function mapStateToProps(state: IStoreState, props: IRouteProps) {
   const { declarationId, pageId: sectionId } = props.match.params
   const declaration = state.declarationsState.declarations.find(
     ({ id }) => id === declarationId
   )
 
-  if (!declaration) {
-    throw new Error(`Draft "${declarationId}" missing!`)
-  }
-
   return {
     declaration,
-    sectionId,
-    isWritingDraft: declaration.writingDraft ?? false
+    sectionId
   }
 }
 
-type IStateProps = {
-  declaration: IDeclaration
-  sectionId: string
-  isWritingDraft: boolean
-}
+type IStateProps = ReturnType<typeof mapStateToProps>
 
 type IDispatchProps = {
   modifyDeclaration: typeof modifyDeclaration

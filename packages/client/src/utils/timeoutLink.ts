@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ApolloLink, Observable, Operation, NextLink } from 'apollo-link'
+import { ApolloLink, Observable, Operation, NextLink } from '@apollo/client'
 import { DefinitionNode, OperationDefinitionNode } from 'graphql'
 const DEFAULT_TIMEOUT = 600000
 const REQUEST_TIMEOUT_ERROR_CODE = 408

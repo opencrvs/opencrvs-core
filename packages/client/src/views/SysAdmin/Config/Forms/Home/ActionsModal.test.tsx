@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { MockedResponse } from 'react-apollo/test-links'
 import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { DraftStatus, Event } from '@client/utils/gateway'
@@ -25,6 +24,7 @@ import { History } from 'history'
 import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import { MockedResponse } from '@apollo/client/testing'
 
 const inPreviewDraft: IFormDraft = {
   event: Event.Birth,

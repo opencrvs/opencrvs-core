@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 
 export const changePhoneMutation = gql`
   mutation changePhone(

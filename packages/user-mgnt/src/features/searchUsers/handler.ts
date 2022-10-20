@@ -13,6 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
 import User, { IUserModel } from '@user-mgnt/model/user'
+import { SortOrder } from 'mongoose'
 
 interface IVerifyPayload {
   username?: string
@@ -23,7 +24,7 @@ interface IVerifyPayload {
   locationId?: string
   count: number
   skip: number
-  sortOrder: string
+  sortOrder: SortOrder
 }
 
 export default async function searchUsers(

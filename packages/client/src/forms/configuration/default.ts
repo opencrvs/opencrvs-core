@@ -561,6 +561,14 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrationNumberTransformer'
             },
             {
+              fieldName: 'mosipAid',
+              operation: 'mosipAidTransformer'
+            },
+            {
+              fieldName: 'mosipAIDLabel',
+              operation: 'mosipAidLabelTransformer'
+            },
+            {
               fieldName: 'certificateDate',
               operation: 'certificateDateTransformer',
               parameters: ['en', 'dd MMMM yyyy']
@@ -3335,23 +3343,13 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'causeOfDeathEstablished',
-                type: 'RADIO_GROUP',
+                type: 'CHECKBOX',
                 label: formMessageDescriptors.causeOfDeathEstablished,
                 required: true,
                 customisable: true,
-                initialValue: 'true',
-                size: RadioSize.NORMAL,
+                hideHeader: true,
+                initialValue: false,
                 validate: [],
-                options: [
-                  {
-                    value: 'true',
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: 'false',
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 mapping: {
                   mutation: {
                     operation: 'sectionFieldToBundleFieldTransformer',
@@ -3375,7 +3373,7 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: 'values.causeOfDeathEstablished !== "true"'
+                    expression: 'values.causeOfDeathEstablished !== true'
                   }
                 ],
                 options: [
@@ -3415,7 +3413,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      'values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
+                      'values.causeOfDeathEstablished !== true || values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
                   }
                 ],
                 initialValue: '',

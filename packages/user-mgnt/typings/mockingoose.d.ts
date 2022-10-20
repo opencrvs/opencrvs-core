@@ -1,3 +1,4 @@
+
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,16 +10,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
-
-/** @deprecated for LinkButton */
-export const Link = styled.a<{ error?: boolean }>`
-  width: auto;
-  min-height: 44px;
-  color: ${({ error, theme }) =>
-    error ? theme.colors.negative : theme.colors.copy};
-  cursor: pointer;
-  border: 0;
-  text-decoration: underline;
-  ${({ theme }) => theme.fonts.reg16};
-`
+declare module 'mockingoose'

@@ -85,7 +85,13 @@ const mockQuestion = {
   required: true,
   enabled: true,
   custom: true,
-  initialValue: 'myValue'
+  initialValue: 'myValue',
+  conditionals: [
+    {
+      fieldId: 'currentFieldId',
+      regexp: 'FARAJALAND'
+    }
+  ]
 } as unknown as IQuestion & { _id: string }
 
 describe('updateQuestion handler', () => {
