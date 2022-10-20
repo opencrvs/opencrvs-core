@@ -38,7 +38,6 @@ import {
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { ApolloClient, InternalRefetchQueriesInclude } from '@apollo/client'
-import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 import { withApollo, WithApolloClient } from 'react-apollo'
 import { User } from '@client/utils/gateway'
 
