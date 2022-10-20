@@ -4428,6 +4428,55 @@
                   }
                 },
                 {
+                  "name": "informantBirthDate",
+                  "type": "DATE",
+                  "label": {
+                    "defaultMessage": "Date of birth",
+                    "description": "Label for form field: Date of birth",
+                    "id": "form.field.label.motherDateOfBirth"
+                  },
+                  "required": true,
+                  "customisable": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "dateFormatIsCorrect",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateInPast",
+                      "parameters": []
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "longDateTransformer",
+                          "parameters": [
+                            "birthDate"
+                          ]
+                        },
+                        "birthDate"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldValueTransformer",
+                          "parameters": [
+                            "birthDate"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
                   "name": "firstNamesEng",
                   "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
