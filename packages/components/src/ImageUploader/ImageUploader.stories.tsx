@@ -11,7 +11,6 @@
  */
 import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
-import { ArrowForward } from '../icons'
 import { ImageUploader } from './ImageUploader'
 
 export default {

@@ -14,7 +14,7 @@ import { Workqueue } from './Workqueue'
 import { DeclarationIcon, Download, Downloaded } from '../icons'
 import React from 'react'
 import { Stack } from '../Stack'
-import { LinkButton } from '../buttons'
+import { Link } from '../Link'
 import { Button } from '../Button'
 
 export default {
@@ -29,9 +29,7 @@ const onReviewClick = () => {
 const IconWithName = ({ children }: { children: string }) => (
   <Stack gap={16}>
     <DeclarationIcon color="orange" />
-    <LinkButton isBoldLink onClick={() => alert('John Doe clicked')}>
-      {children}
-    </LinkButton>
+    <Link onClick={() => alert('John Doe clicked')}>{children}</Link>
   </Stack>
 )
 
@@ -50,7 +48,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
         },
         {
           actionComponent: (
-            <Button type="icon">
+            <Button type="icon" aria-label="Unassign record from myself">
               <Downloaded />
             </Button>
           )
@@ -66,7 +64,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <Button type="icon">
+            <Button type="icon" aria-label="Assign record to myself">
               <Download />
             </Button>
           )
@@ -86,7 +84,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
         },
         {
           actionComponent: (
-            <Button type="icon">
+            <Button type="icon" aria-label="Unassign record from myself">
               <Downloaded />
             </Button>
           )
@@ -106,7 +104,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
         },
         {
           actionComponent: (
-            <Button type="icon">
+            <Button type="icon" aria-label="Unassign record from myself">
               <Downloaded />
             </Button>
           )
@@ -122,7 +120,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <Button type="icon">
+            <Button type="icon" aria-label="Assign record to myself">
               <Download />
             </Button>
           )
@@ -138,7 +136,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <Button type="icon">
+            <Button type="icon" aria-label="Assign record to myself">
               <Download />
             </Button>
           )
@@ -154,7 +152,7 @@ export const Default: ComponentStory<typeof Workqueue> = () => {
       actions: [
         {
           actionComponent: (
-            <Button type="icon">
+            <Button type="icon" aria-label="Assign record to myself">
               <Download />
             </Button>
           )

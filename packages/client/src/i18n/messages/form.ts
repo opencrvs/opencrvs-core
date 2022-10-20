@@ -659,7 +659,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.causeOfDeathProof'
   },
   causeOfDeathEstablished: {
-    defaultMessage: 'Has a cause of death been established ?',
+    defaultMessage: 'Cause of death has been established',
     description: 'Label for form field: Cause of Death Established',
     id: 'form.field.label.CauseOfDeathEstablished'
   },

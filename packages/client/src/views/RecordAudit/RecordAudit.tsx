@@ -43,7 +43,7 @@ import {
 } from 'react-intl'
 import {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   IDeclaration,
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
@@ -79,7 +79,7 @@ import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { CorrectionSection, IForm } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
@@ -176,7 +176,7 @@ interface IStateProps {
 
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
-  clearCorrectionChange: typeof clearCorrectionChange
+  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
@@ -280,7 +280,7 @@ function ReinstateButton({
 
 function RecordAuditBody({
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   declaration,
   draft,
   duplicates,
@@ -348,7 +348,7 @@ function RecordAuditBody({
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
         onClick={() => {
-          clearCorrectionChange(declaration.id)
+          clearCorrectionAndPrintChanges(declaration.id)
           goToCertificateCorrection(declaration.id, CorrectionSection.Corrector)
         }}
       >
@@ -458,7 +458,8 @@ function RecordAuditBody({
         userDetails,
         draft,
         goToPrintCertificate,
-        goToTeamUserList
+        goToTeamUserList,
+        clearCorrectionAndPrintChanges
       })
     )
     mobileActions.push(actions[actions.length - 1])
@@ -776,6 +777,9 @@ const RecordAuditComp = (props: IFullProps) => {
       navigation={
         <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       }
+      skipToContentText={props.intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <BodyContent {...props} />
     </Frame>
@@ -813,7 +817,7 @@ export const RecordAudit = connect<
   IStoreState
 >(mapStateToProps, {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   goToCertificateCorrection,
   goToPage,
   goToPrintCertificate,
