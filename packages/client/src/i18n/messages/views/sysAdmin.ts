@@ -42,6 +42,8 @@ interface ISysAdminMessages
   sendUsernameReminderSMS: MessageDescriptor
   sendUsernameReminderSMSSuccess: MessageDescriptor
   sendUsernameReminderSMSError: MessageDescriptor
+  sendUsernameReminderSMSModalMessage: MessageDescriptor
+  sendUsernameReminderSMSModalTitle: MessageDescriptor
   newUser: MessageDescriptor
   active: MessageDescriptor
   pending: MessageDescriptor
@@ -195,9 +197,20 @@ const messagesToDefine: ISysAdminMessages = {
     id: 'sysAdHome.sendUsernameReminderSMSSuccess'
   },
   sendUsernameReminderSMSError: {
-    defaultMessage: 'Invite could not be sent',
+    defaultMessage: 'Username reminder could not be sent',
     description: 'The label for error notification of send username reminder',
     id: 'sysAdHome.sendUsernameReminderSMSError'
+  },
+  sendUsernameReminderSMSModalTitle: {
+    defaultMessage: 'Send username reminder?',
+    description: 'Title for send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSModalTitle'
+  },
+  sendUsernameReminderSMSModalMessage: {
+    defaultMessage:
+      'The user will recieve a username reminder via an SMS sent to ',
+    description: 'Message for send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSModalMessage'
   },
   newUser: {
     defaultMessage: 'New User',
