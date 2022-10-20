@@ -380,6 +380,11 @@ export type ComparisonInput = {
   nin?: InputMaybe<Array<Scalars['String']>>
 }
 
+export type ConditionalInput = {
+  fieldId: Scalars['String']
+  regexp: Scalars['String']
+}
+
 export type ContactPoint = {
   __typename?: 'ContactPoint'
   system?: Maybe<Scalars['String']>
@@ -1469,6 +1474,7 @@ export type QueryVerifyPasswordByIdArgs = {
 }
 
 export type QuestionInput = {
+  conditionals?: InputMaybe<Array<ConditionalInput>>
   custom?: InputMaybe<Scalars['Boolean']>
   description?: InputMaybe<Array<MesssageInput>>
   enabled?: InputMaybe<Scalars['String']>

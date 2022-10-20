@@ -43,6 +43,7 @@ import {
 import { cloneDeep } from 'lodash'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
 import * as fetchAny from 'jest-fetch-mock'
+import { mockFormDraft } from '@workflow/utils/formDraftUtils.test'
 
 const fetch = fetchAny as any
 
@@ -1112,7 +1113,9 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [JSON.stringify({ config: { INTEGRATIONS: [] } }), { status: 200 }],
       [patientMock, { status: 200 }],
+      [motherMock, { status: 200 }],
       [motherMock, { status: 200 }]
     )
     const res = await server.server.inject({
@@ -1149,8 +1152,9 @@ describe('markEventAsDownloadedAndAssignedHandler', () => {
       [upazilaMock, { status: 200 }],
       [unionMock, { status: 200 }],
       [officeMock, { status: 200 }],
+      [userResponseMock, { status: 200 }],
       [hearthResponseMock, { status: 200 }],
-      [userResponseMock, { status: 200 }]
+      [mockFormDraft, { status: 200 }]
     )
   })
 

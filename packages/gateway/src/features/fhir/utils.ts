@@ -1057,6 +1057,28 @@ export const postSearch = (
     })
 }
 
+export const postAdvancedSearch = (
+  authHeader: IAuthHeader,
+  criteria: ISearchCriteria
+) => {
+  return fetch(`${SEARCH_URL}advancedRecordSearch`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
 export const getMetrics = (
   prefix: string,
   params: IMetricsParam,

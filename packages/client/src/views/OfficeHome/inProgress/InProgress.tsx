@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 import {
+  Workqueue,
   ColumnContentAlignment,
-  GridTable,
   COLUMNS,
   SORT_ORDER
-} from '@opencrvs/components/lib/interface/GridTable'
+} from '@opencrvs/components/lib/Workqueue'
 import {
   GQLHumanName,
   GQLEventSearchResultSet,
@@ -44,11 +42,7 @@ import { ITheme, withTheme } from '@client/styledComponents'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape
-} from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import {
   buttonMessages,
@@ -66,8 +60,8 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { FormTabs } from '@opencrvs/components/lib/forms'
-import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { IAction } from '@opencrvs/components/lib/common-types'
 import {
   IconWithName,
   IconWithNameEvent,
@@ -80,7 +74,7 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface IQueryData {
@@ -362,7 +356,7 @@ export class InProgressComponent extends React.Component<
         })
       }
       actions.push({
-        actionComponent: <Uploaded />
+        actionComponent: <Downloaded />
       })
       const event =
         (draft.event &&
@@ -560,12 +554,11 @@ export class InProgressComponent extends React.Component<
     isShowPagination: boolean
   ) => {
     return (
-      <GridTable
+      <Workqueue
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
-        sortedCol={this.state.sortedCol}
         hideLastBorder={!isShowPagination}
       />
     )
@@ -576,12 +569,11 @@ export class InProgressComponent extends React.Component<
     isShowPagination: boolean
   ) => {
     return (
-      <GridTable
+      <Workqueue
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
-        sortedCol={this.state.sortedCol}
         hideLastBorder={!isShowPagination}
       />
     )
@@ -671,11 +663,10 @@ export class InProgressComponent extends React.Component<
         noContent={noContent}
       >
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-          <GridTable
+          <Workqueue
             content={this.transformDraftContent()}
             columns={this.getColumns()}
             loading={isFieldAgent ? false : this.props.loading}
-            sortedCol={this.state.sortedCol}
             sortOrder={this.state.sortOrder}
             hideLastBorder={!isShowPagination}
           />

@@ -55,6 +55,8 @@ export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
 
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
+export const REGISTRAR_HOME_TAB_PAGE =
+  '/registration-home/:tabId/:selectorId/:pageId'
 export const SETTINGS = '/settings'
 export const CERTIFICATE_CONFIG = '/config/certificate'
 export const FORM_CONFIG_HOME = '/config/form'

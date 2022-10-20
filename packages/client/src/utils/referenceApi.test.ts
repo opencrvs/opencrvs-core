@@ -118,6 +118,13 @@ export const mockCertificateTemplate = {
   }
 }
 
+const statuses = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  DISABLED: 'disabled',
+  DEACTIVATED: 'deactivated'
+}
+
 export const mockFetchConfig = {
   config: {
     API_GATEWAY_URL: 'http://localhost:7070/',
@@ -140,7 +147,13 @@ export const mockFetchConfig = {
       languagesAndCountry: ['en-ZM']
     },
     LANGUAGES: 'en',
-    ADDRESSES: 1
+    ADDRESSES: 1,
+    INTEGRATIONS: [
+      {
+        name: 'MOSIP',
+        status: statuses.ACTIVE
+      }
+    ]
   },
   certificates: [
     {

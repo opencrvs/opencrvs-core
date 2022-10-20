@@ -11,16 +11,15 @@
  */
 import React from 'react'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { FormTabs } from '@opencrvs/components/lib/forms'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { BodyContent } from '@opencrvs/components/lib/layout'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { BodyContent, Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import {
   ListViewItemSimplified,
   ListViewSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { Query } from '@client/components/Query'
 import { GET_TOTAL_VSEXPORT } from './queries'
 import {
@@ -28,12 +27,9 @@ import {
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-
 import { MINIO_URL } from '@client/utils/constants'
 import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
-import { ErrorToastNotification } from '@opencrvs/components/lib/interface'
-
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
 
 const UserTable = styled(BodyContent)`
@@ -45,10 +41,6 @@ const UserTable = styled(BodyContent)`
 `
 type VSExportProps = {
   items: VsExport[]
-}
-
-const notificationActionButtonHandler = () => {
-  window.location.reload()
 }
 
 function downloadURI(uri: string, name: string) {
@@ -143,14 +135,7 @@ const VSExport = () => {
             >
               {({ data, loading, error }) => {
                 if (error) {
-                  return (
-                    <ErrorToastNotification
-                      retryButtonText={intl.formatMessage(buttonMessages.retry)}
-                      retryButtonHandler={notificationActionButtonHandler}
-                    >
-                      {intl.formatMessage(errorMessages.pageLoadFailed)}
-                    </ErrorToastNotification>
-                  )
+                  return <GenericErrorToast />
                 } else if (loading) {
                   return (
                     <>

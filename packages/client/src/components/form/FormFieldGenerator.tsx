@@ -10,17 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  CheckboxGroup,
-  DateField,
-  RadioGroup,
-  Select,
-  TextArea,
-  TextInput,
-  WarningMessage,
-  RadioSize
-} from '@opencrvs/components/lib/forms'
-import { Paragraph, Link } from '@opencrvs/components/lib/typography'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
+import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { Select } from '@opencrvs/components/lib/Select'
+import { DateField } from '@opencrvs/components/lib/DateField'
+import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
+import { Link } from '@opencrvs/components/lib/Link'
+import { Text } from '@opencrvs/components/lib/Text'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -42,6 +40,7 @@ import {
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
+  CHECKBOX,
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION,
   TEXTAREA,
@@ -114,7 +113,7 @@ import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/declarations'
-import { LocationSearch } from '@opencrvs/components/lib/interface'
+import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -369,6 +368,26 @@ function GeneratedInputField({
     )
   }
 
+  if (fieldDefinition.type === CHECKBOX) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Checkbox
+          {...inputProps}
+          label={fieldDefinition.label}
+          name={fieldDefinition.name}
+          value={String(value)}
+          selected={value as boolean}
+          onChange={(event) =>
+            onSetFieldValue(
+              fieldDefinition.name,
+              event.target.value === 'true' ? false : true
+            )
+          }
+        />
+      </InputField>
+    )
+  }
+
   if (fieldDefinition.type === DATE) {
     return (
       <InputField {...inputFieldProps}>
@@ -419,14 +438,14 @@ function GeneratedInputField({
     const label = fieldDefinition.label as unknown as MessageDescriptor
 
     return (
-      <Paragraph fontSize={fieldDefinition.fontSize}>
+      <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
         <FormattedMessage
           {...label}
           values={{
             [fieldDefinition.name]: value as any
           }}
         />
-      </Paragraph>
+      </Text>
     )
   }
   if (fieldDefinition.type === LIST) {

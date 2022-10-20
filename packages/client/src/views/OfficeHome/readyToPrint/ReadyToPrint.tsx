@@ -18,11 +18,11 @@ import { transformData } from '@client/search/transformer'
 import { ITheme } from '@client/styledComponents'
 import {
   ColumnContentAlignment,
-  GridTable,
-  IAction,
+  Workqueue,
   SORT_ORDER,
-  COLUMNS
-} from '@opencrvs/components/lib/interface'
+  COLUMNS,
+  IAction
+} from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -35,7 +35,11 @@ import {
   wqMessages
 } from '@client/i18n/messages'
 import { IStoreState } from '@client/store'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  clearCorrectionAndPrintChanges
+} from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -58,6 +62,7 @@ interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -198,6 +203,7 @@ class ReadyToPrintComponent extends React.Component<
           ) => {
             e && e.stopPropagation()
             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
+              this.props.clearCorrectionAndPrintChanges(reg.id)
               this.props.goToPrintCertificate(
                 reg.id,
                 reg.event.toLocaleLowerCase() || ''
@@ -316,12 +322,11 @@ class ReadyToPrintComponent extends React.Component<
         noResultText={intl.formatMessage(wqMessages.noRecordsReadyToPrint)}
         noContent={this.transformRegisteredContent(data).length <= 0}
       >
-        <GridTable
+        <Workqueue
           content={this.transformRegisteredContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
           hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>
@@ -337,5 +342,6 @@ function mapStateToProps(state: IStoreState) {
 
 export const ReadyToPrint = connect(mapStateToProps, {
   goToPrintCertificate,
-  goToDeclarationRecordAudit
+  goToDeclarationRecordAudit,
+  clearCorrectionAndPrintChanges
 })(injectIntl(withTheme(ReadyToPrintComponent)))

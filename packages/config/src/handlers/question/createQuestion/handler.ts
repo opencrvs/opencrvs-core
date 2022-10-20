@@ -38,6 +38,11 @@ export const messageSchema = Joi.array().items({
   })
 })
 
+export const conditionalSchema = Joi.array().items({
+  fieldId: Joi.string(),
+  regexp: Joi.string()
+})
+
 export const requestSchema = Joi.object({
   fieldId: Joi.string().required(),
   label: messageSchema,
@@ -51,7 +56,8 @@ export const requestSchema = Joi.object({
   precedingFieldId: Joi.string().required(),
   required: Joi.boolean(),
   enabled: Joi.string().allow(''),
-  custom: Joi.boolean()
+  custom: Joi.boolean(),
+  conditionals: conditionalSchema
 })
 
 export const responseSchema = Joi.object({})

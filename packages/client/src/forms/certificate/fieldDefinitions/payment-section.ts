@@ -55,7 +55,7 @@ export const paymentFormSection: IFormSection = {
           type: PARAGRAPH,
           label: messages.paymentAmount,
           initialValue: '',
-          fontSize: 'h1FontStyle',
+          fontVariant: 'h1',
           required: false,
           validate: []
         }

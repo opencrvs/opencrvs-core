@@ -16,6 +16,7 @@ import {
   setupLastRegUser,
   setupLastRegLocation,
   setupAuthorOnNotes,
+  validateDeceasedDetails,
   setupRegAssigned
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
@@ -30,7 +31,12 @@ import {
   districtMock,
   upazilaMock,
   unionMock,
-  officeMock
+  officeMock,
+  mosipSuccessMock,
+  mosipConfigMock,
+  mosipDeceasedPatientMock,
+  mosipBirthPatientBundleMock,
+  mosipUpdatedDeceasedPatientMock
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 import * as jwt from 'jsonwebtoken'
@@ -527,5 +533,42 @@ describe('Verify fhir bundle modifier functions', () => {
 
       expect(taskResource).toEqual(modifiedTaskResource)
     })
+  })
+})
+
+describe('validateDeceasedDetails functions', () => {
+  let token: string
+  let authHeader: { Authorization: string }
+  beforeEach(async () => {
+    fetch.resetMocks()
+    token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    authHeader = {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  it('Validates deceased details and modifies bundle', async () => {
+    fetch.mockResponses(
+      [mosipConfigMock, { status: 200 }],
+      [mosipSuccessMock, { status: 200 }],
+      [mosipBirthPatientBundleMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }]
+    )
+    const validateResponse = await validateDeceasedDetails(
+      mosipDeceasedPatientMock,
+      authHeader
+    )
+    expect(validateResponse).toEqual(mosipUpdatedDeceasedPatientMock)
+  })
+  afterAll(async () => {
+    jest.clearAllMocks()
   })
 })
