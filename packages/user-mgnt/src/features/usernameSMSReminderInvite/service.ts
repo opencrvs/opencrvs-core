@@ -10,23 +10,24 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch from 'node-fetch'
+import { resolve } from 'url'
 import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
 
-// export async function sendUserName(
-//   mobile: string,
-//   username: string,
-//   authHeader: { Authorization: string }
-// ) {
-//   const url = `${NOTIFICATION_SERVICE_URL}retrieveUserNameSMS`
-//   const res = await fetch(url, {
-//     method: 'POST',
-//     body: JSON.stringify({ msisdn: mobile, username }),
-//     headers: {
-//       'Content-Type': 'application/json',
-//       ...authHeader
-//     }
-//   })
-//   if (res.status !== 200) {
-//     throw Error(`Unable to send username`)
-//   }
-// }
+export async function sendUserName(
+  mobile: string,
+  username: string,
+  authHeader: { Authorization: string }
+) {
+  const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserNameSMS')
+  const res = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ msisdn: mobile, username }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+  if (res.status !== 200) {
+    throw Error(`Unable to send username`)
+  }
+}
