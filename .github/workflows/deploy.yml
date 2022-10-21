@@ -154,7 +154,6 @@ jobs:
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-          MINIO_BUCKET_REGION: ${{ secrets.MINIO_BUCKET_REGION }}
         run: |
           yarn deploy:qa farajaland-qa.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
 
@@ -178,7 +177,6 @@ jobs:
           TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD: ${{ secrets.TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD }}
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-          MINIO_BUCKET_REGION: ${{ secrets.MINIO_BUCKET_REGION }}
         run: |
           yarn deploy:demo farajaland.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 3
 
@@ -199,7 +197,6 @@ jobs:
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-          MINIO_BUCKET_REGION: ${{ secrets.MINIO_BUCKET_REGION }}
         run: |
           yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
 
@@ -220,7 +217,6 @@ jobs:
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-          MINIO_BUCKET_REGION: ${{ secrets.MINIO_BUCKET_REGION }}
         run: |
           yarn deploy:config farajaland-config.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
 
@@ -239,5 +235,7 @@ jobs:
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
           MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         run: |
           yarn deploy:prod farajaland-migrate.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
