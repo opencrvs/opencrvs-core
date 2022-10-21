@@ -13,7 +13,7 @@ export const up = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      const compositionCursor = getCompositionCursor(db)
+      const compositionCursor = await getCompositionCursor(db)
       while (await compositionCursor.hasNext()) {
         const composition = await compositionCursor.next()
         const compositionHistory = await db
@@ -48,7 +48,7 @@ export const up = async (db, client) => {
   }
 }
 
-function getCompositionCursor(db) {
+async function getCompositionCursor(db) {
   return db.collection('Composition').find({
     'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
   })
