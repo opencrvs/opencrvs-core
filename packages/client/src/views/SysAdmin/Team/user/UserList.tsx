@@ -38,7 +38,12 @@ import {
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import {
+  LinkButton,
+  TertiaryButton,
+  PrimaryButton
+} from '@opencrvs/components/lib/buttons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
@@ -239,6 +244,11 @@ interface ToggleUserActivation {
   selectedUser: GQLUser | null
 }
 
+interface ToggleModal {
+  modalVisible: boolean
+  selectedUser: GQLUser | null
+}
+
 export const Status = (statusProps: IStatusProps) => {
   const status = statusProps.status
   const intl = useIntl()
@@ -271,7 +281,11 @@ export const Status = (statusProps: IStatusProps) => {
 
 function UserListComponent(props: IProps) {
   const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
+  const [showUsernameSMSReminderSuccess, setShowUsernameSMSReminderSuccess] =
+    useState(false)
   const [showResendSMSError, setShowResendSMSError] = useState(false)
+  const [showUsernameSMSReminderError, setShowUsernameSMSReminderError] =
+    useState(false)
   const {
     intl,
     userDetails,
@@ -295,7 +309,11 @@ function UserListComponent(props: IProps) {
       modalVisible: false,
       selectedUser: null
     })
-
+  const [toggleUsernameReminder, setToggleUsernameReminder] =
+    useState<ToggleModal>({
+      modalVisible: false,
+      selectedUser: null
+    })
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const searchedLocation: ILocation | undefined = offlineOffices.find(
@@ -321,6 +339,24 @@ function UserListComponent(props: IProps) {
     [toggleActivation]
   )
 
+  const toggleUsernameReminderModal = useCallback(
+    function toggleUsernameReminderModal(user?: GQLUser) {
+      if (user !== undefined) {
+        setToggleUsernameReminder({
+          ...toggleUsernameReminder,
+          modalVisible: true,
+          selectedUser: user
+        })
+      } else {
+        setToggleUsernameReminder({
+          ...toggleUsernameReminder,
+          modalVisible: false
+        })
+      }
+    },
+    [toggleUsernameReminder]
+  )
+
   const resendSMS = useCallback(
     async function resendSMS(userId: string) {
       try {
@@ -340,23 +376,24 @@ function UserListComponent(props: IProps) {
     [locationId, recordCount]
   )
 
-  async function usernameSMSReminder(userId: string) {
-    try {
-      const res = await userMutations.usernameSMSReminderSend(userId, [
-        {
-          query: SEARCH_USERS,
-          variables: { primaryOfficeId: locationId, count: recordCount }
+  const usernameSMSReminder = useCallback(
+    async function usernameSMSReminder(userId: string) {
+      try {
+        const res = await userMutations.usernameSMSReminderSend(userId, [
+          {
+            query: SEARCH_USERS,
+            variables: { primaryOfficeId: locationId, count: recordCount }
+          }
+        ])
+        if (res && res.data && res.data.usernameSMSReminder) {
+          setShowUsernameSMSReminderSuccess(true)
         }
-      ])
-      if (res && res.data && res.data.usernameSMSReminder) {
-        console.log('res.data', res.data)
-        // setShowResendSMSSuccess(true)
+      } catch (err) {
+        setShowUsernameSMSReminderError(true)
       }
-    } catch (err) {
-      console.log('Error', err)
-      // setShowResendSMSError(true)
-    }
-  }
+    },
+    [locationId, recordCount]
+  )
 
   const getMenuItems = useCallback(
     function getMenuItems(user: GQLUser) {
@@ -373,7 +410,7 @@ function UserListComponent(props: IProps) {
         menuItems.push({
           label: intl.formatMessage(messages.sendUsernameReminderSMS),
           handler: () => {
-            usernameSMSReminder(user.id as string)
+            toggleUsernameReminderModal(user)
           }
         })
       }
@@ -403,7 +440,13 @@ function UserListComponent(props: IProps) {
 
       return menuItems
     },
-    [goToReviewUserDetails, intl, resendSMS, toggleUserActivationModal]
+    [
+      goToReviewUserDetails,
+      intl,
+      resendSMS,
+      toggleUserActivationModal,
+      toggleUsernameReminderModal
+    ]
   )
 
   function getViewOnly(
@@ -429,6 +472,16 @@ function UserListComponent(props: IProps) {
     } else {
       return true
     }
+  }
+
+  const getUserName = (user: GQLUser) => {
+    const userName =
+      (user &&
+        user.name &&
+        ((createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
+          (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string))) ||
+      ''
+    return userName
   }
 
   const StatusMenu = useCallback(
@@ -628,6 +681,44 @@ function UserListComponent(props: IProps) {
                 }
               ]}
             />
+            <ResponsiveModal
+              id="username-reminder-modal"
+              show={toggleUsernameReminder.modalVisible}
+              handleClose={() => toggleUsernameReminderModal()}
+              title={intl.formatMessage(
+                messages.sendUsernameReminderSMSModalTitle
+              )}
+              actions={[
+                <TertiaryButton
+                  id="username-reminder-cancel"
+                  key="username-reminusernameSMSReminderder-cancel"
+                  onClick={() => toggleUsernameReminderModal()}
+                >
+                  {intl.formatMessage(buttonMessages.cancel)}
+                </TertiaryButton>,
+                <PrimaryButton
+                  id="username-reminder-send"
+                  key="username-reminder-send"
+                  onClick={() => {
+                    if (toggleUsernameReminder.selectedUser?.id) {
+                      usernameSMSReminder(
+                        toggleUsernameReminder.selectedUser.id
+                      )
+                    }
+                    toggleUsernameReminderModal()
+                  }}
+                >
+                  {intl.formatMessage(buttonMessages.send)}
+                </PrimaryButton>
+              ]}
+              responsive={false}
+              autoHeight={true}
+            >
+              {intl.formatMessage(
+                messages.sendUsernameReminderSMSModalMessage,
+                { phoneNumber: toggleUsernameReminder.selectedUser?.mobile }
+              )}
+            </ResponsiveModal>
           </UserTable>
         </>
       )
@@ -639,7 +730,11 @@ function UserListComponent(props: IProps) {
       recordCount,
       toggleActivation.modalVisible,
       toggleActivation.selectedUser,
-      toggleUserActivationModal
+      toggleUserActivationModal,
+      toggleUsernameReminder.modalVisible,
+      toggleUsernameReminder.selectedUser,
+      toggleUsernameReminderModal,
+      usernameSMSReminder
     ]
   )
 
@@ -747,6 +842,27 @@ function UserListComponent(props: IProps) {
           onClose={() => setShowResendSMSError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}
+        </Toast>
+      )}
+
+      {showUsernameSMSReminderSuccess && (
+        <Toast
+          id="username_reminder_success"
+          type="success"
+          onClose={() => setShowUsernameSMSReminderSuccess(false)}
+        >
+          {intl.formatMessage(messages.sendUsernameReminderSMSSuccess, {
+            name: getUserName(toggleUsernameReminder.selectedUser as GQLUser)
+          })}
+        </Toast>
+      )}
+      {showUsernameSMSReminderError && (
+        <Toast
+          id="username_reminder_error"
+          type="warning"
+          onClose={() => setShowUsernameSMSReminderError(false)}
+        >
+          {intl.formatMessage(messages.sendUsernameReminderSMSError)}
         </Toast>
       )}
     </SysAdminContentWrapper>

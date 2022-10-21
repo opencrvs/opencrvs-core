@@ -226,6 +226,7 @@ describe('User list tests', () => {
 
     describe('when there is a result from query', () => {
       userMutations.resendSMSInvite = vi.fn()
+      userMutations.usernameSMSReminderSend = vi.fn()
       let component: ReactWrapper<{}, {}>
       const userListMock = [
         {
@@ -397,7 +398,7 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-2-menuItem1'
+          '#user-item-2-menuItem2'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
         menuOptionButton.hostNodes().simulate('click')
@@ -418,7 +419,7 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-2-menuItem1'
+          '#user-item-2-menuItem2'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
         menuOptionButton.hostNodes().simulate('click')
@@ -436,12 +437,91 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-1-menuItem1'
+          '#user-item-1-menuItem2'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
         menuOptionButton.first().simulate('click')
         component.update()
         expect(component.exists('#user-audit-modal')).toBeTruthy()
+      })
+
+      it('clicking on menu options Send username reminder pop up confirmation modal', async () => {
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().first().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem1'
+        )
+
+        expect(menuOptionButton.hostNodes().text()).toBe(
+          'Send username reminder'
+        )
+        menuOptionButton.hostNodes().simulate('click')
+        await flushPromises()
+        component.update()
+        expect(component.exists('#username-reminder-modal')).toBeTruthy()
+      })
+
+      it('will send username after clicking on send button shows on modal', async () => {
+        ;(userMutations.usernameSMSReminderSend as Mock).mockResolvedValueOnce({
+          data: { usernameSMSReminder: 'iModupsy' }
+        })
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().first().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem1'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe(
+          'Send username reminder'
+        )
+        menuOptionButton.hostNodes().simulate('click')
+        component.update()
+        expect(component.exists('#username-reminder-modal')).toBeTruthy()
+        const sendButton = await waitForElement(
+          component,
+          '#username-reminder-send'
+        )
+        sendButton.hostNodes().simulate('click')
+        component.update()
+        await waitForElement(component, '#username_reminder_success')
+      })
+
+      it('clicking username reminder send button shows error if any submission error', async () => {
+        ;(userMutations.usernameSMSReminderSend as Mock).mockRejectedValueOnce(
+          new Error('Something went wrong')
+        )
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().first().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem1'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe(
+          'Send username reminder'
+        )
+        menuOptionButton.hostNodes().simulate('click')
+        component.update()
+        expect(component.exists('#username-reminder-modal')).toBeTruthy()
+        const sendButton = await waitForElement(
+          component,
+          '#username-reminder-send'
+        )
+        sendButton.hostNodes().simulate('click')
+        component.update()
+        await waitForElement(component, '#username_reminder_error')
       })
 
       it('clicking on menu options reactivate to user pops up audit action modal', async () => {

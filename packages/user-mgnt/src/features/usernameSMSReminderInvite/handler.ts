@@ -18,7 +18,7 @@ import {
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
 import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
-import { sendCredentialsNotification } from '@user-mgnt/features/createUser/service'
+import { sendUserName } from './service'
 
 interface IResendUsernameSMSPayload {
   userId: string
@@ -50,7 +50,7 @@ export default async function usernameSMSReminderInvite(
     return h.response().code(400)
   }
 
-  sendCredentialsNotification(user.mobile, user.username, randomPassword, {
+  sendUserName(user.mobile, user.username, {
     Authorization: request.headers.authorization
   })
 
