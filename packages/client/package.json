@@ -48,6 +48,7 @@
     "patch-package": "^6.1.2",
     "pdfmake": "^0.2.5",
     "postinstall-postinstall": "^2.0.0",
+    "qrcode": "^1.5.1",
     "query-string": "^6.1.0",
     "react": "^16.10.1",
     "react-apollo": "^2.1.4",

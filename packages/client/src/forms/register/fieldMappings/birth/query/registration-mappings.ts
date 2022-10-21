@@ -36,6 +36,8 @@ import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 
+import QRCode from 'qrcode'
+
 export function transformStatusData(
   transformedData: IFormData,
   statusData: GQLRegWorkflow[],
@@ -358,4 +360,16 @@ export const registrarSignatureUserTransformer = (
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
   ] = history?.signature?.data as string
+}
+export const QRCodeTransformerTransformer = async (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  debugger
+  transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
+    await QRCode.toDataURL('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 }
