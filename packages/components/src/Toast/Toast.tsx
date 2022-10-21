@@ -22,14 +22,6 @@ const TOAST_DEFAULT_DURATION_MS = 80000
 
 type ToastType = 'success' | 'warning' | 'loading' | 'error'
 
-interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
-  type?: ToastType
-  onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
-  onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
-  actionText?: string
-  duration?: number | null
-}
-
 const deepToast = keyframes`
   from { bottom: -10px; }
   to { bottom: 80px; }
@@ -52,13 +44,11 @@ const Container = styled.div<{
   `};
   background: var(--color);
   border-radius: 8px;
-  min-height: 40px;
+  min-height: 48px;
   position: fixed;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  padding: 0 16px;
+  gap: 8px;
+  /* padding: 0px 12px 0px 20px; */
   ${({ theme }) => theme.shadows.heavy};
   transform: translateX(-50%);
   left: 50%;
@@ -75,6 +65,8 @@ const Container = styled.div<{
 
 const Close = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
+  margin-top: 8px;
+  margin-right: 8px;
   svg {
     height: 24px;
     width: 24px;
@@ -90,6 +82,8 @@ const Close = styled(Button)`
 
 const ActionButton = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
+  margin-top: 8px;
+  margin-right: 8px;
   &:hover {
     color: ${({ theme }) => theme.colors.white};
     background: none;
@@ -100,16 +94,17 @@ const NotificationMessage = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   color: ${({ theme }) => theme.colors.white};
   position: relative;
-  padding: 8px 0;
   width: 100%;
+  padding: 14px 24px 12px 16px;
   flex: 1;
 `
 
-export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface IToastProps extends React.HTMLAttributes<HTMLDivElement> {
   type: ToastType
   onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   actionText?: string
+  duration?: number | null
 }
 
 export const Toast = ({
@@ -120,7 +115,7 @@ export const Toast = ({
   actionText,
   children,
   ...props
-}: ToastProps) => (
+}: IToastProps) => (
   <Container $type={type} {...props}>
     {type === 'loading' && (
       <Spinner
