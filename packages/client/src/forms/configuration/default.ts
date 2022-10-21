@@ -1220,21 +1220,13 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'detailsExist',
-                type: 'RADIO_GROUP',
+                type: 'CHECKBOX',
                 label: formMessageDescriptors.mothersDetailsExist,
                 required: true,
+                flip: true,
+                hideHeader: true,
                 initialValue: true,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1709,26 +1701,13 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'detailsExist',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage: "Do you have the father's details?",
-                  description:
-                    "Question to ask the user if they have the father's details",
-                  id: 'form.field.label.fathersDetailsExist'
-                },
+                type: 'CHECKBOX',
+                label: formMessageDescriptors.fathersDetailsExist,
                 required: true,
+                flip: true,
+                hideHeader: true,
                 initialValue: true,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
