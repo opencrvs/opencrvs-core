@@ -15,7 +15,10 @@ import { Cross } from '../icons'
 import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
+<<<<<<< HEAD
 import { Link } from '../Link'
+=======
+>>>>>>> 9a57ca8143714dfce87b463d82f6c16f8c84fae9
 import { colors } from '../colors'
 import { useToastVisibility } from './useToastVisibility'
 
@@ -49,6 +52,10 @@ const Container = styled.div<{
   position: fixed;
   display: flex;
   gap: 8px;
+<<<<<<< HEAD
+=======
+  /* padding: 0px 12px 0px 20px; */
+>>>>>>> 9a57ca8143714dfce87b463d82f6c16f8c84fae9
   ${({ theme }) => theme.shadows.heavy};
   transform: translateX(-50%);
   left: 50%;
@@ -63,6 +70,7 @@ const Container = styled.div<{
   }
 `
 
+<<<<<<< HEAD
 const SpinnerContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -84,6 +92,32 @@ const Close = styled(Button)`
   margin-right: 4px;
   &:hover {
     background: var(--color) !important;
+=======
+const Close = styled(Button)`
+  color: ${({ theme }) => theme.colors.white};
+  margin-top: 8px;
+  margin-right: 8px;
+  svg {
+    height: 24px;
+    width: 24px;
+  }
+  &:hover {
+    background: none;
+  }
+`
+
+/**
+ *  Change to Link component
+ */
+
+const ActionButton = styled(Button)`
+  color: ${({ theme }) => theme.colors.white};
+  margin-top: 8px;
+  margin-right: 8px;
+  &:hover {
+    color: ${({ theme }) => theme.colors.white};
+    background: none;
+>>>>>>> 9a57ca8143714dfce87b463d82f6c16f8c84fae9
   }
 `
 
@@ -115,6 +149,7 @@ export const Toast = ({
 }: IToastProps) => (
   <Container $type={type} {...props}>
     {type === 'loading' && (
+<<<<<<< HEAD
       <SpinnerContainer>
         <Spinner
           id="in-progress-floating-notification"
@@ -122,6 +157,13 @@ export const Toast = ({
           size={20}
         />
       </SpinnerContainer>
+=======
+      <Spinner
+        id="in-progress-floating-notification"
+        baseColor={colors.white}
+        size={20}
+      />
+>>>>>>> 9a57ca8143714dfce87b463d82f6c16f8c84fae9
     )}
 
     <NotificationMessage>{children}</NotificationMessage>
@@ -132,6 +174,7 @@ export const Toast = ({
     })}
 
     {onActionClick && (
+<<<<<<< HEAD
       <ActionLink
         color="white"
         font="bold14"
@@ -140,11 +183,25 @@ export const Toast = ({
       >
         {actionText}
       </ActionLink>
+=======
+      <ActionButton
+        type="tertiary"
+        size="small"
+        onClick={onActionClick}
+        data-testid={props['data-testid'] && `${props['data-testid']}-action`}
+      >
+        {actionText}
+      </ActionButton>
+>>>>>>> 9a57ca8143714dfce87b463d82f6c16f8c84fae9
     )}
     {onClose && type !== 'loading' && (
       <Close
         type="icon"
+<<<<<<< HEAD
         size="medium"
+=======
+        size="small"
+>>>>>>> 9a57ca8143714dfce87b463d82f6c16f8c84fae9
         id={props.id + 'Cancel'}
         data-testid={props['data-testid'] && `${props['data-testid']}-close`}
         onClick={onClose}
