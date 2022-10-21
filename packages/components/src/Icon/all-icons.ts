@@ -10,6 +10,5 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-export * from './icons'
-export * from './form-icons'
+export * from './custom-icons'
 export * from 'react-feather'
