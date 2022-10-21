@@ -28,6 +28,21 @@ export const resolvers: GQLResolver = {
     async getTotalMetrics(_, variables, authHeader) {
       return getMetrics('/totalMetrics', variables, authHeader)
     },
+    async getTotalMetricsByRegistrar(
+      _,
+      { filterBy, ...variables },
+      authHeader
+    ) {
+      let result
+      if (filterBy === 'registrar')
+        result = await getMetrics(
+          '/totalMetricsByRegistrar',
+          variables,
+          authHeader
+        )
+      else result = await getMetrics('/totalMetrics', variables, authHeader)
+      return result
+    },
     async getTotalPayments(
       _,
       { timeStart, timeEnd, locationId, event },

@@ -64,6 +64,13 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
+  getTotalMetricsByRegistrar(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+    filterBy: String!
+  ): MixedTotalMetricsResult
   getTotalPayments(
     timeStart: String!
     timeEnd: String!
@@ -413,6 +420,10 @@ type TotalMetricsResult {
   estimated: Estimation!
   results: [EventMetrics!]!
 }
+
+union MixedTotalMetricsResult =
+    TotalMetricsResult
+  | TotalMetricsByRegistrarResult
 
 type PaymentMetric {
   total: Float!
@@ -912,6 +923,10 @@ type EventMetrics {
   practitionerRole: String!
 }
 
+type TotalMetricsByRegistrarResult {
+  results: [EventMetricsByRegistrar!]!
+}
+
 type TimeLoggedMetrics {
   status: String!
   trackingId: String
@@ -1253,6 +1268,13 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
 }
 
+type EventMetricsByRegistrar {
+  registrarPractitioner: RegistrarPractitioner
+  total: Int!
+  late: Int!
+  delayed: Int!
+}
+
 type RegistrationSearchSet {
   status: String
   contactNumber: String
@@ -1432,6 +1454,11 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+type RegistrarPractitioner {
+  registrarPractitionerId: String!
+  fullName: String!
 }
 
 input CommentInput {

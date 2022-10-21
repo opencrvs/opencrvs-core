@@ -33,6 +33,7 @@ export interface GQLQuery {
   searchFieldAgents?: GQLSearchFieldAgentResult
   verifyPasswordById?: GQLVerifyPasswordResult
   getTotalMetrics?: GQLTotalMetricsResult
+  getTotalMetricsByRegistrar?: GQLMixedTotalMetricsResult
   getTotalPayments?: Array<GQLPaymentMetric>
   getTotalCertifications?: Array<GQLCertificationMetric>
   getTotalCorrections?: Array<GQLCorrectionMetric>
@@ -261,6 +262,21 @@ export interface GQLVerifyPasswordResult {
 export interface GQLTotalMetricsResult {
   estimated: GQLEstimation
   results: Array<GQLEventMetrics>
+}
+
+export type GQLMixedTotalMetricsResult =
+  | GQLTotalMetricsResult
+  | GQLTotalMetricsByRegistrarResult
+
+/** Use this to resolve union type MixedTotalMetricsResult */
+export type GQLPossibleMixedTotalMetricsResultTypeNames =
+  | 'TotalMetricsResult'
+  | 'TotalMetricsByRegistrarResult'
+
+export interface GQLMixedTotalMetricsResultNameMap {
+  MixedTotalMetricsResult: GQLMixedTotalMetricsResult
+  TotalMetricsResult: GQLTotalMetricsResult
+  TotalMetricsByRegistrarResult: GQLTotalMetricsByRegistrarResult
 }
 
 export interface GQLPaymentMetric {
@@ -761,6 +777,10 @@ export interface GQLEventMetrics {
   practitionerRole: string
 }
 
+export interface GQLTotalMetricsByRegistrarResult {
+  results: Array<GQLEventMetricsByRegistrar>
+}
+
 export interface GQLTimeLoggedMetrics {
   status: string
   trackingId?: string
@@ -1113,6 +1133,13 @@ export const enum GQLAttachmentSubject {
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF'
 }
 
+export interface GQLEventMetricsByRegistrar {
+  registrarPractitioner?: GQLRegistrarPractitioner
+  total: number
+  late: number
+  delayed: number
+}
+
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
@@ -1294,6 +1321,11 @@ export interface GQLPayment {
   date?: GQLDate
 }
 
+export interface GQLRegistrarPractitioner {
+  registrarPractitionerId: string
+  fullName: string
+}
+
 export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
@@ -1364,6 +1396,10 @@ export interface GQLResolver {
   SearchFieldAgentResult?: GQLSearchFieldAgentResultTypeResolver
   VerifyPasswordResult?: GQLVerifyPasswordResultTypeResolver
   TotalMetricsResult?: GQLTotalMetricsResultTypeResolver
+  MixedTotalMetricsResult?: {
+    __resolveType: GQLMixedTotalMetricsResultTypeResolver
+  }
+
   PaymentMetric?: GQLPaymentMetricTypeResolver
   CertificationMetric?: GQLCertificationMetricTypeResolver
   CorrectionMetric?: GQLCorrectionMetricTypeResolver
@@ -1400,6 +1436,7 @@ export interface GQLResolver {
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
+  TotalMetricsByRegistrarResult?: GQLTotalMetricsByRegistrarResultTypeResolver
   TimeLoggedMetrics?: GQLTimeLoggedMetricsTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -1417,6 +1454,7 @@ export interface GQLResolver {
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
+  EventMetricsByRegistrar?: GQLEventMetricsByRegistrarTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   OperationHistorySearchSet?: GQLOperationHistorySearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
@@ -1425,6 +1463,7 @@ export interface GQLResolver {
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
+  RegistrarPractitioner?: GQLRegistrarPractitionerTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
@@ -1448,6 +1487,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   getTotalMetrics?: QueryToGetTotalMetricsResolver<TParent>
+  getTotalMetricsByRegistrar?: QueryToGetTotalMetricsByRegistrarResolver<TParent>
   getTotalPayments?: QueryToGetTotalPaymentsResolver<TParent>
   getTotalCertifications?: QueryToGetTotalCertificationsResolver<TParent>
   getTotalCorrections?: QueryToGetTotalCorrectionsResolver<TParent>
@@ -1795,6 +1835,25 @@ export interface QueryToGetTotalMetricsResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetTotalMetricsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetTotalMetricsByRegistrarArgs {
+  timeStart: string
+  timeEnd: string
+  locationId?: string
+  event: string
+  filterBy: string
+}
+export interface QueryToGetTotalMetricsByRegistrarResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToGetTotalMetricsByRegistrarArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3410,6 +3469,12 @@ export interface TotalMetricsResultToResultsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLMixedTotalMetricsResultTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'TotalMetricsResult'
+    | 'TotalMetricsByRegistrarResult'
+    | Promise<'TotalMetricsResult' | 'TotalMetricsByRegistrarResult'>
+}
 export interface GQLPaymentMetricTypeResolver<TParent = any> {
   total?: PaymentMetricToTotalResolver<TParent>
   paymentType?: PaymentMetricToPaymentTypeResolver<TParent>
@@ -4709,6 +4774,17 @@ export interface EventMetricsToPractitionerRoleResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLTotalMetricsByRegistrarResultTypeResolver<TParent = any> {
+  results?: TotalMetricsByRegistrarResultToResultsResolver<TParent>
+}
+
+export interface TotalMetricsByRegistrarResultToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLTimeLoggedMetricsTypeResolver<TParent = any> {
   status?: TimeLoggedMetricsToStatusResolver<TParent>
   trackingId?: TimeLoggedMetricsToTrackingIdResolver<TParent>
@@ -5062,6 +5138,41 @@ export interface InputOutputToValueIdResolver<TParent = any, TResult = any> {
 }
 
 export interface InputOutputToValueStringResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventMetricsByRegistrarTypeResolver<TParent = any> {
+  registrarPractitioner?: EventMetricsByRegistrarToRegistrarPractitionerResolver<TParent>
+  total?: EventMetricsByRegistrarToTotalResolver<TParent>
+  late?: EventMetricsByRegistrarToLateResolver<TParent>
+  delayed?: EventMetricsByRegistrarToDelayedResolver<TParent>
+}
+
+export interface EventMetricsByRegistrarToRegistrarPractitionerResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByRegistrarToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByRegistrarToLateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByRegistrarToDelayedResolver<
   TParent = any,
   TResult = any
 > {
@@ -5474,5 +5585,24 @@ export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
 }
 
 export interface PaymentToDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLRegistrarPractitionerTypeResolver<TParent = any> {
+  registrarPractitionerId?: RegistrarPractitionerToRegistrarPractitionerIdResolver<TParent>
+  fullName?: RegistrarPractitionerToFullNameResolver<TParent>
+}
+
+export interface RegistrarPractitionerToRegistrarPractitionerIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrarPractitionerToFullNameResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }

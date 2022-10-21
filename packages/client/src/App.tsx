@@ -59,6 +59,7 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import { RegistrationList } from './views/Performance/RegistrationsList'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -371,6 +372,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.USER_PROFILE}
                                             component={UserProfile}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={'/test'}
+                                            component={RegistrationList}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

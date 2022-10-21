@@ -49,7 +49,10 @@ import {
   postAdvancedSearchByClient,
   responseSchema
 } from '@metrics/features/searchMetrics/handler'
-import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
+import {
+  totalMetricsByRegistrar,
+  totalMetricsHandler
+} from '@metrics/features/totalMetrics/handler'
 import * as Joi from 'joi'
 
 const enum RouteScope {
@@ -324,6 +327,24 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
+
+    {
+      method: 'GET',
+      path: '/totalMetricsByRegistrar',
+      handler: totalMetricsByRegistrar,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string(),
+            event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
     {
       method: 'GET',
       path: '/totalPayments',
