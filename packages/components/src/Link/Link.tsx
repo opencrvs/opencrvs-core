@@ -36,11 +36,9 @@ const StyledLink = styled.button<{ $font: IFont; $color: IColor }>`
   text-decoration: none;
   display: inline;
 
-  // Ellipsis if Link doesn't fit its container
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 100%;
-  //
 
   &:hover,
   &:active {
