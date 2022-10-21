@@ -9,47 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IReviewMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  additionalComments: MessageDescriptor
-  backToPreview: MessageDescriptor
-  editDeclarationConfirmationTitle: MessageDescriptor
-  editDeclarationConfirmation: MessageDescriptor
-  editDocuments: MessageDescriptor
-  headerSubjectWithName: MessageDescriptor
-  headerSubjectWithoutName: MessageDescriptor
-  previewName: MessageDescriptor
-  previewTitle: MessageDescriptor
-  registerActionDescription: MessageDescriptor
-  registerActionDescriptionComplete: MessageDescriptor
-  registerActionDescriptionIncomplete: MessageDescriptor
-  registerActionTitle: MessageDescriptor
-  registerConfirmationTitle: MessageDescriptor
-  approvalActionDescriptionComplete: MessageDescriptor
-  approvalActionDescriptionIncomplete: MessageDescriptor
-  approvalActionTitle: MessageDescriptor
-  reviewActionDescriptionComplete: MessageDescriptor
-  reviewActionDescriptionIncomplete: MessageDescriptor
-  reviewActionTitle: MessageDescriptor
-  reviewName: MessageDescriptor
-  reviewTitle: MessageDescriptor
-  submitConfirmationDesc: MessageDescriptor
-  submitConfirmationTitle: MessageDescriptor
-  validateConfirmationDesc: MessageDescriptor
-  validateConfirmationTitle: MessageDescriptor
-  valueApprove: MessageDescriptor
-  zeroDocumentsText: MessageDescriptor
-  validateCompleteDeclarationActionTitle: MessageDescriptor
-  validateCompleteDeclarationActionDescription: MessageDescriptor
-  validateDeclarationActionModalTitle: MessageDescriptor
-  validateDeclarationActionModalDescription: MessageDescriptor
-  govtName: MessageDescriptor
-  documentForWhom: MessageDescriptor
-}
-
-const messagesToDefine: IReviewMessages = {
+const messagesToDefine = {
   validateCompleteDeclarationActionTitle: {
     id: 'validate.complete.declaration.action.title',
     defaultMessage: 'Send for approval or reject?'
@@ -67,6 +29,11 @@ const messagesToDefine: IReviewMessages = {
     id: 'validate.declaration.action.modal.description',
     defaultMessage:
       'This declaration will be sent to the registrar for them to register'
+  },
+  informantsSignature: {
+    defaultMessage: 'Signature of informant',
+    description: 'Label for informants signature input',
+    id: 'review.inputs.informantsSignature'
   },
   additionalComments: {
     defaultMessage: 'Any additional comments?',
@@ -234,4 +201,4 @@ const messagesToDefine: IReviewMessages = {
   }
 }
 
-export const messages: IReviewMessages = defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)
