@@ -15,6 +15,7 @@ import { Cross } from '../icons'
 import { Spinner } from '../Spinner'
 import { Button } from '../Button'
 import { Text } from '../Text'
+import { Link } from '../Link'
 import { colors } from '../colors'
 import { useToastVisibility } from './useToastVisibility'
 
@@ -48,7 +49,6 @@ const Container = styled.div<{
   position: fixed;
   display: flex;
   gap: 8px;
-  /* padding: 0px 12px 0px 20px; */
   ${({ theme }) => theme.shadows.heavy};
   transform: translateX(-50%);
   left: 50%;
@@ -63,30 +63,27 @@ const Container = styled.div<{
   }
 `
 
-const Close = styled(Button)`
-  color: ${({ theme }) => theme.colors.white};
-  margin-top: 8px;
-  margin-right: 8px;
-  svg {
-    height: 24px;
-    width: 24px;
-  }
-  &:hover {
-    background: none;
-  }
+const SpinnerContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+  width: 48px;
+  margin-right: -16px;
 `
 
-/**
- *  Change to Link component
- */
+const ActionLink = styled(Link)`
+  height: 24px;
+  margin-top: 12px;
+  margin-right: 4px;
+`
 
-const ActionButton = styled(Button)`
+const Close = styled(Button)`
   color: ${({ theme }) => theme.colors.white};
-  margin-top: 8px;
-  margin-right: 8px;
+  margin-top: 4px;
+  margin-right: 4px;
   &:hover {
-    color: ${({ theme }) => theme.colors.white};
-    background: none;
+    background: var(--color) !important;
   }
 `
 
@@ -118,11 +115,13 @@ export const Toast = ({
 }: IToastProps) => (
   <Container $type={type} {...props}>
     {type === 'loading' && (
-      <Spinner
-        id="in-progress-floating-notification"
-        baseColor={colors.white}
-        size={20}
-      />
+      <SpinnerContainer>
+        <Spinner
+          id="in-progress-floating-notification"
+          baseColor={colors.white}
+          size={20}
+        />
+      </SpinnerContainer>
     )}
 
     <NotificationMessage>{children}</NotificationMessage>
@@ -133,19 +132,19 @@ export const Toast = ({
     })}
 
     {onActionClick && (
-      <ActionButton
-        type="tertiary"
-        size="small"
-        onClick={onActionClick}
+      <ActionLink
+        color="white"
+        font="bold14"
+        element="button"
         data-testid={props['data-testid'] && `${props['data-testid']}-action`}
       >
         {actionText}
-      </ActionButton>
+      </ActionLink>
     )}
     {onClose && type !== 'loading' && (
       <Close
         type="icon"
-        size="small"
+        size="medium"
         id={props.id + 'Cancel'}
         data-testid={props['data-testid'] && `${props['data-testid']}-close`}
         onClick={onClose}
