@@ -38,11 +38,8 @@ import {
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
-import {
-  LinkButton,
-  TertiaryButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
@@ -684,16 +681,18 @@ function UserListComponent(props: IProps) {
               handleClose={() => toggleUserResetPasswordModal()}
               title={intl.formatMessage(messages.resetUserPasswordModalTitle)}
               actions={[
-                <TertiaryButton
+                <Button
+                  type="tertiary"
                   id="reset-password-cancel"
                   key="reset-password-cancel"
                   onClick={() => toggleUserResetPasswordModal()}
                 >
                   {intl.formatMessage(buttonMessages.cancel)}
-                </TertiaryButton>,
-                <PrimaryButton
+                </Button>,
+                <Button
                   id="reset-password-send"
                   key="reset-password-send"
+                  type="primary"
                   onClick={() => {
                     if (toggleResetPassword.selectedUser?.id) {
                       resetPassword(toggleResetPassword.selectedUser.id)
@@ -702,7 +701,7 @@ function UserListComponent(props: IProps) {
                   }}
                 >
                   {intl.formatMessage(buttonMessages.send)}
-                </PrimaryButton>
+                </Button>
               ]}
               responsive={false}
               autoHeight={true}
