@@ -247,9 +247,6 @@ services:
     volumes:
       - '/data/minio:/data/minio'
       - '/data/backups/minio:/data/backups/minio'
-    ports:
-      - '9000:9000'
-      - '9001:9001'
     command: server --address ":9000" --console-address ":9001" /data/minio
     deploy:
       labels:
@@ -258,7 +255,7 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
-        - 'traefik.port=80'
+        - 'traefik.port=9000'
         - 'traefik.docker.network=opencrvs_overlay_net'
     networks:
       - overlay_net
