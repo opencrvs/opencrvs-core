@@ -273,7 +273,7 @@ describe('User audit list tests', () => {
                       time: '2019-01-29T18:00:00.000Z',
                       data: {
                         compositionId: '80b90ac3-1032-4f98-af64-627d2b7443f3',
-                        trackingId: 'D23S2D10'
+                        trackingId: 'D23S2D0'
                       }
                     }
                   ]
@@ -291,7 +291,7 @@ describe('User audit list tests', () => {
       '#row_0'
     )
     expect(firstRowElementOnFirstPage.hostNodes().childAt(1).text()).toBe(
-      'D23S2D1'
+      'D23S2D0'
     )
     expect(nextPageButton.hostNodes()).toHaveLength(2)
     nextPageButton.hostNodes().first().simulate('click')
@@ -304,7 +304,7 @@ describe('User audit list tests', () => {
       '#row_0'
     )
     expect(firstRowElementOnSecondPage.hostNodes().childAt(1).text()).toBe(
-      'D23S2D10'
+      'D23S2D0'
     )
   })
 })
