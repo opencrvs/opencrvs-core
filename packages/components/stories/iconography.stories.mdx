@@ -10,8 +10,6 @@ graphic logo are (registered/a) trademark(s) of Plan International.-->
 
 import { Meta, IconGallery, IconItem } from '@storybook/addon-docs'
 import { Icon } from '../src/Icon'
-import * as formIcons from '../src/Icon/form-icons'
-import * as icons from '../src/Icon/icons'
 import * as featherIcons from 'react-feather'
 
 <Meta title="Styles/Iconography" />
@@ -26,24 +24,47 @@ export function AllIcons({ icons: allIcons }) {
 
 # Iconography
 
-OpenCRVS UI-Kit is highly relying on open source [Feather icons](https://github.com/feathericons/feather). In addition to feather icons we have a few custom ones; form icons and custom ui-kit icons. The color of these icons cannot be changed with the `color` -prop.<br />
+OpenCRVS UI-Kit is relying on open source [Feather icons](https://github.com/feathericons/feather). In addition to feather icons we have custom ones; record status icons and custom ui-kit icons. The colour of these icons cannot be changed with the `color` -prop.<br />
 For more information how to use the [&lt;Icon&gt;](/docs/typography-icon--default) component, see its story page.
 
-## Form icons
+## Record status icons
 
 <br />
 <IconGallery>
-  <AllIcons icons={Object.keys(formIcons)} />
+  <AllIcons
+    icons={[
+      'Archived',
+      'Certified',
+      'Draft',
+      'DuplicateYellow',
+      'ExternalValidate',
+      'InReview',
+      'Registered',
+      'RequiresUpdates',
+      'Validated',
+      'WaitingApproval'
+    ]}
+  />
 </IconGallery>
 
 ## Custom UI-kit icons
 
 <br />
 <IconGallery>
-  <AllIcons icons={Object.keys(icons)} />
+  <AllIcons
+    icons={[
+      'Assigned',
+      'FilledCheck',
+      'Sent',
+      'Offline',
+      'Close',
+      'Collapse',
+      'Expand'
+    ]}
+  />
 </IconGallery>
 
-## Feather icons
+## Icons
 
 <br />
 <IconGallery>
