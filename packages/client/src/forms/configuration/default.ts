@@ -316,10 +316,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'female',
                     label: formMessageDescriptors.childSexFemale
-                  },
-                  {
-                    value: 'unknown',
-                    label: formMessageDescriptors.childSexUnknown
                   }
                 ]
               },
