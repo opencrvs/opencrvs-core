@@ -19,11 +19,7 @@ import {
   getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
-import User, {
-  FIELD_AGENT_TYPES,
-  IUser,
-  IUserModel
-} from '@user-mgnt/model/user'
+import User, { FIELD_AGENT_TYPES, IUser } from '@user-mgnt/model/user'
 import {
   generateSaltedHash,
   generateRandomPassword
@@ -139,7 +135,7 @@ export default async function createUser(
     request.headers.authorization.split(' ')[1]
   )
   const systemUserAdminId = tokenPayload.sub
-  const systemUserAdmin: IUserModel | null = await User.findOne({
+  await User.findOne({
     _id: systemUserAdminId
   })
   const remoteAddress =
@@ -148,7 +144,6 @@ export default async function createUser(
     request.headers['x-real-user-agent'] || request.headers['user-agent']
   await postUserActionToMetrics(
     'CREATE_USER',
-    systemUserAdmin!.practitionerId,
     request.headers.authorization,
     remoteAddress,
     userAgent

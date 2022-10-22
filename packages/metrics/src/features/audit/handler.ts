@@ -12,11 +12,14 @@
 import * as Hapi from '@hapi/hapi'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import { writePoints } from '@metrics/influxdb/client'
-import { badRequest, internal } from '@hapi/boom'
+import { internal } from '@hapi/boom'
 import { IUserAuditBody } from '@metrics/features/registration'
 import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
 import { countUserAuditEvents, getUserAuditEvents } from './service'
-
+import { getClientIdFromToken } from '@metrics/utils/authUtils'
+import fetch from 'node-fetch'
+export const USER_MANAGEMENT_URL =
+  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export async function newAuditHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -28,9 +31,21 @@ export async function newAuditHandler(
     const userAgent =
       request.headers['x-real-user-agent'] || request.headers['user-agent']
     const payload = request.payload as IUserAuditBody
+
+    let practitionerId
+    if (payload.practitionerId) {
+      practitionerId = payload.practitionerId!
+    } else {
+      const userId = getClientIdFromToken(request.headers.authorization)
+      const user = await getUser(userId, {
+        Authorization: request.headers.authorization
+      })
+      practitionerId = user.practitionerId
+    }
+
     points.push(
       generateAuditPoint(
-        payload.practitionerId,
+        practitionerId,
         payload.action,
         remoteAddress,
         userAgent,
@@ -44,37 +59,26 @@ export async function newAuditHandler(
   return h.response().code(201)
 }
 
-export async function newAuditHandlerWithOutAuth(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+export async function getUser(
+  userId: string,
+  authHeader: { Authorization: string }
 ) {
-  const points = []
-  try {
-    const remoteAddress =
-      request.headers['x-real-ip'] || request.info.remoteAddress
-    const userAgent =
-      request.headers['x-real-user-agent'] || request.headers['user-agent']
-    const payload = request.payload as IUserAuditBody
-
-    if (payload.action === 'PASSWORD_RESET') {
-      points.push(
-        generateAuditPoint(
-          payload.practitionerId,
-          payload.action,
-          remoteAddress,
-          userAgent,
-          payload.additionalData
-        )
-      )
-
-      await writePoints(points)
-    } else {
-      throw badRequest('Invalid user action')
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
     }
-  } catch (err) {
-    return internal(err)
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve user mobile number. Error: ${res.status} status received`
+    )
   }
-  return h.response().code(201)
+
+  return await res.json()
 }
 
 export async function getUserAuditsHandler(request: Hapi.Request) {

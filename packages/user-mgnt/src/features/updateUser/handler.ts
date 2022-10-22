@@ -25,7 +25,7 @@ import User, {
   IUser,
   IUserModel
 } from '@user-mgnt/model/user'
-import { getTokenPayload, roleScopeMapping } from '@user-mgnt/utils/userUtils'
+import { roleScopeMapping } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
@@ -38,14 +38,6 @@ export default async function updateUser(
   const user = request.payload as IUser & { id: string }
   const token = request.headers.authorization
   const existingUser: IUserModel | null = await User.findOne({ _id: user.id })
-
-  const tokenPayload = getTokenPayload(
-    request.headers.authorization.split(' ')[1]
-  )
-  const systemUserAdminId = tokenPayload.sub
-  const systemUserAdmin: IUserModel | null = await User.findOne({
-    _id: systemUserAdminId
-  })
 
   if (!existingUser) {
     throw new Error(`No user found by given id: ${user.id}`)
@@ -168,7 +160,6 @@ export default async function updateUser(
 
   await postUserActionToMetrics(
     'EDIT_USER',
-    systemUserAdmin!.practitionerId,
     request.headers.authorization,
     remoteAddress,
     userAgent

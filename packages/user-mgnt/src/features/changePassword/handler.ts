@@ -68,18 +68,16 @@ export default async function changePasswordHandler(
       request.headers['x-real-user-agent'] || request.headers['user-agent']
 
     if (request.headers.authorization == undefined) {
-      // TODO: generate authentication token
       await postUserActionToMetrics(
         'PASSWORD_RESET',
-        user.practitionerId,
         request.headers.authorization,
         remoteAddress,
-        userAgent
+        userAgent,
+        user.practitionerId
       )
     } else {
       await postUserActionToMetrics(
         'PASSWORD_CHANGED',
-        user.practitionerId,
         request.headers.authorization,
         remoteAddress,
         userAgent

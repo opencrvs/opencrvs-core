@@ -219,13 +219,13 @@ export function getPublicKey() {
 
 export async function postUserActionToMetrics(
   action: string,
-  practitionerId: string,
   token: string,
   remoteAddress: string,
-  userAgent: string
+  userAgent: string,
+  practitionerId?: string
 ) {
   const url = resolve(METRICS_URL, '/audit/events')
-  const body = { practitionerId: practitionerId, action: action }
+  const body = { action: action, practitionerId }
   const authentication = 'Bearer ' + token
 
   await fetch(url, {

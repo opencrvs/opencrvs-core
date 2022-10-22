@@ -23,7 +23,6 @@ import {
 } from '@auth/features/authenticate/service'
 import { logger } from '@auth/logger'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
-
 interface IVerifyPayload {
   nonce: string
   code: string
@@ -32,7 +31,6 @@ interface IVerifyPayload {
 interface IVerifyResponse {
   token: string
 }
-
 export default async function authenticateHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -44,9 +42,7 @@ export default async function authenticateHandler(
     logger.error(err)
     return unauthorized()
   }
-  const { userId, scope, practitionerId } = await getStoredUserInformation(
-    nonce
-  )
+  const { userId, scope } = await getStoredUserInformation(nonce)
   const token = await createToken(
     userId,
     scope,
@@ -59,17 +55,14 @@ export default async function authenticateHandler(
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
-
   await postUserActionToMetrics(
     'LOGGED_IN',
-    practitionerId,
     response.token,
     remoteAddress,
     userAgent
   )
   return response
 }
-
 export const requestSchema = Joi.object({
   nonce: Joi.string(),
   code: Joi.string()

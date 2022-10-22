@@ -41,9 +41,6 @@ export async function userAuditHandler(
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   const user: IUserModel | null = await User.findById(auditUserPayload.userId)
-  const systemAdminUser: IUserModel | null = await User.findById(
-    auditUserPayload.auditedBy
-  )
 
   if (!user) {
     logger.error(
@@ -108,7 +105,6 @@ export async function userAuditHandler(
       }
       await postUserActionToMetrics(
         action,
-        systemAdminUser!.practitionerId,
         request.headers.authorization,
         remoteAddress,
         userAgent

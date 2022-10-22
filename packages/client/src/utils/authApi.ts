@@ -38,14 +38,11 @@ function request<T>(options: AxiosRequestConfig) {
   return client(options).then(onSuccess).catch(onError)
 }
 
-const invalidateToken = (
-  token: string,
-  practitionerId: string | null | undefined
-): Promise<void> => {
+const invalidateToken = (token: string): Promise<void> => {
   return request({
     url: resolve(window.config.AUTH_URL, 'invalidateToken'),
     method: 'POST',
-    data: { token, practitionerId }
+    data: { token }
   })
 }
 

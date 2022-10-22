@@ -17,26 +17,19 @@ import { postUserActionToMetrics } from '@auth/features/authenticate/service'
 
 interface IInvalidateTokenPayload {
   token: string
-  practitionerId: string
 }
 
 export default async function invalidateTokenHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { token, practitionerId } = request.payload as IInvalidateTokenPayload
+  const { token } = request.payload as IInvalidateTokenPayload
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
-    await postUserActionToMetrics(
-      'LOGGED_OUT',
-      practitionerId,
-      token,
-      remoteAddress,
-      userAgent
-    )
+    await postUserActionToMetrics('LOGGED_OUT', token, remoteAddress, userAgent)
     await invalidateToken(token)
   } catch (err) {
     throw internal('Failed to invalidate token', err)
@@ -46,6 +39,5 @@ export default async function invalidateTokenHandler(
 }
 
 export const reqInvalidateTokenSchema = Joi.object({
-  token: Joi.string(),
-  practitionerId: Joi.string()
+  token: Joi.string()
 })

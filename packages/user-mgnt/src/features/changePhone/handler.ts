@@ -57,7 +57,6 @@ export default async function changePhoneHandler(
     await User.update({ _id: user._id }, user)
     await postUserActionToMetrics(
       'PHONE_NUMBER_CHANGED',
-      user.practitionerId,
       request.headers.authorization,
       remoteAddress,
       userAgent
@@ -71,17 +70,13 @@ export default async function changePhoneHandler(
 
 export async function postUserActionToMetrics(
   action: string,
-  practitionerId: string,
   token: string,
   remoteAddress: string,
-  userAgent: string
+  userAgent: string,
+  practitionerId?: string
 ) {
-  let url = resolve(METRICS_URL, '/audit/events')
-
-  if (action === 'PASSWORD_RESET' || action === 'USERNAME_REMINDER') {
-    url = resolve(METRICS_URL, '/audit/events/noAuth')
-  }
-  const body = { practitionerId: practitionerId, action: action }
+  const url = resolve(METRICS_URL, '/audit/events')
+  const body = { action: action, practitionerId: practitionerId }
   const authentication = 'Bearer ' + token
   await fetch(url, {
     method: 'POST',
