@@ -365,46 +365,6 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'birthLocation',
-                customisable: false,
-                type: 'LOCATION_SEARCH_INPUT',
-                label: formMessageDescriptors.healthInstitution,
-                previewGroup: 'placeOfBirth',
-                required: true,
-                initialValue: '',
-                searchableResource: 'facilities',
-                searchableType: 'HEALTH_FACILITY',
-                dynamicOptions: {
-                  resource: 'facilities'
-                },
-                validate: [
-                  {
-                    operation: 'facilityMustBeSelected'
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression: '(values.placeOfBirth!="HEALTH_FACILITY")'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    fieldName: 'placeOfBirth',
-                    operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
-                  },
-                  mutation: {
-                    operation: 'birthEventLocationMutationTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'eventLocationIDQueryTransformer',
-                    parameters: []
-                  }
-                }
-              },
-              {
                 name: 'seperator',
                 type: 'SUBSECTION',
                 label: {
