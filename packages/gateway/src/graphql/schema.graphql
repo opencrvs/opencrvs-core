@@ -305,7 +305,6 @@ type Person {
   photo: [Attachment]
   deceased: Deceased
   nationality: [String]
-  literacy: LiteracyType
   educationalAttainment: EducationType
 }
 
@@ -808,11 +807,6 @@ type Deceased {
   deathDate: String
 }
 
-enum LiteracyType {
-  LITERATE
-  ILLITERATE
-}
-
 enum EducationType {
   KORANIC
   PRIMARY
@@ -945,7 +939,6 @@ input PersonInput {
   gender: String
   birthDate: String
   age: Float
-  literacy: LiteracyType
   maritalStatus: MaritalStatusType
   occupation: String
   detailsExist: Boolean
@@ -1224,6 +1217,7 @@ enum AttachmentType {
   VERBAL_AUTOPSY_REPORT
   CORONERS_REPORT
   OTHER
+  VOTERS_CARD
 }
 
 enum AttachmentSubject {

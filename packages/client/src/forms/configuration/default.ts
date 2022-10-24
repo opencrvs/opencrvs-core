@@ -3118,6 +3118,10 @@ export const registerForms: IDefaultRegisterForms = {
                     label: formMessageDescriptors.docTypePassport
                   },
                   {
+                    value: birthDocumentTypeFhirMapping.VOTERS_CARD,
+                    label: formMessageDescriptors.docTypeVotersCard
+                  },
+                  {
                     value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
                     label: formMessageDescriptors.docTypeBirthCert
                   },
@@ -3160,6 +3164,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: birthDocumentTypeFhirMapping.PASSPORT,
                     label: formMessageDescriptors.docTypePassport
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.VOTERS_CARD,
+                    label: formMessageDescriptors.docTypeVotersCard
                   },
                   {
                     value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,

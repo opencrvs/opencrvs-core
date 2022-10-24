@@ -2159,6 +2159,11 @@ export const formMessageDescriptors = {
     description: 'Label for select option Police death certificate',
     id: 'form.field.label.docTypePoliceCertificate'
   },
+  docTypeVotersCard: {
+    defaultMessage: 'Voters card',
+    description: 'Label for select option Voters card',
+    id: 'form.field.label.docTypeVotersCard'
+  },
   primaryAddressSameAsDeceasedsPrimary: {
     defaultMessage: "Same as deceased's usual place of residence",
     description:
