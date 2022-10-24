@@ -258,7 +258,7 @@ const CustomImageUpload = styled(ImageUploader)`
   border: 0 !important;
 `
 const SignatureContainer = styled.div`
-  border: 2px solid #222222;
+  border: 2px solid ${({ theme }) => theme.colors.grey600};
   border-radius: 4px;
   width: 100%;
 `
