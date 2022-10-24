@@ -100,8 +100,12 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice } from '@client/utils/commonUtils'
-import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
+import { isBase64FileString, isMobileDevice } from '@client/utils/commonUtils'
+import {
+  ACCUMULATED_FILE_SIZE,
+  MINIO_URL,
+  REJECTED
+} from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
@@ -666,8 +670,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           return true
         }
 
+        const documentData = !isBase64FileString(document.data)
+          ? `${MINIO_URL || 'http://localhost:9000'}${document.data}`
+          : document.data
+
         documentOptions.push({
-          value: document.data,
+          value: documentData,
           label
         })
         selectOptions.push({
