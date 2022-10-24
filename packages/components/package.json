@@ -47,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^6.5.12",
     "@storybook/addon-actions": "^6.5.11",
     "@storybook/addon-docs": "^6.5.11",
     "@storybook/addon-essentials": "^6.5.11",
@@ -68,6 +69,8 @@
     "@types/webfontloader": "^1.6.34",
     "concurrently": "^3.5.1",
     "dotenv": "^6.1.0",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-styled-components-a11y": "^1.0.0",
     "lint-staged": "^7.1.0",
     "prettier": "^2.5.1",
     "rimraf": "^2.6.2",

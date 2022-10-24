@@ -99,6 +99,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Declaration forms',
     description: 'Declaration forms label in navigation',
     id: 'navigation.declarationForms'
+  },
+  outbox: {
+    defaultMessage: 'Outbox',
+    description: 'Label for navigation item outbox',
+    id: 'navigation.outbox'
   }
 }
 

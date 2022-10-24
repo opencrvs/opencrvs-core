@@ -15,10 +15,6 @@ import React, {
   ChangeEvent,
   useState
 } from 'react'
-import {
-  PageWrapper as UnlockPageWrapper,
-  LogoutHeader as LogoutContainer
-} from '@client/views/Unlock/Unlock'
 import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { storage } from '@client/storage'
@@ -48,6 +44,10 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getUserName } from '@client/utils/userUtils'
+import {
+  PageWrapper as UnlockPageWrapper,
+  LogoutHeader as LogoutContainer
+} from '@client/views/Unlock/Unlock'
 
 interface IForgotPINProps {
   goBack: () => void
@@ -77,6 +77,8 @@ const Container = styled.div`
   width: 300px;
   position: relative;
   margin-top: 104px;
+  margin-left: auto;
+  margin-right: auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: 80px;
   }
@@ -171,9 +173,7 @@ export function ForgotPIN(props: IForgotPINProps) {
           (storedName: GQLHumanName) => storedName.use === 'en'
         ) as GQLHumanName)) ||
       {}
-    const fullName = `${String(nameObj.firstNames)} ${String(
-      nameObj.familyName
-    )}`
+    const fullName = `${nameObj.firstNames ?? ''} ${nameObj.familyName ?? ''}`
     return <Name>{fullName}</Name>
   }
 

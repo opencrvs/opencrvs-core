@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 interface Window {
   config: {
     APPLICATION_NAME: string
@@ -54,6 +55,7 @@ interface Window {
     LOGROCKET: string
     SENTRY: string
     ADDRESSES: number
+    INTEGRATIONS: any[]
   }
   __localeId__: string
 }

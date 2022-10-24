@@ -525,6 +525,11 @@ const messagesToDefine: IConstantsMessages = {
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
   },
+  noResultsOutbox: {
+    defaultMessage: 'No records require processing',
+    description: 'Text to display if there is no items in outbox',
+    id: 'constants.noResultsOutbox'
+  },
   over5Years: {
     defaultMessage: 'Over 5 years',
     description: 'Label for registrations over 5 years',
@@ -544,6 +549,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Reason',
     description: 'Label for Reason the declaration was rejected',
     id: 'constants.reason'
+  },
+  record: {
+    defaultMessage: 'Record',
+    description: 'Label for header table header Record',
+    id: 'constants.record'
   },
   requestReason: {
     defaultMessage: 'Reason for request',
@@ -600,6 +610,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'A label from the review button',
     id: 'constants.review'
   },
+  assignRecord: {
+    defaultMessage: 'Assign record',
+    description: 'A label for the Assign record -button',
+    id: 'constants.assignRecord'
+  },
   search: {
     defaultMessage: 'Search',
     description: 'The title of the page',
@@ -619,6 +634,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Sent on',
     description: 'Label for rejection date in work queue list item',
     id: 'constants.sentOn'
+  },
+  skipToMainContent: {
+    defaultMessage: 'Skip to main content',
+    description:
+      'Label for a keyboard accessibility link which skips to the main content',
+    id: 'constants.skipToMainContent'
   },
   status: {
     defaultMessage: 'Status',

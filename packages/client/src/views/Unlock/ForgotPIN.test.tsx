@@ -16,7 +16,7 @@ import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'
-import { NetworkStatus } from 'apollo-client'
+import { NetworkStatus } from '@apollo/client'
 import { userQueries } from '@client/user/queries'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
@@ -39,7 +39,6 @@ describe('ForgotPIN tests', () => {
       setUserDetails({
         loading: false,
         networkStatus: NetworkStatus.ready,
-        stale: false,
         data: {
           getUser: {
             userMgntUserID: '5eba726866458970cf2e23c2',

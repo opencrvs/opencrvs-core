@@ -18,7 +18,7 @@ import {
 } from '@opencrvs/components/lib/Radio'
 import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
 import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
-import { ApolloQueryResult } from 'apollo-client'
+import { ApolloQueryResult } from '@apollo/client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { IDynamicValues } from '@opencrvs/client/src/navigation'
 
@@ -46,6 +46,7 @@ export const RADIO_GROUP = 'RADIO_GROUP'
 export const RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS'
 export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
+export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
 export const TEXTAREA = 'TEXTAREA'
 export const SUBSECTION = 'SUBSECTION'
@@ -532,6 +533,10 @@ export interface ICheckboxGroupFormField extends IFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: ICheckboxOption[]
 }
+export interface ICheckboxFormField extends IFormFieldBase {
+  type: typeof CHECKBOX
+  flip?: boolean
+}
 export interface IDateFormField extends IFormFieldBase {
   type: typeof DATE
   notice?: MessageDescriptor
@@ -640,6 +645,7 @@ export type IFormField =
   | IRadioGroupWithNestedFieldsFormField
   | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
+  | ICheckboxFormField
   | IDateFormField
   | ITextareaFormField
   | ISubsectionFormField
@@ -1070,6 +1076,11 @@ export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: CheckboxComponentOption[]
 }
+
+export interface Ii18nCheckboxFormField extends Ii18nFormFieldBase {
+  type: typeof CHECKBOX
+  flip?: boolean
+}
 export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE
   notice?: string
@@ -1157,6 +1168,7 @@ export type Ii18nFormField =
   | Ii18nRadioGroupWithNestedFieldsFormField
   | Ii18nInformativeRadioGroupFormField
   | Ii18nCheckboxGroupFormField
+  | Ii18nCheckboxFormField
   | Ii18nDateFormField
   | Ii18nTextareaFormField
   | Ii18nSubsectionFormField
@@ -1228,6 +1240,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
     INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
     CHECKBOX_GROUP: messages.checkboxGroup,
+    CHECKBOX: messages.checkbox,
     DATE: messages.date,
     DYNAMIC_LIST: messages.dynamicList
   }

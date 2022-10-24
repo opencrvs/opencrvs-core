@@ -94,10 +94,10 @@ export const MONTHS_IN_YEAR = 12
 
 /* change to import.meta.env.mode when migrating to vitest */
 export const LOADER_MIN_DISPLAY_TIME =
-  process.env.NODE_ENV !== 'test' ? 3 * 1000 : 0 // 3 seconds except test environment
+  import.meta.env.MODE !== 'test' ? 3 * 1000 : 0 // 3 seconds except test environment
 
 export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
-  process.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
+  import.meta.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
 export const ACCUMULATED_FILE_SIZE = 20480000
@@ -106,4 +106,5 @@ export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 export const INFORMANT_MINIMUM_AGE = 16
 export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
 
-export const APPLICATION_VERSION = '1.1.0'
+/** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
+export const APPLICATION_VERSION = 'v1.1.1'

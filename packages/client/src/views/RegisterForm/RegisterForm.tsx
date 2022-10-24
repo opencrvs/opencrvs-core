@@ -25,7 +25,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
-  EventTopBar,
+  FixedEventTopBar,
   IEventTopBarProps,
   IEventTopBarMenuAction
 } from '@opencrvs/components/lib/EventTopBar'
@@ -108,6 +108,7 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { IUserDetails } from '@client/utils/userUtils'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -236,6 +237,14 @@ const StyledContainer = styled(Container)`
     z-index: 999;
   }
 `
+function getDeclarationIconColor(declaration: IDeclaration): string {
+  return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
+    ? 'purple'
+    : declaration.registrationStatus
+    ? STATUSTOCOLOR[declaration.registrationStatus]
+    : 'orange'
+}
+
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -555,10 +564,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       title: intl.formatMessage(messages.newVitalEventRegistration, {
         event: declaration.event
       }),
-      iconColor:
-        declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-          ? 'purple'
-          : 'orange'
+      iconColor: getDeclarationIconColor(declaration)
     }
 
     if (!!activeSectionGroup.showExitButtonOnly) {
@@ -641,18 +647,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
             <>
               {activeSection.viewType === VIEW_TYPE.PREVIEW && (
                 <>
-                  <EventTopBar
+                  <FixedEventTopBar
                     title={intl.formatMessage(
                       messages.newVitalEventRegistration,
                       {
                         event: declaration.event
                       }
                     )}
-                    iconColor={
-                      declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'purple'
-                        : 'orange'
-                    }
+                    iconColor={getDeclarationIconColor(declaration)}
                     saveAction={{
                       handler: this.onSaveAsDraftClicked,
                       label: intl.formatMessage(buttonMessages.saveExitButton)
@@ -670,20 +672,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
               {activeSection.viewType === VIEW_TYPE.REVIEW && (
                 <>
                   {isCorrection(declaration) ? (
-                    <EventTopBar {...this.getEventTopBarPropsForCorrection()} />
+                    <FixedEventTopBar
+                      {...this.getEventTopBarPropsForCorrection()}
+                    />
                   ) : (
-                    <EventTopBar
+                    <FixedEventTopBar
                       title={intl.formatMessage(
                         messages.newVitalEventRegistration,
                         {
                           event: declaration.event
                         }
                       )}
-                      iconColor={
-                        declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                          ? 'purple'
-                          : 'orange'
-                      }
+                      iconColor={getDeclarationIconColor(declaration)}
                       saveAction={{
                         handler: () =>
                           this.props.goToHomeTab(
@@ -711,7 +711,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
               {activeSection.viewType === VIEW_TYPE.FORM && (
                 <>
-                  <EventTopBar
+                  <FixedEventTopBar
                     {...this.getEventTopBarPropsForForm(menuItemDeleteOrClose)}
                   />
                   <BodyContent id="register_form">
