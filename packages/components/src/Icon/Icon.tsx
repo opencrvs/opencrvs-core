@@ -15,8 +15,8 @@ import { colors } from '../colors'
 import * as icons from './all-icons'
 
 enum IconSize {
-  small = 12,
-  medium = 18,
+  small = 16,
+  medium = 20,
   large = 24
 }
 

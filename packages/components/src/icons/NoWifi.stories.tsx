@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { NoWifi } from '.'
 
 export default {
-  title: 'Styles/Icons/NoWifi',
+  title: 'Deprecated/Icons/NoWifi',
   component: NoWifi
 } as Meta
 

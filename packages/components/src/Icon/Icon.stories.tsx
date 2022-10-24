@@ -19,7 +19,7 @@ const Template: ComponentStory<typeof Icon> = (args) => {
 }
 
 export default {
-  title: 'Typography/Icon',
+  title: 'Data/Icon',
   component: Icon,
   parameters: {
     docs: {
@@ -34,7 +34,7 @@ export default {
 
 export const Default = Template.bind({})
 Default.args = {
-  name: 'BarChart',
+  name: 'Globe',
   color: 'currentColor',
-  size: 'medium'
+  size: 'large'
 }

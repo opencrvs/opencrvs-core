@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Trash } from '.'
 
 export default {
-  title: 'Styles/Icons/Trash',
+  title: 'Deprecated/Icons/Trash',
   component: Trash
 } as Meta
 

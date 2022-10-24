@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Box } from './Box'
 
 export default {
-  title: 'Styles/Icons/Box',
+  title: 'Deprecated/Icons/Box',
   component: Box
 } as Meta
 

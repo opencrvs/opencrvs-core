@@ -24,8 +24,7 @@ export function AllIcons({ icons: allIcons }) {
 
 # Iconography
 
-OpenCRVS UI-Kit is relying on open source [Feather icons](https://github.com/feathericons/feather). In addition to feather icons we have custom ones; record status icons and custom ui-kit icons. The colour of these icons cannot be changed with the `color` -prop.<br />
-For more information how to use the [&lt;Icon&gt;](/docs/typography-icon--default) component, see its story page.
+OpenCRVS UI-Kit is uses the open source [Feather icons](https://github.com/feathericons/feather) library with some additonal custom icons. Visit the [&lt;Icon&gt component](/docs/data-icon--default) story page for more information.
 
 ## Record status icons
 
@@ -47,10 +46,11 @@ For more information how to use the [&lt;Icon&gt;](/docs/typography-icon--defaul
   />
 </IconGallery>
 
-## Custom UI-kit icons
+## Icons
 
 <br />
 <IconGallery>
+  <AllIcons icons={Object.keys(featherIcons)} />
   <AllIcons
     icons={[
       'Assigned',
@@ -62,11 +62,4 @@ For more information how to use the [&lt;Icon&gt;](/docs/typography-icon--defaul
       'Expand'
     ]}
   />
-</IconGallery>
-
-## Icons
-
-<br />
-<IconGallery>
-  <AllIcons icons={Object.keys(featherIcons)} />
 </IconGallery>
