@@ -95,6 +95,7 @@ describe('SearchResult tests', () => {
             locationIds: null,
             sort: 'DESC',
             trackingId: '',
+            nationalId: '',
             registrationNumber: '',
             contactNumber: '+8801622688232',
             name: ''
@@ -337,6 +338,7 @@ describe('SearchResult tests', () => {
             locationIds: ['1234567s2323289'],
             sort: 'DESC',
             trackingId: '',
+            nationalId: '',
             registrationNumber: '',
             contactNumber: '+8801622688232'
           }
@@ -411,6 +413,7 @@ describe('SearchResult tests', () => {
             locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
+            nationalId: '',
             registrationNumber: '',
             contactNumber: '',
             name: ''
@@ -507,6 +510,7 @@ describe('SearchResult tests', () => {
             locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
+            nationalId: '',
             registrationNumber: '',
             contactNumber: '',
             name: ''
@@ -610,6 +614,7 @@ describe('SearchResult tests', () => {
           variables: {
             locationIds: null,
             sort: 'DESC',
+            nationalId: '',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
             contactNumber: '',
@@ -719,6 +724,7 @@ describe('SearchResult downloadButton tests', () => {
           variables: {
             locationIds: null,
             sort: 'DESC',
+            nationalId: '',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
             contactNumber: '',
@@ -818,6 +824,7 @@ describe('SearchResult downloadButton tests', () => {
           variables: {
             locationIds: null,
             sort: 'DESC',
+            nationalId: '',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
             contactNumber: '',
