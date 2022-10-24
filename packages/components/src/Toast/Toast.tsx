@@ -19,7 +19,7 @@ import { Link } from '../Link'
 import { colors } from '../colors'
 import { useToastVisibility } from './useToastVisibility'
 
-const TOAST_DEFAULT_DURATION_MS = 80000
+const TOAST_DEFAULT_DURATION_MS = 8000
 
 type ToastType = 'success' | 'warning' | 'loading' | 'error'
 
