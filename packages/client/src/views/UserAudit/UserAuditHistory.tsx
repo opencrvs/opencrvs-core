@@ -59,7 +59,7 @@ import {
 import { GetUserAuditLogQuery } from '@client/utils/gateway'
 import { NameContainer } from '@client/views/OfficeHome/components'
 
-const DEFAULT_LIST_SIZE = 10
+const DEFAULT_LIST_SIZE = 4
 
 const InformationCaption = styled.div`
   ${({ theme }) => theme.fonts.reg12};
@@ -192,6 +192,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
 
   setCurrentPage = (currentPage: number) => {
     this.setState({ currentPageNumber: currentPage })
+    console.log(recordCount)
   }
 
   updateViewPort() {
