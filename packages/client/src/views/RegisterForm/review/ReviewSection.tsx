@@ -671,7 +671,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         }
 
         const documentData = !isBase64FileString(document.data)
-          ? `${MINIO_URL || 'http://localhost:9000'}${document.data}`
+          ? `${MINIO_URL}${document.data}`
           : document.data
 
         documentOptions.push({
