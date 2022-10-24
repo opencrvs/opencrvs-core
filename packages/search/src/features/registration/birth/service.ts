@@ -242,7 +242,9 @@ function createMotherIndex(
     motherNameLocal && motherNameLocal.family && motherNameLocal.family[0]
   body.motherDoB = mother.birthDate
   body.motherIdentifier =
-    mother.identifier && mother.identifier[0] && mother.identifier[0].value
+    mother.identifier &&
+    mother.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
 }
 
 function createFatherIndex(
@@ -273,7 +275,9 @@ function createFatherIndex(
     fatherNameLocal && fatherNameLocal.family && fatherNameLocal.family[0]
   body.fatherDoB = father.birthDate
   body.fatherIdentifier =
-    father.identifier && father.identifier[0] && father.identifier[0].value
+    father.identifier &&
+    father.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
 }
 
 function createInformantIndex(
