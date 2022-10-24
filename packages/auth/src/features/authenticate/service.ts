@@ -49,7 +49,6 @@ export interface IAuthentication {
   userId: string
   status: string
   scope: string[]
-  practitionerId: string
 }
 
 export interface ISystemAuthentication {
@@ -86,8 +85,7 @@ export async function authenticate(
     userId: body.id,
     scope: body.scope,
     status: body.status,
-    mobile: body.mobile,
-    practitionerId: body.practitionerId
+    mobile: body.mobile
   }
 }
 
@@ -140,12 +138,11 @@ export async function storeUserInformation(
   nonce: string,
   userId: string,
   scope: string[],
-  mobile: string,
-  practitionerId: string
+  mobile: string
 ) {
   return set(
     `user_information_${nonce}`,
-    JSON.stringify({ userId, scope, mobile, practitionerId })
+    JSON.stringify({ userId, scope, mobile })
   )
 }
 

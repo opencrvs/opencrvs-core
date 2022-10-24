@@ -59,14 +59,13 @@ export default async function changePasswordHandler(
     }
   }
   user.passwordHash = generateHash(userUpdateData.password, user.salt)
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   try {
     await User.update({ _id: user._id }, user)
-    const remoteAddress =
-      request.headers['x-real-ip'] || request.info.remoteAddress
-    const userAgent =
-      request.headers['x-real-user-agent'] || request.headers['user-agent']
-
     if (request.headers.authorization == undefined) {
       await postUserActionToMetrics(
         'PASSWORD_RESET',
