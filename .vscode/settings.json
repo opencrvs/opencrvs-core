@@ -39,5 +39,6 @@
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "githubPullRequests.ignoredPullRequestBranches": ["develop"]
 }

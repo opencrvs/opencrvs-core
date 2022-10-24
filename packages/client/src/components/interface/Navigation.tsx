@@ -77,6 +77,7 @@ export const WORKQUEUE_TABS = {
   config: 'config',
   application: 'application',
   certificate: 'certificate',
+  integrations: 'integrations',
   settings: 'settings',
   logout: 'logout',
   declarationForms: 'form'
@@ -632,6 +633,18 @@ export const NavigationView = (props: IFullProps) => {
                               navigationMessages[
                                 WORKQUEUE_TABS.declarationForms
                               ]
+                            )}
+                            onClick={goToFormConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.declarationForms
+                            }
+                          />
+
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.declarationForms}`}
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.integrations]
                             )}
                             onClick={goToFormConfigAction}
                             isSelected={
