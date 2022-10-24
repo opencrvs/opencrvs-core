@@ -2291,6 +2291,11 @@ export const formMessageDescriptors = {
     description: 'Label for Relationship to child',
     id: 'form.field.label.informantsRelationWithChild'
   },
+  informantsOtherRelationWithChild: {
+    defaultMessage: 'Other relationship to child',
+    description: 'Label for Other Relationship to child',
+    id: 'form.field.label.informantsOtherRelationWithChild'
+  },
   informantsRelationWithDeceased: {
     defaultMessage: 'Relationship to Deceased',
     description: 'Label for Relationship to Deceased select',
