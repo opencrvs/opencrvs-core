@@ -33,6 +33,7 @@ import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import {
   BRN_DRN_TEXT,
+  NATIONAL_ID_TEXT,
   FIELD_AGENT_ROLES,
   NAME_TEXT,
   NATL_ADMIN_ROLES,
@@ -400,6 +401,13 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
+        label: intl.formatMessage(messages.nationalId),
+        value: NATIONAL_ID_TEXT,
+        icon: <BRN />,
+        invertIcon: <BRN />,
+        placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
+      },
+      {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Phone />,
@@ -412,6 +420,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         icon: <User />,
         invertIcon: <User />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
+      },
+      {
+        label: 'advance search',
+        value: NAME_TEXT,
+        icon: <User />,
+        invertIcon: <User />,
+        placeHolderText: intl.formatMessage(messages.placeholderName),
+        isPlainLink: true
       }
     ]
 

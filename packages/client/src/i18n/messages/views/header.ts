@@ -15,9 +15,11 @@ interface IHeaderMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   typeBrnDrn: MessageDescriptor
   typePhone: MessageDescriptor
+  nationalId: MessageDescriptor
   placeHolderTrackingId: MessageDescriptor
   placeHolderBrnDrn: MessageDescriptor
   placeHolderPhone: MessageDescriptor
+  placeHolderNationalId: MessageDescriptor
   systemTitle: MessageDescriptor
   settingsTitle: MessageDescriptor
   helpTitle: MessageDescriptor
@@ -37,6 +39,11 @@ const messagesToDefine: IHeaderMessages = {
     defaultMessage: 'Phone No.',
     description: 'Search menu phone no type'
   },
+  nationalId: {
+    id: 'home.header.nationalId',
+    defaultMessage: 'National ID',
+    description: 'Search menu national id no type'
+  },
   placeHolderTrackingId: {
     id: 'home.header.placeHolderTrackingId',
     defaultMessage: 'Search for a tracking ID',
@@ -51,6 +58,11 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.placeHolderPhone',
     defaultMessage: 'Search for a phone No.',
     description: 'Search menu phone no place holder'
+  },
+  placeHolderNationalId: {
+    id: 'home.header.placeHolderNationalId',
+    defaultMessage: 'Search for a national ID.',
+    description: 'Search menu national ID place holder'
   },
   systemTitle: {
     id: 'home.header.systemTitle',
