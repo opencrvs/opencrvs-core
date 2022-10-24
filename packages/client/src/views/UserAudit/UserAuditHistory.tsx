@@ -461,9 +461,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                         currentPage={this.state.currentPageNumber}
                         pageSize={DEFAULT_LIST_SIZE}
                         totalItems={totalItems}
-                        onPageChange={(currentPage: number) => {
-                          this.setCurrentPage(currentPage)
-                        }}
+                        onPageChange={(page: any) =>
+                          this.setState({ currentPageNumber: page })
+                        }
                       />
                     )
                   }
