@@ -318,7 +318,7 @@ function UserListComponent(props: IProps) {
         setToggleActivation({
           ...toggleActivation,
           modalVisible: true,
-          selectedUser: null
+          selectedUser: user
         })
       } else {
         setToggleActivation({

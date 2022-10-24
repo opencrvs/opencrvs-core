@@ -56,7 +56,7 @@ export default async function resetPasswordSMSHandler(
     Authorization: request.headers.authorization
   })
 
-  return h.response({ userName: user.username }).code(200)
+  return h.response().code(200)
 }
 
 export async function sendPasswordNotification(

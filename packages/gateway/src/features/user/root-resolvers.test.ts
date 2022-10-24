@@ -1245,10 +1245,7 @@ describe('User root resolvers', () => {
     })
 
     it('returns true if status from user-mgnt response is 200', async () => {
-      fetch.mockResponses([
-        JSON.stringify({ userName: 'sadman' }),
-        { status: 200 }
-      ])
+      fetch.mockResponses([JSON.stringify({}), { status: 200 }])
 
       const res = await resolvers.Mutation.resetPasswordSMS(
         {},
@@ -1259,7 +1256,7 @@ describe('User root resolvers', () => {
         authHeaderSysAdmin
       )
 
-      expect(res).toBe('sadman')
+      expect(res).toBe(true)
     })
   })
 })
