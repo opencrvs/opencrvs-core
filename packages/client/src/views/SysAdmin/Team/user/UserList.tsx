@@ -81,7 +81,6 @@ import {
   LoadingIndicator
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
-import { ApolloError } from 'apollo-client'
 import { Query as QueryType, User } from '@client/utils/gateway'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
@@ -589,7 +588,7 @@ function UserListComponent(props: IProps) {
             </ListViewSimplified>
             {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
               <Pagination
-                initialPage={currentPageNumber}
+                currentPage={currentPageNumber}
                 totalPages={Math.ceil(
                   totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
                 )}

@@ -100,7 +100,7 @@ export function PhoneNumPattern() {
           </Label>
         }
         value={
-          <Value id={`${id}_value`}>
+          <Value id={`${id}_value`} overflowWrap="anywhere">
             {String(offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN)}
           </Value>
         }

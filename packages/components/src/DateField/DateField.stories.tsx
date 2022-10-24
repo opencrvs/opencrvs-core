@@ -26,6 +26,7 @@ export const DateFieldView = Template.bind({})
 DateFieldView.args = {
   id: 'date-field',
   onChange: (value: string) => {
+    // eslint-disable-next-line no-console
     console.log('Value is:', value)
   }
 }

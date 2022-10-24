@@ -10,40 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
+import { ComponentStory, Meta } from '@storybook/react'
 import { LineChart } from './LineChart'
-import { ITheme } from '../theme'
 
 export default {
   title: 'Data/Line chart',
   component: LineChart
 } as Meta
 
-interface IProps {
-  data: ILineDataPoint[]
-  dataKeys: string[]
-  mouseMoveHandler: (data: any) => void
-  mouseLeaveHandler: () => void
-  tooltipContent: (dataPoint: any) => React.ReactNode
-  legendContent: () => React.ReactNode
-  theme: ITheme
-  chartTop: number
-  chartRight: number
-  chartBottom: number
-  chartLeft: number
-  maximizeXAxisInterval?: boolean
-  legendLayout: string
-}
-
-interface ILineDataPoint {
-  label: React.ReactNode
-  registeredInTargetDays: number
-  totalRegistered: number
-  totalEstimate: number
-  registrationPercentage: string
-}
-
-const Template: Story<IProps> = (args) => <LineChart {...args} />
+const Template: ComponentStory<typeof LineChart> = (args) => (
+  <LineChart {...args} />
+)
 
 export const Default = Template.bind({})
 Default.args = {
@@ -134,6 +111,6 @@ Default.args = {
     }
   ],
   dataKeys: ['totalEstimate', 'totalRegistered', 'registeredInTargetDays'],
-  tooltipContent: (dataPoint: any) => <div />,
+  tooltipContent: (dataPoint: unknown) => <div />,
   legendContent: () => <div />
 }

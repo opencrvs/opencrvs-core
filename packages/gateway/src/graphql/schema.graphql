@@ -632,6 +632,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INTEGRATIONS: [Integration]
 }
 
 input ApplicationConfigurationInput {
@@ -646,6 +647,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INTEGRATIONS: [IntegrationInput]
 }
 
 input FormDraftInput {
@@ -670,6 +672,7 @@ type Registration {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -994,6 +997,7 @@ input RegistrationInput {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -1084,6 +1088,11 @@ type Death {
   FEE: DeathFee
 }
 
+type Integration {
+  name: String
+  status: String
+}
+
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1105,6 +1114,11 @@ input DeathInput {
   FEE: DeathFeeInput
 }
 
+input IntegrationInput {
+  name: String
+  status: String
+}
+
 input QuestionInput {
   fieldId: String!
   label: [MesssageInput!]
@@ -1119,6 +1133,7 @@ input QuestionInput {
   required: Boolean
   enabled: String
   custom: Boolean
+  conditionals: [ConditionalInput!]
 }
 
 enum InformantType {
@@ -1192,6 +1207,9 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
+  MOSIP_UINTOKEN
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
@@ -1429,6 +1447,11 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+}
+
+input ConditionalInput {
+  fieldId: String!
+  regexp: String!
 }
 
 type Payment {

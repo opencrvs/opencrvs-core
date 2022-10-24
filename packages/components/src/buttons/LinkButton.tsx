@@ -12,6 +12,7 @@
 import styled from 'styled-components'
 import { Button } from './Button'
 
+/** @deprecated Use Link instead */
 export const LinkButton = styled(Button)<{
   isBoldLink?: boolean
 }>`
@@ -22,7 +23,7 @@ export const LinkButton = styled(Button)<{
   margin-left: -8px;
   border-radius: 2px;
   &:focus {
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]) {

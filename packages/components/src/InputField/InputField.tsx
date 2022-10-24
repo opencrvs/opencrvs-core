@@ -98,7 +98,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       mode
     } = this.props
 
-    const postfix = this.props.postfix as React.ComponentClass<any> | string
+    const postfix = this.props.postfix as React.ComponentClass | string
 
     const { prefix } = this.props
 
@@ -110,7 +110,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     }
     const children = React.Children.map(
       this.props.children,
-      (node: React.ReactElement<any>) => {
+      (node: React.ReactElement) => {
         return React.cloneElement(node, { hideBorder })
       }
     )

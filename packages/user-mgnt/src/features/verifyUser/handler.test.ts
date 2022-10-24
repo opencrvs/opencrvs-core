@@ -11,7 +11,7 @@
  */
 import User from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 
 let server: any
 

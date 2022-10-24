@@ -35,7 +35,7 @@ import {
   StatusWaitingValidation
 } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Link } from '@opencrvs/components/lib/Link'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
@@ -328,7 +328,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
 
       return {
         actionDescription: (
-          <NameContainer isBoldLink={true}>
+          <NameContainer>
             {(actionDescriptor &&
               this.props.intl.formatMessage(actionDescriptor)) ||
               ''}
@@ -347,7 +347,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           </AuditDescTimeContainer>
         ),
         trackingId: isUserAuditItemWithDeclarationDetials(userAuditItem) ? (
-          <LinkButton
+          <Link
             onClick={() =>
               this.props.goToDeclarationRecordAudit(
                 'printTab',
@@ -356,7 +356,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             }
           >
             {userAuditItem.data.trackingId}
-          </LinkButton>
+          </Link>
         ) : null,
         deviceIpAddress: deviceIpAddress,
         trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)

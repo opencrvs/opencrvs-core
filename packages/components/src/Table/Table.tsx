@@ -498,7 +498,7 @@ export class Table extends React.Component<ITableProps, ITableState> {
         )}
         {totalItems > pageSize && !noPagination && (
           <Pagination
-            initialPage={currentPage}
+            currentPage={currentPage}
             totalPages={Math.ceil(totalItems / pageSize)}
             onPageChange={this.onPageChange}
           />
