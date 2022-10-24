@@ -426,8 +426,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         value: NAME_TEXT,
         icon: <User />,
         invertIcon: <User />,
-        placeHolderText: intl.formatMessage(messages.placeholderName),
-        isPlainLink: true
+        placeHolderText: intl.formatMessage(messages.placeholderName)
+        // isPlainLink: true
       }
     ]
 
