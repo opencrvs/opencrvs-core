@@ -35,6 +35,28 @@ const messagesToDefine = {
     description: 'Label for informants signature input',
     id: 'review.inputs.informantsSignature'
   },
+  signatureDescription: {
+    defaultMessage:
+      'I, the undersigned, hereby declare that the particulars in this form are true and correct to the best of my knowledge.',
+    description: 'Label awknowledging the correctness of the declaration',
+    id: 'review.signature.description'
+  },
+  signatureInputDescription: {
+    defaultMessage:
+      'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Nigeria.',
+    description: 'Description awknowledging the correctness of the declaration',
+    id: 'review.signature.input.description'
+  },
+  signatureOpenSignatureInput: {
+    defaultMessage: 'Sign',
+    description: 'Label for button that opens the signature input',
+    id: 'review.signature.open'
+  },
+  signatureDelete: {
+    defaultMessage: 'Delete',
+    description: 'Label for button that deletes signature',
+    id: 'review.signature.delete'
+  },
   additionalComments: {
     defaultMessage: 'Any additional comments?',
     description: 'Label for input Additional comments',

@@ -105,21 +105,13 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice } from '@client/utils/commonUtils'
+
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import {
-  flatten,
-  isArray,
-  flattenDeep,
-  get,
-  clone,
-  flatMap,
-  camelCase
-} from 'lodash'
+import { flatten, isArray, flattenDeep, get, clone, flatMap } from 'lodash'
 import * as React from 'react'
-import { findDOMNode } from 'react-dom'
+
 import {
   injectIntl,
   IntlShape,
@@ -143,7 +135,6 @@ import {
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
   ApplyButton,
   CancelButton
@@ -371,13 +362,12 @@ function SignatureInput({ id, value, onChange }: SignatureInputProps) {
   return (
     <div>
       <SignatureDescription>
-        I, the undersigned, hereby declare that the particulars in this form are
-        true and correct to the best of my knowledge.
+        {intl.formatMessage(messages.signatureDescription)}
       </SignatureDescription>
       {!value && (
         <>
           <SecondaryButton onClick={() => setSignatureDialogOpen(true)}>
-            Sign
+            {intl.formatMessage(messages.signatureOpenSignatureInput)}
           </SecondaryButton>
           <CustomImageUpload
             id="signature-file-upload"
@@ -390,7 +380,9 @@ function SignatureInput({ id, value, onChange }: SignatureInputProps) {
       )}
       {value && <SignaturePreview alt="Informant's signature" src={value} />}
       {value && (
-        <TertiaryButton onClick={() => onChange('')}>Remove</TertiaryButton>
+        <TertiaryButton onClick={() => onChange('')}>
+          {intl.formatMessage(messages.signatureDelete)}
+        </TertiaryButton>
       )}
 
       <ResponsiveModal
@@ -420,9 +412,7 @@ function SignatureInput({ id, value, onChange }: SignatureInputProps) {
         handleClose={() => setSignatureDialogOpen(false)}
       >
         <SignatureDescription>
-          By signing this document with an electronic signature, I agree that
-          such signature will be valid as handwritten signatures to the extent
-          allowed by the laws of Nigeria
+          {intl.formatMessage(messages.signatureInputDescription)}
         </SignatureDescription>
         <SignCanvas value={value} onChange={setSignatureValue} />
       </ResponsiveModal>
@@ -1645,10 +1635,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
+    const isSignatureMissing = isCorrection(declaration)
+      ? false
+      : !(
+          hasB1Form(declaration) ||
+          declaration.data.registration?.informantsSignature
+        )
+
     const isComplete =
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
-      ).length === 0
+      ).length === 0 && !isSignatureMissing
 
     const textAreaProps = {
       id: 'additional_comments',
