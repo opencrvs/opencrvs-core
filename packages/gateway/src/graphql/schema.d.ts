@@ -1962,6 +1962,7 @@ export interface QueryToSearchEventsArgs {
   status?: Array<string | null>
   type?: Array<string | null>
   trackingId?: string
+  nationalId?: string
   registrationNumber?: string
   contactNumber?: string
   name?: string

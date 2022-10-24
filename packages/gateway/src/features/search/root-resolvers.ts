@@ -80,6 +80,7 @@ export const resolvers: GQLResolver = {
         status,
         type,
         trackingId,
+        nationalId,
         registrationNumber,
         contactNumber,
         name,
@@ -108,6 +109,9 @@ export const resolvers: GQLResolver = {
       }
       if (trackingId) {
         searchCriteria.trackingId = trackingId
+      }
+      if (nationalId) {
+        searchCriteria.nationalId = nationalId
       }
       if (registrationNumber) {
         searchCriteria.registrationNumber = registrationNumber

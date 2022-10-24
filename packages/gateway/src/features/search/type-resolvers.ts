@@ -34,6 +34,7 @@ export interface ISearchCriteria {
   declarationLocationHirarchyId?: string
   status?: string[]
   type?: string[]
+  nationalId?: string
   trackingId?: string
   contactNumber?: string
   name?: string
