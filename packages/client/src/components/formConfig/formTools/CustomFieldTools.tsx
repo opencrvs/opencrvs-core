@@ -770,8 +770,6 @@ class CustomFieldToolsComp extends React.Component<
                     return
                   }
                   const modifiedField = this.prepareModifiedFormField()
-                  console.log('modifiedField', modifiedField)
-                  console.log('selectedField', selectedField)
                   modifyConfigField(selectedField.fieldId, modifiedField)
                   debouncedNullifySelectedField()
                 }}
