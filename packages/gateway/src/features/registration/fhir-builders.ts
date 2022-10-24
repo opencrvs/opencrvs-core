@@ -737,6 +737,17 @@ function createEducationalAttainmentBuilder(
   })
 }
 
+function createLiteracyBuilder(resource: fhir.Patient, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/literacy`,
+    valueString: fieldValue
+  })
+}
+
 function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
@@ -1279,6 +1290,18 @@ export const builders: IFieldBuilders = {
       )
       return createDateOfMarriageBuilder(person, fieldValue)
     },
+    literacy: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
+      return createLiteracyBuilder(person, fieldValue)
+    },
     educationalAttainment: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -1410,6 +1433,18 @@ export const builders: IFieldBuilders = {
         fhirBundle
       )
       return createDateOfMarriageBuilder(person, fieldValue)
+    },
+    literacy: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
+      return createLiteracyBuilder(person, fieldValue)
     },
     educationalAttainment: (
       fhirBundle: ITemplatedBundle,
