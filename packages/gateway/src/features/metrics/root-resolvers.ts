@@ -45,7 +45,15 @@ export const resolvers: GQLResolver = {
           variables,
           authHeader
         )
-      } else result = await getMetrics('/totalMetrics', variables, authHeader)
+      } else if (filterBy === FILTER_BY.LOCATION) {
+        result = await getMetrics(
+          '/totalMetricsByLocation',
+          variables,
+          authHeader
+        )
+      } else {
+        result = await getMetrics('/totalMetrics', variables, authHeader)
+      }
       return result
     },
     async getTotalPayments(

@@ -33,7 +33,10 @@ import { SortArrow } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { Table } from '@opencrvs/components/lib/Table'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLMixedTotalMetricsResult,
+  GQLSearchFieldAgentResult
+} from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
@@ -49,7 +52,8 @@ import { IAvatar } from '@client/utils/userUtils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { userMessages } from '@client/i18n/messages'
 import { SegmentedControl } from '@client/components/SegmentedControl'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
+import { getName } from '../RecordAudit/utils'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -97,6 +101,12 @@ type IProps = RouteComponentProps &
 export enum EVENT_OPTIONS {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
+}
+
+enum RESULT_TYPE {
+  by_registrar = 'TotalMetricsByRegistrarResult',
+  by_location = 'TotalMetricsByLocation',
+  by_time = 'TotalMetricsByTime'
 }
 
 enum STATUS_OPTIONS {
@@ -226,7 +236,7 @@ function RegistrationListComponent(props: IProps) {
   function getColumns() {
     const commonColumns = [
       {
-        key: 'totalRegistrations',
+        key: 'total',
         label: intl.formatMessage(messages.totalRegistrations),
         width: 20,
         isSortable: true,
@@ -240,7 +250,7 @@ function RegistrationListComponent(props: IProps) {
         isSorted: columnToBeSort === 'totalRegistrations' ? true : false
       },
       {
-        key: 'lateRegistrations',
+        key: 'late',
         label: intl.formatMessage(messages.performanceLateRegistrationsLabel),
         width: 20,
         isSortable: true,
@@ -254,7 +264,7 @@ function RegistrationListComponent(props: IProps) {
         isSorted: columnToBeSort === 'lateRegistrations' ? true : false
       },
       {
-        key: 'delayedRegistrations',
+        key: 'delayed',
         label: intl.formatMessage(
           messages.performanceDelayedRegistrationsLabel
         ),
@@ -358,13 +368,18 @@ function RegistrationListComponent(props: IProps) {
     if (filterBy === FILTER_BY_OPTIONS.BY_REGISTRAR)
       return [
         {
-          key: 'registrar',
+          key: 'name',
           label: intl.formatMessage(messages.registrar),
           width: 20
         },
         {
-          key: 'type',
+          key: 'role',
           label: intl.formatMessage(messages.typeColumnHeader),
+          width: 20
+        },
+        {
+          key: 'location',
+          label: intl.formatMessage(messages.officeColumnHeader),
           width: 20
         },
         ...commonColumns
@@ -376,73 +391,27 @@ function RegistrationListComponent(props: IProps) {
     return userMessages[type] ? intl.formatMessage(userMessages[type]) : type
   }
 
-  function getContent(data?: GQLSearchFieldAgentResult) {
-    const content =
-      data &&
-      data.results &&
-      data.results.map((row, idx) => {
-        if (row === null) {
-          return {
-            name: '',
-            type: '',
-            officeName: '',
-            startMonth: '',
-            totalDeclarations: '',
-            inProgressDeclarations: '',
-            avgCompleteDeclarationTime: '',
-            rejectedDeclarations: ''
-          }
-        }
-        const office =
-          row.primaryOfficeId &&
-          offices.find(({ id }) => id === row.primaryOfficeId)
-        return {
-          name: getNameWithAvatar(row.fullName || '', row.avatar),
-          rawName: row.fullName || '',
-          type: (row.type && getFieldAgentTypeLabel(row.type)) || '',
-          officeName: (office && office.displayLabel) || '',
-          startMonth: row.creationDate,
-          totalDeclarations: String(row.totalNumberOfDeclarationStarted),
-          inProgressDeclarations: `${
-            row.totalNumberOfInProgressAppStarted
-          } (${getPercentage(
-            row.totalNumberOfDeclarationStarted,
-            row.totalNumberOfInProgressAppStarted
-          )}%)`,
-          avgCompleteDeclarationTime: row.averageTimeForDeclaredDeclarations,
-          rejectedDeclarations: `${
-            row.totalNumberOfRejectedDeclarations
-          } (${getPercentage(
-            row.totalNumberOfDeclarationStarted,
-            row.totalNumberOfRejectedDeclarations
-          )}%)`
-        }
-      })
-    return (
-      (content &&
-        orderBy(
-          content,
-          columnToBeSort === 'rawName'
-            ? [(content) => content[columnToBeSort]!.toString().toLowerCase()]
-            : [columnToBeSort],
-          [sortOrder[columnToBeSort]]
-        ).map((row, idx) => {
-          return {
-            ...row,
-            startMonth:
-              (row.startMonth && format(Number(row.startMonth), 'MMMM yyyy')) ||
-              '',
-            avgCompleteDeclarationTime:
-              row.avgCompleteDeclarationTime === 0
-                ? '-'
-                : getAverageCompletionTimeComponent(
-                    Number(row.avgCompleteDeclarationTime),
-                    idx
-                  )
-          }
-        })) ||
-      []
-    )
+  function getContent(data?: GQLMixedTotalMetricsResult) {
+    if (!data) {
+      return []
+    }
+
+    if (data.__typename === RESULT_TYPE.by_registrar) {
+      return data.results.map((result) => ({
+        ...result,
+        name: result.registrarPractitioner.user.name
+          ? getName(result.registrarPractitioner.user.name, 'en')
+          : '',
+        location: result.registrarPractitioner.user.primaryOffice.name,
+        role: getFieldAgentTypeLabel(result.registrarPractitioner.user.role)
+      }))
+    } else if (data.__typename === RESULT_TYPE.by_location) {
+      return []
+    } else if (data.__typename === RESULT_TYPE.by_time) {
+      return []
+    } else {
+      return []
+    }
   }
 
   const options: (IPerformanceSelectOption & { disabled?: boolean })[] = [

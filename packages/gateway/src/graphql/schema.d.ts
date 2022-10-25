@@ -267,16 +267,19 @@ export interface GQLTotalMetricsResult {
 export type GQLMixedTotalMetricsResult =
   | GQLTotalMetricsResult
   | GQLTotalMetricsByRegistrarResult
+  | GQLTotalMetricsByLocation
 
 /** Use this to resolve union type MixedTotalMetricsResult */
 export type GQLPossibleMixedTotalMetricsResultTypeNames =
   | 'TotalMetricsResult'
   | 'TotalMetricsByRegistrarResult'
+  | 'TotalMetricsByLocation'
 
 export interface GQLMixedTotalMetricsResultNameMap {
   MixedTotalMetricsResult: GQLMixedTotalMetricsResult
   TotalMetricsResult: GQLTotalMetricsResult
   TotalMetricsByRegistrarResult: GQLTotalMetricsByRegistrarResult
+  TotalMetricsByLocation: GQLTotalMetricsByLocation
 }
 
 export interface GQLPaymentMetric {
@@ -781,6 +784,10 @@ export interface GQLTotalMetricsByRegistrarResult {
   results: Array<GQLEventMetricsByRegistrar>
 }
 
+export interface GQLTotalMetricsByLocation {
+  results: Array<GQLEventMetricsByLocation>
+}
+
 export interface GQLTimeLoggedMetrics {
   status: string
   trackingId?: string
@@ -1140,6 +1147,15 @@ export interface GQLEventMetricsByRegistrar {
   delayed: number
 }
 
+export interface GQLEventMetricsByLocation {
+  locationID?: GQLLocationDetails
+  total: number
+  late: number
+  delayed: number
+  home: number
+  healthFacility: number
+}
+
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
@@ -1325,6 +1341,10 @@ export interface GQLRegistrarPractitioner {
   user?: GQLUser
 }
 
+export interface GQLLocationDetails {
+  details?: GQLLocation
+}
+
 export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
@@ -1436,6 +1456,7 @@ export interface GQLResolver {
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
   TotalMetricsByRegistrarResult?: GQLTotalMetricsByRegistrarResultTypeResolver
+  TotalMetricsByLocation?: GQLTotalMetricsByLocationTypeResolver
   TimeLoggedMetrics?: GQLTimeLoggedMetricsTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -1454,6 +1475,7 @@ export interface GQLResolver {
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
   EventMetricsByRegistrar?: GQLEventMetricsByRegistrarTypeResolver
+  EventMetricsByLocation?: GQLEventMetricsByLocationTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   OperationHistorySearchSet?: GQLOperationHistorySearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
@@ -1463,6 +1485,7 @@ export interface GQLResolver {
   DeathFee?: GQLDeathFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
   RegistrarPractitioner?: GQLRegistrarPractitionerTypeResolver
+  LocationDetails?: GQLLocationDetailsTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
@@ -3472,7 +3495,12 @@ export interface GQLMixedTotalMetricsResultTypeResolver<TParent = any> {
   (parent: TParent, context: any, info: GraphQLResolveInfo):
     | 'TotalMetricsResult'
     | 'TotalMetricsByRegistrarResult'
-    | Promise<'TotalMetricsResult' | 'TotalMetricsByRegistrarResult'>
+    | 'TotalMetricsByLocation'
+    | Promise<
+        | 'TotalMetricsResult'
+        | 'TotalMetricsByRegistrarResult'
+        | 'TotalMetricsByLocation'
+      >
 }
 export interface GQLPaymentMetricTypeResolver<TParent = any> {
   total?: PaymentMetricToTotalResolver<TParent>
@@ -4784,6 +4812,17 @@ export interface TotalMetricsByRegistrarResultToResultsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLTotalMetricsByLocationTypeResolver<TParent = any> {
+  results?: TotalMetricsByLocationToResultsResolver<TParent>
+}
+
+export interface TotalMetricsByLocationToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLTimeLoggedMetricsTypeResolver<TParent = any> {
   status?: TimeLoggedMetricsToStatusResolver<TParent>
   trackingId?: TimeLoggedMetricsToTrackingIdResolver<TParent>
@@ -5172,6 +5211,57 @@ export interface EventMetricsByRegistrarToLateResolver<
 }
 
 export interface EventMetricsByRegistrarToDelayedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventMetricsByLocationTypeResolver<TParent = any> {
+  locationID?: EventMetricsByLocationToLocationIDResolver<TParent>
+  total?: EventMetricsByLocationToTotalResolver<TParent>
+  late?: EventMetricsByLocationToLateResolver<TParent>
+  delayed?: EventMetricsByLocationToDelayedResolver<TParent>
+  home?: EventMetricsByLocationToHomeResolver<TParent>
+  healthFacility?: EventMetricsByLocationToHealthFacilityResolver<TParent>
+}
+
+export interface EventMetricsByLocationToLocationIDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToLateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToDelayedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToHomeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToHealthFacilityResolver<
   TParent = any,
   TResult = any
 > {
@@ -5592,6 +5682,17 @@ export interface GQLRegistrarPractitionerTypeResolver<TParent = any> {
 }
 
 export interface RegistrarPractitionerToUserResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLLocationDetailsTypeResolver<TParent = any> {
+  details?: LocationDetailsToDetailsResolver<TParent>
+}
+
+export interface LocationDetailsToDetailsResolver<
   TParent = any,
   TResult = any
 > {

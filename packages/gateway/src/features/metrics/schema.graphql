@@ -45,6 +45,23 @@ type TotalMetricsByRegistrarResult {
   results: [EventMetricsByRegistrar!]!
 }
 
+type LocationDetails {
+  details: Location
+}
+
+type EventMetricsByLocation {
+  locationID: LocationDetails
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+}
+
+type TotalMetricsByLocation {
+  results: [EventMetricsByLocation!]!
+}
+
 type PaymentMetric {
   total: Float!
   paymentType: String!
@@ -119,6 +136,7 @@ type LocationStatisticsResponse {
 union MixedTotalMetricsResult =
     TotalMetricsResult
   | TotalMetricsByRegistrarResult
+  | TotalMetricsByLocation
 
 type Query {
   getTotalMetrics(

@@ -424,6 +424,7 @@ type TotalMetricsResult {
 union MixedTotalMetricsResult =
     TotalMetricsResult
   | TotalMetricsByRegistrarResult
+  | TotalMetricsByLocation
 
 type PaymentMetric {
   total: Float!
@@ -927,6 +928,10 @@ type TotalMetricsByRegistrarResult {
   results: [EventMetricsByRegistrar!]!
 }
 
+type TotalMetricsByLocation {
+  results: [EventMetricsByLocation!]!
+}
+
 type TimeLoggedMetrics {
   status: String!
   trackingId: String
@@ -1275,6 +1280,15 @@ type EventMetricsByRegistrar {
   delayed: Int!
 }
 
+type EventMetricsByLocation {
+  locationID: LocationDetails
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+}
+
 type RegistrationSearchSet {
   status: String
   contactNumber: String
@@ -1458,6 +1472,10 @@ type Payment {
 
 type RegistrarPractitioner {
   user: User
+}
+
+type LocationDetails {
+  details: Location
 }
 
 input CommentInput {

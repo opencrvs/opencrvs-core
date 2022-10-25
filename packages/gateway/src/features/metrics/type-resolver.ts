@@ -13,13 +13,22 @@
 import { GQLResolver } from '@gateway/graphql/schema'
 import { getUser } from '@gateway/features/user/utils'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
+import { fetchFHIR } from '@gateway/features/fhir/utils'
 
 export const typeResolvers: GQLResolver = {
   MixedTotalMetricsResult: {
     __resolveType(obj, context, info) {
       if (info.variableValues.filterBy === FILTER_BY.REGISTERER)
         return 'TotalMetricsByRegistrarResult'
+      else if (info.variableValues.filterBy === FILTER_BY.LOCATION)
+        return 'TotalMetricsByLocation'
       else return 'TotalMetricsResult'
+    }
+  },
+  LocationDetails: {
+    async details(locationId, _, authHeader) {
+      const location = await fetchFHIR(`/${locationId}`, authHeader)
+      return location
     }
   },
   RegistrarPractitioner: {

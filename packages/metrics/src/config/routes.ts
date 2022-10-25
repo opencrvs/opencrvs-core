@@ -50,6 +50,7 @@ import {
   responseSchema
 } from '@metrics/features/searchMetrics/handler'
 import {
+  totalMetricsByLocation,
   totalMetricsByRegistrar,
   totalMetricsHandler
 } from '@metrics/features/totalMetrics/handler'
@@ -338,6 +339,22 @@ export const getRoutes = () => {
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
             locationId: Joi.string(),
+            event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    {
+      method: 'GET',
+      path: '/totalMetricsByLocation',
+      handler: totalMetricsByLocation,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
             event: Joi.string().required()
           })
         },

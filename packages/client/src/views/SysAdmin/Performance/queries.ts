@@ -173,9 +173,14 @@ export const FETCH_REGISTRATIONS = gql`
           delayed
           registrarPractitioner {
             user {
+              role
+              primaryOffice {
+                name
+              }
               name {
                 firstNames
                 familyName
+                use
               }
             }
           }

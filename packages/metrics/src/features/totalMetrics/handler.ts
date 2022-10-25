@@ -16,9 +16,17 @@ import {
   TIME_FROM,
   TIME_TO
 } from '@metrics/features/metrics/constants'
-import { getTotalMetrics } from '@metrics/features/metrics/metricsGenerator'
+import {
+  fetchRegistrationsGroupByOfficeLocation,
+  getTotalMetrics
+} from '@metrics/features/metrics/metricsGenerator'
 import { IAuthHeader } from '@metrics/features/registration'
-import { unionBy } from 'lodash'
+import { uniqBy } from 'lodash'
+
+enum EVENT_LOCATION_TYPE {
+  HEALTH_FACILITY = 'HEALTH_FACILITY',
+  PRIVATE_HOME = 'PRIVATE_HOME'
+}
 
 export async function totalMetricsHandler(
   request: Hapi.Request,
@@ -67,12 +75,12 @@ export async function totalMetricsByRegistrar(
     authHeader
   )
 
-  const registrarIDs = unionBy(
+  const registrarIDs = uniqBy(
     totalRegistrations.results,
     'registrarPractitionerId'
   ).map((item) => item.registrarPractitionerId)
 
-  let results: any[] = []
+  const results: any[] = []
 
   registrarIDs.forEach((registrarId) => {
     const registrarResults = totalRegistrations.results.filter(
@@ -94,4 +102,63 @@ export async function totalMetricsByRegistrar(
   })
 
   return { results }
+}
+
+export async function totalMetricsByLocation(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const timeStart = request.query[TIME_FROM]
+  const timeEnd = request.query[TIME_TO]
+  const event = request.query[EVENT]
+  const authHeader: IAuthHeader = {
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
+  }
+
+  const results = await fetchRegistrationsGroupByOfficeLocation(
+    timeStart,
+    timeEnd,
+    event,
+    authHeader
+  )
+
+  const locationIDs = uniqBy(results, 'officeLocation').map(
+    (item) => item.officeLocation
+  )
+
+  const response: any[] = []
+
+  locationIDs.forEach((locationID) => {
+    const registrations = results.filter(
+      (result) => result.officeLocation === locationID
+    )
+
+    const lateRegistrations = registrations.filter(
+      (result) => result.timeLabel === 'withinLate'
+    )
+    const delayedRegistrations = registrations.filter(
+      (result) => !['withinLate', 'withinTarget'].includes(result.timeLabel)
+    )
+
+    const healthFacilityRegistrations = registrations.filter(
+      (result) =>
+        result.eventLocationType === EVENT_LOCATION_TYPE.HEALTH_FACILITY
+    )
+
+    const homeRegistrations = registrations.filter(
+      (result) => result.eventLocationType === EVENT_LOCATION_TYPE.PRIVATE_HOME
+    )
+
+    response.push({
+      locationID,
+      total: registrations.length,
+      late: lateRegistrations.length,
+      delayed: delayedRegistrations.length,
+      home: homeRegistrations.length,
+      healthFacility: healthFacilityRegistrations.length
+    })
+  })
+
+  return { results: response }
 }
