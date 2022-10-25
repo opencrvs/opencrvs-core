@@ -2814,7 +2814,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 action: 'hide',
                 expression:
-                  "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                  '((draftData.registration.informantType === "MOTHER" && draftData.mother.detailsExist) || (draftData.registration.informantType === "FATHER" && draftData.father.detailsExist))'
               }
             ],
             fields: [
