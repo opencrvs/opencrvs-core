@@ -59,6 +59,8 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import { Integrations } from '@sentry/browser'
+import { IntegrationList } from './views/SysAdmin/Config/Integrations/Integrations'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -307,6 +309,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.TEAM_USER_LIST}
                                             component={UserList}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.INTEGRATION_LIST}
+                                            component={IntegrationList}
                                           />
                                           <ProtectedRoute
                                             exact

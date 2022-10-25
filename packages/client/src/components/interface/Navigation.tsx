@@ -30,6 +30,7 @@ import {
   goToSettings,
   goToPerformanceView,
   goToTeamView,
+  goToIntegrationList,
   goToFormConfigHome,
   goToApplicationConfig
 } from '@client/navigation'
@@ -194,6 +195,7 @@ interface IDispatchProps {
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
+  goToIntegrationViewAction: typeof goToIntegrationList
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
 }
@@ -258,6 +260,7 @@ export const NavigationView = (props: IFullProps) => {
     activeMenuItem,
     goToCertificateConfigAction,
     goToFormConfigAction,
+    goToIntegrationViewAction,
     goToApplicationConfigAction,
     navigationWidth,
     workqueue,
@@ -642,14 +645,14 @@ export const NavigationView = (props: IFullProps) => {
                           />
 
                           <NavigationSubItem
-                            id={`navigation_${WORKQUEUE_TABS.declarationForms}`}
+                            id={`navigation_${WORKQUEUE_TABS.integrations}`}
                             label={intl.formatMessage(
                               navigationMessages[WORKQUEUE_TABS.integrations]
                             )}
-                            onClick={goToFormConfigAction}
+                            onClick={goToIntegrationViewAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.declarationForms
+                              activeMenuItem === WORKQUEUE_TABS.integrations
                             }
                           />
                         </>
@@ -715,6 +718,7 @@ export const Navigation = connect<
   goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
+  goToIntegrationViewAction: goToIntegrationList,
   redirectToAuthentication,
   goToSettings,
   updateRegistrarWorkqueue
