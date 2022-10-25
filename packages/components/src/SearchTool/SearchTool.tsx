@@ -167,8 +167,12 @@ export interface ISearchType {
   invertIcon?: React.ReactNode
   isDefault?: boolean
   placeHolderText: string
-  isPlainText?: boolean
-  onClick?: () => void
+}
+export interface INavigationType {
+  label: string
+  id: string
+  icon?: React.ReactNode
+  onClick: () => void
 }
 interface IState {
   dropDownIsVisible: boolean
@@ -178,6 +182,7 @@ interface IState {
 }
 interface IProps {
   searchTypeList: ISearchType[]
+  navigationList?: INavigationType[]
   searchText?: string
   selectedSearchType?: string
   language: string
@@ -242,18 +247,7 @@ export class SearchTool extends React.Component<IProps, IState> {
       this.state.dropDownIsVisible && (
         <DropDownWrapper>
           {this.props.searchTypeList.map((item) => {
-            return item.isPlainText ? (
-              <DropDownItem
-                borderTop={true}
-                id={item.value}
-                key={item.value}
-                onClick={() => this.dropDownItemSelect(item)}
-              >
-                <Text variant={'bold14'} element={'p'} color={'primary'}>
-                  {item.label}
-                </Text>
-              </DropDownItem>
-            ) : (
+            return (
               <DropDownItem
                 borderTop={false}
                 id={item.value}
@@ -265,10 +259,26 @@ export class SearchTool extends React.Component<IProps, IState> {
               </DropDownItem>
             )
           })}
+          {this.props.navigationList?.map((item) => {
+            return (
+              <DropDownItem
+                borderTop={true}
+                id={item.id}
+                key={item.id}
+                onClick={() => item.onClick()}
+              >
+                <IconWrapper>{item.icon}</IconWrapper>
+                <Text variant={'bold14'} element={'p'} color={'primary'}>
+                  {item.label}
+                </Text>
+              </DropDownItem>
+            )
+          })}
         </DropDownWrapper>
       )
     )
   }
+
   dropDownItemSelect = (item: ISearchType) => {
     this.setState((_) => ({
       selectedSearchType: item,

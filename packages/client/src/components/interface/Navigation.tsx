@@ -27,7 +27,6 @@ import { connect } from 'react-redux'
 import {
   goToHomeTab,
   goToCertificateConfig,
-  goToAdvancedSearch,
   goToSettings,
   goToPerformanceView,
   goToTeamView,
@@ -189,7 +188,6 @@ interface IProps {
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
-  goToAdvancedSearchAction: typeof goToAdvancedSearch
   goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
@@ -700,7 +698,6 @@ export const Navigation = connect<
 >(mapStateToProps, {
   goToHomeTab,
   goToCertificateConfigAction: goToCertificateConfig,
-  goToAdvancedSearchAction: goToAdvancedSearch,
   goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,

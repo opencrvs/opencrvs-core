@@ -64,7 +64,11 @@ import {
   AddUser
 } from '@opencrvs/components/lib/icons'
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
-import { SearchTool, ISearchType } from '@opencrvs/components/lib/SearchTool'
+import {
+  SearchTool,
+  ISearchType,
+  INavigationType
+} from '@opencrvs/components/lib/SearchTool'
 import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
@@ -424,12 +428,13 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         icon: <User />,
         invertIcon: <User />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
-      },
+      }
+    ]
+    const navigationList: INavigationType[] = [
       {
         label: intl.formatMessage(messages.advancedSearch),
-        value: ADVANCED_SEARCH_TEXT,
-        placeHolderText: intl.formatMessage(messages.placeholderAdvancedSearch),
-        isPlainText: true
+        id: ADVANCED_SEARCH_TEXT,
+        onClick: () => this.props.goToAdvancedSearch()
       }
     ]
 
@@ -440,6 +445,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
+        navigationList={navigationList}
         searchHandler={(text, type) =>
           props.goToSearchResult(text, type, isMobile)
         }
