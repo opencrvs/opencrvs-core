@@ -87,9 +87,10 @@ const Close = styled(Button)`
   }
 `
 
-const NotificationMessage = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  color: ${({ theme }) => theme.colors.white};
+const NotificationMessage = styled(Text).attrs(
+  color: 'white',
+  variant: 'bold16'
+)`
   position: relative;
   width: 100%;
   padding: 14px 24px 12px 16px;
@@ -104,7 +105,7 @@ export interface IToastProps extends React.HTMLAttributes<HTMLDivElement> {
   duration?: number | null
 }
 
-export const Toast = ({
+export function Toast({
   type,
   onClose,
   duration = TOAST_DEFAULT_DURATION_MS,
@@ -112,45 +113,46 @@ export const Toast = ({
   actionText,
   children,
   ...props
-}: IToastProps) => (
-  <Container $type={type} {...props}>
-    {type === 'loading' && (
-      <SpinnerContainer>
-        <Spinner
-          id="in-progress-floating-notification"
-          baseColor={colors.white}
-          size={20}
-        />
-      </SpinnerContainer>
-    )}
+}: IToastProps) {
+  useToastVisibility({
+    duration: type === 'loading' ? null : duration,
+    onClose
+  })
+  return (
+    <Container $type={type} {...props}>
+      {type === 'loading' && (
+        <SpinnerContainer>
+          <Spinner
+            id="in-progress-floating-notification"
+            baseColor={colors.white}
+            size={20}
+          />
+        </SpinnerContainer>
+      )}
 
-    <NotificationMessage>{children}</NotificationMessage>
+      <NotificationMessage>{children}</NotificationMessage>
 
-    {useToastVisibility({
-      duration: type === 'loading' ? null : duration,
-      onClose
-    })}
-
-    {onActionClick && (
-      <ActionLink
-        color="white"
-        font="bold14"
-        element="button"
-        data-testid={props['data-testid'] && `${props['data-testid']}-action`}
-      >
-        {actionText}
-      </ActionLink>
-    )}
-    {onClose && type !== 'loading' && (
-      <Close
-        type="icon"
-        size="medium"
-        id={props.id + 'Cancel'}
-        data-testid={props['data-testid'] && `${props['data-testid']}-close`}
-        onClick={onClose}
-      >
-        <Cross color="currentColor" />
-      </Close>
-    )}
-  </Container>
-)
+      {onActionClick && (
+        <ActionLink
+          color="white"
+          font="bold14"
+          element="button"
+          data-testid={props['data-testid'] && `${props['data-testid']}-action`}
+        >
+          {actionText}
+        </ActionLink>
+      )}
+      {onClose && type !== 'loading' && (
+        <Close
+          type="icon"
+          size="medium"
+          id={props.id + 'Cancel'}
+          data-testid={props['data-testid'] && `${props['data-testid']}-close`}
+          onClick={onClose}
+        >
+          <Cross color="currentColor" />
+        </Close>
+      )}
+    </Container>
+  )
+}
