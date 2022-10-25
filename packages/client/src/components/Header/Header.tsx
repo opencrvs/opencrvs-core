@@ -13,6 +13,7 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
+// import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   goBack,
   goForward,
@@ -24,7 +25,8 @@ import {
   goToTeamSearch,
   goToTeamUserList,
   goToCreateNewUserWithLocationId,
-  goToCreateNewUser
+  goToCreateNewUser,
+  goToAdvancedSearch
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -98,6 +100,7 @@ type IDispatchProps = {
   goToCreateNewUser: typeof goToCreateNewUser
   goToTeamSearchAction: typeof goToTeamSearch
   goToTeamUserListAction: typeof goToTeamUserList
+  goToAdvancedSearch: typeof goToAdvancedSearch
 }
 
 interface IProps extends RouteComponentProps {
@@ -404,8 +407,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(messages.nationalId),
         value: NATIONAL_ID_TEXT,
-        icon: <BRN />,
-        invertIcon: <BRN />,
+        icon: <User />,
+        invertIcon: <User />,
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       },
       {
@@ -425,8 +428,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(messages.advancedSearch),
         value: ADVANCED_SEARCH_TEXT,
-        icon: <User />,
-        invertIcon: <User />,
         placeHolderText: intl.formatMessage(messages.placeholderAdvancedSearch),
         isPlainText: true
       }
@@ -618,7 +619,8 @@ export const Header = connect(
     goToCreateNewUserWithLocationId,
     goToCreateNewUser,
     goToTeamSearchAction: goToTeamSearch,
-    goToTeamUserListAction: goToTeamUserList
+    goToTeamUserListAction: goToTeamUserList,
+    goToAdvancedSearch: goToAdvancedSearch
   }
 )(injectIntl(withTheme(withRouter(HeaderComp))))
 

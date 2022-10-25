@@ -163,11 +163,12 @@ const ClearTextIcon = styled((props) => <ClearText {...props} />)`
 export interface ISearchType {
   label: string
   value: string
-  icon: React.ReactNode
-  invertIcon: React.ReactNode
+  icon?: React.ReactNode
+  invertIcon?: React.ReactNode
   isDefault?: boolean
   placeHolderText: string
   isPlainText?: boolean
+  onClick?: () => void
 }
 interface IState {
   dropDownIsVisible: boolean
