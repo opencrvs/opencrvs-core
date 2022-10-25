@@ -16,6 +16,7 @@ export enum SortOrder {
 export interface ISearchQuery {
   query?: string
   trackingId?: string
+  nationalId?: string
   contactNumber?: string
   registrationNumber?: string
   name?: string

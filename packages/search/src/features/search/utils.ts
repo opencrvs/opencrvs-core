@@ -76,6 +76,7 @@ export const EMPTY_STRING = ''
 export function queryBuilder(
   query: string,
   trackingId: string,
+  nationalId: string,
   contactNumber: string,
   registrationNumber: string,
   eventLocationId: string,
@@ -117,6 +118,31 @@ export function queryBuilder(
         'trackingId.keyword': trackingId
       }
     })
+  }
+
+  if (nationalId !== EMPTY_STRING) {
+    should.push(
+      {
+        match: {
+          motherIdentifier: nationalId
+        }
+      },
+      {
+        match: {
+          fatherIdentifier: nationalId
+        }
+      },
+      {
+        match: {
+          informantIdentifier: nationalId
+        }
+      },
+      {
+        match: {
+          deceasedIdentifier: nationalId
+        }
+      }
+    )
   }
 
   if (contactNumber !== EMPTY_STRING) {
