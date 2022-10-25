@@ -16,6 +16,7 @@ describe('elasticsearch db helper', () => {
     const newQuery = queryBuilder(
       '',
       'trackingId',
+      'nationalId',
       'contactNumber',
       'registrationNumber',
       'eventLocationId',
@@ -126,7 +127,28 @@ describe('elasticsearch db helper', () => {
             }
           }
         ],
-        should: []
+        should: [
+          {
+            match: {
+              motherIdentifier: 'nationalId'
+            }
+          },
+          {
+            match: {
+              fatherIdentifier: 'nationalId'
+            }
+          },
+          {
+            match: {
+              informantIdentifier: 'nationalId'
+            }
+          },
+          {
+            match: {
+              deceasedIdentifier: 'nationalId'
+            }
+          }
+        ]
       }
     })
   })
