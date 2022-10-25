@@ -63,8 +63,8 @@ itemPerformance.args = {
 export const itemTeam = Template.bind({})
 
 itemTeam.args = {
-  // icon: () => <Users stroke={'#595C5F'} height={15} width={15} />,
-  // label: 'Team'
+  icon: () => <Users stroke={'#595C5F'} height={15} width={15} />,
+  label: 'Team'
 }
 
 export const itemConfiguration = Template.bind({})
