@@ -532,6 +532,7 @@ export interface GQLRegistration {
   assignment?: GQLAssignmentData
   contact?: string
   contactRelationship?: string
+  informantsSignature?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
@@ -873,6 +874,7 @@ export interface GQLRegistrationInput {
   paperFormID?: string
   page?: string
   book?: string
+  informantsSignature?: string
   informantType?: GQLInformantType
   otherInformantType?: string
   contact?: string
@@ -3944,6 +3946,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   assignment?: RegistrationToAssignmentResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
   contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
+  informantsSignature?: RegistrationToInformantsSignatureResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
@@ -4020,6 +4023,13 @@ export interface RegistrationToContactResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToContactRelationshipResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToInformantsSignatureResolver<
   TParent = any,
   TResult = any
 > {
