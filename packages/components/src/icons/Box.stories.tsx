@@ -11,13 +11,13 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { ThreeDots } from '.'
+import { Box } from './Box'
 
 export default {
-  title: 'Styles/Icons/ThreeDots',
-  component: ThreeDots
+  title: 'Deprecated/Icons/Box',
+  component: Box
 } as Meta
 
-const Template: Story<{}> = () => <ThreeDots />
+const Template: Story<{}> = () => <Box />
 
-export const ThreeDotsIcon = Template.bind({})
+export const BoxView = Template.bind({})

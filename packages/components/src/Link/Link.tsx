@@ -35,7 +35,6 @@ const StyledLink = styled.button<{ $font: IFont; $color: IColor }>`
   background: transparent;
   text-decoration: none;
   display: inline;
-
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 100%;
