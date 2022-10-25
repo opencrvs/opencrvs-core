@@ -22,6 +22,6 @@ SpinnerExample.args = {
 }
 
 export default {
-  title: 'Styles/Icons/Spinner',
+  title: 'Data/Spinner',
   component: Spinner
 } as Meta

@@ -9,15 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { StatusCertified } from '.'
 
-export default {
-  title: 'Styles/Icons/StatusCertified',
-  component: StatusCertified
-} as Meta
-
-const Template: Story<{}> = () => <StatusCertified />
-
-export const StatusCertifiedIcon = Template.bind({})
+export * from './custom-icons'
+export * from 'react-feather'

@@ -16,6 +16,7 @@
     "rc-progress": "^2.5.2",
     "react": "^16.10.1",
     "react-dom": "^16.10.1",
+    "react-feather": "^2.0.10",
     "react-pdf": "^4.0.2",
     "react-select": "^2.0.0",
     "react-stickynode": "^2.1.1",

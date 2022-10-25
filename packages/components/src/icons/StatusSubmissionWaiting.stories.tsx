@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { StatusSubmissionWaiting } from './StatusSubmissionWaiting'
 
 export default {
-  title: 'Styles/Icons/StatusSubmissionWaiting',
+  title: 'Deprecated/Icons/StatusSubmissionWaiting',
   component: StatusSubmissionWaiting
 } as Meta
 

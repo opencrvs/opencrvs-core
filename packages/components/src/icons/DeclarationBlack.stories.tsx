@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { DeclarationBlack } from './DeclarationBlack'
 
 export default {
-  title: 'Styles/Icons/DeclarationBlack',
+  title: 'Deprecated/Icons/DeclarationBlack',
   component: DeclarationBlack
 } as Meta
 
