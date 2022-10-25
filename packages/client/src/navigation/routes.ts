@@ -69,6 +69,7 @@ export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const PERFORMANCE_HOME = '/performance'
+export const ADVANCED_SEARCH = '/search-result/advanced-search'
 export const EVENT_COMPLETENESS_RATES =
   '/performance/operations/completenessRates/:eventType'
 export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'
