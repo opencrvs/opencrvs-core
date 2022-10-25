@@ -59,7 +59,6 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
-import { Integrations } from '@sentry/browser'
 import { IntegrationList } from './views/SysAdmin/Config/Integrations/Integrations'
 
 interface IAppProps {

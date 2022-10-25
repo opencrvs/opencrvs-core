@@ -1,12 +1,31 @@
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { connect } from 'formik'
 import React, { useState } from 'react'
-import { injectIntl } from 'react-intl'
+import { Content } from '@opencrvs/components/lib/Content'
+import { injectIntl, useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import {
+  LinkButton,
+  SecondaryButton
+} from '@client/../../components/lib/buttons'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Navigation } from '@client/components/interface/Navigation'
+import { Header } from '@client/components/Header/Header'
+import {
+  AvatarSmall,
+  Plus,
+  VerticalThreeDots
+} from '@client/../../components/lib/icons'
+import { Pill, ToggleMenu } from '@client/../../components/lib'
 
 interface IIntegration {
   name: string
-  status: string // statuses
-  systemId: string // This is not here now. It is added in a different ticket
+  status: string
+  systemId: string
 }
 
 export const statuses = {
@@ -17,12 +36,69 @@ export const statuses = {
 }
 
 export function IntegrationList() {
-  const [count, setCount] = useState(0)
+  const intl = useIntl()
 
   return (
-    <div>
-      <p>You clicked {count} times</p>
-      <button onClick={() => setCount(count + 1)}>Click me</button>
-    </div>
+    <Frame
+      header={<Header />}
+      navigation={<Navigation loadWorkqueueStatuses={false} />}
+    >
+      <Content
+        title={intl.formatMessage(messages.integrations)}
+        topActionButtons={[
+          <SecondaryButton
+            key="1"
+            id="myButton"
+            onClick={function noRefCheck() {}}
+          >
+            <Plus /> Create Client
+          </SecondaryButton>
+        ]}
+      >
+        For each new client that needs to integrate with OpenCRVS you can create
+        unique client IDs. A number of integration use cases are currently
+        supported, based on both API and webhook technologies.
+        <ListViewSimplified>
+          <React.Fragment key=".0">
+            <ListViewItemSimplified
+              actions={
+                <>
+                  <Pill label="Active" type="active" />
+                  <ToggleMenu
+                    id="toggleMenu"
+                    menuItems={[
+                      { handler: () => {}, label: 'Reveal Keys' },
+                      { handler: () => {}, label: 'Disable' },
+                      { handler: () => {}, label: 'Delete' }
+                    ]}
+                    toggleButton={<VerticalThreeDots />}
+                  />
+                </>
+              }
+              label="Sweet Health"
+              value="Health Integration"
+            />
+            <ListViewItemSimplified
+              actions={
+                <>
+                  <Pill label="Active" type="active" />
+                  <ToggleMenu
+                    id="toggleMenu"
+                    menuItems={[
+                      { handler: () => {}, label: 'Reveal Keys' },
+                      { handler: () => {}, label: 'Disable' },
+                      { handler: () => {}, label: 'Delete' }
+                    ]}
+                    toggleButton={<VerticalThreeDots />}
+                  />
+                </>
+              }
+              label="Sweet Health"
+              value="Health Integration"
+            />
+          </React.Fragment>
+        </ListViewSimplified>
+      </Content>
+    </Frame>
   )
 }
