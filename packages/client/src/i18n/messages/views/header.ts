@@ -27,7 +27,6 @@ interface IHeaderMessages
   typeName: MessageDescriptor
   advancedSearch: MessageDescriptor
   placeholderName: MessageDescriptor
-  placeholderAdvancedSearch: MessageDescriptor
 }
 
 const messagesToDefine: IHeaderMessages = {
@@ -44,7 +43,7 @@ const messagesToDefine: IHeaderMessages = {
   nationalId: {
     id: 'home.header.nationalId',
     defaultMessage: 'National ID',
-    description: 'Search menu national id no type'
+    description: 'Search menu national ID type'
   },
   placeHolderTrackingId: {
     id: 'home.header.placeHolderTrackingId',
@@ -100,11 +99,6 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.placeholderName',
     defaultMessage: 'Search for a name',
     description: 'Search menu name placeholder'
-  },
-  placeholderAdvancedSearch: {
-    id: 'home.header.placeholderAdvancedSearch',
-    defaultMessage: 'Make advanced search',
-    description: 'Search menu advanced search placeholder'
   }
 }
 
