@@ -66,7 +66,7 @@ export default async function changePasswordHandler(
 
   try {
     await User.update({ _id: user._id }, user)
-    if (request.headers.authorization == undefined) {
+    if (request.headers.authorization === undefined) {
       await postUserActionToMetrics(
         'PASSWORD_RESET',
         request.headers.authorization,

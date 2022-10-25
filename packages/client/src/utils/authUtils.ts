@@ -54,11 +54,11 @@ export function storeToken(token: string) {
   localStorage.setItem('opencrvs', token)
 }
 
-export function removeToken(practitionerId: string | null | undefined) {
+export function removeToken() {
   const token = getToken()
   if (token) {
     try {
-      authApi.invalidateToken(token, practitionerId)
+      authApi.invalidateToken(token)
     } catch (err) {
       Sentry.captureException(err)
     }
@@ -107,7 +107,7 @@ export function refreshToken() {
     })
       .then((res) => res.json())
       .then((data) => {
-        removeToken(null)
+        removeToken()
         storeToken(data.token)
       })
   }

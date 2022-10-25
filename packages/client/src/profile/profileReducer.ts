@@ -73,7 +73,7 @@ export const profileReducer: LoopReducer<
         },
         Cmd.list([
           Cmd.run(() => {
-            removeToken(state.userDetails?.practitionerId)
+            removeToken()
           }),
           Cmd.run(() => {
             removeUserDetails()
