@@ -17,8 +17,7 @@ type EventMetrics {
 }
 
 type RegistrarPractitioner {
-  registrarPractitionerId: String!
-  fullName: String!
+  user: User
 }
 
 type EventMetricsByRegistrar {
@@ -128,7 +127,7 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
-  getTotalMetricsByRegistrar(
+  getRegistrationsListByFilter(
     timeStart: String!
     timeEnd: String!
     locationId: String

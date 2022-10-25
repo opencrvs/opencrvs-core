@@ -144,6 +144,47 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
     }
   }
 `
+
+export const FETCH_REGISTRATIONS = gql`
+  query getRegistrationsListByFilter(
+    $event: String!
+    $timeStart: String!
+    $timeEnd: String!
+    $filterBy: String!
+    $locationId: String
+  ) {
+    getRegistrationsListByFilter(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+      event: $event
+      filterBy: $filterBy
+    ) {
+      __typename
+      ... on TotalMetricsResult {
+        results {
+          total
+        }
+      }
+      ... on TotalMetricsByRegistrarResult {
+        results {
+          total
+          late
+          delayed
+          registrarPractitioner {
+            user {
+              name {
+                firstNames
+                familyName
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
   query searchFieldAgents(
     $locationId: String

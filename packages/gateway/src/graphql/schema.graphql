@@ -64,7 +64,7 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
-  getTotalMetricsByRegistrar(
+  getRegistrationsListByFilter(
     timeStart: String!
     timeEnd: String!
     locationId: String
@@ -1457,8 +1457,7 @@ type Payment {
 }
 
 type RegistrarPractitioner {
-  registrarPractitionerId: String!
-  fullName: String!
+  user: User
 }
 
 input CommentInput {

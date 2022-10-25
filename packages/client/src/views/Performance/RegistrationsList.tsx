@@ -23,7 +23,10 @@ import {
   IPerformanceSelectOption,
   PerformanceSelect
 } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
+import {
+  FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA,
+  FETCH_REGISTRATIONS
+} from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { SortArrow } from '@opencrvs/components/lib/icons'
@@ -46,6 +49,7 @@ import { IAvatar } from '@client/utils/userUtils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { userMessages } from '@client/i18n/messages'
 import { SegmentedControl } from '@client/components/SegmentedControl'
+import { get } from 'lodash'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -195,7 +199,8 @@ function RegistrationListComponent(props: IProps) {
         event: event || undefined,
         count: recordCount,
         sort: 'asc',
-        skip: 0
+        skip: 0,
+        filterBy
       }
     : {
         timeStart: timeStart,
@@ -205,7 +210,8 @@ function RegistrationListComponent(props: IProps) {
         event: event || undefined,
         count: recordCount,
         sort: 'asc',
-        skip: 0
+        skip: 0,
+        filterBy
       }
 
   function toggleSort(key: keyof SortMap) {
@@ -522,7 +528,7 @@ function RegistrationListComponent(props: IProps) {
         }
       >
         <Query
-          query={FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA}
+          query={FETCH_REGISTRATIONS}
           variables={queryVariables}
           fetchPolicy={'no-cache'}
         >
@@ -543,10 +549,10 @@ function RegistrationListComponent(props: IProps) {
                 </>
               )
             } else {
-              const totalData =
-                data &&
-                data.searchFieldAgents &&
-                data.searchFieldAgents.totalItems
+              const totalData = get(
+                data,
+                'getRegistrationsListByFilter.results.length'
+              )
               return (
                 <TableDiv>
                   <Table
@@ -557,12 +563,10 @@ function RegistrationListComponent(props: IProps) {
                     isLoading={loading}
                     disableScrollOnOverflow={true}
                     columns={getColumns()}
-                    content={getContent(data && data.searchFieldAgents)}
-                    totalItems={
-                      data &&
-                      data.searchFieldAgents &&
-                      data.searchFieldAgents.totalItems
-                    }
+                    content={getContent(
+                      data && data.getRegistrationsListByFilter
+                    )}
+                    totalItems={totalData}
                     currentPage={currentPageNumber}
                     pageSize={recordCount}
                     onPageChange={(currentPage: number) => {

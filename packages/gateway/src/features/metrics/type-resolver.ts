@@ -11,25 +11,20 @@
  */
 
 import { GQLResolver } from '@gateway/graphql/schema'
-import { getUser, getFullName } from '@gateway/features/user/utils'
+import { getUser } from '@gateway/features/user/utils'
+import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
 
 export const typeResolvers: GQLResolver = {
   MixedTotalMetricsResult: {
     __resolveType(obj, context, info) {
-      if (info.variableValues.filterBy === 'registrar')
+      if (info.variableValues.filterBy === FILTER_BY.REGISTERER)
         return 'TotalMetricsByRegistrarResult'
       else return 'TotalMetricsResult'
     }
   },
   RegistrarPractitioner: {
-    registrarPractitionerId(registrarPractitionerId) {
-      return registrarPractitionerId
-    },
-    async fullName(userId, _, authHeader) {
-      const registrarPractitioner = await getUser({ userId }, authHeader)
-      const name = getFullName(registrarPractitioner, 'en')
-      console.log(registrarPractitioner)
-      return name
+    async user(userId, _, authHeader) {
+      return await getUser({ userId }, authHeader)
     }
   }
 }

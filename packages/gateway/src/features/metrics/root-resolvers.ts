@@ -11,7 +11,6 @@
  */
 import { GQLResolver } from '@gateway/graphql/schema'
 import { getMetrics } from '@gateway/features/fhir/utils'
-
 export interface IMetricsParam {
   timeStart?: string
   timeEnd?: string
@@ -23,24 +22,30 @@ export interface IMetricsParam {
   populationYear?: number
 }
 
+export enum FILTER_BY {
+  REGISTERER = 'by_registrar',
+  LOCATION = 'by_location',
+  TIME = 'by_time'
+}
+
 export const resolvers: GQLResolver = {
   Query: {
     async getTotalMetrics(_, variables, authHeader) {
       return getMetrics('/totalMetrics', variables, authHeader)
     },
-    async getTotalMetricsByRegistrar(
+    async getRegistrationsListByFilter(
       _,
       { filterBy, ...variables },
       authHeader
     ) {
       let result
-      if (filterBy === 'registrar')
+      if (filterBy === FILTER_BY.REGISTERER) {
         result = await getMetrics(
           '/totalMetricsByRegistrar',
           variables,
           authHeader
         )
-      else result = await getMetrics('/totalMetrics', variables, authHeader)
+      } else result = await getMetrics('/totalMetrics', variables, authHeader)
       return result
     },
     async getTotalPayments(
