@@ -244,6 +244,9 @@ services:
     environment:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+    ports:
+      - '9000:9000'
+      - '9001:9001'
     volumes:
       - '/data/minio:/data/minio'
       - '/data/backups/minio:/data/backups/minio'
