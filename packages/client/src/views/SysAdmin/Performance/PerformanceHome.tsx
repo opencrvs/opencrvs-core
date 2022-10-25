@@ -37,7 +37,7 @@ import { DateRangePicker } from '@client/components/DateRangePicker'
 import subYears from 'date-fns/subYears'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { Event } from '@client/utils/gateway'
-import { LocationPicker } from '@client/components/LocationPicker'
+import { LocationPicker } from './LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
@@ -197,7 +197,7 @@ interface IMetricsQueryResult {
 }
 
 interface State {
-  selectedLocation: ISearchLocation
+  selectedLocation: ISearchLocation | null
   /* TODO the event type should be changed because Event is birth/death.
   WorkflowStatus.tsx, StatusWiseDeclarationCountView requires BIRTH/DEATH.
   GraphQL Queries in PerformanceHome.tsx also require BIRTH/DEATH.
@@ -239,35 +239,28 @@ interface ICorrectionsQueryResult {
   getTotalCorrections: Array<GQLCorrectionMetric>
 }
 
+type LocationsById = {
+  [key: string]: ILocation
+}
+
 class PerformanceHomeComponent extends React.Component<Props, State> {
   transformPropsToState(props: Props) {
     const {
-      location: { search },
-      locations,
-      offices
+      location: { search }
     } = props
-    const { timeStart, timeEnd, locationId, event } = parse(
+    const { timeStart, timeEnd, event } = parse(
       search
     ) as unknown as ISearchParams
 
-    const selectedLocation = !locationId
-      ? getAdditionalLocations(props.intl)[0]
-      : selectLocation(
-          locationId,
-          generateLocations({ ...locations, ...offices }, props.intl).concat(
-            getAdditionalLocations(props.intl)
-          )
-        )
-
     return {
-      selectedLocation,
+      selectedLocation: null,
       timeStart:
         (timeStart && new Date(timeStart)) || subYears(new Date(Date.now()), 1),
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.Birth,
       toggleStatus: false,
-      officeSelected: this.isOfficeSelected(selectedLocation),
-      isAccessibleOffice: this.isAccessibleOfficeSelected(selectedLocation)
+      officeSelected: false,
+      isAccessibleOffice: false
     }
   }
 
@@ -279,6 +272,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   componentDidUpdate(_: Props, prevState: State) {
+    if (!this.state.selectedLocation) {
+      return
+    }
     if (this.state.selectedLocation !== prevState.selectedLocation) {
       this.setState({
         officeSelected: this.isOfficeSelected(this.state.selectedLocation),
@@ -308,25 +304,16 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     )
   }
 
-  getFilter = (intl: IntlShape, selectedLocation: ISearchLocation) => {
-    const { id: locationId } = selectedLocation || {}
+  getFilter = (intl: IntlShape) => {
+    const { locationId } = parse(
+      this.props.location.search
+    ) as unknown as ISearchParams
 
     return (
       <>
         <LocationPicker
-          additionalLocations={getAdditionalLocations(intl)}
-          selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
-          onChangeLocation={(newLocationId) => {
-            const newLocation = selectLocation(
-              newLocationId,
-              generateLocations(
-                {
-                  ...this.props.locations,
-                  ...this.props.offices
-                },
-                this.props.intl
-              ).concat(getAdditionalLocations(intl))
-            )
+          locationId={locationId}
+          onChangeLocation={(newLocation) => {
             this.setState({ selectedLocation: newLocation })
           }}
         />
@@ -363,7 +350,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   onClickStatusDetails = (status?: keyof IStatusMapping) => {
     const { selectedLocation, event, timeStart, timeEnd } = this.state
-    const { id: locationId } = selectedLocation
+    const { id: locationId } = selectedLocation!
     this.props.goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
   }
 
@@ -422,7 +409,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             <Content
               title={intl.formatMessage(navigationMessages.performance)}
               size={ContentSize.LARGE}
-              filterContent={this.getFilter(intl, this.state.selectedLocation)}
+              filterContent={this.getFilter(intl)}
             >
               {isOnline ? (
                 <>
@@ -495,6 +482,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             data={data!.getTotalMetrics}
                             isAccessibleOffice={this.state.isAccessibleOffice}
                             locationId={
+                              !this.state.selectedLocation ||
                               isCountry(this.state.selectedLocation)
                                 ? undefined
                                 : this.state.selectedLocation.id

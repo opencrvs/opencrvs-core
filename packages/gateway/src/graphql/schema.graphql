@@ -350,12 +350,14 @@ type User {
   name: [HumanName]
   username: String
   mobile: String
+  title: String
   role: String
   type: String
   email: String
   status: String
   underInvestigation: Boolean
   primaryOffice: Location
+  supervisoryArea: String
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar
   identifier: Identifier
@@ -561,6 +563,7 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
+  title: String
   role: String
   type: String
   email: String

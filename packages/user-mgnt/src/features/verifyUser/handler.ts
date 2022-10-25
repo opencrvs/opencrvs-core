@@ -72,7 +72,7 @@ export function getRandomQuestionKey(
 ): string {
   const filteredQuestions = questionKeyToSkip
     ? securityQuestionAnswers.filter(
-        securityQnA => securityQnA.questionKey !== questionKeyToSkip
+        (securityQnA) => securityQnA.questionKey !== questionKeyToSkip
       )
     : securityQuestionAnswers
   return filteredQuestions[

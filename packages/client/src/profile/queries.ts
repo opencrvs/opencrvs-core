@@ -20,6 +20,7 @@ export const FETCH_USER = gql`
       mobile
       role
       type
+      title
       status
       name {
         use
@@ -42,6 +43,7 @@ export const FETCH_USER = gql`
         alias
         status
       }
+      supervisoryArea
       localRegistrar {
         name {
           use

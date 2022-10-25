@@ -11,7 +11,11 @@
  */
 import { IAuthHeader } from '@gateway/common-types'
 import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
-import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
+import {
+  fetchFHIR,
+  findExtension,
+  getSupervisoryArea
+} from '@gateway/features/fhir/utils'
 import {
   GQLIdentifier,
   GQLResolver,
@@ -70,6 +74,7 @@ export interface IUserPayload
   identifiers: GQLUserIdentifierInput[]
   role: string
   type: string
+  title?: string
   signature?: GQLSignatureInput
 }
 
@@ -148,10 +153,22 @@ export const userTypeResolvers: GQLResolver = {
       return userModel.identifiers && userModel.identifiers[0]
     },
     async primaryOffice(userModel: IUserModelData, _, authHeader) {
-      return await fetchFHIR(
+      return fetchFHIR(`/Location/${userModel.primaryOfficeId}`, authHeader)
+    },
+    async supervisoryArea(userModel: IUserModelData, _, authHeader) {
+      const office = await fetchFHIR(
         `/Location/${userModel.primaryOfficeId}`,
         authHeader
       )
+
+      const supervisoryArea = getSupervisoryArea(office)
+      console.log(JSON.stringify(office))
+
+      if (supervisoryArea) {
+        return supervisoryArea.split('/')[1]
+      }
+
+      return null
     },
     async catchmentArea(userModel: IUserModelData, _, authHeader) {
       return await Promise.all(

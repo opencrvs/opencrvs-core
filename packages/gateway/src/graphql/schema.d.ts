@@ -226,12 +226,14 @@ export interface GQLUser {
   name?: Array<GQLHumanName | null>
   username?: string
   mobile?: string
+  title?: string
   role?: string
   type?: string
   email?: string
   status?: string
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
+  supervisoryArea?: string
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
@@ -437,6 +439,7 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile?: string
+  title?: string
   role?: string
   type?: string
   email?: string
@@ -3174,12 +3177,14 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
+  title?: UserToTitleResolver<TParent>
   role?: UserToRoleResolver<TParent>
   type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
+  supervisoryArea?: UserToSupervisoryAreaResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
   identifier?: UserToIdentifierResolver<TParent>
@@ -3213,6 +3218,10 @@ export interface UserToMobileResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface UserToTitleResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface UserToRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
@@ -3237,6 +3246,10 @@ export interface UserToUnderInvestigationResolver<
 }
 
 export interface UserToPrimaryOfficeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToSupervisoryAreaResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

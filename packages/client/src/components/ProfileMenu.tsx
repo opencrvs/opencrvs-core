@@ -87,13 +87,14 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   }
 
   getUserRole = (intl: IntlShape, userDetails: IUserDetails | null): string => {
-    let userRole = ''
-
+    if (userDetails && userDetails.title) {
+      return userDetails.title
+    }
     if (userDetails && userDetails.role) {
-      userRole = intl.formatMessage(userMessages[userDetails.role as string])
+      return intl.formatMessage(userMessages[userDetails.role as string])
     }
 
-    return userRole
+    return ''
   }
 
   getMenuHeader = (

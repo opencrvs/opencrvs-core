@@ -47,10 +47,12 @@ export interface IUserDetails {
   mobile?: string
   role?: string
   type?: string
+  title?: string
   status?: string
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
+  supervisoryArea?: string
   localRegistrar?: {
     name: Array<GQLHumanName | null>
     role?: string
@@ -71,6 +73,8 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     userMgntUserID,
     practitionerId,
     localRegistrar,
+    title,
+    supervisoryArea,
     avatar
   } = user
   const userDetails: IUserDetails = {}
@@ -92,11 +96,17 @@ export function getUserDetails(user: GQLUser): IUserDetails {
   if (role) {
     userDetails.role = role
   }
+  if (title) {
+    userDetails.title = title
+  }
   if (type) {
     userDetails.type = type
   }
   if (status) {
     userDetails.status = status
+  }
+  if (supervisoryArea) {
+    userDetails.supervisoryArea = supervisoryArea
   }
   if (primaryOffice) {
     userDetails.primaryOffice = {

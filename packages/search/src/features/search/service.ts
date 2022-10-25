@@ -21,6 +21,7 @@ const DEFAULT_SEARCH_TYPE = 'compositions'
 
 export const searchComposition = async (params: ISearchQuery) => {
   const formattedParams = formatSearchParams(params)
+
   let response: ApiResponse<ISearchResponse<any>>
   try {
     // NOTE: we are using the destructuring assignment

@@ -98,6 +98,7 @@ export const resolvers: GQLResolver = {
               supervisesThisArea,
               authHeader
             )
+
             searchCriteria.declarationLocationId = locationIds
           } else {
             searchCriteria.declarationLocationId = locationIds[0]
