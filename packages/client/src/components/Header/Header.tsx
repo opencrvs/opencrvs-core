@@ -13,7 +13,7 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
-// import { Icon } from '@opencrvs/components/lib/Icon'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   goBack,
   goForward,
@@ -411,8 +411,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(messages.nationalId),
         value: NATIONAL_ID_TEXT,
-        icon: <User />,
-        invertIcon: <User />,
+        icon: <Icon name="CreditCard" />,
+        invertIcon: <Icon name="CreditCard" />,
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       },
       {
