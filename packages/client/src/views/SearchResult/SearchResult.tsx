@@ -46,6 +46,7 @@ import {
   BRN_DRN_TEXT,
   NAME_TEXT,
   PHONE_TEXT,
+  NATIONAL_ID_TEXT,
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
@@ -347,7 +348,9 @@ export class SearchResultView extends React.Component<
                         searchType === PHONE_TEXT
                           ? convertToMSISDN(searchText)
                           : '',
-                      name: searchType === NAME_TEXT ? searchText : ''
+                      name: searchType === NAME_TEXT ? searchText : '',
+                      nationalId:
+                        searchType === NATIONAL_ID_TEXT ? searchText : ''
                     }
                   }
                 ],
@@ -456,7 +459,8 @@ export class SearchResultView extends React.Component<
               registrationNumber: searchType === BRN_DRN_TEXT ? searchText : '',
               contactNumber:
                 searchType === PHONE_TEXT ? convertToMSISDN(searchText) : '',
-              name: searchType === NAME_TEXT ? searchText : ''
+              name: searchType === NAME_TEXT ? searchText : '',
+              nationalId: searchType == NATIONAL_ID_TEXT ? searchText : ''
             }}
             fetchPolicy="cache-and-network"
           >

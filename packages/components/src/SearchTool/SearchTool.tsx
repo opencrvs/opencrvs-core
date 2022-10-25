@@ -13,6 +13,7 @@ import * as React from 'react'
 import { SearchBlue, ClearText } from '../icons'
 import { Button } from '../buttons'
 import styled from 'styled-components'
+import { Text } from '../Text'
 
 const SearchBox = styled.div`
   background: ${({ theme }) => theme.colors.grey200};
@@ -97,11 +98,17 @@ const DropDownWrapper = styled.ul`
   margin: 4px 0px;
   cursor: pointer;
 `
-const DropDownItem = styled.li`
+
+const DropDownItem = styled.li<{ borderTop: boolean }>`
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 8px 8px 8px 16px;
+  ${({ borderTop, theme }) =>
+    borderTop
+      ? `border-top: 1px solid ${theme.colors.grey200}; padding:2px 2px 2px 10px; margin-top: 2px`
+      : ''}
   &:nth-last-child {
     border-bottom: none;
   }
@@ -114,7 +121,8 @@ const DropDownItem = styled.li`
 `
 const IconWrapper = styled.span`
   display: flex;
-  padding: 8px 12px 8px 16px;
+  padding-right: 12px;
+  padding-left: 0;
 `
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg16};
@@ -159,6 +167,7 @@ export interface ISearchType {
   invertIcon: React.ReactNode
   isDefault?: boolean
   placeHolderText: string
+  isPlainText?: boolean
 }
 interface IState {
   dropDownIsVisible: boolean
@@ -232,8 +241,20 @@ export class SearchTool extends React.Component<IProps, IState> {
       this.state.dropDownIsVisible && (
         <DropDownWrapper>
           {this.props.searchTypeList.map((item) => {
-            return (
+            return item.isPlainText ? (
               <DropDownItem
+                borderTop={true}
+                id={item.value}
+                key={item.value}
+                onClick={() => this.dropDownItemSelect(item)}
+              >
+                <Text variant={'bold14'} element={'p'} color={'primary'}>
+                  {item.label}
+                </Text>
+              </DropDownItem>
+            ) : (
+              <DropDownItem
+                borderTop={false}
                 id={item.value}
                 key={item.value}
                 onClick={() => this.dropDownItemSelect(item)}

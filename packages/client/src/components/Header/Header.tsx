@@ -38,6 +38,7 @@ import {
   NAME_TEXT,
   NATL_ADMIN_ROLES,
   PHONE_TEXT,
+  ADVANCED_SEARCH_TEXT,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
@@ -422,12 +423,12 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         placeHolderText: intl.formatMessage(messages.placeholderName)
       },
       {
-        label: 'advance search',
-        value: NAME_TEXT,
+        label: intl.formatMessage(messages.advancedSearch),
+        value: ADVANCED_SEARCH_TEXT,
         icon: <User />,
         invertIcon: <User />,
-        placeHolderText: intl.formatMessage(messages.placeholderName)
-        // isPlainLink: true
+        placeHolderText: intl.formatMessage(messages.placeholderAdvancedSearch),
+        isPlainText: true
       }
     ]
 

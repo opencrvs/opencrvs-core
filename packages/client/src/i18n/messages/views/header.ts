@@ -25,7 +25,9 @@ interface IHeaderMessages
   helpTitle: MessageDescriptor
   teamTitle: MessageDescriptor
   typeName: MessageDescriptor
+  advancedSearch: MessageDescriptor
   placeholderName: MessageDescriptor
+  placeholderAdvancedSearch: MessageDescriptor
 }
 
 const messagesToDefine: IHeaderMessages = {
@@ -89,10 +91,20 @@ const messagesToDefine: IHeaderMessages = {
     defaultMessage: 'Name',
     description: 'Search menu name type'
   },
+  advancedSearch: {
+    id: 'home.header.advancedSearch',
+    defaultMessage: 'Advanced Search',
+    description: 'Search menu advanced search type'
+  },
   placeholderName: {
     id: 'home.header.placeholderName',
     defaultMessage: 'Search for a name',
     description: 'Search menu name placeholder'
+  },
+  placeholderAdvancedSearch: {
+    id: 'home.header.placeholderAdvancedSearch',
+    defaultMessage: 'Make advanced search',
+    description: 'Search menu advanced search placeholder'
   }
 }
 
