@@ -629,6 +629,8 @@ services:
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - MINIO_ACCESS_KEY=minioadmin2
+      - MINIO_SECRET_KEY=minioadmin2
     networks:
       - overlay_net
     logging:
