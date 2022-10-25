@@ -319,6 +319,10 @@ function createInformantIndex(
     informantNameLocal &&
     informantNameLocal.family &&
     informantNameLocal.family[0]
+  body.informantIdentifier =
+    informant.identifier &&
+    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
 }
 
 async function createDeclarationIndex(
