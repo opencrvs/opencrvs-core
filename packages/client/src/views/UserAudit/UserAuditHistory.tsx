@@ -18,6 +18,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Query } from '@client/components/Query'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
 import { connect } from 'react-redux'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 
 import {
   GQLUserAuditLogItemWithComposition,
@@ -59,7 +60,7 @@ import {
 import { GetUserAuditLogQuery } from '@client/utils/gateway'
 import { NameContainer } from '@client/views/OfficeHome/components'
 
-const DEFAULT_LIST_SIZE = 4
+const DEFAULT_LIST_SIZE = 10
 
 const InformationCaption = styled.div`
   ${({ theme }) => theme.fonts.reg12};
@@ -448,23 +449,31 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                         data.getUserAuditLog.total) ||
                         0
                     )
+                    console.log(data)
 
                     return (
-                      <Table
-                        columns={this.getAuditColumns()}
-                        content={this.getAuditData(data.getUserAuditLog)}
-                        noResultText={intl.formatMessage(messages.noAuditFound)}
-                        isLoading={loading}
-                        hideTableHeader={
-                          this.state.viewportWidth <= theme.grid.breakpoints.md
-                        }
-                        currentPage={this.state.currentPageNumber}
-                        pageSize={DEFAULT_LIST_SIZE}
-                        totalItems={totalItems}
-                        onPageChange={(page: any) =>
-                          this.setState({ currentPageNumber: page })
-                        }
-                      />
+                      <>
+                        <Table
+                          columns={this.getAuditColumns()}
+                          content={this.getAuditData(data.getUserAuditLog)}
+                          noResultText={intl.formatMessage(
+                            messages.noAuditFound
+                          )}
+                          isLoading={loading}
+                          hideTableHeader={
+                            this.state.viewportWidth <=
+                            theme.grid.breakpoints.md
+                          }
+                          pageSize={DEFAULT_LIST_SIZE}
+                        />
+                        <Pagination
+                          currentPage={this.state.currentPageNumber}
+                          totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
+                          onPageChange={(page: any) =>
+                            this.setState({ currentPageNumber: page })
+                          }
+                        />
+                      </>
                     )
                   }
                 }}
