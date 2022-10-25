@@ -91,7 +91,7 @@ export type AllowedAddressConfigurations = {
 
 export const defaultAddressConfiguration: IAddressConfiguration[] = [
   {
-    precedingFieldId: 'birth.child.child-view-group.birthLocation',
+    precedingFieldId: 'birth.child.child-view-group.placeOfBirth',
     configurations: [{ config: EventLocationAddressCases.PLACE_OF_BIRTH }]
   },
   {
@@ -119,7 +119,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    precedingFieldId: 'birth.mother.mother-view-group.phoneNumber',
+    precedingFieldId: 'birth.mother.mother-view-group.firstNamesEng',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -144,7 +144,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    precedingFieldId: 'birth.father.father-view-group.phoneNumber',
+    precedingFieldId: 'birth.father.father-view-group.firstNamesEng',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -2762,7 +2762,7 @@ export function getPlaceOfEventAddressFields(
       conditionals: [
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME" && values.${configCase}!="HEALTH_FACILITY")`
         }
       ],
       mapping: {
@@ -2814,7 +2814,7 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME" && values.${configCase}!="HEALTH_FACILITY")`
         },
         {
           action: 'hide',
@@ -2884,7 +2884,7 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME" && values.${configCase}!="HEALTH_FACILITY")`
         },
         {
           action: 'hide',
@@ -2921,75 +2921,6 @@ export function getPlaceOfEventAddressFields(
       }
     },
     {
-      name: 'ruralOrUrban',
-      customisable: false,
-      type: 'RADIO_GROUP',
-      label: {
-        defaultMessage: ' ',
-        description: 'Empty label for form field',
-        id: 'form.field.label.emptyLabel'
-      },
-      options: [
-        {
-          label: {
-            defaultMessage: 'Urban',
-            id: 'form.field.label.urban',
-            description: 'Label for form field checkbox option Urban'
-          },
-          value: 'URBAN'
-        },
-        {
-          label: {
-            defaultMessage: 'Rural',
-            id: 'form.field.label.rural',
-            description: 'Label for form field checkbox option Rural'
-          },
-          value: 'RURAL'
-        }
-      ],
-      initialValue: 'URBAN',
-      flexDirection: FLEX_DIRECTION.ROW,
-      required: false,
-      hideValueInPreview: true,
-      previewGroup: configCase,
-      validate: [],
-      conditionals: [
-        {
-          action: 'hide',
-          expression: '!values.country'
-        },
-        {
-          action: 'hide',
-          expression: '!values.state'
-        },
-        {
-          action: 'hide',
-          expression: '!values.district'
-        },
-        {
-          action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
-        },
-        {
-          action: 'hide',
-          expression: '!isDefaultCountry(values.country)'
-        }
-      ],
-      mapping: {
-        mutation: {
-          operation:
-            configCase === EventLocationAddressCases.PLACE_OF_BIRTH
-              ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
-          parameters: [6]
-        },
-        query: {
-          operation: 'eventLocationQueryTransformer',
-          parameters: [6]
-        }
-      }
-    },
-    {
       name: 'cityUrbanOption',
       customisable: false,
       type: 'TEXT',
@@ -3002,7 +2933,6 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
-      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3018,11 +2948,7 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
-        },
-        {
-          action: 'hide',
-          expression: 'values.ruralOrUrban !== "URBAN"'
+          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME" && values.${configCase}!="HEALTH_FACILITY")`
         },
         {
           action: 'hide',

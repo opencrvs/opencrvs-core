@@ -25,19 +25,19 @@ const birthBulletListItemsToDefine: MessageDescriptor[] = [
   {
     id: 'register.eventInfo.birth.listItem0',
     defaultMessage:
-      'I am here to complete the birth registration declaration for you.',
+      'I am here to help you start the birth registration process for your child.',
     description: 'Event info bullet list item for birth'
   },
   {
     id: 'register.eventInfo.birth.listItem1',
     defaultMessage:
-      'Once I complete the declaration, it will be sent to the registration office for review.',
+      'A birth certificate is extremely important for this child, especially to make their life easier in the future. It will assist access to health care, school examinations and other government benefits.',
     description: 'Event info bullet list item for birth'
   },
   {
     id: 'register.eventInfo.birth.listItem2',
     defaultMessage:
-      'Wait for an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.',
+      'Make sure you collect the certificate of your child when it is ready.',
     description: 'Event info bullet list item for birth'
   }
 ]

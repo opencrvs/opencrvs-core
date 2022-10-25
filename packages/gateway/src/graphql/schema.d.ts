@@ -170,6 +170,7 @@ export interface GQLPerson {
   photo?: Array<GQLAttachment | null>
   deceased?: GQLDeceased
   nationality?: Array<string | null>
+  literacy?: GQLLiteracyType
   educationalAttainment?: GQLEducationType
 }
 
@@ -684,6 +685,11 @@ export interface GQLDeceased {
   deathDate?: string
 }
 
+export const enum GQLLiteracyType {
+  LITERATE = 'LITERATE',
+  ILLITERATE = 'ILLITERATE'
+}
+
 export const enum GQLEducationType {
   KORANIC = 'KORANIC',
   PRIMARY = 'PRIMARY',
@@ -839,6 +845,7 @@ export interface GQLPersonInput {
   photo?: Array<GQLAttachmentInput>
   deceased?: GQLDeceasedInput
   nationality?: Array<string | null>
+  literacy?: GQLLiteracyType
   educationalAttainment?: GQLEducationType
 }
 
@@ -2954,6 +2961,7 @@ export interface GQLPersonTypeResolver<TParent = any> {
   photo?: PersonToPhotoResolver<TParent>
   deceased?: PersonToDeceasedResolver<TParent>
   nationality?: PersonToNationalityResolver<TParent>
+  literacy?: PersonToLiteracyResolver<TParent>
   educationalAttainment?: PersonToEducationalAttainmentResolver<TParent>
 }
 
@@ -3037,6 +3045,10 @@ export interface PersonToDeceasedResolver<TParent = any, TResult = any> {
 }
 
 export interface PersonToNationalityResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToLiteracyResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

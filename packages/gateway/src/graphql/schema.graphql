@@ -305,6 +305,7 @@ type Person {
   photo: [Attachment]
   deceased: Deceased
   nationality: [String]
+  literacy: LiteracyType
   educationalAttainment: EducationType
 }
 
@@ -808,6 +809,11 @@ type Deceased {
   deathDate: String
 }
 
+enum LiteracyType {
+  LITERATE
+  ILLITERATE
+}
+
 enum EducationType {
   KORANIC
   PRIMARY
@@ -952,6 +958,7 @@ input PersonInput {
   photo: [AttachmentInput!]
   deceased: DeceasedInput
   nationality: [String]
+  literacy: LiteracyType
   educationalAttainment: EducationType
 }
 
