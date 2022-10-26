@@ -13,6 +13,8 @@ import { Header } from '@client/components/Header/Header'
 import { Plus, VerticalThreeDots } from '@client/../../components/lib/icons'
 import { Pill, ToggleMenu } from '@client/../../components/lib'
 import { constantsMessages } from '@client/i18n/messages'
+import { Button } from '@client/../../components/lib/Button'
+import { integrationMessages } from '@client/i18n/messages/views/integrations'
 
 interface IIntegration {
   name: string
@@ -41,18 +43,12 @@ export function IntegrationList() {
       <Content
         title={intl.formatMessage(messages.integrations)}
         topActionButtons={[
-          <SecondaryButton
-            key="1"
-            id="myButton"
-            onClick={function noRefCheck() {}}
-          >
-            <Plus /> Create Client
-          </SecondaryButton>
+          <Button type="secondary">
+            <Plus /> {intl.formatMessage(integrationMessages.createClient)}
+          </Button>
         ]}
       >
-        For each new client that needs to integrate with OpenCRVS you can create
-        unique client IDs. A number of integration use cases are currently
-        supported, based on both API and webhook technologies.
+        {intl.formatMessage(integrationMessages.pageIntroduction)}
         <ListViewSimplified>
           <ListViewItemSimplified
             actions={
@@ -72,7 +68,8 @@ export function IntegrationList() {
             label="Sweet Health"
             value="Health Integration"
           />
-          <ListViewItemSimplified
+
+          {/* <ListViewItemSimplified
             actions={
               <>
                 <Pill label="Active" type="active" />
@@ -89,7 +86,7 @@ export function IntegrationList() {
             }
             label="Sweet Health"
             value="Health Integration"
-          />
+          /> */}
         </ListViewSimplified>
       </Content>
     </Frame>
