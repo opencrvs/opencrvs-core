@@ -69,7 +69,7 @@ import {
 } from '@client/views/PrintCertificate/utils'
 import { StyledSpinner } from '@client/views/OfficeHome/OfficeHome'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
+import * as Sentry from '@sentry/browser'
 import { flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'

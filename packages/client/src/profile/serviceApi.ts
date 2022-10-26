@@ -13,7 +13,7 @@ import { getToken } from '@client/utils/authUtils'
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { resolve } from 'url'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
+import * as Sentry from '@sentry/browser'
 export interface ISendVerifyCodeData {
   phoneNumber: string
 }
