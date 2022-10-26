@@ -38,168 +38,6 @@ export const registerForms: IDefaultRegisterForms = {
   birth: {
     sections: [
       {
-        id: BirthSection.Registration,
-        viewType: 'form',
-        name: formMessageDescriptors.registrationName,
-        title: formMessageDescriptors.registrationTitle,
-        groups: [
-          {
-            id: 'who-is-applying-view-group',
-            title: informantMessageDescriptors.birthInformantTitle,
-            conditionals: [],
-            preventContinueIfError: true,
-            showExitButtonOnly: true,
-            fields: [
-              {
-                name: 'informantType',
-                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: informantMessageDescriptors.birthInformantTitle,
-                hideHeader: true,
-                required: true,
-                hideInPreview: false,
-                initialValue: '',
-                validate: [],
-                size: RadioSize.LARGE,
-                options: [
-                  {
-                    value: 'MOTHER',
-                    label: informantMessageDescriptors.mother
-                  },
-                  {
-                    value: 'FATHER',
-                    label: informantMessageDescriptors.father
-                  },
-                  {
-                    value: 'PATERNAL_GRANDFATHER',
-                    label: informantMessageDescriptors.paternalGrandfather
-                  },
-                  {
-                    value: 'PATERNAL_GRANDMOTHER',
-                    label: informantMessageDescriptors.paternalGrandmother
-                  },
-                  {
-                    value: 'MATERNAL_GRANDFATHER',
-                    label: informantMessageDescriptors.maternalGrandfather
-                  },
-                  {
-                    value: 'MATERNAL_GRANDMOTHER',
-                    label: informantMessageDescriptors.maternalGrandmother
-                  },
-                  {
-                    value: 'BROTHER',
-                    label: informantMessageDescriptors.brother
-                  },
-                  {
-                    value: 'SISTER',
-                    label: informantMessageDescriptors.sister
-                  },
-                  {
-                    value: 'OTHER_FAMILY_MEMBER',
-                    label: informantMessageDescriptors.otherFamilyMember
-                  },
-                  {
-                    value: 'LEGAL_GUARDIAN',
-                    label: informantMessageDescriptors.legalGuardian
-                  },
-                  {
-                    value: 'OTHER',
-                    label: formMessageDescriptors.someoneElse
-                  }
-                ],
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                nestedFields: {
-                  MOTHER: [],
-                  FATHER: [],
-                  PATERNAL_GRANDFATHER: [],
-                  PATERNAL_GRANDMOTHER: [],
-                  MATERNAL_GRANDFATHER: [],
-                  MATERNAL_GRANDMOTHER: [],
-                  BROTHER: [],
-                  SISTER: [],
-                  OTHER_FAMILY_MEMBER: [],
-                  LEGAL_GUARDIAN: [],
-                  OTHER: [
-                    {
-                      name: 'otherInformantType',
-                      type: 'TEXT',
-                      label: formMessageDescriptors.informantsRelationWithChild,
-                      placeholder:
-                        formMessageDescriptors.relationshipPlaceHolder,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'englishOnlyNameFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: ['registration.otherInformantType']
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: ['registration.otherInformantType']
-                        }
-                      }
-                    }
-                  ]
-                },
-                mapping: {
-                  mutation: {
-                    operation: 'nestedRadioFieldToBundleFieldTransformer',
-                    parameters: ['registration.informantType']
-                  },
-                  query: {
-                    operation: 'bundleFieldToNestedRadioFieldTransformer',
-                    parameters: ['registration.informantType']
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        mapping: {
-          template: [
-            {
-              fieldName: 'registrationNumber',
-              operation: 'registrationNumberTransformer'
-            },
-            {
-              fieldName: 'certificateDate',
-              operation: 'certificateDateTransformer',
-              parameters: ['en', 'dd MMMM yyyy']
-            },
-            {
-              fieldName: 'registrarName',
-              operation: 'registrarNameUserTransformer'
-            },
-            {
-              fieldName: 'role',
-              operation: 'roleUserTransformer'
-            },
-            {
-              fieldName: 'registrarSignature',
-              operation: 'registrarSignatureUserTransformer'
-            },
-            {
-              fieldName: 'qrCode',
-              operation: 'QRCodeTransformerTransformer'
-            },
-            {
-              fieldName: 'registrationLocation',
-              operation: 'registrationLocationUserTransformer'
-            }
-          ],
-          mutation: {
-            operation: 'setBirthRegistrationSectionTransformer'
-          },
-          query: {
-            operation: 'getBirthRegistrationSectionTransformer'
-          }
-        }
-      },
-      {
         id: BirthSection.Child,
         viewType: 'form',
         name: formMessageDescriptors.childTab,
@@ -320,10 +158,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'female',
                     label: formMessageDescriptors.childSexFemale
-                  },
-                  {
-                    value: 'unknown',
-                    label: formMessageDescriptors.childSexUnknown
                   }
                 ]
               },
@@ -368,46 +202,6 @@ export const registerForms: IDefaultRegisterForms = {
                   },
                   query: {
                     operation: 'eventLocationTypeQueryTransformer',
-                    parameters: []
-                  }
-                }
-              },
-              {
-                name: 'birthLocation',
-                customisable: false,
-                type: 'LOCATION_SEARCH_INPUT',
-                label: formMessageDescriptors.healthInstitution,
-                previewGroup: 'placeOfBirth',
-                required: true,
-                initialValue: '',
-                searchableResource: 'facilities',
-                searchableType: 'HEALTH_FACILITY',
-                dynamicOptions: {
-                  resource: 'facilities'
-                },
-                validate: [
-                  {
-                    operation: 'facilityMustBeSelected'
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression: '(values.placeOfBirth!="HEALTH_FACILITY")'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    fieldName: 'placeOfBirth',
-                    operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
-                  },
-                  mutation: {
-                    operation: 'birthEventLocationMutationTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'eventLocationIDQueryTransformer',
                     parameters: []
                   }
                 }
@@ -473,33 +267,6 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'weightAtBirth',
-                type: 'NUMBER',
-                step: 0.01,
-                label: formMessageDescriptors.weightAtBirth,
-                customisable: true,
-                required: false,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'range',
-                    parameters: [0, 6]
-                  }
-                ],
-                postfix: 'Kg',
-                mapping: {
-                  mutation: {
-                    operation: 'sectionFieldToBundleFieldTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'bundleFieldToSectionFieldTransformer',
-                    parameters: []
-                  }
-                },
-                inputFieldWidth: '78px'
-              },
-              {
                 name: 'multipleBirth',
                 type: 'NUMBER',
                 label: {
@@ -531,221 +298,6 @@ export const registerForms: IDefaultRegisterForms = {
             ]
           }
         ]
-      },
-      {
-        id: BirthSection.Informant,
-        viewType: 'form',
-        name: {
-          defaultMessage: 'Informant',
-          description: 'Form section name for Informant',
-          id: 'form.section.informant.name'
-        },
-        title: formMessageDescriptors.informantTitle,
-        hasDocumentSection: true,
-        groups: [
-          {
-            id: 'informant-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
-              }
-            ],
-            fields: [
-              {
-                name: 'familyNameEng',
-                previewGroup: 'informantNameInEnglish',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last name',
-                  description: 'Label for form field: Last name in english',
-                  id: 'form.field.label.childFamilyName'
-                },
-                maxLength: 32,
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'familyName']
-                      },
-                      'name'
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['en', 'familyName']
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'firstNamesEng',
-                previewGroup: 'informantNameInEnglish',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'First name(s)',
-                  description: 'Label for form field: Given names',
-                  id: 'form.field.label.childFirstNames'
-                },
-                maxLength: 32,
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'firstNames']
-                      },
-                      'name'
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['en', 'firstNames']
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'seperator',
-                type: 'SUBSECTION',
-                label: {
-                  defaultMessage: ' ',
-                  description: 'empty string',
-                  id: 'form.field.label.empty'
-                },
-                initialValue: '',
-                ignoreBottomMargin: true,
-                validate: [],
-                conditionals: []
-              },
-              {
-                name: 'registrationPhone',
-                type: 'TEL',
-                label: formMessageDescriptors.phoneNumber,
-                required: false,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'phoneNumberFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'changeHirerchyMutationTransformer',
-                    parameters: [
-                      'registration.contactPhoneNumber',
-                      {
-                        operation: 'msisdnTransformer',
-                        parameters: ['registration.contactPhoneNumber']
-                      }
-                    ]
-                  },
-                  query: {
-                    operation: 'changeHirerchyQueryTransformer',
-                    parameters: [
-                      'registration.contactPhoneNumber',
-                      {
-                        operation: 'localPhoneTransformer',
-                        parameters: ['registration.contactPhoneNumber']
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'informantID',
-                type: 'TEXT',
-                label: formMessageDescriptors.iDTypeNationalID,
-                required: false,
-                customisable: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'validIDNumber',
-                    parameters: ['NATIONAL_ID']
-                  },
-                  {
-                    operation: 'duplicateIDNumber',
-                    parameters: ['deceased.iD']
-                  }
-                ],
-                conditionals: [],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldToIdentityTransformer',
-                        parameters: ['id', 'NATIONAL_ID']
-                      }
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'identityToFieldTransformer',
-                        parameters: ['id', 'NATIONAL_ID']
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            previewGroups: [
-              {
-                id: 'informantNameInEnglish',
-                label: {
-                  defaultMessage: "Informant's fullname",
-                  description: "Label for informant's name in english",
-                  id: 'form.preview.group.label.informant.english.name'
-                },
-                fieldToRedirect: 'informantFamilyNameEng',
-                delimiter: ' '
-              }
-            ]
-          }
-        ],
-        mapping: {
-          mutation: {
-            operation: 'setInformantSectionTransformer'
-          },
-          query: {
-            operation: 'getInformantSectionTransformer'
-          }
-        }
       },
       {
         id: BirthSection.Mother,
@@ -835,6 +387,13 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: First names in english',
                   id: 'form.field.label.motherFirstNamesEng'
                 },
+                description: {
+                  defaultMessage:
+                    'Middle name (if any) should be entered after the first name',
+                  description:
+                    'Description for form field: First names in english',
+                  id: 'form.field.label.firstNamesDesc'
+                },
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -865,75 +424,6 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['en', 'firstNames']
                   }
                 }
-              },
-              {
-                name: 'iD',
-                type: 'TEXT',
-                label: formMessageDescriptors.iDTypeNationalID,
-                required: false,
-                customisable: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'validIDNumber',
-                    parameters: ['NATIONAL_ID']
-                  },
-                  {
-                    operation: 'duplicateIDNumber',
-                    parameters: ['father.iD']
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    fieldName: 'motherNID',
-                    operation: 'identityToFieldTransformer',
-                    parameters: ['id', 'NATIONAL_ID']
-                  },
-                  mutation: {
-                    operation: 'fieldToIdentityTransformer',
-                    parameters: ['id', 'NATIONAL_ID']
-                  },
-                  query: {
-                    operation: 'identityToFieldTransformer',
-                    parameters: ['id', 'NATIONAL_ID']
-                  }
-                }
-              },
-              {
-                name: 'phoneNumber',
-                type: 'TEL',
-                label: formMessageDescriptors.phoneNumber,
-                required: false,
-                initialValue: '',
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToTelecomTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'telecomToFieldTransformer',
-                    parameters: []
-                  }
-                },
-                validate: [
-                  {
-                    operation: 'phoneNumberFormat'
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
-                  }
-                ]
               },
               {
                 name: 'address-separator',
@@ -1037,11 +527,11 @@ export const registerForms: IDefaultRegisterForms = {
                     }
                   },
                   {
-                    value: 'WIDOWED',
+                    value: 'SEPARATED',
                     label: {
-                      defaultMessage: 'Widowed',
-                      description: 'Option for form field: Marital status',
-                      id: 'form.field.label.maritalStatusWidowed'
+                      id: 'form.field.label.maritalStatusSeparated',
+                      defaultMessage: 'Separated',
+                      description: 'Option for form field: Marital status'
                     }
                   },
                   {
@@ -1053,19 +543,11 @@ export const registerForms: IDefaultRegisterForms = {
                     }
                   },
                   {
-                    value: 'SEPARATED',
+                    value: 'WIDOWED',
                     label: {
-                      id: 'form.field.label.maritalStatusSeparated',
-                      defaultMessage: 'Separated',
-                      description: 'Option for form field: Marital status'
-                    }
-                  },
-                  {
-                    value: 'NOT_STATED',
-                    label: {
-                      defaultMessage: 'Not stated',
+                      defaultMessage: 'Widowed',
                       description: 'Option for form field: Marital status',
-                      id: 'form.field.label.maritalStatusNotStated'
+                      id: 'form.field.label.maritalStatusWidowed'
                     }
                   }
                 ]
@@ -1767,6 +1249,45 @@ export const registerForms: IDefaultRegisterForms = {
                 ]
               },
               {
+                name: 'literacy',
+                type: 'SELECT_WITH_OPTIONS',
+                label: {
+                  defaultMessage: 'literacy',
+                  description: 'Label for form field: Mother literacy',
+                  id: 'form.field.label.motherLiteracy'
+                },
+                required: false,
+                customisable: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: [
+                  {
+                    value: 'LITERATE',
+                    label: {
+                      defaultMessage: 'Literate',
+                      description: 'Label for literacy option Literate',
+                      id: 'form.field.label.literacy.literate'
+                    }
+                  },
+                  {
+                    value: 'ILLITERATE',
+                    label: {
+                      defaultMessage: 'Illiterate',
+                      description: 'Label for literacy option Illiterate',
+                      id: 'form.field.label.literacy.illiterate'
+                    }
+                  }
+                ]
+              },
+              {
                 name: 'educationalAttainment',
                 type: 'SELECT_WITH_OPTIONS',
                 label: {
@@ -1842,22 +1363,6 @@ export const registerForms: IDefaultRegisterForms = {
                       description: 'Label for education option University',
                       id: 'form.field.label.educationAttainment.university'
                     }
-                  },
-                  {
-                    value: 'NO_EDUCATION',
-                    label: {
-                      defaultMessage: 'No Education',
-                      description: 'Label for education option No Education',
-                      id: 'form.field.label.educationAttainment.noEducation'
-                    }
-                  },
-                  {
-                    value: 'N_A',
-                    label: {
-                      defaultMessage: 'N/A',
-                      description: 'Label for education option N/A',
-                      id: 'form.field.label.educationAttainment.nA'
-                    }
                   }
                 ]
               },
@@ -1880,6 +1385,75 @@ export const registerForms: IDefaultRegisterForms = {
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
+              },
+              {
+                name: 'phoneNumber',
+                type: 'TEL',
+                label: formMessageDescriptors.phoneNumber,
+                required: false,
+                initialValue: '',
+                mapping: {
+                  mutation: {
+                    operation: 'fieldToTelecomTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'telecomToFieldTransformer',
+                    parameters: []
+                  }
+                },
+                validate: [
+                  {
+                    operation: 'phoneNumberFormat'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ]
+              },
+              {
+                name: 'iD',
+                type: 'TEXT',
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: false,
+                customisable: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'validIDNumber',
+                    parameters: ['NATIONAL_ID']
+                  },
+                  {
+                    operation: 'duplicateIDNumber',
+                    parameters: ['father.iD']
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'motherNID',
+                    operation: 'identityToFieldTransformer',
+                    parameters: ['id', 'NATIONAL_ID']
+                  },
+                  mutation: {
+                    operation: 'fieldToIdentityTransformer',
+                    parameters: ['id', 'NATIONAL_ID']
+                  },
+                  query: {
+                    operation: 'identityToFieldTransformer',
+                    parameters: ['id', 'NATIONAL_ID']
+                  }
+                }
               }
             ],
             previewGroups: [
@@ -2006,6 +1580,13 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: First names in english',
                   id: 'form.field.label.fatherFirstNamesEng'
                 },
+                description: {
+                  defaultMessage:
+                    'Middle name (if any) should be entered after the first name',
+                  description:
+                    'Description for form field: First names in english',
+                  id: 'form.field.label.firstNamesDesc'
+                },
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -2036,77 +1617,6 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['en', 'firstNames']
                   }
                 }
-              },
-              // NiD
-              {
-                name: 'iD',
-                type: 'TEXT',
-                label: formMessageDescriptors.iDTypeNationalID,
-                required: false,
-                customisable: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'validIDNumber',
-                    parameters: ['NATIONAL_ID']
-                  },
-                  {
-                    operation: 'duplicateIDNumber',
-                    parameters: ['mother.iD']
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    fieldName: 'fatherNID',
-                    operation: 'identityToFieldTransformer',
-                    parameters: ['id', 'NATIONAL_ID']
-                  },
-                  mutation: {
-                    operation: 'fieldToIdentityTransformer',
-                    parameters: ['id', 'NATIONAL_ID']
-                  },
-                  query: {
-                    operation: 'identityToFieldTransformer',
-                    parameters: ['id', 'NATIONAL_ID']
-                  }
-                }
-              },
-              // Phone number
-              {
-                name: 'phoneNumber',
-                type: 'TEL',
-                label: formMessageDescriptors.phoneNumber,
-                required: false,
-                initialValue: '',
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToTelecomTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'telecomToFieldTransformer',
-                    parameters: []
-                  }
-                },
-                validate: [
-                  {
-                    operation: 'phoneNumberFormat'
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
-                  }
-                ]
               },
               // Separator
               {
@@ -2199,7 +1709,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'SINGLE',
                     label: {
-                      defaultMessage: 'Unmarried',
+                      defaultMessage: 'Single',
                       description: 'Option for form field: Marital status',
                       id: 'form.field.label.maritalStatusSingle'
                     }
@@ -2213,11 +1723,11 @@ export const registerForms: IDefaultRegisterForms = {
                     }
                   },
                   {
-                    value: 'WIDOWED',
+                    value: 'SEPARATED',
                     label: {
-                      defaultMessage: 'Widowed',
-                      description: 'Option for form field: Marital status',
-                      id: 'form.field.label.maritalStatusWidowed'
+                      id: 'form.field.label.maritalStatusSeparated',
+                      defaultMessage: 'Separated',
+                      description: 'Option for form field: Marital status'
                     }
                   },
                   {
@@ -2229,19 +1739,11 @@ export const registerForms: IDefaultRegisterForms = {
                     }
                   },
                   {
-                    value: 'SEPARATED',
+                    value: 'WIDOWED',
                     label: {
-                      id: 'form.field.label.maritalStatusSeparated',
-                      defaultMessage: 'Separated',
-                      description: 'Option for form field: Marital status'
-                    }
-                  },
-                  {
-                    value: 'NOT_STATED',
-                    label: {
-                      defaultMessage: 'Not stated',
+                      defaultMessage: 'Widowed',
                       description: 'Option for form field: Marital status',
-                      id: 'form.field.label.maritalStatusNotStated'
+                      id: 'form.field.label.maritalStatusWidowed'
                     }
                   }
                 ]
@@ -2928,6 +2430,45 @@ export const registerForms: IDefaultRegisterForms = {
               },
               // Education
               {
+                name: 'literacy',
+                type: 'SELECT_WITH_OPTIONS',
+                label: {
+                  defaultMessage: 'literacy',
+                  description: 'Label for form field: Mother literacy',
+                  id: 'form.field.label.motherLiteracy'
+                },
+                required: false,
+                customisable: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: [
+                  {
+                    value: 'LITERATE',
+                    label: {
+                      defaultMessage: 'Literate',
+                      description: 'Label for literacy option Literate',
+                      id: 'form.field.label.literacy.literate'
+                    }
+                  },
+                  {
+                    value: 'ILLITERATE',
+                    label: {
+                      defaultMessage: 'Illiterate',
+                      description: 'Label for literacy option Illiterate',
+                      id: 'form.field.label.literacy.illiterate'
+                    }
+                  }
+                ]
+              },
+              {
                 name: 'educationalAttainment',
                 type: 'SELECT_WITH_OPTIONS',
                 label: {
@@ -3003,22 +2544,6 @@ export const registerForms: IDefaultRegisterForms = {
                       description: 'Label for education option University',
                       id: 'form.field.label.educationAttainment.university'
                     }
-                  },
-                  {
-                    value: 'NO_EDUCATION',
-                    label: {
-                      defaultMessage: 'No Education',
-                      description: 'Label for education option No Education',
-                      id: 'form.field.label.educationAttainment.noEducation'
-                    }
-                  },
-                  {
-                    value: 'N_A',
-                    label: {
-                      defaultMessage: 'N/A',
-                      description: 'Label for education option N/A',
-                      id: 'form.field.label.educationAttainment.nA'
-                    }
                   }
                 ]
               },
@@ -3042,6 +2567,77 @@ export const registerForms: IDefaultRegisterForms = {
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
+              },
+              // Phone number
+              {
+                name: 'phoneNumber',
+                type: 'TEL',
+                label: formMessageDescriptors.phoneNumber,
+                required: false,
+                initialValue: '',
+                mapping: {
+                  mutation: {
+                    operation: 'fieldToTelecomTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'telecomToFieldTransformer',
+                    parameters: []
+                  }
+                },
+                validate: [
+                  {
+                    operation: 'phoneNumberFormat'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                  }
+                ]
+              },
+              // NiD
+              {
+                name: 'iD',
+                type: 'TEXT',
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: false,
+                customisable: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'validIDNumber',
+                    parameters: ['NATIONAL_ID']
+                  },
+                  {
+                    operation: 'duplicateIDNumber',
+                    parameters: ['mother.iD']
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'fatherNID',
+                    operation: 'identityToFieldTransformer',
+                    parameters: ['id', 'NATIONAL_ID']
+                  },
+                  mutation: {
+                    operation: 'fieldToIdentityTransformer',
+                    parameters: ['id', 'NATIONAL_ID']
+                  },
+                  query: {
+                    operation: 'identityToFieldTransformer',
+                    parameters: ['id', 'NATIONAL_ID']
+                  }
+                }
               }
             ],
             previewGroups: [
@@ -3061,6 +2657,358 @@ export const registerForms: IDefaultRegisterForms = {
         mapping: {
           query: {
             operation: 'emptyFatherSectionTransformer'
+          }
+        }
+      },
+      {
+        id: BirthSection.Registration,
+        viewType: 'form',
+        name: formMessageDescriptors.registrationName,
+        title: formMessageDescriptors.registrationTitle,
+        groups: [
+          {
+            id: 'who-is-applying-view-group',
+            title: {
+              defaultMessage: 'Informant',
+              description: 'Form section name for Informant',
+              id: 'form.section.informant.title'
+            },
+            conditionals: [],
+            preventContinueIfError: true,
+            showExitButtonOnly: false,
+            fields: [
+              {
+                name: 'informantType',
+                type: 'SELECT_WITH_OPTIONS',
+                label: formMessageDescriptors.informantsRelationWithChild,
+                hideHeader: false,
+                required: true,
+                hideInPreview: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'validInformant'
+                  }
+                ],
+                options: [
+                  {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
+                    value: 'PATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.paternalGrandfather
+                  },
+                  {
+                    value: 'PATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.paternalGrandmother
+                  },
+                  {
+                    value: 'MATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.maternalGrandfather
+                  },
+                  {
+                    value: 'MATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.maternalGrandmother
+                  },
+                  {
+                    value: 'BROTHER',
+                    label: informantMessageDescriptors.brother
+                  },
+                  {
+                    value: 'SISTER',
+                    label: informantMessageDescriptors.sister
+                  },
+                  {
+                    value: 'OTHER_FAMILY_MEMBER',
+                    label: informantMessageDescriptors.otherFamilyMember
+                  },
+                  {
+                    value: 'LEGAL_GUARDIAN',
+                    label: informantMessageDescriptors.legalGuardian
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.someoneElse
+                  }
+                ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder
+              },
+              {
+                name: 'otherInformantType',
+                type: 'TEXT',
+                label: formMessageDescriptors.informantsOtherRelationWithChild,
+                placeholder: formMessageDescriptors.relationshipPlaceHolder,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.informantType || values.informantType !== "OTHER"'
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        mapping: {
+          template: [
+            {
+              fieldName: 'registrationNumber',
+              operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'certificateDate',
+              operation: 'certificateDateTransformer',
+              parameters: ['en', 'dd MMMM yyyy']
+            },
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'registrationLocation',
+              operation: 'registrationLocationUserTransformer'
+            }
+          ],
+          mutation: {
+            operation: 'setBirthRegistrationSectionTransformer'
+          },
+          query: {
+            operation: 'getBirthRegistrationSectionTransformer'
+          }
+        }
+      },
+      {
+        id: BirthSection.Informant,
+        viewType: 'form',
+        name: {
+          defaultMessage: 'Informant',
+          description: 'Form section name for Informant',
+          id: 'form.section.informant.name'
+        },
+        title: formMessageDescriptors.informantTitle,
+        hasDocumentSection: true,
+        groups: [
+          {
+            id: 'informant-view-group',
+            conditionals: [
+              {
+                action: 'hide',
+                expression:
+                  '((draftData && draftData.registration && draftData.registration.informantType === "MOTHER" && draftData.mother && draftData.mother.detailsExist) || (draftData && draftData.registration && draftData.registration.informantType === "FATHER" && draftData.father && draftData.father.detailsExist))'
+              }
+            ],
+            fields: [
+              {
+                name: 'familyNameEng',
+                previewGroup: 'informantNameInEnglish',
+                type: 'TEXT',
+                label: {
+                  defaultMessage: 'Last name',
+                  description: 'Label for form field: Last name in english',
+                  id: 'form.field.label.childFamilyName'
+                },
+                maxLength: 32,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'familyName']
+                      },
+                      'name'
+                    ]
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'familyName']
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'firstNamesEng',
+                previewGroup: 'informantNameInEnglish',
+                type: 'TEXT',
+                label: {
+                  defaultMessage: 'First name(s)',
+                  description: 'Label for form field: Given names',
+                  id: 'form.field.label.childFirstNames'
+                },
+                maxLength: 32,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'firstNames']
+                      },
+                      'name'
+                    ]
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'firstNames']
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'seperator',
+                type: 'SUBSECTION',
+                label: {
+                  defaultMessage: ' ',
+                  description: 'empty string',
+                  id: 'form.field.label.empty'
+                },
+                initialValue: '',
+                ignoreBottomMargin: true,
+                validate: [],
+                conditionals: []
+              },
+              {
+                name: 'registrationPhone',
+                type: 'TEL',
+                label: formMessageDescriptors.phoneNumber,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'phoneNumberFormat'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'changeHirerchyMutationTransformer',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      {
+                        operation: 'msisdnTransformer',
+                        parameters: ['registration.contactPhoneNumber']
+                      }
+                    ]
+                  },
+                  query: {
+                    operation: 'changeHirerchyQueryTransformer',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      {
+                        operation: 'localPhoneTransformer',
+                        parameters: ['registration.contactPhoneNumber']
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'informantID',
+                type: 'TEXT',
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: false,
+                customisable: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'validIDNumber',
+                    parameters: ['NATIONAL_ID']
+                  },
+                  {
+                    operation: 'duplicateIDNumber',
+                    parameters: ['deceased.iD']
+                  }
+                ],
+                conditionals: [],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToIdentityTransformer',
+                        parameters: ['id', 'NATIONAL_ID']
+                      }
+                    ]
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'identityToFieldTransformer',
+                        parameters: ['id', 'NATIONAL_ID']
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            previewGroups: [
+              {
+                id: 'informantNameInEnglish',
+                label: {
+                  defaultMessage: "Informant's fullname",
+                  description: "Label for informant's name in english",
+                  id: 'form.preview.group.label.informant.english.name'
+                },
+                fieldToRedirect: 'informantFamilyNameEng',
+                delimiter: ' '
+              }
+            ]
+          }
+        ],
+        mapping: {
+          mutation: {
+            operation: 'setInformantSectionTransformer'
+          },
+          query: {
+            operation: 'getInformantSectionTransformer'
           }
         }
       },
@@ -3170,6 +3118,10 @@ export const registerForms: IDefaultRegisterForms = {
                     label: formMessageDescriptors.docTypePassport
                   },
                   {
+                    value: birthDocumentTypeFhirMapping.VOTERS_CARD,
+                    label: formMessageDescriptors.docTypeVotersCard
+                  },
+                  {
                     value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
                     label: formMessageDescriptors.docTypeBirthCert
                   },
@@ -3212,6 +3164,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: birthDocumentTypeFhirMapping.PASSPORT,
                     label: formMessageDescriptors.docTypePassport
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.VOTERS_CARD,
+                    label: formMessageDescriptors.docTypeVotersCard
                   },
                   {
                     value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,

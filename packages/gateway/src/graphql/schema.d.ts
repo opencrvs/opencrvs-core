@@ -170,6 +170,7 @@ export interface GQLPerson {
   photo?: Array<GQLAttachment | null>
   deceased?: GQLDeceased
   nationality?: Array<string | null>
+  literacy?: GQLLiteracyType
   educationalAttainment?: GQLEducationType
 }
 
@@ -531,6 +532,7 @@ export interface GQLRegistration {
   assignment?: GQLAssignmentData
   contact?: string
   contactRelationship?: string
+  informantsSignature?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
@@ -681,6 +683,11 @@ export interface GQLAttachment {
 export interface GQLDeceased {
   deceased?: boolean
   deathDate?: string
+}
+
+export const enum GQLLiteracyType {
+  LITERATE = 'LITERATE',
+  ILLITERATE = 'ILLITERATE'
 }
 
 export const enum GQLEducationType {
@@ -838,6 +845,7 @@ export interface GQLPersonInput {
   photo?: Array<GQLAttachmentInput>
   deceased?: GQLDeceasedInput
   nationality?: Array<string | null>
+  literacy?: GQLLiteracyType
   educationalAttainment?: GQLEducationType
 }
 
@@ -866,6 +874,7 @@ export interface GQLRegistrationInput {
   paperFormID?: string
   page?: string
   book?: string
+  informantsSignature?: string
   informantType?: GQLInformantType
   otherInformantType?: string
   contact?: string
@@ -2952,6 +2961,7 @@ export interface GQLPersonTypeResolver<TParent = any> {
   photo?: PersonToPhotoResolver<TParent>
   deceased?: PersonToDeceasedResolver<TParent>
   nationality?: PersonToNationalityResolver<TParent>
+  literacy?: PersonToLiteracyResolver<TParent>
   educationalAttainment?: PersonToEducationalAttainmentResolver<TParent>
 }
 
@@ -3035,6 +3045,10 @@ export interface PersonToDeceasedResolver<TParent = any, TResult = any> {
 }
 
 export interface PersonToNationalityResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToLiteracyResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -3932,6 +3946,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   assignment?: RegistrationToAssignmentResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
   contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
+  informantsSignature?: RegistrationToInformantsSignatureResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
@@ -4008,6 +4023,13 @@ export interface RegistrationToContactResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToContactRelationshipResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToInformantsSignatureResolver<
   TParent = any,
   TResult = any
 > {

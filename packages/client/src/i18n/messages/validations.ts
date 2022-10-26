@@ -274,6 +274,12 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Can not have any decimal point number',
     description:
       'The error message that appeards when any decimal point number is used'
+  },
+  informantDetailsDoesNotExist: {
+    id: 'validations.informantDetailsDoesNotExist',
+    defaultMessage: 'Informant details does not exist',
+    description:
+      'The error message that appears when an informant missing details is selected'
   }
 }
 

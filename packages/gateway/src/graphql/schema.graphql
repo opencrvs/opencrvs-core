@@ -305,6 +305,7 @@ type Person {
   photo: [Attachment]
   deceased: Deceased
   nationality: [String]
+  literacy: LiteracyType
   educationalAttainment: EducationType
 }
 
@@ -655,6 +656,7 @@ type Registration {
   assignment: AssignmentData
   contact: String
   contactRelationship: String
+  informantsSignature: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -807,6 +809,11 @@ type Deceased {
   deathDate: String
 }
 
+enum LiteracyType {
+  LITERATE
+  ILLITERATE
+}
+
 enum EducationType {
   KORANIC
   PRIMARY
@@ -951,6 +958,7 @@ input PersonInput {
   photo: [AttachmentInput!]
   deceased: DeceasedInput
   nationality: [String]
+  literacy: LiteracyType
   educationalAttainment: EducationType
 }
 
@@ -979,6 +987,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantsSignature: String
   informantType: InformantType
   otherInformantType: String
   contact: String

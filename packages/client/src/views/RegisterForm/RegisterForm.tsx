@@ -459,7 +459,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
         const activeSectionFields = this.props.activeSectionGroup.fields
         const activeSectionValues =
           this.props.declaration.data[this.props.activeSection.id]
-        groupHasError = hasFormError(activeSectionFields, activeSectionValues)
+        groupHasError = hasFormError(
+          activeSectionFields,
+          activeSectionValues,
+          undefined,
+          this.props.declaration.data
+        )
       }
       if (groupHasError) {
         this.showAllValidationErrors()
