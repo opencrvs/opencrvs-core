@@ -45,6 +45,7 @@ import { Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,
   NAME_TEXT,
+  NATIONAL_ID_TEXT,
   PHONE_TEXT,
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
@@ -341,6 +342,8 @@ export class SearchResultView extends React.Component<
                       sort: SEARCH_RESULT_SORT,
                       trackingId:
                         searchType === TRACKING_ID_TEXT ? searchText : '',
+                      nationalId:
+                        searchType === NATIONAL_ID_TEXT ? searchText : '',
                       registrationNumber:
                         searchType === BRN_DRN_TEXT ? searchText : '',
                       contactNumber:
@@ -453,6 +456,7 @@ export class SearchResultView extends React.Component<
                 : [],
               sort: SEARCH_RESULT_SORT,
               trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
+              nationalId: searchType === NATIONAL_ID_TEXT ? searchText : '',
               registrationNumber: searchType === BRN_DRN_TEXT ? searchText : '',
               contactNumber:
                 searchType === PHONE_TEXT ? convertToMSISDN(searchText) : '',

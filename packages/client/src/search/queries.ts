@@ -15,6 +15,7 @@ export const SEARCH_EVENTS = gql`
   query searchEvents(
     $sort: String
     $trackingId: String
+    $nationalId: String
     $contactNumber: String
     $registrationNumber: String
     $name: String
@@ -22,6 +23,7 @@ export const SEARCH_EVENTS = gql`
   ) {
     searchEvents(
       sort: $sort
+      nationalId: $nationalId
       trackingId: $trackingId
       registrationNumber: $registrationNumber
       name: $name

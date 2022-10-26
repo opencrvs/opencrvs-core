@@ -122,6 +122,7 @@ export interface IBirthCompositionBody extends ICompositionBody {
   informantFamilyName?: string
   informantFirstNamesLocal?: string
   informantFamilyNameLocal?: string
+  informantIdentifier?: string
 }
 
 export interface IDeathCompositionBody extends ICompositionBody {
@@ -129,6 +130,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   deceasedFamilyName?: string
   deceasedFirstNamesLocal?: string
   deceasedFamilyNameLocal?: string
+  deceasedIdentifier?: string
   deathDate?: string
   motherFirstNames?: string
   motherFamilyName?: string
@@ -146,6 +148,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   informantFamilyName?: string
   informantFirstNamesLocal?: string
   informantFamilyNameLocal?: string
+  informantIdentifier?: string
 }
 export interface IUserModelData {
   _id: string

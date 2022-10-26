@@ -50,6 +50,7 @@ export function formatSearchParams(params: ISearchQuery) {
   const {
     query = EMPTY_STRING,
     trackingId = EMPTY_STRING,
+    nationalId = EMPTY_STRING,
     contactNumber = EMPTY_STRING,
     registrationNumber = EMPTY_STRING,
     event = EMPTY_STRING,
@@ -84,6 +85,7 @@ export function formatSearchParams(params: ISearchQuery) {
       query: queryBuilder(
         query,
         trackingId,
+        nationalId,
         contactNumber,
         registrationNumber,
         eventLocationId,

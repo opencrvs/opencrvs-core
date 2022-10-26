@@ -107,6 +107,7 @@ type Query {
     status: [String]
     type: [String]
     trackingId: String
+    nationalId: String
     registrationNumber: String
     contactNumber: String
     name: String

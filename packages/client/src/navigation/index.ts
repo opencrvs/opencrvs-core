@@ -25,6 +25,7 @@ import {
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
+  ADVANCED_SEARCH,
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
@@ -165,6 +166,10 @@ export function goToHome() {
 
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+
+export function goToAdvancedSearch() {
+  return push(ADVANCED_SEARCH)
 }
 
 export function goToFormConfigHome() {

@@ -202,6 +202,10 @@ async function createDeceasedIndex(
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
   body.deathDate = deceased && deceased.deceasedDateTime
   body.eventLocationId = deathLocation && deathLocation.id
+  body.deceasedIdentifier =
+    deceased.identifier &&
+    deceased.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
 }
 
 function createMotherIndex(
@@ -327,6 +331,10 @@ function createInformantIndex(
     informantNameLocal &&
     informantNameLocal.family &&
     informantNameLocal.family[0]
+  body.informantIdentifier =
+    informant.identifier &&
+    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
 }
 
 async function createDeclarationIndex(
