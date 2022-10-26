@@ -961,6 +961,7 @@ export interface IFormSectionGroup {
   error?: MessageDescriptor
   preventContinueIfError?: boolean
   showExitButtonOnly?: boolean
+  includeHiddenValues?: boolean
 }
 
 export interface IForm {
