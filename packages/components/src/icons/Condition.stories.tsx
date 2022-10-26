@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Condition } from './Condition'
 
 export default {
-  title: 'Components/icons/Condition',
+  title: 'Deprecated/icons/Condition',
   component: Condition
 } as Meta
 

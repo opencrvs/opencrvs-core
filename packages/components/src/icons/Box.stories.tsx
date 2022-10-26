@@ -9,16 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
+import React from 'react'
+import { Meta, Story } from '@storybook/react'
+import { Box } from './Box'
 
-/** @deprecated for LinkButton */
-export const Link = styled.a<{ error?: boolean }>`
-  width: auto;
-  min-height: 44px;
-  color: ${({ error, theme }) =>
-    error ? theme.colors.negative : theme.colors.copy};
-  cursor: pointer;
-  border: 0;
-  text-decoration: underline;
-  ${({ theme }) => theme.fonts.reg16};
-`
+export default {
+  title: 'Deprecated/Icons/Box',
+  component: Box
+} as Meta
+
+const Template: Story<{}> = () => <Box />
+
+export const BoxView = Template.bind({})
