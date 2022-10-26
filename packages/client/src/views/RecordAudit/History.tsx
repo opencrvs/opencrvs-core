@@ -11,37 +11,24 @@
  */
 
 import React from 'react'
-import { TableView } from '@opencrvs/components/lib/interface/TableView'
-import { Divider } from '@opencrvs/components/lib/interface/Divider'
+import { Table } from '@opencrvs/components/lib/Table'
+import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
-import {
-  ISearchLocation,
-  ColumnContentAlignment
-} from '@opencrvs/components/lib/interface'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { getFormattedDate, getPageItems, getStatusLabel } from './utils'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import {
-  PaginationWrapper,
-  MobileWrapper,
-  DesktopWrapper
-} from '@opencrvs/components/lib/styleForPagination'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import {
-  IAvatar,
-  getIndividualNameObj,
-  IUserDetails
-} from '@client/utils/userUtils'
-import { goToUserProfile } from '@client/navigation'
+import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, HumanName } from '@client/utils/gateway'
+import { History, RegStatus } from '@client/utils/gateway'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -67,10 +54,6 @@ const NameAvatar = styled.div`
     margin-right: 10px;
   }
 `
-
-export interface IActionDetailsData {
-  [key: string]: any
-}
 
 export const GetLink = ({
   status,
@@ -163,7 +146,7 @@ export const GetHistory = ({
   toggleActionDetails,
   userDetails
 }: CMethodParams & {
-  toggleActionDetails: (actionItem: IActionDetailsData, index?: number) => void
+  toggleActionDetails: (actionItem: History, index?: number) => void
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
@@ -190,7 +173,7 @@ export const GetHistory = ({
   if (!allHistoryData.length && userDetails) {
     allHistoryData.unshift({
       date: new Date(draft.savedOn || Date.now()).toString(),
-      action: 'STARTED',
+      regStatus: 'STARTED',
       user: {
         id: userDetails.userMgntUserID,
         name: userDetails.name,
@@ -205,8 +188,8 @@ export const GetHistory = ({
   }
 
   if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
-    allHistoryData = allHistoryData.filter((obj: { [key: string]: any }) => {
-      return obj.action !== 'WAITING_VALIDATION'
+    allHistoryData = allHistoryData.filter(({ regStatus }: History) => {
+      return regStatus !== RegStatus.WaitingValidation
     })
   }
 
@@ -226,10 +209,11 @@ export const GetHistory = ({
     action: (
       <GetLink
         status={getStatusLabel(
-          item?.action as string,
-          !!item.reinstated,
+          item.action,
+          item.regStatus,
           intl,
-          item?.user as IUserDetails
+          item.user,
+          userDetails
         )}
         onClick={() => {
           const actionIndex = getIndexByAction(historiesForDisplay, index)
@@ -249,7 +233,7 @@ export const GetHistory = ({
         />
       ),
     type: intl.formatMessage(
-      item.dhis2Notification && !item.user?.role
+      (item.dhis2Notification && !item.user?.role) || null === item.user?.role
         ? userMessages.healthSystem
         : userMessages[item?.user?.role as string]
     ),
@@ -302,40 +286,23 @@ export const GetHistory = ({
       <Divider />
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableDiv>
-        <TableView
+        <Table
           id="task-history"
           fixedWidth={1088}
           noResultText=""
-          hideBoxShadow={true}
           columns={columns}
           content={historyData}
-          alignItemCenter={true}
           highlightRowOnMouseOver
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
         {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
-          <PaginationWrapper>
-            <DesktopWrapper>
-              <PaginationModified
-                size="small"
-                initialPage={currentPageNumber}
-                totalPages={Math.ceil(
-                  allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
-                )}
-                onPageChange={onPageChange}
-              />
-            </DesktopWrapper>
-            <MobileWrapper>
-              <PaginationModified
-                size="large"
-                initialPage={currentPageNumber}
-                totalPages={Math.ceil(
-                  allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
-                )}
-                onPageChange={onPageChange}
-              />
-            </MobileWrapper>
-          </PaginationWrapper>
+          <Pagination
+            currentPage={currentPageNumber}
+            totalPages={Math.ceil(
+              allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+            )}
+            onPageChange={onPageChange}
+          />
         )}
       </TableDiv>
     </>

@@ -28,6 +28,7 @@ describe('Correction root resolvers', () => {
       { scope: ['register', 'certify'] },
       readFileSync('../auth/test/cert.key'),
       {
+        subject: '121223',
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:gateway-user'
@@ -146,6 +147,8 @@ describe('Correction root resolvers', () => {
     })
 
     it('posts a fhir bundle', async () => {
+      fetch.mockResponses([JSON.stringify({ userId: '121223' })])
+
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -186,6 +189,8 @@ describe('Correction root resolvers', () => {
     })
 
     it('posts a fhir bundle', async () => {
+      fetch.mockResponses([JSON.stringify({ userId: '121223' })])
+
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',

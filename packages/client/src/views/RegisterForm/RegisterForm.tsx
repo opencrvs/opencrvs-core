@@ -20,18 +20,19 @@ import {
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton,
-  SecondaryButton
+  SecondaryButton,
+  DangerButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
-  EventTopBar,
+  FixedEventTopBar,
   IEventTopBarProps,
-  IEventTopBarMenuAction,
-  ResponsiveModal,
-  Spinner,
-  Warning
-} from '@opencrvs/components/lib/interface'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+  IEventTopBarMenuAction
+} from '@opencrvs/components/lib/EventTopBar'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {
   deleteDeclaration,
   IDeclaration,
@@ -107,6 +108,7 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { IUserDetails } from '@client/utils/userUtils'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -212,6 +214,7 @@ type State = {
   rejectFormOpen: boolean
   hasError: boolean
   showConfirmationModal: boolean
+  confirmDeleteDeclarationModal: boolean
   isFileUploading: boolean
   startTime: number
 }
@@ -234,6 +237,14 @@ const StyledContainer = styled(Container)`
     z-index: 999;
   }
 `
+function getDeclarationIconColor(declaration: IDeclaration): string {
+  return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
+    ? 'purple'
+    : declaration.registrationStatus
+    ? STATUSTOCOLOR[declaration.registrationStatus]
+    : 'orange'
+}
+
 class RegisterFormView extends React.Component<FullProps, State> {
   constructor(props: FullProps) {
     super(props)
@@ -242,6 +253,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       rejectFormOpen: false,
       hasError: false,
       showConfirmationModal: false,
+      confirmDeleteDeclarationModal: false,
       isFileUploading: false,
       startTime: 0
     }
@@ -403,6 +415,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }))
   }
 
+  toggleConfirmDeleteModalOpen = () => {
+    this.setState((prevState) => ({
+      confirmDeleteDeclarationModal: !prevState.confirmDeleteDeclarationModal
+    }))
+  }
+
   getEvent() {
     const eventType = this.props.declaration.event || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
@@ -546,10 +564,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       title: intl.formatMessage(messages.newVitalEventRegistration, {
         event: declaration.event
       }),
-      iconColor:
-        declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-          ? 'purple'
-          : 'orange'
+      iconColor: getDeclarationIconColor(declaration)
     }
 
     if (!!activeSectionGroup.showExitButtonOnly) {
@@ -604,7 +619,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
         ? {
             label: intl.formatMessage(buttonMessages.deleteDeclaration),
-            handler: () => this.onDeleteDeclaration(declaration)
+            handler: () => this.toggleConfirmDeleteModalOpen()
           }
         : {
             label: intl.formatMessage(buttonMessages.closeDeclaration),
@@ -618,6 +633,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.logTime(duration)
           }}
         ></TimeMounted>
+
         <StyledContainer
           className={PAGE_TRANSITIONS_CLASSNAME}
           id="informant_parent_view"
@@ -631,18 +647,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
             <>
               {activeSection.viewType === VIEW_TYPE.PREVIEW && (
                 <>
-                  <EventTopBar
+                  <FixedEventTopBar
                     title={intl.formatMessage(
                       messages.newVitalEventRegistration,
                       {
                         event: declaration.event
                       }
                     )}
-                    iconColor={
-                      declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'purple'
-                        : 'orange'
-                    }
+                    iconColor={getDeclarationIconColor(declaration)}
                     saveAction={{
                       handler: this.onSaveAsDraftClicked,
                       label: intl.formatMessage(buttonMessages.saveExitButton)
@@ -660,20 +672,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
               {activeSection.viewType === VIEW_TYPE.REVIEW && (
                 <>
                   {isCorrection(declaration) ? (
-                    <EventTopBar {...this.getEventTopBarPropsForCorrection()} />
+                    <FixedEventTopBar
+                      {...this.getEventTopBarPropsForCorrection()}
+                    />
                   ) : (
-                    <EventTopBar
+                    <FixedEventTopBar
                       title={intl.formatMessage(
                         messages.newVitalEventRegistration,
                         {
                           event: declaration.event
                         }
                       )}
-                      iconColor={
-                        declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-                          ? 'purple'
-                          : 'orange'
-                      }
+                      iconColor={getDeclarationIconColor(declaration)}
                       saveAction={{
                         handler: () =>
                           this.props.goToHomeTab(
@@ -701,7 +711,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
               {activeSection.viewType === VIEW_TYPE.FORM && (
                 <>
-                  <EventTopBar
+                  <FixedEventTopBar
                     {...this.getEventTopBarPropsForForm(menuItemDeleteOrClose)}
                   />
                   <BodyContent id="register_form">
@@ -780,14 +790,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         >
                           {isFileSizeExceeded(declaration) &&
                             isDocumentUploadPage && (
-                              <Warning
-                                label={intl.formatMessage(
+                              <Alert type="warning">
+                                {intl.formatMessage(
                                   constantsMessages.totalFileSizeExceed,
                                   {
                                     fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
                                   }
                                 )}
-                              />
+                              </Alert>
                             )}
                           <FormFieldGenerator
                             id={activeSectionGroup.id}
@@ -905,6 +915,37 @@ class RegisterFormView extends React.Component<FullProps, State> {
           >
             {intl.formatMessage(
               messages.saveDeclarationConfirmModalDescription
+            )}
+          </ResponsiveModal>
+
+          <ResponsiveModal
+            id="delete_declaration_confirmation"
+            title={intl.formatMessage(
+              messages.deleteDeclarationConfirmModalTitle
+            )}
+            show={this.state.confirmDeleteDeclarationModal}
+            handleClose={this.toggleConfirmDeleteModalOpen}
+            responsive={false}
+            contentHeight={80}
+            actions={[
+              <TertiaryButton
+                id="cancel_delete"
+                key="cancel_delete"
+                onClick={this.toggleConfirmDeleteModalOpen}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </TertiaryButton>,
+              <DangerButton
+                id="confirm_delete"
+                key="confirm_delete"
+                onClick={() => this.onDeleteDeclaration(declaration)}
+              >
+                {intl.formatMessage(buttonMessages.delete)}
+              </DangerButton>
+            ]}
+          >
+            {intl.formatMessage(
+              messages.deleteDeclarationConfirmModalDescription
             )}
           </ResponsiveModal>
         </StyledContainer>

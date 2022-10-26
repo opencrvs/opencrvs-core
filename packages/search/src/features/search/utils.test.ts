@@ -80,7 +80,6 @@ describe('elasticsearch db helper', () => {
             term: {
               'eventLocationId.keyword': {
                 value: 'eventLocationId',
-                // tslint:disable-next-line
                 boost: 2.0
               }
             }
@@ -89,7 +88,6 @@ describe('elasticsearch db helper', () => {
             term: {
               'declarationLocationId.keyword': {
                 value: 'declarationLocationId',
-                // tslint:disable-next-line
                 boost: 2.0
               }
             }
@@ -98,7 +96,6 @@ describe('elasticsearch db helper', () => {
             term: {
               'declarationLocationHirarchyIds.keyword': {
                 value: 'declarationLocationHirarchyId',
-                // tslint:disable-next-line
                 boost: 2.0
               }
             }

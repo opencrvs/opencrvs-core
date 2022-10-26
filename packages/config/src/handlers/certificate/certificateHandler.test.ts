@@ -37,7 +37,7 @@ const token = jwt.sign(
 
 const fetch = fetchMock as fetchMock.FetchMock
 
-let mockCertificate = {
+const mockCertificate = {
   svgCode: `<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
   width="200.000000pt" height="200.000000pt" viewBox="0 0 200.000000 200.000000"
   preserveAspectRatio="xMidYMid meet">

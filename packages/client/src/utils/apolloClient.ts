@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import ApolloClient from 'apollo-client'
-import { setContext } from 'apollo-link-context'
-import { ApolloLink, from } from 'apollo-link'
-import { createHttpLink } from 'apollo-link-http'
 import {
+  ApolloClient,
   InMemoryCache,
-  IntrospectionFragmentMatcher
-} from 'apollo-cache-inmemory'
+  ApolloLink,
+  from,
+  createHttpLink
+} from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+import { onError } from '@apollo/client/link/error'
 import { resolve } from 'url'
-import { onError } from 'apollo-link-error'
 import { showSessionExpireConfirmation } from '@client/notification/actions'
 
 import { IStoreState } from '@client/store'
@@ -27,7 +27,6 @@ import { AnyAction, Store } from 'redux'
 import * as Sentry from '@sentry/browser'
 import TimeoutLink from '@client/utils/timeoutLink'
 
-/* jest spyOn doesn't work if the variable is left as undefined */
 export let client: any = { mutate: () => {} }
 
 export const createClient = (store: Store<IStoreState, AnyAction>) => {
@@ -65,21 +64,10 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
   })
 
   const timeoutLink = new TimeoutLink() as ApolloLink
-  /*
-  Use IntrospectionFragmentMatcher to remove the warning of using inteface in GraphQL Query
-  This change is suggested in the following link:
-  https://www.apollographql.com/docs/react/advanced/fragments.html#fragment-matcher
-   */
-  const fragmentMatcher = new IntrospectionFragmentMatcher({
-    introspectionQueryResultData: {
-      __schema: {
-        types: [] // no types provided
-      }
-    }
-  })
+
   client = new ApolloClient({
     link: from([errorLink, timeoutLink, authLink, httpLink]),
-    cache: new InMemoryCache({ fragmentMatcher })
+    cache: new InMemoryCache()
   })
   return client
 }

@@ -14,7 +14,9 @@ import {
   EVENT_TYPE,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  ASSIGNED_EXTENSION_URL
+  ASSIGNED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -25,17 +27,16 @@ import {
   getRegistrationIds,
   getDeclarationIds,
   getStatusFromTask,
-  findExtension,
   setCertificateCollector
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle,
-  addOrUpdateExtension,
   ITaskBundle,
-  checkUserAssignment
+  checkUserAssignment,
+  taskBundleWithExtension
 } from '@gateway/features/registration/fhir-builders'
-import { hasScope } from '@gateway/features/user/utils'
+import { hasScope, inScope } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
@@ -45,7 +46,6 @@ import {
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
-import { updateTaskTemplate } from '@gateway/features/fhir/templates'
 import { UnassignError } from '@gateway/utils/unassignError'
 import { UserInputError } from 'apollo-server-hapi'
 import {
@@ -99,7 +99,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await markRecordAsDownloadedAndAssigned(id, authHeader)
+        return await markRecordAsDownloadedOrAssigned(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -112,7 +112,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await markRecordAsDownloadedAndAssigned(id, authHeader)
+        return await markRecordAsDownloadedOrAssigned(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -362,189 +362,77 @@ export const resolvers: GQLResolver = {
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
-      ) {
-        const taskBundle = await fetchFHIR(
-          `/Task?focus=Composition/${id}`,
-          authHeader
-        )
-        const taskEntry = taskBundle.entry[0]
-        if (!taskEntry) {
-          throw new Error('Task does not exist')
-        }
-        const status = 'REJECTED'
-        const newTaskBundle = await updateFHIRTaskBundle(
-          taskEntry,
-          status,
-          reason,
-          comment
-        )
-        const taskResource = newTaskBundle.entry[0].resource
-        // remove assigned extension when reject
-        if (
-          taskResource.extension &&
-          findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension)
-        ) {
-          taskResource.extension = taskResource.extension.filter(
-            (ext) => ext.url !== ASSIGNED_EXTENSION_URL
-          )
-        }
-
-        await fetchFHIR(
-          '/Task',
-          authHeader,
-          'PUT',
-          JSON.stringify(newTaskBundle)
-        )
-        // return the taskId
-        return taskEntry.resource.id
-      } else {
+      if (!inScope(authHeader, ['register', 'validate'])) {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
         )
       }
+      const taskEntry = await getTaskEntry(id, authHeader)
+      const newTaskBundle = await updateFHIRTaskBundle(
+        taskEntry,
+        GQLRegStatus.REJECTED,
+        reason,
+        comment
+      )
+
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      // return the taskId
+      return taskEntry.resource.id
     },
     async markEventAsArchived(_, { id }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
-      ) {
-        const taskBundle = await fetchFHIR(
-          `/Task?focus=Composition/${id}`,
-          authHeader
-        )
-        const taskEntry = taskBundle.entry[0]
-        if (!taskEntry) {
-          throw new Error('Task does not exist')
-        }
-        const status = 'ARCHIVED'
-        const newTaskBundle = await updateFHIRTaskBundle(taskEntry, status)
-        const taskResource = newTaskBundle.entry[0].resource
-        // remove downloaded and assigned extension while archiving
-        if (
-          taskResource.extension &&
-          (findExtension(DOWNLOADED_EXTENSION_URL, taskResource.extension) ||
-            findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension))
-        ) {
-          taskResource.extension = taskResource.extension.filter(
-            (ext) =>
-              ![DOWNLOADED_EXTENSION_URL, ASSIGNED_EXTENSION_URL].includes(
-                ext.url
-              )
-          )
-        }
-        await fetchFHIR(
-          '/Task',
-          authHeader,
-          'PUT',
-          JSON.stringify(newTaskBundle)
-        )
-        // return the taskId
-        return taskEntry.resource.id
-      } else {
+      if (!inScope(authHeader, ['register', 'validate'])) {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
         )
       }
+      const taskEntry = await getTaskEntry(id, authHeader)
+      const newTaskBundle = await updateFHIRTaskBundle(
+        taskEntry,
+        GQLRegStatus.ARCHIVED
+      )
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+      // return the taskId
+      return taskEntry.resource.id
     },
     async markEventAsReinstated(_, { id }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
       }
-      if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
-      ) {
-        const taskBundle: ITaskBundle = await fetchFHIR(
-          `/Task?focus=Composition/${id}`,
-          authHeader
-        )
-
-        const taskEntryData = taskBundle.entry[0]
-        if (!taskEntryData) {
-          throw new Error('Task does not exist')
-        }
-
-        const taskEntryResourceID = taskEntryData.resource.id
-
-        const taskHistoryBundle: fhir.Bundle = await fetchFHIR(
-          `/Task/${taskEntryResourceID}/_history`,
-          authHeader
-        )
-
-        const taskHistory =
-          taskHistoryBundle.entry &&
-          taskHistoryBundle.entry.map((taskEntry: fhir.BundleEntry) => {
-            const historicalTask = taskEntry.resource
-            // all these tasks will have the same id, make it more specific to keep apollo-client's cache happy
-            if (historicalTask && historicalTask.meta) {
-              historicalTask.id = `${historicalTask.id}/_history/${historicalTask.meta.versionId}`
-            }
-            return historicalTask as fhir.Task
-          })
-
-        const taskHistoryEntry = taskHistory && taskHistory.length > 1
-        if (!taskHistoryEntry) {
-          throw new Error('Task has no history')
-        }
-
-        const filteredTaskHistory = taskHistory?.filter((task) => {
-          return (
-            task.businessStatus?.coding &&
-            task.businessStatus?.coding[0].code !== 'ARCHIVED'
-          )
-        })
-        const regStatusCode =
-          filteredTaskHistory &&
-          filteredTaskHistory.length > 0 &&
-          getStatusFromTask(filteredTaskHistory[0])
-
-        if (!regStatusCode) {
-          return await Promise.reject(new Error('Task has no reg-status code'))
-        }
-
-        const newTaskBundle = addOrUpdateExtension(
-          taskEntryData,
-          [
-            {
-              url: REINSTATED_EXTENSION_URL,
-              valueString: regStatusCode
-            }
-          ],
-          'reinstated'
-        )
-
-        newTaskBundle.entry[0].resource = updateTaskTemplate(
-          newTaskBundle.entry[0].resource,
-          regStatusCode
-        )
-
-        await fetchFHIR(
-          '/Task',
-          authHeader,
-          'PUT',
-          JSON.stringify(newTaskBundle)
-        )
-
-        return { taskEntryResourceID, registrationStatus: regStatusCode }
-      } else {
+      if (!inScope(authHeader, ['register', 'validate'])) {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
         )
       }
+      const taskEntry = await getTaskEntry(id, authHeader)
+
+      const taskId = taskEntry.resource.id
+
+      const prevRegStatus =
+        taskId && (await getPreviousRegStatus(taskId, authHeader))
+      if (!prevRegStatus) {
+        return await Promise.reject(new Error('Task has no reg-status code'))
+      }
+
+      taskEntry.resource.extension = [
+        ...(taskEntry.resource.extension ?? []),
+        { url: REINSTATED_EXTENSION_URL }
+      ]
+
+      const newTaskBundle = await updateFHIRTaskBundle(taskEntry, prevRegStatus)
+
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+
+      return {
+        taskEntryResourceID: taskId,
+        registrationStatus: prevRegStatus
+      }
     },
     async markBirthAsCertified(_, { id, details }, authHeader) {
-      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-      if (!hasAssignedToThisUser) {
-        throw new UnassignError('User has been unassigned')
-      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
       } else {
@@ -552,10 +440,6 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsCertified(_, { id, details }, authHeader) {
-      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-      if (!hasAssignedToThisUser) {
-        throw new UnassignError('User has been unassigned')
-      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
       } else {
@@ -610,54 +494,18 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsUnassigned(_, { id }, authHeader) {
-      if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
-      ) {
-        const taskBundle = (await fetchFHIR(
-          `/Task?focus=Composition/${id}`,
-          authHeader
-        )) as ITaskBundle
-        const taskEntry = taskBundle.entry[0]
-        if (!taskEntry) {
-          throw new Error('Task does not exist')
-        }
-        const taskResource = taskBundle.entry[0].resource
-        // remove assigned extension when unassigned
-        if (
-          taskResource.extension &&
-          findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension)
-        ) {
-          taskResource.extension = taskResource.extension.filter(
-            (ext) => ext.url !== ASSIGNED_EXTENSION_URL
-          )
-        }
-        taskEntry.request = {
-          method: 'PUT',
-          url: `Task/${taskEntry.resource.id}`
-        } as fhir.BundleEntryRequest
-
-        const fhirBundle: ITaskBundle = {
-          resourceType: 'Bundle',
-          type: 'document',
-          entry: [taskEntry],
-          signature: {
-            type: [
-              {
-                code: 'unassigned'
-              }
-            ],
-            when: Date().toString()
-          }
-        }
-        await fetchFHIR('', authHeader, 'POST', JSON.stringify(fhirBundle))
-        // return the taskId
-        return taskEntry.resource.id
-      } else {
+      if (!inScope(authHeader, ['register', 'validate'])) {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
         )
       }
+      const taskEntry = await getTaskEntry(id, authHeader)
+      const taskBundle = taskBundleWithExtension(taskEntry, {
+        url: UNASSIGNED_EXTENSION_URL
+      })
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      // return the taskId
+      return taskEntry.resource.id
     }
   }
 }
@@ -729,29 +577,12 @@ async function markEventAsValidated(
 ) {
   let doc
   if (!details) {
-    const taskBundle = (await fetchFHIR(
-      `/Task?focus=Composition/${id}`,
-      authHeader
-    )) as ITaskBundle
-    if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
-      throw new Error('Task does not exist')
-    }
-
-    const taskResource = taskBundle.entry[0].resource
-    // remove assigned extension when reject
-    if (
-      taskResource.extension &&
-      findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension)
-    ) {
-      taskResource.extension = taskResource.extension.filter(
-        (ext) => ext.url !== ASSIGNED_EXTENSION_URL
-      )
-    }
+    const taskEntry = await getTaskEntry(id, authHeader)
 
     doc = {
       resourceType: 'Bundle',
       type: 'document',
-      entry: taskBundle.entry
+      entry: taskEntry
     }
   } else {
     doc = await buildFHIRBundle(details, event, authHeader)
@@ -789,57 +620,82 @@ async function markEventAsCertified(
   return getIDFromResponse(res)
 }
 
-async function markRecordAsDownloadedAndAssigned(
+const ACTION_EXTENSIONS = [
+  ASSIGNED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
+  DOWNLOADED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
+]
+
+async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
+  const taskBundle: ITaskBundle = await fetchFHIR(
+    `/Task?focus=Composition/${compositionId}`,
+    authHeader
+  )
+  const taskEntry = taskBundle.entry[0]
+  if (!taskEntry) {
+    throw new Error('Task does not exist')
+  }
+  taskEntry.resource.extension = taskEntry.resource.extension?.filter(
+    ({ url }) => !ACTION_EXTENSIONS.includes(url)
+  )
+  return taskEntry
+}
+
+function getDownloadedOrAssignedExtension(
+  authHeader: IAuthHeader,
+  status: string
+): fhir.Extension {
+  if (
+    inScope(authHeader, ['declare', 'recordsearch']) ||
+    (hasScope(authHeader, 'validate') && status === GQLRegStatus.VALIDATED)
+  ) {
+    return {
+      url: DOWNLOADED_EXTENSION_URL
+    }
+  }
+  return {
+    url: ASSIGNED_EXTENSION_URL
+  }
+}
+
+async function getPreviousRegStatus(taskId: string, authHeader: IAuthHeader) {
+  const taskHistoryBundle: fhir.Bundle = await fetchFHIR(
+    `/Task/${taskId}/_history`,
+    authHeader
+  )
+
+  const taskHistory = taskHistoryBundle.entry?.map((taskEntry) => {
+    return taskEntry.resource as fhir.Task
+  })
+
+  if (!taskHistory) {
+    throw new Error('Task has no history')
+  }
+
+  const filteredTaskHistory = taskHistory.filter((task) => {
+    return (
+      task.businessStatus?.coding &&
+      task.businessStatus?.coding[0].code !== 'ARCHIVED'
+    )
+  })
+  return filteredTaskHistory[0] && getStatusFromTask(filteredTaskHistory[0])
+}
+
+export async function markRecordAsDownloadedOrAssigned(
   id: string,
   authHeader: IAuthHeader
 ) {
-  const taskBundle: ITaskBundle = await fetchFHIR(
-    `/Task?focus=Composition/${id}`,
-    authHeader
-  )
-  if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
-    throw new Error('Task does not exist')
-  }
+  const taskEntry = await getTaskEntry(id, authHeader)
 
-  let extensions: fhir.Extension[]
-  const businessStatus = getStatusFromTask(
-    taskBundle.entry[0].resource
-  ) as GQLRegStatus
+  const businessStatus = getStatusFromTask(taskEntry.resource) as GQLRegStatus
 
-  const isFieldAgentValidatedDeclaration =
-    hasScope(authHeader, 'validate') &&
-    businessStatus === GQLRegStatus.VALIDATED
+  const extension = getDownloadedOrAssignedExtension(authHeader, businessStatus)
 
-  if (
-    hasScope(authHeader, 'register') ||
-    (hasScope(authHeader, 'validate') && !isFieldAgentValidatedDeclaration)
-  ) {
-    extensions = [
-      {
-        url: ASSIGNED_EXTENSION_URL,
-        valueString: getStatusFromTask(taskBundle.entry[0].resource)
-      },
-      {
-        url: DOWNLOADED_EXTENSION_URL,
-        valueString: getStatusFromTask(taskBundle.entry[0].resource)
-      }
-    ]
-  } else {
-    extensions = [
-      {
-        url: DOWNLOADED_EXTENSION_URL,
-        valueString: getStatusFromTask(taskBundle.entry[0].resource)
-      }
-    ]
-  }
+  const taskBundle = taskBundleWithExtension(taskEntry, extension)
 
-  const doc = addOrUpdateExtension(
-    taskBundle.entry[0],
-    extensions,
-    'downloaded'
-  )
-
-  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
 
   // return the full composition
   return fetchFHIR(`/Composition/${id}`, authHeader)

@@ -12,6 +12,7 @@
 import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
 
+// eslint-disable-next-line import/no-relative-parent-imports
 import { IDatabaseConnector } from '../src/database'
 
 jest.setMock('node-fetch', { default: fetch })
@@ -33,9 +34,7 @@ const mock: IDatabaseConnector = {
     delete database[key]
     return keyExists ? 1 : 0
   }),
-  // tslint:disable-next-line no-empty
   start: jest.fn(),
-  // tslint:disable-next-line no-empty
   stop: jest.fn()
 }
 

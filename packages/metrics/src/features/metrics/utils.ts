@@ -110,14 +110,14 @@ export const fetchEstimateByLocation = async (
   timeFrom: string,
   timeTo: string
 ): Promise<IEstimation> => {
-  let crudRate: number = 0
-  let totalPopulation: number = 0
+  let crudRate = 0
+  let totalPopulation = 0
 
   const estimationForDays = Math.ceil(
     Math.abs(new Date(timeTo).getTime() - new Date(timeFrom).getTime()) /
       (1000 * 60 * 60 * 24)
   )
-  let estimateExtensionFound: boolean = false
+  let estimateExtensionFound = false
   const toYear = new Date(timeTo).getFullYear()
   let selectedCrudYear = new Date(timeTo).getFullYear()
   let selectedPopYear = new Date(timeTo).getFullYear()
@@ -144,7 +144,6 @@ export const fetchEstimateByLocation = async (
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // Checking upto fromYear is risky as most of the time we won't
       // have any estimation data for recent years
-      // tslint:disable-next-line
       for (let key = toYear; key > 1; key--) {
         valueArray.forEach((data) => {
           if (key in data) {
@@ -162,7 +161,6 @@ export const fetchEstimateByLocation = async (
     ) {
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
-      // tslint:disable-next-line
       for (let key = toYear; key > 1; key--) {
         valueArray.forEach((data) => {
           if (key in data) {

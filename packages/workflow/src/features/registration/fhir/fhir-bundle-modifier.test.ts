@@ -15,7 +15,8 @@ import {
   setupRegistrationWorkflow,
   setupLastRegUser,
   setupLastRegLocation,
-  setupAuthorOnNotes
+  setupAuthorOnNotes,
+  validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -29,10 +30,16 @@ import {
   districtMock,
   upazilaMock,
   unionMock,
-  officeMock
+  officeMock,
+  mosipSuccessMock,
+  mosipConfigMock,
+  mosipDeceasedPatientMock,
+  mosipBirthPatientBundleMock,
+  mosipUpdatedDeceasedPatientMock
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
-
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -206,7 +213,7 @@ describe('Verify fhir bundle modifier functions', () => {
         scope: ['register']
       }
       const fhirBundle = cloneDeep(testFhirBundle)
-      /* tslint:disable:no-string-literal */
+
       if (
         fhirBundle &&
         fhirBundle.entry &&
@@ -221,7 +228,7 @@ describe('Verify fhir bundle modifier functions', () => {
             }
           ]
         }
-        /* tslint:enable:no-string-literal */
+
         const taskResource = await setupRegistrationWorkflow(
           fhirBundle.entry[1].resource as fhir.Task,
           tokenPayload
@@ -363,7 +370,7 @@ describe('Verify fhir bundle modifier functions', () => {
       id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
     }
     const fhirBundle = cloneDeep(testFhirBundle)
-    /* tslint:disable:no-string-literal */
+
     fhirBundle.entry[1].resource['note'] = [
       {
         text: 'this is a test note',
@@ -382,7 +389,6 @@ describe('Verify fhir bundle modifier functions', () => {
         time: '2018-10-31T09:45:05+10:00'
       })
     }
-    /* tslint:enable:no-string-literal */
   })
   describe('setupLastRegLocation', () => {
     beforeEach(() => {
@@ -437,5 +443,42 @@ describe('Verify fhir bundle modifier functions', () => {
         )
       ).rejects.toThrowError('Invalid practitioner data found')
     })
+  })
+})
+
+describe('validateDeceasedDetails functions', () => {
+  let token: string
+  let authHeader: { Authorization: string }
+  beforeEach(async () => {
+    fetch.resetMocks()
+    token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+
+    authHeader = {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  it('Validates deceased details and modifies bundle', async () => {
+    fetch.mockResponses(
+      [mosipConfigMock, { status: 200 }],
+      [mosipSuccessMock, { status: 200 }],
+      [mosipBirthPatientBundleMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }]
+    )
+    const validateResponse = await validateDeceasedDetails(
+      mosipDeceasedPatientMock,
+      authHeader
+    )
+    expect(validateResponse).toEqual(mosipUpdatedDeceasedPatientMock)
+  })
+  afterAll(async () => {
+    jest.clearAllMocks()
   })
 })

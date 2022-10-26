@@ -24,8 +24,9 @@ describe('fhir utils', () => {
       mockComposition.relatesTo[2].targetReference &&
       mockComposition.relatesTo[2].targetReference.reference
     ) {
-      expect(mockComposition.relatesTo[2].targetReference
-        .reference as string).toEqual('Composition/123')
+      expect(
+        mockComposition.relatesTo[2].targetReference.reference as string
+      ).toEqual('Composition/123')
       expect(mockComposition.relatesTo.length).toEqual(3)
     } else {
       throw new Error('Failed')

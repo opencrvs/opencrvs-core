@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import { Action, DownloadAction } from '@client/forms'
 
 export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
@@ -19,7 +19,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       id
       child {
         id
-        multipleBirth
         name {
           use
           firstNames
@@ -65,6 +64,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           firstNames
           familyName
         }
+        multipleBirth
         birthDate
         maritalStatus
         occupation
@@ -158,6 +158,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         type
         trackingId
         registrationNumber
+        mosipAid
       }
       attendantAtBirth
       weightAtBirth
@@ -181,7 +182,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       history {
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text
@@ -267,6 +268,11 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       child {
         id
         multipleBirth
+        identifier {
+          id
+          type
+          otherType
+        }
         name {
           use
           firstNames
@@ -400,6 +406,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
         trackingId
         registrationNumber
+        mosipAid
       }
       attendantAtBirth
       weightAtBirth
@@ -423,7 +430,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       history {
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text

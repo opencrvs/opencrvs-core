@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as ShortUIDGen from 'short-uid'
-import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
+import {
+  NOTIFICATION_SERVICE_URL,
+  MOSIP_TOKEN_SEEDER_URL
+} from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import {
@@ -18,7 +21,8 @@ import {
   getTrackingId,
   getCRVSOfficeName,
   getBirthRegistrationNumber,
-  getDeathRegistrationNumber
+  getDeathRegistrationNumber,
+  concatenateName
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   EVENT_TYPE,
@@ -37,6 +41,15 @@ interface INotificationPayload {
   trackingId?: string
   crvsOffice?: string
   registrationNumber?: string
+}
+export type Composition = fhir.Composition & { id: string }
+export type Patient = fhir.Patient & { id: string }
+export enum FHIR_RESOURCE_TYPE {
+  COMPOSITION = 'Composition',
+  TASK = 'Task',
+  ENCOUNTER = 'Encounter',
+  PAYMENT_RECONCILIATION = 'PaymentReconciliation',
+  PATIENT = 'Patient'
 }
 
 export function generateBirthTrackingId(): string {
@@ -64,7 +77,6 @@ export async function sendEventNotification(
   authHeader: { Authorization: string }
 ) {
   logger.info(`sendEventNotification method for event: ${event}`)
-  // tslint:disable-next-line
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       await sendNotification('birthInProgressSMS', msisdn, authHeader, {
@@ -272,5 +284,143 @@ export function isEventNonNotifiable(event: Events) {
       Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
       Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ].indexOf(event) >= 0
+  )
+}
+interface IMosipAuthData {
+  vid?: string
+  name?: string
+  gender?: string
+  phoneNumber?: string
+  dob?: string // Format "1998/01/01"
+  emailId?: string
+  fullAddress?: string
+}
+
+interface IMosipRequest {
+  deliverytype: 'sync'
+  output: string | ''
+  lang: 'eng'
+  authdata: IMosipAuthData[]
+}
+
+export interface IMosipSeederPayload {
+  id: string | ''
+  version: string | ''
+  metadata: string | ''
+  requesttime: string | ''
+  request: IMosipRequest
+}
+
+export interface IMosipErrors {
+  errorCode: string
+  errorMessage: string
+  actionMessage: string
+}
+
+export interface IMosipSeederResponseContent {
+  authStatus: boolean
+  authToken: string
+}
+
+export interface IMosipSeederResponse {
+  id: 'mosip.identity.auth'
+  version: 'v1'
+  responseTime: string
+  transactionID: string
+  response: IMosipSeederResponseContent
+  errors: IMosipErrors[]
+}
+
+export async function getMosipUINToken(
+  patient: fhir.Patient
+): Promise<IMosipSeederResponse> {
+  let submittedNationalIDInForm = ''
+  const identifiers = patient?.identifier?.filter(
+    (identifier: fhir.Identifier) => {
+      return identifier.type === 'NATIONAL_ID'
+    }
+  )
+  if (identifiers) {
+    submittedNationalIDInForm = `${identifiers[0].value}`
+  }
+  const payload: IMosipSeederPayload = {
+    id: '',
+    version: '',
+    metadata: '',
+    requesttime: '',
+    request: {
+      deliverytype: 'sync',
+      output: '',
+      lang: 'eng',
+      authdata: [
+        {
+          vid: submittedNationalIDInForm,
+          name: concatenateName(patient.name as fhir.HumanName[]),
+          gender: patient.gender,
+          dob: patient.birthDate?.replace(/-/g, '/')
+          // TODO: send informant contact phone number?  We dont ask for deceased's phone number in Civil Reg form currently
+          // TODO: send address in a way MOSIP can understand
+        }
+      ]
+    }
+  }
+  logger.info(`IMosipSeederPayload: ${JSON.stringify(payload)}`)
+  const res = await fetch(`${MOSIP_TOKEN_SEEDER_URL}/authtoken/json`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+
+  if (!res.ok) {
+    logger.info(
+      `Unable to retrieve system mosip UIN token. Error: ${res.status} status received`
+    )
+  }
+
+  const body = await res.json()
+
+  return body
+}
+
+export function getResourceByType<T = fhir.Resource>(
+  bundle: fhir.Bundle,
+  type: string
+): T | undefined {
+  const bundleEntry =
+    bundle &&
+    bundle.entry &&
+    bundle.entry.find((entry) => {
+      if (!entry.resource) {
+        return false
+      } else {
+        return entry.resource.resourceType === type
+      }
+    })
+  return bundleEntry && (bundleEntry.resource as T)
+}
+
+export function getComposition(bundle: fhir.Bundle) {
+  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+}
+
+export function getPatientBySection(
+  bundle: fhir.Bundle,
+  section: fhir.Reference
+) {
+  return (
+    bundle &&
+    bundle.entry &&
+    (bundle.entry.find((entry) => {
+      if (!entry.resource) {
+        return false
+      } else {
+        return (
+          entry.resource.resourceType === 'Patient' &&
+          entry.fullUrl === section.reference
+        )
+      }
+    })?.resource as fhir.Patient)
   )
 }

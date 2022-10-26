@@ -15,12 +15,9 @@ import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
-import {
-  Box,
-  ISearchLocation,
-  ResponsiveModal,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -29,10 +26,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subYears from 'date-fns/subYears'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
@@ -46,11 +40,8 @@ import {
   PERFORMANCE_METRICS,
   PERFORMANCE_STATS
 } from './metricsQuery'
-import { ApolloError } from 'apollo-client'
-import {
-  ToastNotification,
-  NOTIFICATION_TYPE
-} from '@client/components/interface/ToastNotification'
+import { ApolloError } from '@apollo/client'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
 import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
 import {
@@ -81,6 +72,7 @@ import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
+import { Box } from '@opencrvs/components/lib/Box'
 
 const Layout = styled.div`
   display: flex;
@@ -207,7 +199,6 @@ interface State {
   timeStart: Date
   timeEnd: Date
   toggleStatus: boolean
-  queriesLoading: string[]
   officeSelected: boolean
   isAccessibleOffice: boolean
 }
@@ -267,7 +258,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.Birth,
       toggleStatus: false,
-      queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS'],
       officeSelected: this.isOfficeSelected(selectedLocation),
       isAccessibleOffice: this.isAccessibleOfficeSelected(selectedLocation)
     }
@@ -369,16 +359,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     this.props.goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
   }
 
-  markFinished = (query: string) => {
-    this.setState({
-      queriesLoading: this.state.queriesLoading.filter((q) => q !== query)
-    })
-  }
-
-  isQueriesInProgress = () => {
-    return this.state.queriesLoading.length > 0
-  }
-
   isOfficeSelected(selectedLocation?: ISearchLocation) {
     if (selectedLocation) {
       return Object.keys(this.props.offices).some(
@@ -441,8 +421,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   <Query
                     query={PERFORMANCE_METRICS}
                     fetchPolicy="no-cache"
-                    onCompleted={() => this.markFinished('PERFORMANCE_METRICS')}
-                    onError={() => this.markFinished('PERFORMANCE_METRICS')}
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -454,6 +432,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }
                   >
                     {({
+                      loading,
                       error,
                       data
                     }: {
@@ -462,14 +441,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       data?: IMetricsQueryResult
                     }) => {
                       if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
+                        return <GenericErrorToast />
                       }
 
-                      if (this.isQueriesInProgress()) {
+                      if (loading) {
                         return (
                           <Spinner id="performance-home-loading" size={24} />
                         )
@@ -522,8 +497,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   <Query
                     fetchPolicy="no-cache"
                     query={CORRECTION_TOTALS}
-                    onCompleted={() => this.markFinished('CORRECTION_TOTALS')}
-                    onError={() => this.markFinished('CORRECTION_TOTALS')}
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -544,14 +517,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       data?: ICorrectionsQueryResult
                     }) => {
                       if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
+                        return <GenericErrorToast />
                       }
 
-                      if (this.isQueriesInProgress()) {
+                      if (loading) {
                         return null
                       }
                       return (
@@ -562,8 +531,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   <Query
                     fetchPolicy="no-cache"
                     query={GET_TOTAL_PAYMENTS}
-                    onCompleted={() => this.markFinished('GET_TOTAL_PAYMENTS')}
-                    onError={() => this.markFinished('GET_TOTAL_PAYMENTS')}
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -574,15 +541,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         : queryVariablesWithoutLocationId
                     }
                   >
-                    {({ data, error }) => {
+                    {({ loading, data, error }) => {
                       if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
+                        return <GenericErrorToast />
                       }
-                      if (this.isQueriesInProgress()) {
+                      if (loading) {
                         return null
                       }
                       if (data && data.getTotalPayments) {
@@ -634,9 +597,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             {({ loading, data, error }) => {
               return (
                 <>
-                  {error && (
-                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                  )}
+                  {error && <GenericErrorToast />}
                   <ResponsiveModal
                     title={intl.formatMessage(constantsMessages.status)}
                     show={toggleStatus}

@@ -27,10 +27,12 @@ import { Event } from '@client/utils/gateway'
 import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { push } from 'connected-react-router'
+import * as pdfRender from '@client/pdfRenderer'
+import { vi } from 'vitest'
 
 describe('when user wants to review death certificate', () => {
   let component: ReactWrapper<{}, {}>
-
+  const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
   beforeEach(async () => {
     const { history, location, match } = createRouterProps(
       '/',
@@ -71,8 +73,12 @@ describe('when user wants to review death certificate', () => {
     )
   })
 
+  afterAll(() => {
+    spy.mockReset()
+  })
+
   it('displays have the Continue and print Button', async () => {
-    const confirmBtn = await waitForElement(component, '#confirm-print')
+    const confirmBtn = component.find('#confirm-print')
     const confirmBtnExist = !!confirmBtn.hostNodes().length
     expect(confirmBtnExist).toBe(true)
   })
@@ -118,11 +124,10 @@ describe('back button behavior tests of review certificate action', () => {
       },
       event: Event.Birth
     }
-    await store.dispatch(
+    store.dispatch(
       // @ts-ignore
       storeDeclaration(birthDeclaration)
     )
-    await flushPromises()
     component = await createTestComponent(
       <ReviewCertificateAction
         location={location}
@@ -168,7 +173,7 @@ describe('back button behavior tests of review certificate action', () => {
 
     component.find('#action_page_back_button').hostNodes().simulate('click')
     await flushPromises()
-    expect(history.location.pathname).toBe('/registration-home/print/')
+    expect(history.location.pathname).toContain('/registration-home/print/')
   })
 })
 
@@ -243,7 +248,6 @@ describe('when user wants to review birth certificate', () => {
     const confirmBtn = await waitForElement(component, '#confirm-print')
     confirmBtn.hostNodes().simulate('click')
     component.update()
-
     component.find('#print-certificate').hostNodes().simulate('click')
     component.update()
 

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 
 const EVENT_SEARCH_RESULT_FIELDS = gql`
   fragment EventSearchFields on EventSearchSet {
@@ -32,6 +32,22 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
         lastName
         officeName
       }
+    }
+    operationHistories {
+      operationType
+      operatedOn
+      operatorRole
+      operatorName {
+        firstNames
+        familyName
+        use
+      }
+      operatorOfficeName
+      operatorOfficeAlias
+      notificationFacilityName
+      notificationFacilityAlias
+      rejectReason
+      rejectComment
     }
     ... on BirthEventSearchSet {
       dateOfBirth

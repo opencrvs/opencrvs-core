@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "config/**/*.js",
+    "node_modules/**/*.ts",
+    "no-font-styles.js"
+  ]
+}

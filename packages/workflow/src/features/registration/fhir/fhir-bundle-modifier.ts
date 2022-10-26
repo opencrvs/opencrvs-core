@@ -22,12 +22,15 @@ import {
 import {
   getFromFhir,
   getRegStatusCode,
-  fetchExistingRegStatusCode
+  fetchExistingRegStatusCode,
+  updateResourceInHearth,
+  mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateBirthTrackingId,
   generateDeathTrackingId,
   getEventType,
+  getMosipUINToken,
   isEventNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
@@ -35,19 +38,21 @@ import {
   getLoggedInPractitionerResource,
   getPractitionerOffice,
   getPractitionerPrimaryLocation,
-  getPractitionerRef,
-  getUserByToken
+  getPractitionerRef
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
-import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
-import { RESOURCE_SERVICE_URL } from '@workflow/constants'
+import {
+  APPLICATION_CONFIG_URL,
+  RESOURCE_SERVICE_URL
+} from '@workflow/constants'
+import {
+  getTokenPayload,
+  ITokenPayload,
+  USER_SCOPE
+} from '@workflow/utils/authUtils'
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
-import {
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
+import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -66,7 +71,6 @@ export async function modifyRegistrationBundle(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  // tslint:disable-next-line
   fhirBundle = setTrackingId(fhirBundle)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
@@ -132,6 +136,7 @@ export async function markBundleAsRequestedForCorrection(
   const taskResource = getTaskResource(bundle)
   const practitioner = await getLoggedInPractitionerResource(token)
   const regStatusCode = await fetchExistingRegStatusCode(taskResource.id)
+  await mergePatientIdentifier(bundle)
 
   if (!taskResource.extension) {
     taskResource.extension = []
@@ -151,11 +156,6 @@ export async function markBundleAsRequestedForCorrection(
     getTokenPayload(token),
     regStatusCode?.code
   )
-
-  removeExtensionFromBundle(bundle, [
-    DOWNLOADED_EXTENSION_URL,
-    REINSTATED_EXTENSION_URL
-  ])
 
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
@@ -297,45 +297,23 @@ export async function touchBundle(
   bundle: fhir.Bundle,
   token: string
 ): Promise<fhir.Bundle> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
+  const taskResource = getTaskResource(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
+  const payload = getTokenPayload(token)
   /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
+  if (!payload.scope.includes(USER_SCOPE.RECORD_SEARCH)) {
+    await setupLastRegLocation(taskResource, practitioner)
+  }
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
-
-  /* setting regAssigned valueReference here if regAssigned extension exists */
-  await setupRegAssigned(taskResource, practitioner, token)
 
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
-}
-
-export function removeExtensionFromBundle(
-  fhirBundle: fhir.Bundle,
-  urls: string[]
-): fhir.Bundle {
-  if (
-    fhirBundle &&
-    fhirBundle.entry &&
-    fhirBundle.entry[0] &&
-    fhirBundle.entry[0].resource
-  ) {
-    let extensions: fhir.Extension[] =
-      (fhirBundle.entry[0].resource as fhir.Element).extension || []
-
-    extensions = extensions.filter(
-      (ext: fhir.Extension) => !urls.includes(ext.url)
-    )
-    ;(fhirBundle.entry[0].resource as fhir.Element).extension = extensions
-  }
-
-  return fhirBundle
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
@@ -520,38 +498,6 @@ export function setupLastRegUser(
   return taskResource
 }
 
-export async function setupRegAssigned(
-  taskResource: fhir.Task,
-  practitioner: fhir.Practitioner,
-  token: string
-) {
-  if (!taskResource.extension) {
-    taskResource.extension = []
-  }
-  const setupRegAssignedExtension = taskResource.extension.find((extension) => {
-    return (
-      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
-    )
-  })
-  if (setupRegAssignedExtension) {
-    const practitionerDetails = await getUserByToken(token)
-    if (
-      setupRegAssignedExtension.valueString === RegStatus.REJECTED &&
-      practitionerDetails.role === 'FIELD_AGENT'
-    ) {
-      return taskResource
-    }
-
-    if (!setupRegAssignedExtension.valueReference) {
-      setupRegAssignedExtension.valueReference = {}
-    }
-    setupRegAssignedExtension.valueReference.reference =
-      getPractitionerRef(practitioner)
-    taskResource.lastModified =
-      taskResource.lastModified || new Date().toISOString()
-  }
-  return taskResource
-}
 export function setupTestExtension(taskResource: fhir.Task): fhir.Task {
   if (!taskResource.extension) {
     taskResource.extension = []
@@ -641,6 +587,165 @@ export async function updatePatientIdentifierWithRN(
       type: identifierType,
       value: registrationNumber
     })
+  }
+  return patient
+}
+
+interface IIntegration {
+  name: string
+  status: string
+}
+interface IApplicationConfig {
+  INTEGRATIONS: [IIntegration]
+}
+
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
+}
+
+const statuses = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  DISABLED: 'disabled',
+  DEACTIVATED: 'deactivated'
+}
+
+export async function validateDeceasedDetails(
+  patient: fhir.Patient,
+  authHeader: { Authorization: string }
+): Promise<fhir.Patient> {
+  /*
+    In OCRVS-1637 https://github.com/opencrvs/opencrvs-core/pull/964 we attempted to create a longitudinal
+    record of life events by an attempt to use an existing person in gateway if an identifier is supplied that we already
+    have a record of in our system, rather than creating a new patient every time.
+
+    However this supplied identifier cannot be trusted. This could lead to links between persons being abused or the wrong indivdual
+    being marked as deceased.
+
+    Any external identifier must be justifiably verified as authentic by a National ID system such as MOSIP or equivalent
+  */
+
+  const configResponse: IApplicationConfigResponse = await fetch(
+    `${APPLICATION_CONFIG_URL}integrationConfig`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
+    }
+  )
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Config request failed: ${error.message}`)
+      )
+    })
+  logger.info(
+    `validateDeceasedDetails: configResponse ${JSON.stringify(configResponse)}`
+  )
+  if (
+    configResponse &&
+    configResponse.config.INTEGRATIONS &&
+    configResponse.config.INTEGRATIONS.length
+  ) {
+    const mosipIntegration = configResponse.config.INTEGRATIONS.filter(
+      (integration) => {
+        return integration.name === 'MOSIP'
+      }
+    )[0]
+    if (mosipIntegration.status === statuses.ACTIVE) {
+      logger.info('validateDeceasedDetails: MOSIP ENABLED')
+      try {
+        const mosipTokenSeederResponse = await getMosipUINToken(patient)
+        logger.info(
+          `MOSIP RESPONSE: ${JSON.stringify(mosipTokenSeederResponse)}`
+        )
+        if (
+          (mosipTokenSeederResponse.errors &&
+            mosipTokenSeederResponse.errors.length) ||
+          !mosipTokenSeederResponse.response.authToken
+        ) {
+          logger.info(
+            `MOSIP token request failed with errors: ${JSON.stringify(
+              mosipTokenSeederResponse.errors
+            )}`
+          )
+        } else if (mosipTokenSeederResponse.response.authStatus === false) {
+          logger.info(
+            `MOSIP token request failed with false authStatus: ${JSON.stringify(
+              mosipTokenSeederResponse.errors
+            )}`
+          )
+        } else {
+          const birthPatientBundle: fhir.Bundle = await getFromFhir(
+            `/Patient?identifier=${mosipTokenSeederResponse.response.authToken}`
+          )
+          logger.info(
+            `Patient bundle returned by MOSIP Token Seeder search: ${JSON.stringify(
+              birthPatientBundle
+            )}`
+          )
+          let birthPatient: fhir.Patient = {}
+          if (
+            birthPatientBundle &&
+            birthPatientBundle.entry &&
+            birthPatientBundle.entry.length
+          ) {
+            birthPatientBundle.entry.forEach((entry) => {
+              const bundlePatient = entry.resource as fhir.Patient
+              const selectedIdentifier = bundlePatient.identifier?.filter(
+                (identifier) => {
+                  return (
+                    identifier.type === 'MOSIP_UINTOKEN' &&
+                    identifier.value ===
+                      mosipTokenSeederResponse.response.authToken
+                  )
+                }
+              )[0]
+              if (selectedIdentifier) {
+                birthPatient = bundlePatient
+              }
+            })
+          }
+          logger.info(`birthPatient: ${JSON.stringify(birthPatient)}`)
+          if (birthPatient && birthPatient.identifier) {
+            // If existing patient can be found
+            // mark existing OpenCRVS birth patient as deceased with link to this patient
+            // Keep both Patient copies as a history of name at birth, may not be that recorde for name at death etc ...
+            // One should not overwrite the other
+            birthPatient.deceasedBoolean = true
+            birthPatient.identifier.push({
+              type: 'DECEASED_PATIENT_ENTRY',
+              value: patient.id
+            } as fhir.CodeableConcept)
+            await updateResourceInHearth(birthPatient)
+            // mark patient with link to the birth patient
+            patient.identifier?.push({
+              type: 'BIRTH_PATIENT_ENTRY',
+              value: birthPatient.id
+            } as fhir.CodeableConcept)
+          }
+        }
+      } catch (err) {
+        logger.info(`MOSIP token seeder request failed: ${JSON.stringify(err)}`)
+      }
+    }
+  } else {
+    // mosip not enabled
+    /*
+      TODO: Any internal OpenCRVS identifier (BRN) must be justifiably verified as authentic.
+
+      If the form is enabled to submit a BRN in deceased form ...
+      OpenCRVS needs a robust MOSIP-like verification model on the BRN
+      We have to validate the bundle carefully against internal checks to find a legitimate birth patient.
+
+      Ensure patient has link to the birth record if it exists.
+
+    */
+    //
   }
   return patient
 }

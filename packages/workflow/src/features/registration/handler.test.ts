@@ -9,13 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+// eslint-disable-next-line import/no-relative-parent-imports
 import { createServer } from '../../server'
 import {
   testFhirBundle,
   testFhirTaskBundle,
   testFhirBundleWithIds,
+  mockFormDraft,
   userMock,
   fieldAgentPractitionerMock,
   fieldAgentPractitionerRoleMock,
@@ -41,7 +44,11 @@ import {
 import { cloneDeep } from 'lodash'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
 import * as fetchAny from 'jest-fetch-mock'
-
+import {
+  ASSIGNED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
+  DOWNLOADED_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
 const fetch = fetchAny as any
 
 const mockInput = [
@@ -1110,7 +1117,9 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [JSON.stringify({ config: { INTEGRATIONS: [] } }), { status: 200 }],
       [patientMock, { status: 200 }],
+      [motherMock, { status: 200 }],
       [motherMock, { status: 200 }]
     )
     const res = await server.server.inject({
@@ -1128,7 +1137,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
   })
 })
 
-describe('markEventAsDownloadedAndAssignedHandler', () => {
+describe('downloaded action handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1147,8 +1156,9 @@ describe('markEventAsDownloadedAndAssignedHandler', () => {
       [upazilaMock, { status: 200 }],
       [unionMock, { status: 200 }],
       [officeMock, { status: 200 }],
+      [userResponseMock, { status: 200 }],
       [hearthResponseMock, { status: 200 }],
-      [userResponseMock, { status: 200 }]
+      [mockFormDraft, { status: 200 }]
     )
   })
 
@@ -1162,18 +1172,125 @@ describe('markEventAsDownloadedAndAssignedHandler', () => {
         audience: 'opencrvs:workflow-user'
       }
     )
-    const bundleWithDownloadSignature: any = cloneDeep(testFhirTaskBundle)
-    bundleWithDownloadSignature.signature = {
-      type: [
-        {
-          code: 'downloaded'
-        }
-      ]
-    }
+    const bundleWithDownloadExtension: any = cloneDeep(testFhirTaskBundle)
+    bundleWithDownloadExtension.entry[0].resource.extension = [
+      ...bundleWithDownloadExtension.entry[0].resource.extension,
+      {
+        url: DOWNLOADED_EXTENSION_URL
+      }
+    ]
     const res = await server.server.inject({
-      method: 'POST',
+      method: 'PUT',
       url: '/fhir',
-      payload: bundleWithDownloadSignature,
+      payload: bundleWithDownloadExtension,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+})
+
+describe('assigned action handler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    fetch.resetMocks()
+    server = await createServer()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [userResponseMock, { status: 200 }],
+      [hearthResponseMock, { status: 200 }],
+      [mockFormDraft, { status: 200 }]
+    )
+  })
+
+  it('returns OK with full fhir bundle as payload', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+    const bundleWithAssignedExtension: any = cloneDeep(testFhirTaskBundle)
+    bundleWithAssignedExtension.entry[0].resource.extension = [
+      ...bundleWithAssignedExtension.entry[0].resource.extension,
+      {
+        url: ASSIGNED_EXTENSION_URL
+      }
+    ]
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/fhir',
+      payload: bundleWithAssignedExtension,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+})
+
+describe('unassigned action handler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    fetch.resetMocks()
+    server = await createServer()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [userResponseMock, { status: 200 }],
+      [hearthResponseMock, { status: 200 }],
+      [mockFormDraft, { status: 200 }]
+    )
+  })
+
+  it('returns OK with full fhir bundle as payload', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+    const bundleWithUnassignedExtension: any = cloneDeep(testFhirTaskBundle)
+    bundleWithUnassignedExtension.entry[0].resource.extension = [
+      ...bundleWithUnassignedExtension.entry[0].resource.extension,
+      {
+        url: UNASSIGNED_EXTENSION_URL
+      }
+    ]
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/fhir',
+      payload: bundleWithUnassignedExtension,
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -1248,6 +1365,7 @@ describe('markEventAsRequestedForCorrection handler', () => {
     server = await createServer()
     fetch.mockResponses(
       [userMock, { status: 200 }],
+      [patientMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
@@ -3125,59 +3243,5 @@ describe('populateCompositionWithID', () => {
       ],
       meta: { lastUpdated: '2020-03-09T10:20:43.664Z' }
     })
-  })
-})
-
-describe('markDownloadedEventAsAssignedOrUnassignedHandler', () => {
-  let server: any
-
-  beforeEach(async () => {
-    fetch.resetMocks()
-    server = await createServer()
-    fetch.mockResponses(
-      [userMock, { status: 200 }],
-      [fieldAgentPractitionerMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }],
-      [hearthResponseMock, { status: 200 }],
-      [userResponseMock, { status: 200 }]
-    )
-  })
-
-  it('returns OK with full fhir bundle as payload', async () => {
-    const token = jwt.sign(
-      { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:workflow-user'
-      }
-    )
-    const bundleWithDownloadSignature: any = cloneDeep(testFhirTaskBundle)
-    bundleWithDownloadSignature.signature = {
-      type: [
-        {
-          code: 'downloaded'
-        }
-      ]
-    }
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/fhir',
-      payload: bundleWithDownloadSignature,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
   })
 })

@@ -15,16 +15,14 @@ import { storage } from '@client/storage'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
-  IWorkqueue,
-  filterProcessingDeclarationsFromQuery,
-  updateRegistrarWorkqueue
+  filterProcessingDeclarationsFromQuery
 } from '@client/declarations'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
-import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/LeftNavigation'
-import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
-import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
-import { NavigationSubItem } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
+import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
+import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
+import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
+import { NavigationSubItem } from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
 import { connect } from 'react-redux'
 import {
   goToHomeTab,
@@ -37,8 +35,8 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { Activity, Users } from '@opencrvs/components/lib/icons'
+import { IUserDetails } from '@client/utils/userUtils'
+import { Activity, PaperPlane, Users } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
@@ -51,7 +49,13 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { UnbuplishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import { UnpublishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import {
+  ALLOWED_STATUS_FOR_RETRY,
+  INPROGRESS_STATUS
+} from '@client/SubmissionController'
+import styled from '@client/styledComponents'
+import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -66,6 +70,7 @@ export const WORKQUEUE_TABS = {
   requiresUpdate: 'requiresUpdate',
   sentForApproval: 'approvals',
   readyToPrint: 'print',
+  outbox: 'outbox',
   externalValidation: 'waitingValidation',
   performance: 'performance',
   team: 'team',
@@ -91,6 +96,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.sentForReview,
     WORKQUEUE_TABS.requiresUpdate,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
@@ -101,6 +107,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -111,6 +118,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -121,6 +129,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -131,6 +140,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -201,7 +211,7 @@ type IFullProps = IProps &
   IStateProps &
   IDispatchProps &
   IntlShapeProps &
-  RouteComponentProps<{ tabId: string }>
+  RouteComponentProps<{ tabId: string }> & { className?: string }
 
 const getSettingsAndLogout = (props: IFullProps) => {
   const {
@@ -255,7 +265,8 @@ export const NavigationView = (props: IFullProps) => {
     menuCollapse,
     userInfo,
     offlineCountryConfiguration,
-    updateRegistrarWorkqueue
+    updateRegistrarWorkqueue,
+    className
   } = props
   const tabId = deselectAllTabs
     ? ''
@@ -270,13 +281,12 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.declarationForms
   ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
-  const { loading, error, data, initialSyncDone } = workqueue
+  const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
     data,
     storedDeclarations
   )
-
-  const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
+  const runningVer = String(localStorage.getItem('running-version'))
 
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
@@ -312,17 +322,28 @@ export const NavigationView = (props: IFullProps) => {
       window.config.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
         ? 0
         : filteredData.externalValidationTab?.totalItems || 0,
-    readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0
+    readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
+    outbox: storedDeclarations.filter((draft) =>
+      (
+        [
+          ...ALLOWED_STATUS_FOR_RETRY,
+          ...INPROGRESS_STATUS
+        ] as SUBMISSION_STATUS[]
+      ).includes(draft.submissionStatus as SUBMISSION_STATUS)
+    ).length
   }
 
   return (
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
+      applicationVersion={runningVer}
+      buildVersion={import.meta.env.VITE_APP_VERSION ?? 'Development'}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
       avatar={() => userInfo && userInfo.avatar}
-      warning={isMobileDevice() ? <></> : <UnbuplishedWarning hideIcon />}
+      warning={isMobileDevice() ? <></> : <UnpublishedWarning compact={true} />}
+      className={className}
     >
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>
@@ -363,6 +384,19 @@ export const NavigationView = (props: IFullProps) => {
               isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
               onClick={() => {
                 props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
+                menuCollapse && menuCollapse()
+              }}
+            />
+            <NavigationItem
+              icon={() => <PaperPlane />}
+              id={`navigation_${WORKQUEUE_TABS.outbox}`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TABS.outbox]
+              )}
+              count={declarationCount.outbox}
+              isSelected={tabId === WORKQUEUE_TABS.outbox}
+              onClick={() => {
+                props.goToHomeTab(WORKQUEUE_TABS.outbox)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -479,6 +513,24 @@ export const NavigationView = (props: IFullProps) => {
                       isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
                       onClick={() => {
                         props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+                        menuCollapse && menuCollapse()
+                      }}
+                    />
+                  )}
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.outbox
+                  ) && (
+                    <NavigationItem
+                      icon={() => <PaperPlane />}
+                      id={`navigation_${WORKQUEUE_TABS.outbox}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.outbox]
+                      )}
+                      count={declarationCount.outbox}
+                      isSelected={tabId === WORKQUEUE_TABS.outbox}
+                      onClick={() => {
+                        props.goToHomeTab(WORKQUEUE_TABS.outbox)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -654,3 +706,8 @@ export const Navigation = connect<
   goToSettings,
   updateRegistrarWorkqueue
 })(injectIntl(withRouter(NavigationView)))
+
+/** @deprecated since the introduction of `<Frame>` */
+export const FixedNavigation = styled(Navigation)`
+  position: fixed;
+`

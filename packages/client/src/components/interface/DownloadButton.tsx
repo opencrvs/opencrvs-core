@@ -11,49 +11,41 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import {
-  Spinner,
-  ResponsiveModal,
-  IActionObject
-} from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { IActionObject } from '@opencrvs/components/lib/Workqueue'
 import { Download } from '@opencrvs/components/lib/icons'
-import {
-  CircleButton,
-  TertiaryButton,
-  SuccessButton,
-  DangerButton
-} from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { connect } from 'react-redux'
 import {
   downloadDeclaration,
   DOWNLOAD_STATUS,
-  unassignDeclaration
+  unassignDeclaration,
+  deleteDeclaration as deleteDeclarationAction
 } from '@client/declarations'
 import { Action } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { withApollo, WithApolloClient } from 'react-apollo'
+import {
+  ApolloClient,
+  InternalRefetchQueriesInclude,
+  useApolloClient
+} from '@apollo/client'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
 import {
-  ROLE_LOCAL_REGISTRAR,
   FIELD_AGENT_ROLES,
   ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
 import { Dispatch } from 'redux'
-import ApolloClient from 'apollo-client'
 import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
-import {
-  withOnlineStatus,
-  IOnlineStatusProps
-} from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import ReactTooltip from 'react-tooltip'
 import { Roles } from '@client/utils/authUtils'
-import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -61,7 +53,7 @@ interface IDownloadConfig {
   compositionId: string
   action: Action
   assignment?: GQLAssignmentData
-  refetchQueries?: RefetchQueryDescription
+  refetchQueries?: InternalRefetchQueriesInclude
   declarationStatus?: string
 }
 
@@ -79,9 +71,10 @@ interface IConnectProps {
 interface IDispatchProps {
   downloadDeclaration: typeof downloadDeclaration
   unassignDeclaration: typeof unassignDeclaration
+  deleteDeclaration: typeof deleteDeclarationAction
 }
 
-type HOCProps = IConnectProps & IDispatchProps & WithApolloClient<{}>
+type HOCProps = IConnectProps & IDispatchProps
 
 const StatusIndicator = styled.div<{
   isLoading?: boolean
@@ -93,7 +86,7 @@ const StatusIndicator = styled.div<{
   justify-content: ${({ isLoading }) =>
     isLoading ? `space-between` : `flex-end`};
 `
-const DownloadAction = styled(CircleButton)`
+const DownloadAction = styled(Button)`
   border-radius: 50%;
   height: 40px;
   width: 40px;
@@ -189,25 +182,26 @@ const NoConnectionViewContainer = styled.div`
 `
 
 function renderModalAction(action: IModalAction, intl: IntlShape): JSX.Element {
-  let Button
+  let buttonType: 'positive' | 'negative' | 'tertiary'
   if (action.type === 'success') {
-    Button = SuccessButton
+    buttonType = 'positive' as const
   } else if (action.type === 'danger') {
-    Button = DangerButton
+    buttonType = 'negative'
   } else {
-    Button = TertiaryButton
+    buttonType = 'tertiary'
   }
+
   return (
-    <Button id={action.id} onClick={action.handler}>
+    <Button id={action.id} type={buttonType} onClick={action.handler}>
       {intl.formatMessage(action.label)}
     </Button>
   )
 }
 
-function DownloadButtonComponent(
-  props: DownloadButtonProps & HOCProps & IOnlineStatusProps
-) {
+function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   const intl = useIntl()
+  const client = useApolloClient()
+  const isOnline = useOnlineStatus()
   const LOADING_STATUSES = useMemo(function () {
     return [
       DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
@@ -221,12 +215,11 @@ function DownloadButtonComponent(
     status,
     className,
     downloadConfigs,
-    client,
     downloadDeclaration,
     userRole,
     userId,
     unassignDeclaration,
-    isOnline
+    deleteDeclaration
   } = props
   const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -243,8 +236,18 @@ function DownloadButtonComponent(
   }, [downloadConfigs, client, downloadDeclaration])
   const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
-    unassignDeclaration(compositionId, client)
-  }, [compositionId, client, unassignDeclaration])
+    if (assignment) {
+      unassignDeclaration(compositionId, client)
+    } else {
+      deleteDeclaration(compositionId)
+    }
+  }, [
+    compositionId,
+    client,
+    unassignDeclaration,
+    assignment,
+    deleteDeclaration
+  ])
   const isFailed = useMemo(
     () =>
       status === DOWNLOAD_STATUS.FAILED ||
@@ -328,9 +331,11 @@ function DownloadButtonComponent(
   return (
     <>
       <DownloadAction
+        type="icon"
         id={`${id}-icon${isFailed ? `-failed` : ``}`}
         onClick={onClickDownload}
         className={className}
+        aria-label={intl.formatMessage(constantsMessages.assignRecord)}
       >
         {status === DOWNLOAD_STATUS.DOWNLOADED ? (
           <Downloaded />
@@ -380,6 +385,7 @@ const mapDispatchToProps = (
     action: Action,
     client: ApolloClient<any>
   ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
+  deleteDeclaration: (id: string) => dispatch(deleteDeclarationAction(id)),
   unassignDeclaration: (id: string, client: ApolloClient<any>) =>
     dispatch(
       unassignDeclaration(id, client, ownProps.downloadConfigs.refetchQueries)
@@ -389,4 +395,4 @@ const mapDispatchToProps = (
 export const DownloadButton = connect(
   mapStateToProps,
   mapDispatchToProps
-)(withApollo(withOnlineStatus(DownloadButtonComponent)))
+)(DownloadButtonComponent)

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import {
@@ -18,10 +18,10 @@ import {
   TertiaryButton,
   LinkButton
 } from '@opencrvs/components/lib/buttons'
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import Cropper from 'react-easy-crop'
 import { Point, Area, Size } from 'react-easy-crop/types'
-import { Mutation } from 'react-apollo'
+import { Mutation } from '@apollo/client/react/components'
 import styled from '@client/styledComponents'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
