@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import decode from 'jwt-decode'
-import * as Sentry from '@sentry/react'
+import * as Sentry from '@sentry/browser'
 
 export const ERROR_CODE_TOO_MANY_ATTEMPTS = 429
 export const ERROR_CODE_FIELD_MISSING = 500

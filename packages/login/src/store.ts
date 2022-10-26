@@ -33,7 +33,7 @@ import {
 } from 'connected-react-router'
 import { loginReducer, LoginState } from '@login/login/reducer'
 import { intlReducer, IntlState } from '@login/i18n/reducer'
-import * as Sentry from '@sentry/react'
+import * as Sentry from '@sentry/browser'
 import createSentryMiddleware from 'redux-sentry-middleware'
 
 export interface IStoreState {

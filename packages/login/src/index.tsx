@@ -11,13 +11,12 @@
  */
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import * as Sentry from '@sentry/react'
+import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 import { App } from '@login/App'
 import registerServiceWorker from '@login/registerServiceWorker'
 import { storage } from '@login/storage'
 import { createStore } from './store'
-import { BrowserTracing } from '@sentry/tracing'
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import WebFont from 'webfontloader'
@@ -37,9 +36,7 @@ if (
   if (window.config.SENTRY) {
     Sentry.init({
       environment: process.env.NODE_ENV,
-      dsn: window.config.SENTRY,
-      integrations: [new BrowserTracing()],
-      tracesSampleRate: 1.0
+      dsn: window.config.SENTRY
     })
   }
 

@@ -24,7 +24,7 @@ import {
   QueryComponentOptions
 } from '@apollo/client/react/components'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
+import * as Sentry from '@sentry/browser'
 
 export function Query<T = any>(props: QueryComponentOptions<T>) {
   return (
