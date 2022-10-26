@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { PaperClip } from '.'
 
 export default {
-  title: 'Styles/Icons/PaperClip',
+  title: 'Deprecated/Icons/PaperClip',
   component: PaperClip
 } as Meta
 

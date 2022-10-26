@@ -9,12 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-
-export const StatusPendingOffline = (
-  props: React.HTMLAttributes<SVGElement>
-) => (
-  <svg width={24} height={24} fill="none" {...props}>
-    <circle cx={12} cy={12} r={11} stroke="#707C80" strokeWidth={2} />
-  </svg>
-)
+export * from './Archived'
+export * from './Assigned'
+export * from './Certified'
+export * from './Close'
+export * from './Collapse'
+export * from './Draft'
+export * from './DuplicateYellow'
+export * from './Expand'
+export * from './ExternalValidate'
+export * from './FilledCheck'
+export * from './InReview'
+export * from './Offline'
+export * from './Registered'
+export * from './RequiresUpdates'
+export * from './Sent'
+export * from './Validated'
+export * from './WaitingApproval'
