@@ -53,6 +53,11 @@ enum IdentityIDType {
   SOCIAL_SECURITY_NO
 }
 
+enum LiteracyType {
+  LITERATE
+  ILLITERATE
+}
+
 enum EducationType {
   KORANIC
   PRIMARY
@@ -181,6 +186,7 @@ input PersonInput {
   photo: [AttachmentInput!]
   deceased: DeceasedInput
   nationality: [String] # In BDRIS2 for father and mother only
+  literacy: LiteracyType
   educationalAttainment: EducationType # Not in BDRIS2
 }
 
@@ -206,6 +212,7 @@ type Person { # -> Patient
   photo: [Attachment] # -> .photo
   deceased: Deceased # -> .deceased
   nationality: [String] # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
+  literacy: LiteracyType # -> .extension(url='http://opencrvs.org/specs/extension/literacy')
   educationalAttainment: EducationType # -> .extension(url='http://opencrvs.org/specs/extension/educational-attainment').valueString
 }
 
