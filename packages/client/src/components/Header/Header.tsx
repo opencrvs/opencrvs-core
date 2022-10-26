@@ -52,13 +52,8 @@ import {
   ArrowBack,
   BackArrowDeepBlue,
   ForwardArrowDeepBlue,
-  BRN,
-  Location,
-  Phone,
   Plus,
   SearchDark,
-  TrackingID,
-  User,
   Activity,
   SearchBlue,
   AddUser
@@ -396,37 +391,37 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
-        icon: <TrackingID />,
-        invertIcon: <TrackingID />,
+        icon: <Icon name="Target" size="small" />,
+        invertIcon: <Icon name="Target" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
       {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
-        icon: <BRN />,
-        invertIcon: <BRN />,
+        icon: <Icon name="Award" size="small" />,
+        invertIcon: <Icon name="Award" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         label: intl.formatMessage(messages.nationalId),
         value: NATIONAL_ID_TEXT,
-        icon: <Icon name="CreditCard" />,
+        icon: <Icon name="CreditCard" size="small" />,
         invertIcon: <Icon name="CreditCard" />,
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
-        icon: <Phone />,
-        invertIcon: <Phone />,
+        icon: <Icon name="Phone" size="small" />,
+        invertIcon: <Icon name="Phone" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       },
       {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
-        icon: <User />,
-        invertIcon: <User />,
+        icon: <Icon name="User" size="small" />,
+        invertIcon: <Icon name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
