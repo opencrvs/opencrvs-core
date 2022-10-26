@@ -6,7 +6,8 @@
   "private": true,
   "dependencies": {
     "@opencrvs/components": "^1.0.0",
-    "@sentry/browser": "^4.6.3",
+    "@sentry/react": "^7.12.1",
+    "@sentry/tracing": "^7.12.1",
     "@types/history": "^4.6.2",
     "@types/react-redux": "^7.1.5",
     "@types/react-router": "^5.1.2",

@@ -12,7 +12,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { resolve } from 'url'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 
 export const client = axios.create({
   baseURL: window.config.AUTH_URL
