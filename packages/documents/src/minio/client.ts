@@ -21,8 +21,8 @@ export const minioClient = new Minio.Client({
   endPoint: MINIO_HOST,
   port: Number(MINIO_PORT),
   useSSL: false,
-  accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-  secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin'
+  accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin2',
+  secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin2'
 })
 
 export async function defaultMinioBucketExists() {

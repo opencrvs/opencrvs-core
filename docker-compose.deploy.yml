@@ -242,8 +242,8 @@ services:
   # Configure elasticsearch
   minio:
     environment:
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_ACCESS_KEY=minioadmin2
+      - MINIO_SECRET_KEY=minioadmin2
     ports:
       - '9000:9000'
       - '9001:9001'
