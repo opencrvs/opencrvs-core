@@ -1363,6 +1363,15 @@ export const registerForms: IDefaultRegisterForms = {
                       description: 'Label for education option University',
                       id: 'form.field.label.educationAttainment.university'
                     }
+                  },
+                  {
+                    value: 'NO_EDUCATION',
+                    label: {
+                      defaultMessage: 'No formal education',
+                      description:
+                        'Label for education option No formal education',
+                      id: 'form.field.label.educationAttainmentNoEducation'
+                    }
                   }
                 ]
               },
@@ -2543,6 +2552,15 @@ export const registerForms: IDefaultRegisterForms = {
                       defaultMessage: 'University',
                       description: 'Label for education option University',
                       id: 'form.field.label.educationAttainment.university'
+                    }
+                  },
+                  {
+                    value: 'NO_EDUCATION',
+                    label: {
+                      defaultMessage: 'No formal education',
+                      description:
+                        'Label for education option No formal education',
+                      id: 'form.field.label.educationAttainmentNoEducation'
                     }
                   }
                 ]
