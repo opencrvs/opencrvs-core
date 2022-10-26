@@ -10,14 +10,23 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { ThreeDots } from '.'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { Link } from './Link'
 
 export default {
-  title: 'Styles/Icons/ThreeDots',
-  component: ThreeDots
-} as Meta
+  title: 'Controls/Link',
+  component: Link,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+\`<Link>\` is a clickable variant of text. It can be used as a button or a link.
+`
+      }
+    }
+  }
+} as ComponentMeta<typeof Link>
 
-const Template: Story<{}> = () => <ThreeDots />
-
-export const ThreeDotsIcon = Template.bind({})
+export const Default: ComponentStory<typeof Link> = (args) => (
+  <Link {...args}>Click here</Link>
+)

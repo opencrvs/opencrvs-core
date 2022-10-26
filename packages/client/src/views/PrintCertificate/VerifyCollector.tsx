@@ -18,6 +18,7 @@ import {
 import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
+  formatUrl,
   goBack,
   goToHomeTab,
   goToPrintCertificatePayment,
@@ -31,7 +32,7 @@ import {
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { getEventDate, getRegisteredDate, isFreeOfCost } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
@@ -40,6 +41,7 @@ import {
   verifyIDOnBirthCertificateCollectorDefinition
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 interface IMatchParams {
   registrationId: string
@@ -159,6 +161,16 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   render() {
     const { collector } = this.props.match.params
     const { intl } = this.props
+    if (!this.props.declaration) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToPrint,
+            selectorId: ''
+          })}
+        />
+      )
+    }
     return (
       <ActionPageLight
         goBack={this.props.goBack}

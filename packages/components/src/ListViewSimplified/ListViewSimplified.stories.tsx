@@ -17,9 +17,10 @@ import {
 import React from 'react'
 import { ToggleMenu } from '../ToggleMenu'
 import { VerticalThreeDots, AvatarSmall, AvatarLarge } from '../icons'
-import { LinkButton, PrimaryButton } from '../buttons'
 import { Pill } from '../Pill'
 import styled from 'styled-components'
+import { Link } from '../Link'
+import { Button } from '../Button'
 
 const Template: Story = ({ children, ...args }) => {
   return <ListViewSimplified {...args}>{children}</ListViewSimplified>
@@ -47,21 +48,17 @@ const toggleMenu = (
 )
 
 const linkButton = (
-  <LinkButton key="linkButton" size="medium">
+  <Link font="reg14" key="linkButton">
     Change
-  </LinkButton>
+  </Link>
 )
 
-const linkLabel = (i: number) => (
-  <LinkButton key="linkButton" size="medium">
-    Link {i}
-  </LinkButton>
-)
+const linkLabel = (i: number) => <Link key="linkButton">Link {i}</Link>
 
 const button = (
-  <PrimaryButton key="primaryButton" size="medium">
+  <Button type="primary" key="primaryButton" size="medium">
     Click here
-  </PrimaryButton>
+  </Button>
 )
 
 const pill = <Pill label="Active" type="active" />

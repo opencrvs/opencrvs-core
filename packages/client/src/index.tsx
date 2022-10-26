@@ -19,14 +19,14 @@ import { createStore } from '@client/store'
 import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
 import WebFont from 'webfontloader'
 import { BACKGROUND_SYNC_BROADCAST_CHANNEL } from './utils/constants'
-
+import { BrowserTracing } from '@sentry/tracing'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:400']
@@ -48,6 +48,11 @@ if (
     Sentry.init({
       release: import.meta.env.REACT_APP_VERSION,
       environment: import.meta.env.NODE_ENV,
+      integrations: [new BrowserTracing()],
+
+      // We recommend adjusting this value in production, or using tracesSampler
+      // for finer control
+      tracesSampleRate: 1.0,
       dsn: window.config.SENTRY
     })
   }

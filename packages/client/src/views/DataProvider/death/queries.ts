@@ -174,7 +174,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         hasShowedVerifiedDocument
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text
@@ -410,7 +410,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         requester
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text

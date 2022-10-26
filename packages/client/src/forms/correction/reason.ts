@@ -19,10 +19,9 @@ import {
 } from '@client/forms'
 import { formMessages } from '@client/i18n/messages/form'
 import { messages } from '@client/i18n/messages/views/correction'
-import {
-  changeHirerchyMutationTransformer,
-  fieldValueSectionExchangeTransformer
-} from '@client/forms/mappings/mutation'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { required as requiredValidation } from '@opencrvs/client/src/utils/validate'
+import { validationMessages } from '@client/i18n/messages'
 
 export enum CorrectionReason {
   CLERICAL_ERROR = 'CLERICAL_ERROR',
@@ -73,14 +72,12 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
           {
             name: 'otherReason',
             type: 'TEXT',
-            label: {
-              defaultMessage: 'Reason for change',
-              id: 'form.field.label.reasonForChange',
-              description: 'Label for input Reason for Change'
-            },
+            label: messages.reasonForChange,
             required: true,
             initialValue: '',
-            validate: [],
+            validate: [
+              requiredValidation(validationMessages.requiredReasonForCorrection)
+            ],
             mapping: {}
           }
         ]

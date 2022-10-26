@@ -24,7 +24,7 @@ import { showSessionExpireConfirmation } from '@client/notification/actions'
 import { IStoreState } from '@client/store'
 import { AnyAction, Store } from 'redux'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
 
 export let client: any = { mutate: () => {} }

@@ -19,7 +19,6 @@ import {
 import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/correction'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
-import { userMessages } from '@client/i18n/messages'
 
 export enum CorrectorRelationship {
   //death

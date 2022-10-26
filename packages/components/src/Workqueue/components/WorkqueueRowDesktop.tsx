@@ -74,6 +74,7 @@ export const ContentWrapper = styled.div<{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding: 4px 0;
 `
 
 export const Error = styled.span`

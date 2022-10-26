@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Edit } from './Edit'
 
 export default {
-  title: 'Styles/Icons/Edit',
+  title: 'Deprecated/Icons/Edit',
   component: Edit
 } as Meta
 

@@ -483,6 +483,7 @@ export interface GQLApplicationConfiguration {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
+  INTEGRATIONS?: Array<GQLIntegration | null>
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -497,6 +498,7 @@ export interface GQLApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
+  INTEGRATIONS?: Array<GQLIntegrationInput | null>
 }
 
 export interface GQLFormDraftInput {
@@ -521,6 +523,7 @@ export interface GQLRegistration {
   _fhirID?: string
   draftId?: string
   trackingId?: string
+  mosipAid?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -584,13 +587,13 @@ export const enum GQLBirthRegType {
 export interface GQLHistory {
   user?: GQLUser
   date?: GQLDate
-  action?: GQLRegStatus
-  requester?: string
-  hasShowedVerifiedDocument?: boolean
+  regStatus?: GQLRegStatus
+  action?: GQLRegAction
   statusReason?: GQLStatusReason
   reason?: string
+  requester?: string
+  hasShowedVerifiedDocument?: boolean
   otherReason?: string
-  reinstated?: boolean
   location?: GQLLocation
   office?: GQLLocation
   dhis2Notification?: boolean
@@ -862,6 +865,7 @@ export interface GQLRegistrationInput {
   _fhirID?: string
   draftId?: string
   trackingId?: string
+  mosipAid?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -903,9 +907,7 @@ export const enum GQLRegStatus {
   VALIDATED = 'VALIDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED',
-  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
-  DOWNLOADED = 'DOWNLOADED'
+  REJECTED = 'REJECTED'
 }
 
 export interface GQLMedicalPractitionerInput {
@@ -952,6 +954,11 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
+export interface GQLIntegration {
+  name?: string
+  status?: string
+}
+
 export interface GQLBirthInput {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
@@ -971,6 +978,11 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
+}
+
+export interface GQLIntegrationInput {
+  name?: string
+  status?: string
 }
 
 export interface GQLQuestionInput {
@@ -1041,6 +1053,14 @@ export interface GQLCertificate {
   data?: string
 }
 
+export const enum GQLRegAction {
+  ASSIGNED = 'ASSIGNED',
+  UNASSIGNED = 'UNASSIGNED',
+  REINSTATED = 'REINSTATED',
+  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
+  DOWNLOADED = 'DOWNLOADED'
+}
+
 export interface GQLStatusReason {
   text?: string
 }
@@ -1061,6 +1081,9 @@ export interface GQLInputOutput {
 export const enum GQLIdentityIDType {
   PASSPORT = 'PASSPORT',
   NATIONAL_ID = 'NATIONAL_ID',
+  MOSIP_UINTOKEN = 'MOSIP_UINTOKEN',
+  DECEASED_PATIENT_ENTRY = 'DECEASED_PATIENT_ENTRY',
+  BIRTH_PATIENT_ENTRY = 'BIRTH_PATIENT_ENTRY',
   DRIVING_LICENSE = 'DRIVING_LICENSE',
   BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER',
   DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER',
@@ -1415,6 +1438,7 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
+  Integration?: GQLIntegrationTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -3885,6 +3909,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
+  INTEGRATIONS?: ApplicationConfigurationToINTEGRATIONSResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -3964,11 +3989,19 @@ export interface ApplicationConfigurationToADDRESSESResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface ApplicationConfigurationToINTEGRATIONSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLRegistrationTypeResolver<TParent = any> {
   id?: RegistrationToIdResolver<TParent>
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
   draftId?: RegistrationToDraftIdResolver<TParent>
   trackingId?: RegistrationToTrackingIdResolver<TParent>
+  mosipAid?: RegistrationToMosipAidResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
@@ -4003,6 +4036,10 @@ export interface RegistrationToTrackingIdResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToMosipAidResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4170,13 +4207,13 @@ export interface QuestionnaireQuestionToValueResolver<
 export interface GQLHistoryTypeResolver<TParent = any> {
   user?: HistoryToUserResolver<TParent>
   date?: HistoryToDateResolver<TParent>
+  regStatus?: HistoryToRegStatusResolver<TParent>
   action?: HistoryToActionResolver<TParent>
-  requester?: HistoryToRequesterResolver<TParent>
-  hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
+  requester?: HistoryToRequesterResolver<TParent>
+  hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
   otherReason?: HistoryToOtherReasonResolver<TParent>
-  reinstated?: HistoryToReinstatedResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
   dhis2Notification?: HistoryToDhis2NotificationResolver<TParent>
@@ -4195,7 +4232,19 @@ export interface HistoryToDateResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface HistoryToRegStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface HistoryToActionResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToStatusReasonResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToReasonResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4210,19 +4259,7 @@ export interface HistoryToHasShowedVerifiedDocumentResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface HistoryToStatusReasonResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface HistoryToReasonResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface HistoryToOtherReasonResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface HistoryToReinstatedResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4929,6 +4966,19 @@ export interface DeathToREGISTRATION_TARGETResolver<
 }
 
 export interface DeathToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLIntegrationTypeResolver<TParent = any> {
+  name?: IntegrationToNameResolver<TParent>
+  status?: IntegrationToStatusResolver<TParent>
+}
+
+export interface IntegrationToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IntegrationToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -43,7 +43,7 @@ import {
 } from 'react-intl'
 import {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   IDeclaration,
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
@@ -79,7 +79,7 @@ import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { CorrectionSection, IForm } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
@@ -99,16 +99,17 @@ import {
   ShowUpdateButton,
   ShowPrintButton
 } from './ActionButtons'
-import { IActionDetailsData, GetHistory } from './History'
+import { GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
-import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { Mutation } from '@apollo/client/react/components'
 import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
-  Event
+  Event,
+  History
 } from '@client/utils/gateway'
 import {
   REINSTATE_BIRTH_DECLARATION,
@@ -176,7 +177,7 @@ interface IStateProps {
 
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
-  clearCorrectionChange: typeof clearCorrectionChange
+  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
@@ -280,7 +281,7 @@ function ReinstateButton({
 
 function RecordAuditBody({
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   declaration,
   draft,
   duplicates,
@@ -315,10 +316,7 @@ function RecordAuditBody({
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
-  const toggleActionDetails = (
-    actionItem: IActionDetailsData | null,
-    itemIndex = -1
-  ) => {
+  const toggleActionDetails = (actionItem: History | null, itemIndex = -1) => {
     actionItem && setActionDetailsData(actionItem)
     setActionDetailsIndex(itemIndex)
     setActionDetails((prevValue) => !prevValue)
@@ -348,7 +346,7 @@ function RecordAuditBody({
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
         onClick={() => {
-          clearCorrectionChange(declaration.id)
+          clearCorrectionAndPrintChanges(declaration.id)
           goToCertificateCorrection(declaration.id, CorrectionSection.Corrector)
         }}
       >
@@ -458,7 +456,8 @@ function RecordAuditBody({
         userDetails,
         draft,
         goToPrintCertificate,
-        goToTeamUserList
+        goToTeamUserList,
+        clearCorrectionAndPrintChanges
       })
     )
     mobileActions.push(actions[actions.length - 1])
@@ -479,7 +478,7 @@ function RecordAuditBody({
     desktopActionsView.push(actions[actions.length - 1])
   } else {
     if (draft?.submissionStatus === SUBMISSION_STATUS.DRAFT) {
-      actions.push(<Uploaded />)
+      actions.push(<Downloaded />)
     } else {
       actions.push(
         ShowDownloadButton({
@@ -504,6 +503,7 @@ function RecordAuditBody({
     actionDetailsIndex,
     toggleActionDetails,
     intl,
+    userDetails,
     goToUser: goToUserProfile,
     registerForm: regForm,
     offlineData,
@@ -776,6 +776,9 @@ const RecordAuditComp = (props: IFullProps) => {
       navigation={
         <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       }
+      skipToContentText={props.intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <BodyContent {...props} />
     </Frame>
@@ -813,7 +816,7 @@ export const RecordAudit = connect<
   IStoreState
 >(mapStateToProps, {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   goToCertificateCorrection,
   goToPage,
   goToPrintCertificate,

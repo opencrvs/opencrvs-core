@@ -54,7 +54,6 @@ import {
   SYSTEM_FILE_NAME_SYSTEM,
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
-  REINSTATED_EXTENSION_URL,
   REQUESTING_INDIVIDUAL,
   HAS_SHOWED_VERIFIED_DOCUMENT
 } from '@gateway/features/fhir/constants'
@@ -291,6 +290,28 @@ export const typeResolvers: GQLResolver = {
         task.identifier.find(
           (identifier: fhir.Identifier) =>
             identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/${regNoType}`
+        )
+
+      return (foundIdentifier && foundIdentifier.value) || null
+    },
+    async mosipAid(task: fhir.Task) {
+      let mosipAidType =
+        task &&
+        task.code &&
+        task.code.coding &&
+        task.code.coding[0] &&
+        task.code.coding[0].code
+      if (mosipAidType === 'BIRTH') {
+        mosipAidType = 'mosip-aid'
+      } else {
+        return null
+      }
+      const foundIdentifier =
+        task.identifier &&
+        task.identifier.find(
+          (identifier: fhir.Identifier) =>
+            identifier.system ===
+            `${OPENCRVS_SPECIFICATION_URL}id/${mosipAidType}`
         )
 
       return (foundIdentifier && foundIdentifier.value) || null
@@ -748,13 +769,6 @@ export const typeResolvers: GQLResolver = {
   },
 
   History: {
-    action: async (task) => getActionFromTask(task),
-    reinstated: (task: fhir.Task) => {
-      const extension =
-        task.extension &&
-        findExtension(REINSTATED_EXTENSION_URL, task.extension)
-      return extension !== undefined
-    },
     hasShowedVerifiedDocument: (task: fhir.Task) => {
       const hasShowedDocument = findExtension(
         HAS_SHOWED_VERIFIED_DOCUMENT,
@@ -771,6 +785,8 @@ export const typeResolvers: GQLResolver = {
 
       return requestedBy?.valueString || ''
     },
+    regStatus: (task: fhir.Task) => getStatusFromTask(task),
+    action: (task) => getActionFromTask(task),
     statusReason: (task: fhir.Task) => task.statusReason || null,
     reason: (task: fhir.Task) => task.reason?.text || null,
     otherReason: (task: fhir.Task) => {
@@ -832,14 +848,17 @@ export const typeResolvers: GQLResolver = {
     input: (task) => task.input || [],
     output: (task) => task.output || [],
     certificates: async (task, _, authHeader) => {
-      if (getActionFromTask(task) !== GQLRegStatus.CERTIFIED) {
+      if (
+        getActionFromTask(task) ||
+        getStatusFromTask(task) !== GQLRegStatus.CERTIFIED
+      ) {
         return null
       }
       return await getCertificatesFromTask(task, _, authHeader)
     },
     signature: async (task: fhir.Task, _: any, authHeader: any) => {
       const action = getActionFromTask(task)
-      if (action !== GQLRegStatus.REGISTERED) {
+      if (action || getStatusFromTask(task) !== GQLRegStatus.REGISTERED) {
         return null
       }
       const user = findExtension(
