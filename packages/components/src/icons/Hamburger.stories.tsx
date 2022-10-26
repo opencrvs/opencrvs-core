@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Hamburger } from './Hamburger'
 
 export default {
-  title: 'Styles/Icons/Hamburger',
+  title: 'Deprecated/Icons/Hamburger',
   component: Hamburger
 } as Meta
 

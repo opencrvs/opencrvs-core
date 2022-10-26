@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { PaperPlane } from './PaperPlane'
 
 export default {
-  title: 'Styles/Icons/PaperPlane',
+  title: 'Deprecated/Icons/PaperPlane',
   component: PaperPlane
 } as Meta
 
