@@ -369,30 +369,21 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === CHECKBOX) {
-    /*
-     * If flip is true it means that the checkbox and fieldValue are
-     * inversely related i.e. checkbox will be checked when the fieldValue
-     * is false and vise versa
-     */
-    const { flip } = fieldDefinition
+    const { checkedValue = true, uncheckedValue = false } = fieldDefinition
     return (
       <InputField {...inputFieldProps}>
         <Checkbox
           {...inputProps}
           label={fieldDefinition.label}
           name={fieldDefinition.name}
-          value={String(flip ? !value : value)}
-          selected={(flip ? !value : value) as boolean}
+          value={String(value)}
+          selected={(value as string) === checkedValue}
           onChange={(event) =>
             onSetFieldValue(
               fieldDefinition.name,
-              flip
-                ? event.target.value === 'true'
-                  ? true
-                  : false
-                : event.target.value === 'true'
-                ? false
-                : true
+              event.target.value === String(checkedValue)
+                ? uncheckedValue
+                : checkedValue
             )
           }
         />

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ZoomIn } from '.'
 
 export default {
-  title: 'Styles/Icons/ZoomIn',
+  title: 'Deprecated/Icons/ZoomIn',
   component: ZoomIn
 } as Meta
 

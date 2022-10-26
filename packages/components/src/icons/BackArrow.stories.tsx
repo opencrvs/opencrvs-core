@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { BackArrow } from './BackArrow'
 
 export default {
-  title: 'Styles/Icons/BackArrow',
+  title: 'Deprecated/Icons/BackArrow',
   component: BackArrow
 } as Meta
 
