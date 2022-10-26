@@ -172,17 +172,27 @@ export const FETCH_REGISTRATIONS = gql`
           late
           delayed
           registrarPractitioner {
-            user {
-              role
-              primaryOffice {
-                name
-              }
-              name {
-                firstNames
-                familyName
-                use
-              }
+            role
+            primaryOffice {
+              name
             }
+            name {
+              firstNames
+              familyName
+              use
+            }
+          }
+        }
+      }
+      ... on TotalMetricsByLocation {
+        results {
+          total
+          late
+          delayed
+          home
+          healthFacility
+          location {
+            name
           }
         }
       }

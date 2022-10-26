@@ -52,6 +52,7 @@ import {
 import {
   totalMetricsByLocation,
   totalMetricsByRegistrar,
+  totalMetricsByTime,
   totalMetricsHandler
 } from '@metrics/features/totalMetrics/handler'
 import * as Joi from 'joi'
@@ -361,7 +362,19 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
-
+    {
+      method: 'GET',
+      path: '/totalMetricsByTime',
+      handler: totalMetricsByTime,
+      config: {
+        validate: {
+          query: Joi.object({
+            event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
     {
       method: 'GET',
       path: '/totalPayments',

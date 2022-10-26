@@ -58,6 +58,13 @@ interface IMetricsTotalGroupByLocation {
   timeLabel: string
 }
 
+interface IMetricsTotalGroupByTime {
+  time: string
+  total: number
+  eventLocationType: string
+  timeLabel: string
+}
+
 export interface IBirthKeyFigures {
   label: string
   value: number
@@ -961,6 +968,21 @@ export async function fetchRegistrationsGroupByOfficeLocation(
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'      
     GROUP BY officeLocation, eventLocationType, timeLabel`
+  )
+
+  return result
+}
+
+export async function fetchRegistrationsGroupByTime(event: EVENT_TYPE) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+
+  const result: IMetricsTotalGroupByTime[] = await query(
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}    
+    GROUP BY time(30d), timeLabel, eventLocationType
+    `
   )
 
   return result

@@ -37,7 +37,7 @@ import {
   GQLMixedTotalMetricsResult,
   GQLSearchFieldAgentResult
 } from '@opencrvs/gateway/src/graphql/schema'
-import { orderBy } from 'lodash'
+import { orderBy, get, isEmpty } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -52,7 +52,6 @@ import { IAvatar } from '@client/utils/userUtils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { userMessages } from '@client/i18n/messages'
 import { SegmentedControl } from '@client/components/SegmentedControl'
-import { get, isEmpty } from 'lodash'
 import { getName } from '../RecordAudit/utils'
 
 const ToolTipContainer = styled.span`
@@ -67,7 +66,7 @@ interface SortMap {
   lateRegistrations: SORT_ORDER
   delayedRegistrations: SORT_ORDER
   healthFacility: SORT_ORDER
-  homeBirth: SORT_ORDER
+  home: SORT_ORDER
 }
 const INITIAL_SORT_MAP = {
   month: SORT_ORDER.ASCENDING,
@@ -337,18 +336,13 @@ function RegistrationListComponent(props: IProps) {
         },
         ...commonColumns,
         {
-          key: 'homeBirth',
+          key: 'home',
           label: intl.formatMessage(messages.performanceHomeBirth),
           width: 20,
           isSortable: true,
-          sortFunction: () => toggleSort('homeBirth'),
-          icon:
-            columnToBeSort === 'homeBirth' ? (
-              <SortArrow active={true} />
-            ) : (
-              <></>
-            ),
-          isSorted: columnToBeSort === 'homeBirth' ? true : false
+          sortFunction: () => toggleSort('home'),
+          icon: columnToBeSort === 'home' ? <SortArrow active={true} /> : <></>,
+          isSorted: columnToBeSort === 'home' ? true : false
         },
         {
           key: 'healthFacility',
@@ -399,16 +393,19 @@ function RegistrationListComponent(props: IProps) {
     if (data.__typename === RESULT_TYPE.by_registrar) {
       return data.results.map((result) => ({
         ...result,
-        name: result.registrarPractitioner.user.name
-          ? getName(result.registrarPractitioner.user.name, 'en')
+        name: result.registrarPractitioner.name
+          ? getName(result.registrarPractitioner.name, 'en')
           : '',
-        location: result.registrarPractitioner.user.primaryOffice.name,
-        role: getFieldAgentTypeLabel(result.registrarPractitioner.user.role)
+        location: result.registrarPractitioner.primaryOffice.name,
+        role: getFieldAgentTypeLabel(result.registrarPractitioner.role)
       }))
     } else if (data.__typename === RESULT_TYPE.by_location) {
-      return []
+      return data.results.map((result) => ({
+        ...result,
+        location: result.location.name
+      }))
     } else if (data.__typename === RESULT_TYPE.by_time) {
-      return []
+      return data.results
     } else {
       return []
     }

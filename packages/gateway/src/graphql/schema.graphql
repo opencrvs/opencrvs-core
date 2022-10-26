@@ -422,9 +422,9 @@ type TotalMetricsResult {
 }
 
 union MixedTotalMetricsResult =
-    TotalMetricsResult
-  | TotalMetricsByRegistrarResult
+    TotalMetricsByRegistrarResult
   | TotalMetricsByLocation
+  | TotalMetricsByTime
 
 type PaymentMetric {
   total: Float!
@@ -932,6 +932,10 @@ type TotalMetricsByLocation {
   results: [EventMetricsByLocation!]!
 }
 
+type TotalMetricsByTime {
+  results: [EventMetricsByTime!]!
+}
+
 type TimeLoggedMetrics {
   status: String!
   trackingId: String
@@ -1274,19 +1278,28 @@ enum AttachmentSubject {
 }
 
 type EventMetricsByRegistrar {
-  registrarPractitioner: RegistrarPractitioner
+  registrarPractitioner: User
   total: Int!
   late: Int!
   delayed: Int!
 }
 
 type EventMetricsByLocation {
-  locationID: LocationDetails
+  location: Location!
   total: Int!
   late: Int!
   delayed: Int!
   home: Int!
   healthFacility: Int!
+}
+
+type EventMetricsByTime {
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+  month: String!
 }
 
 type RegistrationSearchSet {
@@ -1468,14 +1481,6 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
-}
-
-type RegistrarPractitioner {
-  user: User
-}
-
-type LocationDetails {
-  details: Location
 }
 
 input CommentInput {

@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { GQLResolver } from '@gateway/graphql/schema'
-import { getUser } from '@gateway/features/user/utils'
-import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
+import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
+import { getUser } from '@gateway/features/user/utils'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 export const typeResolvers: GQLResolver = {
   MixedTotalMetricsResult: {
@@ -22,18 +22,19 @@ export const typeResolvers: GQLResolver = {
         return 'TotalMetricsByRegistrarResult'
       else if (info.variableValues.filterBy === FILTER_BY.LOCATION)
         return 'TotalMetricsByLocation'
-      else return 'TotalMetricsResult'
+      else if (info.variableValues.filterBy === FILTER_BY.TIME)
+        return 'TotalMetricsByTime'
+      else throw new Error('Invalid type')
     }
   },
-  LocationDetails: {
-    async details(locationId, _, authHeader) {
-      const location = await fetchFHIR(`/${locationId}`, authHeader)
-      return location
+  EventMetricsByLocation: {
+    async location({ location }, _, authHeader) {
+      return await fetchFHIR(`/${location}`, authHeader)
     }
   },
-  RegistrarPractitioner: {
-    async user(userId, _, authHeader) {
-      return await getUser({ userId }, authHeader)
+  EventMetricsByRegistrar: {
+    async registrarPractitioner({ registrarPractitioner }, _, authHeader) {
+      return await getUser({ userId: registrarPractitioner }, authHeader)
     }
   }
 }

@@ -51,8 +51,9 @@ export const resolvers: GQLResolver = {
           variables,
           authHeader
         )
-      } else {
-        result = await getMetrics('/totalMetrics', variables, authHeader)
+      } else if (filterBy === FILTER_BY.TIME) {
+        const { event } = variables
+        result = await getMetrics('/totalMetricsByTime', { event }, authHeader)
       }
       return result
     },

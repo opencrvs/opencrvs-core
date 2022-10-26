@@ -18,10 +18,12 @@ import {
 } from '@metrics/features/metrics/constants'
 import {
   fetchRegistrationsGroupByOfficeLocation,
+  fetchRegistrationsGroupByTime,
   getTotalMetrics
 } from '@metrics/features/metrics/metricsGenerator'
 import { IAuthHeader } from '@metrics/features/registration'
 import { uniqBy } from 'lodash'
+// import { format } from 'date-fns'
 
 enum EVENT_LOCATION_TYPE {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
@@ -151,7 +153,7 @@ export async function totalMetricsByLocation(
     )
 
     response.push({
-      locationID,
+      location: locationID,
       total: registrations.length,
       late: lateRegistrations.length,
       delayed: delayedRegistrations.length,
@@ -161,4 +163,48 @@ export async function totalMetricsByLocation(
   })
 
   return { results: response }
+}
+
+export async function totalMetricsByTime(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const event = request.query[EVENT]
+  const registrations = await fetchRegistrationsGroupByTime(event)
+  const timeStamps = uniqBy(registrations, 'time').map((item) => item.time)
+
+  const results: any[] = []
+
+  timeStamps.forEach((timeStamp) => {
+    const filteredRegistrations = registrations.filter(
+      (registration) => registration.time === timeStamp
+    )
+
+    const lateRegistrations = filteredRegistrations.filter(
+      (result) => result.timeLabel === 'withinLate'
+    )
+    const delayedRegistrations = filteredRegistrations.filter(
+      (result) => !['withinLate', 'withinTarget'].includes(result.timeLabel)
+    )
+
+    const healthFacilityRegistrations = filteredRegistrations.filter(
+      (result) =>
+        result.eventLocationType === EVENT_LOCATION_TYPE.HEALTH_FACILITY
+    )
+
+    const homeRegistrations = registrations.filter(
+      (result) => result.eventLocationType === EVENT_LOCATION_TYPE.PRIVATE_HOME
+    )
+
+    results.push({
+      total: filteredRegistrations.length,
+      late: lateRegistrations.length,
+      delayed: delayedRegistrations.length,
+      home: homeRegistrations.length,
+      healthFacility: healthFacilityRegistrations.length,
+      month: timeStamp
+    })
+  })
+
+  return { results }
 }

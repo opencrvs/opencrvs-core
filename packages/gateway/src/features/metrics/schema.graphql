@@ -16,12 +16,8 @@ type EventMetrics {
   practitionerRole: String!
 }
 
-type RegistrarPractitioner {
-  user: User
-}
-
 type EventMetricsByRegistrar {
-  registrarPractitioner: RegistrarPractitioner
+  registrarPractitioner: User
   total: Int!
   late: Int!
   delayed: Int!
@@ -45,12 +41,8 @@ type TotalMetricsByRegistrarResult {
   results: [EventMetricsByRegistrar!]!
 }
 
-type LocationDetails {
-  details: Location
-}
-
 type EventMetricsByLocation {
-  locationID: LocationDetails
+  location: Location!
   total: Int!
   late: Int!
   delayed: Int!
@@ -60,6 +52,19 @@ type EventMetricsByLocation {
 
 type TotalMetricsByLocation {
   results: [EventMetricsByLocation!]!
+}
+
+type EventMetricsByTime {
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+  month: String!
+}
+
+type TotalMetricsByTime {
+  results: [EventMetricsByTime!]!
 }
 
 type PaymentMetric {
@@ -134,9 +139,9 @@ type LocationStatisticsResponse {
 }
 
 union MixedTotalMetricsResult =
-    TotalMetricsResult
-  | TotalMetricsByRegistrarResult
+    TotalMetricsByRegistrarResult
   | TotalMetricsByLocation
+  | TotalMetricsByTime
 
 type Query {
   getTotalMetrics(
