@@ -2785,6 +2785,10 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrarSignatureUserTransformer'
             },
             {
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
+            },
+            {
               fieldName: 'registrationLocation',
               operation: 'registrationLocationUserTransformer'
             }

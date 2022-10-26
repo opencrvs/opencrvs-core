@@ -37,6 +37,8 @@ import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 
 import QRCode from 'qrcode'
+import { formatUrl } from '@client/navigation'
+import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -363,13 +365,20 @@ export const registrarSignatureUserTransformer = (
 }
 export const QRCodeTransformerTransformer = async (
   transformedData: IFormData,
-  _: any,
+  queryData: { id: string },
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
   __?: IOfflineData
 ) => {
-  debugger
   transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
-    await QRCode.toDataURL('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+    await QRCode.toDataURL(
+      `${window.location.protocol}//${window.location.host}${formatUrl(
+        DECLARATION_RECORD_AUDIT,
+        {
+          tab: 'printTab',
+          declarationId: queryData.id
+        }
+      )}`
+    )
 }

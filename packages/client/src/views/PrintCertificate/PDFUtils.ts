@@ -83,7 +83,7 @@ export async function previewCertificate(
   if (!userDetails) {
     throw new Error('No user details found')
   }
-  console.log(declaration)
+
   await createPDF(
     getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
     declaration,
