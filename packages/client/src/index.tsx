@@ -23,7 +23,6 @@ import * as Sentry from '@sentry/react'
 import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
-import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
 import WebFont from 'webfontloader'
 import { BACKGROUND_SYNC_BROADCAST_CHANNEL } from './utils/constants'
 import { BrowserTracing } from '@sentry/tracing'
@@ -32,7 +31,7 @@ WebFont.load({
     families: ['Noto+Sans:600', 'Noto+Sans:400']
   }
 })
-
+const pdfjsWorker = import('pdfjs-dist/build/pdf.worker.entry')
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
 storage.configStorage('OpenCRVS')
