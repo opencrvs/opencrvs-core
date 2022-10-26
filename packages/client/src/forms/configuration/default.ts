@@ -85,6 +85,13 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'TEXT',
                 label: formMessageDescriptors.childFirstNames,
                 maxLength: 32,
+                description: {
+                  defaultMessage:
+                    'Middle name (if any) should be entered after the first name',
+                  description:
+                    'Description for form field: First names in english',
+                  id: 'form.field.label.firstNamesDesc'
+                },
                 required: true,
                 initialValue: '',
                 validate: [
@@ -486,6 +493,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
+                inputFieldWidth: '180px',
                 conditionals: [
                   {
                     action: 'hide',
@@ -583,25 +591,6 @@ export const registerForms: IDefaultRegisterForms = {
                       description: 'Option for form field: Marital status',
                       id: 'form.field.label.maritalStatusWidowed'
                     }
-                  }
-                ]
-              },
-              {
-                name: 'marital-seperator',
-                type: 'SUBSECTION',
-                label: {
-                  defaultMessage: ' ',
-                  description: 'empty string',
-                  id: 'form.field.label.empty'
-                },
-                initialValue: '',
-                ignoreBottomMargin: true,
-                validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -1690,6 +1679,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
+                inputFieldWidth: '180px',
                 conditionals: [
                   {
                     action: 'hide',
@@ -2919,6 +2909,13 @@ export const registerForms: IDefaultRegisterForms = {
                   defaultMessage: 'First name(s)',
                   description: 'Label for form field: Given names',
                   id: 'form.field.label.childFirstNames'
+                },
+                description: {
+                  defaultMessage:
+                    'Middle name (if any) should be entered after the first name',
+                  description:
+                    'Description for form field: First names in english',
+                  id: 'form.field.label.firstNamesDesc'
                 },
                 maxLength: 32,
                 required: true,
