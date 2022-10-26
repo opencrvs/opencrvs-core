@@ -29,7 +29,7 @@ if [ -z "$3" ] ; then
     print_usage_and_exit
 fi
 
-SHARED_COMPOSE_FILES="docker-compose.yml"
+COMPOSE_FILE="docker-compose.yml"
 DOCKERHUB_USERNAME=$1
 DOCKERHUB_PASSWORD=$2
 IMAGE_TAG=$3
@@ -39,11 +39,11 @@ function docker_tag_exists() {
     curl --silent -f --head -lL https://hub.docker.com/v2/repositories/$1/tags/$2/ > /dev/null
 }
 
-# Takes in a space separated string of docker-compose.yml files
-# returns a new line separated list of images defined in those files
+# Takes in a docker-compose.yml file name and returns
+# a new line separated list of images defined in the file
 get_docker_tags_from_compose_files() {
-   COMPOSE_FILES=$1
-   IMAGE_TAG_LIST_WITH_VERSION=$(cat $COMPOSE_FILES \
+   COMPOSE_FILE=$1
+   IMAGE_TAG_LIST_WITH_VERSION=$(cat $COMPOSE_FILE \
    `# Select rows with the image tag` \
    | grep image: \
    `# Only keep the image version` \
@@ -54,7 +54,7 @@ get_docker_tags_from_compose_files() {
 }
 
 imagesAlreadyBuilt="true"
-IMAGE_TAGS_TO_CHECK=$(get_docker_tags_from_compose_files "$SHARED_COMPOSE_FILES")
+IMAGE_TAGS_TO_CHECK=$(get_docker_tags_from_compose_files "$COMPOSE_FILE")
 
 for tag in ${IMAGE_TAGS_TO_CHECK[@]}; do
     if docker_tag_exists $tag $IMAGE_TAG; then
