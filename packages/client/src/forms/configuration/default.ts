@@ -1223,7 +1223,8 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'CHECKBOX',
                 label: formMessageDescriptors.mothersDetailsExist,
                 required: true,
-                flip: true,
+                checkedValue: false,
+                uncheckedValue: true,
                 hideHeader: true,
                 initialValue: true,
                 validate: [],
@@ -1704,7 +1705,8 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'CHECKBOX',
                 label: formMessageDescriptors.fathersDetailsExist,
                 required: true,
-                flip: true,
+                checkedValue: false,
+                uncheckedValue: true,
                 hideHeader: true,
                 initialValue: true,
                 validate: [],
@@ -3325,9 +3327,11 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'CHECKBOX',
                 label: formMessageDescriptors.causeOfDeathEstablished,
                 required: true,
+                checkedValue: 'true',
+                uncheckedValue: 'false',
                 customisable: true,
                 hideHeader: true,
-                initialValue: false,
+                initialValue: 'false',
                 validate: [],
                 mapping: {
                   mutation: {
@@ -3352,7 +3356,7 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: 'values.causeOfDeathEstablished !== true'
+                    expression: 'values.causeOfDeathEstablished !== "true"'
                   }
                 ],
                 options: [
@@ -3392,7 +3396,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      'values.causeOfDeathEstablished !== true || values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
+                      'values.causeOfDeathEstablished !== "true" || values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
                   }
                 ],
                 initialValue: '',
