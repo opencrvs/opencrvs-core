@@ -809,7 +809,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       },
       customisable: false,
       previewGroup: 'primaryAddress',
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       dependency: 'districtPrimary',
@@ -1159,7 +1159,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       },
       customisable: false,
       previewGroup: 'primaryAddress',
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       dependency: 'districtPrimary',
@@ -2910,7 +2910,7 @@ export function getPlaceOfEventAddressFields(
         id: 'form.field.label.cityUrbanOption'
       },
       previewGroup: configCase,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       conditionals: [
