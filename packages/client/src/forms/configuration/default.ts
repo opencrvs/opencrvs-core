@@ -192,6 +192,39 @@ export const registerForms: IDefaultRegisterForms = {
                     label: formMessageDescriptors.privateHome
                   },
                   {
+                    value: 'TRADITIONAL_DOCTORS',
+                    label: formMessageDescriptors.placeOfBirthTraditionalDoctors
+                  },
+                  {
+                    value: 'CAR_TAXI',
+                    label: formMessageDescriptors.placeOfBirthCarTaxi
+                  },
+                  {
+                    value: 'BUS',
+                    label: formMessageDescriptors.placeOfBirthBus
+                  },
+                  {
+                    value: 'TRAIN',
+                    label: formMessageDescriptors.placeOfBirthTrain
+                  },
+                  {
+                    value: 'ROADSIDE',
+                    label: formMessageDescriptors.placeOfBirthRoadside
+                  },
+                  {
+                    value: 'AEROPLANE',
+                    label: formMessageDescriptors.placeOfBirthAeroplane
+                  },
+                  {
+                    value: 'SHIP',
+                    label: formMessageDescriptors.placeOfBirthShip
+                  },
+                  {
+                    value: 'TRADITIONAL_MATERNITY_HOMES',
+                    label:
+                      formMessageDescriptors.placeOfBirthTraditionalMaternityHomes
+                  },
+                  {
                     value: 'OTHER',
                     label: formMessageDescriptors.otherInstitution
                   }
