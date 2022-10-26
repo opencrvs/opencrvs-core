@@ -742,6 +742,9 @@ type History {
   action: RegAction
   statusReason: StatusReason
   reason: String
+  requester: String
+  hasShowedVerifiedDocument: Boolean
+  otherReason: String
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -1404,6 +1407,7 @@ input CorrectionInput {
   location: LocationInput
   data: String
   reason: String
+  otherReason: String
   note: String
 }
 

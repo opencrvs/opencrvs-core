@@ -234,6 +234,9 @@ type History {
   action: RegAction
   statusReason: StatusReason
   reason: String
+  requester: String
+  hasShowedVerifiedDocument: Boolean
+  otherReason: String
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
   dhis2Notification: Boolean # -> identitifier(system='http://opencrvs.org/specs/extension/dhis2_event_identifier')
@@ -361,6 +364,7 @@ input CorrectionInput {
   location: LocationInput
   data: String
   reason: String
+  otherReason: String
   note: String
 }
 

@@ -33,7 +33,10 @@ import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { isEmpty, find, flatten, values } from 'lodash'
 import { getFieldValue, getFormattedDate, getStatusLabel } from './utils'
-import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
+import {
+  CollectorRelationLabelArray,
+  CorrectorRelationLabelArray
+} from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { CorrectionReason } from '@client/forms/correction/reason'
@@ -125,7 +128,21 @@ function prepareComments(
   )
 }
 
-const getReasonForRequest = (reasonValue: string, intl: IntlShape) => {
+const requesterLabelMapper = (requester: string, intl: IntlShape) => {
+  const requesterIndividual = CorrectorRelationLabelArray.find(
+    (labelItem) => labelItem.value === requester
+  )
+
+  return requesterIndividual?.label
+    ? intl.formatMessage(requesterIndividual.label)
+    : ''
+}
+
+const getReasonForRequest = (
+  reasonValue: string,
+  otherReason: string,
+  intl: IntlShape
+) => {
   switch (reasonValue) {
     case CorrectionReason.CLERICAL_ERROR:
       return intl.formatMessage(messages.clericalError)
@@ -139,6 +156,8 @@ const getReasonForRequest = (reasonValue: string, intl: IntlShape) => {
     case CorrectionReason.JUDICIAL_ORDER:
       return intl.formatMessage(messages.judicialOrder)
 
+    case CorrectionReason.OTHER:
+      return otherReason
     default:
       return '-'
   }
@@ -157,6 +176,13 @@ export const ActionDetailsModalListTable = ({
   if (registerForm === undefined) return <></>
 
   const sections = registerForm?.sections || []
+  const requesterColumn = [
+    {
+      key: 'requester',
+      label: intl.formatMessage(messages.correctionSummaryRequestedBy),
+      width: 100
+    }
+  ]
   const commentsColumn = [
     {
       key: 'comment',
@@ -365,6 +391,10 @@ export const ActionDetailsModalListTable = ({
   ]
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   const content = prepareComments(actionDetailsData, draft)
+  const requesterLabel = requesterLabelMapper(
+    actionDetailsData.requester as string,
+    intl
+  )
   return (
     <>
       {/* For Reject Reason */}
@@ -383,6 +413,35 @@ export const ActionDetailsModalListTable = ({
           />
         )}
 
+      {/* Correction Requester */}
+      {actionDetailsData.requester && (
+        <Table
+          noResultText=" "
+          columns={requesterColumn}
+          content={[{ requester: requesterLabel }]}
+        />
+      )}
+
+      {/* Correction Requester Id Verified */}
+      {actionDetailsData.requester && (
+        <Table
+          noResultText=" "
+          columns={certificateCollectorVerified}
+          content={[
+            {
+              hasShowedVerifiedDocument:
+                actionDetailsData.hasShowedVerifiedDocument
+                  ? intl.formatMessage(certificateMessages.idCheckVerify)
+                  : intl.formatMessage(certificateMessages.idCheckWithoutVerify)
+            }
+          ]}
+          pageSize={10}
+          totalItems={1}
+          currentPage={currentPage}
+          onPageChange={pageChangeHandler}
+        />
+      )}
+
       {/* For Correction Reason */}
       {actionDetailsData.reason &&
         actionDetailsData.action === RegAction.RequestedCorrection && (
@@ -393,6 +452,7 @@ export const ActionDetailsModalListTable = ({
               {
                 text: getReasonForRequest(
                   actionDetailsData.reason as string,
+                  actionDetailsData.otherReason as string,
                   intl
                 )
               }
@@ -401,7 +461,9 @@ export const ActionDetailsModalListTable = ({
         )}
 
       {/* For Comments */}
-      <Table noResultText=" " columns={commentsColumn} content={content} />
+      {content.length > 0 && (
+        <Table noResultText=" " columns={commentsColumn} content={content} />
+      )}
 
       {/* For Data Updated */}
       {declarationUpdates.length > 0 && (

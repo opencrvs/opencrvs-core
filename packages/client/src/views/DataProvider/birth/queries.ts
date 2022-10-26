@@ -180,6 +180,9 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         value
       }
       history {
+        otherReason
+        requester
+        hasShowedVerifiedDocument
         date
         action
         regStatus
@@ -435,6 +438,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         statusReason {
           text
         }
+        reason
+        otherReason
         location {
           id
           name

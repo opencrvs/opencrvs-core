@@ -13,8 +13,6 @@ COPY packages/commons packages/commons
 COPY yarn.lock yarn.lock
 RUN yarn install --production
 
-RUN apk del build-dependencies
-
 # Copy package build
 COPY --from=opencrvs-build packages/notification/build packages/notification/build
 

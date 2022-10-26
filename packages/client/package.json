@@ -140,7 +140,6 @@
     "express": "^4.17.1",
     "fetch-mock": "^7.3.3",
     "json2csv": "^4.3.2",
-    "moxios": "^0.4.0",
     "opener": "^1.5.1",
     "prettier": "^2.5.1",
     "serve": "^10.0.2",

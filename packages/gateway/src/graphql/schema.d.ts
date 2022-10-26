@@ -591,6 +591,9 @@ export interface GQLHistory {
   action?: GQLRegAction
   statusReason?: GQLStatusReason
   reason?: string
+  requester?: string
+  hasShowedVerifiedDocument?: boolean
+  otherReason?: string
   location?: GQLLocation
   office?: GQLLocation
   dhis2Notification?: boolean
@@ -1264,6 +1267,7 @@ export interface GQLCorrectionInput {
   location?: GQLLocationInput
   data?: string
   reason?: string
+  otherReason?: string
   note?: string
 }
 
@@ -4207,6 +4211,9 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   action?: HistoryToActionResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
+  requester?: HistoryToRequesterResolver<TParent>
+  hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
+  otherReason?: HistoryToOtherReasonResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
   dhis2Notification?: HistoryToDhis2NotificationResolver<TParent>
@@ -4238,6 +4245,21 @@ export interface HistoryToStatusReasonResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToReasonResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToRequesterResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToHasShowedVerifiedDocumentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToOtherReasonResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

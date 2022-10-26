@@ -703,6 +703,9 @@ export type History = {
   output?: Maybe<Array<Maybe<InputOutput>>>
   reason?: Maybe<Scalars['String']>
   regStatus?: Maybe<RegStatus>
+  requester?: Maybe<Scalars['String']>
+  hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
+  otherReason?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
   user?: Maybe<User>

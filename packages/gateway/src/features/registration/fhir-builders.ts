@@ -79,7 +79,9 @@ import {
 import {
   OPENCRVS_SPECIFICATION_URL,
   FHIR_SPECIFICATION_URL,
-  EVENT_TYPE
+  EVENT_TYPE,
+  REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL,
+  HAS_SHOWED_VERIFIED_DOCUMENT
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload } from '@gateway/features/user/utils'
@@ -2153,7 +2155,7 @@ export const builders: IFieldBuilders = {
       return setResourceIdentifier(taskResource, 'paper-form-id', fieldValue)
     },
     correction: {
-      requester: (
+      requester: async (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
         context: any
@@ -2186,21 +2188,40 @@ export const builders: IFieldBuilders = {
           context.event,
           true
         )
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
         if (!certDocResource.extension) {
           certDocResource.extension = []
         }
+        if (!taskResource.extension) {
+          taskResource.extension = []
+        }
+
         const hasVerifiedExt = certDocResource.extension.find(
-          (extention) =>
-            extention.url ===
-            `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
+          (ext) => ext.url === HAS_SHOWED_VERIFIED_DOCUMENT
         )
+
+        const hasVerifiedExtInTask = taskResource.extension.find(
+          (ext) => ext.url === HAS_SHOWED_VERIFIED_DOCUMENT
+        )
+
+        //  pushing HAS_SHOWED_VERIFIED_DOCUMENT in DocReference
         if (!hasVerifiedExt) {
           certDocResource.extension.push({
-            url: `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
+            url: HAS_SHOWED_VERIFIED_DOCUMENT,
             valueString: fieldValue
           })
         } else {
           hasVerifiedExt.valueString = fieldValue
+        }
+
+        //  pushing HAS_SHOWED_VERIFIED_DOCUMENT in Task
+        if (!hasVerifiedExtInTask) {
+          taskResource.extension.push({
+            url: HAS_SHOWED_VERIFIED_DOCUMENT,
+            valueString: fieldValue
+          })
+        } else {
+          hasVerifiedExtInTask.valueString = fieldValue
         }
       },
       attestedAndCopied: (
@@ -2507,6 +2528,22 @@ export const builders: IFieldBuilders = {
           taskResource.reason = {}
         }
         taskResource.reason.text = fieldValue
+      },
+      otherReason: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        if (!taskResource.reason) {
+          taskResource.reason = {}
+        }
+        taskResource.reason.extension = [
+          {
+            url: REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL,
+            valueString: fieldValue
+          }
+        ]
       },
       note: (
         fhirBundle: ITemplatedBundle,
@@ -3011,9 +3048,7 @@ export const builders: IFieldBuilders = {
           certDocResource.extension = []
         }
         const hasVerifiedExt = certDocResource.extension.find(
-          (extention) =>
-            extention.url ===
-            `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
+          (extention) => extention.url === HAS_SHOWED_VERIFIED_DOCUMENT
         )
         if (!hasVerifiedExt) {
           certDocResource.extension.push({

@@ -53,7 +53,9 @@ import {
   ORIGINAL_FILE_NAME_SYSTEM,
   SYSTEM_FILE_NAME_SYSTEM,
   FHIR_SPECIFICATION_URL,
-  OPENCRVS_SPECIFICATION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  REQUESTING_INDIVIDUAL,
+  HAS_SHOWED_VERIFIED_DOCUMENT
 } from '@gateway/features/fhir/constants'
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
@@ -674,6 +676,18 @@ export const typeResolvers: GQLResolver = {
         }`,
         authHeader
       )) as fhir.RelatedPerson
+    },
+    async hasShowedVerifiedDocument(
+      docRef: fhir.DocumentReference,
+      _,
+      authHeader
+    ) {
+      const hasShowedDocument = findExtension(
+        HAS_SHOWED_VERIFIED_DOCUMENT,
+        docRef.extension as fhir.Extension[]
+      )
+
+      return Boolean(hasShowedDocument?.valueString)
     }
   },
   Identifier: {
@@ -755,10 +769,29 @@ export const typeResolvers: GQLResolver = {
   },
 
   History: {
+    hasShowedVerifiedDocument: (task: fhir.Task) => {
+      const hasShowedDocument = findExtension(
+        HAS_SHOWED_VERIFIED_DOCUMENT,
+        task.extension as fhir.Extension[]
+      )
+
+      return Boolean(hasShowedDocument?.valueString)
+    },
+    requester: (task: fhir.Task) => {
+      const requestedBy = findExtension(
+        REQUESTING_INDIVIDUAL,
+        task.extension as fhir.Extension[]
+      )
+
+      return requestedBy?.valueString || ''
+    },
     regStatus: (task: fhir.Task) => getStatusFromTask(task),
     action: (task) => getActionFromTask(task),
     statusReason: (task: fhir.Task) => task.statusReason || null,
     reason: (task: fhir.Task) => task.reason?.text || null,
+    otherReason: (task: fhir.Task) => {
+      return task.reason?.extension ? task.reason?.extension[0].valueString : ''
+    },
     date: (task: fhir.Task) => task.meta?.lastUpdated,
     dhis2Notification: (task: fhir.Task) =>
       task.identifier?.some(
