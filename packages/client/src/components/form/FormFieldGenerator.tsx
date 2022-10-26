@@ -573,40 +573,47 @@ export function getInitialValueForSelectDynamicValue(
 
 const mapFieldsToValues = (
   fields: IFormField[],
-  userDetails: IUserDetails | null
+  userDetails: IUserDetails | null,
+  extraValues = {}
 ) =>
-  fields.reduce((memo, field) => {
-    let fieldInitialValue = field.initialValue as IFormFieldValue
+  fields.reduce(
+    (memo, field) => {
+      let fieldInitialValue = field.initialValue as IFormFieldValue
 
-    if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
-      const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
+      if (
+        field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
+        !field.initialValue
+      ) {
+        const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
 
-      const nestedInitialValues = nestedFieldsFlatted.reduce(
-        (nestedValues, nestedField) => ({
-          ...nestedValues,
-          [nestedField.name]: nestedField.initialValue
-        }),
-        {}
-      )
+        const nestedInitialValues = nestedFieldsFlatted.reduce(
+          (nestedValues, nestedField) => ({
+            ...nestedValues,
+            [nestedField.name]: nestedField.initialValue
+          }),
+          {}
+        )
 
-      fieldInitialValue = {
-        value: field.initialValue as IFormFieldValue,
-        nestedFields: nestedInitialValues
+        fieldInitialValue = {
+          value: field.initialValue as IFormFieldValue,
+          nestedFields: nestedInitialValues
+        }
       }
-    }
 
-    if (
-      field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-      !field.initialValue &&
-      field.dynamicOptions.initialValue === 'agentDefault'
-    ) {
-      fieldInitialValue = getInitialValueForSelectDynamicValue(
-        field,
-        userDetails
-      )
-    }
-    return { ...memo, [field.name]: fieldInitialValue }
-  }, {})
+      if (
+        field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+        !field.initialValue &&
+        field.dynamicOptions.initialValue === 'agentDefault'
+      ) {
+        fieldInitialValue = getInitialValueForSelectDynamicValue(
+          field,
+          userDetails
+        )
+      }
+      return { ...memo, [field.name]: fieldInitialValue }
+    },
+    { ...extraValues }
+  )
 
 type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 interface IFormSectionProps {
@@ -619,6 +626,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
+  extraValues?: Record<string, IFormFieldValue>
 }
 
 interface IStateProps {
@@ -1090,7 +1098,7 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionData
 >({
   mapPropsToValues: (props) =>
-    mapFieldsToValues(props.fields, props.userDetails),
+    mapFieldsToValues(props.fields, props.userDetails, props.extraValues),
   handleSubmit: (values) => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(

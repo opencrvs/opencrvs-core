@@ -305,6 +305,13 @@ export function getNextSectionIds(
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
+
+export const getHiddenValues = (group: IFormSectionGroup) => {
+  return group.fields
+    .filter((field) => field.hidden)
+    .reduce((v, f) => ({ ...v, [f.name]: f.initialValue }), {})
+}
+
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,

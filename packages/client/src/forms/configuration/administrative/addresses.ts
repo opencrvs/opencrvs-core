@@ -2751,6 +2751,7 @@ export function getPlaceOfEventAddressFields(
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
+      hidden: true,
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',

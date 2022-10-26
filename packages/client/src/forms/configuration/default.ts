@@ -46,6 +46,7 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'child-view-group',
+            includeHiddenValues: true,
             fields: [
               {
                 name: 'familyNameEng',
