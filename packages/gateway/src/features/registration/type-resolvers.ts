@@ -157,6 +157,13 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
+    literacy: (person) => {
+      const literacyExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/literacy`,
+        person.extension
+      )
+      return literacyExtension?.valueString ?? null
+    },
     detailsExist: (person) => {
       return person.active
     },
@@ -395,6 +402,13 @@ export const typeResolvers: GQLResolver = {
     contact: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
+    informantsSignature: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
         task.extension
       )
       return (contact && contact.valueString) || null

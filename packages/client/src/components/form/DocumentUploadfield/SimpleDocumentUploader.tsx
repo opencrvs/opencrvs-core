@@ -167,6 +167,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
       requiredErrorMessage,
       touched
     } = this.props
+
     const errorMessage =
       (requiredErrorMessage && intl.formatMessage(requiredErrorMessage)) ||
       this.state.error ||

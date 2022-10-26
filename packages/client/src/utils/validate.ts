@@ -171,6 +171,16 @@ export const facilityMustBeSelected: Validation = (
   return isValid ? undefined : { message: messages.facilityMustBeSelected }
 }
 
+export const validInformant: Validation = (
+  value: IFormFieldValue,
+  draftData?: IFormData
+) => {
+  const cast = value as string
+  if (cast === 'MOTHER' && !draftData?.mother?.detailsExist)
+    return { message: messages.informantDetailsDoesNotExist }
+  if (cast === 'FATHER' && !draftData?.father?.detailsExist)
+    return { message: messages.informantDetailsDoesNotExist }
+}
 export const officeMustBeSelected: Validation = (
   value: IFormFieldValue,
   drafts,
