@@ -12,4 +12,79 @@
 import React from 'react'
 import styled from 'styled-components'
 
-export const Accordion = () => <div>hello</div>
+const Container = styled.div`
+  box-sizing: border-box;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  padding-bottom: 16px;
+
+  details > summary::before {
+    border-style: solid;
+    border-width: 0.25em 0.25em 0 0;
+    content: '';
+    display: inline-block;
+    height: 0.45em;
+    position: relative;
+    top: 0.15em;
+    vertical-align: top;
+    width: 0.45em;
+    left: 0;
+    transform: rotate(45deg);
+  }
+
+  details[open] > summary::before {
+    top: 0;
+    transform: rotate(135deg);
+  }
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey100};
+    cursor: pointer;
+  }
+
+  &:focus-within {
+    background: ${({ theme }) => theme.colors.yellow};
+    border-bottom: 3px solid ${({ theme }) => theme.colors.grey600};
+  }
+  /* 
+  &:active {
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+  }
+
+  &:focus-within input {
+    background: ${({ theme }) => theme.colors.white};
+  } */
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
+    width: 100%;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 100%;
+    margin: auto;
+  }
+`
+
+const TextWrapper = styled.div``
+
+const Details = styled.details``
+
+const Summary = styled.summary`
+  color: ${({ theme }) => theme.colors.primary};
+  padding-bottom: 2px;
+  text-decoration: underline;
+  list-style-type: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+`
+
+export const Accordion = () => (
+  <Container>
+    <h2>Select name</h2>
+    <Details>
+      <Summary>Show</Summary>
+      <TextWrapper>Something small enough to escape casual notice.</TextWrapper>
+    </Details>
+  </Container>
+)
