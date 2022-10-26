@@ -33,7 +33,8 @@ module.exports = {
     ],
     'react/boolean-prop-naming': 'off',
     'react/sort-comp': 'off',
-    'react/sort-prop-types': 'off'
+    'react/sort-prop-types': 'off',
+    '@typescript-eslint/no-explicit-any': 'warn'
   },
   settings: {
     react: {

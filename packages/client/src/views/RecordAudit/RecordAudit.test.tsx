@@ -61,7 +61,7 @@ declaration.data.registration = {
 declaration.data.history = [
   {
     date: new Date().toString(),
-    action: 'CREATED',
+    regStatus: 'STARTED',
     user: {
       id: userDetails.userMgntUserID,
       name: userDetails.name,

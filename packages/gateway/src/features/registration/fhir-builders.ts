@@ -70,21 +70,19 @@ import {
   selectOrCreateInformantSection,
   selectOrCreateInformantResource,
   setInformantReference,
-  fetchFHIR,
   selectOrCreateEncounterPartitioner,
   selectOrCreateEncounterParticipant,
   selectOrCreateQuestionnaireResource,
-  findExtension,
-  setQuestionnaireItem
+  setQuestionnaireItem,
+  postAssignmentSearch
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
   FHIR_SPECIFICATION_URL,
-  EVENT_TYPE,
-  ASSIGNED_EXTENSION_URL
+  EVENT_TYPE
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
-import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import { getTokenPayload } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput
@@ -157,21 +155,6 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'value',
         context
       )
-      if (!person.id) {
-        const personSearchSet = await fetchFHIR(
-          `/Patient?identifier=${fieldValue}`,
-          context.authHeader
-        )
-        if (
-          person &&
-          personSearchSet &&
-          personSearchSet.entry &&
-          personSearchSet.entry[0] &&
-          personSearchSet.entry[0].resource
-        ) {
-          person.id = personSearchSet.entry[0].resource.id
-        }
-      }
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -2130,6 +2113,14 @@ export const builders: IFieldBuilders = {
       }
       return setResourceIdentifier(taskResource, `${trackingId}`, fieldValue)
     },
+    mosipAid: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return setResourceIdentifier(taskResource, 'mosip-aid', fieldValue)
+    },
     registrationNumber: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -3590,44 +3581,17 @@ export async function updateFHIRTaskBundle(
   return fhirBundle
 }
 
-export function addOrUpdateExtension(
+export function taskBundleWithExtension(
   taskEntry: ITaskBundleEntry,
-  extensions: fhir.Extension[],
-  code: 'downloaded' | 'reinstated'
+  extension: fhir.Extension
 ) {
   const task = taskEntry.resource
-
-  if (!task.extension) {
-    task.extension = []
-  }
-
-  for (const extension of extensions) {
-    const previousExtension = findExtension(extension.url, task.extension)
-
-    if (!previousExtension) {
-      task.extension.push(extension)
-    } else {
-      previousExtension.valueString = extension.valueString
-    }
-  }
-
-  taskEntry.request = {
-    method: 'PUT',
-    url: `Task/${taskEntry.resource.id}`
-  } as fhir.BundleEntryRequest
-
+  task.lastModified = new Date().toISOString()
+  task.extension = [...(task.extension ?? []), extension]
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [taskEntry],
-    signature: {
-      type: [
-        {
-          code
-        }
-      ],
-      when: Date().toString()
-    }
+    entry: [taskEntry]
   }
   return fhirBundle
 }
@@ -3641,34 +3605,8 @@ export async function checkUserAssignment(
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   const userId = tokenPayload.sub
-  const taskBundle: ITaskBundle = await fetchFHIR(
-    `/Task?focus=Composition/${id}`,
-    authHeader
-  )
-  const taskEntryData = taskBundle.entry[0]
-  if (
-    !taskEntryData ||
-    !taskEntryData.resource ||
-    !taskEntryData.resource.extension
-  ) {
-    return false
-  }
-  const assignedExtensionData = findExtension(
-    ASSIGNED_EXTENSION_URL,
-    taskEntryData.resource.extension
-  )
-  if (!assignedExtensionData) {
-    return false
-  }
-  const practitionerId =
-    assignedExtensionData?.valueReference?.reference?.split('/')[1]
-
-  const userDetails = await getUser({ userId }, authHeader)
-
-  if (practitionerId === userDetails.practitionerId) {
-    return true
-  }
-  return false
+  const res: { userId?: string } = await postAssignmentSearch(authHeader, id)
+  return userId === res?.userId
 }
 
 export interface ITemplatedComposition extends fhir.Composition {

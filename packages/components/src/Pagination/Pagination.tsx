@@ -134,7 +134,7 @@ export class Pagination extends React.Component<IPaginationProps> {
 
   canGoToNextPage = () => this.currentPage() + 1 <= this.props.totalPages
 
-  changePage = (page: any) => {
+  changePage = (page: number | string) => {
     if (typeof page === 'number') {
       this.props.onPageChange(page)
     }

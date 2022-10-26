@@ -14,7 +14,7 @@ import { EyeOn } from './EyeOn'
 import React from 'react'
 
 export default {
-  title: 'Styles/Icons/EyeOn',
+  title: 'Deprecated/Icons/EyeOn',
   component: EyeOn
 } as Meta
 

@@ -35,14 +35,15 @@ import { messages as certificateMessages } from '@client/i18n/messages/views/cer
 import {
   goToHomeTab,
   goBack,
-  goToCertificateCorrection
+  goToCertificateCorrection,
+  formatUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import {
   previewCertificate,
@@ -63,6 +64,7 @@ import { countries } from '@client/forms/countries'
 import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { hasRegisterScope } from '@client/utils/authUtils'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
@@ -239,6 +241,18 @@ class ReviewCertificateActionComponent extends React.Component<
 
   render = () => {
     const { intl, scope } = this.props
+
+    /* The id of the draft is an empty string if it's not found in store*/
+    if (!this.props.draft.id) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToPrint,
+            selectorId: ''
+          })}
+        />
+      )
+    }
 
     return (
       <ActionPageLight

@@ -16,7 +16,6 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
-  createReviewDeclaration,
   modifyDeclaration,
   storeDeclaration,
   writeDeclaration,
@@ -346,8 +345,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       declaration,
       formSection,
       formGroup,
-      goBack,
-      registerForm
+      goBack
     } = this.props
 
     const { showError, showModalForNoSignedAffidavit } = this.state

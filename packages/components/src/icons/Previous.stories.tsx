@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Previous } from '.'
 
 export default {
-  title: 'Styles/Icons/Previous',
+  title: 'Deprecated/Icons/Previous',
   component: Previous
 } as Meta
 

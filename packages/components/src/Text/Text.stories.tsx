@@ -15,6 +15,8 @@ import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Text } from './Text'
 import { Stack } from '../Stack'
 import { UserIcon } from '../icons/User.stories'
+import { Box } from '../Box'
+import styled from 'styled-components'
 
 export default {
   title: 'Typography/Text',
@@ -67,4 +69,34 @@ export const Caption = () => (
   <Text variant="reg12" element="p">
     OpenCRVS is highly configurable
   </Text>
+)
+
+const NarrowBox = styled(Box)`
+  width: 150px;
+`
+
+export const OverflowWrap = () => (
+  <>
+    <Text variant="bold16" element="h4">
+      No overflow
+    </Text>
+
+    <NarrowBox>
+      <Text variant="reg16" element="p">
+        This is text with a long string 012345678901234567890123456789
+      </Text>
+    </NarrowBox>
+
+    <br />
+
+    <Text variant="bold16" element="h4">
+      Overflow anywhere
+    </Text>
+
+    <NarrowBox>
+      <Text variant="reg16" element="p" overflowWrap="anywhere">
+        This is text with a long string 012345678901234567890123456789
+      </Text>
+    </NarrowBox>
+  </>
 )

@@ -18,6 +18,7 @@ interface IProps {
   onComplete: (pin: string) => void
   forgotPinComponent?: React.ReactNode
   pin?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ref?: any
 }
 
