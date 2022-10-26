@@ -452,7 +452,7 @@ export const ActionDetailsModalListTable = ({
               {
                 text: getReasonForRequest(
                   actionDetailsData.reason as string,
-                  actionDetailsData.otherReason,
+                  actionDetailsData.otherReason as string,
                   intl
                 )
               }
