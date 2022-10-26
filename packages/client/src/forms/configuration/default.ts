@@ -46,6 +46,7 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'child-view-group',
+            includeHiddenValues: true,
             fields: [
               {
                 name: 'familyNameEng',
@@ -84,6 +85,13 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'TEXT',
                 label: formMessageDescriptors.childFirstNames,
                 maxLength: 32,
+                description: {
+                  defaultMessage:
+                    'Middle name (if any) should be entered after the first name',
+                  description:
+                    'Description for form field: First names in english',
+                  id: 'form.field.label.firstNamesDesc'
+                },
                 required: true,
                 initialValue: '',
                 validate: [
@@ -189,6 +197,39 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'PRIVATE_HOME',
                     label: formMessageDescriptors.privateHome
+                  },
+                  {
+                    value: 'TRADITIONAL_DOCTORS',
+                    label: formMessageDescriptors.placeOfBirthTraditionalDoctors
+                  },
+                  {
+                    value: 'CAR_TAXI',
+                    label: formMessageDescriptors.placeOfBirthCarTaxi
+                  },
+                  {
+                    value: 'BUS',
+                    label: formMessageDescriptors.placeOfBirthBus
+                  },
+                  {
+                    value: 'TRAIN',
+                    label: formMessageDescriptors.placeOfBirthTrain
+                  },
+                  {
+                    value: 'ROADSIDE',
+                    label: formMessageDescriptors.placeOfBirthRoadside
+                  },
+                  {
+                    value: 'AEROPLANE',
+                    label: formMessageDescriptors.placeOfBirthAeroplane
+                  },
+                  {
+                    value: 'SHIP',
+                    label: formMessageDescriptors.placeOfBirthShip
+                  },
+                  {
+                    value: 'TRADITIONAL_MATERNITY_HOMES',
+                    label:
+                      formMessageDescriptors.placeOfBirthTraditionalMaternityHomes
                   },
                   {
                     value: 'OTHER',
@@ -452,6 +493,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
+                inputFieldWidth: '180px',
                 conditionals: [
                   {
                     action: 'hide',
@@ -549,25 +591,6 @@ export const registerForms: IDefaultRegisterForms = {
                       description: 'Option for form field: Marital status',
                       id: 'form.field.label.maritalStatusWidowed'
                     }
-                  }
-                ]
-              },
-              {
-                name: 'marital-seperator',
-                type: 'SUBSECTION',
-                label: {
-                  defaultMessage: ' ',
-                  description: 'empty string',
-                  id: 'form.field.label.empty'
-                },
-                initialValue: '',
-                ignoreBottomMargin: true,
-                validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -1363,6 +1386,15 @@ export const registerForms: IDefaultRegisterForms = {
                       description: 'Label for education option University',
                       id: 'form.field.label.educationAttainment.university'
                     }
+                  },
+                  {
+                    value: 'NO_EDUCATION',
+                    label: {
+                      defaultMessage: 'No formal education',
+                      description:
+                        'Label for education option No formal education',
+                      id: 'form.field.label.educationAttainmentNoEducation'
+                    }
                   }
                 ]
               },
@@ -1647,6 +1679,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
+                inputFieldWidth: '180px',
                 conditionals: [
                   {
                     action: 'hide',
@@ -2544,6 +2577,15 @@ export const registerForms: IDefaultRegisterForms = {
                       description: 'Label for education option University',
                       id: 'form.field.label.educationAttainment.university'
                     }
+                  },
+                  {
+                    value: 'NO_EDUCATION',
+                    label: {
+                      defaultMessage: 'No formal education',
+                      description:
+                        'Label for education option No formal education',
+                      id: 'form.field.label.educationAttainmentNoEducation'
+                    }
                   }
                 ]
               },
@@ -2868,6 +2910,13 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Given names',
                   id: 'form.field.label.childFirstNames'
                 },
+                description: {
+                  defaultMessage:
+                    'Middle name (if any) should be entered after the first name',
+                  description:
+                    'Description for form field: First names in english',
+                  id: 'form.field.label.firstNamesDesc'
+                },
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -3040,29 +3089,29 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: []
               },
-              // {
-              //   name: 'uploadDocForB1Form',
-              //   type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-              //   label: formMessageDescriptors.docTypeB1Form,
-              //   initialValue: '',
-              //   extraValue: birthDocumentForWhomFhirMapping.B1_FORM,
-              //   hideAsterisk: true,
-              //   validate: [],
-              //   options: [
-              //     {
-              //       value: birthDocumentTypeFhirMapping.B1_FORM,
-              //       label: formMessageDescriptors.docTypeB1Form
-              //     }
-              //   ],
-              //   mapping: {
-              //     mutation: {
-              //       operation: 'birthFieldToAttachmentTransformer'
-              //     },
-              //     query: {
-              //       operation: 'birthAttachmentToFieldTransformer'
-              //     }
-              //   }
-              // },
+              {
+                name: 'uploadDocForB1Form',
+                type: 'DOCUMENT_UPLOADER_WITH_OPTION',
+                label: formMessageDescriptors.docTypeBirthDeclaration,
+                initialValue: '',
+                extraValue: birthDocumentForWhomFhirMapping.CHILD,
+                hideAsterisk: true,
+                validate: [],
+                options: [
+                  {
+                    value: birthDocumentTypeFhirMapping.B1_FORM,
+                    label: formMessageDescriptors.docTypeB1Form
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'birthFieldToAttachmentTransformer'
+                  },
+                  query: {
+                    operation: 'birthAttachmentToFieldTransformer'
+                  }
+                }
+              },
               {
                 name: 'uploadDocForChildDOB',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
@@ -3077,18 +3126,9 @@ export const registerForms: IDefaultRegisterForms = {
                     label: formMessageDescriptors.docTypeChildBirthProof
                   },
                   {
-                    value: birthDocumentTypeFhirMapping.B1_FORM,
-                    label: formMessageDescriptors.docTypeB1Form
-                  },
-                  {
                     value: birthDocumentTypeFhirMapping.VACCINATION_CARD,
                     label:
                       formMessageDescriptors.docTypeChildBirthProofVaccinationCard
-                  },
-                  {
-                    value: birthDocumentTypeFhirMapping.BAPTISMAL_CARD,
-                    label:
-                      formMessageDescriptors.docTypeChildBirthProofBaptismalCard
                   }
                 ],
                 mapping: {

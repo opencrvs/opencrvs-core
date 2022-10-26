@@ -2820,6 +2820,11 @@ export const formMessageDescriptors = {
     description: 'Label for select option B1 Form',
     id: 'form.field.label.docTypeB1Form'
   },
+  docTypeBirthDeclaration: {
+    defaultMessage: 'Birth declaration',
+    description: 'Label for select option birth declaration',
+    id: 'form.field.label.docTypeBirthDeclaration'
+  },
   docTypeCopyOfBurialReceipt: {
     defaultMessage: 'Certified copy of burial receipt',
     description: 'Label for select option Certified Copy of Burial Receipt',
