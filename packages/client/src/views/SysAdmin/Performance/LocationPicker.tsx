@@ -13,7 +13,12 @@
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { generateLocations } from '@client/utils/locationUtils'
+import {
+  generateLocations,
+  getJurisdictionTypeForUser,
+  getOfficesByUserSupervisoryAreaFilter,
+  shouldSeeCountryLevel
+} from '@client/utils/locationUtils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 
@@ -100,36 +105,6 @@ function setInitialLocationForUser(
   return selectLocation(user.supervisoryArea, allLocations)
 }
 
-function getJurisdictionTypeFilterForUser(
-  user: IUserDetails,
-  locations: LocationsById
-) {
-  if (shouldSeeCountryLevel(user)) {
-    return undefined
-  }
-  if (!user.supervisoryArea) {
-    return []
-  }
-  return [locations[user.supervisoryArea].jurisdictionType!]
-}
-
-function getJurisdictionTypeForUser(
-  user: IUserDetails,
-  locations: LocationsById
-) {
-  if (!user.supervisoryArea) {
-    return null
-  }
-  if (shouldSeeCountryLevel(user)) {
-    return 'COUNTRY'
-  }
-  return locations[user.supervisoryArea].jurisdictionType!
-}
-
-function shouldSeeCountryLevel(user: IUserDetails) {
-  return user.supervisoryArea === '0'
-}
-
 function LocationPickerWithUserPermissionFiltering(props: Props) {
   const intl = useIntl()
 
@@ -170,25 +145,11 @@ function LocationPickerWithUserPermissionFiltering(props: Props) {
         }
         return false
       }}
-      officeFilter={(office) => {
-        if (supervisoryAreaType === 'COUNTRY') {
-          return true
-        }
-
-        const officeDistrict = locations[office.partOf.replace('Location/', '')]
-
-        if (supervisoryAreaType === 'STATE') {
-          return (
-            officeDistrict.partOf.replace('Location/', '') ===
-            userDetails.supervisoryArea
-          )
-        }
-        if (supervisoryAreaType === 'DISTRICT') {
-          return officeDistrict.id === userDetails.supervisoryArea
-        }
-
-        return office.id === userDetails.primaryOffice?.id
-      }}
+      officeFilter={getOfficesByUserSupervisoryAreaFilter(
+        userDetails,
+        locations,
+        supervisoryAreaType
+      )}
       additionalLocations={
         shouldSeeCountryLevel(userDetails) ? getAdditionalLocations(intl) : []
       }
@@ -201,8 +162,6 @@ function LocationPickerWithUserPermissionFiltering(props: Props) {
           intl,
           newLocationId
         )
-
-        console.log({ newLocation })
 
         setSelectedLocation(newLocation)
       }}

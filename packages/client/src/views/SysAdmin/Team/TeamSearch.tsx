@@ -30,6 +30,12 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { buttonMessages } from '@client/i18n/messages/buttons'
+import {
+  getJurisdictionTypeForUser,
+  getOfficesByUserSupervisoryAreaFilter
+} from '@client/utils/locationUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IUserDetails } from '@client/utils/userUtils'
 
 interface BaseProps {
   goToTeamUserList: typeof goToTeamUserList
@@ -44,6 +50,7 @@ type Props = BaseProps &
   IOnlineStatusProps &
   Pick<RouteComponentProps, 'history'> & {
     offlineCountryConfiguration: IOfflineData
+    userDetails: IUserDetails
   }
 
 interface State {
@@ -89,7 +96,12 @@ class TeamSearchComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, offlineCountryConfiguration, isOnline } = this.props
+    const { intl, offlineCountryConfiguration, isOnline, userDetails } =
+      this.props
+    const supervisoryAreaType = getJurisdictionTypeForUser(
+      userDetails,
+      offlineCountryConfiguration.locations
+    )
 
     return (
       <SysAdminContentWrapper>
@@ -102,15 +114,21 @@ class TeamSearchComponent extends React.Component<Props, State> {
             <LocationSearch
               selectedLocation={this.state.selectedLocation}
               buttonLabel={intl.formatMessage(buttonMessages.search)}
-              locationList={Object.values(
-                offlineCountryConfiguration.offices
-              ).map((location: ILocation) => {
-                return {
-                  id: location.id,
-                  searchableText: location.name,
-                  displayLabel: location.name
-                }
-              })}
+              locationList={Object.values(offlineCountryConfiguration.offices)
+                .filter(
+                  getOfficesByUserSupervisoryAreaFilter(
+                    userDetails,
+                    offlineCountryConfiguration.locations,
+                    supervisoryAreaType
+                  )
+                )
+                .map((location: ILocation) => {
+                  return {
+                    id: location.id,
+                    searchableText: location.name,
+                    displayLabel: location.name
+                  }
+                })}
               searchHandler={this.searchHandler}
               searchButtonHandler={this.searchButtonHandler}
               errorMessage={intl.formatMessage(messagesSearch.locationNotFound)}
@@ -131,7 +149,8 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
 function mapStateToProps(state: IStoreState) {
   return {
-    offlineCountryConfiguration: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state),
+    userDetails: getUserDetails(state)!
   }
 }
 
