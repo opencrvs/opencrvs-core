@@ -52,6 +52,7 @@ export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 export const TRACKING_ID_TEXT = 'tracking-id'
 export const NATIONAL_ID_TEXT = 'national-id'
 export const BRN_DRN_TEXT = 'brn-drn'
+export const ADVANCED_SEARCH_TEXT = 'advanced-search'
 export const PHONE_TEXT = 'phone'
 export const NAME_TEXT = 'name'
 export const SEARCH_RESULT_SORT = 'DESC'

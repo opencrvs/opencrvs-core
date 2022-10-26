@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { StatsBlue } from '.'
 
 export default {
-  title: 'Styles/Icons/StatsBlue',
+  title: 'Deprecated/Icons/StatsBlue',
   component: StatsBlue
 } as Meta
 

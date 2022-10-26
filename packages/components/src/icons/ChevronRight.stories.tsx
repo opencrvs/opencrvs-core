@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ChevronRight } from './ChevronRight'
 
 export default {
-  title: 'Styles/Icons/ChevronRight',
+  title: 'Deprecated/Icons/ChevronRight',
   component: ChevronRight
 } as Meta
 

@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 
-export const StatusPendingOffline = (
-  props: React.HTMLAttributes<SVGElement>
-) => (
-  <svg width={24} height={24} fill="none" {...props}>
-    <circle cx={12} cy={12} r={11} stroke="#707C80" strokeWidth={2} />
-  </svg>
-)
+import { ReactElement } from 'react'
+
+type CustomIconProps = {
+  size: number
+  color: string
+} & React.HTMLAttributes<SVGElement>
+
+export type CustomIcon = (props: CustomIconProps) => ReactElement<SVGSVGElement>

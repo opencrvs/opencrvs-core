@@ -20,6 +20,7 @@ export const SEARCH_EVENTS = gql`
     $registrationNumber: String
     $name: String
     $locationIds: [String!]
+    $nationalId: String
   ) {
     searchEvents(
       sort: $sort
@@ -29,6 +30,7 @@ export const SEARCH_EVENTS = gql`
       name: $name
       contactNumber: $contactNumber
       locationIds: $locationIds
+      nationalId: $nationalId
     ) {
       totalItems
       results {
@@ -38,6 +40,7 @@ export const SEARCH_EVENTS = gql`
           status
           contactNumber
           trackingId
+          nationalId
           registrationNumber
           registeredLocationId
           duplicates

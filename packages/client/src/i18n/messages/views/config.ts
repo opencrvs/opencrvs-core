@@ -14,6 +14,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationSettings: MessageDescriptor
+  advancedSearch: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
@@ -86,6 +87,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.settings',
     defaultMessage: 'Application',
     description: 'Link Text for Config Application Settings'
+  },
+  advancedSearch: {
+    id: 'config.advanced.search',
+    defaultMessage: 'Advanced Search',
+    description: 'This is used for the advanced search'
   },
   applicationNameChangeMessage: {
     id: 'config.application.nameChangeMessage',
