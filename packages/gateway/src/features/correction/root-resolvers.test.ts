@@ -12,35 +12,7 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { resolvers } from '@gateway/features/correction/root-resolvers'
-import { mockTaskBundle } from '@gateway/utils/testUtils'
 import * as fetchAny from 'jest-fetch-mock'
-const mockUserDetails = {
-  _id: 'ba7022f0ff4822',
-  name: [
-    {
-      use: 'en',
-      given: ['Sakib Al'],
-      family: ['Hasan']
-    }
-  ],
-  username: 'sakibal.hasan',
-  mobile: '+8801711111111',
-  email: 'test@test.org',
-  passwordHash:
-    'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-  salt: '12345',
-  role: 'FIELD_AGENT',
-  status: 'active',
-  practitionerId: '2d11389d-f58e-4d47-a562-b934f1b85936',
-  primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-  catchmentAreaIds: [
-    'b21ce04e-7ccd-4d65-929f-453bc193a736',
-    '95754572-ab6f-407b-b51a-1636cb3d0683',
-    '7719942b-16a7-474a-8af1-cd0c94c730d2',
-    '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-  ],
-  creationDate: 1559054406433
-}
 
 describe('Correction root resolvers', () => {
   let registerCertifyToken: string
@@ -56,6 +28,7 @@ describe('Correction root resolvers', () => {
       { scope: ['register', 'certify'] },
       readFileSync('../auth/test/cert.key'),
       {
+        subject: '121223',
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:gateway-user'
@@ -174,10 +147,7 @@ describe('Correction root resolvers', () => {
     })
 
     it('posts a fhir bundle', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121223' })])
 
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -219,10 +189,8 @@ describe('Correction root resolvers', () => {
     })
 
     it('posts a fhir bundle', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121223' })])
+
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',

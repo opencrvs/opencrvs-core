@@ -220,7 +220,7 @@ describe('Verify utility functions', () => {
 })
 
 describe('getMosipUINToken functions', () => {
-  it.only('Calls mosip token seeder function and returns success', async () => {
+  it('Calls mosip token seeder function and returns success', async () => {
     fetch.mockResponse(mosipSuccessMock)
     const mosipResponse = await getMosipUINToken(mosipDeceasedPatientMock)
     const response = await JSON.parse(mosipSuccessMock)
