@@ -94,12 +94,8 @@ export const resolvers: GQLResolver = {
           )
           const supervisesThisArea = getSupervisoryArea(locationFHIRObject)
           if (supervisesThisArea) {
-            locationIds = await getAllLocationIdsInDistrict(
-              supervisesThisArea,
-              authHeader
-            )
-
-            searchCriteria.declarationLocationId = locationIds
+            searchCriteria.declarationLocationId =
+              await getAllLocationIdsInDistrict(supervisesThisArea, authHeader)
           } else {
             searchCriteria.declarationLocationId = locationIds[0]
           }

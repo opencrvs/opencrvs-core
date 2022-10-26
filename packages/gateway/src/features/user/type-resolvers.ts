@@ -162,7 +162,6 @@ export const userTypeResolvers: GQLResolver = {
       )
 
       const supervisoryArea = getSupervisoryArea(office)
-      console.log(JSON.stringify(office))
 
       if (supervisoryArea) {
         return supervisoryArea.split('/')[1]
