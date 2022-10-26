@@ -2777,6 +2777,22 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrarNameUserTransformer'
             },
             {
+              fieldName: 'registrationDate',
+              operation: 'registrationDateTransformer'
+            },
+            {
+              fieldName: 'placeOfBirthLocality',
+              operation: 'placeOfBirthLocalityTransformer'
+            },
+            {
+              fieldName: 'placeOfBirthLGA',
+              operation: 'placeOfBirthLGATransformer'
+            },
+            {
+              fieldName: 'placeOfBirthState',
+              operation: 'placeOfBirthStateTransformer'
+            },
+            {
               fieldName: 'role',
               operation: 'roleUserTransformer'
             },
@@ -2789,8 +2805,19 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'QRCodeTransformerTransformer'
             },
             {
-              fieldName: 'registrationLocation',
-              operation: 'registrationLocationUserTransformer'
+              fieldName: 'registrationCentre',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':office']
+            },
+            {
+              fieldName: 'registrationLGA',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':district']
+            },
+            {
+              fieldName: 'registrationState',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':state']
             }
           ],
           mutation: {
@@ -3878,8 +3905,19 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'QRCodeTransformerTransformer'
             },
             {
-              fieldName: 'registrationLocation',
-              operation: 'registrationLocationUserTransformer'
+              fieldName: 'registrationCentre',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':office']
+            },
+            {
+              fieldName: 'registrationLGA',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':district']
+            },
+            {
+              fieldName: 'registrationState',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':state']
             }
           ],
           mutation: {
