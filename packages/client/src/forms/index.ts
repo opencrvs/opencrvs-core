@@ -535,7 +535,8 @@ export interface ICheckboxGroupFormField extends IFormFieldBase {
 }
 export interface ICheckboxFormField extends IFormFieldBase {
   type: typeof CHECKBOX
-  flip?: boolean
+  checkedValue?: 'true' | 'false' | boolean
+  uncheckedValue?: 'true' | 'false' | boolean
 }
 export interface IDateFormField extends IFormFieldBase {
   type: typeof DATE
@@ -1079,7 +1080,8 @@ export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
 
 export interface Ii18nCheckboxFormField extends Ii18nFormFieldBase {
   type: typeof CHECKBOX
-  flip?: boolean
+  checkedValue?: 'true' | 'false' | boolean
+  uncheckedValue?: 'true' | 'false' | boolean
 }
 export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE

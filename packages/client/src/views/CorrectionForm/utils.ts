@@ -37,7 +37,9 @@ import {
   WARNING,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  Section
+  Section,
+  CHECKBOX,
+  ICheckboxFormField
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
@@ -56,7 +58,7 @@ import {
   getListOfLocations,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
 import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
 import { IGQLLocation } from '@client/utils/userUtils'
 import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
@@ -310,6 +312,19 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckboxFieldValue = (
+  field: ICheckboxFormField,
+  value: string,
+  intl: IntlShape
+) => {
+  const { checkedValue = true } = field
+  return intl.formatMessage(
+    value === String(checkedValue)
+      ? formMessageDescriptors.confirm
+      : formMessageDescriptors.deny
+  )
+}
+
 export const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
@@ -394,6 +409,10 @@ export const renderValue = (
       field.options,
       intl
     )
+  }
+
+  if (field.type === CHECKBOX) {
+    return getCheckboxFieldValue(field, String(value), intl)
   }
 
   if (value && field.type === CHECKBOX_GROUP) {

@@ -63,7 +63,9 @@ import {
   IDocumentUploaderWithOptionsFormField,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  SubmissionAction
+  SubmissionAction,
+  ICheckboxFormField,
+  CHECKBOX
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -84,7 +86,11 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessageDescriptors
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -337,6 +343,19 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckboxFieldValue = (
+  field: ICheckboxFormField,
+  value: string,
+  intl: IntlShape
+) => {
+  const { checkedValue = true } = field
+  return intl.formatMessage(
+    value === String(checkedValue)
+      ? formMessageDescriptors.confirm
+      : formMessageDescriptors.deny
+  )
+}
+
 const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
@@ -421,6 +440,10 @@ const renderValue = (
       field.options,
       intl
     )
+  }
+
+  if (field.type === CHECKBOX) {
+    return getCheckboxFieldValue(field, String(value), intl)
   }
 
   if (value && field.type === CHECKBOX_GROUP) {
