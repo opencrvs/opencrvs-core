@@ -9,16 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
+import React from 'react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { Link } from './Link'
 
-/** @deprecated for LinkButton */
-export const Link = styled.a<{ error?: boolean }>`
-  width: auto;
-  min-height: 44px;
-  color: ${({ error, theme }) =>
-    error ? theme.colors.negative : theme.colors.copy};
-  cursor: pointer;
-  border: 0;
-  text-decoration: underline;
-  ${({ theme }) => theme.fonts.reg16};
+export default {
+  title: 'Controls/Link',
+  component: Link,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+\`<Link>\` is a clickable variant of text. It can be used as a button or a link.
 `
+      }
+    }
+  }
+} as ComponentMeta<typeof Link>
+
+export const Default: ComponentStory<typeof Link> = (args) => (
+  <Link {...args}>Click here</Link>
+)

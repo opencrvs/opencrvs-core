@@ -82,6 +82,7 @@ interface IFormConfigMessages
   radioGroupWithNestedField: MessageDescriptor
   informativeRadioGroup: MessageDescriptor
   checkboxGroup: MessageDescriptor
+  checkbox: MessageDescriptor
   date: MessageDescriptor
   dynamicList: MessageDescriptor
   formConfigMobileModalTitle: MessageDescriptor
@@ -429,9 +430,14 @@ const messagesToDefine: IFormConfigMessages = {
     description: 'Success notification label for number of addresses settings'
   },
   checkboxGroup: {
+    id: 'config.form.settings.checkboxGroup',
+    defaultMessage: 'Checkbox group',
+    description: 'Checkbox group Label'
+  },
+  checkbox: {
     id: 'config.form.settings.checkbox',
     defaultMessage: 'Checkbox',
-    description: 'Success notification label for number of addresses settings'
+    description: 'Checkbox Label'
   },
   date: {
     id: 'config.form.settings.date',

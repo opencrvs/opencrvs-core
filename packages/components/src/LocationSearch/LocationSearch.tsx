@@ -106,6 +106,7 @@ interface IProps {
   searchHandler?: (location: ISearchLocation) => void
   searchButtonHandler?: () => void
   id?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onBlur?: (e: React.FocusEvent<any>) => void
   errorMessage?: string
   error?: boolean

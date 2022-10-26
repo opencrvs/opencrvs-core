@@ -1,13 +1,8 @@
-import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
-import { connect } from 'formik'
-import React, { useState } from 'react'
+import React from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
-import { injectIntl, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import {
-  LinkButton,
-  SecondaryButton
-} from '@client/../../components/lib/buttons'
+import { SecondaryButton } from '@client/../../components/lib/buttons'
 import {
   ListViewItemSimplified,
   ListViewSimplified
@@ -15,12 +10,9 @@ import {
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
-import {
-  AvatarSmall,
-  Plus,
-  VerticalThreeDots
-} from '@client/../../components/lib/icons'
+import { Plus, VerticalThreeDots } from '@client/../../components/lib/icons'
 import { Pill, ToggleMenu } from '@client/../../components/lib'
+import { constantsMessages } from '@client/i18n/messages'
 
 interface IIntegration {
   name: string
@@ -42,6 +34,9 @@ export function IntegrationList() {
     <Frame
       header={<Header />}
       navigation={<Navigation loadWorkqueueStatuses={false} />}
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <Content
         title={intl.formatMessage(messages.integrations)}
@@ -59,44 +54,42 @@ export function IntegrationList() {
         unique client IDs. A number of integration use cases are currently
         supported, based on both API and webhook technologies.
         <ListViewSimplified>
-          <React.Fragment key=".0">
-            <ListViewItemSimplified
-              actions={
-                <>
-                  <Pill label="Active" type="active" />
-                  <ToggleMenu
-                    id="toggleMenu"
-                    menuItems={[
-                      { handler: () => {}, label: 'Reveal Keys' },
-                      { handler: () => {}, label: 'Disable' },
-                      { handler: () => {}, label: 'Delete' }
-                    ]}
-                    toggleButton={<VerticalThreeDots />}
-                  />
-                </>
-              }
-              label="Sweet Health"
-              value="Health Integration"
-            />
-            <ListViewItemSimplified
-              actions={
-                <>
-                  <Pill label="Active" type="active" />
-                  <ToggleMenu
-                    id="toggleMenu"
-                    menuItems={[
-                      { handler: () => {}, label: 'Reveal Keys' },
-                      { handler: () => {}, label: 'Disable' },
-                      { handler: () => {}, label: 'Delete' }
-                    ]}
-                    toggleButton={<VerticalThreeDots />}
-                  />
-                </>
-              }
-              label="Sweet Health"
-              value="Health Integration"
-            />
-          </React.Fragment>
+          <ListViewItemSimplified
+            actions={
+              <>
+                <Pill label="Active" type="active" />
+                <ToggleMenu
+                  id="toggleMenu"
+                  menuItems={[
+                    { handler: () => {}, label: 'Reveal Keys' },
+                    { handler: () => {}, label: 'Disable' },
+                    { handler: () => {}, label: 'Delete' }
+                  ]}
+                  toggleButton={<VerticalThreeDots />}
+                />
+              </>
+            }
+            label="Sweet Health"
+            value="Health Integration"
+          />
+          <ListViewItemSimplified
+            actions={
+              <>
+                <Pill label="Active" type="active" />
+                <ToggleMenu
+                  id="toggleMenu"
+                  menuItems={[
+                    { handler: () => {}, label: 'Reveal Keys' },
+                    { handler: () => {}, label: 'Disable' },
+                    { handler: () => {}, label: 'Delete' }
+                  ]}
+                  toggleButton={<VerticalThreeDots />}
+                />
+              </>
+            }
+            label="Sweet Health"
+            value="Health Integration"
+          />
         </ListViewSimplified>
       </Content>
     </Frame>

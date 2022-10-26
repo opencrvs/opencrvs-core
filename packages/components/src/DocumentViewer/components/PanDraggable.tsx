@@ -62,9 +62,9 @@ export default class ReactPanZoom extends React.PureComponent<
     rotation: 0
   }
 
-  private panWrapper: any
+  private panWrapper: HTMLDivElement | null
 
-  private panContainer: any
+  private panContainer: HTMLDivElement | null
   private getInitialState = () => {
     const { pandx, pandy, zoom } = this.props
     const defaultDragData = {
@@ -123,6 +123,7 @@ export default class ReactPanZoom extends React.PureComponent<
     const { pageX, pageY } = e.touches[0]
     this.panStart(pageX, pageY, e)
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public onTouchEnd = (e: any) => {
     this.onMouseUp(e)
   }
