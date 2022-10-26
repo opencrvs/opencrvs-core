@@ -34,6 +34,15 @@
         mongodb_admin_username={{ mongodb_admin_username }}
         elasticsearch_superuser_password={{elasticsearch_superuser_password}}
         disk_encryption_key={{ disk_encryption_key }}
+        # MOSIP integration requires wireguard and some secrets to be installed
+        # Here is an example configuration that we use on our 3 node demo production environment
+        # mosip_wireguard_peer_1_path={{ mosip_wireguard_peer_1_path }}
+        # mosip_wireguard_peer_2_path={{ mosip_wireguard_peer_2_path }}
+        # mosip_wireguard_peer_3_path={{ mosip_wireguard_peer_3_path }}
+        # mosip_seeder_encrypt_cert_path={{ mosip_seeder_encrypt_cert_path }}
+        # mosip_seeder_encrypt_cert_filename={{ mosip_seeder_encrypt_cert_filename }}
+        # mosip_seeder_encrypt_sig_path={{ mosip_seeder_encrypt_sig_path }}
+        # mosip_seeder_encrypt_sig_filename={{ mosip_seeder_encrypt_sig_filename }}
 
     - name: 'Add docker repository key'
       apt_key:
@@ -42,7 +51,7 @@
 
     - name: 'Add docker repository'
       apt_repository:
-        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} edge'
+        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable'
         state: present
         update_cache: yes
 

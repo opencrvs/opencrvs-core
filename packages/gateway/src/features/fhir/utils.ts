@@ -51,7 +51,10 @@ import {
   BIRTH_REG_NO,
   DEATH_REG_NO,
   DOWNLOADED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
+  REQUEST_CORRECTION_EXTENSION_URL,
+  ASSIGNED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -60,6 +63,7 @@ import { logger } from '@gateway/logger'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLRegAction,
   GQLRegStatus
 } from '@gateway/graphql/schema'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
@@ -814,7 +818,7 @@ export function selectOrCreateTaskRefResource(
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,
-  value: string | string[] | object,
+  value: string | string[] | Record<string, unknown>,
   propName: string,
   context: any,
   contextProperty?: string
@@ -953,21 +957,26 @@ export async function getCertificatesFromTask(
   )
 }
 export function getActionFromTask(task: fhir.Task) {
-  const businessStatus = getStatusFromTask(task)
-  const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
-  if (businessStatus === extensionStatusWhileDownloaded) {
-    return GQLRegStatus.DOWNLOADED
-  } else if (hasRequestCorrectionExtension(task)) {
-    return GQLRegStatus.REQUESTED_CORRECTION
+  const extensions = task.extension || []
+  if (findExtension(DOWNLOADED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.DOWNLOADED
+  } else if (findExtension(ASSIGNED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.ASSIGNED
+  } else if (findExtension(UNASSIGNED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.UNASSIGNED
+  } else if (findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions)) {
+    return GQLRegAction.REQUESTED_CORRECTION
+  } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.REINSTATED
   }
-  return businessStatus
+  return null
 }
 export function getStatusFromTask(task: fhir.Task) {
   const statusType = task.businessStatus?.coding?.find(
     (coding: fhir.Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
   )
-  return statusType && statusType.code
+  return statusType && (statusType.code as GQLRegStatus)
 }
 export function getMaritalStatusCode(fieldValue: string) {
   switch (fieldValue) {
@@ -1011,7 +1020,7 @@ export function removeDuplicatesFromComposition(
 export const fetchFHIR = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET',
+  method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
   return fetch(`${FHIR_URL}${suffix}`, {
@@ -1030,11 +1039,55 @@ export const fetchFHIR = <T = any>(
     })
 }
 
+export async function postAssignmentSearch(
+  authHeader: IAuthHeader,
+  compositionId: string
+) {
+  return fetch(`${SEARCH_URL}search/assignment`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify({ compositionId })
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search assignment failed: ${error.message}`)
+      )
+    })
+}
+
 export const postSearch = (
   authHeader: IAuthHeader,
   criteria: ISearchCriteria
 ) => {
   return fetch(`${SEARCH_URL}search`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+export const postAdvancedSearch = (
+  authHeader: IAuthHeader,
+  criteria: ISearchCriteria
+) => {
+  return fetch(`${SEARCH_URL}advancedRecordSearch`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

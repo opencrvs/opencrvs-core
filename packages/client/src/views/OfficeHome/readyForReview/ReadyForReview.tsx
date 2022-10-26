@@ -18,11 +18,12 @@ import styled, { ITheme } from '@client/styledComponents'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
-  GridTable,
-  IAction,
+  Workqueue,
   COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/interface'
+  SORT_ORDER,
+  IDynamicValues,
+  IAction
+} from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -52,11 +53,11 @@ import {
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { RegStatus } from '@client/utils/gateway'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -198,11 +199,19 @@ class ReadyForReviewComponent extends React.Component<
           reg.dateOfEvent.length > 0 &&
           new Date(reg.dateOfEvent)) ||
         ''
-      const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
+      const createdAt =
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.Declared
+        ) ||
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.Validated
+        ) ||
+        ''
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          isBoldLink={true}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
           }
@@ -349,12 +358,11 @@ class ReadyForReviewComponent extends React.Component<
             )}
           </ToolTipContainer>
         </ReactTooltip>
-        <GridTable
+        <Workqueue
           content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
           hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>

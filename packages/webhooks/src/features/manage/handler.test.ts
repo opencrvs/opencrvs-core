@@ -14,7 +14,7 @@ import Webhook, { IWebhook } from '@webhooks/model/webhook'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 import * as service from '@webhooks/features/manage/service'
 
 const fetch = fetchMock as fetchMock.FetchMock

@@ -24,15 +24,34 @@ import {
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils'
 import fetch, { RequestInit } from 'node-fetch'
-import { getEventType } from '@workflow/features/registration/utils'
+import {
+  getComposition,
+  getEventType,
+  getPatientBySection
+} from '@workflow/features/registration/utils'
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@workflow/logger'
+import { unionBy } from 'lodash'
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   return await getPhoneNo(getTaskResource(fhirBundle), getEventType(fhirBundle))
+}
+
+export function concatenateName(fhirNames: fhir.HumanName[]) {
+  const language = getDefaultLanguage()
+  const name = fhirNames.find((humanName: fhir.HumanName) => {
+    return humanName.use === language
+  })
+  if (!name || !name.family) {
+    throw new Error(`Didn't found informant's ${language} name`)
+  }
+  return ''
+    .concat(name.given ? name.given.join(' ') : '')
+    .concat(' ')
+    .concat(name.family)
 }
 
 export async function getInformantName(
@@ -44,22 +63,12 @@ export async function getInformantName(
       'getInformantName: Invalid FHIR bundle found for declaration'
     )
   }
-  const language = getDefaultLanguage()
   const informant = await findPersonEntry(sectionCode, fhirBundle)
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")
   }
 
-  const name = informant.name.find((humanName: fhir.HumanName) => {
-    return humanName.use === language
-  })
-  if (!name || !name.family) {
-    throw new Error(`Didn't found informant's ${language} name`)
-  }
-  return ''
-    .concat(name.given ? name.given.join(' ') : '')
-    .concat(' ')
-    .concat(name.family)
+  return concatenateName(informant.name)
 }
 
 export async function getCRVSOfficeName(fhirBundle: fhir.Bundle) {
@@ -380,4 +389,39 @@ export async function fetchExistingRegStatusCode(taskId: string | undefined) {
     })
 
   return existingRegStatusCode
+}
+
+export async function mergePatientIdentifier(bundle: fhir.Bundle) {
+  const event = getEventType(bundle)
+  const composition = getComposition(bundle)
+  const section = getSectionEntryBySectionCode(
+    composition,
+    event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE
+  )
+  const patient = getPatientBySection(bundle, section)
+  const patientFromFhir: fhir.Patient = await getFromFhir(
+    `/Patient/${patient?.id}`
+  )
+  if (patientFromFhir) {
+    bundle.entry =
+      bundle &&
+      bundle.entry &&
+      bundle.entry.map((entry) => {
+        if (entry.resource?.id === patientFromFhir.id) {
+          return {
+            ...entry,
+            resource: {
+              ...entry.resource,
+              identifier: unionBy(
+                (entry.resource as fhir.Patient).identifier,
+                patientFromFhir.identifier,
+                'type'
+              )
+            }
+          }
+        } else {
+          return entry
+        }
+      })
+  }
 }

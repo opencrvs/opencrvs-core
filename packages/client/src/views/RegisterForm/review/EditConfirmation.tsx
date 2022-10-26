@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from '@client/styledComponents'
-import { Modal } from '@opencrvs/components/lib/interface'
+import { Modal } from '@opencrvs/components/lib/Modal'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages } from '@client/i18n/messages'

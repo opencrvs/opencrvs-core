@@ -211,6 +211,12 @@ const messagesToDefine: IValidationMessages = {
       'The error message that appears on required fields on new user form',
     id: 'validations.userform.required'
   },
+  requiredReasonForCorrection: {
+    defaultMessage: 'Please provide a reason for this correction',
+    description:
+      'The error message that appears on reason field on correction form',
+    id: 'validations.correction.reason.required'
+  },
   requiredSymbol: {
     defaultMessage: '',
     description:

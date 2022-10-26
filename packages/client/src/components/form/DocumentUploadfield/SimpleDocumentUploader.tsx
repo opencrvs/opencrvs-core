@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ImageUploader } from '@opencrvs/components/lib/forms'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { IFormFieldValue, IAttachmentValue } from '@client/forms'
 import * as React from 'react'
@@ -56,6 +56,7 @@ type IFullProps = {
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
+  previewTransformer?: (files: IAttachmentValue) => IAttachmentValue
 } & IntlShapeProps
 
 type IState = {
@@ -106,10 +107,9 @@ class SimpleDocumentUploaderComponent extends React.Component<
       })
       this.setState({
         error: this.props.intl.formatMessage(messages.fileUploadError, {
-          type:
-            allowedDocType.join() === 'image/png'
-              ? 'png'
-              : allowedDocType.join()
+          type: allowedDocType
+            .map((docTypeStr) => docTypeStr.split('/').pop())
+            .join(', ')
         })
       })
     } else {
@@ -130,6 +130,13 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   selectForPreview = (previewImage: IFormFieldValue) => {
+    if (this.props.previewTransformer) {
+      return this.setState({
+        previewImage: this.props.previewTransformer(
+          previewImage as IAttachmentValue
+        )
+      })
+    }
     this.setState({ previewImage: previewImage as IAttachmentValue })
   }
 

@@ -23,7 +23,7 @@ import {
   touchBundle,
   markBundleAsDeclarationUpdated,
   markBundleAsRequestedForCorrection,
-  removeExtensionFromBundle
+  validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -32,15 +32,12 @@ import {
   getSharedContactMsisdn,
   postToHearth,
   generateEmptyBundle,
-  forwardToHearth
+  mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable,
-  getEventType,
-  getComposition,
-  getPatientBySection
+  isEventNonNotifiable
 } from '@workflow/features/registration/utils'
 import {
   taskHasInput,
@@ -57,14 +54,7 @@ import {
   BIRTH_REG_NUMBER_SYSTEM,
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
-import {
-  getSectionEntryBySectionCode,
-  getTaskResource
-} from '@workflow/features/registration/fhir/fhir-template'
-import {
-  REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -309,7 +299,7 @@ export async function markEventAsRegisteredCallbackHandler(
     )
 
     /** pushing registrationNumber on related person's identifier */
-    const patient = await updatePatientIdentifierWithRN(
+    let patient = await updatePatientIdentifierWithRN(
       composition,
       event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE,
       event === EVENT_TYPE.BIRTH
@@ -318,10 +308,17 @@ export async function markEventAsRegisteredCallbackHandler(
       registrationNumber
     )
 
+    if (event === EVENT_TYPE.DEATH) {
+      patient = await validateDeceasedDetails(patient, {
+        Authorization: request.headers.authorization
+      })
+    }
+
     //** Making sure db automicity */
     const bundle = generateEmptyBundle()
     bundle.entry?.push({ resource: task })
     bundle.entry?.push({ resource: patient })
+
     await sendBundleToHearth(bundle)
 
     const phoneNo = await getPhoneNo(task, event)
@@ -351,7 +348,6 @@ export async function markEventAsRegisteredCallbackHandler(
     // have time to complete indexing the previous waiting for external validation state before we update the search index with a BRN / DRN
     // If an external system is being used, then its processing time will mean a wait is not required.
     if (!VALIDATING_EXTERNALLY) {
-      // tslint:disable-next-line
       await new Promise((resolve) => setTimeout(resolve, 2000))
     }
     // Trigger an event for the registration
@@ -421,32 +417,7 @@ export async function markEventAsCertifiedHandler(
       request.payload as fhir.Bundle,
       getToken(request)
     )
-
-    const event = getEventType(request.payload as fhir.Bundle)
-    const composition = getComposition(payload)
-
-    const section = getSectionEntryBySectionCode(
-      composition,
-      event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE
-    )
-    const patient = getPatientBySection(payload, section)
-
-    const patientFromFhir: fhir.Patient =
-      patient && (await getFromFhir(`/Patient/${patient.id}`))
-
-    if (patientFromFhir) {
-      payload.entry =
-        payload &&
-        payload.entry &&
-        payload.entry.map((e) => {
-          if (e.resource?.id === patientFromFhir.id) {
-            return { resource: patientFromFhir }
-          } else {
-            return e
-          }
-        })
-    }
-
+    await mergePatientIdentifier(payload)
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
@@ -454,25 +425,24 @@ export async function markEventAsCertifiedHandler(
   }
 }
 
-export async function markDownloadedEventAsAssignedOrUnassignedHandler(
+export async function actionEventHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  event: Events
 ) {
   try {
-    let payload = await touchBundle(
-      request.payload as fhir.Bundle,
-      getToken(request)
-    )
-    payload = removeExtensionFromBundle(payload, [
-      REINSTATED_EXTENSION_URL,
-      REQUEST_CORRECTION_EXTENSION_URL
-    ])
-    const newRequest = { ...request, payload } as Hapi.Request
-    return await forwardToHearth(newRequest, h)
+    let payload = request.payload as fhir.Bundle
+    payload = await touchBundle(payload, getToken(request))
+    const taskResource = payload.entry?.[0].resource as fhir.Task
+    return await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(taskResource),
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    })
   } catch (error) {
-    logger.error(
-      `Workflow/markDownloadedEventAsAssignedOrUnassignedHandler: error: ${error}`
-    )
+    logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
     throw new Error(error)
   }
 }

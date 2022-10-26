@@ -18,6 +18,7 @@ import registerServiceWorker from '@login/registerServiceWorker'
 import { storage } from '@login/storage'
 import { createStore } from './store'
 import { BrowserTracing } from '@sentry/tracing'
+// eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import WebFont from 'webfontloader'
 

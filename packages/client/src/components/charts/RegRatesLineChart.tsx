@@ -11,13 +11,14 @@
  */
 import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
-import { TriLineChart } from '@opencrvs/components/lib/charts'
+import { LineChart } from '@opencrvs/components/lib/LineChart'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { messages } from '@client/i18n/messages/views/performance'
+import type { LayoutType } from 'recharts'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
@@ -39,7 +40,7 @@ interface IState {
   chartBottom: number
   chartLeft: number
   maximizeXAxisInterval?: boolean
-  legendLayout: string
+  legendLayout: LayoutType
   activeLabel: string
   activeRegisteredInTargetDays: IActiveState
   activeTotalRegistered: IActiveState
@@ -158,7 +159,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
       chartBottom: 40,
       chartLeft: 40,
       maximizeXAxisInterval: true,
-      legendLayout: 'horizontal'
+      legendLayout: 'horizontal' as const
     }
   }
   getStatePropertiesForLargeWindowChart = () => {
@@ -170,7 +171,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
       chartBottom: 40,
       chartLeft: 10,
       maximizeXAxisInterval: false,
-      legendLayout: 'vertical'
+      legendLayout: 'vertical' as const
     }
   }
   componentDidMount() {
@@ -443,7 +444,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
       legendLayout
     } = this.state
     return (
-      <TriLineChart
+      <LineChart
         data={data}
         dataKeys={[
           'totalEstimate',

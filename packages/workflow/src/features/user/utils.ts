@@ -67,7 +67,6 @@ export const convertToLocal = (
   mobileWithCountryCode: string,
   countryCode: string
 ) => {
-  // tslint:disable-next-line
   countryCode = countryCode.toUpperCase()
   return mobileWithCountryCode.replace(
     callingCountries[countryCode].countryCallingCodes[0],
@@ -152,14 +151,6 @@ export async function getLoggedInPractitionerLocations(
   }
   /* getting location list for practitioner */
   return await getPractitionerLocations(practitionerResource.id)
-}
-
-export async function getUserByToken(token: string) {
-  const tokenPayload = getTokenPayload(token)
-
-  return await getUser(tokenPayload.sub, {
-    Authorization: `Bearer ${token}`
-  })
 }
 
 export async function getLoggedInPractitionerResource(

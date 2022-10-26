@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router'
 import { IPage } from '@login/common/Page'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { getTheme } from '@opencrvs/components/lib/theme'
 
 const StyledPage = styled.div<IPage>`

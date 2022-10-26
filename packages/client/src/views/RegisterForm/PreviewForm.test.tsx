@@ -41,7 +41,7 @@ import { Store } from 'redux'
 import { Event } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
 // eslint-disable-next-line no-restricted-imports
-import * as ReactApollo from 'react-apollo'
+import * as ReactApollo from '@apollo/client/react'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { waitForElement } from '@client/tests/wait-for-element'
 import {
@@ -210,7 +210,7 @@ describe('when user is previewing the form data', () => {
     })
 
     it('rejecting declaration redirects to home screen', async () => {
-      vi.doMock('react-apollo', () => ({ default: ReactApollo }))
+      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
 
       app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
@@ -324,7 +324,7 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
+      store.dispatch(checkAuth())
       await flushPromises()
       const data = deathReviewDraftData
 
@@ -342,13 +342,14 @@ describe('when user is previewing the form data', () => {
     })
 
     it('successfully submits the review form', async () => {
-      vi.doMock('react-apollo', () => ({ default: ReactApollo }))
+      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
       app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
+      app.update()
       app.update().find('#submit_confirm').hostNodes().simulate('click')
     })
 
     it('rejecting declaration redirects to reject confirmation screen', async () => {
-      vi.doMock('react-apollo', () => ({ default: ReactApollo }))
+      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
 
       app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 

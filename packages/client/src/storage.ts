@@ -10,12 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as localForage from 'localforage'
+import { validateApplicationVersion } from '@client/utils'
 
 function configStorage(dbName: string) {
   localForage.config({
     driver: localForage.INDEXEDDB,
     name: dbName
   })
+  validateApplicationVersion()
 }
 
 async function getItem(key: string): Promise<string | null> {

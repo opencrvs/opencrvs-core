@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+// eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
@@ -45,8 +46,8 @@ if (
   // setup error reporting using sentry
   if (window.config.SENTRY) {
     Sentry.init({
-      release: process.env.REACT_APP_VERSION,
-      environment: process.env.NODE_ENV,
+      release: import.meta.env.REACT_APP_VERSION,
+      environment: import.meta.env.NODE_ENV,
       integrations: [new BrowserTracing()],
 
       // We recommend adjusting this value in production, or using tracesSampler

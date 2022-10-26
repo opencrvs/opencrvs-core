@@ -28,7 +28,7 @@ import {
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -242,6 +242,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
+    const birthEventRegisteredDate = '2019-10-20T11:03:20.660Z'
     const birthEventSearchSet: GQLBirthEventSearchSet = {
       id: '956281c9-1f47-4c26-948a-970dd23c4094',
       type: 'Birth',
@@ -256,6 +257,27 @@ describe('RegistrarHome ready to print tab related tests', () => {
         createdAt: TIME_STAMP,
         modifiedAt: TIME_STAMP
       },
+      operationHistories: [
+        {
+          operationType: 'REGISTERED',
+          operatedOn: birthEventRegisteredDate,
+          operatorRole: 'LOCAL_REGISTRAR',
+          operatorName: [
+            {
+              firstNames: 'Mohammad',
+              familyName: 'Ashraful',
+              use: 'en'
+            },
+            {
+              firstNames: '',
+              familyName: '',
+              use: 'bn'
+            }
+          ],
+          operatorOfficeName: 'Alokbali Union Parishad',
+          operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+        }
+      ],
       dateOfBirth: '2010-10-10',
       childName: [
         {
@@ -313,9 +335,11 @@ describe('RegistrarHome ready to print tab related tests', () => {
       { store, history }
     )
 
-    const element = await waitForElement(testComponent, GridTable)
+    const element = await waitForElement(testComponent, Workqueue)
     const data = element.prop('content')
-    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(Number(TIME_STAMP))
+    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
+      new Date(birthEventRegisteredDate)
+    )
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
@@ -339,7 +363,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     )
 
     testComponent.update()
-    const data = testComponent.find(GridTable).prop('content')
+    const data = testComponent.find(Workqueue).prop('content')
     expect(data.length).toBe(0)
   })
 

@@ -33,7 +33,7 @@ const extractRelatesToIDs = (bundle: fhir.Bundle) => {
   const relatesToBundle = get(bundle, 'relatesTo') || []
 
   return relatesToBundle.map(
-    (item: { targetReference: { reference: String } }) =>
+    (item: { targetReference: { reference: string } }) =>
       item.targetReference.reference.replace('Composition/', '')
   )
 }

@@ -35,7 +35,7 @@ import {
 } from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
 

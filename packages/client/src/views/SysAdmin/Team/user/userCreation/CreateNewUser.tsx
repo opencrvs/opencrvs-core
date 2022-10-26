@@ -30,10 +30,11 @@ import {
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { UserReviewForm } from '@client/views/SysAdmin/Team/user/userCreation/UserReviewForm'
-import { ActionPageLight, Spinner } from '@opencrvs/components/lib/interface'
-import ApolloClient from 'apollo-client'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { ApolloClient } from '@apollo/client'
+import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
 import * as React from 'react'
-import { withApollo } from 'react-apollo'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
@@ -58,7 +59,6 @@ type IUserProps = {
   submitting: boolean
   userDetailsStored?: boolean
   loadingRoles?: boolean
-  client: ApolloClient<unknown>
 }
 
 interface IDispatchProps {
@@ -71,6 +71,7 @@ interface IDispatchProps {
 
 export type Props = RouteComponentProps<IMatchParams> &
   IUserProps &
+  IDispatchProps &
   IntlShapeProps
 
 const Container = styled.div`
@@ -94,7 +95,7 @@ const SpinnerWrapper = styled.div`
   align-items: center;
 `
 
-class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
+class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
   async componentDidMount() {
     const { userId, client } = this.props
     if (
@@ -103,7 +104,9 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
       this.props.clearUserFormData()
     }
     if (userId) {
-      this.props.fetchAndStoreUserData(client, GET_USER, { userId })
+      this.props.fetchAndStoreUserData(client as ApolloClient<any>, GET_USER, {
+        userId
+      })
     }
     if (this.props.match.params.locationId) {
       this.props.processRoles(this.props.match.params.locationId)
@@ -162,7 +165,12 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
     }
 
     if (section.viewType === 'preview') {
-      return <UserReviewForm {...this.props} />
+      return (
+        <UserReviewForm
+          client={this.props.client as ApolloClient<any>}
+          {...this.props}
+        />
+      )
     }
   }
 }
@@ -273,4 +281,4 @@ export const CreateNewUser = connect(mapStateToProps, {
   clearUserFormData,
   fetchAndStoreUserData,
   processRoles
-})(injectIntl(withApollo(CreateNewUserComponent)))
+})(injectIntl(withApollo<Props>(CreateNewUserComponent)))

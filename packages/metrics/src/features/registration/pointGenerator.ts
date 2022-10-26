@@ -130,7 +130,7 @@ export const generateInCompleteFieldPoints = async (
     })
 }
 
-function toInfluxTimestamp(date?: Date | string) {
+export function toInfluxTimestamp(date?: Date | string) {
   if (!date) {
     return undefined
   }
@@ -326,7 +326,6 @@ const generatePointLocations = async (
   locations.locationLevel5 = locationLevel5
   let locationID: string = locations.locationLevel5
 
-  // tslint:disable-next-line no-increment-decrement
   for (let index = 4; index > 1; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)
     if (!locationID || locationID === 'Location/0') {
@@ -544,7 +543,7 @@ export async function generateDeclarationStartedPoint(
     throw new Error('Task not found')
   }
 
-  let role: string = ''
+  let role = ''
 
   if (status === Events.IN_PROGRESS_DEC) {
     isNotification(composition)

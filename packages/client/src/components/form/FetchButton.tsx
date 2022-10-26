@@ -11,8 +11,7 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { ApolloError, ApolloQueryResult } from 'apollo-client'
-import { ApolloConsumer } from 'react-apollo'
+import { ApolloError, ApolloQueryResult, ApolloConsumer } from '@apollo/client'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
@@ -22,7 +21,7 @@ import {
   IntlShape
 } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/client/src/forms'

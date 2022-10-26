@@ -14,18 +14,16 @@ import {
   TertiaryButton,
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  ISelectOption as SelectComponentOptions,
-  TextArea
-} from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/Select'
+import { Alert } from '@opencrvs/components/lib/Alert'
 import {
   DocumentViewer,
-  IDocumentViewerOptions,
-  ResponsiveModal,
-  Warning
-} from '@opencrvs/components/lib/interface'
-import { FullBodyContent } from '@opencrvs/components/lib/layout'
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/DocumentViewer'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { FullBodyContent } from '@opencrvs/components/lib/Content'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
@@ -65,33 +63,34 @@ import {
   IDocumentUploaderWithOptionsFormField,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  SubmissionAction
+  SubmissionAction,
+  ICheckboxFormField,
+  CHECKBOX
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
   getBirthSection,
   getRegisterForm
 } from '@client/forms/register/declaration-selectors'
-import {
-  birthSectionMapping,
-  birthSectionTitle
-} from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
-import {
-  deathSectionMapping,
-  deathSectionTitle
-} from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+import { birthSectionMapping } from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
+import { deathSectionMapping } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
 import {
   getConditionalActionsForField,
   getSectionFields,
   getVisibleSectionGroupsBasedOnConditions,
-  getListOfLocations
+  getListOfLocations,
+  getSelectedInformantAndContactType
 } from '@client/forms/utils'
 import {
   Errors,
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessageDescriptors
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -134,7 +133,7 @@ import {
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 
 const Deleted = styled.del`
@@ -344,6 +343,19 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckboxFieldValue = (
+  field: ICheckboxFormField,
+  value: string,
+  intl: IntlShape
+) => {
+  const { checkedValue = true } = field
+  return intl.formatMessage(
+    value === String(checkedValue)
+      ? formMessageDescriptors.confirm
+      : formMessageDescriptors.deny
+  )
+}
+
 const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
@@ -430,6 +442,10 @@ const renderValue = (
     )
   }
 
+  if (field.type === CHECKBOX) {
+    return getCheckboxFieldValue(field, String(value), intl)
+  }
+
   if (value && field.type === CHECKBOX_GROUP) {
     return getCheckBoxGroupFieldValue(field, value as string[], intl)
   }
@@ -505,10 +521,6 @@ const getErrorsOnFieldsBySection = (
 const SECTION_MAPPING = {
   [Event.Birth]: birthSectionMapping,
   [Event.Death]: deathSectionMapping
-}
-const SECTION_TITLE = {
-  [Event.Birth]: birthSectionTitle,
-  [Event.Death]: deathSectionTitle
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
@@ -607,7 +619,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     })
   }
 
-  getLabelForDocType = (_: string, docType: string) => {
+  getLabelForDoc = (docForWhom: string, docType: string) => {
     const { intl } = this.props
     const documentSection = this.props.registerForm[
       this.props.draft.event
@@ -619,22 +631,26 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         (field) =>
           field.extraValue && field.type === DOCUMENT_UPLOADER_WITH_OPTION
       ) as IDocumentUploaderWithOptionsFormField[])
-    const allOptionsForPerson: ISelectOption[][] = []
-    if (docFieldsWithOptions) {
-      for (let i = 0; i < docFieldsWithOptions.length; i++) {
-        allOptionsForPerson.push(docFieldsWithOptions[i].options)
-      }
-    }
-    const matchedOption = allOptionsForPerson
-      .flat()
-      .find((option) => option.value === docType)
-    return matchedOption && intl.formatMessage(matchedOption.label)
+    const matchedField = docFieldsWithOptions?.find(
+      (field) => field.extraValue === docForWhom
+    )
+    const matchedOption = matchedField?.options.find(
+      (option) => option.value === docType
+    )
+    return (
+      matchedField &&
+      matchedOption &&
+      intl.formatMessage(matchedField.label) +
+        ' (' +
+        intl.formatMessage(matchedOption.label) +
+        ')'
+    )
   }
   prepSectionDocuments = (
     draft: IDeclaration,
     activeSection: Section
   ): IDocumentViewerOptions & { uploadedDocuments: IFileValue[] } => {
-    const { documentsSection, intl } = this.props
+    const { documentsSection } = this.props
 
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
@@ -653,7 +669,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     uploadedDocuments = uploadedDocuments.filter((document) => {
       const sectionMapping = SECTION_MAPPING[draft.event]
-      const sectionTitle = SECTION_TITLE[draft.event]
 
       const allowedDocumentType: string[] =
         sectionMapping[activeSection as keyof typeof sectionMapping] || []
@@ -661,15 +676,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (
         allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
       ) {
-        const title: string =
-          sectionTitle[activeSection as keyof typeof sectionMapping]
         const label =
-          intl.formatMessage(messages.documentForWhom, {
-            section: title.toLowerCase()
-          }) +
-          ' ' +
-          (this.getLabelForDocType(title, document.optionValues[1] as string) ||
-            document.optionValues[1])
+          this.getLabelForDoc(
+            document.optionValues[0] as string,
+            document.optionValues[1] as string
+          ) || (document.optionValues[1] as string)
 
         /**
          * Skip insertion if the value already exist
@@ -1613,12 +1624,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
               {totalFileSizeExceeded && (
-                <Warning
-                  label={intl.formatMessage(
-                    constantsMessages.totalFileSizeExceed,
-                    { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
-                  )}
-                />
+                <Alert type="warning">
+                  {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
+                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
+                  })}
+                </Alert>
               )}
               {!isCorrection(declaration) ? (
                 <>
@@ -1668,7 +1678,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   })}
                   <LinkButton
                     id="edit-document"
-                    disabled={isCorrection(declaration)}
+                    disabled={
+                      isCorrection(declaration) ||
+                      motherDoesNotExistAndStateIsMother(
+                        declaration,
+                        sectionName
+                      ) ||
+                      fatherDoesNotExistAndStateIsFather(
+                        declaration,
+                        sectionName
+                      )
+                    }
                     onClick={() =>
                       this.editLinkClickHandlerForDraft(
                         documentsSection.id,
@@ -1720,11 +1740,43 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             title={intl.formatMessage(buttonMessages.preview)}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}
+            disableDelete={true}
           />
         )}
       </FullBodyContent>
     )
   }
+}
+
+function motherDoesNotExistAndStateIsMother(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  const selectedInformantAndContactType = getSelectedInformantAndContactType(
+    declaration.data
+  )
+
+  return (
+    !Boolean(declaration.data.mother?.detailsExist) &&
+    activeState === 'mother' &&
+    selectedInformantAndContactType.selectedInformantType !== 'MOTHER' &&
+    selectedInformantAndContactType.selectedContactType !== 'MOTHER'
+  )
+}
+
+function fatherDoesNotExistAndStateIsFather(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  const selectedInformantAndContactType = getSelectedInformantAndContactType(
+    declaration.data
+  )
+  return (
+    !Boolean(declaration.data.father?.detailsExist) &&
+    activeState === 'father' &&
+    selectedInformantAndContactType.selectedInformantType !== 'FATHER' &&
+    selectedInformantAndContactType.selectedContactType !== 'FATHER'
+  )
 }
 
 export const ReviewSection = connect(

@@ -9,13 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  createDeclaration,
-  storeDeclaration,
-  IUserData,
-  updateRegistrarWorkqueueSuccessActionCreator
-} from '@client/declarations'
-import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
@@ -27,7 +20,7 @@ import {
 } from '@client/tests/util'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { merge } from 'lodash'
 import * as React from 'react'
 
@@ -41,51 +34,6 @@ const registerScopeToken =
 const getItem = window.localStorage.getItem as Mock
 const mockFetchUserDetails = vi.fn()
 const mockListSyncController = vi.fn()
-
-const declaration = {
-  id: 'db097901-feba-4f71-a1ae-d3d46289d2d5',
-  type: 'Birth',
-  registration: {
-    status: 'IN_PROGRESS',
-    contactNumber: '+8801622688231',
-    trackingId: 'BN99CGM',
-    registeredLocationId: '425b9cab-6ec3-47b3-bb8b-aee1b1afe4fc',
-    createdAt: '1597657903690'
-  },
-  operationHistories: [
-    {
-      operationType: 'IN_PROGRESS',
-      operatedOn: '2020-08-17T09:51:43.350Z',
-      operatorRole: 'FIELD_AGENT',
-      operatorName: [
-        {
-          firstNames: 'Shakib',
-          familyName: 'Al Hasan',
-          use: 'en'
-        },
-        {
-          firstNames: 'সাকিব',
-          familyName: 'হাসান',
-          use: 'bn'
-        }
-      ],
-      operatorOfficeName: 'Baniajan Union Parishad',
-      operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-    }
-  ],
-  childName: [
-    {
-      firstNames: 'Shakib',
-      familyName: 'Al Hasan',
-      use: 'en'
-    },
-    {
-      firstNames: 'সাকিব',
-      familyName: 'হাসান',
-      use: 'bn'
-    }
-  ]
-}
 
 const nameObj = {
   data: {
