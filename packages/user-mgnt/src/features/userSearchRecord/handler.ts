@@ -35,20 +35,29 @@ export async function createSearchHandler(
   const user: IUserModel | null = await User.findById(
     userCreateSearchPayload.userId
   )
-  if (!user) {
+  const mutableUser = user?.toObject()
+
+  if (!mutableUser) {
     logger.error(
       `No user details found by given userid: ${userCreateSearchPayload.userId}`
     )
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  if (user.searches) {
-    user.searches.push(userCreateSearchPayload.search)
+
+  if (mutableUser.searches) {
+    mutableUser.searches.push(userCreateSearchPayload.search)
   } else {
-    user.searches = [userCreateSearchPayload.search]
+    mutableUser.searches = [userCreateSearchPayload.search]
   }
-  await User.updateOne({ _id: user._id }, user)
-  return h.response({ searchList: user.searches }).code(200)
+
+  try {
+    await User.updateOne({ _id: mutableUser._id }, mutableUser)
+  } catch (err) {
+    // return 400 if there is a validation error when updating to mongo
+    return h.response(err.message).code(400)
+  }
+  return h.response({ searchList: mutableUser.searches }).code(200)
 }
 
 export async function removeSearchHandler(
@@ -71,7 +80,12 @@ export async function removeSearchHandler(
     (searchData) => searchData.searchId !== userSearchRemovePayload.searchId
   )
   user.searches = filteredSearchList
-  await User.updateOne({ _id: user._id }, user)
+  try {
+    await User.updateOne({ _id: user._id }, user)
+  } catch (err) {
+    // return 400 if there is a validation error when updating to mongo
+    return h.response(err.message).code(400)
+  }
 
   return h.response({ searchList: user.searches }).code(200)
 }
@@ -130,6 +144,6 @@ export const createSearchrequestSchema = Joi.object({
 })
 
 export const removeSearchrequestSchema = Joi.object({
-  userId: Joi.string(),
-  searchId: Joi.string()
+  userId: Joi.string().required(),
+  searchId: Joi.string().required()
 })

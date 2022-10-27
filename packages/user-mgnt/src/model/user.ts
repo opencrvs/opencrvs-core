@@ -314,7 +314,7 @@ const userSchema = new Schema({
   creationDate: { type: Number, default: Date.now },
   auditHistory: [AuditHistory],
   avatar: Avatar,
-  searches: SearchesSchema
+  searches: [SearchesSchema]
 })
 
 export default model<IUserModel>('User', userSchema)
