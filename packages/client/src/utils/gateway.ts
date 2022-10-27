@@ -1695,6 +1695,57 @@ export type Role = {
   value?: Maybe<Scalars['String']>
 }
 
+export type Search = {
+  __typename?: 'Search'
+  childDoB?: Maybe<Scalars['String']>
+  childDoBEnd?: Maybe<Scalars['String']>
+  childDoBStart?: Maybe<Scalars['String']>
+  childFirstNames?: Maybe<Scalars['String']>
+  childGender?: Maybe<Scalars['String']>
+  childLastName?: Maybe<Scalars['String']>
+  dateOfEvent?: Maybe<Scalars['String']>
+  dateOfEventEnd?: Maybe<Scalars['String']>
+  dateOfEventStart?: Maybe<Scalars['String']>
+  dateOfRegistration?: Maybe<Scalars['String']>
+  dateOfRegistrationEnd?: Maybe<Scalars['String']>
+  dateOfRegistrationStart?: Maybe<Scalars['String']>
+  deceasedDoB?: Maybe<Scalars['String']>
+  deceasedDoBEnd?: Maybe<Scalars['String']>
+  deceasedDoBStart?: Maybe<Scalars['String']>
+  deceasedFamilyName?: Maybe<Scalars['String']>
+  deceasedFirstNames?: Maybe<Scalars['String']>
+  deceasedGender?: Maybe<Scalars['String']>
+  declarationJurisdictionId?: Maybe<Scalars['String']>
+  declarationLocationId?: Maybe<Scalars['String']>
+  event?: Maybe<Event>
+  eventLocationId?: Maybe<Scalars['String']>
+  eventLocationLevel1?: Maybe<Scalars['String']>
+  eventLocationLevel2?: Maybe<Scalars['String']>
+  eventLocationLevel3?: Maybe<Scalars['String']>
+  eventLocationLevel4?: Maybe<Scalars['String']>
+  eventLocationLevel5?: Maybe<Scalars['String']>
+  fatherDoB?: Maybe<Scalars['String']>
+  fatherDoBEnd?: Maybe<Scalars['String']>
+  fatherDoBStart?: Maybe<Scalars['String']>
+  fatherFamilyName?: Maybe<Scalars['String']>
+  fatherFirstNames?: Maybe<Scalars['String']>
+  informantDoB?: Maybe<Scalars['String']>
+  informantDoBEnd?: Maybe<Scalars['String']>
+  informantDoBStart?: Maybe<Scalars['String']>
+  informantFamilyName?: Maybe<Scalars['String']>
+  informantFirstNames?: Maybe<Scalars['String']>
+  motherDoB?: Maybe<Scalars['String']>
+  motherDoBEnd?: Maybe<Scalars['String']>
+  motherDoBStart?: Maybe<Scalars['String']>
+  motherFamilyName?: Maybe<Scalars['String']>
+  motherFirstNames?: Maybe<Scalars['String']>
+  name: Scalars['String']
+  registrationNumber?: Maybe<Scalars['String']>
+  registrationStatuses?: Maybe<Array<Maybe<Scalars['String']>>>
+  searchId: Scalars['String']
+  trackingId?: Maybe<Scalars['String']>
+}
+
 export type SearchFieldAgentResponse = {
   __typename?: 'SearchFieldAgentResponse'
   avatar?: Maybe<Avatar>
@@ -1784,6 +1835,7 @@ export type User = {
   practitionerId?: Maybe<Scalars['String']>
   primaryOffice?: Maybe<Location>
   role?: Maybe<Scalars['String']>
+  searches?: Maybe<Array<Maybe<Search>>>
   signature?: Maybe<Signature>
   status?: Maybe<Scalars['String']>
   type?: Maybe<Scalars['String']>
@@ -2035,6 +2087,7 @@ export type FetchUserQuery = {
 export type SearchEventsQueryVariables = Exact<{
   sort?: InputMaybe<Scalars['String']>
   trackingId?: InputMaybe<Scalars['String']>
+  nationalId?: InputMaybe<Scalars['String']>
   contactNumber?: InputMaybe<Scalars['String']>
   registrationNumber?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
@@ -4954,149 +5007,6 @@ export type SearchEventsForWorkqueueQuery = {
   } | null
 }
 
-export type FetchRegistrationByCompositionQueryVariables = Exact<{
-  id: Scalars['ID']
-}>
-
-export type FetchRegistrationByCompositionQuery = {
-  __typename?: 'Query'
-  fetchRegistration?:
-    | {
-        __typename?: 'BirthRegistration'
-        id: string
-        child?: {
-          __typename?: 'Person'
-          id?: string | null
-          multipleBirth?: number | null
-          birthDate?: string | null
-          name?: Array<{
-            __typename?: 'HumanName'
-            use?: string | null
-            firstNames?: string | null
-            familyName?: string | null
-          } | null> | null
-        } | null
-        registration?: {
-          __typename?: 'Registration'
-          id?: string | null
-          type?: RegistrationType | null
-          contact?: string | null
-          contactPhoneNumber?: string | null
-          status?: Array<{
-            __typename?: 'RegWorkflow'
-            id: string
-            type?: RegStatus | null
-            timestamp?: any | null
-            user?: {
-              __typename?: 'User'
-              id?: string | null
-              role?: string | null
-              name?: Array<{
-                __typename?: 'HumanName'
-                use?: string | null
-                firstNames?: string | null
-                familyName?: string | null
-              } | null> | null
-            } | null
-            location?: {
-              __typename?: 'Location'
-              id: string
-              name?: string | null
-              alias?: Array<string | null> | null
-            } | null
-            office?: {
-              __typename?: 'Location'
-              name?: string | null
-              alias?: Array<string | null> | null
-              address?: {
-                __typename?: 'Address'
-                district?: string | null
-                state?: string | null
-              } | null
-            } | null
-            comments?: Array<{
-              __typename?: 'Comment'
-              comment?: string | null
-            } | null> | null
-          } | null> | null
-        } | null
-      }
-    | {
-        __typename?: 'DeathRegistration'
-        id: string
-        deceased?: {
-          __typename?: 'Person'
-          name?: Array<{
-            __typename?: 'HumanName'
-            use?: string | null
-            firstNames?: string | null
-            familyName?: string | null
-          } | null> | null
-          deceased?: {
-            __typename?: 'Deceased'
-            deathDate?: string | null
-          } | null
-        } | null
-        informant?: {
-          __typename?: 'RelatedPerson'
-          individual?: {
-            __typename?: 'Person'
-            telecom?: Array<{
-              __typename?: 'ContactPoint'
-              use?: string | null
-              system?: string | null
-              value?: string | null
-            } | null> | null
-          } | null
-        } | null
-        registration?: {
-          __typename?: 'Registration'
-          id?: string | null
-          type?: RegistrationType | null
-          contact?: string | null
-          contactPhoneNumber?: string | null
-          status?: Array<{
-            __typename?: 'RegWorkflow'
-            id: string
-            type?: RegStatus | null
-            timestamp?: any | null
-            user?: {
-              __typename?: 'User'
-              id?: string | null
-              role?: string | null
-              name?: Array<{
-                __typename?: 'HumanName'
-                use?: string | null
-                firstNames?: string | null
-                familyName?: string | null
-              } | null> | null
-            } | null
-            location?: {
-              __typename?: 'Location'
-              id: string
-              name?: string | null
-              alias?: Array<string | null> | null
-            } | null
-            office?: {
-              __typename?: 'Location'
-              name?: string | null
-              alias?: Array<string | null> | null
-              address?: {
-                __typename?: 'Address'
-                district?: string | null
-                state?: string | null
-              } | null
-            } | null
-            comments?: Array<{
-              __typename?: 'Comment'
-              comment?: string | null
-            } | null> | null
-          } | null> | null
-        } | null
-      }
-    | null
-}
-
 export type MarkEventAsReinstatedMutationVariables = Exact<{
   id: Scalars['String']
 }>
@@ -5179,150 +5089,6 @@ export type FetchDeclarationShortInfoQuery = {
             lastName?: string | null
             officeName?: string | null
           } | null
-        } | null
-      }
-    | null
-}
-
-export type FetchRegistrationQueryVariables = Exact<{
-  id: Scalars['ID']
-}>
-
-export type FetchRegistrationQuery = {
-  __typename?: 'Query'
-  fetchRegistration?:
-    | {
-        __typename?: 'BirthRegistration'
-        id: string
-        registration?: {
-          __typename?: 'Registration'
-          id?: string | null
-          status?: Array<{
-            __typename?: 'RegWorkflow'
-            id: string
-            type?: RegStatus | null
-            timestamp?: any | null
-            user?: {
-              __typename?: 'User'
-              id?: string | null
-              role?: string | null
-              name?: Array<{
-                __typename?: 'HumanName'
-                use?: string | null
-                firstNames?: string | null
-                familyName?: string | null
-              } | null> | null
-            } | null
-            location?: {
-              __typename?: 'Location'
-              id: string
-              name?: string | null
-              alias?: Array<string | null> | null
-            } | null
-            office?: {
-              __typename?: 'Location'
-              name?: string | null
-              alias?: Array<string | null> | null
-              address?: {
-                __typename?: 'Address'
-                district?: string | null
-                state?: string | null
-              } | null
-            } | null
-            comments?: Array<{
-              __typename?: 'Comment'
-              comment?: string | null
-            } | null> | null
-          } | null> | null
-          certificates?: Array<{
-            __typename?: 'Certificate'
-            collector?: {
-              __typename?: 'RelatedPerson'
-              relationship?: string | null
-              individual?: {
-                __typename?: 'Person'
-                name?: Array<{
-                  __typename?: 'HumanName'
-                  use?: string | null
-                  firstNames?: string | null
-                  familyName?: string | null
-                } | null> | null
-              } | null
-            } | null
-          } | null> | null
-        } | null
-      }
-    | {
-        __typename?: 'DeathRegistration'
-        id: string
-        informant?: {
-          __typename?: 'RelatedPerson'
-          individual?: {
-            __typename?: 'Person'
-            telecom?: Array<{
-              __typename?: 'ContactPoint'
-              use?: string | null
-              system?: string | null
-              value?: string | null
-            } | null> | null
-          } | null
-        } | null
-        registration?: {
-          __typename?: 'Registration'
-          id?: string | null
-          status?: Array<{
-            __typename?: 'RegWorkflow'
-            id: string
-            type?: RegStatus | null
-            timestamp?: any | null
-            user?: {
-              __typename?: 'User'
-              id?: string | null
-              role?: string | null
-              name?: Array<{
-                __typename?: 'HumanName'
-                use?: string | null
-                firstNames?: string | null
-                familyName?: string | null
-              } | null> | null
-            } | null
-            location?: {
-              __typename?: 'Location'
-              id: string
-              name?: string | null
-              alias?: Array<string | null> | null
-            } | null
-            office?: {
-              __typename?: 'Location'
-              name?: string | null
-              alias?: Array<string | null> | null
-              address?: {
-                __typename?: 'Address'
-                district?: string | null
-                state?: string | null
-              } | null
-            } | null
-            comments?: Array<{
-              __typename?: 'Comment'
-              comment?: string | null
-            } | null> | null
-          } | null> | null
-          certificates?: Array<{
-            __typename?: 'Certificate'
-            collector?: {
-              __typename?: 'RelatedPerson'
-              relationship?: string | null
-              individual?: {
-                __typename?: 'Person'
-                name?: Array<{
-                  __typename?: 'HumanName'
-                  use?: string | null
-                  firstNames?: string | null
-                  familyName?: string | null
-                } | null> | null
-              } | null
-            } | null
-          } | null> | null
         } | null
       }
     | null
