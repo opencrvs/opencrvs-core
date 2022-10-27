@@ -39,6 +39,9 @@ services:
     ports:
       - '9000:9000'
       - '9001:9001'
+    environment:
+      - MINIO_ACCESS_KEY=minioadmin2
+      - MINIO_SECRET_KEY=minioadmin2
     volumes:
       - './data/minio:/data/minio'
       - './data/backups/minio:/data/backups/minio'
