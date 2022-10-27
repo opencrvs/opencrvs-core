@@ -15,12 +15,6 @@ import { constantsMessages } from '@client/i18n/messages'
 import { Button } from '@client/../../components/lib/Button'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 
-interface IIntegration {
-  name: string
-  status: string
-  systemId: string
-}
-
 export const statuses = {
   PENDING: 'pending',
   ACTIVE: 'active',
