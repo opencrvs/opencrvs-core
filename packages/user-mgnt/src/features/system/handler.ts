@@ -321,6 +321,23 @@ export async function getSystemHandler(
   }
 }
 
+export async function getAllSystemsHandler() {
+  const systems: ISystemModel[] = await System.find()
+
+  return systems.map((system) => {
+    const systemName = `${system.name[0]?.given || ''} ${
+      system.name[0]?.family || ''
+    }`.trim()
+
+    return {
+      client_id: system.client_id,
+      name: systemName,
+      sha_secret: system.sha_secret,
+      status: system.status
+    }
+  })
+}
+
 export const getSystemRequestSchema = Joi.object({
   systemId: Joi.string()
 })
