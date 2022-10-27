@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ComponentStory, ComponentMeta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { Accordion } from './Accordion'
 import React, { useState } from 'react'
 
@@ -27,9 +27,9 @@ export default {
   }
 } as ComponentMeta<typeof Accordion>
 
-export const text = () => <Accordion />
-export const emoji = () => (
-  <span role="img" aria-label="so cool">
-    💎💎💎
-  </span>
+export const text = () => (
+  <Accordion
+    title="Select name"
+    details="Something small enough to escape casual notice."
+  />
 )

@@ -19,21 +19,30 @@ const Container = styled.div`
 
   details > summary::before {
     border-style: solid;
-    border-width: 0.25em 0.25em 0 0;
+    border-width: 3px 3px 0 0;
     content: '';
     display: inline-block;
-    height: 0.45em;
+    height: 8px;
     position: relative;
-    top: 0.15em;
+    top: 5px;
     vertical-align: top;
-    width: 0.45em;
+    width: 8px;
     left: 0;
+    margin-right: 10px;
     transform: rotate(45deg);
   }
 
   details[open] > summary::before {
     top: 0;
     transform: rotate(135deg);
+  }
+
+  details[open] > summary::after {
+    content: attr(data-open);
+  }
+
+  details:not([open]) > summary::after {
+    content: attr(data-close);
   }
 
   &:hover {
@@ -45,46 +54,65 @@ const Container = styled.div`
     background: ${({ theme }) => theme.colors.yellow};
     border-bottom: 3px solid ${({ theme }) => theme.colors.grey600};
   }
-  /* 
-  &:active {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
-  }
 
-  &:focus-within input {
+  &:has(details[open]) {
     background: ${({ theme }) => theme.colors.white};
-  } */
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
-    width: 100%;
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 100%;
-    margin: auto;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   }
 `
 
-const TextWrapper = styled.div``
-
-const Details = styled.details``
-
 const Summary = styled.summary`
+  ${({ theme }) => theme.fonts.bold12};
   color: ${({ theme }) => theme.colors.primary};
   padding-bottom: 2px;
-  text-decoration: underline;
   list-style-type: none;
+  margin-top: 5px;
+  display: inline;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-within {
+    color: ${({ theme }) => theme.colors.grey600};
+    text-decoration: underline;
+  }
 
   &::-webkit-details-marker {
     display: none;
   }
 `
+const NestedChildren = styled.div`
+  margin: 15px 0px 0px 18px;
+  padding-left: 33px;
+  border-left: 4px solid ${({ theme }) => theme.colors.copy};
+  padding-top: 0px !important;
+`
 
-export const Accordion = () => (
+export interface IAccordionProps {
+  title: string
+  details?: string
+  nestedFields?: { [key: string]: JSX.Element[] }
+  hasNestedField?: boolean
+}
+
+export const Accordion = ({
+  title,
+  details,
+  nestedFields,
+  hasNestedField
+}: IAccordionProps) => (
   <Container>
-    <h2>Select name</h2>
-    <Details>
-      <Summary>Show</Summary>
-      <TextWrapper>Something small enough to escape casual notice.</TextWrapper>
-    </Details>
+    <h2>{title}</h2>
+    <details>
+      <Summary data-open="Hide" data-close="Show"></Summary>
+      {hasNestedField ? (
+        <div>
+          {nestedFields && <NestedChildren>{nestedFields}</NestedChildren>}
+        </div>
+      ) : (
+        <div>{details}</div>
+      )}
+    </details>
   </Container>
 )
