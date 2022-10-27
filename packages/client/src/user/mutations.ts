@@ -30,7 +30,27 @@ async function resendSMSInvite(
     })
   )
 }
+const RESET_PASSWORD_SMS = gql`
+  mutation resetPasswordSMS($userId: String!, $applicationName: String!) {
+    resetPasswordSMS(userId: $userId, applicationName: $applicationName)
+  }
+`
+async function sendResetPasswordSMS(
+  userId: string,
+  applicationName: string,
+  refetchQueries: InternalRefetchQueriesInclude
+) {
+  return (
+    client &&
+    client.mutate({
+      mutation: RESET_PASSWORD_SMS,
+      variables: { userId, applicationName },
+      refetchQueries
+    })
+  )
+}
 
 export const userMutations = {
-  resendSMSInvite
+  resendSMSInvite,
+  sendResetPasswordSMS
 }
