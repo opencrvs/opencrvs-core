@@ -91,20 +91,6 @@ export const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
-const integrationsSchema = new Schema<IIntegration>({
-  name: String,
-  status: {
-    type: String,
-    enum: [
-      statuses.PENDING,
-      statuses.ACTIVE,
-      statuses.DISABLED,
-      statuses.DEACTIVATED
-    ],
-    default: statuses.PENDING
-  }
-})
-
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   BIRTH: { type: birthSchema, required: false },
@@ -138,8 +124,7 @@ const systemSchema = new Schema({
     required: false,
     enum: [1, 2],
     default: 1
-  },
-  INTEGRATIONS: [integrationsSchema]
+  }
 })
 
 export default model<IApplicationConfigurationModel>('Config', systemSchema)
