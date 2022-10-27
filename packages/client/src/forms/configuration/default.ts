@@ -3125,7 +3125,7 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
                 label: formMessageDescriptors.docTypeBirthDeclaration,
                 initialValue: '',
-                extraValue: birthDocumentForWhomFhirMapping.CHILD,
+                extraValue: birthDocumentForWhomFhirMapping.BIRTH_DECLARATION,
                 hideAsterisk: true,
                 validate: [],
                 options: [

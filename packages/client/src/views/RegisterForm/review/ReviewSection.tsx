@@ -470,12 +470,12 @@ function renderSelectOrRadioLabel(
 }
 
 function hasB1Form(draft: IDeclaration) {
-  if (!draft.data.documents.uploadDocForChildDOB) {
+  if (!draft.data.documents.uploadDocForB1Form) {
     return false
   }
 
   return (
-    draft.data.documents.uploadDocForChildDOB as Array<{
+    draft.data.documents.uploadDocForB1Form as Array<{
       optionValues: string[]
     }>
   ).some((item) => item.optionValues[1] === 'B1_FORM')
@@ -1684,7 +1684,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       errorsOnFields
     )
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
-
     return (
       <FullBodyContent>
         <Row>

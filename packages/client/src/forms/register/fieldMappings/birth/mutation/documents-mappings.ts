@@ -24,11 +24,15 @@ export const birthDocumentForWhomFhirMapping = {
   PARENT: 'PARENT',
   OTHER: 'OTHER',
   INFORMANT_ID_PROOF: 'INFORMANT_ID_PROOF',
-  LEGAL_GUARDIAN_PROOF: 'LEGAL_GUARDIAN_PROOF'
+  LEGAL_GUARDIAN_PROOF: 'LEGAL_GUARDIAN_PROOF',
+  BIRTH_DECLARATION: 'BIRTH_DECLARATION'
 }
 
 export const birthSectionMapping = {
-  [BirthSection.Child]: [birthDocumentForWhomFhirMapping.CHILD],
+  [BirthSection.Child]: [
+    birthDocumentForWhomFhirMapping.CHILD,
+    birthDocumentForWhomFhirMapping.BIRTH_DECLARATION
+  ],
   [BirthSection.Mother]: [birthDocumentForWhomFhirMapping.MOTHER],
   [BirthSection.Father]: [birthDocumentForWhomFhirMapping.FATHER],
   [BirthSection.Informant]: [
