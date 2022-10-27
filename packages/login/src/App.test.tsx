@@ -9,16 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as moxios from 'moxios'
 import { createTestApp, wait } from '@login/tests/util'
-import { client } from '@login/utils/authApi'
-import { resolve } from 'url'
-import { ReactWrapper } from 'enzyme'
 
 describe('Login app step one', () => {
   let app: any
   beforeEach(async () => {
-    moxios.install(client)
     const appBundle = await createTestApp()
     app = appBundle.app
     window.config = {
@@ -37,7 +32,6 @@ describe('Login app step one', () => {
 
   afterEach(() => {
     app.unmount()
-    moxios.uninstall(client)
   })
 
   it('renders a phone number and a password field on startup', async () => {
@@ -52,61 +46,4 @@ describe('Login app step one', () => {
 
     app.find('input#password').simulate('change', { target: { value: 'test' } })
   })
-
-  it('redirects user to verification code form once username and password are accepted', async () => {
-    moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
-      status: 200,
-      response: { nonce: '12345', mobile: '+260933333333', status: 'active' }
-    })
-    app
-      .find('input#username')
-      .simulate('change', { target: { value: 'kennedy.mweene' } })
-    app.find('input#password').simulate('change', { target: { value: 'test' } })
-
-    app.find('form#STEP_ONE').simulate('submit')
-    await wait()
-    app.update()
-    expect(app.find('form#STEP_TWO')).toHaveLength(1)
-  })
-
-  /* describe('when credential form is filled', () => {
-
-    /*it('sends the phone number and the password to our api when user submits the form', async () => {
-      moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
-        status: 401,
-        responseText: { message: 'unauthorized' }
-      })
-
-      app.find('form#STEP_ONE').simulate('submit')
-      await wait()
-      const request = moxios.requests.mostRecent()
-      expect(request.url).toMatch(/authenticate/)
-    })
-
-    xit('handles no connectivity', async () => {
-      moxios.stubRequest(
-        resolve(window.config.AUTH_API_URL, 'authenticate'),
-        undefined
-      )
-      app.find('form#STEP_ONE').simulate('submit')
-      await wait()
-      app.update()
-      expect(app.find(ErrorMessage)).toHaveLength(1)
-    })
-
-    it('displays loading spinner when the user is submitting the form', async () => {
-      moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
-        status: 400,
-        responseText: { message: 'bad request' }
-      })
-
-      app.find('form#STEP_ONE').simulate('submit')
-      moxios.wait(() => {
-        expect(app.find('#login-submitting-spinner').hostNodes()).toHaveLength(
-          1
-        )
-      })
-    })*/
-
-  //})
 })
