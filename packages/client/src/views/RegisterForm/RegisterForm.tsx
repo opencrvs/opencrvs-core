@@ -80,7 +80,8 @@ import {
   hasFormError,
   getSectionFields,
   getNextSectionIds,
-  VIEW_TYPE
+  VIEW_TYPE,
+  getHiddenValues
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
@@ -808,6 +809,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               fieldsToShowValidationErrors
                             }
                             fields={getVisibleGroupFields(activeSectionGroup)}
+                            extraValues={
+                              activeSectionGroup.includeHiddenValues
+                                ? getHiddenValues(activeSectionGroup)
+                                : undefined
+                            }
                             draftData={declaration.data}
                             onSetTouched={(setTouchedFunc) => {
                               this.setAllFormFieldsTouched = setTouchedFunc
