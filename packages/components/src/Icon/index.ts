@@ -9,15 +9,5 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { ThreeDots } from '.'
 
-export default {
-  title: 'Styles/Icons/ThreeDots',
-  component: ThreeDots
-} as Meta
-
-const Template: Story<{}> = () => <ThreeDots />
-
-export const ThreeDotsIcon = Template.bind({})
+export * from './Icon'

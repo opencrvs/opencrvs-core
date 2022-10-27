@@ -9,4 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-declare module 'iconv'
+import React from 'react'
+import { Meta, Story } from '@storybook/react'
+import { Trash } from '.'
+
+export default {
+  title: 'Deprecated/Icons/Trash',
+  component: Trash
+} as Meta
+
+const Template: Story<{}> = () => <Trash />
+
+export const TrashIcon = Template.bind({})

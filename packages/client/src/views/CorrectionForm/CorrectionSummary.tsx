@@ -46,7 +46,6 @@ import {
   REVIEW_OVERRIDE_POSITION,
   SubmissionAction
 } from '@client/forms'
-import { lookup } from 'country-data'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Content } from '@opencrvs/components/lib/Content'
@@ -814,8 +813,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       corrector &&
       ((corrector as IFormSectionData).hasShowedVerifiedDocument as boolean)
     return idChecked
-      ? this.props.intl.formatMessage(messages.idCheckWithoutVerify)
-      : this.props.intl.formatMessage(messages.idCheckVerify)
+      ? this.props.intl.formatMessage(messages.idCheckVerify)
+      : this.props.intl.formatMessage(messages.idCheckWithoutVerify)
   }
 
   getReasonForRequest = () => {
@@ -841,8 +840,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         )
       case CorrectionReason.OTHER:
         return this.getReason(
-          (reasonType.nestedFields as IFormSectionData)
-            .reasonForChange as string
+          (reasonType.nestedFields as IFormSectionData).otherReason as string
         )
       default:
         return '-'

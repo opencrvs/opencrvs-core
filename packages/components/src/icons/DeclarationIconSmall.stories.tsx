@@ -26,6 +26,6 @@ LeftNavigationIconView.args = {
 }
 
 export default {
-  title: 'Styles/Icons/DeclarationIconSmall',
+  title: 'Deprecated/Icons/DeclarationIconSmall',
   component: DeclarationIconSmall
 } as Meta

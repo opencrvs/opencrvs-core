@@ -9,15 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { StatusSubmitted } from '.'
-
-export default {
-  title: 'Styles/Icons/StatusSubmitted',
-  component: StatusSubmitted
-} as Meta
-
-const Template: Story<{}> = () => <StatusSubmitted />
-
-export const StatusSubmittedIcon = Template.bind({})
+export * from './Archived'
+export * from './Assigned'
+export * from './Certified'
+export * from './Close'
+export * from './Collapse'
+export * from './Draft'
+export * from './DuplicateYellow'
+export * from './Expand'
+export * from './ExternalValidate'
+export * from './FilledCheck'
+export * from './InReview'
+export * from './Offline'
+export * from './Registered'
+export * from './RequiresUpdates'
+export * from './Sent'
+export * from './Validated'
+export * from './WaitingApproval'

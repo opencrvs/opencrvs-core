@@ -54,7 +54,8 @@ import {
   SYSTEM_FILE_NAME_SYSTEM,
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
-  REINSTATED_EXTENSION_URL
+  REQUESTING_INDIVIDUAL,
+  HAS_SHOWED_VERIFIED_DOCUMENT
 } from '@gateway/features/fhir/constants'
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
@@ -675,6 +676,18 @@ export const typeResolvers: GQLResolver = {
         }`,
         authHeader
       )) as fhir.RelatedPerson
+    },
+    async hasShowedVerifiedDocument(
+      docRef: fhir.DocumentReference,
+      _,
+      authHeader
+    ) {
+      const hasShowedDocument = findExtension(
+        HAS_SHOWED_VERIFIED_DOCUMENT,
+        docRef.extension as fhir.Extension[]
+      )
+
+      return Boolean(hasShowedDocument?.valueString)
     }
   },
   Identifier: {
@@ -756,15 +769,29 @@ export const typeResolvers: GQLResolver = {
   },
 
   History: {
-    action: async (task) => getActionFromTask(task),
-    reinstated: (task: fhir.Task) => {
-      const extension =
-        task.extension &&
-        findExtension(REINSTATED_EXTENSION_URL, task.extension)
-      return extension !== undefined
+    hasShowedVerifiedDocument: (task: fhir.Task) => {
+      const hasShowedDocument = findExtension(
+        HAS_SHOWED_VERIFIED_DOCUMENT,
+        task.extension as fhir.Extension[]
+      )
+
+      return Boolean(hasShowedDocument?.valueString)
     },
+    requester: (task: fhir.Task) => {
+      const requestedBy = findExtension(
+        REQUESTING_INDIVIDUAL,
+        task.extension as fhir.Extension[]
+      )
+
+      return requestedBy?.valueString || ''
+    },
+    regStatus: (task: fhir.Task) => getStatusFromTask(task),
+    action: (task) => getActionFromTask(task),
     statusReason: (task: fhir.Task) => task.statusReason || null,
     reason: (task: fhir.Task) => task.reason?.text || null,
+    otherReason: (task: fhir.Task) => {
+      return task.reason?.extension ? task.reason?.extension[0].valueString : ''
+    },
     date: (task: fhir.Task) => task.meta?.lastUpdated,
     dhis2Notification: (task: fhir.Task) =>
       task.identifier?.some(
@@ -821,14 +848,17 @@ export const typeResolvers: GQLResolver = {
     input: (task) => task.input || [],
     output: (task) => task.output || [],
     certificates: async (task, _, authHeader) => {
-      if (getActionFromTask(task) !== GQLRegStatus.CERTIFIED) {
+      if (
+        getActionFromTask(task) ||
+        getStatusFromTask(task) !== GQLRegStatus.CERTIFIED
+      ) {
         return null
       }
       return await getCertificatesFromTask(task, _, authHeader)
     },
     signature: async (task: fhir.Task, _: any, authHeader: any) => {
       const action = getActionFromTask(task)
-      if (action !== GQLRegStatus.REGISTERED) {
+      if (action || getStatusFromTask(task) !== GQLRegStatus.REGISTERED) {
         return null
       }
       const user = findExtension(

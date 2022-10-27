@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { LinkButton } from '../buttons'
+import { Link } from '../Link'
 
 const Container = styled.div`
   display: flex;
@@ -102,13 +102,14 @@ export class DataRow extends React.Component<IDataProps> {
             </DataContainer>
             {action && (
               <Action>
-                <LinkButton
+                <Link
+                  font="reg14"
                   id={action.id}
                   disabled={action.disabled}
                   onClick={action.handler}
                 >
                   {action.label}
-                </LinkButton>
+                </Link>
               </Action>
             )}
             {actionsMenu && <div>{actionsMenu}</div>}

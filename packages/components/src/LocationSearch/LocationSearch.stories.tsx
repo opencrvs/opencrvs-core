@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
+import { Meta, ComponentStory } from '@storybook/react'
 import { LocationSearch, ISearchLocation } from './LocationSearch'
 import React from 'react'
 
@@ -18,23 +18,9 @@ export default {
   component: LocationSearch
 } as Meta
 
-interface IProps {
-  locationList: ISearchLocation[]
-  selectedLocation?: ISearchLocation | undefined
-  searchHandler?: (location: ISearchLocation) => void
-  searchButtonHandler?: () => void
-  id?: string
-  onBlur?: (e: React.FocusEvent<any>) => void
-  error?: boolean
-  touched?: boolean
-  className?: string
-  dropDownIsVisible: boolean
-  filteredList: ISearchLocation[]
-  selectedText: string | null
-  selectedItem: ISearchLocation | null
-  buttonLabel: string
-}
-const Template: Story<IProps> = (args) => <LocationSearch {...args} />
+const Template: ComponentStory<typeof LocationSearch> = (args) => (
+  <LocationSearch {...args} />
+)
 export const LocationSearchView = Template.bind({})
 LocationSearchView.args = {
   buttonLabel: 'Search',

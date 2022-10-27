@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { HelpBlack } from '.'
 
 export default {
-  title: 'Styles/Icons/HelpBlack',
+  title: 'Deprecated/Icons/HelpBlack',
   component: HelpBlack
 } as Meta
 

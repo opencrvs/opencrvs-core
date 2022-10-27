@@ -11,13 +11,13 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { StatusCertified } from '.'
+import { Box } from './Box'
 
 export default {
-  title: 'Styles/Icons/StatusCertified',
-  component: StatusCertified
+  title: 'Deprecated/Icons/Box',
+  component: Box
 } as Meta
 
-const Template: Story<{}> = () => <StatusCertified />
+const Template: Story<{}> = () => <Box />
 
-export const StatusCertifiedIcon = Template.bind({})
+export const BoxView = Template.bind({})
