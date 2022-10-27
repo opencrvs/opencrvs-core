@@ -13,22 +13,16 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import User from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
-import {
-  generateRandomPassword,
-  generateSaltedHash
-} from '@user-mgnt/utils/hash'
-import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { sendUserName } from './service'
 
 interface IResendUsernameSMSPayload {
   userId: string
 }
 
-export default async function usernameSMSReminderInvite(
+export default async function usernameSMSReminderHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  let randomPassword = null
   const { userId } = request.payload as IResendUsernameSMSPayload
 
   const user = await User.findById(userId)
@@ -37,20 +31,7 @@ export default async function usernameSMSReminderInvite(
     throw unauthorized()
   }
 
-  randomPassword = generateRandomPassword(hasDemoScope(request))
-  const { hash, salt } = generateSaltedHash(randomPassword)
-
-  user.passwordHash = hash
-  user.salt = salt
-  user.status = statuses.PENDING
-
-  try {
-    await User.update({ _id: user._id }, user)
-  } catch (err) {
-    return h.response().code(400)
-  }
-
-  sendUserName(user.mobile, user.username, {
+  await sendUserName(user.mobile, user.username, {
     Authorization: request.headers.authorization
   })
 

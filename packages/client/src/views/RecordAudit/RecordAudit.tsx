@@ -79,7 +79,7 @@ import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { CorrectionSection, IForm } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
@@ -777,6 +777,9 @@ const RecordAuditComp = (props: IFullProps) => {
       navigation={
         <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       }
+      skipToContentText={props.intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <BodyContent {...props} />
     </Frame>

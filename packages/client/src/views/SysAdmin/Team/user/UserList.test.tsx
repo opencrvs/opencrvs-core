@@ -227,6 +227,7 @@ describe('User list tests', () => {
     describe('when there is a result from query', () => {
       userMutations.resendSMSInvite = vi.fn()
       userMutations.usernameSMSReminderSend = vi.fn()
+      userMutations.sendResetPasswordSMS = vi.fn()
       let component: ReactWrapper<{}, {}>
       const userListMock = [
         {
@@ -539,6 +540,78 @@ describe('User list tests', () => {
         menuOptionButton.first().simulate('click')
         component.update()
         expect(component.exists('#user-audit-modal')).toBeTruthy()
+      })
+
+      it('clicking on menu options Reset Password pop up confirmation modal', async () => {
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().first().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem3'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
+        menuOptionButton.hostNodes().simulate('click')
+        await flushPromises()
+        component.update()
+        expect(component.exists('#user-reset-password-modal')).toBeTruthy()
+      })
+
+      it('will reset password after clicking on send button shows on modal', async () => {
+        ;(userMutations.sendResetPasswordSMS as Mock).mockResolvedValueOnce({
+          data: { resetPasswordSMS: 'sadman.anik' }
+        })
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().first().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem3'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
+        menuOptionButton.hostNodes().simulate('click')
+        component.update()
+        expect(component.exists('#user-reset-password-modal')).toBeTruthy()
+        const sendButton = await waitForElement(
+          component,
+          '#reset-password-send'
+        )
+        sendButton.hostNodes().simulate('click')
+        component.update()
+        await waitForElement(component, '#reset_password_success')
+      })
+
+      it('clicking reset password send button shows error if any submission error', async () => {
+        ;(userMutations.sendResetPasswordSMS as Mock).mockRejectedValueOnce(
+          new Error('Something went wrong')
+        )
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().first().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem3'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
+        menuOptionButton.hostNodes().simulate('click')
+        component.update()
+        expect(component.exists('#user-reset-password-modal')).toBeTruthy()
+        const sendButton = await waitForElement(
+          component,
+          '#reset-password-send'
+        )
+        sendButton.hostNodes().simulate('click')
+        component.update()
+        await waitForElement(component, '#reset_password_error')
       })
     })
   })

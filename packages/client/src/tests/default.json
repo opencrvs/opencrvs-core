@@ -1514,33 +1514,17 @@
               "fields": [
                 {
                   "name": "detailsExist",
-                  "type": "RADIO_GROUP",
+                  "type": "CHECKBOX",
                   "label": {
-                    "defaultMessage": "Do you have the mother's details?",
+                    "defaultMessage": "Mother's details are not available",
                     "description": "Question to ask the user if they have the mother's details",
                     "id": "form.field.label.mothersDetailsExist"
                   },
                   "required": true,
+                  "flip": true,
+                  "hideHeader": true,
                   "initialValue": true,
                   "validate": [],
-                  "options": [
-                    {
-                      "value": true,
-                      "label": {
-                        "defaultMessage": "Yes",
-                        "description": "confirmation label for yes / no radio button",
-                        "id": "form.field.label.confirm"
-                      }
-                    },
-                    {
-                      "value": false,
-                      "label": {
-                        "defaultMessage": "No",
-                        "description": "deny label for yes / no radio button",
-                        "id": "form.field.label.deny"
-                      }
-                    }
-                  ],
                   "conditionals": [
                     {
                       "action": "hide",
@@ -2020,33 +2004,17 @@
               "fields": [
                 {
                   "name": "detailsExist",
-                  "type": "RADIO_GROUP",
+                  "type": "CHECKBOX",
                   "label": {
-                    "defaultMessage": "Do you have the father's details?",
+                    "defaultMessage": "Father's details are not available",
                     "description": "Question to ask the user if they have the father's details",
                     "id": "form.field.label.fathersDetailsExist"
                   },
                   "required": true,
+                  "flip": true,
+                  "hideHeader": true,
                   "initialValue": true,
                   "validate": [],
-                  "options": [
-                    {
-                      "value": true,
-                      "label": {
-                        "defaultMessage": "Yes",
-                        "description": "confirmation label for yes / no radio button",
-                        "id": "form.field.label.confirm"
-                      }
-                    },
-                    {
-                      "value": false,
-                      "label": {
-                        "defaultMessage": "No",
-                        "description": "deny label for yes / no radio button",
-                        "id": "form.field.label.deny"
-                      }
-                    }
-                  ],
                   "conditionals": [
                     {
                       "action": "hide",
@@ -4422,6 +4390,55 @@
                         {
                           "operation": "fieldValueTransformer",
                           "parameters": ["birthDate"]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "informantBirthDate",
+                  "type": "DATE",
+                  "label": {
+                    "defaultMessage": "Date of birth",
+                    "description": "Label for form field: Date of birth",
+                    "id": "form.field.label.motherDateOfBirth"
+                  },
+                  "required": true,
+                  "customisable": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "dateFormatIsCorrect",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateInPast",
+                      "parameters": []
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "longDateTransformer",
+                          "parameters": [
+                            "birthDate"
+                          ]
+                        },
+                        "birthDate"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldValueTransformer",
+                          "parameters": [
+                            "birthDate"
+                          ]
                         }
                       ]
                     }

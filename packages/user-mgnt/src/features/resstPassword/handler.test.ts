@@ -68,7 +68,7 @@ const mockUser: IUser & { _id: string } = {
   salt: '12345'
 }
 
-describe('usernameSMSReminderInvite handler', () => {
+describe('resetPasswordSMS handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -76,13 +76,14 @@ describe('usernameSMSReminderInvite handler', () => {
     server = await createServer()
   })
 
-  it('returns 401 if no user corresponding to mobile number found', async () => {
+  it('returns 401 if no user corresponding to userid found', async () => {
     mockingoose(User).toReturn(null, 'findOne')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/usernameSMSReminder',
+      url: '/resetPasswordSMS',
       payload: {
-        userId: '5d10885374be318fa7689f0b'
+        userId: '5d10885374be318fa7689f0b',
+        applicationName: 'opencrvs'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`
@@ -92,14 +93,32 @@ describe('usernameSMSReminderInvite handler', () => {
     expect(res.statusCode).toBe(401)
   })
 
-  it('returns 201 if handler success', async () => {
+  it('returns 400 if there is any error updating the user', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(User).toReturn(new Error('Unable to update the user'), 'update')
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/resetPasswordSMS',
+      payload: {
+        userId: '5d10885374be318fa7689f0b',
+        applicationName: 'opencrvs'
+      },
+      headers: {
+        Authorization: `Bearer ${sysAdminToken}`
+      }
+    })
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('returns 201 if succeeds updating the user', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     mockingoose(User).toReturn(null, 'update')
     const res = await server.server.inject({
       method: 'POST',
-      url: '/usernameSMSReminder',
+      url: '/resetPasswordSMS',
       payload: {
-        userId: '5d10885374be318fa7689f0b'
+        userId: '5d10885374be318fa7689f0b',
+        applicationName: 'opencrvs'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`

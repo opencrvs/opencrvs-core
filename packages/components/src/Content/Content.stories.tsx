@@ -12,8 +12,9 @@
 import { Meta, Story } from '@storybook/react'
 import { Content } from './Content'
 import React, { ReactElement } from 'react'
-import { LinkButton, PrimaryButton, SecondaryButton } from '../buttons'
 import { DeclarationIcon } from '../icons'
+import { Button } from '../Button'
+import { Link } from '../Link'
 
 export default {
   title: 'Layout/Content',
@@ -46,7 +47,8 @@ Default.args = {
   icon: () => <DeclarationIcon />,
   title: 'Register',
   topActionButtons: [
-    <SecondaryButton
+    <Button
+      type="secondary"
       key="1"
       id="myButton"
       onClick={() => {
@@ -54,21 +56,22 @@ Default.args = {
       }}
     >
       Press me
-    </SecondaryButton>,
-    <LinkButton key="2">Click</LinkButton>
+    </Button>,
+    <Link font="reg14">Click</Link>
   ],
   subtitle:
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   bottomActionButtons: [
-    <PrimaryButton
+    <Button
       key="1"
+      type="primary"
       id="myButton"
       onClick={() => {
         alert('Clicked')
       }}
     >
       Press me
-    </PrimaryButton>
+    </Button>
   ],
   size: 'normal'
 }

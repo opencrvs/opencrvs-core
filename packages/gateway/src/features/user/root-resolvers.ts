@@ -471,11 +471,10 @@ export const resolvers: GQLResolver = {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error(
-            'SMS invite can only be resent by a user with sys admin scope'
+            'Username reminder can only be resent by a user with sys admin scope'
           )
         )
       }
-
       const res = await fetch(`${USER_MANAGEMENT_URL}usernameSMSReminder`, {
         method: 'POST',
         body: JSON.stringify({
@@ -495,9 +494,37 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const result = await res.json()
+      return true
+    },
+    async resetPasswordSMS(_, { userId, applicationName }, authHeader) {
+      if (!hasScope(authHeader, 'sysadmin')) {
+        return await Promise.reject(
+          new Error(
+            'Reset password can only be sent by a user with sys admin scope'
+          )
+        )
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}resetPasswordSMS`, {
+        method: 'POST',
+        body: JSON.stringify({
+          userId,
+          applicationName
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
 
-      return result.username
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            `Something went wrong on user-mgnt service. Couldn't reset password and send sms to ${userId}`
+          )
+        )
+      }
+
+      return true
     }
   }
 }

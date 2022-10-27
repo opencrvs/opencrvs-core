@@ -956,6 +956,7 @@ export type Mutation = {
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
   resendSMSInvite?: Maybe<Scalars['String']>
+  resetPasswordSMS?: Maybe<Scalars['String']>
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
@@ -1100,6 +1101,11 @@ export type MutationRequestDeathRegistrationCorrectionArgs = {
 }
 
 export type MutationResendSmsInviteArgs = {
+  userId: Scalars['String']
+}
+
+export type MutationResetPasswordSmsArgs = {
+  applicationName: Scalars['String']
   userId: Scalars['String']
 }
 
@@ -2302,6 +2308,7 @@ export type SearchUsersQuery = {
       id?: string | null
       username?: string | null
       role?: string | null
+      mobile?: string | null
       type?: string | null
       status?: string | null
       underInvestigation?: boolean | null

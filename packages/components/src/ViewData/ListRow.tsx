@@ -11,7 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IconButton, LinkButton, PrimaryButton } from '../buttons'
+import { Link } from '../Link'
+import { Button } from '../Button'
 
 const Container = styled.div`
   display: flex;
@@ -177,12 +178,11 @@ export class ListRow extends React.Component<IListRowProps> {
               <ListDataContainer>
                 {isLinkLabel ? (
                   <Label id={`${id}_label`}>
-                    <LinkButton
+                    <Link
                       onClick={() => onClickLabelLink && onClickLabelLink()}
-                      isBoldLink={true}
                     >
                       {label}
-                    </LinkButton>
+                    </Link>
                   </Label>
                 ) : nameWithAvatar ? (
                   <ProfileInfoContainer id={`${id}_label`}>
@@ -209,35 +209,38 @@ export class ListRow extends React.Component<IListRowProps> {
             </LabelValueLayer>
             {action && (actionType === ActionType.LINK || !actionType) && (
               <Action>
-                <LinkButton
+                <Link
                   id={action.id}
+                  font="reg16"
                   disabled={action.disabled}
                   onClick={action.handler}
                 >
                   {action.label}
-                </LinkButton>
+                </Link>
               </Action>
             )}
             {action && actionType === ActionType.ICON && (
               <Action>
-                <IconButton
+                <Link
                   id={action.id}
+                  font="reg16"
                   disabled={action.disabled}
                   onClick={action.handler}
                 >
                   {action.label}
-                </IconButton>
+                </Link>
               </Action>
             )}
             {action && actionType === ActionType.BUTTON && (
               <Action>
-                <PrimaryButton
+                <Button
+                  type="primary"
                   id={action.id}
                   disabled={action.disabled}
                   onClick={action.handler}
                 >
                   {action.label}
-                </PrimaryButton>
+                </Button>
               </Action>
             )}
             <HideOnDesktop>
