@@ -375,7 +375,9 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={'/test'}
+                                            path={
+                                              routes.PERFORMANCE_REGISTRATIONS_LIST
+                                            }
                                             component={RegistrationList}
                                           />
                                         </Switch>

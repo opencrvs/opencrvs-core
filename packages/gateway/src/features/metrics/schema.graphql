@@ -37,7 +37,7 @@ type TotalMetricsResult {
   results: [EventMetrics!]!
 }
 
-type TotalMetricsByRegistrarResult {
+type TotalMetricsByRegistrar {
   results: [EventMetricsByRegistrar!]!
 }
 
@@ -139,7 +139,7 @@ type LocationStatisticsResponse {
 }
 
 union MixedTotalMetricsResult =
-    TotalMetricsByRegistrarResult
+    TotalMetricsByRegistrar
   | TotalMetricsByLocation
   | TotalMetricsByTime
 

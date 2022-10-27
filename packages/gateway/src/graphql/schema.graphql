@@ -422,7 +422,7 @@ type TotalMetricsResult {
 }
 
 union MixedTotalMetricsResult =
-    TotalMetricsByRegistrarResult
+    TotalMetricsByRegistrar
   | TotalMetricsByLocation
   | TotalMetricsByTime
 
@@ -924,7 +924,7 @@ type EventMetrics {
   practitionerRole: String!
 }
 
-type TotalMetricsByRegistrarResult {
+type TotalMetricsByRegistrar {
   results: [EventMetricsByRegistrar!]!
 }
 

@@ -19,7 +19,7 @@ export const typeResolvers: GQLResolver = {
   MixedTotalMetricsResult: {
     __resolveType(obj, context, info) {
       if (info.variableValues.filterBy === FILTER_BY.REGISTERER)
-        return 'TotalMetricsByRegistrarResult'
+        return 'TotalMetricsByRegistrar'
       else if (info.variableValues.filterBy === FILTER_BY.LOCATION)
         return 'TotalMetricsByLocation'
       else if (info.variableValues.filterBy === FILTER_BY.TIME)

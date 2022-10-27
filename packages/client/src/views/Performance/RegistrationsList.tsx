@@ -15,7 +15,12 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToFieldAgentList, goToPerformanceHome } from '@client/navigation'
+import {
+  goToFieldAgentList,
+  goToPerformanceHome,
+  goToRegistrationsList,
+  IDynamicValues
+} from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -62,20 +67,20 @@ const { useState } = React
 interface SortMap {
   month: SORT_ORDER
   location: SORT_ORDER
-  totalRegistrations: SORT_ORDER
-  lateRegistrations: SORT_ORDER
-  delayedRegistrations: SORT_ORDER
+  total: SORT_ORDER
+  late: SORT_ORDER
+  delayed: SORT_ORDER
   healthFacility: SORT_ORDER
   home: SORT_ORDER
 }
 const INITIAL_SORT_MAP = {
   month: SORT_ORDER.ASCENDING,
   location: SORT_ORDER.ASCENDING,
-  totalRegistrations: SORT_ORDER.ASCENDING,
-  lateRegistrations: SORT_ORDER.ASCENDING,
-  delayedRegistrations: SORT_ORDER.ASCENDING,
+  total: SORT_ORDER.ASCENDING,
+  late: SORT_ORDER.ASCENDING,
+  delayed: SORT_ORDER.ASCENDING,
   healthFacility: SORT_ORDER.ASCENDING,
-  homeBirth: SORT_ORDER.ASCENDING
+  home: SORT_ORDER.ASCENDING
 }
 
 interface ISearchParams {
@@ -91,6 +96,7 @@ interface IConnectProps {
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToFieldAgentList: typeof goToFieldAgentList
+  goToRegistrationsList: typeof goToRegistrationsList
 }
 type IProps = RouteComponentProps &
   WrappedComponentProps &
@@ -103,7 +109,7 @@ export enum EVENT_OPTIONS {
 }
 
 enum RESULT_TYPE {
-  by_registrar = 'TotalMetricsByRegistrarResult',
+  by_registrar = 'TotalMetricsByRegistrar',
   by_location = 'TotalMetricsByLocation',
   by_time = 'TotalMetricsByTime'
 }
@@ -190,8 +196,7 @@ function RegistrationListComponent(props: IProps) {
   const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.BIRTH)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
-  const [columnToBeSort, setColumnToBeSort] =
-    useState<keyof SortMap>('totalRegistrations')
+  const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('total')
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
@@ -239,28 +244,9 @@ function RegistrationListComponent(props: IProps) {
         label: intl.formatMessage(messages.totalRegistrations),
         width: 20,
         isSortable: true,
-        sortFunction: () => toggleSort('totalRegistrations'),
-        icon:
-          columnToBeSort === 'totalRegistrations' ? (
-            <SortArrow active={true} />
-          ) : (
-            <></>
-          ),
-        isSorted: columnToBeSort === 'totalRegistrations' ? true : false
-      },
-      {
-        key: 'late',
-        label: intl.formatMessage(messages.performanceLateRegistrationsLabel),
-        width: 20,
-        isSortable: true,
-        sortFunction: () => toggleSort('lateRegistrations'),
-        icon:
-          columnToBeSort === 'lateRegistrations' ? (
-            <SortArrow active={true} />
-          ) : (
-            <></>
-          ),
-        isSorted: columnToBeSort === 'lateRegistrations' ? true : false
+        sortFunction: () => toggleSort('total'),
+        icon: columnToBeSort === 'total' ? <SortArrow active={true} /> : <></>,
+        isSorted: columnToBeSort === 'total' ? true : false
       },
       {
         key: 'delayed',
@@ -269,16 +255,24 @@ function RegistrationListComponent(props: IProps) {
         ),
         width: 20,
         isSortable: true,
-        sortFunction: () => toggleSort('delayedRegistrations'),
+        sortFunction: () => toggleSort('delayed'),
         icon:
-          columnToBeSort === 'delayedRegistrations' ? (
-            <SortArrow active={true} />
-          ) : (
-            <></>
-          ),
-        isSorted: columnToBeSort === 'lateRegistrations' ? true : false
+          columnToBeSort === 'delayed' ? <SortArrow active={true} /> : <></>,
+        isSorted: columnToBeSort === 'late' ? true : false
       }
     ]
+
+    if (event === EVENT_OPTIONS.BIRTH) {
+      commonColumns.push({
+        key: 'late',
+        label: intl.formatMessage(messages.performanceLateRegistrationsLabel),
+        width: 20,
+        isSortable: true,
+        sortFunction: () => toggleSort('late'),
+        icon: columnToBeSort === 'late' ? <SortArrow active={true} /> : <></>,
+        isSorted: columnToBeSort === 'late' ? true : false
+      })
+    }
 
     if (filterBy === FILTER_BY_OPTIONS.BY_TIME)
       return [
@@ -294,18 +288,13 @@ function RegistrationListComponent(props: IProps) {
         },
         ...commonColumns,
         {
-          key: 'homeBirth',
+          key: 'home',
           label: intl.formatMessage(messages.performanceHomeBirth),
           width: 20,
           isSortable: true,
-          sortFunction: () => toggleSort('homeBirth'),
-          icon:
-            columnToBeSort === 'homeBirth' ? (
-              <SortArrow active={true} />
-            ) : (
-              <></>
-            ),
-          isSorted: columnToBeSort === 'homeBirth' ? true : false
+          sortFunction: () => toggleSort('home'),
+          icon: columnToBeSort === 'home' ? <SortArrow active={true} /> : <></>,
+          isSorted: columnToBeSort === 'home' ? true : false
         },
         {
           key: 'healthFacility',
@@ -386,29 +375,42 @@ function RegistrationListComponent(props: IProps) {
   }
 
   function getContent(data?: GQLMixedTotalMetricsResult) {
-    if (!data) {
-      return []
-    }
+    const content = { ...data } as IDynamicValues
+    let finalContent: IDynamicValues[] = []
 
-    if (data.__typename === RESULT_TYPE.by_registrar) {
-      return data.results.map((result) => ({
+    if (content.__typename === RESULT_TYPE.by_registrar) {
+      finalContent = content.results.map((result: IDynamicValues) => ({
         ...result,
         name: result.registrarPractitioner.name
           ? getName(result.registrarPractitioner.name, 'en')
           : '',
         location: result.registrarPractitioner.primaryOffice.name,
-        role: getFieldAgentTypeLabel(result.registrarPractitioner.role)
+        role: getFieldAgentTypeLabel(result.registrarPractitioner.role),
+        total: String(result.total),
+        delayed: `${getPercentage(result.total, result.delayed)}%`,
+        late: `${getPercentage(result.total, result.late)}%`
       }))
-    } else if (data.__typename === RESULT_TYPE.by_location) {
-      return data.results.map((result) => ({
+    } else if (content.__typename === RESULT_TYPE.by_location) {
+      finalContent = content.results.map((result: IDynamicValues) => ({
         ...result,
-        location: result.location.name
+        location: result.location.name,
+        total: String(result.total),
+        delayed: `${getPercentage(result.total, result.delayed)}%`,
+        late: `${getPercentage(result.total, result.late)}%`,
+        home: `${getPercentage(result.total, result.home)}%`,
+        healthFacility: `${getPercentage(result.total, result.healthFacility)}%`
       }))
-    } else if (data.__typename === RESULT_TYPE.by_time) {
-      return data.results
-    } else {
-      return []
+    } else if (content.__typename === RESULT_TYPE.by_time) {
+      finalContent = content.results.map((result: IDynamicValues) => ({
+        ...result,
+        total: String(result.total),
+        delayed: `${getPercentage(result.total, result.delayed)}%`,
+        late: `${getPercentage(result.total, result.late)}%`,
+        home: `${getPercentage(result.total, result.home)}%`,
+        healthFacility: `${getPercentage(result.total, result.healthFacility)}%`
+      }))
     }
+    return orderBy(finalContent, [columnToBeSort], [sortOrder[columnToBeSort]])
   }
 
   const options: (IPerformanceSelectOption & { disabled?: boolean })[] = [
@@ -441,7 +443,7 @@ function RegistrationListComponent(props: IProps) {
             <LocationPicker
               selectedLocationId={locationId}
               onChangeLocation={(newLocationId) => {
-                props.goToFieldAgentList(timeStart, timeEnd, newLocationId)
+                props.goToRegistrationsList(timeStart, timeEnd, newLocationId)
               }}
               requiredJurisdictionTypes={
                 window.config.FIELD_AGENT_AUDIT_LOCATIONS
@@ -509,7 +511,9 @@ function RegistrationListComponent(props: IProps) {
                     )}
                     isLoading={true}
                     columns={getColumns()}
-                    content={getContent(data && data.searchFieldAgents)}
+                    content={getContent(
+                      data && data.getRegistrationsListByFilter
+                    )}
                   />
                   <GenericErrorToast />
                 </>
@@ -569,5 +573,5 @@ export const RegistrationList = connect(
       offlineOffices
     }
   },
-  { goToPerformanceHome, goToFieldAgentList }
+  { goToPerformanceHome, goToFieldAgentList, goToRegistrationsList }
 )(injectIntl(RegistrationListComponent))

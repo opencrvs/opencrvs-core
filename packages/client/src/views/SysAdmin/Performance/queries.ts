@@ -161,7 +161,7 @@ export const FETCH_REGISTRATIONS = gql`
       filterBy: $filterBy
     ) {
       __typename
-      ... on TotalMetricsByRegistrarResult {
+      ... on TotalMetricsByRegistrar {
         __typename
         results {
           total

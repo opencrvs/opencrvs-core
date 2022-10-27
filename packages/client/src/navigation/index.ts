@@ -49,7 +49,8 @@ import {
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
-  REGISTRAR_HOME_TAB_PAGE
+  REGISTRAR_HOME_TAB_PAGE,
+  PERFORMANCE_REGISTRATIONS_LIST
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -417,6 +418,21 @@ export function goToFieldAgentList(
 ) {
   return push({
     pathname: PERFORMANCE_FIELD_AGENT_LIST,
+    search: stringify({
+      locationId,
+      timeStart,
+      timeEnd
+    })
+  })
+}
+
+export function goToRegistrationsList(
+  timeStart: string,
+  timeEnd: string,
+  locationId?: string
+) {
+  return push({
+    pathname: PERFORMANCE_REGISTRATIONS_LIST,
     search: stringify({
       locationId,
       timeStart,

@@ -265,19 +265,19 @@ export interface GQLTotalMetricsResult {
 }
 
 export type GQLMixedTotalMetricsResult =
-  | GQLTotalMetricsByRegistrarResult
+  | GQLTotalMetricsByRegistrar
   | GQLTotalMetricsByLocation
   | GQLTotalMetricsByTime
 
 /** Use this to resolve union type MixedTotalMetricsResult */
 export type GQLPossibleMixedTotalMetricsResultTypeNames =
-  | 'TotalMetricsByRegistrarResult'
+  | 'TotalMetricsByRegistrar'
   | 'TotalMetricsByLocation'
   | 'TotalMetricsByTime'
 
 export interface GQLMixedTotalMetricsResultNameMap {
   MixedTotalMetricsResult: GQLMixedTotalMetricsResult
-  TotalMetricsByRegistrarResult: GQLTotalMetricsByRegistrarResult
+  TotalMetricsByRegistrar: GQLTotalMetricsByRegistrar
   TotalMetricsByLocation: GQLTotalMetricsByLocation
   TotalMetricsByTime: GQLTotalMetricsByTime
 }
@@ -780,7 +780,7 @@ export interface GQLEventMetrics {
   practitionerRole: string
 }
 
-export interface GQLTotalMetricsByRegistrarResult {
+export interface GQLTotalMetricsByRegistrar {
   results: Array<GQLEventMetricsByRegistrar>
 }
 
@@ -1460,7 +1460,7 @@ export interface GQLResolver {
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
-  TotalMetricsByRegistrarResult?: GQLTotalMetricsByRegistrarResultTypeResolver
+  TotalMetricsByRegistrar?: GQLTotalMetricsByRegistrarTypeResolver
   TotalMetricsByLocation?: GQLTotalMetricsByLocationTypeResolver
   TotalMetricsByTime?: GQLTotalMetricsByTimeTypeResolver
   TimeLoggedMetrics?: GQLTimeLoggedMetricsTypeResolver
@@ -3498,11 +3498,11 @@ export interface TotalMetricsResultToResultsResolver<
 
 export interface GQLMixedTotalMetricsResultTypeResolver<TParent = any> {
   (parent: TParent, context: any, info: GraphQLResolveInfo):
-    | 'TotalMetricsByRegistrarResult'
+    | 'TotalMetricsByRegistrar'
     | 'TotalMetricsByLocation'
     | 'TotalMetricsByTime'
     | Promise<
-        | 'TotalMetricsByRegistrarResult'
+        | 'TotalMetricsByRegistrar'
         | 'TotalMetricsByLocation'
         | 'TotalMetricsByTime'
       >
@@ -4806,11 +4806,11 @@ export interface EventMetricsToPractitionerRoleResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLTotalMetricsByRegistrarResultTypeResolver<TParent = any> {
-  results?: TotalMetricsByRegistrarResultToResultsResolver<TParent>
+export interface GQLTotalMetricsByRegistrarTypeResolver<TParent = any> {
+  results?: TotalMetricsByRegistrarToResultsResolver<TParent>
 }
 
-export interface TotalMetricsByRegistrarResultToResultsResolver<
+export interface TotalMetricsByRegistrarToResultsResolver<
   TParent = any,
   TResult = any
 > {
