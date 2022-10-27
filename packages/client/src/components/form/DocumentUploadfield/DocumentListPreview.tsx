@@ -71,7 +71,9 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
   getFormattedLabelForDocType = (docType: string) => {
     const matchingOptionForDocType =
       this.props.dropdownOptions &&
-      this.props.dropdownOptions.find((option) => option.value === docType)
+      this.props.dropdownOptions.find(
+        (option) => option.value === docType || option.originalValue === docType
+      )
     return matchingOptionForDocType && matchingOptionForDocType.label
   }
   render() {

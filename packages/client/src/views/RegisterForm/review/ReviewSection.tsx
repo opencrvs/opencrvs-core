@@ -772,7 +772,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
   prepSectionDocuments = (
     draft: IDeclaration,
-    activeSection: Section
+    activeSection?: Section
   ): IDocumentViewerOptions & { uploadedDocuments: IFileValue[] } => {
     const { documentsSection } = this.props
 
@@ -793,9 +793,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     uploadedDocuments = uploadedDocuments.filter((document) => {
       const sectionMapping = SECTION_MAPPING[draft.event]
-
       const allowedDocumentType: string[] =
-        flatMap(Object.values(sectionMapping)) || []
+        (activeSection
+          ? sectionMapping[activeSection as keyof typeof sectionMapping]
+          : flatMap(Object.values(sectionMapping))) || []
 
       if (
         allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
@@ -817,8 +818,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           value: document.data,
           label
         })
+
         selectOptions.push({
           value: label,
+          originalValue: document.optionValues[
+            document.optionValues.length - 1
+          ] as string,
           label
         })
         return true
@@ -1707,6 +1712,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               {transformedSectionData.map((sec, index) => {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
+
                 return (
                   <SectionContainer key={index}>
                     {sec.title && (
@@ -1823,10 +1829,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               <DocumentViewer
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
-                options={this.prepSectionDocuments(
-                  declaration,
-                  this.state.activeSection || this.docSections[0].id
-                )}
+                options={this.prepSectionDocuments(declaration)}
               >
                 <ZeroDocument id={`zero_document_${sectionName}`}>
                   {intl.formatMessage(messages.zeroDocumentsText, {
