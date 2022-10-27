@@ -56,9 +56,18 @@ export function IntegrationList() {
                 <ToggleMenu
                   id="toggleMenu"
                   menuItems={[
-                    { handler: () => {}, label: 'Reveal Keys' },
-                    { handler: () => {}, label: 'Disable' },
-                    { handler: () => {}, label: 'Delete' }
+                    {
+                      handler: () => {},
+                      label: intl.formatMessage(integrationMessages.revealKeys)
+                    },
+                    {
+                      handler: () => {},
+                      label: intl.formatMessage(integrationMessages.disable)
+                    },
+                    {
+                      handler: () => {},
+                      label: intl.formatMessage(integrationMessages.delete)
+                    }
                   ]}
                   toggleButton={<VerticalThreeDots />}
                 />
