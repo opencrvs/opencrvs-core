@@ -74,6 +74,7 @@ interface IConstantsMessages
   labelPhone: MessageDescriptor
   labelPin: MessageDescriptor
   labelRole: MessageDescriptor
+  labelTitle: MessageDescriptor
   last30Days: MessageDescriptor
   last12Months: MessageDescriptor
   lastEdited: MessageDescriptor
@@ -485,6 +486,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Role',
     description: 'Role label',
     id: 'constants.role'
+  },
+  labelTitle: {
+    defaultMessage: 'Title',
+    description: 'Title label',
+    id: 'constants.title'
   },
   last30Days: {
     defaultMessage: 'Last 30 days',
