@@ -960,6 +960,7 @@ export type Mutation = {
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
+  usernameSMSReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
 
@@ -1120,6 +1121,10 @@ export type MutationUpdateBirthRegistrationArgs = {
 export type MutationUpdateDeathRegistrationArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
+}
+
+export type MutationUsernameSmsReminderArgs = {
+  userId: Scalars['String']
 }
 
 export type MutationVoidNotificationArgs = {
@@ -2276,6 +2281,15 @@ export type ResendSmsInviteMutationVariables = Exact<{
 export type ResendSmsInviteMutation = {
   __typename?: 'Mutation'
   resendSMSInvite?: string | null
+}
+
+export type UsernameSmsReminderMutationVariables = Exact<{
+  userId: Scalars['String']
+}>
+
+export type UsernameSmsReminderMutation = {
+  __typename?: 'Mutation'
+  usernameSMSReminder?: string | null
 }
 
 export type SearchUsersQueryVariables = Exact<{

@@ -71,6 +71,9 @@ import * as Hapi from '@hapi/hapi'
 import resendSMSInviteHandler, {
   requestSchema as resendSMSRequestSchema
 } from '@user-mgnt/features/resendSMSInvite/handler'
+import usernameSMSReminderHandler, {
+  requestSchema as usernameSMSReminderRequestSchema
+} from '@user-mgnt/features/usernameSMSReminderInvite/handler'
 import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
@@ -443,6 +446,21 @@ export const getRoutes = () => {
         },
         description:
           'Resend sms for given mobile number and make the corresponding user pending'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/usernameSMSReminder',
+      handler: usernameSMSReminderHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: usernameSMSReminderRequestSchema
+        },
+        description:
+          'Resend sms for given username and make the corresponding user pending'
       }
     },
     {

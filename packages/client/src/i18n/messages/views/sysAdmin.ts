@@ -42,6 +42,11 @@ interface ISysAdminMessages
   resendSMS: MessageDescriptor
   resendSMSSuccess: MessageDescriptor
   resendSMSError: MessageDescriptor
+  sendUsernameReminderSMS: MessageDescriptor
+  sendUsernameReminderSMSSuccess: MessageDescriptor
+  sendUsernameReminderSMSError: MessageDescriptor
+  sendUsernameReminderSMSModalMessage: MessageDescriptor
+  sendUsernameReminderSMSModalTitle: MessageDescriptor
   resetPasswordSMSSuccess: MessageDescriptor
   resetPasswordSMSError: MessageDescriptor
   newUser: MessageDescriptor
@@ -201,6 +206,32 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Invite could not be sent',
     description: 'The label for error notification of resend sms invite',
     id: 'sysAdHome.resendSMSError'
+  },
+  sendUsernameReminderSMS: {
+    defaultMessage: 'Send username reminder',
+    description: 'The label for menu option to send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMS'
+  },
+  sendUsernameReminderSMSSuccess: {
+    defaultMessage: 'Username reminder sent to {name}',
+    description: 'The label for success notification of send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSSuccess'
+  },
+  sendUsernameReminderSMSError: {
+    defaultMessage: 'Username reminder could not be sent',
+    description: 'The label for error notification of send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSError'
+  },
+  sendUsernameReminderSMSModalTitle: {
+    defaultMessage: 'Send username reminder?',
+    description: 'Title for send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSModalTitle'
+  },
+  sendUsernameReminderSMSModalMessage: {
+    defaultMessage:
+      'The user will recieve a username reminder via an SMS sent to {phoneNumber}',
+    description: 'Message for send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSModalMessage'
   },
   resetPasswordSMSSuccess: {
     defaultMessage: 'Temporary password sent to {username}',

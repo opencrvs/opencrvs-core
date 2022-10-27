@@ -242,6 +242,11 @@ interface ToggleModal {
   selectedUser: GQLUser | null
 }
 
+interface ToggleModal {
+  modalVisible: boolean
+  selectedUser: GQLUser | null
+}
+
 export const Status = (statusProps: IStatusProps) => {
   const status = statusProps.status
   const intl = useIntl()
@@ -274,7 +279,11 @@ export const Status = (statusProps: IStatusProps) => {
 
 function UserListComponent(props: IProps) {
   const [showResendSMSSuccess, setShowResendSMSSuccess] = useState(false)
+  const [showUsernameSMSReminderSuccess, setShowUsernameSMSReminderSuccess] =
+    useState(false)
   const [showResendSMSError, setShowResendSMSError] = useState(false)
+  const [showUsernameSMSReminderError, setShowUsernameSMSReminderError] =
+    useState(false)
   const [showResetPasswordSMSSuccess, setShowResetPasswordSMSSuccess] =
     useState(false)
   const [showResetPasswordSMSError, setResetPasswordSMSError] = useState(false)
@@ -297,6 +306,11 @@ function UserListComponent(props: IProps) {
     : false
 
   const { locationId } = parse(search) as unknown as ISearchParams
+  const [toggleUsernameReminder, setToggleUsernameReminder] =
+    useState<ToggleModal>({
+      modalVisible: false,
+      selectedUser: null
+    })
   const [toggleActivation, setToggleActivation] = useState<ToggleModal>({
     modalVisible: false,
     selectedUser: null
@@ -328,6 +342,24 @@ function UserListComponent(props: IProps) {
       }
     },
     [toggleActivation]
+  )
+
+  const toggleUsernameReminderModal = useCallback(
+    function toggleUsernameReminderModal(user?: GQLUser) {
+      if (user !== undefined) {
+        setToggleUsernameReminder({
+          ...toggleUsernameReminder,
+          modalVisible: true,
+          selectedUser: user
+        })
+      } else {
+        setToggleUsernameReminder({
+          ...toggleUsernameReminder,
+          modalVisible: false
+        })
+      }
+    },
+    [toggleUsernameReminder]
   )
 
   const toggleUserResetPasswordModal = useCallback(
@@ -367,6 +399,25 @@ function UserListComponent(props: IProps) {
     [locationId, recordCount]
   )
 
+  const usernameSMSReminder = useCallback(
+    async function usernameSMSReminder(userId: string) {
+      try {
+        const res = await userMutations.usernameSMSReminderSend(userId, [
+          {
+            query: SEARCH_USERS,
+            variables: { primaryOfficeId: locationId, count: recordCount }
+          }
+        ])
+        if (res && res.data && res.data.usernameSMSReminder) {
+          setShowUsernameSMSReminderSuccess(true)
+        }
+      } catch (err) {
+        setShowUsernameSMSReminderError(true)
+      }
+    },
+    [locationId, recordCount]
+  )
+
   const resetPassword = useCallback(
     async function resetPassword(userId: string) {
       try {
@@ -400,6 +451,15 @@ function UserListComponent(props: IProps) {
           }
         }
       ]
+
+      if (user.status === 'pending' || user.status === 'active') {
+        menuItems.push({
+          label: intl.formatMessage(messages.sendUsernameReminderSMS),
+          handler: () => {
+            toggleUsernameReminderModal(user)
+          }
+        })
+      }
 
       if (user.status === 'pending') {
         menuItems.push({
@@ -439,6 +499,7 @@ function UserListComponent(props: IProps) {
       intl,
       resendSMS,
       toggleUserActivationModal,
+      toggleUsernameReminderModal,
       toggleUserResetPasswordModal
     ]
   )
@@ -675,6 +736,47 @@ function UserListComponent(props: IProps) {
                 }
               ]}
             />
+
+            <ResponsiveModal
+              id="username-reminder-modal"
+              show={toggleUsernameReminder.modalVisible}
+              handleClose={() => toggleUsernameReminderModal()}
+              title={intl.formatMessage(
+                messages.sendUsernameReminderSMSModalTitle
+              )}
+              actions={[
+                <Button
+                  type="tertiary"
+                  id="username-reminder-cancel"
+                  key="username-reminusernameSMSReminderder-cancel"
+                  onClick={() => toggleUsernameReminderModal()}
+                >
+                  {intl.formatMessage(buttonMessages.cancel)}
+                </Button>,
+                <Button
+                  type="primary"
+                  id="username-reminder-send"
+                  key="username-reminder-send"
+                  onClick={() => {
+                    if (toggleUsernameReminder.selectedUser?.id) {
+                      usernameSMSReminder(
+                        toggleUsernameReminder.selectedUser.id
+                      )
+                    }
+                    toggleUsernameReminderModal()
+                  }}
+                >
+                  {intl.formatMessage(buttonMessages.send)}
+                </Button>
+              ]}
+              responsive={false}
+              autoHeight={true}
+            >
+              {intl.formatMessage(
+                messages.sendUsernameReminderSMSModalMessage,
+                { phoneNumber: toggleUsernameReminder.selectedUser?.mobile }
+              )}
+            </ResponsiveModal>
             <ResponsiveModal
               id="user-reset-password-modal"
               show={toggleResetPassword.modalVisible}
@@ -690,9 +792,9 @@ function UserListComponent(props: IProps) {
                   {intl.formatMessage(buttonMessages.cancel)}
                 </Button>,
                 <Button
+                  type="primary"
                   id="reset-password-send"
                   key="reset-password-send"
-                  type="primary"
                   onClick={() => {
                     if (toggleResetPassword.selectedUser?.id) {
                       resetPassword(toggleResetPassword.selectedUser.id)
@@ -721,8 +823,12 @@ function UserListComponent(props: IProps) {
       recordCount,
       toggleActivation.modalVisible,
       toggleActivation.selectedUser,
-      resetPassword,
       toggleUserActivationModal,
+      toggleUsernameReminder.modalVisible,
+      toggleUsernameReminder.selectedUser,
+      toggleUsernameReminderModal,
+      usernameSMSReminder,
+      resetPassword,
       toggleResetPassword.modalVisible,
       toggleResetPassword.selectedUser,
       toggleUserResetPasswordModal
@@ -833,6 +939,27 @@ function UserListComponent(props: IProps) {
           onClose={() => setShowResendSMSError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}
+        </Toast>
+      )}
+
+      {showUsernameSMSReminderSuccess && (
+        <Toast
+          id="username_reminder_success"
+          type="success"
+          onClose={() => setShowUsernameSMSReminderSuccess(false)}
+        >
+          {intl.formatMessage(messages.sendUsernameReminderSMSSuccess, {
+            name: getUserName(toggleUsernameReminder.selectedUser as GQLUser)
+          })}
+        </Toast>
+      )}
+      {showUsernameSMSReminderError && (
+        <Toast
+          id="username_reminder_error"
+          type="warning"
+          onClose={() => setShowUsernameSMSReminderError(false)}
+        >
+          {intl.formatMessage(messages.sendUsernameReminderSMSError)}
         </Toast>
       )}
 
