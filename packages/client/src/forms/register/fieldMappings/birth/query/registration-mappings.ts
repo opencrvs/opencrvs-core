@@ -123,6 +123,34 @@ export function registrationNumberTransformer(
   }
 }
 
+export function mosipAidTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].mosipAid) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'mosipAid'
+    ] = queryData[sectionId].mosipAid
+  }
+}
+
+export function mosipAidLabelTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].mosipAid) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'mosipAIDLabel'
+    ] = 'MOSIP Application ID'
+  }
+}
+
 export const certificateDateTransformer =
   (locale: string, dateFormat: string) =>
   (
@@ -243,7 +271,8 @@ export const registrarNameUserTransformer = (
   }
 
   const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
+    ({ action, regStatus }: History) =>
+      !action && regStatus === RegStatus.Registered
   )
   transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
     history?.user ? getUserName(history.user) : ''
@@ -263,7 +292,8 @@ export const roleUserTransformer = (
   }
 
   const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
+    ({ action, regStatus }: History) =>
+      !action && regStatus === RegStatus.Registered
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
@@ -309,7 +339,8 @@ export const registrarSignatureUserTransformer = (
   }
 
   const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
+    ({ action, regStatus }: History) =>
+      !action && regStatus === RegStatus.Registered
   )
 
   transformedData[targetSectionId || sectionId][

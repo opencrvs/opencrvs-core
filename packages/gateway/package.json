@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
@@ -42,6 +42,7 @@
     "dotenv": "^6.1.0",
     "file-type": "^16.5.3",
     "flat": "^5.0.0",
+    "fp-ts": "^2.12.3",
     "glob": "^7.1.2",
     "graphql": "^15.0.0",
     "graphql-import": "^0.5.2",

@@ -107,4 +107,4 @@ export const INFORMANT_MINIMUM_AGE = 16
 export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
-export const APPLICATION_VERSION = '1.1.0'
+export const APPLICATION_VERSION = 'v1.1.1'

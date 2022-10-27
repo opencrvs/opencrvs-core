@@ -74,7 +74,6 @@ import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
-
 export interface IDynamicValues {
   [key: string]: any
 }
@@ -86,7 +85,6 @@ export function formatUrl(url: string, props: { [key: string]: string }) {
   )
   return formattedUrl.endsWith('?') ? formattedUrl.slice(0, -1) : formattedUrl
 }
-
 export const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
 type GoToPageAction = {
   type: typeof GO_TO_PAGE

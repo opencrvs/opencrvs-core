@@ -610,6 +610,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'A label from the review button',
     id: 'constants.review'
   },
+  assignRecord: {
+    defaultMessage: 'Assign record',
+    description: 'A label for the Assign record -button',
+    id: 'constants.assignRecord'
+  },
   search: {
     defaultMessage: 'Search',
     description: 'The title of the page',
@@ -629,6 +634,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Sent on',
     description: 'Label for rejection date in work queue list item',
     id: 'constants.sentOn'
+  },
+  skipToMainContent: {
+    defaultMessage: 'Skip to main content',
+    description:
+      'Label for a keyboard accessibility link which skips to the main content',
+    id: 'constants.skipToMainContent'
   },
   status: {
     defaultMessage: 'Status',

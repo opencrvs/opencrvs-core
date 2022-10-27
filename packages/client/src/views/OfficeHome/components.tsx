@@ -19,7 +19,7 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { WaitingToSent } from '@opencrvs/components/lib/icons/WaitingToSent'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Link } from '@opencrvs/components/lib/Link'
 
 const Flex = styled.div`
   display: flex;
@@ -30,23 +30,10 @@ const Flex = styled.div`
   }
 `
 
-export const NameContainer = styled(LinkButton)`
-  height: auto;
-  margin-left: 0;
-  div {
-    padding: 0;
-  }
-`
-
-export const NoNameContainer = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
-  cursor: pointer;
-  &:hover {
-    color: ${({ theme }) => theme.colors.negative};
-    text-decoration-line: underline;
-    text-underline-offset: 4px;
-  }
-`
+export const NameContainer = styled(Link)``
+export const NoNameContainer = styled(Link).attrs({
+  color: 'negative'
+})``
 
 const Event = styled.div`
   color: ${({ theme }) => theme.colors.grey500};

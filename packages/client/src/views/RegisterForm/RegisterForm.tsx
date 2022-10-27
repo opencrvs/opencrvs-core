@@ -25,7 +25,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
-  EventTopBar,
+  FixedEventTopBar,
   IEventTopBarProps,
   IEventTopBarMenuAction
 } from '@opencrvs/components/lib/EventTopBar'
@@ -647,7 +647,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             <>
               {activeSection.viewType === VIEW_TYPE.PREVIEW && (
                 <>
-                  <EventTopBar
+                  <FixedEventTopBar
                     title={intl.formatMessage(
                       messages.newVitalEventRegistration,
                       {
@@ -672,9 +672,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
               {activeSection.viewType === VIEW_TYPE.REVIEW && (
                 <>
                   {isCorrection(declaration) ? (
-                    <EventTopBar {...this.getEventTopBarPropsForCorrection()} />
+                    <FixedEventTopBar
+                      {...this.getEventTopBarPropsForCorrection()}
+                    />
                   ) : (
-                    <EventTopBar
+                    <FixedEventTopBar
                       title={intl.formatMessage(
                         messages.newVitalEventRegistration,
                         {
@@ -709,7 +711,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
               {activeSection.viewType === VIEW_TYPE.FORM && (
                 <>
-                  <EventTopBar
+                  <FixedEventTopBar
                     {...this.getEventTopBarPropsForForm(menuItemDeleteOrClose)}
                   />
                   <BodyContent id="register_form">

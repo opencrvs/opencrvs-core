@@ -209,7 +209,7 @@ export function Outbox() {
       const icon = getIcon(declaration.submissionStatus, index, isOnline)
 
       const NameComponent = name ? (
-        <NameContainer isBoldLink>{name}</NameContainer>
+        <NameContainer>{name}</NameContainer>
       ) : (
         <NoNameContainer>
           {intl.formatMessage(constantsMessages.noNameProvided)}
