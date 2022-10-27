@@ -470,15 +470,15 @@ function renderSelectOrRadioLabel(
 }
 
 function hasB1Form(draft: IDeclaration) {
-  if (!draft.data.documents.uploadDocForB1Form) {
+  if (!draft.data?.documents?.uploadDocForB1Form) {
     return false
   }
 
   return (
-    draft.data.documents.uploadDocForB1Form as Array<{
+    draft.data?.documents?.uploadDocForB1Form as Array<{
       optionValues: string[]
     }>
-  ).some((item) => item.optionValues[1] === 'B1_FORM')
+  )?.some((item) => item.optionValues[1] === 'B1_FORM')
 }
 
 export function renderSelectDynamicLabel(
