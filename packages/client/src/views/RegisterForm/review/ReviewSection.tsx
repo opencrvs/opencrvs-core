@@ -778,7 +778,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
-    const selectOptions: SelectComponentOptions[] = []
+    const selectOptions: Array<ISelectOption & { originalValue?: string }> = []
 
     let uploadedDocuments: IFileValue[] = []
 

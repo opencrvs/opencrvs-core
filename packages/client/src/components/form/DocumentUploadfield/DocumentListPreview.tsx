@@ -63,7 +63,7 @@ type IProps = {
   label?: string
   theme: ITheme
   onSelect: (document: IFileValue | IAttachmentValue) => void
-  dropdownOptions?: ISelectOption[]
+  dropdownOptions?: Array<ISelectOption & { originalValue?: string }>
   onDelete?: (image: IFileValue | IAttachmentValue) => void
 }
 
