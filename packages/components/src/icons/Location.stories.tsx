@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Location } from '.'
 
 export default {
-  title: 'Styles/Icons/Location',
+  title: 'Deprecated/Icons/Location',
   component: Location
 } as Meta
 

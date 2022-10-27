@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ConnectionError } from './ConnectionError'
 
 export default {
-  title: 'Styles/Icons/ConnectionError',
+  title: 'Deprecated/Icons/ConnectionError',
   component: ConnectionError
 } as Meta
 
