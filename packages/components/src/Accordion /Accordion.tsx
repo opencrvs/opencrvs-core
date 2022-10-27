@@ -24,7 +24,7 @@ const Container = styled.div`
     display: inline-block;
     height: 8px;
     position: relative;
-    top: 5px;
+    top: 7px;
     vertical-align: top;
     width: 8px;
     left: 0;
@@ -62,7 +62,7 @@ const Container = styled.div`
 `
 
 const Summary = styled.summary`
-  ${({ theme }) => theme.fonts.bold12};
+  ${({ theme }) => theme.fonts.bold18};
   color: ${({ theme }) => theme.colors.primary};
   padding-bottom: 2px;
   list-style-type: none;
