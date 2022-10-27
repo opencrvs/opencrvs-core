@@ -399,7 +399,7 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-2-menuItem2'
+          '#user-item-2-menuItem3'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
         menuOptionButton.hostNodes().simulate('click')
@@ -420,7 +420,7 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-2-menuItem2'
+          '#user-item-2-menuItem3'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
         menuOptionButton.hostNodes().simulate('click')
@@ -438,7 +438,7 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-1-menuItem2'
+          '#user-item-1-menuItem3'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
         menuOptionButton.first().simulate('click')
@@ -551,7 +551,7 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-1-menuItem3'
+          '#user-item-1-menuItem2'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
         menuOptionButton.hostNodes().simulate('click')
@@ -572,7 +572,7 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-1-menuItem3'
+          '#user-item-1-menuItem2'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
         menuOptionButton.hostNodes().simulate('click')
@@ -599,7 +599,7 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-1-menuItem3'
+          '#user-item-1-menuItem2'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
         menuOptionButton.hostNodes().simulate('click')

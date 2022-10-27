@@ -453,12 +453,20 @@ function UserListComponent(props: IProps) {
       ]
 
       if (user.status === 'pending' || user.status === 'active') {
-        menuItems.push({
-          label: intl.formatMessage(messages.sendUsernameReminderSMS),
-          handler: () => {
-            toggleUsernameReminderModal(user)
+        menuItems.push(
+          {
+            label: intl.formatMessage(messages.sendUsernameReminderSMS),
+            handler: () => {
+              toggleUsernameReminderModal(user)
+            }
+          },
+          {
+            label: intl.formatMessage(messages.resetUserPasswordTitle),
+            handler: () => {
+              toggleUserResetPasswordModal(user)
+            }
           }
-        })
+        )
       }
 
       if (user.status === 'pending') {
@@ -471,18 +479,10 @@ function UserListComponent(props: IProps) {
       }
 
       if (user.status === 'active') {
-        menuItems.push(
-          {
-            label: intl.formatMessage(messages.deactivate),
-            handler: () => toggleUserActivationModal(user)
-          },
-          {
-            label: intl.formatMessage(messages.resetUserPasswordTitle),
-            handler: () => {
-              toggleUserResetPasswordModal(user)
-            }
-          }
-        )
+        menuItems.push({
+          label: intl.formatMessage(messages.deactivate),
+          handler: () => toggleUserActivationModal(user)
+        })
       }
 
       if (user.status === 'deactivated') {
