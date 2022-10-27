@@ -98,19 +98,19 @@ export async function updateApplicationConfigHandler(
 ) {
   try {
     const applicationConfig = request.payload as IApplicationConfigurationModel
-    const existingApllicationConfig: IApplicationConfigurationModel | null =
+    const existingApplicationConfig: IApplicationConfigurationModel | null =
       await ApplicationConfig.findOne({})
-    if (!existingApllicationConfig) {
+    if (!existingApplicationConfig) {
       throw badRequest('No existing application config found')
     }
     // Update existing application config fields
-    merge(existingApllicationConfig, applicationConfig)
+    merge(existingApplicationConfig, applicationConfig)
 
     await ApplicationConfig.update(
-      { _id: existingApllicationConfig._id },
-      existingApllicationConfig
+      { _id: existingApplicationConfig._id },
+      existingApplicationConfig
     )
-    return h.response(existingApllicationConfig).code(201)
+    return h.response(existingApplicationConfig).code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo
@@ -151,9 +151,5 @@ export const updateApplicationConfig = Joi.object({
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.string(),
-  ADDRESSES: Joi.number().valid(...[1, 2]),
-  INTEGRATIONS: Joi.array().items({
-    name: Joi.string().required(),
-    status: Joi.string().required()
-  })
+  ADDRESSES: Joi.number().valid(...[1, 2])
 })
