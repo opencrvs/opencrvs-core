@@ -778,7 +778,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
-    const selectOptions: SelectComponentOptions[] = []
+    const selectOptions: Array<
+      SelectComponentOptions & { originalValue?: string }
+    > = []
 
     let uploadedDocuments: IFileValue[] = []
 
@@ -824,7 +826,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           originalValue: document.optionValues[
             document.optionValues.length - 1
           ] as string,
-          label
+          label: label as string
         })
         return true
       }
