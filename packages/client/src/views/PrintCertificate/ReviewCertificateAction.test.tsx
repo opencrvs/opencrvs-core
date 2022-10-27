@@ -54,7 +54,7 @@ describe('when user wants to review death certificate', () => {
         history: [
           {
             date: '2022-03-21T08:16:24.467+00:00',
-            action: 'REGISTERED',
+            regStatus: 'REGISTERED',
             reinstated: false
           }
         ]
@@ -117,7 +117,7 @@ describe('back button behavior tests of review certificate action', () => {
         history: [
           {
             date: '2022-03-21T08:16:24.467+00:00',
-            action: 'REGISTERED',
+            regStatus: 'REGISTERED',
             reinstated: false
           }
         ]
@@ -209,7 +209,7 @@ describe('when user wants to review birth certificate', () => {
           history: [
             {
               date: '2022-03-21T08:16:24.467+00:00',
-              action: 'REGISTERED',
+              regStatus: 'REGISTERED',
               reinstated: false
             }
           ] as unknown as IFormSectionData
