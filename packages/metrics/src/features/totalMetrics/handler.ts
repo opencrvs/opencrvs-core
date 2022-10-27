@@ -22,8 +22,8 @@ import {
   getTotalMetrics
 } from '@metrics/features/metrics/metricsGenerator'
 import { IAuthHeader } from '@metrics/features/registration'
+import { format } from 'date-fns'
 import { uniqBy } from 'lodash'
-// import { format } from 'date-fns'
 
 enum EVENT_LOCATION_TYPE {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
@@ -171,13 +171,18 @@ export async function totalMetricsByTime(
 ) {
   const event = request.query[EVENT]
   const registrations = await fetchRegistrationsGroupByTime(event)
-  const timeStamps = uniqBy(registrations, 'time').map((item) => item.time)
+
+  registrations.forEach((registration) => {
+    registration.time = format(new Date(registration.time), 'MMMM-yyyy')
+  })
+
+  const months = uniqBy(registrations, 'time').map((item) => item.time)
 
   const results: any[] = []
 
-  timeStamps.forEach((timeStamp) => {
+  months.forEach((month) => {
     const filteredRegistrations = registrations.filter(
-      (registration) => registration.time === timeStamp
+      (registration) => registration.time === month
     )
 
     const lateRegistrations = filteredRegistrations.filter(
@@ -192,7 +197,7 @@ export async function totalMetricsByTime(
         result.eventLocationType === EVENT_LOCATION_TYPE.HEALTH_FACILITY
     )
 
-    const homeRegistrations = registrations.filter(
+    const homeRegistrations = filteredRegistrations.filter(
       (result) => result.eventLocationType === EVENT_LOCATION_TYPE.PRIVATE_HOME
     )
 
@@ -202,7 +207,7 @@ export async function totalMetricsByTime(
       delayed: delayedRegistrations.length,
       home: homeRegistrations.length,
       healthFacility: healthFacilityRegistrations.length,
-      month: timeStamp
+      month
     })
   })
 

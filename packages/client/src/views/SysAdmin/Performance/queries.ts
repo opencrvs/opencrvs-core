@@ -161,12 +161,8 @@ export const FETCH_REGISTRATIONS = gql`
       filterBy: $filterBy
     ) {
       __typename
-      ... on TotalMetricsResult {
-        results {
-          total
-        }
-      }
       ... on TotalMetricsByRegistrarResult {
+        __typename
         results {
           total
           late
@@ -194,6 +190,16 @@ export const FETCH_REGISTRATIONS = gql`
           location {
             name
           }
+        }
+      }
+      ... on TotalMetricsByTime {
+        results {
+          total
+          delayed
+          late
+          home
+          healthFacility
+          month
         }
       }
     }
