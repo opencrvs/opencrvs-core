@@ -169,9 +169,12 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
+        otherReason
+        requester
+        hasShowedVerifiedDocument
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text
@@ -403,9 +406,11 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
+        otherReason
+        requester
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text

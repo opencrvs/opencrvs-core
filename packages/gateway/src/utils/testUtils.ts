@@ -338,10 +338,6 @@ export const mockTaskDownloaded = {
     {
       url: 'http://opencrvs.org/specs/extension/regDownloaded',
       valueString: 'DECLARED'
-    },
-    {
-      url: 'http://opencrvs.org/specs/extension/regReinstated',
-      valueString: '01733333333'
     }
   ],
   meta: {

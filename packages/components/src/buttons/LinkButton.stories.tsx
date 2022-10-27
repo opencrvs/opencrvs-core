@@ -18,7 +18,7 @@ const Template: Story<IButtonProps> = (args) => (
 )
 
 export default {
-  title: 'Controls/Link button',
+  title: 'Deprecated/Link button',
   component: LinkButton,
   argTypes: {
     icon: {
@@ -31,6 +31,14 @@ export default {
       control: {
         type: 'select',
         options: ['LEFT', 'RIGHT']
+      }
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Deprecated in favour of **Link**. Please use it going forward.'
       }
     }
   }

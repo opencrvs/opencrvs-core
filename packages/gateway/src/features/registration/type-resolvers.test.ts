@@ -31,7 +31,7 @@ import {
   mockErrorComposition,
   mockTaskDownloaded
 } from '@gateway/utils/testUtils'
-import { GQLRegStatus } from '@gateway/graphql/schema'
+import { GQLRegAction } from '@gateway/graphql/schema'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
@@ -266,7 +266,7 @@ describe('Registration type resolvers', () => {
   describe('History type resolver', () => {
     it('Should return action DOWNLOADED', async () => {
       const action = await typeResolvers.History.action(mockTaskDownloaded)
-      expect(action).toEqual(GQLRegStatus.DOWNLOADED)
+      expect(action).toEqual(GQLRegAction.DOWNLOADED)
     })
 
     it('Should return reject reason', async () => {
@@ -274,11 +274,6 @@ describe('Registration type resolvers', () => {
         mockTaskDownloaded
       )
       expect(statusReason.text).toEqual('Rejected reason')
-    })
-
-    it('Should return true if reinstated', () => {
-      const reinstated = typeResolvers.History.reinstated(mockTaskDownloaded)
-      expect(reinstated).toBe(true)
     })
 
     it('Should return date', () => {

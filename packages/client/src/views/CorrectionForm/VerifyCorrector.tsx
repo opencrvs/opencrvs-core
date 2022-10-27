@@ -17,7 +17,12 @@ import {
 } from '@client/declarations'
 import { ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
-import { goBack, goToPageGroup, goToHomeTab } from '@client/navigation'
+import {
+  goBack,
+  goToPageGroup,
+  goToHomeTab,
+  formatUrl
+} from '@client/navigation'
 import { IStoreState } from '@client/store'
 import {
   IDVerifier,
@@ -26,11 +31,15 @@ import {
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
-import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
+import { Redirect, RouteComponentProps } from 'react-router'
+import {
+  CERTIFICATE_CORRECTION_REVIEW,
+  REGISTRAR_HOME_TAB
+} from '@client/navigation/routes'
 import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+
 interface INameField {
   firstNamesField: string
   familyNameField: string
@@ -159,7 +168,17 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
 
   render() {
     const { corrector } = this.props.match.params
-    const { intl } = this.props
+    const { intl, declaration } = this.props
+    if (!declaration) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyForReview,
+            selectorId: ''
+          })}
+        />
+      )
+    }
     const correctorInfo = this.getGenericCorrectorInfo(corrector)
     const hasNoInfo = Object.values(correctorInfo).every(
       (property) => property === undefined || property === ''
@@ -186,13 +205,13 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
                 positiveAction: {
                   label: intl.formatMessage(messages.idCheckVerify),
                   handler: () => {
-                    this.handleVerification(false)
+                    this.handleVerification(true)
                   }
                 },
                 negativeAction: {
                   label: intl.formatMessage(messages.idCheckWithoutVerify),
                   handler: () => {
-                    this.handleVerification(true)
+                    this.handleVerification(false)
                   }
                 }
               }}
