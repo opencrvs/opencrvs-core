@@ -22,6 +22,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
 import {
+  BirthRegistration,
   ContactPointInput,
   Event,
   History,
@@ -35,6 +36,10 @@ import {
 import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
+
+import QRCode from 'qrcode'
+import { formatUrl } from '@client/navigation'
+import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -272,6 +277,27 @@ export function questionnaireToCustomFieldTransformer(
   }
 }
 
+export const registrationDateTransformer = (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  if (!_.history) {
+    return
+  }
+
+  const history = _.history.find(
+    (historyItem: History) => historyItem?.action === RegStatus.Registered
+  )
+
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'registrationDate'
+  ] = format(new Date(history.date), 'dd MMMM yyyy')
+}
+
 export const registrarNameUserTransformer = (
   transformedData: IFormData,
   _: any,
@@ -290,6 +316,70 @@ export const registrarNameUserTransformer = (
   )
   transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
     history?.user ? getUserName(history.user) : ''
+}
+
+export const placeOfBirthLocalityTransformer = (
+  transformedData: IFormData,
+  registration: BirthRegistration,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) => {
+  const city = registration.eventLocation?.address?.city
+
+  if (!city) {
+    return
+  }
+
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'placeOfBirthLocality'
+  ] = city
+}
+
+export const placeOfBirthStateTransformer = (
+  transformedData: IFormData,
+  registration: BirthRegistration,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  offlineData?: IOfflineData
+) => {
+  const stateId = registration.eventLocation?.address?.state
+  if (!stateId) {
+    return
+  }
+
+  const state = offlineData?.locations[stateId]
+
+  if (!state) {
+    return
+  }
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'placeOfBirthState'
+  ] = state.name
+}
+export const placeOfBirthLGATransformer = (
+  transformedData: IFormData,
+  registration: BirthRegistration,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  offlineData?: IOfflineData
+) => {
+  const lgaId = registration.eventLocation?.address?.district
+
+  if (!lgaId) {
+    return
+  }
+  const lga = offlineData?.locations[lgaId]
+
+  if (!lga) {
+    return
+  }
+
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'placeOfBirthLGAState'
+  ] = lga.name
 }
 
 export const roleUserTransformer = (
@@ -316,27 +406,33 @@ export const roleUserTransformer = (
       : ''
 }
 
-export const registrationLocationUserTransformer = (
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  targetSectionId?: string,
-  targetFieldName?: string
-) => {
-  const statusData = queryData[REGISTRATION_SECTION].status as GQLRegWorkflow[]
-  const registrationStatus =
-    statusData &&
-    statusData.find((status) => {
-      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
-    })
-  const officeName = registrationStatus?.office?.name || ''
-  const officeAddressLevel3 =
-    registrationStatus?.office?.address?.district || ''
-  const officeAddressLevel4 = registrationStatus?.office?.address?.state || ''
-  transformedData[targetSectionId || sectionId][
-    targetFieldName || 'registrationOffice'
-  ] = [officeName, officeAddressLevel3, officeAddressLevel4].join(', ')
-}
+export const registrationLocationUserTransformer =
+  (template: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string
+  ) => {
+    const statusData = queryData[REGISTRATION_SECTION]
+      .status as GQLRegWorkflow[]
+    const registrationStatus =
+      statusData &&
+      statusData.find((status) => {
+        return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      })
+    const officeName = registrationStatus?.office?.name || ''
+    const officeAddressLevel3 =
+      registrationStatus?.office?.address?.district || ''
+    const officeAddressLevel4 = registrationStatus?.office?.address?.state || ''
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'registrationOffice'
+    ] = template
+      .replace(':office', officeName)
+      .replace(':district', officeAddressLevel3)
+      .replace(':state', officeAddressLevel4)
+  }
 
 export const registrarSignatureUserTransformer = (
   transformedData: IFormData,
@@ -358,4 +454,23 @@ export const registrarSignatureUserTransformer = (
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
   ] = history?.signature?.data as string
+}
+export const QRCodeTransformerTransformer = async (
+  transformedData: IFormData,
+  queryData: { id: string },
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
+    await QRCode.toDataURL(
+      `${window.location.protocol}//${window.location.host}${formatUrl(
+        DECLARATION_RECORD_AUDIT,
+        {
+          tab: 'printTab',
+          declarationId: queryData.id
+        }
+      )}`
+    )
 }
