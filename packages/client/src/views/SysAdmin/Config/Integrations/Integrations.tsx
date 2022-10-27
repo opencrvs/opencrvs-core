@@ -2,7 +2,6 @@ import React from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { SecondaryButton } from '@client/../../components/lib/buttons'
 import {
   ListViewItemSimplified,
   ListViewSimplified
@@ -68,25 +67,6 @@ export function IntegrationList() {
             label="Sweet Health"
             value="Health Integration"
           />
-
-          {/* <ListViewItemSimplified
-            actions={
-              <>
-                <Pill label="Active" type="active" />
-                <ToggleMenu
-                  id="toggleMenu"
-                  menuItems={[
-                    { handler: () => {}, label: 'Reveal Keys' },
-                    { handler: () => {}, label: 'Disable' },
-                    { handler: () => {}, label: 'Delete' }
-                  ]}
-                  toggleButton={<VerticalThreeDots />}
-                />
-              </>
-            }
-            label="Sweet Health"
-            value="Health Integration"
-          /> */}
         </ListViewSimplified>
       </Content>
     </Frame>
