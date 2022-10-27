@@ -26,6 +26,7 @@ export const SEARCH_USERS = gql`
         username
         role
         type
+        title
         status
         mobile
         underInvestigation
@@ -55,6 +56,7 @@ export const GET_USER = gql`
       }
       role
       type
+      title
       status
       underInvestigation
       practitionerId

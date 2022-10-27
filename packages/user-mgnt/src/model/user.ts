@@ -76,6 +76,7 @@ export interface IUser {
   identifiers?: IIdentifier[]
   email?: string
   mobile: string
+  title?: string
   passwordHash: string
   salt: string
   role?: string
@@ -178,6 +179,7 @@ const userSchema = new Schema({
   salt: { type: String, required: true },
   role: String,
   type: String,
+  title: String,
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
   catchmentAreaIds: { type: [String], required: true },

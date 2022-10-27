@@ -1030,6 +1030,35 @@ export const fetchFHIR = <T = any>(
     })
 }
 
+export const getFHIRLocation = (
+  id: string,
+  authHeader: IAuthHeader
+): Promise<fhir.Location> => {
+  return fetchFHIR<fhir.Location>(`/Location/${id}`, authHeader)
+}
+
+export const getSupervisoryArea = (location: fhir.Location) => {
+  const supervisoryAreaExtension = location.extension?.find(
+    (ext) => ext.url === 'http://opencrvs.org/specs/id/supervisory-area'
+  )
+  return supervisoryAreaExtension?.valueString ?? null
+}
+
+export const getAllLocationIdsInDistrict = (
+  districtLocationId: string,
+  authHeader: IAuthHeader,
+  locationType = 'CRVS_OFFICE'
+): Promise<string[]> => {
+  return fetchFHIR(
+    `/Location?partof=${districtLocationId}&type=${locationType}`,
+    authHeader
+  ).then((fhirBundle) =>
+    fhirBundle.entry?.map(
+      (fhir: fhir.BundleEntry) => fhir.resource?.id as string
+    )
+  )
+}
+
 export const postSearch = (
   authHeader: IAuthHeader,
   criteria: ISearchCriteria

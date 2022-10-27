@@ -248,11 +248,12 @@ export const GetHistory = ({
           language={window.config.LANGUAGES}
         />
       ),
-    type: intl.formatMessage(
+    type:
       item.dhis2Notification && !item.user?.role
-        ? userMessages.healthSystem
-        : userMessages[item?.user?.role as string]
-    ),
+        ? intl.formatMessage(userMessages.healthSystem)
+        : item.user?.title
+        ? item.user?.title
+        : intl.formatMessage(userMessages[item?.user?.role as string]),
     location:
       item.dhis2Notification && !item.user?.role ? (
         <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>

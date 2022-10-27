@@ -1138,6 +1138,18 @@
             "deprecationReason": null
           },
           {
+            "name": "B1_FORM",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BAPTISMAL_CARD",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "BIRTH_CERTIFICATE",
             "description": null,
             "isDeprecated": false,
@@ -1205,6 +1217,12 @@
           },
           {
             "name": "PROOF_OF_LEGAL_GUARDIANSHIP",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "VACCINATION_CARD",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -6138,18 +6156,6 @@
             "deprecationReason": null
           },
           {
-            "name": "GRANDFATHER",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "GRANDMOTHER",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "GRANDSON",
             "description": null,
             "isDeprecated": false,
@@ -6168,6 +6174,18 @@
             "deprecationReason": null
           },
           {
+            "name": "MATERNAL_GRANDFATHER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MATERNAL_GRANDMOTHER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "MOTHER",
             "description": null,
             "isDeprecated": false,
@@ -6181,6 +6199,18 @@
           },
           {
             "name": "OTHER_FAMILY_MEMBER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PATERNAL_GRANDFATHER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PATERNAL_GRANDMOTHER",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -9409,6 +9439,18 @@
             "deprecationReason": null
           },
           {
+            "name": "ethnicOrigin",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "gender",
             "description": null,
             "args": [],
@@ -9534,6 +9576,18 @@
           },
           {
             "name": "reasonNotApplying",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "stateOfOrigin",
             "description": null,
             "args": [],
             "type": {
@@ -9673,6 +9727,18 @@
             "deprecationReason": null
           },
           {
+            "name": "ethnicOrigin",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "gender",
             "description": null,
             "type": {
@@ -9790,6 +9856,18 @@
           },
           {
             "name": "reasonNotApplying",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "stateOfOrigin",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -14329,6 +14407,30 @@
             "deprecationReason": null
           },
           {
+            "name": "supervisoryArea",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "title",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "type",
             "description": null,
             "args": [],
@@ -14561,6 +14663,18 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "SignatureInput",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "title",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "defaultValue": null,

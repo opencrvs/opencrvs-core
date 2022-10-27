@@ -252,6 +252,7 @@ export const resolvers: GQLResolver = {
       }
 
       const userPayload: IUserPayload = createOrUpdateUserPayload(user)
+
       const action = userPayload.id ? 'update' : 'create'
       const res = await fetch(`${USER_MANAGEMENT_URL}${action}User`, {
         method: 'POST',
@@ -483,6 +484,7 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     primaryOfficeId: user.primaryOffice as string,
     email: user.email || '',
     mobile: user.mobile as string,
+    title: user.title as string,
     device: user.device as string,
     signature: user.signature
   }

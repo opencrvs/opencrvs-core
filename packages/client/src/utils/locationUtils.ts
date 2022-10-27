@@ -94,6 +94,57 @@ export function generateFullLocation(
   return location
 }
 
+type LocationsById = {
+  [key: string]: ILocation
+}
+
+export function shouldSeeCountryLevel(user: IUserDetails) {
+  return user.supervisoryArea === '0'
+}
+
+export function getJurisdictionTypeForUser(
+  user: IUserDetails,
+  locations: LocationsById
+): 'COUNTRY' | 'STATE' | 'DISTRICT' | null {
+  if (!user.supervisoryArea) {
+    return null
+  }
+  if (shouldSeeCountryLevel(user)) {
+    return 'COUNTRY'
+  }
+  return (
+    (locations[user.supervisoryArea].jurisdictionType as
+      | 'STATE'
+      | 'DISTRICT'
+      | undefined) || null
+  )
+}
+
+export function getOfficesByUserSupervisoryAreaFilter(
+  user: IUserDetails,
+  locations: LocationsById,
+  supervisoryAreaType: 'COUNTRY' | 'STATE' | 'DISTRICT' | null
+) {
+  return (office: ILocation) => {
+    if (supervisoryAreaType === 'COUNTRY') {
+      return true
+    }
+
+    const officeDistrict = locations[office.partOf.replace('Location/', '')]
+
+    if (supervisoryAreaType === 'STATE') {
+      return (
+        officeDistrict.partOf.replace('Location/', '') === user.supervisoryArea
+      )
+    }
+    if (supervisoryAreaType === 'DISTRICT') {
+      return officeDistrict.id === user.supervisoryArea
+    }
+
+    return office.id === user.primaryOffice?.id
+  }
+}
+
 function generateSearchableLocations(
   locations: ILocation[],
   offlineLocations: { [key: string]: ILocation },

@@ -163,6 +163,8 @@ export enum AttachmentSubject {
 
 export enum AttachmentType {
   AttestedLetterOfDeath = 'ATTESTED_LETTER_OF_DEATH',
+  B1Form = 'B1_FORM',
+  BaptismalCard = 'BAPTISMAL_CARD',
   BirthCertificate = 'BIRTH_CERTIFICATE',
   BurialReceipt = 'BURIAL_RECEIPT',
   CoronersReport = 'CORONERS_REPORT',
@@ -170,12 +172,12 @@ export enum AttachmentType {
   MedicallyCertifiedCauseOfDeath = 'MEDICALLY_CERTIFIED_CAUSE_OF_DEATH',
   NationalId = 'NATIONAL_ID',
   NotificationOfBirth = 'NOTIFICATION_OF_BIRTH',
-  B1Form = 'B1_FORM',
   Other = 'OTHER',
   Passport = 'PASSPORT',
   PoliceCertificateOfDeath = 'POLICE_CERTIFICATE_OF_DEATH',
   ProofOfAssignedResponsibility = 'PROOF_OF_ASSIGNED_RESPONSIBILITY',
   ProofOfLegalGuardianship = 'PROOF_OF_LEGAL_GUARDIANSHIP',
+  VaccinationCard = 'VACCINATION_CARD',
   VerbalAutopsyReport = 'VERBAL_AUTOPSY_REPORT'
 }
 
@@ -753,16 +755,16 @@ export enum InformantType {
   DaughterInLaw = 'DAUGHTER_IN_LAW',
   Father = 'FATHER',
   Granddaughter = 'GRANDDAUGHTER',
-  MaternalGrandfather = 'MATERNAL_GRANDFATHER',
-  PaternalGrandfather = 'PATERNAL_GRANDFATHER',
-  MaternalGrandmother = 'MATERNAL_GRANDMOTHER',
-  PaternalGrandmother = 'PATERNAL_GRANDMOTHER',
   Grandson = 'GRANDSON',
   Informant = 'INFORMANT',
   LegalGuardian = 'LEGAL_GUARDIAN',
+  MaternalGrandfather = 'MATERNAL_GRANDFATHER',
+  MaternalGrandmother = 'MATERNAL_GRANDMOTHER',
   Mother = 'MOTHER',
   Other = 'OTHER',
   OtherFamilyMember = 'OTHER_FAMILY_MEMBER',
+  PaternalGrandfather = 'PATERNAL_GRANDFATHER',
+  PaternalGrandmother = 'PATERNAL_GRANDMOTHER',
   Sister = 'SISTER',
   Son = 'SON',
   SonInLaw = 'SON_IN_LAW',
@@ -1168,6 +1170,7 @@ export type Person = {
   deceased?: Maybe<Deceased>
   detailsExist?: Maybe<Scalars['Boolean']>
   educationalAttainment?: Maybe<EducationType>
+  ethnicOrigin?: Maybe<Scalars['String']>
   gender?: Maybe<Scalars['String']>
   id?: Maybe<Scalars['ID']>
   identifier?: Maybe<Array<Maybe<IdentityType>>>
@@ -1178,6 +1181,7 @@ export type Person = {
   occupation?: Maybe<Scalars['String']>
   photo?: Maybe<Array<Maybe<Attachment>>>
   reasonNotApplying?: Maybe<Scalars['String']>
+  stateOfOrigin?: Maybe<Scalars['String']>
   telecom?: Maybe<Array<Maybe<ContactPoint>>>
 }
 
@@ -1190,6 +1194,7 @@ export type PersonInput = {
   deceased?: InputMaybe<DeceasedInput>
   detailsExist?: InputMaybe<Scalars['Boolean']>
   educationalAttainment?: InputMaybe<EducationType>
+  ethnicOrigin?: InputMaybe<Scalars['String']>
   gender?: InputMaybe<Scalars['String']>
   identifier?: InputMaybe<Array<InputMaybe<IdentityInput>>>
   maritalStatus?: InputMaybe<MaritalStatusType>
@@ -1199,6 +1204,7 @@ export type PersonInput = {
   occupation?: InputMaybe<Scalars['String']>
   photo?: InputMaybe<Array<AttachmentInput>>
   reasonNotApplying?: InputMaybe<Scalars['String']>
+  stateOfOrigin?: InputMaybe<Scalars['String']>
   telecom?: InputMaybe<Array<InputMaybe<ContactPointInput>>>
 }
 
@@ -1718,6 +1724,8 @@ export type User = {
   role?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
   status?: Maybe<Scalars['String']>
+  supervisoryArea?: Maybe<Scalars['String']>
+  title?: Maybe<Scalars['String']>
   type?: Maybe<Scalars['String']>
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID?: Maybe<Scalars['ID']>
@@ -1741,6 +1749,7 @@ export type UserInput = {
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
+  title?: InputMaybe<Scalars['String']>
   type?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
 }
@@ -1919,7 +1928,9 @@ export type FetchUserQuery = {
     mobile?: string | null
     role?: string | null
     type?: string | null
+    title?: string | null
     status?: string | null
+    supervisoryArea?: string | null
     name?: Array<{
       __typename?: 'HumanName'
       use?: string | null
@@ -2150,7 +2161,9 @@ export type SearchUsersQuery = {
       username?: string | null
       role?: string | null
       type?: string | null
+      title?: string | null
       status?: string | null
+      mobile?: string | null
       underInvestigation?: boolean | null
       name?: Array<{
         __typename?: 'HumanName'
@@ -2176,6 +2189,7 @@ export type GetUserQuery = {
     mobile?: string | null
     role?: string | null
     type?: string | null
+    title?: string | null
     status?: string | null
     underInvestigation?: boolean | null
     practitionerId?: string | null
@@ -2399,6 +2413,7 @@ export type FetchBirthRegistrationForReviewQuery = {
     child?: {
       __typename?: 'Person'
       id?: string | null
+      multipleBirth?: number | null
       birthDate?: string | null
       gender?: string | null
       name?: Array<{
@@ -2446,13 +2461,14 @@ export type FetchBirthRegistrationForReviewQuery = {
     mother?: {
       __typename?: 'Person'
       id?: string | null
-      multipleBirth?: number | null
       birthDate?: string | null
       maritalStatus?: MaritalStatusType | null
       occupation?: string | null
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
       dateOfMarriage?: any | null
+      stateOfOrigin?: string | null
+      ethnicOrigin?: string | null
       educationalAttainment?: EducationType | null
       nationality?: Array<string | null> | null
       name?: Array<{
@@ -2493,6 +2509,8 @@ export type FetchBirthRegistrationForReviewQuery = {
       reasonNotApplying?: string | null
       dateOfMarriage?: any | null
       educationalAttainment?: EducationType | null
+      stateOfOrigin?: string | null
+      ethnicOrigin?: string | null
       nationality?: Array<string | null> | null
       name?: Array<{
         __typename?: 'HumanName'
@@ -2565,6 +2583,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       __typename?: 'Location'
       id: string
       type?: LocationType | null
+      description?: string | null
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -2703,6 +2722,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
       maritalStatus?: MaritalStatusType | null
       dateOfMarriage?: any | null
       educationalAttainment?: EducationType | null
+      stateOfOrigin?: string | null
+      ethnicOrigin?: string | null
       nationality?: Array<string | null> | null
       occupation?: string | null
       detailsExist?: boolean | null
@@ -2742,6 +2763,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
       maritalStatus?: MaritalStatusType | null
       dateOfMarriage?: any | null
       educationalAttainment?: EducationType | null
+      stateOfOrigin?: string | null
+      ethnicOrigin?: string | null
       nationality?: Array<string | null> | null
       occupation?: string | null
       detailsExist?: boolean | null
@@ -2852,6 +2875,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       __typename?: 'Location'
       id: string
       type?: LocationType | null
+      description?: string | null
       address?: {
         __typename?: 'Address'
         line?: Array<string | null> | null
@@ -3206,6 +3230,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       __typename?: 'Location'
       id: string
       type?: LocationType | null
+      description?: string | null
       address?: {
         __typename?: 'Address'
         type?: AddressType | null
@@ -3482,6 +3507,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       __typename?: 'Location'
       id: string
       type?: LocationType | null
+      description?: string | null
       address?: {
         __typename?: 'Address'
         type?: AddressType | null

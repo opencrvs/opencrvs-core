@@ -516,8 +516,11 @@ function UserListComponent(props: IProps) {
                     LANG_EN
                   ] as string))) ||
               ''
+
             const role =
-              (user.role && intl.formatMessage(userMessages[user.role])) || '-'
+              user.title ||
+              (user.role && intl.formatMessage(userMessages[user.role])) ||
+              '-'
 
             const avatar = user.avatar
 
