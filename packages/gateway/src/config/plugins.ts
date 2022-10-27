@@ -26,7 +26,7 @@ export const getPlugins = () => {
   plugins.push(JWT, {
     plugin: Pino,
     options: {
-      prettyPrint: false,
+      prettyPrint: true,
       logPayload: false,
       instance: logger
     }

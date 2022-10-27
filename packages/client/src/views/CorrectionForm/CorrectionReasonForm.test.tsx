@@ -108,10 +108,10 @@ describe('Correction reason form', () => {
       wrapper.update()
 
       wrapper
-        .find('input[name="type.nestedFields.reasonForChange"]')
+        .find('input[name="type.nestedFields.otherReason"]')
         .simulate('change', {
           target: {
-            name: 'type.nestedFields.reasonForChange',
+            name: 'type.nestedFields.otherReason',
             value: 'Misspelling'
           }
         })
