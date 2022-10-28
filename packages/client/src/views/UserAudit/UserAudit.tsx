@@ -13,7 +13,10 @@
 import React, { useState } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { userMessages as messages } from '@client/i18n/messages'
+import {
+  userMessages as messages,
+  constantsMessages
+} from '@client/i18n/messages'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { useIntl } from 'react-intl'
@@ -172,7 +175,14 @@ export const UserAudit = () => {
 
   return (
     <Frame
-      header={<Header title={intl.formatMessage(messages.profileTitle)} />}
+      header={
+        <Header
+          title={intl.formatMessage(userSetupMessages.auditSectionTitle)}
+        />
+      }
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
       navigation={<Navigation />}
     >
       <Query<GetUserQuery>

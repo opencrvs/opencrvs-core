@@ -25,6 +25,9 @@ import { Payment } from './Payment'
 import { queries } from '@client/profile/queries'
 import { checkAuth } from '@client/profile/profileActions'
 import { vi, Mock } from 'vitest'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { formatUrl } from '@client/navigation'
 
 const getItem = window.localStorage.getItem as Mock
 ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)
@@ -129,25 +132,29 @@ describe('verify collector tests', () => {
       expect(printMoneyReceiptSpy).toBeCalled()
     })*/
 
-    it('invalid declaration id', () => {
-      expect(
-        createTestComponent(
-          <Payment
-            location={mockLocation}
-            history={history}
-            match={{
-              params: {
-                registrationId: 'mockBirth',
-                eventType: Event.Birth
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          { store, history }
-        )
-      ).rejects.toEqual(new Error('Declaration "mockBirth" missing!'))
+    it('invalid declaration id', async () => {
+      await createTestComponent(
+        <Payment
+          location={mockLocation}
+          history={history}
+          match={{
+            params: {
+              registrationId: 'mockBirth',
+              eventType: Event.Birth
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
+      expect(history.location.pathname).toEqual(
+        formatUrl(REGISTRAR_HOME_TAB, {
+          tabId: WORKQUEUE_TABS.readyToPrint,
+          selectorId: ''
+        })
+      )
     })
   })
 

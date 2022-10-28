@@ -19,8 +19,6 @@ import { ThemeProvider } from '@client/styledComponents'
 import { getSchema } from '@client/tests/graphql-schema-mock'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { ApolloLink, Observable } from 'apollo-link'
 import {
   configure,
   mount,
@@ -33,8 +31,15 @@ import { readFileSync } from 'fs'
 import { graphql, print } from 'graphql'
 import * as jwt from 'jsonwebtoken'
 import * as React from 'react'
-import { ApolloProvider } from 'react-apollo'
-import { MockedProvider } from 'react-apollo/test-utils'
+import {
+  ApolloProvider,
+  NetworkStatus,
+  ApolloClient,
+  InMemoryCache,
+  ApolloLink,
+  Observable
+} from '@apollo/client'
+import { MockedProvider } from '@apollo/client/testing'
 import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
@@ -48,7 +53,6 @@ import { mockOfflineData } from './mock-offline-data'
 import { Section, SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { vi } from 'vitest'
-import { NetworkStatus, ApolloClient } from 'apollo-client'
 import { getRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
@@ -2177,7 +2181,6 @@ export function loginAsFieldAgent(store: AppStore) {
     setUserDetails({
       loading: false,
       networkStatus: NetworkStatus.ready,
-      stale: false,
       data: {
         getUser: {
           id: '5eba726866458970cf2e23c2',

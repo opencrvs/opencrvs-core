@@ -43,7 +43,7 @@ import {
 } from 'react-intl'
 import {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   IDeclaration,
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
@@ -73,17 +73,16 @@ import {
   FIELD_AGENT_ROLES,
   IN_PROGRESS
 } from '@client/utils/constants'
-import { IQueryData } from '@client/views/OfficeHome/utils'
+import { IQueryData } from '@client/workqueue'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { CorrectionSection, IForm } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
@@ -104,8 +103,8 @@ import { IActionDetailsData, GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
-import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
-import { Mutation } from 'react-apollo'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { Mutation } from '@apollo/client/react/components'
 import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
@@ -119,6 +118,7 @@ import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -176,7 +176,7 @@ interface IStateProps {
 
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
-  clearCorrectionChange: typeof clearCorrectionChange
+  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
@@ -280,7 +280,7 @@ function ReinstateButton({
 
 function RecordAuditBody({
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   declaration,
   draft,
   duplicates,
@@ -311,6 +311,7 @@ function RecordAuditBody({
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
+  const isOnline = useOnlineStatus()
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
@@ -347,7 +348,7 @@ function RecordAuditBody({
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
         onClick={() => {
-          clearCorrectionChange(declaration.id)
+          clearCorrectionAndPrintChanges(declaration.id)
           goToCertificateCorrection(declaration.id, CorrectionSection.Corrector)
         }}
       >
@@ -389,6 +390,7 @@ function RecordAuditBody({
         align={ICON_ALIGNMENT.LEFT}
         id="reinstate_button"
         key="reinstate_button"
+        disabled={!isOnline}
         icon={() => <RotateLeft />}
         onClick={toggleDisplayDialog}
       >
@@ -456,7 +458,8 @@ function RecordAuditBody({
         userDetails,
         draft,
         goToPrintCertificate,
-        goToTeamUserList
+        goToTeamUserList,
+        clearCorrectionAndPrintChanges
       })
     )
     mobileActions.push(actions[actions.length - 1])
@@ -477,7 +480,7 @@ function RecordAuditBody({
     desktopActionsView.push(actions[actions.length - 1])
   } else {
     if (draft?.submissionStatus === SUBMISSION_STATUS.DRAFT) {
-      actions.push(<Uploaded />)
+      actions.push(<Downloaded />)
     } else {
       actions.push(
         ShowDownloadButton({
@@ -667,7 +670,7 @@ const BodyContent = ({
               return <Loader id="search_loader" marginPercent={35} />
             } else if (error) {
               return (
-                !isErrorDismissed && (
+                (!isErrorDismissed && (
                   <Toast
                     type="warning"
                     actionText={intl.formatMessage(buttonMessages.retry)}
@@ -679,7 +682,8 @@ const BodyContent = ({
                   >
                     {intl.formatMessage(errorMessages.pleaseTryAgainError)}
                   </Toast>
-                )
+                )) ||
+                null
               )
             }
 
@@ -773,9 +777,11 @@ const RecordAuditComp = (props: IFullProps) => {
       navigation={
         <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       }
+      skipToContentText={props.intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
     >
       <BodyContent {...props} />
-      <NotificationToast />
     </Frame>
   )
 }
@@ -811,7 +817,7 @@ export const RecordAudit = connect<
   IStoreState
 >(mapStateToProps, {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   goToCertificateCorrection,
   goToPage,
   goToPrintCertificate,

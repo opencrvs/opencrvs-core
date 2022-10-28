@@ -14,7 +14,7 @@ import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
 
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 

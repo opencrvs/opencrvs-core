@@ -18,6 +18,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Query } from '@client/components/Query'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
 import { connect } from 'react-redux'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 
 import {
   GQLUserAuditLogItemWithComposition,
@@ -46,12 +47,10 @@ import {
   ColumnContentAlignment
 } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
-
 import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
 import format from '@client/utils/date-formatting'
-
 import {
   IOnlineStatusProps,
   withOnlineStatus
@@ -59,7 +58,6 @@ import {
 import { GetUserAuditLogQuery } from '@client/utils/gateway'
 import { GetLink, IActionDetailsData } from '@client/views/RecordAudit/History'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Pagination } from '@opencrvs/components'
 
 const DEFAULT_LIST_SIZE = 10
 

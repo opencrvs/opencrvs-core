@@ -11,6 +11,8 @@
  */
 import * as jwt from 'jsonwebtoken'
 import * as t from 'io-ts'
+import { pipe } from 'fp-ts/function'
+import { chainW, tryCatch } from 'fp-ts/Either'
 import { publicCert } from '@config/server'
 
 const tokenPayload = t.type({
@@ -23,11 +25,17 @@ const tokenPayload = t.type({
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
-export function verifyToken(token: string): ITokenPayload {
-  const decoded = jwt.verify(token, publicCert, {
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:config-user'
-  })
-  const result = tokenPayload.decode(decoded)
-  return result.value as ITokenPayload
+function safeVerifyJwt(token: string) {
+  return tryCatch(
+    () =>
+      jwt.verify(token, publicCert, {
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:config-user'
+      }),
+    (e) => (e instanceof Error ? e : new Error('Unkown error'))
+  )
+}
+
+export function verifyToken(token: string) {
+  return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
 }

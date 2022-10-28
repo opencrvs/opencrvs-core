@@ -21,10 +21,11 @@ import { IntlShape } from 'react-intl'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
-  DOWNLOAD_STATUS
+  DOWNLOAD_STATUS,
+  clearCorrectionAndPrintChanges
 } from '@client/declarations'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { EVENT_STATUS } from '@client/views/OfficeHome/utils'
+import { EVENT_STATUS } from '@client/workqueue'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -36,7 +37,7 @@ import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { Roles } from '@client/utils/authUtils'
 
@@ -45,6 +46,7 @@ export type CMethodParams = {
   intl: IntlShape
   userDetails: IUserDetails | null
   draft: IDeclaration | null
+  clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
   goToPage?: typeof goToPage
   goToPrintCertificate?: typeof goToPrintCertificate
   goToUserProfile?: typeof goToUserProfile
@@ -65,7 +67,7 @@ export const ShowDownloadButton = ({
   if (declaration === null || id === null || type === null) return <></>
 
   const downloadStatus = draft?.downloadStatus || undefined
-  let refetchQueries: RefetchQueryDescription = []
+  let refetchQueries: InternalRefetchQueriesInclude = []
   if (
     userDetails?.role === 'FIELD_AGENT' &&
     draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
@@ -201,7 +203,8 @@ export const ShowPrintButton = ({
   intl,
   userDetails,
   draft,
-  goToPrintCertificate
+  goToPrintCertificate,
+  clearCorrectionAndPrintChanges
 }: CMethodParams) => {
   const { id, type } = declaration || {}
   const role = userDetails ? userDetails.role : ''
@@ -258,6 +261,8 @@ export const ShowPrintButton = ({
         size={'medium'}
         id={`print-${id}`}
         onClick={() => {
+          clearCorrectionAndPrintChanges &&
+            clearCorrectionAndPrintChanges(declaration.id)
           goToPrintCertificate &&
             goToPrintCertificate(id, type.toLocaleLowerCase())
         }}

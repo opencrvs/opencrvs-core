@@ -37,8 +37,10 @@ const Container = styled.div`
 interface IProps {
   data: ILineDataPoint[]
   dataKeys: string[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mouseMoveHandler: (data: any) => void
   mouseLeaveHandler: () => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tooltipContent: (dataPoint: any) => React.ReactNode
   legendContent: () => React.ReactNode
   theme: ITheme
@@ -47,7 +49,7 @@ interface IProps {
   chartBottom: number
   chartLeft: number
   maximizeXAxisInterval?: boolean
-  legendLayout: string
+  legendLayout: Recharts.LayoutType
 }
 
 interface ILineDataPoint {
@@ -212,7 +214,7 @@ class LineChartComponent extends React.Component<IProps> {
 
             <Legend
               content={legendContent}
-              layout={legendLayout as any}
+              layout={legendLayout}
               verticalAlign="top"
               align="right"
             />

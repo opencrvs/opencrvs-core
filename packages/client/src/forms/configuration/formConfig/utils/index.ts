@@ -31,7 +31,8 @@ import {
   ICustomQuestionConfig,
   isDefaultQuestionConfig,
   configFieldToQuestionConfig,
-  getConfiguredQuestions
+  getConfiguredQuestions,
+  getIdentifiersFromFieldId
 } from '@client/forms/questionConfig'
 import { Event, QuestionInput } from '@client/utils/gateway'
 import { FieldPosition } from '@client/forms/configuration'
@@ -71,15 +72,6 @@ export type IConfigField =
 export type IConfigFieldMap = Record<string, IConfigField>
 
 export type ISectionFieldMap = Record<string, IConfigFieldMap>
-
-export function getConfigFieldIdentifiers(fieldId: string) {
-  const [event, sectionId, groupId] = fieldId.split('.')
-  return {
-    event: event as Event,
-    sectionId,
-    groupId
-  }
-}
 
 export function getFieldDefinition(
   configField: IDefaultConfigField | ICustomConfigField,
@@ -151,7 +143,7 @@ export function getCertificateHandlebar(formField: IFormField) {
 }
 
 function getPreviewGroupFieldId(fieldId: string, previewGroup: string) {
-  const { event, sectionId, groupId } = getConfigFieldIdentifiers(fieldId)
+  const { event, sectionId, groupId } = getIdentifiersFromFieldId(fieldId)
   return [event, sectionId, groupId, 'previewGroup', previewGroup].join('.')
 }
 
@@ -161,8 +153,8 @@ type IConfigFieldMaybeWithPreviewGroup =
   | IDefaultConfigFieldWithPreviewGroup
 
 function isFromDifferentSections(fieldIdA: string, fieldIdB: string) {
-  const { sectionId: sectionA } = getConfigFieldIdentifiers(fieldIdA)
-  const { sectionId: sectionB } = getConfigFieldIdentifiers(fieldIdB)
+  const { sectionId: sectionA } = getIdentifiersFromFieldId(fieldIdA)
+  const { sectionId: sectionB } = getIdentifiersFromFieldId(fieldIdB)
   return sectionA !== sectionB
 }
 
@@ -185,7 +177,7 @@ function getConfigFieldsWithoutPreviewGroups(
         !isDefaultConfigFieldWithPreviewGroup(configField)
     )
     .reduce<ISectionFieldMap>((sectionFieldsMap, configField) => {
-      const { sectionId: currentSection } = getConfigFieldIdentifiers(
+      const { sectionId: currentSection } = getIdentifiersFromFieldId(
         configField.fieldId
       )
       const currentSectionFields = sectionFieldsMap[currentSection] ?? {}
@@ -283,7 +275,7 @@ function addPreviewGroupConfigField(
 ): ISectionFieldMap {
   const { precedingFieldId, foregoingFieldId, fieldId } =
     previewGroupConfigField
-  const { sectionId: currentSection } = getConfigFieldIdentifiers(fieldId)
+  const { sectionId: currentSection } = getIdentifiersFromFieldId(fieldId)
   let currentSectionConfigFields = sectionFieldsMap[currentSection]
   if (previewGroupConfigField.precedingFieldId !== FieldPosition.TOP) {
     currentSectionConfigFields = {
@@ -371,7 +363,7 @@ function configFieldsToQuestionConfigs(configFields: ISectionFieldMap) {
     if (precedingFieldId === FieldPosition.TOP) {
       return precedingFieldId
     }
-    const { sectionId } = getConfigFieldIdentifiers(fieldId)
+    const { sectionId } = getIdentifiersFromFieldId(fieldId)
     const previousConfigField = configFields[sectionId][precedingFieldId]
     if (isPreviewGroupConfigField(previousConfigField)) {
       return getLastFieldOfPreviewGroup(previousConfigField).fieldId

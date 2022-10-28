@@ -48,6 +48,7 @@ export const PageTemplateContentLarge = () => (
         <NavigationGroup {...groupSetting.args} />
       </LeftNavigation>
     }
+    skipToContentText="Skip to main content"
   >
     <Content size={ContentSize.LARGE} title="Content title">
       Page content goes here
@@ -68,6 +69,7 @@ export const PageTemplateContentMedium = () => (
         <NavigationGroup {...groupSetting.args} />
       </LeftNavigation>
     }
+    skipToContentText="Skip to main content"
   >
     <Content size={ContentSize.NORMAL} title="Content title">
       Page content goes here
@@ -80,7 +82,10 @@ PageTemplateContentMedium.parameters = {
 }
 
 export const PageTemplateFlow = () => (
-  <Frame header={<AppBar mobileTitle="Page title" desktopTitle="Page title" />}>
+  <Frame
+    header={<AppBar mobileTitle="Page title" desktopTitle="Page title" />}
+    skipToContentText="Skip to main content"
+  >
     <Content title="Content title ">Page content goes here</Content>
   </Frame>
 )
@@ -88,7 +93,10 @@ export const PageTemplateFlow = () => (
 PageTemplateFlow.parameters = { layout: 'fullscreen' }
 
 export const PageTemplateForm = () => (
-  <Frame header={<EventTopBar title="Hello!" />}>
+  <Frame
+    header={<EventTopBar title="Hello!" />}
+    skipToContentText="Skip to main content"
+  >
     <Content title="Content title">Page content goes here</Content>
   </Frame>
 )
@@ -104,6 +112,7 @@ export const PageTemplateContentSideColumn = () => (
         <NavigationGroup {...groupSetting.args} />
       </LeftNavigation>
     }
+    skipToContentText="Skip to main content"
   >
     <Frame.Layout>
       <Content title="Content title">Page content goes here</Content>
@@ -123,6 +132,7 @@ export const PageTemplateContentMultipleSideColumns = () => (
         <NavigationGroup {...groupSetting.args} />
       </LeftNavigation>
     }
+    skipToContentText="Skip to main content"
   >
     <Frame.Layout>
       <Frame.Section>
@@ -149,6 +159,7 @@ export const PageTemplateSequentialContents = () => (
         <NavigationGroup {...groupSetting.args} />
       </LeftNavigation>
     }
+    skipToContentText="Skip to main content"
   >
     <Content title="Content title">Page content goes here</Content>
     <Content title="Content title">Page content goes here</Content>
@@ -166,6 +177,7 @@ export const PageTemplateSequentialContentsWrapped = () => (
         <NavigationGroup {...groupSetting.args} />
       </LeftNavigation>
     }
+    skipToContentText="Skip to main content"
   >
     <Frame.Layout>
       <Frame.Section>
@@ -179,7 +191,10 @@ export const PageTemplateSequentialContentsWrapped = () => (
 PageTemplateSequentialContentsWrapped.parameters = { layout: 'fullscreen' }
 
 export const PageTemplateCentered = () => (
-  <Frame header={<AppBar title="OpenCRVS" />}>
+  <Frame
+    header={<AppBar title="OpenCRVS" />}
+    skipToContentText="Skip to main content"
+  >
     <Frame.LayoutCentered>
       <Box>Box content goes here</Box>
     </Frame.LayoutCentered>

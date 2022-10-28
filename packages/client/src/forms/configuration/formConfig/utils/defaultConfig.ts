@@ -11,9 +11,10 @@
  */
 import {
   IDefaultQuestionConfig,
-  ICustomQuestionConfig
+  ICustomQuestionConfig,
+  getIdentifiersFromFieldId
 } from '@client/forms/questionConfig'
-import { IConnection, IConfigField, getConfigFieldIdentifiers } from '.'
+import { IConnection, IConfigField } from '.'
 import { isCustomConfigField } from './customConfig'
 import {
   getField,
@@ -98,7 +99,7 @@ export function hasDefaultFieldChanged(
   defaultForm: ISerializedForm
 ) {
   const { sectionIndex, groupIndex, fieldIndex } = questionConfig.identifiers
-  const { event } = getConfigFieldIdentifiers(questionConfig.fieldId)
+  const { event } = getIdentifiersFromFieldId(questionConfig.fieldId)
   const defaultFormField =
     defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
   const precedingDefaultFieldId = getPrecedingDefaultFieldIdAcrossGroups(

@@ -37,8 +37,8 @@ import {
   showSubmitFormErrorToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
-import { withApollo, WithApolloClient } from 'react-apollo'
+import { ApolloClient, InternalRefetchQueriesInclude } from '@apollo/client'
+import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
 import { User } from '@client/utils/gateway'
 
 const { useState, useEffect } = React
@@ -58,7 +58,7 @@ interface ToggleUserActivationModalProps
     DispatchProps {
   user: User | null
   show: boolean
-  onConfirmRefetchQueries?: RefetchQueryDescription
+  onConfirmRefetchQueries?: InternalRefetchQueriesInclude
   onClose: () => void
 }
 
@@ -94,7 +94,7 @@ function isValidAuditStatus(status: string): status is AuditStatus {
 let makeAllFieldsDirty: (touched: {}) => void
 
 function UserAuditActionModalComponent(
-  props: ToggleUserActivationModalProps & WithApolloClient<{}>
+  props: WithApolloClient<ToggleUserActivationModalProps>
 ) {
   const { intl, user, onClose, show, form } = props
   const [formValues, setFormValues] = useState<IFormSectionData>({})
@@ -156,16 +156,16 @@ function UserAuditActionModalComponent(
   function handleConfirm() {
     if (makeAllFieldsDirty) {
       const touched = props.form.fields.reduce(
-        (memo, field) => ({ ...memo, [field.name]: true }),
+        (memo: any, field: { name: any }) => ({ ...memo, [field.name]: true }),
         {}
       )
       makeAllFieldsDirty(touched)
     }
     makeErrorVisible(true)
     if (!formError) {
-      const userId = (props.user && (props.user.id as string)) || ''
+      const userId = props?.user?.id ?? ''
 
-      props.client
+      ;(props.client as ApolloClient<any>)
         .mutate({
           mutation: USER_AUDIT_ACTION,
           variables: {
@@ -258,4 +258,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
 export const UserAuditActionModal = connect(
   mapStateToProps,
   mapDispatchToProps
-)(injectIntl(withApollo(UserAuditActionModalComponent)))
+)(
+  injectIntl(
+    withApollo<ToggleUserActivationModalProps>(UserAuditActionModalComponent)
+  )
+)

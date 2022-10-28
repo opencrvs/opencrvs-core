@@ -317,12 +317,12 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.auditList.loggedIn'
   },
   loggedOutAuditAction: {
-    defaultMessage: 'Log out',
+    defaultMessage: 'Logged out',
     description: 'Description for user logged out',
     id: 'user.profile.auditList.loggedOut'
   },
   phoneNumberChangedAuditAction: {
-    defaultMessage: 'Phone Number Changed',
+    defaultMessage: 'Phone number changed',
     description: 'Description for user change phoneNumber',
     id: 'user.profile.auditList.phoneNumberChanged'
   },
