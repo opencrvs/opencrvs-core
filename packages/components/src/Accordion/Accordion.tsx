@@ -60,7 +60,6 @@ const Container = styled.div`
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   }
 `
-
 const Summary = styled.summary`
   ${({ theme }) => theme.fonts.bold18};
   color: ${({ theme }) => theme.colors.primary};
@@ -88,31 +87,66 @@ const NestedChildren = styled.div`
   border-left: 4px solid ${({ theme }) => theme.colors.copy};
   padding-top: 0px !important;
 `
+const List = styled.ul<{ flexDirection?: string }>`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  & > div {
+    margin-bottom: 16px;
+  }
+  ${({ flexDirection }) =>
+    flexDirection &&
+    `display: flex;
+    & > div {
+      margin-right: 16px;
+    }`}
+`
+export interface IAccordionOption {
+  value: string
+}
 
 export interface IAccordionProps {
-  title: string
-  details?: string
-  nestedFields?: { [key: string]: JSX.Element[] }
-  hasNestedField?: boolean
+  name: string
+  label: string
+  options: IAccordionOption[]
+  value: string
+  nestedFields: { [key: string]: JSX.Element[] }
+  onChange: (value: string) => void
+}
+
+function toggleDetails(value: string) {
+  if (value === 'no') return false
+  return true
 }
 
 export const Accordion = ({
-  title,
-  details,
+  name,
+  label,
+  options,
+  value,
   nestedFields,
-  hasNestedField
-}: IAccordionProps) => (
-  <Container>
-    <h2>{title}</h2>
-    <details>
-      <Summary data-open="Hide" data-close="Show"></Summary>
-      {hasNestedField ? (
-        <div>
-          {nestedFields && <NestedChildren>{nestedFields}</NestedChildren>}
-        </div>
-      ) : (
-        <div>{details}</div>
-      )}
-    </details>
-  </Container>
-)
+  onChange
+}: IAccordionProps) => {
+  return (
+    <Container>
+      <h2>{label}</h2>
+      <details onToggle={() => onChange(value)}>
+        <Summary id={name}>
+          <List>
+            {options.map((option, index) => {
+              return (
+                <div key={`nestedField-${index}`}>
+                  {nestedFields &&
+                    value === option.value &&
+                    nestedFields[value] && (
+                      <NestedChildren>{nestedFields[value]}</NestedChildren>
+                    )}
+                </div>
+              )
+            })}
+          </List>
+        </Summary>
+      </details>
+    </Container>
+  )
+}

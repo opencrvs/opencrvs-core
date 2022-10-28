@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ComponentMeta } from '@storybook/react'
-import { Accordion } from './Accordion'
-import React, { useState } from 'react'
+import { Story, ComponentMeta } from '@storybook/react'
+import { Accordion, IAccordionProps } from './Accordion'
+import React from 'react'
 
 export default {
   title: 'Data/Accordion',
@@ -19,17 +19,26 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: `
-\`<Accordion>\` 
-`
+        component: `\`<Accordion />\` `
       }
     }
   }
 } as ComponentMeta<typeof Accordion>
 
-export const text = () => (
-  <Accordion
-    title="Select name"
-    details="Something small enough to escape casual notice."
-  />
-)
+const Template: Story<IAccordionProps> = (args) => <Accordion {...args} />
+
+export const AccordionView = Template.bind({})
+AccordionView.args = {
+  name: 'accordion-component',
+  label: 'Section name',
+  value: 'no',
+  options: [
+    {
+      value: 'yes'
+    },
+    {
+      value: 'no'
+    }
+  ],
+  onChange: () => alert('Clicked')
+}
