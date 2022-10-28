@@ -87,10 +87,11 @@ const Close = styled(Button)`
   }
 `
 
-const NotificationMessage = styled(Text).attrs(
+const NotificationMessage = styled(Text).attrs({
   color: 'white',
-  variant: 'bold16'
-)`
+  variant: 'bold16',
+  element: 'p'
+})`
   position: relative;
   width: 100%;
   padding: 14px 24px 12px 16px;
