@@ -409,17 +409,18 @@ class CustomFieldToolsComp extends React.Component<
       errorMessage: optionalContent.errorMessage,
       fieldName: handleBars,
       fieldId: newFieldID,
-      conditionals: selectedField.conditionals
-        ? [
-            {
-              fieldId: conditionalField.fieldId,
-              regexp: conditionalField.regex
-            }
-          ]
-        : [],
       /* We can't let maxlength be 0 as it doesn't make any sense */
       maxLength: this.state.maxLength || DEFAULT_MAX_LENGTH,
       label
+    }
+
+    if (selectedField.conditionals) {
+      modifiedField.conditionals = [
+        {
+          fieldId: conditionalField.fieldId,
+          regexp: conditionalField.regex
+        }
+      ]
     }
     return modifiedField
   }

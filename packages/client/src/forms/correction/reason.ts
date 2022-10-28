@@ -70,7 +70,7 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
       nestedFields: {
         OTHER: [
           {
-            name: 'reasonForChange',
+            name: 'otherReason',
             type: 'TEXT',
             label: messages.reasonForChange,
             required: true,

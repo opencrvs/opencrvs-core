@@ -49,7 +49,7 @@ export const primary = ({ loading }: { loading?: boolean }) => css`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
 
-  &:hover:not(:focus-visible) {
+  &:hover {
     background: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
