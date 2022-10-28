@@ -16,7 +16,10 @@ import { internal } from '@hapi/boom'
 import { IUserAuditBody } from '@metrics/features/registration'
 import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
 import { countUserAuditEvents, getUserAuditEvents } from './service'
-
+import { getClientIdFromToken } from '@metrics/utils/authUtils'
+import fetch from 'node-fetch'
+export const USER_MANAGEMENT_URL =
+  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export async function newAuditHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -28,9 +31,21 @@ export async function newAuditHandler(
     const userAgent =
       request.headers['x-real-user-agent'] || request.headers['user-agent']
     const payload = request.payload as IUserAuditBody
+
+    let practitionerId
+    if (payload.practitionerId) {
+      practitionerId = payload.practitionerId!
+    } else {
+      const userId = getClientIdFromToken(request.headers.authorization)
+      const user = await getUser(userId, {
+        Authorization: request.headers.authorization
+      })
+      practitionerId = user.practitionerId
+    }
+
     points.push(
       generateAuditPoint(
-        payload.practitionerId,
+        practitionerId,
         payload.action,
         remoteAddress,
         userAgent,
@@ -44,13 +59,43 @@ export async function newAuditHandler(
   return h.response().code(201)
 }
 
+export async function getUser(
+  userId: string,
+  authHeader: { Authorization: string }
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve user mobile number. Error: ${res.status} status received`
+    )
+  }
+
+  return await res.json()
+}
+
 export async function getUserAuditsHandler(request: Hapi.Request) {
   const practitionerId = request.query[PRACTITIONER_ID]
   const skip = request.query['skip'] || 0
   const size = request.query['count']
+  const timeStart = request.query['timeStart']
+  const timeEnd = request.query['timeEnd']
 
-  const results = await getUserAuditEvents(practitionerId, size, skip)
-  const total = await countUserAuditEvents(practitionerId)
+  const results = await getUserAuditEvents(
+    practitionerId,
+    size,
+    skip,
+    timeStart,
+    timeEnd
+  )
+  const total = await countUserAuditEvents(practitionerId, timeStart, timeEnd)
   return {
     results,
     total

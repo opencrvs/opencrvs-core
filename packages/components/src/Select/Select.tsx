@@ -113,7 +113,6 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     z-index: 2;
     padding: 0;
   }
-
 `
 
 function getSelectedOption(

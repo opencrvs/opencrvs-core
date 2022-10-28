@@ -36,7 +36,7 @@ import {
   StatusWaitingValidation
 } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
-import { Link } from '@opencrvs/components/lib/Link'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
@@ -47,18 +47,17 @@ import {
   ColumnContentAlignment
 } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
-
 import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
 import format from '@client/utils/date-formatting'
-
 import {
   IOnlineStatusProps,
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { GetUserAuditLogQuery } from '@client/utils/gateway'
-import { NameContainer } from '@client/views/OfficeHome/components'
+import { GetLink, IActionDetailsData } from '@client/views/RecordAudit/History'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -111,9 +110,18 @@ const InformationTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   width: 320px;
 `
+const AuditContent = styled.div`
+  color: ${({ theme }) => theme.colors.grey600};
+`
 
+const BoldContent = styled.div`
+  color: ${({ theme }) => theme.colors.grey600};
+  ${({ theme }) => theme.fonts.bold12};
+`
 interface IBaseProp {
   practitionerId: string
+  practitionerName: string | null | undefined
+  loggedInUserRole: string | null | undefined
 }
 
 interface DispatchProps {
@@ -142,6 +150,8 @@ type State = {
   sortOrder: SORT_ORDER
   sortedColumn: SORTED_COLUMN
   currentPageNumber: number
+  showModal: boolean
+  actionDetailsData: Record<string, string>
 }
 
 const isUserAuditItemWithDeclarationDetials = (
@@ -160,7 +170,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
       viewportWidth: 0,
       currentPageNumber: 1,
       sortOrder: SORT_ORDER.DESCENDING,
-      sortedColumn: SORTED_COLUMN.DATE
+      sortedColumn: SORTED_COLUMN.DATE,
+      showModal: false,
+      actionDetailsData: {}
     }
     this.updateViewPort = this.updateViewPort.bind(this)
   }
@@ -193,7 +205,6 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
 
   setCurrentPage = (currentPage: number) => {
     this.setState({ currentPageNumber: currentPage })
-    console.log(recordCount)
   }
 
   updateViewPort() {
@@ -308,13 +319,23 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     }
   }
 
+  toggleActionDetails = (actionItem: IActionDetailsData | null) => {
+    actionItem &&
+      this.setState({
+        actionDetailsData: actionItem,
+        showModal: !this.state.showModal
+      })
+  }
+
   getAuditData(data: GQLUserAuditLogResultSet) {
     const auditList = data.results.map((userAuditItem) => {
       if (userAuditItem === null) {
         return {}
       }
       const actionDescriptor = getUserAuditDescription(userAuditItem.action)
-
+      const actionMessage = actionDescriptor
+        ? this.props.intl.formatMessage(actionDescriptor)
+        : ''
       const device = Bowser.getParser(userAuditItem.userAgent).getResult()
 
       const deviceIpAddress =
@@ -328,14 +349,47 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         ' • ' +
         userAuditItem.ipAddress
 
+      const isSystemAdmin =
+        this.props.loggedInUserRole === 'NATIONAL_SYSTEM_ADMIN' ||
+        this.props.loggedInUserRole === 'LOCAL_SYSTEM_ADMIN'
+
       return {
-        actionDescription: (
-          <NameContainer>
-            {(actionDescriptor &&
-              this.props.intl.formatMessage(actionDescriptor)) ||
-              ''}
-          </NameContainer>
-        ),
+        actionDescription:
+          isSystemAdmin &&
+          isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
+            <GetLink
+              status={actionMessage}
+              onClick={() => {
+                this.toggleActionDetails({
+                  ...userAuditItem,
+                  formattedDeviceData: deviceIpAddress,
+                  formattedActionData: format(
+                    new Date(userAuditItem.time),
+                    'MMMM dd, yyyy hh:mm a'
+                  ),
+                  action: actionMessage
+                })
+              }}
+            />
+          ) : !isSystemAdmin ? (
+            <GetLink
+              status={actionMessage}
+              onClick={() => {
+                this.toggleActionDetails({
+                  ...userAuditItem,
+                  formattedDeviceData: deviceIpAddress,
+                  formattedActionData: format(
+                    new Date(userAuditItem.time),
+                    'MMMM dd, yyyy hh:mm a'
+                  ),
+                  action: actionMessage
+                })
+              }}
+            />
+          ) : (
+            <BoldContent>{actionMessage}</BoldContent>
+          ),
+
         actionDescriptionWithAuditTime: (
           <AuditDescTimeContainer>
             <InformationTitle>
@@ -348,18 +402,23 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             </InformationCaption>
           </AuditDescTimeContainer>
         ),
-        trackingId: isUserAuditItemWithDeclarationDetials(userAuditItem) ? (
-          <Link
-            onClick={() =>
-              this.props.goToDeclarationRecordAudit(
-                'printTab',
-                userAuditItem.data.compositionId as string
-              )
-            }
-          >
-            {userAuditItem.data.trackingId}
-          </Link>
-        ) : null,
+        trackingId:
+          isUserAuditItemWithDeclarationDetials(userAuditItem) &&
+          !isSystemAdmin ? (
+            <LinkButton
+              onClick={() =>
+                this.props.goToDeclarationRecordAudit(
+                  'printTab',
+                  userAuditItem.data.compositionId as string
+                )
+              }
+            >
+              {userAuditItem.data.trackingId}
+            </LinkButton>
+          ) : isUserAuditItemWithDeclarationDetials(userAuditItem) ? (
+            <AuditContent>{userAuditItem.data.trackingId}</AuditContent>
+          ) : null,
+
         deviceIpAddress: deviceIpAddress,
         trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
           ? userAuditItem.data.trackingId
@@ -435,7 +494,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                 variables={{
                   practitionerId: practitionerId,
                   count: recordCount,
-                  skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1)
+                  skip: DEFAULT_LIST_SIZE * (currentPageNumber - 1),
+                  timeStart: timeStart,
+                  timeEnd: timeEnd
                 }}
                 fetchPolicy={'no-cache'}
               >
@@ -449,7 +510,6 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                         data.getUserAuditLog.total) ||
                         0
                     )
-                    console.log(data)
 
                     return (
                       <>
@@ -473,6 +533,25 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                             this.setState({ currentPageNumber: page })
                           }
                         />
+
+                        <ResponsiveModal
+                          actions={[]}
+                          handleClose={() => this.toggleActionDetails({})}
+                          show={this.state.showModal}
+                          responsive={true}
+                          title={this.state.actionDetailsData.action}
+                          width={1024}
+                          autoHeight={true}
+                        >
+                          <>
+                            <AuditContent>
+                              {this.props.practitionerName} -{' '}
+                              {this.state.actionDetailsData.formattedActionData}{' '}
+                              {' | '}
+                              {this.state.actionDetailsData.formattedDeviceData}
+                            </AuditContent>
+                          </>
+                        </ResponsiveModal>
                       </>
                     )
                   }

@@ -38,11 +38,19 @@ export const SEARCH_USERS = gql`
 `
 
 export const GET_USER_AUDIT_LOG = gql`
-  query getUserAuditLog($practitionerId: String!, $count: Int!, $skip: Int!) {
+  query getUserAuditLog(
+    $practitionerId: String!
+    $count: Int!
+    $skip: Int!
+    $timeStart: String
+    $timeEnd: String
+  ) {
     getUserAuditLog(
       practitionerId: $practitionerId
       count: $count
       skip: $skip
+      timeStart: $timeStart
+      timeEnd: $timeEnd
     ) {
       total
       results {

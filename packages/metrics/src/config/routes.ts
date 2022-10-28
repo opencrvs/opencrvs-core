@@ -583,7 +583,8 @@ export const getRoutes = () => {
       path: '/audit/events',
       handler: newAuditHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        auth: false
       }
     },
     // GET user audit events
@@ -596,7 +597,9 @@ export const getRoutes = () => {
           query: Joi.object({
             practitionerId: Joi.string().required(),
             skip: Joi.number(),
-            count: Joi.number()
+            count: Joi.number(),
+            timeStart: Joi.string(),
+            timeEnd: Joi.string()
           })
         },
         tags: ['api']

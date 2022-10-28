@@ -185,7 +185,7 @@ export interface IUserAuditPoints {
 }
 
 export interface IUserAuditBody {
-  practitionerId: string
+  practitionerId?: string
   action: USER_ACTION | string
   additionalData?: Record<string, any>
 }

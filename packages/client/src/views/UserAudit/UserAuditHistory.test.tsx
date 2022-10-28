@@ -244,7 +244,11 @@ describe('User audit list tests', () => {
 
   it('renders next page of audits after clicking next page', async () => {
     const testComponent = await createTestComponent(
-      <UserAuditHistory practitionerId="94429795-0a09-4de8-8e1e-27dab01877d2" />,
+      <UserAuditHistory
+        practitionerId="94429795-0a09-4de8-8e1e-27dab01877d2"
+        practitionerName="Kennedy Mweene"
+        loggedInUserRole="LOCAL_REGISTRAR"
+      />,
       {
         store,
         history,
@@ -294,9 +298,9 @@ describe('User audit list tests', () => {
       'D23S2D0'
     )
     expect(nextPageButton.hostNodes()).toHaveLength(2)
-    nextPageButton.hostNodes().first().simulate('click')
+    nextPageButton.hostNodes().find('button').first().simulate('click')
     await new Promise((resolve) => {
-      setTimeout(resolve, 100)
+      setTimeout(resolve, 2000)
     })
     testComponent.update()
     const firstRowElementOnSecondPage = await waitForElement(

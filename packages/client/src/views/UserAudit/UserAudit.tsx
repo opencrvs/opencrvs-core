@@ -40,7 +40,7 @@ import { goToReviewUserDetails, goToTeamUserList } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { VerticalThreeDots } from '@client/../../components/lib/icons'
 import { IStoreState } from '@client/store'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { userMutations } from '@client/user/mutations'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
@@ -78,6 +78,8 @@ export const UserAudit = () => {
   const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
   const [modalVisible, setModalVisible] = useState(false)
   const scope = useSelector((store: IStoreState) => getScope(store))
+  const userDetails = useSelector((store: IStoreState) => getUserDetails(store))
+
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
   }
@@ -253,25 +255,17 @@ export const UserAudit = () => {
                     }
                   />
                   <Summary.Row
-                    label={intl.formatMessage(userSetupMessages.phoneNumber)}
-                    value={user.number}
-                  />
-                  <Summary.Row
-                    label={intl.formatMessage(userSetupMessages.nid)}
-                    value={user.nid}
-                  />
-                  <Summary.Row
-                    label={intl.formatMessage(userSetupMessages.userName)}
-                    value={user.username}
-                  />
-                  <Summary.Row
                     label={intl.formatMessage(userFormMessages.userDevice)}
-                    value={user.device}
+                    value={user.device === null ? 'N/A' : user.device}
                   />
                 </Summary>
 
                 {user.practitionerId && (
-                  <UserAuditHistory practitionerId={user.practitionerId} />
+                  <UserAuditHistory
+                    practitionerId={user.practitionerId}
+                    practitionerName={user.name}
+                    loggedInUserRole={userDetails!.role}
+                  />
                 )}
               </>
               <UserAuditActionModal

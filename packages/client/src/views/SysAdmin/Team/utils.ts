@@ -158,7 +158,17 @@ const AuditDescriptionMapping: {
   ASSIGNED: messages.assignedAuditAction,
   UNASSIGNED: messages.unAssignedAuditAction,
   CORRECTED: messages.correctedAuditAction,
-  ARCHIVED: messages.archivedAuditAction
+  ARCHIVED: messages.archivedAuditAction,
+  LOGGED_IN: messages.loggedInAuditAction,
+  LOGGED_OUT: messages.loggedOutAuditAction,
+  PHONE_NUMBER_CHANGED: messages.phoneNumberChangedAuditAction,
+  PASSWORD_CHANGED: messages.passwordChangedAuditAction,
+  DEACTIVATE: messages.deactivateAuditAction,
+  REACTIVATE: messages.reactivateAuditAction,
+  EDIT_USER: messages.editUserAuditAction,
+  CREATE_USER: messages.createUserAuditAction,
+  PASSWORD_RESET: messages.passwordResetAuditAction,
+  USERNAME_REMINDER: messages.userNameReminderAuditAction
 }
 
 export function getUserAuditDescription(

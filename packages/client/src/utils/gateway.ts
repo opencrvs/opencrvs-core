@@ -1395,6 +1395,8 @@ export type QueryGetUserAuditLogArgs = {
   count: Scalars['Int']
   practitionerId: Scalars['String']
   skip?: InputMaybe<Scalars['Int']>
+  timeEnd?: InputMaybe<Scalars['String']>
+  timeStart?: InputMaybe<Scalars['String']>
 }
 
 export type QueryGetUserByMobileArgs = {
@@ -2333,6 +2335,8 @@ export type GetUserAuditLogQueryVariables = Exact<{
   practitionerId: Scalars['String']
   count: Scalars['Int']
   skip: Scalars['Int']
+  timeStart?: InputMaybe<Scalars['String']>
+  timeEnd?: InputMaybe<Scalars['String']>
 }>
 
 export type GetUserAuditLogQuery = {

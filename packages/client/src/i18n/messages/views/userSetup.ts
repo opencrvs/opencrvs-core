@@ -60,6 +60,16 @@ interface IUserSetupMessages
   unAssignedAuditAction: MessageDescriptor
   correctedAuditAction: MessageDescriptor
   archivedAuditAction: MessageDescriptor
+  loggedInAuditAction: MessageDescriptor
+  loggedOutAuditAction: MessageDescriptor
+  phoneNumberChangedAuditAction: MessageDescriptor
+  passwordChangedAuditAction: MessageDescriptor
+  reactivateAuditAction: MessageDescriptor
+  deactivateAuditAction: MessageDescriptor
+  createUserAuditAction: MessageDescriptor
+  editUserAuditAction: MessageDescriptor
+  passwordResetAuditAction: MessageDescriptor
+  userNameReminderAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -300,6 +310,56 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Archived',
     description: 'Description for declaration archived',
     id: 'user.profile.auditList.archived'
+  },
+  loggedInAuditAction: {
+    defaultMessage: 'Logged in',
+    description: 'Description for user logged in',
+    id: 'user.profile.auditList.loggedIn'
+  },
+  loggedOutAuditAction: {
+    defaultMessage: 'Logged out',
+    description: 'Description for user logged out',
+    id: 'user.profile.auditList.loggedOut'
+  },
+  phoneNumberChangedAuditAction: {
+    defaultMessage: 'Phone number changed',
+    description: 'Description for user change phoneNumber',
+    id: 'user.profile.auditList.phoneNumberChanged'
+  },
+  passwordChangedAuditAction: {
+    defaultMessage: 'Changed Password',
+    description: 'Description for user change password',
+    id: 'user.profile.auditList.passwordChanged'
+  },
+  reactivateAuditAction: {
+    defaultMessage: 'Reactivates User',
+    description: 'Description for User reactivated',
+    id: 'user.profile.auditList.userReactivated'
+  },
+  deactivateAuditAction: {
+    defaultMessage: 'Deactivated User',
+    description: 'Description for User deactivated',
+    id: 'user.profile.auditList.userDeactivated'
+  },
+  createUserAuditAction: {
+    defaultMessage: 'Created User',
+    description: 'Description for User created action',
+    id: 'user.profile.auditList.userCreated'
+  },
+  editUserAuditAction: {
+    defaultMessage: 'Edit User',
+    description: 'Description for User edited action',
+    id: 'user.profile.auditList.userEdited'
+  },
+  passwordResetAuditAction: {
+    defaultMessage: 'Reset password',
+    description: 'Description for User reset password action',
+    id: 'user.profile.auditList.passwordReset'
+  },
+  userNameReminderAuditAction: {
+    defaultMessage: 'Username Reminder Requested',
+    description: 'Description for User username requested audit action',
+    id: 'user.profile.auditList.usernameRequested'
   }
 }
 
