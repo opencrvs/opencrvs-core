@@ -28,7 +28,6 @@ export const SEARCH_USERS = gql`
         mobile
         type
         status
-        mobile
         underInvestigation
         avatar {
           type
