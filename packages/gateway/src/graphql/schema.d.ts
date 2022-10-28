@@ -737,7 +737,7 @@ export interface GQLSignature {
 export interface GQLSearch {
   searchId: string
   name: string
-  event?: GQLEvent
+  event?: string
   registrationStatuses?: Array<string | null>
   dateOfEvent?: string
   dateOfEventStart?: string
@@ -2054,6 +2054,8 @@ export interface QueryToGetEventsWithProgressResolver<
 
 export interface QueryToSearchRecordArgs {
   event?: string
+  dateOfEvent?: string
+  registrationStatuses?: string
   eventLocationId?: string
   childFirstName?: string
   childLastName?: string
@@ -2079,6 +2081,27 @@ export interface QueryToSearchRecordArgs {
   dateOfRegistration?: string
   dateOfRegistrationStart?: string
   dateOfRegistrationEnd?: string
+  declarationLocationId?: string
+  declarationJurisdictionId?: string
+  eventLocationLevel1?: string
+  eventLocationLevel2?: string
+  eventLocationLevel3?: string
+  eventLocationLevel4?: string
+  eventLocationLevel5?: string
+  childDoBStart?: string
+  childDoBEnd?: string
+  childGender?: string
+  deceasedGender?: string
+  deceasedDoB?: string
+  deceasedDoBStart?: string
+  deceasedDoBEnd?: string
+  motherDoBStart?: string
+  motherDoBEnd?: string
+  fatherDoBStart?: string
+  fatherDoBEnd?: string
+  informantDoB?: string
+  informantDoBStart?: string
+  informantDoBEnd?: string
 }
 export interface QueryToSearchRecordResolver<TParent = any, TResult = any> {
   (

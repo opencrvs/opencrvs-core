@@ -134,6 +134,8 @@ type Query {
   ): EventProgressResultSet
   searchRecord(
     event: String
+    dateOfEvent: String
+    registrationStatuses: String
     eventLocationId: String
     childFirstName: String
     childLastName: String
@@ -159,6 +161,27 @@ type Query {
     dateOfRegistration: String
     dateOfRegistrationStart: String
     dateOfRegistrationEnd: String
+    declarationLocationId: String
+    declarationJurisdictionId: String
+    eventLocationLevel1: String
+    eventLocationLevel2: String
+    eventLocationLevel3: String
+    eventLocationLevel4: String
+    eventLocationLevel5: String
+    childDoBStart: String
+    childDoBEnd: String
+    childGender: String
+    deceasedGender: String
+    deceasedDoB: String
+    deceasedDoBStart: String
+    deceasedDoBEnd: String
+    motherDoBStart: String
+    motherDoBEnd: String
+    fatherDoBStart: String
+    fatherDoBEnd: String
+    informantDoB: String
+    informantDoBStart: String
+    informantDoBEnd: String
   ): EventProgressResultSet
   getRoles(
     title: String
@@ -889,7 +912,7 @@ type Signature {
 type Search {
   searchId: String!
   name: String!
-  event: Event
+  event: String
   registrationStatuses: [String]
   dateOfEvent: String
   dateOfEventStart: String
