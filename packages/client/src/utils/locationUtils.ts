@@ -181,25 +181,24 @@ export function getJurisidictionType(
 
 export type LocationName = string | MessageDescriptor
 
-export function getFullLocationNameOfFacility(
+export function getLocationNameMapOfFacility(
   facilityLocation: ILocation,
   offlineLocations: Record<string, ILocation>
-) {
+): Record<string, LocationName> {
   let location: ILocation = facilityLocation
-  const names: LocationName[] = [location.name]
   let continueLoop = true
+  const map: Record<string, LocationName> = { facility: location.name }
   while (location.partOf && continueLoop) {
     const parent = location.partOf.split('/')[1]
     if (parent === '0') {
       continueLoop = false
-      names.push(
-        countries.find(({ value }) => value === window.config.COUNTRY)
-          ?.label as MessageDescriptor
-      )
+      map.country = countries.find(
+        ({ value }) => value === window.config.COUNTRY
+      )?.label as MessageDescriptor
     } else {
       location = offlineLocations[parent]
-      names.push(location.name)
+      map[location.jurisdictionType as string] = location.name
     }
   }
-  return names
+  return map
 }
