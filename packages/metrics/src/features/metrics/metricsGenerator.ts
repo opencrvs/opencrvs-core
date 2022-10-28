@@ -956,6 +956,7 @@ export async function fetchRegistrationsGroupByOfficeLocation(
   timeFrom: string,
   timeTo: string,
   event: EVENT_TYPE,
+  locationId: string | undefined,
   authHeader: IAuthHeader
 ) {
   const measurement =
@@ -966,7 +967,16 @@ export async function fetchRegistrationsGroupByOfficeLocation(
     `SELECT COUNT(${column}) AS total
       FROM ${measurement}
     WHERE time > '${timeFrom}'
-      AND time <= '${timeTo}'      
+      AND time <= '${timeTo}' 
+      ${
+        locationId
+          ? `AND ( locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}'
+      OR officeLocation = '${locationId}')`
+          : ``
+      }     
     GROUP BY officeLocation, eventLocationType, timeLabel`
   )
 

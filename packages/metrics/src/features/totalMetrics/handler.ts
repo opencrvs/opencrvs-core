@@ -113,6 +113,9 @@ export async function totalMetricsByLocation(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const event = request.query[EVENT]
+  const locationId = request.query[LOCATION_ID]
+    ? 'Location/' + request.query[LOCATION_ID]
+    : undefined
   const authHeader: IAuthHeader = {
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
@@ -122,6 +125,7 @@ export async function totalMetricsByLocation(
     timeStart,
     timeEnd,
     event,
+    locationId,
     authHeader
   )
 

@@ -476,7 +476,7 @@ function RegistrationListComponent(props: IProps) {
               startDate={dateStart}
               endDate={dateEnd}
               onDatesChange={({ startDate, endDate }) =>
-                props.goToFieldAgentList(
+                props.goToRegistrationsList(
                   startDate.toISOString(),
                   endDate.toISOString(),
                   locationId

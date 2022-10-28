@@ -356,7 +356,8 @@ export const getRoutes = () => {
           query: Joi.object({
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
-            event: Joi.string().required()
+            event: Joi.string().required(),
+            locationId: Joi.string()
           })
         },
         tags: ['api']
