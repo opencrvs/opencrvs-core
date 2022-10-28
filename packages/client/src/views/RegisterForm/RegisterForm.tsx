@@ -696,6 +696,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   <ReviewSection
                     pageRoute={this.props.pageRoute}
                     draft={declaration}
+                    viewRecord={true}
                     rejectDeclarationClickEvent={this.toggleRejectForm}
                     submitClickEvent={this.confirmSubmission}
                     onChangeReviewForm={this.modifyDeclaration}
