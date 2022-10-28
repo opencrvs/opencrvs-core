@@ -42,7 +42,7 @@ import {
   GQLMixedTotalMetricsResult,
   GQLSearchFieldAgentResult
 } from '@opencrvs/gateway/src/graphql/schema'
-import { orderBy, get, isEmpty } from 'lodash'
+import { orderBy, get, sortBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -51,7 +51,6 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
-import format from '@client/utils/date-formatting'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IAvatar } from '@client/utils/userUtils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
@@ -72,6 +71,7 @@ interface SortMap {
   delayed: SORT_ORDER
   healthFacility: SORT_ORDER
   home: SORT_ORDER
+  time: SORT_ORDER
 }
 const INITIAL_SORT_MAP = {
   month: SORT_ORDER.ASCENDING,
@@ -80,7 +80,8 @@ const INITIAL_SORT_MAP = {
   late: SORT_ORDER.ASCENDING,
   delayed: SORT_ORDER.ASCENDING,
   healthFacility: SORT_ORDER.ASCENDING,
-  home: SORT_ORDER.ASCENDING
+  home: SORT_ORDER.ASCENDING,
+  time: SORT_ORDER.DESCENDING
 }
 
 interface ISearchParams {
@@ -281,10 +282,9 @@ function RegistrationListComponent(props: IProps) {
           label: intl.formatMessage(messages.month),
           width: 20,
           isSortable: true,
-          sortFunction: () => toggleSort('month'),
-          icon:
-            columnToBeSort === 'month' ? <SortArrow active={true} /> : <></>,
-          isSorted: columnToBeSort === 'month' ? true : false
+          sortFunction: () => toggleSort('time'),
+          icon: columnToBeSort === 'time' ? <SortArrow active={true} /> : <></>,
+          isSorted: columnToBeSort === 'time' ? true : false
         },
         ...commonColumns,
         {

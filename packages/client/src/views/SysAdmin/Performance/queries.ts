@@ -200,6 +200,7 @@ export const FETCH_REGISTRATIONS = gql`
           home
           healthFacility
           month
+          time
         }
       }
     }

@@ -60,6 +60,7 @@ interface IMetricsTotalGroupByLocation {
 
 interface IMetricsTotalGroupByTime {
   time: string
+  month: string
   total: number
   eventLocationType: string
   timeLabel: string
@@ -956,8 +957,7 @@ export async function fetchRegistrationsGroupByOfficeLocation(
   timeFrom: string,
   timeTo: string,
   event: EVENT_TYPE,
-  locationId: string | undefined,
-  authHeader: IAuthHeader
+  locationId: string | undefined
 ) {
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
@@ -983,7 +983,12 @@ export async function fetchRegistrationsGroupByOfficeLocation(
   return result
 }
 
-export async function fetchRegistrationsGroupByTime(event: EVENT_TYPE) {
+export async function fetchRegistrationsGroupByTime(
+  timeFrom: string,
+  timeTo: string,
+  event: EVENT_TYPE,
+  locationId: string | undefined
+) {
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
@@ -991,7 +996,19 @@ export async function fetchRegistrationsGroupByTime(event: EVENT_TYPE) {
   const result: IMetricsTotalGroupByTime[] = await query(
     `SELECT COUNT(${column}) AS total
       FROM ${measurement}    
-    GROUP BY time(30d), timeLabel, eventLocationType
+      WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}' 
+      ${
+        locationId
+          ? `AND ( locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}'
+      OR officeLocation = '${locationId}')`
+          : ``
+      }   
+    GROUP BY time(30d), timeLabel, eventLocationType ORDER BY time DESC
+
     `
   )
 

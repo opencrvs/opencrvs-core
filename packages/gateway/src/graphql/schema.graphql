@@ -1326,6 +1326,7 @@ type EventMetricsByTime {
   home: Int!
   healthFacility: Int!
   month: String!
+  time: String!
 }
 
 type RegistrationSearchSet {

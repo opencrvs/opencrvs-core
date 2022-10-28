@@ -370,7 +370,10 @@ export const getRoutes = () => {
       config: {
         validate: {
           query: Joi.object({
-            event: Joi.string().required()
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            event: Joi.string().required(),
+            locationId: Joi.string()
           })
         },
         tags: ['api']

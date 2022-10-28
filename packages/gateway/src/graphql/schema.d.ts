@@ -1193,6 +1193,7 @@ export interface GQLEventMetricsByTime {
   home: number
   healthFacility: number
   month: string
+  time: string
 }
 
 export interface GQLRegistrationSearchSet {
@@ -5363,6 +5364,7 @@ export interface GQLEventMetricsByTimeTypeResolver<TParent = any> {
   home?: EventMetricsByTimeToHomeResolver<TParent>
   healthFacility?: EventMetricsByTimeToHealthFacilityResolver<TParent>
   month?: EventMetricsByTimeToMonthResolver<TParent>
+  time?: EventMetricsByTimeToTimeResolver<TParent>
 }
 
 export interface EventMetricsByTimeToTotalResolver<
@@ -5401,6 +5403,13 @@ export interface EventMetricsByTimeToHealthFacilityResolver<
 }
 
 export interface EventMetricsByTimeToMonthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByTimeToTimeResolver<
   TParent = any,
   TResult = any
 > {

@@ -97,9 +97,18 @@ export async function totalMetricsByRegistrar(
 
     results.push({
       registrarPractitioner: registrarId,
-      total: registrarResults.length,
-      late: lateRegistrations.length,
-      delayed: delayedRegistrations.length
+      total: registrarResults.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      late: lateRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      delayed: delayedRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      )
     })
   })
 
@@ -116,17 +125,12 @@ export async function totalMetricsByLocation(
   const locationId = request.query[LOCATION_ID]
     ? 'Location/' + request.query[LOCATION_ID]
     : undefined
-  const authHeader: IAuthHeader = {
-    Authorization: request.headers.authorization,
-    'x-correlation-id': request.headers['x-correlation-id']
-  }
 
   const results = await fetchRegistrationsGroupByOfficeLocation(
     timeStart,
     timeEnd,
     event,
-    locationId,
-    authHeader
+    locationId
   )
 
   const locationIDs = uniqBy(results, 'officeLocation').map(
@@ -158,11 +162,26 @@ export async function totalMetricsByLocation(
 
     response.push({
       location: locationID,
-      total: registrations.length,
-      late: lateRegistrations.length,
-      delayed: delayedRegistrations.length,
-      home: homeRegistrations.length,
-      healthFacility: healthFacilityRegistrations.length
+      total: registrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      late: lateRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      delayed: delayedRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      home: homeRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      healthFacility: healthFacilityRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      )
     })
   })
 
@@ -173,20 +192,30 @@ export async function totalMetricsByTime(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const timeStart = request.query[TIME_FROM]
+  const timeEnd = request.query[TIME_TO]
+  const locationId = request.query[LOCATION_ID]
+    ? 'Location/' + request.query[LOCATION_ID]
+    : undefined
   const event = request.query[EVENT]
-  const registrations = await fetchRegistrationsGroupByTime(event)
+  const registrations = await fetchRegistrationsGroupByTime(
+    timeStart,
+    timeEnd,
+    event,
+    locationId
+  )
 
   registrations.forEach((registration) => {
-    registration.time = format(new Date(registration.time), 'MMMM-yyyy')
+    registration.month = format(new Date(registration.time), 'MMMM-yyyy')
   })
 
-  const months = uniqBy(registrations, 'time').map((item) => item.time)
+  const months = uniqBy(registrations, 'month').map((item) => item.month)
 
   const results: any[] = []
 
   months.forEach((month) => {
     const filteredRegistrations = registrations.filter(
-      (registration) => registration.time === month
+      (registration) => registration.month === month
     )
 
     const lateRegistrations = filteredRegistrations.filter(
@@ -206,12 +235,28 @@ export async function totalMetricsByTime(
     )
 
     results.push({
-      total: filteredRegistrations.length,
-      late: lateRegistrations.length,
-      delayed: delayedRegistrations.length,
-      home: homeRegistrations.length,
-      healthFacility: healthFacilityRegistrations.length,
-      month
+      total: filteredRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      late: lateRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      delayed: delayedRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      home: homeRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      healthFacility: healthFacilityRegistrations.reduce(
+        (total, currentValue) => total + currentValue.total,
+        0
+      ),
+      month,
+      time: new Date(month).getTime()
     })
   })
 
