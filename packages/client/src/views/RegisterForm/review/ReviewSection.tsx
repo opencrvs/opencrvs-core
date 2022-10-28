@@ -1645,7 +1645,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     required={false}
                     label={intl.formatMessage(messages.additionalComments)}
                   >
-                    <TextArea {...textAreaProps} readOnly={viewRecord} />
+                    <TextArea {...{ ...textAreaProps, readonly: viewRecord }} />
                   </InputField>
                 </InputWrapper>
               )}
