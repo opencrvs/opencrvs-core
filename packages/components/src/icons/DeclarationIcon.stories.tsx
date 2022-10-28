@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { DeclarationIcon } from './DeclarationIcon'
 
 export default {
-  title: 'Styles/Icons/DeclarationIcon',
+  title: 'Deprecated/Icons/DeclarationIcon',
   component: DeclarationIcon
 } as Meta
 

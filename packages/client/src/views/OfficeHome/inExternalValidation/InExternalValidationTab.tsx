@@ -123,7 +123,6 @@ function InExternalValidationComponent(props: IProps) {
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          isBoldLink={true}
           onClick={() =>
             props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
           }

@@ -16,7 +16,6 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
-  createReviewDeclaration,
   modifyDeclaration,
   storeDeclaration,
   writeDeclaration,
@@ -70,7 +69,7 @@ import {
 } from '@client/views/PrintCertificate/utils'
 import { StyledSpinner } from '@client/views/OfficeHome/OfficeHome'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 import { flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -346,8 +345,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       declaration,
       formSection,
       formGroup,
-      goBack,
-      registerForm
+      goBack
     } = this.props
 
     const { showError, showModalForNoSignedAffidavit } = this.state

@@ -656,7 +656,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.causeOfDeathProof'
   },
   causeOfDeathEstablished: {
-    defaultMessage: 'Has a cause of death been established ?',
+    defaultMessage: 'Cause of death has been established',
     description: 'Label for form field: Cause of Death Established',
     id: 'form.field.label.causeOfDeathEstablished'
   },
@@ -1184,12 +1184,12 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.section.father.name'
   },
   mothersDetailsExist: {
-    defaultMessage: "Do you have the mother's details?",
+    defaultMessage: "Mother's details are not available",
     description: "Question to ask the user if they have the mother's details",
     id: 'form.field.label.mothersDetailsExist'
   },
   fathersDetailsExist: {
-    defaultMessage: "Do you have the father's details?",
+    defaultMessage: "Father's details are not available",
     description: "Question to ask the user if they have the father's details",
     id: 'form.field.label.fathersDetailsExist'
   },

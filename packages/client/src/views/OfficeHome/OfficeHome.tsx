@@ -61,6 +61,7 @@ import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
+import { constantsMessages } from '@client/i18n/messages'
 import { Outbox } from './outbox/Outbox'
 import { ArrayElement } from '@client/SubmissionController'
 
@@ -198,12 +199,9 @@ class OfficeHomeView extends React.Component<
           selectorId === SELECTOR_ID.ownDrafts &&
           pageId !== this.state.draftCurrentPage
         ) {
-          this.setState({ draftCurrentPage: pageId }, () => {
-            this.updateWorkqueue()
-          })
+          this.setState({ draftCurrentPage: pageId })
         }
-      }
-      if (pageId !== this.props[WORKQUEUE_TABS_PAGINATION[tabId]]) {
+      } else if (pageId !== this.props[WORKQUEUE_TABS_PAGINATION[tabId]]) {
         this.props.updateWorkqueuePagination({
           [WORKQUEUE_TABS_PAGINATION[tabId]]: pageId
         })
@@ -248,13 +246,13 @@ class OfficeHomeView extends React.Component<
 
     if (isDeclarationWorkqueueTab(tabId)) {
       if (tabId === WORKQUEUE_TABS.inProgress) {
-        if (Object.values(SELECTOR_ID).includes(selectorId)) {
-          this.props.goToHomeTab(
-            WORKQUEUE_TABS.inProgress,
-            selectorId,
-            newPageNumber
-          )
-        }
+        this.props.goToHomeTab(
+          WORKQUEUE_TABS.inProgress,
+          Object.values(SELECTOR_ID).includes(selectorId)
+            ? selectorId
+            : SELECTOR_ID.ownDrafts,
+          newPageNumber
+        )
         return
       }
       this.props.goToHomeTab(tabId, '', newPageNumber)
@@ -437,6 +435,9 @@ class OfficeHomeView extends React.Component<
             title={intl.formatMessage(navigationMessages[this.props.tabId])}
           />
         }
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
         navigation={<Navigation loadWorkqueueStatuses={false} />}
       >
         {this.getData(

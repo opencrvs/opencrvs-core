@@ -9,11 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { RegAction, RegStatus } from '@client/utils/gateway'
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IRecordAuditMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   archived: MessageDescriptor
+  sentNotification: MessageDescriptor
+  started: MessageDescriptor
   confirmationBody: MessageDescriptor
   confirmationTitle: MessageDescriptor
   status: MessageDescriptor
@@ -46,6 +49,16 @@ const messagesToDefine: IRecordAuditMessages = {
     id: 'recordAudit.archive.status',
     defaultMessage: 'Archived',
     description: 'Archived status'
+  },
+  sentNotification: {
+    id: 'recordAudit.regStatus.declared.sentNotification',
+    defaultMessage: 'Sent notification for review',
+    description: 'Field agent sent notification'
+  },
+  started: {
+    id: 'recordAudit.history.started',
+    defaultMessage: 'Started',
+    description: 'Declaration Started'
   },
   confirmationBody: {
     id: 'recordAudit.archive.confirmation.body',
@@ -176,5 +189,88 @@ const messagesToDefine: IRecordAuditMessages = {
     description: 'Description for the dialog when reinstate declaration'
   }
 }
+
+const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
+  [RegAction.Downloaded]: {
+    id: 'recordAudit.regAction.downloaded',
+    defaultMessage: 'Retrieved',
+    description: 'Retrieved action'
+  },
+  [RegAction.Assigned]: {
+    id: 'recordAudit.regAction.assigned',
+    defaultMessage: 'Assigned',
+    description: 'Assigned action'
+  },
+  [RegAction.Unassigned]: {
+    id: 'recordAudit.regAction.unassigned',
+    defaultMessage: 'Unassigned',
+    description: 'Unassigned action'
+  },
+  [RegAction.Reinstated]: {
+    id: 'recordAudit.regAction.reinstated',
+    defaultMessage: 'Reinstated to {regStatus}',
+    description: 'Reinstated action'
+  },
+  [RegAction.RequestedCorrection]: {
+    id: 'recordAudit.regAction.requestedCorrection',
+    defaultMessage: 'Requested Correction',
+    description: 'Requested Correction action'
+  }
+}
+
+const regStatusMessagesToDefine: Record<RegStatus, MessageDescriptor> = {
+  [RegStatus.Archived]: {
+    defaultMessage: 'Archived',
+    description: 'Label for registration status archived',
+    id: 'recordAudit.regStatus.archived'
+  },
+  [RegStatus.InProgress]: {
+    defaultMessage: 'Sent incomplete',
+    description: 'Declaration submitted without completing the required fields',
+    id: 'constants.sent_incomplete'
+  },
+  [RegStatus.Declared]: {
+    defaultMessage: 'Declaration started',
+    description: 'Label for registration status declared',
+    id: 'recordAudit.regStatus.declared'
+  },
+  [RegStatus.WaitingValidation]: {
+    defaultMessage: 'Waiting for validation',
+    description: 'Label for registration status waitingValidation',
+    id: 'recordAudit.regStatus.waitingValidation'
+  },
+  [RegStatus.Validated]: {
+    defaultMessage: 'Sent for approval',
+    description: 'The title of sent for approvals tab',
+    id: 'regHome.sentForApprovals'
+  },
+  [RegStatus.Registered]: {
+    defaultMessage: 'Registered',
+    description: 'Label for registration status registered',
+    id: 'recordAudit.regStatus.registered'
+  },
+  [RegStatus.Certified]: {
+    defaultMessage: 'Certified',
+    description: 'Label for registration status certified',
+    id: 'recordAudit.regStatus.certified'
+  },
+  [RegStatus.Rejected]: {
+    defaultMessage: 'Rejected',
+    description: 'A label for registration status rejected',
+    id: 'recordAudit.regStatus.rejected'
+  },
+  [RegStatus.DeclarationUpdated]: {
+    defaultMessage: 'Updated',
+    description: 'Declaration has been updated',
+    id: 'recordAudit.regStatus.updatedDeclaration'
+  }
+}
+
 export const recordAuditMessages: IRecordAuditMessages =
   defineMessages(messagesToDefine)
+
+export const regActionMessages: Record<RegAction, MessageDescriptor> =
+  defineMessages(actionMessagesToDefine)
+
+export const regStatusMessages: Record<RegStatus, MessageDescriptor> =
+  defineMessages(regStatusMessagesToDefine)

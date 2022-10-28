@@ -36,7 +36,10 @@ import {
   TEXTAREA,
   WARNING,
   LOCATION_SEARCH_INPUT,
-  IAttachmentValue
+  IAttachmentValue,
+  Section,
+  CHECKBOX,
+  ICheckboxFormField
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
@@ -55,7 +58,7 @@ import {
   getListOfLocations,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
 import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
 import { IGQLLocation } from '@client/utils/userUtils'
 import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
@@ -127,7 +130,7 @@ export function updateDeclarationRegistrationWithCorrection(
   declaration: IDeclaration,
   meta?: { userPrimaryOffice?: IGQLLocation }
 ): void {
-  const correctionValues: Record<string, any> = {}
+  let correctionValues: Record<string, any> = {}
   const { data } = declaration
 
   if (data.corrector && data.corrector.relationship) {
@@ -135,6 +138,10 @@ export function updateDeclarationRegistrationWithCorrection(
       data.corrector.relationship as IFormSectionData
     ).value || data.corrector.relationship) as string
   }
+
+  correctionValues.hasShowedVerifiedDocument = Boolean(
+    data.corrector?.hasShowedVerifiedDocument
+  )
 
   if (data.reason) {
     if (data.reason.type) {
@@ -144,6 +151,12 @@ export function updateDeclarationRegistrationWithCorrection(
 
     if (data.reason.additionalComment) {
       correctionValues.note = data.reason.additionalComment
+    }
+
+    if ((data.reason.type as IFormSectionData).nestedFields) {
+      const nestedFields = (data.reason.type as IFormSectionData)
+        .nestedFields as IFormSectionData
+      correctionValues = { ...correctionValues, ...nestedFields }
     }
   }
 
@@ -309,6 +322,19 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckboxFieldValue = (
+  field: ICheckboxFormField,
+  value: string,
+  intl: IntlShape
+) => {
+  const { checkedValue = true } = field
+  return intl.formatMessage(
+    value === String(checkedValue)
+      ? formMessageDescriptors.confirm
+      : formMessageDescriptors.deny
+  )
+}
+
 export const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
@@ -393,6 +419,10 @@ export const renderValue = (
       field.options,
       intl
     )
+  }
+
+  if (field.type === CHECKBOX) {
+    return getCheckboxFieldValue(field, String(value), intl)
   }
 
   if (value && field.type === CHECKBOX_GROUP) {

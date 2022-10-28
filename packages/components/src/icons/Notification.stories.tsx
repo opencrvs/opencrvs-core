@@ -14,7 +14,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react'
 import { Notification } from './Notification'
 
 export default {
-  title: 'Styles/Icons/Notification',
+  title: 'Deprecated/Icons/Notification',
   component: Notification
 } as ComponentMeta<typeof Notification>
 

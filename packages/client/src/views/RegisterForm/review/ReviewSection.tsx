@@ -63,7 +63,9 @@ import {
   IDocumentUploaderWithOptionsFormField,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  SubmissionAction
+  SubmissionAction,
+  ICheckboxFormField,
+  CHECKBOX
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -76,14 +78,19 @@ import {
   getConditionalActionsForField,
   getSectionFields,
   getVisibleSectionGroupsBasedOnConditions,
-  getListOfLocations
+  getListOfLocations,
+  getSelectedInformantAndContactType
 } from '@client/forms/utils'
 import {
   Errors,
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessageDescriptors
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -336,6 +343,19 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckboxFieldValue = (
+  field: ICheckboxFormField,
+  value: string,
+  intl: IntlShape
+) => {
+  const { checkedValue = true } = field
+  return intl.formatMessage(
+    value === String(checkedValue)
+      ? formMessageDescriptors.confirm
+      : formMessageDescriptors.deny
+  )
+}
+
 const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
@@ -420,6 +440,10 @@ const renderValue = (
       field.options,
       intl
     )
+  }
+
+  if (field.type === CHECKBOX) {
+    return getCheckboxFieldValue(field, String(value), intl)
   }
 
   if (value && field.type === CHECKBOX_GROUP) {
@@ -1654,7 +1678,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   })}
                   <LinkButton
                     id="edit-document"
-                    disabled={isCorrection(declaration)}
+                    disabled={
+                      isCorrection(declaration) ||
+                      motherDoesNotExistAndStateIsMother(
+                        declaration,
+                        sectionName
+                      ) ||
+                      fatherDoesNotExistAndStateIsFather(
+                        declaration,
+                        sectionName
+                      )
+                    }
                     onClick={() =>
                       this.editLinkClickHandlerForDraft(
                         documentsSection.id,
@@ -1706,11 +1740,43 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             title={intl.formatMessage(buttonMessages.preview)}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}
+            disableDelete={true}
           />
         )}
       </FullBodyContent>
     )
   }
+}
+
+function motherDoesNotExistAndStateIsMother(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  const selectedInformantAndContactType = getSelectedInformantAndContactType(
+    declaration.data
+  )
+
+  return (
+    !Boolean(declaration.data.mother?.detailsExist) &&
+    activeState === 'mother' &&
+    selectedInformantAndContactType.selectedInformantType !== 'MOTHER' &&
+    selectedInformantAndContactType.selectedContactType !== 'MOTHER'
+  )
+}
+
+function fatherDoesNotExistAndStateIsFather(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  const selectedInformantAndContactType = getSelectedInformantAndContactType(
+    declaration.data
+  )
+  return (
+    !Boolean(declaration.data.father?.detailsExist) &&
+    activeState === 'father' &&
+    selectedInformantAndContactType.selectedInformantType !== 'FATHER' &&
+    selectedInformantAndContactType.selectedContactType !== 'FATHER'
+  )
 }
 
 export const ReviewSection = connect(

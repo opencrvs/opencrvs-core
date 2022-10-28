@@ -12,9 +12,10 @@
 import styled from 'styled-components'
 import React from 'react'
 import { CircleButton } from '../buttons'
+import { noop } from 'lodash'
 
 // TODO: margin-left value of auto needs to be refactored out
-const ToggleMenuContainer = styled.div`
+const ToggleMenuContainer = styled.nav`
   position: relative;
   height: 40px;
   display: flex;
@@ -96,17 +97,20 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     }
     this.showMenu = this.showMenu.bind(this)
     this.closeMenu = this.closeMenu.bind(this)
+    this.closeMenuOnEscape = this.closeMenuOnEscape.bind(this)
   }
 
   componentWillUnmount() {
     document.removeEventListener('click', this.closeMenu)
     document.removeEventListener('click', this.showMenu)
+    document.removeEventListener('keyup', this.closeMenuOnEscape)
   }
   showMenu() {
     this.setState(() => ({
       showSubmenu: true
     }))
     document.addEventListener('click', this.closeMenu)
+    document.addEventListener('keyup', this.closeMenuOnEscape)
   }
 
   closeMenu() {
@@ -114,6 +118,13 @@ export class ToggleMenu extends React.Component<IProps, IState> {
       showSubmenu: false
     }))
     document.removeEventListener('click', this.closeMenu)
+    document.removeEventListener('keyup', this.closeMenuOnEscape)
+  }
+
+  closeMenuOnEscape(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      this.closeMenu()
+    }
   }
 
   render() {
@@ -123,7 +134,7 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     }
     return (
       <>
-        <ToggleMenuContainer>
+        <ToggleMenuContainer aria-expanded={this.state.showSubmenu}>
           <CircleButton id={`${id}ToggleButton`} onClick={this.showMenu}>
             {toggleButton}
           </CircleButton>
@@ -135,6 +146,11 @@ export class ToggleMenu extends React.Component<IProps, IState> {
                   id={`${id}Item${index}`}
                   key={`${id}-${index}`}
                   onClick={mi.handler}
+                  onKeyUp={(e) =>
+                    e.key === 'Enter' || e.key === ' ' ? mi.handler() : noop
+                  }
+                  tabIndex={0}
+                  role="button"
                 >
                   {mi.icon && mi.icon}
                   {mi.label}
