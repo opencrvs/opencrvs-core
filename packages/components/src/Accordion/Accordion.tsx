@@ -16,6 +16,7 @@ const Container = styled.div`
   box-sizing: border-box;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   padding-bottom: 16px;
+  width: 100%;
 
   details > summary::before {
     border-style: solid;
@@ -131,21 +132,20 @@ export const Accordion = ({
     <Container>
       <h2>{label}</h2>
       <details onToggle={() => onChange(value)}>
-        <Summary id={name}>
-          <List>
-            {options.map((option, index) => {
-              return (
-                <div key={`nestedField-${index}`}>
-                  {nestedFields &&
-                    value === option.value &&
-                    nestedFields[value] && (
-                      <NestedChildren>{nestedFields[value]}</NestedChildren>
-                    )}
-                </div>
-              )
-            })}
-          </List>
-        </Summary>
+        <Summary id={name} data-open="Hide" data-close="Show"></Summary>
+        <List>
+          {options.map((option, index) => {
+            return (
+              <div key={`nestedField-${index}`}>
+                {nestedFields &&
+                  value === option.value &&
+                  nestedFields[value] && (
+                    <NestedChildren>{nestedFields[value]}</NestedChildren>
+                  )}
+              </div>
+            )
+          })}
+        </List>
       </details>
     </Container>
   )
