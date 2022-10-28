@@ -54,6 +54,7 @@ export interface IDeclarationData {
   placeOfDeath?: string
   informant?: string
   informantContact?: string
+  informantRelationship?: string
   brnDrn?: string
   assignment?: GQLAssignmentData
 }
@@ -182,6 +183,7 @@ export const getLocation = (
   let locationId = EMPTY_STRING
   let district = EMPTY_STRING
   let state = EMPTY_STRING
+  let city = EMPTY_STRING
   let internationalDistrict = EMPTY_STRING
   let internationalState = EMPTY_STRING
   let country = EMPTY_STRING
@@ -196,7 +198,7 @@ export const getLocation = (
       declaration.data?.deathEvent?.district?.toString() || EMPTY_STRING
     state = declaration.data?.deathEvent?.state?.toString() || EMPTY_STRING
     country = declaration.data?.deathEvent?.country?.toString() || EMPTY_STRING
-
+    city = declaration.data?.deathEvent?.city?.toString() || EMPTY_STRING
     // when address is outside of default country
     internationalDistrict =
       declaration.data?.deathEvent?.internationalDistrict?.toString() ||
@@ -213,6 +215,7 @@ export const getLocation = (
     district = declaration.data?.child?.district?.toString() || EMPTY_STRING
     state = declaration.data?.child?.state?.toString() || EMPTY_STRING
     country = declaration.data?.child?.country?.toString() || EMPTY_STRING
+    city = declaration.data?.child?.cityUrbanOption?.toString() || EMPTY_STRING
 
     // when address is outside of default country
     internationalDistrict =
@@ -220,26 +223,26 @@ export const getLocation = (
     internationalState =
       declaration.data?.child?.internationalState?.toString() || EMPTY_STRING
   }
-  if (locationType === 'HEALTH_FACILITY' && locationId) {
-    const facility = resources.facilities[locationId]
-    const district =
-      facility &&
-      facility.partOf &&
-      resources.locations[facility.partOf.split('/')[1]]
-    const state = district && resources.locations[district.partOf.split('/')[1]]
-    const defaultCountry = intl.formatMessage(
-      countryMessages[window.config.COUNTRY]
-    )
-    const healthFacility = generateLocationName(facility, intl)
+  // if (locationType === 'HEALTH_FACILITY' && locationId) {
+  //   const facility = resources.facilities[locationId]
+  //   const district =
+  //     facility &&
+  //     facility.partOf &&
+  //     resources.locations[facility.partOf.split('/')[1]]
+  //   const state = district && resources.locations[district.partOf.split('/')[1]]
+  //   const defaultCountry = intl.formatMessage(
+  //     countryMessages[window.config.COUNTRY]
+  //   )
+  //   const healthFacility = generateLocationName(facility, intl)
 
-    let location = EMPTY_STRING
-    if (healthFacility) location = healthFacility + ', '
-    if (district) location = location + district.name + ', '
-    if (state) location = location + state.name + ', '
-    location = location + defaultCountry
-    return location
-  }
-  if (locationType === 'OTHER' || locationType === 'PRIVATE_HOME') {
+  //   let location = EMPTY_STRING
+  //   if (healthFacility) location = healthFacility + ', '
+  //   if (district) location = location + district.name + ', '
+  //   if (state) location = location + state.name + ', '
+  //   location = location + defaultCountry
+  //   return location
+  // }
+  if (locationType !== 'DECEASED_USUAL_RESIDENCE') {
     if (country && country !== window.config.COUNTRY) {
       let location = EMPTY_STRING
       if (internationalDistrict) location = internationalDistrict + ', '
@@ -248,7 +251,7 @@ export const getLocation = (
       return location
     }
 
-    return generateFullLocation(district, state, country, resources, intl)
+    return generateFullLocation(city, district, state, country, resources, intl)
   }
 
   // when address is default residence address of deceased
@@ -279,8 +282,11 @@ export const getLocation = (
         declaration.data?.deceased?.districtPrimary?.toString() || EMPTY_STRING
       const stateResidence =
         declaration.data?.deceased?.statePrimary?.toString() || EMPTY_STRING
+      const cityResidence =
+        declaration.data?.deceased?.cityPrimary?.toString() || EMPTY_STRING
 
       return generateFullLocation(
+        cityResidence,
         districtResidence,
         stateResidence,
         countryResidence,
@@ -351,6 +357,14 @@ export const getName = (name: (GQLHumanName | null)[], language: string) => {
   return createNamesMap(name.filter(notNull))[language]
 }
 
+export const getInformantPhoneNumber = (declaration: IDeclaration): string => {
+  return declaration.data?.registration?.informantType === 'MOTHER'
+    ? declaration.data?.mother?.phoneNumber?.toString()
+    : declaration.data?.registration?.informantType === 'FATHER'
+    ? declaration.data?.father?.phoneNumber?.toString()
+    : declaration.data?.informant?.phoneNumber.toString()
+}
+
 export const getDraftDeclarationData = (
   declaration: IDeclaration,
   resources: IOfflineData,
@@ -373,12 +387,16 @@ export const getDraftDeclarationData = (
     placeOfDeath: getLocation(declaration, resources, intl) || EMPTY_STRING,
     informant:
       ((declaration.data?.registration?.contactPoint as IFormSectionData)
-        ?.value as string) || EMPTY_STRING,
+        ?.value as string) ||
+      declaration.data?.registration?.informantType.toString() ||
+      EMPTY_STRING,
     informantContact:
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
           ?.nestedFields as IContactPointPhone
-      )?.registrationPhone?.toString() || EMPTY_STRING
+      )?.registrationPhone?.toString() ||
+      getInformantPhoneNumber(declaration) ||
+      EMPTY_STRING
   }
 }
 

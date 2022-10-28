@@ -534,7 +534,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.maritalStatus'
                 },
                 customisable: true,
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -680,6 +680,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist || values.nationality !== "NGA"'
+                  },
+                  {
+                    action: 'hide',
+                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },
@@ -1248,6 +1252,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression: '!values.detailsExist'
+                  },
+                  {
+                    action: 'hide',
+                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },
@@ -1721,7 +1729,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.maritalStatus'
                 },
                 customisable: true,
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -1869,6 +1877,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist || values.nationality !== "NGA"'
+                  },
+                  {
+                    action: 'hide',
+                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },
@@ -2438,6 +2450,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression: '!values.detailsExist'
+                  },
+                  {
+                    action: 'hide',
+                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },

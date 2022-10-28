@@ -77,6 +77,7 @@ export function generateLocationName(
 }
 
 export function generateFullLocation(
+  city: string,
   districtId: string,
   stateId: string,
   countryCode: string,
@@ -88,7 +89,8 @@ export function generateFullLocation(
   const country =
     countryCode && intl.formatMessage(countryMessages[countryCode])
   let location = ''
-  if (district) location = district.name + ', '
+  if (city) location = location + city + ', '
+  if (district) location = location + district.name + ', '
   if (state) location = location + state.name + ', '
   location = location + country
   return location
