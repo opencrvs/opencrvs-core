@@ -49,7 +49,6 @@ import {
   BackArrowDeepBlue,
   ForwardArrowDeepBlue,
   BRN,
-  Location,
   Phone,
   Plus,
   SearchDark,
@@ -66,7 +65,7 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled, { ThemeConsumer } from 'styled-components'
+import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { FixedNavigation } from '@client/components/interface/Navigation'
 import { Avatar } from '@client/components/Avatar'

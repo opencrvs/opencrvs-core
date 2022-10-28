@@ -57,8 +57,9 @@ import {
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { GetUserAuditLogQuery } from '@client/utils/gateway'
-import { GetLink, IActionDetailsData } from '../RecordAudit/History'
+import { GetLink, IActionDetailsData } from '@client/views/RecordAudit/History'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Pagination } from '@opencrvs/components'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -112,7 +113,12 @@ const InformationTitle = styled.div`
   width: 320px;
 `
 const AuditContent = styled.div`
-  color: #222222;
+  color: ${({ theme }) => theme.colors.grey600};
+`
+
+const BoldContent = styled.div`
+  color: ${({ theme }) => theme.colors.grey600};
+  ${({ theme }) => theme.fonts.bold12};
 `
 interface IBaseProp {
   practitionerId: string
@@ -345,24 +351,47 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         ' • ' +
         userAuditItem.ipAddress
 
+      const isSystemAdmin =
+        this.props.loggedInUserRole === 'NATIONAL_SYSTEM_ADMIN' ||
+        this.props.loggedInUserRole === 'LOCAL_SYSTEM_ADMIN'
+
       return {
-        actionDescription: (
-          <GetLink
-            status={actionMessage}
-            disabled={this.props.loggedInUserRole === 'NATIONAL_SYSTEM_ADMIN'}
-            onClick={() => {
-              this.toggleActionDetails({
-                ...userAuditItem,
-                formattedDeviceData: deviceIpAddress,
-                formattedActionData: format(
-                  new Date(userAuditItem.time),
-                  'MMMM dd, yyyy hh:mm a'
-                ),
-                action: actionMessage
-              })
-            }}
-          />
-        ),
+        actionDescription:
+          isSystemAdmin &&
+          isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
+            <GetLink
+              status={actionMessage}
+              onClick={() => {
+                this.toggleActionDetails({
+                  ...userAuditItem,
+                  formattedDeviceData: deviceIpAddress,
+                  formattedActionData: format(
+                    new Date(userAuditItem.time),
+                    'MMMM dd, yyyy hh:mm a'
+                  ),
+                  action: actionMessage
+                })
+              }}
+            />
+          ) : !isSystemAdmin ? (
+            <GetLink
+              status={actionMessage}
+              onClick={() => {
+                this.toggleActionDetails({
+                  ...userAuditItem,
+                  formattedDeviceData: deviceIpAddress,
+                  formattedActionData: format(
+                    new Date(userAuditItem.time),
+                    'MMMM dd, yyyy hh:mm a'
+                  ),
+                  action: actionMessage
+                })
+              }}
+            />
+          ) : (
+            <BoldContent>{actionMessage}</BoldContent>
+          ),
+
         actionDescriptionWithAuditTime: (
           <AuditDescTimeContainer>
             <InformationTitle>
@@ -375,18 +404,23 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             </InformationCaption>
           </AuditDescTimeContainer>
         ),
-        trackingId: isUserAuditItemWithDeclarationDetials(userAuditItem) ? (
-          <LinkButton
-            onClick={() =>
-              this.props.goToDeclarationRecordAudit(
-                'printTab',
-                userAuditItem.data.compositionId as string
-              )
-            }
-          >
-            {userAuditItem.data.trackingId}
-          </LinkButton>
-        ) : null,
+        trackingId:
+          isUserAuditItemWithDeclarationDetials(userAuditItem) &&
+          !isSystemAdmin ? (
+            <LinkButton
+              onClick={() =>
+                this.props.goToDeclarationRecordAudit(
+                  'printTab',
+                  userAuditItem.data.compositionId as string
+                )
+              }
+            >
+              {userAuditItem.data.trackingId}
+            </LinkButton>
+          ) : isUserAuditItemWithDeclarationDetials(userAuditItem) ? (
+            <AuditContent>{userAuditItem.data.trackingId}</AuditContent>
+          ) : null,
+
         deviceIpAddress: deviceIpAddress,
         trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
           ? userAuditItem.data.trackingId
@@ -492,13 +526,16 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                             this.state.viewportWidth <=
                             theme.grid.breakpoints.md
                           }
-                          currentPage={this.state.currentPageNumber}
                           pageSize={DEFAULT_LIST_SIZE}
-                          totalItems={totalItems}
-                          onPageChange={(currentPage: number) => {
-                            this.setCurrentPage(currentPage)
-                          }}
                         />
+                        <Pagination
+                          currentPage={this.state.currentPageNumber}
+                          totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
+                          onPageChange={(page: any) =>
+                            this.setState({ currentPageNumber: page })
+                          }
+                        />
+
                         <ResponsiveModal
                           actions={[]}
                           handleClose={() => this.toggleActionDetails({})}
