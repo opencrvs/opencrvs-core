@@ -138,7 +138,7 @@ describe('registerSystemClient handler', () => {
       method: 'POST',
       url: '/registerSystemClient',
       payload: {
-        scope: 'NATIONAL_ID'
+        type: 'NATIONAL_ID'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -153,7 +153,7 @@ describe('registerSystemClient handler', () => {
       method: 'POST',
       url: '/registerSystemClient',
       payload: {
-        scope: 'NATIONAL_ID'
+        type: 'NATIONAL_ID'
       },
       headers: {
         Authorization: `Bearer ${badToken}`
@@ -168,7 +168,7 @@ describe('registerSystemClient handler', () => {
       method: 'POST',
       url: '/registerSystemClient',
       payload: {
-        scope: '123'
+        type: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
