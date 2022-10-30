@@ -118,8 +118,8 @@ describe('registerSystemClient handler', () => {
       method: 'POST',
       url: '/registerSystemClient',
       payload: {
-        type: 'NATIONAL_ID',
-        name: [{ use: 'en', family: 'Health complex' }],
+        type: 'RECORD_SEARCH',
+        name: 'Fortune Green',
         settings: {
           dailyQuota: 50
         }
