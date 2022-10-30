@@ -118,7 +118,7 @@ describe('registerSystemClient handler', () => {
       method: 'POST',
       url: '/registerSystemClient',
       payload: {
-        scope: 'NATIONAL_ID',
+        type: 'NATIONAL_ID',
         name: [{ use: 'en', family: 'Health complex' }],
         settings: {
           dailyQuota: 50
