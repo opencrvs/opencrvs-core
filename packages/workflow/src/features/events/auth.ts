@@ -62,7 +62,7 @@ function getEventToScopeMap() {
     ],
     [Events.VIEWED]: [
       USER_SCOPE.VALIDATE,
-      USER_SCOPE.RECORD_SEARCH,
+      USER_SCOPE.REGISTER,
       USER_SCOPE.CERTIFY
     ],
     [Events.ASSIGNED_EVENT]: [USER_SCOPE.VALIDATE, USER_SCOPE.REGISTER],
