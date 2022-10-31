@@ -427,14 +427,18 @@ export function goToFieldAgentList(
 export function goToRegistrationsList(
   timeStart: string,
   timeEnd: string,
-  locationId?: string
+  locationId?: string,
+  event?: string,
+  filterBy?: string
 ) {
   return push({
     pathname: PERFORMANCE_REGISTRATIONS_LIST,
     search: stringify({
       locationId,
       timeStart,
-      timeEnd
+      timeEnd,
+      event,
+      filterBy
     })
   })
 }

@@ -96,6 +96,8 @@ interface ISearchParams {
   locationId: string
   timeStart: string
   timeEnd: string
+  event: string
+  filterBy: string
 }
 
 interface IConnectProps {
@@ -195,14 +197,14 @@ function RegistrationListComponent(props: IProps) {
     location: { search },
     offlineOffices
   } = props
-  const { locationId, timeStart, timeEnd } = parse(
-    search
-  ) as unknown as ISearchParams
-  const [filterBy, setFilterBy] = useState<FILTER_BY_OPTIONS>(
-    FILTER_BY_OPTIONS.BY_TIME
-  )
+  const {
+    locationId,
+    timeStart,
+    timeEnd,
+    event = EVENT_OPTIONS.BIRTH,
+    filterBy = FILTER_BY_OPTIONS.BY_TIME
+  } = parse(search) as unknown as ISearchParams
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
-  const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.BIRTH)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('total')
@@ -474,7 +476,13 @@ function RegistrationListComponent(props: IProps) {
             <LocationPicker
               selectedLocationId={locationId}
               onChangeLocation={(newLocationId) => {
-                props.goToRegistrationsList(timeStart, timeEnd, newLocationId)
+                props.goToRegistrationsList(
+                  timeStart,
+                  timeEnd,
+                  newLocationId,
+                  event,
+                  filterBy
+                )
               }}
               requiredJurisdictionTypes={
                 window.config.FIELD_AGENT_AUDIT_LOCATIONS
@@ -482,10 +490,16 @@ function RegistrationListComponent(props: IProps) {
             />
             <PerformanceSelect
               onChange={(option) => {
-                setEvent(
+                const selectedEvent =
                   Object.values(EVENT_OPTIONS).find(
                     (val) => val === option.value
                   ) || EVENT_OPTIONS.BIRTH
+                props.goToRegistrationsList(
+                  timeStart,
+                  timeEnd,
+                  locationId,
+                  selectedEvent,
+                  filterBy
                 )
               }}
               id="event-select"
@@ -510,7 +524,9 @@ function RegistrationListComponent(props: IProps) {
                 props.goToRegistrationsList(
                   startDate.toISOString(),
                   endDate.toISOString(),
-                  locationId
+                  locationId,
+                  event,
+                  filterBy
                 )
               }
             />
@@ -520,7 +536,13 @@ function RegistrationListComponent(props: IProps) {
               value={filterBy}
               options={options}
               onChange={(option) =>
-                setFilterBy(option.value as FILTER_BY_OPTIONS)
+                props.goToRegistrationsList(
+                  timeStart,
+                  timeEnd,
+                  locationId,
+                  event,
+                  option?.value
+                )
               }
             />
           </>
