@@ -31,7 +31,8 @@
     "packages/components/**/*.mdx",
     "packages/components/.storybook/preview.jsx",
     "grafana",
-    ".nvmrc"
+    ".nvmrc",
+    ".idea"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {
