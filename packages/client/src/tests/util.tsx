@@ -2269,8 +2269,6 @@ export function createRouterProps<
   return { location, history, match }
 }
 
-export { mockOfflineData } from './mock-offline-data'
-
 export const mockFetchRoleGraphqlOperation = {
   request: {
     query: getRolesQuery,
@@ -2717,3 +2715,9 @@ export const mockDataWithRegistarRoleSelected = {
     data: 'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
   }
 }
+
+export {
+  mockOfflineData,
+  mockOfflineDataWithLocationHierarchy,
+  mockOfflineLocationsWithHierarchy
+} from './mock-offline-data'
