@@ -39,6 +39,7 @@ const messagesToDefine = {
       'These unique keys will be required by the client integrating...',
     description: 'Label for the unique key description'
   },
+
   revealKeys: {
     id: 'integrations.revealKeys',
     defaultMessage: 'Reveal Keys',
