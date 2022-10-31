@@ -15,7 +15,7 @@ import {
   IPrintableDeclaration
 } from '@client/declarations'
 import { BirthSection, DeathSection, IFormSectionData } from '@client/forms'
-import { Event, History } from '@client/utils/gateway'
+import { Event, History, RegStatus } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -208,7 +208,7 @@ export function getRegisteringOfficeId(
 ): string | null {
   const registeringHistory = (
     declaration?.data?.history as unknown as History[]
-  )?.find((h) => h.action === 'REGISTERED')
+  )?.find((h) => !h.action && h.regStatus === RegStatus.Registered)
 
   return registeringHistory?.office?.id || null
 }

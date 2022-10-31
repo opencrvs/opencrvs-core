@@ -1,4 +1,4 @@
-FROM node:erbium-alpine
+FROM node:fermium-alpine
 WORKDIR /usr/src/app
 
 ## Add the wait script to the image

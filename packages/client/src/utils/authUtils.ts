@@ -12,7 +12,7 @@
 import * as queryString from 'querystring'
 import decode from 'jwt-decode'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
 import { IUserDetails } from '@client/utils/userUtils'

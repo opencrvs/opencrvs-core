@@ -63,7 +63,9 @@ import {
   IDocumentUploaderWithOptionsFormField,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  SubmissionAction
+  SubmissionAction,
+  ICheckboxFormField,
+  CHECKBOX
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -84,7 +86,11 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessageDescriptors
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -101,7 +107,11 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
+import {
+  ACCUMULATED_FILE_SIZE,
+  ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
+  REJECTED
+} from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
@@ -337,6 +347,19 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckboxFieldValue = (
+  field: ICheckboxFormField,
+  value: string,
+  intl: IntlShape
+) => {
+  const { checkedValue = true } = field
+  return intl.formatMessage(
+    value === String(checkedValue)
+      ? formMessageDescriptors.confirm
+      : formMessageDescriptors.deny
+  )
+}
+
 const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
@@ -421,6 +444,10 @@ const renderValue = (
       field.options,
       intl
     )
+  }
+
+  if (field.type === CHECKBOX) {
+    return getCheckboxFieldValue(field, String(value), intl)
   }
 
   if (value && field.type === CHECKBOX_GROUP) {
@@ -521,7 +548,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   componentDidMount() {
-    !isMobileDevice() && window.addEventListener('scroll', this.onScroll)
+    !isMobileDevice() &&
+      ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+      window.addEventListener('scroll', this.onScroll)
   }
 
   componentWillUnmount() {
@@ -623,6 +652,53 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         ')'
     )
   }
+  getAllAttachmentInPreviewList = (declaration: IDeclaration) => {
+    const options = this.prepSectionDocsBasedOnScrollFlag(
+      declaration,
+      this.state.activeSection || this.docSections[0].id
+    )
+
+    return (
+      <DocumentListPreviewContainer>
+        <DocumentListPreview
+          id="all_attachment_list"
+          documents={options.uploadedDocuments}
+          onSelect={this.selectForPreview}
+          dropdownOptions={options.selectOptions}
+          inReviewSection={true}
+        />
+      </DocumentListPreviewContainer>
+    )
+  }
+
+  prepSectionDocsBasedOnScrollFlag = (
+    draft: IDeclaration,
+    activeSection: Section
+  ): IDocumentViewerOptions & {
+    uploadedDocuments: IFileValue[]
+  } => {
+    if (!ENABLE_REVIEW_ATTACHMENTS_SCROLLING) {
+      let selectOptions: SelectComponentOptions[] = []
+      let documentOptions: SelectComponentOptions[] = []
+      let uploadedDocuments: IFileValue[] = []
+      for (const section of this.docSections) {
+        const prepDocumentOption = this.prepSectionDocuments(draft, section.id)
+        selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
+        documentOptions = [
+          ...documentOptions,
+          ...prepDocumentOption.documentOptions
+        ]
+        uploadedDocuments = [
+          ...uploadedDocuments,
+          ...prepDocumentOption.uploadedDocuments
+        ]
+      }
+      return { selectOptions, documentOptions, uploadedDocuments }
+    } else {
+      return this.prepSectionDocuments(draft, activeSection)
+    }
+  }
+
   prepSectionDocuments = (
     draft: IDeclaration,
     activeSection: Section
@@ -1553,14 +1629,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         )}
                       </Title>
                     )}
-                    <DocumentListPreviewContainer>
-                      <DocumentListPreview
-                        id={sec.id}
-                        documents={uploadedDocuments}
-                        onSelect={this.selectForPreview}
-                        dropdownOptions={selectOptions}
-                      />
-                    </DocumentListPreviewContainer>
+                    {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
+                      <DocumentListPreviewContainer>
+                        <DocumentListPreview
+                          id={sec.id}
+                          documents={uploadedDocuments}
+                          onSelect={this.selectForPreview}
+                          dropdownOptions={selectOptions}
+                          inReviewSection={true}
+                        />
+                      </DocumentListPreviewContainer>
+                    )}
                     <ListViewSimplified id={'Section_' + sec.id}>
                       {sec.items.map((item, index) => {
                         return (
@@ -1588,6 +1667,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </SectionContainer>
                 )
               })}
+              {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                this.getAllAttachmentInPreviewList(declaration)}
               {!isCorrection(declaration) && (
                 <InputWrapper>
                   <InputField
@@ -1644,15 +1725,18 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               <DocumentViewer
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
-                options={this.prepSectionDocuments(
+                options={this.prepSectionDocsBasedOnScrollFlag(
                   declaration,
                   this.state.activeSection || this.docSections[0].id
                 )}
               >
                 <ZeroDocument id={`zero_document_${sectionName}`}>
-                  {intl.formatMessage(messages.zeroDocumentsText, {
-                    section: sectionName
-                  })}
+                  {ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                    intl.formatMessage(messages.zeroDocumentsText, {
+                      section: sectionName
+                    })}
+                  {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                    intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
                   <LinkButton
                     id="edit-document"
                     disabled={
