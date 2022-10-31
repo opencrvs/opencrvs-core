@@ -33,8 +33,12 @@ const Container = styled.div`
     transform: rotate(45deg);
   }
 
+  details[open] > summary {
+    color: ${({ theme }) => theme.colors.primary};
+  }
+
   details[open] > summary::before {
-    top: 0;
+    top: 6px;
     transform: rotate(135deg);
   }
 
@@ -113,11 +117,6 @@ export interface IAccordionProps {
   value: string
   nestedFields: { [key: string]: JSX.Element[] }
   onChange: (value: string) => void
-}
-
-function toggleDetails(value: string) {
-  if (value === 'no') return false
-  return true
 }
 
 export const Accordion = ({
