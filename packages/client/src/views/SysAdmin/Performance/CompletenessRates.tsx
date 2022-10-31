@@ -15,7 +15,7 @@ import {
   NOTIFICATION_TYPE,
   ToastNotification
 } from '@client/components/interface/ToastNotification'
-import { LocationPicker } from '@client/components/LocationPicker'
+import { LocationPicker } from './LocationPicker'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/performance'
@@ -24,7 +24,6 @@ import { goToCompletenessRates } from '@client/navigation'
 import {
   getJurisidictionType,
   CompletenessRateTime,
-  getAdditionalLocations,
   NATIONAL_ADMINISTRATIVE_LEVEL
 } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
@@ -177,12 +176,11 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                 />
               )}
               <LocationPicker
-                additionalLocations={getAdditionalLocations(intl)}
-                selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
-                onChangeLocation={(newLocationId) => {
+                locationId={locationId}
+                onChangeLocation={(newLocation) => {
                   props.goToCompletenessRates(
                     eventType as Event,
-                    newLocationId,
+                    newLocation.id,
                     dateStart,
                     dateEnd,
                     time

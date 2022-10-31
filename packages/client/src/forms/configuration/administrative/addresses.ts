@@ -809,7 +809,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       },
       customisable: false,
       previewGroup: 'primaryAddress',
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       dependency: 'districtPrimary',
@@ -1159,7 +1159,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       },
       customisable: false,
       previewGroup: 'primaryAddress',
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       dependency: 'districtPrimary',
@@ -2687,7 +2687,7 @@ export function getPlaceOfEventAddressFields(
     {
       name: 'otherType',
       customisable: false,
-      type: 'SELECT_WITH_OPTIONS',
+      type: 'TEXT',
       label: {
         defaultMessage: 'Type of place',
         description: 'Title for "other" type select',
@@ -2697,27 +2697,6 @@ export function getPlaceOfEventAddressFields(
       required: true,
       initialValue: '',
       validate: [],
-      placeholder: {
-        defaultMessage: 'Select',
-        description: 'Placeholder text for a select',
-        id: 'form.field.select.placeholder'
-      },
-      options: [
-        {
-          value: 'TRADITIONAL_DOCTORS',
-          label: formMessages.placeOfBirthTraditionalDoctors
-        },
-        { value: 'CAR_TAXI', label: formMessages.placeOfBirthCarTaxi },
-        { value: 'BUS', label: formMessages.placeOfBirthBus },
-        { value: 'TRAIN', label: formMessages.placeOfBirthTrain },
-        { value: 'ROADSIDE', label: formMessages.placeOfBirthRoadside },
-        { value: 'AEROPLANE', label: formMessages.placeOfBirthAeroplane },
-        { value: 'SHIP', label: formMessages.placeOfBirthShip },
-        {
-          value: 'TRADITIONAL_MATERNITY_HOMES',
-          label: formMessages.placeOfBirthTraditionalMaternityHomes
-        }
-      ],
       conditionals: [
         {
           action: 'hide',
@@ -2751,6 +2730,7 @@ export function getPlaceOfEventAddressFields(
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
       validate: [],
+      hidden: true,
       placeholder: {
         defaultMessage: 'Select',
         description: 'Placeholder text for a select',
@@ -2762,7 +2742,7 @@ export function getPlaceOfEventAddressFields(
       conditionals: [
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME" && values.${configCase}!="HEALTH_FACILITY")`
+          expression: `(!values.${configCase})`
         }
       ],
       mapping: {
@@ -2814,7 +2794,7 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME" && values.${configCase}!="HEALTH_FACILITY")`
+          expression: `(!values.${configCase})`
         },
         {
           action: 'hide',
@@ -2884,7 +2864,7 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME" && values.${configCase}!="HEALTH_FACILITY")`
+          expression: `(!values.${configCase})`
         },
         {
           action: 'hide',
@@ -2930,7 +2910,7 @@ export function getPlaceOfEventAddressFields(
         id: 'form.field.label.cityUrbanOption'
       },
       previewGroup: configCase,
-      required: false,
+      required: true,
       initialValue: '',
       validate: [],
       conditionals: [
@@ -2948,7 +2928,7 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME" && values.${configCase}!="HEALTH_FACILITY")`
+          expression: `(!values.${configCase})`
         },
         {
           action: 'hide',

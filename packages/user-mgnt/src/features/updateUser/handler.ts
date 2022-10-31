@@ -56,6 +56,8 @@ export default async function updateUser(
   existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar
   existingUser.device = user.device
+  existingUser.title = user.title
+
   if (existingUser.role !== user.role) {
     existingUser.role = user.role
     // Updating user sope
@@ -129,7 +131,7 @@ export default async function updateUser(
     }
 
     // update user in user-mgnt data store
-    await User.update({ _id: existingUser._id }, existingUser)
+    await existingUser.save()
   } catch (err) {
     logger.error(err)
     await rollbackUpdateUser(

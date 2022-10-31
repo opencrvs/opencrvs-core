@@ -117,6 +117,14 @@ export const userSectionFormType: ISerializedFormSection = {
           }
         },
         {
+          name: 'title',
+          type: TEXT,
+          label: userFormMessages.title,
+          required: false,
+          initialValue: '',
+          validate: []
+        },
+        {
           name: 'username',
           type: TEXT,
           label: userFormMessages.username,

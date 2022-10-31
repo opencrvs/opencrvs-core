@@ -22,7 +22,8 @@ const fieldNameMapping = {
   [birthDocumentForWhomFhirMapping.CHILD]: 'uploadDocForChildDOB',
   [birthDocumentForWhomFhirMapping.INFORMANT_ID_PROOF]: 'uploadDocForInformant',
   [birthDocumentForWhomFhirMapping.LEGAL_GUARDIAN_PROOF]:
-    'uploadDocForProofOfLegarGuardian'
+    'uploadDocForProofOfLegarGuardian',
+  [birthDocumentForWhomFhirMapping.BIRTH_DECLARATION]: 'uploadDocForB1Form'
 }
 
 export function birthAttachmentToFieldTransformer(

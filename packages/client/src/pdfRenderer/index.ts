@@ -61,6 +61,7 @@ export function createPDF(
       )
     })
   }
+
   return pdfMake.createPdf(
     JSON.parse(definitionString),
     undefined,

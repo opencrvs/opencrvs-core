@@ -227,12 +227,14 @@ export interface GQLUser {
   name?: Array<GQLHumanName | null>
   username?: string
   mobile?: string
+  title?: string
   role?: string
   type?: string
   email?: string
   status?: string
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
+  supervisoryArea?: string
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
@@ -438,6 +440,7 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile?: string
+  title?: string
   role?: string
   type?: string
   email?: string
@@ -725,6 +728,14 @@ export const enum GQLLocationType {
   MILITARY_BASE_OR_CANTONMENT = 'MILITARY_BASE_OR_CANTONMENT',
   IDP_CAMP = 'IDP_CAMP',
   UNHCR_CAMP = 'UNHCR_CAMP',
+  TRADITIONAL_DOCTORS = 'TRADITIONAL_DOCTORS',
+  CAR_TAXI = 'CAR_TAXI',
+  BUS = 'BUS',
+  TRAIN = 'TRAIN',
+  ROADSIDE = 'ROADSIDE',
+  AEROPLANE = 'AEROPLANE',
+  SHIP = 'SHIP',
+  TRADITIONAL_MATERNITY_HOMES = 'TRADITIONAL_MATERNITY_HOMES',
   OTHER = 'OTHER'
 }
 
@@ -1126,7 +1137,8 @@ export const enum GQLAttachmentSubject {
   DECEASED_DEATH_PROOF = 'DECEASED_DEATH_PROOF',
   DECEASED_DEATH_CAUSE_PROOF = 'DECEASED_DEATH_CAUSE_PROOF',
   INFORMANT_ID_PROOF = 'INFORMANT_ID_PROOF',
-  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF'
+  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
+  BIRTH_DECLARATION = 'BIRTH_DECLARATION'
 }
 
 export interface GQLRegistrationSearchSet {
@@ -3188,12 +3200,14 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
+  title?: UserToTitleResolver<TParent>
   role?: UserToRoleResolver<TParent>
   type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
+  supervisoryArea?: UserToSupervisoryAreaResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
   identifier?: UserToIdentifierResolver<TParent>
@@ -3227,6 +3241,10 @@ export interface UserToMobileResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface UserToTitleResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface UserToRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
@@ -3251,6 +3269,10 @@ export interface UserToUnderInvestigationResolver<
 }
 
 export interface UserToPrimaryOfficeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToSupervisoryAreaResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

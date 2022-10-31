@@ -24,7 +24,8 @@ import {
   Password,
   PIN,
   PhoneNumber,
-  ProfileImage
+  ProfileImage,
+  Title
 } from '@client/views/Settings/items'
 
 const BodyContainer = styled.div`
@@ -52,6 +53,7 @@ export function SettingsPage() {
             <Name />
             <PhoneNumber />
             <Role />
+            <Title />
             <Language />
             <Password />
             <PIN />

@@ -63,7 +63,7 @@ type IProps = {
   label?: string
   theme: ITheme
   onSelect: (document: IFileValue | IAttachmentValue) => void
-  dropdownOptions?: ISelectOption[]
+  dropdownOptions?: Array<ISelectOption & { originalValue?: string }>
   onDelete?: (image: IFileValue | IAttachmentValue) => void
 }
 
@@ -71,7 +71,9 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
   getFormattedLabelForDocType = (docType: string) => {
     const matchingOptionForDocType =
       this.props.dropdownOptions &&
-      this.props.dropdownOptions.find((option) => option.value === docType)
+      this.props.dropdownOptions.find(
+        (option) => option.value === docType || option.originalValue === docType
+      )
     return matchingOptionForDocType && matchingOptionForDocType.label
   }
   render() {

@@ -77,6 +77,7 @@ export function generateLocationName(
 }
 
 export function generateFullLocation(
+  city: string,
   districtId: string,
   stateId: string,
   countryCode: string,
@@ -88,10 +89,62 @@ export function generateFullLocation(
   const country =
     countryCode && intl.formatMessage(countryMessages[countryCode])
   let location = ''
-  if (district) location = district.name + ', '
+  if (city) location = location + city + ', '
+  if (district) location = location + district.name + ', '
   if (state) location = location + state.name + ', '
   location = location + country
   return location
+}
+
+type LocationsById = {
+  [key: string]: ILocation
+}
+
+export function shouldSeeCountryLevel(user: IUserDetails) {
+  return user.supervisoryArea === '0'
+}
+
+export function getJurisdictionTypeForUser(
+  user: IUserDetails,
+  locations: LocationsById
+): 'COUNTRY' | 'STATE' | 'DISTRICT' | null {
+  if (!user.supervisoryArea) {
+    return null
+  }
+  if (shouldSeeCountryLevel(user)) {
+    return 'COUNTRY'
+  }
+  return (
+    (locations[user.supervisoryArea].jurisdictionType as
+      | 'STATE'
+      | 'DISTRICT'
+      | undefined) || null
+  )
+}
+
+export function getOfficesByUserSupervisoryAreaFilter(
+  user: IUserDetails,
+  locations: LocationsById,
+  supervisoryAreaType: 'COUNTRY' | 'STATE' | 'DISTRICT' | null
+) {
+  return (office: ILocation) => {
+    if (supervisoryAreaType === 'COUNTRY') {
+      return true
+    }
+
+    const officeDistrict = locations[office.partOf.replace('Location/', '')]
+
+    if (supervisoryAreaType === 'STATE') {
+      return (
+        officeDistrict.partOf.replace('Location/', '') === user.supervisoryArea
+      )
+    }
+    if (supervisoryAreaType === 'DISTRICT') {
+      return officeDistrict.id === user.supervisoryArea
+    }
+
+    return office.id === user.primaryOffice?.id
+  }
 }
 
 function generateSearchableLocations(

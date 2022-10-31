@@ -470,15 +470,15 @@ function renderSelectOrRadioLabel(
 }
 
 function hasB1Form(draft: IDeclaration) {
-  if (!draft.data.documents.uploadDocForChildDOB) {
+  if (!draft.data?.documents?.uploadDocForB1Form) {
     return false
   }
 
   return (
-    draft.data.documents.uploadDocForChildDOB as Array<{
+    draft.data?.documents?.uploadDocForB1Form as Array<{
       optionValues: string[]
     }>
-  ).some((item) => item.optionValues[1] === 'B1_FORM')
+  )?.some((item) => item.optionValues[1] === 'B1_FORM')
 }
 
 export function renderSelectDynamicLabel(
@@ -772,13 +772,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
   prepSectionDocuments = (
     draft: IDeclaration,
-    activeSection: Section
+    activeSection?: Section
   ): IDocumentViewerOptions & { uploadedDocuments: IFileValue[] } => {
     const { documentsSection } = this.props
 
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
-    const selectOptions: SelectComponentOptions[] = []
+    const selectOptions: Array<
+      SelectComponentOptions & { originalValue?: string }
+    > = []
 
     let uploadedDocuments: IFileValue[] = []
 
@@ -793,9 +795,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     uploadedDocuments = uploadedDocuments.filter((document) => {
       const sectionMapping = SECTION_MAPPING[draft.event]
-
       const allowedDocumentType: string[] =
-        flatMap(Object.values(sectionMapping)) || []
+        (activeSection
+          ? sectionMapping[activeSection as keyof typeof sectionMapping]
+          : flatMap(Object.values(sectionMapping))) || []
 
       if (
         allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
@@ -817,9 +820,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           value: document.data,
           label
         })
+
         selectOptions.push({
           value: label,
-          label
+          originalValue: document.optionValues[
+            document.optionValues.length - 1
+          ] as string,
+          label: label as string
         })
         return true
       }
@@ -1684,7 +1691,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       errorsOnFields
     )
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
-
     return (
       <FullBodyContent>
         <Row>
@@ -1708,6 +1714,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               {transformedSectionData.map((sec, index) => {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
+
                 return (
                   <SectionContainer key={index}>
                     {sec.title && (
@@ -1824,10 +1831,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               <DocumentViewer
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
-                options={this.prepSectionDocuments(
-                  declaration,
-                  this.state.activeSection || this.docSections[0].id
-                )}
+                options={this.prepSectionDocuments(declaration)}
               >
                 <ZeroDocument id={`zero_document_${sectionName}`}>
                   {intl.formatMessage(messages.zeroDocumentsText, {

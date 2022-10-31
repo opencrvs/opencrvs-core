@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ApiResponse } from '@elastic/elasticsearch'
-import { postSearch } from '@gateway/features/fhir/utils'
+import {
+  postSearch,
+  getSupervisoryArea,
+  getFHIRLocation,
+  getAllLocationIdsInDistrict
+} from '@gateway/features/fhir/utils'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { hasScope, inScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
@@ -83,7 +88,17 @@ export const resolvers: GQLResolver = {
           return await Promise.reject(new Error('Invalid location id'))
         }
         if (locationIds.length === 1) {
-          searchCriteria.declarationLocationId = locationIds[0]
+          const locationFHIRObject = await getFHIRLocation(
+            locationIds[0],
+            authHeader
+          )
+          const supervisesThisArea = getSupervisoryArea(locationFHIRObject)
+          if (supervisesThisArea) {
+            searchCriteria.declarationLocationId =
+              await getAllLocationIdsInDistrict(supervisesThisArea, authHeader)
+          } else {
+            searchCriteria.declarationLocationId = locationIds[0]
+          }
         } else {
           searchCriteria.declarationLocationId = locationIds
         }

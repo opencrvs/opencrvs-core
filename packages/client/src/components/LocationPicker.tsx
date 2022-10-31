@@ -44,11 +44,14 @@ interface IConnectProps {
 
 interface IBaseProps {
   additionalLocations?: ISearchLocation[]
+  locationFilter?: (location: ILocation) => boolean
+  officeFilter?: (office: ILocation) => boolean
   selectedLocationId?: string
   disabled?: boolean
   onChangeLocation: (locationId: string) => void
   requiredJurisdictionTypes?: string
   fuzzy?: boolean
+  jurisidictionTypeFilter?: string[]
 }
 
 type LocationPickerProps = IBaseProps & IConnectProps & WrappedComponentProps
@@ -110,17 +113,30 @@ function LocationPickerComponent(props: LocationPickerProps) {
     disabled,
     additionalLocations = [],
     intl,
-    fuzzy = true
+    fuzzy = true,
+    locationFilter = () => true,
+    officeFilter = () => true
   } = props
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 
   const offlineSearchableLocations = generateLocations(
-    offlineLocations,
+    Object.fromEntries(
+      Object.entries(offlineLocations).filter(([key, value]) =>
+        locationFilter(value)
+      )
+    ),
     intl,
     jurisidictionTypeFilter
   )
 
-  const offlineSearchableOffices = generateLocations(offlineOffices, intl)
+  const offlineSearchableOffices = generateLocations(
+    Object.fromEntries(
+      Object.entries(offlineOffices).filter(([key, value]) =>
+        officeFilter(value)
+      )
+    ),
+    intl
+  )
 
   const searchableLocations = [
     ...additionalLocations,
@@ -206,9 +222,11 @@ function mapStateToProps(state: IStoreState, props: IBaseProps): IConnectProps {
   const offlineLocations = getOfflineData(state).locations
   const offlineOffices = getOfflineData(state).offices
   const jurisidictionTypeFilter =
+    props.jurisidictionTypeFilter ||
     (props.requiredJurisdictionTypes &&
       props.requiredJurisdictionTypes.split(',')) ||
     undefined
+
   return {
     offlineLocations,
     offlineOffices,

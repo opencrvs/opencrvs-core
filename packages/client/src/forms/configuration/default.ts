@@ -46,6 +46,7 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'child-view-group',
+            includeHiddenValues: true,
             fields: [
               {
                 name: 'familyNameEng',
@@ -84,6 +85,13 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'TEXT',
                 label: formMessageDescriptors.childFirstNames,
                 maxLength: 32,
+                description: {
+                  defaultMessage:
+                    'Middle name (if any) should be entered after the first name',
+                  description:
+                    'Description for form field: First names in english',
+                  id: 'form.field.label.firstNamesDesc'
+                },
                 required: true,
                 initialValue: '',
                 validate: [
@@ -189,6 +197,39 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'PRIVATE_HOME',
                     label: formMessageDescriptors.privateHome
+                  },
+                  {
+                    value: 'TRADITIONAL_DOCTORS',
+                    label: formMessageDescriptors.placeOfBirthTraditionalDoctors
+                  },
+                  {
+                    value: 'CAR_TAXI',
+                    label: formMessageDescriptors.placeOfBirthCarTaxi
+                  },
+                  {
+                    value: 'BUS',
+                    label: formMessageDescriptors.placeOfBirthBus
+                  },
+                  {
+                    value: 'TRAIN',
+                    label: formMessageDescriptors.placeOfBirthTrain
+                  },
+                  {
+                    value: 'ROADSIDE',
+                    label: formMessageDescriptors.placeOfBirthRoadside
+                  },
+                  {
+                    value: 'AEROPLANE',
+                    label: formMessageDescriptors.placeOfBirthAeroplane
+                  },
+                  {
+                    value: 'SHIP',
+                    label: formMessageDescriptors.placeOfBirthShip
+                  },
+                  {
+                    value: 'TRADITIONAL_MATERNITY_HOMES',
+                    label:
+                      formMessageDescriptors.placeOfBirthTraditionalMaternityHomes
                   },
                   {
                     value: 'OTHER',
@@ -452,6 +493,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
+                inputFieldWidth: '180px',
                 conditionals: [
                   {
                     action: 'hide',
@@ -492,7 +534,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.maritalStatus'
                 },
                 customisable: true,
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -549,25 +591,6 @@ export const registerForms: IDefaultRegisterForms = {
                       description: 'Option for form field: Marital status',
                       id: 'form.field.label.maritalStatusWidowed'
                     }
-                  }
-                ]
-              },
-              {
-                name: 'marital-seperator',
-                type: 'SUBSECTION',
-                label: {
-                  defaultMessage: ' ',
-                  description: 'empty string',
-                  id: 'form.field.label.empty'
-                },
-                initialValue: '',
-                ignoreBottomMargin: true,
-                validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -657,6 +680,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist || values.nationality !== "NGA"'
+                  },
+                  {
+                    action: 'hide',
+                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },
@@ -1225,6 +1252,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression: '!values.detailsExist'
+                  },
+                  {
+                    action: 'hide',
+                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },
@@ -1362,6 +1393,15 @@ export const registerForms: IDefaultRegisterForms = {
                       defaultMessage: 'University',
                       description: 'Label for education option University',
                       id: 'form.field.label.educationAttainment.university'
+                    }
+                  },
+                  {
+                    value: 'NO_EDUCATION',
+                    label: {
+                      defaultMessage: 'No formal education',
+                      description:
+                        'Label for education option No formal education',
+                      id: 'form.field.label.educationAttainmentNoEducation'
                     }
                   }
                 ]
@@ -1647,6 +1687,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
+                inputFieldWidth: '180px',
                 conditionals: [
                   {
                     action: 'hide',
@@ -1688,7 +1729,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.maritalStatus'
                 },
                 customisable: true,
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -1836,6 +1877,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist || values.nationality !== "NGA"'
+                  },
+                  {
+                    action: 'hide',
+                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },
@@ -2405,6 +2450,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression: '!values.detailsExist'
+                  },
+                  {
+                    action: 'hide',
+                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },
@@ -2543,6 +2592,15 @@ export const registerForms: IDefaultRegisterForms = {
                       defaultMessage: 'University',
                       description: 'Label for education option University',
                       id: 'form.field.label.educationAttainment.university'
+                    }
+                  },
+                  {
+                    value: 'NO_EDUCATION',
+                    label: {
+                      defaultMessage: 'No formal education',
+                      description:
+                        'Label for education option No formal education',
+                      id: 'form.field.label.educationAttainmentNoEducation'
                     }
                   }
                 ]
@@ -2777,6 +2835,22 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrarNameUserTransformer'
             },
             {
+              fieldName: 'registrationDate',
+              operation: 'registrationDateTransformer'
+            },
+            {
+              fieldName: 'placeOfBirthLocality',
+              operation: 'placeOfBirthLocalityTransformer'
+            },
+            {
+              fieldName: 'placeOfBirthLGA',
+              operation: 'placeOfBirthLGATransformer'
+            },
+            {
+              fieldName: 'placeOfBirthState',
+              operation: 'placeOfBirthStateTransformer'
+            },
+            {
               fieldName: 'role',
               operation: 'roleUserTransformer'
             },
@@ -2785,8 +2859,23 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrarSignatureUserTransformer'
             },
             {
-              fieldName: 'registrationLocation',
-              operation: 'registrationLocationUserTransformer'
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
+            },
+            {
+              fieldName: 'registrationCentre',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':office']
+            },
+            {
+              fieldName: 'registrationLGA',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':district']
+            },
+            {
+              fieldName: 'registrationState',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':state']
             }
           ],
           mutation: {
@@ -2814,7 +2903,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 action: 'hide',
                 expression:
-                  '((draftData.registration.informantType === "MOTHER" && draftData.mother.detailsExist) || (draftData.registration.informantType === "FATHER" && draftData.father.detailsExist))'
+                  '((draftData && draftData.registration && draftData.registration.informantType === "MOTHER" && draftData.mother && draftData.mother.detailsExist) || (draftData && draftData.registration && draftData.registration.informantType === "FATHER" && draftData.father && draftData.father.detailsExist))'
               }
             ],
             fields: [
@@ -2867,6 +2956,13 @@ export const registerForms: IDefaultRegisterForms = {
                   defaultMessage: 'First name(s)',
                   description: 'Label for form field: Given names',
                   id: 'form.field.label.childFirstNames'
+                },
+                description: {
+                  defaultMessage:
+                    'Middle name (if any) should be entered after the first name',
+                  description:
+                    'Description for form field: First names in english',
+                  id: 'form.field.label.firstNamesDesc'
                 },
                 maxLength: 32,
                 required: true,
@@ -3040,29 +3136,29 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: []
               },
-              // {
-              //   name: 'uploadDocForB1Form',
-              //   type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-              //   label: formMessageDescriptors.docTypeB1Form,
-              //   initialValue: '',
-              //   extraValue: birthDocumentForWhomFhirMapping.B1_FORM,
-              //   hideAsterisk: true,
-              //   validate: [],
-              //   options: [
-              //     {
-              //       value: birthDocumentTypeFhirMapping.B1_FORM,
-              //       label: formMessageDescriptors.docTypeB1Form
-              //     }
-              //   ],
-              //   mapping: {
-              //     mutation: {
-              //       operation: 'birthFieldToAttachmentTransformer'
-              //     },
-              //     query: {
-              //       operation: 'birthAttachmentToFieldTransformer'
-              //     }
-              //   }
-              // },
+              {
+                name: 'uploadDocForB1Form',
+                type: 'DOCUMENT_UPLOADER_WITH_OPTION',
+                label: formMessageDescriptors.docTypeBirthDeclaration,
+                initialValue: '',
+                extraValue: birthDocumentForWhomFhirMapping.BIRTH_DECLARATION,
+                hideAsterisk: true,
+                validate: [],
+                options: [
+                  {
+                    value: birthDocumentTypeFhirMapping.B1_FORM,
+                    label: formMessageDescriptors.docTypeB1Form
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'birthFieldToAttachmentTransformer'
+                  },
+                  query: {
+                    operation: 'birthAttachmentToFieldTransformer'
+                  }
+                }
+              },
               {
                 name: 'uploadDocForChildDOB',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
@@ -3077,18 +3173,9 @@ export const registerForms: IDefaultRegisterForms = {
                     label: formMessageDescriptors.docTypeChildBirthProof
                   },
                   {
-                    value: birthDocumentTypeFhirMapping.B1_FORM,
-                    label: formMessageDescriptors.docTypeB1Form
-                  },
-                  {
                     value: birthDocumentTypeFhirMapping.VACCINATION_CARD,
                     label:
                       formMessageDescriptors.docTypeChildBirthProofVaccinationCard
-                  },
-                  {
-                    value: birthDocumentTypeFhirMapping.BAPTISMAL_CARD,
-                    label:
-                      formMessageDescriptors.docTypeChildBirthProofBaptismalCard
                   }
                 ],
                 mapping: {
@@ -3870,8 +3957,23 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrarSignatureUserTransformer'
             },
             {
-              fieldName: 'registrationLocation',
-              operation: 'registrationLocationUserTransformer'
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
+            },
+            {
+              fieldName: 'registrationCentre',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':office']
+            },
+            {
+              fieldName: 'registrationLGA',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':district']
+            },
+            {
+              fieldName: 'registrationState',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':state']
             }
           ],
           mutation: {

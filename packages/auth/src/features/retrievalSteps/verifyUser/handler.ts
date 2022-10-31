@@ -44,6 +44,7 @@ export default async function verifyUserHandler(
   } catch (err) {
     throw unauthorized()
   }
+
   const nonce = generateNonce()
   const isUserNameRetrievalFlow =
     payload.retrieveFlow.toLowerCase() === RETRIEVAL_FLOW_USER_NAME

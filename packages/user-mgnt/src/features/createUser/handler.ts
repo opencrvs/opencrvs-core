@@ -113,6 +113,7 @@ export default async function createUser(
 
   // save user in user-mgnt data store
   let userModelObject
+
   try {
     userModelObject = await User.create(user)
   } catch (err) {

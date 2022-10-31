@@ -351,12 +351,14 @@ type User {
   name: [HumanName]
   username: String
   mobile: String
+  title: String
   role: String
   type: String
   email: String
   status: String
   underInvestigation: Boolean
   primaryOffice: Location
+  supervisoryArea: String
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar
   identifier: Identifier
@@ -562,6 +564,7 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
+  title: String
   role: String
   type: String
   email: String
@@ -849,6 +852,14 @@ enum LocationType {
   MILITARY_BASE_OR_CANTONMENT
   IDP_CAMP
   UNHCR_CAMP
+  TRADITIONAL_DOCTORS
+  CAR_TAXI
+  BUS
+  TRAIN
+  ROADSIDE
+  AEROPLANE
+  SHIP
+  TRADITIONAL_MATERNITY_HOMES
   OTHER
 }
 
@@ -1240,6 +1251,7 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+  BIRTH_DECLARATION
 }
 
 type RegistrationSearchSet {

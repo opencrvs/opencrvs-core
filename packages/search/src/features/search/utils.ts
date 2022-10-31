@@ -148,15 +148,14 @@ export function queryBuilder(
   }
 
   if (Array.isArray(declarationLocationId)) {
-    declarationLocationId.forEach((id) => {
-      should.push({
-        term: {
-          'declarationLocationId.keyword': {
-            value: id,
-            boost: 2
+    must.push({
+      bool: {
+        should: declarationLocationId.map((locationId: string) => ({
+          term: {
+            'declarationLocationId.keyword': locationId
           }
-        }
-      })
+        }))
+      }
     })
   } else if (declarationLocationId !== EMPTY_STRING) {
     must.push({
