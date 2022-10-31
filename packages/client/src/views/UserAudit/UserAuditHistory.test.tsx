@@ -261,7 +261,7 @@ describe('User audit list tests', () => {
               query: GET_USER_AUDIT_LOG,
               variables: {
                 practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-                count: 20,
+                count: 10,
                 skip: 10,
                 timeStart: new Date(Date.parse('2017-01-14T12:51:48.000Z')),
                 timeEnd: new Date(Date.parse('2017-02-14T12:51:48.000Z'))
@@ -294,25 +294,13 @@ describe('User audit list tests', () => {
     )
 
     const nextPageButton = await waitForElement(testComponent, '#page-number-1')
-    const firstRowElementOnFirstPage = await waitForElement(
-      testComponent,
-      '#row_0'
-    )
-    expect(firstRowElementOnFirstPage.hostNodes().childAt(1).text()).toBe(
-      'D23S2D1'
-    )
-    expect(nextPageButton.hostNodes()).toHaveLength(2)
     nextPageButton.hostNodes().find('button').first().simulate('click')
+    // wait for query to go from loading to success
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
     testComponent.update()
-    const firstRowElementOnSecondPage = await waitForElement(
-      testComponent,
-      '#row_0'
-    )
-    expect(firstRowElementOnSecondPage.hostNodes().childAt(1).text()).toBe(
-      'D23S2D0'
-    )
+    const firstRow = await waitForElement(testComponent, '#row_0')
+    expect(firstRow.hostNodes().childAt(1).text()).toBe('D23S2D0')
   })
 })
