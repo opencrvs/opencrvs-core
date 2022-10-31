@@ -1736,9 +1736,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       section: sectionName
                     })}
                   {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
-                    intl.formatMessage(
-                      messages.zeroDocumentsTextOForAnySection
-                    )}
+                    intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
                   <LinkButton
                     id="edit-document"
                     disabled={
