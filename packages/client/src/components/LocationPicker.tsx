@@ -50,6 +50,7 @@ interface IBaseProps {
   disabled?: boolean
   onChangeLocation: (locationId: string) => void
   requiredJurisdictionTypes?: string
+  fuzzy?: boolean
   jurisidictionTypeFilter?: string[]
 }
 
@@ -112,6 +113,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
     disabled,
     additionalLocations = [],
     intl,
+    fuzzy = true,
     locationFilter = () => true,
     officeFilter = () => true
   } = props
@@ -202,6 +204,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
                   props.onChangeLocation(id)
                   setModalVisible(false)
                 }}
+                fuzzy={fuzzy}
               />
             </ModalBody>
           </ModalContainer>

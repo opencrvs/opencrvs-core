@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import Fuse from 'fuse.js'
 import styled from 'styled-components'
 import { Location } from '../../icons'
 import { PrimaryButton } from '../../buttons'
@@ -112,9 +113,11 @@ interface IProps {
   touched?: boolean
   className?: string
   buttonLabel: string
+  fuzzy?: boolean
 }
 export class LocationSearch extends React.Component<IProps, IState> {
   searchTimeout: NodeJS.Timeout | undefined
+  fuse: Fuse<ISearchLocation>
   constructor(props: IProps) {
     super(props)
     this.state = {
@@ -124,6 +127,14 @@ export class LocationSearch extends React.Component<IProps, IState> {
       selectedText: null,
       isFocused: false
     }
+    this.fuse = new Fuse<ISearchLocation>(
+      props.locationList as readonly ISearchLocation[],
+      {
+        includeScore: true,
+        ignoreLocation: true,
+        keys: ['searchableText']
+      }
+    )
   }
   handler = () => {
     document.removeEventListener('click', this.handler)
@@ -139,6 +150,25 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   search = (searchText: string) => {
+    const searchFunc = this.props.fuzzy ? this.fuzzySearch : this.exactSearch
+    const searchResult = searchFunc(searchText)
+    if (
+      searchResult.length === 0 ||
+      (this.state.selectedItem &&
+        this.state.selectedText !== this.state.selectedItem.displayLabel)
+    ) {
+      this.setState({
+        selectedItem: null
+      })
+    }
+
+    this.setState({
+      filteredList: searchResult,
+      dropDownIsVisible: searchResult.length > 0
+    })
+  }
+
+  exactSearch = (searchText: string): ISearchLocation[] => {
     const searchResult = [] as ISearchLocation[]
     if (searchText && this.props.locationList) {
       for (const location of this.props.locationList) {
@@ -155,20 +185,11 @@ export class LocationSearch extends React.Component<IProps, IState> {
         }
       }
     }
-    if (
-      searchResult.length === 0 ||
-      (this.state.selectedItem &&
-        this.state.selectedText !== this.state.selectedItem.displayLabel)
-    ) {
-      this.setState({
-        selectedItem: null
-      })
-    }
+    return searchResult
+  }
 
-    this.setState({
-      filteredList: searchResult,
-      dropDownIsVisible: searchResult.length > 0
-    })
+  fuzzySearch = (searchText: string): ISearchLocation[] => {
+    return this.fuse.search(searchText).map((result) => result.item)
   }
 
   debounce(callback: () => void, duration: number) {
