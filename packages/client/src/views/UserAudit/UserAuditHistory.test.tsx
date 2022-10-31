@@ -37,7 +37,9 @@ describe('User audit list tests', () => {
         variables: {
           practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
           count: 10,
-          skip: 0
+          skip: 0,
+          timeStart: new Date(Date.parse('2017-01-14T12:51:48.000Z')),
+          timeEnd: new Date(Date.parse('2017-02-14T12:51:48.000Z'))
         }
       },
       result: {
@@ -260,7 +262,9 @@ describe('User audit list tests', () => {
               variables: {
                 practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
                 count: 20,
-                skip: 10
+                skip: 10,
+                timeStart: new Date(Date.parse('2017-01-14T12:51:48.000Z')),
+                timeEnd: new Date(Date.parse('2017-02-14T12:51:48.000Z'))
               }
             },
             result: {
@@ -295,7 +299,7 @@ describe('User audit list tests', () => {
       '#row_0'
     )
     expect(firstRowElementOnFirstPage.hostNodes().childAt(1).text()).toBe(
-      'D23S2D0'
+      'D23S2D1'
     )
     expect(nextPageButton.hostNodes()).toHaveLength(2)
     nextPageButton.hostNodes().find('button').first().simulate('click')

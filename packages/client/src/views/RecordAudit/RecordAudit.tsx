@@ -99,7 +99,7 @@ import {
   ShowUpdateButton,
   ShowPrintButton
 } from './ActionButtons'
-import { IActionDetailsData, GetHistory } from './History'
+import { GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
@@ -108,7 +108,8 @@ import { Mutation } from '@apollo/client/react/components'
 import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
-  Event
+  Event,
+  History
 } from '@client/utils/gateway'
 import {
   REINSTATE_BIRTH_DECLARATION,
@@ -315,10 +316,7 @@ function RecordAuditBody({
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
-  const toggleActionDetails = (
-    actionItem: IActionDetailsData | null,
-    itemIndex = -1
-  ) => {
+  const toggleActionDetails = (actionItem: History | null, itemIndex = -1) => {
     actionItem && setActionDetailsData(actionItem)
     setActionDetailsIndex(itemIndex)
     setActionDetails((prevValue) => !prevValue)
@@ -505,6 +503,7 @@ function RecordAuditBody({
     actionDetailsIndex,
     toggleActionDetails,
     intl,
+    userDetails,
     goToUser: goToUserProfile,
     registerForm: regForm,
     offlineData,

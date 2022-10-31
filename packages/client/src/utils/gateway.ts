@@ -421,6 +421,7 @@ export type CorrectionInput = {
   location?: InputMaybe<LocationInput>
   noSupportingDocumentationRequired?: InputMaybe<Scalars['Boolean']>
   note?: InputMaybe<Scalars['String']>
+  otherReason?: InputMaybe<Scalars['String']>
   payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
   reason?: InputMaybe<Scalars['String']>
   requester?: InputMaybe<Scalars['ID']>
@@ -708,17 +709,20 @@ export type FormDraftStatusModifyInput = {
 
 export type History = {
   __typename?: 'History'
-  action?: Maybe<RegStatus>
+  action?: Maybe<RegAction>
   certificates?: Maybe<Array<Maybe<Certificate>>>
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
   dhis2Notification?: Maybe<Scalars['Boolean']>
+  hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
   location?: Maybe<Location>
   office?: Maybe<Location>
+  otherReason?: Maybe<Scalars['String']>
   output?: Maybe<Array<Maybe<InputOutput>>>
   reason?: Maybe<Scalars['String']>
-  reinstated?: Maybe<Scalars['Boolean']>
+  regStatus?: Maybe<RegStatus>
+  requester?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
   user?: Maybe<User>
@@ -1560,16 +1564,22 @@ export type QuestionnaireQuestionInput = {
   value?: InputMaybe<Scalars['String']>
 }
 
+export enum RegAction {
+  Assigned = 'ASSIGNED',
+  Downloaded = 'DOWNLOADED',
+  Reinstated = 'REINSTATED',
+  RequestedCorrection = 'REQUESTED_CORRECTION',
+  Unassigned = 'UNASSIGNED'
+}
+
 export enum RegStatus {
   Archived = 'ARCHIVED',
   Certified = 'CERTIFIED',
   DeclarationUpdated = 'DECLARATION_UPDATED',
   Declared = 'DECLARED',
-  Downloaded = 'DOWNLOADED',
   InProgress = 'IN_PROGRESS',
   Registered = 'REGISTERED',
   Rejected = 'REJECTED',
-  RequestedCorrection = 'REQUESTED_CORRECTION',
   Validated = 'VALIDATED',
   WaitingValidation = 'WAITING_VALIDATION'
 }
@@ -2767,9 +2777,12 @@ export type FetchBirthRegistrationForReviewQuery = {
     } | null> | null
     history?: Array<{
       __typename?: 'History'
+      otherReason?: string | null
+      requester?: string | null
+      hasShowedVerifiedDocument?: boolean | null
       date?: any | null
-      action?: RegStatus | null
-      reinstated?: boolean | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       reason?: string | null
       statusReason?: {
@@ -3057,9 +3070,11 @@ export type FetchBirthRegistrationForCertificateQuery = {
     history?: Array<{
       __typename?: 'History'
       date?: any | null
-      action?: RegStatus | null
-      reinstated?: boolean | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      reason?: string | null
+      otherReason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3416,9 +3431,12 @@ export type FetchDeathRegistrationForReviewQuery = {
     } | null> | null
     history?: Array<{
       __typename?: 'History'
+      otherReason?: string | null
+      requester?: string | null
+      hasShowedVerifiedDocument?: boolean | null
       date?: any | null
-      action?: RegStatus | null
-      reinstated?: boolean | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       reason?: string | null
       statusReason?: {
@@ -3687,9 +3705,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
     } | null
     history?: Array<{
       __typename?: 'History'
+      otherReason?: string | null
+      requester?: string | null
       date?: any | null
-      action?: RegStatus | null
-      reinstated?: boolean | null
+      action?: RegAction | null
+      regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       statusReason?: {
         __typename?: 'StatusReason'

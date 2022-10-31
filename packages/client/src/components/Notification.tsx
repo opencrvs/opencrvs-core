@@ -113,6 +113,7 @@ class Component extends React.Component<
         {children}
         {backgroundSyncMessageVisible && (
           <Toast
+            type="success"
             id="backgroundSyncShowNotification"
             onClose={this.hideBackgroundSyncedNotification}
           >
@@ -131,6 +132,7 @@ class Component extends React.Component<
         )}
         {saveDraftClicked && (
           <Toast
+            type="success"
             id="draftsSavedNotification"
             onClose={this.hideDraftsSavedNotification}
           >
