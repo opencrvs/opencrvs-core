@@ -262,8 +262,8 @@ services:
   # Configure elasticsearch
   minio:
     environment:
-      - MINIO_ACCESS_KEY=minioadmin2
-      - MINIO_SECRET_KEY=minioadmin2
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
     ports:
       - '3535:9000'
       - '3536:9001'
@@ -699,8 +699,8 @@ services:
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MINIO_ACCESS_KEY=minioadmin2
-      - MINIO_SECRET_KEY=minioadmin2
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
     networks:
       - overlay_net
     logging:
