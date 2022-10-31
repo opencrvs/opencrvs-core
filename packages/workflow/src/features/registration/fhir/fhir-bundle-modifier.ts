@@ -591,16 +591,9 @@ export async function updatePatientIdentifierWithRN(
   return patient
 }
 
-interface IIntegration {
+interface Integration {
   name: string
   status: string
-}
-interface IApplicationConfig {
-  INTEGRATIONS: [IIntegration]
-}
-
-export interface IApplicationConfigResponse {
-  config: IApplicationConfig
 }
 
 const statuses = {
@@ -625,7 +618,7 @@ export async function validateDeceasedDetails(
     Any external identifier must be justifiably verified as authentic by a National ID system such as MOSIP or equivalent
   */
 
-  const configResponse: IApplicationConfigResponse = await fetch(
+  const configResponse: Integration[] | undefined = await fetch(
     `${APPLICATION_CONFIG_URL}integrationConfig`,
     {
       method: 'GET',
@@ -646,16 +639,10 @@ export async function validateDeceasedDetails(
   logger.info(
     `validateDeceasedDetails: configResponse ${JSON.stringify(configResponse)}`
   )
-  if (
-    configResponse &&
-    configResponse.config.INTEGRATIONS &&
-    configResponse.config.INTEGRATIONS.length
-  ) {
-    const mosipIntegration = configResponse.config.INTEGRATIONS.filter(
-      (integration) => {
-        return integration.name === 'MOSIP'
-      }
-    )[0]
+  if (configResponse?.length) {
+    const mosipIntegration = configResponse.filter((integration) => {
+      return integration.name === 'MOSIP'
+    })[0]
     if (mosipIntegration.status === statuses.ACTIVE) {
       logger.info('validateDeceasedDetails: MOSIP ENABLED')
       try {
