@@ -103,6 +103,8 @@ export const formConfig: IFormConfig = {
   ]
 }
 
+export const integrations = []
+
 export const mockConditionals = {
   presentAtBirthRegistration: {
     action: 'hide',
@@ -681,5 +683,6 @@ export const mockOfflineData = {
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
     ADDRESSES: 1
   },
-  formConfig
+  formConfig,
+  integrations
 }
