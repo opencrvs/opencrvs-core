@@ -30,9 +30,9 @@ export const ToastToggler = ({ type, dismissable, actionable, children }) => {
 # Toast
 
 Toast is a message that pop ups from the bottom of the interface on a desktop, and from the top of the interface on mobile. It provides feedback on the outcome of an action.
-Toast can be used inside any view, it doesn't have to be on the application root level element. Toast is an animated and position fixed `<Alert>`.
+Toast can be used inside any view, it doesn't have to be on the application root level element.
 
-Toast automatically closes after 10 seconds, unless `timeout` -prop is set to `null`.
+Toast automatically closes after 8 seconds, unless `timeout` -prop is set to `null`.
 
 ## Success
 
@@ -123,7 +123,6 @@ Loading toasts cannot be dismissed.
     type="success"
     onActionClick={() => alert('Retried')}
     actionText="Retry"
-    onClose={() => setVisible(false)}
   >
     Hello! I'm a toast with an action button
   </Toast>

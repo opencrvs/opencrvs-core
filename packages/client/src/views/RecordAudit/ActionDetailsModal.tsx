@@ -11,17 +11,11 @@
  */
 
 import React from 'react'
-import styled from '@client/styledComponents'
 import { goToUserProfile, IDynamicValues } from '@client/navigation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
-import {
-  DOWNLOAD_STATUS,
-  IDeclaration,
-  SUBMISSION_STATUS
-} from '@client/declarations'
+import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   IForm,
   IFormSection,
@@ -34,24 +28,24 @@ import {
   dynamicConstantsMessages,
   userMessages
 } from '@client/i18n/messages'
-import { getIndividualNameObj } from '@client/utils/userUtils'
+import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
-import { isEmpty, find, flatten, values, get } from 'lodash'
+import { isEmpty, find, flatten, values } from 'lodash'
+import { getFieldValue, getFormattedDate, getStatusLabel } from './utils'
 import {
-  getFieldValue,
-  DECLARATION_STATUS_LABEL,
-  getFormattedDate
-} from './utils'
-import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
-import { IActionDetailsData } from './History'
+  CollectorRelationLabelArray,
+  CorrectorRelationLabelArray
+} from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
+import { History, RegAction, RegStatus } from '@client/utils/gateway'
+import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
 
 interface IActionDetailsModalListTable {
-  actionDetailsData: IActionDetailsData
+  actionDetailsData: History
   actionDetailsIndex: number
   registerForm: IForm
   intl: IntlShape
@@ -60,8 +54,8 @@ interface IActionDetailsModalListTable {
 }
 
 function retrieveUniqueComments(
-  histories: IActionDetailsData[],
-  actionDetailsData: IActionDetailsData,
+  histories: History[],
+  actionDetailsData: History,
   previousHistoryItemIndex: number
 ) {
   if (!Array.isArray(actionDetailsData.comments)) {
@@ -70,17 +64,17 @@ function retrieveUniqueComments(
 
   if (previousHistoryItemIndex === -1) {
     return actionDetailsData.comments
-      .map((comment: IDynamicValues) => comment.comment)
-      .map((comment: string) => ({ comment }))
+      .map((comment) => comment?.comment)
+      .map((comment) => ({ comment }))
   }
 
   const comments: IDynamicValues[] = []
-  actionDetailsData.comments.forEach((item: IDynamicValues, index: number) => {
+  actionDetailsData.comments.forEach((item, index) => {
     if (
       (histories[previousHistoryItemIndex].comments || [])[index]?.comment !==
-      item.comment
+      item?.comment
     ) {
-      comments.push({ comment: item.comment })
+      comments.push({ comment: item?.comment })
     }
   })
 
@@ -88,7 +82,7 @@ function retrieveUniqueComments(
 }
 
 function getHistories(draft: IDeclaration | null) {
-  const histories: IActionDetailsData[] =
+  const histories: History[] =
     draft?.data.history && Array.isArray(draft.data.history)
       ? draft.data.history.sort((prevItem, nextItem) => {
           return new Date(prevItem.date).getTime() >
@@ -105,13 +99,10 @@ function getHistories(draft: IDeclaration | null) {
  *  This function prepares the comments to be displayed based on status of the declaration.
  */
 function prepareComments(
-  actionDetailsData: IActionDetailsData,
+  actionDetailsData: History,
   draft: IDeclaration | null
 ) {
-  if (
-    null === draft ||
-    actionDetailsData.action === DOWNLOAD_STATUS.DOWNLOADED
-  ) {
+  if (!draft || actionDetailsData.action === RegAction.Downloaded) {
     return []
   }
 
@@ -124,7 +115,7 @@ function prepareComments(
       ? currentHistoryItemIndex
       : currentHistoryItemIndex - 1
 
-  if (actionDetailsData.action === SUBMISSION_STATUS.REJECTED) {
+  if (actionDetailsData.regStatus === RegStatus.Rejected) {
     return actionDetailsData.statusReason?.text
       ? [{ comment: actionDetailsData.statusReason.text }]
       : []
@@ -137,7 +128,21 @@ function prepareComments(
   )
 }
 
-const getReasonForRequest = (reasonValue: string, intl: IntlShape) => {
+const requesterLabelMapper = (requester: string, intl: IntlShape) => {
+  const requesterIndividual = CorrectorRelationLabelArray.find(
+    (labelItem) => labelItem.value === requester
+  )
+
+  return requesterIndividual?.label
+    ? intl.formatMessage(requesterIndividual.label)
+    : ''
+}
+
+const getReasonForRequest = (
+  reasonValue: string,
+  otherReason: string,
+  intl: IntlShape
+) => {
   switch (reasonValue) {
     case CorrectionReason.CLERICAL_ERROR:
       return intl.formatMessage(messages.clericalError)
@@ -151,6 +156,8 @@ const getReasonForRequest = (reasonValue: string, intl: IntlShape) => {
     case CorrectionReason.JUDICIAL_ORDER:
       return intl.formatMessage(messages.judicialOrder)
 
+    case CorrectionReason.OTHER:
+      return otherReason
     default:
       return '-'
   }
@@ -169,6 +176,13 @@ export const ActionDetailsModalListTable = ({
   if (registerForm === undefined) return <></>
 
   const sections = registerForm?.sections || []
+  const requesterColumn = [
+    {
+      key: 'requester',
+      label: intl.formatMessage(messages.correctionSummaryRequestedBy),
+      width: 100
+    }
+  ]
   const commentsColumn = [
     {
       key: 'comment',
@@ -221,24 +235,22 @@ export const ActionDetailsModalListTable = ({
     return (label && label.trim().length > 0 && `${label} (${section})`) || ''
   }
 
-  const dataChange = (
-    actionDetailsData: IActionDetailsData
-  ): IDynamicValues[] => {
+  const dataChange = (actionDetailsData: History): IDynamicValues[] => {
     const result: IDynamicValues[] = []
 
-    if (actionDetailsData.action === DOWNLOAD_STATUS.DOWNLOADED) {
+    if (actionDetailsData.action === RegAction.Downloaded) {
       return result
     }
 
-    actionDetailsData.input.forEach((item: { [key: string]: any }) => {
-      const editedValue = actionDetailsData.output.find(
-        (oi: { valueId: string; valueCode: string }) =>
-          oi.valueId === item.valueId && oi.valueCode === item.valueCode
+    actionDetailsData?.input?.forEach((item) => {
+      if (!item) return
+      const editedValue = actionDetailsData?.output?.find(
+        (oi) => oi?.valueId === item.valueId && oi?.valueCode === item.valueCode
       )
-
+      if (!editedValue) return
       const section = find(
         sections,
-        (section) => section.id === item.valueCode
+        (section) => section.id === item?.valueCode
       ) as IFormSection
 
       if (
@@ -250,7 +262,8 @@ export const ActionDetailsModalListTable = ({
         )
       }
 
-      const indexes: string[] = item.valueId.split('.')
+      const indexes = item?.valueId?.split('.')
+      if (!indexes) return
 
       if (indexes.length > 1) {
         const [parentField, , nestedField] = indexes
@@ -310,22 +323,22 @@ export const ActionDetailsModalListTable = ({
     return result
   }
   const certificateCollectorData = (
-    actionDetailsData: IActionDetailsData,
+    actionDetailsData: History,
     index: number
   ): IDynamicValues => {
     if (!actionDetailsData.certificates) return {}
 
-    const certificate = actionDetailsData.certificates.filter(
-      (item: IDynamicValues) => item
-    )[index]
+    const certificate = actionDetailsData.certificates.filter((item) => item)[
+      index
+    ]
 
     if (!certificate) {
       return {}
     }
 
-    const name = certificate.collector?.individual
+    const name = certificate.collector?.individual?.name
       ? getIndividualNameObj(
-          certificate.collector.individual.name,
+          certificate.collector.individual.name as GQLHumanName[],
           window.config.LANGUAGES
         )
       : {}
@@ -378,11 +391,15 @@ export const ActionDetailsModalListTable = ({
   ]
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   const content = prepareComments(actionDetailsData, draft)
+  const requesterLabel = requesterLabelMapper(
+    actionDetailsData.requester as string,
+    intl
+  )
   return (
     <>
       {/* For Reject Reason */}
       {actionDetailsData.reason &&
-        actionDetailsData.action === SUBMISSION_STATUS.REJECTED && (
+        actionDetailsData.regStatus === RegStatus.Rejected && (
           <Table
             noResultText=" "
             columns={reasonColumn}
@@ -396,9 +413,38 @@ export const ActionDetailsModalListTable = ({
           />
         )}
 
+      {/* Correction Requester */}
+      {actionDetailsData.requester && (
+        <Table
+          noResultText=" "
+          columns={requesterColumn}
+          content={[{ requester: requesterLabel }]}
+        />
+      )}
+
+      {/* Correction Requester Id Verified */}
+      {actionDetailsData.requester && (
+        <Table
+          noResultText=" "
+          columns={certificateCollectorVerified}
+          content={[
+            {
+              hasShowedVerifiedDocument:
+                actionDetailsData.hasShowedVerifiedDocument
+                  ? intl.formatMessage(certificateMessages.idCheckVerify)
+                  : intl.formatMessage(certificateMessages.idCheckWithoutVerify)
+            }
+          ]}
+          pageSize={10}
+          totalItems={1}
+          currentPage={currentPage}
+          onPageChange={pageChangeHandler}
+        />
+      )}
+
       {/* For Correction Reason */}
       {actionDetailsData.reason &&
-        actionDetailsData.action === SUBMISSION_STATUS.REQUESTED_CORRECTION && (
+        actionDetailsData.action === RegAction.RequestedCorrection && (
           <Table
             noResultText=" "
             columns={correctionReasonColumn}
@@ -406,6 +452,7 @@ export const ActionDetailsModalListTable = ({
               {
                 text: getReasonForRequest(
                   actionDetailsData.reason as string,
+                  actionDetailsData.otherReason as string,
                   intl
                 )
               }
@@ -414,7 +461,9 @@ export const ActionDetailsModalListTable = ({
         )}
 
       {/* For Comments */}
-      <Table noResultText=" " columns={commentsColumn} content={content} />
+      {content.length > 0 && (
+        <Table noResultText=" " columns={commentsColumn} content={content} />
+      )}
 
       {/* For Data Updated */}
       {declarationUpdates.length > 0 && (
@@ -462,16 +511,18 @@ export const ActionDetailsModal = ({
   actionDetailsIndex,
   toggleActionDetails,
   intl,
+  userDetails,
   goToUser,
   registerForm,
   offlineData,
   draft
 }: {
   show: boolean
-  actionDetailsData: IActionDetailsData
+  actionDetailsData: History
   actionDetailsIndex: number
-  toggleActionDetails: (param: IActionDetailsData | null) => void
+  toggleActionDetails: (param: History | null) => void
   intl: IntlShape
+  userDetails: IUserDetails | null
   goToUser: typeof goToUserProfile
   registerForm: IForm
   offlineData: Partial<IOfflineData>
@@ -479,20 +530,23 @@ export const ActionDetailsModal = ({
 }) => {
   if (isEmpty(actionDetailsData)) return <></>
 
-  const title =
-    (DECLARATION_STATUS_LABEL[actionDetailsData?.action] &&
-      intl.formatMessage(
-        DECLARATION_STATUS_LABEL[actionDetailsData?.action]
-      )) ||
-    ''
+  const title = getStatusLabel(
+    actionDetailsData.action,
+    actionDetailsData.regStatus,
+    intl,
+    actionDetailsData.user,
+    userDetails
+  )
 
   let userName = ''
 
   if (!actionDetailsData.dhis2Notification) {
-    const nameObj = getIndividualNameObj(
-      actionDetailsData.user.name,
-      window.config.LANGUAGES
-    )
+    const nameObj = actionDetailsData?.user?.name
+      ? getIndividualNameObj(
+          actionDetailsData.user.name as GQLHumanName[],
+          window.config.LANGUAGES
+        )
+      : null
     userName = nameObj
       ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
       : ''

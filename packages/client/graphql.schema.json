@@ -5728,7 +5728,7 @@
             "args": [],
             "type": {
               "kind": "ENUM",
-              "name": "RegStatus",
+              "name": "RegAction",
               "ofType": null
             },
             "isDeprecated": false,
@@ -5859,12 +5859,12 @@
             "deprecationReason": null
           },
           {
-            "name": "reinstated",
+            "name": "regStatus",
             "description": null,
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "Boolean",
+              "kind": "ENUM",
+              "name": "RegStatus",
               "ofType": null
             },
             "isDeprecated": false,
@@ -12901,6 +12901,47 @@
       },
       {
         "kind": "ENUM",
+        "name": "RegAction",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ASSIGNED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DOWNLOADED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REINSTATED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REQUESTED_CORRECTION",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "UNASSIGNED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
         "name": "RegStatus",
         "description": null,
         "fields": null,
@@ -12932,12 +12973,6 @@
             "deprecationReason": null
           },
           {
-            "name": "DOWNLOADED",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "IN_PROGRESS",
             "description": null,
             "isDeprecated": false,
@@ -12951,12 +12986,6 @@
           },
           {
             "name": "REJECTED",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "REQUESTED_CORRECTION",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

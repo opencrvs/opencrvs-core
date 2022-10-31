@@ -938,7 +938,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     fieldName: 'placeOfBirth',
                     operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
+                    parameters: ['facilities', 'placeOfBirth']
                   },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
@@ -3484,7 +3484,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     fieldName: 'placeOfDeath',
                     operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
+                    parameters: ['facilities', 'placeOfDeath']
                   },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
