@@ -11,6 +11,11 @@
  */
 
 import React from 'react'
+import {
+  IDeclaration,
+  SUBMISSION_STATUS,
+  createReviewDeclaration
+} from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 import { useQuery } from '@apollo/client'
@@ -19,15 +24,24 @@ import { goBack } from '@client/navigation'
 import { Event } from '@client/utils/gateway'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/Button'
-import { EventTopBar, Frame } from '@opencrvs/components'
+import { AppBar, Frame } from '@opencrvs/components'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { createReviewDeclaration } from '@client/declarations'
+import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import { FETCH_VIEW_RECORD_BY_COMPOSITION } from '@client/views/ViewRecord/query'
+
+const getDeclarationIconColor = (declaration: IDeclaration): string => {
+  return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
+    ? 'purple'
+    : declaration.registrationStatus
+    ? STATUSTOCOLOR[declaration.registrationStatus]
+    : 'orange'
+}
 
 export const ViewRecord = () => {
   const intl = useIntl()
@@ -49,9 +63,7 @@ export const ViewRecord = () => {
     data?.fetchRegistration?.__typename === 'BirthRegistration'
       ? Event.Birth
       : Event.Death
-
   const eventData = data?.fetchRegistration
-
   const transData: IFormData = gqlToDraftTransformer(
     form[eventType],
     data?.fetchRegistration,
@@ -70,16 +82,17 @@ export const ViewRecord = () => {
     eventType,
     downloadedAppStatus
   )
-
   const declarationType = declaration?.event === Event.Death ? 'Death' : 'Birth'
   const headerTitle = declarationType + ' declaration'
+  const iconColor = getDeclarationIconColor(declaration)
 
   return (
     <Frame
       header={
-        <EventTopBar
-          title={headerTitle}
-          topBarActions={[
+        <AppBar
+          desktopTitle={headerTitle}
+          desktopLeft={<DeclarationIcon color={iconColor} />}
+          desktopRight={
             <Button
               size="large"
               type="tertiary"
@@ -87,7 +100,18 @@ export const ViewRecord = () => {
             >
               {intl.formatMessage(buttonMessages.exitButton)}
             </Button>
-          ]}
+          }
+          mobileTitle={headerTitle}
+          mobileLeft={<DeclarationIcon color={iconColor} />}
+          mobileRight={
+            <Button
+              size="large"
+              type="tertiary"
+              onClick={() => dispatch(goBack())}
+            >
+              {intl.formatMessage(buttonMessages.exitButton)}
+            </Button>
+          }
         />
       }
       skipToContentText={intl.formatMessage(
