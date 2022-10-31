@@ -25,7 +25,10 @@ import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
-import { updateComposition } from '@search/elasticsearch/dbhelper'
+import {
+  searchByCompositionId,
+  updateComposition
+} from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
@@ -38,6 +41,27 @@ export async function searchDeclaration(
     return h.response(result).code(200)
   } catch (error) {
     logger.error(`Search/searchDeclarationHandler: error: ${error}`)
+    return internal(error)
+  }
+}
+
+type IAssignmentPayload = {
+  compositionId: string
+}
+
+export async function searchAssignment(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IAssignmentPayload
+  try {
+    const results = await searchByCompositionId(payload.compositionId)
+    const result = results?.body?.hits?.hits[0]?._source as
+      | ICompositionBody
+      | undefined
+    return h.response({ userId: result?.assignment?.userId }).code(200)
+  } catch (error) {
+    logger.error(`Search/searchAssginment: ${error}`)
     return internal(error)
   }
 }

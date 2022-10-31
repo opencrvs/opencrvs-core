@@ -83,7 +83,6 @@ export const secondary = css`
 `
 
 export const tertiary = css`
-  background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.primary};
 
   &:hover {
@@ -120,12 +119,11 @@ export const negative = css`
 `
 
 export const icon = css`
-  background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.primary};
   border-radius: 100%;
   aspect-ratio: 1 / 1;
 
-  &:hover {
+  &:hover:not(:focus-visible) {
     background: ${({ theme }) => theme.colors.grey100};
   }
   &:active {

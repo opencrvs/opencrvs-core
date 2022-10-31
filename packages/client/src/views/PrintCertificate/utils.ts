@@ -218,7 +218,7 @@ export function getEventDate(data: IFormData, event: Event) {
 export function getRegisteredDate(data: IFormData) {
   const historyList = data.history as unknown as { [key: string]: any }[]
   const regHistory = historyList.find(
-    (history) => history.action === 'REGISTERED'
+    (history) => history.regStatus === 'REGISTERED'
   )
   return regHistory && regHistory.date
 }

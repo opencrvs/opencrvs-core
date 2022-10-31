@@ -1,4 +1,4 @@
-FROM node:erbium-alpine
+FROM node:fermium-alpine
 WORKDIR /usr/src/app
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn

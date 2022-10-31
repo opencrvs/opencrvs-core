@@ -592,10 +592,13 @@ export const enum GQLBirthRegType {
 export interface GQLHistory {
   user?: GQLUser
   date?: GQLDate
-  action?: GQLRegStatus
+  regStatus?: GQLRegStatus
+  action?: GQLRegAction
   statusReason?: GQLStatusReason
   reason?: string
-  reinstated?: boolean
+  requester?: string
+  hasShowedVerifiedDocument?: boolean
+  otherReason?: string
   location?: GQLLocation
   office?: GQLLocation
   dhis2Notification?: boolean
@@ -917,9 +920,7 @@ export const enum GQLRegStatus {
   VALIDATED = 'VALIDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED',
-  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
-  DOWNLOADED = 'DOWNLOADED'
+  REJECTED = 'REJECTED'
 }
 
 export interface GQLMedicalPractitionerInput {
@@ -1063,6 +1064,14 @@ export interface GQLCertificate {
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPayment | null>
   data?: string
+}
+
+export const enum GQLRegAction {
+  ASSIGNED = 'ASSIGNED',
+  UNASSIGNED = 'UNASSIGNED',
+  REINSTATED = 'REINSTATED',
+  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
+  DOWNLOADED = 'DOWNLOADED'
 }
 
 export interface GQLStatusReason {
@@ -1271,6 +1280,7 @@ export interface GQLCorrectionInput {
   location?: GQLLocationInput
   data?: string
   reason?: string
+  otherReason?: string
   note?: string
 }
 
@@ -4225,10 +4235,13 @@ export interface QuestionnaireQuestionToValueResolver<
 export interface GQLHistoryTypeResolver<TParent = any> {
   user?: HistoryToUserResolver<TParent>
   date?: HistoryToDateResolver<TParent>
+  regStatus?: HistoryToRegStatusResolver<TParent>
   action?: HistoryToActionResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
-  reinstated?: HistoryToReinstatedResolver<TParent>
+  requester?: HistoryToRequesterResolver<TParent>
+  hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
+  otherReason?: HistoryToOtherReasonResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
   dhis2Notification?: HistoryToDhis2NotificationResolver<TParent>
@@ -4247,6 +4260,10 @@ export interface HistoryToDateResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface HistoryToRegStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface HistoryToActionResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
@@ -4259,7 +4276,18 @@ export interface HistoryToReasonResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface HistoryToReinstatedResolver<TParent = any, TResult = any> {
+export interface HistoryToRequesterResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToHasShowedVerifiedDocumentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToOtherReasonResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

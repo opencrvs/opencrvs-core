@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { IDataProps, DataRow } from './DataRow'
-import { LinkButton } from '../buttons'
+import { Link } from '../Link'
 
 const Container = styled.div`
   margin-top: 48px;
@@ -60,9 +60,7 @@ export class DataSection extends React.Component<IProps> {
       <Container id={id}>
         <Title>
           {title}
-          {action && (
-            <LinkButton onClick={action.handler}>{action.label}</LinkButton>
-          )}
+          {action && <Link onClick={action.handler}>{action.label}</Link>}
         </Title>
         {responsiveContents && (
           <ResponsiveContainer

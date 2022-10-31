@@ -2262,4 +2262,8 @@ export function createRouterProps<
   return { location, history, match }
 }
 
-export { mockOfflineData } from './mock-offline-data'
+export {
+  mockOfflineData,
+  mockOfflineDataWithLocationHierarchy,
+  mockOfflineLocationsWithHierarchy
+} from './mock-offline-data'

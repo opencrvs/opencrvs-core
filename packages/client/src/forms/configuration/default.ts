@@ -938,7 +938,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     fieldName: 'placeOfBirth',
                     operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
+                    parameters: ['facilities', 'placeOfBirth']
                   },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
@@ -1220,21 +1220,14 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'detailsExist',
-                type: 'RADIO_GROUP',
+                type: 'CHECKBOX',
                 label: formMessageDescriptors.mothersDetailsExist,
                 required: true,
+                checkedValue: false,
+                uncheckedValue: true,
+                hideHeader: true,
                 initialValue: true,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1709,26 +1702,14 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'detailsExist',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage: "Do you have the father's details?",
-                  description:
-                    "Question to ask the user if they have the father's details",
-                  id: 'form.field.label.fathersDetailsExist'
-                },
+                type: 'CHECKBOX',
+                label: formMessageDescriptors.fathersDetailsExist,
                 required: true,
+                checkedValue: false,
+                uncheckedValue: true,
+                hideHeader: true,
                 initialValue: true,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -3346,9 +3327,11 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'CHECKBOX',
                 label: formMessageDescriptors.causeOfDeathEstablished,
                 required: true,
+                checkedValue: 'true',
+                uncheckedValue: 'false',
                 customisable: true,
                 hideHeader: true,
-                initialValue: false,
+                initialValue: 'false',
                 validate: [],
                 mapping: {
                   mutation: {
@@ -3373,7 +3356,7 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: 'values.causeOfDeathEstablished !== true'
+                    expression: 'values.causeOfDeathEstablished !== "true"'
                   }
                 ],
                 options: [
@@ -3413,7 +3396,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      'values.causeOfDeathEstablished !== true || values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
+                      'values.causeOfDeathEstablished !== "true" || values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
                   }
                 ],
                 initialValue: '',
@@ -3501,7 +3484,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     fieldName: 'placeOfDeath',
                     operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
+                    parameters: ['facilities', 'placeOfDeath']
                   },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
