@@ -20,6 +20,8 @@ export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const MONGO_URL =
   process.env.MONGO_URL || 'mongodb://localhost/application-config'
+export const USER_MANAGEMENT_URL =
+  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||

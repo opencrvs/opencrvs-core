@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import ApplicationConfig, {
   IApplicationConfigurationModel
-} from '@config/models/config' //   IApplicationConfigurationModel
+} from '@config/models/config'
 import { logger } from '@config/config/logger'
 import { badRequest, internal } from '@hapi/boom'
 import * as Joi from 'joi'
@@ -20,22 +20,25 @@ import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
+import getSystems from '@config/handlers/system/systemHandler'
 
 export default async function configHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const [certificates, questionConfig, formDrafts, config] =
+    const [certificates, questionConfig, formDrafts, config, integrations] =
       await Promise.all([
         getActiveCertificatesHandler(request, h),
         getQuestionsHandler(request, h),
         getFormDrafts(request, h),
-        getApplicationConfig(request, h)
+        getApplicationConfig(request, h),
+        getSystems(request, h)
       ])
     return {
       config,
       certificates,
+      integrations,
       formConfig: {
         questionConfig,
         formDrafts
@@ -75,20 +78,6 @@ export async function getLoginConfigHandler(
     'COUNTRY_LOGO',
     'PHONE_NUMBER_PATTERN'
   ])
-  return { config: refineConfigResponse }
-}
-
-export async function getIntegrationConfigHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  let integrationConfig: IApplicationConfigurationModel | null
-  try {
-    integrationConfig = await ApplicationConfig.findOne({})
-  } catch (error) {
-    throw internal(error.message)
-  }
-  const refineConfigResponse = pick(integrationConfig, ['INTEGRATIONS'])
   return { config: refineConfigResponse }
 }
 

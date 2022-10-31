@@ -48,7 +48,6 @@ export interface IApplicationConfigurationModel extends Document {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
-  INTEGRATIONS: [IIntegration]
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -79,7 +78,7 @@ const currencySchema = new Schema<ICurrency>({
   languagesAndCountry: { type: [String] }
 })
 
-interface IIntegration {
+export interface Integration {
   name: string
   status: string
 }
