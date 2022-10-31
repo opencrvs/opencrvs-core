@@ -1,0 +1,128 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+
+type AdvancedSeachParameters {
+  searchId: String!
+  name: String!
+  event: Event
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
+}
+
+input AdvancedSeachParametersInput {
+  userId: String!
+  searchId: String!
+  name: String!
+  event: Event
+  registrationStatuses: [String!]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
+}
+
+input DeleteAdvancedSeachInput {
+  userId: String!
+  searchId: String!
+}
+
+type BookMarkedSearches {
+  searchList: [AdvancedSeachParameters]
+}
+
+type Mutation {
+  bookmarkAdvancedSearch(
+    advancedSeachInput: AdvancedSeachParametersInput!
+  ): BookMarkedSearches
+  unbookmarkedAdvancedSearch(
+    advancedSeachInput: DeleteAdvancedSeachInput!
+  ): BookMarkedSearches
+}

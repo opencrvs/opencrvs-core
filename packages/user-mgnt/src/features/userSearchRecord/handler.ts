@@ -35,7 +35,7 @@ export async function createSearchHandler(
   const user: IUserModel | null = await User.findById(
     userCreateSearchPayload.userId
   )
-  const mutableUser = user?.toObject()
+  const mutableUser = user?.toObject() as IUserModel
 
   if (!mutableUser) {
     logger.error(
@@ -57,7 +57,7 @@ export async function createSearchHandler(
     // return 400 if there is a validation error when updating to mongo
     return h.response(err.message).code(400)
   }
-  return h.response({ searchList: mutableUser.searches }).code(200)
+  return h.response({ searchList: mutableUser.searches }).code(201)
 }
 
 export async function removeSearchHandler(

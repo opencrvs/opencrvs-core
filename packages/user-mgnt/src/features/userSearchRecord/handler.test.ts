@@ -116,7 +116,7 @@ describe('createSearchHandler & removeSearchHandler', () => {
     })
 
     expect(res.result.searchList.length).toBe(1)
-    expect(res.statusCode).toBe(200)
+    expect(res.statusCode).toBe(201)
   })
 
   it("removeSearchHandler should throw with 401 when user doesn't exist", async () => {

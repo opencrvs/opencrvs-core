@@ -270,6 +270,12 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
+  bookmarkAdvancedSearch(
+    advancedSeachInput: AdvancedSeachParametersInput!
+  ): BookMarkedSearches
+  unbookmarkedAdvancedSearch(
+    advancedSeachInput: DeleteAdvancedSeachInput!
+  ): BookMarkedSearches
 }
 
 type Dummy {
@@ -690,6 +696,66 @@ input FormDraftStatusModifyInput {
 
 input DeleteFormDraftInput {
   event: Event!
+}
+
+type BookMarkedSearches {
+  searchList: [AdvancedSeachParameters]
+}
+
+input AdvancedSeachParametersInput {
+  userId: String!
+  searchId: String!
+  name: String!
+  event: Event
+  registrationStatuses: [String!]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
+}
+
+input DeleteAdvancedSeachInput {
+  userId: String!
+  searchId: String!
 }
 
 scalar Map
@@ -1214,6 +1280,56 @@ input QuestionInput {
   enabled: String
   custom: Boolean
   conditionals: [ConditionalInput!]
+}
+
+type AdvancedSeachParameters {
+  searchId: String!
+  name: String!
+  event: Event
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
 }
 
 enum InformantType {
