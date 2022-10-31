@@ -154,7 +154,7 @@ function LocationPickerWithUserPermissionFiltering(props: Props) {
         shouldSeeCountryLevel(userDetails) ? getAdditionalLocations(intl) : []
       }
       selectedLocationId={selectedLocation.id}
-      onChangeLocation={(newLocationId) => {
+      onChangeLocation={({ id: newLocationId }) => {
         const newLocation = setInitialLocationForUser(
           userDetails,
           locations,

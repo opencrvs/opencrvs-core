@@ -15,7 +15,7 @@ import {
   NOTIFICATION_TYPE,
   ToastNotification
 } from '@client/components/interface/ToastNotification'
-import { LocationPicker } from './LocationPicker'
+import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/performance'
@@ -176,7 +176,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                 />
               )}
               <LocationPicker
-                locationId={locationId}
+                selectedLocationId={locationId}
                 onChangeLocation={(newLocation) => {
                   props.goToCompletenessRates(
                     eventType as Event,

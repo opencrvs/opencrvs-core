@@ -245,7 +245,7 @@ export enum CompletenessRateTime {
   Within5Years = 'within5Years'
 }
 
-export const NATIONAL_ADMINISTRATIVE_LEVEL = 'NATIONAL_ADMINISTRATIVE_LEVEL'
+export const NATIONAL_ADMINISTRATIVE_LEVEL = '0'
 
 export function getAdditionalLocations(intl: IntlShape) {
   return [

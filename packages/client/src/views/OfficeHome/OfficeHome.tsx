@@ -337,19 +337,17 @@ export class OfficeHomeView extends React.Component<
       <>
         {this.role &&
           (NATL_ADMIN_ROLES.includes(this.role) ||
+            SYS_ADMIN_ROLES.includes(this.role) ||
             PERFORMANCE_MANAGEMENT_ROLES.includes(this.role)) && (
-            <Redirect to={PERFORMANCE_HOME} />
+            <Redirect
+              to={{
+                pathname: PERFORMANCE_HOME,
+                search: `?locationId=${getDefaultPerformanceLocationId(
+                  this.props.userDetails as IUserDetails
+                )}`
+              }}
+            />
           )}
-        {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
-          <Redirect
-            to={{
-              pathname: PERFORMANCE_HOME,
-              search: `?locationId=${getDefaultPerformanceLocationId(
-                this.props.userDetails as IUserDetails
-              )}`
-            }}
-          />
-        )}
         <Navigation loadWorkqueueStatuses={false} />
         <BodyContainer>
           {tabId === WORKQUEUE_TABS.inProgress && (

@@ -33,6 +33,7 @@ import {
 } from '@client/components/DateRangePicker'
 import styled from '@client/styledComponents'
 import { ILocation } from '@client/offline/reducer'
+import { getAdditionalLocations } from '@client/views/SysAdmin/Performance/utils'
 
 const { useState, useEffect } = React
 
@@ -48,7 +49,7 @@ interface IBaseProps {
   officeFilter?: (office: ILocation) => boolean
   selectedLocationId?: string
   disabled?: boolean
-  onChangeLocation: (locationId: string) => void
+  onChangeLocation: (locationId: ISearchLocation) => void
   requiredJurisdictionTypes?: string
   fuzzy?: boolean
   jurisidictionTypeFilter?: string[]
@@ -111,7 +112,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
     jurisidictionTypeFilter,
     selectedLocationId,
     disabled,
-    additionalLocations = [],
+    additionalLocations = getAdditionalLocations(props.intl),
     intl,
     fuzzy = true,
     locationFilter = () => true,
@@ -200,8 +201,8 @@ function LocationPickerComponent(props: LocationPickerProps) {
                 buttonLabel={intl.formatMessage(buttonMessages.search)}
                 selectedLocation={selectedSearchedLocation}
                 locationList={searchableLocations}
-                searchHandler={({ id }) => {
-                  props.onChangeLocation(id)
+                searchHandler={(location) => {
+                  props.onChangeLocation(location)
                   setModalVisible(false)
                 }}
                 fuzzy={fuzzy}

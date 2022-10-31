@@ -688,7 +688,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             <LocationPicker
               selectedLocationId={locationId}
               disabled={true}
-              onChangeLocation={(newLocationId: string) => {
+              onChangeLocation={({ id: newLocationId }) => {
                 props.goToWorkflowStatus(
                   newLocationId,
                   new Date(timeStart),

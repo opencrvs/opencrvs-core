@@ -554,6 +554,9 @@ export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
   const role = userDetails?.role
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
+    if (userDetails.supervisoryArea) {
+      return userDetails.supervisoryArea
+    }
     if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
       return primaryOfficeId
     } else if (
