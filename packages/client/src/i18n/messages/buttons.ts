@@ -23,6 +23,7 @@ interface IButtonsMessages
   configure: MessageDescriptor
   continueButton: MessageDescriptor
   createUser: MessageDescriptor
+  create: MessageDescriptor
   deactivate: MessageDescriptor
   delete: MessageDescriptor
   edit: MessageDescriptor
@@ -120,6 +121,12 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Continue',
     description: 'Continue Button Text',
     id: 'buttons.continue'
+  },
+
+  create: {
+    defaultMessage: 'Create',
+    description: 'Label for submit button of client integration creation form',
+    id: 'buttons.create'
   },
   createUser: {
     defaultMessage: 'Create user',

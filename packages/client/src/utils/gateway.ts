@@ -608,6 +608,10 @@ export enum Event {
   Birth = 'birth',
   Death = 'death'
 }
+export enum WebhookOption {
+  birth = 'Birth',
+  death = 'Death'
+}
 
 export type EventMetrics = {
   __typename?: 'EventMetrics'

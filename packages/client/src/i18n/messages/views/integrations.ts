@@ -1,0 +1,183 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+
+import { defineMessages } from 'react-intl'
+
+const messagesToDefine = {
+  createClient: {
+    id: 'integrations.createClient',
+    defaultMessage: 'Create client',
+    description: 'Label for the button creating client'
+  },
+
+  pageIntroduction: {
+    id: 'integrations.pageIntroduction',
+    defaultMessage:
+      'For each new client that needs to integrate with OpenCRVS you can create unique client IDs. A number of integration use cases are currently supported, based on both API and webhook technologies.',
+    description: 'Label for the text integration page intorduction'
+  },
+
+  supportingDescription: {
+    id: 'integrations.supportingDescription',
+    defaultMessage:
+      'Supporting description to help user make a decision and navigate the content',
+    description: 'Label for the  supporting description'
+  },
+
+  uniqueKeysDescription: {
+    id: 'integrations.uniqueKeyDescription',
+    defaultMessage:
+      'These unique keys will be required by the client integrating...',
+    description: 'Label for the unique key description'
+  },
+  revealKeys: {
+    id: 'integrations.revealKeys',
+    defaultMessage: 'Reveal Keys',
+    description: 'Label for reveal keys option'
+  },
+  disable: {
+    id: 'integrations.disable',
+    defaultMessage: 'Disable',
+    description: 'Label for disable option'
+  },
+  delete: {
+    id: 'integrations.delete',
+    defaultMessage: 'Delete',
+    description: 'Label for delete option'
+  },
+
+  name: {
+    id: 'integrations.name',
+    defaultMessage: 'Name',
+    description: 'Label for name input'
+  },
+  type: {
+    id: 'integrations.client.type',
+    defaultMessage: 'Type',
+    description: 'Label for type of client'
+  },
+  label: {
+    id: 'integrations.label',
+    defaultMessage: 'Label',
+    description: 'Label'
+  },
+  webhookDescription: {
+    id: 'integrations.webhookDescription',
+    defaultMessage:
+      ' Select the ... or with no PII (Personal Identifiable Information)',
+    description: 'Label for webhook description'
+  },
+
+  PIIDataLabel: {
+    id: 'integrations.webhook.PII',
+    defaultMessage: 'Include PII data',
+    description: 'Label for PII'
+  },
+
+  birth: {
+    id: 'integrations.birth',
+    defaultMessage: 'Birth',
+    description: 'Label for birth'
+  },
+
+  death: {
+    id: 'integrations.death',
+    defaultMessage: 'Death',
+    description: 'Label for death'
+  },
+
+  healthNotification: {
+    id: 'integrations.type.healthNotification',
+    defaultMessage: 'Health notification',
+    description: 'Label for health notification'
+  },
+
+  mosip: {
+    id: 'integrations.type.mosip',
+    defaultMessage: 'MOSIP',
+    description: 'Label for mosip'
+  },
+
+  registrationDetails: {
+    id: 'integrations.registrationDetails',
+    defaultMessage: 'Registration Details',
+    description: 'Label for registration details'
+  },
+
+  childDetails: {
+    id: 'integrations.childDetails',
+    defaultMessage: 'Childs Details',
+    description: 'Label for child details'
+  },
+
+  motherDetails: {
+    id: 'integrations.motherDetails',
+    defaultMessage: 'Mothers Details',
+    description: 'Label for mothers details'
+  },
+
+  fatherDetails: {
+    id: 'integrations.fatherDetails',
+    defaultMessage: 'Fathers Details',
+    description: 'Label for fathers details'
+  },
+
+  informantDetails: {
+    id: 'integrations.informantDetails',
+    defaultMessage: 'Informant Details',
+    description: 'Label for informant details'
+  },
+
+  registrationDetailsNoPII: {
+    id: 'integrations.registrationDetailsnNoPII',
+    defaultMessage: 'Registration Details (No PII)',
+    description: 'Label for registration details no PII'
+  },
+
+  childDetailsNoPII: {
+    id: 'integrations.childDetailsNoPII',
+    defaultMessage: 'Childs Details (No PII)',
+    description: 'Label for child details no PII'
+  },
+
+  motherDetailsNoPII: {
+    id: 'integrations.motherDetailsNoPII',
+    defaultMessage: 'Mothers Details (No PII)',
+    description: 'Label for mothers details no PII'
+  },
+
+  fatherDetailsNoPII: {
+    id: 'integrations.fatherDetailsNoPII',
+    defaultMessage: 'Fathers Details (No PII)',
+    description: 'Label for fathers details no PII'
+  },
+
+  informantDetailsNoPII: {
+    id: 'integrations.informantDetailsNoPII',
+    defaultMessage: 'Informant Details (No PII)',
+    description: 'Label for informant details no PII'
+  },
+
+  recordSearch: {
+    id: 'integrations.type.recordSearch',
+    defaultMessage: 'Record Search',
+    description: 'Label for record search'
+  },
+
+  webhook: {
+    id: 'integrations.type.webhook',
+    defaultMessage: 'Webhook',
+    description: 'Label for web hook'
+  }
+}
+
+export const integrationMessages = defineMessages(messagesToDefine)

@@ -49,7 +49,8 @@ import {
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
-  REGISTRAR_HOME_TAB_PAGE
+  REGISTRAR_HOME_TAB_PAGE,
+  INTEGRATION_LIST
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -229,6 +230,10 @@ export function goToTeamUserList(id: string) {
       locationId: id
     })
   })
+}
+
+export function goToIntegrationList() {
+  return push(INTEGRATION_LIST)
 }
 
 export function goToSearchResult(
