@@ -44,6 +44,7 @@ export const NUMBER = 'NUMBER'
 export const BIG_NUMBER = 'BIG_NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
 export const RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS'
+export const ACCORDION_WITH_NESTED_FIELDS = 'ACCORDION_WITH_NESTED_FIELDS'
 export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const CHECKBOX = 'CHECKBOX'
@@ -102,6 +103,9 @@ export interface IRadioOption {
   value: RadioComponentOption['value']
   label: MessageDescriptor
   conditionals?: RadioComponentOption['conditionals']
+}
+export interface IAccordionOption {
+  value: string
 }
 export interface ICheckboxOption {
   value: CheckboxComponentOption['value']
@@ -377,6 +381,13 @@ type SerializedRadioGroupWithNestedFields = Omit<
   nestedFields: { [key: string]: SerializedFormField[] }
 }
 
+type SerializedAccordionGroupWithNestedFields = Omit<
+  IAccordionWithNestedFieldsFormField,
+  'nestedFields'
+> & {
+  nestedFields: { [key: string]: SerializedFormField[] }
+}
+
 export type SerializedFormField = UnionOmit<
   | Exclude<
       IFormField,
@@ -384,11 +395,13 @@ export type SerializedFormField = UnionOmit<
       | ILoaderButton
       | ISelectFormFieldWithOptions
       | IRadioGroupWithNestedFieldsFormField
+      | IAccordionWithNestedFieldsFormField
     >
   | SerializedSelectFormFieldWithOptions
   | SerializedFormFieldWithDynamicDefinitions
   | ILoaderButtonWithSerializedQueryMap
-  | SerializedRadioGroupWithNestedFields,
+  | SerializedRadioGroupWithNestedFields
+  | SerializedAccordionGroupWithNestedFields,
   'validate' | 'mapping'
 > & {
   validate: IValidatorDescriptor[]
@@ -495,13 +508,16 @@ export interface IRadioGroupFormField extends IFormFieldBase {
   notice?: MessageDescriptor
   flexDirection?: FLEX_DIRECTION
 }
-
 export interface IRadioGroupWithNestedFieldsFormField
   extends Omit<IRadioGroupFormField, 'type'> {
   type: typeof RADIO_GROUP_WITH_NESTED_FIELDS
   nestedFields: INestedInputFields
 }
-
+export interface IAccordionWithNestedFieldsFormField extends IFormFieldBase {
+  type: typeof ACCORDION_WITH_NESTED_FIELDS
+  options: IAccordionOption[]
+  nestedFields: INestedInputFields
+}
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
   information: IFormSectionData
@@ -662,6 +678,7 @@ export type IFormField =
   | ILoaderButton
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
+  | IAccordionWithNestedFieldsFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1031,6 +1048,13 @@ export interface Ii18nRadioGroupWithNestedFieldsFormField
   nestedFields: Ii18nNestedInputFields
 }
 
+export interface Ii18nIAccordionWithNestedFieldsFormField
+  extends Ii18nFormFieldBase {
+  type: typeof ACCORDION_WITH_NESTED_FIELDS
+  options: IAccordionOption[]
+  nestedFields: Ii18nNestedInputFields
+}
+
 type Name = {
   firstNames: string
   familyName: string
@@ -1185,6 +1209,7 @@ export type Ii18nFormField =
   | Ii18nLoaderButtonField
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
+  | Ii18nIAccordionWithNestedFieldsFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
@@ -1240,6 +1265,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     FIELD_WITH_DYNAMIC_DEFINITIONS: messages.fieldWithDynamicDefinition,
     RADIO_GROUP: messages.radioGroup,
     RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
+    ACCORDION_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
     INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
     CHECKBOX_GROUP: messages.checkboxGroup,
     CHECKBOX: messages.checkbox,
