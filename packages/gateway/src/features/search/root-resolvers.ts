@@ -16,7 +16,7 @@ import {
   postMetrics,
   postSearch
 } from '@gateway/features/fhir/utils'
-import { markRecordAsDownloadedAndAssigned } from '@gateway/features/registration/root-resolvers'
+import { markRecordAsDownloadedOrAssigned } from '@gateway/features/registration/root-resolvers'
 import {
   IAdvancedSearchParam,
   ISearchCriteria
@@ -237,7 +237,7 @@ export const resolvers: GQLResolver = {
       }
 
       ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-        await markRecordAsDownloadedAndAssigned(hit._id, authHeader)
+        await markRecordAsDownloadedOrAssigned(hit._id, authHeader)
       })
 
       if (searchResult.body.hits.total.value) {

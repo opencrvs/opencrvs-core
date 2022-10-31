@@ -219,7 +219,7 @@ function mapStatetoProps(
   ) as IPrintableDeclaration
 
   return {
-    event: declaration.event,
+    event,
     registrationId,
     language: state.i18n.language,
     declaration,

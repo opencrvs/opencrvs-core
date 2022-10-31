@@ -1184,12 +1184,12 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.section.father.name'
   },
   mothersDetailsExist: {
-    defaultMessage: "Do you have the mother's details?",
+    defaultMessage: "Mother's details are not available",
     description: "Question to ask the user if they have the mother's details",
     id: 'form.field.label.mothersDetailsExist'
   },
   fathersDetailsExist: {
-    defaultMessage: "Do you have the father's details?",
+    defaultMessage: "Father's details are not available",
     description: "Question to ask the user if they have the father's details",
     id: 'form.field.label.fathersDetailsExist'
   },

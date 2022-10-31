@@ -32,6 +32,7 @@ const registerCertifyToken = jwt.sign(
   { scope: ['register', 'certify'] },
   readFileSync('../auth/test/cert.key'),
   {
+    subject: '121221',
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:gateway-user'
@@ -42,6 +43,7 @@ const validateToken = jwt.sign(
   { scope: ['validate'] },
   readFileSync('../auth/test/cert.key'),
   {
+    subject: '121221',
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:gateway-user'
@@ -52,6 +54,7 @@ const declareToken = jwt.sign(
   { scope: ['declare'] },
   readFileSync('../auth/test/cert.key'),
   {
+    subject: '121221',
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:gateway-user'
@@ -918,8 +921,7 @@ describe('Registration root resolvers', () => {
   describe('markEventAsVoided()', () => {
     it('updates a task with rejected status, reason and comment', async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)],
+        [JSON.stringify({ userId: '121221' })],
         [JSON.stringify(mockTaskBundle)],
         [
           JSON.stringify({
@@ -943,7 +945,7 @@ describe('Registration root resolvers', () => {
         { id, reason, comment },
         authHeaderRegCert
       )
-      const postData = JSON.parse(fetch.mock.calls[3][1].body)
+      const postData = JSON.parse(fetch.mock.calls[2][1].body)
       expect(postData.entry[0].resource.reason.text).toBe('Misspelling')
       expect(postData.entry[0].resource.statusReason.text).toBe(
         'Family name misspelled'
@@ -952,10 +954,7 @@ describe('Registration root resolvers', () => {
     })
 
     it('throws error if user does not have register or validate scope', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const reason = 'Misspelling'
       const comment = 'Family name misspelled'
@@ -972,8 +971,7 @@ describe('Registration root resolvers', () => {
   describe('markEventAsArchived()', () => {
     it('updates a task with archived status', async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)],
+        [JSON.stringify({ userId: '121221' })],
         [JSON.stringify(mockTaskBundle)],
         [JSON.stringify('ok'), { status: 200 }]
       )
@@ -983,7 +981,7 @@ describe('Registration root resolvers', () => {
         { id },
         authHeaderRegCert
       )
-      const postData = JSON.parse(fetch.mock.calls[3][1].body)
+      const postData = JSON.parse(fetch.mock.calls[2][1].body)
       expect(postData.entry[0].resource.businessStatus.coding[0].code).toBe(
         'ARCHIVED'
       )
@@ -991,10 +989,7 @@ describe('Registration root resolvers', () => {
     })
 
     it('throws error if user does not have register or validate scope', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
         resolvers.Mutation.markEventAsArchived({}, { id }, authHeaderNotRegCert)
@@ -1010,8 +1005,7 @@ describe('Registration root resolvers', () => {
       const taskHistoryBundle = cloneDeep(mockTaskBundle)
       taskHistoryBundle.entry.push(mockTaskBundle.entry[0])
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)],
+        [JSON.stringify({ userId: '121221' })],
         [JSON.stringify(archivedTaskBundle)],
         [JSON.stringify(taskHistoryBundle)],
         [JSON.stringify({})]
@@ -1021,8 +1015,8 @@ describe('Registration root resolvers', () => {
         { id: archivedTaskBundle.id },
         authHeaderRegCert
       )
-      expect(fetch.mock.calls[2][0]).toContain(archivedTaskBundle.id)
-      const task = JSON.parse(fetch.mock.calls[4][1].body).entry[0].resource
+      expect(fetch.mock.calls[1][0]).toContain(archivedTaskBundle.id)
+      const task = JSON.parse(fetch.mock.calls[3][1].body).entry[0].resource
       expect(
         findExtension(REINSTATED_EXTENSION_URL, task.extension)
       ).not.toBeUndefined()
@@ -1030,10 +1024,7 @@ describe('Registration root resolvers', () => {
     })
 
     it('throws error if user does not have register or validate scope', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
         resolvers.Mutation.markEventAsReinstated(
@@ -1117,8 +1108,7 @@ describe('Registration root resolvers', () => {
         }
       }
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)],
+        [JSON.stringify({ userId: '121221' })],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1152,8 +1142,7 @@ describe('Registration root resolvers', () => {
     it('updates status successfully when only composition id is sent', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)],
+        [JSON.stringify({ userId: '121221' })],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1277,10 +1266,7 @@ describe('Registration root resolvers', () => {
     })
 
     it('throws error if no task entry found by given id', async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponseOnce([
         JSON.stringify({
@@ -1310,10 +1296,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have validate scope", async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
         resolvers.Mutation.markBirthAsValidated(
@@ -1436,8 +1419,7 @@ describe('Registration root resolvers', () => {
         _fhirIDMap: { composition: 'd7e273e7-e4d3-4342-905e-f3514fa2c10a' }
       }
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)],
+        [JSON.stringify({ userId: '121221' })],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1517,8 +1499,7 @@ describe('Registration root resolvers', () => {
     it('updates status successfully when only composition id is sent', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)],
+        [JSON.stringify({ userId: '121221' })],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1635,10 +1616,7 @@ describe('Registration root resolvers', () => {
 
     it('throws error if no task entry found by given id', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -1667,10 +1645,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have validate scope", async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
         resolvers.Mutation.markDeathAsValidated(
@@ -1774,8 +1749,7 @@ describe('Registration root resolvers', () => {
         }
       }
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)],
+        [JSON.stringify({ userId: '121221' })],
         [
           // Response for when the status is updated
           JSON.stringify({
@@ -1820,10 +1794,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have register scope", async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
         resolvers.Mutation.markBirthAsRegistered(
@@ -1926,8 +1897,7 @@ describe('Registration root resolvers', () => {
         id: '02ffb3a5-303f-4828-b63f-5847d4a4eff7'
       }
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)],
+        [JSON.stringify({ userId: '121221' })],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1955,10 +1925,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have register scope", async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
+      fetch.mockResponses([JSON.stringify({ userId: '121221' })])
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       await expect(
         resolvers.Mutation.markDeathAsRegistered(
@@ -2114,10 +2081,6 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have a certify scope", async () => {
-      fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
-        [JSON.stringify(mockUserDetails)]
-      )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
         resolvers.Mutation.markBirthAsCertified(

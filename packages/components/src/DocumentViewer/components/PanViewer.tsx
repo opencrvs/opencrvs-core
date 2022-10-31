@@ -60,11 +60,13 @@ const ControlsContainer = styled.div<{ centerController?: boolean }>`
   }
 `
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // cast to any because of styled-components bug
 // https://stackoverflow.com/questions/53724583/why-this-wrapped-styled-component-errors-has-no-properties-in-common-with/53902817#53902817
 const StyledReactPanZoom = styled(ReactPanZoom)`
   ${Container};
 ` as any
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 interface IProps {
   image: string

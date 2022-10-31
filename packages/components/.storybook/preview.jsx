@@ -112,5 +112,13 @@ export const parameters = {
         'Data'
       ]
     }
+  },
+  a11y: {
+    options: {
+      runOnly: {
+        type: 'tag',
+        values: ['wcag21a', 'wcag2aa', 'best-practice']
+      }
+    }
   }
 }

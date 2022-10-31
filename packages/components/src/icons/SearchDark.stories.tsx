@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { SearchDark } from '.'
 
 export default {
-  title: 'Styles/Icons/SearchDark',
+  title: 'Deprecated/Icons/SearchDark',
   component: SearchDark
 } as Meta
 

@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import * as moxios from 'moxios'
 import { ReactWrapper } from 'enzyme'
 import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
 import { createTestComponent, createTestApp } from '@login/tests/util'
@@ -18,12 +17,6 @@ import { client } from '@login/utils/authApi'
 import { applicationConfigLoadedAction } from '@login/login/actions'
 
 describe('Login app step one', () => {
-  beforeEach(() => {
-    moxios.install(client)
-  })
-  afterEach(() => {
-    moxios.uninstall(client)
-  })
   describe('Step One Container', () => {
     let component: ReactWrapper
 

@@ -369,6 +369,7 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === CHECKBOX) {
+    const { checkedValue = true, uncheckedValue = false } = fieldDefinition
     return (
       <InputField {...inputFieldProps}>
         <Checkbox
@@ -376,11 +377,13 @@ function GeneratedInputField({
           label={fieldDefinition.label}
           name={fieldDefinition.name}
           value={String(value)}
-          selected={value as boolean}
+          selected={(value as string) === checkedValue}
           onChange={(event) =>
             onSetFieldValue(
               fieldDefinition.name,
-              event.target.value === 'true' ? false : true
+              event.target.value === String(checkedValue)
+                ? uncheckedValue
+                : checkedValue
             )
           }
         />

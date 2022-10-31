@@ -9,19 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
+import { Meta, ComponentStory } from '@storybook/react'
 import { PINKeypad } from './PINKeypad'
 import React from 'react'
 
-interface IProps {
-  id?: string
-  onComplete: (pin: string) => void
-  forgotPinComponent?: React.ReactNode
-  pin?: string
-  ref?: any
-}
-
-const Template: Story<IProps> = (args) => <PINKeypad {...args} />
+const Template: ComponentStory<typeof PINKeypad> = (args) => (
+  <PINKeypad {...args} />
+)
 export const PINKeypadView = Template.bind({})
 PINKeypadView.args = {
   onComplete: (pin: string) => alert(`The entered PIN is: ${pin}`)

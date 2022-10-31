@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
+import {
+  IPrintableDeclaration,
+  modifyDeclaration,
+  writeDeclaration
+} from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
@@ -53,6 +57,7 @@ interface IDispatchProps {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
   modifyDeclaration: typeof modifyDeclaration
+  writeDeclaration: typeof writeDeclaration
   goToReviewCertificate: typeof goToReviewCertificate
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
@@ -67,6 +72,15 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const eventDate = getEventDate(this.props.declaration.data, event)
     const registeredDate = getRegisteredDate(this.props.declaration.data)
     const { offlineCountryConfiguration } = this.props
+
+    const declaration = { ...this.props.declaration }
+    if (declaration.data.registration.certificates.length) {
+      declaration.data.registration.certificates[0].hasShowedVerifiedDocument =
+        true
+    }
+
+    this.props.modifyDeclaration(declaration)
+    this.props.writeDeclaration(declaration)
 
     if (
       isFreeOfCost(
@@ -204,6 +218,7 @@ export const VerifyCollector = connect(mapStateToProps, {
   goBack,
   goToHomeTab,
   modifyDeclaration,
+  writeDeclaration,
   goToReviewCertificate,
   goToPrintCertificatePayment
 })(injectIntl(VerifyCollectorComponent))
