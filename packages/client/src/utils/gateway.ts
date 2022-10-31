@@ -93,6 +93,7 @@ export type ApplicationConfiguration = {
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
+  INTEGRATIONS?: Maybe<Array<Maybe<Integration>>>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -107,6 +108,7 @@ export type ApplicationConfigurationInput = {
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
+  INTEGRATIONS?: InputMaybe<Array<InputMaybe<IntegrationInput>>>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -732,9 +734,12 @@ export type Identifier = {
 
 export enum IdentityIdType {
   AlienNumber = 'ALIEN_NUMBER',
+  BirthPatientEntry = 'BIRTH_PATIENT_ENTRY',
   BirthRegistrationNumber = 'BIRTH_REGISTRATION_NUMBER',
   DeathRegistrationNumber = 'DEATH_REGISTRATION_NUMBER',
+  DeceasedPatientEntry = 'DECEASED_PATIENT_ENTRY',
   DrivingLicense = 'DRIVING_LICENSE',
+  MosipUintoken = 'MOSIP_UINTOKEN',
   NationalId = 'NATIONAL_ID',
   NoId = 'NO_ID',
   Other = 'OTHER',
@@ -781,6 +786,17 @@ export type InputOutput = {
   valueCode?: Maybe<Scalars['String']>
   valueId?: Maybe<Scalars['String']>
   valueString?: Maybe<Scalars['String']>
+}
+
+export type Integration = {
+  __typename?: 'Integration'
+  name?: Maybe<Scalars['String']>
+  status?: Maybe<Scalars['String']>
+}
+
+export type IntegrationInput = {
+  name?: InputMaybe<Scalars['String']>
+  status?: InputMaybe<Scalars['String']>
 }
 
 export type LocalRegistrar = {
@@ -1232,6 +1248,7 @@ export type Query = {
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
+  fetchRegistrationForViewing?: Maybe<EventRegistration>
   fetchTimeLoggedMetricsByPractitioner?: Maybe<TimeLoggedMetricsResultSet>
   getActiveCertificatesSVG?: Maybe<Array<Maybe<CertificateSvg>>>
   getCertificateSVG?: Maybe<CertificateSvg>
@@ -1297,6 +1314,10 @@ export type QueryFetchRegistrationCountByStatusArgs = {
   event?: InputMaybe<Scalars['String']>
   locationId?: InputMaybe<Scalars['String']>
   status: Array<InputMaybe<Scalars['String']>>
+}
+
+export type QueryFetchRegistrationForViewingArgs = {
+  id: Scalars['ID']
 }
 
 export type QueryFetchTimeLoggedMetricsByPractitionerArgs = {
@@ -1538,7 +1559,8 @@ export enum RegAction {
   Downloaded = 'DOWNLOADED',
   Reinstated = 'REINSTATED',
   RequestedCorrection = 'REQUESTED_CORRECTION',
-  Unassigned = 'UNASSIGNED'
+  Unassigned = 'UNASSIGNED',
+  Viewed = 'VIEWED'
 }
 
 export enum RegStatus {
@@ -1591,6 +1613,7 @@ export type Registration = {
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
+  mosipAid?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
   paperFormID?: Maybe<Scalars['String']>
@@ -1619,6 +1642,7 @@ export type RegistrationInput = {
   inCompleteFields?: InputMaybe<Scalars['String']>
   informantType?: InputMaybe<InformantType>
   location?: InputMaybe<LocationInput>
+  mosipAid?: InputMaybe<Scalars['String']>
   otherInformantType?: InputMaybe<Scalars['String']>
   page?: InputMaybe<Scalars['String']>
   paperFormID?: InputMaybe<Scalars['String']>
@@ -2664,6 +2688,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      mosipAid?: string | null
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
@@ -2819,6 +2844,12 @@ export type FetchBirthRegistrationForCertificateQuery = {
       multipleBirth?: number | null
       birthDate?: string | null
       gender?: string | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: IdentityIdType | null
+        otherType?: string | null
+      } | null> | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -2948,6 +2979,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       contactPhoneNumber?: string | null
       trackingId?: string | null
       registrationNumber?: string | null
+      mosipAid?: string | null
       status?: Array<{
         __typename?: 'RegWorkflow'
         type?: RegStatus | null

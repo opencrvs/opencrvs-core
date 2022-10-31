@@ -25,6 +25,7 @@ enum RegAction {
   REINSTATED
   REQUESTED_CORRECTION
   DOWNLOADED
+  VIEWED
 }
 
 enum BirthRegType {
@@ -539,6 +540,7 @@ type Query {
   fetchDeathRegistration(id: ID!): DeathRegistration
   fetchEventRegistration(id: ID!): EventRegistration
   fetchRegistration(id: ID!): EventRegistration
+  fetchRegistrationForViewing(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
     status: [String]!

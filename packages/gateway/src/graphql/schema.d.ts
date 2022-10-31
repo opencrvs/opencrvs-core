@@ -22,6 +22,7 @@ export interface GQLQuery {
   fetchDeathRegistration?: GQLDeathRegistration
   fetchEventRegistration?: GQLEventRegistration
   fetchRegistration?: GQLEventRegistration
+  fetchRegistrationForViewing?: GQLEventRegistration
   queryPersonByNidIdentifier?: GQLPerson
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   locationsByParent?: Array<GQLLocation | null>
@@ -1058,7 +1059,8 @@ export const enum GQLRegAction {
   UNASSIGNED = 'UNASSIGNED',
   REINSTATED = 'REINSTATED',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
-  DOWNLOADED = 'DOWNLOADED'
+  DOWNLOADED = 'DOWNLOADED',
+  VIEWED = 'VIEWED'
 }
 
 export interface GQLStatusReason {
@@ -1465,6 +1467,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchDeathRegistration?: QueryToFetchDeathRegistrationResolver<TParent>
   fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
   fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
+  fetchRegistrationForViewing?: QueryToFetchRegistrationForViewingResolver<TParent>
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
@@ -1650,6 +1653,21 @@ export interface QueryToFetchRegistrationResolver<
   (
     parent: TParent,
     args: QueryToFetchRegistrationArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToFetchRegistrationForViewingArgs {
+  id: string
+}
+export interface QueryToFetchRegistrationForViewingResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchRegistrationForViewingArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
