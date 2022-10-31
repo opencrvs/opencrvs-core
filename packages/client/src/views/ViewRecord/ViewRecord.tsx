@@ -24,7 +24,20 @@ import { goBack } from '@client/navigation'
 import { Event } from '@client/utils/gateway'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/Button'
-import { AppBar, Frame } from '@opencrvs/components'
+import {
+  Alert,
+  AppBar,
+  BodyContent,
+  DocumentViewer,
+  Frame,
+  FullBodyContent,
+  InputField,
+  ListViewItemSimplified,
+  ListViewSimplified,
+  ResponsiveModal,
+  Spinner,
+  TextArea
+} from '@opencrvs/components'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
@@ -34,6 +47,22 @@ import { getReviewForm } from '@client/forms/register/review-selectors'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import { FETCH_VIEW_RECORD_BY_COMPOSITION } from '@client/views/ViewRecord/query'
+import { Box } from '@opencrvs/components/lib/Box/Box'
+import styled from '@client/styledComponents'
+import { ReviewHeader } from '@client/views/RegisterForm/review/ReviewHeader'
+import { messages } from '@client/i18n/messages/views/review'
+import {
+  LinkButton,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
+import { bytesToSize, isCorrection } from '@client/views/CorrectionForm/utils'
+import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
+import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { ReviewAction } from '@client/components/form/ReviewActionComponent'
+import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 
 const getDeclarationIconColor = (declaration: IDeclaration): string => {
   return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
@@ -41,6 +70,87 @@ const getDeclarationIconColor = (declaration: IDeclaration): string => {
     : declaration.registrationStatus
     ? STATUSTOCOLOR[declaration.registrationStatus]
     : 'orange'
+}
+
+const Row = styled.div`
+  height: 100%;
+  margin-top: 20px;
+  padding: 30px;
+  display: flex;
+  flex: 1;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    flex-direction: column;
+  }
+`
+const RightColumn = styled.div`
+  width: 40%;
+  height: 90%;
+  border-radius: 4px;
+  margin-left: 24px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
+
+const LeftColumn = styled.div`
+  width: 60%;
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 100%;
+    margin-bottom: 0px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    border: 0;
+  }
+`
+const SpinnerWrapper = styled.div`
+  padding: 10px;
+`
+const LoadingState = () => {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  return (
+    <Frame
+      header={
+        <AppBar
+          desktopRight={
+            <Button
+              size="large"
+              type="tertiary"
+              onClick={() => dispatch(goBack())}
+            >
+              {intl.formatMessage(buttonMessages.exitButton)}
+            </Button>
+          }
+          mobileRight={
+            <Button
+              size="large"
+              type="tertiary"
+              onClick={() => dispatch(goBack())}
+            >
+              {intl.formatMessage(buttonMessages.exitButton)}
+            </Button>
+          }
+        />
+      }
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+    >
+      <Row>
+        <LeftColumn>
+          <SpinnerWrapper>
+            <Spinner id={'view-record-spinner'} size={24} />
+          </SpinnerWrapper>
+        </LeftColumn>
+        <RightColumn></RightColumn>
+      </Row>
+    </Frame>
+  )
 }
 
 export const ViewRecord = () => {
@@ -55,9 +165,9 @@ export const ViewRecord = () => {
     variables: { id: declarationId }
   })
 
-  if (loading) return <>Loading</>
+  if (loading) return <LoadingState />
 
-  if (error) return <>Error</>
+  if (error) return <GenericErrorToast />
 
   const eventType =
     data?.fetchRegistration?.__typename === 'BirthRegistration'
