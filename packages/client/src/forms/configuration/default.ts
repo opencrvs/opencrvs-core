@@ -680,10 +680,6 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist || values.nationality !== "NGA"'
-                  },
-                  {
-                    action: 'hide',
-                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },
@@ -1251,11 +1247,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.detailsExist'
-                  },
-                  {
-                    action: 'hide',
-                    expression: '!isDefaultCountry(values.countryPrimary)'
+                    expression:
+                      '!values.detailsExist || values.nationality !== "NGA"'
                   }
                 ]
               },
@@ -1877,10 +1870,6 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist || values.nationality !== "NGA"'
-                  },
-                  {
-                    action: 'hide',
-                    expression: '!isDefaultCountry(values.countryPrimary)'
                   }
                 ]
               },
@@ -2449,11 +2438,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.detailsExist'
-                  },
-                  {
-                    action: 'hide',
-                    expression: '!isDefaultCountry(values.countryPrimary)'
+                    expression:
+                      '!values.detailsExist || values.nationality !== "NGA"'
                   }
                 ]
               },
@@ -2788,6 +2774,23 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'LEGAL_GUARDIAN',
                     label: informantMessageDescriptors.legalGuardian
+                  },
+
+                  {
+                    value: 'MOTHERS_BROTHER',
+                    label: informantMessageDescriptors.mothersBrother
+                  },
+                  {
+                    value: 'MOTHERS_SISTER',
+                    label: informantMessageDescriptors.mothersSister
+                  },
+                  {
+                    value: 'FATHERS_BROTHER',
+                    label: informantMessageDescriptors.fathersBrother
+                  },
+                  {
+                    value: 'FATHERS_SISTER',
+                    label: informantMessageDescriptors.fathersSister
                   },
                   {
                     value: 'OTHER',
@@ -3313,7 +3316,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                      "(draftData && draftData.registration && draftData.registration.informantType && (draftData.registration.informantType === 'MOTHER' || draftData.registration.informantType === 'FATHER'))"
                   }
                 ],
                 mapping: {
@@ -3350,7 +3353,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
+                      "(draftData && draftData.registration && draftData.registration.informantType && (draftData.registration.informantType === 'MOTHER' || draftData.registration.informantType === 'FATHER'))"
                   }
                 ],
                 mapping: {

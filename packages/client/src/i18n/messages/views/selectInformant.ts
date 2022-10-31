@@ -38,6 +38,10 @@ interface IFormMessages
   otherFamilyMember: MessageDescriptor
   birthInformantTitle: MessageDescriptor
   deathInformantTitle: MessageDescriptor
+  mothersBrother: MessageDescriptor
+  mothersSister: MessageDescriptor
+  fathersBrother: MessageDescriptor
+  fathersSister: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -170,6 +174,26 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Please select the relationship to the deceased.',
     description: 'Label for death error message',
     id: 'register.selectInformant.deathErrorMessage'
+  },
+  mothersBrother: {
+    defaultMessage: "Mother's brother",
+    description: "Label for option Mother's brother",
+    id: 'form.field.label.informantRelation.mothersbrother'
+  },
+  mothersSister: {
+    defaultMessage: "Mother's sister",
+    description: "Label for option Mother's sister",
+    id: 'form.field.label.informantRelation.motherssister'
+  },
+  fathersBrother: {
+    defaultMessage: "Father's brother",
+    description: "Label for option Father's brother",
+    id: 'form.field.label.informantRelation.fathersbrother'
+  },
+  fathersSister: {
+    defaultMessage: "Father's sister",
+    description: "Label for option Father's sister",
+    id: 'form.field.label.informantRelation.fatherssister'
   },
   otherFamilyMember: {
     defaultMessage: 'Other family member',
