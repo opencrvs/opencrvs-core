@@ -71,6 +71,10 @@ interface SortMap {
   delayed: SORT_ORDER
   healthFacility: SORT_ORDER
   home: SORT_ORDER
+  late_num: SORT_ORDER
+  delayed_num: SORT_ORDER
+  healthFacility_num: SORT_ORDER
+  home_num: SORT_ORDER
   time: SORT_ORDER
 }
 const INITIAL_SORT_MAP = {
@@ -81,6 +85,10 @@ const INITIAL_SORT_MAP = {
   delayed: SORT_ORDER.ASCENDING,
   healthFacility: SORT_ORDER.ASCENDING,
   home: SORT_ORDER.ASCENDING,
+  late_num: SORT_ORDER.ASCENDING,
+  delayed_num: SORT_ORDER.ASCENDING,
+  healthFacility_num: SORT_ORDER.ASCENDING,
+  home_num: SORT_ORDER.ASCENDING,
   time: SORT_ORDER.DESCENDING
 }
 
@@ -256,10 +264,14 @@ function RegistrationListComponent(props: IProps) {
         ),
         width: 20,
         isSortable: true,
-        sortFunction: () => toggleSort('delayed'),
+        sortFunction: () => toggleSort('delayed_num'),
         icon:
-          columnToBeSort === 'delayed' ? <SortArrow active={true} /> : <></>,
-        isSorted: columnToBeSort === 'late' ? true : false
+          columnToBeSort === 'delayed_num' ? (
+            <SortArrow active={true} />
+          ) : (
+            <></>
+          ),
+        isSorted: columnToBeSort === 'delayed_num' ? true : false
       }
     ]
 
@@ -269,9 +281,10 @@ function RegistrationListComponent(props: IProps) {
         label: intl.formatMessage(messages.performanceLateRegistrationsLabel),
         width: 20,
         isSortable: true,
-        sortFunction: () => toggleSort('late'),
-        icon: columnToBeSort === 'late' ? <SortArrow active={true} /> : <></>,
-        isSorted: columnToBeSort === 'late' ? true : false
+        sortFunction: () => toggleSort('late_num'),
+        icon:
+          columnToBeSort === 'late_num' ? <SortArrow active={true} /> : <></>,
+        isSorted: columnToBeSort === 'late_num' ? true : false
       })
     }
 
@@ -292,23 +305,24 @@ function RegistrationListComponent(props: IProps) {
           label: intl.formatMessage(messages.performanceHomeBirth),
           width: 20,
           isSortable: true,
-          sortFunction: () => toggleSort('home'),
-          icon: columnToBeSort === 'home' ? <SortArrow active={true} /> : <></>,
-          isSorted: columnToBeSort === 'home' ? true : false
+          sortFunction: () => toggleSort('home_num'),
+          icon:
+            columnToBeSort === 'home_num' ? <SortArrow active={true} /> : <></>,
+          isSorted: columnToBeSort === 'home_num' ? true : false
         },
         {
           key: 'healthFacility',
           label: intl.formatMessage(messages.performanceHealthFacilityBirth),
           width: 20,
           isSortable: true,
-          sortFunction: () => toggleSort('healthFacility'),
+          sortFunction: () => toggleSort('healthFacility_num'),
           icon:
-            columnToBeSort === 'healthFacility' ? (
+            columnToBeSort === 'healthFacility_num' ? (
               <SortArrow active={true} />
             ) : (
               <></>
             ),
-          isSorted: columnToBeSort === 'healthFacility' ? true : false
+          isSorted: columnToBeSort === 'healthFacility_num' ? true : false
         }
       ]
     if (filterBy === FILTER_BY_OPTIONS.BY_LOCATION)
@@ -329,23 +343,24 @@ function RegistrationListComponent(props: IProps) {
           label: intl.formatMessage(messages.performanceHomeBirth),
           width: 20,
           isSortable: true,
-          sortFunction: () => toggleSort('home'),
-          icon: columnToBeSort === 'home' ? <SortArrow active={true} /> : <></>,
-          isSorted: columnToBeSort === 'home' ? true : false
+          sortFunction: () => toggleSort('home_num'),
+          icon:
+            columnToBeSort === 'home_num' ? <SortArrow active={true} /> : <></>,
+          isSorted: columnToBeSort === 'home_num' ? true : false
         },
         {
           key: 'healthFacility',
           label: intl.formatMessage(messages.performanceHealthFacilityBirth),
           width: 20,
           isSortable: true,
-          sortFunction: () => toggleSort('healthFacility'),
+          sortFunction: () => toggleSort('healthFacility_num'),
           icon:
-            columnToBeSort === 'healthFacility' ? (
+            columnToBeSort === 'healthFacility_num' ? (
               <SortArrow active={true} />
             ) : (
               <></>
             ),
-          isSorted: columnToBeSort === 'healthFacility' ? true : false
+          isSorted: columnToBeSort === 'healthFacility_num' ? true : false
         }
       ]
     if (filterBy === FILTER_BY_OPTIONS.BY_REGISTRAR)
@@ -388,7 +403,9 @@ function RegistrationListComponent(props: IProps) {
         role: getFieldAgentTypeLabel(result.registrarPractitioner.role),
         total: String(result.total),
         delayed: `${getPercentage(result.total, result.delayed)}%`,
-        late: `${getPercentage(result.total, result.late)}%`
+        delayed_num: getPercentage(result.total, result.delayed),
+        late: `${getPercentage(result.total, result.late)}%`,
+        late_num: getPercentage(result.total, result.late)
       }))
     } else if (content.__typename === RESULT_TYPE.by_location) {
       finalContent = content.results.map((result: IDynamicValues) => ({
@@ -396,18 +413,32 @@ function RegistrationListComponent(props: IProps) {
         location: result.location.name,
         total: String(result.total),
         delayed: `${getPercentage(result.total, result.delayed)}%`,
+        delayed_num: getPercentage(result.total, result.delayed),
         late: `${getPercentage(result.total, result.late)}%`,
+        late_num: getPercentage(result.total, result.late),
         home: `${getPercentage(result.total, result.home)}%`,
-        healthFacility: `${getPercentage(result.total, result.healthFacility)}%`
+        home_num: getPercentage(result.total, result.home),
+        healthFacility: `${getPercentage(
+          result.total,
+          result.healthFacility
+        )}%`,
+        healthFacility_num: getPercentage(result.total, result.healthFacility)
       }))
     } else if (content.__typename === RESULT_TYPE.by_time) {
       finalContent = content.results.map((result: IDynamicValues) => ({
         ...result,
         total: String(result.total),
         delayed: `${getPercentage(result.total, result.delayed)}%`,
+        delayed_num: getPercentage(result.total, result.delayed),
         late: `${getPercentage(result.total, result.late)}%`,
+        late_num: getPercentage(result.total, result.late),
         home: `${getPercentage(result.total, result.home)}%`,
-        healthFacility: `${getPercentage(result.total, result.healthFacility)}%`
+        home_num: getPercentage(result.total, result.home),
+        healthFacility: `${getPercentage(
+          result.total,
+          result.healthFacility
+        )}%`,
+        healthFacility_num: getPercentage(result.total, result.healthFacility)
       }))
     }
     return orderBy(finalContent, [columnToBeSort], [sortOrder[columnToBeSort]])
