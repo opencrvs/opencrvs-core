@@ -470,7 +470,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   render() {
     const { intl, practitionerId, theme } = this.props
     const { timeStart, timeEnd, currentPageNumber } = this.state
-    const recordCount = DEFAULT_LIST_SIZE * this.state.currentPageNumber
+    const recordCount = DEFAULT_LIST_SIZE
 
     return (
       <RecentActionsHolder id="user-audit-list">
@@ -502,7 +502,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
               >
                 {({ data, loading, error }) => {
                   if (error || !data || !data.getUserAuditLog) {
-                    return this.getLoadingAuditListView(true)
+                    return this.getLoadingAuditListView(error ? true : false)
                   } else {
                     const totalItems = Number(
                       (data &&
