@@ -304,7 +304,7 @@ describe('User audit list tests', () => {
     expect(nextPageButton.hostNodes()).toHaveLength(2)
     nextPageButton.hostNodes().find('button').first().simulate('click')
     await new Promise((resolve) => {
-      setTimeout(resolve, 2000)
+      setTimeout(resolve, 0)
     })
     testComponent.update()
     const firstRowElementOnSecondPage = await waitForElement(
