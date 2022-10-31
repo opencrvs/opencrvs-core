@@ -46,8 +46,8 @@ services:
       #- "ES_JAVA_OPTS=-Xms512m -Xmx512m"
   minio:
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - '3535:9000'
+      - '3536:9001'
     volumes:
       - './data/minio:/data/minio'
       - './data/backups/minio:/data/backups/minio'

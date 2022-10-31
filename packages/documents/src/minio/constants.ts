@@ -10,6 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export const MINIO_HOST = process.env.MINIO_HOST || 'localhost'
-export const MINIO_PORT = process.env.MINIO_PORT || 9000
+export const MINIO_PORT = process.env.MINIO_PORT || 3535
 export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'
 export const MINIO_BUCKET_REGION = process.env.MINIO_BUCKET_REGION || 'local'
