@@ -147,13 +147,7 @@ export const mockFetchConfig = {
       languagesAndCountry: ['en-ZM']
     },
     LANGUAGES: 'en',
-    ADDRESSES: 1,
-    INTEGRATIONS: [
-      {
-        name: 'MOSIP',
-        status: statuses.ACTIVE
-      }
-    ]
+    ADDRESSES: 1
   },
   certificates: [
     {
@@ -177,7 +171,13 @@ export const mockFetchConfig = {
       svgDateCreated: 1640696804785
     }
   ],
-  formConfig: { questionConfig: [] }
+  formConfig: { questionConfig: [] },
+  integrations: [
+    {
+      name: 'MOSIP',
+      status: statuses.ACTIVE
+    }
+  ]
 }
 
 const certificates = [

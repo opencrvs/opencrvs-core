@@ -77,6 +77,8 @@ export const PERFORMANCE_FIELD_AGENT_LIST = '/performance/field-agents'
 export const TEAM_SEARCH = '/team/search'
 export const TEAM_USER_LIST = '/team/users'
 
+export const INTEGRATION_LIST = '/integration/client'
+
 export const CREATE_USER = '/createUser'
 export const CREATE_USER_ON_LOCATION = '/createUserInLocation/:locationId'
 export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'

@@ -30,6 +30,7 @@ import {
   goToSettings,
   goToPerformanceView,
   goToTeamView,
+  goToIntegrationList,
   goToFormConfigHome,
   goToApplicationConfig
 } from '@client/navigation'
@@ -77,6 +78,7 @@ export const WORKQUEUE_TABS = {
   config: 'config',
   application: 'application',
   certificate: 'certificate',
+  integrations: 'integrations',
   settings: 'settings',
   logout: 'logout',
   declarationForms: 'form'
@@ -193,6 +195,7 @@ interface IDispatchProps {
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
+  goToIntegrationViewAction: typeof goToIntegrationList
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
 }
@@ -257,6 +260,7 @@ export const NavigationView = (props: IFullProps) => {
     activeMenuItem,
     goToCertificateConfigAction,
     goToFormConfigAction,
+    goToIntegrationViewAction,
     goToApplicationConfigAction,
     navigationWidth,
     workqueue,
@@ -639,6 +643,18 @@ export const NavigationView = (props: IFullProps) => {
                               activeMenuItem === WORKQUEUE_TABS.declarationForms
                             }
                           />
+
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.integrations}`}
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.integrations]
+                            )}
+                            onClick={goToIntegrationViewAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.integrations
+                            }
+                          />
                         </>
                       )}
                     </>
@@ -702,6 +718,7 @@ export const Navigation = connect<
   goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
+  goToIntegrationViewAction: goToIntegrationList,
   redirectToAuthentication,
   goToSettings,
   updateRegistrarWorkqueue

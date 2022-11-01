@@ -531,7 +531,7 @@ export const getRoutes = () => {
       handler: getAllSystemsHandler,
       config: {
         tags: ['api'],
-        description: 'Returns all systems '
+        description: 'Returns all systems'
       }
     },
 
