@@ -23,7 +23,8 @@ import {
   goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
   goToTeamSearch,
-  goToTeamUserList
+  goToTeamUserList,
+  goToUserProfile
 } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -56,11 +57,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  GQLHumanName,
-  GQLQuery,
-  GQLUser
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
 import {
@@ -84,6 +81,7 @@ import {
   LoadingIndicator
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
+import { Query as QueryType, User } from '@client/utils/gateway'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -113,6 +111,9 @@ const Loading = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     height: calc(100vh - 104px);
   }
+`
+const LinkButtonWithoutSpacing = styled(LinkButton)`
+  height: auto !important;
 `
 
 const StatusBox = styled.div`
@@ -223,6 +224,7 @@ type BaseProps = {
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
   goToTeamUserList: typeof goToTeamUserList
+  goToUserProfile: typeof goToUserProfile
 }
 
 type IProps = BaseProps &
@@ -236,7 +238,7 @@ interface IStatusProps {
 
 interface ToggleUserActivation {
   modalVisible: boolean
-  selectedUser: GQLUser | null
+  selectedUser: User | null
 }
 
 export const Status = (statusProps: IStatusProps) => {
@@ -279,6 +281,7 @@ function UserListComponent(props: IProps) {
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToTeamSearch,
+    goToUserProfile,
     offlineOffices,
     isOnline,
     location: { search }
@@ -303,7 +306,7 @@ function UserListComponent(props: IProps) {
   )
 
   const toggleUserActivationModal = useCallback(
-    function toggleUserActivationModal(user?: GQLUser) {
+    function toggleUserActivationModal(user?: User) {
       if (user !== undefined) {
         setToggleActivation({
           ...toggleActivation,
@@ -341,7 +344,7 @@ function UserListComponent(props: IProps) {
   )
 
   const getMenuItems = useCallback(
-    function getMenuItems(user: GQLUser) {
+    function getMenuItems(user: User) {
       const menuItems = [
         {
           label: intl.formatMessage(messages.editUserDetailsTitle),
@@ -415,7 +418,7 @@ function UserListComponent(props: IProps) {
     }: {
       userDetails: IUserDetails | null
       locationId: string
-      user: GQLUser
+      user: User
       index: number
       status?: string
       underInvestigation?: boolean
@@ -446,7 +449,7 @@ function UserListComponent(props: IProps) {
 
   const generateUserContents = useCallback(
     function generateUserContents(
-      data: GQLQuery,
+      data: QueryType,
       locationId: string,
       userDetails: IUserDetails | null
     ) {
@@ -455,7 +458,7 @@ function UserListComponent(props: IProps) {
       }
 
       return data.searchUsers.results.map(
-        (user: GQLUser | null, index: number) => {
+        (user: User | null, index: number) => {
           if (user !== null) {
             const name =
               (user &&
@@ -473,8 +476,15 @@ function UserListComponent(props: IProps) {
             const avatar = user.avatar
 
             return {
-              image: <AvatarSmall name={name} avatar={avatar} />,
-              label: <Name>{name}</Name>,
+              image: <AvatarSmall name={name} avatar={avatar || undefined} />,
+              label: (
+                <LinkButtonWithoutSpacing
+                  id="profile-link"
+                  onClick={() => goToUserProfile(String(user.id))}
+                >
+                  {name}
+                </LinkButtonWithoutSpacing>
+              ),
               value: <Value>{role}</Value>,
               actions: (
                 <StatusMenu
@@ -482,8 +492,8 @@ function UserListComponent(props: IProps) {
                   locationId={locationId}
                   user={user}
                   index={index}
-                  status={user.status}
-                  underInvestigation={user.underInvestigation}
+                  status={user.status || undefined}
+                  underInvestigation={user.underInvestigation || false}
                 />
               )
             }
@@ -495,7 +505,7 @@ function UserListComponent(props: IProps) {
         }
       )
     },
-    [StatusMenu, intl]
+    [StatusMenu, intl, goToUserProfile]
   )
 
   const onClickAddUser = useCallback(
@@ -736,6 +746,7 @@ export const UserList = connect(
     goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
     goToTeamSearch,
+    goToUserProfile,
     goToTeamUserList
   }
 )(withTheme(injectIntl(withOnlineStatus(UserListComponent))))

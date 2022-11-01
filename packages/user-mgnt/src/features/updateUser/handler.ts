@@ -29,6 +29,7 @@ import { roleScopeMapping } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 export default async function updateUser(
   request: Hapi.Request,
@@ -37,6 +38,7 @@ export default async function updateUser(
   const user = request.payload as IUser & { id: string }
   const token = request.headers.authorization
   const existingUser: IUserModel | null = await User.findOne({ _id: user.id })
+
   if (!existingUser) {
     throw new Error(`No user found by given id: ${user.id}`)
   }
@@ -150,5 +152,17 @@ export default async function updateUser(
     })
   }
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
+
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
+
+  await postUserActionToMetrics(
+    'EDIT_USER',
+    request.headers.authorization,
+    remoteAddress,
+    userAgent
+  )
   return h.response(resUser).code(201)
 }
