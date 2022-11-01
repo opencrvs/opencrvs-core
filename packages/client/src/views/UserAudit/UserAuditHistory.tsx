@@ -50,13 +50,16 @@ import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
-import format from '@client/utils/date-formatting'
 import {
   IOnlineStatusProps,
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
-import { GetUserAuditLogQuery } from '@client/utils/gateway'
-import { GetLink, IActionDetailsData } from '@client/views/RecordAudit/History'
+import {
+  GetUserAuditLogQuery,
+  UserAuditLogResultItem
+} from '@client/utils/gateway'
+import { GetLink } from '@client/views/RecordAudit/History'
+import { getFormattedDate } from '@client/views/RecordAudit/utils'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 
 const DEFAULT_LIST_SIZE = 10
@@ -151,7 +154,7 @@ type State = {
   sortedColumn: SORTED_COLUMN
   currentPageNumber: number
   showModal: boolean
-  actionDetailsData: Record<string, string>
+  actionDetailsData: UserAuditLogResultItem | null
 }
 
 const isUserAuditItemWithDeclarationDetials = (
@@ -172,7 +175,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
       sortOrder: SORT_ORDER.DESCENDING,
       sortedColumn: SORTED_COLUMN.DATE,
       showModal: false,
-      actionDetailsData: {}
+      actionDetailsData: null
     }
     this.updateViewPort = this.updateViewPort.bind(this)
   }
@@ -319,12 +322,34 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     }
   }
 
-  toggleActionDetails = (actionItem: IActionDetailsData | null) => {
-    actionItem &&
-      this.setState({
-        actionDetailsData: actionItem,
-        showModal: !this.state.showModal
-      })
+  toggleActionDetails = (actionItem: UserAuditLogResultItem | null) => {
+    this.setState({
+      actionDetailsData: actionItem,
+      showModal: !this.state.showModal
+    })
+  }
+
+  getIpAdress(auditLog: UserAuditLogResultItem) {
+    const device = Bowser.getParser(auditLog.userAgent).getResult()
+
+    return (
+      [
+        device.platform.vendor,
+        device.os.name,
+        device.browser ? `(${device.browser.name})` : ''
+      ]
+        .filter(Boolean)
+        .join(' ') +
+      ' • ' +
+      auditLog.ipAddress
+    )
+  }
+
+  getActionMessage(auditLog: UserAuditLogResultItem) {
+    const actionDescriptor = getUserAuditDescription(auditLog.action)
+    return actionDescriptor
+      ? this.props.intl.formatMessage(actionDescriptor)
+      : ''
   }
 
   getAuditData(data: GQLUserAuditLogResultSet) {
@@ -332,22 +357,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
       if (userAuditItem === null) {
         return {}
       }
-      const actionDescriptor = getUserAuditDescription(userAuditItem.action)
-      const actionMessage = actionDescriptor
-        ? this.props.intl.formatMessage(actionDescriptor)
-        : ''
-      const device = Bowser.getParser(userAuditItem.userAgent).getResult()
-
-      const deviceIpAddress =
-        [
-          device.platform.vendor,
-          device.os.name,
-          device.browser ? `(${device.browser.name})` : ''
-        ]
-          .filter(Boolean)
-          .join(' ') +
-        ' • ' +
-        userAuditItem.ipAddress
+      const actionMessage = this.getActionMessage(userAuditItem)
 
       const isSystemAdmin =
         this.props.loggedInUserRole === 'NATIONAL_SYSTEM_ADMIN' ||
@@ -360,30 +370,14 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             <GetLink
               status={actionMessage}
               onClick={() => {
-                this.toggleActionDetails({
-                  ...userAuditItem,
-                  formattedDeviceData: deviceIpAddress,
-                  formattedActionData: format(
-                    new Date(userAuditItem.time),
-                    'MMMM dd, yyyy hh:mm a'
-                  ),
-                  action: actionMessage
-                })
+                this.toggleActionDetails(userAuditItem)
               }}
             />
           ) : !isSystemAdmin ? (
             <GetLink
               status={actionMessage}
               onClick={() => {
-                this.toggleActionDetails({
-                  ...userAuditItem,
-                  formattedDeviceData: deviceIpAddress,
-                  formattedActionData: format(
-                    new Date(userAuditItem.time),
-                    'MMMM dd, yyyy hh:mm a'
-                  ),
-                  action: actionMessage
-                })
+                this.toggleActionDetails(userAuditItem)
               }}
             />
           ) : (
@@ -392,13 +386,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
 
         actionDescriptionWithAuditTime: (
           <AuditDescTimeContainer>
-            <InformationTitle>
-              {(actionDescriptor &&
-                this.props.intl.formatMessage(actionDescriptor)) ||
-                ''}
-            </InformationTitle>
+            <InformationTitle>{actionMessage}</InformationTitle>
             <InformationCaption>
-              {format(new Date(userAuditItem.time), 'MMMM dd, yyyy hh:mm a')}
+              {getFormattedDate(new Date(userAuditItem.time))}
             </InformationCaption>
           </AuditDescTimeContainer>
         ),
@@ -419,11 +409,11 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             <AuditContent>{userAuditItem.data.trackingId}</AuditContent>
           ) : null,
 
-        deviceIpAddress: deviceIpAddress,
+        deviceIpAddress: this.getIpAdress(userAuditItem),
         trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
           ? userAuditItem.data.trackingId
           : null,
-        auditTime: format(new Date(userAuditItem.time), 'MMMM dd, yyyy hh:mm a')
+        auditTime: getFormattedDate(new Date(userAuditItem.time))
       }
     })
     return (
@@ -534,24 +524,30 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                           }
                         />
 
-                        <ResponsiveModal
-                          actions={[]}
-                          handleClose={() => this.toggleActionDetails({})}
-                          show={this.state.showModal}
-                          responsive={true}
-                          title={this.state.actionDetailsData.action}
-                          width={1024}
-                          autoHeight={true}
-                        >
-                          <>
-                            <AuditContent>
-                              {this.props.practitionerName} -{' '}
-                              {this.state.actionDetailsData.formattedActionData}{' '}
-                              {' | '}
-                              {this.state.actionDetailsData.formattedDeviceData}
-                            </AuditContent>
-                          </>
-                        </ResponsiveModal>
+                        {this.state.actionDetailsData && (
+                          <ResponsiveModal
+                            actions={[]}
+                            handleClose={() => this.toggleActionDetails(null)}
+                            show={this.state.showModal}
+                            responsive={true}
+                            title={this.getActionMessage(
+                              this.state.actionDetailsData
+                            )}
+                            width={1024}
+                            autoHeight={true}
+                          >
+                            <>
+                              <AuditContent>
+                                {this.props.practitionerName} -{' '}
+                                {getFormattedDate(
+                                  new Date(this.state.actionDetailsData.time)
+                                )}{' '}
+                                {' | '}
+                                {this.getIpAdress(this.state.actionDetailsData)}
+                              </AuditContent>
+                            </>
+                          </ResponsiveModal>
+                        )}
                       </>
                     )
                   }
