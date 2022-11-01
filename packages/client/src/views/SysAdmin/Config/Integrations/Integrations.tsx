@@ -27,12 +27,14 @@ import { WebhookOption } from '@client/utils/gateway'
 import {
   Alert,
   CheckboxGroup,
+  Divider,
   FormTabs,
   InputField,
   Link,
   Pill,
   Select,
   Spinner,
+  Stack,
   TextInput,
   ToggleMenu
 } from '@client/../../components/lib'
@@ -94,15 +96,16 @@ export function IntegrationList() {
     margin-top: 20px;
   `
 
-  const Border = styled.div`
-    border-top: 1px solid rgb(238, 238, 238);
-    height: 20px;
+  const AlertLink = styled(Link)`
+    text-align: left;
+    ${({ theme }) => theme.fonts.bold17}
   `
 
   const Label = styled.div`
     margin-top: 5px;
   `
   const ClientInfoLabel = styled.div`
+    ${({ theme }) => theme.fonts.bold14};
     color: rgb(0, 0, 0);
     justify-content: left;
   `
@@ -177,7 +180,7 @@ export function IntegrationList() {
           </Link>,
           <Button
             disabled={
-              clientType === '' || clientName === '' || selectedItems === ['']
+              clientType === '' || clientName === '' || selectedItems.length < 1
             }
             onClick={changeModalInfo}
             type="primary"
@@ -256,18 +259,17 @@ export function IntegrationList() {
             </DivSection>
 
             {clientType === 'health-notification' && (
-              <AlertSyled type="warning">
-                A notification client (eg. health systems) sends notification of
-                birth and death to OpenCRVS for processing. {'\n'}
-                Please visit{'\n'}
-                <LinkButton
-                  style={{ textAlign: 'left', fontWeight: 'bold' }}
+              <AlertSyled type="warning" color="tealDark">
+                {intl.formatMessage(
+                  integrationMessages.healthnotificationAlertDescription
+                )}
+                <AlertLink
                   onClick={() => {
                     window.open('https://documentation.opencrvs.org/', '_blank')
                   }}
                 >
                   documentation.opencrvs.org
-                </LinkButton>
+                </AlertLink>
               </AlertSyled>
             )}
 
@@ -275,15 +277,15 @@ export function IntegrationList() {
               clientType === 'record-search' ||
               clientType === 'webhook') && (
               <AlertSyled type="warning">
-                ...Please visit
-                <LinkButton
-                  style={{ textAlign: 'left', fontWeight: 'bold' }}
+                {intl.formatMessage(integrationMessages.otherAlertDescription)}
+                {'\n'}
+                <AlertLink
                   onClick={() => {
                     window.open('https://documentation.opencrvs.org/', '_blank')
                   }}
                 >
                   documentation.opencrvs.org
-                </LinkButton>
+                </AlertLink>
               </AlertSyled>
             )}
 
@@ -312,7 +314,7 @@ export function IntegrationList() {
                   activeTabId={selectedTab}
                   onTabClick={(tabId) => setSelectedTab(tabId)}
                 />
-                <Border></Border>
+                <Divider />
                 {selectedTab === WebhookOption.birth ? (
                   <>
                     <CheckboxGroup
@@ -355,7 +357,7 @@ export function IntegrationList() {
                         setSelectedItems(newValue)
                       }}
                     />
-                    <Border></Border>
+                    <Divider />
 
                     {NoPII && (
                       <CheckboxGroup
@@ -397,16 +399,21 @@ export function IntegrationList() {
                         onChange={(newValue) => setSelectedItemsNoPII(newValue)}
                       />
                     )}
-                    <DivSection
-                      style={{ display: 'flex', alignItems: 'flex-end' }}
-                    >
-                      <Toggle
-                        defaultChecked={!NoPII}
-                        onChange={toggleOnChange}
-                      />
-                      <Label style={{ marginLeft: 5 }}>
-                        {intl.formatMessage(integrationMessages.PIIDataLabel)}
-                      </Label>
+                    <DivSection>
+                      <Stack
+                        alignItems="center"
+                        direction="row"
+                        gap={8}
+                        justifyContent="flex-start"
+                      >
+                        <Toggle
+                          defaultChecked={!NoPII}
+                          onChange={toggleOnChange}
+                        />
+                        <div>
+                          {intl.formatMessage(integrationMessages.PIIDataLabel)}
+                        </div>
+                      </Stack>
                     </DivSection>
                   </>
                 ) : (
@@ -420,15 +427,15 @@ export function IntegrationList() {
         {generateClientInfo && (
           <DivSection>
             <ClientInfoLabel>
-              Client ID
+              {intl.formatMessage(integrationMessages.clientId)}
               <StyledSpinner size={24} id="Spinner" />
             </ClientInfoLabel>
             <ClientInfoLabel>
-              Client secret
+              {intl.formatMessage(integrationMessages.clientSecret)}
               <StyledSpinner size={24} id="Spinner" />
             </ClientInfoLabel>
             <ClientInfoLabel>
-              SHA secret
+              {intl.formatMessage(integrationMessages.shaSecret)}
               <StyledSpinner size={24} id="Spinner" />
             </ClientInfoLabel>
           </DivSection>

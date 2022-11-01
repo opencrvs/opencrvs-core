@@ -178,6 +178,36 @@ const messagesToDefine = {
     id: 'integrations.type.webhook',
     defaultMessage: 'Webhook',
     description: 'Label for web hook'
+  },
+
+  healthnotificationAlertDescription: {
+    id: 'integrations.healthnotificationDescription',
+    defaultMessage:
+      'A notification client (eg. health systems) sends notification of birth and death to OpenCRVS for processing. Please visit',
+    description: 'Label for  health notification description'
+  },
+
+  otherAlertDescription: {
+    id: 'integrations.otherAlertDescription',
+    defaultMessage: '...Please visit',
+    description: 'Label for  health notification description'
+  },
+
+  clientId: {
+    id: 'integrations.clientId',
+    defaultMessage: 'Client ID',
+    description: 'Label for client Id'
+  },
+
+  clientSecret: {
+    id: 'integrations.clientSecret',
+    defaultMessage: 'Client Secret',
+    description: 'Label for client secret'
+  },
+  shaSecret: {
+    id: 'integrations.shaSecret',
+    defaultMessage: 'SHA Secret',
+    description: 'Label for SHA secret'
   }
 }
 
