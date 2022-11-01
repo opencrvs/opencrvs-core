@@ -43,7 +43,7 @@ describe('verify collector tests', () => {
       history: [
         {
           date: '2022-03-21T08:16:24.467+00:00',
-          action: 'REGISTERED',
+          regStatus: 'REGISTERED',
           reinstated: false
         }
       ]
@@ -58,7 +58,7 @@ describe('verify collector tests', () => {
       history: [
         {
           date: '2022-03-21T08:16:24.467+00:00',
-          action: 'REGISTERED',
+          regStatus: 'REGISTERED',
           reinstated: false
         }
       ]

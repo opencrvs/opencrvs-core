@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import React, { useState } from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
 import { useIntl } from 'react-intl'
@@ -23,7 +22,6 @@ import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
 import { Plus, VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { WebhookOption } from '@client/utils/gateway'
-
 import {
   Alert,
   CheckboxGroup,
@@ -45,6 +43,8 @@ import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import styled from 'styled-components'
 import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { connect, useSelector } from 'react-redux'
+import { getOfflineData } from '@client/offline/selectors'
 
 export const statuses = {
   PENDING: 'pending',
@@ -84,8 +84,9 @@ const StyledSpinner = styled(Spinner)`
   margin: 10px 0;
 `
 
-export function IntegrationList() {
+export function Integrations() {
   const intl = useIntl()
+  const offlineData = useSelector(getOfflineData)
   const [showModal, setToggleModal] = React.useState<boolean>(false)
   const [createClientInfo, setCreateClientInfo] = React.useState<boolean>(true)
   const [generateClientInfo, setGenerateClientInfo] =
@@ -140,33 +141,51 @@ export function IntegrationList() {
         {intl.formatMessage(integrationMessages.pageIntroduction)}
 
         <ListViewSimplified>
-          <ListViewItemSimplified
-            actions={
-              <>
-                <Pill label="Active" type="active" />
-                <ToggleMenu
-                  id="toggleMenu"
-                  menuItems={[
-                    {
-                      handler: () => {},
-                      label: intl.formatMessage(integrationMessages.revealKeys)
-                    },
-                    {
-                      handler: () => {},
-                      label: intl.formatMessage(integrationMessages.disable)
-                    },
-                    {
-                      handler: () => {},
-                      label: intl.formatMessage(integrationMessages.delete)
-                    }
-                  ]}
-                  toggleButton={<VerticalThreeDots />}
-                />
-              </>
-            }
-            label="Sweet Health"
-            value="Health Integration"
-          />
+          {offlineData.integrations.map((integration) => (
+            <ListViewItemSimplified
+              actions={
+                <>
+                  {integration.status === 'active' ? (
+                    <Pill
+                      label={intl.formatMessage(integrationMessages.active)}
+                      type="active"
+                    />
+                  ) : (
+                    <Pill
+                      label={intl.formatMessage(integrationMessages.inactive)}
+                      type="inactive"
+                    />
+                  )}
+
+                  <ToggleMenu
+                    id="toggleMenu"
+                    menuItems={[
+                      {
+                        handler: () => {},
+                        label: intl.formatMessage(
+                          integrationMessages.revealKeys
+                        )
+                      },
+                      {
+                        handler: () => {},
+                        label:
+                          integration.status === 'active'
+                            ? intl.formatMessage(integrationMessages.disable)
+                            : intl.formatMessage(integrationMessages.enable)
+                      },
+                      {
+                        handler: () => {},
+                        label: intl.formatMessage(integrationMessages.delete)
+                      }
+                    ]}
+                    toggleButton={<VerticalThreeDots />}
+                  />
+                </>
+              }
+              label={integration.name}
+              value="-"
+            />
+          ))}
         </ListViewSimplified>
       </Content>
       <ResponsiveModal
@@ -443,3 +462,5 @@ export function IntegrationList() {
     </Frame>
   )
 }
+
+export const IntegrationList = connect()(Integrations)

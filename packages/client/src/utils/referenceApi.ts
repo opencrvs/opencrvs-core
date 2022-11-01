@@ -47,9 +47,11 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
-interface IIntegration {
+export interface Integration {
   name: string
   status: string
+  client_id: string
+  sha_secret: string
 }
 export interface IApplicationConfig {
   APPLICATION_NAME: string
@@ -78,12 +80,12 @@ export interface IApplicationConfig {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
-  INTEGRATIONS?: [IIntegration]
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
   certificates: ICertificateTemplateData[]
   formConfig: IFormConfig
+  integrations: Integration[]
 }
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {

@@ -21,7 +21,11 @@ import {
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
+import {
+  IApplicationConfig,
+  Integration,
+  referenceApi
+} from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { IFormConfig } from '@client/forms'
@@ -75,6 +79,7 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
+  integrations: Integration[]
 
   config: IApplicationConfig
   formConfig: IFormConfig
@@ -381,7 +386,7 @@ function reducer(
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, formConfig } = action.payload
+      const { certificates, config, formConfig, integrations } = action.payload
       merge(window.config, config)
       let newOfflineData
       const birthCertificateTemplate = certificates.find(
@@ -411,6 +416,7 @@ function reducer(
           ...state.offlineData,
           config,
           formConfig,
+          integrations,
           templates: {
             certificates: certificatesTemplates
           }
@@ -420,6 +426,7 @@ function reducer(
           ...state.offlineData,
           config,
           formConfig,
+          integrations,
 
           // Field agents do not get certificate templates from the config service.
           // Our loading logic depends on certificates being present and the app would load infinitely

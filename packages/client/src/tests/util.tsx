@@ -1909,7 +1909,8 @@ export const mockFetchCertificatesTemplatesDefinition = [
 export const mockConfigResponse = {
   config: mockOfflineData.config,
   certificates: mockFetchCertificatesTemplatesDefinition,
-  formConfig: mockOfflineData.formConfig
+  formConfig: mockOfflineData.formConfig,
+  integrations: mockOfflineData.integrations
 }
 
 export const mockOfflineDataDispatch = {
@@ -1921,7 +1922,8 @@ export const mockOfflineDataDispatch = {
   offices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
-  formConfig: mockOfflineData.formConfig
+  formConfig: mockOfflineData.formConfig,
+  integrations: mockOfflineData.integrations
 }
 
 export async function createTestStore() {
@@ -2262,4 +2264,8 @@ export function createRouterProps<
   return { location, history, match }
 }
 
-export { mockOfflineData } from './mock-offline-data'
+export {
+  mockOfflineData,
+  mockOfflineDataWithLocationHierarchy,
+  mockOfflineLocationsWithHierarchy
+} from './mock-offline-data'

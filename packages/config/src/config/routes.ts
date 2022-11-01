@@ -21,7 +21,6 @@ import {
 } from '@config/handlers/certificate/certificateHandler'
 import configHandler, {
   getLoginConfigHandler,
-  getIntegrationConfigHandler,
   updateApplicationConfig,
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
@@ -46,6 +45,7 @@ import {
   deleteFormDraftHandler,
   requestSchema as deleteFormDraftReqSchema
 } from '@config/handlers/formDraft/deleteFormDraft/handler'
+import getSystems from '@config/handlers/system/systemHandler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -108,10 +108,10 @@ export default function getRoutes() {
     {
       method: 'GET',
       path: '/integrationConfig',
-      handler: getIntegrationConfigHandler,
+      handler: getSystems,
       config: {
         tags: ['api'],
-        description: 'Retrieve Application integration configuration'
+        description: 'Retrieve Application integrations'
       }
     },
     {

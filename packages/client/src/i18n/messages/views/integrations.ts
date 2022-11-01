@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
@@ -50,12 +49,16 @@ const messagesToDefine = {
     defaultMessage: 'Disable',
     description: 'Label for disable option'
   },
+  enable: {
+    id: 'integrations.enable',
+    defaultMessage: 'Enable',
+    description: 'Label for enable option'
+  },
   delete: {
     id: 'integrations.delete',
     defaultMessage: 'Delete',
     description: 'Label for delete option'
   },
-
   name: {
     id: 'integrations.name',
     defaultMessage: 'Name',
@@ -208,6 +211,16 @@ const messagesToDefine = {
     id: 'integrations.shaSecret',
     defaultMessage: 'SHA Secret',
     description: 'Label for SHA secret'
+  },
+  active: {
+    id: 'integrations.active',
+    defaultMessage: 'Active',
+    description: 'Label for active integration'
+  },
+  inactive: {
+    id: 'integrations.inactive',
+    defaultMessage: 'Inactive',
+    description: 'Label for inactive integration'
   }
 }
 

@@ -483,7 +483,6 @@ export interface GQLApplicationConfiguration {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
-  INTEGRATIONS?: Array<GQLIntegration | null>
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -498,7 +497,6 @@ export interface GQLApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
-  INTEGRATIONS?: Array<GQLIntegrationInput | null>
 }
 
 export interface GQLFormDraftInput {
@@ -954,11 +952,6 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
-export interface GQLIntegration {
-  name?: string
-  status?: string
-}
-
 export interface GQLBirthInput {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
@@ -978,11 +971,6 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
-}
-
-export interface GQLIntegrationInput {
-  name?: string
-  status?: string
 }
 
 export interface GQLQuestionInput {
@@ -1438,7 +1426,6 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
-  Integration?: GQLIntegrationTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -3909,7 +3896,6 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
-  INTEGRATIONS?: ApplicationConfigurationToINTEGRATIONSResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -3983,13 +3969,6 @@ export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
 }
 
 export interface ApplicationConfigurationToADDRESSESResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToINTEGRATIONSResolver<
   TParent = any,
   TResult = any
 > {
@@ -4966,19 +4945,6 @@ export interface DeathToREGISTRATION_TARGETResolver<
 }
 
 export interface DeathToFEEResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLIntegrationTypeResolver<TParent = any> {
-  name?: IntegrationToNameResolver<TParent>
-  status?: IntegrationToStatusResolver<TParent>
-}
-
-export interface IntegrationToNameResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface IntegrationToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

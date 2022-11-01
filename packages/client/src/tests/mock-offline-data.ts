@@ -14,6 +14,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { CustomFieldType, DraftStatus, Event } from '@client/utils/gateway'
+import { ILocation } from '@client/offline/reducer'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -102,6 +103,8 @@ export const formConfig: IFormConfig = {
     }
   ]
 }
+
+export const integrations = []
 
 export const mockConditionals = {
   presentAtBirthRegistration: {
@@ -681,5 +684,67 @@ export const mockOfflineData = {
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
     ADDRESSES: 1
   },
-  formConfig
+  formConfig,
+  integrations
+}
+
+export const mockOfflineLocationsWithHierarchy: Record<
+  string,
+  Record<string, ILocation>
+> = {
+  facilities: {
+    '5c6abc88-26b8-4834-a1a6-2992807e3a72': {
+      id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
+      name: 'ARK Private Clinic',
+      alias: 'ARK Private Clinic',
+      address: '',
+      physicalType: 'Building',
+      type: 'HEALTH_FACILITY',
+      partOf: 'Location/f244b79e-16e7-40b2-834f-c1c57bd7eae8'
+    }
+  },
+  offices: {
+    'c9c4d6e9-981c-4646-98fe-4014fddebd5e': {
+      id: 'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
+      name: 'Ibombo District Office',
+      alias: 'Ibombo District Office',
+      address: 'Ibombo District, Central Province',
+      physicalType: 'Building',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f'
+    }
+  },
+  locations: {
+    'f244b79e-16e7-40b2-834f-c1c57bd7eae8': {
+      id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
+      name: 'Abwe',
+      alias: 'Abwe',
+      physicalType: 'Jurisdiction',
+      jurisdictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
+    },
+    'ecc5a78b-e7d9-4640-ac65-e591a6a9590f': {
+      id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
+      name: 'Ibombo',
+      alias: 'Ibombo',
+      physicalType: 'Jurisdiction',
+      jurisdictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
+    },
+    'df669feb-61a3-4984-ab24-4b28511b472a': {
+      id: 'df669feb-61a3-4984-ab24-4b28511b472a',
+      name: 'Central',
+      alias: 'Central',
+      physicalType: 'Jurisdiction',
+      jurisdictionType: 'STATE',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    }
+  }
+}
+export const mockOfflineDataWithLocationHierarchy = {
+  ...mockOfflineData,
+  ...mockOfflineLocationsWithHierarchy
 }
