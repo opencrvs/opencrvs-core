@@ -530,8 +530,7 @@ export const getRoutes = () => {
       path: '/fetchVSExport',
       handler: getAllVSExport,
       config: {
-        tags: ['api'],
-        auth: false
+        tags: ['api']
       }
     },
     // used for tests to check JWT auth
