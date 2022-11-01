@@ -37,7 +37,7 @@ import {
   Stack,
   TextInput,
   ToggleMenu
-} from '@client/../../components/lib'
+} from '@opencrvs/components/lib'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { Button } from '@client/../../components/lib/Button'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
@@ -53,6 +53,37 @@ export const statuses = {
   DISABLED: 'disabled',
   DEACTIVATED: 'deactivated'
 }
+
+const AlertSyled = styled(Alert)`
+  margin-top: 30px;
+  min-height: 5rem;
+`
+const TextInputStyled = styled(TextInput)`
+  width: 100%;
+`
+
+const SelectOptionStyled = styled(Select)`
+  width: 100%;
+`
+const DivSection = styled.div`
+  margin-top: 20px;
+`
+
+const AlertLink = styled(Link)`
+  text-align: left;
+`
+
+const Label = styled.div`
+  margin-top: 5px;
+`
+const ClientInfoLabel = styled.div`
+  ${({ theme }) => theme.fonts.bold14};
+  color: rgb(0, 0, 0);
+  justify-content: left;
+`
+const StyledSpinner = styled(Spinner)`
+  margin: 10px 0;
+`
 
 export function IntegrationList() {
   const intl = useIntl()
@@ -79,38 +110,6 @@ export function IntegrationList() {
     setCreateClientInfo(!createClientInfo)
     setGenerateClientInfo(!generateClientInfo)
   }
-
-  const AlertSyled = styled(Alert)`
-    margin-top: 30px;
-    min-height: 5rem;
-  `
-  const TextInputStyled = styled(TextInput)`
-    width: 100%;
-  `
-
-  const SelectOptionStyled = styled(Select)`
-    width: 100%;
-  `
-  const DivSection = styled.div`
-    margin-top: 20px;
-  `
-
-  const AlertLink = styled(Link)`
-    text-align: left;
-    ${({ theme }) => theme.fonts.bold17}
-  `
-
-  const Label = styled.div`
-    margin-top: 5px;
-  `
-  const ClientInfoLabel = styled.div`
-    ${({ theme }) => theme.fonts.bold14};
-    color: rgb(0, 0, 0);
-    justify-content: left;
-  `
-  const StyledSpinner = styled(Spinner)`
-    margin: 10px 0;
-  `
 
   const onChangeText = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = String(event.target.value)
@@ -266,6 +265,7 @@ export function IntegrationList() {
                   onClick={() => {
                     window.open('https://documentation.opencrvs.org/', '_blank')
                   }}
+                  font="bold16"
                 >
                   documentation.opencrvs.org
                 </AlertLink>
@@ -282,6 +282,7 @@ export function IntegrationList() {
                   onClick={() => {
                     window.open('https://documentation.opencrvs.org/', '_blank')
                   }}
+                  font="bold16"
                 >
                   documentation.opencrvs.org
                 </AlertLink>
