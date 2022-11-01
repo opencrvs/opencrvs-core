@@ -81,7 +81,6 @@ export function IntegrationList() {
   }
 
   const AlertSyled = styled(Alert)`
-    --color: rgb(56, 162, 157);
     margin-top: 30px;
     min-height: 5rem;
   `
@@ -259,7 +258,7 @@ export function IntegrationList() {
             </DivSection>
 
             {clientType === 'health-notification' && (
-              <AlertSyled type="warning" color="tealDark">
+              <AlertSyled type="info">
                 {intl.formatMessage(
                   integrationMessages.healthnotificationAlertDescription
                 )}
@@ -276,7 +275,7 @@ export function IntegrationList() {
             {(clientType === 'mosip' ||
               clientType === 'record-search' ||
               clientType === 'webhook') && (
-              <AlertSyled type="warning">
+              <AlertSyled type="info">
                 {intl.formatMessage(integrationMessages.otherAlertDescription)}
                 {'\n'}
                 <AlertLink
