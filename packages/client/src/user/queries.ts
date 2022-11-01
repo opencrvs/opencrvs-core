@@ -25,6 +25,7 @@ export const SEARCH_USERS = gql`
         }
         username
         role
+        mobile
         type
         status
         underInvestigation

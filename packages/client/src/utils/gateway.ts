@@ -974,9 +974,11 @@ export type Mutation = {
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
   resendSMSInvite?: Maybe<Scalars['String']>
+  resetPasswordSMS?: Maybe<Scalars['String']>
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
+  usernameSMSReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
 
@@ -1120,6 +1122,11 @@ export type MutationResendSmsInviteArgs = {
   userId: Scalars['String']
 }
 
+export type MutationResetPasswordSmsArgs = {
+  applicationName: Scalars['String']
+  userId: Scalars['String']
+}
+
 export type MutationUpdateApplicationConfigArgs = {
   applicationConfig?: InputMaybe<ApplicationConfigurationInput>
 }
@@ -1132,6 +1139,10 @@ export type MutationUpdateBirthRegistrationArgs = {
 export type MutationUpdateDeathRegistrationArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
+}
+
+export type MutationUsernameSmsReminderArgs = {
+  userId: Scalars['String']
 }
 
 export type MutationVoidNotificationArgs = {
@@ -2311,6 +2322,15 @@ export type ResendSmsInviteMutation = {
   resendSMSInvite?: string | null
 }
 
+export type UsernameSmsReminderMutationVariables = Exact<{
+  userId: Scalars['String']
+}>
+
+export type UsernameSmsReminderMutation = {
+  __typename?: 'Mutation'
+  usernameSMSReminder?: string | null
+}
+
 export type SearchUsersQueryVariables = Exact<{
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
@@ -2327,6 +2347,7 @@ export type SearchUsersQuery = {
       id?: string | null
       username?: string | null
       role?: string | null
+      mobile?: string | null
       type?: string | null
       status?: string | null
       underInvestigation?: boolean | null

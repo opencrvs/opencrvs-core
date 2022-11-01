@@ -21,5 +21,6 @@ export const messageKeys = {
   authenticationCodeNotification: 'authenticationCodeNotification',
   userCredentialsNotification: 'userCredentialsNotification',
   retieveUserNameNotification: 'retieveUserNameNotification',
-  updateUserNameNotification: 'updateUserNameNotification'
+  updateUserNameNotification: 'updateUserNameNotification',
+  resetUserPasswordNotification: 'resetUserPasswordNotification'
 }
