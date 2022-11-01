@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Cursor, MongoClient } from 'mongodb'
+import { FindCursor, Document, MongoClient } from 'mongodb'
 import { createObjectCsvWriter as createCSV } from 'csv-writer'
 
 const HEARTH_MONGO_URL = process.env.HEARTH_MONGO_URL || 'mongodb://localhost'
@@ -159,6 +159,17 @@ const connect = async () => {
   } catch (err) {
     // tslint:disable-next-line
     console.log('Error occured while connecting to mongoDB', err)
+  }
+}
+
+const Disconnect = async () => {
+  try {
+    await client.close()
+    // tslint:disable-next-line
+    console.log('Disconnected to mongoDB')
+  } catch (err) {
+    // tslint:disable-next-line
+    console.log('Error occured while disconnecting to mongoDB', err)
   }
 }
 
@@ -634,7 +645,7 @@ async function createDeathDeclarationCSVWriter() {
 }
 
 async function makeCompositionAndExportCSVReport(
-  compositionsCursor: Cursor<any>,
+  compositionsCursor: FindCursor<Document>,
   locations: fhir.Location[]
 ) {
   const birthCSVWriter = await createBirthDeclarationCSVWriter()
@@ -757,8 +768,6 @@ async function makeCompositionAndExportCSVReport(
         birthRow.presentAtBirthReg =
           fullComposition.observations?.presentAtBirthReg ?? ''
 
-        // tslint:disable-next-line
-        console.log('Writing CSV row for birth declaration...')
         await birthCSVWriter.writeRecords([birthRow])
       } else if (fullComposition.event === 'Death') {
         const deathRow: IDeathRow = {
@@ -853,6 +862,7 @@ const startScript = async () => {
     []
   )
   await makeCompositionAndExportCSVReport(compositionsCursor, locations)
+  await Disconnect()
   process.exit()
 }
 
