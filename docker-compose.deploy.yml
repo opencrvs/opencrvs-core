@@ -265,12 +265,12 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
     ports:
-      - '3535:9000'
-      - '3536:9001'
+      - '3535:3535'
+      - '3536:3536'
     volumes:
       - '/data/minio:/data/minio'
       - '/data/backups/minio:/data/backups/minio'
-    command: server --address ":9000" --console-address ":9001" /data/minio
+    command: server --address ":3535" --console-address ":3536" /data/minio
     deploy:
       labels:
         - 'traefik.enable=true'
