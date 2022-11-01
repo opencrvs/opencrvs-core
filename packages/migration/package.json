@@ -12,6 +12,7 @@
     "create:openhim": "migrate-mongo create -f migrate-mongo-config-openhim.js",
     "status:hearth": "migrate-mongo status -f migrate-mongo-config-hearth.js",
     "status:openhim": "migrate-mongo status -f migrate-mongo-config-openhim.js",
+    "down:hearth": "migrate-mongo down",
     "precommit": "lint-staged"
   },
   "dependencies": {
