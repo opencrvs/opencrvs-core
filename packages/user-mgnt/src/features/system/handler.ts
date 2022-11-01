@@ -305,10 +305,9 @@ export async function getSystemHandler(
   }
 
   const systemName = system.name
-  const createdBy = system.createdBy
   return {
-    name: systemName || createdBy,
-    createdBy: createdBy,
+    name: systemName || system.createdBy,
+    createdBy: system.createdBy,
     client_id: system.client_id,
     username: system.username,
     status: system.status,
@@ -325,11 +324,9 @@ export async function getAllSystemsHandler() {
   const systems: ISystemModel[] = await System.find()
 
   return systems.map((system) => {
-    const systemName = system.name
-
     return {
       client_id: system.client_id,
-      name: systemName,
+      name: system.name,
       sha_secret: system.sha_secret,
       status: system.status
     }
