@@ -97,7 +97,7 @@ export interface IFormConfig {
 
 export interface ISelectOption {
   value: SelectComponentOption['value']
-  label: MessageDescriptor
+  label: MessageDescriptor | string
 }
 export interface IRadioOption {
   value: RadioComponentOption['value']
@@ -106,6 +106,7 @@ export interface IRadioOption {
 }
 export interface IAccordionOption {
   value: string
+  label: MessageDescriptor
 }
 export interface ICheckboxOption {
   value: CheckboxComponentOption['value']
@@ -442,7 +443,7 @@ export interface IFormFieldBase {
   extraValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: MessageDescriptor
-  placeholder?: MessageDescriptor
+  placeholder?: MessageDescriptor | string
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
   hideHeader?: boolean
@@ -517,6 +518,8 @@ export interface IAccordionWithNestedFieldsFormField extends IFormFieldBase {
   type: typeof ACCORDION_WITH_NESTED_FIELDS
   options: IAccordionOption[]
   nestedFields: INestedInputFields
+  hideLabel: string
+  showLabel: string
 }
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
@@ -641,13 +644,13 @@ export interface IQueryMap {
 }
 export interface ILoaderButton extends IFormFieldBase {
   type: typeof FETCH_BUTTON
-  queryMap: IQueryMap
+  queryMap?: IQueryMap
   queryData?: IQuery
-  querySelectorInput: IFieldInput
+  querySelectorInput?: IFieldInput
   onFetch?: (response: any) => void
-  modalTitle: MessageDescriptor
-  successTitle: MessageDescriptor
-  errorTitle: MessageDescriptor
+  modalTitle?: MessageDescriptor
+  successTitle?: MessageDescriptor
+  errorTitle?: MessageDescriptor
 }
 
 export type IFormField =
@@ -910,6 +913,10 @@ export enum UserSection {
   Preview = 'preview'
 }
 
+export enum AdvancedSearchSection {
+  Birth = 'birth'
+}
+
 export enum CertificateSection {
   Collector = 'collector',
   CollectCertificate = 'collectCertificate',
@@ -1004,6 +1011,8 @@ export interface Ii18nFormFieldBase {
   name: string
   type: string
   label: string
+  showLabel?: string
+  hideLabel?: string
   helperText?: string
   tooltip?: string
   description?: string
@@ -1265,7 +1274,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     FIELD_WITH_DYNAMIC_DEFINITIONS: messages.fieldWithDynamicDefinition,
     RADIO_GROUP: messages.radioGroup,
     RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
-    ACCORDION_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
+    ACCORDION_WITH_NESTED_FIELDS: messages.accordionWithNestedField,
     INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
     CHECKBOX_GROUP: messages.checkboxGroup,
     CHECKBOX: messages.checkbox,

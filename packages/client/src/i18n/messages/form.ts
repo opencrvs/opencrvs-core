@@ -379,6 +379,8 @@ interface IFormMessages
   informantSecondaryAddress: MessageDescriptor
   emptyStringForSubSection: MessageDescriptor
   assignedResponsibilityProof: MessageDescriptor
+  showLabel: MessageDescriptor
+  hideLabel: MessageDescriptor
 }
 
 export const formMessageDescriptors: IFormMessages = {
@@ -2283,6 +2285,16 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: ' ',
     description: 'empty string',
     id: 'form.field.label.empty'
+  },
+  showLabel: {
+    defaultMessage: 'Show',
+    description: 'Show label for accordion component',
+    id: 'form.field.showLabel'
+  },
+  hideLabel: {
+    defaultMessage: 'Hide',
+    description: 'Hide label for accordion component',
+    id: 'form.field.hideLabel'
   }
 }
 

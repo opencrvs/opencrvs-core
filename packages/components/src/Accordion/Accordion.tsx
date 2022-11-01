@@ -113,6 +113,8 @@ export interface IAccordionOption {
 export interface IAccordionProps {
   name: string
   label: string
+  showLabel: string
+  hideLabel: string
   options: IAccordionOption[]
   value: string
   nestedFields: { [key: string]: JSX.Element[] }
@@ -122,6 +124,8 @@ export interface IAccordionProps {
 export const Accordion = ({
   name,
   label,
+  showLabel,
+  hideLabel,
   options,
   value,
   nestedFields,
@@ -131,7 +135,11 @@ export const Accordion = ({
     <Container>
       <h2>{label}</h2>
       <details onToggle={() => onChange(value)}>
-        <Summary id={name} data-open="Hide" data-close="Show"></Summary>
+        <Summary
+          id={name}
+          data-open={hideLabel}
+          data-close={showLabel}
+        ></Summary>
         <List>
           {options.map((option, index) => {
             return (

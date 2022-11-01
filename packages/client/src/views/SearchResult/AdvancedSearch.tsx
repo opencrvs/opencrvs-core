@@ -19,17 +19,68 @@ import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
 
-import { Content, FormTabs } from '@client/../../components/lib'
+import { Content, FormTabs, Text } from '@client/../../components/lib'
+import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import {
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup
+} from '@client/forms'
+import { advancedSearchBirthSectionFormType } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
+import { PrimaryButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages'
+import { IOfflineData } from '@client/offline/reducer'
+
 export enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
 
-function BirthTabContent() {
-  return <>Birth</>
+type IProps = {
+  userId?: string
+  section: IFormSection
+  formData: IFormSectionData
+  activeGroup: IFormSectionGroup
+  nextSectionId: string
+  nextGroupId: string
+  offlineCountryConfig: IOfflineData
 }
 
-function DeathTabContent() {
+const BirthTabContent = () => {
+  return <BirthSection />
+}
+
+const BirthSection = () => {
+  const intl = useIntl()
+  return (
+    <>
+      <Text element={'p'} variant={'reg18'}>
+        {intl.formatMessage(messages.advancedSearchInstruction)}
+      </Text>
+      <FormFieldGenerator
+        id={'o'}
+        onChange={(values) => {
+          //  modifyDeclaration(values, section, declaration)
+        }}
+        setAllFieldsDirty={false}
+        fields={advancedSearchBirthSectionFormType.fields}
+      />
+
+      <PrimaryButton
+        icon={() => <Icon name={'Search'} />}
+        align={ICON_ALIGNMENT.LEFT}
+        id="search"
+        key="search"
+        // onClick={}
+      >
+        {intl.formatMessage(buttonMessages.search)}
+      </PrimaryButton>
+    </>
+  )
+}
+
+const DeathTabContent = () => {
   return <>Death</>
 }
 
