@@ -25,6 +25,8 @@ import { Pill, ToggleMenu } from '@client/../../components/lib'
 import { constantsMessages } from '@client/i18n/messages'
 import { Button } from '@client/../../components/lib/Button'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import { connect, useSelector } from 'react-redux'
+import { getOfflineData } from '@client/offline/selectors'
 
 export const statuses = {
   PENDING: 'pending',
@@ -33,8 +35,9 @@ export const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
-export function IntegrationList() {
+function Integrations() {
   const intl = useIntl()
+  const offlineData = useSelector(getOfflineData)
 
   return (
     <Frame
@@ -54,35 +57,41 @@ export function IntegrationList() {
       >
         {intl.formatMessage(integrationMessages.pageIntroduction)}
         <ListViewSimplified>
-          <ListViewItemSimplified
-            actions={
-              <>
-                <Pill label="Active" type="active" />
-                <ToggleMenu
-                  id="toggleMenu"
-                  menuItems={[
-                    {
-                      handler: () => {},
-                      label: intl.formatMessage(integrationMessages.revealKeys)
-                    },
-                    {
-                      handler: () => {},
-                      label: intl.formatMessage(integrationMessages.disable)
-                    },
-                    {
-                      handler: () => {},
-                      label: intl.formatMessage(integrationMessages.delete)
-                    }
-                  ]}
-                  toggleButton={<VerticalThreeDots />}
-                />
-              </>
-            }
-            label="Sweet Health"
-            value="Health Integration"
-          />
+          {offlineData.integrations.map((integration) => (
+            <ListViewItemSimplified
+              actions={
+                <>
+                  <Pill label="Active" type="active" />
+                  <ToggleMenu
+                    id="toggleMenu"
+                    menuItems={[
+                      {
+                        handler: () => {},
+                        label: intl.formatMessage(
+                          integrationMessages.revealKeys
+                        )
+                      },
+                      {
+                        handler: () => {},
+                        label: intl.formatMessage(integrationMessages.disable)
+                      },
+                      {
+                        handler: () => {},
+                        label: intl.formatMessage(integrationMessages.delete)
+                      }
+                    ]}
+                    toggleButton={<VerticalThreeDots />}
+                  />
+                </>
+              }
+              label={integration.name}
+              value="-"
+            />
+          ))}
         </ListViewSimplified>
       </Content>
     </Frame>
   )
 }
+
+export const IntegrationList = connect()(Integrations)
