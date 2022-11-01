@@ -18,6 +18,12 @@ const messagesToDefine = {
     description: 'Label for the button creating client'
   },
 
+  pageTitle: {
+    id: 'integrations.pageTitle',
+    defaultMessage: 'Integrations',
+    description: 'Title for integrations page'
+  },
+
   pageIntroduction: {
     id: 'integrations.pageIntroduction',
     defaultMessage:

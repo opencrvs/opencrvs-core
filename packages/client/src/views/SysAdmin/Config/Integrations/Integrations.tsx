@@ -12,7 +12,6 @@
 import React, { useState } from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
 import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/formConfig'
 import {
   ListViewItemSimplified,
   ListViewSimplified
@@ -103,7 +102,7 @@ export function Integrations() {
   const [NoPII, setSelected] = React.useState(false)
 
   const toggleModal = () => {
-    setToggleModal((prev: any) => !prev)
+    setToggleModal((prev) => !prev)
   }
 
   const changeModalInfo = () => {
@@ -113,9 +112,7 @@ export function Integrations() {
 
   const onChangeText = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = String(event.target.value)
-    if (!value.includes('.') && !/^\d+$/.test(value)) {
-      setClientName(value)
-    }
+    setClientName(value)
   }
 
   const toggleOnChange = () => {
@@ -131,7 +128,7 @@ export function Integrations() {
       )}
     >
       <Content
-        title={intl.formatMessage(messages.integrations)}
+        title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
           <Button type="secondary" onClick={toggleModal}>
             <Plus /> {intl.formatMessage(integrationMessages.createClient)}
@@ -191,7 +188,6 @@ export function Integrations() {
       <ResponsiveModal
         actions={[
           <Link onClick={toggleModal}>
-            {' '}
             {intl.formatMessage(buttonMessages.cancel)}
           </Link>,
           <Button
