@@ -50,6 +50,8 @@ export interface ICurrency {
 export interface Integration {
   name: string
   status: string
+  client_id: string
+  sha_secret: string
 }
 export interface IApplicationConfig {
   APPLICATION_NAME: string
