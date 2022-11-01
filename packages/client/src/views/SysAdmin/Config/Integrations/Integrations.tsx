@@ -21,7 +21,7 @@ import {
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
-import { Plus, VerticalThreeDots } from '@client/../../components/lib/icons'
+import { Plus, VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { WebhookOption } from '@client/utils/gateway'
 
 import {
@@ -39,12 +39,11 @@ import {
   ToggleMenu
 } from '@opencrvs/components/lib'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { Button } from '@client/../../components/lib/Button'
+import { Button } from '@opencrvs/components/lib/Button'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import styled from 'styled-components'
-import { LinkButton } from '@client/../../components/lib/buttons'
-import { Toggle } from '@client/../../components/lib/Toggle'
+import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 export const statuses = {
