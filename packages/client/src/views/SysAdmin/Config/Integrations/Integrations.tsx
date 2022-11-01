@@ -61,7 +61,18 @@ function Integrations() {
             <ListViewItemSimplified
               actions={
                 <>
-                  <Pill label="Active" type="active" />
+                  {integration.status === 'active' ? (
+                    <Pill
+                      label={intl.formatMessage(integrationMessages.active)}
+                      type="active"
+                    />
+                  ) : (
+                    <Pill
+                      label={intl.formatMessage(integrationMessages.inactive)}
+                      type="inactive"
+                    />
+                  )}
+
                   <ToggleMenu
                     id="toggleMenu"
                     menuItems={[
@@ -73,7 +84,10 @@ function Integrations() {
                       },
                       {
                         handler: () => {},
-                        label: intl.formatMessage(integrationMessages.disable)
+                        label:
+                          integration.status === 'active'
+                            ? intl.formatMessage(integrationMessages.disable)
+                            : intl.formatMessage(integrationMessages.enable)
                       },
                       {
                         handler: () => {},
