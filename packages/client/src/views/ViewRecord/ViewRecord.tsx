@@ -12,9 +12,9 @@
 
 import React from 'react'
 import {
+  createReviewDeclaration,
   IDeclaration,
-  SUBMISSION_STATUS,
-  createReviewDeclaration
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
@@ -22,59 +22,24 @@ import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
 import { goBack } from '@client/navigation'
 import { Event } from '@client/utils/gateway'
+import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/Button'
-import {
-  Alert,
-  AppBar,
-  BodyContent,
-  DocumentViewer,
-  Frame,
-  FullBodyContent,
-  InputField,
-  ListViewItemSimplified,
-  ListViewSimplified,
-  ResponsiveModal,
-  Spinner,
-  TextArea
-} from '@opencrvs/components'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
+import { AppBar, Frame, Spinner } from '@opencrvs/components'
+import { messages } from '@client/i18n/messages/views/review'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { getReviewForm } from '@client/forms/register/review-selectors'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import { FETCH_VIEW_RECORD_BY_COMPOSITION } from '@client/views/ViewRecord/query'
-import { Box } from '@opencrvs/components/lib/Box/Box'
-import styled from '@client/styledComponents'
-import { ReviewHeader } from '@client/views/RegisterForm/review/ReviewHeader'
-import { messages } from '@client/i18n/messages/views/review'
-import {
-  LinkButton,
-  PrimaryButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
-import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
-import { bytesToSize, isCorrection } from '@client/views/CorrectionForm/utils'
-import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
-import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
-import { ReviewAction } from '@client/components/form/ReviewActionComponent'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
 
-const getDeclarationIconColor = (declaration: IDeclaration): string => {
-  return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
-    ? 'purple'
-    : declaration.registrationStatus
-    ? STATUSTOCOLOR[declaration.registrationStatus]
-    : 'orange'
-}
-
-const Row = styled.div`
+const Container = styled.div`
   height: 100%;
-  margin-top: 20px;
   padding: 30px;
   display: flex;
   flex: 1;
@@ -82,19 +47,8 @@ const Row = styled.div`
     flex-direction: column;
   }
 `
-const RightColumn = styled.div`
-  width: 40%;
-  height: 90%;
-  border-radius: 4px;
-  margin-left: 24px;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
-
-const LeftColumn = styled.div`
+const FormPreview = styled.div`
   width: 60%;
   background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -107,9 +61,31 @@ const LeftColumn = styled.div`
     border: 0;
   }
 `
+
+const DocumentPreview = styled.div`
+  height: 90%;
+  width: 40%;
+  border-radius: 4px;
+  margin-left: 24px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
+
 const SpinnerWrapper = styled.div`
   padding: 10px;
 `
+
+const getDeclarationIconColor = (declaration: IDeclaration): string => {
+  return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
+    ? 'purple'
+    : declaration.registrationStatus
+    ? STATUSTOCOLOR[declaration.registrationStatus]
+    : 'orange'
+}
+
 const LoadingState = () => {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -141,14 +117,14 @@ const LoadingState = () => {
         constantsMessages.skipToMainContent
       )}
     >
-      <Row>
-        <LeftColumn>
+      <Container>
+        <FormPreview>
           <SpinnerWrapper>
             <Spinner id={'view-record-spinner'} size={24} />
           </SpinnerWrapper>
-        </LeftColumn>
-        <RightColumn></RightColumn>
-      </Row>
+        </FormPreview>
+        <DocumentPreview></DocumentPreview>
+      </Container>
     </Frame>
   )
 }
@@ -170,13 +146,13 @@ export const ViewRecord = () => {
   if (error) return <GenericErrorToast />
 
   const eventType =
-    data?.fetchRegistration?.__typename === 'BirthRegistration'
+    data?.fetchRegistrationForViewing?.__typename === 'BirthRegistration'
       ? Event.Birth
       : Event.Death
-  const eventData = data?.fetchRegistration
+  const eventData = data?.fetchRegistrationForViewing
   const transData: IFormData = gqlToDraftTransformer(
     form[eventType],
-    data?.fetchRegistration,
+    data?.fetchRegistrationForViewing,
     offlineData,
     userDetails!
   )
@@ -192,8 +168,9 @@ export const ViewRecord = () => {
     eventType,
     downloadedAppStatus
   )
-  const declarationType = declaration?.event === Event.Death ? 'Death' : 'Birth'
-  const headerTitle = declarationType + ' declaration'
+  const headerTitle = intl.formatMessage(messages.headerSubjectWithoutName, {
+    eventType: eventType
+  })
   const iconColor = getDeclarationIconColor(declaration)
 
   return (
@@ -229,6 +206,7 @@ export const ViewRecord = () => {
       )}
     >
       <ReviewSection
+        viewRecord
         submitClickEvent={() => {}}
         pageRoute={''}
         draft={declaration}

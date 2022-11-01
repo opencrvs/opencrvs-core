@@ -1637,7 +1637,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </SectionContainer>
                 )
               })}
-              {!isCorrection(declaration) && (
+              {(!isCorrection(declaration) || viewRecord) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
