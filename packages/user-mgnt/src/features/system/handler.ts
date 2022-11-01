@@ -166,9 +166,9 @@ export async function deactivateSystemClient(
 
     const auditSystemPayload = request.payload as IAuditSystemPayload
 
-    const system: ISystemModel | null = await System.findById(
-      auditSystemPayload.client_id
-    )
+    const system: ISystemModel | null = await System.findOne({
+      client_id: auditSystemPayload.client_id
+    })
     if (!system) {
       logger.error(
         `No system details found for requested client_id: ${auditSystemPayload.client_id}`
@@ -208,9 +208,9 @@ export async function reactivateSystemClient(
 
     const auditSystemPayload = request.payload as IAuditSystemPayload
 
-    const system: ISystemModel | null = await System.findById(
-      auditSystemPayload.client_id
-    )
+    const system: ISystemModel | null = await System.findOne({
+      client_id: auditSystemPayload.client_id
+    })
     if (!system) {
       logger.error(
         `No system details found for requested client_id: ${auditSystemPayload.client_id}`

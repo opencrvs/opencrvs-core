@@ -13,6 +13,7 @@
 import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
+import { resolvers as integrationResolver } from '@gateway/features/integrations/root-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
 import { typeResolvers } from '@gateway/features/registration/type-resolvers'
@@ -59,6 +60,7 @@ const resolvers: StringIndexed<IResolvers> = merge(
   userTypeResolvers as IResolvers,
   certificateTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
+  integrationResolver as IResolvers,
   typeResolvers as IResolvers,
   searchRootResolvers as IResolvers,
   searchTypeResolvers as IResolvers,

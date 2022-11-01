@@ -246,6 +246,8 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
+  reactivateSystemClient(clientDetails: ClientPayload): SampleResponse
+  deactivateSystemClient(clientDetails: ClientPayload): SampleResponse
 }
 
 type Dummy {
@@ -663,6 +665,14 @@ input FormDraftStatusModifyInput {
 
 input DeleteFormDraftInput {
   event: Event!
+}
+
+type SampleResponse {
+  name: String
+}
+
+input ClientPayload {
+  client_id: String
 }
 
 scalar Map

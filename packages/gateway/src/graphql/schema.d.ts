@@ -84,6 +84,8 @@ export interface GQLMutation {
   createFormDraft?: GQLFormDraft
   modifyDraftStatus?: GQLFormDraft
   deleteFormDraft?: string
+  reactivateSystemClient?: GQLSampleResponse
+  deactivateSystemClient?: GQLSampleResponse
 }
 
 export interface GQLDummy {
@@ -512,6 +514,14 @@ export interface GQLFormDraftStatusModifyInput {
 
 export interface GQLDeleteFormDraftInput {
   event: GQLEvent
+}
+
+export interface GQLSampleResponse {
+  name?: string
+}
+
+export interface GQLClientPayload {
+  client_id?: string
 }
 
 export type GQLMap = any
@@ -1396,6 +1406,7 @@ export interface GQLResolver {
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
+  SampleResponse?: GQLSampleResponseTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -2111,6 +2122,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createFormDraft?: MutationToCreateFormDraftResolver<TParent>
   modifyDraftStatus?: MutationToModifyDraftStatusResolver<TParent>
   deleteFormDraft?: MutationToDeleteFormDraftResolver<TParent>
+  reactivateSystemClient?: MutationToReactivateSystemClientResolver<TParent>
+  deactivateSystemClient?: MutationToDeactivateSystemClientResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2614,6 +2627,36 @@ export interface MutationToDeleteFormDraftResolver<
   (
     parent: TParent,
     args: MutationToDeleteFormDraftArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToReactivateSystemClientArgs {
+  clientDetails?: GQLClientPayload
+}
+export interface MutationToReactivateSystemClientResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToReactivateSystemClientArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToDeactivateSystemClientArgs {
+  clientDetails?: GQLClientPayload
+}
+export interface MutationToDeactivateSystemClientResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToDeactivateSystemClientArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3972,6 +4015,14 @@ export interface ApplicationConfigurationToADDRESSESResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSampleResponseTypeResolver<TParent = any> {
+  name?: SampleResponseToNameResolver<TParent>
+}
+
+export interface SampleResponseToNameResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
