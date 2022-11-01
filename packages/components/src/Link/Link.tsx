@@ -57,8 +57,10 @@ const StyledLink = styled.button<{ $font: IFont; $color: IColor }>`
   }
 
   &:disabled {
-    color: ${({ theme }) => theme.colors.grey300};
+    opacity: 0.5;
     text-decoration: none;
+    pointer-events: none;
+    user-select: none;
   }
 `
 
