@@ -149,6 +149,10 @@ function LocationPickerComponent(props: LocationPickerProps) {
     ({ id }) => id === selectedLocationId
   ) as ISearchLocation
 
+  const [selectedLocation, setSelectedLocation] = useState<ISearchLocation>(
+    selectedSearchedLocation
+  )
+
   useEffect(() => {
     function toggleBodyScroll() {
       const body = document.querySelector('body') as HTMLBodyElement
@@ -172,11 +176,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
         disabled={disabled}
       >
         <ContentWrapper>
-          <span>
-            {(selectedSearchedLocation &&
-              selectedSearchedLocation.displayLabel) ||
-              ''}
-          </span>
+          <span>{selectedLocation?.displayLabel || ''}</span>
           <MapPin color={props.disabled ? colors.grey200 : undefined} />
         </ContentWrapper>
       </PickerButton>
@@ -202,6 +202,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
                 selectedLocation={selectedSearchedLocation}
                 locationList={searchableLocations}
                 searchHandler={(location) => {
+                  setSelectedLocation(location)
                   props.onChangeLocation(location)
                   setModalVisible(false)
                 }}

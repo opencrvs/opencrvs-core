@@ -297,7 +297,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     const { event, timeStart, timeEnd } = this.state
     this.props.goToCompletenessRates(
       event,
-      locationId,
+      this.state.selectedLocation ? this.state.selectedLocation.id : locationId,
       timeStart,
       timeEnd,
       time
