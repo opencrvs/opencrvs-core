@@ -82,8 +82,10 @@ describe('createSearchHandler & removeSearchHandler', () => {
       payload: {
         userId: '5d10885374be318fa7689f0b',
         search: {
-          searchId: '7a10234254be318fa7607823df',
-          name: 'Advance Search'
+          name: 'Advance Search',
+          parameters: {
+            event: 'birth'
+          }
         }
       },
       headers: {
@@ -106,8 +108,10 @@ describe('createSearchHandler & removeSearchHandler', () => {
       payload: {
         userId: '5d10885374be318fa7689f0b',
         search: {
-          searchId: '7a10234254be318fa7607823df',
-          name: 'Advance Search'
+          name: 'Advance Search',
+          parameters: {
+            event: 'birth'
+          }
         }
       },
       headers: {

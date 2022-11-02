@@ -61,9 +61,12 @@ describe('Advanced search resolvers', () => {
       const response = await resolvers.Mutation.bookmarkAdvancedSearch(
         {},
         {
-          advancedSeachInput: {
+          bookmarkSearchInput: {
             userId: '62b99cd98f113a700cc19a1a',
-            searchId: '62b99cd234vs4700cc19a1a'
+            name: 'Advance Search',
+            parameters: {
+              event: 'birth'
+            }
           }
         },
         authHeaderRegister
@@ -77,9 +80,12 @@ describe('Advanced search resolvers', () => {
         resolvers.Mutation.bookmarkAdvancedSearch(
           {},
           {
-            advancedSeachInput: {
+            bookmarkSearchInput: {
               userId: '62b99cd98f113a700cc19a1a',
-              searchId: '62b99cd234vs4700cc19a1a'
+              name: 'Advance Search',
+              parameters: {
+                event: 'birth'
+              }
             }
           },
           'null'
@@ -96,9 +102,12 @@ describe('Advanced search resolvers', () => {
         resolvers.Mutation.bookmarkAdvancedSearch(
           {},
           {
-            advancedSeachInput: {
+            bookmarkSearchInput: {
               userId: '62b99cd98f113a700cc19a1a',
-              searchId: '62b99cd234vs4700cc19a1a'
+              name: 'Advance Search',
+              parameters: {
+                event: 'birth'
+              }
             }
           },
           authHeaderRegister
@@ -109,7 +118,7 @@ describe('Advanced search resolvers', () => {
     })
   })
 
-  describe('unbookmarkedAdvancedSearch mutation', () => {
+  describe('removeBookmarkedAdvancedSearch mutation', () => {
     let authHeaderRegister: { Authorization: string }
     beforeEach(() => {
       fetch.resetMocks()
@@ -143,10 +152,10 @@ describe('Advanced search resolvers', () => {
         { status: 200 }
       )
 
-      const response = await resolvers.Mutation.unbookmarkedAdvancedSearch(
+      const response = await resolvers.Mutation.removeBookmarkedAdvancedSearch(
         {},
         {
-          advancedSeachInput: {
+          removeBookmarkedSearchInput: {
             userId: '62b99cd98f113a700cc19a1a',
             searchId: '62b99cd234vs4700cc19a1a'
           }
@@ -159,10 +168,10 @@ describe('Advanced search resolvers', () => {
 
     it('throws error for unauthorized user', async () => {
       await expect(
-        resolvers.Mutation.unbookmarkedAdvancedSearch(
+        resolvers.Mutation.removeBookmarkedAdvancedSearch(
           {},
           {
-            advancedSeachInput: {
+            removeBookmarkedSearchInput: {
               userId: '62b99cd98f113a700cc19a1a',
               searchId: '62b99cd234vs4700cc19a1a'
             }
@@ -178,10 +187,10 @@ describe('Advanced search resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify(null), { status: 400 })
 
       await expect(
-        resolvers.Mutation.unbookmarkedAdvancedSearch(
+        resolvers.Mutation.removeBookmarkedAdvancedSearch(
           {},
           {
-            advancedSeachInput: {
+            removeBookmarkedSearchInput: {
               userId: '62b99cd98f113a700cc19a1a',
               searchId: '62b99cd234vs4700cc19a1a'
             }
