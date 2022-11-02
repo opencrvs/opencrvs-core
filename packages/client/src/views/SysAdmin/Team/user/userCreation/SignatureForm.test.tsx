@@ -17,16 +17,14 @@ import {
   getFileFromBase64String,
   mockOfflineData,
   validImageB64String,
-  mockOfflineDataDispatch
+  mockOfflineDataDispatch,
+  mockFetchRoleGraphqlOperation,
+  mockDataWithRegistarRoleSelected,
+  mockUserGraphqlOperation
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import {
-  mockDataWithRegistarRoleSelected,
-  mockFetchRoleGraphqlOperation,
-  mockUserGraphqlOperation
-} from '@client/views/SysAdmin/Team/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 

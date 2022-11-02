@@ -56,7 +56,7 @@ import { IAvatar } from '@client/utils/userUtils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { userMessages } from '@client/i18n/messages'
 import { SegmentedControl } from '@client/components/SegmentedControl'
-import { getName } from '../RecordAudit/utils'
+import { getName } from '@client/views/RecordAudit/utils'
 
 const ToolTipContainer = styled.span`
   text-align: center;

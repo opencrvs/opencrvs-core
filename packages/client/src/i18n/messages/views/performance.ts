@@ -326,6 +326,7 @@ const messagesToDefine = {
     defaultMessage: 'Births',
     description: 'Label for birth event option'
   },
+
   eventOptionForDeaths: {
     id: 'performance.fieldAgents.options.event.deaths',
     defaultMessage: 'Deaths',

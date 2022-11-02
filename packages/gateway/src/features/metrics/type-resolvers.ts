@@ -9,13 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
+import { GQLResolver } from '@gateway/graphql/schema'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
 import { getUser } from '@gateway/features/user/utils'
-import { GQLResolver } from '@gateway/graphql/schema'
 
 export const typeResolvers: GQLResolver = {
+  UserAuditLogResultItem: {
+    __resolveType(obj) {
+      if (obj.data?.compositionId) {
+        return 'UserAuditLogItemWithComposition'
+      } else {
+        return 'UserAuditLogItem'
+      }
+    }
+  },
   MixedTotalMetricsResult: {
     __resolveType(obj, context, info) {
       if (info.variableValues.filterBy === FILTER_BY.REGISTERER)
