@@ -14,6 +14,7 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
 import { Event } from '@client/utils/gateway'
+import { getStatusWiseWQTab } from '@client/views/OfficeHome/utils'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -21,7 +22,12 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToPerformanceHome, goToWorkflowStatus } from '@client/navigation'
+import {
+  goToPerformanceHome,
+  goToWorkflowStatus,
+  goToSearchResult,
+  goToDeclarationRecordAudit
+} from '@client/navigation'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
@@ -59,6 +65,15 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import register from '@client/registerServiceWorker'
+
+type IDispatchProps = {
+  goToSearchResult: typeof goToSearchResult
+}
+
+interface IBasePrintTabProps {
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+}
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -174,6 +189,8 @@ function isPrimaryContact(contact: string): contact is PrimaryContact {
 interface DispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToWorkflowStatus: typeof goToWorkflowStatus
+  goToSearchResult: typeof goToSearchResult
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 interface ISearchParams {
   locationId: string
@@ -568,6 +585,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               eventProgress.registration &&
               eventProgress.registration.trackingId,
             status,
+            compositionId: eventProgress.id,
             eventType: event,
             dateOfEvent: eventProgress.dateOfEvent,
             nameIntl,
@@ -617,7 +635,18 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     ).map((row, idx) => {
       return {
         ...row,
-        id: <LinkButton>{row.id}</LinkButton>,
+        id: (
+          <LinkButton
+            onClick={() =>
+              props.goToDeclarationRecordAudit(
+                'printTab',
+                row.compositionId as string
+              )
+            }
+          >
+            {row.id}
+          </LinkButton>
+        ),
         declarationStartedBy: (
           <DoubleLineValueWrapper>
             {row.declarationStartedBy}
@@ -801,5 +830,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 
 export const WorkflowStatus = connect(null, {
   goToPerformanceHome,
+  goToSearchResult,
+  goToDeclarationRecordAudit,
   goToWorkflowStatus
 })(injectIntl(WorkflowStatusComponent))
