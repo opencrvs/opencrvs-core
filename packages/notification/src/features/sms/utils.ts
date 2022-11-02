@@ -20,6 +20,7 @@ import * as Handlebars from 'handlebars'
 import * as Hapi from '@hapi/hapi'
 import { getDefaultLanguage } from '@notification/i18n/utils'
 interface ISendSMSPayload {
+  applicationName?: string
   name?: string
   authCode?: string
   trackingId?: string

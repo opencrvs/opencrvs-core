@@ -179,15 +179,16 @@ export function queryBuilder(
       }
     })
   }
-
   if (Array.isArray(declarationLocationId)) {
+    // If you are searching multiple locations at once
     declarationLocationId.forEach((id) => {
-      should.push({
-        term: {
-          'declarationLocationId.keyword': {
-            value: id,
-            boost: 2
-          }
+      must.push({
+        bool: {
+          should: declarationLocationId.map((locationId: string) => ({
+            term: {
+              'declarationLocationId.keyword': locationId
+            }
+          }))
         }
       })
     })

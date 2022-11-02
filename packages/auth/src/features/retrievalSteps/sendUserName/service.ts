@@ -29,7 +29,6 @@ export async function sendUserName(mobile: string, username: string) {
       )}`
     }
   })
-
   if (res.status !== 200) {
     throw Error(`Unable to send username`)
   }

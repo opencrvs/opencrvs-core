@@ -196,7 +196,7 @@ export async function createRegistrationHandler(
     ) {
       // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
       // validate registration with resource service and set resulting registration number
-      invokeRegistrationValidation(payload, getToken(request))
+      invokeRegistrationValidation(payload, request.headers)
     }
     if (isEventNonNotifiable(event)) {
       return resBundle
@@ -397,7 +397,7 @@ export async function markEventAsWaitingValidationHandler(
     )
     const resBundle = await postToHearth(payload)
     populateCompositionWithID(payload, resBundle)
-    invokeRegistrationValidation(payload, getToken(request))
+    invokeRegistrationValidation(payload, request.headers)
 
     return resBundle
   } catch (error) {
