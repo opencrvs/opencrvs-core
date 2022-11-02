@@ -222,8 +222,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             label: formMessageDescriptors.motherDateOfBirth,
             required: false,
             initialValue: '',
-            validate: [],
-            notice: formMessageDescriptors.motherDateOfBirth
+            validate: []
           },
           {
             name: 'firstNamesEng',
