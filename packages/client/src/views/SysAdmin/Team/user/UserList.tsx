@@ -238,6 +238,7 @@ type IProps = BaseProps &
 interface IStatusProps {
   status: string
 }
+
 interface ToggleModal {
   modalVisible: boolean
   selectedUser: User | null
@@ -526,7 +527,7 @@ function UserListComponent(props: IProps) {
     }
   }
 
-  const getUserName = (user: GQLUser) => {
+  const getUserName = (user: User) => {
     const userName =
       (user &&
         user.name &&
@@ -953,7 +954,7 @@ function UserListComponent(props: IProps) {
           onClose={() => setShowUsernameSMSReminderSuccess(false)}
         >
           {intl.formatMessage(messages.sendUsernameReminderSMSSuccess, {
-            name: getUserName(toggleUsernameReminder.selectedUser as GQLUser)
+            name: getUserName(toggleUsernameReminder.selectedUser as User)
           })}
         </Toast>
       )}
@@ -980,7 +981,7 @@ function UserListComponent(props: IProps) {
           }}
         >
           {intl.formatMessage(messages.resetPasswordSMSSuccess, {
-            username: getUserName(toggleResetPassword.selectedUser as GQLUser)
+            username: getUserName(toggleResetPassword.selectedUser as User)
           })}
         </Toast>
       )}

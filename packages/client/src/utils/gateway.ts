@@ -88,6 +88,103 @@ export enum AddressType {
   UnhcrCamp = 'UNHCR_CAMP'
 }
 
+export type AdvancedSeachParameters = {
+  __typename?: 'AdvancedSeachParameters'
+  childDoB?: Maybe<Scalars['String']>
+  childDoBEnd?: Maybe<Scalars['String']>
+  childDoBStart?: Maybe<Scalars['String']>
+  childFirstNames?: Maybe<Scalars['String']>
+  childGender?: Maybe<Scalars['String']>
+  childLastName?: Maybe<Scalars['String']>
+  dateOfEvent?: Maybe<Scalars['String']>
+  dateOfEventEnd?: Maybe<Scalars['String']>
+  dateOfEventStart?: Maybe<Scalars['String']>
+  dateOfRegistration?: Maybe<Scalars['String']>
+  dateOfRegistrationEnd?: Maybe<Scalars['String']>
+  dateOfRegistrationStart?: Maybe<Scalars['String']>
+  deceasedDoB?: Maybe<Scalars['String']>
+  deceasedDoBEnd?: Maybe<Scalars['String']>
+  deceasedDoBStart?: Maybe<Scalars['String']>
+  deceasedFamilyName?: Maybe<Scalars['String']>
+  deceasedFirstNames?: Maybe<Scalars['String']>
+  deceasedGender?: Maybe<Scalars['String']>
+  declarationJurisdictionId?: Maybe<Scalars['String']>
+  declarationLocationId?: Maybe<Scalars['String']>
+  event?: Maybe<Event>
+  eventLocationId?: Maybe<Scalars['String']>
+  eventLocationLevel1?: Maybe<Scalars['String']>
+  eventLocationLevel2?: Maybe<Scalars['String']>
+  eventLocationLevel3?: Maybe<Scalars['String']>
+  eventLocationLevel4?: Maybe<Scalars['String']>
+  eventLocationLevel5?: Maybe<Scalars['String']>
+  fatherDoB?: Maybe<Scalars['String']>
+  fatherDoBEnd?: Maybe<Scalars['String']>
+  fatherDoBStart?: Maybe<Scalars['String']>
+  fatherFamilyName?: Maybe<Scalars['String']>
+  fatherFirstNames?: Maybe<Scalars['String']>
+  informantDoB?: Maybe<Scalars['String']>
+  informantDoBEnd?: Maybe<Scalars['String']>
+  informantDoBStart?: Maybe<Scalars['String']>
+  informantFamilyName?: Maybe<Scalars['String']>
+  informantFirstNames?: Maybe<Scalars['String']>
+  motherDoB?: Maybe<Scalars['String']>
+  motherDoBEnd?: Maybe<Scalars['String']>
+  motherDoBStart?: Maybe<Scalars['String']>
+  motherFamilyName?: Maybe<Scalars['String']>
+  motherFirstNames?: Maybe<Scalars['String']>
+  registrationNumber?: Maybe<Scalars['String']>
+  registrationStatuses?: Maybe<Array<Maybe<Scalars['String']>>>
+  trackingId?: Maybe<Scalars['String']>
+}
+
+export type AdvancedSearchParametersInput = {
+  childDoB?: InputMaybe<Scalars['String']>
+  childDoBEnd?: InputMaybe<Scalars['String']>
+  childDoBStart?: InputMaybe<Scalars['String']>
+  childFirstNames?: InputMaybe<Scalars['String']>
+  childGender?: InputMaybe<Scalars['String']>
+  childLastName?: InputMaybe<Scalars['String']>
+  dateOfEvent?: InputMaybe<Scalars['String']>
+  dateOfEventEnd?: InputMaybe<Scalars['String']>
+  dateOfEventStart?: InputMaybe<Scalars['String']>
+  dateOfRegistration?: InputMaybe<Scalars['String']>
+  dateOfRegistrationEnd?: InputMaybe<Scalars['String']>
+  dateOfRegistrationStart?: InputMaybe<Scalars['String']>
+  deceasedDoB?: InputMaybe<Scalars['String']>
+  deceasedDoBEnd?: InputMaybe<Scalars['String']>
+  deceasedDoBStart?: InputMaybe<Scalars['String']>
+  deceasedFamilyName?: InputMaybe<Scalars['String']>
+  deceasedFirstNames?: InputMaybe<Scalars['String']>
+  deceasedGender?: InputMaybe<Scalars['String']>
+  declarationJurisdictionId?: InputMaybe<Scalars['String']>
+  declarationLocationId?: InputMaybe<Scalars['String']>
+  event?: InputMaybe<Event>
+  eventLocationId?: InputMaybe<Scalars['String']>
+  eventLocationLevel1?: InputMaybe<Scalars['String']>
+  eventLocationLevel2?: InputMaybe<Scalars['String']>
+  eventLocationLevel3?: InputMaybe<Scalars['String']>
+  eventLocationLevel4?: InputMaybe<Scalars['String']>
+  eventLocationLevel5?: InputMaybe<Scalars['String']>
+  fatherDoB?: InputMaybe<Scalars['String']>
+  fatherDoBEnd?: InputMaybe<Scalars['String']>
+  fatherDoBStart?: InputMaybe<Scalars['String']>
+  fatherFamilyName?: InputMaybe<Scalars['String']>
+  fatherFirstNames?: InputMaybe<Scalars['String']>
+  informantDoB?: InputMaybe<Scalars['String']>
+  informantDoBEnd?: InputMaybe<Scalars['String']>
+  informantDoBStart?: InputMaybe<Scalars['String']>
+  informantFamilyName?: InputMaybe<Scalars['String']>
+  informantFirstNames?: InputMaybe<Scalars['String']>
+  motherDoB?: InputMaybe<Scalars['String']>
+  motherDoBEnd?: InputMaybe<Scalars['String']>
+  motherDoBStart?: InputMaybe<Scalars['String']>
+  motherFamilyName?: InputMaybe<Scalars['String']>
+  motherFirstNames?: InputMaybe<Scalars['String']>
+  registrationNumber?: InputMaybe<Scalars['String']>
+  registrationStatuses?: InputMaybe<Array<Scalars['String']>>
+  trackingId?: InputMaybe<Scalars['String']>
+}
+
 export type ApplicationConfiguration = {
   __typename?: 'ApplicationConfiguration'
   ADDRESSES?: Maybe<Scalars['Int']>
@@ -318,6 +415,24 @@ export enum BirthType {
   Single = 'SINGLE',
   Triplet = 'TRIPLET',
   Twin = 'TWIN'
+}
+
+export type BookMarkedSearches = {
+  __typename?: 'BookMarkedSearches'
+  searchList?: Maybe<Array<Maybe<BookmarkedSeachItem>>>
+}
+
+export type BookmarkSearchInput = {
+  name: Scalars['String']
+  parameters: AdvancedSearchParametersInput
+  userId: Scalars['String']
+}
+
+export type BookmarkedSeachItem = {
+  __typename?: 'BookmarkedSeachItem'
+  name: Scalars['String']
+  parameters: AdvancedSeachParameters
+  searchId: Scalars['String']
 }
 
 export enum CauseOfDeathMethodType {
@@ -947,6 +1062,7 @@ export type Mutation = {
   __typename?: 'Mutation'
   activateUser?: Maybe<Scalars['String']>
   auditUser?: Maybe<Scalars['String']>
+  bookmarkAdvancedSearch?: Maybe<BookMarkedSearches>
   changeAvatar?: Maybe<Avatar>
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
@@ -971,6 +1087,7 @@ export type Mutation = {
   markEventAsVoided: Scalars['ID']
   modifyDraftStatus?: Maybe<FormDraft>
   notADuplicate: Scalars['ID']
+  removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
   resendSMSInvite?: Maybe<Scalars['String']>
@@ -993,6 +1110,10 @@ export type MutationAuditUserArgs = {
   comment?: InputMaybe<Scalars['String']>
   reason: Scalars['String']
   userId: Scalars['String']
+}
+
+export type MutationBookmarkAdvancedSearchArgs = {
+  bookmarkSearchInput: BookmarkSearchInput
 }
 
 export type MutationChangeAvatarArgs = {
@@ -1106,6 +1227,10 @@ export type MutationModifyDraftStatusArgs = {
 export type MutationNotADuplicateArgs = {
   duplicateId: Scalars['String']
   id: Scalars['String']
+}
+
+export type MutationRemoveBookmarkedAdvancedSearchArgs = {
+  removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
 }
 
 export type MutationRequestBirthRegistrationCorrectionArgs = {
@@ -1504,30 +1629,53 @@ export type QuerySearchFieldAgentsArgs = {
 
 export type QuerySearchRecordArgs = {
   childDoB?: InputMaybe<Scalars['String']>
+  childDoBEnd?: InputMaybe<Scalars['String']>
+  childDoBStart?: InputMaybe<Scalars['String']>
   childFirstName?: InputMaybe<Scalars['String']>
+  childGender?: InputMaybe<Scalars['String']>
   childLastName?: InputMaybe<Scalars['String']>
   contactNumber?: InputMaybe<Scalars['String']>
+  dateOfEvent?: InputMaybe<Scalars['String']>
   dateOfRegistration?: InputMaybe<Scalars['String']>
   dateOfRegistrationEnd?: InputMaybe<Scalars['String']>
   dateOfRegistrationStart?: InputMaybe<Scalars['String']>
   deathDate?: InputMaybe<Scalars['String']>
   deathDateEnd?: InputMaybe<Scalars['String']>
   deathDateStart?: InputMaybe<Scalars['String']>
+  deceasedDoB?: InputMaybe<Scalars['String']>
+  deceasedDoBEnd?: InputMaybe<Scalars['String']>
+  deceasedDoBStart?: InputMaybe<Scalars['String']>
   deceasedFamilyName?: InputMaybe<Scalars['String']>
   deceasedFirstNames?: InputMaybe<Scalars['String']>
+  deceasedGender?: InputMaybe<Scalars['String']>
+  declarationJurisdictionId?: InputMaybe<Scalars['String']>
+  declarationLocationId?: InputMaybe<Scalars['String']>
   event?: InputMaybe<Scalars['String']>
   eventLocationId?: InputMaybe<Scalars['String']>
+  eventLocationLevel1?: InputMaybe<Scalars['String']>
+  eventLocationLevel2?: InputMaybe<Scalars['String']>
+  eventLocationLevel3?: InputMaybe<Scalars['String']>
+  eventLocationLevel4?: InputMaybe<Scalars['String']>
+  eventLocationLevel5?: InputMaybe<Scalars['String']>
   fatherDoB?: InputMaybe<Scalars['String']>
+  fatherDoBEnd?: InputMaybe<Scalars['String']>
+  fatherDoBStart?: InputMaybe<Scalars['String']>
   fatherFamilyName?: InputMaybe<Scalars['String']>
   fatherFirstNames?: InputMaybe<Scalars['String']>
   fatherIdentifier?: InputMaybe<Scalars['String']>
+  informantDoB?: InputMaybe<Scalars['String']>
+  informantDoBEnd?: InputMaybe<Scalars['String']>
+  informantDoBStart?: InputMaybe<Scalars['String']>
   informantFamilyName?: InputMaybe<Scalars['String']>
   informantFirstNames?: InputMaybe<Scalars['String']>
   motherDoB?: InputMaybe<Scalars['String']>
+  motherDoBEnd?: InputMaybe<Scalars['String']>
+  motherDoBStart?: InputMaybe<Scalars['String']>
   motherFamilyName?: InputMaybe<Scalars['String']>
   motherFirstNames?: InputMaybe<Scalars['String']>
   motherIdentifier?: InputMaybe<Scalars['String']>
   registrationNumber?: InputMaybe<Scalars['String']>
+  registrationStatuses?: InputMaybe<Scalars['String']>
   trackingId?: InputMaybe<Scalars['String']>
 }
 
@@ -1721,6 +1869,11 @@ export type RelatedPersonInput = {
   relationship?: InputMaybe<Scalars['String']>
 }
 
+export type RemoveBookmarkedSeachInput = {
+  searchId: Scalars['String']
+  userId: Scalars['String']
+}
+
 export type Role = {
   __typename?: 'Role'
   active?: Maybe<Scalars['Boolean']>
@@ -1805,6 +1958,7 @@ export type User = {
   practitionerId?: Maybe<Scalars['String']>
   primaryOffice?: Maybe<Location>
   role?: Maybe<Scalars['String']>
+  searches?: Maybe<Array<Maybe<BookmarkedSeachItem>>>
   signature?: Maybe<Signature>
   status?: Maybe<Scalars['String']>
   type?: Maybe<Scalars['String']>

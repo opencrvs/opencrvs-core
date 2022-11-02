@@ -134,6 +134,8 @@ type Query {
   ): EventProgressResultSet
   searchRecord(
     event: String
+    dateOfEvent: String
+    registrationStatuses: String
     eventLocationId: String
     childFirstName: String
     childLastName: String
@@ -159,6 +161,27 @@ type Query {
     dateOfRegistration: String
     dateOfRegistrationStart: String
     dateOfRegistrationEnd: String
+    declarationLocationId: String
+    declarationJurisdictionId: String
+    eventLocationLevel1: String
+    eventLocationLevel2: String
+    eventLocationLevel3: String
+    eventLocationLevel4: String
+    eventLocationLevel5: String
+    childDoBStart: String
+    childDoBEnd: String
+    childGender: String
+    deceasedGender: String
+    deceasedDoB: String
+    deceasedDoBStart: String
+    deceasedDoBEnd: String
+    motherDoBStart: String
+    motherDoBEnd: String
+    fatherDoBStart: String
+    fatherDoBEnd: String
+    informantDoB: String
+    informantDoBStart: String
+    informantDoBEnd: String
   ): EventProgressResultSet
   getRoles(
     title: String
@@ -249,6 +272,12 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
+  bookmarkAdvancedSearch(
+    bookmarkSearchInput: BookmarkSearchInput!
+  ): BookMarkedSearches
+  removeBookmarkedAdvancedSearch(
+    removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
+  ): BookMarkedSearches
 }
 
 type Dummy {
@@ -392,6 +421,7 @@ type User {
   creationDate: String
   avatar: Avatar
   device: String
+  searches: [BookmarkedSeachItem]
 }
 
 type SearchUserResult {
@@ -670,6 +700,21 @@ input DeleteFormDraftInput {
   event: Event!
 }
 
+type BookMarkedSearches {
+  searchList: [BookmarkedSeachItem]
+}
+
+input BookmarkSearchInput {
+  userId: String!
+  name: String!
+  parameters: AdvancedSearchParametersInput!
+}
+
+input RemoveBookmarkedSeachInput {
+  userId: String!
+  searchId: String!
+}
+
 scalar Map
 
 type Registration {
@@ -888,6 +933,12 @@ type LocalRegistrar {
 type Signature {
   data: String
   type: String
+}
+
+type BookmarkedSeachItem {
+  searchId: String!
+  name: String!
+  parameters: AdvancedSeachParameters!
 }
 
 type SearchFieldAgentResponse {
@@ -1142,6 +1193,54 @@ input QuestionInput {
   conditionals: [ConditionalInput!]
 }
 
+input AdvancedSearchParametersInput {
+  event: Event
+  registrationStatuses: [String!]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
+}
+
 enum InformantType {
   INFORMANT
   MOTHER
@@ -1277,6 +1376,54 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+}
+
+type AdvancedSeachParameters {
+  event: Event
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
 }
 
 type UserAuditLogItemWithComposition implements AuditLogItemBase {
