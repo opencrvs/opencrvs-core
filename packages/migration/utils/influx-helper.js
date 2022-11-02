@@ -22,6 +22,29 @@ export const influx = new InfluxDB({
   port: INFLUX_PORT,
   schema: [
     {
+      measurement: 'birth_registration',
+      fields: {
+        compositionId: FieldType.STRING,
+        currentStatus: FieldType.STRING,
+        ageInDays: FieldType.INTEGER
+      },
+      tags: [
+        'regStatus',
+        'gender',
+        'timeLabel',
+        'ageLabel',
+        'dateLabel',
+        'registrarPractitionerId',
+        'practitionerRole',
+        'eventLocationType',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
       measurement: 'declarations_rejected',
       fields: {
         compositionId: FieldType.STRING

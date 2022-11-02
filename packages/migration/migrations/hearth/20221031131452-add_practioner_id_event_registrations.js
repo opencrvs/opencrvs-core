@@ -53,8 +53,14 @@ export const up = async (db, client) => {
           timestamp: time.getNanoTime()
         }
 
-        console.log(point)
+        console.log(
+          `DELETE FROM birth_registration WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
+        )
+
         await writePoints([point])
+        await query(
+          `DELETE FROM birth_registration WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
+        )
       }
     )
   })
