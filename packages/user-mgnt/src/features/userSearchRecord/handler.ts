@@ -10,14 +10,61 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { logger } from '@user-mgnt/logger'
-import User, { IUserModel, Event, ISearch } from '@user-mgnt/model/user'
+import User, { IUserModel, Event } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-
+import * as uuid from 'uuid/v4'
 interface IUserCreateSearchPayload {
   userId: string
-  search: ISearch
+  name: string
+  parameters: {
+    event?: Event
+    registrationStatuses?: string[]
+    dateOfEvent?: string
+    dateOfEventStart?: string
+    dateOfEventEnd?: string
+    registrationNumber?: string
+    trackingId?: string
+    dateOfRegistration?: string
+    dateOfRegistrationStart?: string
+    dateOfRegistrationEnd?: string
+    declarationLocationId?: string
+    declarationJurisdictionId?: string
+    eventLocationId?: string
+    eventLocationLevel1?: string
+    eventLocationLevel2?: string
+    eventLocationLevel3?: string
+    eventLocationLevel4?: string
+    eventLocationLevel5?: string
+    childFirstNames?: string
+    childLastName?: string
+    childDoB?: string
+    childDoBStart?: string
+    childDoBEnd?: string
+    childGender?: string
+    deceasedFirstNames?: string
+    deceasedFamilyName?: string
+    deceasedGender?: string
+    deceasedDoB?: string
+    deceasedDoBStart?: string
+    deceasedDoBEnd?: string
+    motherFirstNames?: string
+    motherFamilyName?: string
+    motherDoB?: string
+    motherDoBStart?: string
+    motherDoBEnd?: string
+    fatherFirstNames?: string
+    fatherFamilyName?: string
+    fatherDoB?: string
+    fatherDoBStart?: string
+    fatherDoBEnd?: string
+    informantFirstNames?: string
+    informantFamilyName?: string
+    informantDoB?: string
+    informantDoBStart?: string
+    informantDoBEnd?: string
+  }
 }
 
 interface IUserRemoveSearchPayload {
@@ -45,10 +92,17 @@ export async function createSearchHandler(
     throw unauthorized()
   }
 
+  const modifiedPayload = {
+    userId: userCreateSearchPayload.userId,
+    searchId: uuid(),
+    name: userCreateSearchPayload.name,
+    ...userCreateSearchPayload.parameters
+  }
+
   if (mutableUser.searches) {
-    mutableUser.searches.push(userCreateSearchPayload.search)
+    mutableUser.searches.push(modifiedPayload)
   } else {
-    mutableUser.searches = [userCreateSearchPayload.search]
+    mutableUser.searches = [modifiedPayload]
   }
 
   try {
@@ -93,53 +147,54 @@ export async function removeSearchHandler(
 export const createSearchrequestSchema = Joi.object({
   userId: Joi.string().required(),
   search: Joi.object({
-    searchId: Joi.string().required(),
     name: Joi.string().required(),
-    event: Joi.string().valid(...validEvent),
-    registrationStatuses: Joi.string(),
-    dateOfEvent: Joi.string(),
-    dateOfEventStart: Joi.string(),
-    dateOfEventEnd: Joi.string(),
-    registrationNumber: Joi.string(),
-    trackingId: Joi.string(),
-    dateOfRegistration: Joi.string(),
-    dateOfRegistrationStart: Joi.string(),
-    dateOfRegistrationEnd: Joi.string(),
-    declarationLocationId: Joi.string(),
-    declarationJurisdictionId: Joi.string(),
-    eventLocationId: Joi.string(),
-    eventLocationLevel1: Joi.string(),
-    eventLocationLevel2: Joi.string(),
-    eventLocationLevel3: Joi.string(),
-    eventLocationLevel4: Joi.string(),
-    eventLocationLevel5: Joi.string(),
-    childFirstNames: Joi.string(),
-    childLastName: Joi.string(),
-    childDoB: Joi.string(),
-    childDoBStart: Joi.string(),
-    childDoBEnd: Joi.string(),
-    childGender: Joi.string(),
-    deceasedFirstNames: Joi.string(),
-    deceasedFamilyName: Joi.string(),
-    deceasedGender: Joi.string(),
-    deceasedDoB: Joi.string(),
-    deceasedDoBStart: Joi.string(),
-    deceasedDoBEnd: Joi.string(),
-    motherFirstNames: Joi.string(),
-    motherFamilyName: Joi.string(),
-    motherDoB: Joi.string(),
-    motherDoBStart: Joi.string(),
-    motherDoBEnd: Joi.string(),
-    fatherFirstNames: Joi.string(),
-    fatherFamilyName: Joi.string(),
-    fatherDoB: Joi.string(),
-    fatherDoBStart: Joi.string(),
-    fatherDoBEnd: Joi.string(),
-    informantFirstNames: Joi.string(),
-    informantFamilyName: Joi.string(),
-    informantDoB: Joi.string(),
-    informantDoBStart: Joi.string(),
-    informantDoBEnd: Joi.string()
+    parameters: Joi.object({
+      event: Joi.string().valid(...validEvent),
+      registrationStatuses: Joi.string(),
+      dateOfEvent: Joi.string(),
+      dateOfEventStart: Joi.string(),
+      dateOfEventEnd: Joi.string(),
+      registrationNumber: Joi.string(),
+      trackingId: Joi.string(),
+      dateOfRegistration: Joi.string(),
+      dateOfRegistrationStart: Joi.string(),
+      dateOfRegistrationEnd: Joi.string(),
+      declarationLocationId: Joi.string(),
+      declarationJurisdictionId: Joi.string(),
+      eventLocationId: Joi.string(),
+      eventLocationLevel1: Joi.string(),
+      eventLocationLevel2: Joi.string(),
+      eventLocationLevel3: Joi.string(),
+      eventLocationLevel4: Joi.string(),
+      eventLocationLevel5: Joi.string(),
+      childFirstNames: Joi.string(),
+      childLastName: Joi.string(),
+      childDoB: Joi.string(),
+      childDoBStart: Joi.string(),
+      childDoBEnd: Joi.string(),
+      childGender: Joi.string(),
+      deceasedFirstNames: Joi.string(),
+      deceasedFamilyName: Joi.string(),
+      deceasedGender: Joi.string(),
+      deceasedDoB: Joi.string(),
+      deceasedDoBStart: Joi.string(),
+      deceasedDoBEnd: Joi.string(),
+      motherFirstNames: Joi.string(),
+      motherFamilyName: Joi.string(),
+      motherDoB: Joi.string(),
+      motherDoBStart: Joi.string(),
+      motherDoBEnd: Joi.string(),
+      fatherFirstNames: Joi.string(),
+      fatherFamilyName: Joi.string(),
+      fatherDoB: Joi.string(),
+      fatherDoBStart: Joi.string(),
+      fatherDoBEnd: Joi.string(),
+      informantFirstNames: Joi.string(),
+      informantFamilyName: Joi.string(),
+      informantDoB: Joi.string(),
+      informantDoBStart: Joi.string(),
+      informantDoBEnd: Joi.string()
+    })
   })
 })
 

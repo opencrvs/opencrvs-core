@@ -271,10 +271,10 @@ type Mutation {
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
   bookmarkAdvancedSearch(
-    advancedSeachInput: AdvancedSeachParametersInput!
+    bookmarkSearchInput: BookmarkSearchInput!
   ): BookMarkedSearches
-  unbookmarkedAdvancedSearch(
-    advancedSeachInput: DeleteAdvancedSeachInput!
+  removeBookmarkedAdvancedSearch(
+    removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
 }
 
@@ -699,61 +699,16 @@ input DeleteFormDraftInput {
 }
 
 type BookMarkedSearches {
-  searchList: [AdvancedSeachParameters]
+  searchList: [BookmarkedSeachItem]
 }
 
-input AdvancedSeachParametersInput {
+input BookmarkSearchInput {
   userId: String!
-  searchId: String!
   name: String!
-  event: Event
-  registrationStatuses: [String!]
-  dateOfEvent: String
-  dateOfEventStart: String
-  dateOfEventEnd: String
-  registrationNumber: String
-  trackingId: String
-  dateOfRegistration: String
-  dateOfRegistrationStart: String
-  dateOfRegistrationEnd: String
-  declarationLocationId: String
-  declarationJurisdictionId: String
-  eventLocationId: String
-  eventLocationLevel1: String
-  eventLocationLevel2: String
-  eventLocationLevel3: String
-  eventLocationLevel4: String
-  eventLocationLevel5: String
-  childFirstNames: String
-  childLastName: String
-  childDoB: String
-  childDoBStart: String
-  childDoBEnd: String
-  childGender: String
-  deceasedFirstNames: String
-  deceasedFamilyName: String
-  deceasedGender: String
-  deceasedDoB: String
-  deceasedDoBStart: String
-  deceasedDoBEnd: String
-  motherFirstNames: String
-  motherFamilyName: String
-  motherDoB: String
-  motherDoBStart: String
-  motherDoBEnd: String
-  fatherFirstNames: String
-  fatherFamilyName: String
-  fatherDoB: String
-  fatherDoBStart: String
-  fatherDoBEnd: String
-  informantFirstNames: String
-  informantFamilyName: String
-  informantDoB: String
-  informantDoBStart: String
-  informantDoBEnd: String
+  parameters: AdvancedSearchParametersInput!
 }
 
-input DeleteAdvancedSeachInput {
+input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
 }
@@ -1282,11 +1237,15 @@ input QuestionInput {
   conditionals: [ConditionalInput!]
 }
 
-type AdvancedSeachParameters {
+type BookmarkedSeachItem {
   searchId: String!
   name: String!
+  parameters: AdvancedSeachParameters!
+}
+
+input AdvancedSearchParametersInput {
   event: Event
-  registrationStatuses: [String]
+  registrationStatuses: [String!]
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String
@@ -1631,6 +1590,54 @@ enum CustomFieldType {
 input ConditionalInput {
   fieldId: String!
   regexp: String!
+}
+
+type AdvancedSeachParameters {
+  event: Event
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
 }
 
 type Payment {

@@ -12,9 +12,10 @@
 
 import { GQLEvent } from '@gateway/graphql/schema'
 
-export interface ISearch {
-  searchId: string
+export interface ISearch extends IAdvancedSearchParameters {
   name: string
+}
+export interface IAdvancedSearchParameters {
   event?: GQLEvent
   registrationStatuses?: string[]
   dateOfEvent?: string

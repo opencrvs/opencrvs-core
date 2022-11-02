@@ -8,9 +8,13 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-type AdvancedSeachParameters {
+type BookmarkedSeachItem {
   searchId: String!
   name: String!
+  parameters: AdvancedSeachParameters!
+}
+
+type AdvancedSeachParameters {
   event: Event
   registrationStatuses: [String]
   dateOfEvent: String
@@ -58,10 +62,13 @@ type AdvancedSeachParameters {
   informantDoBEnd: String
 }
 
-input AdvancedSeachParametersInput {
+input BookmarkSearchInput {
   userId: String!
-  searchId: String!
   name: String!
+  parameters: AdvancedSearchParametersInput!
+}
+
+input AdvancedSearchParametersInput {
   event: Event
   registrationStatuses: [String!]
   dateOfEvent: String
@@ -109,20 +116,20 @@ input AdvancedSeachParametersInput {
   informantDoBEnd: String
 }
 
-input DeleteAdvancedSeachInput {
+input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
 }
 
 type BookMarkedSearches {
-  searchList: [AdvancedSeachParameters]
+  searchList: [BookmarkedSeachItem]
 }
 
 type Mutation {
   bookmarkAdvancedSearch(
-    advancedSeachInput: AdvancedSeachParametersInput!
+    bookmarkSearchInput: BookmarkSearchInput!
   ): BookMarkedSearches
-  unbookmarkedAdvancedSearch(
-    advancedSeachInput: DeleteAdvancedSeachInput!
+  removeBookmarkedAdvancedSearch(
+    removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
 }

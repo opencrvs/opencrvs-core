@@ -20,7 +20,7 @@ import {
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async bookmarkAdvancedSearch(_, { advancedSeachInput }, authHeader) {
+    async bookmarkAdvancedSearch(_, { bookmarkSearchInput }, authHeader) {
       // Only registrar or registration agent should be able to search user
       if (!inScope(authHeader, ['register', 'validate'])) {
         return await Promise.reject(
@@ -30,10 +30,10 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const { userId, ...parameters } = advancedSeachInput
+      const { userId, name, ...parameters } = bookmarkSearchInput
       const advancedSearchPayload: IBookmarkAdvancedSearchPayload = {
         userId: userId,
-        search: { ...parameters } as ISearch
+        search: { name, ...parameters } as ISearch
       }
 
       const res = await fetch(`${USER_MANAGEMENT_URL}searches`, {
@@ -55,7 +55,11 @@ export const resolvers: GQLResolver = {
       const response = await res.json()
       return response
     },
-    async unbookmarkedAdvancedSearch(_, { advancedSeachInput }, authHeader) {
+    async removeBookmarkedAdvancedSearch(
+      _,
+      { removeBookmarkedSearchInput },
+      authHeader
+    ) {
       // Only registrar or registration agent should be able to search user
       if (!inScope(authHeader, ['register', 'validate'])) {
         return await Promise.reject(
@@ -65,14 +69,14 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const deleteAdvancedSearchPayload = {
-        userId: advancedSeachInput.userId,
-        searchId: advancedSeachInput.searchId
+      const removeBookmarkedSearchPayload = {
+        userId: removeBookmarkedSearchInput.userId,
+        searchId: removeBookmarkedSearchInput.searchId
       }
 
       const res = await fetch(`${USER_MANAGEMENT_URL}searches`, {
         method: 'DELETE',
-        body: JSON.stringify(deleteAdvancedSearchPayload),
+        body: JSON.stringify(removeBookmarkedSearchPayload),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
