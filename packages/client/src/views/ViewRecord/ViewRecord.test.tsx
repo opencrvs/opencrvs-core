@@ -13,12 +13,13 @@
 import React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import { createTestComponent } from '@client/tests/util'
 import { FETCH_VIEW_RECORD_BY_COMPOSITION } from '@client/views/ViewRecord/query'
 import { ViewRecord } from './ViewRecord'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { useParams } from 'react-router'
+import { Mock } from 'vitest'
 
-describe('View Record for GraphQL loading state', () => {
+describe('View Record for loading and success state', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
@@ -29,7 +30,7 @@ describe('View Record for GraphQL loading state', () => {
         request: {
           query: FETCH_VIEW_RECORD_BY_COMPOSITION,
           variables: {
-            declarationId: '4090df15-f4e5-4f16-ae7e-bb518129d493'
+            id: '4090df15-f4e5-4f16-ae7e-bb518129d493'
           }
         },
         result: {
@@ -1207,12 +1208,40 @@ describe('View Record for GraphQL loading state', () => {
       history,
       graphqlMocks: mocks
     })
-    await flushPromises()
-    component.update()
-    await waitForElement(component, 'ViewRecord')
+    ;(useParams as Mock).mockImplementation(() => ({
+      declarationId: '4090df15-f4e5-4f16-ae7e-bb518129d493'
+    }))
   })
 
-  it('Record Audit page loads properly', async () => {
-    expect(component.exists('ViewRecord')).toBeTruthy()
+  it('Render loading state properly ', async () => {
+    expect(component.exists('LoadingState')).toBeTruthy()
+  })
+
+  it('Render review section properly ', async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0)
+    })
+    component.update()
+    expect(component.exists('ReviewSectionComp')).toBeTruthy()
+  })
+})
+
+describe('View Record error state', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store, history } = createStore()
+    component = await createTestComponent(<ViewRecord />, {
+      store,
+      history
+    })
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0)
+    })
+    component.update()
+  })
+
+  it('Render error state properly ', async () => {
+    expect(component.exists('GenericErrorToast')).toBeTruthy()
   })
 })

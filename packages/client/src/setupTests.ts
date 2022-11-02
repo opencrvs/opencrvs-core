@@ -233,9 +233,8 @@ vi.mock('./utils', () => ({ isNavigatorOnline: () => true }))
 
 vi.mock('react-router', async () => ({
   ...((await vi.importActual('react-router')) as any),
-  useParams: () => ({
-    declarationId: '4090df15-f4e5-4f16-ae7e-bb518129d493', //Amber Bailey
+  useParams: vi.fn().mockImplementation(() => ({
     event: 'birth',
     section: 'child'
-  })
+  }))
 }))
