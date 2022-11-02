@@ -37,6 +37,7 @@ import { IStoreState } from '@client/store'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserData } from './user/userProfilie/UserProfile'
 import { Roles } from '@client/utils/authUtils'
+import { isArray, mergeWith } from 'lodash'
 
 export enum UserStatus {
   ACTIVE,
@@ -533,13 +534,40 @@ export const transformRoleDataToDefinitions = (
   })
 }
 
-function getRoleSearchCriteria(currentUserRole?: string) {
-  if (currentUserRole && SYS_ADMIN_ROLES.includes(currentUserRole)) {
-    return {
-      value: { nin: NATL_ADMIN_ROLES.concat(NATIONAL_REGISTRAR_ROLES) }
+const DEFAULT_SEARCH_CRITERIA = {
+  value: {
+    nin: SYS_ADMIN_ROLES.concat(NATIONAL_REGISTRAR_ROLES)
+  }
+}
+
+const ROLEWISE_SEARCH_CRITERIA = {
+  [SYS_ADMIN_ROLES[0]]: {
+    value: {
+      nin: NATL_ADMIN_ROLES
     }
   }
-  return {}
+}
+
+type ValueOf<T> = T[keyof T]
+type Criteria = ValueOf<typeof ROLEWISE_SEARCH_CRITERIA>
+
+function mergeCustomizer(
+  objValue: Criteria,
+  srcValue: typeof DEFAULT_SEARCH_CRITERIA
+) {
+  if (isArray(objValue)) {
+    return objValue.concat(srcValue)
+  }
+  if (!objValue) {
+    return srcValue
+  }
+}
+
+function getRoleSearchCriteria(currentUserRole?: string) {
+  const criteria = DEFAULT_SEARCH_CRITERIA
+  const currentRoleSearchCriteria =
+    ROLEWISE_SEARCH_CRITERIA[currentUserRole as string]
+  return mergeWith(currentRoleSearchCriteria, criteria, mergeCustomizer)
 }
 
 export async function alterRolesBasedOnUserRole(

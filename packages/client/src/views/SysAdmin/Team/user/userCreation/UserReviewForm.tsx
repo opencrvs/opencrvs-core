@@ -78,6 +78,7 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/interface/Content'
+import { isEqual } from 'lodash'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -133,7 +134,7 @@ const Value = styled.span`
 `
 
 class UserReviewFormComponent extends React.Component<
-  IFullProps & IDispatchProps
+  IFullProps & IDispatchProps & { originalUserFormData: IFormSectionData }
 > {
   transformSectionData = () => {
     const { intl, userFormSection } = this.props
@@ -263,6 +264,16 @@ class UserReviewFormComponent extends React.Component<
     )}`
   }
 
+  isSubmitDisabled = () => {
+    const { skippedOfficeSelction, ...formData } = this.props.formData
+    return (
+      ((this.props.formData.role === 'LOCAL_REGISTRAR' ||
+        this.props.formData.role === 'NATIONAL_REGISTRAR') &&
+        !this.props.formData.signature) ||
+      isEqual(this.props.originalUserFormData, formData)
+    )
+  }
+
   render() {
     const {
       intl,
@@ -286,11 +297,7 @@ class UserReviewFormComponent extends React.Component<
       actionComponent = (
         <SuccessButton
           id="submit-edit-user-form"
-          disabled={
-            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
-              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
-            !this.props.formData.signature
-          }
+          disabled={this.isSubmitDisabled()}
           onClick={() => this.props.submitForm(userFormSection)}
           icon={() => <Check />}
           align={ICON_ALIGNMENT.LEFT}
@@ -397,9 +404,8 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 export const UserReviewForm = connect((store: IStoreState) => {
   return {
     userFormSection: store.userForm.userForm!.sections[0],
+    originalUserFormData: store.userForm.originalUserFormData,
     offlineCountryConfiguration: getOfflineData(store),
     userDetails: getUserDetails(store)
   }
-}, mapDispatchToProps)(
-  injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent)
-)
+}, mapDispatchToProps)(injectIntl(UserReviewFormComponent))

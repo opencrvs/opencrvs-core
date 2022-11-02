@@ -79,7 +79,8 @@ const initialState: IUserFormState = {
   submitting: false,
   loadingRoles: false,
   submissionError: false,
-  userAuditForm
+  userAuditForm,
+  originalUserFormData: {}
 }
 
 interface IUpdateUserFormFieldDefsAction {
@@ -291,6 +292,7 @@ export interface IUserFormState {
   loadingRoles: boolean
   submissionError: boolean
   userAuditForm: IUserAuditForm
+  originalUserFormData: IFormSectionData
 }
 
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
@@ -485,6 +487,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       return {
         ...state,
         userFormData: formData.user,
+        originalUserFormData: formData.user,
         userDetailsStored: true
       }
     case FETCH_USER_DATA:
