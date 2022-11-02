@@ -9,15 +9,55 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { query } from './../../utils/influx-helper.js'
+import { query, writePoints } from './../../utils/influx-helper.js'
 
 export const up = async (db, client) => {
-  const result = query(
-    "SELECT * FROM birth_registration WHERE registrarPractitionerId = ''"
-  )
+  const session = client.startSession()
+  await session.withTransaction(async () => {
+    const result = await query(
+      "SELECT * FROM birth_registration WHERE registrarPractitionerId = ''"
+    )
 
-  console.log(result)
-  ;(await result).map((result) => console.log(result))
+    result.forEach(
+      async ({ compositionId, time, ageInDays, currentStatus, ...tags }) => {
+        const task = await db.collection('Task').findOne({
+          focus: {
+            reference: `Composition/${compositionId}`
+          },
+          businessStatus: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/reg-status',
+                code: 'REGISTERED'
+              }
+            ]
+          }
+        })
+
+        const practitionerExtension = task.extension.find(
+          (extension) =>
+            extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
+        )
+        const id = practitionerExtension.valueReference.reference.replace(
+          'Practitioner/',
+          ''
+        )
+        const practitioner = await db.collection('Practitioner').findOne({ id })
+        const point = {
+          measurement: 'birth_registration',
+          tags: {
+            ...tags,
+            registrarPractitionerId: practitioner._id.toString()
+          },
+          fields: { compositionId, ageInDays, currentStatus },
+          timestamp: time.getNanoTime()
+        }
+
+        console.log(point)
+        await writePoints([point])
+      }
+    )
+  })
 }
 
 export const down = async (db, client) => {
