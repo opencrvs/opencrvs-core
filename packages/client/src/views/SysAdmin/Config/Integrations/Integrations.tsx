@@ -57,19 +57,13 @@ const PaddedAlert = styled(Alert)`
   margin-top: 16px;
 `
 const Label = styled.label`
-  margin-top: 5px;
+  margin-top: 12px;
 `
 const StyledSpinner = styled(Spinner)`
   margin: 10px 0;
 `
 const Field = styled.div`
-  margin-top: 10px;
-`
-const TextInputField = styled(TextInput)`
-  width: 100%;
-`
-const SelectInputField = styled(Select)`
-  width: 100%;
+  margin-top: 16px;
 `
 
 export function Integrations() {
@@ -204,7 +198,7 @@ export function Integrations() {
           : intl.formatMessage(integrationMessages.uniqueKeysDescription)}
 
         {createClientInfo && (
-          <div>
+          <>
             <Field>
               <InputField
                 id="name_of_client"
@@ -212,12 +206,13 @@ export function Integrations() {
                 required={true}
                 label={intl.formatMessage(integrationMessages.name)}
               >
-                <TextInputField
+                <TextInput
                   id="client_name"
                   type="text"
                   value={clientName}
                   onChange={onChangeText}
                   error={false}
+                  inputFieldWidth="100%"
                 />
               </InputField>
             </Field>
@@ -228,7 +223,8 @@ export function Integrations() {
                 touched={false}
                 label={intl.formatMessage(integrationMessages.type)}
               >
-                <SelectInputField
+                <Select
+                  ignoreMediaQuery
                   onChange={(val: string) => {
                     setClientType(val)
                   }}
@@ -260,7 +256,7 @@ export function Integrations() {
             </Field>
 
             {clientType === 'health-notification' && (
-              <AlertSyled type="info">
+              <PaddedAlert type="info">
                 {intl.formatMessage(
                   integrationMessages.healthnotificationAlertDescription
                 )}
@@ -272,13 +268,13 @@ export function Integrations() {
                 >
                   documentation.opencrvs.org
                 </Link>
-              </AlertSyled>
+              </PaddedAlert>
             )}
 
             {(clientType === 'mosip' ||
               clientType === 'record-search' ||
               clientType === 'webhook') && (
-              <AlertSyled type="info">
+              <PaddedAlert type="info">
                 {intl.formatMessage(integrationMessages.otherAlertDescription)}
                 {'\n'}
                 <Link
@@ -289,11 +285,11 @@ export function Integrations() {
                 >
                   documentation.opencrvs.org
                 </Link>
-              </AlertSyled>
+              </PaddedAlert>
             )}
 
             {clientType === 'webhook' && (
-              <div>
+              <>
                 <InputField
                   id="select-input"
                   touched={false}
@@ -421,9 +417,9 @@ export function Integrations() {
                 ) : (
                   <></>
                 )}
-              </div>
+              </>
             )}
-          </div>
+          </>
         )}
 
         {generateClientInfo && (
