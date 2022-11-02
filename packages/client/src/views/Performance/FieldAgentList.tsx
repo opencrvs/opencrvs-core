@@ -415,7 +415,7 @@ function FieldAgentListComponent(props: IProps) {
             <LocationPicker
               selectedLocationId={locationId}
               disabled={true}
-              onChangeLocation={({ id: newLocationId }) => {
+              onChangeLocation={(newLocationId) => {
                 props.goToFieldAgentList(timeStart, timeEnd, newLocationId)
               }}
               requiredJurisdictionTypes={

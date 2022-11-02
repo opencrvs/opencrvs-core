@@ -14,6 +14,7 @@ import { messages } from '@client/i18n/messages/views/performance'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
+import { generateLocations } from '@client/utils/locationUtils'
 import {
   Box,
   ISearchLocation,
@@ -36,7 +37,7 @@ import { DateRangePicker } from '@client/components/DateRangePicker'
 import subYears from 'date-fns/subYears'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { Event } from '@client/utils/gateway'
-import { LocationPicker } from '@client/components/LocationPicker'
+import { LocationPicker } from './LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
@@ -291,13 +292,12 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   onClickDetails = (time: CompletenessRateTime) => {
-    const { locationId } = parse(
-      this.props.location.search
-    ) as unknown as ISearchParams
-    const { event, timeStart, timeEnd } = this.state
+    const { event, selectedLocation, timeStart, timeEnd } = this.state
     this.props.goToCompletenessRates(
       event,
-      this.state.selectedLocation ? this.state.selectedLocation.id : locationId,
+      selectedLocation && !isCountry(selectedLocation)
+        ? selectedLocation.id
+        : undefined,
       timeStart,
       timeEnd,
       time
@@ -312,7 +312,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     return (
       <>
         <LocationPicker
-          selectedLocationId={locationId}
+          locationId={locationId}
           onChangeLocation={(newLocation) => {
             this.setState({ selectedLocation: newLocation })
           }}

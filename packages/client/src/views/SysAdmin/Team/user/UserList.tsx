@@ -581,7 +581,7 @@ function UserListComponent(props: IProps) {
       buttons.push(
         <LocationPicker
           selectedLocationId={locationId}
-          onChangeLocation={({ id: locationId }) => {
+          onChangeLocation={(locationId) => {
             props.goToTeamUserList(locationId)
           }}
           requiredJurisdictionTypes={'CRVS_OFFICE'}

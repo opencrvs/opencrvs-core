@@ -33,7 +33,6 @@ import {
 } from '@client/components/DateRangePicker'
 import styled from '@client/styledComponents'
 import { ILocation } from '@client/offline/reducer'
-import { getAdditionalLocations } from '@client/views/SysAdmin/Performance/utils'
 
 const { useState, useEffect } = React
 
@@ -49,7 +48,7 @@ interface IBaseProps {
   officeFilter?: (office: ILocation) => boolean
   selectedLocationId?: string
   disabled?: boolean
-  onChangeLocation: (locationId: ISearchLocation) => void
+  onChangeLocation: (locationId: string) => void
   requiredJurisdictionTypes?: string
   fuzzy?: boolean
   jurisidictionTypeFilter?: string[]
@@ -112,7 +111,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
     jurisidictionTypeFilter,
     selectedLocationId,
     disabled,
-    additionalLocations = getAdditionalLocations(props.intl),
+    additionalLocations = [],
     intl,
     fuzzy = true,
     locationFilter = () => true,
@@ -149,10 +148,6 @@ function LocationPickerComponent(props: LocationPickerProps) {
     ({ id }) => id === selectedLocationId
   ) as ISearchLocation
 
-  const [selectedLocation, setSelectedLocation] = useState<ISearchLocation>(
-    selectedSearchedLocation
-  )
-
   useEffect(() => {
     function toggleBodyScroll() {
       const body = document.querySelector('body') as HTMLBodyElement
@@ -176,7 +171,11 @@ function LocationPickerComponent(props: LocationPickerProps) {
         disabled={disabled}
       >
         <ContentWrapper>
-          <span>{selectedLocation?.displayLabel || ''}</span>
+          <span>
+            {(selectedSearchedLocation &&
+              selectedSearchedLocation.displayLabel) ||
+              ''}
+          </span>
           <MapPin color={props.disabled ? colors.grey200 : undefined} />
         </ContentWrapper>
       </PickerButton>
@@ -201,9 +200,8 @@ function LocationPickerComponent(props: LocationPickerProps) {
                 buttonLabel={intl.formatMessage(buttonMessages.search)}
                 selectedLocation={selectedSearchedLocation}
                 locationList={searchableLocations}
-                searchHandler={(location) => {
-                  setSelectedLocation(location)
-                  props.onChangeLocation(location)
+                searchHandler={({ id }) => {
+                  props.onChangeLocation(id)
                   setModalVisible(false)
                 }}
                 fuzzy={fuzzy}
