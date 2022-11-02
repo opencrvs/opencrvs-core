@@ -13,10 +13,6 @@ import fetch from 'node-fetch'
 import { inScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import {
-  IBookmarkAdvancedSearchPayload,
-  ISearch
-} from '@gateway/features/advanceSearch/type-resolvers'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -30,15 +26,9 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const { userId, name, ...parameters } = bookmarkSearchInput
-      const advancedSearchPayload: IBookmarkAdvancedSearchPayload = {
-        userId: userId,
-        search: { name, ...parameters } as ISearch
-      }
-
       const res = await fetch(`${USER_MANAGEMENT_URL}searches`, {
         method: 'POST',
-        body: JSON.stringify(advancedSearchPayload),
+        body: JSON.stringify(bookmarkSearchInput),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader

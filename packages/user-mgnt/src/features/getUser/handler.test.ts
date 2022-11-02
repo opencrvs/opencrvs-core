@@ -75,9 +75,12 @@ const dummyUser = {
   auditHistory: [],
   searches: [
     {
-      searchId: '7a10234254be318fa7607823df',
-      name: 'Advance Search',
-      registrationStatuses: []
+      searchId: '121212',
+      name: 'Advanced Search',
+      parameters: {
+        event: 'birth',
+        registrationStatuses: []
+      }
     }
   ]
 }

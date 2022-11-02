@@ -421,7 +421,7 @@ type User {
   creationDate: String
   avatar: Avatar
   device: String
-  searches: [Search]
+  searches: [BookmarkedSeachItem]
 }
 
 type SearchUserResult {
@@ -935,54 +935,10 @@ type Signature {
   type: String
 }
 
-type Search {
+type BookmarkedSeachItem {
   searchId: String!
   name: String!
-  event: String
-  registrationStatuses: [String]
-  dateOfEvent: String
-  dateOfEventStart: String
-  dateOfEventEnd: String
-  registrationNumber: String
-  trackingId: String
-  dateOfRegistration: String
-  dateOfRegistrationStart: String
-  dateOfRegistrationEnd: String
-  declarationLocationId: String
-  declarationJurisdictionId: String
-  eventLocationId: String
-  eventLocationLevel1: String
-  eventLocationLevel2: String
-  eventLocationLevel3: String
-  eventLocationLevel4: String
-  eventLocationLevel5: String
-  childFirstNames: String
-  childLastName: String
-  childDoB: String
-  childDoBStart: String
-  childDoBEnd: String
-  childGender: String
-  deceasedFirstNames: String
-  deceasedFamilyName: String
-  deceasedGender: String
-  deceasedDoB: String
-  deceasedDoBStart: String
-  deceasedDoBEnd: String
-  motherFirstNames: String
-  motherFamilyName: String
-  motherDoB: String
-  motherDoBStart: String
-  motherDoBEnd: String
-  fatherFirstNames: String
-  fatherFamilyName: String
-  fatherDoB: String
-  fatherDoBStart: String
-  fatherDoBEnd: String
-  informantFirstNames: String
-  informantFamilyName: String
-  informantDoB: String
-  informantDoBStart: String
-  informantDoBEnd: String
+  parameters: AdvancedSeachParameters!
 }
 
 type SearchFieldAgentResponse {
@@ -1237,12 +1193,6 @@ input QuestionInput {
   conditionals: [ConditionalInput!]
 }
 
-type BookmarkedSeachItem {
-  searchId: String!
-  name: String!
-  parameters: AdvancedSeachParameters!
-}
-
 input AdvancedSearchParametersInput {
   event: Event
   registrationStatuses: [String!]
@@ -1426,6 +1376,54 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+}
+
+type AdvancedSeachParameters {
+  event: Event
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
 }
 
 type UserAuditLogItemWithComposition implements AuditLogItemBase {
@@ -1616,54 +1614,6 @@ enum CustomFieldType {
 input ConditionalInput {
   fieldId: String!
   regexp: String!
-}
-
-type AdvancedSeachParameters {
-  event: Event
-  registrationStatuses: [String]
-  dateOfEvent: String
-  dateOfEventStart: String
-  dateOfEventEnd: String
-  registrationNumber: String
-  trackingId: String
-  dateOfRegistration: String
-  dateOfRegistrationStart: String
-  dateOfRegistrationEnd: String
-  declarationLocationId: String
-  declarationJurisdictionId: String
-  eventLocationId: String
-  eventLocationLevel1: String
-  eventLocationLevel2: String
-  eventLocationLevel3: String
-  eventLocationLevel4: String
-  eventLocationLevel5: String
-  childFirstNames: String
-  childLastName: String
-  childDoB: String
-  childDoBStart: String
-  childDoBEnd: String
-  childGender: String
-  deceasedFirstNames: String
-  deceasedFamilyName: String
-  deceasedGender: String
-  deceasedDoB: String
-  deceasedDoBStart: String
-  deceasedDoBEnd: String
-  motherFirstNames: String
-  motherFamilyName: String
-  motherDoB: String
-  motherDoBStart: String
-  motherDoBEnd: String
-  fatherFirstNames: String
-  fatherFamilyName: String
-  fatherDoB: String
-  fatherDoBStart: String
-  fatherDoBEnd: String
-  informantFirstNames: String
-  informantFamilyName: String
-  informantDoB: String
-  informantDoBStart: String
-  informantDoBEnd: String
 }
 
 type Payment {

@@ -53,13 +53,15 @@ const mockUser: IUser & { _id: string } = {
   salt: '12345'
 }
 
-// @ts-ignore
-const mockUserWithSearchRecord: IUser & { _id: string } = {
-  username: 'j.doe1',
-  searches: [
+const mockUserWithSearchRecord = {
+  searchList: [
     {
-      searchId: '7a10234254be318fa7607823df',
-      name: 'Advance Search'
+      searchId: '121212',
+      name: 'Advanced Search',
+      parameters: {
+        event: 'birth',
+        registrationStatuses: []
+      }
     }
   ]
 }
@@ -81,11 +83,9 @@ describe('createSearchHandler & removeSearchHandler', () => {
       url: '/searches',
       payload: {
         userId: '5d10885374be318fa7689f0b',
-        search: {
-          name: 'Advance Search',
-          parameters: {
-            event: 'birth'
-          }
+        name: 'Advance Search',
+        parameters: {
+          event: 'birth'
         }
       },
       headers: {
@@ -100,18 +100,16 @@ describe('createSearchHandler & removeSearchHandler', () => {
 
   it('create search entry in user', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
-    mockingoose(User).toReturn({}, 'updateOne')
+    mockingoose(User).toReturn(mockUserWithSearchRecord, 'updateOne')
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/searches',
       payload: {
         userId: '5d10885374be318fa7689f0b',
-        search: {
-          name: 'Advance Search',
-          parameters: {
-            event: 'birth'
-          }
+        name: 'Advance Search',
+        parameters: {
+          event: 'birth'
         }
       },
       headers: {

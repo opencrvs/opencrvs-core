@@ -73,51 +73,53 @@ export enum Event {
 export interface ISearch {
   searchId: string
   name: string
-  event?: Event
-  registrationStatuses?: string[]
-  dateOfEvent?: string
-  dateOfEventStart?: string
-  dateOfEventEnd?: string
-  registrationNumber?: string
-  trackingId?: string
-  dateOfRegistration?: string
-  dateOfRegistrationStart?: string
-  dateOfRegistrationEnd?: string
-  declarationLocationId?: string
-  declarationJurisdictionId?: string
-  eventLocationId?: string
-  eventLocationLevel1?: string
-  eventLocationLevel2?: string
-  eventLocationLevel3?: string
-  eventLocationLevel4?: string
-  eventLocationLevel5?: string
-  childFirstNames?: string
-  childLastName?: string
-  childDoB?: string
-  childDoBStart?: string
-  childDoBEnd?: string
-  childGender?: string
-  deceasedFirstNames?: string
-  deceasedFamilyName?: string
-  deceasedGender?: string
-  deceasedDoB?: string
-  deceasedDoBStart?: string
-  deceasedDoBEnd?: string
-  motherFirstNames?: string
-  motherFamilyName?: string
-  motherDoB?: string
-  motherDoBStart?: string
-  motherDoBEnd?: string
-  fatherFirstNames?: string
-  fatherFamilyName?: string
-  fatherDoB?: string
-  fatherDoBStart?: string
-  fatherDoBEnd?: string
-  informantFirstNames?: string
-  informantFamilyName?: string
-  informantDoB?: string
-  informantDoBStart?: string
-  informantDoBEnd?: string
+  parameters: {
+    event?: Event
+    registrationStatuses?: string[]
+    dateOfEvent?: string
+    dateOfEventStart?: string
+    dateOfEventEnd?: string
+    registrationNumber?: string
+    trackingId?: string
+    dateOfRegistration?: string
+    dateOfRegistrationStart?: string
+    dateOfRegistrationEnd?: string
+    declarationLocationId?: string
+    declarationJurisdictionId?: string
+    eventLocationId?: string
+    eventLocationLevel1?: string
+    eventLocationLevel2?: string
+    eventLocationLevel3?: string
+    eventLocationLevel4?: string
+    eventLocationLevel5?: string
+    childFirstNames?: string
+    childLastName?: string
+    childDoB?: string
+    childDoBStart?: string
+    childDoBEnd?: string
+    childGender?: string
+    deceasedFirstNames?: string
+    deceasedFamilyName?: string
+    deceasedGender?: string
+    deceasedDoB?: string
+    deceasedDoBStart?: string
+    deceasedDoBEnd?: string
+    motherFirstNames?: string
+    motherFamilyName?: string
+    motherDoB?: string
+    motherDoBStart?: string
+    motherDoBEnd?: string
+    fatherFirstNames?: string
+    fatherFamilyName?: string
+    fatherDoB?: string
+    fatherDoBStart?: string
+    fatherDoBEnd?: string
+    informantFirstNames?: string
+    informantFamilyName?: string
+    informantDoB?: string
+    informantDoBStart?: string
+    informantDoBEnd?: string
+  }
 }
 export interface IAvatar {
   type: string
@@ -212,10 +214,8 @@ const AuditHistory = new Schema(
   }
 )
 
-const SearchesSchema = new Schema(
+const AdvanceSearchParameters = new Schema(
   {
-    searchId: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
     event: {
       type: String,
       enum: [Event.BIRTH, Event.DEATH],
@@ -269,6 +269,17 @@ const SearchesSchema = new Schema(
     informantDoB: { type: String },
     informantDoBStart: { type: String },
     informantDoBEnd: { type: String }
+  },
+  {
+    _id: false
+  }
+)
+
+const SearchesSchema = new Schema(
+  {
+    searchId: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    parameters: { type: AdvanceSearchParameters, required: true }
   },
   {
     _id: false
