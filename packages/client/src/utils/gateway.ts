@@ -36,6 +36,12 @@ export type Scalars = {
   Map: any
 }
 
+export type AdditionalIdWithCompositionId = {
+  __typename?: 'AdditionalIdWithCompositionId'
+  compositionId: Scalars['String']
+  trackingId: Scalars['String']
+}
+
 export type Address = {
   __typename?: 'Address'
   city?: Maybe<Scalars['String']>
@@ -93,6 +99,7 @@ export type ApplicationConfiguration = {
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
+  INTEGRATIONS?: Maybe<Array<Maybe<Integration>>>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -107,6 +114,7 @@ export type ApplicationConfigurationInput = {
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
+  INTEGRATIONS?: InputMaybe<Array<InputMaybe<IntegrationInput>>>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -188,6 +196,14 @@ export enum AttendantType {
   OtherParamedicalPersonnel = 'OTHER_PARAMEDICAL_PERSONNEL',
   Physician = 'PHYSICIAN',
   TraditionalBirthAttendant = 'TRADITIONAL_BIRTH_ATTENDANT'
+}
+
+export type AuditLogItemBase = {
+  action: Scalars['String']
+  ipAddress: Scalars['String']
+  practitionerId: Scalars['String']
+  time: Scalars['String']
+  userAgent: Scalars['String']
 }
 
 export type Avatar = {
@@ -405,6 +421,7 @@ export type CorrectionInput = {
   location?: InputMaybe<LocationInput>
   noSupportingDocumentationRequired?: InputMaybe<Scalars['Boolean']>
   note?: InputMaybe<Scalars['String']>
+  otherReason?: InputMaybe<Scalars['String']>
   payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
   reason?: InputMaybe<Scalars['String']>
   requester?: InputMaybe<Scalars['ID']>
@@ -701,15 +718,15 @@ export type History = {
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
   dhis2Notification?: Maybe<Scalars['Boolean']>
+  hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
   location?: Maybe<Location>
   office?: Maybe<Location>
+  otherReason?: Maybe<Scalars['String']>
   output?: Maybe<Array<Maybe<InputOutput>>>
   reason?: Maybe<Scalars['String']>
   regStatus?: Maybe<RegStatus>
   requester?: Maybe<Scalars['String']>
-  hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
-  otherReason?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
   user?: Maybe<User>
@@ -736,9 +753,12 @@ export type Identifier = {
 
 export enum IdentityIdType {
   AlienNumber = 'ALIEN_NUMBER',
+  BirthPatientEntry = 'BIRTH_PATIENT_ENTRY',
   BirthRegistrationNumber = 'BIRTH_REGISTRATION_NUMBER',
   DeathRegistrationNumber = 'DEATH_REGISTRATION_NUMBER',
+  DeceasedPatientEntry = 'DECEASED_PATIENT_ENTRY',
   DrivingLicense = 'DRIVING_LICENSE',
+  MosipUintoken = 'MOSIP_UINTOKEN',
   NationalId = 'NATIONAL_ID',
   NoId = 'NO_ID',
   Other = 'OTHER',
@@ -785,6 +805,17 @@ export type InputOutput = {
   valueCode?: Maybe<Scalars['String']>
   valueId?: Maybe<Scalars['String']>
   valueString?: Maybe<Scalars['String']>
+}
+
+export type Integration = {
+  __typename?: 'Integration'
+  name?: Maybe<Scalars['String']>
+  status?: Maybe<Scalars['String']>
+}
+
+export type IntegrationInput = {
+  name?: InputMaybe<Scalars['String']>
+  status?: InputMaybe<Scalars['String']>
 }
 
 export type LocalRegistrar = {
@@ -947,9 +978,11 @@ export type Mutation = {
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
   resendSMSInvite?: Maybe<Scalars['String']>
+  resetPasswordSMS?: Maybe<Scalars['String']>
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
+  usernameSMSReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
 
@@ -1093,6 +1126,11 @@ export type MutationResendSmsInviteArgs = {
   userId: Scalars['String']
 }
 
+export type MutationResetPasswordSmsArgs = {
+  applicationName: Scalars['String']
+  userId: Scalars['String']
+}
+
 export type MutationUpdateApplicationConfigArgs = {
   applicationConfig?: InputMaybe<ApplicationConfigurationInput>
 }
@@ -1105,6 +1143,10 @@ export type MutationUpdateBirthRegistrationArgs = {
 export type MutationUpdateDeathRegistrationArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
+}
+
+export type MutationUsernameSmsReminderArgs = {
+  userId: Scalars['String']
 }
 
 export type MutationVoidNotificationArgs = {
@@ -1236,7 +1278,6 @@ export type Query = {
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
-  fetchTimeLoggedMetricsByPractitioner?: Maybe<TimeLoggedMetricsResultSet>
   getActiveCertificatesSVG?: Maybe<Array<Maybe<CertificateSvg>>>
   getCertificateSVG?: Maybe<CertificateSvg>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
@@ -1249,6 +1290,7 @@ export type Query = {
   getTotalMetrics?: Maybe<TotalMetricsResult>
   getTotalPayments?: Maybe<Array<PaymentMetric>>
   getUser?: Maybe<User>
+  getUserAuditLog?: Maybe<UserAuditLogResultSet>
   getUserByMobile?: Maybe<User>
   hasChildLocation?: Maybe<Location>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
@@ -1301,14 +1343,6 @@ export type QueryFetchRegistrationCountByStatusArgs = {
   event?: InputMaybe<Scalars['String']>
   locationId?: InputMaybe<Scalars['String']>
   status: Array<InputMaybe<Scalars['String']>>
-}
-
-export type QueryFetchTimeLoggedMetricsByPractitionerArgs = {
-  count: Scalars['Int']
-  locationId: Scalars['String']
-  practitionerId: Scalars['String']
-  timeEnd: Scalars['String']
-  timeStart: Scalars['String']
 }
 
 export type QueryGetCertificateSvgArgs = {
@@ -1374,6 +1408,14 @@ export type QueryGetTotalPaymentsArgs = {
 
 export type QueryGetUserArgs = {
   userId?: InputMaybe<Scalars['String']>
+}
+
+export type QueryGetUserAuditLogArgs = {
+  count: Scalars['Int']
+  practitionerId: Scalars['String']
+  skip?: InputMaybe<Scalars['Int']>
+  timeEnd?: InputMaybe<Scalars['String']>
+  timeStart?: InputMaybe<Scalars['String']>
 }
 
 export type QueryGetUserByMobileArgs = {
@@ -1595,6 +1637,7 @@ export type Registration = {
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
+  mosipAid?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
   paperFormID?: Maybe<Scalars['String']>
@@ -1623,6 +1666,7 @@ export type RegistrationInput = {
   inCompleteFields?: InputMaybe<Scalars['String']>
   informantType?: InputMaybe<InformantType>
   location?: InputMaybe<LocationInput>
+  mosipAid?: InputMaybe<Scalars['String']>
   otherInformantType?: InputMaybe<Scalars['String']>
   page?: InputMaybe<Scalars['String']>
   paperFormID?: InputMaybe<Scalars['String']>
@@ -1743,20 +1787,6 @@ export type StatusWiseRegistrationCount = {
   status: Scalars['String']
 }
 
-export type TimeLoggedMetrics = {
-  __typename?: 'TimeLoggedMetrics'
-  eventType: Scalars['String']
-  status: Scalars['String']
-  time: Scalars['String']
-  trackingId?: Maybe<Scalars['String']>
-}
-
-export type TimeLoggedMetricsResultSet = {
-  __typename?: 'TimeLoggedMetricsResultSet'
-  results?: Maybe<Array<Maybe<TimeLoggedMetrics>>>
-  totalItems?: Maybe<Scalars['Int']>
-}
-
 export type TotalMetricsResult = {
   __typename?: 'TotalMetricsResult'
   estimated: Estimation
@@ -1784,6 +1814,35 @@ export type User = {
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID?: Maybe<Scalars['ID']>
   username?: Maybe<Scalars['String']>
+}
+
+export type UserAuditLogItem = AuditLogItemBase & {
+  __typename?: 'UserAuditLogItem'
+  action: Scalars['String']
+  ipAddress: Scalars['String']
+  practitionerId: Scalars['String']
+  time: Scalars['String']
+  userAgent: Scalars['String']
+}
+
+export type UserAuditLogItemWithComposition = AuditLogItemBase & {
+  __typename?: 'UserAuditLogItemWithComposition'
+  action: Scalars['String']
+  data: AdditionalIdWithCompositionId
+  ipAddress: Scalars['String']
+  practitionerId: Scalars['String']
+  time: Scalars['String']
+  userAgent: Scalars['String']
+}
+
+export type UserAuditLogResultItem =
+  | UserAuditLogItem
+  | UserAuditLogItemWithComposition
+
+export type UserAuditLogResultSet = {
+  __typename?: 'UserAuditLogResultSet'
+  results: Array<UserAuditLogResultItem>
+  total: Scalars['Int']
 }
 
 export type UserIdentifierInput = {
@@ -2267,6 +2326,15 @@ export type ResendSmsInviteMutation = {
   resendSMSInvite?: string | null
 }
 
+export type UsernameSmsReminderMutationVariables = Exact<{
+  userId: Scalars['String']
+}>
+
+export type UsernameSmsReminderMutation = {
+  __typename?: 'Mutation'
+  usernameSMSReminder?: string | null
+}
+
 export type SearchUsersQueryVariables = Exact<{
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
@@ -2283,6 +2351,7 @@ export type SearchUsersQuery = {
       id?: string | null
       username?: string | null
       role?: string | null
+      mobile?: string | null
       type?: string | null
       status?: string | null
       underInvestigation?: boolean | null
@@ -2294,6 +2363,45 @@ export type SearchUsersQuery = {
       } | null> | null
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
+  } | null
+}
+
+export type GetUserAuditLogQueryVariables = Exact<{
+  practitionerId: Scalars['String']
+  count: Scalars['Int']
+  skip: Scalars['Int']
+  timeStart?: InputMaybe<Scalars['String']>
+  timeEnd?: InputMaybe<Scalars['String']>
+}>
+
+export type GetUserAuditLogQuery = {
+  __typename?: 'Query'
+  getUserAuditLog?: {
+    __typename?: 'UserAuditLogResultSet'
+    total: number
+    results: Array<
+      | {
+          __typename?: 'UserAuditLogItem'
+          time: string
+          userAgent: string
+          practitionerId: string
+          ipAddress: string
+          action: string
+        }
+      | {
+          __typename?: 'UserAuditLogItemWithComposition'
+          time: string
+          userAgent: string
+          practitionerId: string
+          ipAddress: string
+          action: string
+          data: {
+            __typename?: 'AdditionalIdWithCompositionId'
+            compositionId: string
+            trackingId: string
+          }
+        }
+    >
   } | null
 }
 
@@ -2349,29 +2457,6 @@ export type GetUserQuery = {
       data?: string | null
     } | null
     avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
-  } | null
-}
-
-export type FetchTimeLoggedMetricsByPractitionerQueryVariables = Exact<{
-  timeStart: Scalars['String']
-  timeEnd: Scalars['String']
-  practitionerId: Scalars['String']
-  locationId: Scalars['String']
-  count: Scalars['Int']
-}>
-
-export type FetchTimeLoggedMetricsByPractitionerQuery = {
-  __typename?: 'Query'
-  fetchTimeLoggedMetricsByPractitioner?: {
-    __typename?: 'TimeLoggedMetricsResultSet'
-    totalItems?: number | null
-    results?: Array<{
-      __typename?: 'TimeLoggedMetrics'
-      status: string
-      trackingId?: string | null
-      eventType: string
-      time: string
-    } | null> | null
   } | null
 }
 
@@ -2668,6 +2753,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      mosipAid?: string | null
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
@@ -2716,6 +2802,9 @@ export type FetchBirthRegistrationForReviewQuery = {
     } | null> | null
     history?: Array<{
       __typename?: 'History'
+      otherReason?: string | null
+      requester?: string | null
+      hasShowedVerifiedDocument?: boolean | null
       date?: any | null
       action?: RegAction | null
       regStatus?: RegStatus | null
@@ -2823,6 +2912,12 @@ export type FetchBirthRegistrationForCertificateQuery = {
       multipleBirth?: number | null
       birthDate?: string | null
       gender?: string | null
+      identifier?: Array<{
+        __typename?: 'IdentityType'
+        id?: string | null
+        type?: IdentityIdType | null
+        otherType?: string | null
+      } | null> | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -2952,6 +3047,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       contactPhoneNumber?: string | null
       trackingId?: string | null
       registrationNumber?: string | null
+      mosipAid?: string | null
       status?: Array<{
         __typename?: 'RegWorkflow'
         type?: RegStatus | null
@@ -3002,6 +3098,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      reason?: string | null
+      otherReason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3358,6 +3456,9 @@ export type FetchDeathRegistrationForReviewQuery = {
     } | null> | null
     history?: Array<{
       __typename?: 'History'
+      otherReason?: string | null
+      requester?: string | null
+      hasShowedVerifiedDocument?: boolean | null
       date?: any | null
       action?: RegAction | null
       regStatus?: RegStatus | null
@@ -3629,6 +3730,8 @@ export type FetchDeathRegistrationForCertificationQuery = {
     } | null
     history?: Array<{
       __typename?: 'History'
+      otherReason?: string | null
+      requester?: string | null
       date?: any | null
       action?: RegAction | null
       regStatus?: RegStatus | null
