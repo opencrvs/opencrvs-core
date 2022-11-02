@@ -215,7 +215,7 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Please provide a reason for this correction',
     description:
       'The error message that appears on reason field on correction form',
-    id: 'validations.correction.reason.required'
+    id: 'validations.correctionReason'
   },
   requiredSymbol: {
     defaultMessage: '',
