@@ -31,7 +31,6 @@ const Container = styled.div<{
     ${$type === undefined ? theme.colors.positiveDark : ''}
   `};
 
-  min-height: 52px;
   display: flex;
   border-radius: 4px;
   border: 2px solid var(--color);

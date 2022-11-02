@@ -53,9 +53,8 @@ export const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
-const AlertSyled = styled(Alert)`
-  margin-top: 30px;
-  min-height: 5rem;
+const PaddedAlert = styled(Alert)`
+  margin-top: 16px;
 `
 const Label = styled.label`
   margin-top: 5px;
