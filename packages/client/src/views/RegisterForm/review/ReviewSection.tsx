@@ -1693,9 +1693,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </SectionContainer>
                 )
               })}
-
               {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                 this.getAllAttachmentInPreviewList(declaration)}
+              {(!isCorrection(declaration) || viewRecord) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
