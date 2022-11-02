@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useState } from 'react'
+import React from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
 import { useIntl } from 'react-intl'
 import {
@@ -20,18 +20,13 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
 import { Plus, VerticalThreeDots } from '@opencrvs/components/lib/icons'
-import { WebhookOption } from '@client/utils/gateway'
 import {
   Alert,
-  CheckboxGroup,
-  Divider,
-  FormTabs,
   InputField,
   Link,
   Pill,
   Select,
   Spinner,
-  Stack,
   TextInput,
   ToggleMenu
 } from '@opencrvs/components/lib'
@@ -40,7 +35,6 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import styled from 'styled-components'
-import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { connect, useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
@@ -56,9 +50,7 @@ export const statuses = {
 const PaddedAlert = styled(Alert)`
   margin-top: 16px;
 `
-const Label = styled.label`
-  margin-top: 12px;
-`
+
 const StyledSpinner = styled(Spinner)`
   margin: 10px 0;
 `
@@ -75,14 +67,6 @@ export function Integrations() {
     React.useState<boolean>(false)
   const [clientName, setClientName] = React.useState<string>(EMPTY_STRING)
   const [clientType, setClientType] = React.useState<string>(EMPTY_STRING)
-  const [selectedTab, setSelectedTab] = React.useState<string>(
-    WebhookOption.birth
-  )
-  const [selectedItems, setSelectedItems] = useState(['registration-details'])
-  const [selectedItemsNoPII, setSelectedItemsNoPII] = useState([
-    'registration-details-noPII'
-  ])
-  const [NoPII, setSelected] = React.useState(false)
 
   const toggleModal = () => {
     setToggleModal((prev) => !prev)
@@ -98,9 +82,21 @@ export function Integrations() {
     setClientName(value)
   }
 
+  /* TODO: Note, webhooks will be amended in OCRVS-4160
+
+  const [NoPII, setSelected] = React.useState(false)
+  const [selectedTab, setSelectedTab] = React.useState<string>(
+    WebhookOption.birth
+  )
+  const [selectedItems, setSelectedItems] = useState(['registration-details'])
+  const [selectedItemsNoPII, setSelectedItemsNoPII] = useState([
+    'registration-details-noPII'
+  ])
   const toggleOnChange = () => {
     setSelected(!NoPII)
   }
+
+  */
 
   return (
     <Frame
@@ -174,9 +170,7 @@ export function Integrations() {
             {intl.formatMessage(buttonMessages.cancel)}
           </Link>,
           <Button
-            disabled={
-              clientType === '' || clientName === '' || selectedItems.length < 1
-            }
+            disabled={clientType === '' || clientName === ''}
             onClick={changeModalInfo}
             type="primary"
           >
@@ -245,11 +239,12 @@ export function Integrations() {
                         integrationMessages.recordSearch
                       ),
                       value: 'record-search'
-                    },
+                    }
+                    /* TODO: Note, this will be amended in OCRVS-4160
                     {
                       label: intl.formatMessage(integrationMessages.webhook),
                       value: 'webhook'
-                    }
+                    } */
                   ]}
                 />
               </InputField>
@@ -288,7 +283,8 @@ export function Integrations() {
               </PaddedAlert>
             )}
 
-            {clientType === 'webhook' && (
+            {/* TODO: Note, webhooks will be amended in OCRVS-4160
+            clientType === 'webhook' && (
               <>
                 <InputField
                   id="select-input"
@@ -418,7 +414,7 @@ export function Integrations() {
                   <></>
                 )}
               </>
-            )}
+                )*/}
           </>
         )}
 
