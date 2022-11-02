@@ -59,7 +59,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
 import {
@@ -241,7 +241,7 @@ interface IStatusProps {
 
 interface ToggleModal {
   modalVisible: boolean
-  selectedUser: GQLUser | null
+  selectedUser: User | null
 }
 
 interface ToggleModal {
@@ -348,7 +348,7 @@ function UserListComponent(props: IProps) {
   )
 
   const toggleUsernameReminderModal = useCallback(
-    function toggleUsernameReminderModal(user?: GQLUser) {
+    function toggleUsernameReminderModal(user?: User) {
       if (user !== undefined) {
         setToggleUsernameReminder({
           ...toggleUsernameReminder,
@@ -366,7 +366,7 @@ function UserListComponent(props: IProps) {
   )
 
   const toggleUserResetPasswordModal = useCallback(
-    function toggleUserResetPasswordModal(user?: GQLUser) {
+    function toggleUserResetPasswordModal(user?: User) {
       if (user !== undefined) {
         setToggleResetPassword({
           ...toggleResetPassword,
@@ -532,7 +532,7 @@ function UserListComponent(props: IProps) {
     }
   }
 
-  const getUserName = (user: GQLUser) => {
+  const getUserName = (user: User) => {
     const userName =
       (user &&
         user.name &&
@@ -959,7 +959,7 @@ function UserListComponent(props: IProps) {
           onClose={() => setShowUsernameSMSReminderSuccess(false)}
         >
           {intl.formatMessage(messages.sendUsernameReminderSMSSuccess, {
-            name: getUserName(toggleUsernameReminder.selectedUser as GQLUser)
+            name: getUserName(toggleUsernameReminder.selectedUser as User)
           })}
         </Toast>
       )}
@@ -986,7 +986,7 @@ function UserListComponent(props: IProps) {
           }}
         >
           {intl.formatMessage(messages.resetPasswordSMSSuccess, {
-            username: getUserName(toggleResetPassword.selectedUser as GQLUser)
+            username: getUserName(toggleResetPassword.selectedUser as User)
           })}
         </Toast>
       )}
