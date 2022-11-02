@@ -11,6 +11,8 @@
  */
 import { FindCursor, Document, MongoClient } from 'mongodb'
 import { createObjectCsvWriter as createCSV } from 'csv-writer'
+import * as DateFNS from 'date-fns'
+import { CsvWriter } from 'csv-writer/src/lib/csv-writer'
 
 const HEARTH_MONGO_URL = process.env.HEARTH_MONGO_URL || 'mongodb://localhost'
 const DB_NAME = 'hearth-dev'
@@ -154,31 +156,30 @@ const OBSERVATION_CODE = {
 const connect = async () => {
   try {
     await client.connect()
-    // tslint:disable-next-line
     console.log('Connected to mongoDB')
   } catch (err) {
-    // tslint:disable-next-line
     console.log('Error occured while connecting to mongoDB', err)
   }
 }
 
-const Disconnect = async () => {
+const disconnect = async () => {
   try {
     await client.close()
-    // tslint:disable-next-line
-    console.log('Disconnected to mongoDB')
+    console.log('Closed mongoDB connection.')
   } catch (err) {
-    // tslint:disable-next-line
     console.log('Error occured while disconnecting to mongoDB', err)
   }
 }
 
-async function getCompositionCursor() {
+async function getCompositionCursor(startDate: string, endDate: string) {
   const db = client.db(DB_NAME)
   return db
     .collection(COLLECTION_NAMES.COMPOSITION)
     .find({
-      date: { $gt: process.argv[2], $lt: process.argv[3] }
+      date: {
+        $gte: startDate,
+        $lte: endDate
+      }
     })
     .project({ id: 1, title: 1, section: 1, date: 1, _id: 0 })
 }
@@ -249,24 +250,22 @@ async function setPatientsAddress(
   patients: fhir.Patient[],
   locations: fhir.Location[]
 ) {
-  patients.forEach(
-    (patient: { address: { district: string; state: string }[] }) => {
-      if (patient.address) {
-        if (patient.address[0].district) {
-          const districtAddress = locations.find(
-            ({ id }) => id === patient.address[0].district
-          )
-          patient.address[0].district = districtAddress?.name ?? ''
-        }
-        if (patient.address[0].state) {
-          const stateAddress = locations.find(
-            ({ id }) => id === patient.address[0].state
-          )
-          patient.address[0].state = stateAddress?.name ?? ''
-        }
+  patients.forEach((patient) => {
+    if (patient.address) {
+      if (patient.address[0].district) {
+        const districtAddress = locations.find(
+          ({ id }) => id === patient.address?.[0].district
+        )
+        patient.address[0].district = districtAddress?.name ?? ''
+      }
+      if (patient.address[0].state) {
+        const stateAddress = locations.find(
+          ({ id }) => id === patient.address?.[0].state
+        )
+        patient.address[0].state = stateAddress?.name ?? ''
       }
     }
-  )
+  })
 }
 
 async function setPatientsDetailsInComposition(
@@ -280,10 +279,10 @@ async function setPatientsDetailsInComposition(
   const patientIds = patientList?.map((patient) =>
     patient.entry?.[0].reference?.replace('Patient/', '')
   ) as string[]
-  const patients: fhir.Patient[] = await getCollectionDocuments(
+  const patients = (await getCollectionDocuments(
     COLLECTION_NAMES.PATIENT,
     patientIds
-  )
+  )) as unknown as fhir.Patient[]
   await setPatientsAddress(patients, locations)
 
   composition.section?.forEach((section) => {
@@ -303,7 +302,8 @@ async function setPatientsDetailsInComposition(
 async function setLocationInComposition(
   composition: fhir.Composition,
   fullComposition: Partial<IFullComposition>,
-  locations: fhir.Location[]
+  locations: fhir.Location[],
+  task: fhir.Task
 ) {
   const encounter = composition.section?.find(
     (section) =>
@@ -312,7 +312,7 @@ async function setLocationInComposition(
   )
   const encounterId =
     encounter?.entry?.[0].reference?.replace('Encounter/', '') ?? ''
-  const encounterDoc: fhir.Encounter[] = await getCollectionDocuments(
+  const encounterDoc = await getCollectionDocuments(
     COLLECTION_NAMES.ENCOUNTER,
     [encounterId]
   )
@@ -335,10 +335,6 @@ async function setLocationInComposition(
   fullComposition['eventState'] = stateLocation?.name ?? ''
   fullComposition['eventCity'] = location.address?.city ?? ''
 
-  const [task] = (await getTaskDocByCompositionId(
-    `Composition/${composition.id}`
-  )) as [fhir.Task]
-
   const officeLocationId = task.extension
     ?.find((obj) => obj.url === officeLocationExtURL)
     ?.valueReference?.reference?.replace('Location/', '')
@@ -358,7 +354,7 @@ async function setObservationDetailsInComposition(
   )
   const observations = (await getObservationDocByEncounterId(
     String(encounter?.entry?.[0].reference)
-  )) as fhir.Observation[]
+  )) as unknown as fhir.Observation[]
   const observationObj: IObservation = {
     causeOfDeathMethod: '',
     birthPluralityOfPregnancy: '',
@@ -479,24 +475,26 @@ async function setInformantDetailsInComposition(
   )
   const informantId =
     informant?.entry?.[0].reference?.replace('RelatedPerson/', '') ?? ''
-  const relatedPerson: fhir.RelatedPerson[] = await getCollectionDocuments(
+  const relatedPerson = (await getCollectionDocuments(
     COLLECTION_NAMES.RELATEDPERSON,
     [informantId]
-  )
-  const patientId = relatedPerson?.[0].patient.reference?.replace(
-    'Patient/',
-    ''
-  )
-  const patient: fhir.Patient[] = await getCollectionDocuments(
-    COLLECTION_NAMES.PATIENT,
-    [String(patientId)]
-  )
+  )) as unknown as fhir.RelatedPerson[]
 
-  await setPatientsAddress(patient, locations)
+  if (relatedPerson?.[0].patient) {
+    const patientId = relatedPerson?.[0].patient.reference?.replace(
+      'Patient/',
+      ''
+    )
+    const patient = (await getCollectionDocuments(COLLECTION_NAMES.PATIENT, [
+      String(patientId)
+    ])) as unknown as fhir.Patient[]
 
-  fullComposition.informant = {
-    relationship: relatedPerson[0].relationship?.coding?.[0].code ?? '',
-    ...makePatientObject(patient[0])
+    await setPatientsAddress(patient, locations)
+
+    fullComposition.informant = {
+      relationship: relatedPerson[0].relationship?.coding?.[0].code ?? '',
+      ...makePatientObject(patient[0])
+    }
   }
 }
 
@@ -646,223 +644,302 @@ async function createDeathDeclarationCSVWriter() {
 
 async function makeCompositionAndExportCSVReport(
   compositionsCursor: FindCursor<Document>,
-  locations: fhir.Location[]
+  locations: fhir.Location[],
+  birthCSVWriter: CsvWriter<any>,
+  deathCSVWriter: CsvWriter<any>,
+  startDate: string,
+  endDate: string
 ) {
-  const birthCSVWriter = await createBirthDeclarationCSVWriter()
-  const deathCSVWriter = await createDeathDeclarationCSVWriter()
-  try {
+  const totalCompositionCount = await compositionsCursor.count()
+  let processedDatacount = 0
+  if (totalCompositionCount > 0) {
     while (await compositionsCursor.hasNext()) {
-      const composition = (await compositionsCursor.next()) as fhir.Composition
-      composition.section = composition.section?.filter(
-        (sec: { title: string }) =>
-          !['Certificates', 'Supporting Documents'].includes(sec.title)
-      )
-      const fullComposition: Partial<IFullComposition> = {}
-      fullComposition.event =
-        composition.title === 'Birth Declaration' ? 'Birth' : 'Death'
-      await setPatientsDetailsInComposition(
-        composition,
-        fullComposition,
-        locations
-      )
-      await setLocationInComposition(composition, fullComposition, locations)
-      await setObservationDetailsInComposition(composition, fullComposition)
-      await setInformantDetailsInComposition(
-        composition,
-        fullComposition,
-        locations
-      )
-      if (fullComposition.event === 'Birth') {
-        const birthRow: IBirthRow = {
-          childGen: '',
-          childDOB: '',
-          childOrd: 0,
-          birthCity: '',
-          birthState: '',
-          birthDistrict: '',
-          healthCenter: '',
-          officeLocation: '',
-          birthPluralityOfPregnancy: '',
-          bodyWeightMeasured: '',
-          birthAttendantTitle: '',
-          presentAtBirthReg: '',
-          motherDOB: '',
-          motherMaritalStatus: '',
-          motherOccupation: '',
-          motherEducationalAttainment: '',
-          motherCity: '',
-          motherDistrict: '',
-          motherState: '',
-          fatherDOB: '',
-          fatherMaritalStatus: '',
-          fatherOccupation: '',
-          fatherEducationalAttainment: '',
-          fatherCity: '',
-          fatherDistrict: '',
-          fatherState: '',
-          informantDOB: '',
-          informantMaritalStatus: '',
-          informantOccupation: '',
-          informantEducationalAttainment: '',
-          informantCity: '',
-          informantDistrict: '',
-          informantState: '',
-          informantRelationship: ''
+      try {
+        processedDatacount++
+        const percentage = Math.round(
+          (processedDatacount / totalCompositionCount) * 100
+        )
+        console.log(
+          `VSEXPORT GENERATION: Vital statistics export for month ${DateFNS.format(
+            new Date(startDate),
+            'MMMM'
+          )} of ${DateFNS.format(
+            new Date(startDate),
+            'yyyy'
+          )} at: ${percentage}%`
+        )
+        const composition =
+          (await compositionsCursor.next()) as fhir.Composition
+        const [task] = (await getTaskDocByCompositionId(
+          `Composition/${composition.id}`
+        )) as unknown as [fhir.Task]
+
+        const businessStatus = task.businessStatus?.coding?.[0].code
+
+        if (businessStatus === 'CERTIFIED' || businessStatus === 'REGISTERED') {
+          composition.section = composition.section?.filter(
+            (sec) =>
+              sec.title &&
+              !['Certificates', 'Supporting Documents'].includes(sec.title)
+          )
+          const fullComposition: Partial<IFullComposition> = {}
+          fullComposition.event =
+            composition.title === 'Birth Declaration' ? 'Birth' : 'Death'
+          await setPatientsDetailsInComposition(
+            composition,
+            fullComposition,
+            locations
+          )
+          await setLocationInComposition(
+            composition,
+            fullComposition,
+            locations,
+            task
+          )
+          await setObservationDetailsInComposition(composition, fullComposition)
+          await setInformantDetailsInComposition(
+            composition,
+            fullComposition,
+            locations
+          )
+          if (fullComposition.event === 'Birth') {
+            const birthRow: IBirthRow = {
+              childGen: '',
+              childDOB: '',
+              childOrd: 0,
+              birthCity: '',
+              birthState: '',
+              birthDistrict: '',
+              healthCenter: '',
+              officeLocation: '',
+              birthPluralityOfPregnancy: '',
+              bodyWeightMeasured: '',
+              birthAttendantTitle: '',
+              presentAtBirthReg: '',
+              motherDOB: '',
+              motherMaritalStatus: '',
+              motherOccupation: '',
+              motherEducationalAttainment: '',
+              motherCity: '',
+              motherDistrict: '',
+              motherState: '',
+              fatherDOB: '',
+              fatherMaritalStatus: '',
+              fatherOccupation: '',
+              fatherEducationalAttainment: '',
+              fatherCity: '',
+              fatherDistrict: '',
+              fatherState: '',
+              informantDOB: '',
+              informantMaritalStatus: '',
+              informantOccupation: '',
+              informantEducationalAttainment: '',
+              informantCity: '',
+              informantDistrict: '',
+              informantState: '',
+              informantRelationship: ''
+            }
+
+            //Address
+            birthRow.birthDistrict = fullComposition.eventDistrict ?? ''
+            birthRow.birthState = fullComposition.eventState ?? ''
+            birthRow.birthCity = fullComposition.eventCity ?? ''
+            birthRow.healthCenter = fullComposition.healthCenter ?? ''
+            birthRow.officeLocation = fullComposition.officeLocation ?? ''
+
+            //Child details
+            birthRow.childGen = fullComposition.child?.gender ?? ''
+            birthRow.childDOB = fullComposition.child?.birthDate ?? ''
+            birthRow.childOrd = fullComposition.child?.multipleBirth ?? 0
+
+            //Mother details
+            birthRow.motherDOB = fullComposition.mother?.birthDate ?? ''
+            birthRow.motherMaritalStatus =
+              fullComposition.mother?.maritalStatus ?? ''
+            birthRow.motherOccupation = fullComposition.mother?.occupation ?? ''
+            birthRow.motherEducationalAttainment =
+              fullComposition.mother?.educational_attainment ?? ''
+            birthRow.motherCity = fullComposition.mother?.city ?? ''
+            birthRow.motherDistrict = fullComposition.mother?.district ?? ''
+            birthRow.motherState = fullComposition.mother?.state ?? ''
+
+            //Father details
+            birthRow.fatherDOB = fullComposition.father?.birthDate ?? ''
+            birthRow.fatherMaritalStatus =
+              fullComposition.father?.maritalStatus ?? ''
+            birthRow.fatherOccupation = fullComposition.father?.occupation ?? ''
+            birthRow.fatherEducationalAttainment =
+              fullComposition.father?.educational_attainment ?? ''
+            birthRow.fatherCity = fullComposition.father?.city ?? ''
+            birthRow.fatherDistrict = fullComposition.father?.district ?? ''
+            birthRow.fatherState = fullComposition.father?.state ?? ''
+
+            //Informant details
+            birthRow.informantDOB = fullComposition.informant?.birthDate ?? ''
+            birthRow.informantMaritalStatus =
+              fullComposition.informant?.maritalStatus ?? ''
+            birthRow.informantOccupation =
+              fullComposition.informant?.occupation ?? ''
+            birthRow.informantEducationalAttainment =
+              fullComposition.informant?.educational_attainment ?? ''
+            birthRow.informantCity = fullComposition.informant?.city ?? ''
+            birthRow.informantDistrict =
+              fullComposition.informant?.district ?? ''
+            birthRow.informantState = fullComposition.informant?.state ?? ''
+            birthRow.informantRelationship =
+              fullComposition.informant?.relationship ?? ''
+
+            //Observations
+            birthRow.birthPluralityOfPregnancy =
+              fullComposition.observations?.birthPluralityOfPregnancy ?? ''
+            birthRow.bodyWeightMeasured =
+              fullComposition.observations?.bodyWeightMeasured ?? ''
+            birthRow.birthAttendantTitle =
+              fullComposition.observations?.birthAttendantTitle ?? ''
+            birthRow.presentAtBirthReg =
+              fullComposition.observations?.presentAtBirthReg ?? ''
+
+            await birthCSVWriter.writeRecords([birthRow])
+          } else if (fullComposition.event === 'Death') {
+            const deathRow: IDeathRow = {
+              deceasedGen: '',
+              deceasedDOB: '',
+              deceasedMaritalStatus: '',
+              deceasedDate: '',
+              deathCity: '',
+              deathState: '',
+              deathDistrict: '',
+              healthCenter: '',
+              officeLocation: '',
+              uncertifiedMannerOfDeath: '',
+              verbalAutopsyDescription: '',
+              causeOfDeathMethod: '',
+              causeOfDeathEstablished: '',
+              causeOfDeath: '',
+              numMaleDependentsOnDeceased: '',
+              numFemaleDependentsOnDeceased: '',
+              informantDOB: '',
+              informantMaritalStatus: '',
+              informantOccupation: '',
+              informantCity: '',
+              informantDistrict: '',
+              informantState: '',
+              informantRelationship: ''
+            }
+
+            //Address
+            deathRow.healthCenter = fullComposition.healthCenter ?? ''
+            deathRow.officeLocation = fullComposition.officeLocation ?? ''
+            deathRow.deathDistrict = fullComposition.deceased?.district ?? ''
+            deathRow.deathState = fullComposition.deceased?.state ?? ''
+            deathRow.deathCity = fullComposition.deceased?.city ?? ''
+
+            //Deceased details
+            deathRow.deceasedGen = fullComposition.deceased?.gender ?? ''
+            deathRow.deceasedDOB = fullComposition.deceased?.birthDate ?? ''
+            deathRow.deceasedMaritalStatus =
+              fullComposition.deceased?.maritalStatus ?? ''
+            deathRow.deceasedDate = fullComposition.deceased?.deceasedDate ?? ''
+
+            //Informant details
+            deathRow.informantDOB = fullComposition.informant?.birthDate ?? ''
+            deathRow.informantMaritalStatus =
+              fullComposition.informant?.maritalStatus ?? ''
+            deathRow.informantOccupation =
+              fullComposition.informant?.occupation ?? ''
+            deathRow.informantCity = fullComposition.informant?.city ?? ''
+            deathRow.informantDistrict =
+              fullComposition.informant?.district ?? ''
+            deathRow.informantState = fullComposition.informant?.state ?? ''
+            deathRow.informantRelationship =
+              fullComposition.informant?.relationship ?? ''
+
+            //Observations
+            deathRow.uncertifiedMannerOfDeath =
+              fullComposition.observations?.uncertifiedMannerOfDeath ?? ''
+            deathRow.verbalAutopsyDescription =
+              fullComposition.observations?.verbalAutopsyDescription ?? ''
+            deathRow.causeOfDeathMethod =
+              fullComposition.observations?.causeOfDeathMethod ?? ''
+            deathRow.causeOfDeathEstablished = fullComposition.observations
+              ?.causeOfDeathEstablished
+              ? 'Yes'
+              : 'No'
+            deathRow.causeOfDeath =
+              fullComposition.observations?.causeOfDeath ?? ''
+            deathRow.numMaleDependentsOnDeceased =
+              fullComposition.observations?.numMaleDependentsOnDeceased ?? ''
+            deathRow.numFemaleDependentsOnDeceased =
+              fullComposition.observations?.numFemaleDependentsOnDeceased ?? ''
+
+            await deathCSVWriter.writeRecords([deathRow])
+          }
         }
-
-        //Address
-        birthRow.birthDistrict = fullComposition.eventDistrict ?? ''
-        birthRow.birthState = fullComposition.eventState ?? ''
-        birthRow.birthCity = fullComposition.eventCity ?? ''
-        birthRow.healthCenter = fullComposition.healthCenter ?? ''
-        birthRow.officeLocation = fullComposition.officeLocation ?? ''
-
-        //Child details
-        birthRow.childGen = fullComposition.child?.gender ?? ''
-        birthRow.childDOB = fullComposition.child?.birthDate ?? ''
-        birthRow.childOrd = fullComposition.child?.multipleBirth ?? 0
-
-        //Mother details
-        birthRow.motherDOB = fullComposition.mother?.birthDate ?? ''
-        birthRow.motherMaritalStatus =
-          fullComposition.mother?.maritalStatus ?? ''
-        birthRow.motherOccupation = fullComposition.mother?.occupation ?? ''
-        birthRow.motherEducationalAttainment =
-          fullComposition.mother?.educational_attainment ?? ''
-        birthRow.motherCity = fullComposition.mother?.city ?? ''
-        birthRow.motherDistrict = fullComposition.mother?.district ?? ''
-        birthRow.motherState = fullComposition.mother?.state ?? ''
-
-        //Father details
-        birthRow.fatherDOB = fullComposition.father?.birthDate ?? ''
-        birthRow.fatherMaritalStatus =
-          fullComposition.father?.maritalStatus ?? ''
-        birthRow.fatherOccupation = fullComposition.father?.occupation ?? ''
-        birthRow.fatherEducationalAttainment =
-          fullComposition.father?.educational_attainment ?? ''
-        birthRow.fatherCity = fullComposition.father?.city ?? ''
-        birthRow.fatherDistrict = fullComposition.father?.district ?? ''
-        birthRow.fatherState = fullComposition.father?.state ?? ''
-
-        //Informant details
-        birthRow.informantDOB = fullComposition.informant?.birthDate ?? ''
-        birthRow.informantMaritalStatus =
-          fullComposition.informant?.maritalStatus ?? ''
-        birthRow.informantOccupation =
-          fullComposition.informant?.occupation ?? ''
-        birthRow.informantEducationalAttainment =
-          fullComposition.informant?.educational_attainment ?? ''
-        birthRow.informantCity = fullComposition.informant?.city ?? ''
-        birthRow.informantDistrict = fullComposition.informant?.district ?? ''
-        birthRow.informantState = fullComposition.informant?.state ?? ''
-        birthRow.informantRelationship =
-          fullComposition.informant?.relationship ?? ''
-
-        //Observations
-        birthRow.birthPluralityOfPregnancy =
-          fullComposition.observations?.birthPluralityOfPregnancy ?? ''
-        birthRow.bodyWeightMeasured =
-          fullComposition.observations?.bodyWeightMeasured ?? ''
-        birthRow.birthAttendantTitle =
-          fullComposition.observations?.birthAttendantTitle ?? ''
-        birthRow.presentAtBirthReg =
-          fullComposition.observations?.presentAtBirthReg ?? ''
-
-        await birthCSVWriter.writeRecords([birthRow])
-      } else if (fullComposition.event === 'Death') {
-        const deathRow: IDeathRow = {
-          deceasedGen: '',
-          deceasedDOB: '',
-          deceasedMaritalStatus: '',
-          deceasedDate: '',
-          deathCity: '',
-          deathState: '',
-          deathDistrict: '',
-          healthCenter: '',
-          officeLocation: '',
-          uncertifiedMannerOfDeath: '',
-          verbalAutopsyDescription: '',
-          causeOfDeathMethod: '',
-          causeOfDeathEstablished: '',
-          causeOfDeath: '',
-          numMaleDependentsOnDeceased: '',
-          numFemaleDependentsOnDeceased: '',
-          informantDOB: '',
-          informantMaritalStatus: '',
-          informantOccupation: '',
-          informantCity: '',
-          informantDistrict: '',
-          informantState: '',
-          informantRelationship: ''
-        }
-
-        //Address
-        deathRow.healthCenter = fullComposition.healthCenter ?? ''
-        deathRow.officeLocation = fullComposition.officeLocation ?? ''
-        deathRow.deathDistrict = fullComposition.deceased?.district ?? ''
-        deathRow.deathState = fullComposition.deceased?.state ?? ''
-        deathRow.deathCity = fullComposition.deceased?.city ?? ''
-
-        //Deceased details
-        deathRow.deceasedGen = fullComposition.deceased?.gender ?? ''
-        deathRow.deceasedDOB = fullComposition.deceased?.birthDate ?? ''
-        deathRow.deceasedMaritalStatus =
-          fullComposition.deceased?.maritalStatus ?? ''
-        deathRow.deceasedDate = fullComposition.deceased?.deceasedDate ?? ''
-
-        //Informant details
-        deathRow.informantDOB = fullComposition.informant?.birthDate ?? ''
-        deathRow.informantMaritalStatus =
-          fullComposition.informant?.maritalStatus ?? ''
-        deathRow.informantOccupation =
-          fullComposition.informant?.occupation ?? ''
-        deathRow.informantCity = fullComposition.informant?.city ?? ''
-        deathRow.informantDistrict = fullComposition.informant?.district ?? ''
-        deathRow.informantState = fullComposition.informant?.state ?? ''
-        deathRow.informantRelationship =
-          fullComposition.informant?.relationship ?? ''
-
-        //Observations
-        deathRow.uncertifiedMannerOfDeath =
-          fullComposition.observations?.uncertifiedMannerOfDeath ?? ''
-        deathRow.verbalAutopsyDescription =
-          fullComposition.observations?.verbalAutopsyDescription ?? ''
-        deathRow.causeOfDeathMethod =
-          fullComposition.observations?.causeOfDeathMethod ?? ''
-        deathRow.causeOfDeathEstablished = fullComposition.observations
-          ?.causeOfDeathEstablished
-          ? 'Yes'
-          : 'No'
-        deathRow.causeOfDeath = fullComposition.observations?.causeOfDeath ?? ''
-        deathRow.numMaleDependentsOnDeceased =
-          fullComposition.observations?.numMaleDependentsOnDeceased ?? ''
-        deathRow.numFemaleDependentsOnDeceased =
-          fullComposition.observations?.numFemaleDependentsOnDeceased ?? ''
-
-        // tslint:disable-next-line
-        console.log('Writing CSV row for death declaration...')
-        await deathCSVWriter.writeRecords([deathRow])
+      } catch (error) {
+        console.log('Sorry. Something went wrong!', error)
       }
     }
-    // tslint:disable-next-line
     console.log(
-      'Successfully generated CSV report for birth and death declarations.'
+      `VSEXPORT GENERATION: Successfully generated CSV report for birth and death declarations from ${startDate} to ${endDate}`
     )
-  } catch (error) {
-    // tslint:disable-next-line
-    console.log('Sorry. Something went wrong!', error)
+  } else {
+    console.log(
+      `VSEXPORT GENERATION: No record found from ${startDate} to ${endDate}`
+    )
   }
 }
 
 const startScript = async () => {
   await connect()
-  const compositionsCursor = await getCompositionCursor()
-  const locations: fhir.Location[] = await getCollectionDocuments(
-    COLLECTION_NAMES.LOCATION,
-    []
-  )
-  await makeCompositionAndExportCSVReport(compositionsCursor, locations)
-  await Disconnect()
+  let startDate = new Date(process.argv[2])
+  const endDate = new Date(process.argv[3])
+  const totalMonths = DateFNS.differenceInCalendarMonths(endDate, startDate) + 1
+  const birthCSVWriter = await createBirthDeclarationCSVWriter()
+  const deathCSVWriter = await createDeathDeclarationCSVWriter()
+  for (let month = 0; month < totalMonths; month++) {
+    console.log(
+      `VSEXPORT GENERATION: Commencing vital statistics export for month ${
+        month + 1
+      } of ${totalMonths}`
+    )
+    const daysInMonths = DateFNS.getDaysInMonth(startDate)
+    const dayPassed = DateFNS.getDate(startDate)
+    const daysToMonth = daysInMonths - dayPassed
+    let lastOneMonth = DateFNS.addDays(startDate, daysToMonth)
+    if (month + 1 === totalMonths) {
+      lastOneMonth = endDate
+    }
+    const formatedStartDate = `${DateFNS.format(
+      startDate,
+      'yyyy-MM-dd'
+    )}T00:00:00.000Z`
+
+    const formatedEndDate = `${DateFNS.format(
+      lastOneMonth,
+      'yyyy-MM-dd'
+    )}T23:59:59.000Z`
+
+    const compositionsCursor = await getCompositionCursor(
+      formatedStartDate,
+      formatedEndDate
+    )
+    const locations = (await getCollectionDocuments(
+      COLLECTION_NAMES.LOCATION,
+      []
+    )) as unknown as fhir.Location[]
+
+    await makeCompositionAndExportCSVReport(
+      compositionsCursor,
+      locations,
+      birthCSVWriter,
+      deathCSVWriter,
+      formatedStartDate,
+      formatedEndDate
+    )
+
+    startDate = DateFNS.addDays(lastOneMonth, 1)
+  }
+  await disconnect()
   process.exit()
 }
 
