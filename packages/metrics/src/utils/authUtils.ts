@@ -35,3 +35,8 @@ export const getTokenPayload = (token: string) => {
   }
   return decoded
 }
+
+export function getClientIdFromToken(token: string) {
+  const payload = getTokenPayload(token)
+  return payload.sub
+}

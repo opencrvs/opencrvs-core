@@ -9,4 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-declare module 'iconv'
+import { GQLResolver } from '@gateway/graphql/schema'
+
+export const typeResolvers: GQLResolver = {
+  UserAuditLogResultItem: {
+    __resolveType(obj) {
+      if (obj.data?.compositionId) {
+        return 'UserAuditLogItemWithComposition'
+      } else {
+        return 'UserAuditLogItem'
+      }
+    }
+  }
+}

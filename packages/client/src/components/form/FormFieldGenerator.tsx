@@ -12,6 +12,7 @@
 import * as React from 'react'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
+import { Accordion } from '@opencrvs/components/lib/Accordion'
 import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
@@ -79,7 +80,8 @@ import {
   Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
   Ii18nTextareaFormField,
-  TEXT
+  TEXT,
+  ACCORDION_WITH_NESTED_FIELDS
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -335,6 +337,32 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={value as string}
           notice={fieldDefinition.notice}
+        />
+      </InputField>
+    )
+  }
+
+  if (
+    fieldDefinition.type === ACCORDION_WITH_NESTED_FIELDS &&
+    nestedFields &&
+    resetNestedInputValues
+  ) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Accordion
+          {...inputProps}
+          onChange={(val: string) => {
+            resetNestedInputValues(fieldDefinition)
+            onSetFieldValue(
+              `${fieldDefinition.name}.value`,
+              val === 'no' ? 'yes' : 'no'
+            )
+          }}
+          label={fieldDefinition.label}
+          nestedFields={nestedFields}
+          options={fieldDefinition.options}
+          name={fieldDefinition.name}
+          value={value as string}
         />
       </InputField>
     )
@@ -600,7 +628,10 @@ const mapFieldsToValues = (
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
-    if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
+    if (
+      (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) ||
+      field.type === ACCORDION_WITH_NESTED_FIELDS
+    ) {
       const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
 
       const nestedInitialValues = nestedFieldsFlatted.reduce(
@@ -974,7 +1005,8 @@ class FormSectionComponent extends React.Component<Props> {
               </FormItem>
             )
           } else if (
-            field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
+            (field.type === RADIO_GROUP_WITH_NESTED_FIELDS ||
+              field.type === ACCORDION_WITH_NESTED_FIELDS) &&
             field.nestedFields
           ) {
             let nestedFieldElements = Object.create(null)

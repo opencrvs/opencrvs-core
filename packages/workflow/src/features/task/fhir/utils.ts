@@ -14,10 +14,6 @@ import {
   RegStatus,
   EVENT_TYPE
 } from '@workflow/features/registration/fhir/constants'
-import {
-  ASSIGNED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
 
 export function isRejectedTask(taskResource: fhir.Task) {
   return getTaskBusinessStatus(taskResource) === RegStatus.REJECTED
@@ -33,19 +29,9 @@ export function getTaskBusinessStatus(
   return taskResource.businessStatus?.coding?.[0]?.code as RegStatus | undefined
 }
 
-export function hasReinstatedExtension(taskResource: fhir.Task) {
-  return (
-    taskResource.extension?.findIndex(
-      (extension) => extension.url === REINSTATED_EXTENSION_URL
-    ) !== -1
-  )
-}
-
-export function hasAssignedExtension(taskResource: fhir.Task) {
-  return (
-    taskResource.extension?.findIndex(
-      (extension) => extension.url === ASSIGNED_EXTENSION_URL
-    ) !== -1
+export function hasExtension(taskResource: fhir.Task, extensionUrl: string) {
+  return taskResource.extension?.some(
+    (extension) => extension.url === extensionUrl
   )
 }
 

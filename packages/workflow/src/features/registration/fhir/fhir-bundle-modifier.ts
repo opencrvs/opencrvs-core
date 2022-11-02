@@ -38,8 +38,7 @@ import {
   getLoggedInPractitionerResource,
   getPractitionerOffice,
   getPractitionerPrimaryLocation,
-  getPractitionerRef,
-  getUserByToken
+  getPractitionerRef
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
 import {
@@ -53,11 +52,7 @@ import {
 } from '@workflow/utils/authUtils'
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
-import {
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
+import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -162,11 +157,6 @@ export async function markBundleAsRequestedForCorrection(
     regStatusCode?.code
   )
 
-  removeExtensionFromBundle(bundle, [
-    DOWNLOADED_EXTENSION_URL,
-    REINSTATED_EXTENSION_URL
-  ])
-
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
@@ -175,7 +165,7 @@ export async function markBundleAsRequestedForCorrection(
 
 export async function invokeRegistrationValidation(
   bundle: fhir.Bundle,
-  token: string
+  headers: Record<string, string>
 ) {
   try {
     await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
@@ -183,7 +173,7 @@ export async function invokeRegistrationValidation(
       body: JSON.stringify(bundle),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        ...headers
       }
     })
   } catch (err) {
@@ -307,7 +297,7 @@ export async function touchBundle(
   bundle: fhir.Bundle,
   token: string
 ): Promise<fhir.Bundle> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
+  const taskResource = getTaskResource(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -320,35 +310,10 @@ export async function touchBundle(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  /* setting regAssigned valueReference here if regAssigned extension exists */
-  await setupRegAssigned(taskResource, practitioner, token)
-
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
-}
-
-export function removeExtensionFromBundle(
-  fhirBundle: fhir.Bundle,
-  urls: string[]
-): fhir.Bundle {
-  if (
-    fhirBundle &&
-    fhirBundle.entry &&
-    fhirBundle.entry[0] &&
-    fhirBundle.entry[0].resource
-  ) {
-    let extensions: fhir.Extension[] =
-      (fhirBundle.entry[0].resource as fhir.Element).extension || []
-
-    extensions = extensions.filter(
-      (ext: fhir.Extension) => !urls.includes(ext.url)
-    )
-    ;(fhirBundle.entry[0].resource as fhir.Element).extension = extensions
-  }
-
-  return fhirBundle
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
@@ -533,43 +498,6 @@ export function setupLastRegUser(
   return taskResource
 }
 
-export async function setupRegAssigned(
-  taskResource: fhir.Task,
-  practitioner: fhir.Practitioner,
-  token: string
-) {
-  if (!taskResource.extension) {
-    taskResource.extension = []
-  }
-  const setupRegAssignedExtension = taskResource.extension.find((extension) => {
-    return (
-      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
-    )
-  })
-  if (setupRegAssignedExtension) {
-    const practitionerDetails = await getUserByToken(token)
-    if (practitionerDetails.scope.includes(USER_SCOPE.RECORD_SEARCH)) {
-      return taskResource
-    }
-    if (
-      (setupRegAssignedExtension.valueString === RegStatus.REJECTED &&
-        practitionerDetails.role === 'FIELD_AGENT') ||
-      (practitionerDetails.role === 'REGISTRATION_AGENT' &&
-        setupRegAssignedExtension.valueString === RegStatus.VALIDATED)
-    ) {
-      return taskResource
-    }
-
-    if (!setupRegAssignedExtension.valueReference) {
-      setupRegAssignedExtension.valueReference = {}
-    }
-    setupRegAssignedExtension.valueReference.reference =
-      getPractitionerRef(practitioner)
-    taskResource.lastModified =
-      taskResource.lastModified || new Date().toISOString()
-  }
-  return taskResource
-}
 export function setupTestExtension(taskResource: fhir.Task): fhir.Task {
   if (!taskResource.extension) {
     taskResource.extension = []

@@ -16,7 +16,7 @@ import {
   postMetrics,
   postSearch
 } from '@gateway/features/fhir/utils'
-import { markRecordAsDownloadedAndAssigned } from '@gateway/features/registration/root-resolvers'
+import { markRecordAsDownloadedOrAssigned } from '@gateway/features/registration/root-resolvers'
 import {
   IAdvancedSearchParam,
   ISearchCriteria
@@ -99,8 +99,10 @@ export const resolvers: GQLResolver = {
           return await Promise.reject(new Error('Invalid location id'))
         }
         if (locationIds.length === 1) {
+          // Currently used if the user is a registration agent
           searchCriteria.declarationLocationId = locationIds[0]
         } else {
+          // Not used currently, but this could be used if you were searching a group of offices
           searchCriteria.declarationLocationId = locationIds
         }
       } else if (authHeader && !hasScope(authHeader, 'register')) {
@@ -241,7 +243,7 @@ export const resolvers: GQLResolver = {
       }
 
       ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-        await markRecordAsDownloadedAndAssigned(hit._id, authHeader)
+        await markRecordAsDownloadedOrAssigned(hit._id, authHeader)
       })
 
       if (searchResult.body.hits.total.value) {

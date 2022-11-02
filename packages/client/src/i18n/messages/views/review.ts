@@ -41,6 +41,7 @@ interface IReviewMessages
   validateConfirmationTitle: MessageDescriptor
   valueApprove: MessageDescriptor
   zeroDocumentsText: MessageDescriptor
+  zeroDocumentsTextForAnySection: MessageDescriptor
   validateCompleteDeclarationActionTitle: MessageDescriptor
   validateCompleteDeclarationActionDescription: MessageDescriptor
   validateDeclarationActionModalTitle: MessageDescriptor
@@ -220,6 +221,11 @@ const messagesToDefine: IReviewMessages = {
       'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant} primaryCaregiver {parents}}',
     description: 'Zero documents text',
     id: 'review.documents.zeroDocumentsText'
+  },
+  zeroDocumentsTextForAnySection: {
+    defaultMessage: 'No supporting documents',
+    description: 'Zero documents text',
+    id: 'review.documents.zeroDocumentsTextForAnySection'
   },
   govtName: {
     id: 'review.header.title.govtName',

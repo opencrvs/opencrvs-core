@@ -79,6 +79,7 @@ interface IFormConfigMessages
   fieldWithDynamicDefinition: MessageDescriptor
   radioGroup: MessageDescriptor
   radioGroupWithNestedField: MessageDescriptor
+  accordionWithNestedField: MessageDescriptor
   informativeRadioGroup: MessageDescriptor
   checkboxGroup: MessageDescriptor
   checkbox: MessageDescriptor
@@ -250,7 +251,7 @@ const messagesToDefine: IFormConfigMessages = {
     description: 'Content key label for formTools'
   },
   feildId: {
-    id: 'config.form.tools.feildId',
+    id: 'config.form.tools.fieldId',
     defaultMessage: 'Field ID',
     description: 'Content id for formTools'
   },
@@ -414,6 +415,11 @@ const messagesToDefine: IFormConfigMessages = {
   radioGroupWithNestedField: {
     id: 'config.form.settings.radioGroupWithNestedField',
     defaultMessage: 'Radio group with nested field',
+    description: 'Success notification label for number of addresses settings'
+  },
+  accordionWithNestedField: {
+    id: 'config.form.settings.accordionWithNestedField',
+    defaultMessage: 'Accordion with nested field',
     description: 'Success notification label for number of addresses settings'
   },
   informativeRadioGroup: {

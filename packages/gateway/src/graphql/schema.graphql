@@ -102,13 +102,13 @@ type Query {
     locationId: String
     event: String!
   ): [LocationWiseEstimationMetric!]
-  fetchTimeLoggedMetricsByPractitioner(
-    timeStart: String!
-    timeEnd: String!
+  getUserAuditLog(
     practitionerId: String!
-    locationId: String!
+    skip: Int
     count: Int!
-  ): TimeLoggedMetricsResultSet
+    timeStart: String
+    timeEnd: String
+  ): UserAuditLogResultSet
   searchEvents(
     userId: String
     locationIds: [String!]
@@ -261,6 +261,8 @@ type Mutation {
     comment: String
   ): String
   resendSMSInvite(userId: String!): String
+  usernameSMSReminder(userId: String!): String
+  resetPasswordSMS(userId: String!, applicationName: String!): String
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -492,9 +494,9 @@ type LocationWiseEstimationMetric {
   locationName: String!
 }
 
-type TimeLoggedMetricsResultSet {
-  results: [TimeLoggedMetrics]
-  totalItems: Int
+type UserAuditLogResultSet {
+  total: Int!
+  results: [UserAuditLogResultItem!]!
 }
 
 type EventSearchResultSet {
@@ -784,10 +786,13 @@ enum BirthRegType {
 type History {
   user: User
   date: Date
-  action: RegStatus
+  regStatus: RegStatus
+  action: RegAction
   statusReason: StatusReason
   reason: String
-  reinstated: Boolean
+  requester: String
+  hasShowedVerifiedDocument: Boolean
+  otherReason: String
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -1011,12 +1016,9 @@ type EventMetrics {
   practitionerRole: String!
 }
 
-type TimeLoggedMetrics {
-  status: String!
-  trackingId: String
-  eventType: String!
-  time: String!
-}
+union UserAuditLogResultItem =
+    UserAuditLogItemWithComposition
+  | UserAuditLogItem
 
 interface EventSearchSet {
   id: ID!
@@ -1141,8 +1143,6 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
-  REQUESTED_CORRECTION
-  DOWNLOADED
 }
 
 input MedicalPractitionerInput {
@@ -1342,6 +1342,14 @@ type Certificate {
   data: String
 }
 
+enum RegAction {
+  ASSIGNED
+  UNASSIGNED
+  REINSTATED
+  REQUESTED_CORRECTION
+  DOWNLOADED
+}
+
 type StatusReason {
   text: String
 }
@@ -1418,6 +1426,23 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+}
+
+type UserAuditLogItemWithComposition implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+  data: AdditionalIdWithCompositionId!
+}
+
+type UserAuditLogItem implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
 }
 
 type RegistrationSearchSet {
@@ -1548,6 +1573,7 @@ input CorrectionInput {
   location: LocationInput
   data: String
   reason: String
+  otherReason: String
   note: String
 }
 
@@ -1647,6 +1673,19 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+interface AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
+type AdditionalIdWithCompositionId {
+  compositionId: String!
+  trackingId: String!
 }
 
 input CommentInput {
