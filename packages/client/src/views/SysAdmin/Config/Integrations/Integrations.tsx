@@ -44,6 +44,7 @@ import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { connect, useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
+import { Text } from '@opencrvs/components/lib/Text'
 
 export const statuses = {
   PENDING: 'pending',
@@ -56,31 +57,20 @@ const AlertSyled = styled(Alert)`
   margin-top: 30px;
   min-height: 5rem;
 `
-const TextInputStyled = styled(TextInput)`
-  width: 100%;
-`
-
-const SelectOptionStyled = styled(Select)`
-  width: 100%;
-`
-const DivSection = styled.div`
-  margin-top: 20px;
-`
-
-const AlertLink = styled(Link)`
-  text-align: left;
-`
-
-const Label = styled.div`
+const Label = styled.label`
   margin-top: 5px;
-`
-const ClientInfoLabel = styled.div`
-  ${({ theme }) => theme.fonts.bold14};
-  color: rgb(0, 0, 0);
-  justify-content: left;
 `
 const StyledSpinner = styled(Spinner)`
   margin: 10px 0;
+`
+const Field = styled.div`
+  margin-top: 10px;
+`
+const TextInputField = styled(TextInput)`
+  width: 100%;
+`
+const SelectInputField = styled(Select)`
+  width: 100%;
 `
 
 export function Integrations() {
@@ -216,14 +206,14 @@ export function Integrations() {
 
         {createClientInfo && (
           <div>
-            <DivSection>
+            <Field>
               <InputField
                 id="name_of_client"
                 touched={false}
                 required={true}
                 label={intl.formatMessage(integrationMessages.name)}
               >
-                <TextInputStyled
+                <TextInputField
                   id="client_name"
                   type="text"
                   value={clientName}
@@ -231,15 +221,15 @@ export function Integrations() {
                   error={false}
                 />
               </InputField>
-            </DivSection>
+            </Field>
 
-            <DivSection>
+            <Field>
               <InputField
                 id="select-input"
                 touched={false}
                 label={intl.formatMessage(integrationMessages.type)}
               >
-                <SelectOptionStyled
+                <SelectInputField
                   onChange={(val: string) => {
                     setClientType(val)
                   }}
@@ -268,21 +258,21 @@ export function Integrations() {
                   ]}
                 />
               </InputField>
-            </DivSection>
+            </Field>
 
             {clientType === 'health-notification' && (
               <AlertSyled type="info">
                 {intl.formatMessage(
                   integrationMessages.healthnotificationAlertDescription
                 )}
-                <AlertLink
+                <Link
                   onClick={() => {
                     window.open('https://documentation.opencrvs.org/', '_blank')
                   }}
                   font="bold16"
                 >
                   documentation.opencrvs.org
-                </AlertLink>
+                </Link>
               </AlertSyled>
             )}
 
@@ -292,19 +282,19 @@ export function Integrations() {
               <AlertSyled type="info">
                 {intl.formatMessage(integrationMessages.otherAlertDescription)}
                 {'\n'}
-                <AlertLink
+                <Link
                   onClick={() => {
                     window.open('https://documentation.opencrvs.org/', '_blank')
                   }}
                   font="bold16"
                 >
                   documentation.opencrvs.org
-                </AlertLink>
+                </Link>
               </AlertSyled>
             )}
 
             {clientType === 'webhook' && (
-              <DivSection>
+              <div>
                 <InputField
                   id="select-input"
                   touched={false}
@@ -413,46 +403,45 @@ export function Integrations() {
                         onChange={(newValue) => setSelectedItemsNoPII(newValue)}
                       />
                     )}
-                    <DivSection>
-                      <Stack
-                        alignItems="center"
-                        direction="row"
-                        gap={8}
-                        justifyContent="flex-start"
-                      >
-                        <Toggle
-                          defaultChecked={!NoPII}
-                          onChange={toggleOnChange}
-                        />
-                        <div>
-                          {intl.formatMessage(integrationMessages.PIIDataLabel)}
-                        </div>
-                      </Stack>
-                    </DivSection>
+
+                    <Stack
+                      alignItems="center"
+                      direction="row"
+                      gap={8}
+                      justifyContent="flex-start"
+                    >
+                      <Toggle
+                        defaultChecked={!NoPII}
+                        onChange={toggleOnChange}
+                      />
+                      <div>
+                        {intl.formatMessage(integrationMessages.PIIDataLabel)}
+                      </div>
+                    </Stack>
                   </>
                 ) : (
                   <></>
                 )}
-              </DivSection>
+              </div>
             )}
           </div>
         )}
 
         {generateClientInfo && (
-          <DivSection>
-            <ClientInfoLabel>
+          <>
+            <Text variant="bold16" element="span">
               {intl.formatMessage(integrationMessages.clientId)}
               <StyledSpinner size={24} id="Spinner" />
-            </ClientInfoLabel>
-            <ClientInfoLabel>
+            </Text>
+            <Text variant="bold16" element="span">
               {intl.formatMessage(integrationMessages.clientSecret)}
               <StyledSpinner size={24} id="Spinner" />
-            </ClientInfoLabel>
-            <ClientInfoLabel>
+            </Text>
+            <Text variant="bold16" element="span">
               {intl.formatMessage(integrationMessages.shaSecret)}
               <StyledSpinner size={24} id="Spinner" />
-            </ClientInfoLabel>
-          </DivSection>
+            </Text>
+          </>
         )}
       </ResponsiveModal>
     </Frame>
