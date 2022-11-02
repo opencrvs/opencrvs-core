@@ -60,6 +60,7 @@ export const GetLink = ({
   onClick
 }: {
   status: string
+  disabled?: boolean
   onClick: () => void
 }) => {
   return (

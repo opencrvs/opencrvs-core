@@ -40,6 +40,45 @@ type CertificationMetric {
   eventType: String!
 }
 
+type AdditionalIdWithCompositionId {
+  compositionId: String!
+  trackingId: String!
+}
+
+interface AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
+type UserAuditLogItem implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
+type UserAuditLogItemWithComposition implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+  data: AdditionalIdWithCompositionId!
+}
+
+union UserAuditLogResultItem =
+    UserAuditLogItemWithComposition
+  | UserAuditLogItem
+
+type UserAuditLogResultSet {
+  total: Int!
+  results: [UserAuditLogResultItem!]!
+}
+
 type CorrectionMetric {
   total: Float!
   reason: String!
@@ -81,18 +120,6 @@ type LocationWiseEstimationMetric {
   estimated: Int!
   locationId: String!
   locationName: String!
-}
-
-type TimeLoggedMetrics {
-  status: String!
-  trackingId: String
-  eventType: String!
-  time: String!
-}
-
-type TimeLoggedMetricsResultSet {
-  results: [TimeLoggedMetrics]
-  totalItems: Int
 }
 
 type LocationStatisticsResponse {
@@ -146,11 +173,11 @@ type Query {
     locationId: String
     event: String!
   ): [LocationWiseEstimationMetric!]
-  fetchTimeLoggedMetricsByPractitioner(
-    timeStart: String!
-    timeEnd: String!
+  getUserAuditLog(
     practitionerId: String!
-    locationId: String!
+    skip: Int
     count: Int!
-  ): TimeLoggedMetricsResultSet
+    timeStart: String
+    timeEnd: String
+  ): UserAuditLogResultSet
 }

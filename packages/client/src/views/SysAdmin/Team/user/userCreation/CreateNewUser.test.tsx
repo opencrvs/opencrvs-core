@@ -18,15 +18,13 @@ import {
   createTestComponent,
   flushPromises,
   loginAsFieldAgent,
+  mockCompleteFormData,
+  mockDataWithRegistarRoleSelected,
   mockOfflineData,
   mockOfflineDataDispatch
 } from '@client/tests/util'
 import { modifyUserFormData, processRoles } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import {
-  mockCompleteFormData,
-  mockDataWithRegistarRoleSelected
-} from '@client/views/SysAdmin/Team/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import {
