@@ -58,6 +58,8 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { UserAudit } from '@client/views/UserAudit/UserAudit'
 
 interface IAppProps {
   client?: ApolloClient<{}>
