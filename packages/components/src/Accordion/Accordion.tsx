@@ -87,9 +87,7 @@ const Summary = styled.summary`
   }
 `
 const NestedChildren = styled.div`
-  margin: 15px 0px 0px 18px;
-  padding-left: 33px;
-  border-left: 4px solid ${({ theme }) => theme.colors.copy};
+  margin-top: 15px;
   padding-top: 0px !important;
 `
 const List = styled.ul<{ flexDirection?: string }>`
