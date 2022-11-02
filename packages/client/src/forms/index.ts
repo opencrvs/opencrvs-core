@@ -518,8 +518,8 @@ export interface IAccordionWithNestedFieldsFormField extends IFormFieldBase {
   type: typeof ACCORDION_WITH_NESTED_FIELDS
   options: IAccordionOption[]
   nestedFields: INestedInputFields
-  hideLabel: string
-  showLabel: string
+  hideLabel: MessageDescriptor
+  showLabel: MessageDescriptor
 }
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
@@ -1011,8 +1011,6 @@ export interface Ii18nFormFieldBase {
   name: string
   type: string
   label: string
-  showLabel?: string
-  hideLabel?: string
   helperText?: string
   tooltip?: string
   description?: string
@@ -1062,6 +1060,8 @@ export interface Ii18nIAccordionWithNestedFieldsFormField
   type: typeof ACCORDION_WITH_NESTED_FIELDS
   options: IAccordionOption[]
   nestedFields: Ii18nNestedInputFields
+  showLabel: MessageDescriptor
+  hideLabel: MessageDescriptor
 }
 
 type Name = {

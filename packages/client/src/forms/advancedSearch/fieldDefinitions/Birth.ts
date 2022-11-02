@@ -18,11 +18,11 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
   title: advancedSearchBirthForm.registrationDetails,
   fields: [
     {
-      name: 'informantType', //CHANGE
+      name: 'informantType',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
       label: advancedSearchBirthForm.registrationDetails,
-      showLabel: 'Show',
-      hideLabel: 'Hide',
+      showLabel: formMessageDescriptors.showLabel,
+      hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
       required: false,
       hideInPreview: true,
@@ -43,7 +43,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             type: 'LOCATION_SEARCH_INPUT',
             label: advancedSearchBirthForm.placeOfRegistrationlabel,
             helperText: advancedSearchBirthForm.placeOfRegistrationHelperText,
-            placeholder: advancedSearchBirthForm.placeOfRegistrationplaceholder,
+            placeholder: formMessageDescriptors.formSelectPlaceholder,
             required: false,
             initialValue: '',
             searchableResource: 'offices',
@@ -73,7 +73,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             required: false,
             initialValue: '',
             validate: [],
-            placeholder: advancedSearchBirthForm.statusOfRecordPlaceholder,
+            placeholder: formMessageDescriptors.formSelectPlaceholder,
             options: [
               {
                 value: 'ALL',
@@ -112,8 +112,8 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       name: 'childDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
       label: formMessageDescriptors.childTitle,
-      showLabel: 'Show',
-      hideLabel: 'Hide',
+      showLabel: formMessageDescriptors.showLabel,
+      hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
       required: false,
       hideInPreview: true,
@@ -189,7 +189,8 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
           //   label: formMessageDescriptors.healthInstitution,
           //   modalTitle: formMessageDescriptors.healthInstitution,
           //   errorTitle: formMessageDescriptors.healthInstitution,
-          //   validate: []
+          //   validate: [],
+          //   initialValue: ''
           // }
         ]
       }
@@ -198,8 +199,8 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       name: 'motherDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
       label: formMessageDescriptors.motherTitle,
-      showLabel: 'Show',
-      hideLabel: 'Hide',
+      showLabel: formMessageDescriptors.showLabel,
+      hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
       required: false,
       hideInPreview: true,
@@ -221,7 +222,8 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             label: formMessageDescriptors.motherDateOfBirth,
             required: false,
             initialValue: '',
-            validate: []
+            validate: [],
+            notice: formMessageDescriptors.motherDateOfBirth
           },
           {
             name: 'firstNamesEng',
@@ -252,8 +254,8 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       name: 'fatherDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
       label: formMessageDescriptors.fatherTitle,
-      showLabel: 'Show',
-      hideLabel: 'Hide',
+      showLabel: formMessageDescriptors.showLabel,
+      hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
       required: false,
       hideInPreview: true,
@@ -306,8 +308,8 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       name: 'informantDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
       label: advancedSearchBirthForm.informantDetails,
-      showLabel: 'Show',
-      hideLabel: 'Hide',
+      showLabel: formMessageDescriptors.showLabel,
+      hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
       required: false,
       hideInPreview: true,

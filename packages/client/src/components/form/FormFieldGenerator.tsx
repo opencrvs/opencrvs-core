@@ -363,8 +363,8 @@ function GeneratedInputField({
           options={fieldDefinition.options}
           name={fieldDefinition.name}
           value={value as string}
-          showLabel={fieldDefinition.showLabel as string}
-          hideLabel={fieldDefinition.hideLabel as string}
+          showLabel={intl.formatMessage(fieldDefinition.showLabel) as string}
+          hideLabel={intl.formatMessage(fieldDefinition.hideLabel) as string}
         />
       </InputField>
     )

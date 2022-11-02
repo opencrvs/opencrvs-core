@@ -16,10 +16,8 @@ interface IAdvancedSearchMessages
   registrationDetails: MessageDescriptor
   placeOfRegistrationlabel: MessageDescriptor
   placeOfRegistrationHelperText: MessageDescriptor
-  placeOfRegistrationplaceholder: MessageDescriptor
   dateOfRegistration: MessageDescriptor
   statusOfRecordLabel: MessageDescriptor
-  statusOfRecordPlaceholder: MessageDescriptor
   informantDetails: MessageDescriptor
   recordStatusAny: MessageDescriptor
   recordStatusInprogress: MessageDescriptor
@@ -46,11 +44,6 @@ const messagesToDefine: IAdvancedSearchMessages = {
     description: 'Helper text for input Place of registration',
     id: 'form.field.label.birth.placeOfRegistrationHelperText'
   },
-  placeOfRegistrationplaceholder: {
-    defaultMessage: 'Search',
-    description: 'Placeholder for example of relationship',
-    id: 'form.field.label.birth.placeOfRegistrationPlaceHolder'
-  },
   dateOfRegistration: {
     defaultMessage: 'Date of registration',
     description: 'Label for input date of registration',
@@ -60,11 +53,6 @@ const messagesToDefine: IAdvancedSearchMessages = {
     defaultMessage: 'Status of record',
     description: 'Label for input Status of record',
     id: 'form.field.label.birth.statusOfRecordLabel'
-  },
-  statusOfRecordPlaceholder: {
-    defaultMessage: 'Select',
-    description: 'Placeholder for status of record',
-    id: 'form.field.label.birth.statusOfRecordPlaceholder'
   },
   informantDetails: {
     defaultMessage: 'Informant details',
