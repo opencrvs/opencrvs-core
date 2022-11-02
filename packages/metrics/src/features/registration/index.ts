@@ -1,4 +1,7 @@
-import { DECLARATION_STATUS } from '@metrics/features/registration/fhirUtils'
+import {
+  DECLARATION_STATUS,
+  USER_ACTION
+} from '@metrics/features/registration/fhirUtils'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,6 +23,12 @@ export interface IDeathRegistrationFields extends IPoint {
   compositionId: string
   ageInYears: number | undefined
   deathDays: number | undefined
+}
+
+export interface IUserAuditFields extends IPoint {
+  data: string | undefined
+  userAgent: string
+  ipAddress: string
 }
 
 export interface IPoint {
@@ -55,6 +64,11 @@ export interface IBirthRegistrationTags {
   locationLevel4?: string
   locationLevel3?: string
   locationLevel2?: string
+}
+
+export interface IUserAuditTags {
+  action: string | USER_ACTION
+  practitionerId: string | undefined
 }
 
 export interface IDeathRegistrationTags {
@@ -163,6 +177,18 @@ export interface IBirthRegistrationPoints {
   timestamp: number | undefined
 }
 
+export interface IUserAuditPoints {
+  measurement: string
+  tags: IUserAuditTags
+  fields: IUserAuditFields
+  timestamp: number | undefined
+}
+
+export interface IUserAuditBody {
+  practitionerId?: string
+  action: USER_ACTION | string
+  additionalData?: Record<string, any>
+}
 export interface IPaymentPoints {
   measurement: string
   tags: ILocationTags & {
@@ -234,7 +260,7 @@ export type IPoints =
   | IPaymentPoints
   | IBirthRegistrationPoints
   | IDeathRegistrationPoints
-  | IPaymentPoints
   | IDeclarationsStartedPoints
   | IRejectedPoints
+  | IUserAuditPoints
   | IAdvancedSearchPoints

@@ -250,7 +250,9 @@ export async function forwardToHearth(
     method: request.method,
     headers: {
       'Content-Type': 'application/fhir+json',
-      'x-correlation-id': request.headers['x-correlation-id']
+      'x-correlation-id': request.headers['x-correlation-id'],
+      'x-real-ip': request.headers['x-real-ip'],
+      'x-real-user-agent': request.headers['x-real-user-agent']
     }
   }
 

@@ -251,7 +251,7 @@ const messagesToDefine: IFormConfigMessages = {
     description: 'Content key label for formTools'
   },
   feildId: {
-    id: 'config.form.tools.feildId',
+    id: 'config.form.tools.fieldId',
     defaultMessage: 'Field ID',
     description: 'Content id for formTools'
   },
