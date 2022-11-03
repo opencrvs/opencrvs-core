@@ -61,7 +61,6 @@ export default async function searchUsers(
   if (status) {
     criteria = { ...criteria, status }
   }
-
   const userList: IUserModel[] = await User.find(criteria)
     .skip(skip)
     .limit(count)

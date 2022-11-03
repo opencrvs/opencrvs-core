@@ -27,11 +27,13 @@ import {
 import {
   statuses,
   roleScopeMapping,
-  hasDemoScope
+  hasDemoScope,
+  getTokenPayload
 } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -128,6 +130,24 @@ export default async function createUser(
   sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
     Authorization: request.headers.authorization
   })
+
+  const tokenPayload = getTokenPayload(
+    request.headers.authorization.split(' ')[1]
+  )
+  const systemUserAdminId = tokenPayload.sub
+  await User.findOne({
+    _id: systemUserAdminId
+  })
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
+  await postUserActionToMetrics(
+    'CREATE_USER',
+    request.headers.authorization,
+    remoteAddress,
+    userAgent
+  )
 
   const resUser = _.omit(userModelObject.toObject(), ['passwordHash', 'salt'])
   return h.response(resUser).code(201)
