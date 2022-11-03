@@ -18,7 +18,7 @@ export const up = async (db, client) => {
       "SELECT * FROM birth_registration WHERE registrarPractitionerId = ''"
     )
 
-    result.forEach(
+    const promiseArray = result.map(
       async ({ compositionId, time, ageInDays, currentStatus, ...tags }) => {
         const task = await db.collection('Task').findOne({
           focus: {
@@ -52,17 +52,13 @@ export const up = async (db, client) => {
           fields: { compositionId, ageInDays, currentStatus },
           timestamp: time.getNanoTime()
         }
-
-        console.log(
-          `DELETE FROM birth_registration WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
-        )
+        const deleteQuery = `DELETE FROM birth_registration WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
 
         await writePoints([point])
-        await query(
-          `DELETE FROM birth_registration WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
-        )
+        return await query(deleteQuery)
       }
     )
+    await Promise.all(promiseArray)
   })
 }
 
