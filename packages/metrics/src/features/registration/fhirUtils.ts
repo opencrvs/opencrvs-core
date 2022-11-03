@@ -519,3 +519,10 @@ export async function fetchDeclarationsBeginnerRole(
   }
   return startedByRole
 }
+
+export function getRegistrarPractitionerIdFromDeclaration(
+  fhirBundle: fhir.Bundle
+) {
+  const currentTask = getTask(fhirBundle)
+  return getPractionerIdFromTask(currentTask as fhir.Task)
+}

@@ -55,7 +55,8 @@ import {
   getRegLastOffice,
   getEncounterLocationType,
   getPractitionerIdFromBundle,
-  fetchDeclarationsBeginnerRole
+  fetchDeclarationsBeginnerRole,
+  getRegistrarPractitionerIdFromDeclaration
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -71,7 +72,6 @@ import {
 } from '@metrics/features/metrics/constants'
 import { fetchParentLocationByLocationID, fetchTaskHistory } from '@metrics/api'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
-import { getTokenPayload } from '@metrics/utils/authUtils'
 
 export const generateInCompleteFieldPoints = async (
   payload: fhir.Bundle,
@@ -193,7 +193,8 @@ export const generateBirthRegPoint = async (
     payload,
     authHeader
   )
-  const registrarPractitionerId = getTokenPayload(authHeader.Authorization).sub
+  const registrarPractitionerId =
+    getRegistrarPractitionerIdFromDeclaration(payload) || ''
 
   const ageInDays =
     (child.birthDate &&
