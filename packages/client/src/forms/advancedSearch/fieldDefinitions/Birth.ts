@@ -104,6 +104,48 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
                 label: advancedSearchBirthForm.recordStatusAchived
               }
             ]
+          },
+          // {
+          //   name: 'placeOfBirthTitle',
+          //   type: 'SUBSECTION',
+          //   label: formMessageDescriptors.placeOfBirth,
+          //   previewGroup: 'placeOfBirth',
+          //   ignoreBottomMargin: true,
+          //   initialValue: '',
+          //   validate: []
+          // },
+          {
+            name: 'location',
+            customisable: false,
+            type: 'LOCATION_SEARCH_INPUT',
+            label: formMessageDescriptors.placeOfBirth,
+            previewGroup: 'placeOfBirth',
+            required: false,
+            initialValue: '',
+            searchableResource: 'facilities',
+            searchableType: 'HEALTH_FACILITY',
+            dynamicOptions: {
+              resource: 'facilities'
+            },
+            validate: []
+          },
+          {
+            name: 'internationalDistrict',
+            customisable: false,
+            type: 'TEXT',
+            label: formMessageDescriptors.internationalDistrict,
+            required: false,
+            initialValue: '',
+            validate: []
+          },
+          {
+            name: 'internationalState',
+            customisable: false,
+            type: 'TEXT',
+            label: formMessageDescriptors.internationalState,
+            required: false,
+            initialValue: '',
+            validate: []
           }
         ]
       }
