@@ -1450,7 +1450,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'iD',
-                type: 'TEXT',
+                type: 'TEL',
                 label: formMessageDescriptors.iDTypeNationalID,
                 required: false,
                 customisable: true,
@@ -2645,7 +2645,7 @@ export const registerForms: IDefaultRegisterForms = {
               // NiD
               {
                 name: 'iD',
-                type: 'TEXT',
+                type: 'TEL',
                 label: formMessageDescriptors.iDTypeNationalID,
                 required: false,
                 customisable: true,
