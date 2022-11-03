@@ -55,8 +55,7 @@ import {
   getRegLastOffice,
   getEncounterLocationType,
   getPractitionerIdFromBundle,
-  fetchDeclarationsBeginnerRole,
-  getRegistrarPractitionerIdFromDeclaration
+  fetchDeclarationsBeginnerRole
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -193,8 +192,7 @@ export const generateBirthRegPoint = async (
     payload,
     authHeader
   )
-  const registrarPractitionerId =
-    getRegistrarPractitionerIdFromDeclaration(payload) || ''
+  const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
 
   const ageInDays =
     (child.birthDate &&
@@ -264,6 +262,8 @@ export const generateDeathRegPoint = async (
     authHeader
   )
 
+  const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
+
   const deathDays =
     (deceased.deceasedDateTime &&
       getDurationInDays(
@@ -288,6 +288,7 @@ export const generateDeathRegPoint = async (
     regStatus: regStatus,
     gender: deceased.gender,
     practitionerRole,
+    registrarPractitionerId,
     ageLabel:
       (deceasedAgeInDays && getAgeLabel(deceasedAgeInDays)) || undefined,
     timeLabel:

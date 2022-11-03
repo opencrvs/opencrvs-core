@@ -12,7 +12,8 @@
 import { GQLResolver } from '@gateway/graphql/schema'
 import { fetchFHIR } from '@gateway/features/fhir/utils'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
-import { getUser } from '@gateway/features/user/utils'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import fetch from 'node-fetch'
 
 export const typeResolvers: GQLResolver = {
   UserAuditLogResultItem: {
@@ -42,7 +43,16 @@ export const typeResolvers: GQLResolver = {
   },
   EventMetricsByRegistrar: {
     async registrarPractitioner({ registrarPractitioner }, _, authHeader) {
-      return await getUser({ userId: registrarPractitioner }, authHeader)
+      return await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+        method: 'POST',
+        body: JSON.stringify({
+          practitionerId: registrarPractitioner
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
     }
   }
 }

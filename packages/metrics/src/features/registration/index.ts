@@ -74,6 +74,7 @@ export interface IUserAuditTags {
 
 export interface IDeathRegistrationTags {
   regStatus: string
+  registrarPractitionerId: string
   practitionerRole: string
   eventLocationType: string
   gender: string | undefined
