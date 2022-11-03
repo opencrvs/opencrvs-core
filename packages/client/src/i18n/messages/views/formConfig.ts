@@ -230,7 +230,7 @@ const messagesToDefine: IFormConfigMessages = {
   },
 
   integrations: {
-    id: 'config.integrations.',
+    id: 'config.integrations',
     defaultMessage: 'Integrations',
     description: 'Title for Form Integrations Page'
   },
