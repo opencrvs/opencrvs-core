@@ -43,7 +43,7 @@ export const typeResolvers: GQLResolver = {
   },
   EventMetricsByRegistrar: {
     async registrarPractitioner({ registrarPractitioner }, _, authHeader) {
-      return await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
         method: 'POST',
         body: JSON.stringify({
           practitionerId: registrarPractitioner
@@ -53,6 +53,7 @@ export const typeResolvers: GQLResolver = {
           ...authHeader
         }
       })
+      return await res.json()
     }
   }
 }
