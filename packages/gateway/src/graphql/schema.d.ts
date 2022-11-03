@@ -84,8 +84,8 @@ export interface GQLMutation {
   createFormDraft?: GQLFormDraft
   modifyDraftStatus?: GQLFormDraft
   deleteFormDraft?: string
-  reactivateSystemClient?: GQLSampleResponse
-  deactivateSystemClient?: GQLSampleResponse
+  reactivateSystemClient?: GQLIntegrationResponse
+  deactivateSystemClient?: GQLIntegrationResponse
 }
 
 export interface GQLDummy {
@@ -516,8 +516,8 @@ export interface GQLDeleteFormDraftInput {
   event: GQLEvent
 }
 
-export interface GQLSampleResponse {
-  name?: string
+export interface GQLIntegrationResponse {
+  message?: string
 }
 
 export interface GQLClientPayload {
@@ -1406,7 +1406,7 @@ export interface GQLResolver {
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
-  SampleResponse?: GQLSampleResponseTypeResolver
+  IntegrationResponse?: GQLIntegrationResponseTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -4018,11 +4018,14 @@ export interface ApplicationConfigurationToADDRESSESResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLSampleResponseTypeResolver<TParent = any> {
-  name?: SampleResponseToNameResolver<TParent>
+export interface GQLIntegrationResponseTypeResolver<TParent = any> {
+  message?: IntegrationResponseToMessageResolver<TParent>
 }
 
-export interface SampleResponseToNameResolver<TParent = any, TResult = any> {
+export interface IntegrationResponseToMessageResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

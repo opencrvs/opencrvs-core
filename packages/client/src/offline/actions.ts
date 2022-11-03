@@ -18,12 +18,14 @@ import {
   IAssetResponse,
   IApplicationConfigResponse,
   IApplicationConfig,
-  ICertificateTemplateData
+  ICertificateTemplateData,
+  Integration
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IFormConfig } from '@client/forms'
 import { IQuestionConfig } from '@client/forms/questionConfig'
+import { IntegrationType } from '@client/views/SysAdmin/Config/Integrations/Integrations'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -89,6 +91,12 @@ export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
 export type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
   payload: { config: IApplicationConfig }
+}
+export const UPDATE_OFFLINE_INTEGRATIONS =
+  'OFFLINE/UPDATE_OFFLINE_INTEGRATIONS' as const
+export type ApplicationConfigUpdatedIntegrations = {
+  type: typeof UPDATE_OFFLINE_INTEGRATIONS
+  payload: { integrations: Integration[] }
 }
 
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
@@ -216,6 +224,12 @@ export const updateOfflineConfigData = (payload: {
   type: UPDATE_OFFLINE_CONFIG,
   payload: payload
 })
+export const updateOfflineIntegrations = (payload: {
+  integrations: Integration[]
+}): ApplicationConfigUpdatedIntegrations => ({
+  type: UPDATE_OFFLINE_INTEGRATIONS,
+  payload: payload
+})
 
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
@@ -292,6 +306,7 @@ export type Action =
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
+  | ApplicationConfigUpdatedIntegrations
   | UpdateOfflineFormConfigAction
   | UpdateOfflineCertificateAction
   | OfflineFormConfigUpdatedAction

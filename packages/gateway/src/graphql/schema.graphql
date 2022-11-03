@@ -246,8 +246,8 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
-  reactivateSystemClient(clientDetails: ClientPayload): SampleResponse
-  deactivateSystemClient(clientDetails: ClientPayload): SampleResponse
+  reactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
+  deactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
 }
 
 type Dummy {
@@ -667,8 +667,8 @@ input DeleteFormDraftInput {
   event: Event!
 }
 
-type SampleResponse {
-  name: String
+type IntegrationResponse {
+  message: String
 }
 
 input ClientPayload {

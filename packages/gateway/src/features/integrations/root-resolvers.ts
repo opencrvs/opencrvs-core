@@ -35,7 +35,7 @@ export const resolvers: GQLResolver = {
           }
         )
         if (res.status == 200) {
-          return await Promise.resolve({ message: 'User status changed' })
+          return await Promise.resolve({ message: 'User status activated' })
         }
 
         if (res.status !== 201) {
@@ -71,7 +71,7 @@ export const resolvers: GQLResolver = {
           }
         )
         if (res.status == 200) {
-          return await Promise.resolve({ message: 'User status changed' })
+          return await Promise.resolve({ message: 'User status deactivated' })
         }
 
         if (res.status !== 201) {

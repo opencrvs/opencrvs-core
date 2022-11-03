@@ -21,13 +21,13 @@ input ClientPayload {
   client_id: String
 }
 
-type SampleResponse {
-  name: String
+type IntegrationResponse {
+  message: String
 }
 
 type Mutation {
-  reactivateSystemClient(clientDetails: ClientPayload): SampleResponse
+  reactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
 }
 type Mutation {
-  deactivateSystemClient(clientDetails: ClientPayload): SampleResponse
+  deactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
 }
