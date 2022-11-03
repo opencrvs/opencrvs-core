@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
 import { injectIntl, useIntl } from 'react-intl'
@@ -22,46 +22,111 @@ import { messages } from '@client/i18n/messages/views/config'
 import { Content, FormTabs, Text } from '@client/../../components/lib'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  IFormSection,
-  IFormSectionData,
-  IFormSectionGroup
-} from '@client/forms'
 import { advancedSearchBirthSectionFormType } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
 import { PrimaryButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { IOfflineData } from '@client/offline/reducer'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 export enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
 
-type IProps = {
-  userId?: string
-  section: IFormSection
-  formData: IFormSectionData
-  activeGroup: IFormSectionGroup
-  nextSectionId: string
-  nextGroupId: string
-  offlineCountryConfig: IOfflineData
-}
-
 const BirthTabContent = () => {
   return <BirthSection />
 }
 
+const DeathTabContent = () => {
+  return <>Death</>
+}
+
+export interface IAdvancedSearch {
+  event?: Event
+  registrationStatuses?: string[]
+  dateOfEvent?: string
+  dateOfEventStart?: string
+  dateOfEventEnd?: string
+  contactNumber?: string
+  nationalId?: string
+  registrationNumber?: string
+  trackingId?: string
+  dateOfRegistration?: string
+  dateOfRegistrationStart?: string
+  dateOfRegistrationEnd?: string
+  declarationLocationId?: string
+  declarationJurisdictionId?: string
+  eventLocationId?: string
+  eventLocationLevel1?: string
+  eventLocationLevel2?: string
+  eventLocationLevel3?: string
+  eventLocationLevel4?: string
+  eventLocationLevel5?: string
+  childFirstNames?: string
+  childLastName?: string
+  childDoB?: string
+  childDoBStart?: string
+  childDoBEnd?: string
+  childGender?: string
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deceasedGender?: string
+  deceasedDoB?: string
+  deceasedDoBStart?: string
+  deceasedDoBEnd?: string
+  deceasedIdentifier?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  motherDoBStart?: string
+  motherDoBEnd?: string
+  motherIdentifier?: string
+  fatherFirstNames?: string
+  fatherFamilyName?: string
+  fatherDoB?: string
+  fatherDoBStart?: string
+  fatherDoBEnd?: string
+  fatherIdentifier?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  informantDoB?: string
+  informantDoBStart?: string
+  informantDoBEnd?: string
+  informantIdentifier?: string
+}
+
 const BirthSection = () => {
   const intl = useIntl()
+  const [isDisable, setDisable] = useState(true)
+  const isOnline = useOnlineStatus()
+
+  const validateForm = (advancedSearch: IAdvancedSearch) => {
+    let count = 0
+
+    for (const field of Object.values(advancedSearch)) {
+      const result = field.nestedFields
+      for (const value of Object.values(result)) {
+        if (value !== '') {
+          count++
+        }
+      }
+    }
+
+    if (count > 1 && isOnline) {
+      setDisable(false)
+    } else {
+      setDisable(true)
+    }
+  }
+
   return (
     <>
       <Text element={'p'} variant={'reg18'}>
         {intl.formatMessage(messages.advancedSearchInstruction)}
       </Text>
       <FormFieldGenerator
-        id={'o'}
+        id={advancedSearchBirthSectionFormType.id}
         onChange={(values) => {
-          //  modifyDeclaration(values, section, declaration)
+          validateForm(values)
         }}
         setAllFieldsDirty={false}
         fields={advancedSearchBirthSectionFormType.fields}
@@ -72,7 +137,7 @@ const BirthSection = () => {
         align={ICON_ALIGNMENT.LEFT}
         id="search"
         key="search"
-        // onClick={}
+        disabled={isDisable}
       >
         {intl.formatMessage(buttonMessages.search)}
       </PrimaryButton>
@@ -80,13 +145,9 @@ const BirthSection = () => {
   )
 }
 
-const DeathTabContent = () => {
-  return <>Death</>
-}
-
 const AdvancedSearch = () => {
   const intl = useIntl()
-  const [activeTabId, setActiveTabId] = React.useState(TabId.BIRTH)
+  const [activeTabId, setActiveTabId] = useState(TabId.BIRTH)
 
   const tabSections = [
     {
@@ -122,6 +183,7 @@ const AdvancedSearch = () => {
     </>
   )
 }
+
 function mapStateToProps(state: IStoreState) {
   return {
     scope: getScope(state)

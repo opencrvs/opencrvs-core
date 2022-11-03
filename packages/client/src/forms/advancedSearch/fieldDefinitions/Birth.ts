@@ -18,7 +18,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
   title: advancedSearchBirthForm.registrationDetails,
   fields: [
     {
-      name: 'informantType',
+      name: 'registrationDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
       label: advancedSearchBirthForm.registrationDetails,
       showLabel: formMessageDescriptors.showLabel,
@@ -183,15 +183,6 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
               }
             ]
           }
-          // {
-          //   name: 'birthLocation',
-          //   type: 'FETCH_BUTTON',
-          //   label: formMessageDescriptors.healthInstitution,
-          //   modalTitle: formMessageDescriptors.healthInstitution,
-          //   errorTitle: formMessageDescriptors.healthInstitution,
-          //   validate: [],
-          //   initialValue: ''
-          // }
         ]
       }
     },
