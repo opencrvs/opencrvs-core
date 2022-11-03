@@ -14,52 +14,87 @@ import { query, writePoints } from './../../utils/influx-helper.js'
 export const up = async (db, client) => {
   const session = client.startSession()
   await session.withTransaction(async () => {
-    const result = await query(
+    const resultBirth = await query(
       "SELECT * FROM birth_registration WHERE registrarPractitionerId = ''"
     )
+    const birthPromises = updateInflux(resultBirth, 'birth_registration', db)
+    await Promise.all(birthPromises)
 
-    const promiseArray = result.map(
-      async ({ compositionId, time, ageInDays, currentStatus, ...tags }) => {
-        const task = await db.collection('Task').findOne({
-          focus: {
-            reference: `Composition/${compositionId}`
-          },
-          businessStatus: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/reg-status',
-                code: 'REGISTERED'
-              }
-            ]
-          }
-        })
-
-        const practitionerExtension = task.extension.find(
-          (extension) =>
-            extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
-        )
-        const id = practitionerExtension.valueReference.reference.replace(
-          'Practitioner/',
-          ''
-        )
-        const practitioner = await db.collection('Practitioner').findOne({ id })
-        const point = {
-          measurement: 'birth_registration',
-          tags: {
-            ...tags,
-            registrarPractitionerId: practitioner.id
-          },
-          fields: { compositionId, ageInDays, currentStatus },
-          timestamp: time.getNanoTime()
-        }
-        const deleteQuery = `DELETE FROM birth_registration WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
-
-        await writePoints([point])
-        return await query(deleteQuery)
-      }
+    const result = await query(
+      "SELECT * FROM death_registration WHERE registrarPractitionerId = ''"
     )
-    await Promise.all(promiseArray)
+    const deathPromises = updateInflux(result, 'death_registration', db)
+    await Promise.all(deathPromises)
   })
+}
+
+const updateInflux = (result, measurement, db) => {
+  return result.map(
+    async ({
+      compositionId,
+      time,
+      ageInDays,
+      ageInYears,
+      currentStatus,
+      deathDays,
+      ...tags
+    }) => {
+      const task = await db.collection('Task').findOne({
+        focus: {
+          reference: `Composition/${compositionId}`
+        },
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'REGISTERED'
+            }
+          ]
+        }
+      })
+
+      const practitionerExtension = task.extension.find(
+        (extension) =>
+          extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
+      )
+      const id = practitionerExtension.valueReference.reference.replace(
+        'Practitioner/',
+        ''
+      )
+      const fields = { compositionId, currentStatus }
+      if (measurement === 'birth_registration') {
+        fields.ageInDays = ageInDays
+      }
+      if (measurement === 'death_registration') {
+        fields.deathDays = deathDays
+        fields.ageInYears = ageInYears
+      }
+
+      const practitioner = await db.collection('Practitioner').findOne({ id })
+
+      const point = {
+        measurement,
+        tags: {
+          ...tags,
+          registrarPractitionerId: practitioner.id
+        },
+        fields,
+        timestamp: time.getNanoTime()
+      }
+      const deleteQuery = `DELETE FROM ${measurement} WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
+
+      console.log(`==========${JSON.stringify(point)}===============`)
+      console.log({
+        ...tags,
+        registrarPractitionerId: practitioner.id
+      })
+      console.log('========================')
+      console.log(fields)
+
+      await writePoints([point])
+      return await query(deleteQuery)
+    }
+  )
 }
 
 export const down = async (db, client) => {
