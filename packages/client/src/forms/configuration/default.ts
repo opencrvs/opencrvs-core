@@ -1421,7 +1421,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'phoneNumber',
-                type: 'TEL',
+                type: 'NUMBER',
                 label: formMessageDescriptors.phoneNumber,
                 required: false,
                 initialValue: '',
@@ -1450,7 +1450,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'iD',
-                type: 'TEL',
+                type: 'NUMBER',
                 label: formMessageDescriptors.iDTypeNationalID,
                 required: false,
                 customisable: true,
@@ -2615,7 +2615,7 @@ export const registerForms: IDefaultRegisterForms = {
               // Phone number
               {
                 name: 'phoneNumber',
-                type: 'TEL',
+                type: 'NUMBER',
                 label: formMessageDescriptors.phoneNumber,
                 required: false,
                 initialValue: '',
@@ -2645,7 +2645,7 @@ export const registerForms: IDefaultRegisterForms = {
               // NiD
               {
                 name: 'iD',
-                type: 'TEL',
+                type: 'NUMBER',
                 label: formMessageDescriptors.iDTypeNationalID,
                 required: false,
                 customisable: true,
