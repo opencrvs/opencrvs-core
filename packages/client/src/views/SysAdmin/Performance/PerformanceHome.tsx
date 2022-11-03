@@ -466,6 +466,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             selectedEvent={
                               event.toUpperCase() as 'BIRTH' | 'DEATH'
                             }
+                            timeStart={timeStart.toISOString()}
+                            timeEnd={timeEnd.toISOString()}
+                            locationId={this.state.selectedLocation.id}
                           />
                           <CertificationRatesReport
                             totalRegistrations={calculateTotal(

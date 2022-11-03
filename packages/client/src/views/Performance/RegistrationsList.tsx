@@ -54,7 +54,7 @@ import { ILocation } from '@client/offline/reducer'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IAvatar } from '@client/utils/userUtils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { userMessages } from '@client/i18n/messages'
+import { userMessages, constantsMessages } from '@client/i18n/messages'
 import { SegmentedControl } from '@client/components/SegmentedControl'
 import { getName } from '@client/views/RecordAudit/utils'
 
@@ -141,54 +141,11 @@ const TableDiv = styled.div`
   overflow: auto;
 `
 
-const NameAvatar = styled.div`
-  display: flex;
-  align-items: center;
-  img {
-    margin-right: 10px;
-  }
-`
-
-function getNameWithAvatar(userName: string, avatar?: IAvatar) {
-  return (
-    <NameAvatar>
-      <AvatarSmall name={userName} avatar={avatar} />
-      <span>{userName}</span>
-    </NameAvatar>
-  )
-}
-
 function getPercentage(total: number | undefined, current: number | undefined) {
   if (!total || total <= 0 || !current || current <= 0) {
     return 0
   }
   return Math.round((current / total) * 100)
-}
-
-function getAverageCompletionTimeComponent(
-  completionTimeInSeconds: number | undefined,
-  id: number
-) {
-  const timeStructure = formatTimeDuration(completionTimeInSeconds || 0)
-  const label =
-    (timeStructure &&
-      `${timeStructure.days}:${timeStructure.hours}:${timeStructure.minutes}`) ||
-    '-'
-  const tooltip =
-    (timeStructure &&
-      `${timeStructure.days} days, ${timeStructure.hours} hours, ${timeStructure.minutes} minutes`) ||
-    '-'
-
-  return (
-    <>
-      <ReactTooltip id={`cmpltn_time_${id}`}>
-        <ToolTipContainer>{tooltip}</ToolTipContainer>
-      </ReactTooltip>
-      <span data-tip data-for={`cmpltn_time_${id}`}>
-        {label}
-      </span>
-    </>
-  )
 }
 
 function RegistrationListComponent(props: IProps) {
@@ -204,7 +161,6 @@ function RegistrationListComponent(props: IProps) {
     event = EVENT_OPTIONS.BIRTH,
     filterBy = FILTER_BY_OPTIONS.BY_TIME
   } = parse(search) as unknown as ISearchParams
-  const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('total')
@@ -220,7 +176,7 @@ function RegistrationListComponent(props: IProps) {
         timeStart: timeStart,
         timeEnd: timeEnd,
         primaryOfficeId: locationId,
-        status: status.toString(),
+        status: STATUS_OPTIONS.ACTIVE.toString(),
         event: event || undefined,
         count: recordCount,
         sort: 'asc',
@@ -231,7 +187,7 @@ function RegistrationListComponent(props: IProps) {
         timeStart: timeStart,
         timeEnd: timeEnd,
         locationId: locationId,
-        status: status.toString(),
+        status: STATUS_OPTIONS.ACTIVE.toString(),
         event: event || undefined,
         count: recordCount,
         sort: 'asc',
@@ -560,7 +516,7 @@ function RegistrationListComponent(props: IProps) {
                   <Table
                     id={'field-agent-error-list'}
                     noResultText={intl.formatMessage(
-                      messages.fieldAgentsNoResult
+                      constantsMessages.noResults
                     )}
                     isLoading={true}
                     columns={getColumns()}
@@ -581,7 +537,7 @@ function RegistrationListComponent(props: IProps) {
                   <Table
                     id={'field-agent-list'}
                     noResultText={intl.formatMessage(
-                      messages.fieldAgentsNoResult
+                      constantsMessages.noResults
                     )}
                     isLoading={loading}
                     disableScrollOnOverflow={true}
