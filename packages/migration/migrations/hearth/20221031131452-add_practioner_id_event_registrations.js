@@ -47,7 +47,7 @@ export const up = async (db, client) => {
           measurement: 'birth_registration',
           tags: {
             ...tags,
-            registrarPractitionerId: practitioner._id.toString()
+            registrarPractitionerId: practitioner.id
           },
           fields: { compositionId, ageInDays, currentStatus },
           timestamp: time.getNanoTime()
