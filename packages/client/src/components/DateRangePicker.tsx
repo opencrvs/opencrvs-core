@@ -89,6 +89,9 @@ function isPresetNavButton(button: IPresetButton): button is IPresetNavButton {
 
 interface IDateRangePickerProps extends WrappedComponentProps, IDateRange {
   onDatesChange: ({ startDate, endDate }: IDateRange) => void
+  hidePresetBar?: boolean
+  closeModalFromHOC?: () => void
+  usedInsideHOC?: boolean
 }
 
 interface PresetSelectorProps {
@@ -375,7 +378,9 @@ const StyledPrimaryButton = styled(PrimaryButton)`
   height: auto;
 `
 function DateRangePickerComponent(props: IDateRangePickerProps) {
-  const [modalVisible, setModalVisible] = useState<boolean>(false)
+  const [modalVisible, setModalVisible] = useState<boolean>(
+    props.usedInsideHOC ? true : false
+  )
   const { intl } = props
 
   window.__localeId__ = intl.locale
@@ -390,7 +395,9 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
   const todaysDate = new Date(Date.now())
   const [presetOptions, updatePresetOptions] = useState<IPresetButton[]>([])
-  const [activeRoute, setActiveRoute] = useState<PATHS>(PRESET)
+  const [activeRoute, setActiveRoute] = useState<PATHS>(
+    props.hidePresetBar ? START_MONTH : PRESET
+  )
 
   const months = useMemo(() => {
     return getMonthsShort(intl.locale)
@@ -637,6 +644,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               endDate: date
             })
             setModalVisible(false)
+            props.closeModalFromHOC && props.closeModalFromHOC()
           }}
           minDate={addDays(startDate, 1)}
           maxDate={todaysDate}
@@ -649,22 +657,24 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
   return (
     <div>
-      <PickerButton
-        id="date-range-picker-action"
-        onClick={() => setModalVisible(true)}
-      >
-        <ContentWrapper>
-          <span>
-            {selectedPresetFromProps
-              ? selectedPresetFromProps.label
-              : `${format(startDateFromProps, 'MMMM yyyy')} - ${format(
-                  endDateFromProps,
-                  'MMMM yyyy'
-                )}`}
-          </span>
-          <Calendar />
-        </ContentWrapper>
-      </PickerButton>
+      {!props.hidePresetBar && (
+        <PickerButton
+          id="date-range-picker-action"
+          onClick={() => setModalVisible(true)}
+        >
+          <ContentWrapper>
+            <span>
+              {selectedPresetFromProps
+                ? selectedPresetFromProps.label
+                : `${format(startDateFromProps, 'MMMM yyyy')} - ${format(
+                    endDateFromProps,
+                    'MMMM yyyy'
+                  )}`}
+            </span>
+            <Calendar />
+          </ContentWrapper>
+        </PickerButton>
+      )}
       {modalVisible && (
         <>
           <ModalContainer id="picker-modal">
@@ -676,20 +686,25 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               <CircleButton
                 id="close-btn"
                 type="button"
-                onClick={() => setModalVisible(false)}
+                onClick={() => {
+                  setModalVisible(false)
+                  props.closeModalFromHOC && props.closeModalFromHOC()
+                }}
               >
                 <Cross color="currentColor" />
               </CircleButton>
             </ModalHeader>
             <ModalBody>
-              <PresetSelector
-                onSelectPreset={({ startDate, endDate }) => {
-                  setStartDateNav(startDate)
-                  setEndDateNav(endDate)
-                  setStartDate(startDate)
-                  setEndDate(endDate)
-                }}
-              />
+              {!props.hidePresetBar && (
+                <PresetSelector
+                  onSelectPreset={({ startDate, endDate }) => {
+                    setStartDateNav(startDate)
+                    setEndDateNav(endDate)
+                    setStartDate(startDate)
+                    setEndDate(endDate)
+                  }}
+                />
+              )}
               <MonthSelector
                 date={startDateNav}
                 onNavigateDate={setStartDateNav}
@@ -719,6 +734,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                     endDate: endOfMonth(endDate)
                   })
                   setModalVisible(false)
+                  props.closeModalFromHOC && props.closeModalFromHOC()
                 }}
                 disabled={isAfter(startDate, endDate)}
               >
@@ -728,7 +744,10 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           </ModalContainer>
           <CancelableArea
             id="cancelable-area"
-            onClick={() => setModalVisible(false)}
+            onClick={() => {
+              setModalVisible(false)
+              props.closeModalFromHOC && props.closeModalFromHOC()
+            }}
           />
         </>
       )}
