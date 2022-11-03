@@ -34,10 +34,25 @@ const messagesToDefine = {
     defaultMessage: 'Disable',
     description: 'Label for disable option'
   },
+  enable: {
+    id: 'integrations.enable',
+    defaultMessage: 'Enable',
+    description: 'Label for enable option'
+  },
   delete: {
     id: 'integrations.delete',
     defaultMessage: 'Delete',
     description: 'Label for delete option'
+  },
+  active: {
+    id: 'integrations.active',
+    defaultMessage: 'Active',
+    description: 'Label for active integration'
+  },
+  inactive: {
+    id: 'integrations.inactive',
+    defaultMessage: 'Inactive',
+    description: 'Label for inactive integration'
   },
   activate: {
     id: 'integrations.activate',

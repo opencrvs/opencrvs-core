@@ -11,6 +11,7 @@
  */
 import { AppStore } from '@client/store'
 import {
+  createRouterProps,
   createTestComponent,
   createTestStore,
   flushPromises
@@ -19,14 +20,14 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as React from 'react'
-import {
-  GET_USER,
-  FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER
-} from '@client/user/queries'
-import { UserProfile } from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
-import { USER_PROFILE } from '@client/navigation/routes'
+import { GET_USER } from '@client/user/queries'
+import { UserAudit } from '@client/views/UserAudit/UserAudit'
 import { userMutations } from '@client/user/mutations'
 import { vi, Mock } from 'vitest'
+
+import * as Router from 'react-router'
+
+const useParams = Router.useParams as Mock
 
 describe('User audit list tests', () => {
   userMutations.resendSMSInvite = vi.fn()
@@ -87,36 +88,7 @@ describe('User audit list tests', () => {
                 ]
               }
             ],
-            signature: null,
             creationDate: '2019-03-31T18:00:00.000Z'
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER,
-        variables: {
-          timeEnd: new Date(1487076708000).toISOString(),
-          timeStart: new Date(1484398308000).toISOString(),
-          practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
-          locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-          count: 10
-        }
-      },
-      result: {
-        data: {
-          fetchTimeLoggedMetricsByPractitioner: {
-            totalItems: 1,
-            results: [
-              {
-                status: 'REGISTERED',
-                trackingId: 'B23S555',
-                eventType: 'BIRTH',
-                timeSpentEditing: 50,
-                time: '2019-03-31T18:00:00.000Z'
-              }
-            ]
           }
         }
       }
@@ -125,54 +97,40 @@ describe('User audit list tests', () => {
 
   beforeEach(async () => {
     Date.now = vi.fn(() => 1487076708000)
+
+    useParams.mockImplementation(() => ({
+      userId: '5d08e102542c7a19fc55b790'
+    }))
+
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
-    component = await createTestComponent(
-      // @ts-ignore
-      <UserProfile
-        match={{
-          params: {
-            userId: '5d08e102542c7a19fc55b790'
-          },
-          isExact: true,
-          path: USER_PROFILE,
-          url: ''
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock }
-    )
-
-    expect(await waitForElement(component, '#user-profile')).toBeDefined()
+    component = await createTestComponent(<UserAudit />, {
+      store,
+      history,
+      graphqlMocks: graphqlMock
+    })
   })
 
   it('renders without crashing', async () => {
     expect(await waitForElement(component, '#user-audit-list')).toBeDefined()
   })
+
   it('renders with a error toast for graphql error', async () => {
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <UserProfile
-        match={{
-          params: {
-            userId: '5d08e102542c7a19fc55b790'
-          },
-          isExact: true,
-          path: USER_PROFILE,
-          url: ''
-        }}
-      />,
-      { store, history }
-    )
+    const testComponent = await createTestComponent(<UserAudit />, {
+      store,
+      history,
+      graphqlMocks: []
+    })
     expect(await waitForElement(testComponent, '#error-toast')).toBeDefined()
   })
+
   it('redirects to edit user view on clicking edit details menu option', async () => {
     const menuLink = await waitForElement(
       component,
       '#sub-page-header-munu-buttonToggleButton'
     )
     menuLink.hostNodes().simulate('click')
-
     const editUserLink = await waitForElement(
       component,
       '#sub-page-header-munu-buttonItem0'
@@ -180,9 +138,8 @@ describe('User audit list tests', () => {
     editUserLink.hostNodes().simulate('click')
 
     // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
+    await flushPromises()
+
     expect(history.location.pathname).toBe(
       '/user/5d08e102542c7a19fc55b790/preview/'
     )
@@ -245,6 +202,7 @@ describe('User audit list tests', () => {
       await waitForElement(component, '#resend_invite_error')
     ).toBeDefined()
   })
+  //NEED TO FIX
   it('opens deactivation modal on clicking deactivate menu option', async () => {
     const menuLink = await waitForElement(
       component,
@@ -260,23 +218,15 @@ describe('User audit list tests', () => {
 
     expect(await waitForElement(component, '#deactivate-action')).toBeDefined()
   })
+  //NEED TO FIX
   it('opens activation modal on clicking deactivate menu option', async () => {
     // @ts-ignore
     graphqlMock[0].result.data.getUser.status = 'deactivated'
-    component = await createTestComponent(
-      // @ts-ignore
-      <UserProfile
-        match={{
-          params: {
-            userId: '5d08e102542c7a19fc55b790'
-          },
-          isExact: true,
-          path: USER_PROFILE,
-          url: ''
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock }
-    )
+    component = await createTestComponent(<UserAudit />, {
+      store,
+      history,
+      graphqlMocks: graphqlMock
+    })
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {

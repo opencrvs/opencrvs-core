@@ -12,11 +12,10 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { PaperClip, Delete } from '@opencrvs/components/lib/icons'
-import { IFileValue, IAttachmentValue, IFormFieldValue } from '@client/forms'
+import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { ISelectOption } from '@opencrvs/components/lib/Select'
-import { Button } from '@opencrvs/components/lib/buttons/Button'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
 const Wrapper = styled.div`

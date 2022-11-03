@@ -14,6 +14,7 @@ import { resolvers as certificateResolvers } from '@gateway/features/certificate
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
 import { resolvers as integrationResolver } from '@gateway/features/integrations/root-resolvers'
+import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
 import { typeResolvers } from '@gateway/features/registration/type-resolvers'
@@ -61,6 +62,7 @@ const resolvers: StringIndexed<IResolvers> = merge(
   certificateTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
   integrationResolver as IResolvers,
+  metricsTypeResolvers as IResolvers,
   typeResolvers as IResolvers,
   searchRootResolvers as IResolvers,
   searchTypeResolvers as IResolvers,
@@ -116,7 +118,9 @@ export const getApolloConfig = (): Config => {
 
       return {
         Authorization: request.headers.authorization,
-        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId()
+        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
+        'x-real-ip': request.info?.remoteAddress,
+        'x-real-user-agent': request.headers['user-agent']
       }
     }
   }

@@ -13,6 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
 import { invalidateToken } from '@auth/features/invalidateToken/service'
+import { postUserActionToMetrics } from '@auth/features/authenticate/service'
 
 interface IInvalidateTokenPayload {
   token: string
@@ -23,8 +24,12 @@ export default async function invalidateTokenHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { token } = request.payload as IInvalidateTokenPayload
-
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   try {
+    await postUserActionToMetrics('LOGGED_OUT', token, remoteAddress, userAgent)
     await invalidateToken(token)
   } catch (err) {
     throw internal('Failed to invalidate token', err)
