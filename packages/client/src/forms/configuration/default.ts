@@ -380,6 +380,21 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
+                name: 'reasonNotApplying',
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: 'values.detailsExist'
+                  }
+                ],
+                type: 'TEXT',
+                label: formMessageDescriptors.reasonMNA,
+                validate: [],
+                initialValue: '',
+                customisable: true,
+                required: true
+              },
+              {
                 name: 'familyNameEng',
                 previewGroup: 'motherNameInEnglish',
                 type: 'TEXT',
@@ -1421,7 +1436,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'phoneNumber',
-                type: 'NUMBER',
+                type: 'BIG_NUMBER',
                 label: formMessageDescriptors.phoneNumber,
                 required: false,
                 initialValue: '',
@@ -1450,7 +1465,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'iD',
-                type: 'NUMBER',
+                type: 'BIG_NUMBER',
                 label: formMessageDescriptors.iDTypeNationalID,
                 required: false,
                 customisable: true,
@@ -1561,6 +1576,21 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'booleanTransformer'
                   }
                 }
+              },
+              {
+                name: 'reasonNotApplying',
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: 'values.detailsExist'
+                  }
+                ],
+                type: 'TEXT',
+                label: formMessageDescriptors.reasonFNA,
+                validate: [],
+                initialValue: '',
+                customisable: true,
+                required: true
               },
               // Last name
               {
@@ -2615,7 +2645,7 @@ export const registerForms: IDefaultRegisterForms = {
               // Phone number
               {
                 name: 'phoneNumber',
-                type: 'NUMBER',
+                type: 'BIG_NUMBER',
                 label: formMessageDescriptors.phoneNumber,
                 required: false,
                 initialValue: '',
@@ -2645,7 +2675,7 @@ export const registerForms: IDefaultRegisterForms = {
               // NiD
               {
                 name: 'iD',
-                type: 'NUMBER',
+                type: 'BIG_NUMBER',
                 label: formMessageDescriptors.iDTypeNationalID,
                 required: false,
                 customisable: true,
@@ -3014,7 +3044,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'registrationPhone',
-                type: 'TEL',
+                type: 'BIG_NUMBER',
                 label: formMessageDescriptors.phoneNumber,
                 required: false,
                 initialValue: '',
@@ -3048,7 +3078,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'informantID',
-                type: 'TEXT',
+                type: 'BIG_NUMBER',
                 label: formMessageDescriptors.iDTypeNationalID,
                 required: false,
                 customisable: true,

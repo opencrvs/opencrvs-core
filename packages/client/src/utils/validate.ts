@@ -195,7 +195,7 @@ export const officeMustBeSelected: Validation = (
 }
 
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {
-  const cast = value as string
+  const cast = value.toString()
   const trimmedValue = cast === undefined || cast === null ? '' : cast.trim()
 
   if (!trimmedValue) {

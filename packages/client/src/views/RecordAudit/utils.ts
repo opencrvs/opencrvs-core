@@ -362,7 +362,7 @@ export const getInformantPhoneNumber = (declaration: IDeclaration): string => {
     ? declaration.data?.mother?.phoneNumber?.toString()
     : declaration.data?.registration?.informantType === 'FATHER'
     ? declaration.data?.father?.phoneNumber?.toString()
-    : declaration.data?.informant?.phoneNumber.toString()
+    : declaration.data?.informant?.registrationPhone?.toString()
 }
 
 export const getDraftDeclarationData = (
