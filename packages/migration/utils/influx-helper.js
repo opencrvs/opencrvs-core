@@ -45,6 +45,32 @@ export const influx = new InfluxDB({
       ]
     },
     {
+      measurement: 'death_registration',
+      fields: {
+        compositionId: FieldType.STRING,
+        currentStatus: FieldType.STRING,
+        ageInYears: FieldType.INTEGER,
+        deathDays: FieldType.INTEGER
+      },
+      tags: [
+        'regStatus',
+        'gender',
+        'ageLabel',
+        'timeLabel',
+        'dateLabel',
+        'registrarPractitionerId',
+        'practitionerRole',
+        'eventLocationType',
+        'mannerOfDeath',
+        'causeOfDeath',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
       measurement: 'declarations_rejected',
       fields: {
         compositionId: FieldType.STRING
