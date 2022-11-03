@@ -66,6 +66,8 @@ export const MOTHER_DETAILS_DONT_EXIST = `(${mothersDetailsDontExist} && ${mothe
 
 export const FATHER_DETAILS_DONT_EXIST = `(${fathersDetailsDontExist} && ${fathersDetailsDontExistBasedOnContactAndInformant})`
 
+const motherOrFatherIsTheInformant =
+  '(!values.informantType || values.informantType == "MOTHER" || values.informantType == "FATHER")'
 export enum AddressSubsections {
   PRIMARY_ADDRESS_SUBSECTION = 'primaryAddress',
   SECONDARY_ADDRESS_SUBSECTION = 'secondaryAddress'
@@ -103,9 +105,14 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-        label: formMessageDescriptors.primaryAddress
+        label: formMessageDescriptors.primaryAddress,
+        conditionalCase: `${motherOrFatherIsTheInformant}`
       },
-      { config: AddressCases.PRIMARY_ADDRESS, informant: true },
+      {
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: true,
+        conditionalCase: `${motherOrFatherIsTheInformant}`
+      },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.informantSecondaryAddress,

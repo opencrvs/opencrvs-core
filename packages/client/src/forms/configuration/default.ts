@@ -43,6 +43,66 @@ export const registerForms: IDefaultRegisterForms = {
         name: formMessageDescriptors.childTab,
         title: formMessageDescriptors.childTitle,
         hasDocumentSection: true,
+        mapping: {
+          template: [
+            {
+              fieldName: 'registrationNumber',
+              operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'certificateDate',
+              operation: 'certificateDateTransformer',
+              parameters: ['en', 'dd MMMM yyyy']
+            },
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'registrationDate',
+              operation: 'registrationDateTransformer'
+            },
+            {
+              fieldName: 'placeOfBirthLocality',
+              operation: 'placeOfBirthLocalityTransformer'
+            },
+            {
+              fieldName: 'placeOfBirthLGA',
+              operation: 'placeOfBirthLGATransformer'
+            },
+            {
+              fieldName: 'placeOfBirthState',
+              operation: 'placeOfBirthStateTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
+            },
+            {
+              fieldName: 'registrationCentre',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':office']
+            },
+            {
+              fieldName: 'registrationLGA',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':district']
+            },
+            {
+              fieldName: 'registrationState',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':state']
+            }
+          ]
+        },
         groups: [
           {
             id: 'child-view-group',
@@ -2747,7 +2807,12 @@ export const registerForms: IDefaultRegisterForms = {
               description: 'Form section name for Informant',
               id: 'form.section.informant.title'
             },
-            conditionals: [],
+            conditionals: [
+              {
+                action: 'hide',
+                expression: 'true'
+              }
+            ],
             preventContinueIfError: true,
             showExitButtonOnly: false,
             fields: [
@@ -2853,64 +2918,7 @@ export const registerForms: IDefaultRegisterForms = {
           }
         ],
         mapping: {
-          template: [
-            {
-              fieldName: 'registrationNumber',
-              operation: 'registrationNumberTransformer'
-            },
-            {
-              fieldName: 'certificateDate',
-              operation: 'certificateDateTransformer',
-              parameters: ['en', 'dd MMMM yyyy']
-            },
-            {
-              fieldName: 'registrarName',
-              operation: 'registrarNameUserTransformer'
-            },
-            {
-              fieldName: 'registrationDate',
-              operation: 'registrationDateTransformer'
-            },
-            {
-              fieldName: 'placeOfBirthLocality',
-              operation: 'placeOfBirthLocalityTransformer'
-            },
-            {
-              fieldName: 'placeOfBirthLGA',
-              operation: 'placeOfBirthLGATransformer'
-            },
-            {
-              fieldName: 'placeOfBirthState',
-              operation: 'placeOfBirthStateTransformer'
-            },
-            {
-              fieldName: 'role',
-              operation: 'roleUserTransformer'
-            },
-            {
-              fieldName: 'registrarSignature',
-              operation: 'registrarSignatureUserTransformer'
-            },
-            {
-              fieldName: 'qrCode',
-              operation: 'QRCodeTransformerTransformer'
-            },
-            {
-              fieldName: 'registrationCentre',
-              operation: 'registrationLocationUserTransformer',
-              parameters: [':office']
-            },
-            {
-              fieldName: 'registrationLGA',
-              operation: 'registrationLocationUserTransformer',
-              parameters: [':district']
-            },
-            {
-              fieldName: 'registrationState',
-              operation: 'registrationLocationUserTransformer',
-              parameters: [':state']
-            }
-          ],
+          template: [],
           mutation: {
             operation: 'setBirthRegistrationSectionTransformer'
           },
@@ -2932,14 +2940,126 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'informant-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '((draftData && draftData.registration && draftData.registration.informantType === "MOTHER" && draftData.mother && draftData.mother.detailsExist) || (draftData && draftData.registration && draftData.registration.informantType === "FATHER" && draftData.father && draftData.father.detailsExist))'
-              }
-            ],
+            conditionals: [],
             fields: [
+              {
+                name: 'informantType',
+                type: 'SELECT_WITH_OPTIONS',
+                label: formMessageDescriptors.informantsRelationWithChild,
+                hideHeader: false,
+                required: true,
+                hideInPreview: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'validInformant'
+                  }
+                ],
+                options: [
+                  {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
+                    value: 'PATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.paternalGrandfather
+                  },
+                  {
+                    value: 'PATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.paternalGrandmother
+                  },
+                  {
+                    value: 'MATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.maternalGrandfather
+                  },
+                  {
+                    value: 'MATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.maternalGrandmother
+                  },
+                  {
+                    value: 'BROTHER',
+                    label: informantMessageDescriptors.brother
+                  },
+                  {
+                    value: 'SISTER',
+                    label: informantMessageDescriptors.sister
+                  },
+                  {
+                    value: 'OTHER_FAMILY_MEMBER',
+                    label: informantMessageDescriptors.otherFamilyMember
+                  },
+                  {
+                    value: 'LEGAL_GUARDIAN',
+                    label: informantMessageDescriptors.legalGuardian
+                  },
+
+                  {
+                    value: 'MOTHERS_BROTHER',
+                    label: informantMessageDescriptors.mothersBrother
+                  },
+                  {
+                    value: 'MOTHERS_SISTER',
+                    label: informantMessageDescriptors.mothersSister
+                  },
+                  {
+                    value: 'FATHERS_BROTHER',
+                    label: informantMessageDescriptors.fathersBrother
+                  },
+                  {
+                    value: 'FATHERS_SISTER',
+                    label: informantMessageDescriptors.fathersSister
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.someoneElse
+                  }
+                ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                mapping: {
+                  mutation: {
+                    operation: 'changeHirerchyMutationTransformer',
+                    parameters: ['registration.informantType']
+                  },
+                  query: {
+                    operation: 'changeHirerchyQueryTransformer',
+                    parameters: ['registration.informantType']
+                  }
+                }
+              },
+              {
+                name: 'otherInformantType',
+                type: 'TEXT',
+                label: formMessageDescriptors.informantsOtherRelationWithChild,
+                placeholder: formMessageDescriptors.relationshipPlaceHolder,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.informantType || values.informantType !== "OTHER"'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'changeHirerchyMutationTransformer',
+                    parameters: ['registration.otherInformantType']
+                  },
+                  query: {
+                    operation: 'changeHirerchyQueryTransformer',
+                    parameters: ['registration.otherInformantType']
+                  }
+                }
+              },
               {
                 name: 'familyNameEng',
                 previewGroup: 'informantNameInEnglish',
@@ -2952,6 +3072,13 @@ export const registerForms: IDefaultRegisterForms = {
                 maxLength: 32,
                 required: true,
                 initialValue: '',
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.informantType || values.informantType == "MOTHER" || values.informantType == "FATHER"'
+                  }
+                ],
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
@@ -3005,6 +3132,13 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'englishOnlyNameFormat'
                   }
                 ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.informantType || values.informantType == "MOTHER" || values.informantType == "FATHER"'
+                  }
+                ],
                 mapping: {
                   mutation: {
                     operation: 'fieldValueNestingTransformer',
@@ -3040,7 +3174,13 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 ignoreBottomMargin: true,
                 validate: [],
-                conditionals: []
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.informantType || values.informantType == "MOTHER" || values.informantType == "FATHER"'
+                  }
+                ]
               },
               {
                 name: 'registrationPhone',
@@ -3048,6 +3188,13 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.phoneNumber,
                 required: false,
                 initialValue: '',
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.informantType || values.informantType == "MOTHER" || values.informantType == "FATHER"'
+                  }
+                ],
                 validate: [
                   {
                     operation: 'phoneNumberFormat'
@@ -3093,7 +3240,13 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['deceased.iD']
                   }
                 ],
-                conditionals: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.informantType || values.informantType == "MOTHER" || values.informantType == "FATHER"'
+                  }
+                ],
                 mapping: {
                   mutation: {
                     operation: 'fieldValueNestingTransformer',
@@ -3346,7 +3499,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      "(draftData && draftData.registration && draftData.registration.informantType && (draftData.registration.informantType === 'MOTHER' || draftData.registration.informantType === 'FATHER'))"
+                      "(draftData && draftData.informant && draftData.informant.informantType && (draftData.informant.informantType === 'MOTHER' || draftData.informant.informantType === 'FATHER'))"
                   }
                 ],
                 mapping: {
@@ -3383,7 +3536,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      "(draftData && draftData.registration && draftData.registration.informantType && (draftData.registration.informantType === 'MOTHER' || draftData.registration.informantType === 'FATHER'))"
+                      "(draftData && draftData.informant && draftData.informant.informantType && (draftData.informant.informantType === 'MOTHER' || draftData.informant.informantType === 'FATHER'))"
                   }
                 ],
                 mapping: {

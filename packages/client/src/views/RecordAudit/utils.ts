@@ -388,7 +388,7 @@ export const getDraftDeclarationData = (
     informant:
       ((declaration.data?.registration?.contactPoint as IFormSectionData)
         ?.value as string) ||
-      declaration.data?.registration?.informantType.toString() ||
+      declaration.data?.informant?.informantType?.toString() ||
       EMPTY_STRING,
     informantContact:
       (

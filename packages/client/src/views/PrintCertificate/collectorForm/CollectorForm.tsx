@@ -127,7 +127,7 @@ function getNextSectionIds(
   formSectionGroup: IFormSectionGroup,
   declaration?: IPrintableDeclaration
 ) {
-  const certificates = declaration && declaration.data.registration.certificates
+  const certificates = declaration?.data?.registration?.certificates
 
   const certificate = (certificates && certificates[0]) || {}
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -207,7 +207,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     sectionData: ICertificate['collector'],
     declaration: IPrintableDeclaration
   ) => {
-    const certificates = declaration.data.registration.certificates
+    const certificates = declaration?.data?.registration?.certificates
     const certificate = (certificates && certificates[0]) || {}
     const collector = { ...(certificate.collector || {}), ...sectionData }
 
@@ -563,8 +563,7 @@ const mapStateToProps = (
   }
   const fields = replaceInitialValues(
     formGroup.fields,
-    (declaration &&
-      declaration.data.registration.certificates &&
+    (declaration?.data?.registration?.certificates &&
       declaration.data.registration.certificates[
         declaration.data.registration.certificates.length - 1
       ].collector) ||
