@@ -347,57 +347,100 @@ function RegistrationListComponent(props: IProps) {
     return userMessages[type] ? intl.formatMessage(userMessages[type]) : type
   }
 
+  function showWithTooltip(
+    total: number,
+    amount: number,
+    key: string,
+    index: number
+  ) {
+    return (
+      <>
+        <ReactTooltip id={`${key}_${index}`}>
+          <ToolTipContainer>{amount}</ToolTipContainer>
+        </ReactTooltip>
+        <span data-tip data-for={`${key}_${index}`}>
+          {getPercentage(total, amount)}%
+        </span>
+      </>
+    )
+  }
+
   function getContent(data?: GQLMixedTotalMetricsResult) {
     const content = { ...data } as IDynamicValues
     let finalContent: IDynamicValues[] = []
 
     if (content.__typename === RESULT_TYPE.by_registrar) {
-      finalContent = content.results.map((result: IDynamicValues) => ({
-        ...result,
-        name: result.registrarPractitioner.name
-          ? getName(result.registrarPractitioner.name, 'en')
-          : '',
-        location: result.registrarPractitioner.primaryOffice.name,
-        role: getFieldAgentTypeLabel(result.registrarPractitioner.role),
-        total: String(result.total),
-        delayed: `${getPercentage(result.total, result.delayed)}%`,
-        delayed_num: getPercentage(result.total, result.delayed),
-        late: `${getPercentage(result.total, result.late)}%`,
-        late_num: getPercentage(result.total, result.late)
-      }))
+      finalContent = content.results.map(
+        (result: IDynamicValues, index: number) => ({
+          ...result,
+          name: result.registrarPractitioner.name
+            ? getName(result.registrarPractitioner.name, 'en')
+            : '',
+          location: result.registrarPractitioner.primaryOffice.name,
+          role: getFieldAgentTypeLabel(result.registrarPractitioner.role),
+          total: String(result.total),
+          delayed: showWithTooltip(
+            result.total,
+            result.delayed,
+            'delayed',
+            index
+          ),
+          delayed_num: getPercentage(result.total, result.delayed),
+          late: showWithTooltip(result.total, result.late, 'late', index),
+          late_num: getPercentage(result.total, result.late)
+        })
+      )
     } else if (content.__typename === RESULT_TYPE.by_location) {
-      finalContent = content.results.map((result: IDynamicValues) => ({
-        ...result,
-        location: result.location.name,
-        total: String(result.total),
-        delayed: `${getPercentage(result.total, result.delayed)}%`,
-        delayed_num: getPercentage(result.total, result.delayed),
-        late: `${getPercentage(result.total, result.late)}%`,
-        late_num: getPercentage(result.total, result.late),
-        home: `${getPercentage(result.total, result.home)}%`,
-        home_num: getPercentage(result.total, result.home),
-        healthFacility: `${getPercentage(
-          result.total,
-          result.healthFacility
-        )}%`,
-        healthFacility_num: getPercentage(result.total, result.healthFacility)
-      }))
+      finalContent = content.results.map(
+        (result: IDynamicValues, index: number) => ({
+          ...result,
+          location: result.location.name,
+          total: String(result.total),
+          delayed: showWithTooltip(
+            result.total,
+            result.delayed,
+            'delayed',
+            index
+          ),
+          delayed_num: getPercentage(result.total, result.delayed),
+          late: showWithTooltip(result.total, result.late, 'late', index),
+          late_num: getPercentage(result.total, result.late),
+          home: showWithTooltip(result.total, result.home, 'home', index),
+          home_num: getPercentage(result.total, result.home),
+          healthFacility: showWithTooltip(
+            result.total,
+            result.healthFacility,
+            'healthFacility',
+            index
+          ),
+          healthFacility_num: getPercentage(result.total, result.healthFacility)
+        })
+      )
     } else if (content.__typename === RESULT_TYPE.by_time) {
-      finalContent = content.results.map((result: IDynamicValues) => ({
-        ...result,
-        total: String(result.total),
-        delayed: `${getPercentage(result.total, result.delayed)}%`,
-        delayed_num: getPercentage(result.total, result.delayed),
-        late: `${getPercentage(result.total, result.late)}%`,
-        late_num: getPercentage(result.total, result.late),
-        home: `${getPercentage(result.total, result.home)}%`,
-        home_num: getPercentage(result.total, result.home),
-        healthFacility: `${getPercentage(
-          result.total,
-          result.healthFacility
-        )}%`,
-        healthFacility_num: getPercentage(result.total, result.healthFacility)
-      }))
+      finalContent = content.results.map(
+        (result: IDynamicValues, index: number) => ({
+          ...result,
+          total: String(result.total),
+          delayed: showWithTooltip(
+            result.total,
+            result.delayed,
+            'delayed',
+            index
+          ),
+          delayed_num: getPercentage(result.total, result.delayed),
+          late: showWithTooltip(result.total, result.late, 'late', index),
+          late_num: getPercentage(result.total, result.late),
+          home: showWithTooltip(result.total, result.home, 'home', index),
+          home_num: getPercentage(result.total, result.home),
+          healthFacility: showWithTooltip(
+            result.total,
+            result.healthFacility,
+            'healthFacility',
+            index
+          ),
+          healthFacility_num: getPercentage(result.total, result.healthFacility)
+        })
+      )
     }
     return orderBy(finalContent, [columnToBeSort], [sortOrder[columnToBeSort]])
   }
