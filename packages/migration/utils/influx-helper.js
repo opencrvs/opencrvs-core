@@ -66,14 +66,14 @@ export const query = (query, options) => {
   try {
     return influx.query(query, options)
   } catch (err) {
-    logger.error(`Error reading data from InfluxDB! ${err.stack}`)
+    console.error(`Error reading data from InfluxDB! ${err.stack}`)
     throw err
   }
 }
 
 export const writePoints = (points) => {
   return influx.writePoints(points).catch((err) => {
-    logger.error(`Error saving data to InfluxDB! ${err.stack}`)
+    console.error(`Error saving data to InfluxDB! ${err.stack}`)
     throw err
   })
 }
