@@ -9,32 +9,31 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { GQLResolver } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
-import { hasScope } from '../user/utils'
+import { getSystem, hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
     async fetchIntegration(_, { ids }, authHeader) {
-      // check that the user is sysadmin
-      if (!hasScope(authHeader, 'sysadmin')) {
-        return await Promise.reject(new Error('only allowed for sysadmin'))
+      if (authHeader && !hasScope(authHeader, 'sysadmin')) {
+        return await Promise.reject(
+          new Error('Fetch integration is only allowed for sysadmin')
+        )
       }
-      //send a fetch to user-mgnt `getSystemHandler`
 
-      const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
-        method: 'POST',
-        body: JSON.stringify({
-          clientId: ids?.clientId,
-          systemId: ids?.systemId
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-      return await res.json()
+      let payload = {}
+      if (ids?.clientId) {
+        payload = { clientId: ids?.clientId }
+      }
+      if (ids?.systemId) {
+        payload = { systemId: ids?.systemId }
+      }
+      const systemRes = await getSystem(payload, authHeader)
+      return {
+        name: systemRes.name,
+        client_id: systemRes.client_id,
+        shaSecret: systemRes.sha_secret
+      }
     }
   }
 }
