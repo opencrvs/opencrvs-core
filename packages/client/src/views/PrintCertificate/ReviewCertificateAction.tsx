@@ -198,7 +198,9 @@ class ReviewCertificateActionComponent extends React.Component<
       draft,
       this.props.userDetails,
       this.props.offlineCountryConfig,
-      this.props.countries
+      this.props.countries,
+      undefined,
+      true
     )
     this.props.modifyDeclaration(draft)
     this.props.writeDeclaration(draft)

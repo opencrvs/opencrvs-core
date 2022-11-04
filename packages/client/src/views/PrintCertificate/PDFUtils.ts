@@ -22,6 +22,7 @@ import {
 import { Content, PageSize } from 'pdfmake/interfaces'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
+import birthCertificateTemplateTextOnly from '@client/views/PrintCertificate/birth-certificate-template-text-only'
 
 function isMessageDescriptor(
   obj: Record<string, unknown>
@@ -102,13 +103,14 @@ export function printCertificate(
   userDetails: IUserDetails | null,
   offlineResource: IOfflineData,
   optionalData?: OptionalData,
-  pageSize: PageSize = 'A4'
+  pageSize: PageSize = 'A4',
+  textOnly?: boolean
 ) {
   if (!userDetails) {
     throw new Error('No user details found')
   }
   printPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
+    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, textOnly),
     declaration,
     userDetails,
     offlineResource,
@@ -120,11 +122,16 @@ export function printCertificate(
 function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
-  pageSize: PageSize
+  pageSize: PageSize,
+  textOnly?: boolean
 ): IPDFTemplate {
   let svgTemplate
   if (declaration.event === Event.Birth) {
-    svgTemplate = offlineResource.templates.certificates!.birth.definition
+    if (textOnly) {
+      svgTemplate = birthCertificateTemplateTextOnly
+    } else {
+      svgTemplate = offlineResource.templates.certificates!.birth.definition
+    }
   } else {
     svgTemplate = offlineResource.templates.certificates!.death.definition
   }
