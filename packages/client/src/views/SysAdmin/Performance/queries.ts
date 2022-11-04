@@ -151,7 +151,9 @@ export const FETCH_REGISTRATIONS = gql`
     $timeStart: String!
     $timeEnd: String!
     $filterBy: String!
-    $locationId: String
+    $locationId: String!
+    $skip: Int!
+    $size: Int!
   ) {
     getRegistrationsListByFilter(
       timeStart: $timeStart
@@ -159,6 +161,8 @@ export const FETCH_REGISTRATIONS = gql`
       locationId: $locationId
       event: $event
       filterBy: $filterBy
+      skip: $skip
+      size: $size
     ) {
       __typename
       ... on TotalMetricsByRegistrar {
@@ -179,6 +183,7 @@ export const FETCH_REGISTRATIONS = gql`
             }
           }
         }
+        total
       }
       ... on TotalMetricsByLocation {
         results {
@@ -191,6 +196,7 @@ export const FETCH_REGISTRATIONS = gql`
             name
           }
         }
+        total
       }
       ... on TotalMetricsByTime {
         results {
@@ -202,6 +208,7 @@ export const FETCH_REGISTRATIONS = gql`
           month
           time
         }
+        total
       }
     }
   }

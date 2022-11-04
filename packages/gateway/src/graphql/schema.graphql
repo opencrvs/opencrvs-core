@@ -70,6 +70,8 @@ type Query {
     locationId: String
     event: String!
     filterBy: String!
+    skip: Int!
+    size: Int!
   ): MixedTotalMetricsResult
   getTotalPayments(
     timeStart: String!
@@ -934,14 +936,17 @@ type EventMetrics {
 
 type TotalMetricsByRegistrar {
   results: [EventMetricsByRegistrar!]!
+  total: Int
 }
 
 type TotalMetricsByLocation {
   results: [EventMetricsByLocation!]!
+  total: Int
 }
 
 type TotalMetricsByTime {
   results: [EventMetricsByTime!]!
+  total: Int
 }
 
 union UserAuditLogResultItem =

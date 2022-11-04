@@ -790,14 +790,17 @@ export interface GQLEventMetrics {
 
 export interface GQLTotalMetricsByRegistrar {
   results: Array<GQLEventMetricsByRegistrar>
+  total?: number
 }
 
 export interface GQLTotalMetricsByLocation {
   results: Array<GQLEventMetricsByLocation>
+  total?: number
 }
 
 export interface GQLTotalMetricsByTime {
   results: Array<GQLEventMetricsByTime>
+  total?: number
 }
 
 export type GQLUserAuditLogResultItem =
@@ -1964,6 +1967,8 @@ export interface QueryToGetRegistrationsListByFilterArgs {
   locationId?: string
   event: string
   filterBy: string
+  skip: number
+  size: number
 }
 export interface QueryToGetRegistrationsListByFilterResolver<
   TParent = any,
@@ -4960,6 +4965,7 @@ export interface EventMetricsToPractitionerRoleResolver<
 
 export interface GQLTotalMetricsByRegistrarTypeResolver<TParent = any> {
   results?: TotalMetricsByRegistrarToResultsResolver<TParent>
+  total?: TotalMetricsByRegistrarToTotalResolver<TParent>
 }
 
 export interface TotalMetricsByRegistrarToResultsResolver<
@@ -4969,8 +4975,16 @@ export interface TotalMetricsByRegistrarToResultsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface TotalMetricsByRegistrarToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLTotalMetricsByLocationTypeResolver<TParent = any> {
   results?: TotalMetricsByLocationToResultsResolver<TParent>
+  total?: TotalMetricsByLocationToTotalResolver<TParent>
 }
 
 export interface TotalMetricsByLocationToResultsResolver<
@@ -4980,11 +4994,26 @@ export interface TotalMetricsByLocationToResultsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface TotalMetricsByLocationToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLTotalMetricsByTimeTypeResolver<TParent = any> {
   results?: TotalMetricsByTimeToResultsResolver<TParent>
+  total?: TotalMetricsByTimeToTotalResolver<TParent>
 }
 
 export interface TotalMetricsByTimeToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface TotalMetricsByTimeToTotalResolver<
   TParent = any,
   TResult = any
 > {

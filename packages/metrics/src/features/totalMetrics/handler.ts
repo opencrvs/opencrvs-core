@@ -13,6 +13,8 @@ import * as Hapi from '@hapi/hapi'
 import {
   EVENT,
   LOCATION_ID,
+  SIZE,
+  SKIP,
   TIME_FROM,
   TIME_TO
 } from '@metrics/features/metrics/constants'
@@ -64,6 +66,9 @@ export async function totalMetricsByRegistrar(
     ? 'Location/' + request.query[LOCATION_ID]
     : undefined
   const event = request.query[EVENT]
+  const skip = request.query[SKIP]
+  const size = request.query[SIZE]
+
   const authHeader: IAuthHeader = {
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
@@ -112,7 +117,10 @@ export async function totalMetricsByRegistrar(
     })
   })
 
-  return { results }
+  return {
+    total: results.length,
+    results: results.splice(skip, size)
+  }
 }
 
 export async function totalMetricsByLocation(
@@ -125,6 +133,8 @@ export async function totalMetricsByLocation(
   const locationId = request.query[LOCATION_ID]
     ? 'Location/' + request.query[LOCATION_ID]
     : undefined
+  const skip = request.query[SKIP]
+  const size = request.query[SIZE]
 
   const results = await fetchRegistrationsGroupByOfficeLocation(
     timeStart,
@@ -185,7 +195,10 @@ export async function totalMetricsByLocation(
     })
   })
 
-  return { results: response }
+  return {
+    total: response.length,
+    results: response.splice(skip, size)
+  }
 }
 
 export async function totalMetricsByTime(
@@ -198,12 +211,15 @@ export async function totalMetricsByTime(
     ? 'Location/' + request.query[LOCATION_ID]
     : undefined
   const event = request.query[EVENT]
-  const registrations = await fetchRegistrationsGroupByTime(
+  const skip = request.query[SKIP]
+  const size = request.query[SIZE]
+  const registrationsByGroup = await fetchRegistrationsGroupByTime(
     timeStart,
     timeEnd,
     event,
     locationId
   )
+  const registrations = registrationsByGroup
 
   registrations.forEach((registration) => {
     registration.month = format(new Date(registration.time), 'MMMM-yyyy')
@@ -260,5 +276,8 @@ export async function totalMetricsByTime(
     })
   })
 
-  return { results }
+  return {
+    total: results.length,
+    results: results.splice(skip, size)
+  }
 }

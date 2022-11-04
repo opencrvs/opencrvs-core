@@ -365,7 +365,9 @@ export const getRoutes = () => {
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
             locationId: Joi.string(),
-            event: Joi.string().required()
+            event: Joi.string().required(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
           })
         },
         tags: ['api']
@@ -382,7 +384,9 @@ export const getRoutes = () => {
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
             event: Joi.string().required(),
-            locationId: Joi.string()
+            locationId: Joi.string(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
           })
         },
         tags: ['api']
@@ -398,7 +402,9 @@ export const getRoutes = () => {
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
             event: Joi.string().required(),
-            locationId: Joi.string()
+            locationId: Joi.string(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
           })
         },
         tags: ['api']

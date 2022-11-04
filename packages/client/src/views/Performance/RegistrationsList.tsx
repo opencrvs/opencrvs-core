@@ -13,7 +13,8 @@ import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
-import { formatTimeDuration } from '@client/DateUtils'
+import { SegmentedControl } from '@client/components/SegmentedControl'
+import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
   goToFieldAgentList,
@@ -21,28 +22,23 @@ import {
   goToRegistrationsList,
   IDynamicValues
 } from '@client/navigation'
+import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { generateLocations } from '@client/utils/locationUtils'
+import { getName } from '@client/views/RecordAudit/utils'
 import {
   IPerformanceSelectOption,
   PerformanceSelect
 } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import {
-  FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA,
-  FETCH_REGISTRATIONS
-} from '@client/views/SysAdmin/Performance/queries'
+import { FETCH_REGISTRATIONS } from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { SortArrow } from '@opencrvs/components/lib/icons'
-import { AvatarSmall } from '@client/components/Avatar'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import {
-  GQLMixedTotalMetricsResult,
-  GQLSearchFieldAgentResult
-} from '@opencrvs/gateway/src/graphql/schema'
-import { orderBy, get, sortBy } from 'lodash'
+import { GQLMixedTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import { get, orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -50,18 +46,11 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import { ILocation } from '@client/offline/reducer'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { IAvatar } from '@client/utils/userUtils'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { userMessages, constantsMessages } from '@client/i18n/messages'
-import { SegmentedControl } from '@client/components/SegmentedControl'
-import { getName } from '@client/views/RecordAudit/utils'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
+const DEFAULT_PAGE_SIZE = 10
 const { useState } = React
 interface SortMap {
   month: SORT_ORDER
@@ -151,8 +140,7 @@ function getPercentage(total: number | undefined, current: number | undefined) {
 function RegistrationListComponent(props: IProps) {
   const {
     intl,
-    location: { search },
-    offlineOffices
+    location: { search }
   } = props
   const {
     locationId,
@@ -164,36 +152,20 @@ function RegistrationListComponent(props: IProps) {
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('total')
-  const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
+  const recordCount = DEFAULT_PAGE_SIZE * currentPageNumber
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
-  const offices = generateLocations(offlineOffices, intl)
 
-  const isOfficeSelected = offices.some((office) => office.id === locationId)
-
-  const queryVariables = isOfficeSelected
-    ? {
-        timeStart: timeStart,
-        timeEnd: timeEnd,
-        primaryOfficeId: locationId,
-        status: STATUS_OPTIONS.ACTIVE.toString(),
-        event: event || undefined,
-        count: recordCount,
-        sort: 'asc',
-        skip: 0,
-        filterBy
-      }
-    : {
-        timeStart: timeStart,
-        timeEnd: timeEnd,
-        locationId: locationId,
-        status: STATUS_OPTIONS.ACTIVE.toString(),
-        event: event || undefined,
-        count: recordCount,
-        sort: 'asc',
-        skip: 0,
-        filterBy
-      }
+  const queryVariables = {
+    timeStart: timeStart,
+    timeEnd: timeEnd,
+    locationId: locationId,
+    status: STATUS_OPTIONS.ACTIVE.toString(),
+    event: event || undefined,
+    skip: recordCount,
+    size: DEFAULT_PAGE_SIZE,
+    filterBy
+  }
 
   function toggleSort(key: keyof SortMap) {
     const invertedOrder =
@@ -460,7 +432,7 @@ function RegistrationListComponent(props: IProps) {
     }
   ]
 
-  const skip = (currentPageNumber - 1) * 1
+  const skip = (currentPageNumber - 1) * DEFAULT_PAGE_SIZE
   queryVariables.skip = skip
   return (
     <SysAdminContentWrapper
@@ -519,7 +491,8 @@ function RegistrationListComponent(props: IProps) {
             <DateRangePicker
               startDate={dateStart}
               endDate={dateEnd}
-              onDatesChange={({ startDate, endDate }) =>
+              onDatesChange={({ startDate, endDate }) => {
+                debugger
                 props.goToRegistrationsList(
                   startDate.toISOString(),
                   endDate.toISOString(),
@@ -527,7 +500,7 @@ function RegistrationListComponent(props: IProps) {
                   event,
                   filterBy
                 )
-              }
+              }}
             />
 
             <SegmentedControl
@@ -571,10 +544,7 @@ function RegistrationListComponent(props: IProps) {
                 </>
               )
             } else {
-              const totalData = get(
-                data,
-                'getRegistrationsListByFilter.results.length'
-              )
+              const totalData = get(data, 'getRegistrationsListByFilter.total')
               return (
                 <TableDiv>
                   <Table
@@ -596,13 +566,12 @@ function RegistrationListComponent(props: IProps) {
                     }}
                     isFullPage={true}
                     highlightRowOnMouseOver
+                    noPagination={true}
                   />
-                  {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+                  {totalData > DEFAULT_PAGE_SIZE && (
                     <Pagination
                       currentPage={currentPageNumber}
-                      totalPages={Math.ceil(
-                        totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                      )}
+                      totalPages={Math.ceil(totalData / DEFAULT_PAGE_SIZE)}
                       onPageChange={(currentPage: number) => {
                         setCurrentPageNumber(currentPage)
                       }}

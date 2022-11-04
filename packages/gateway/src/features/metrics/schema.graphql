@@ -39,6 +39,7 @@ type TotalMetricsResult {
 
 type TotalMetricsByRegistrar {
   results: [EventMetricsByRegistrar!]!
+  total: Int
 }
 
 type EventMetricsByLocation {
@@ -52,6 +53,7 @@ type EventMetricsByLocation {
 
 type TotalMetricsByLocation {
   results: [EventMetricsByLocation!]!
+  total: Int
 }
 
 type EventMetricsByTime {
@@ -66,6 +68,7 @@ type EventMetricsByTime {
 
 type TotalMetricsByTime {
   results: [EventMetricsByTime!]!
+  total: Int
 }
 
 type PaymentMetric {
@@ -184,6 +187,8 @@ type Query {
     locationId: String
     event: String!
     filterBy: String!
+    skip: Int!
+    size: Int!
   ): MixedTotalMetricsResult
   getTotalPayments(
     timeStart: String!
