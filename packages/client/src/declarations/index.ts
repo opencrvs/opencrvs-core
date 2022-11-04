@@ -1426,7 +1426,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
 
       if (modifiedDeclaration.data?.informant?.relationship) {
         modifiedDeclaration.data.informant.relationship = (
-          modifiedDeclaration.data.registration.informantType as FieldValueMap
+          modifiedDeclaration.data.registration?.informantType as FieldValueMap
         )?.value
       }
 
