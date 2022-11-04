@@ -61,6 +61,7 @@ import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
 import {
+  GQLAdvancedSearchParametersInput,
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
   GQLRegAction,
@@ -1085,7 +1086,7 @@ export const postSearch = (
 
 export const postAdvancedSearch = (
   authHeader: IAuthHeader,
-  criteria: ISearchCriteria
+  criteria: GQLAdvancedSearchParametersInput
 ) => {
   return fetch(`${SEARCH_URL}advancedRecordSearch`, {
     method: 'POST',

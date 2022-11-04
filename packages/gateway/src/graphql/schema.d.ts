@@ -325,9 +325,70 @@ export interface GQLEventSearchResultSet {
   totalItems?: number
 }
 
+export interface GQLAdvancedSearchParametersInput {
+  event?: GQLEvent
+  name?: string
+  registrationStatuses?: Array<string | null>
+  dateOfEvent?: string
+  dateOfEventStart?: string
+  dateOfEventEnd?: string
+  contactNumber?: string
+  nationalId?: string
+  registrationNumber?: string
+  trackingId?: string
+  dateOfRegistration?: string
+  dateOfRegistrationStart?: string
+  dateOfRegistrationEnd?: string
+  declarationLocationId?: string
+  declarationJurisdictionId?: string
+  eventLocationId?: string
+  eventLocationLevel1?: string
+  eventLocationLevel2?: string
+  eventLocationLevel3?: string
+  eventLocationLevel4?: string
+  eventLocationLevel5?: string
+  childFirstNames?: string
+  childLastName?: string
+  childDoB?: string
+  childDoBStart?: string
+  childDoBEnd?: string
+  childGender?: string
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deceasedGender?: string
+  deceasedDoB?: string
+  deceasedDoBStart?: string
+  deceasedDoBEnd?: string
+  deceasedIdentifier?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  motherDoBStart?: string
+  motherDoBEnd?: string
+  motherIdentifier?: string
+  fatherFirstNames?: string
+  fatherFamilyName?: string
+  fatherDoB?: string
+  fatherDoBStart?: string
+  fatherDoBEnd?: string
+  fatherIdentifier?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  informantDoB?: string
+  informantDoBStart?: string
+  informantDoBEnd?: string
+  informantIdentifier?: string
+  compositionType?: Array<string | null>
+}
+
 export interface GQLEventProgressResultSet {
   results?: Array<GQLEventProgressSet | null>
   totalItems?: number
+}
+
+export const enum GQLEvent {
+  birth = 'birth',
+  death = 'death'
 }
 
 export interface GQLRole {
@@ -838,11 +899,6 @@ export interface GQLEventProgressSet {
   progressReport?: GQLEventProgressData
 }
 
-export const enum GQLEvent {
-  birth = 'birth',
-  death = 'death'
-}
-
 export const enum GQLDraftStatus {
   DRAFT = 'DRAFT',
   IN_PREVIEW = 'IN_PREVIEW',
@@ -1036,54 +1092,6 @@ export interface GQLQuestionInput {
   conditionals?: Array<GQLConditionalInput>
 }
 
-export interface GQLAdvancedSearchParametersInput {
-  event?: GQLEvent
-  registrationStatuses?: Array<string>
-  dateOfEvent?: string
-  dateOfEventStart?: string
-  dateOfEventEnd?: string
-  registrationNumber?: string
-  trackingId?: string
-  dateOfRegistration?: string
-  dateOfRegistrationStart?: string
-  dateOfRegistrationEnd?: string
-  declarationLocationId?: string
-  declarationJurisdictionId?: string
-  eventLocationId?: string
-  eventLocationLevel1?: string
-  eventLocationLevel2?: string
-  eventLocationLevel3?: string
-  eventLocationLevel4?: string
-  eventLocationLevel5?: string
-  childFirstNames?: string
-  childLastName?: string
-  childDoB?: string
-  childDoBStart?: string
-  childDoBEnd?: string
-  childGender?: string
-  deceasedFirstNames?: string
-  deceasedFamilyName?: string
-  deceasedGender?: string
-  deceasedDoB?: string
-  deceasedDoBStart?: string
-  deceasedDoBEnd?: string
-  motherFirstNames?: string
-  motherFamilyName?: string
-  motherDoB?: string
-  motherDoBStart?: string
-  motherDoBEnd?: string
-  fatherFirstNames?: string
-  fatherFamilyName?: string
-  fatherDoB?: string
-  fatherDoBStart?: string
-  fatherDoBEnd?: string
-  informantFirstNames?: string
-  informantFamilyName?: string
-  informantDoB?: string
-  informantDoBStart?: string
-  informantDoBEnd?: string
-}
-
 export const enum GQLInformantType {
   INFORMANT = 'INFORMANT',
   MOTHER = 'MOTHER',
@@ -1223,10 +1231,13 @@ export const enum GQLAttachmentSubject {
 
 export interface GQLAdvancedSeachParameters {
   event?: GQLEvent
+  name?: string
   registrationStatuses?: Array<string | null>
   dateOfEvent?: string
   dateOfEventStart?: string
   dateOfEventEnd?: string
+  contactNumber?: string
+  nationalId?: string
   registrationNumber?: string
   trackingId?: string
   dateOfRegistration?: string
@@ -1252,21 +1263,26 @@ export interface GQLAdvancedSeachParameters {
   deceasedDoB?: string
   deceasedDoBStart?: string
   deceasedDoBEnd?: string
+  deceasedIdentifier?: string
   motherFirstNames?: string
   motherFamilyName?: string
   motherDoB?: string
   motherDoBStart?: string
   motherDoBEnd?: string
+  motherIdentifier?: string
   fatherFirstNames?: string
   fatherFamilyName?: string
   fatherDoB?: string
   fatherDoBStart?: string
   fatherDoBEnd?: string
+  fatherIdentifier?: string
   informantFirstNames?: string
   informantFamilyName?: string
   informantDoB?: string
   informantDoBStart?: string
   informantDoBEnd?: string
+  informantIdentifier?: string
+  compositionType?: Array<string | null>
 }
 
 export interface GQLUserAuditLogItemWithComposition
@@ -2150,14 +2166,7 @@ export interface QueryToGetUserAuditLogResolver<TParent = any, TResult = any> {
 
 export interface QueryToSearchEventsArgs {
   userId?: string
-  locationIds?: Array<string>
-  status?: Array<string | null>
-  type?: Array<string | null>
-  trackingId?: string
-  nationalId?: string
-  registrationNumber?: string
-  contactNumber?: string
-  name?: string
+  advanceSearchParameters: GQLAdvancedSearchParametersInput
   count?: number
   skip?: number
   sort?: string
@@ -2173,12 +2182,12 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetEventsWithProgressArgs {
-  locationId?: string
+  declarationJurisdictionId?: string
+  registrationStatuses?: Array<string | null>
+  compositionType?: Array<string | null>
   count?: number
   skip?: number
   sort?: string
-  status?: Array<string | null>
-  type?: Array<string | null>
 }
 export interface QueryToGetEventsWithProgressResolver<
   TParent = any,
@@ -2193,29 +2202,13 @@ export interface QueryToGetEventsWithProgressResolver<
 }
 
 export interface QueryToSearchRecordArgs {
-  event?: string
+  event?: GQLEvent
+  registrationStatuses?: Array<string | null>
   dateOfEvent?: string
-  registrationStatuses?: string
-  eventLocationId?: string
-  childFirstName?: string
-  childLastName?: string
-  childDoB?: string
-  deceasedFirstNames?: string
-  deceasedFamilyName?: string
-  deathDate?: string
-  deathDateStart?: string
-  deathDateEnd?: string
-  motherFirstNames?: string
-  motherFamilyName?: string
-  motherDoB?: string
-  motherIdentifier?: string
-  fatherFirstNames?: string
-  fatherFamilyName?: string
-  fatherDoB?: string
-  fatherIdentifier?: string
-  informantFirstNames?: string
-  informantFamilyName?: string
+  dateOfEventStart?: string
+  dateOfEventEnd?: string
   contactNumber?: string
+  nationalId?: string
   registrationNumber?: string
   trackingId?: string
   dateOfRegistration?: string
@@ -2223,25 +2216,43 @@ export interface QueryToSearchRecordArgs {
   dateOfRegistrationEnd?: string
   declarationLocationId?: string
   declarationJurisdictionId?: string
+  eventLocationId?: string
   eventLocationLevel1?: string
   eventLocationLevel2?: string
   eventLocationLevel3?: string
   eventLocationLevel4?: string
   eventLocationLevel5?: string
+  childFirstNames?: string
+  childLastName?: string
+  childDoB?: string
   childDoBStart?: string
   childDoBEnd?: string
   childGender?: string
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
   deceasedGender?: string
   deceasedDoB?: string
   deceasedDoBStart?: string
   deceasedDoBEnd?: string
+  deceasedIdentifier?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
   motherDoBStart?: string
   motherDoBEnd?: string
+  motherIdentifier?: string
+  fatherFirstNames?: string
+  fatherFamilyName?: string
+  fatherDoB?: string
   fatherDoBStart?: string
   fatherDoBEnd?: string
+  fatherIdentifier?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
   informantDoB?: string
   informantDoBStart?: string
   informantDoBEnd?: string
+  informantIdentifier?: string
 }
 export interface QueryToSearchRecordResolver<TParent = any, TResult = any> {
   (
@@ -5430,10 +5441,13 @@ export interface InputOutputToValueStringResolver<
 
 export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   event?: AdvancedSeachParametersToEventResolver<TParent>
+  name?: AdvancedSeachParametersToNameResolver<TParent>
   registrationStatuses?: AdvancedSeachParametersToRegistrationStatusesResolver<TParent>
   dateOfEvent?: AdvancedSeachParametersToDateOfEventResolver<TParent>
   dateOfEventStart?: AdvancedSeachParametersToDateOfEventStartResolver<TParent>
   dateOfEventEnd?: AdvancedSeachParametersToDateOfEventEndResolver<TParent>
+  contactNumber?: AdvancedSeachParametersToContactNumberResolver<TParent>
+  nationalId?: AdvancedSeachParametersToNationalIdResolver<TParent>
   registrationNumber?: AdvancedSeachParametersToRegistrationNumberResolver<TParent>
   trackingId?: AdvancedSeachParametersToTrackingIdResolver<TParent>
   dateOfRegistration?: AdvancedSeachParametersToDateOfRegistrationResolver<TParent>
@@ -5459,24 +5473,36 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   deceasedDoB?: AdvancedSeachParametersToDeceasedDoBResolver<TParent>
   deceasedDoBStart?: AdvancedSeachParametersToDeceasedDoBStartResolver<TParent>
   deceasedDoBEnd?: AdvancedSeachParametersToDeceasedDoBEndResolver<TParent>
+  deceasedIdentifier?: AdvancedSeachParametersToDeceasedIdentifierResolver<TParent>
   motherFirstNames?: AdvancedSeachParametersToMotherFirstNamesResolver<TParent>
   motherFamilyName?: AdvancedSeachParametersToMotherFamilyNameResolver<TParent>
   motherDoB?: AdvancedSeachParametersToMotherDoBResolver<TParent>
   motherDoBStart?: AdvancedSeachParametersToMotherDoBStartResolver<TParent>
   motherDoBEnd?: AdvancedSeachParametersToMotherDoBEndResolver<TParent>
+  motherIdentifier?: AdvancedSeachParametersToMotherIdentifierResolver<TParent>
   fatherFirstNames?: AdvancedSeachParametersToFatherFirstNamesResolver<TParent>
   fatherFamilyName?: AdvancedSeachParametersToFatherFamilyNameResolver<TParent>
   fatherDoB?: AdvancedSeachParametersToFatherDoBResolver<TParent>
   fatherDoBStart?: AdvancedSeachParametersToFatherDoBStartResolver<TParent>
   fatherDoBEnd?: AdvancedSeachParametersToFatherDoBEndResolver<TParent>
+  fatherIdentifier?: AdvancedSeachParametersToFatherIdentifierResolver<TParent>
   informantFirstNames?: AdvancedSeachParametersToInformantFirstNamesResolver<TParent>
   informantFamilyName?: AdvancedSeachParametersToInformantFamilyNameResolver<TParent>
   informantDoB?: AdvancedSeachParametersToInformantDoBResolver<TParent>
   informantDoBStart?: AdvancedSeachParametersToInformantDoBStartResolver<TParent>
   informantDoBEnd?: AdvancedSeachParametersToInformantDoBEndResolver<TParent>
+  informantIdentifier?: AdvancedSeachParametersToInformantIdentifierResolver<TParent>
+  compositionType?: AdvancedSeachParametersToCompositionTypeResolver<TParent>
 }
 
 export interface AdvancedSeachParametersToEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AdvancedSeachParametersToNameResolver<
   TParent = any,
   TResult = any
 > {
@@ -5505,6 +5531,20 @@ export interface AdvancedSeachParametersToDateOfEventStartResolver<
 }
 
 export interface AdvancedSeachParametersToDateOfEventEndResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AdvancedSeachParametersToContactNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AdvancedSeachParametersToNationalIdResolver<
   TParent = any,
   TResult = any
 > {
@@ -5686,6 +5726,13 @@ export interface AdvancedSeachParametersToDeceasedDoBEndResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface AdvancedSeachParametersToDeceasedIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface AdvancedSeachParametersToMotherFirstNamesResolver<
   TParent = any,
   TResult = any
@@ -5715,6 +5762,13 @@ export interface AdvancedSeachParametersToMotherDoBStartResolver<
 }
 
 export interface AdvancedSeachParametersToMotherDoBEndResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AdvancedSeachParametersToMotherIdentifierResolver<
   TParent = any,
   TResult = any
 > {
@@ -5756,6 +5810,13 @@ export interface AdvancedSeachParametersToFatherDoBEndResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface AdvancedSeachParametersToFatherIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface AdvancedSeachParametersToInformantFirstNamesResolver<
   TParent = any,
   TResult = any
@@ -5785,6 +5846,20 @@ export interface AdvancedSeachParametersToInformantDoBStartResolver<
 }
 
 export interface AdvancedSeachParametersToInformantDoBEndResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AdvancedSeachParametersToInformantIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AdvancedSeachParametersToCompositionTypeResolver<
   TParent = any,
   TResult = any
 > {

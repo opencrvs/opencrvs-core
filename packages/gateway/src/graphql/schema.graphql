@@ -111,51 +111,28 @@ type Query {
   ): UserAuditLogResultSet
   searchEvents(
     userId: String
-    locationIds: [String!]
-    status: [String]
-    type: [String]
-    trackingId: String
-    nationalId: String
-    registrationNumber: String
-    contactNumber: String
-    name: String
+    advanceSearchParameters: AdvancedSearchParametersInput!
     count: Int
     skip: Int
     sort: String
     sortColumn: String
   ): EventSearchResultSet
   getEventsWithProgress(
-    locationId: String
+    declarationJurisdictionId: String
+    registrationStatuses: [String]
+    compositionType: [String]
     count: Int
     skip: Int
     sort: String
-    status: [String]
-    type: [String]
   ): EventProgressResultSet
   searchRecord(
-    event: String
+    event: Event
+    registrationStatuses: [String]
     dateOfEvent: String
-    registrationStatuses: String
-    eventLocationId: String
-    childFirstName: String
-    childLastName: String
-    childDoB: String
-    deceasedFirstNames: String
-    deceasedFamilyName: String
-    deathDate: String
-    deathDateStart: String
-    deathDateEnd: String
-    motherFirstNames: String
-    motherFamilyName: String
-    motherDoB: String
-    motherIdentifier: String
-    fatherFirstNames: String
-    fatherFamilyName: String
-    fatherDoB: String
-    fatherIdentifier: String
-    informantFirstNames: String
-    informantFamilyName: String
+    dateOfEventStart: String
+    dateOfEventEnd: String
     contactNumber: String
+    nationalId: String
     registrationNumber: String
     trackingId: String
     dateOfRegistration: String
@@ -163,25 +140,43 @@ type Query {
     dateOfRegistrationEnd: String
     declarationLocationId: String
     declarationJurisdictionId: String
+    eventLocationId: String
     eventLocationLevel1: String
     eventLocationLevel2: String
     eventLocationLevel3: String
     eventLocationLevel4: String
     eventLocationLevel5: String
+    childFirstNames: String
+    childLastName: String
+    childDoB: String
     childDoBStart: String
     childDoBEnd: String
     childGender: String
+    deceasedFirstNames: String
+    deceasedFamilyName: String
     deceasedGender: String
     deceasedDoB: String
     deceasedDoBStart: String
     deceasedDoBEnd: String
+    deceasedIdentifier: String
+    motherFirstNames: String
+    motherFamilyName: String
+    motherDoB: String
     motherDoBStart: String
     motherDoBEnd: String
+    motherIdentifier: String
+    fatherFirstNames: String
+    fatherFamilyName: String
+    fatherDoB: String
     fatherDoBStart: String
     fatherDoBEnd: String
+    fatherIdentifier: String
+    informantFirstNames: String
+    informantFamilyName: String
     informantDoB: String
     informantDoBStart: String
     informantDoBEnd: String
+    informantIdentifier: String
   ): EventProgressResultSet
   getRoles(
     title: String
@@ -504,9 +499,70 @@ type EventSearchResultSet {
   totalItems: Int
 }
 
+input AdvancedSearchParametersInput {
+  event: Event
+  name: String
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  contactNumber: String
+  nationalId: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  deceasedIdentifier: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  motherIdentifier: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  fatherIdentifier: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
+  informantIdentifier: String
+  compositionType: [String]
+}
+
 type EventProgressResultSet {
   results: [EventProgressSet]
   totalItems: Int
+}
+
+enum Event {
+  birth
+  death
 }
 
 type Role {
@@ -995,11 +1051,6 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
-enum Event {
-  birth
-  death
-}
-
 enum DraftStatus {
   DRAFT
   IN_PREVIEW
@@ -1193,54 +1244,6 @@ input QuestionInput {
   conditionals: [ConditionalInput!]
 }
 
-input AdvancedSearchParametersInput {
-  event: Event
-  registrationStatuses: [String!]
-  dateOfEvent: String
-  dateOfEventStart: String
-  dateOfEventEnd: String
-  registrationNumber: String
-  trackingId: String
-  dateOfRegistration: String
-  dateOfRegistrationStart: String
-  dateOfRegistrationEnd: String
-  declarationLocationId: String
-  declarationJurisdictionId: String
-  eventLocationId: String
-  eventLocationLevel1: String
-  eventLocationLevel2: String
-  eventLocationLevel3: String
-  eventLocationLevel4: String
-  eventLocationLevel5: String
-  childFirstNames: String
-  childLastName: String
-  childDoB: String
-  childDoBStart: String
-  childDoBEnd: String
-  childGender: String
-  deceasedFirstNames: String
-  deceasedFamilyName: String
-  deceasedGender: String
-  deceasedDoB: String
-  deceasedDoBStart: String
-  deceasedDoBEnd: String
-  motherFirstNames: String
-  motherFamilyName: String
-  motherDoB: String
-  motherDoBStart: String
-  motherDoBEnd: String
-  fatherFirstNames: String
-  fatherFamilyName: String
-  fatherDoB: String
-  fatherDoBStart: String
-  fatherDoBEnd: String
-  informantFirstNames: String
-  informantFamilyName: String
-  informantDoB: String
-  informantDoBStart: String
-  informantDoBEnd: String
-}
-
 enum InformantType {
   INFORMANT
   MOTHER
@@ -1380,10 +1383,13 @@ enum AttachmentSubject {
 
 type AdvancedSeachParameters {
   event: Event
+  name: String
   registrationStatuses: [String]
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String
+  contactNumber: String
+  nationalId: String
   registrationNumber: String
   trackingId: String
   dateOfRegistration: String
@@ -1409,21 +1415,26 @@ type AdvancedSeachParameters {
   deceasedDoB: String
   deceasedDoBStart: String
   deceasedDoBEnd: String
+  deceasedIdentifier: String
   motherFirstNames: String
   motherFamilyName: String
   motherDoB: String
   motherDoBStart: String
   motherDoBEnd: String
+  motherIdentifier: String
   fatherFirstNames: String
   fatherFamilyName: String
   fatherDoB: String
   fatherDoBStart: String
   fatherDoBEnd: String
+  fatherIdentifier: String
   informantFirstNames: String
   informantFamilyName: String
   informantDoB: String
   informantDoBStart: String
   informantDoBEnd: String
+  informantIdentifier: String
+  compositionType: [String]
 }
 
 type UserAuditLogItemWithComposition implements AuditLogItemBase {

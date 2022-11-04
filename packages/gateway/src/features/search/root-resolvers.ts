@@ -17,10 +17,7 @@ import {
   postSearch
 } from '@gateway/features/fhir/utils'
 import { markRecordAsDownloadedOrAssigned } from '@gateway/features/registration/root-resolvers'
-import {
-  IAdvancedSearchParam,
-  ISearchCriteria
-} from '@gateway/features/search/type-resolvers'
+import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import {
   getSystem,
   getTokenPayload,
@@ -76,14 +73,7 @@ export const resolvers: GQLResolver = {
       _,
       {
         userId,
-        locationIds,
-        status,
-        type,
-        trackingId,
-        nationalId,
-        registrationNumber,
-        contactNumber,
-        name,
+        advanceSearchParameters,
         count,
         skip,
         sortColumn,
@@ -92,37 +82,19 @@ export const resolvers: GQLResolver = {
       authHeader
     ) {
       const searchCriteria: ISearchCriteria = {
-        sort
+        sort,
+        parameters: advanceSearchParameters
       }
-      if (locationIds) {
-        if (locationIds.length <= 0 || locationIds.includes('')) {
-          return await Promise.reject(new Error('Invalid location id'))
-        }
-        if (locationIds.length === 1) {
-          // Currently used if the user is a registration agent
-          searchCriteria.declarationLocationId = locationIds[0]
-        } else {
-          // Not used currently, but this could be used if you were searching a group of offices
-          searchCriteria.declarationLocationId = locationIds
-        }
-      } else if (authHeader && !hasScope(authHeader, 'register')) {
-        // Only register scope user can search without locationIds
+      if (authHeader && !hasScope(authHeader, 'register')) {
         return await Promise.reject(new Error('User does not have permission'))
       }
-      if (trackingId) {
-        searchCriteria.trackingId = trackingId
-      }
-      if (nationalId) {
-        searchCriteria.nationalId = nationalId
-      }
-      if (registrationNumber) {
-        searchCriteria.registrationNumber = registrationNumber
-      }
-      if (contactNumber) {
-        searchCriteria.contactNumber = contactNumber
-      }
-      if (name) {
-        searchCriteria.name = name
+      // Only registrar or registration agent should be able to search user
+      if (!inScope(authHeader, ['register', 'validate', 'certify'])) {
+        return await Promise.reject(
+          new Error(
+            'Advanced search is only allowed for registrar or registration agent'
+          )
+        )
       }
       if (count) {
         searchCriteria.size = count
@@ -130,18 +102,14 @@ export const resolvers: GQLResolver = {
       if (skip) {
         searchCriteria.from = skip
       }
-      if (status) {
-        searchCriteria.status = status as string[]
-      }
-      if (type) {
-        searchCriteria.type = type as string[]
-      }
       if (userId) {
         searchCriteria.createdBy = userId
       }
       if (sortColumn) {
         searchCriteria.sortColumn = sortColumn
       }
+
+      searchCriteria.parameters = { ...advanceSearchParameters }
 
       const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(
         authHeader,
@@ -162,7 +130,14 @@ export const resolvers: GQLResolver = {
     },
     async getEventsWithProgress(
       _,
-      { locationId, count, skip, sort = 'desc', status, type },
+      {
+        declarationJurisdictionId,
+        registrationStatuses,
+        compositionType,
+        count,
+        skip,
+        sort = 'desc'
+      },
       authHeader
     ) {
       if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
@@ -174,8 +149,12 @@ export const resolvers: GQLResolver = {
       }
 
       const searchCriteria: ISearchCriteria = {
-        declarationLocationHirarchyId: locationId,
-        sort
+        sort,
+        parameters: {
+          declarationJurisdictionId: declarationJurisdictionId,
+          registrationStatuses: registrationStatuses,
+          compositionType: compositionType
+        }
       }
 
       if (count) {
@@ -183,14 +162,6 @@ export const resolvers: GQLResolver = {
       }
       if (skip) {
         searchCriteria.from = skip
-      }
-
-      if (type) {
-        searchCriteria.type = type as string[]
-      }
-
-      if (status) {
-        searchCriteria.status = status as string[]
       }
 
       const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(
@@ -212,7 +183,7 @@ export const resolvers: GQLResolver = {
           []
       }
     },
-    async searchRecord(_, searchCriteria: IAdvancedSearchParam, authHeader) {
+    async searchRecord(_, searchCriteria, authHeader) {
       if (authHeader && !hasScope(authHeader, 'recordsearch')) {
         return await Promise.reject(new Error('User does not have permission'))
       }
