@@ -151,7 +151,7 @@ export const FETCH_REGISTRATIONS = gql`
     $timeStart: String!
     $timeEnd: String!
     $filterBy: String!
-    $locationId: String!
+    $locationId: String
     $skip: Int!
     $size: Int!
   ) {

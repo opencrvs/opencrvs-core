@@ -46,6 +46,20 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import {
+  StatusMapping,
+  getAdditionalLocations,
+  CompletenessRateTime,
+  isCountry,
+  NATIONAL_ADMINISTRATIVE_LEVEL,
+  calculateTotal
+} from '@client/views/SysAdmin/Performance/utils'
+import { generateLocations } from '@client/utils/locationUtils'
+import { ISearchLocation } from '@client/../../components/lib'
+import {
+  QueryGetRegistrationsListByFilterArgs,
+  RegistrationType
+} from '@client/utils/gateway'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -91,6 +105,7 @@ interface ISearchParams {
 
 interface IConnectProps {
   offlineOffices: { [key: string]: ILocation }
+  offlineLocations: { [key: string]: ILocation }
 }
 
 interface IDispatchProps {
@@ -156,15 +171,17 @@ function RegistrationListComponent(props: IProps) {
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
 
-  const queryVariables = {
+  const queryVariables: QueryGetRegistrationsListByFilterArgs = {
     timeStart: timeStart,
     timeEnd: timeEnd,
-    locationId: locationId,
-    status: STATUS_OPTIONS.ACTIVE.toString(),
-    event: event || undefined,
+    event: event || RegistrationType.Birth,
     skip: recordCount,
     size: DEFAULT_PAGE_SIZE,
     filterBy
+  }
+
+  if (locationId !== NATIONAL_ADMINISTRATIVE_LEVEL) {
+    queryVariables.locationId = locationId
   }
 
   function toggleSort(key: keyof SortMap) {
@@ -432,6 +449,15 @@ function RegistrationListComponent(props: IProps) {
     }
   ]
 
+  const selectLocation = (
+    locationId: string,
+    searchableLocations: ISearchLocation[]
+  ) => {
+    return searchableLocations.find(
+      ({ id }) => id === locationId
+    ) as ISearchLocation
+  }
+
   const skip = (currentPageNumber - 1) * DEFAULT_PAGE_SIZE
   queryVariables.skip = skip
   return (
@@ -444,7 +470,7 @@ function RegistrationListComponent(props: IProps) {
         size={ContentSize.LARGE}
         filterContent={
           <>
-            <LocationPicker
+            {/* <LocationPicker
               selectedLocationId={locationId}
               onChangeLocation={(newLocationId) => {
                 props.goToRegistrationsList(
@@ -455,9 +481,29 @@ function RegistrationListComponent(props: IProps) {
                   filterBy
                 )
               }}
-              requiredJurisdictionTypes={
-                window.config.FIELD_AGENT_AUDIT_LOCATIONS
-              }
+            /> */}
+            <LocationPicker
+              additionalLocations={getAdditionalLocations(intl)}
+              selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
+              onChangeLocation={(newLocationId) => {
+                const newLocation = selectLocation(
+                  newLocationId,
+                  generateLocations(
+                    {
+                      ...props.offlineOffices,
+                      ...props.offlineLocations
+                    },
+                    props.intl
+                  ).concat(getAdditionalLocations(intl))
+                )
+                props.goToRegistrationsList(
+                  timeStart,
+                  timeEnd,
+                  newLocation.id,
+                  event,
+                  filterBy
+                )
+              }}
             />
             <PerformanceSelect
               onChange={(option) => {
@@ -590,8 +636,10 @@ function RegistrationListComponent(props: IProps) {
 export const RegistrationList = connect(
   (state: IStoreState) => {
     const offlineOffices = getOfflineData(state).offices
+    const offlineLocations = getOfflineData(state).locations
     return {
-      offlineOffices
+      offlineOffices,
+      offlineLocations
     }
   },
   { goToPerformanceHome, goToFieldAgentList, goToRegistrationsList }
