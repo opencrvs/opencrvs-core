@@ -66,7 +66,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'statusOfRecord',
+            name: 'registrationStatuses',
             customisable: false,
             type: 'SELECT_WITH_OPTIONS',
             label: advancedSearchBirthForm.statusOfRecordLabel,
@@ -105,17 +105,8 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
               }
             ]
           },
-          // {
-          //   name: 'placeOfBirthTitle',
-          //   type: 'SUBSECTION',
-          //   label: formMessageDescriptors.placeOfBirth,
-          //   previewGroup: 'placeOfBirth',
-          //   ignoreBottomMargin: true,
-          //   initialValue: '',
-          //   validate: []
-          // },
           {
-            name: 'location',
+            name: ' declarationLocationId',
             customisable: false,
             type: 'LOCATION_SEARCH_INPUT',
             label: formMessageDescriptors.placeOfBirth,
@@ -130,7 +121,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'internationalDistrict',
+            name: '  eventLocationLevel2',
             customisable: false,
             type: 'TEXT',
             label: formMessageDescriptors.internationalDistrict,
@@ -139,7 +130,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'internationalState',
+            name: '  eventLocationLevel1',
             customisable: false,
             type: 'TEXT',
             label: formMessageDescriptors.internationalState,
@@ -171,7 +162,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       nestedFields: {
         yes: [
           {
-            name: 'childBirthDate',
+            name: 'childDoB',
             customisable: false,
             type: 'DATE',
             label: formMessageDescriptors.childDateOfBirth,
@@ -180,7 +171,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'firstNamesEng',
+            name: 'childFirstNames',
             previewGroup: 'childNameInEnglish',
             customisable: false,
             type: 'TEXT',
@@ -191,7 +182,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'familyNameEng',
+            name: 'childLastName',
             previewGroup: 'childNameInEnglish',
             customisable: false,
             type: 'TEXT',
@@ -202,7 +193,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'gender',
+            name: 'childGender',
             customisable: false,
             type: 'SELECT_WITH_OPTIONS',
             label: formMessageDescriptors.childSex,
@@ -249,7 +240,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       nestedFields: {
         yes: [
           {
-            name: 'motherDateOfBirth',
+            name: ' motherDoB',
             customisable: false,
             type: 'DATE',
             label: formMessageDescriptors.motherDateOfBirth,
@@ -258,7 +249,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'firstNamesEng',
+            name: ' motherFirstNames',
             previewGroup: 'motherFirstNamesEng',
             customisable: false,
             type: 'TEXT',
@@ -269,7 +260,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'familyNameEng',
+            name: ' motherFamilyName',
             previewGroup: 'motherNameInEnglish',
             customisable: false,
             type: 'TEXT',
@@ -303,7 +294,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       nestedFields: {
         yes: [
           {
-            name: 'fatherBirthDate',
+            name: '  fatherDoB',
             customisable: false,
             type: 'DATE',
             label: formMessageDescriptors.fatherDateOfBirth,
@@ -312,7 +303,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'firstNamesEng',
+            name: 'fatherFirstNames',
             previewGroup: 'fatherNameInEnglish',
             customisable: false,
             type: 'TEXT',
@@ -323,7 +314,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'familyNameEng',
+            name: 'fatherFamilyName',
             previewGroup: 'fatherNameInEnglish',
             customisable: false,
             type: 'TEXT',
@@ -357,7 +348,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       nestedFields: {
         yes: [
           {
-            name: 'informantBirthDate',
+            name: ' informantDoB',
             customisable: false,
             type: 'DATE',
             label: formMessageDescriptors.motherDateOfBirth,
@@ -366,7 +357,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'firstNamesEng',
+            name: ' informantFirstNames',
             previewGroup: 'informantNameInEnglish',
             customisable: false,
             type: 'TEXT',
@@ -377,7 +368,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'familyNameEng',
+            name: 'informantFamilyName',
             previewGroup: 'informantNameInEnglish',
             customisable: false,
             type: 'TEXT',

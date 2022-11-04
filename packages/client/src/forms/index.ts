@@ -97,7 +97,7 @@ export interface IFormConfig {
 
 export interface ISelectOption {
   value: SelectComponentOption['value']
-  label: MessageDescriptor | string
+  label: MessageDescriptor
 }
 export interface IRadioOption {
   value: RadioComponentOption['value']
@@ -644,13 +644,13 @@ export interface IQueryMap {
 }
 export interface ILoaderButton extends IFormFieldBase {
   type: typeof FETCH_BUTTON
-  queryMap?: IQueryMap
+  queryMap: IQueryMap
   queryData?: IQuery
-  querySelectorInput?: IFieldInput
+  querySelectorInput: IFieldInput
   onFetch?: (response: any) => void
-  modalTitle?: MessageDescriptor
-  successTitle?: MessageDescriptor
-  errorTitle?: MessageDescriptor
+  modalTitle: MessageDescriptor
+  successTitle: MessageDescriptor
+  errorTitle: MessageDescriptor
 }
 
 export type IFormField =

@@ -32,67 +32,67 @@ const messagesToDefine: IAdvancedSearchMessages = {
   registrationDetails: {
     defaultMessage: 'Registration details',
     description: 'The title of advanced search birth tab form',
-    id: 'form.section.advancedSearch.birth.title'
+    id: 'advancedSearch.birth.title'
   },
   placeOfRegistrationlabel: {
     defaultMessage: 'Place of registration',
     description: 'Label for input Place of registration',
-    id: 'form.field.label.birth.placeOfRegistration'
+    id: 'advancedSearch.birth.placeOfRegistration'
   },
   placeOfRegistrationHelperText: {
     defaultMessage: 'Search for a province, district or registration office',
     description: 'Helper text for input Place of registration',
-    id: 'form.field.label.birth.placeOfRegistrationHelperText'
+    id: 'advancedSearch.birth.placeOfRegistrationHelperText'
   },
   dateOfRegistration: {
     defaultMessage: 'Date of registration',
     description: 'Label for input date of registration',
-    id: 'form.field.label.birth.dateOfRegistration'
+    id: 'advancedSearch.birth.dateOfRegistration'
   },
   statusOfRecordLabel: {
     defaultMessage: 'Status of record',
     description: 'Label for input Status of record',
-    id: 'form.field.label.birth.statusOfRecordLabel'
+    id: 'advancedSearch.birth.statusOfRecordLabel'
   },
   informantDetails: {
     defaultMessage: 'Informant details',
     description: 'The title informant details form',
-    id: 'form.section.advancedSearch.birth.informantDetails'
+    id: 'advancedSearch.birth.informantDetails'
   },
   recordStatusAny: {
     defaultMessage: 'Any status',
     description: 'Option for form field: status of record',
-    id: 'form.field.label.recordStatusAny'
+    id: 'advancedSearch.birth.recordStatusAny'
   },
   recordStatusInprogress: {
     defaultMessage: 'In progress',
     description: 'Option for form field: status of record',
-    id: 'form.field.label.recordStatusInprogress'
+    id: 'advancedSearch.birth.recordStatusInprogress'
   },
   recordStatusInReview: {
     defaultMessage: 'In review',
     description: 'Option for form field: status of record',
-    id: 'form.field.label.recordStatusInReview'
+    id: 'advancedSearch.birth.recordStatusInReview'
   },
   recordStatusRequireUpdate: {
     defaultMessage: 'Requires updates',
     description: 'Option for form field: status of record',
-    id: 'form.field.label.recordStatusRequireUpdate'
+    id: 'advancedSearch.birth.recordStatusRequireUpdate'
   },
   recordStatusRegistered: {
     defaultMessage: 'Registered',
     description: 'Option for form field: status of record',
-    id: 'form.field.label.recordStatusRegistered'
+    id: 'advancedSearch.birth.recordStatusRegistered'
   },
   recordStatusCertified: {
     defaultMessage: 'Certified',
     description: 'Option for form field: status of record',
-    id: 'form.field.label.recordStatusCertified'
+    id: 'advancedSearch.birth.recordStatusCertified'
   },
   recordStatusAchived: {
     defaultMessage: 'Archived',
     description: 'Option for form field: status of record',
-    id: 'form.field.label.recordStatusAchived'
+    id: 'advancedSearch.birth.recordStatusAchived'
   }
 }
 export const messages: IAdvancedSearchMessages =
