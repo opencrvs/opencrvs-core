@@ -127,7 +127,6 @@ function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
         <Link onClick={handleLinkOnClick}>{linkLabel}</Link>
         {modalVisible && (
           <DateRangePicker
-            hidePresetBar={true}
             startDate={
               (props.value.rangeStart && new Date(props.value.rangeStart)) ||
               subYears(new Date(Date.now()), 1)

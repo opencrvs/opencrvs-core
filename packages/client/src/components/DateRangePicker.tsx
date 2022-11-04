@@ -89,7 +89,6 @@ function isPresetNavButton(button: IPresetButton): button is IPresetNavButton {
 
 interface IDateRangePickerProps extends WrappedComponentProps, IDateRange {
   onDatesChange: ({ startDate, endDate }: IDateRange) => void
-  hidePresetBar?: boolean
   closeModalFromHOC?: () => void
   usedInsideHOC?: boolean
 }
@@ -396,7 +395,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   const todaysDate = new Date(Date.now())
   const [presetOptions, updatePresetOptions] = useState<IPresetButton[]>([])
   const [activeRoute, setActiveRoute] = useState<PATHS>(
-    props.hidePresetBar ? START_MONTH : PRESET
+    props.usedInsideHOC ? START_MONTH : PRESET
   )
 
   const months = useMemo(() => {
@@ -657,7 +656,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
   return (
     <div>
-      {!props.hidePresetBar && (
+      {!props.usedInsideHOC && (
         <PickerButton
           id="date-range-picker-action"
           onClick={() => setModalVisible(true)}
@@ -695,7 +694,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               </CircleButton>
             </ModalHeader>
             <ModalBody>
-              {!props.hidePresetBar && (
+              {!props.usedInsideHOC && (
                 <PresetSelector
                   onSelectPreset={({ startDate, endDate }) => {
                     setStartDateNav(startDate)
