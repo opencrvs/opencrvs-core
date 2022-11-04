@@ -1502,12 +1502,34 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 mapping: {
                   mutation: {
-                    operation: 'fieldToTelecomTransformer',
-                    parameters: []
+                    operation: 'changeHirerchyMutationTransformerConditional',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      'isMotherInformant',
+                      {
+                        operation: 'msisdnTransformer',
+                        parameters: ['registration.contactPhoneNumber']
+                      },
+                      {
+                        operation: 'fieldToTelecomTransformer',
+                        parameters: []
+                      }
+                    ]
                   },
                   query: {
-                    operation: 'telecomToFieldTransformer',
-                    parameters: []
+                    operation: 'changeHirerchyQueryTransformerConditional',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      'isMotherInformant',
+                      {
+                        operation: 'localPhoneTransformer',
+                        parameters: ['registration.contactPhoneNumber']
+                      },
+                      {
+                        operation: 'telecomToFieldTransformer',
+                        parameters: []
+                      }
+                    ]
                   }
                 },
                 validate: [
@@ -2711,12 +2733,34 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 mapping: {
                   mutation: {
-                    operation: 'fieldToTelecomTransformer',
-                    parameters: []
+                    operation: 'changeHirerchyMutationTransformerConditional',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      'isFatherInformant',
+                      {
+                        operation: 'msisdnTransformer',
+                        parameters: ['registration.contactPhoneNumber']
+                      },
+                      {
+                        operation: 'fieldToTelecomTransformer',
+                        parameters: []
+                      }
+                    ]
                   },
                   query: {
-                    operation: 'telecomToFieldTransformer',
-                    parameters: []
+                    operation: 'changeHirerchyQueryTransformerConditional',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      'isFatherInformant',
+                      {
+                        operation: 'localPhoneTransformer',
+                        parameters: ['registration.contactPhoneNumber']
+                      },
+                      {
+                        operation: 'telecomToFieldTransformer',
+                        parameters: []
+                      }
+                    ]
                   }
                 },
                 validate: [

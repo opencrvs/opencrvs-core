@@ -259,6 +259,42 @@ export const changeHirerchyQueryTransformer =
     return transformedData
   }
 
+type MappingCondition = 'isMotherInformant' | 'isFatherInformant'
+
+function isApplied(queryData: any, condition?: MappingCondition) {
+  if (condition === 'isMotherInformant')
+    return queryData.registration.informantType === 'MOTHER'
+  else if (condition === 'isFatherInformant')
+    return queryData.registration.informantType === 'FATHER'
+  return false
+}
+
+export const changeHirerchyQueryTransformerConditional =
+  (
+    transformedFieldName?: string,
+    condition?: MappingCondition,
+    transformerMethod?: IFormFieldQueryMapFunction,
+    fallbackTransformerMethod?: IFormFieldQueryMapFunction
+  ) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField,
+    nestedField: IFormField
+  ) =>
+    isApplied(queryData, condition)
+      ? changeHirerchyQueryTransformer(transformedFieldName, transformerMethod)(
+          transformedData,
+          queryData,
+          sectionId,
+          field,
+          nestedField
+        )
+      : fallbackTransformerMethod
+      ? fallbackTransformerMethod(transformedData, queryData, sectionId, field)
+      : undefined
+
 export function questionnaireToCustomFieldTransformer(
   transformedData: IFormData,
   queryData: any,
