@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
 import { useIntl } from 'react-intl'
 import {
@@ -19,7 +19,7 @@ import {
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
-import { Plus, VerticalThreeDots } from '@opencrvs/components/lib/icons'
+import { Plus, VerticalThreeDots, Copy } from '@opencrvs/components/lib/icons'
 import {
   Alert,
   InputField,
@@ -39,6 +39,8 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { connect, useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { Text } from '@opencrvs/components/lib/Text'
+import { gql } from '@apollo/client'
+import { Mutation } from '@apollo/client/react/components'
 
 export const statuses = {
   PENDING: 'pending',
@@ -50,6 +52,15 @@ export const statuses = {
 const PaddedAlert = styled(Alert)`
   margin-top: 16px;
 `
+const SecretText = styled(Text)`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  margin-top: 4px;
+`
+const TopText = styled(Text)`
+  margin-top: 16px;
+`
 
 const StyledSpinner = styled(Spinner)`
   margin: 10px 0;
@@ -57,22 +68,51 @@ const StyledSpinner = styled(Spinner)`
 const Field = styled.div`
   margin-top: 16px;
 `
+export const registerSystemClient = gql`
+  mutation registerSystemClient($clientDetails: ClientRegistrationPayload) {
+    registerSystemClient(clientDetails: $clientDetails) {
+      client_id
+      client_secret
+      sha_secret
+    }
+  }
+`
+type Secret = {
+  client_id: string
+  client_secret: string
+  sha_secret: string
+}
 
 export function Integrations() {
   const intl = useIntl()
   const offlineData = useSelector(getOfflineData)
   const [showModal, setToggleModal] = React.useState<boolean>(false)
   const [createClientInfo, setCreateClientInfo] = React.useState<boolean>(true)
+  const [secretAvailable, setSecretAvailable] = React.useState<boolean>(false)
   const [generateClientInfo, setGenerateClientInfo] =
     React.useState<boolean>(false)
   const [clientName, setClientName] = React.useState<string>(EMPTY_STRING)
   const [clientType, setClientType] = React.useState<string>(EMPTY_STRING)
-
+  const [clientSecret, setClientSecret] = React.useState<Secret>()
+  useEffect(() => {
+    setSecretAvailable(true)
+  }, [clientSecret])
   const toggleModal = () => {
     setToggleModal((prev) => !prev)
   }
 
-  const changeModalInfo = () => {
+  const clearSecret = () => {
+    setClientName(EMPTY_STRING)
+    setClientType(EMPTY_STRING)
+    setSecretAvailable(false)
+    setGenerateClientInfo(false)
+    setCreateClientInfo(true)
+  }
+
+  const changeModalInfo = async (mutation: () => any) => {
+    await mutation().then((data: any) => {
+      setClientSecret(data.data.registerSystemClient)
+    })
     setCreateClientInfo(!createClientInfo)
     setGenerateClientInfo(!generateClientInfo)
   }
@@ -166,21 +206,50 @@ export function Integrations() {
       </Content>
       <ResponsiveModal
         actions={[
-          <Link onClick={toggleModal}>
+          <Link
+            onClick={() => {
+              toggleModal()
+              clearSecret()
+            }}
+          >
             {intl.formatMessage(buttonMessages.cancel)}
           </Link>,
-          <Button
-            disabled={clientType === '' || clientName === ''}
-            onClick={changeModalInfo}
-            type="primary"
+          <Mutation
+            mutation={registerSystemClient}
+            variables={{
+              clientDetails: {
+                scope: 'NATIONAL_ID',
+                name: [{ use: 'en', family: clientName }],
+                settings: {
+                  dailyQuota: 50
+                }
+              }
+            }}
+            onCompleted={() => {}}
+            onError={() => {}}
           >
-            {intl.formatMessage(buttonMessages.create)}
-          </Button>
+            {(registerSystemClient: any) => {
+              return (
+                <Button
+                  disabled={clientType === '' || clientName === ''}
+                  onClick={() => {
+                    changeModalInfo(registerSystemClient)
+                  }}
+                  type="primary"
+                >
+                  {intl.formatMessage(buttonMessages.create)}
+                </Button>
+              )
+            }}
+          </Mutation>
         ]}
         autoHeight={true}
         titleHeightAuto={true}
         show={showModal}
-        handleClose={toggleModal}
+        handleClose={() => {
+          toggleModal()
+          clearSecret()
+        }}
         title={
           createClientInfo
             ? intl.formatMessage(integrationMessages.createClient)
@@ -418,7 +487,7 @@ export function Integrations() {
           </>
         )}
 
-        {generateClientInfo && (
+        {generateClientInfo && !secretAvailable && (
           <>
             <Text variant="bold16" element="span">
               {intl.formatMessage(integrationMessages.clientId)}
@@ -432,6 +501,39 @@ export function Integrations() {
               {intl.formatMessage(integrationMessages.shaSecret)}
               <StyledSpinner size={24} id="Spinner" />
             </Text>
+          </>
+        )}
+        {clientSecret && secretAvailable && (
+          <>
+            <TopText variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.clientId)}
+            </TopText>
+            <SecretText variant="reg16" element="span">
+              {clientSecret.client_id} <Copy />
+              <Text variant="reg16" color={'primary'} element="span">
+                {'Copy'}
+              </Text>
+            </SecretText>
+            <Text variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.clientSecret)}
+            </Text>
+            <SecretText variant="reg16" element="span">
+              {clientSecret.client_secret}
+              <Copy />
+              <Text variant="reg16" color={'primary'} element="span">
+                {'Copy'}
+              </Text>
+            </SecretText>
+            <Text variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.shaSecret)}
+            </Text>
+            <SecretText variant="reg16" element="span">
+              {clientSecret.sha_secret}
+              <Copy />
+              <Text variant="reg16" color={'primary'} element="span">
+                {'Copy'}
+              </Text>
+            </SecretText>
           </>
         )}
       </ResponsiveModal>

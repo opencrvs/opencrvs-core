@@ -11,6 +11,7 @@
 # import Mutation.* from '../features/notification/schema.graphql'
 # import Query.* from '../features/registration/schema.graphql'
 # import Mutation.* from '../features/registration/schema.graphql'
+# import Mutation.* from '../features/clientRegistration/schema.graphql'
 # import Query.* from '../features/location/schema.graphql'
 # import Query.* from '../features/user/schema.graphql'
 # import Mutation.* from '../features/user/schema.graphql'

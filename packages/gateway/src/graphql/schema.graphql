@@ -212,6 +212,9 @@ type Mutation {
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID!
+  registerSystemClient(
+    clientDetails: ClientRegistrationPayload
+  ): ClientCreationResponse
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -581,6 +584,18 @@ input DeathRegistrationInput {
   medicalPractitioner: MedicalPractitionerInput
   createdAt: Date
   updatedAt: Date
+}
+
+type ClientCreationResponse {
+  client_id: String
+  client_secret: String
+  sha_secret: String
+}
+
+input ClientRegistrationPayload {
+  scope: String!
+  name: [NameArray]!
+  settings: Quote!
 }
 
 input UserInput {
@@ -1051,6 +1066,15 @@ input MedicalPractitionerInput {
   name: String
   qualification: String
   lastVisitDate: Date
+}
+
+input NameArray {
+  use: String
+  family: String
+}
+
+input Quote {
+  dailyQuota: Int
 }
 
 input HumanNameInput {

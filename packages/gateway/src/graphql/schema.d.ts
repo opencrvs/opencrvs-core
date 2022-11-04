@@ -72,6 +72,7 @@ export interface GQLMutation {
   markDeathAsCertified: string
   requestDeathRegistrationCorrection: string
   markEventAsUnassigned: string
+  registerSystemClient?: GQLClientCreationResponse
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -430,6 +431,18 @@ export interface GQLDeathRegistrationInput {
   medicalPractitioner?: GQLMedicalPractitionerInput
   createdAt?: GQLDate
   updatedAt?: GQLDate
+}
+
+export interface GQLClientCreationResponse {
+  client_id?: string
+  client_secret?: string
+  sha_secret?: string
+}
+
+export interface GQLClientRegistrationPayload {
+  scope: string
+  name: Array<GQLNameArray | null>
+  settings: GQLQuote
 }
 
 export interface GQLUserInput {
@@ -922,6 +935,15 @@ export interface GQLMedicalPractitionerInput {
   name?: string
   qualification?: string
   lastVisitDate?: GQLDate
+}
+
+export interface GQLNameArray {
+  use?: string
+  family?: string
+}
+
+export interface GQLQuote {
+  dailyQuota?: number
 }
 
 export interface GQLHumanNameInput {
@@ -1446,6 +1468,7 @@ export interface GQLResolver {
   FormDraft?: GQLFormDraftTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
+  ClientCreationResponse?: GQLClientCreationResponseTypeResolver
   Avatar?: GQLAvatarTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
   Map?: GraphQLScalarType
@@ -2158,6 +2181,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
+  registerSystemClient?: MutationToRegisterSystemClientResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2496,6 +2520,21 @@ export interface MutationToMarkEventAsUnassignedResolver<
   (
     parent: TParent,
     args: MutationToMarkEventAsUnassignedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRegisterSystemClientArgs {
+  clientDetails?: GQLClientRegistrationPayload
+}
+export interface MutationToRegisterSystemClientResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRegisterSystemClientArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3957,6 +3996,33 @@ export interface ReinstatedToTaskEntryResourceIDResolver<
 }
 
 export interface ReinstatedToRegistrationStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLClientCreationResponseTypeResolver<TParent = any> {
+  client_id?: ClientCreationResponseToClient_idResolver<TParent>
+  client_secret?: ClientCreationResponseToClient_secretResolver<TParent>
+  sha_secret?: ClientCreationResponseToSha_secretResolver<TParent>
+}
+
+export interface ClientCreationResponseToClient_idResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ClientCreationResponseToClient_secretResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ClientCreationResponseToSha_secretResolver<
   TParent = any,
   TResult = any
 > {

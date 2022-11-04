@@ -16,6 +16,7 @@ import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/roo
 import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
+import { resolvers as clientRegistrationRootResolvers } from '@gateway/features/clientRegistration/root-resolvers'
 import { typeResolvers } from '@gateway/features/registration/type-resolvers'
 import { resolvers as roleRootResolvers } from '@gateway/features/role/root-resolvers'
 import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
@@ -55,6 +56,7 @@ type StringIndexed<T> = T & IStringIndexSignatureInterface
 const resolvers: StringIndexed<IResolvers> = merge(
   notificationRootResolvers as IResolvers,
   registrationRootResolvers as IResolvers,
+  clientRegistrationRootResolvers as IResolvers,
   locationRootResolvers as IResolvers,
   userRootResolvers as IResolvers,
   userTypeResolvers as IResolvers,
