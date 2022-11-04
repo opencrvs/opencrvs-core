@@ -175,16 +175,20 @@ export async function deactivateSystemClient(
       )
       throw unauthorized()
     }
-
+    let user
     system.status = statuses.DEACTIVATED
 
     try {
-      await System.update({ _id: system._id }, system)
+      await System.update({ _id: system._id }, system).then(async () => {
+        user = await System.findOne({
+          client_id: auditSystemPayload.client_id
+        })
+      })
     } catch (err) {
       logger.error(err.message)
       return h.response().code(400)
     }
-    return h.response().code(200)
+    return h.response(user).code(200)
   } catch (err) {
     logger.error(err)
     return h.response().code(400)
@@ -217,16 +221,20 @@ export async function reactivateSystemClient(
       )
       throw unauthorized()
     }
-
+    let user
     system.status = statuses.ACTIVE
 
     try {
-      await System.update({ _id: system._id }, system)
+      await System.update({ _id: system._id }, system).then(async () => {
+        user = await System.findOne({
+          client_id: auditSystemPayload.client_id
+        })
+      })
     } catch (err) {
       logger.error(err.message)
       return h.response().code(400)
     }
-    return h.response().code(200)
+    return h.response(user).code(200)
   } catch (err) {
     logger.error(err)
     return h.response().code(400)

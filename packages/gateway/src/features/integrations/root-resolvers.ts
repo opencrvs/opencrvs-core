@@ -22,35 +22,23 @@ export const resolvers: GQLResolver = {
           new Error('Activate user is only allowed for sysadmin')
         )
       }
-      if (clientDetails?.client_id) {
-        const res = await fetch(
-          `${USER_MANAGEMENT_URL}reactivateSystemClient`,
-          {
-            method: 'POST',
-            body: JSON.stringify(clientDetails),
-            headers: {
-              'Content-Type': 'application/json',
-              ...authHeader
-            }
-          }
-        )
-        if (res.status == 200) {
-          return await Promise.resolve({ message: 'User status activated' })
+      const res = await fetch(`${USER_MANAGEMENT_URL}reactivateSystemClient`, {
+        method: 'POST',
+        body: JSON.stringify(clientDetails),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
         }
+      })
 
-        if (res.status !== 201) {
-          return await Promise.reject(
-            new Error(
-              `Something went wrong on config service. Couldn't update application config`
-            )
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            `Something went wrong on config service. Couldn't update application config`
           )
-        }
-        return await res.json()
-      } else {
-        return {
-          message: 'Client Id is required'
-        }
+        )
       }
+      return await res.json()
     },
     async deactivateSystemClient(_, { clientDetails }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -58,35 +46,23 @@ export const resolvers: GQLResolver = {
           new Error('Deactivate user is only allowed for sysadmin')
         )
       }
-      if (clientDetails?.client_id) {
-        const res = await fetch(
-          `${USER_MANAGEMENT_URL}deactivateSystemClient`,
-          {
-            method: 'POST',
-            body: JSON.stringify(clientDetails),
-            headers: {
-              'Content-Type': 'application/json',
-              ...authHeader
-            }
-          }
-        )
-        if (res.status == 200) {
-          return await Promise.resolve({ message: 'User status deactivated' })
+      const res = await fetch(`${USER_MANAGEMENT_URL}deactivateSystemClient`, {
+        method: 'POST',
+        body: JSON.stringify(clientDetails),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
         }
+      })
 
-        if (res.status !== 201) {
-          return await Promise.reject(
-            new Error(
-              `Something went wrong on config service. Couldn't update application config`
-            )
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            `Something went wrong on config service. Couldn't update application config`
           )
-        }
-        return await res.json()
-      } else {
-        return {
-          message: 'Client Id is required'
-        }
+        )
       }
+      return await res.json()
     }
   }
 }

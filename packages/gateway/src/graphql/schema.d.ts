@@ -519,11 +519,14 @@ export interface GQLDeleteFormDraftInput {
 }
 
 export interface GQLIntegrationResponse {
-  message?: string
+  status?: string
+  _id?: string
+  username?: string
+  client_id?: string
 }
 
 export interface GQLClientPayload {
-  client_id?: string
+  client_id: string
 }
 
 export type GQLMap = any
@@ -4111,10 +4114,34 @@ export interface ApplicationConfigurationToADDRESSESResolver<
 }
 
 export interface GQLIntegrationResponseTypeResolver<TParent = any> {
-  message?: IntegrationResponseToMessageResolver<TParent>
+  status?: IntegrationResponseToStatusResolver<TParent>
+  _id?: IntegrationResponseTo_idResolver<TParent>
+  username?: IntegrationResponseToUsernameResolver<TParent>
+  client_id?: IntegrationResponseToClient_idResolver<TParent>
 }
 
-export interface IntegrationResponseToMessageResolver<
+export interface IntegrationResponseToStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IntegrationResponseTo_idResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IntegrationResponseToUsernameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IntegrationResponseToClient_idResolver<
   TParent = any,
   TResult = any
 > {

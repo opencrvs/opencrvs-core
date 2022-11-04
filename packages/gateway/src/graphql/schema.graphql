@@ -670,11 +670,14 @@ input DeleteFormDraftInput {
 }
 
 type IntegrationResponse {
-  message: String
+  status: String
+  _id: String
+  username: String
+  client_id: String
 }
 
 input ClientPayload {
-  client_id: String
+  client_id: String!
 }
 
 scalar Map

@@ -18,11 +18,14 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
 input ClientPayload {
-  client_id: String
+  client_id: String!
 }
 
 type IntegrationResponse {
-  message: String
+  status: String
+  _id: String
+  username: String
+  client_id: String
 }
 
 type Mutation {
