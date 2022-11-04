@@ -48,6 +48,8 @@ export interface ISearchCriteria {
 
 export interface IAdvancedSearchParam {
   event?: string
+  dateOfEvent?: string
+  registrationStatuses?: string
   eventLocationId?: string
   childFirstNames?: string
   childLastName?: string
@@ -73,6 +75,27 @@ export interface IAdvancedSearchParam {
   dateOfRegistration?: string
   dateOfRegistrationStart?: string
   dateOfRegistrationEnd?: string
+  declarationLocationId?: string
+  declarationJurisdictionId?: string
+  eventLocationLevel1?: string
+  eventLocationLevel2?: string
+  eventLocationLevel3?: string
+  eventLocationLevel4?: string
+  eventLocationLevel5?: string
+  childDoBStart?: string
+  childDoBEnd?: string
+  childGender?: string
+  deceasedGender?: string
+  deceasedDoB?: string
+  deceasedDoBStart?: string
+  deceasedDoBEnd?: string
+  motherDoBStart?: string
+  motherDoBEnd?: string
+  fatherDoBStart?: string
+  fatherDoBEnd?: string
+  informantDoB?: string
+  informantDoBStart?: string
+  informantDoBEnd?: string
 }
 
 const getTimeLoggedDataByStatus = (

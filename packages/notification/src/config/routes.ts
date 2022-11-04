@@ -32,7 +32,9 @@ import {
   sendUserAuthenticationCode,
   userCredentialsNotificationSchema,
   retrieveUserNameNotificationSchema,
-  authCodeNotificationSchema
+  authCodeNotificationSchema,
+  sendResetPasswordSMS,
+  userPasswordResetNotificationSchema
 } from '@notification/features/sms/user-handler'
 
 const enum RouteScope {
@@ -227,6 +229,21 @@ export default function getRoutes() {
         },
         validate: {
           payload: userCredentialsNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/resetPasswordSMS',
+      handler: sendResetPasswordSMS,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with new temporary password',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: userPasswordResetNotificationSchema
         }
       }
     },
