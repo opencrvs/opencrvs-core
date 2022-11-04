@@ -452,7 +452,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [],
                 initialValue: '',
                 customisable: true,
-                required: true
+                required: false
               },
               {
                 name: 'familyNameEng',
@@ -1650,7 +1650,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [],
                 initialValue: '',
                 customisable: true,
-                required: true
+                required: false
               },
               // Last name
               {
@@ -2989,15 +2989,6 @@ export const registerForms: IDefaultRegisterForms = {
                     label: informantMessageDescriptors.sister
                   },
                   {
-                    value: 'OTHER_FAMILY_MEMBER',
-                    label: informantMessageDescriptors.otherFamilyMember
-                  },
-                  {
-                    value: 'LEGAL_GUARDIAN',
-                    label: informantMessageDescriptors.legalGuardian
-                  },
-
-                  {
                     value: 'MOTHERS_BROTHER',
                     label: informantMessageDescriptors.mothersBrother
                   },
@@ -3012,6 +3003,14 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'FATHERS_SISTER',
                     label: informantMessageDescriptors.fathersSister
+                  },
+                  {
+                    value: 'OTHER_FAMILY_MEMBER',
+                    label: informantMessageDescriptors.otherFamilyMember
+                  },
+                  {
+                    value: 'LEGAL_GUARDIAN',
+                    label: informantMessageDescriptors.legalGuardian
                   },
                   {
                     value: 'OTHER',
