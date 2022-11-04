@@ -1292,6 +1292,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     CHECKBOX_GROUP: messages.checkboxGroup,
     CHECKBOX: messages.checkbox,
     DATE: messages.date,
+    DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
     DYNAMIC_LIST: messages.dynamicList
   }
 
