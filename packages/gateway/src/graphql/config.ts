@@ -25,6 +25,7 @@ import { resolvers as userRootResolvers } from '@gateway/features/user/root-reso
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
 import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
+import { resolvers as integrationResolvers } from '@gateway/features/integrations/root-resolvers'
 import {
   IUserModelData,
   userTypeResolvers
@@ -69,7 +70,8 @@ const resolvers: StringIndexed<IResolvers> = merge(
   certificateResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
   formDraftResolvers as IResolvers,
-  applicationRootResolvers as IResolvers
+  applicationRootResolvers as IResolvers,
+  integrationResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
