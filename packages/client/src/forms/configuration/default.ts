@@ -3330,10 +3330,10 @@ export const registerForms: IDefaultRegisterForms = {
         ],
         mapping: {
           mutation: {
-            operation: 'setInformantSectionTransformer'
+            operation: 'setInformantRegistrationComposedTransformer'
           },
           query: {
-            operation: 'getInformantSectionTransformer'
+            operation: 'getInformantRegistrationComposedTransformer'
           }
         }
       },

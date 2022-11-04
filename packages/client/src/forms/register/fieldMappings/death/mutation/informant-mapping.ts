@@ -20,6 +20,7 @@ import {
   first,
   findIndex
 } from 'lodash'
+import { setBirthRegistrationSectionTransformer } from '@client/forms/mappings/mutation'
 
 export enum OBJECT_TYPE {
   NAME = 'name',
@@ -134,4 +135,17 @@ export function setInformantSectionTransformer(
     transformedData[sectionId].relationship = draftData[sectionId].relationship
   }
   return transformedData
+}
+
+export function setInformantRegistrationComposedTransformer(
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string
+) {
+  setInformantSectionTransformer(transformedData, draftData, sectionId)
+  setBirthRegistrationSectionTransformer(
+    transformedData,
+    draftData,
+    'registration'
+  )
 }

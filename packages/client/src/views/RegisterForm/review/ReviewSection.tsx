@@ -866,6 +866,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   ) => {
     const { draft, pageRoute, writeDeclaration, goToPageGroup } = this.props
     const declaration = draft
+    if (declaration.data.registration) {
+      declaration.data.registration.informantsSignature = ''
+    }
     declaration.review = true
     writeDeclaration(declaration)
     goToPageGroup(

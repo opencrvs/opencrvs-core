@@ -11,6 +11,7 @@
  */
 import { IFormField, IFormData } from '@client/forms'
 import { GQLContactPoint } from '@opencrvs/gateway/src/graphql/schema'
+import { getBirthRegistrationSectionTransformer } from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
 
 export const phoneNumberToFieldTransformer = (
   transformedData: IFormData,
@@ -56,4 +57,17 @@ export function getInformantSectionTransformer(
     transformedData[sectionId].relationship = queryData[sectionId].relationship
   }
   return transformedData
+}
+
+export function getInformantRegistrationComposedTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string
+) {
+  getInformantSectionTransformer(transformedData, queryData, sectionId)
+  getBirthRegistrationSectionTransformer(
+    transformedData,
+    queryData,
+    'registration'
+  )
 }
