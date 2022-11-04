@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/search",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "OpenCRVS search service",
   "license": "MPL-2.0",
   "private": true,
