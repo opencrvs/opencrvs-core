@@ -217,7 +217,7 @@
         state: directory
         group: 1000
         owner: 1000
-        mode: g+rwx
+        mode: ugo+rwx
       when: not elasticsearch_data_backup.stat.exists
 
     - name: Check influxdb data directory
