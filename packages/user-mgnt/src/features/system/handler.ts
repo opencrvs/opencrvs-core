@@ -297,8 +297,7 @@ export async function getSystemHandler(
   const { systemId, clientId } = request.payload as IGetSystemPayload
 
   const system: ISystemModel | null = await System.findOne({
-    _id: systemId,
-    clientId
+    $or: [{ _id: systemId }, { clientId: clientId }]
   })
 
   if (!system) {
