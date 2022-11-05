@@ -11,16 +11,16 @@
  */
 import { AdvancedSearchSection, IFormSectionGroup } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
-import { messages as advancedSearchBirthForm } from '@client/i18n/messages/views/advancedSearchBirthForm'
+import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 
 export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
   id: AdvancedSearchSection.Birth,
-  title: advancedSearchBirthForm.registrationDetails,
+  title: advancedSearchForm.registrationDetails,
   fields: [
     {
       name: 'registrationDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
-      label: advancedSearchBirthForm.registrationDetails,
+      label: advancedSearchForm.registrationDetails,
       showLabel: formMessageDescriptors.showLabel,
       hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
@@ -31,18 +31,18 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       options: [
         {
           value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
+          label: advancedSearchForm.registrationDetails
         }
       ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
+      placeholder: advancedSearchForm.registrationDetails,
       nestedFields: {
         yes: [
           {
-            name: 'placeOfRegistration',
+            name: 'declarationLocationId',
             customisable: false,
             type: 'LOCATION_SEARCH_INPUT',
-            label: advancedSearchBirthForm.placeOfRegistrationlabel,
-            helperText: advancedSearchBirthForm.placeOfRegistrationHelperText,
+            label: advancedSearchForm.placeOfRegistrationlabel,
+            helperText: advancedSearchForm.placeOfRegistrationHelperText,
             placeholder: formMessageDescriptors.formSelectPlaceholder,
             required: false,
             initialValue: '',
@@ -60,7 +60,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             name: 'dateOfRegistration',
             customisable: false,
             type: 'DATE',
-            label: advancedSearchBirthForm.dateOfRegistration,
+            label: advancedSearchForm.dateOfRegistration,
             required: false,
             initialValue: '',
             validate: []
@@ -69,7 +69,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             name: 'registrationStatuses',
             customisable: false,
             type: 'SELECT_WITH_OPTIONS',
-            label: advancedSearchBirthForm.statusOfRecordLabel,
+            label: advancedSearchForm.statusOfRecordLabel,
             required: false,
             initialValue: '',
             validate: [],
@@ -77,36 +77,36 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             options: [
               {
                 value: 'ALL',
-                label: advancedSearchBirthForm.recordStatusAny
+                label: advancedSearchForm.recordStatusAny
               },
               {
                 value: 'IN_PROGRESS',
-                label: advancedSearchBirthForm.recordStatusInprogress
+                label: advancedSearchForm.recordStatusInprogress
               },
               {
                 value: 'IN_REVIEW',
-                label: advancedSearchBirthForm.recordStatusInReview
+                label: advancedSearchForm.recordStatusInReview
               },
               {
                 value: ' REJECTED',
-                label: advancedSearchBirthForm.recordStatusRequireUpdate
+                label: advancedSearchForm.recordStatusRequireUpdate
               },
               {
                 value: 'REGISTERED',
-                label: advancedSearchBirthForm.recordStatusRegistered
+                label: advancedSearchForm.recordStatusRegistered
               },
               {
                 value: ' CERTIFIED',
-                label: advancedSearchBirthForm.recordStatusCertified
+                label: advancedSearchForm.recordStatusCertified
               },
               {
                 value: 'ARCHIVED',
-                label: advancedSearchBirthForm.recordStatusAchived
+                label: advancedSearchForm.recordStatusAchived
               }
             ]
           },
           {
-            name: ' declarationLocationId',
+            name: ' eventLocationLevel1',
             customisable: false,
             type: 'LOCATION_SEARCH_INPUT',
             label: formMessageDescriptors.placeOfBirth,
@@ -155,10 +155,10 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       options: [
         {
           value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
+          label: formMessageDescriptors.childTitle
         }
       ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
+      placeholder: advancedSearchForm.registrationDetails,
       nestedFields: {
         yes: [
           {
@@ -233,10 +233,10 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       options: [
         {
           value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
+          label: formMessageDescriptors.motherTitle
         }
       ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
+      placeholder: advancedSearchForm.registrationDetails,
       nestedFields: {
         yes: [
           {
@@ -287,10 +287,10 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       options: [
         {
           value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
+          label: formMessageDescriptors.fatherTitle
         }
       ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
+      placeholder: advancedSearchForm.registrationDetails,
       nestedFields: {
         yes: [
           {
@@ -330,7 +330,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
     {
       name: 'informantDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
-      label: advancedSearchBirthForm.informantDetails,
+      label: advancedSearchForm.informantDetails,
       showLabel: formMessageDescriptors.showLabel,
       hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
@@ -341,10 +341,10 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       options: [
         {
           value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
+          label: advancedSearchForm.informantDetails
         }
       ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
+      placeholder: advancedSearchForm.registrationDetails,
       nestedFields: {
         yes: [
           {
