@@ -21,7 +21,6 @@ import {
   getOfflineDataLoaded,
   getOfflineLoadingError
 } from '@client/offline/selectors'
-import { parse } from 'querystring'
 import { checkAuth } from '@client/profile/profileActions'
 import {
   showConfigurationErrorNotification,
