@@ -11,16 +11,17 @@
  */
 import { AdvancedSearchSection, IFormSectionGroup } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
-import { messages as advancedSearchBirthForm } from '@client/i18n/messages/views/advancedSearchForm'
+import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
+import { navigationMessages as formMessage } from '@client/i18n/messages/views/formConfig'
 
-export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
-  id: AdvancedSearchSection.Birth,
-  title: advancedSearchBirthForm.registrationDetails,
+export const advancedSearchDeathSectionFormType: IFormSectionGroup = {
+  id: AdvancedSearchSection.Death,
+  title: advancedSearchForm.registrationDetails,
   fields: [
     {
       name: 'registrationDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
-      label: advancedSearchBirthForm.registrationDetails,
+      label: advancedSearchForm.registrationDetails,
       showLabel: formMessageDescriptors.showLabel,
       hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
@@ -31,18 +32,18 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       options: [
         {
           value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
+          label: advancedSearchForm.registrationDetails
         }
       ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
+      placeholder: advancedSearchForm.registrationDetails,
       nestedFields: {
         yes: [
           {
-            name: 'placeOfRegistration',
+            name: 'declarationLocationId',
             customisable: false,
             type: 'LOCATION_SEARCH_INPUT',
-            label: advancedSearchBirthForm.placeOfRegistrationlabel,
-            helperText: advancedSearchBirthForm.placeOfRegistrationHelperText,
+            label: advancedSearchForm.placeOfRegistrationlabel,
+            helperText: advancedSearchForm.placeOfRegistrationHelperText,
             placeholder: formMessageDescriptors.formSelectPlaceholder,
             required: false,
             initialValue: '',
@@ -60,7 +61,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             name: 'dateOfRegistration',
             customisable: false,
             type: 'DATE',
-            label: advancedSearchBirthForm.dateOfRegistration,
+            label: advancedSearchForm.dateOfRegistration,
             required: false,
             initialValue: '',
             validate: []
@@ -69,7 +70,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             name: 'registrationStatuses',
             customisable: false,
             type: 'SELECT_WITH_OPTIONS',
-            label: advancedSearchBirthForm.statusOfRecordLabel,
+            label: advancedSearchForm.statusOfRecordLabel,
             required: false,
             initialValue: '',
             validate: [],
@@ -77,36 +78,36 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             options: [
               {
                 value: 'ALL',
-                label: advancedSearchBirthForm.recordStatusAny
+                label: advancedSearchForm.recordStatusAny
               },
               {
                 value: 'IN_PROGRESS',
-                label: advancedSearchBirthForm.recordStatusInprogress
+                label: advancedSearchForm.recordStatusInprogress
               },
               {
                 value: 'IN_REVIEW',
-                label: advancedSearchBirthForm.recordStatusInReview
+                label: advancedSearchForm.recordStatusInReview
               },
               {
                 value: ' REJECTED',
-                label: advancedSearchBirthForm.recordStatusRequireUpdate
+                label: advancedSearchForm.recordStatusRequireUpdate
               },
               {
                 value: 'REGISTERED',
-                label: advancedSearchBirthForm.recordStatusRegistered
+                label: advancedSearchForm.recordStatusRegistered
               },
               {
                 value: ' CERTIFIED',
-                label: advancedSearchBirthForm.recordStatusCertified
+                label: advancedSearchForm.recordStatusCertified
               },
               {
                 value: 'ARCHIVED',
-                label: advancedSearchBirthForm.recordStatusAchived
+                label: advancedSearchForm.recordStatusAchived
               }
             ]
           },
           {
-            name: ' declarationLocationId',
+            name: 'declarationLocationId',
             customisable: false,
             type: 'LOCATION_SEARCH_INPUT',
             label: formMessageDescriptors.placeOfBirth,
@@ -121,7 +122,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: '  eventLocationLevel2',
+            name: 'eventLocationLevel2',
             customisable: false,
             type: 'TEXT',
             label: formMessageDescriptors.internationalDistrict,
@@ -130,7 +131,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: '  eventLocationLevel1',
+            name: 'eventLocationLevel1',
             customisable: false,
             type: 'TEXT',
             label: formMessageDescriptors.internationalState,
@@ -142,9 +143,9 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       }
     },
     {
-      name: 'childDetails',
+      name: 'deceasedDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
-      label: formMessageDescriptors.childTitle,
+      label: formMessage.deceased,
       showLabel: formMessageDescriptors.showLabel,
       hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
@@ -155,48 +156,44 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       options: [
         {
           value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
+          label: formMessage.deceased
         }
       ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
+      placeholder: advancedSearchForm.registrationDetails,
       nestedFields: {
         yes: [
           {
-            name: 'childDoB',
-            customisable: false,
+            name: 'deceasedDoB',
             type: 'DATE',
-            label: formMessageDescriptors.childDateOfBirth,
+            label: formMessageDescriptors.deceasedDateOfBirth,
             required: false,
             initialValue: '',
             validate: []
           },
           {
-            name: 'childFirstNames',
-            previewGroup: 'childNameInEnglish',
-            customisable: false,
+            name: 'deceasedFirstNames',
+            previewGroup: 'deceasedNameInEnglish',
             type: 'TEXT',
-            label: formMessageDescriptors.childFirstNames,
+            label: formMessageDescriptors.deceasedGivenNamesEng,
             maxLength: 32,
             required: false,
             initialValue: '',
             validate: []
           },
           {
-            name: 'childLastName',
-            previewGroup: 'childNameInEnglish',
-            customisable: false,
+            name: 'deceasedFamilyName',
+            previewGroup: 'deceasedNameInEnglish',
             type: 'TEXT',
-            label: formMessageDescriptors.childFamilyName,
+            label: formMessageDescriptors.deceasedFamilyNameEng,
             maxLength: 32,
             required: false,
             initialValue: '',
             validate: []
           },
           {
-            name: 'childGender',
-            customisable: false,
+            name: 'deceasedGender',
             type: 'SELECT_WITH_OPTIONS',
-            label: formMessageDescriptors.childSex,
+            label: formMessageDescriptors.deceasedSex,
             required: false,
             initialValue: '',
             validate: [],
@@ -204,15 +201,15 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             options: [
               {
                 value: 'male',
-                label: formMessageDescriptors.childSexMale
+                label: formMessageDescriptors.deceasedSexMale
               },
               {
                 value: 'female',
-                label: formMessageDescriptors.childSexFemale
+                label: formMessageDescriptors.deceasedSexFemale
               },
               {
                 value: 'unknown',
-                label: formMessageDescriptors.childSexUnknown
+                label: formMessageDescriptors.deceasedSexUnknown
               }
             ]
           }
@@ -220,9 +217,9 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       }
     },
     {
-      name: 'motherDetails',
+      name: 'event',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
-      label: formMessageDescriptors.motherTitle,
+      label: formMessage.deathEvent,
       showLabel: formMessageDescriptors.showLabel,
       hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
@@ -233,96 +230,45 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       options: [
         {
           value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
+          label: formMessage.deathEvent
         }
       ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
+      placeholder: advancedSearchForm.registrationDetails,
       nestedFields: {
         yes: [
           {
-            name: ' motherDoB',
-            customisable: false,
+            name: 'dateOfEvent',
             type: 'DATE',
-            label: formMessageDescriptors.motherDateOfBirth,
+            label: formMessageDescriptors.deathEventDate,
             required: false,
             initialValue: '',
             validate: []
           },
           {
-            name: ' motherFirstNames',
-            previewGroup: 'motherFirstNamesEng',
+            name: 'eventLocationLevel1',
             customisable: false,
-            type: 'TEXT',
-            label: formMessageDescriptors.motherFirstNamesEng,
-            maxLength: 32,
+            type: 'SELECT_WITH_OPTIONS',
+            previewGroup: 'placeOfDeath',
+            ignoreFieldLabelOnErrorMessage: true,
+            label: advancedSearchForm.placeOfDeath,
             required: false,
             initialValue: '',
-            validate: []
-          },
-          {
-            name: ' motherFamilyName',
-            previewGroup: 'motherNameInEnglish',
-            customisable: false,
-            type: 'TEXT',
-            label: formMessageDescriptors.motherFamilyNameEng,
-            maxLength: 32,
-            required: false,
-            initialValue: '',
-            validate: []
-          }
-        ]
-      }
-    },
-    {
-      name: 'fatherDetails',
-      type: 'ACCORDION_WITH_NESTED_FIELDS',
-      label: formMessageDescriptors.fatherTitle,
-      showLabel: formMessageDescriptors.showLabel,
-      hideLabel: formMessageDescriptors.hideLabel,
-      hideHeader: true,
-      required: false,
-      hideInPreview: true,
-      initialValue: 'no',
-      validate: [],
-      options: [
-        {
-          value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
-        }
-      ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
-      nestedFields: {
-        yes: [
-          {
-            name: '  fatherDoB',
-            customisable: false,
-            type: 'DATE',
-            label: formMessageDescriptors.fatherDateOfBirth,
-            required: false,
-            initialValue: '',
-            validate: []
-          },
-          {
-            name: 'fatherFirstNames',
-            previewGroup: 'fatherNameInEnglish',
-            customisable: false,
-            type: 'TEXT',
-            label: formMessageDescriptors.motherFirstNamesEng,
-            maxLength: 32,
-            required: false,
-            initialValue: '',
-            validate: []
-          },
-          {
-            name: 'fatherFamilyName',
-            previewGroup: 'fatherNameInEnglish',
-            customisable: false,
-            type: 'TEXT',
-            label: formMessageDescriptors.motherFamilyNameEng,
-            maxLength: 32,
-            required: false,
-            initialValue: '',
-            validate: []
+            validate: [],
+            placeholder: formMessageDescriptors.formSelectPlaceholder,
+            options: [
+              {
+                value: 'HEALTH_FACILITY',
+                label: formMessageDescriptors.healthInstitution
+              },
+              {
+                value: 'DECEASED_USUAL_RESIDENCE',
+                label: formMessageDescriptors.placeOfDeathSameAsPrimary
+              },
+              {
+                value: 'OTHER',
+                label: formMessageDescriptors.otherInstitution
+              }
+            ]
           }
         ]
       }
@@ -330,7 +276,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
     {
       name: 'informantDetails',
       type: 'ACCORDION_WITH_NESTED_FIELDS',
-      label: advancedSearchBirthForm.informantDetails,
+      label: advancedSearchForm.informantDetails,
       showLabel: formMessageDescriptors.showLabel,
       hideLabel: formMessageDescriptors.hideLabel,
       hideHeader: true,
@@ -341,10 +287,10 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       options: [
         {
           value: 'yes',
-          label: advancedSearchBirthForm.registrationDetails
+          label: advancedSearchForm.informantDetails
         }
       ],
-      placeholder: advancedSearchBirthForm.registrationDetails,
+      placeholder: advancedSearchForm.registrationDetails,
       nestedFields: {
         yes: [
           {
