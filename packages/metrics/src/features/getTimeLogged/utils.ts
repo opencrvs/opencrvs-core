@@ -76,14 +76,13 @@ export async function getTimeLoggedForPractitioner(
             OR locationLevel4 = $locationId 
             OR locationLevel5 = $locationId)
               ORDER BY time DESC
-              $countLimit`,
+              ${countLimit}`,
     {
       placeholders: {
         timeFrom,
         timeTo,
         practitionerId,
-        locationId,
-        countLimit
+        locationId
       }
     }
   )

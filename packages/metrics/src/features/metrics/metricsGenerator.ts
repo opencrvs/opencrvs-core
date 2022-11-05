@@ -117,17 +117,15 @@ export async function fetchCertificationPayments(
 ) {
   const payments = await query(
     `SELECT SUM(total) as total FROM certification_payment WHERE time > $timeStart AND time <= $timeEnd
-      AND $currentLocationLevel=$locationId
+      AND ${currentLocationLevel}=$locationId
       AND eventType = $eventType
-      GROUP BY $lowerLocationLevel`,
+      GROUP BY ${lowerLocationLevel}`,
     {
       placeholders: {
         timeStart,
         timeEnd,
-        currentLocationLevel,
         locationId,
-        eventType,
-        lowerLocationLevel
+        eventType
       }
     }
   )
@@ -162,25 +160,25 @@ const birthRegWithinTimeFramesQuery = (
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
-   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, $lowerLocationLevel
+   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
     SELECT COUNT(ageInDays) AS withinTargetDays FROM birth_registration WHERE time > $timeStart AND time <= $timeEnd
-  AND ageInDays > -1 AND ageInDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND $currentLocationLevel=$locationId
-    GROUP BY lowerLocationLevel
+  AND ageInDays > -1 AND ageInDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}=$locationId
+    GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(ageInDays) AS withinTargetDTo1Yr FROM birth_registration WHERE time > $timeStart AND time <= $timeEnd
-  AND ageInDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ageInDays <= 365 AND $currentLocationLevel=$locationId
-    GROUP BY $lowerLocationLevel
+  AND ageInDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ageInDays <= 365 AND ${currentLocationLevel}=$locationId
+    GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_registration WHERE time > $timeStart AND time <= $timeEnd
-  AND ageInDays > 366 AND ageInDays <= 1825 AND $currentLocationLevel=$locationId
-    GROUP BY $lowerLocationLevel
+  AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}=$locationId
+    GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(ageInDays) AS over5Yr FROM birth_registration WHERE time > $timeStart AND time <= $timeEnd
-  AND ageInDays > 1826 AND $currentLocationLevel=$locationId
-    GROUP BY $lowerLocationLevel
+  AND ageInDays > 1826 AND ${currentLocationLevel}=$locationId
+    GROUP BY ${lowerLocationLevel}
    ) FILL(0)
- ) GROUP BY $lowerLocationLevel
+ ) GROUP BY ${lowerLocationLevel}
  `
 }
 
@@ -199,25 +197,25 @@ const deathRegWithinTimeFramesQuery = (
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
-   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, $lowerLocationLevel
+   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
     SELECT COUNT(deathDays) AS withinTargetDays FROM death_registration WHERE time > $timeStart AND time <= $timeEnd
-  AND deathDays > -1 AND deathDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND $currentLocationLevel=$locationId
-    GROUP BY $lowerLocationLevel
+  AND deathDays > -1 AND deathDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}=$locationId
+    GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(deathDays) AS withinTargetDTo1Yr FROM death_registration WHERE time > $timeStart AND time <= $timeEnd
-  AND deathDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND deathDays <= 365 AND $currentLocationLevel=$locationId
-    GROUP BY $lowerLocationLevel
+  AND deathDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND deathDays <= 365 AND ${currentLocationLevel}=$locationId
+    GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(deathDays) AS within1YrTo5Yr FROM death_registration WHERE time > $timeStart AND time <= $timeEnd
-  AND deathDays > 366 AND deathDays <= 1825 AND $currentLocationLevel=$locationId
-    GROUP BY $lowerLocationLevel
+  AND deathDays > 366 AND deathDays <= 1825 AND ${currentLocationLevel}=$locationId
+    GROUP BY ${lowerLocationLevel}
    ), (
     SELECT COUNT(deathDays) AS over5Yr FROM death_registration WHERE time > $timeStart AND time <= $timeEnd
-  AND deathDays > 1826 AND $currentLocationLevel=$locationId
-    GROUP BY $lowerLocationLevel
+  AND deathDays > 1826 AND ${currentLocationLevel}=$locationId
+    GROUP BY ${lowerLocationLevel}
    ) FILL(0)
- ) GROUP BY $lowerLocationLevel
+ ) GROUP BY ${lowerLocationLevel}
  `
 }
 
@@ -253,17 +251,14 @@ export async function fetchRegWithinTimeFrames(
     )
   }
 
-  const timeFramePoints = await query(queryString,
-    {
-      placeholders: {
-        timeStart,
-        timeEnd,
-        locationId,
-        currentLocationLevel,
-        lowerLocationLevel,
-        registrationTargetInDays
-      }
-    })
+  const timeFramePoints = await query(queryString, {
+    placeholders: {
+      timeStart,
+      timeEnd,
+      locationId,
+      registrationTargetInDays
+    }
+  })
 
   const dataFromInflux = timeFramePoints.map((point: any) => {
     const {
@@ -315,7 +310,7 @@ export async function getCurrentAndLowerLocationLevels(
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const allPointsContainingLocationId = await query(
-    `SELECT LAST(*) FROM $measurement WHERE time > $timeStart AND time <= $timeEnd
+    `SELECT LAST(*) FROM ${measurement} WHERE time > $timeStart AND time <= $timeEnd
       AND ( officeLocation = $locationId
         OR locationLevel2 = $locationId
         OR locationLevel3 = $locationId
@@ -324,10 +319,9 @@ export async function getCurrentAndLowerLocationLevels(
       GROUP BY officeLocation,locationLevel2,locationLevel3,locationLevel4,locationLevel5`,
     {
       placeholders: {
-        measurement,
         timeStart,
         timeEnd,
-        locationId,
+        locationId
       }
     }
   )
@@ -375,16 +369,9 @@ export const regWithinTargetDays = async (
     `
       SELECT COUNT(ageInDays) AS count
         FROM birth_registration
-      WHERE time >= $timeStart AND time <= $timeEnd
-        GROUP BY time($interval)
-    `,
-    {
-      placeholders: {
-        timeStart,
-        timeEnd,
-        interval
-      }
-    }
+      WHERE time >= ${timeStart} AND time <= ${timeEnd}
+        GROUP BY time(${interval})
+    `
   )
 
   const total =
@@ -432,8 +419,8 @@ export async function fetchKeyFigures(
   const withinTargetDaysData: IGroupedByGender[] = await query(
     `SELECT COUNT(ageInDays) AS total
       FROM birth_registration
-    WHERE time >= $timeStart
-      AND time <= $timeEnd
+    WHERE time >= ${timeStart}
+      AND time <= ${timeEnd}
       AND ( locationLevel2 = $queryLocationId
           OR locationLevel3 = $queryLocationId
           OR locationLevel4 = $queryLocationId
@@ -442,16 +429,15 @@ export async function fetchKeyFigures(
     GROUP BY gender`,
     {
       placeholders: {
-        timeStart,
-        timeEnd,
         queryLocationId,
-        EXPECTED_BIRTH_REGISTRATION_IN_DAYS,
+        EXPECTED_BIRTH_REGISTRATION_IN_DAYS
       }
     }
   )
   const WITHIN_TARGET_DAYS = `DAYS_0_TO_${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}`
-  const WITHIN_TARGET_DAYS_TO_1_YEAR = `DAYS_${EXPECTED_BIRTH_REGISTRATION_IN_DAYS + 1
-    }_TO_365`
+  const WITHIN_TARGET_DAYS_TO_1_YEAR = `DAYS_${
+    EXPECTED_BIRTH_REGISTRATION_IN_DAYS + 1
+  }_TO_365`
   keyFigures.push(
     populateBirthKeyFigurePoint(
       WITHIN_TARGET_DAYS,
@@ -470,8 +456,8 @@ export async function fetchKeyFigures(
   const within1YearData: IGroupedByGender[] = await query(
     `SELECT COUNT(ageInDays) AS total
       FROM birth_registration
-    WHERE time >= $timeStart
-      AND time <= $timeEnd
+    WHERE time >= ${timeStart}
+      AND time <= ${timeEnd}
       AND ( locationLevel2 = $queryLocationId
           OR locationLevel3 = $queryLocationId
           OR locationLevel4 = $queryLocationId
@@ -481,9 +467,7 @@ export async function fetchKeyFigures(
     GROUP BY gender`,
     {
       placeholders: {
-        timeStart,
-        timeEnd,
-        queryLocationId,
+        queryLocationId
       }
     }
   )
@@ -572,15 +556,15 @@ const birthGenderBasisMetricsQuery = (
     SUM(under18) AS under18,
     SUM(over18) AS over18
   FROM (
-    SELECT under18, over18, gender, $locationLevel FROM (
+    SELECT under18, over18, gender, ${locationLevel} FROM (
       SELECT
         COUNT(ageInDays) AS under18
       FROM birth_registration
       WHERE ageInDays < 6574
        AND time > $timeFrom
        AND time <= $timeTo
-       AND $currLocationLevel=$currLocation
-      GROUP BY gender, $locationLevel
+       AND ${currLocationLevel}=$currLocation
+      GROUP BY gender, ${locationLevel}
     ), (
       SELECT
         COUNT(ageInDays) AS over18
@@ -588,11 +572,11 @@ const birthGenderBasisMetricsQuery = (
       WHERE ageInDays >= 6574
        AND time > $timeFrom
        AND time <= $timeTo
-       AND $currLocationLevel=$currLocation
-      GROUP BY gender, $locationLevel
+       AND ${currLocationLevel}=$currLocation
+      GROUP BY gender, ${locationLevel}
     ) FILL(0)
   )
-  GROUP BY gender, $locationLevel
+  GROUP BY gender, ${locationLevel}
   `
 }
 
@@ -608,15 +592,15 @@ const deathGenderBasisMetricsQuery = (
     SUM(under18) AS under18,
     SUM(over18) AS over18
   FROM (
-    SELECT under18, over18, gender, $locationLevel FROM (
+    SELECT under18, over18, gender, ${locationLevel} FROM (
       SELECT
         COUNT(ageInYears) AS under18
       FROM death_registration
       WHERE ageInYears < 18
        AND time > $timeFrom
        AND time <= $timeTo
-       AND $currLocationLevel=$currLocation
-      GROUP BY gender, $locationLevel
+       AND ${currLocationLevel}=$currLocation
+      GROUP BY gender, ${locationLevel}
     ), (
       SELECT
         COUNT(ageInYears) AS over18
@@ -624,11 +608,11 @@ const deathGenderBasisMetricsQuery = (
       WHERE ageInYears >= 18
        AND time > $timeFrom
        AND time <= $timeTo
-       AND $currLocationLevel=$currLocation
-      GROUP BY gender, $locationLevel
+       AND ${currLocationLevel}=$currLocation
+      GROUP BY gender, ${locationLevel}
     ) FILL(0)
   )
-  GROUP BY gender, $locationLevel
+  GROUP BY gender, ${locationLevel}
   `
 }
 
@@ -664,9 +648,7 @@ export async function fetchGenderBasisMetrics(
     placeholders: {
       timeFrom,
       timeTo,
-      currLocation,
-      currLocationLevel,
-      locationLevel
+      currLocation
     }
   })
 
@@ -708,24 +690,20 @@ export async function fetchEstimatedTargetDayMetrics(
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = registrationTargetInDays
 
-  const points = await query(`SELECT
+  const points = await query(
+    `SELECT
                               COUNT(${column}) AS withInTargetDay
                               FROM ${measurement}
-                              WHERE ${column} <= $EXPECTED_BIRTH_REGISTRATION_IN_DAYS
+                              WHERE ${column} <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
                               AND time > $timeFrom
                               AND time <= $timeTo
-                              AND $currLocationLevel=$currLocation
-                              GROUP BY $locationLevel`,
+                              AND ${currLocationLevel}=$currLocation
+                              GROUP BY ${locationLevel}`,
     {
       placeholders: {
-        column,
-        measurement,
         timeFrom,
         timeTo,
-        currLocationLevel,
-        currLocation,
-        locationLevel,
-        EXPECTED_BIRTH_REGISTRATION_IN_DAYS,
+        currLocation
       }
     }
   )
@@ -747,15 +725,15 @@ export async function fetchEstimatedTargetDayMetrics(
       estimationLocationLevel: estimationOfTargetDay.locationLevel,
       estimationPercentage:
         point.withInTargetDay === 0 ||
-          estimationOfTargetDay.totalEstimation === 0
+        estimationOfTargetDay.totalEstimation === 0
           ? 0
           : Number(
-            (
-              (point.withInTargetDay /
-                estimationOfTargetDay.totalEstimation) *
-              100
-            ).toFixed(2)
-          )
+              (
+                (point.withInTargetDay /
+                  estimationOfTargetDay.totalEstimation) *
+                100
+              ).toFixed(2)
+            )
     })
   }
 
@@ -801,7 +779,7 @@ export async function getTotalNumberOfRegistrations(
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const totalRegistrationPoint: Registration[] = await query(
     `SELECT COUNT(DISTINCT(compositionId)) AS total
-      FROM $measurement
+      FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
       AND ( locationLevel2 = $locationId
@@ -810,10 +788,9 @@ export async function getTotalNumberOfRegistrations(
           OR locationLevel5 = $locationId )`,
     {
       placeholders: {
-        measurement,
         timeFrom,
         timeTo,
-        locationId,
+        locationId
       }
     }
   )
@@ -835,24 +812,21 @@ export async function fetchLocationWiseEventEstimations(
     authHeader.Authorization
   )
   const registrationsInTargetDaysPoints: IGroupedByGender[] = await query(
-    `SELECT COUNT($column) AS total
-      FROM $measurement
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
       AND ( locationLevel2 = $locationId
           OR locationLevel3 = $locationId
           OR locationLevel4 = $locationId
           OR locationLevel5 = $locationId )
-      AND $column <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
+      AND ${column} <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
     GROUP BY gender`,
     {
       placeholders: {
-        column,
-        measurement,
         timeFrom,
         timeTo,
-        locationId,
-
+        locationId
       }
     }
   )
@@ -882,37 +856,37 @@ export async function fetchLocationWiseEventEstimations(
     estimatedRegistration: estimationOfTargetDay.totalEstimation,
     estimatedPercentage:
       totalRegistrationInTargetDay === 0 ||
-        estimationOfTargetDay.totalEstimation === 0
+      estimationOfTargetDay.totalEstimation === 0
         ? 0
         : Number(
-          (
-            (totalRegistrationInTargetDay /
-              estimationOfTargetDay.totalEstimation) *
-            100
-          ).toFixed(2)
-        ),
+            (
+              (totalRegistrationInTargetDay /
+                estimationOfTargetDay.totalEstimation) *
+              100
+            ).toFixed(2)
+          ),
     malePercentage:
       totalMaleRegistrationInTargetDay === 0 ||
-        estimationOfTargetDay.maleEstimation === 0
+      estimationOfTargetDay.maleEstimation === 0
         ? 0
         : Number(
-          (
-            (totalMaleRegistrationInTargetDay /
-              estimationOfTargetDay.maleEstimation) *
-            100
-          ).toFixed(2)
-        ),
+            (
+              (totalMaleRegistrationInTargetDay /
+                estimationOfTargetDay.maleEstimation) *
+              100
+            ).toFixed(2)
+          ),
     femalePercentage:
       totalFemaleRegistrationInTargetDay === 0 ||
-        estimationOfTargetDay.femaleEstimation === 0
+      estimationOfTargetDay.femaleEstimation === 0
         ? 0
         : Number(
-          (
-            (totalFemaleRegistrationInTargetDay /
-              estimationOfTargetDay.femaleEstimation) *
-            100
-          ).toFixed(2)
-        )
+            (
+              (totalFemaleRegistrationInTargetDay /
+                estimationOfTargetDay.femaleEstimation) *
+              100
+            ).toFixed(2)
+          )
   }
 }
 
@@ -928,8 +902,8 @@ export async function fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
 
   const registrations: IGroupByTimeLabel[] = await query(
-    `SELECT COUNT($column) AS total
-      FROM $measurement
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
       AND ( locationLevel2 = $locationId
@@ -939,11 +913,9 @@ export async function fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
     GROUP BY timeLabel`,
     {
       placeholders: {
-        column,
-        measurement,
         timeFrom,
         timeTo,
-        locationId,
+        locationId
       }
     }
   )
@@ -972,22 +944,21 @@ export async function fetchEventsGroupByMonthDates(
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
 
   const registrationsInTargetDaysPoints: IGroupByEventDate[] = await query(
-    `SELECT COUNT($column) AS total
-      FROM $measurement
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
-      ${locationId
-      ? `AND ( locationLevel2 = $locationId
+      ${
+        locationId
+          ? `AND ( locationLevel2 = $locationId
       OR locationLevel3 = $locationId
       OR locationLevel4 = $locationId
       OR locationLevel5 = $locationId )`
-      : ``
-    }
+          : ``
+      }
     GROUP BY dateLabel, timeLabel`,
     {
       placeholders: {
-        column,
-        measurement,
         timeFrom,
         timeTo,
         locationId
@@ -1009,23 +980,22 @@ export async function getTotalMetrics(
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
 
   const totalMetrics: IMetricsTotalGroup[] = await query(
-    `SELECT COUNT($column) AS total
-      FROM $measurement
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
-      ${locationId
-      ? `AND ( locationLevel2 = $locationId
+      ${
+        locationId
+          ? `AND ( locationLevel2 = $locationId
       OR locationLevel3 = $locationId
       OR locationLevel4 = $locationId
       OR locationLevel5 = $locationId
       OR officeLocation = $locationId)`
-      : ``
-    }
+          : ``
+      }
     GROUP BY gender, timeLabel, eventLocationType, practitionerRole`,
     {
       placeholders: {
-        column,
-        measurement,
         timeFrom,
         timeTo,
         locationId
@@ -1062,22 +1032,22 @@ function populateGenderBasisMetrics(
       point.gender === 'female'
         ? point.over18
         : metrics
-          ? metrics.femaleOver18
-          : 0
+        ? metrics.femaleOver18
+        : 0
     const maleOver18 =
       point.gender === 'male' ? point.over18 : metrics ? metrics.maleOver18 : 0
     const femaleUnder18 =
       point.gender === 'female'
         ? point.under18
         : metrics
-          ? metrics.femaleUnder18
-          : 0
+        ? metrics.femaleUnder18
+        : 0
     const maleUnder18 =
       point.gender === 'male'
         ? point.under18
         : metrics
-          ? metrics.maleUnder18
-          : 0
+        ? metrics.maleUnder18
+        : 0
 
     const total = maleOver18 + femaleOver18 + maleUnder18 + femaleUnder18
 
