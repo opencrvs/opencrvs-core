@@ -170,8 +170,6 @@ function RegistrationListComponent(props: IProps) {
     setIsOfficeSelected(locationStatus)
   }, [locationStatus])
 
-  console.log(locationStatus, '===============', isOfficeSelected)
-
   const queryVariables: QueryGetRegistrationsListByFilterArgs = {
     timeStart: timeStart,
     timeEnd: timeEnd,
