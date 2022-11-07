@@ -9,30 +9,33 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { UserInputError } from 'apollo-server-hapi'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { hasScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
 
 export const resolvers: GQLResolver = {
   Mutation: {
     async refreshSystemClientSecret(_, { clientId }, authHeader) {
-      try {
-        const res = await fetch(
-          `${USER_MANAGEMENT_URL}refreshSystemClientSecret`,
-          {
-            method: 'POST',
-            body: JSON.stringify({ clientId: clientId }),
-            headers: {
-              'Content-Type': 'application/json',
-              ...authHeader
-            }
-          }
-        )
-        return await res.json()
-      } catch (error) {
-        throw new UserInputError(error.message)
+      if (!hasScope(authHeader, 'natlsysadmin')) {
+        throw new Error('Only system user can update refresh client secret')
       }
+      const res = await fetch(
+        `${USER_MANAGEMENT_URL}refreshSystemClientSecret`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ clientId: clientId }),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
+        }
+      )
+      if (res.status !== 200) {
+        throw new Error(`No user details found by given clientId`)
+      }
+
+      return await res.json()
     }
   }
 }
