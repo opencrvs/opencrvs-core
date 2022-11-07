@@ -19,7 +19,7 @@ import {
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
-import { Plus, VerticalThreeDots, Copy } from '@opencrvs/components/lib/icons'
+import { Plus, VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import {
   Alert,
   InputField,
@@ -27,6 +27,7 @@ import {
   Pill,
   Select,
   Spinner,
+  Stack,
   TextInput,
   ToggleMenu
 } from '@opencrvs/components/lib'
@@ -41,6 +42,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { Text } from '@opencrvs/components/lib/Text'
 import { gql } from '@apollo/client'
 import { Mutation } from '@apollo/client/react/components'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 export const statuses = {
   PENDING: 'pending',
@@ -50,15 +52,6 @@ export const statuses = {
 }
 
 const PaddedAlert = styled(Alert)`
-  margin-top: 16px;
-`
-const SecretText = styled(Text)`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  margin-top: 4px;
-`
-const TopText = styled(Text)`
   margin-top: 16px;
 `
 
@@ -82,7 +75,9 @@ type Secret = {
   client_secret: string
   sha_secret: string
 }
-
+/* TODO: Note, dispatch an action when create client is successful
+using the action in ocrvs-3595 UpdateOfflineIntegrationsAction
+*/
 export function Integrations() {
   const intl = useIntl()
   const offlineData = useSelector(getOfflineData)
@@ -503,37 +498,68 @@ export function Integrations() {
             </Text>
           </>
         )}
+
         {clientSecret && secretAvailable && (
           <>
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.clientId)}
-            </TopText>
-            <SecretText variant="reg16" element="span">
-              {clientSecret.client_id} <Copy />
-              <Text variant="reg16" color={'primary'} element="span">
-                {'Copy'}
-              </Text>
-            </SecretText>
-            <Text variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.clientSecret)}
-            </Text>
-            <SecretText variant="reg16" element="span">
-              {clientSecret.client_secret}
-              <Copy />
-              <Text variant="reg16" color={'primary'} element="span">
-                {'Copy'}
-              </Text>
-            </SecretText>
-            <Text variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.shaSecret)}
-            </Text>
-            <SecretText variant="reg16" element="span">
-              {clientSecret.sha_secret}
-              <Copy />
-              <Text variant="reg16" color={'primary'} element="span">
-                {'Copy'}
-              </Text>
-            </SecretText>
+            <Stack alignItems="flex-start" direction="column" gap={16}>
+              <Stack alignItems="flex-start" direction="column" gap={8}>
+                <Text variant="bold16" element="span">
+                  {intl.formatMessage(integrationMessages.clientId)}
+                </Text>
+                <Stack
+                  alignItems="center"
+                  direction="row"
+                  gap={8}
+                  justifyContent="space-between"
+                >
+                  <Text variant="reg16" element="span">
+                    {clientSecret.client_id}
+                  </Text>
+                  <Icon color="primary" name="Globe" size="small" />
+                  <Text variant="reg16" color={'primary'} element="span">
+                    {intl.formatMessage(integrationMessages.copy)}
+                  </Text>
+                </Stack>
+              </Stack>
+              <Stack alignItems="flex-start" direction="column" gap={8}>
+                <Text variant="bold16" element="span">
+                  {intl.formatMessage(integrationMessages.clientSecret)}
+                </Text>
+                <Stack
+                  alignItems="center"
+                  direction="row"
+                  gap={8}
+                  justifyContent="space-between"
+                >
+                  <Text variant="reg16" element="span">
+                    {clientSecret.client_secret}
+                  </Text>
+                  <Icon color="primary" name="Globe" size="small" />
+                  <Text variant="reg16" color={'primary'} element="span">
+                    {intl.formatMessage(integrationMessages.copy)}
+                  </Text>
+                </Stack>
+              </Stack>
+              <Stack alignItems="flex-start" direction="column" gap={8}>
+                <Text variant="bold16" element="span">
+                  {intl.formatMessage(integrationMessages.shaSecret)}
+                </Text>
+                <Stack
+                  alignItems="center"
+                  direction="row"
+                  gap={8}
+                  justifyContent="space-between"
+                >
+                  <Text variant="reg16" element="span">
+                    {clientSecret.sha_secret}
+                  </Text>
+                  <Icon color="primary" name="Globe" size="small" />
+                  <Text variant="reg16" color={'primary'} element="span">
+                    {intl.formatMessage(integrationMessages.copy)}
+                  </Text>
+                </Stack>
+              </Stack>
+            </Stack>
           </>
         )}
       </ResponsiveModal>
