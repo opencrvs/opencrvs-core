@@ -11,70 +11,26 @@
  */
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
-import {
-  IAdvancedSearchParam,
-  ISearchQuery,
-  SortOrder
-} from '@search/features/search/types'
-import {
-  queryBuilder,
-  EMPTY_STRING,
-  advancedQueryBuilder
-} from '@search/features/search/utils'
+import { ISearchCriteria, SortOrder } from '@search/features/search/types'
+import { advancedQueryBuilder } from '@search/features/search/utils'
 import { logger } from '@search/logger'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
 
-export const searchComposition = async (params: ISearchQuery) => {
-  const formattedParams = formatSearchParams(params)
-  let response: ApiResponse<ISearchResponse<any>>
-  try {
-    // NOTE: we are using the destructuring assignment
-    response = await client.search(formattedParams, {
-      ignore: [404]
-    })
-  } catch (err) {
-    if (err.statusCode === 400) {
-      logger.error('Search: bad request')
-    } else {
-      logger.error('Search error: ', err)
-    }
-    return undefined
-  }
-  return response
-}
-
-export function formatSearchParams(params: ISearchQuery) {
+export function formatSearchParams(
+  searchPayload: ISearchCriteria,
+  isExternalSearch: boolean
+) {
   const {
-    query = EMPTY_STRING,
-    trackingId = EMPTY_STRING,
-    nationalId = EMPTY_STRING,
-    contactNumber = EMPTY_STRING,
-    registrationNumber = EMPTY_STRING,
-    event = EMPTY_STRING,
-    status,
-    type,
-    declarationLocationId = EMPTY_STRING,
-    declarationLocationHirarchyId = EMPTY_STRING,
-    eventLocationId = EMPTY_STRING,
-    gender = EMPTY_STRING,
-    name = EMPTY_STRING,
-    nameCombinations = [],
-    createdBy = EMPTY_STRING,
+    createdBy = '',
     from = 0,
     size = DEFAULT_SIZE,
     sort = SortOrder.ASC,
-    sortColumn = 'dateOfDeclaration'
-  } = params
-
-  if (nameCombinations.length === 0 && name !== EMPTY_STRING) {
-    nameCombinations.push({
-      name,
-      fields: 'ALL'
-    })
-  }
+    sortColumn = 'dateOfDeclaration',
+    parameters
+  } = searchPayload
 
   return {
     index: OPENCRVS_INDEX_NAME,
@@ -82,35 +38,32 @@ export function formatSearchParams(params: ISearchQuery) {
     from,
     size,
     body: {
-      query: queryBuilder(
-        query,
-        trackingId,
-        nationalId,
-        contactNumber,
-        registrationNumber,
-        eventLocationId,
-        gender,
-        nameCombinations,
-        declarationLocationId,
-        declarationLocationHirarchyId,
-        createdBy,
-        { event, status, type }
-      ),
+      query: advancedQueryBuilder(parameters, createdBy, isExternalSearch),
       sort: [{ [sortColumn]: sort }]
     }
   }
 }
 
-export const advancedSearch = async (params: IAdvancedSearchParam) => {
-  const response = await client.search({
-    index: OPENCRVS_INDEX_NAME,
-    type: 'compositions',
-    body: {
-      query: advancedQueryBuilder(params)
+export const advancedSearch = async (
+  isExternalSearch: boolean,
+  payload: ISearchCriteria
+) => {
+  const formattedParams = formatSearchParams(payload, isExternalSearch)
+  let response: ApiResponse<ISearchResponse<any>>
+  try {
+    response = await client.search(formattedParams, {
+      ignore: !isExternalSearch ? [404] : undefined
+    })
+  } catch (error) {
+    if (error.statusCode === 400) {
+      logger.error('Search: bad request')
+    } else {
+      logger.error('Search error: ', error)
     }
-  })
+    return undefined
+  }
 
-  if (response.body.hits.total.value > 5) {
+  if (isExternalSearch && response.body.hits.total.value > 5) {
     throw new Error('Too many results Please narrow your search')
   }
 
