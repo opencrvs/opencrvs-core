@@ -81,7 +81,9 @@ import {
   LOCATION_SEARCH_INPUT,
   Ii18nTextareaFormField,
   TEXT,
-  ACCORDION_WITH_NESTED_FIELDS
+  ACCORDION_WITH_NESTED_FIELDS,
+  DATE_RANGE_PICKER,
+  IDateRangePickerValue
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -122,6 +124,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
+import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -428,6 +431,21 @@ function GeneratedInputField({
           ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
+        />
+      </InputField>
+    )
+  }
+  if (fieldDefinition.type === DATE_RANGE_PICKER) {
+    return (
+      <InputField {...inputFieldProps}>
+        <DateRangePickerForFormField
+          inputProps={{ ...inputProps }}
+          notice={fieldDefinition.notice}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+          onChange={(val: IDateRangePickerValue) =>
+            onSetFieldValue(fieldDefinition.name, val)
+          }
+          value={value as IDateRangePickerValue}
         />
       </InputField>
     )
