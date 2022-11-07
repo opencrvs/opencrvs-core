@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ISearchLocation } from '@client/../../components/lib'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
@@ -25,6 +26,11 @@ import {
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
+import {
+  QueryGetRegistrationsListByFilterArgs,
+  RegistrationType
+} from '@client/utils/gateway'
+import { generateLocations } from '@client/utils/locationUtils'
 import { getName } from '@client/views/RecordAudit/utils'
 import {
   IPerformanceSelectOption,
@@ -32,6 +38,10 @@ import {
 } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_REGISTRATIONS } from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
+import {
+  getAdditionalLocations,
+  NATIONAL_ADMINISTRATIVE_LEVEL
+} from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { SortArrow } from '@opencrvs/components/lib/icons'
@@ -46,20 +56,6 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import {
-  StatusMapping,
-  getAdditionalLocations,
-  CompletenessRateTime,
-  isCountry,
-  NATIONAL_ADMINISTRATIVE_LEVEL,
-  calculateTotal
-} from '@client/views/SysAdmin/Performance/utils'
-import { generateLocations } from '@client/utils/locationUtils'
-import { ISearchLocation } from '@client/../../components/lib'
-import {
-  QueryGetRegistrationsListByFilterArgs,
-  RegistrationType
-} from '@client/utils/gateway'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -127,12 +123,6 @@ enum RESULT_TYPE {
   by_registrar = 'TotalMetricsByRegistrar',
   by_location = 'TotalMetricsByLocation',
   by_time = 'TotalMetricsByTime'
-}
-
-enum STATUS_OPTIONS {
-  ACTIVE = 'active',
-  DEACTIVE = 'deactivated',
-  PENDING = 'pending'
 }
 
 enum FILTER_BY_OPTIONS {
@@ -470,18 +460,6 @@ function RegistrationListComponent(props: IProps) {
         size={ContentSize.LARGE}
         filterContent={
           <>
-            {/* <LocationPicker
-              selectedLocationId={locationId}
-              onChangeLocation={(newLocationId) => {
-                props.goToRegistrationsList(
-                  timeStart,
-                  timeEnd,
-                  newLocationId,
-                  event,
-                  filterBy
-                )
-              }}
-            /> */}
             <LocationPicker
               additionalLocations={getAdditionalLocations(intl)}
               selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
