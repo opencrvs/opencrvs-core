@@ -429,7 +429,8 @@ export function goToRegistrationsList(
   timeEnd: string,
   locationId?: string,
   event?: string,
-  filterBy?: string
+  filterBy?: string,
+  currentPageNumber?: number
 ) {
   return push({
     pathname: PERFORMANCE_REGISTRATIONS_LIST,
@@ -438,7 +439,8 @@ export function goToRegistrationsList(
       timeStart,
       timeEnd,
       event,
-      filterBy
+      filterBy,
+      currentPageNumber
     })
   })
 }

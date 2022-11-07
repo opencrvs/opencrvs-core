@@ -61,7 +61,7 @@ const ToolTipContainer = styled.span`
   text-align: center;
 `
 const DEFAULT_PAGE_SIZE = 10
-const { useState } = React
+const { useState, useEffect } = React
 interface SortMap {
   month: SORT_ORDER
   location: SORT_ORDER
@@ -97,6 +97,7 @@ interface ISearchParams {
   timeEnd: string
   event: string
   filterBy: string
+  currentPageNumber: string
 }
 
 interface IConnectProps {
@@ -152,14 +153,24 @@ function RegistrationListComponent(props: IProps) {
     timeStart,
     timeEnd,
     event = EVENT_OPTIONS.BIRTH,
-    filterBy = FILTER_BY_OPTIONS.BY_TIME
+    filterBy = FILTER_BY_OPTIONS.BY_TIME,
+    currentPageNumber = '1'
   } = parse(search) as unknown as ISearchParams
+  const locationStatus = isLocationOffice(locationId)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
-  const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('time')
-  const recordCount = DEFAULT_PAGE_SIZE * currentPageNumber
+  const [isOfficeSelected, setIsOfficeSelected] =
+    useState<boolean>(locationStatus)
+  const currentPage = parseInt(currentPageNumber)
+  const recordCount = DEFAULT_PAGE_SIZE * currentPage
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
+
+  useEffect(() => {
+    setIsOfficeSelected(locationStatus)
+  }, [locationStatus])
+
+  console.log(locationStatus, '===============', isOfficeSelected)
 
   const queryVariables: QueryGetRegistrationsListByFilterArgs = {
     timeStart: timeStart,
@@ -431,7 +442,8 @@ function RegistrationListComponent(props: IProps) {
     },
     {
       label: intl.formatMessage(messages.byLocation),
-      value: FILTER_BY_OPTIONS.BY_LOCATION
+      value: FILTER_BY_OPTIONS.BY_LOCATION,
+      disabled: isOfficeSelected
     },
     {
       label: intl.formatMessage(messages.byRegistrar),
@@ -448,11 +460,18 @@ function RegistrationListComponent(props: IProps) {
     ) as ISearchLocation
   }
 
-  const skip = (currentPageNumber - 1) * DEFAULT_PAGE_SIZE
+  function isLocationOffice(locationId: string) {
+    if (locationId) {
+      return Object.keys(props.offlineOffices).some((id) => id === locationId)
+    }
+    return false
+  }
+
+  const skip = (currentPage - 1) * DEFAULT_PAGE_SIZE
   queryVariables.skip = skip
   return (
     <SysAdminContentWrapper
-      id="field-agent-list"
+      id="registrations-list"
       isCertificatesConfigPage={true}
     >
       <Content
@@ -474,12 +493,23 @@ function RegistrationListComponent(props: IProps) {
                     props.intl
                   ).concat(getAdditionalLocations(intl))
                 )
+
+                let filterCriteria = filterBy
+                const isSelectedLocationOffice = isLocationOffice(
+                  newLocation.id
+                )
+                if (isSelectedLocationOffice) {
+                  filterCriteria = FILTER_BY_OPTIONS.BY_TIME
+                  setIsOfficeSelected(isSelectedLocationOffice)
+                }
+
                 props.goToRegistrationsList(
                   timeStart,
                   timeEnd,
                   newLocation.id,
                   event,
-                  filterBy
+                  filterCriteria,
+                  1
                 )
               }}
             />
@@ -494,7 +524,8 @@ function RegistrationListComponent(props: IProps) {
                   timeEnd,
                   locationId,
                   selectedEvent,
-                  filterBy
+                  filterBy,
+                  1
                 )
               }}
               id="event-select"
@@ -516,13 +547,13 @@ function RegistrationListComponent(props: IProps) {
               startDate={dateStart}
               endDate={dateEnd}
               onDatesChange={({ startDate, endDate }) => {
-                debugger
                 props.goToRegistrationsList(
                   startDate.toISOString(),
                   endDate.toISOString(),
                   locationId,
                   event,
-                  filterBy
+                  filterBy,
+                  1
                 )
               }}
             />
@@ -537,7 +568,8 @@ function RegistrationListComponent(props: IProps) {
                   timeEnd,
                   locationId,
                   event,
-                  option?.value
+                  option?.value,
+                  1
                 )
               }
             />
@@ -554,7 +586,7 @@ function RegistrationListComponent(props: IProps) {
               return (
                 <>
                   <Table
-                    id={'field-agent-error-list'}
+                    id={'registrations-error-list'}
                     noResultText={intl.formatMessage(
                       constantsMessages.noResults
                     )}
@@ -572,7 +604,7 @@ function RegistrationListComponent(props: IProps) {
               return (
                 <TableDiv>
                   <Table
-                    id={'field-agent-list'}
+                    id={'registrations-list-result'}
                     noResultText={intl.formatMessage(
                       constantsMessages.noResults
                     )}
@@ -583,21 +615,25 @@ function RegistrationListComponent(props: IProps) {
                       data && data.getRegistrationsListByFilter
                     )}
                     totalItems={totalData}
-                    currentPage={currentPageNumber}
+                    currentPage={currentPage}
                     pageSize={recordCount}
-                    onPageChange={(currentPage: number) => {
-                      setCurrentPageNumber(currentPage)
-                    }}
                     isFullPage={true}
                     highlightRowOnMouseOver
                     noPagination={true}
                   />
                   {totalData > DEFAULT_PAGE_SIZE && (
                     <Pagination
-                      currentPage={currentPageNumber}
+                      currentPage={currentPage}
                       totalPages={Math.ceil(totalData / DEFAULT_PAGE_SIZE)}
-                      onPageChange={(currentPage: number) => {
-                        setCurrentPageNumber(currentPage)
+                      onPageChange={(cp: number) => {
+                        props.goToRegistrationsList(
+                          timeStart,
+                          timeEnd,
+                          locationId,
+                          event,
+                          filterBy,
+                          cp
+                        )
                       }}
                     />
                   )}
