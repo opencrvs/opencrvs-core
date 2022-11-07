@@ -14,7 +14,7 @@ import { gql } from '@apollo/client'
 
 export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
   query fetchViewRecordByComposition($id: ID!) {
-    fetchRegistration(id: $id) {
+    fetchRegistrationForViewing(id: $id) {
       __typename
       id
       registration {
