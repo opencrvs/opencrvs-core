@@ -44,6 +44,7 @@ interface IButtonsMessages
   replace: MessageDescriptor
   retry: MessageDescriptor
   review: MessageDescriptor
+  refresh: MessageDescriptor
   save: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteDeclaration: MessageDescriptor
@@ -100,6 +101,12 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Cancel',
     description: 'Cancel button text in the modal',
     id: 'buttons.cancel'
+  },
+
+  refresh: {
+    defaultMessage: 'Refresh',
+    description: 'Refresh button',
+    id: 'buttons.refresh'
   },
   change: {
     defaultMessage: 'Change',

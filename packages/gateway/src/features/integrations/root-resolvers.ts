@@ -29,9 +29,10 @@ export const resolvers: GQLResolver = {
         payload = { systemId: ids?.systemId }
       }
       const systemRes = await getSystem(payload, authHeader)
+
       return {
         name: systemRes.name,
-        client_id: systemRes.client_id,
+        clientId: systemRes.client_id,
         shaSecret: systemRes.sha_secret
       }
     }

@@ -521,9 +521,9 @@ type FormDraft {
 }
 
 type SystemIntegrationsResponse {
-  client_id: String
-  secretHash: String
-  sha_secret: String
+  name: String
+  clientId: String
+  shaSecret: String
 }
 
 input IdsInput {

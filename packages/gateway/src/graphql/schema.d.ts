@@ -370,9 +370,9 @@ export interface GQLFormDraft {
 }
 
 export interface GQLSystemIntegrationsResponse {
-  client_id?: string
-  secretHash?: string
-  sha_secret?: string
+  name?: string
+  clientId?: string
+  shaSecret?: string
 }
 
 export interface GQLIdsInput {
@@ -3947,26 +3947,26 @@ export interface FormDraftToCreatedAtResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLSystemIntegrationsResponseTypeResolver<TParent = any> {
-  client_id?: SystemIntegrationsResponseToClient_idResolver<TParent>
-  secretHash?: SystemIntegrationsResponseToSecretHashResolver<TParent>
-  sha_secret?: SystemIntegrationsResponseToSha_secretResolver<TParent>
+  name?: SystemIntegrationsResponseToNameResolver<TParent>
+  clientId?: SystemIntegrationsResponseToClientIdResolver<TParent>
+  shaSecret?: SystemIntegrationsResponseToShaSecretResolver<TParent>
 }
 
-export interface SystemIntegrationsResponseToClient_idResolver<
+export interface SystemIntegrationsResponseToNameResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SystemIntegrationsResponseToSecretHashResolver<
+export interface SystemIntegrationsResponseToClientIdResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SystemIntegrationsResponseToSha_secretResolver<
+export interface SystemIntegrationsResponseToShaSecretResolver<
   TParent = any,
   TResult = any
 > {

@@ -80,6 +80,7 @@ export interface IOfflineData {
     logo: string
   }
   integrations: Integration[]
+  integration: Integration
 
   config: IApplicationConfig
   formConfig: IFormConfig

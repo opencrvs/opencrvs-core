@@ -29,6 +29,23 @@ const messagesToDefine = {
     defaultMessage: 'Reveal Keys',
     description: 'Label for reveal keys option'
   },
+
+  clientId: {
+    id: 'integrations.clientId',
+    defaultMessage: 'Client ID',
+    description: 'Label for client Id'
+  },
+
+  clientSecret: {
+    id: 'integrations.clientSecret',
+    defaultMessage: 'Client Secret',
+    description: 'Label for client secret'
+  },
+  shaSecret: {
+    id: 'integrations.shaSecret',
+    defaultMessage: 'SHA Secret',
+    description: 'Label for SHA secret'
+  },
   disable: {
     id: 'integrations.disable',
     defaultMessage: 'Disable',
@@ -39,6 +56,14 @@ const messagesToDefine = {
     defaultMessage: 'Enable',
     description: 'Label for enable option'
   },
+
+  uniqueKeysDescription: {
+    id: 'integrations.uniqueKeyDescription',
+    defaultMessage:
+      'These unique keys will be required by the client integrating...',
+    description: 'Label for the unique key description'
+  },
+
   delete: {
     id: 'integrations.delete',
     defaultMessage: 'Delete',
