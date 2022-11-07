@@ -485,6 +485,7 @@ export interface GQLApplicationConfiguration {
   FIELD_AGENT_AUDIT_LOCATIONS?: string
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
+  TWO_FACTOR_AUTHENTICATION_ENABLED?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
@@ -502,6 +503,7 @@ export interface GQLApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
+  TWO_FACTOR_AUTHENTICATION_ENABLED?: boolean
 }
 
 export interface GQLFormDraftInput {
@@ -3876,6 +3878,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
   HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
+  TWO_FACTOR_AUTHENTICATION_ENABLED?: ApplicationConfigurationToTWO_FACTOR_AUTHENTICATION_ENABLEDResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
@@ -3931,6 +3934,13 @@ export interface ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolv
 }
 
 export interface ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToTWO_FACTOR_AUTHENTICATION_ENABLEDResolver<
   TParent = any,
   TResult = any
 > {

@@ -48,6 +48,7 @@ export interface ICurrency {
 }
 export interface IApplicationConfig {
   APPLICATION_NAME: string
+  TWO_FACTOR_AUTHENTICATION_ENABLED: boolean
   BIRTH: {
     REGISTRATION_TARGET: number
     LATE_REGISTRATION_TARGET: number

@@ -99,6 +99,11 @@ const systemSchema = new Schema({
     required: false,
     default: false
   },
+  TWO_FACTOR_AUTHENTICATION_ENABLED: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
   EXTERNAL_VALIDATION_WORKQUEUE: {
     type: Boolean,
     required: false,

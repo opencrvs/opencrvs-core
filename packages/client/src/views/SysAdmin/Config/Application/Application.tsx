@@ -22,7 +22,8 @@ import {
   Currency,
   GovtLogo,
   NIDNumPattern,
-  PhoneNumPattern
+  PhoneNumPattern,
+  TwoFactorAuth
 } from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties'
 import {
   BirthDelayedFee,
@@ -61,6 +62,7 @@ export enum GeneralActionId {
   COUNTRY_LOGO = 'COUNTRY_LOGO',
   NID_NUMBER_PATTERN = 'NID_NUMBER_PATTERN',
   CURRENCY = 'CURRENCY',
+  TWO_FACTOR_AUTHENTICATION_ENABLED = 'TWO_FACTOR_AUTHENTICATION_ENABLED',
   PHONE_NUMBER_PATTERN = 'PHONE_NUMBER_PATTERN'
 }
 
@@ -92,6 +94,7 @@ function GeneralTabContent() {
       <Currency />
       <PhoneNumPattern />
       <NIDNumPattern />
+      <TwoFactorAuth />
     </ListViewSimplified>
   )
 }
