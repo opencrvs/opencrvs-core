@@ -69,8 +69,11 @@ describe('Integrations root resolvers', () => {
         authHeaderSysAdmin
       )
 
-      expect(response).toEqual({ message: 'User status activated' })
+      expect(response).toEqual({
+        client_id: 'faf79994-2197-4007-af17-883bd1c3375b'
+      })
     })
+
     it('deactivate user', async () => {
       fetch.mockResponses(
         [
@@ -90,7 +93,9 @@ describe('Integrations root resolvers', () => {
         authHeaderSysAdmin
       )
 
-      expect(response).toEqual({ message: 'User status deactivated' })
+      expect(response).toEqual({
+        client_id: 'faf79994-2197-4007-af17-883bd1c3375b'
+      })
     })
     it('should throw error for users other than the system admin who try to deactivate integration client', async () => {
       fetch.mockResponseOnce(
