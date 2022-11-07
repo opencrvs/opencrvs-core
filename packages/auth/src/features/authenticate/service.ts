@@ -17,6 +17,7 @@ import {
   CONFIG_TOKEN_EXPIRY_SECONDS,
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   PRODUCTION,
+  CONFIG_API_URL,
   QA_ENV
 } from '@auth/constants'
 import { resolve } from 'url'
@@ -206,4 +207,26 @@ export function verifyToken(token: string): ITokenPayload {
 
 export function getPublicKey() {
   return publicCert
+}
+
+export async function getLoginConfig(): Promise<{
+  TWO_FACTOR_AUTHENTICATION_ENABLED: boolean
+}> {
+  return fetch(`${CONFIG_API_URL}/loginConfig`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .then((response) => {
+      return response.config
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Application config request failed: ${error.message}`)
+      )
+    })
 }

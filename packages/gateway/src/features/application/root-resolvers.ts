@@ -46,6 +46,8 @@ export const resolvers: GQLResolver = {
           applicationConfig.EXTERNAL_VALIDATION_WORKQUEUE as boolean,
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
+        TWO_FACTOR_AUTHENTICATION_ENABLED:
+          applicationConfig.TWO_FACTOR_AUTHENTICATION_ENABLED as boolean,
         ADDRESSES: applicationConfig.ADDRESSES as number
       }
 

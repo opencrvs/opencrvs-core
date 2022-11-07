@@ -72,7 +72,8 @@ export async function getLoginConfigHandler(
   }
   const refineConfigResponse = pick(loginConfig, [
     'APPLICATION_NAME',
-    'COUNTRY_LOGO'
+    'COUNTRY_LOGO',
+    'TWO_FACTOR_AUTHENTICATION_ENABLED'
   ])
   return { config: refineConfigResponse }
 }
@@ -135,6 +136,7 @@ export const updateApplicationConfig = Joi.object({
   PHONE_NUMBER_PATTERN: Joi.string(),
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),
+  TWO_FACTOR_AUTHENTICATION_ENABLED: Joi.boolean(),
   NID_NUMBER_PATTERN: Joi.string(),
   ADDRESSES: Joi.number().valid(...[1, 2])
 })

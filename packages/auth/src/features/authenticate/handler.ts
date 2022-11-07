@@ -15,7 +15,8 @@ import {
   authenticate,
   storeUserInformation,
   createToken,
-  generateAndSendVerificationCode
+  generateAndSendVerificationCode,
+  getLoginConfig
 } from '@auth/features/authenticate/service'
 import { generateNonce } from '@auth/features/verifyCode/service'
 import { unauthorized, forbidden } from '@hapi/boom'
@@ -66,14 +67,25 @@ export default async function authenticateHandler(
       JWT_ISSUER
     )
   } else {
-    await storeUserInformation(
-      nonce,
-      result.userId,
-      result.scope,
-      result.mobile
-    )
+    const config = await getLoginConfig()
 
-    await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
+    if (!config.TWO_FACTOR_AUTHENTICATION_ENABLED) {
+      response.token = await createToken(
+        result.userId,
+        result.scope,
+        WEB_USER_JWT_AUDIENCES,
+        JWT_ISSUER
+      )
+    } else {
+      await storeUserInformation(
+        nonce,
+        result.userId,
+        result.scope,
+        result.mobile
+      )
+
+      await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
+    }
   }
   return response
 }

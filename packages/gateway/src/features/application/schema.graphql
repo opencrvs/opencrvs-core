@@ -99,6 +99,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  TWO_FACTOR_AUTHENTICATION_ENABLED: Boolean
 }
 
 type ApplicationConfiguration {
@@ -110,6 +111,7 @@ type ApplicationConfiguration {
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
+  TWO_FACTOR_AUTHENTICATION_ENABLED: Boolean
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int

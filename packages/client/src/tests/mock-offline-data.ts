@@ -639,6 +639,7 @@ export const mockOfflineData = {
   },
   config: {
     APPLICATION_NAME: 'Farajaland CRVS',
+    TWO_FACTOR_AUTHENTICATION_ENABLED: true,
     BIRTH: {
       REGISTRATION_TARGET: 45,
       LATE_REGISTRATION_TARGET: 365,

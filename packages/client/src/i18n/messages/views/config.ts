@@ -35,7 +35,9 @@ interface IConfigMessages
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
   currencyLabel: MessageDescriptor
+  twoFactorLabel: MessageDescriptor
   applicationCurrencyChangeNotification: MessageDescriptor
+  application2FAChangeNotification: MessageDescriptor
   applicationBirthRegTargetChangeNotification: MessageDescriptor
   applicationBirthLateRegTargetChangeNotification: MessageDescriptor
   applicationDeathRegTargetChangeNotification: MessageDescriptor
@@ -45,6 +47,9 @@ interface IConfigMessages
   applicationDeathOnTimeFeeChangeNotification: MessageDescriptor
   applicationDeathDelayedFeeChangeNotification: MessageDescriptor
   applicationCurrencyChangeMessage: MessageDescriptor
+  application2FAChangeMessage: MessageDescriptor
+  enabledMessage: MessageDescriptor
+  disabledMessage: MessageDescriptor
   applicationConfigUpdatingMessage: MessageDescriptor
   phoneNumberLabel: MessageDescriptor
   birthLegallySpecifiedDialogTitle: MessageDescriptor
@@ -236,10 +241,20 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Currency',
     description: 'Currency config label'
   },
+  twoFactorLabel: {
+    id: 'config.application.twoFactorLabel',
+    defaultMessage: 'Two-Factor Authentication',
+    description: 'Two-Factor authentication label'
+  },
   applicationCurrencyChangeNotification: {
     id: 'config.application.currencyChangeNotification',
     defaultMessage: 'Currency updated',
     description: 'Message for application currency change notification'
+  },
+  application2FAChangeNotification: {
+    id: 'config.application.twoFactorChangeNotification',
+    defaultMessage: 'Two-Factor authentication updated',
+    description: 'Message for application 2FA change notification'
   },
   applicationBirthRegTargetChangeNotification: {
     id: 'config.application.birthRegTargetChangeNotification',
@@ -288,6 +303,22 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.currencyChangeMessage',
     defaultMessage: 'Select your currency for your CRVS system',
     description: 'Message for application currency change modal'
+  },
+  application2FAChangeMessage: {
+    id: 'config.application.2faChangeMessage',
+    defaultMessage:
+      'Enable or disable Two-Factor authentication for your CRVS system',
+    description: 'Message for 2FA change modal'
+  },
+  enabledMessage: {
+    id: 'config.application.enabledMessage',
+    defaultMessage: 'Enabled',
+    description: 'Message for enabled option'
+  },
+  disabledMessage: {
+    id: 'config.application.disabledMessage',
+    defaultMessage: 'Disabled',
+    description: 'Message for disabled option'
   },
   applicationConfigUpdatingMessage: {
     id: 'config.application.updatingeMessage',
