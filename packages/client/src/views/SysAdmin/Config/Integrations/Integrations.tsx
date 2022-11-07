@@ -53,16 +53,22 @@ export interface IntegrationType {
   status: string
 }
 export const deactivateClient = gql`
-  mutation toggleSystemClient($clientDetails: ClientPayload) {
+  mutation deactivateSystemClient($clientDetails: ClientPayload) {
     deactivateSystemClient(clientDetails: $clientDetails) {
-      message
+      status
+      _id
+      username
+      client_id
     }
   }
 `
 export const activateClient = gql`
-  mutation toggleSystemClient($clientDetails: ClientPayload) {
+  mutation reactivateSystemClient($clientDetails: ClientPayload) {
     reactivateSystemClient(clientDetails: $clientDetails) {
-      message
+      status
+      _id
+      username
+      client_id
     }
   }
 `

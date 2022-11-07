@@ -92,10 +92,10 @@ export type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
   payload: { config: IApplicationConfig }
 }
-export const UpdateOfflineIntegrationsAction =
+export const UPDATE_OFFLINE_INTEGRATIONS =
   'OFFLINE/UPDATE_OFFLINE_INTEGRATIONS' as const
-export type ApplicationConfigUpdatedIntegrations = {
-  type: typeof UpdateOfflineIntegrationsAction
+export type UpdateOfflineIntegrationsAction = {
+  type: typeof UPDATE_OFFLINE_INTEGRATIONS
   payload: { integrations: Integration[] }
 }
 
@@ -226,8 +226,8 @@ export const updateOfflineConfigData = (payload: {
 })
 export const updateOfflineIntegrations = (payload: {
   integrations: Integration[]
-}): ApplicationConfigUpdatedIntegrations => ({
-  type: UpdateOfflineIntegrationsAction,
+}): UpdateOfflineIntegrationsAction => ({
+  type: UPDATE_OFFLINE_INTEGRATIONS,
   payload: payload
 })
 
@@ -306,7 +306,7 @@ export type Action =
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | ApplicationConfigUpdatedIntegrations
+  | UpdateOfflineIntegrationsAction
   | UpdateOfflineFormConfigAction
   | UpdateOfflineCertificateAction
   | OfflineFormConfigUpdatedAction

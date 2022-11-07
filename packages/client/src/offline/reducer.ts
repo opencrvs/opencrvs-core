@@ -358,7 +358,7 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
-    case actions.UpdateOfflineIntegrationsAction: {
+    case actions.UPDATE_OFFLINE_INTEGRATIONS: {
       const newOfflineData = {
         ...state.offlineData,
         integrations: action.payload.integrations
