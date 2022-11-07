@@ -142,6 +142,12 @@ export function setInformantRegistrationComposedTransformer(
   draftData: IFormData,
   sectionId: string
 ) {
+  if (!transformedData.registration) {
+    transformedData.registration = {}
+  }
+  if (draftData.registration?._fhirID) {
+    transformedData.registration._fhirID = draftData.registration._fhirID
+  }
   setInformantSectionTransformer(transformedData, draftData, sectionId)
   setBirthRegistrationSectionTransformer(
     transformedData,
