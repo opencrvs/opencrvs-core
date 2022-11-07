@@ -102,7 +102,6 @@ const BirthSection = () => {
 
   const validateForm = (advancedSearch: IAdvancedSearch) => {
     let count = 0
-
     for (const field of Object.values(advancedSearch)) {
       const result = field.nestedFields
       for (const value of Object.values(result)) {
