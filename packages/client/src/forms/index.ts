@@ -443,7 +443,7 @@ export interface IFormFieldBase {
   extraValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: MessageDescriptor
-  placeholder?: MessageDescriptor | string
+  placeholder?: MessageDescriptor
   mapping?: IFormFieldMapping
   hideAsterisk?: boolean
   hideHeader?: boolean

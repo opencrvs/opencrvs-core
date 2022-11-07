@@ -60,7 +60,7 @@ export const advancedSearchDeathSectionFormType: IFormSectionGroup = {
           {
             name: 'dateOfRegistration',
             customisable: false,
-            type: 'DATE',
+            type: 'DATE_RANGE_PICKER',
             label: advancedSearchForm.dateOfRegistration,
             required: false,
             initialValue: '',
