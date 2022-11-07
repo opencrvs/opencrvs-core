@@ -346,6 +346,7 @@ interface IFormMessages
   reasonMNAPreview: MessageDescriptor
   reasonFNAPreview: MessageDescriptor
   tooltipNationalID: MessageDescriptor
+  dateRangePickerCheckboxLabel: MessageDescriptor
   deceasedFatherSectionName: MessageDescriptor
   deceasedFatherSectionTitle: MessageDescriptor
   deceasedFathersFamilyName: MessageDescriptor
@@ -2159,6 +2160,11 @@ export const formMessageDescriptors: IFormMessages = {
       'The National ID can only be numeric and must be 9 digits long',
     description: 'Tooltip for form field: iD number',
     id: 'form.field.tooltip.tooltipNationalID'
+  },
+  dateRangePickerCheckboxLabel: {
+    defaultMessage: '{rangeStart} to {rangeEnd}',
+    description: 'Label for daterange picker checkbox',
+    id: 'form.field.dateRangepicker.checkbox.dateLabel'
   },
   deceasedFatherSectionName: {
     defaultMessage: "What is the deceased's father name?",
