@@ -263,5 +263,5 @@ export function getRegistrarSignatureHandlebarName(
     signatureImage?.getAttribute('href') ||
     signatureImage?.getAttribute('xlink:href') ||
     ''
-  return handlebarText?.match(/^{{(\w+)}}$/)?.[1] || ''
+  return handlebarText?.match(/^{{\s*(\w+)\s*}}$/)?.[1] || 'registrarSignature'
 }
