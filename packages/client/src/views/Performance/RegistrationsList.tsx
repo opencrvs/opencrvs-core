@@ -156,7 +156,7 @@ function RegistrationListComponent(props: IProps) {
   } = parse(search) as unknown as ISearchParams
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
-  const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('total')
+  const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('time')
   const recordCount = DEFAULT_PAGE_SIZE * currentPageNumber
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
