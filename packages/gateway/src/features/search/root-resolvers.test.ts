@@ -54,7 +54,7 @@ describe('Search root resolvers', () => {
         Authorization: `Bearer ${validUserTokenDeclare}`
       }
     })
-    it('returns an array of composition results for eventType', async () => {
+    it('returns an array of composition results for event', async () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
@@ -68,8 +68,11 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          eventType: 'Birth'
-        }
+          advanceSearchParameters: {
+            event: 'Birth'
+          }
+        },
+        authHeaderValidUserDeclare
       )
 
       expect(result).toBeDefined()
@@ -90,15 +93,18 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          status: 'DECLARED'
-        }
+          advanceSearchParameters: {
+            registrationStatuses: ['DECLARED']
+          }
+        },
+        authHeaderValidUserDeclare
       )
 
       expect(result).toBeDefined()
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(1)
     })
-    it('returns an array of composition results for type', async () => {
+    it('returns an array of composition results for compositionType', async () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
@@ -112,8 +118,11 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          type: ['birth-declaration', 'death-declaration']
-        }
+          advanceSearchParameters: {
+            compositionType: ['birth-declaration', 'death-declaration']
+          }
+        },
+        authHeaderValidUserDeclare
       )
 
       expect(result).toBeDefined()
@@ -134,15 +143,18 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce']
-        }
+          advanceSearchParameters: {
+            locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce']
+          }
+        },
+        authHeaderValidUserDeclare
       )
 
       expect(result).toBeDefined()
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(1)
     })
-    it('should returns error for not register scope user without location IDs', async () => {
+    it('should returns error if no has param', async () => {
       fetch.mockResponse(
         JSON.stringify({
           body: {
@@ -158,55 +170,11 @@ describe('Search root resolvers', () => {
         resolvers.Query.searchEvents(
           {},
           {
-            type: ['birth-declaration', 'death-declaration']
-          },
-          authHeaderValidUserDeclare
-        )
-      ).rejects.toThrowError('User does not have permission')
-    })
-    it('should returns error for invalid locationIds', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          body: {
-            hits: {
-              total: { value: 1 },
-              hits: [{ _type: 'composition', _source: {} }]
-            }
-          }
-        })
-      )
-
-      await expect(
-        resolvers.Query.searchEvents(
-          {},
-          {
-            locationIds: ['']
+            advanceSearchParameters: {}
           },
           authHeaderValidUserRegister
         )
-      ).rejects.toThrowError('Invalid location id')
-    })
-    it('returns an array of composition results for searchContent', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          body: {
-            hits: {
-              total: { value: 1 },
-              hits: [{ _type: 'composition', _source: {} }]
-            }
-          }
-        })
-      )
-      const result = await resolvers.Query.searchEvents(
-        {},
-        {
-          searchContent: '01622688231'
-        }
-      )
-
-      expect(result).toBeDefined()
-      expect(result.results).toBeInstanceOf(Array)
-      expect(result.totalItems).toBe(1)
+      ).rejects.toThrowError('There is no param to search')
     })
     it('returns an array of composition results for trackingId', async () => {
       fetch.mockResponse(
@@ -222,74 +190,11 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          trackingId: 'B123456'
-        }
-      )
-
-      expect(result).toBeDefined()
-      expect(result.results).toBeInstanceOf(Array)
-      expect(result.totalItems).toBe(1)
-    })
-    it('returns an array of composition results for registrationNumber', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          body: {
-            hits: {
-              total: { value: 1 },
-              hits: [{ _type: 'composition', _source: {} }]
-            }
+          advanceSearchParameters: {
+            trackingId: 'B123456'
           }
-        })
-      )
-      const result = await resolvers.Query.searchEvents(
-        {},
-        {
-          registrationNumber: 'D2019123258D1234562'
-        }
-      )
-
-      expect(result).toBeDefined()
-      expect(result.results).toBeInstanceOf(Array)
-      expect(result.totalItems).toBe(1)
-    })
-    it('returns an array of composition results for contactNumber', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          body: {
-            hits: {
-              total: { value: 1 },
-              hits: [{ _type: 'composition', _source: {} }]
-            }
-          }
-        })
-      )
-      const result = await resolvers.Query.searchEvents(
-        {},
-        {
-          contactNumber: '01622688231'
-        }
-      )
-
-      expect(result).toBeDefined()
-      expect(result.results).toBeInstanceOf(Array)
-      expect(result.totalItems).toBe(1)
-    })
-    it('returns an array of composition results for userId', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          body: {
-            hits: {
-              total: { value: 1 },
-              hits: [{ _type: 'composition', _source: {} }]
-            }
-          }
-        })
-      )
-      const result = await resolvers.Query.searchEvents(
-        {},
-        {
-          userId: '1'
-        }
+        },
+        authHeaderValidUserRegister
       )
 
       expect(result).toBeDefined()
@@ -310,8 +215,12 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
+          advanceSearchParameters: {
+            trackingId: 'B123456'
+          },
           sortColumn: 'modifiedAt.keyword'
-        }
+        },
+        authHeaderValidUserRegister
       )
 
       expect(result).toBeDefined()
@@ -332,9 +241,13 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
+          advanceSearchParameters: {
+            trackingId: 'B123456'
+          },
           count: 10,
           skip: 2
-        }
+        },
+        authHeaderValidUserRegister
       )
 
       expect(result).toBeDefined()
@@ -350,11 +263,12 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          eventType: 'Birth',
-          status: 'DECLARED',
-          locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce'],
-          searchContent: '01622688231'
-        }
+          advanceSearchParameters: {
+            event: 'Birth',
+            locationIds: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+          }
+        },
+        authHeaderValidUserRegister
       )
 
       expect(result).toBeDefined()
@@ -375,8 +289,11 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          name: 'Hasib'
-        }
+          advanceSearchParameters: {
+            name: 'Hasib'
+          }
+        },
+        authHeaderValidUserRegister
       )
 
       expect(result).toBeDefined()

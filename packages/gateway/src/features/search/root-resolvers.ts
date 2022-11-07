@@ -85,17 +85,25 @@ export const resolvers: GQLResolver = {
         sort,
         parameters: advanceSearchParameters
       }
-      if (authHeader && !hasScope(authHeader, 'register')) {
-        return await Promise.reject(new Error('User does not have permission'))
-      }
       // Only registrar or registration agent should be able to search user
-      if (!inScope(authHeader, ['register', 'validate', 'certify'])) {
+      if (
+        !inScope(authHeader, ['register', 'validate', 'certify', 'declare'])
+      ) {
         return await Promise.reject(
           new Error(
             'Advanced search is only allowed for registrar or registration agent'
           )
         )
       }
+
+      const hasAtLeastOneParam = Object.values(advanceSearchParameters).some(
+        (param) => Boolean(param)
+      )
+
+      if (!hasAtLeastOneParam) {
+        return await Promise.reject(new Error('There is no param to search '))
+      }
+
       if (count) {
         searchCriteria.size = count
       }
