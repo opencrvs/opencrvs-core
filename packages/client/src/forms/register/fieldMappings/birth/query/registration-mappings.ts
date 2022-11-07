@@ -110,6 +110,11 @@ export function getBirthRegistrationSectionTransformer(
     transformedData[sectionId].type = Event.Birth
   }
 
+  if (queryData[sectionId].informantsSignature) {
+    transformedData[sectionId].informantsSignature =
+      queryData[sectionId].informantsSignature
+  }
+
   if (queryData[sectionId].status) {
     transformStatusData(
       transformedData,
