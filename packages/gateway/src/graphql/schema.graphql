@@ -170,6 +170,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
+  fetchIntegration(ids: IdsInput): SystemIntegrationsResponse
 }
 
 type Mutation {
@@ -519,6 +520,17 @@ type FormDraft {
   history: [DraftHistory!]!
   updatedAt: Date!
   createdAt: Date!
+}
+
+type SystemIntegrationsResponse {
+  name: String
+  clientId: String
+  shaSecret: String
+}
+
+input IdsInput {
+  systemId: String
+  clientId: String
 }
 
 input NotificationInput {

@@ -12,7 +12,7 @@
 import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import { hasScope } from '@gateway/features/user/utils'
+import { getSystem, hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -63,6 +63,31 @@ export const resolvers: GQLResolver = {
         )
       }
       return await res.json()
+    }
+  },
+
+  Query: {
+    async fetchIntegration(_, { ids }, authHeader) {
+      if (authHeader && !hasScope(authHeader, 'sysadmin')) {
+        return await Promise.reject(
+          new Error('Fetch integration is only allowed for sysadmin')
+        )
+      }
+
+      let payload = {}
+      if (ids?.clientId) {
+        payload = { clientId: ids?.clientId }
+      }
+      if (ids?.systemId) {
+        payload = { systemId: ids?.systemId }
+      }
+      const systemRes = await getSystem(payload, authHeader)
+
+      return {
+        name: systemRes.name,
+        clientId: systemRes.client_id,
+        shaSecret: systemRes.sha_secret
+      }
     }
   }
 }

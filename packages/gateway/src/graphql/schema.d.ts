@@ -48,6 +48,7 @@ export interface GQLQuery {
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getFormDraft?: Array<GQLFormDraft>
+  fetchIntegration?: GQLSystemIntegrationsResponse
 }
 
 export interface GQLMutation {
@@ -368,6 +369,17 @@ export interface GQLFormDraft {
   history: Array<GQLDraftHistory>
   updatedAt: GQLDate
   createdAt: GQLDate
+}
+
+export interface GQLSystemIntegrationsResponse {
+  name?: string
+  clientId?: string
+  shaSecret?: string
+}
+
+export interface GQLIdsInput {
+  systemId?: string
+  clientId?: string
 }
 
 export interface GQLNotificationInput {
@@ -1457,6 +1469,7 @@ export interface GQLResolver {
   Role?: GQLRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   FormDraft?: GQLFormDraftTypeResolver
+  SystemIntegrationsResponse?: GQLSystemIntegrationsResponseTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -1554,6 +1567,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   getFormDraft?: QueryToGetFormDraftResolver<TParent>
+  fetchIntegration?: QueryToFetchIntegrationResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2148,6 +2162,18 @@ export interface QueryToGetActiveCertificatesSVGResolver<
 
 export interface QueryToGetFormDraftResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QueryToFetchIntegrationArgs {
+  ids?: GQLIdsInput
+}
+export interface QueryToFetchIntegrationResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToFetchIntegrationArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
 }
 
 export interface GQLMutationTypeResolver<TParent = any> {
@@ -3963,6 +3989,33 @@ export interface FormDraftToUpdatedAtResolver<TParent = any, TResult = any> {
 }
 
 export interface FormDraftToCreatedAtResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSystemIntegrationsResponseTypeResolver<TParent = any> {
+  name?: SystemIntegrationsResponseToNameResolver<TParent>
+  clientId?: SystemIntegrationsResponseToClientIdResolver<TParent>
+  shaSecret?: SystemIntegrationsResponseToShaSecretResolver<TParent>
+}
+
+export interface SystemIntegrationsResponseToNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemIntegrationsResponseToClientIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemIntegrationsResponseToShaSecretResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
