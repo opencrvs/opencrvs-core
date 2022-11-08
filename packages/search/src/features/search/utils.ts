@@ -539,8 +539,8 @@ export function advancedQueryBuilder(
 
   if (params.compositionType) {
     must.push({
-      match: {
-        compositionType: params.compositionType
+      terms: {
+        'compositionType.keyword': params.compositionType
       }
     })
   }
