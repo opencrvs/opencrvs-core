@@ -43,7 +43,6 @@ export interface GQLQuery {
   getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
-  searchRecord?: GQLEventProgressResultSet
   getRoles?: Array<GQLRole | null>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
@@ -384,11 +383,6 @@ export interface GQLAdvancedSearchParametersInput {
 export interface GQLEventProgressResultSet {
   results?: Array<GQLEventProgressSet | null>
   totalItems?: number
-}
-
-export const enum GQLEvent {
-  birth = 'birth',
-  death = 'death'
 }
 
 export interface GQLRole {
@@ -885,6 +879,11 @@ export interface GQLEventSearchSetNameMap {
   EventSearchSet: GQLEventSearchSet
   BirthEventSearchSet: GQLBirthEventSearchSet
   DeathEventSearchSet: GQLDeathEventSearchSet
+}
+
+export const enum GQLEvent {
+  birth = 'birth',
+  death = 'death'
 }
 
 export interface GQLEventProgressSet {
@@ -1687,7 +1686,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
-  searchRecord?: QueryToSearchRecordResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
@@ -2196,68 +2194,6 @@ export interface QueryToGetEventsWithProgressResolver<
   (
     parent: TParent,
     args: QueryToGetEventsWithProgressArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface QueryToSearchRecordArgs {
-  event?: GQLEvent
-  registrationStatuses?: Array<string | null>
-  dateOfEvent?: string
-  dateOfEventStart?: string
-  dateOfEventEnd?: string
-  contactNumber?: string
-  nationalId?: string
-  registrationNumber?: string
-  trackingId?: string
-  dateOfRegistration?: string
-  dateOfRegistrationStart?: string
-  dateOfRegistrationEnd?: string
-  declarationLocationId?: string
-  declarationJurisdictionId?: string
-  eventLocationId?: string
-  eventLocationLevel1?: string
-  eventLocationLevel2?: string
-  eventLocationLevel3?: string
-  eventLocationLevel4?: string
-  eventLocationLevel5?: string
-  childFirstNames?: string
-  childLastName?: string
-  childDoB?: string
-  childDoBStart?: string
-  childDoBEnd?: string
-  childGender?: string
-  deceasedFirstNames?: string
-  deceasedFamilyName?: string
-  deceasedGender?: string
-  deceasedDoB?: string
-  deceasedDoBStart?: string
-  deceasedDoBEnd?: string
-  deceasedIdentifier?: string
-  motherFirstNames?: string
-  motherFamilyName?: string
-  motherDoB?: string
-  motherDoBStart?: string
-  motherDoBEnd?: string
-  motherIdentifier?: string
-  fatherFirstNames?: string
-  fatherFamilyName?: string
-  fatherDoB?: string
-  fatherDoBStart?: string
-  fatherDoBEnd?: string
-  fatherIdentifier?: string
-  informantFirstNames?: string
-  informantFamilyName?: string
-  informantDoB?: string
-  informantDoBStart?: string
-  informantDoBEnd?: string
-  informantIdentifier?: string
-}
-export interface QueryToSearchRecordResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: QueryToSearchRecordArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

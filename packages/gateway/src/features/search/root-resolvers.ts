@@ -13,8 +13,7 @@ import { ApiResponse } from '@elastic/elasticsearch'
 import {
   getMetrics,
   postAdvancedSearch,
-  postMetrics,
-  postSearch
+  postMetrics
 } from '@gateway/features/fhir/utils'
 import { markRecordAsDownloadedOrAssigned } from '@gateway/features/registration/root-resolvers'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
@@ -87,7 +86,13 @@ export const resolvers: GQLResolver = {
       }
       // Only registrar or registration agent should be able to search user
       if (
-        !inScope(authHeader, ['register', 'validate', 'certify', 'declare'])
+        !inScope(authHeader, [
+          'register',
+          'validate',
+          'certify',
+          'declare',
+          'recordsearch'
+        ])
       ) {
         return await Promise.reject(
           new Error(
@@ -96,44 +101,91 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      const hasAtLeastOneParam = Object.values(advanceSearchParameters).some(
-        (param) => Boolean(param)
-      )
+      const isExternalAPI = hasScope(authHeader, 'recordsearch')
+      if (isExternalAPI) {
+        const payload = getTokenPayload(authHeader.Authorization)
+        const system = await getSystem({ systemId: payload.sub }, authHeader)
 
-      if (!hasAtLeastOneParam) {
-        return await Promise.reject(new Error('There is no param to search '))
-      }
+        const getTotalRequest = await getMetrics(
+          '/advancedSearch',
+          {},
+          authHeader
+        )
 
-      if (count) {
-        searchCriteria.size = count
-      }
-      if (skip) {
-        searchCriteria.from = skip
-      }
-      if (userId) {
-        searchCriteria.createdBy = userId
-      }
-      if (sortColumn) {
-        searchCriteria.sortColumn = sortColumn
-      }
+        if (getTotalRequest.total >= system.settings.dailyQuota) {
+          return await Promise.reject(new Error('Daily search quota exceeded'))
+        }
 
-      searchCriteria.parameters = { ...advanceSearchParameters }
+        const searchResult: ApiResponse<ISearchResponse<any>> =
+          await postAdvancedSearch(authHeader, searchCriteria)
 
-      const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(
-        authHeader,
-        searchCriteria
-      )
-      return {
-        totalItems:
-          (searchResult &&
-            searchResult.body.hits &&
-            searchResult.body.hits.total.value) ||
-          0,
-        results:
-          (searchResult &&
-            searchResult.body.hits &&
-            searchResult.body.hits.hits) ||
-          []
+        if (
+          searchResult &&
+          searchResult.statusCode &&
+          searchResult.statusCode >= 400
+        ) {
+          const errMsg = searchResult as Options<string>
+          return await Promise.reject(new Error(errMsg.message))
+        }
+
+        ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
+          await markRecordAsDownloadedOrAssigned(hit._id, authHeader)
+        })
+
+        if (searchResult.body.hits.total.value) {
+          await postMetrics('/advancedSearch', {}, authHeader)
+        }
+
+        return {
+          totalItems:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.total.value) ||
+            0,
+          results:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.hits) ||
+            []
+        }
+      } else {
+        const hasAtLeastOneParam = Object.values(advanceSearchParameters).some(
+          (param) => Boolean(param)
+        )
+
+        if (!hasAtLeastOneParam) {
+          return await Promise.reject(new Error('There is no param to search '))
+        }
+
+        if (count) {
+          searchCriteria.size = count
+        }
+        if (skip) {
+          searchCriteria.from = skip
+        }
+        if (userId) {
+          searchCriteria.createdBy = userId
+        }
+        if (sortColumn) {
+          searchCriteria.sortColumn = sortColumn
+        }
+
+        searchCriteria.parameters = { ...advanceSearchParameters }
+
+        const searchResult: ApiResponse<ISearchResponse<any>> =
+          await postAdvancedSearch(authHeader, searchCriteria)
+        return {
+          totalItems:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.total.value) ||
+            0,
+          results:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.hits) ||
+            []
+        }
       }
     },
     async getEventsWithProgress(
@@ -172,71 +224,18 @@ export const resolvers: GQLResolver = {
         searchCriteria.from = skip
       }
 
-      const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(
-        authHeader,
-        searchCriteria
-      )
-      return {
-        totalItems:
-          (searchResult &&
-            searchResult.body &&
-            searchResult.body.hits &&
-            searchResult.body.hits.total.value) ||
-          0,
-        results:
-          (searchResult &&
-            searchResult.body &&
-            searchResult.body.hits &&
-            searchResult.body.hits.hits) ||
-          []
-      }
-    },
-    async searchRecord(_, searchCriteria, authHeader) {
-      if (authHeader && !hasScope(authHeader, 'recordsearch')) {
-        return await Promise.reject(new Error('User does not have permission'))
-      }
-
-      const payload = getTokenPayload(authHeader.Authorization)
-      const system = await getSystem({ systemId: payload.sub }, authHeader)
-
-      const getTotalRequest = await getMetrics(
-        '/advancedSearch',
-        {},
-        authHeader
-      )
-
-      if (getTotalRequest.total >= system.settings.dailyQuota) {
-        return await Promise.reject(new Error('Daily search quota exceeded'))
-      }
-
       const searchResult: ApiResponse<ISearchResponse<any>> =
         await postAdvancedSearch(authHeader, searchCriteria)
-
-      if (
-        searchResult &&
-        searchResult.statusCode &&
-        searchResult.statusCode >= 400
-      ) {
-        const errMsg = searchResult as Options<string>
-        return await Promise.reject(new Error(errMsg.message))
-      }
-
-      ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-        await markRecordAsDownloadedOrAssigned(hit._id, authHeader)
-      })
-
-      if (searchResult.body.hits.total.value) {
-        await postMetrics('/advancedSearch', {}, authHeader)
-      }
-
       return {
         totalItems:
           (searchResult &&
+            searchResult.body &&
             searchResult.body.hits &&
             searchResult.body.hits.total.value) ||
           0,
         results:
           (searchResult &&
+            searchResult.body &&
             searchResult.body.hits &&
             searchResult.body.hits.hits) ||
           []

@@ -125,59 +125,6 @@ type Query {
     skip: Int
     sort: String
   ): EventProgressResultSet
-  searchRecord(
-    event: Event
-    registrationStatuses: [String]
-    dateOfEvent: String
-    dateOfEventStart: String
-    dateOfEventEnd: String
-    contactNumber: String
-    nationalId: String
-    registrationNumber: String
-    trackingId: String
-    dateOfRegistration: String
-    dateOfRegistrationStart: String
-    dateOfRegistrationEnd: String
-    declarationLocationId: String
-    declarationJurisdictionId: String
-    eventLocationId: String
-    eventLocationLevel1: String
-    eventLocationLevel2: String
-    eventLocationLevel3: String
-    eventLocationLevel4: String
-    eventLocationLevel5: String
-    childFirstNames: String
-    childLastName: String
-    childDoB: String
-    childDoBStart: String
-    childDoBEnd: String
-    childGender: String
-    deceasedFirstNames: String
-    deceasedFamilyName: String
-    deceasedGender: String
-    deceasedDoB: String
-    deceasedDoBStart: String
-    deceasedDoBEnd: String
-    deceasedIdentifier: String
-    motherFirstNames: String
-    motherFamilyName: String
-    motherDoB: String
-    motherDoBStart: String
-    motherDoBEnd: String
-    motherIdentifier: String
-    fatherFirstNames: String
-    fatherFamilyName: String
-    fatherDoB: String
-    fatherDoBStart: String
-    fatherDoBEnd: String
-    fatherIdentifier: String
-    informantFirstNames: String
-    informantFamilyName: String
-    informantDoB: String
-    informantDoBStart: String
-    informantDoBEnd: String
-    informantIdentifier: String
-  ): EventProgressResultSet
   getRoles(
     title: String
     value: ComparisonInput
@@ -558,11 +505,6 @@ input AdvancedSearchParametersInput {
 type EventProgressResultSet {
   results: [EventProgressSet]
   totalItems: Int
-}
-
-enum Event {
-  birth
-  death
 }
 
 type Role {
@@ -1037,6 +979,11 @@ interface EventSearchSet {
   type: String
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+}
+
+enum Event {
+  birth
+  death
 }
 
 type EventProgressSet {
