@@ -227,6 +227,56 @@ const messagesToDefine = {
     id: 'integrations.inactive',
     defaultMessage: 'Inactive',
     description: 'Label for inactive integration'
+  },
+  activate: {
+    id: 'integrations.activate',
+    defaultMessage: 'Activate',
+    description: 'Label for activate option'
+  },
+  deactivate: {
+    id: 'integrations.deactivate',
+    defaultMessage: 'Deactivate',
+    description: 'Label for deactivate option'
+  },
+  loading: {
+    id: 'integrations.loading',
+    defaultMessage: 'Loading',
+    description: 'Label for loading option'
+  },
+  error: {
+    id: 'integrations.error',
+    defaultMessage: 'Something went wrong',
+    description: 'Label for error option'
+  },
+  activateClient: {
+    id: 'integrations.activate.client',
+    defaultMessage: 'Activate Client?',
+    description: 'Label for activate client option'
+  },
+  activateClientStatus: {
+    id: 'integrations.activate.status',
+    defaultMessage: 'Client activated',
+    description: 'Label for activate client'
+  },
+  deactivateClientStatus: {
+    id: 'integrations.deactivate.status',
+    defaultMessage: 'Client deactivated',
+    description: 'Label for deactivate client'
+  },
+  deactivateClient: {
+    id: 'integrations.deactivate.client',
+    defaultMessage: 'Deactivate Client?',
+    description: 'Label for deactivate client option'
+  },
+  activateClientText: {
+    id: 'integrations.activatetext',
+    defaultMessage: 'This will activate the client',
+    description: 'This will activate the client'
+  },
+  deactivateClientText: {
+    id: 'integrations.deactivatetext',
+    defaultMessage: 'This will deactivate the client',
+    description: 'This will deactivate the client'
   }
 }
 

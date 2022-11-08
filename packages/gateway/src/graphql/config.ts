@@ -13,6 +13,10 @@
 import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
+import {
+  resolvers as integrationResolver,
+  resolvers as integrationResolvers
+} from '@gateway/features/integrations/root-resolvers'
 import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
@@ -60,6 +64,7 @@ const resolvers: StringIndexed<IResolvers> = merge(
   userTypeResolvers as IResolvers,
   certificateTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
+  integrationResolver as IResolvers,
   metricsTypeResolvers as IResolvers,
   typeResolvers as IResolvers,
   searchRootResolvers as IResolvers,
@@ -69,7 +74,8 @@ const resolvers: StringIndexed<IResolvers> = merge(
   certificateResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
   formDraftResolvers as IResolvers,
-  applicationRootResolvers as IResolvers
+  applicationRootResolvers as IResolvers,
+  integrationResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
