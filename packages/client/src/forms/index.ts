@@ -107,6 +107,7 @@ export interface IRadioOption {
 }
 export interface IAccordionOption {
   value: string
+  label: MessageDescriptor
 }
 export interface ICheckboxOption {
   value: CheckboxComponentOption['value']
@@ -526,6 +527,8 @@ export interface IAccordionWithNestedFieldsFormField extends IFormFieldBase {
   type: typeof ACCORDION_WITH_NESTED_FIELDS
   options: IAccordionOption[]
   nestedFields: INestedInputFields
+  hideLabel: MessageDescriptor
+  showLabel: MessageDescriptor
 }
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
@@ -926,6 +929,11 @@ export enum UserSection {
   Preview = 'preview'
 }
 
+export enum AdvancedSearchSection {
+  Birth = 'birth',
+  Death = 'death'
+}
+
 export enum CertificateSection {
   Collector = 'collector',
   CollectCertificate = 'collectCertificate',
@@ -1069,6 +1077,8 @@ export interface Ii18nIAccordionWithNestedFieldsFormField
   type: typeof ACCORDION_WITH_NESTED_FIELDS
   options: IAccordionOption[]
   nestedFields: Ii18nNestedInputFields
+  showLabel: MessageDescriptor
+  hideLabel: MessageDescriptor
 }
 
 type Name = {
@@ -1287,7 +1297,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     FIELD_WITH_DYNAMIC_DEFINITIONS: messages.fieldWithDynamicDefinition,
     RADIO_GROUP: messages.radioGroup,
     RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
-    ACCORDION_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
+    ACCORDION_WITH_NESTED_FIELDS: messages.accordionWithNestedField,
     INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
     CHECKBOX_GROUP: messages.checkboxGroup,
     CHECKBOX: messages.checkbox,

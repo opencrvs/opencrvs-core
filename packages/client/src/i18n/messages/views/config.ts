@@ -15,6 +15,7 @@ interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationSettings: MessageDescriptor
   advancedSearch: MessageDescriptor
+  advancedSearchInstruction: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
@@ -91,6 +92,12 @@ const messagesToDefine: IConfigMessages = {
   advancedSearch: {
     id: 'config.advanced.search',
     defaultMessage: 'Advanced Search',
+    description: 'This is used for the advanced search'
+  },
+  advancedSearchInstruction: {
+    id: 'config.advanced.search.instruction',
+    defaultMessage:
+      'Select the options to build an advanced search. A minimum of two search parameters is required.',
     description: 'This is used for the advanced search'
   },
   applicationNameChangeMessage: {
