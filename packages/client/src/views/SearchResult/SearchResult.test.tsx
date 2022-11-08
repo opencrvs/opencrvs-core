@@ -17,11 +17,7 @@ import * as React from 'react'
 import { queries } from '@client/profile/queries'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { createStore } from '@client/store'
-import {
-  createTestComponent,
-  mockUserResponse,
-  flushPromises
-} from '@client/tests/util'
+import { createTestComponent, mockUserResponse } from '@client/tests/util'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { goToSearch } from '@client/navigation'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -92,13 +88,15 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: null,
-            sort: 'DESC',
-            trackingId: '',
-            nationalId: '',
-            registrationNumber: '',
-            contactNumber: '+8801622688232',
-            name: ''
+            advanceSearchParameters: {
+              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              trackingId: '',
+              nationalId: '',
+              registrationNumber: '',
+              contactNumber: '+8801622688232',
+              name: ''
+            },
+            sort: 'DESC'
           }
         },
         result: {
@@ -335,12 +333,14 @@ describe('SearchResult tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['1234567s2323289'],
-            sort: 'DESC',
-            trackingId: '',
-            nationalId: '',
-            registrationNumber: '',
-            contactNumber: '+8801622688232'
+            advanceSearchParameters: {
+              trackingId: '',
+              nationalId: '',
+              registrationNumber: '',
+              contactNumber: '+8801622688232',
+              declarationLocationId: '1234567s2323289'
+            },
+            sort: 'DESC'
           }
         },
         error: new Error('boom')
@@ -410,13 +410,15 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: null,
-            sort: 'DESC',
-            trackingId: 'DW0UTHR',
-            nationalId: '',
-            registrationNumber: '',
-            contactNumber: '',
-            name: ''
+            advanceSearchParameters: {
+              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              trackingId: 'DW0UTHR',
+              nationalId: '',
+              registrationNumber: '',
+              contactNumber: '',
+              name: ''
+            },
+            sort: 'DESC'
           }
         },
         result: {
@@ -507,13 +509,15 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: null,
-            sort: 'DESC',
-            trackingId: 'DW0UTHR',
-            nationalId: '',
-            registrationNumber: '',
-            contactNumber: '',
-            name: ''
+            advanceSearchParameters: {
+              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              trackingId: 'DW0UTHR',
+              nationalId: '',
+              registrationNumber: '',
+              contactNumber: '',
+              name: ''
+            },
+            sort: 'DESC'
           }
         },
         result: {
@@ -612,13 +616,15 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: null,
-            sort: 'DESC',
-            nationalId: '',
-            trackingId: 'DW0UTHR',
-            registrationNumber: '',
-            contactNumber: '',
-            name: ''
+            advanceSearchParameters: {
+              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              trackingId: 'DW0UTHR',
+              nationalId: '',
+              registrationNumber: '',
+              contactNumber: '',
+              name: ''
+            },
+            sort: 'DESC'
           }
         },
         result: {
@@ -722,13 +728,15 @@ describe('SearchResult downloadButton tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: null,
-            sort: 'DESC',
-            nationalId: '',
-            trackingId: 'DW0UTHR',
-            registrationNumber: '',
-            contactNumber: '',
-            name: ''
+            advanceSearchParameters: {
+              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              trackingId: 'DW0UTHR',
+              nationalId: '',
+              registrationNumber: '',
+              contactNumber: '',
+              name: ''
+            },
+            sort: 'DESC'
           }
         },
         result: {
@@ -822,13 +830,15 @@ describe('SearchResult downloadButton tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: null,
-            sort: 'DESC',
-            nationalId: '',
-            trackingId: 'DW0UTHR',
-            registrationNumber: '',
-            contactNumber: '',
-            name: ''
+            advanceSearchParameters: {
+              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              trackingId: 'DW0UTHR',
+              nationalId: '',
+              registrationNumber: '',
+              contactNumber: '',
+              name: ''
+            },
+            sort: 'DESC'
           }
         },
         result: {
