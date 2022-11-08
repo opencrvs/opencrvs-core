@@ -327,7 +327,7 @@ function Integrations() {
           titleHeightAuto={true}
           show={toggleKeyModal.modalVisible}
           handleClose={() => toggleRevealKeyModal()}
-          title={toggleKeyModal.selectedClient?.name}
+          title={toggleKeyModal.selectedClient?.name ?? ''}
         >
           {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
 
