@@ -146,13 +146,11 @@ export function ForgotPIN(props: IForgotPINProps) {
   const [password, setPassword] = useState<string>('')
   const [touched, setTouched] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
-
   const intl = useIntl()
   const [verifyingPassword, setVerifyingPassword] = useState<boolean>(false)
 
   const userDetails = useSelector(getUserDetails)
   const dispatch = useDispatch()
-
   const logout = useCallback(() => {
     storage.removeItem(SCREEN_LOCK)
     storage.removeItem(SECURITY_PIN_EXPIRED_AT)
