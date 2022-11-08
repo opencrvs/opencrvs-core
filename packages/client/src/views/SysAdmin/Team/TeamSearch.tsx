@@ -129,6 +129,8 @@ class TeamSearchComponent extends React.Component<Props, State> {
                     displayLabel: location.name
                   }
                 })}
+              fuzzy
+              limit={10}
               searchHandler={this.searchHandler}
               searchButtonHandler={this.searchButtonHandler}
               errorMessage={intl.formatMessage(messagesSearch.locationNotFound)}

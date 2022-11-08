@@ -36,6 +36,8 @@ import { ILocation } from '@client/offline/reducer'
 
 const { useState, useEffect } = React
 
+const DEFAULT_LOCATION_SEARCH_LIMIT = 10
+
 interface IConnectProps {
   offlineLocations: { [key: string]: ILocation }
   offlineOffices: { [key: string]: ILocation }
@@ -51,6 +53,7 @@ interface IBaseProps {
   onChangeLocation: (locationId: string) => void
   requiredJurisdictionTypes?: string
   fuzzy?: boolean
+  limit?: number
   jurisidictionTypeFilter?: string[]
 }
 
@@ -114,6 +117,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
     additionalLocations = [],
     intl,
     fuzzy = true,
+    limit = DEFAULT_LOCATION_SEARCH_LIMIT,
     locationFilter = () => true,
     officeFilter = () => true
   } = props
@@ -205,6 +209,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
                   setModalVisible(false)
                 }}
                 fuzzy={fuzzy}
+                limit={limit}
               />
             </ModalBody>
           </ModalContainer>

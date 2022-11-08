@@ -114,6 +114,7 @@ interface IProps {
   className?: string
   buttonLabel: string
   fuzzy?: boolean
+  limit?: number
 }
 export class LocationSearch extends React.Component<IProps, IState> {
   searchTimeout: NodeJS.Timeout | undefined
@@ -131,6 +132,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
       props.locationList as readonly ISearchLocation[],
       {
         includeScore: true,
+        minMatchCharLength: 2,
         ignoreLocation: true,
         keys: ['searchableText']
       }
@@ -151,7 +153,10 @@ export class LocationSearch extends React.Component<IProps, IState> {
 
   search = (searchText: string) => {
     const searchFunc = this.props.fuzzy ? this.fuzzySearch : this.exactSearch
-    const searchResult = searchFunc(searchText)
+    let searchResult = searchFunc(searchText)
+    if (this.props.limit) {
+      searchResult = searchResult.slice(0, this.props.limit)
+    }
     if (
       searchResult.length === 0 ||
       (this.state.selectedItem &&
