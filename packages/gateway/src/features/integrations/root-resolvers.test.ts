@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { resolvers } from '@gateway/features/user/root-resolvers'
+import { resolvers } from '@gateway/features/integrations/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -22,12 +22,12 @@ beforeEach(() => {
 })
 
 describe('Integration root resolvers', () => {
-  let authHeaderNatlSYSAdmin: { Authorization: string }
+  let authHeaderSYSAdmin: { Authorization: string }
   beforeEach(() => {
     fetch.resetMocks()
 
-    const natlSYSAdminToken = jwt.sign(
-      { scope: ['natlsysadmin'] },
+    const sysAdminToken = jwt.sign(
+      { scope: ['sysadmin'] },
       readFileSync('../auth/test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
@@ -36,17 +36,17 @@ describe('Integration root resolvers', () => {
         audience: 'opencrvs:gateway-user'
       }
     )
-    authHeaderNatlSYSAdmin = {
-      Authorization: `Bearer ${natlSYSAdminToken}`
+    authHeaderSYSAdmin = {
+      Authorization: `Bearer ${sysAdminToken}`
     }
   })
 
   it('returns a client object', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
-        clientId: '25d11fa6-bb7b-4cf3-925c-a38c042b9b21',
         name: 'Emmanuel Mayuka',
-        sha_secret: '4c5e02ba-cb73-40c1-8f48-92e81bd7e0d8'
+        clientId: '25d11fa6-bb7b-4cf3-925c-a38c042b9b21',
+        shaSecret: '4c5e02ba-cb73-40c1-8f48-92e81bd7e0d8'
       })
     )
 
@@ -57,7 +57,7 @@ describe('Integration root resolvers', () => {
           clientId: '25d11fa6-bb7b-4cf3-925c-a38c042b9b21'
         }
       },
-      authHeaderNatlSYSAdmin
+      authHeaderSYSAdmin
     )
 
     expect(data).toBeDefined()
