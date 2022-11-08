@@ -166,29 +166,25 @@ export async function deactivateSystemClient(
 
     const auditSystemPayload = request.payload as IAuditSystemPayload
 
-    const system: ISystemModel | null = await System.findOne({
-      client_id: auditSystemPayload.client_id
-    })
+    const system: ISystemModel | null = await System.findById(
+      auditSystemPayload.client_id
+    )
     if (!system) {
       logger.error(
         `No system details found for requested client_id: ${auditSystemPayload.client_id}`
       )
       throw unauthorized()
     }
-    let user
+
     system.status = statuses.DEACTIVATED
 
     try {
-      await System.update({ _id: system._id }, system).then(async () => {
-        user = await System.findOne({
-          client_id: auditSystemPayload.client_id
-        })
-      })
+      await System.update({ _id: system._id }, system)
     } catch (err) {
       logger.error(err.message)
       return h.response().code(400)
     }
-    return h.response(user).code(200)
+    return h.response().code(200)
   } catch (err) {
     logger.error(err)
     return h.response().code(400)
@@ -212,29 +208,25 @@ export async function reactivateSystemClient(
 
     const auditSystemPayload = request.payload as IAuditSystemPayload
 
-    const system: ISystemModel | null = await System.findOne({
-      client_id: auditSystemPayload.client_id
-    })
+    const system: ISystemModel | null = await System.findById(
+      auditSystemPayload.client_id
+    )
     if (!system) {
       logger.error(
         `No system details found for requested client_id: ${auditSystemPayload.client_id}`
       )
       throw unauthorized()
     }
-    let user
+
     system.status = statuses.ACTIVE
 
     try {
-      await System.update({ _id: system._id }, system).then(async () => {
-        user = await System.findOne({
-          client_id: auditSystemPayload.client_id
-        })
-      })
+      await System.update({ _id: system._id }, system)
     } catch (err) {
       logger.error(err.message)
       return h.response().code(400)
     }
-    return h.response(user).code(200)
+    return h.response().code(200)
   } catch (err) {
     logger.error(err)
     return h.response().code(400)
@@ -295,15 +287,18 @@ export const verifySystemResSchema = Joi.object({
 
 interface IGetSystemPayload {
   systemId: string
+  clientId: string
 }
 
 export async function getSystemHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { systemId } = request.payload as IGetSystemPayload
+  const { systemId, clientId } = request.payload as IGetSystemPayload
 
-  const system: ISystemModel | null = await System.findOne({ _id: systemId })
+  const system: ISystemModel | null = await System.findOne({
+    $or: [{ _id: systemId }, { clientId: clientId }]
+  })
 
   if (!system) {
     // Don't return a 404 as this gives away that this user account exists
@@ -347,7 +342,8 @@ export async function getAllSystemsHandler() {
 }
 
 export const getSystemRequestSchema = Joi.object({
-  systemId: Joi.string()
+  systemId: Joi.string(),
+  clientId: Joi.string()
 })
 
 export const getSystemResponseSchema = Joi.object({

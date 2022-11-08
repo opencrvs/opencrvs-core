@@ -28,6 +28,21 @@ type IntegrationResponse {
   client_id: String
 }
 
+input IdsInput {
+  systemId: String
+  clientId: String
+}
+
+type SystemIntegrationsResponse {
+  name: String
+  clientId: String
+  shaSecret: String
+}
+
+type Query {
+  fetchIntegration(ids: IdsInput): SystemIntegrationsResponse
+}
+
 type Mutation {
   reactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
 }

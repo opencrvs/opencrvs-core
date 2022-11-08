@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/formConfig'
@@ -23,7 +23,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
 import { Plus, VerticalThreeDots } from '@client/../../components/lib/icons'
-import { Pill, Toast, ToggleMenu } from '@client/../../components/lib'
+import { Link, Pill, Toast, ToggleMenu } from '@client/../../components/lib'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { Button } from '@client/../../components/lib/Button'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
@@ -33,6 +33,8 @@ import { gql } from '@apollo/client'
 import { updateOfflineIntegrations } from '@client/offline/actions'
 import { Mutation } from '@apollo/client/react/components'
 import { Integration } from '@client/utils/referenceApi'
+import styled from 'styled-components'
+import { Text } from '@opencrvs/components/lib/Text'
 
 export const statuses = {
   PENDING: 'pending',
@@ -52,6 +54,19 @@ export interface IntegrationType {
   sha_secret: string
   status: string
 }
+
+interface ToggleModal {
+  modalVisible: boolean
+  selectedClient: Integration | null
+}
+
+const TopText = styled(Text)`
+  margin-top: 20px;
+`
+const ButtonLink = styled(Link)`
+  text-align: left;
+`
+
 export const deactivateClient = gql`
   mutation deactivateSystemClient($clientDetails: ClientPayload) {
     deactivateSystemClient(clientDetails: $clientDetails) {
@@ -80,6 +95,11 @@ function Integrations() {
   const [showModal, setShowModal] = useState(false)
   const [clientId, setClientId] = useState('')
   const [clientStatus, setClientStatus] = useState('')
+  const [toggleKeyModal, setToggleKeyModal] = useState<ToggleModal>({
+    modalVisible: false,
+    selectedClient: null
+  })
+
   const [notificationStatus, setNotificationStatus] = useState(
     NOTIFICATION_STATUS.IDLE
   )
@@ -90,6 +110,24 @@ function Integrations() {
       return intl.formatMessage(integrationMessages.deactivate)
     }
   }
+
+  const toggleRevealKeyModal = useCallback(
+    function toggleRevealKeyModal(integration?: Integration) {
+      if (integration !== undefined) {
+        setToggleKeyModal({
+          ...toggleKeyModal,
+          modalVisible: true,
+          selectedClient: integration
+        })
+      } else {
+        setToggleKeyModal({
+          ...toggleKeyModal,
+          modalVisible: false
+        })
+      }
+    },
+    [toggleKeyModal]
+  )
 
   function showSuccessToast() {
     setShowModal(false)
@@ -155,7 +193,9 @@ function Integrations() {
                     id="toggleMenu"
                     menuItems={[
                       {
-                        handler: () => {},
+                        handler: () => {
+                          toggleRevealKeyModal(integration)
+                        },
                         label: intl.formatMessage(
                           integrationMessages.revealKeys
                         )
@@ -276,6 +316,46 @@ function Integrations() {
             </ResponsiveModal>
           )}
         </ListViewSimplified>
+
+        <ResponsiveModal
+          actions={[
+            <Link onClick={() => toggleRevealKeyModal()}>
+              {intl.formatMessage(buttonMessages.cancel)}
+            </Link>
+          ]}
+          autoHeight={true}
+          titleHeightAuto={true}
+          show={toggleKeyModal.modalVisible}
+          handleClose={() => toggleRevealKeyModal()}
+          title={toggleKeyModal.selectedClient?.name ?? ''}
+        >
+          {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+
+          <>
+            <TopText variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.clientId)}{' '}
+            </TopText>
+            <Text variant="reg16" element="p">
+              {' '}
+              {toggleKeyModal.selectedClient?.client_id}
+            </Text>
+
+            <TopText variant="bold16" element="span">
+              {' '}
+              {intl.formatMessage(integrationMessages.clientSecret)}
+            </TopText>
+            <ButtonLink>
+              {intl.formatMessage(buttonMessages.refresh)}
+            </ButtonLink>
+
+            <TopText variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.shaSecret)}
+            </TopText>
+            <Text variant="reg16" element="p">
+              {toggleKeyModal.selectedClient?.sha_secret}
+            </Text>
+          </>
+        </ResponsiveModal>
       </Content>
     </Frame>
   )

@@ -25,6 +25,7 @@
 # import Query.* from '../features/formDraft/schema.graphql'
 # import * from '../features/questions/schema.graphql'
 # import * from 'common.graphql'
+# import Query.* from '../features/integrations/schema.graphql'
 
 # TODO
 # https://github.com/prismagraphql/graphql-import/issues/180

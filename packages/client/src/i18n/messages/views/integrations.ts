@@ -79,6 +79,30 @@ const messagesToDefine = {
     defaultMessage: 'Activate Client?',
     description: 'Label for activate client option'
   },
+
+  clientId: {
+    id: 'integrations.clientId',
+    defaultMessage: 'Client ID',
+    description: 'Label for client Id'
+  },
+
+  clientSecret: {
+    id: 'integrations.clientSecret',
+    defaultMessage: 'Client Secret',
+    description: 'Label for client secret'
+  },
+  shaSecret: {
+    id: 'integrations.shaSecret',
+    defaultMessage: 'SHA Secret',
+    description: 'Label for SHA secret'
+  },
+  uniqueKeysDescription: {
+    id: 'integrations.uniqueKeyDescription',
+    defaultMessage:
+      'These unique keys will be required by the client integrating...',
+    description: 'Label for the unique key description'
+  },
+
   activateClientStatus: {
     id: 'integrations.activate.status',
     defaultMessage: 'Client activated',
