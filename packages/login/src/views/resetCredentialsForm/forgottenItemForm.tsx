@@ -47,7 +47,9 @@ class ForgottenItemComponent extends React.Component<Props, State> {
       error: false
     }
   }
-
+  componentDidMount(): void {
+    document.title = 'Farajaland CRS'
+  }
   handleContinue = (event: React.FormEvent) => {
     event.preventDefault()
     if (this.state.forgottenItem === '') {
