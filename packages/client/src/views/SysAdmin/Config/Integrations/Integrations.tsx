@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/formConfig'
@@ -63,9 +63,7 @@ function Integrations() {
     selectedClient: null
   })
   const offlineData = useSelector(getOfflineData)
-  useEffect(() => {
-    console.log(offlineData.integrations)
-  })
+   
 
   const toggleRevealKeyModal = useCallback(
     function toggleRevealKeyModal(integration?: Integration) {
