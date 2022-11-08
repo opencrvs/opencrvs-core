@@ -358,6 +358,20 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
+    case actions.UPDATE_OFFLINE_INTEGRATIONS: {
+      const newOfflineData = {
+        ...state.offlineData,
+        integrations: action.payload.integrations
+      }
+
+      return loop(
+        {
+          ...state,
+          offlineData: newOfflineData
+        },
+        Cmd.run(saveOfflineData, { args: [newOfflineData] })
+      )
+    }
     case actions.UPDATE_OFFLINE_FORM_CONFIG: {
       const { formConfig } = state.offlineData
 

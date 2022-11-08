@@ -86,6 +86,8 @@ export interface GQLMutation {
   createFormDraft?: GQLFormDraft
   modifyDraftStatus?: GQLFormDraft
   deleteFormDraft?: string
+  reactivateSystemClient?: GQLIntegrationResponse
+  deactivateSystemClient?: GQLIntegrationResponse
 }
 
 export interface GQLDummy {
@@ -514,6 +516,17 @@ export interface GQLFormDraftStatusModifyInput {
 
 export interface GQLDeleteFormDraftInput {
   event: GQLEvent
+}
+
+export interface GQLIntegrationResponse {
+  status?: string
+  _id?: string
+  username?: string
+  client_id?: string
+}
+
+export interface GQLClientPayload {
+  client_id: string
 }
 
 export type GQLMap = any
@@ -1448,6 +1461,7 @@ export interface GQLResolver {
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
+  IntegrationResponse?: GQLIntegrationResponseTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -2172,6 +2186,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createFormDraft?: MutationToCreateFormDraftResolver<TParent>
   modifyDraftStatus?: MutationToModifyDraftStatusResolver<TParent>
   deleteFormDraft?: MutationToDeleteFormDraftResolver<TParent>
+  reactivateSystemClient?: MutationToReactivateSystemClientResolver<TParent>
+  deactivateSystemClient?: MutationToDeactivateSystemClientResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2706,6 +2722,36 @@ export interface MutationToDeleteFormDraftResolver<
   (
     parent: TParent,
     args: MutationToDeleteFormDraftArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToReactivateSystemClientArgs {
+  clientDetails?: GQLClientPayload
+}
+export interface MutationToReactivateSystemClientResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToReactivateSystemClientArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToDeactivateSystemClientArgs {
+  clientDetails?: GQLClientPayload
+}
+export interface MutationToDeactivateSystemClientResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToDeactivateSystemClientArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4061,6 +4107,41 @@ export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
 }
 
 export interface ApplicationConfigurationToADDRESSESResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLIntegrationResponseTypeResolver<TParent = any> {
+  status?: IntegrationResponseToStatusResolver<TParent>
+  _id?: IntegrationResponseTo_idResolver<TParent>
+  username?: IntegrationResponseToUsernameResolver<TParent>
+  client_id?: IntegrationResponseToClient_idResolver<TParent>
+}
+
+export interface IntegrationResponseToStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IntegrationResponseTo_idResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IntegrationResponseToUsernameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IntegrationResponseToClient_idResolver<
   TParent = any,
   TResult = any
 > {
