@@ -30,8 +30,11 @@ describe('elasticsearch db helper', () => {
             }
           },
           {
-            match: {
-              compositionType: ['birth-declaration', 'death-declaration']
+            terms: {
+              'compositionType.keyword': [
+                'birth-declaration',
+                'death-declaration'
+              ]
             }
           }
         ],

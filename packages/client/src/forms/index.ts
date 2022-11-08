@@ -49,6 +49,7 @@ export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
+export const DATE_RANGE_PICKER = 'DATE_RANGE_PICKER'
 export const TEXTAREA = 'TEXTAREA'
 export const SUBSECTION = 'SUBSECTION'
 export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
@@ -106,6 +107,7 @@ export interface IRadioOption {
 }
 export interface IAccordionOption {
   value: string
+  label: MessageDescriptor
 }
 export interface ICheckboxOption {
   value: CheckboxComponentOption['value']
@@ -231,6 +233,7 @@ export type IFormFieldValue =
   | FieldValueMap
   | IContactPoint
   | IInformant
+  | IDateRangePickerValue
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
 export interface FieldValueMap {
@@ -267,6 +270,13 @@ export interface IInformant {
 export interface IContactPoint {
   value: string
   nestedFields: IContactPointPhone
+}
+
+export interface IDateRangePickerValue {
+  exact: string | undefined
+  rangeStart: string | undefined
+  rangeEnd: string | undefined
+  isDateRangeActive: boolean | undefined
 }
 
 export interface IAttachmentValue {
@@ -517,6 +527,8 @@ export interface IAccordionWithNestedFieldsFormField extends IFormFieldBase {
   type: typeof ACCORDION_WITH_NESTED_FIELDS
   options: IAccordionOption[]
   nestedFields: INestedInputFields
+  hideLabel: MessageDescriptor
+  showLabel: MessageDescriptor
 }
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
@@ -559,6 +571,12 @@ export interface IDateFormField extends IFormFieldBase {
   notice?: MessageDescriptor
   ignorePlaceHolder?: boolean
 }
+export interface IDateRangePickerFormField extends IFormFieldBase {
+  type: typeof DATE_RANGE_PICKER
+  notice?: MessageDescriptor
+  ignorePlaceHolder?: boolean
+}
+
 export interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
@@ -679,6 +697,7 @@ export type IFormField =
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
   | IAccordionWithNestedFieldsFormField
+  | IDateRangePickerFormField
 
 export interface IPreviewGroup {
   id: string
@@ -910,6 +929,11 @@ export enum UserSection {
   Preview = 'preview'
 }
 
+export enum AdvancedSearchSection {
+  Birth = 'birth',
+  Death = 'death'
+}
+
 export enum CertificateSection {
   Collector = 'collector',
   CollectCertificate = 'collectCertificate',
@@ -1053,6 +1077,8 @@ export interface Ii18nIAccordionWithNestedFieldsFormField
   type: typeof ACCORDION_WITH_NESTED_FIELDS
   options: IAccordionOption[]
   nestedFields: Ii18nNestedInputFields
+  showLabel: MessageDescriptor
+  hideLabel: MessageDescriptor
 }
 
 type Name = {
@@ -1109,6 +1135,11 @@ export interface Ii18nCheckboxFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE
+  notice?: string
+  ignorePlaceHolder?: boolean
+}
+export interface Ii18nDateRangePickerFormField extends Ii18nFormFieldBase {
+  type: typeof DATE_RANGE_PICKER
   notice?: string
   ignorePlaceHolder?: boolean
 }
@@ -1210,6 +1241,7 @@ export type Ii18nFormField =
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
   | Ii18nIAccordionWithNestedFieldsFormField
+  | Ii18nDateRangePickerFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
@@ -1265,11 +1297,12 @@ export function fieldTypeLabel(type: IFormField['type']) {
     FIELD_WITH_DYNAMIC_DEFINITIONS: messages.fieldWithDynamicDefinition,
     RADIO_GROUP: messages.radioGroup,
     RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
-    ACCORDION_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
+    ACCORDION_WITH_NESTED_FIELDS: messages.accordionWithNestedField,
     INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
     CHECKBOX_GROUP: messages.checkboxGroup,
     CHECKBOX: messages.checkbox,
     DATE: messages.date,
+    DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
     DYNAMIC_LIST: messages.dynamicList
   }
 

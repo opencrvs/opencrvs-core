@@ -84,6 +84,7 @@ interface IFormConfigMessages
   checkboxGroup: MessageDescriptor
   checkbox: MessageDescriptor
   date: MessageDescriptor
+  dateRangePickerForFormField: MessageDescriptor
   dynamicList: MessageDescriptor
   formConfigMobileModalTitle: MessageDescriptor
   formConfigMobileModalDesc: MessageDescriptor
@@ -441,6 +442,11 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.settings.date',
     defaultMessage: 'Date input',
     description: 'Success notification label for number of addresses settings'
+  },
+  dateRangePickerForFormField: {
+    id: 'config.form.settings.dateRangePickerForFormField',
+    defaultMessage: 'Date Rangee Picker input',
+    description: 'Date range picker input label'
   },
   dynamicList: {
     id: 'config.form.settings.dynamicList',

@@ -75,8 +75,7 @@ describe('elasticsearch params formatter', () => {
           registrationStatuses: ['DECLARED'],
           compositionType: ['birth-declaration'],
           declarationLocationId: '123',
-          eventLocationId: '456',
-          gender: 'male'
+          eventLocationId: '456'
         },
         createdBy: 'EMPTY_STRING',
         from: 0,
@@ -142,8 +141,8 @@ describe('elasticsearch params formatter', () => {
                 }
               },
               {
-                match: {
-                  compositionType: ['birth-declaration']
+                terms: {
+                  'compositionType.keyword': ['birth-declaration']
                 }
               }
             ],

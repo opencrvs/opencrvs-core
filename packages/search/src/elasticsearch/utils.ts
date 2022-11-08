@@ -133,7 +133,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   deceasedFirstNamesLocal?: string
   deceasedFamilyNameLocal?: string
   deceasedDoB?: string
-  gender?: string
+  deceasedGender?: string
   deceasedIdentifier?: string
   deathDate?: string
   motherFirstNames?: string
