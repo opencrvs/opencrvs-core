@@ -930,7 +930,8 @@ export enum UserSection {
 }
 
 export enum AdvancedSearchSection {
-  Birth = 'birth'
+  Birth = 'birth',
+  Death = 'death'
 }
 
 export enum CertificateSection {

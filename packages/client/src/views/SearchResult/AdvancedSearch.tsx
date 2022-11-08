@@ -23,6 +23,7 @@ import { Content, FormTabs, Text } from '@client/../../components/lib'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { advancedSearchBirthSectionFormType } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
+import { advancedSearchDeathSectionFormType } from '@client/forms/advancedSearch/fieldDefinitions/Death'
 import { PrimaryButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
@@ -37,7 +38,7 @@ const BirthTabContent = () => {
 }
 
 const DeathTabContent = () => {
-  return <>Death</>
+  return <DeathSection />
 }
 
 export interface IAdvancedSearch {
@@ -129,6 +130,57 @@ const BirthSection = () => {
         }}
         setAllFieldsDirty={false}
         fields={advancedSearchBirthSectionFormType.fields}
+      />
+
+      <PrimaryButton
+        icon={() => <Icon name={'Search'} />}
+        align={ICON_ALIGNMENT.LEFT}
+        id="search"
+        key="search"
+        disabled={isDisable}
+      >
+        {intl.formatMessage(buttonMessages.search)}
+      </PrimaryButton>
+    </>
+  )
+}
+
+const DeathSection = () => {
+  const intl = useIntl()
+  const [isDisable, setDisable] = useState(true)
+  const isOnline = useOnlineStatus()
+
+  const validateForm = (advancedSearch: IAdvancedSearch) => {
+    let count = 0
+
+    for (const field of Object.values(advancedSearch)) {
+      const result = field.nestedFields
+      for (const value of Object.values(result)) {
+        if (value !== '') {
+          count++
+        }
+      }
+    }
+
+    if (count > 1 && isOnline) {
+      setDisable(false)
+    } else {
+      setDisable(true)
+    }
+  }
+
+  return (
+    <>
+      <Text element={'p'} variant={'reg18'}>
+        {intl.formatMessage(messages.advancedSearchInstruction)}
+      </Text>
+      <FormFieldGenerator
+        id={advancedSearchDeathSectionFormType.id}
+        onChange={(values) => {
+          validateForm(values)
+        }}
+        setAllFieldsDirty={false}
+        fields={advancedSearchDeathSectionFormType.fields}
       />
 
       <PrimaryButton

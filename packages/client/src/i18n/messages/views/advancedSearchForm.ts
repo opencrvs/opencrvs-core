@@ -26,6 +26,7 @@ interface IAdvancedSearchMessages
   recordStatusRegistered: MessageDescriptor
   recordStatusCertified: MessageDescriptor
   recordStatusAchived: MessageDescriptor
+  placeOfDeath: MessageDescriptor
 }
 
 const messagesToDefine: IAdvancedSearchMessages = {
@@ -93,6 +94,11 @@ const messagesToDefine: IAdvancedSearchMessages = {
     defaultMessage: 'Archived',
     description: 'Option for form field: status of record',
     id: 'advancedSearch.birth.recordStatusAchived'
+  },
+  placeOfDeath: {
+    defaultMessage: 'Place of death',
+    description: 'Label for input place of death',
+    id: 'advancedSearch.death.placeOfDeath'
   }
 }
 export const messages: IAdvancedSearchMessages =
