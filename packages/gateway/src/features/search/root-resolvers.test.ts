@@ -349,11 +349,11 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.getEventsWithProgress(
         {},
         {
-          locationId: 'dummy_loc_id_parent',
+          declarationJurisdictionId: 'dummy_loc_id_parent',
           count: 25,
           skip: 25,
-          type: ['birth-declaration'],
-          status: ['REGISTERED']
+          compositionType: ['birth-declaration'],
+          registrationStatuses: ['REGISTERED']
         },
         authorizedUser
       )
@@ -377,7 +377,7 @@ describe('Search root resolvers', () => {
       )
       const result = await resolvers.Query.getEventsWithProgress(
         {},
-        { locationId: null },
+        { declarationJurisdictionId: null },
         authorizedUser
       )
       expect(result.totalItems).toBe(0)
