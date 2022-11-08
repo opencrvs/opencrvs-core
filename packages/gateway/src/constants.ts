@@ -33,7 +33,7 @@ export const COUNTRY_CONFIG_URL =
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
-export const QA_ENV = process.env.QA_ENV || false
+export const QA_ENV = process.env.QA_ENV === 'true'
 
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.

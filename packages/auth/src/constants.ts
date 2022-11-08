@@ -31,7 +31,7 @@ export const CERT_PUBLIC_KEY_PATH =
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
-export const QA_ENV = process.env.QA_ENV || false
+export const QA_ENV = process.env.QA_ENV === 'true'
 
 export const CONFIG_TOKEN_EXPIRY_SECONDS = process.env
   .CONFIG_TOKEN_EXPIRY_SECONDS

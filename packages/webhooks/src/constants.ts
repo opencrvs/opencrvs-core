@@ -23,7 +23,7 @@ export const CERT_PUBLIC_KEY_PATH =
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
-export const QA_ENV = process.env.QA_ENV || false
+export const QA_ENV = process.env.QA_ENV === 'true'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 // Check if the token has been invalided in the auth service before it has expired

@@ -19,7 +19,7 @@ export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
 export const SENTRY_DSN = process.env.SENTRY_DSN
-export const QA_ENV = process.env.QA_ENV || false
+export const QA_ENV = process.env.QA_ENV === 'true'
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
