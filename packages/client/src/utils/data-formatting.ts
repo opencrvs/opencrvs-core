@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GQLHumanName, GQLComment } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLComment } from '@opencrvs/gateway/src/graphql/schema'
+import { HumanName } from './gateway'
 
 interface INamesMap {
   [key: string]: string
 }
 
-export const createNamesMap = (names: GQLHumanName[]): INamesMap =>
+export const createNamesMap = (names: HumanName[]): INamesMap =>
   names.filter(Boolean).reduce((prevNamesMap: INamesMap, name) => {
     if (!name.use) {
       prevNamesMap['default'] = `${name.firstNames || ''} ${

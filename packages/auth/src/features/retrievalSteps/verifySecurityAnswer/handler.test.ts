@@ -39,7 +39,8 @@ describe('security question answer checking', () => {
         username: 'fake_user_name',
         mobile: '123123123',
         securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
-        scope: []
+        scope: [],
+        practitionerId: ''
       }
     )
   })
@@ -76,7 +77,8 @@ describe('security question answer checking', () => {
             username: 'fake_user_name',
             mobile: '123123123',
             securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
-            scope: []
+            scope: [],
+            practitionerId: ''
           }
         )
       )

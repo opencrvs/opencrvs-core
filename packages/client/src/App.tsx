@@ -42,7 +42,6 @@ import { CompletenessRates } from '@client/views/SysAdmin/Performance/Completene
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { UserProfile } from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { ApolloClient, ApolloProvider } from '@apollo/client'
 import { ConnectedRouter } from 'connected-react-router'
@@ -60,6 +59,7 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
 import VSExport from './views/SysAdmin/Performance/Vsexports/VSExport'
+import { UserAudit } from './views/UserAudit/UserAudit'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -380,7 +380,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.USER_PROFILE}
-                                            component={UserProfile}
+                                            component={UserAudit}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

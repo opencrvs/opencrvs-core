@@ -22,6 +22,7 @@ export interface IMetricsParam {
   practitionerId?: string
   count?: number
   populationYear?: number
+  skip?: number
 }
 
 export const resolvers: GQLResolver = {
@@ -150,19 +151,15 @@ export const resolvers: GQLResolver = {
       )
       return metricsData
     },
-    async fetchTimeLoggedMetricsByPractitioner(
-      _,
-      { timeStart, timeEnd, practitionerId, locationId, count },
-      authHeader
-    ) {
+    async getUserAuditLog(_, params, authHeader) {
       return await getMetrics(
-        '/timeLoggedMetricsByPractitioner',
+        '/audit/events',
         {
-          timeStart,
-          timeEnd,
-          practitionerId,
-          locationId,
-          count
+          practitionerId: params.practitionerId,
+          skip: params.skip,
+          count: params.count,
+          timeStart: params.timeStart,
+          timeEnd: params.timeEnd
         },
         authHeader
       )

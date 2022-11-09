@@ -15,6 +15,7 @@ export const AUTH_PORT = process.env.AUTH_PORT || 4040
 export const HOSTNAME = process.env.DOMAIN || '*'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
+export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
