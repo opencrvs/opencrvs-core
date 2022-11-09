@@ -35,7 +35,7 @@ export const roleScopeMapping: IRoleScopeMapping = {
   REGISTRATION_AGENT: ['validate', 'performance', 'certify'],
   LOCAL_REGISTRAR: ['register', 'performance', 'certify'],
   LOCAL_SYSTEM_ADMIN: ['sysadmin'],
-  NATIONAL_SYSTEM_ADMIN: ['sysadmin'],
+  NATIONAL_SYSTEM_ADMIN: ['sysadmin', 'natlsysadmin'],
   PERFORMANCE_MANAGEMENT: ['performance'],
   NATIONAL_REGISTRAR: ['register', 'performance', 'certify', 'config', 'teams']
 }

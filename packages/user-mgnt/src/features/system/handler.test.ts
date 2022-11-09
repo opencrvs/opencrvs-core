@@ -21,7 +21,7 @@ import { statuses } from '@user-mgnt/utils/userUtils'
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['sysadmin', 'demo'] },
+  { scope: ['natlsysadmin', 'demo'] },
   readFileSync('../auth/test/cert.key'),
   {
     subject: '123',
