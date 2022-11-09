@@ -32,6 +32,9 @@
     "packages/components/**/*.mdx",
     "packages/components/.storybook/preview.jsx",
     "grafana",
+    "packages/scheduler/start.sh",
+    "packages/scheduler/cronTabFiles/*",
+    "packages/scheduler/jobs/*",
     ".nvmrc"
   ],
   "license": "infrastructure/license-header.txt",

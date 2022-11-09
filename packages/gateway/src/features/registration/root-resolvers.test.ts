@@ -908,6 +908,11 @@ describe('Registration root resolvers', () => {
         [JSON.stringify({})],
         [JSON.stringify({ unexpected: true })]
       )
+      fetch.mockResponse(
+        JSON.stringify({
+          refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+        })
+      )
       await expect(
         resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
@@ -1983,6 +1988,11 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      fetch.mockResponse(
+        JSON.stringify({
+          refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+        })
+      )
       await expect(
         resolvers.Mutation.updateBirthRegistration(
           {},
@@ -2009,7 +2019,7 @@ describe('Registration root resolvers', () => {
               relationship: 'MOTHER'
             },
             hasShowedVerifiedDocument: true,
-            data: 'DUMMY'
+            data: 'data:image/png;base64,2324256'
           }
         ]
       }
@@ -2017,17 +2027,22 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails)],
+        [JSON.stringify(mockUserDetails)],
         [
           JSON.stringify({
             resourceType: 'Bundle',
             entry: [
               {
-                response: { location: 'Patient/12423/_history/1' }
+                response: { location: 'Task/12423/_history/1' }
               }
             ]
           })
         ],
-        [JSON.stringify(mockUserDetails)]
+        [
+          JSON.stringify({
+            refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+          })
+        ]
       )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const result = await resolvers.Mutation.markBirthAsCertified(
@@ -2050,6 +2065,11 @@ describe('Registration root resolvers', () => {
         [JSON.stringify(mockUserDetails)]
       )
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      fetch.mockResponse(
+        JSON.stringify({
+          refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+        })
+      )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
         resolvers.Mutation.markBirthAsCertified(
@@ -2090,13 +2110,14 @@ describe('Registration root resolvers', () => {
               relationship: 'INFORMANT'
             },
             hasShowedVerifiedDocument: true,
-            data: 'DUMMY'
+            data: 'data:image/png;base64,2324256'
           }
         ]
       }
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)],
         [
           JSON.stringify({
@@ -2108,7 +2129,11 @@ describe('Registration root resolvers', () => {
             ]
           })
         ],
-        [JSON.stringify(mockUserDetails)]
+        [
+          JSON.stringify({
+            refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+          })
+        ]
       )
 
       const result = await resolvers.Mutation.markDeathAsCertified(

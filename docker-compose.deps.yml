@@ -10,6 +10,7 @@
 version: '3.3'
 volumes:
   metricbeat:
+  minio_data:
 services:
   mongo1:
     image: mongo:4.4
@@ -54,4 +55,8 @@ services:
 
   openhim-console:
     image: jembi/openhim-console:1.13
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:RELEASE.2022-08-13T21-54-44Z
     restart: unless-stopped
