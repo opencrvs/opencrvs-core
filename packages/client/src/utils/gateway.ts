@@ -1512,6 +1512,7 @@ export type QuerySearchRecordArgs = {
   contactNumber?: InputMaybe<Scalars['String']>
   dateOfRegistration?: InputMaybe<Scalars['String']>
   dateOfRegistrationEnd?: InputMaybe<Scalars['String']>
+  registerSystemClient?: InputMaybe<Scalars['String']>
   dateOfRegistrationStart?: InputMaybe<Scalars['String']>
   deathDate?: InputMaybe<Scalars['String']>
   deathDateEnd?: InputMaybe<Scalars['String']>

@@ -168,25 +168,29 @@ export async function deactivateSystemClient(
 
     const auditSystemPayload = request.payload as IAuditSystemPayload
 
-    const system: ISystemModel | null = await System.findById(
-      auditSystemPayload.client_id
-    )
+    const system: ISystemModel | null = await System.findOne({
+      client_id: auditSystemPayload.client_id
+    })
     if (!system) {
       logger.error(
         `No system details found for requested client_id: ${auditSystemPayload.client_id}`
       )
       throw unauthorized()
     }
-
+    let user
     system.status = statuses.DEACTIVATED
 
     try {
-      await System.update({ _id: system._id }, system)
+      await System.update({ _id: system._id }, system).then(async () => {
+        user = await System.findOne({
+          client_id: auditSystemPayload.client_id
+        })
+      })
     } catch (err) {
       logger.error(err.message)
       return h.response().code(400)
     }
-    return h.response().code(200)
+    return h.response(user).code(200)
   } catch (err) {
     logger.error(err)
     return h.response().code(400)
@@ -210,25 +214,29 @@ export async function reactivateSystemClient(
 
     const auditSystemPayload = request.payload as IAuditSystemPayload
 
-    const system: ISystemModel | null = await System.findById(
-      auditSystemPayload.client_id
-    )
+    const system: ISystemModel | null = await System.findOne({
+      client_id: auditSystemPayload.client_id
+    })
     if (!system) {
       logger.error(
         `No system details found for requested client_id: ${auditSystemPayload.client_id}`
       )
       throw unauthorized()
     }
-
+    let user
     system.status = statuses.ACTIVE
 
     try {
-      await System.update({ _id: system._id }, system)
+      await System.update({ _id: system._id }, system).then(async () => {
+        user = await System.findOne({
+          client_id: auditSystemPayload.client_id
+        })
+      })
     } catch (err) {
       logger.error(err.message)
       return h.response().code(400)
     }
-    return h.response().code(200)
+    return h.response(user).code(200)
   } catch (err) {
     logger.error(err)
     return h.response().code(400)

@@ -30,6 +30,11 @@ const messagesToDefine = {
       'For each new client that needs to integrate with OpenCRVS you can create unique client IDs. A number of integration use cases are currently supported, based on both API and webhook technologies.',
     description: 'Label for the text integration page intorduction'
   },
+  copy: {
+    id: 'integrations.copy',
+    defaultMessage: 'Copy',
+    description: 'Label for the text Copy'
+  },
 
   supportingDescription: {
     id: 'integrations.supportingDescription',
