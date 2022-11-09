@@ -12,12 +12,11 @@
 
 import { logger } from '@user-mgnt/logger'
 import System, { ISystemModel } from '@user-mgnt/model/system'
-import User, { IUserModel, IUserName } from '@user-mgnt/model/user'
+import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
-import { statuses, systemScopeMapping } from '@user-mgnt/utils/userUtils'
+import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
-import * as _ from 'lodash'
 import * as Joi from 'joi'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { unauthorized } from '@hapi/boom'
@@ -29,11 +28,11 @@ import {
 } from '@user-mgnt/features/createUser/service'
 
 interface IRegisterSystemPayload {
-  name: IUserName[]
-  scope: string
+  name: string
   settings: {
     dailyQuota: number
   }
+  type: string
 }
 
 interface IRegisterSystemResponse {
@@ -46,22 +45,31 @@ export async function registerSystemClient(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { scope, name, settings } = request.payload as IRegisterSystemPayload
+  const { name, settings, type } = request.payload as IRegisterSystemPayload
   try {
     const token: ITokenPayload = getTokenPayload(
       request.headers.authorization.split(' ')[1]
     )
     const userId = token.sub
     const systemAdminUser: IUserModel | null = await User.findById(userId)
+
+    const existingSystem: ISystemModel | null = await System.findOne({
+      type: type
+    })
+
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
       logger.error('active system admin user details cannot be found')
       throw unauthorized()
     }
-    if (!systemScopeMapping[scope]) {
+
+    if (existingSystem && existingSystem.type === types.NATIONAL_ID) {
+      throw new Error('System with NATIONAL_ID already exists !')
+    }
+    if (!systemScopeMapping[type]) {
       logger.error('scope doesnt exist')
       return h.response().code(400)
     }
-    const systemScopes: string[] = systemScopeMapping[scope]
+    const systemScopes: string[] = systemScopeMapping[type]
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
@@ -99,8 +107,8 @@ export async function registerSystemClient(
     }
     const system = {
       client_id,
-      name: name || systemAdminUser.name,
-      createdBy: systemAdminUser.name,
+      name: name || systemAdminUser.username,
+      createdBy: userId,
       username: systemAdminUser.username,
       status: statuses.ACTIVE,
       scope: systemScopes,
@@ -108,9 +116,9 @@ export async function registerSystemClient(
       secretHash: hash,
       salt,
       sha_secret,
-      settings
+      settings,
+      type
     }
-
     await System.create(system)
     const response: IRegisterSystemResponse = {
       client_id,
@@ -126,14 +134,8 @@ export async function registerSystemClient(
 }
 
 export const reqRegisterSystemSchema = Joi.object({
-  scope: Joi.string().required(),
-  name: Joi.array().items(
-    Joi.object({
-      given: Joi.array().items(Joi.string()),
-      use: Joi.string(),
-      family: Joi.string()
-    })
-  ),
+  type: Joi.string().required(),
+  name: Joi.string(),
   settings: Joi.object({
     dailyQuota: Joi.number()
   })
@@ -313,13 +315,10 @@ export async function getSystemHandler(
     throw unauthorized()
   }
 
-  const systemName = `${system.name[0]?.given || ''} ${
-    system.name[0]?.family || ''
-  }`.trim()
-  const createdBy = `${system.createdBy[0]?.given} ${system.createdBy[0]?.family}`
+  const systemName = system.name
   return {
-    name: systemName || createdBy,
-    createdBy: `${system.createdBy[0]?.given} ${system.createdBy[0]?.family}`,
+    name: systemName || system.createdBy,
+    createdBy: system.createdBy,
     client_id: system.client_id,
     username: system.username,
     status: system.status,
@@ -336,13 +335,9 @@ export async function getAllSystemsHandler() {
   const systems: ISystemModel[] = await System.find()
 
   return systems.map((system) => {
-    const systemName = `${system.name[0]?.given || ''} ${
-      system.name[0]?.family || ''
-    }`.trim()
-
     return {
       client_id: system.client_id,
-      name: systemName,
+      name: system.name,
       sha_secret: system.sha_secret,
       status: system.status
     }

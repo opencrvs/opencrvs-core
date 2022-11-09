@@ -10,12 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { model, Schema, Document } from 'mongoose'
-import { statuses } from '@user-mgnt/utils/userUtils'
-import { IUserName, UserNameSchema } from '@user-mgnt/model/user'
+import { statuses, types } from '@user-mgnt/utils/userUtils'
 
 export interface ISystem {
-  name: IUserName[]
-  createdBy: IUserName[]
+  name: string
+  createdBy: string
   username: string
   client_id: string
   secretHash: string
@@ -28,13 +27,14 @@ export interface ISystem {
     dailyQuota: number
   }
   creationDate?: number
+  type: string
 }
 
 export interface ISystemModel extends ISystem, Document {}
 
 const systemSchema = new Schema({
-  name: { type: [UserNameSchema], required: true },
-  createdBy: { type: [UserNameSchema], required: true },
+  name: { type: String, required: true },
+  createdBy: { type: String, required: true },
   username: { type: String, required: true },
   client_id: { type: String, required: true },
   secretHash: { type: String, required: true },
@@ -50,7 +50,11 @@ const systemSchema = new Schema({
   settings: {
     dailyQuota: { type: String, default: 0 }
   },
-  creationDate: { type: Number, default: Date.now }
+  creationDate: { type: Number, default: Date.now },
+  type: {
+    type: String,
+    enum: [types.HEALTH, types.NATIONAL_ID, types.RECORD_SEARCH]
+  }
 })
 
 export default model<ISystemModel>('System', systemSchema)
