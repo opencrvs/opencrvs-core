@@ -171,6 +171,8 @@ export const ActionDetailsModalListTable = ({
   offlineData,
   draft
 }: IActionDetailsModalListTable) => {
+  console.log(actionDetailsData)
+
   const [currentPage, setCurrentPage] = React.useState(1)
 
   if (registerForm === undefined) return <></>
@@ -423,24 +425,27 @@ export const ActionDetailsModalListTable = ({
       )}
 
       {/* Correction Requester Id Verified */}
-      {actionDetailsData.requester && (
-        <Table
-          noResultText=" "
-          columns={certificateCollectorVerified}
-          content={[
-            {
-              hasShowedVerifiedDocument:
-                actionDetailsData.hasShowedVerifiedDocument
-                  ? intl.formatMessage(certificateMessages.idCheckVerify)
-                  : intl.formatMessage(certificateMessages.idCheckWithoutVerify)
-            }
-          ]}
-          pageSize={10}
-          totalItems={1}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
+      {actionDetailsData.requester !== 'ANOTHER_AGENT' &&
+        actionDetailsData.requester !== 'REGISTRAR' && (
+          <Table
+            noResultText=" "
+            columns={certificateCollectorVerified}
+            content={[
+              {
+                hasShowedVerifiedDocument:
+                  actionDetailsData.hasShowedVerifiedDocument
+                    ? intl.formatMessage(certificateMessages.idCheckVerify)
+                    : intl.formatMessage(
+                        certificateMessages.idCheckWithoutVerify
+                      )
+              }
+            ]}
+            pageSize={10}
+            totalItems={1}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
 
       {/* For Correction Reason */}
       {actionDetailsData.reason &&
