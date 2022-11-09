@@ -18,6 +18,11 @@ services:
     environment:
       - MONGO_URL=mongodb://webhooks:${WEBHOOKS_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/webhooks?replicaSet=rs0
 
+  metrics:
+    environment:
+      - MONGO_URL=mongodb://metrics:${METRICS_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/reports?replicaSet=rs0
+      - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/hearth-dev?replicaSet=rs0
+
   config:
     environment:
       - MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/application-config?replicaSet=rs0
@@ -76,6 +81,7 @@ services:
       - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
       - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
       - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
+      - METRICS_MONGODB_PASSWORD=${METRICS_MONGODB_PASSWORD}
       - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
       - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     deploy:
@@ -113,6 +119,7 @@ services:
       - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
       - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
       - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
+      - METRICS_MONGODB_PASSWORD=${METRICS_MONGODB_PASSWORD}
       - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
       - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     deploy:

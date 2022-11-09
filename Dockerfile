@@ -28,11 +28,13 @@ COPY packages/search/package.json packages/search/package.json
 COPY packages/user-mgnt/package.json packages/user-mgnt/package.json
 COPY packages/workflow/package.json packages/workflow/package.json
 COPY packages/webhooks/package.json packages/webhooks/package.json
+COPY packages/documents/package.json packages/documents/package.json
 COPY patches patches
 RUN yarn install
 
 COPY . .
 ENV VERSION "$VERSION"
 ENV COUNTRY_CONFIG_URL "THIS_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE"
+ENV MINIO_URL "THIS_TOO_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE"
 ENV HOST "{{hostname}}"
 RUN yarn build
