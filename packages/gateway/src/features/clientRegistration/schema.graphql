@@ -8,13 +8,6 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-# {
-#         "scope": "NATIONAL_ID",
-#         "name": [{ "use": "en", "family": "John Doe" }],
-#         "settings": {
-#           "dailyQuota": 50
-#         }
-#       }
 input NameArray {
   use: String
   family: String
@@ -32,6 +25,8 @@ type ClientCreationResponse {
   client_id: String
   client_secret: String
   sha_secret: String
+  name: String
+  status: String
 }
 
 type Mutation {

@@ -46,6 +46,7 @@ interface IButtonsMessages
   retry: MessageDescriptor
   review: MessageDescriptor
   save: MessageDescriptor
+  refresh: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteDeclaration: MessageDescriptor
   closeDeclaration: MessageDescriptor
@@ -243,6 +244,13 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Review button text',
     id: 'buttons.review'
   },
+
+  refresh: {
+    defaultMessage: 'Refresh',
+    description: 'Refresh button',
+    id: 'buttons.refresh'
+  },
+
   save: {
     defaultMessage: 'Save',
     description: 'Save Button Text',

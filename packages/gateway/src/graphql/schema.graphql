@@ -170,6 +170,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
+  fetchIntegration(ids: IdsInput): SystemIntegrationsResponse
 }
 
 type Mutation {
@@ -251,6 +252,8 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
+  reactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
+  deactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
 }
 
 type Dummy {
@@ -522,6 +525,17 @@ type FormDraft {
   createdAt: Date!
 }
 
+type SystemIntegrationsResponse {
+  name: String
+  clientId: String
+  shaSecret: String
+}
+
+input IdsInput {
+  systemId: String
+  clientId: String
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -590,6 +604,8 @@ type ClientCreationResponse {
   client_id: String
   client_secret: String
   sha_secret: String
+  name: String
+  status: String
 }
 
 input ClientRegistrationPayload {
@@ -680,6 +696,17 @@ input FormDraftStatusModifyInput {
 
 input DeleteFormDraftInput {
   event: Event!
+}
+
+type IntegrationResponse {
+  status: String
+  _id: String
+  username: String
+  client_id: String
+}
+
+input ClientPayload {
+  client_id: String!
 }
 
 scalar Map

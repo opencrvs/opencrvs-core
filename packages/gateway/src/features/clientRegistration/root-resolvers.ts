@@ -22,7 +22,6 @@ export const resolvers: GQLResolver = {
           new Error('Only sysadmin is allowed to create client')
         )
       }
-      // if (clientDetails) {
       const res = await fetch(`${USER_MANAGEMENT_URL}registerSystemClient`, {
         method: 'POST',
         body: JSON.stringify(clientDetails),
@@ -31,9 +30,6 @@ export const resolvers: GQLResolver = {
           ...authHeader
         }
       })
-      // if (res.status == 200) {
-      //   return await Promise.resolve({ message: 'User status activated' })
-      // }
 
       if (res.status !== 201) {
         return await Promise.reject(
@@ -44,6 +40,5 @@ export const resolvers: GQLResolver = {
       }
       return await res.json()
     }
-    // }
   }
 }

@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useEffect } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
 import { useIntl } from 'react-intl'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ListViewItemSimplified,
   ListViewSimplified
@@ -27,21 +28,24 @@ import {
   Pill,
   Select,
   Spinner,
-  Stack,
   TextInput,
-  ToggleMenu
+  ToggleMenu,
+  Toast,
+  Stack
 } from '@opencrvs/components/lib'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { Button } from '@opencrvs/components/lib/Button'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import { EMPTY_STRING } from '@client/utils/constants'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import styled from 'styled-components'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { connect, useSelector } from 'react-redux'
+import { connect, useSelector, useDispatch } from 'react-redux'
+import { gql } from '@apollo/client'
+import { updateOfflineIntegrations } from '@client/offline/actions'
+import { Mutation } from '@apollo/client/react/components'
+import { Integration } from '@client/utils/referenceApi'
 import { getOfflineData } from '@client/offline/selectors'
 import { Text } from '@opencrvs/components/lib/Text'
-import { gql } from '@apollo/client'
-import { Mutation } from '@apollo/client/react/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 export const statuses = {
@@ -50,6 +54,69 @@ export const statuses = {
   DISABLED: 'disabled',
   DEACTIVATED: 'deactivated'
 }
+export enum NOTIFICATION_STATUS {
+  SUCCESS = 'success',
+  IDLE = 'idle',
+  IN_PROGRESS = 'inProgress',
+  ERROR = 'error'
+}
+export interface IntegrationType {
+  client_id: string
+  name: string
+  sha_secret: string
+  status: string
+}
+
+interface ToggleModal {
+  modalVisible: boolean
+  selectedClient: Integration | null
+}
+type Secret = {
+  client_id: string
+  client_secret: string
+  sha_secret: string
+  name: string
+  status: string
+}
+const TopText = styled(Text)`
+  margin-top: 20px;
+`
+const ButtonLink = styled(Link)`
+  text-align: left;
+`
+
+export const registerSystemClient = gql`
+  mutation registerSystemClient($clientDetails: ClientRegistrationPayload) {
+    registerSystemClient(clientDetails: $clientDetails) {
+      client_id
+      client_secret
+      sha_secret
+      name
+      status
+    }
+  }
+`
+
+export const deactivateClient = gql`
+  mutation deactivateSystemClient($clientDetails: ClientPayload) {
+    deactivateSystemClient(clientDetails: $clientDetails) {
+      status
+      _id
+      username
+      client_id
+    }
+  }
+`
+export const activateClient = gql`
+  mutation reactivateSystemClient($clientDetails: ClientPayload) {
+    reactivateSystemClient(clientDetails: $clientDetails) {
+      status
+      _id
+      username
+      client_id
+    }
+  }
+`
 
 const PaddedAlert = styled(Alert)`
   margin-top: 16px;
@@ -61,39 +128,36 @@ const StyledSpinner = styled(Spinner)`
 const Field = styled.div`
   margin-top: 16px;
 `
-export const registerSystemClient = gql`
-  mutation registerSystemClient($clientDetails: ClientRegistrationPayload) {
-    registerSystemClient(clientDetails: $clientDetails) {
-      client_id
-      client_secret
-      sha_secret
-    }
-  }
-`
-type Secret = {
-  client_id: string
-  client_secret: string
-  sha_secret: string
-}
 /* TODO: Note, dispatch an action when create client is successful
 using the action in ocrvs-3595 UpdateOfflineIntegrationsAction
 */
 export function Integrations() {
   const intl = useIntl()
+  const dispatch = useDispatch()
   const offlineData = useSelector(getOfflineData)
-  const [showModal, setToggleModal] = React.useState<boolean>(false)
   const [createClientInfo, setCreateClientInfo] = React.useState<boolean>(true)
-  const [secretAvailable, setSecretAvailable] = React.useState<boolean>(false)
   const [generateClientInfo, setGenerateClientInfo] =
     React.useState<boolean>(false)
   const [clientName, setClientName] = React.useState<string>(EMPTY_STRING)
   const [clientType, setClientType] = React.useState<string>(EMPTY_STRING)
+  const [showModal, setShowModal] = React.useState<boolean>(false)
+  const [secretAvailable, setSecretAvailable] = React.useState<boolean>(false)
   const [clientSecret, setClientSecret] = React.useState<Secret>()
+  const [clientId, setClientId] = useState('')
+  const [clientStatus, setClientStatus] = useState('')
+  const [toggleKeyModal, setToggleKeyModal] = useState<ToggleModal>({
+    modalVisible: false,
+    selectedClient: null
+  })
+
+  const [notificationStatus, setNotificationStatus] = useState(
+    NOTIFICATION_STATUS.IDLE
+  )
   useEffect(() => {
     setSecretAvailable(true)
   }, [clientSecret])
   const toggleModal = () => {
-    setToggleModal((prev) => !prev)
+    setShowModal((prev) => !prev)
   }
 
   const clearSecret = () => {
@@ -107,6 +171,7 @@ export function Integrations() {
   const changeModalInfo = async (mutation: () => any) => {
     await mutation().then((data: any) => {
       setClientSecret(data.data.registerSystemClient)
+      dispatchNewIntegration()
     })
     setCreateClientInfo(!createClientInfo)
     setGenerateClientInfo(!generateClientInfo)
@@ -133,6 +198,69 @@ export function Integrations() {
 
   */
 
+  function returnLabelText(status: string) {
+    if (status === statuses.DEACTIVATED) {
+      return intl.formatMessage(integrationMessages.activate)
+    } else {
+      return intl.formatMessage(integrationMessages.deactivate)
+    }
+  }
+
+  const toggleRevealKeyModal = useCallback(
+    function toggleRevealKeyModal(integration?: Integration) {
+      if (integration !== undefined) {
+        setToggleKeyModal({
+          ...toggleKeyModal,
+          modalVisible: true,
+          selectedClient: integration
+        })
+      } else {
+        setToggleKeyModal({
+          ...toggleKeyModal,
+          modalVisible: false
+        })
+      }
+    },
+    [toggleKeyModal]
+  )
+
+  function showSuccessToast() {
+    setShowModal(false)
+    setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
+    dispatchChanges()
+  }
+  function dispatchChanges() {
+    const integrations = offlineData.integrations.map(
+      (integration: Integration) => {
+        if (integration.client_id === clientId) {
+          if (clientStatus === statuses.DEACTIVATED) {
+            integration = { ...integration, status: statuses.ACTIVE }
+          } else {
+            integration = { ...integration, status: statuses.DEACTIVATED }
+          }
+          return integration
+        }
+        return integration
+      }
+    )
+    dispatch(updateOfflineIntegrations({ integrations }))
+  }
+  function dispatchNewIntegration() {
+    const integrations = [
+      ...offlineData.integrations,
+      {
+        name: clientName,
+        status: 'active',
+        sha_secret: clientSecret?.sha_secret,
+        client_id: clientSecret?.client_id
+      }
+    ]
+    dispatch(updateOfflineIntegrations({ integrations }))
+  }
+  function showErrorToast() {
+    setShowModal(false)
+    setNotificationStatus(NOTIFICATION_STATUS.ERROR)
+  }
   return (
     <Frame
       header={<Header />}
@@ -144,16 +272,16 @@ export function Integrations() {
       <Content
         title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
-          <Button type="secondary" onClick={toggleModal}>
+          <Button type="secondary" onClick={() => setShowModal(true)}>
             <Plus /> {intl.formatMessage(integrationMessages.createClient)}
           </Button>
         ]}
       >
         {intl.formatMessage(integrationMessages.pageIntroduction)}
-
         <ListViewSimplified>
-          {offlineData.integrations.map((integration) => (
+          {offlineData.integrations.map((integration: Integration) => (
             <ListViewItemSimplified
+              key={integration.client_id}
               actions={
                 <>
                   {integration.status === 'active' ? (
@@ -172,7 +300,9 @@ export function Integrations() {
                     id="toggleMenu"
                     menuItems={[
                       {
-                        handler: () => {},
+                        handler: () => {
+                          toggleRevealKeyModal(integration)
+                        },
                         label: intl.formatMessage(
                           integrationMessages.revealKeys
                         )
@@ -183,6 +313,14 @@ export function Integrations() {
                           integration.status === 'active'
                             ? intl.formatMessage(integrationMessages.disable)
                             : intl.formatMessage(integrationMessages.enable)
+                      },
+                      {
+                        handler: () => {
+                          setShowModal(!showModal)
+                          setClientId(integration.client_id)
+                          setClientStatus(integration.status)
+                        },
+                        label: returnLabelText(integration.status)
                       },
                       {
                         handler: () => {},
@@ -197,7 +335,134 @@ export function Integrations() {
               value="-"
             />
           ))}
+          {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
+            <>
+              <Toast
+                type={
+                  notificationStatus === NOTIFICATION_STATUS.SUCCESS
+                    ? 'success'
+                    : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+                    ? 'loading'
+                    : 'error'
+                }
+                duration={3000}
+                id="toggleClientStatusToast"
+                onClose={() => setNotificationStatus(NOTIFICATION_STATUS.IDLE)}
+              >
+                {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+                  ? intl.formatMessage(integrationMessages.loading)
+                  : notificationStatus === NOTIFICATION_STATUS.SUCCESS &&
+                    clientStatus === statuses.ACTIVE
+                  ? intl.formatMessage(
+                      integrationMessages.deactivateClientStatus
+                    )
+                  : notificationStatus === NOTIFICATION_STATUS.SUCCESS &&
+                    clientStatus === statuses.DEACTIVATED
+                  ? intl.formatMessage(integrationMessages.activateClientStatus)
+                  : intl.formatMessage(integrationMessages.error)}
+              </Toast>
+            </>
+          )}
+          {showModal && (
+            <ResponsiveModal
+              title={
+                clientStatus === statuses.ACTIVE
+                  ? intl.formatMessage(integrationMessages.deactivateClient)
+                  : intl.formatMessage(integrationMessages.activateClient)
+              }
+              contentHeight={50}
+              responsive={false}
+              actions={[
+                <TertiaryButton
+                  id="cancel"
+                  key="cancel"
+                  onClick={() => setShowModal(!showModal)}
+                >
+                  {intl.formatMessage(buttonMessages.cancel)}
+                </TertiaryButton>,
+
+                <Mutation
+                  mutation={
+                    clientStatus === statuses.ACTIVE
+                      ? deactivateClient
+                      : activateClient
+                  }
+                  variables={{
+                    clientDetails: {
+                      client_id: clientId
+                    }
+                  }}
+                  onCompleted={() => {
+                    showSuccessToast()
+                  }}
+                  onError={() => {
+                    showErrorToast()
+                  }}
+                >
+                  {(toggleClientStatus: any) => {
+                    return (
+                      <PrimaryButton
+                        key="confirm"
+                        id="confirm"
+                        onClick={() => {
+                          toggleClientStatus()
+                        }}
+                      >
+                        {intl.formatMessage(buttonMessages.confirm)}
+                      </PrimaryButton>
+                    )
+                  }}
+                </Mutation>
+              ]}
+              show={true}
+              handleClose={() => setShowModal(!showModal)}
+            >
+              {clientStatus === statuses.ACTIVE
+                ? intl.formatMessage(integrationMessages.deactivateClientText)
+                : intl.formatMessage(integrationMessages.activateClientText)}
+            </ResponsiveModal>
+          )}
         </ListViewSimplified>
+
+        <ResponsiveModal
+          actions={[
+            <Link onClick={() => toggleRevealKeyModal()}>
+              {intl.formatMessage(buttonMessages.cancel)}
+            </Link>
+          ]}
+          autoHeight={true}
+          titleHeightAuto={true}
+          show={toggleKeyModal.modalVisible}
+          handleClose={() => toggleRevealKeyModal()}
+          title={toggleKeyModal.selectedClient?.name ?? ''}
+        >
+          {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+
+          <>
+            <TopText variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.clientId)}{' '}
+            </TopText>
+            <Text variant="reg16" element="p">
+              {' '}
+              {toggleKeyModal.selectedClient?.client_id}
+            </Text>
+
+            <TopText variant="bold16" element="span">
+              {' '}
+              {intl.formatMessage(integrationMessages.clientSecret)}
+            </TopText>
+            <ButtonLink>
+              {intl.formatMessage(buttonMessages.refresh)}
+            </ButtonLink>
+
+            <TopText variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.shaSecret)}
+            </TopText>
+            <Text variant="reg16" element="p">
+              {toggleKeyModal.selectedClient?.sha_secret}
+            </Text>
+          </>
+        </ResponsiveModal>
       </Content>
       <ResponsiveModal
         actions={[
@@ -566,5 +831,4 @@ export function Integrations() {
     </Frame>
   )
 }
-
 export const IntegrationList = connect()(Integrations)
