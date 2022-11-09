@@ -12,7 +12,6 @@
 import React, { useCallback, useState } from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
 import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/formConfig'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -22,19 +21,30 @@ import {
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
-import { Plus, VerticalThreeDots } from '@client/../../components/lib/icons'
-import { Link, Pill, Toast, ToggleMenu } from '@client/../../components/lib'
+import { Plus, VerticalThreeDots } from '@opencrvs/components/lib/icons'
+import {
+  Alert,
+  InputField,
+  Link,
+  Pill,
+  Select,
+  Spinner,
+  TextInput,
+  ToggleMenu,
+  Toast
+} from '@opencrvs/components/lib'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { Button } from '@client/../../components/lib/Button'
+import { Button } from '@opencrvs/components/lib/Button'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import { connect, useDispatch, useSelector } from 'react-redux'
-import { getOfflineData } from '@client/offline/selectors'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { connect, useSelector, useDispatch } from 'react-redux'
 import { gql } from '@apollo/client'
 import { updateOfflineIntegrations } from '@client/offline/actions'
 import { Mutation } from '@apollo/client/react/components'
 import { Integration } from '@client/utils/referenceApi'
 import styled from 'styled-components'
 import { Text } from '@opencrvs/components/lib/Text'
+import { getOfflineData } from '@client/offline/selectors'
 
 export const statuses = {
   PENDING: 'pending',
@@ -88,10 +98,52 @@ export const activateClient = gql`
   }
 `
 
-function Integrations() {
+const PaddedAlert = styled(Alert)`
+  margin-top: 16px;
+`
+
+const StyledSpinner = styled(Spinner)`
+  margin: 10px 0;
+`
+const Field = styled.div`
+  margin-top: 16px;
+`
+
+export function Integrations() {
   const intl = useIntl()
   const dispatch = useDispatch()
   const offlineData = useSelector(getOfflineData)
+  const [createClientInfo, setCreateClientInfo] = React.useState<boolean>(true)
+  const [generateClientInfo, setGenerateClientInfo] =
+    React.useState<boolean>(false)
+  const [clientName, setClientName] = React.useState<string>(EMPTY_STRING)
+  const [clientType, setClientType] = React.useState<string>(EMPTY_STRING)
+
+  const changeModalInfo = () => {
+    setCreateClientInfo(!createClientInfo)
+    setGenerateClientInfo(!generateClientInfo)
+  }
+
+  const onChangeText = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = String(event.target.value)
+    setClientName(value)
+  }
+
+  /* TODO: Note, webhooks will be amended in OCRVS-4160
+
+  const [NoPII, setSelected] = React.useState(false)
+  const [selectedTab, setSelectedTab] = React.useState<string>(
+    WebhookOption.birth
+  )
+  const [selectedItems, setSelectedItems] = useState(['registration-details'])
+  const [selectedItemsNoPII, setSelectedItemsNoPII] = useState([
+    'registration-details-noPII'
+  ])
+  const toggleOnChange = () => {
+    setSelected(!NoPII)
+  }
+  */
+
   const [showModal, setShowModal] = useState(false)
   const [clientId, setClientId] = useState('')
   const [clientStatus, setClientStatus] = useState('')
@@ -163,14 +215,15 @@ function Integrations() {
       )}
     >
       <Content
-        title={intl.formatMessage(messages.integrations)}
+        title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
-          <Button type="secondary">
+          <Button type="secondary" onClick={() => setShowModal(true)}>
             <Plus /> {intl.formatMessage(integrationMessages.createClient)}
           </Button>
         ]}
       >
         {intl.formatMessage(integrationMessages.pageIntroduction)}
+
         <ListViewSimplified>
           {offlineData.integrations.map((integration: Integration) => (
             <ListViewItemSimplified
@@ -357,6 +410,277 @@ function Integrations() {
           </>
         </ResponsiveModal>
       </Content>
+      <ResponsiveModal
+        actions={[
+          <Link onClick={() => setShowModal(true)}>
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Link>,
+          <Button
+            disabled={clientType === '' || clientName === ''}
+            onClick={changeModalInfo}
+            type="primary"
+          >
+            {intl.formatMessage(buttonMessages.create)}
+          </Button>
+        ]}
+        autoHeight={true}
+        titleHeightAuto={true}
+        show={showModal}
+        handleClose={() => setShowModal(true)}
+        title={
+          createClientInfo
+            ? intl.formatMessage(integrationMessages.createClient)
+            : 'Sweet Health'
+        }
+      >
+        {createClientInfo
+          ? intl.formatMessage(integrationMessages.supportingDescription)
+          : intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+
+        {createClientInfo && (
+          <>
+            <Field>
+              <InputField
+                id="name_of_client"
+                touched={false}
+                required={true}
+                label={intl.formatMessage(integrationMessages.name)}
+              >
+                <TextInput
+                  id="client_name"
+                  type="text"
+                  value={clientName}
+                  onChange={onChangeText}
+                  error={false}
+                  inputFieldWidth="100%"
+                />
+              </InputField>
+            </Field>
+
+            <Field>
+              <InputField
+                id="select-input"
+                touched={false}
+                label={intl.formatMessage(integrationMessages.type)}
+              >
+                <Select
+                  ignoreMediaQuery
+                  onChange={(val: string) => {
+                    setClientType(val)
+                  }}
+                  value={clientType}
+                  options={[
+                    {
+                      label: intl.formatMessage(
+                        integrationMessages.healthNotification
+                      ),
+                      value: 'health-notification'
+                    },
+                    {
+                      label: intl.formatMessage(integrationMessages.mosip),
+                      value: 'mosip'
+                    },
+                    {
+                      label: intl.formatMessage(
+                        integrationMessages.recordSearch
+                      ),
+                      value: 'record-search'
+                    }
+                    /* TODO: Note, this will be amended in OCRVS-4160
+                    {
+                      label: intl.formatMessage(integrationMessages.webhook),
+                      value: 'webhook'
+                    } */
+                  ]}
+                />
+              </InputField>
+            </Field>
+
+            {clientType === 'health-notification' && (
+              <PaddedAlert type="info">
+                {intl.formatMessage(
+                  integrationMessages.healthnotificationAlertDescription
+                )}
+                <Link
+                  onClick={() => {
+                    window.open('https://documentation.opencrvs.org/', '_blank')
+                  }}
+                  font="bold16"
+                >
+                  documentation.opencrvs.org
+                </Link>
+              </PaddedAlert>
+            )}
+
+            {(clientType === 'mosip' ||
+              clientType === 'record-search' ||
+              clientType === 'webhook') && (
+              <PaddedAlert type="info">
+                {intl.formatMessage(integrationMessages.otherAlertDescription)}
+                {'\n'}
+                <Link
+                  onClick={() => {
+                    window.open('https://documentation.opencrvs.org/', '_blank')
+                  }}
+                  font="bold16"
+                >
+                  documentation.opencrvs.org
+                </Link>
+              </PaddedAlert>
+            )}
+
+            {/* TODO: Note, webhooks will be amended in OCRVS-4160
+            clientType === 'webhook' && (
+              <>
+                <InputField
+                  id="select-input"
+                  touched={false}
+                  label={intl.formatMessage(integrationMessages.label)}
+                >
+                  <Label>
+                    {intl.formatMessage(integrationMessages.webhookDescription)}
+                  </Label>
+                </InputField>
+                <FormTabs
+                  sections={[
+                    {
+                      id: WebhookOption.birth,
+                      title: intl.formatMessage(integrationMessages.birth)
+                    },
+                    {
+                      id: WebhookOption.death,
+                      title: intl.formatMessage(integrationMessages.death)
+                    }
+                  ]}
+                  activeTabId={selectedTab}
+                  onTabClick={(tabId) => setSelectedTab(tabId)}
+                />
+                <Divider />
+                {selectedTab === WebhookOption.birth ? (
+                  <>
+                    <CheckboxGroup
+                      id="test-checkbox-group1"
+                      options={[
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.registrationDetails
+                          ),
+                          value: 'registration-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.childDetails
+                          ),
+                          value: 'child-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.motherDetails
+                          ),
+                          value: 'mothers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.fatherDetails
+                          ),
+                          value: 'fathers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.informantDetails
+                          ),
+                          value: 'informant-details'
+                        }
+                      ]}
+                      name="test-checkbox-group1"
+                      value={selectedItems}
+                      onChange={(newValue) => {
+                        setSelectedItems(newValue)
+                      }}
+                    />
+                    <Divider />
+
+                    {NoPII && (
+                      <CheckboxGroup
+                        id="test-checkbox-group1"
+                        options={[
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.registrationDetailsNoPII
+                            ),
+                            value: 'registration-details-noPII'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.childDetailsNoPII
+                            ),
+                            value: 'child-details-noPII'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.motherDetailsNoPII
+                            ),
+                            value: 'mothers-details-noPII'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.fatherDetailsNoPII
+                            ),
+                            value: 'fathers-details-noPII'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.informantDetailsNoPII
+                            ),
+                            value: 'informant-details-noPII'
+                          }
+                        ]}
+                        name="test-checkbox-group1"
+                        value={selectedItemsNoPII}
+                        onChange={(newValue) => setSelectedItemsNoPII(newValue)}
+                      />
+                    )}
+
+                    <Stack
+                      alignItems="center"
+                      direction="row"
+                      gap={8}
+                      justifyContent="flex-start"
+                    >
+                      <Toggle
+                        defaultChecked={!NoPII}
+                        onChange={toggleOnChange}
+                      />
+                      <div>
+                        {intl.formatMessage(integrationMessages.PIIDataLabel)}
+                      </div>
+                    </Stack>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </>
+                )*/}
+          </>
+        )}
+
+        {generateClientInfo && (
+          <>
+            <Text variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.clientId)}
+              <StyledSpinner size={24} id="Spinner" />
+            </Text>
+            <Text variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.clientSecret)}
+              <StyledSpinner size={24} id="Spinner" />
+            </Text>
+            <Text variant="bold16" element="span">
+              {intl.formatMessage(integrationMessages.shaSecret)}
+              <StyledSpinner size={24} id="Spinner" />
+            </Text>
+          </>
+        )}
+      </ResponsiveModal>
     </Frame>
   )
 }
