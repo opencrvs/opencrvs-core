@@ -172,7 +172,7 @@ export function Integrations() {
   const changeModalInfo = async (mutation: () => any) => {
     await mutation().then((data: any) => {
       setClientSecret(data.data.registerSystemClient)
-      dispatchNewIntegration()
+      dispatchNewIntegration(data.data.registerSystemClient)
     })
     setCreateClientInfo(!createClientInfo)
     setGenerateClientInfo(!generateClientInfo)
@@ -246,19 +246,17 @@ export function Integrations() {
     )
     dispatch(updateOfflineIntegrations({ integrations }))
   }
-  function dispatchNewIntegration() {
-    if (clientSecret?.sha_secret && clientSecret?.client_id) {
-      const integrations = [
-        ...offlineData.integrations,
-        {
-          name: clientName,
-          status: 'active',
-          sha_secret: clientSecret?.sha_secret,
-          client_id: clientSecret?.client_id
-        }
-      ]
-      dispatch(updateOfflineIntegrations({ integrations }))
-    }
+  function dispatchNewIntegration(newIntegration: Secret) {
+    const integrations = [
+      ...offlineData.integrations,
+      {
+        name: clientName,
+        status: 'active',
+        sha_secret: newIntegration?.sha_secret,
+        client_id: newIntegration?.client_id
+      }
+    ]
+    dispatch(updateOfflineIntegrations({ integrations }))
   }
   function showErrorToast() {
     setShowModal(false)
