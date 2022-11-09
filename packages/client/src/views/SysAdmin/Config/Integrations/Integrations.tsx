@@ -141,6 +141,7 @@ export function Integrations() {
   const [clientName, setClientName] = React.useState<string>(EMPTY_STRING)
   const [clientType, setClientType] = React.useState<string>(EMPTY_STRING)
   const [showModal, setShowModal] = React.useState<boolean>(false)
+  const [confirmModal, setConfirmModal] = React.useState<boolean>(false)
   const [secretAvailable, setSecretAvailable] = React.useState<boolean>(false)
   const [clientSecret, setClientSecret] = React.useState<Secret>()
   const [clientId, setClientId] = useState('')
@@ -246,16 +247,18 @@ export function Integrations() {
     dispatch(updateOfflineIntegrations({ integrations }))
   }
   function dispatchNewIntegration() {
-    const integrations = [
-      ...offlineData.integrations,
-      {
-        name: clientName,
-        status: 'active',
-        sha_secret: clientSecret?.sha_secret,
-        client_id: clientSecret?.client_id
-      }
-    ]
-    dispatch(updateOfflineIntegrations({ integrations }))
+    if (clientSecret?.sha_secret && clientSecret?.client_id) {
+      const integrations = [
+        ...offlineData.integrations,
+        {
+          name: clientName,
+          status: 'active',
+          sha_secret: clientSecret?.sha_secret,
+          client_id: clientSecret?.client_id
+        }
+      ]
+      dispatch(updateOfflineIntegrations({ integrations }))
+    }
   }
   function showErrorToast() {
     setShowModal(false)
@@ -316,7 +319,7 @@ export function Integrations() {
                       },
                       {
                         handler: () => {
-                          setShowModal(!showModal)
+                          setConfirmModal(!confirmModal)
                           setClientId(integration.client_id)
                           setClientStatus(integration.status)
                         },
@@ -363,7 +366,7 @@ export function Integrations() {
               </Toast>
             </>
           )}
-          {showModal && (
+          {confirmModal && (
             <ResponsiveModal
               title={
                 clientStatus === statuses.ACTIVE
@@ -376,7 +379,7 @@ export function Integrations() {
                 <TertiaryButton
                   id="cancel"
                   key="cancel"
-                  onClick={() => setShowModal(!showModal)}
+                  onClick={() => setConfirmModal(!confirmModal)}
                 >
                   {intl.formatMessage(buttonMessages.cancel)}
                 </TertiaryButton>,
@@ -394,6 +397,7 @@ export function Integrations() {
                   }}
                   onCompleted={() => {
                     showSuccessToast()
+                    setConfirmModal(false)
                   }}
                   onError={() => {
                     showErrorToast()
@@ -415,7 +419,7 @@ export function Integrations() {
                 </Mutation>
               ]}
               show={true}
-              handleClose={() => setShowModal(!showModal)}
+              handleClose={() => setConfirmModal(!confirmModal)}
             >
               {clientStatus === statuses.ACTIVE
                 ? intl.formatMessage(integrationMessages.deactivateClientText)
