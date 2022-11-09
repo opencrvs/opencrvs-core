@@ -223,3 +223,21 @@ export const GET_TOTAL_CERTIFICATIONS = gql`
     }
   }
 `
+export const GET_OFFICEWISE_REGISTRATIONS = gql`
+  query getOfficewiseRegistrations(
+    $locationId: String!
+    $timeStart: String!
+    $timeEnd: String!
+    $event: String!
+  ) {
+    getOfficewiseRegistrations(
+      locationId: $locationId
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      event: $event
+    ) {
+      total
+      officeLocation
+    }
+  }
+`

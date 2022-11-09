@@ -48,7 +48,8 @@ import {
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
-  FORM_CONFIG_HOME
+  FORM_CONFIG_HOME,
+  EVENT_REGISTRATIONS
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -75,6 +76,8 @@ import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { useLocation } from 'react-router'
+import * as React from 'react'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -86,6 +89,11 @@ export function formatUrl(url: string, props: { [key: string]: string }) {
     url
   )
   return formattedUrl.endsWith('?') ? formattedUrl.slice(0, -1) : formattedUrl
+}
+
+export function useQuery() {
+  const { search } = useLocation()
+  return React.useMemo(() => new URLSearchParams(search), [search])
 }
 
 export const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
@@ -391,6 +399,23 @@ export function goToCompletenessRates(
             time
           }
     )
+  })
+}
+
+export function goToRegistrations(
+  eventType: 'BIRTH' | 'DEATH',
+  locationId: string,
+  timeStart: Date,
+  timeEnd: Date
+) {
+  return push({
+    pathname: EVENT_REGISTRATIONS,
+    search: stringify({
+      eventType,
+      locationId,
+      timeStart: timeStart.toISOString(),
+      timeEnd: timeEnd.toISOString()
+    })
   })
 }
 

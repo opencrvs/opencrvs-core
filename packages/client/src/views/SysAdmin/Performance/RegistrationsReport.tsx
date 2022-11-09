@@ -27,6 +27,10 @@ import {
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { useIntl } from 'react-intl'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages'
+import { useDispatch } from 'react-redux'
+import { goToRegistrations, useQuery } from '@client/navigation'
 
 interface RegistrationsReportProps {
   data: GQLTotalMetricsResult
@@ -38,6 +42,9 @@ export function RegistrationsReport({
   selectedEvent
 }: RegistrationsReportProps) {
   const intl = useIntl()
+  const dispatch = useDispatch()
+  const query = useQuery()
+
   return (
     <ReportContainer>
       <ListViewItemSimplified
@@ -93,6 +100,23 @@ export function RegistrationsReport({
               </BreakdownRow>
             </Breakdown>
           </div>
+        }
+        actions={
+          <LinkButton
+            id="registration-report-view"
+            onClick={() =>
+              dispatch(
+                goToRegistrations(
+                  selectedEvent,
+                  query.get('locationId')!,
+                  new Date(query.get('timeStart')!),
+                  new Date(query.get('timeEnd')!)
+                )
+              )
+            }
+          >
+            {intl.formatMessage(buttonMessages.view)}
+          </LinkButton>
         }
       />
       {selectedEvent === 'BIRTH' && (
