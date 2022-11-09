@@ -159,6 +159,22 @@ export const resolvers: GQLResolver = {
         locationId ? { locationId, populationYear } : { populationYear },
         authHeader
       )
+    },
+    async getOfficewiseRegistrations(
+      _,
+      { timeStart, timeEnd, locationId, event },
+      authHeader
+    ) {
+      return getMetrics(
+        '/officewiseRegistrations',
+        {
+          timeStart,
+          timeEnd,
+          locationId,
+          event
+        },
+        authHeader
+      )
     }
   }
 }

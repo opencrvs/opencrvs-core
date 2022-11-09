@@ -101,6 +101,11 @@ type LocationStatisticsResponse {
   offices: Int!
 }
 
+type OfficewiseRegistration {
+  officeLocation: String!
+  total: Int!
+}
+
 type Query {
   getTotalMetrics(
     timeStart: String!
@@ -153,4 +158,10 @@ type Query {
     locationId: String!
     count: Int!
   ): TimeLoggedMetricsResultSet
+  getOfficewiseRegistrations(
+    timeStart: String!
+    timeEnd: String!
+    event: String!
+    locationId: String!
+  ): [OfficewiseRegistration]
 }
