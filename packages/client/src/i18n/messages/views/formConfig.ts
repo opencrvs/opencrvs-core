@@ -34,7 +34,6 @@ interface IFormConfigMessages
   addInputContent: MessageDescriptor
   pages: MessageDescriptor
   title: MessageDescriptor
-  integrations: MessageDescriptor
   previewDescription: MessageDescriptor
   publishedDescription: MessageDescriptor
   publishedWarning: MessageDescriptor
@@ -229,12 +228,6 @@ const messagesToDefine: IFormConfigMessages = {
     description: 'Title for Form Configuration Page'
   },
 
-  integrations: {
-    id: 'config.integrations.',
-    defaultMessage: 'Integrations',
-    description: 'Title for Form Integrations Page'
-  },
-
   previewDescription: {
     id: 'config.form.preview.description',
     defaultMessage:
@@ -258,7 +251,7 @@ const messagesToDefine: IFormConfigMessages = {
     description: 'Content key label for formTools'
   },
   feildId: {
-    id: 'config.form.tools.feildId',
+    id: 'config.form.tools.fieldId',
     defaultMessage: 'Field ID',
     description: 'Content id for formTools'
   },

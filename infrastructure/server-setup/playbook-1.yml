@@ -164,10 +164,21 @@
       tags:
         - swap.file.swapon
 
+    - name: Check mongo data directory
+      stat:
+        path: /data/mongo
+      register: mongo_data
+
     - name: 'Create mongo data directory'
       file:
         path: /data/mongo
         state: directory
+      when: not mongo_data.stat.exists
+
+    - name: Check mongo data backup directory
+      stat:
+        path: /data/backups/mongo
+      register: mongo_data_backup
 
     - name: 'Create mongo backup directory'
       file:
@@ -176,11 +187,17 @@
         group: 1000
         owner: 1000
         mode: g+rwx
+      when: not mongo_data_backup.stat.exists
 
     - name: 'Create traefik data directory'
       file:
         path: /data/traefik
         state: directory
+
+    - name: Check elasticsearch data directory
+      stat:
+        path: /data/elasticsearch
+      register: elasticsearch_data
 
     - name: 'Create elasticsearch data directory'
       file:
@@ -189,6 +206,12 @@
         group: 1000
         owner: 1000
         mode: g+rwx
+      when: not elasticsearch_data.stat.exists
+
+    - name: Check elasticsearch data backup directory
+      stat:
+        path: /data/backups/elasticsearch
+      register: elasticsearch_data_backup
 
     - name: 'Create elasticsearch backup directory'
       file:
@@ -196,12 +219,24 @@
         state: directory
         group: 1000
         owner: 1000
-        mode: ugo+rwx
+        mode: g+rwx
+      when: not elasticsearch_data_backup.stat.exists
+
+    - name: Check influxdb data directory
+      stat:
+        path: /data/influxdb
+      register: influxdb_data
 
     - name: 'Create influxdb data directory'
       file:
         path: /data/influxdb
         state: directory
+      when: not influxdb_data.stat.exists
+
+    - name: Check influxdb data backup directory
+      stat:
+        path: /data/backups/influxdb
+      register: influxdb_data_backup
 
     - name: 'Create influxdb backup directory'
       file:
@@ -210,6 +245,7 @@
         group: 1000
         owner: 1000
         mode: g+rwx
+      when: not influxdb_data_backup.stat.exists
 
     - name: 'Install UFW'
       apt:

@@ -165,7 +165,7 @@ export async function markBundleAsRequestedForCorrection(
 
 export async function invokeRegistrationValidation(
   bundle: fhir.Bundle,
-  token: string
+  headers: Record<string, string>
 ) {
   try {
     await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
@@ -173,7 +173,7 @@ export async function invokeRegistrationValidation(
       body: JSON.stringify(bundle),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        ...headers
       }
     })
   } catch (err) {

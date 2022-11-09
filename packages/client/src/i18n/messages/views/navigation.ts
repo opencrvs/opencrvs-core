@@ -27,6 +27,7 @@ interface INavigationMessages
   certificate: MessageDescriptor
   completenessRates: MessageDescriptor
   form: MessageDescriptor
+  integrations: MessageDescriptor
 }
 
 const messagesToDefine: INavigationMessages = {

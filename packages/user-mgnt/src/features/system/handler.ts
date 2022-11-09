@@ -289,15 +289,18 @@ export const verifySystemResSchema = Joi.object({
 
 interface IGetSystemPayload {
   systemId: string
+  clientId: string
 }
 
 export async function getSystemHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { systemId } = request.payload as IGetSystemPayload
+  const { systemId, clientId } = request.payload as IGetSystemPayload
 
-  const system: ISystemModel | null = await System.findOne({ _id: systemId })
+  const system: ISystemModel | null = await System.findOne({
+    $or: [{ _id: systemId }, { clientId: clientId }]
+  })
 
   if (!system) {
     // Don't return a 404 as this gives away that this user account exists
@@ -334,7 +337,8 @@ export async function getAllSystemsHandler() {
 }
 
 export const getSystemRequestSchema = Joi.object({
-  systemId: Joi.string()
+  systemId: Joi.string(),
+  clientId: Joi.string()
 })
 
 export const getSystemResponseSchema = Joi.object({
