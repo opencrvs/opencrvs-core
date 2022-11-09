@@ -256,6 +256,11 @@
         mode: g+rwx
       when: not influxdb_data_backup.stat.exists
 
+    - name: Check minio data directory
+      stat:
+        path: /data/minio
+      register: minio_data
+
     - name: 'Create minio data directory'
       file:
         path: /data/minio
@@ -263,6 +268,12 @@
         group: 1000
         owner: 1000
         mode: ugo+rwx
+      when: not minio_data.stat.exists
+
+    - name: Check minio data backup directory
+      stat:
+        path: /data/backups/minio
+      register: minio_data_backup
 
     - name: 'Create minio backup directory'
       file:
@@ -271,6 +282,7 @@
         group: 1000
         owner: 1000
         mode: ugo+rwx
+      when: not minio_data_backup.stat.exists
 
     - name: 'Install UFW'
       apt:
