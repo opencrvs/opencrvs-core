@@ -35,7 +35,8 @@ import { isEmpty, find, flatten, values } from 'lodash'
 import { getFieldValue, getFormattedDate, getStatusLabel } from './utils'
 import {
   CollectorRelationLabelArray,
-  CorrectorRelationLabelArray
+  CorrectorRelationLabelArray,
+  CorrectorRelationship
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
@@ -423,8 +424,8 @@ export const ActionDetailsModalListTable = ({
       )}
 
       {/* Correction Requester Id Verified */}
-      {actionDetailsData.requester !== 'ANOTHER_AGENT' &&
-        actionDetailsData.requester !== 'REGISTRAR' && (
+      {actionDetailsData.requester !== CorrectorRelationship.ANOTHER_AGENT &&
+        actionDetailsData.requester !== CorrectorRelationship.REGISTRAR && (
           <Table
             noResultText=" "
             columns={certificateCollectorVerified}
