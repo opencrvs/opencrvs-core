@@ -41,7 +41,7 @@ export const translationsMock = {
         authenticationCodeNotification:
           'Your OpenCRVS authentication code is: {{authCode}}',
         userCredentialsNotification:
-          'You can login to OpenCRVS with this temporary username: {{username}} and password: {{password}}',
+          'Your OpenCRVS account has been created. Please login with your username: {{username}} and temporary password: {{password}}',
         retieveUserNameNotification:
           'Your username for OpenCRVS is: {{username}}',
         updateUserNameNotification:
