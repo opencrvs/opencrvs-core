@@ -27,9 +27,13 @@ import { EMPTY_STRING } from '@client/utils/constants'
 
 const getInformantEngName = (sectionData: IFormSectionData): string => {
   if (sectionData.firstNamesEng) {
-    return `${sectionData.firstNamesEng as string} ${
-      sectionData.familyNameEng as string
-    }`
+    if (sectionData.firstNamesEng && sectionData.familyNameEng) {
+      return `${sectionData.firstNamesEng as string} ${
+        sectionData.familyNameEng as string
+      }`
+    } else {
+      return `${sectionData.firstNamesEng as string}`
+    }
   } else {
     return sectionData.familyNameEng as string
   }
