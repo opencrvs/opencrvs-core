@@ -47,6 +47,8 @@ interface IConnectProps {
 type Props = WrappedComponentProps & {
   locationId?: string
   onChangeLocation?: (location: ISearchLocation) => void
+  locationFilter?: (location: ILocation) => boolean
+  officeFilter?: (office: ILocation) => boolean
 } & IConnectProps & {
     theme: ITheme
   }
@@ -101,14 +103,21 @@ function setInitialLocationForUser(
   if (locationInSearchParams) {
     return selectLocation(locationInSearchParams, allLocations)
   }
-
+  console.log(selectLocation(user.supervisoryArea, allLocations))
   return selectLocation(user.supervisoryArea, allLocations)
 }
 
 function LocationPickerWithUserPermissionFiltering(props: Props) {
   const intl = useIntl()
 
-  const { locationId, locations, offices, userDetails } = props
+  const {
+    locationId,
+    locationFilter,
+    officeFilter,
+    locations,
+    offices,
+    userDetails
+  } = props
 
   const [selectedLocation, setSelectedLocation] = React.useState(
     setInitialLocationForUser(userDetails, locations, offices, intl, locationId)
@@ -129,27 +138,33 @@ function LocationPickerWithUserPermissionFiltering(props: Props) {
 
   return (
     <LocationPickerComponent
-      locationFilter={(location) => {
-        if (supervisoryAreaType === 'COUNTRY') {
-          return true
-        }
-        if (supervisoryAreaType === 'STATE') {
-          return (
-            location.partOf.replace('Location/', '') ===
-              userDetails.supervisoryArea ||
-            location.id === userDetails.supervisoryArea
-          )
-        }
-        if (supervisoryAreaType === 'DISTRICT') {
-          return location.id === userDetails.supervisoryArea
-        }
-        return false
-      }}
-      officeFilter={getOfficesByUserSupervisoryAreaFilter(
-        userDetails,
-        locations,
-        supervisoryAreaType
-      )}
+      locationFilter={
+        locationFilter ||
+        ((location) => {
+          if (supervisoryAreaType === 'COUNTRY') {
+            return true
+          }
+          if (supervisoryAreaType === 'STATE') {
+            return (
+              location.partOf.replace('Location/', '') ===
+                userDetails.supervisoryArea ||
+              location.id === userDetails.supervisoryArea
+            )
+          }
+          if (supervisoryAreaType === 'DISTRICT') {
+            return location.id === userDetails.supervisoryArea
+          }
+          return false
+        })
+      }
+      officeFilter={
+        officeFilter ||
+        getOfficesByUserSupervisoryAreaFilter(
+          userDetails,
+          locations,
+          supervisoryAreaType
+        )
+      }
       additionalLocations={
         shouldSeeCountryLevel(userDetails) ? getAdditionalLocations(intl) : []
       }

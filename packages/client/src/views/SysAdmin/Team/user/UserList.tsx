@@ -96,8 +96,9 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
-import { LocationPicker } from '@client/components/LocationPicker'
+
 import { ApolloError } from 'apollo-client'
+import { LocationPicker } from '@client/views/SysAdmin/Performance/LocationPicker'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -580,11 +581,11 @@ function UserListComponent(props: IProps) {
     if (!getViewOnly(locationId, userDetails, onlyNational)) {
       buttons.push(
         <LocationPicker
-          selectedLocationId={locationId}
-          onChangeLocation={(locationId) => {
-            props.goToTeamUserList(locationId)
+          locationId={locationId}
+          locationFilter={() => false}
+          onChangeLocation={(location) => {
+            props.goToTeamUserList(location.id)
           }}
-          requiredJurisdictionTypes={'CRVS_OFFICE'}
         />
       )
       buttons.push(<AddUserIcon id="add-user" onClick={onClickAddUser} />)

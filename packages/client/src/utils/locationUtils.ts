@@ -101,7 +101,7 @@ type LocationsById = {
 }
 
 export function shouldSeeCountryLevel(user: IUserDetails) {
-  return true // As any user can search for country level data
+  return user.supervisoryArea === '0'
 }
 
 export function getJurisdictionTypeForUser(
@@ -114,6 +114,8 @@ export function getJurisdictionTypeForUser(
   if (shouldSeeCountryLevel(user)) {
     return 'COUNTRY'
   }
+  console.log(user.supervisoryArea)
+
   return (
     (locations[user.supervisoryArea].jurisdictionType as
       | 'STATE'
