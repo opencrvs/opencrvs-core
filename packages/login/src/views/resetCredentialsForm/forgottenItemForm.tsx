@@ -20,10 +20,6 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
-import { changeLanguage } from '@login/i18n/actions'
-import { IStoreState } from '@login/store'
-import { getLanguage } from '@login/i18n/selectors'
-import { retrieveLanguage } from '@login/i18n/utils'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -35,14 +31,13 @@ const Actions = styled.div`
 interface BaseProps {
   goToHome: typeof goToHome
   goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
-  changeLanguage: typeof changeLanguage
 }
 interface State {
   forgottenItem: string
   error: boolean
 }
 
-type Props = BaseProps & WrappedComponentProps & { locale: string | undefined }
+type Props = BaseProps & WrappedComponentProps
 
 class ForgottenItemComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -59,12 +54,6 @@ class ForgottenItemComponent extends React.Component<Props, State> {
       this.setState({ error: true })
     } else {
       this.props.goToPhoneNumberVerificationForm(this.state.forgottenItem)
-    }
-  }
-  async componentDidMount() {
-    const currentLang = await retrieveLanguage()
-    if (currentLang) {
-      this.props.changeLanguage({ language: currentLang })
     }
   }
 
@@ -136,15 +125,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
   }
 }
 
-export const ForgottenItem = connect(
-  (state: IStoreState) => {
-    return {
-      locale: getLanguage(state)
-    }
-  },
-  {
-    goToHome,
-    goToPhoneNumberVerificationForm,
-    changeLanguage
-  }
-)(injectIntl(ForgottenItemComponent))
+export const ForgottenItem = connect(null, {
+  goToHome,
+  goToPhoneNumberVerificationForm
+})(injectIntl(ForgottenItemComponent))

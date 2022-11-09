@@ -48,6 +48,7 @@ import {
   PageWrapper as UnlockPageWrapper,
   LogoutHeader as LogoutContainer
 } from '@client/views/Unlock/Unlock'
+import { getLanguage } from '@client/i18n/selectors'
 
 interface IForgotPINProps {
   goBack: () => void
@@ -156,11 +157,13 @@ export function ForgotPIN(props: IForgotPINProps) {
     storage.removeItem(SECURITY_PIN_EXPIRED_AT)
     dispatch(redirectToAuthentication())
   }, [dispatch])
-
+  const language = useSelector(getLanguage)
   const onForgetPassword = useCallback(() => {
     logout()
-    window.location.assign(window.config.LOGIN_URL + '/forgotten-item')
-  }, [logout])
+    window.location.assign(
+      window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
+    )
+  }, [language, logout])
 
   function showName() {
     const nameObj =
