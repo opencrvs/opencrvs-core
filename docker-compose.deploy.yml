@@ -672,7 +672,7 @@ services:
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MONGO_URL=mongodb://metrics:${METRICS_MONGODB_PASSWORD}@mongo1/reports?replicaSet=rs0
+      - MONGO_URL=mongodb://metrics:${METRICS_MONGODB_PASSWORD}@mongo1/metrics?replicaSet=rs0
       - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
     deploy:
       replicas: 2

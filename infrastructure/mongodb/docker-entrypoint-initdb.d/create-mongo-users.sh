@@ -48,11 +48,11 @@ mongo <<EOF
 EOF
 
 mongo <<EOF
-  use reports
+  use metrics
   db.createUser({
     user: 'metrics',
     pwd: '$METRICS_MONGODB_PASSWORD',
-    roles: [{ role: 'readWrite', db: 'reports' }]
+    roles: [{ role: 'readWrite', db: 'metrics' }]
   })
 EOF
 

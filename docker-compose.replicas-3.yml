@@ -20,7 +20,7 @@ services:
 
   metrics:
     environment:
-      - MONGO_URL=mongodb://metrics:${METRICS_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/reports?replicaSet=rs0
+      - MONGO_URL=mongodb://metrics:${METRICS_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/metrics?replicaSet=rs0
       - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/hearth-dev?replicaSet=rs0
 
   config:

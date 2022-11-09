@@ -83,7 +83,7 @@ mongo $(mongo_credentials) --host $HOST <<EOF
 EOF
 
 mongo $(mongo_credentials) --host $HOST <<EOF
-  use reports
+  use metrics
   db.updateUser('metrics', {
     pwd: '$METRICS_MONGODB_PASSWORD'
   })
