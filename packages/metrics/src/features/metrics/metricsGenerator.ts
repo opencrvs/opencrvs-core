@@ -44,6 +44,11 @@ interface IGroupByEventDate {
   timeLabel: string
 }
 
+interface IOfficeRegistration {
+  officeLocation: string
+  total: number
+}
+
 interface IMetricsTotalGroup extends IGroupedByGender {
   practitionerRole: string
   timeLabel: string
@@ -930,6 +935,32 @@ export async function getTotalMetrics(
     estimated: estimationOfTimeRange,
     results: totalMetrics || []
   }
+}
+
+export async function getOfficewiseRegistrationsCount(
+  timeFrom: string,
+  timeTo: string,
+  event: EVENT_TYPE,
+  locationId: string
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+
+  const registrationsByOffice: IOfficeRegistration[] = await query(
+    `SELECT COUNT(compositionId) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      AND ( locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}'
+      OR officeLocation = '${locationId}')
+    GROUP BY officeLocation
+    `
+  )
+
+  return registrationsByOffice || []
 }
 
 function populateGenderBasisMetrics(
