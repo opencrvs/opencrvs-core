@@ -17,7 +17,7 @@ import {
   CONFIG_TOKEN_EXPIRY_SECONDS,
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   PRODUCTION,
-  CONFIG_API_URL,
+  APPLICATION_CONFIG_URL,
   QA_ENV
 } from '@auth/constants'
 import { resolve } from 'url'
@@ -212,7 +212,7 @@ export function getPublicKey() {
 export async function getLoginConfig(): Promise<{
   TWO_FACTOR_AUTHENTICATION_ENABLED: boolean
 }> {
-  return fetch(`${CONFIG_API_URL}/loginConfig`, {
+  return fetch(`${APPLICATION_CONFIG_URL}/loginConfig`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'

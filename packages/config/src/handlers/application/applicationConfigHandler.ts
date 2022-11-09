@@ -137,6 +137,9 @@ export const updateApplicationConfig = Joi.object({
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),
   TWO_FACTOR_AUTHENTICATION_ENABLED: Joi.boolean(),
+  SMS_USERNAME_REMINDER_ENABLED: Joi.boolean(),
+  SMS_EVENT_NOTIFICATIONS_ENABLED: Joi.boolean(),
+  SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED: Joi.boolean(),
   NID_NUMBER_PATTERN: Joi.string(),
   ADDRESSES: Joi.number().valid(...[1, 2])
 })

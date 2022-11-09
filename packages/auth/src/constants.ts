@@ -16,8 +16,8 @@ export const HOSTNAME = process.env.DOMAIN || '*'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 
-export const CONFIG_API_URL =
-  process.env.CONFIG_API_URL || 'http://localhost:2021'
+export const APPLICATION_CONFIG_URL =
+  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021'
 
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'

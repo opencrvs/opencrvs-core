@@ -24,3 +24,5 @@ export const QA_ENV = process.env.QA_ENV === 'true'
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const DEFAULT_TIMEOUT = 600000
+export const APPLICATION_CONFIG_URL =
+  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'

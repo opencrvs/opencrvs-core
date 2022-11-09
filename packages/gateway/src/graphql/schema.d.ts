@@ -486,6 +486,9 @@ export interface GQLApplicationConfiguration {
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   TWO_FACTOR_AUTHENTICATION_ENABLED?: boolean
+  SMS_USERNAME_REMINDER_ENABLED?: boolean
+  SMS_EVENT_NOTIFICATIONS_ENABLED?: boolean
+  SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
@@ -504,6 +507,9 @@ export interface GQLApplicationConfigurationInput {
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
   TWO_FACTOR_AUTHENTICATION_ENABLED?: boolean
+  SMS_USERNAME_REMINDER_ENABLED?: boolean
+  SMS_EVENT_NOTIFICATIONS_ENABLED?: boolean
+  SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED?: boolean
 }
 
 export interface GQLFormDraftInput {
@@ -3879,6 +3885,9 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
   TWO_FACTOR_AUTHENTICATION_ENABLED?: ApplicationConfigurationToTWO_FACTOR_AUTHENTICATION_ENABLEDResolver<TParent>
+  SMS_USERNAME_REMINDER_ENABLED?: ApplicationConfigurationToSMS_USERNAME_REMINDER_ENABLEDResolver<TParent>
+  SMS_EVENT_NOTIFICATIONS_ENABLED?: ApplicationConfigurationToSMS_EVENT_NOTIFICATIONS_ENABLEDResolver<TParent>
+  SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED?: ApplicationConfigurationToSMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLEDResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
@@ -3941,6 +3950,27 @@ export interface ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver
 }
 
 export interface ApplicationConfigurationToTWO_FACTOR_AUTHENTICATION_ENABLEDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToSMS_USERNAME_REMINDER_ENABLEDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToSMS_EVENT_NOTIFICATIONS_ENABLEDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToSMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLEDResolver<
   TParent = any,
   TResult = any
 > {

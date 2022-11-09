@@ -9,12 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
+import {
+  APPLICATION_CONFIG_URL,
+  FHIR_URL,
+  NOTIFICATION_SERVICE_URL
+} from '@user-mgnt/constants'
 import { IUser, IUserName } from '@user-mgnt/model/user'
 import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import fetch from 'node-fetch'
 import { logger } from '@user-mgnt/logger'
-
+import { URL } from 'url'
 export const createFhirPractitioner = (
   user: IUser,
   system: boolean
@@ -280,29 +284,53 @@ export async function generateUsername(
   return proposedUsername
 }
 
+async function sendNotification(
+  path: string,
+  payload: Record<string, string>,
+  authHeader: { Authorization: string }
+) {
+  const config = await getApplicationConfig(authHeader.Authorization)
+
+  if (!config.SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED) {
+    logger.info('SMS notifications for user management are disabled')
+    return
+  }
+
+  const url = new URL(path, NOTIFICATION_SERVICE_URL).toString()
+
+  const res = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (res.status !== 200) {
+    throw new Error(res.statusText)
+  }
+  return res
+}
+
 export async function sendCredentialsNotification(
   msisdn: string,
   username: string,
   password: string,
   authHeader: { Authorization: string }
 ) {
-  const url = `${NOTIFICATION_SERVICE_URL}${
-    NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
-  }userCredentialsSMS`
   try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
+    await sendNotification(
+      '/userCredentialsSMS',
+      {
         msisdn,
         username,
         password
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    })
+      },
+      authHeader
+    )
   } catch (err) {
+    console.log(err)
     logger.error(`Unable to send notification for error : ${err}`)
   }
 }
@@ -312,22 +340,40 @@ export async function sendUpdateUsernameNotification(
   username: string,
   authHeader: { Authorization: string }
 ) {
-  const url = `${NOTIFICATION_SERVICE_URL}${
-    NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
-  }updateUserNameSMS`
   try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
+    await sendNotification(
+      '/updateUserNameSMS',
+      {
         msisdn,
         username
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    })
+      },
+      authHeader
+    )
   } catch (err) {
     logger.error(`Unable to send notification for error : ${err}`)
   }
+}
+
+async function getApplicationConfig(authToken: string): Promise<{
+  SMS_EVENT_NOTIFICATIONS_ENABLED: boolean
+  SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED: boolean
+}> {
+  return fetch(new URL('/config', APPLICATION_CONFIG_URL).toString(), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authToken
+    }
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .then((response) => {
+      return response.config
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Application config request failed: ${error.message}`)
+      )
+    })
 }

@@ -23,7 +23,8 @@ import {
   GovtLogo,
   NIDNumPattern,
   PhoneNumPattern,
-  TwoFactorAuth
+  TwoFactorAuth,
+  SMS
 } from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties'
 import {
   BirthDelayedFee,
@@ -63,6 +64,9 @@ export enum GeneralActionId {
   NID_NUMBER_PATTERN = 'NID_NUMBER_PATTERN',
   CURRENCY = 'CURRENCY',
   TWO_FACTOR_AUTHENTICATION_ENABLED = 'TWO_FACTOR_AUTHENTICATION_ENABLED',
+  SMS_USERNAME_REMINDER_ENABLED = 'SMS_USERNAME_REMINDER_ENABLED',
+  SMS_EVENT_NOTIFICATIONS_ENABLED = 'SMS_EVENT_NOTIFICATIONS_ENABLED',
+  SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED = 'SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED',
   PHONE_NUMBER_PATTERN = 'PHONE_NUMBER_PATTERN'
 }
 
@@ -95,6 +99,7 @@ function GeneralTabContent() {
       <PhoneNumPattern />
       <NIDNumPattern />
       <TwoFactorAuth />
+      <SMS />
     </ListViewSimplified>
   )
 }

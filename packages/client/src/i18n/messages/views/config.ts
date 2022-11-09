@@ -9,84 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IConfigMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  applicationSettings: MessageDescriptor
-  applicationNameChangeMessage: MessageDescriptor
-  govtLogoChangeMessage: MessageDescriptor
-  govtLogoChangeNotification: MessageDescriptor
-  govtLogoChangeError: MessageDescriptor
-  govtLogoFileLimitError: MessageDescriptor
-  applicationConfigChangeError: MessageDescriptor
-  certificateConfiguration: MessageDescriptor
-  printTemplate: MessageDescriptor
-  downloadTemplate: MessageDescriptor
-  uploadTemplate: MessageDescriptor
-  listTitle: MessageDescriptor
-  listDetails: MessageDescriptor
-  birthTemplate: MessageDescriptor
-  deathTemplate: MessageDescriptor
-  birthDefaultTempDesc: MessageDescriptor
-  eventUpdatedTempDesc: MessageDescriptor
-  deathDefaultTempDesc: MessageDescriptor
-  listDetailsQsn: MessageDescriptor
-  applicationNameLabel: MessageDescriptor
-  govermentLogoLabel: MessageDescriptor
-  currencyLabel: MessageDescriptor
-  twoFactorLabel: MessageDescriptor
-  applicationCurrencyChangeNotification: MessageDescriptor
-  application2FAChangeNotification: MessageDescriptor
-  applicationBirthRegTargetChangeNotification: MessageDescriptor
-  applicationBirthLateRegTargetChangeNotification: MessageDescriptor
-  applicationDeathRegTargetChangeNotification: MessageDescriptor
-  applicationBirthOnTimeFeeChangeNotification: MessageDescriptor
-  applicationBirthLateFeeChangeNotification: MessageDescriptor
-  applicationBirthDelayedFeeChangeNotification: MessageDescriptor
-  applicationDeathOnTimeFeeChangeNotification: MessageDescriptor
-  applicationDeathDelayedFeeChangeNotification: MessageDescriptor
-  applicationCurrencyChangeMessage: MessageDescriptor
-  application2FAChangeMessage: MessageDescriptor
-  enabledMessage: MessageDescriptor
-  disabledMessage: MessageDescriptor
-  applicationConfigUpdatingMessage: MessageDescriptor
-  phoneNumberLabel: MessageDescriptor
-  birthLegallySpecifiedDialogTitle: MessageDescriptor
-  birthDelayedDialogTitle: MessageDescriptor
-  deathLegallySpecifiedDialogTitle: MessageDescriptor
-  onTimeFeeDialogTitle: MessageDescriptor
-  lateFeeDialogTitle: MessageDescriptor
-  delayedFeeDialogTitle: MessageDescriptor
-  nidPatternTitle: MessageDescriptor
-  nidPatternChangeMessage: MessageDescriptor
-  nidPatternChangeError: MessageDescriptor
-  nidPatternChangeNotification: MessageDescriptor
-  phoneNumberPatternTitle: MessageDescriptor
-  phoneNumberChangeMessage: MessageDescriptor
-  phoneNumberChangeError: MessageDescriptor
-  phoneNumberChangeNotification: MessageDescriptor
-  legallySpecifiedLabel: MessageDescriptor
-  legallySpecifiedValue: MessageDescriptor
-  lateRegistrationLabel: MessageDescriptor
-  lateRegistrationValue: MessageDescriptor
-  delayedRegistrationLabel: MessageDescriptor
-  delayedRegistrationValue: MessageDescriptor
-  withinLegallySpecifiedTimeLabel: MessageDescriptor
-  generalTabTitle: MessageDescriptor
-  birthTabTitle: MessageDescriptor
-  deathTabTitle: MessageDescriptor
-  registrationTimePeriodsGroupTitle: MessageDescriptor
-  registrationFeesGroupTitle: MessageDescriptor
-  eventTargetInputLabel: MessageDescriptor
-  pattern: MessageDescriptor
-  example: MessageDescriptor
-  testNumber: MessageDescriptor
-  validExample: MessageDescriptor
-  invalidExample: MessageDescriptor
-}
-
-const messagesToDefine: IConfigMessages = {
+const messagesToDefine = {
   applicationSettings: {
     id: 'config.application.settings',
     defaultMessage: 'Application',
@@ -246,6 +171,32 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Two-Factor Authentication',
     description: 'Two-Factor authentication label'
   },
+  smsLabel: {
+    id: 'config.application.sms',
+    defaultMessage: 'SMS messaging',
+    description: 'SMS messaging label'
+  },
+  smsUsernameDescription: {
+    id: 'config.application.smsUsernameDescription',
+    defaultMessage:
+      'Notification sent when user cannot remember their username.',
+    description:
+      'description for SMS input field controlling username reminders'
+  },
+  smsEventNotificationsDescription: {
+    id: 'config.application.smsEventNotificationsDescription',
+    defaultMessage:
+      'Notifications sent to informant when an event changes its status.',
+    description:
+      'description for SMS input field controlling event notifications'
+  },
+  smsUserManagementDescription: {
+    id: 'config.application.smsUserManagementDescription',
+    defaultMessage:
+      'Notifications the user receives when their account is created or when their username is changed.',
+    description:
+      'description for SMS input field controlling user management notifications'
+  },
   applicationCurrencyChangeNotification: {
     id: 'config.application.currencyChangeNotification',
     defaultMessage: 'Currency updated',
@@ -255,6 +206,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.twoFactorChangeNotification',
     defaultMessage: 'Two-Factor authentication updated',
     description: 'Message for application 2FA change notification'
+  },
+  applicationSMSChangeNotification: {
+    id: 'config.application.smsChangeNotification',
+    defaultMessage: 'SMS settings updated',
+    description: 'Message for application SMS settings'
   },
   applicationBirthRegTargetChangeNotification: {
     id: 'config.application.birthRegTargetChangeNotification',
@@ -495,4 +451,4 @@ const messagesToDefine: IConfigMessages = {
   }
 }
 
-export const messages: IConfigMessages = defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)
