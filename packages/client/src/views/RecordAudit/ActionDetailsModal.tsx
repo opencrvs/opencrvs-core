@@ -171,8 +171,6 @@ export const ActionDetailsModalListTable = ({
   offlineData,
   draft
 }: IActionDetailsModalListTable) => {
-  console.log(actionDetailsData)
-
   const [currentPage, setCurrentPage] = React.useState(1)
 
   if (registerForm === undefined) return <></>
