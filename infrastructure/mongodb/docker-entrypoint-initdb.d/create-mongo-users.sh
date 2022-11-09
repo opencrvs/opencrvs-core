@@ -52,7 +52,7 @@ mongo <<EOF
   db.createUser({
     user: 'metrics',
     pwd: '$METRICS_MONGODB_PASSWORD',
-    roles: [{ role: 'readWrite', db: 'application-config' }]
+    roles: [{ role: 'readWrite', db: 'reports' }]
   })
 EOF
 
