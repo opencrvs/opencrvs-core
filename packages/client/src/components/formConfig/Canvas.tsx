@@ -166,7 +166,7 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
                 <ConfigPlaceholder label={configField.previewGroupLabel} />
               ) : (
                 <CardContentWrapper>
-                  {conditionalField && (
+                  {conditionalField && conditionalField.length > 0 && (
                     <Stack>
                       <Condition color="grey400" />
                       <Text variant="reg14" element="span" color="grey400">
