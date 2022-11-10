@@ -24,7 +24,7 @@ export async function sendUserName(mobile: string, username: string) {
   const token = await createToken(
     'auth',
     ['service'],
-    ['opencrvs:notification-user'],
+    ['opencrvs:notification-user', 'opencrvs:config-user'],
     JWT_ISSUER
   )
   const config = await getApplicationConfig(token)
