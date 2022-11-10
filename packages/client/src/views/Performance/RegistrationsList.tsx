@@ -59,6 +59,7 @@ import styled from 'styled-components'
 
 const ToolTipContainer = styled.span`
   text-align: center;
+  font-weight: bold;
 `
 const DEFAULT_PAGE_SIZE = 10
 const { useState, useEffect } = React
@@ -200,7 +201,12 @@ function RegistrationListComponent(props: IProps) {
         width: 20,
         isSortable: true,
         sortFunction: () => toggleSort('total'),
-        icon: columnToBeSort === 'total' ? <SortArrow active={true} /> : <></>,
+        icon:
+          columnToBeSort === 'total' ? (
+            <SortArrow active={true} />
+          ) : (
+            <SortArrow active={false} />
+          ),
         isSorted: columnToBeSort === 'total' ? true : false
       },
       {
@@ -215,7 +221,7 @@ function RegistrationListComponent(props: IProps) {
           columnToBeSort === 'delayed_num' ? (
             <SortArrow active={true} />
           ) : (
-            <></>
+            <SortArrow active={false} />
           ),
         isSorted: columnToBeSort === 'delayed_num' ? true : false
       }
@@ -229,7 +235,11 @@ function RegistrationListComponent(props: IProps) {
         isSortable: true,
         sortFunction: () => toggleSort('late_num'),
         icon:
-          columnToBeSort === 'late_num' ? <SortArrow active={true} /> : <></>,
+          columnToBeSort === 'late_num' ? (
+            <SortArrow active={true} />
+          ) : (
+            <SortArrow active={false} />
+          ),
         isSorted: columnToBeSort === 'late_num' ? true : false
       })
     }
@@ -242,7 +252,12 @@ function RegistrationListComponent(props: IProps) {
           width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('time'),
-          icon: columnToBeSort === 'time' ? <SortArrow active={true} /> : <></>,
+          icon:
+            columnToBeSort === 'time' ? (
+              <SortArrow active={true} />
+            ) : (
+              <SortArrow active={false} />
+            ),
           isSorted: columnToBeSort === 'time' ? true : false
         },
         ...commonColumns,
@@ -253,7 +268,11 @@ function RegistrationListComponent(props: IProps) {
           isSortable: true,
           sortFunction: () => toggleSort('home_num'),
           icon:
-            columnToBeSort === 'home_num' ? <SortArrow active={true} /> : <></>,
+            columnToBeSort === 'home_num' ? (
+              <SortArrow active={true} />
+            ) : (
+              <SortArrow active={false} />
+            ),
           isSorted: columnToBeSort === 'home_num' ? true : false
         },
         {
@@ -266,7 +285,7 @@ function RegistrationListComponent(props: IProps) {
             columnToBeSort === 'healthFacility_num' ? (
               <SortArrow active={true} />
             ) : (
-              <></>
+              <SortArrow active={false} />
             ),
           isSorted: columnToBeSort === 'healthFacility_num' ? true : false
         }
@@ -280,7 +299,11 @@ function RegistrationListComponent(props: IProps) {
           isSortable: true,
           sortFunction: () => toggleSort('location'),
           icon:
-            columnToBeSort === 'location' ? <SortArrow active={true} /> : <></>,
+            columnToBeSort === 'location' ? (
+              <SortArrow active={true} />
+            ) : (
+              <SortArrow active={false} />
+            ),
           isSorted: columnToBeSort === 'location' ? true : false
         },
         ...commonColumns,
@@ -291,7 +314,11 @@ function RegistrationListComponent(props: IProps) {
           isSortable: true,
           sortFunction: () => toggleSort('home_num'),
           icon:
-            columnToBeSort === 'home_num' ? <SortArrow active={true} /> : <></>,
+            columnToBeSort === 'home_num' ? (
+              <SortArrow active={true} />
+            ) : (
+              <SortArrow active={false} />
+            ),
           isSorted: columnToBeSort === 'home_num' ? true : false
         },
         {
@@ -304,7 +331,7 @@ function RegistrationListComponent(props: IProps) {
             columnToBeSort === 'healthFacility_num' ? (
               <SortArrow active={true} />
             ) : (
-              <></>
+              <SortArrow active={false} />
             ),
           isSorted: columnToBeSort === 'healthFacility_num' ? true : false
         }
