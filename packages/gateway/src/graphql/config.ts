@@ -13,6 +13,7 @@
 import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
+import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
 import { typeResolvers } from '@gateway/features/registration/type-resolvers'
@@ -24,6 +25,7 @@ import { resolvers as userRootResolvers } from '@gateway/features/user/root-reso
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
 import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
+import { resolvers as advancedSearchResolvers } from '@gateway/features/advanceSearch/root-resolvers'
 import {
   IUserModelData,
   userTypeResolvers
@@ -59,6 +61,7 @@ const resolvers: StringIndexed<IResolvers> = merge(
   userTypeResolvers as IResolvers,
   certificateTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
+  metricsTypeResolvers as IResolvers,
   typeResolvers as IResolvers,
   searchRootResolvers as IResolvers,
   searchTypeResolvers as IResolvers,
@@ -67,7 +70,8 @@ const resolvers: StringIndexed<IResolvers> = merge(
   certificateResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
   formDraftResolvers as IResolvers,
-  applicationRootResolvers as IResolvers
+  applicationRootResolvers as IResolvers,
+  advancedSearchResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
@@ -114,7 +118,9 @@ export const getApolloConfig = (): Config => {
 
       return {
         Authorization: request.headers.authorization,
-        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId()
+        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
+        'x-real-ip': request.info?.remoteAddress,
+        'x-real-user-agent': request.headers['user-agent']
       }
     }
   }

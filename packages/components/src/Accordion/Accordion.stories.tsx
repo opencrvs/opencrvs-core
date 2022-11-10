@@ -31,6 +31,8 @@ export const AccordionView = Template.bind({})
 AccordionView.args = {
   name: 'accordion-component',
   label: 'Section name',
+  showLabel: 'Show',
+  hideLabel: 'Hide',
   value: 'no',
   options: [
     {
