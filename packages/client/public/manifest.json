@@ -6,13 +6,6 @@
   "display": "standalone",
   "scope": "/",
   "start_url": "/",
-  "protocol_handlers": [
-    {
-      "protocol": "web+opencrvs",
-      "name": "OpenCRVS",
-      "uriTemplate": "https://register.nigeria-demo.opencrvs.org/record-audit/printTab/%s"
-    }
-  ],
   "icons": [
     {
       "src": "images/icons/icon-72x72.png",
