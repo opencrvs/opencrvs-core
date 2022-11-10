@@ -105,6 +105,7 @@ services:
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
+      - METRICS_URL=http://metrics:1050
   user-mgnt:
     image: opencrvs/ocrvs-user-mgnt:${VERSION:-latest}
     build:
@@ -116,6 +117,7 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
+      - METRICS_URL=http://metrics:1050
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION:-latest}
     build:

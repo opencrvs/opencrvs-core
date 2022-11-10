@@ -18,11 +18,11 @@ import {
 } from '@auth/features/verifyCode/service'
 import {
   getStoredUserInformation,
-  createToken
+  createToken,
+  postUserActionToMetrics
 } from '@auth/features/authenticate/service'
 import { logger } from '@auth/logger'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
-
 interface IVerifyPayload {
   nonce: string
   code: string
@@ -31,7 +31,6 @@ interface IVerifyPayload {
 interface IVerifyResponse {
   token: string
 }
-
 export default async function authenticateHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -52,9 +51,18 @@ export default async function authenticateHandler(
   )
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
+  await postUserActionToMetrics(
+    'LOGGED_IN',
+    response.token,
+    remoteAddress,
+    userAgent
+  )
   return response
 }
-
 export const requestSchema = Joi.object({
   nonce: Joi.string(),
   code: Joi.string()

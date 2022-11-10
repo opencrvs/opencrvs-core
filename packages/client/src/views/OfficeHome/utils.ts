@@ -104,6 +104,17 @@ export const changeSortedColumn = (
   }
 }
 
+export const getStatusWiseWQTab = (status: string) => {
+  switch (status) {
+    case 'REGISTERED':
+      return 'printTab'
+    case 'VALIDATED':
+      return 'approvalTab'
+    default:
+      return 'reviewTab'
+  }
+}
+
 export const getPreviousOperationDateByOperationType = (
   operationHistories: ITaskHistory[],
   operationType: string
