@@ -44,14 +44,6 @@ services:
       #- http.cors.allow-credentials=true
       #- bootstrap.memory_lock=true
       #- "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-  minio:
-    ports:
-      - '3535:3535'
-      - '3536:3536'
-    volumes:
-      - './data/minio:/data/minio'
-      - './data/backups/minio:/data/backups/minio'
-    command: server --address ":3535" --console-address ":3536" /data/minio
 
   # elasticsearch browser.  Uncomment during development, along with the environment variables for elastic above, to browse Elastic via a GUI at http://localhost:1358/
   #dejavu:

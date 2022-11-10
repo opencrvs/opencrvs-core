@@ -11,7 +11,6 @@
  */
 import { GQLResolver } from '@gateway/graphql/schema'
 import { getMetrics } from '@gateway/features/fhir/utils'
-import { inScope } from '@gateway/features/user/utils'
 
 export interface IMetricsParam {
   timeStart?: string
@@ -29,19 +28,6 @@ export const resolvers: GQLResolver = {
   Query: {
     async getTotalMetrics(_, variables, authHeader) {
       return getMetrics('/totalMetrics', variables, authHeader)
-    },
-    async getVSExports(_, variables, authHeader) {
-      let results
-      if (inScope(authHeader, ['natlsysadmin', 'performance'])) {
-        results = await getMetrics('/fetchVSExport', variables, authHeader)
-        return {
-          results
-        }
-      } else {
-        return await Promise.reject(
-          new Error('User does not have the scope required for this resource')
-        )
-      }
     },
     async getTotalPayments(
       _,

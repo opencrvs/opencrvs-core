@@ -83,13 +83,6 @@ mongo $(mongo_credentials) --host $HOST <<EOF
 EOF
 
 mongo $(mongo_credentials) --host $HOST <<EOF
-  use metrics
-  db.updateUser('metrics', {
-    pwd: '$METRICS_MONGODB_PASSWORD'
-  })
-EOF
-
-mongo $(mongo_credentials) --host $HOST <<EOF
   use webhooks
   db.updateUser('webhooks', {
     pwd: '$WEBHOOKS_MONGODB_PASSWORD'
