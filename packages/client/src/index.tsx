@@ -11,6 +11,7 @@
  */
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
+import { showUserOnlineStatusNotificationToast } from '@client/notification/actions'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { App } from '@client/App'
@@ -26,6 +27,7 @@ import * as pdfjs from 'pdfjs-dist/build/pdf'
 import WebFont from 'webfontloader'
 import { BACKGROUND_SYNC_BROADCAST_CHANNEL } from './utils/constants'
 import { BrowserTracing } from '@sentry/tracing'
+
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:400']
@@ -100,6 +102,14 @@ function onBackGroundSync() {
   }
 }
 
+function userOnlineStatus() {
+  window.ononline = () => {
+    const action = actions.showUserOnlineStatusNotificationToast()
+    store.dispatch(action)
+  }
+}
+
+userOnlineStatus()
 onBackGroundSync()
 
 ReactDOM.render(

@@ -29,7 +29,8 @@ import {
   hideDownloadDeclarationFailedToast,
   ShowUnassignedPayload,
   hideUnassignedModal,
-  hideCreateUserErrorToast
+  hideCreateUserErrorToast,
+  hideUserOnlineStatusNotificationToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
@@ -46,6 +47,7 @@ type NotificationProps = {
   downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
+  onlineUserStatusToast: boolean
 }
 
 type DispatchProps = {
@@ -59,6 +61,7 @@ type DispatchProps = {
   hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
   hideUnassignedModal: typeof hideUnassignedModal
   hideCreateUserErrorToast: typeof hideCreateUserErrorToast
+  hideUserOnlineStatusNotificationToast: typeof hideUserOnlineStatusNotificationToast
 }
 
 class Component extends React.Component<
@@ -91,6 +94,9 @@ class Component extends React.Component<
   hideUserAuditSuccessToast = () => {
     this.props.hideUserAuditSuccessToast()
   }
+  hideUserOnlineStatusNotificationToast = () => {
+    this.props.hideUserOnlineStatusNotificationToast()
+  }
 
   render() {
     const {
@@ -105,7 +111,8 @@ class Component extends React.Component<
       showPINUpdateSuccess,
       downloadDeclarationFailedToast,
       unassignedModal,
-      userCreateDuplicateMobileFailedToast
+      userCreateDuplicateMobileFailedToast,
+      onlineUserStatusToast
     } = this.props
 
     return (
@@ -118,6 +125,15 @@ class Component extends React.Component<
             onClose={this.hideBackgroundSyncedNotification}
           >
             {intl.formatMessage(messages.declarationsSynced)}
+          </Toast>
+        )}
+        {onlineUserStatusToast && (
+          <Toast
+            type="success"
+            id="backgroundSyncShowNotification"
+            onClose={this.hideUserOnlineStatusNotificationToast}
+          >
+            User online
           </Toast>
         )}
         {configurationErrorVisible && (
@@ -234,7 +250,8 @@ const mapStateToProps = (store: IStoreState) => {
       store.notification.downloadDeclarationFailedToast,
     unassignedModal: store.notification.unassignedModal,
     userCreateDuplicateMobileFailedToast:
-      store.notification.userCreateDuplicateMobileFailedToast
+      store.notification.userCreateDuplicateMobileFailedToast,
+    onlineUserStatusToast: store.notification.onlineUserStatusToast
   }
 }
 
@@ -249,6 +266,7 @@ export const NotificationComponent = withRouter(
     hidePINUpdateSuccessToast,
     hideDownloadDeclarationFailedToast,
     hideUnassignedModal,
-    hideCreateUserErrorToast
+    hideCreateUserErrorToast,
+    hideUserOnlineStatusNotificationToast
   })(injectIntl(Component))
 )

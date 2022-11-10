@@ -13,6 +13,10 @@ import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionMo
  */
 export const SHOW_BACKGROUND_SYNC_TRIGGERED = 'SHOW_BACKGROUND_SYNC_TRIGGERED'
 export const HIDE_BACKGROUND_SYNC_TRIGGERED = 'HIDE_BACKGROUND_SYNC_TRIGGERED'
+
+export const SHOW_ONLINE_USER_SUCCESS_TOAST = 'SHOW_ONLINE_USER_SUCCESS_TOAST'
+export const HIDE_ONLINE_USER_SUCCESS_TOAST = 'HIDE_ONLINE_USER_SUCCESS_TOAST'
+
 export const SHOW_CONFIG_ERROR = 'SHOW_CONFIG_ERROR'
 export const HIDE_CONFIG_ERROR = 'HIDE_CONFIG_ERROR'
 export const SESSION_EXPIRED = 'AUTH/SESSION_EXPIRED'
@@ -127,6 +131,14 @@ export type HideBackgroundSyncedAction = {
   type: typeof HIDE_BACKGROUND_SYNC_TRIGGERED
 }
 
+export type ShowOnlineUserStatusNotificationAction = {
+  type: typeof SHOW_ONLINE_USER_SUCCESS_TOAST
+}
+
+export type HideOnlineUserStatusNotificationAction = {
+  type: typeof HIDE_ONLINE_USER_SUCCESS_TOAST
+}
+
 export type SessionExpiredAction = {
   type: typeof SESSION_EXPIRED
 }
@@ -152,6 +164,16 @@ export const showBackgroundSyncedNotification =
 export const hideBackgroundSyncedNotification =
   (): HideBackgroundSyncedAction => ({
     type: HIDE_BACKGROUND_SYNC_TRIGGERED
+  })
+
+export const showUserOnlineStatusNotificationToast =
+  (): ShowOnlineUserStatusNotificationAction => ({
+    type: SHOW_ONLINE_USER_SUCCESS_TOAST
+  })
+
+export const hideUserOnlineStatusNotificationToast =
+  (): HideOnlineUserStatusNotificationAction => ({
+    type: HIDE_ONLINE_USER_SUCCESS_TOAST
   })
 
 export const showSessionExpireConfirmation = (): SessionExpiredAction => ({
@@ -264,3 +286,5 @@ export type Action =
   | HideUnassigned
   | ShowCreateUserErrorToast
   | HideCreateUserErrorToast
+  | ShowOnlineUserStatusNotificationAction
+  | HideOnlineUserStatusNotificationAction
