@@ -29,6 +29,7 @@ import {
 import { IAuthHeader } from '@metrics/features/registration'
 import { query } from '@metrics/influxdb/client'
 import { format } from 'date-fns'
+import { fetchChildLocationsWithTypeByParentId } from '@metrics/api'
 interface IGroupedByGender {
   total: number
   gender: string
@@ -42,6 +43,11 @@ interface IGroupByEventDate {
   total: number
   dateLabel: string
   timeLabel: string
+}
+
+interface IOfficeRegistration {
+  officeLocation: string
+  total: number
 }
 
 interface IMetricsTotalGroup extends IGroupedByGender {
@@ -930,6 +936,47 @@ export async function getTotalMetrics(
     estimated: estimationOfTimeRange,
     results: totalMetrics || []
   }
+}
+
+export async function getOfficewiseRegistrationsCount(
+  timeFrom: string,
+  timeTo: string,
+  event: EVENT_TYPE,
+  locationId: string,
+  authHeader: IAuthHeader
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+
+  const registrationsByOffice: IOfficeRegistration[] = await query(
+    `SELECT COUNT(compositionId) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      AND ( locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}'
+      OR officeLocation = '${locationId}')
+    GROUP BY officeLocation
+    `
+  )
+
+  const officesUnderLocation = await fetchChildLocationsWithTypeByParentId(
+    locationId,
+    'CRVS_OFFICE',
+    authHeader
+  )
+
+  return (
+    officesUnderLocation.map((loc) => ({
+      officeLocation: loc.id,
+      total:
+        registrationsByOffice?.find(
+          ({ officeLocation }) => officeLocation === `Location/${loc.id}`
+        )?.total || 0
+    })) || []
+  )
 }
 
 function populateGenderBasisMetrics(

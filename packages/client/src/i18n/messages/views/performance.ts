@@ -28,6 +28,11 @@ const messagesToDefine = {
     defaultMessage: 'Registrations',
     description: 'Header for report total registrations'
   },
+  performanceAvgPerDayHeader: {
+    id: 'performance.reports.header.avgPerDay',
+    defaultMessage: 'Avg per day',
+    description: 'Header for report table Avg per day'
+  },
   performanceTotalCertificatesHeader: {
     id: 'performance.reports.header.totalCertificates',
     defaultMessage: 'Certificates issued',
@@ -231,6 +236,11 @@ const messagesToDefine = {
     id: 'performance.regRates.select.item.byLocation',
     defaultMessage: 'By location',
     description: 'Label for select option By location'
+  },
+  byRegistrars: {
+    id: 'performance.regRates.select.item.byRegistrars',
+    defaultMessage: 'By registrars',
+    description: 'Label for select option By registrars'
   },
   locationTitle: {
     id: 'performance.regRates.column.location',

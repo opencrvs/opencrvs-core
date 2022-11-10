@@ -34,6 +34,11 @@ const Segment = styled(Button)<{ isSelected?: boolean }>`
     border-radius: 0 4px 4px 0;
     border-left: none;
   }
+  &:disabled {
+    border: ${({ theme }) => `2px solid ${theme.colors.grey300}`};
+    cursor: not-allowed;
+    color: ${({ theme }) => theme.colors.grey300};
+  }
 `
 
 const Container = styled.div`
@@ -42,7 +47,7 @@ const Container = styled.div`
 `
 export function SegmentedControl(
   props: Omit<ISelectProps, 'options' | 'onChange'> & {
-    options: IPerformanceSelectOption[]
+    options: (IPerformanceSelectOption & { disabled?: boolean })[]
     onChange: (option: IPerformanceSelectOption) => void
   }
 ) {
@@ -52,6 +57,7 @@ export function SegmentedControl(
         <Segment
           key={`${opt.label}_${i}`}
           id={`${opt.label}_${i}`}
+          disabled={opt.disabled}
           isSelected={opt.value === props.value}
           onClick={() => {
             if (props.onChange) {
