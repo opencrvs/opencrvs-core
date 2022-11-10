@@ -11,9 +11,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { SecondaryButton } from '../buttons'
+import { Link } from '../Link'
 
-const ImageBase = styled(SecondaryButton)`
+const ImageBase = styled(Link)`
   width: auto;
   ${({ theme }) => theme.fonts.bold16};
   align-items: center;
@@ -55,6 +55,7 @@ export class FileSelectLink extends React.Component<IImagePickerProps, {}> {
     return (
       <ImageBase
         {...otherProps}
+        element={'button'}
         onClick={(event) => {
           if (this.props.onClick) {
             this.props.onClick(event)
