@@ -130,10 +130,10 @@ class Component extends React.Component<
         {onlineUserStatusToast && (
           <Toast
             type="success"
-            id="backgroundSyncShowNotification"
+            id="onlineUserStatusNotification"
             onClose={this.hideUserOnlineStatusNotificationToast}
           >
-            User online
+            {intl.formatMessage(messages.onlineUserStatus)}
           </Toast>
         )}
         {configurationErrorVisible && (
