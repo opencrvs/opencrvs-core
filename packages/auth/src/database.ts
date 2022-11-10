@@ -33,13 +33,13 @@ export async function start() {
   logger.info('REDIS_HOST', REDIS_HOST)
   redisClient = redis.createClient({
     host: REDIS_HOST,
-    retry_strategy: options => {
+    retry_strategy: (options) => {
       return 1000
     }
   })
 }
 
-export const get = (key: string) =>
+export const get = (key: string): Promise<string> =>
   promisify(redisClient.get).bind(redisClient)(key)
 
 export const set = (key: string, value: string) =>

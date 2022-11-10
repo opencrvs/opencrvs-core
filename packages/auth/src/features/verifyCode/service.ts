@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch from 'node-fetch'
-import { set, get, del } from '@auth/database'
+import { set, get, del, setex } from '@auth/database'
 import {
   NOTIFICATION_SERVICE_URL,
   CONFIG_SMS_CODE_EXPIRY_SECONDS,
@@ -82,6 +82,10 @@ export async function sendVerificationCode(
   })
 
   return undefined
+}
+
+export function storeLastLogin(userId: string, expiry: number) {
+  return setex(`last_login_${userId}`, expiry, new Date().toISOString())
 }
 
 export async function checkVerificationCode(

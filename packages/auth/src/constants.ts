@@ -48,6 +48,9 @@ export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS = process.env
   ? parseInt(process.env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS, 10)
   : 600
 
+// How long until the user has to go through the 2FA process again after one successful login
+export const TWO_FA_EXPIRY_SECONDS = 60 * 60 * 27 * 14 // 14 days
+
 export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:auth-user',
   'opencrvs:user-mgnt-user',

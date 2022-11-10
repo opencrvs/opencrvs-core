@@ -14,14 +14,19 @@ import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import {
   checkVerificationCode,
-  deleteUsedVerificationCode
+  deleteUsedVerificationCode,
+  storeLastLogin
 } from '@auth/features/verifyCode/service'
 import {
   getStoredUserInformation,
   createToken
 } from '@auth/features/authenticate/service'
 import { logger } from '@auth/logger'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import {
+  WEB_USER_JWT_AUDIENCES,
+  JWT_ISSUER,
+  TWO_FA_EXPIRY_SECONDS
+} from '@auth/constants'
 
 interface IVerifyPayload {
   nonce: string
@@ -52,6 +57,9 @@ export default async function authenticateHandler(
   )
   await deleteUsedVerificationCode(nonce)
   const response: IVerifyResponse = { token }
+
+  await storeLastLogin(userId, TWO_FA_EXPIRY_SECONDS)
+
   return response
 }
 

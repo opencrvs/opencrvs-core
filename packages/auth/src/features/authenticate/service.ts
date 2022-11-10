@@ -230,3 +230,20 @@ export async function getLoginConfig(): Promise<{
       )
     })
 }
+
+export function getLastLogin(userId: string) {
+  return get(`last_login_${userId}`)
+}
+
+export async function shouldBeAskedFor2FA(userId: string) {
+  const config = await getLoginConfig()
+  if (!config.TWO_FACTOR_AUTHENTICATION_ENABLED) {
+    return false
+  }
+
+  const lastLogin = await getLastLogin(userId)
+
+  // There should be nothing found if the user has never logged in or it was more than 14 days ago
+  // otherwise it returns the timestamp
+  return !lastLogin
+}
