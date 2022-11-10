@@ -17,6 +17,8 @@ import { GQLOfficewiseRegistration } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
+import { SortArrow } from '@opencrvs/components/lib/icons'
+import { orderBy } from 'lodash'
 
 interface Props {
   loading: boolean
@@ -28,12 +30,27 @@ export function RegistrationsDataTable(props: Props) {
   const { loading, extraData } = props
   const intl = useIntl()
   const offlineData = useSelector(getOfflineData)
-  const sortedContent =
+  const [sort, setSort] = React.useState({ by: 'total', order: 'desc' })
+
+  const handleSort = (col: string) =>
+    setSort((prevSort) => {
+      if (prevSort.by === col)
+        return {
+          ...prevSort,
+          order: prevSort.order === 'desc' ? 'asc' : 'desc'
+        }
+      else return { by: col, order: 'desc' }
+    })
+
+  const content =
     props.data?.map((r) => ({
       total: r.total.toString(),
       officeLocation: offlineData.offices[r.officeLocation]?.name ?? '',
       avgPerDay: Number(r.total / (extraData.days || 1)).toFixed(2)
     })) || []
+
+  const sortedContent = orderBy(content, sort.by, sort.order as 'asc' | 'desc')
+
   return (
     <ListTable
       noResultText={intl.formatMessage(constantsMessages.noResults)}
@@ -42,6 +59,10 @@ export function RegistrationsDataTable(props: Props) {
         {
           key: 'officeLocation',
           label: intl.formatMessage(messages.locationTitle),
+          isSortable: true,
+          isSorted: sort.by === 'officeLocation',
+          sortFunction: handleSort,
+          icon: <SortArrow active={sort.by === 'officeLocation'} />,
           width: 50
         },
         {
@@ -49,10 +70,18 @@ export function RegistrationsDataTable(props: Props) {
           label: intl.formatMessage(
             messages.performanceTotalRegitrationsHeader
           ),
+          isSorted: sort.by === 'total',
+          sortFunction: handleSort,
+          icon: <SortArrow active={sort.by === 'total'} />,
+          isSortable: true,
           width: 25
         },
         {
           key: 'avgPerDay',
+          isSortable: true,
+          isSorted: sort.by === 'avgPerDay',
+          sortFunction: handleSort,
+          icon: <SortArrow active={sort.by === 'avgPerDay'} />,
           label: intl.formatMessage(messages.performanceAvgPerDayHeader),
           width: 25
         }
