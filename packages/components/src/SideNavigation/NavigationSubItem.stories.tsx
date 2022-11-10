@@ -18,17 +18,6 @@ const Template: Story<INavigationSubItemProps> = (args) => (
   <NavigationSubItem {...args} />
 )
 
-export const subItemDashboard = Template.bind({})
-
-subItemDashboard.args = {
-  label: 'Dashboard'
-}
-export const subItemVsexports = Template.bind({})
-
-subItemVsexports.args = {
-  label: 'Vsexports'
-}
-
 export const subItemCertificates = Template.bind({})
 
 subItemCertificates.args = {

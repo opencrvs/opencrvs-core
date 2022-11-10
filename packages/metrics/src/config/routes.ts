@@ -59,10 +59,6 @@ import {
   newAuditHandler
 } from '@metrics/features/audit/handler'
 import * as Joi from 'joi'
-import {
-  getAllVSExport,
-  vsExportHandler
-} from '@metrics/features/vsExport/handler'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -538,23 +534,6 @@ export const getRoutes = () => {
             event: Joi.string().required()
           })
         },
-        tags: ['api']
-      }
-    },
-    {
-      method: 'GET',
-      path: '/vsExport',
-      handler: vsExportHandler,
-      config: {
-        tags: ['api'],
-        auth: false
-      }
-    },
-    {
-      method: 'GET',
-      path: '/fetchVSExport',
-      handler: getAllVSExport,
-      config: {
         tags: ['api']
       }
     },
