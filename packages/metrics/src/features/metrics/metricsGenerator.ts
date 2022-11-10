@@ -29,6 +29,7 @@ import {
 import { IAuthHeader } from '@metrics/features/registration'
 import { query } from '@metrics/influxdb/client'
 import { format } from 'date-fns'
+import { fetchChildLocationsWithTypeByParentId } from '@metrics/api'
 interface IGroupedByGender {
   total: number
   gender: string
@@ -941,7 +942,8 @@ export async function getOfficewiseRegistrationsCount(
   timeFrom: string,
   timeTo: string,
   event: EVENT_TYPE,
-  locationId: string
+  locationId: string,
+  authHeader: IAuthHeader
 ) {
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
@@ -960,7 +962,21 @@ export async function getOfficewiseRegistrationsCount(
     `
   )
 
-  return registrationsByOffice || []
+  const officesUnderLocation = await fetchChildLocationsWithTypeByParentId(
+    locationId,
+    'CRVS_OFFICE',
+    authHeader
+  )
+
+  return (
+    officesUnderLocation.map((loc) => ({
+      officeLocation: loc.id,
+      total:
+        registrationsByOffice?.find(
+          ({ officeLocation }) => officeLocation === `Location/${loc.id}`
+        )?.total || 0
+    })) || []
+  )
 }
 
 function populateGenderBasisMetrics(

@@ -44,7 +44,7 @@ interface ISearchParams {
 export enum REGISTRATION_REPORT_BASE {
   TIME = 'TIME',
   LOCATION = 'LOCATION',
-  USER = 'USER'
+  REGISTRAR = 'REGISTRAR'
 }
 
 export function Registrations() {
@@ -102,11 +102,17 @@ export function Registrations() {
           options={[
             {
               label: intl.formatMessage(messages.overTime),
-              value: REGISTRATION_REPORT_BASE.TIME
+              value: REGISTRATION_REPORT_BASE.TIME,
+              disabled: true
             },
             {
               label: intl.formatMessage(messages.byLocation),
               value: REGISTRATION_REPORT_BASE.LOCATION
+            },
+            {
+              label: intl.formatMessage(messages.byRegistrars),
+              value: REGISTRATION_REPORT_BASE.REGISTRAR,
+              disabled: true
             }
           ]}
           onChange={(option) =>
@@ -124,7 +130,7 @@ export function Registrations() {
       hideBackground={true}
     >
       <Content
-        title="Registrations"
+        title={intl.formatMessage(messages.performanceTotalRegitrationsHeader)}
         size={ContentSize.LARGE}
         filterContent={getFilter()}
       >

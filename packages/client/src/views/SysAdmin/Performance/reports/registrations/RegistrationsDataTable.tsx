@@ -30,8 +30,8 @@ export function RegistrationsDataTable(props: Props) {
   const offlineData = useSelector(getOfflineData)
   const sortedContent =
     props.data?.map((r) => ({
-      ...r,
-      officeLocation: offlineData.offices[r.officeLocation.split('/')[1]].name,
+      total: r.total.toString(),
+      officeLocation: offlineData.offices[r.officeLocation]?.name ?? '',
       avgPerDay: Number(r.total / (extraData.days || 1)).toFixed(2)
     })) || []
   return (
@@ -53,7 +53,7 @@ export function RegistrationsDataTable(props: Props) {
         },
         {
           key: 'avgPerDay',
-          label: 'Avg per day',
+          label: intl.formatMessage(messages.performanceAvgPerDayHeader),
           width: 25
         }
       ]}

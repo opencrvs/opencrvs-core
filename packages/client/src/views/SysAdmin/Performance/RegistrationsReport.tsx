@@ -29,22 +29,28 @@ import { messages } from '@client/i18n/messages/views/performance'
 import { useIntl } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { goToRegistrations, useQuery } from '@client/navigation'
+import { getOfflineData } from '@client/offline/selectors'
 
 interface RegistrationsReportProps {
   data: GQLTotalMetricsResult
+  selectedLocationId?: string
   selectedEvent: 'BIRTH' | 'DEATH'
 }
 
 export function RegistrationsReport({
   data,
-  selectedEvent
+  selectedEvent,
+  selectedLocationId
 }: RegistrationsReportProps) {
   const intl = useIntl()
   const dispatch = useDispatch()
   const query = useQuery()
-
+  const { locations } = useSelector(getOfflineData)
+  const shouldShowViewLink =
+    selectedLocationId &&
+    locations[selectedLocationId]?.jurisdictionType === 'DISTRICT'
   return (
     <ReportContainer>
       <ListViewItemSimplified
@@ -102,21 +108,23 @@ export function RegistrationsReport({
           </div>
         }
         actions={
-          <LinkButton
-            id="registration-report-view"
-            onClick={() =>
-              dispatch(
-                goToRegistrations(
-                  selectedEvent,
-                  query.get('locationId')!,
-                  new Date(query.get('timeStart')!),
-                  new Date(query.get('timeEnd')!)
+          shouldShowViewLink && (
+            <LinkButton
+              id="registration-report-view"
+              onClick={() =>
+                dispatch(
+                  goToRegistrations(
+                    selectedEvent,
+                    query.get('locationId')!,
+                    new Date(query.get('timeStart')!),
+                    new Date(query.get('timeEnd')!)
+                  )
                 )
-              )
-            }
-          >
-            {intl.formatMessage(buttonMessages.view)}
-          </LinkButton>
+              }
+            >
+              {intl.formatMessage(buttonMessages.view)}
+            </LinkButton>
+          )
         }
       />
       {selectedEvent === 'BIRTH' && (

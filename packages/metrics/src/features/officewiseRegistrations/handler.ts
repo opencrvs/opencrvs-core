@@ -17,6 +17,7 @@ import {
   EVENT
 } from '@metrics/features/metrics/constants'
 import { getOfficewiseRegistrationsCount } from '@metrics/features/metrics/metricsGenerator'
+import { IAuthHeader } from '@metrics/features/registration'
 
 export async function officewiseRegistrationsHandler(
   request: Hapi.Request,
@@ -27,5 +28,15 @@ export async function officewiseRegistrationsHandler(
   const locationId = 'Location/' + request.query[LOCATION_ID]
   const event = request.query[EVENT]
 
-  return getOfficewiseRegistrationsCount(timeStart, timeEnd, event, locationId)
+  const authHeader: IAuthHeader = {
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
+  }
+  return getOfficewiseRegistrationsCount(
+    timeStart,
+    timeEnd,
+    event,
+    locationId,
+    authHeader
+  )
 }

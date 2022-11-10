@@ -163,5 +163,5 @@ type Query {
     timeEnd: String!
     event: String!
     locationId: String!
-  ): [OfficewiseRegistration]
+  ): [OfficewiseRegistration!]
 }
