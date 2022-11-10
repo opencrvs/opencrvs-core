@@ -32,7 +32,7 @@ const birthCertificateTemplateTextOnly = `<svg width="421" height="595" viewBox=
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
     <tspan x="59.7088" y="260.226">This is to certify that the birth, details of which are recorded herein, has been </tspan>
     <tspan x="59.7088" y="274.626">registered on</tspan>
-    <tspan x="179.217" y="274.626"> at this registration centre.</tspan>
+    <tspan x="183.217" y="274.626"> at this registration centre.</tspan>
   </text>
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
     <tspan x="110.045" y="274.626">{{ registrationDate }}</tspan>
