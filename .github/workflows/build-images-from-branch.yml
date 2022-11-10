@@ -14,11 +14,11 @@ on:
     inputs:
       branch_name:
         description: Branch to build from
-        default: develop
+        default: release-v1.1.0-nigeria
         required: true
   push:
     branches:
-      - 'develop'
+      - 'release-v1.1.0-nigeria'
 
 jobs:
   push:

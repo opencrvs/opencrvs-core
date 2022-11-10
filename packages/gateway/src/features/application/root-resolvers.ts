@@ -48,6 +48,12 @@ export const resolvers: GQLResolver = {
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
         TWO_FACTOR_AUTHENTICATION_ENABLED:
           applicationConfig.TWO_FACTOR_AUTHENTICATION_ENABLED as boolean,
+        SMS_USERNAME_REMINDER_ENABLED:
+          applicationConfig.SMS_USERNAME_REMINDER_ENABLED as boolean,
+        SMS_EVENT_NOTIFICATIONS_ENABLED:
+          applicationConfig.SMS_EVENT_NOTIFICATIONS_ENABLED as boolean,
+        SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED:
+          applicationConfig.SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED as boolean,
         ADDRESSES: applicationConfig.ADDRESSES as number
       }
 

@@ -37,7 +37,7 @@ import { DateRangePicker } from '@client/components/DateRangePicker'
 import subYears from 'date-fns/subYears'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { Event } from '@client/utils/gateway'
-import { LocationPicker } from './LocationPicker'
+
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
@@ -81,6 +81,7 @@ import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
+import { LocationPicker } from '@client/components/LocationPicker'
 
 const Layout = styled.div`
   display: flex;
@@ -246,14 +247,25 @@ type LocationsById = {
 class PerformanceHomeComponent extends React.Component<Props, State> {
   transformPropsToState(props: Props) {
     const {
-      location: { search }
+      location: { search },
+      locations,
+      offices
     } = props
-    const { timeStart, timeEnd, event } = parse(
+    const { timeStart, timeEnd, locationId, event } = parse(
       search
     ) as unknown as ISearchParams
 
+    const selectedLocation = !locationId
+      ? getAdditionalLocations(props.intl)[0]
+      : selectLocation(
+          locationId,
+          generateLocations({ ...locations, ...offices }, props.intl).concat(
+            getAdditionalLocations(props.intl)
+          )
+        )
+
     return {
-      selectedLocation: null,
+      selectedLocation,
       timeStart:
         (timeStart && new Date(timeStart)) || subYears(new Date(Date.now()), 1),
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
@@ -305,15 +317,25 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   getFilter = (intl: IntlShape) => {
-    const { locationId } = parse(
-      this.props.location.search
-    ) as unknown as ISearchParams
+    const { id: locationId } = this.state.selectedLocation || {}
 
     return (
       <>
         <LocationPicker
-          locationId={locationId}
-          onChangeLocation={(newLocation) => {
+          additionalLocations={getAdditionalLocations(intl)}
+          selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
+          onChangeLocation={(newLocationId) => {
+            const newLocation = selectLocation(
+              newLocationId,
+              generateLocations(
+                {
+                  ...this.props.locations,
+                  ...this.props.offices
+                },
+                this.props.intl
+              ).concat(getAdditionalLocations(intl))
+            )
+
             this.setState({ selectedLocation: newLocation })
           }}
         />

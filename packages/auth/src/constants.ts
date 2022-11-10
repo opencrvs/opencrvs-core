@@ -16,8 +16,8 @@ export const HOSTNAME = process.env.DOMAIN || '*'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 
-export const CONFIG_API_URL =
-  process.env.CONFIG_API_URL || 'http://localhost:2021'
+export const APPLICATION_CONFIG_URL =
+  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021'
 
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
@@ -31,7 +31,7 @@ export const CERT_PUBLIC_KEY_PATH =
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
-export const QA_ENV = process.env.QA_ENV || false
+export const QA_ENV = process.env.QA_ENV === 'true'
 
 export const CONFIG_TOKEN_EXPIRY_SECONDS = process.env
   .CONFIG_TOKEN_EXPIRY_SECONDS

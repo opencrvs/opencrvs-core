@@ -15,7 +15,7 @@ import {
   NOTIFICATION_TYPE,
   ToastNotification
 } from '@client/components/interface/ToastNotification'
-import { LocationPicker } from './LocationPicker'
+
 import { Query } from '@client/components/Query'
 import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/performance'
@@ -51,6 +51,7 @@ import {
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import format from '@client/utils/date-formatting'
 import { SegmentedControl } from '@client/components/SegmentedControl'
+import { LocationPicker } from '@client/components/LocationPicker'
 const { useState } = React
 
 export enum COMPLETENESS_RATE_REPORT_BASE {
@@ -176,11 +177,11 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                 />
               )}
               <LocationPicker
-                locationId={locationId}
-                onChangeLocation={(newLocation) => {
+                selectedLocationId={locationId}
+                onChangeLocation={(newLocationId) => {
                   props.goToCompletenessRates(
                     eventType as Event,
-                    newLocation.id,
+                    newLocationId,
                     dateStart,
                     dateEnd,
                     time

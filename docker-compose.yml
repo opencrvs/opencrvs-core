@@ -102,7 +102,7 @@ services:
     environment:
       - REDIS_HOST=redis
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - CONFIG_API_URL=http://config:2021
+      - APPLICATION_CONFIG_URL=http://config:2021
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
@@ -116,6 +116,7 @@ services:
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - FHIR_URL=http://openhim-core:5001/fhir
+      - APPLICATION_CONFIG_URL=http://config:2021/
       - HOST=0.0.0.0
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION:-latest}

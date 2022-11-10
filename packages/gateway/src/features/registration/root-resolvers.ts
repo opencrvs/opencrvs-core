@@ -683,6 +683,7 @@ async function createEventRegistration(
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
+
     return await getRegistrationIdsFromResponse(res, event, authHeader)
   } else {
     // return tracking-id

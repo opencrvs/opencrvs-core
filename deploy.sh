@@ -302,7 +302,10 @@ docker_stack_deploy() {
   ROTATING_APM_ELASTIC_PASSWORD=$ROTATING_APM_ELASTIC_PASSWORD
   ROTATING_SEARCH_ELASTIC_PASSWORD=$ROTATING_SEARCH_ELASTIC_PASSWORD
   KIBANA_USERNAME=$KIBANA_USERNAME
-  KIBANA_PASSWORD=$KIBANA_PASSWORD"
+  KIBANA_PASSWORD=$KIBANA_PASSWORD
+  SMS_API_KEY=$SMS_API_KEY
+  SMS_API_USERNAME=$SMS_API_USERNAME
+  SMS_ENDPOINT_SECRET=$SMS_ENDPOINT_SECRET"
 
   echo "Pulling all docker images. This might take a while"
 
@@ -324,7 +327,11 @@ docker_stack_deploy() {
     done
   done
 
-  echo "Updating docker swarm stack with new compose files"
+  echo "Updating docker swarm stack with new compose files:"
+  echo "SHARED_COMPOSE_FILES $SHARED_COMPOSE_FILES"
+  echo "environment_compose $environment_compose"
+  echo "replicas_compose $replicas_compose"
+
   ssh $SSH_USER@$SSH_HOST 'cd /opt/opencrvs && \
     '$ENV_VARIABLES' docker stack deploy --prune -c '$(split_and_join " " " -c " "$SHARED_COMPOSE_FILES $environment_compose $replicas_compose")' --with-registry-auth opencrvs'
 }
@@ -346,16 +353,16 @@ fi
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
-  ENVIRONMENT_COMPOSE="docker-compose.countryconfig.staging-deploy.yml docker-compose.staging-deploy.yml"
+  ENVIRONMENT_COMPOSE="docker-compose.staging-deploy.yml docker-compose.countryconfig.staging-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.staging-deploy.yml /opt/opencrvs/docker-compose.staging-deploy.yml"
 elif [[ "$ENV" = "qa" ]]; then
-  ENVIRONMENT_COMPOSE="docker-compose.countryconfig.qa-deploy.yml docker-compose.qa-deploy.yml"
+  ENVIRONMENT_COMPOSE="docker-compose.qa-deploy.yml docker-compose.countryconfig.qa-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.qa-deploy.yml /opt/opencrvs/docker-compose.qa-deploy.yml"
 elif [[ "$ENV" = "production" ]]; then
-  ENVIRONMENT_COMPOSE="docker-compose.countryconfig.prod-deploy.yml docker-compose.prod-deploy.yml"
+  ENVIRONMENT_COMPOSE="docker-compose.prod-deploy.yml docker-compose.countryconfig.prod-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.prod-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 elif [[ "$ENV" = "demo" ]]; then
-  ENVIRONMENT_COMPOSE="docker-compose.countryconfig.demo-deploy.yml docker-compose.prod-deploy.yml"
+  ENVIRONMENT_COMPOSE="docker-compose.prod-deploy.yml docker-compose.countryconfig.demo-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.demo-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 else
   echo "Unknown error running docker-compose on server as ENV is not staging, qa or production."

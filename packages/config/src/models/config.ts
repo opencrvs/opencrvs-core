@@ -102,7 +102,22 @@ const systemSchema = new Schema({
   TWO_FACTOR_AUTHENTICATION_ENABLED: {
     type: Boolean,
     required: false,
-    default: false
+    default: true
+  },
+  SMS_USERNAME_REMINDER_ENABLED: {
+    type: Boolean,
+    required: false,
+    default: true
+  },
+  SMS_EVENT_NOTIFICATIONS_ENABLED: {
+    type: Boolean,
+    required: false,
+    default: true
+  },
+  SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED: {
+    type: Boolean,
+    required: false,
+    default: true
   },
   EXTERNAL_VALIDATION_WORKQUEUE: {
     type: Boolean,

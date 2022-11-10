@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as ShortUIDGen from 'short-uid'
-import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
+import {
+  APPLICATION_CONFIG_URL,
+  NOTIFICATION_SERVICE_URL
+} from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import {
@@ -30,7 +33,7 @@ import {
 import { Events } from '@workflow/features/events/handler'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
-
+import { URL } from 'url'
 interface INotificationPayload {
   msisdn: string
   name?: string
@@ -167,10 +170,20 @@ async function sendNotification(
     registrationNumber?: string
   }
 ) {
+  const config = await getConfig(authHeader.Authorization)
+
+  if (!config.SMS_EVENT_NOTIFICATIONS_ENABLED) {
+    logger.info(
+      'SMS_EVENT_NOTIFICATIONS_ENABLED is false. Skipping sending SMS.'
+    )
+    return
+  }
+
   const payload: INotificationPayload = {
     msisdn,
     ...notificationPayload
   }
+
   logger.info(
     `Sending sms to : ${NOTIFICATION_SERVICE_URL}${smsType} with body: ${JSON.stringify(
       payload
@@ -323,4 +336,28 @@ export function getPatientBySection(
       }
     })?.resource as fhir.Patient)
   )
+}
+
+export async function getConfig(authToken: string): Promise<{
+  SMS_EVENT_NOTIFICATIONS_ENABLED: boolean
+  SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED: boolean
+}> {
+  return fetch(new URL('/config', APPLICATION_CONFIG_URL).toString(), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authToken
+    }
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .then((response) => {
+      return response.config
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Application config request failed: ${error.message}`)
+      )
+    })
 }

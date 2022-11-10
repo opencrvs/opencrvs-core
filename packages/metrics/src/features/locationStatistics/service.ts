@@ -53,7 +53,7 @@ async function getAdminLocationStatistics(
         registrarsCountByLocation.find(
           ({ locationId }) => locationId === each.id
         )?.total || 0
-    } else {
+    } else if (getLocationType(each) === 'ADMINISTRATIVE_AREA') {
       await getAdminLocationStatistics(
         each,
         registrarsCountByLocation,
@@ -106,6 +106,7 @@ export async function getLocationStatistics(
     { role: 'LOCAL_REGISTRAR' },
     authHeader
   )
+
   if (locationId) {
     const location = await fetchLocation(locationId, authHeader)
     return getAdminLocationStatistics(

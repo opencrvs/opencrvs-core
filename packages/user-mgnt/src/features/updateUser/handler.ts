@@ -147,7 +147,7 @@ export default async function updateUser(
   }
 
   if (userNameChanged) {
-    sendUpdateUsernameNotification(user.mobile, user.username, {
+    sendUpdateUsernameNotification(user.mobile, existingUser.username, {
       Authorization: request.headers.authorization
     })
   }
