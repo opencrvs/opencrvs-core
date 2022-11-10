@@ -23,7 +23,7 @@ import { logger } from '@auth/logger'
 export async function sendUserName(mobile: string, username: string) {
   const token = await createToken(
     'auth',
-    ['service'],
+    ['sysadmin'],
     ['opencrvs:notification-user', 'opencrvs:config-user'],
     JWT_ISSUER
   )
