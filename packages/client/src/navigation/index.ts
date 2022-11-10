@@ -49,7 +49,8 @@ import {
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
-  REGISTRAR_HOME_TAB_PAGE
+  REGISTRAR_HOME_TAB_PAGE,
+  VS_EXPORTS
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -165,6 +166,9 @@ export function goToHome() {
 
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+export function goToVSExport() {
+  return push(VS_EXPORTS)
 }
 
 export function goToFormConfigHome() {
