@@ -20,6 +20,8 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
+import { selectApplicationName } from '@login/login/selectors'
+import { IStoreState } from '@login/store'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -36,8 +38,11 @@ interface State {
   forgottenItem: string
   error: boolean
 }
+interface IName {
+  applicationName: string | undefined
+}
 
-type Props = BaseProps & WrappedComponentProps
+type Props = BaseProps & WrappedComponentProps & IName
 
 class ForgottenItemComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -47,9 +52,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
       error: false
     }
   }
-  componentDidMount(): void {
-    document.title = 'Farajaland CRS'
-  }
+
   handleContinue = (event: React.FormEvent) => {
     event.preventDefault()
     if (this.state.forgottenItem === '') {
@@ -60,7 +63,9 @@ class ForgottenItemComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, goToHome } = this.props
+    const { intl, goToHome, applicationName } = this.props
+    if (applicationName) document.title = applicationName
+
     const forgottenItems = [
       {
         id: 'usernameOption',
@@ -126,8 +131,13 @@ class ForgottenItemComponent extends React.Component<Props, State> {
     )
   }
 }
+const mapStateToProps = (store: IStoreState): IName => {
+  return {
+    applicationName: selectApplicationName(store)
+  }
+}
 
-export const ForgottenItem = connect(null, {
+export const ForgottenItem = connect(mapStateToProps, {
   goToHome,
   goToPhoneNumberVerificationForm
 })(injectIntl(ForgottenItemComponent))
