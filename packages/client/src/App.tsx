@@ -60,6 +60,7 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import { Registrations } from '@client/views/SysAdmin/Performance/Registrations'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -348,6 +349,11 @@ export class App extends React.Component<IAppProps> {
                                               routes.EVENT_COMPLETENESS_RATES
                                             }
                                             component={CompletenessRates}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.EVENT_REGISTRATIONS}
+                                            component={Registrations}
                                           />
                                           <ProtectedRoute
                                             exact

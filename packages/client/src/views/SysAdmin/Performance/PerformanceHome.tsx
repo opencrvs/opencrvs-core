@@ -484,6 +484,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                           )}
                           <RegistrationsReport
                             data={data!.getTotalMetrics}
+                            selectedLocationId={
+                              this.state.selectedLocation?.id ?? undefined
+                            }
                             selectedEvent={
                               event.toUpperCase() as 'BIRTH' | 'DEATH'
                             }

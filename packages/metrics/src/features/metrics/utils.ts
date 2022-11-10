@@ -453,14 +453,8 @@ export function getPopulation(
   const totalPopulationExtension = location.extension?.find(
     (ext) => ext.url === OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
   )
-
-  if (!totalPopulationExtension) {
-    throw new Error(
-      `Total population extension not found for location, location ID: ${location.id}`
-    )
-  }
   const populationDataArray: Record<string, number>[] =
-    totalPopulationExtension.valueString
+    totalPopulationExtension?.valueString
       ? JSON.parse(totalPopulationExtension.valueString)
       : []
   const populationYears = populationDataArray.map((data) =>

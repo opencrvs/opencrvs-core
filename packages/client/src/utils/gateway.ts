@@ -95,6 +95,7 @@ export type ApplicationConfiguration = {
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
+  TWO_FACTOR_AUTHENTICATION_ENABLED?: Maybe<Scalars['Boolean']>
 }
 
 export type ApplicationConfigurationInput = {
@@ -109,6 +110,7 @@ export type ApplicationConfigurationInput = {
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
+  TWO_FACTOR_AUTHENTICATION_ENABLED?: InputMaybe<Scalars['Boolean']>
 }
 
 export type AssignmentData = {
@@ -148,6 +150,7 @@ export type AttachmentInput = {
 }
 
 export enum AttachmentSubject {
+  BirthDeclaration = 'BIRTH_DECLARATION',
   Child = 'CHILD',
   ChildAge = 'CHILD_AGE',
   DeceasedDeathCauseProof = 'DECEASED_DEATH_CAUSE_PROOF',
@@ -754,6 +757,8 @@ export enum InformantType {
   Daughter = 'DAUGHTER',
   DaughterInLaw = 'DAUGHTER_IN_LAW',
   Father = 'FATHER',
+  FathersBrother = 'FATHERS_BROTHER',
+  FathersSister = 'FATHERS_SISTER',
   Granddaughter = 'GRANDDAUGHTER',
   Grandson = 'GRANDSON',
   Informant = 'INFORMANT',
@@ -761,6 +766,8 @@ export enum InformantType {
   MaternalGrandfather = 'MATERNAL_GRANDFATHER',
   MaternalGrandmother = 'MATERNAL_GRANDMOTHER',
   Mother = 'MOTHER',
+  MothersBrother = 'MOTHERS_BROTHER',
+  MothersSister = 'MOTHERS_SISTER',
   Other = 'OTHER',
   OtherFamilyMember = 'OTHER_FAMILY_MEMBER',
   PaternalGrandfather = 'PATERNAL_GRANDFATHER',
@@ -776,6 +783,11 @@ export type InputOutput = {
   valueCode?: Maybe<Scalars['String']>
   valueId?: Maybe<Scalars['String']>
   valueString?: Maybe<Scalars['String']>
+}
+
+export enum LiteracyType {
+  Illiterate = 'ILLITERATE',
+  Literate = 'LITERATE'
 }
 
 export type LocalRegistrar = {
@@ -830,6 +842,9 @@ export type LocationStatisticsResponse = {
 
 export enum LocationType {
   AdminStructure = 'ADMIN_STRUCTURE',
+  Aeroplane = 'AEROPLANE',
+  Bus = 'BUS',
+  CarTaxi = 'CAR_TAXI',
   CrvsOffice = 'CRVS_OFFICE',
   DeceasedUsualResidence = 'DECEASED_USUAL_RESIDENCE',
   HealthFacility = 'HEALTH_FACILITY',
@@ -840,7 +855,12 @@ export enum LocationType {
   OtherHealthInstitution = 'OTHER_HEALTH_INSTITUTION',
   PrimaryAddress = 'PRIMARY_ADDRESS',
   PrivateHome = 'PRIVATE_HOME',
+  Roadside = 'ROADSIDE',
   SecondaryAddress = 'SECONDARY_ADDRESS',
+  Ship = 'SHIP',
+  TraditionalDoctors = 'TRADITIONAL_DOCTORS',
+  TraditionalMaternityHomes = 'TRADITIONAL_MATERNITY_HOMES',
+  Train = 'TRAIN',
   UnhcrCamp = 'UNHCR_CAMP'
 }
 
@@ -1124,6 +1144,12 @@ export type NotificationInput = {
   updatedAt?: InputMaybe<Scalars['Date']>
 }
 
+export type OfficewiseRegistration = {
+  __typename?: 'OfficewiseRegistration'
+  officeLocation: Scalars['String']
+  total: Scalars['Int']
+}
+
 export type Payment = {
   __typename?: 'Payment'
   amount?: Maybe<Scalars['Float']>
@@ -1174,6 +1200,7 @@ export type Person = {
   gender?: Maybe<Scalars['String']>
   id?: Maybe<Scalars['ID']>
   identifier?: Maybe<Array<Maybe<IdentityType>>>
+  literacy?: Maybe<LiteracyType>
   maritalStatus?: Maybe<MaritalStatusType>
   multipleBirth?: Maybe<Scalars['Int']>
   name?: Maybe<Array<Maybe<HumanName>>>
@@ -1197,6 +1224,7 @@ export type PersonInput = {
   ethnicOrigin?: InputMaybe<Scalars['String']>
   gender?: InputMaybe<Scalars['String']>
   identifier?: InputMaybe<Array<InputMaybe<IdentityInput>>>
+  literacy?: InputMaybe<LiteracyType>
   maritalStatus?: InputMaybe<MaritalStatusType>
   multipleBirth?: InputMaybe<Scalars['Int']>
   name?: InputMaybe<Array<InputMaybe<HumanNameInput>>>
@@ -1224,6 +1252,7 @@ export type Query = {
   getEventsWithProgress?: Maybe<EventProgressResultSet>
   getFormDraft?: Maybe<Array<FormDraft>>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
+  getOfficewiseRegistrations?: Maybe<Array<OfficewiseRegistration>>
   getRoles?: Maybe<Array<Maybe<Role>>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
   getTotalCorrections?: Maybe<Array<CorrectionMetric>>
@@ -1314,6 +1343,13 @@ export type QueryGetEventsWithProgressArgs = {
 export type QueryGetLocationStatisticsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   populationYear: Scalars['Int']
+}
+
+export type QueryGetOfficewiseRegistrationsArgs = {
+  event: Scalars['String']
+  locationId: Scalars['String']
+  timeEnd: Scalars['String']
+  timeStart: Scalars['String']
 }
 
 export type QueryGetRolesArgs = {
@@ -1539,6 +1575,7 @@ export type Registration = {
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
+  informantsSignature?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
   paperFormID?: Maybe<Scalars['String']>
@@ -1566,6 +1603,7 @@ export type RegistrationInput = {
   draftId?: InputMaybe<Scalars['String']>
   inCompleteFields?: InputMaybe<Scalars['String']>
   informantType?: InputMaybe<InformantType>
+  informantsSignature?: InputMaybe<Scalars['String']>
   location?: InputMaybe<LocationInput>
   otherInformantType?: InputMaybe<Scalars['String']>
   page?: InputMaybe<Scalars['String']>
@@ -2469,6 +2507,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       dateOfMarriage?: any | null
       stateOfOrigin?: string | null
       ethnicOrigin?: string | null
+      literacy?: LiteracyType | null
       educationalAttainment?: EducationType | null
       nationality?: Array<string | null> | null
       name?: Array<{
@@ -2508,6 +2547,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
       dateOfMarriage?: any | null
+      literacy?: LiteracyType | null
       educationalAttainment?: EducationType | null
       stateOfOrigin?: string | null
       ethnicOrigin?: string | null
@@ -2549,6 +2589,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
       duplicates?: Array<string | null> | null
+      informantsSignature?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -2625,6 +2666,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         id?: string | null
         type?: string | null
         role?: string | null
+        title?: string | null
         name?: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -2721,6 +2763,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       birthDate?: string | null
       maritalStatus?: MaritalStatusType | null
       dateOfMarriage?: any | null
+      literacy?: LiteracyType | null
       educationalAttainment?: EducationType | null
       stateOfOrigin?: string | null
       ethnicOrigin?: string | null
@@ -2762,6 +2805,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       birthDate?: string | null
       maritalStatus?: MaritalStatusType | null
       dateOfMarriage?: any | null
+      literacy?: LiteracyType | null
       educationalAttainment?: EducationType | null
       stateOfOrigin?: string | null
       ethnicOrigin?: string | null
@@ -2839,6 +2883,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       otherInformantType?: string | null
       contact?: string | null
       contactPhoneNumber?: string | null
+      informantsSignature?: string | null
       trackingId?: string | null
       registrationNumber?: string | null
       status?: Array<{
@@ -2911,6 +2956,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         id?: string | null
         type?: string | null
         role?: string | null
+        title?: string | null
         name?: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -4872,6 +4918,7 @@ export type UpdateApplicationConfigMutation = {
     NID_NUMBER_PATTERN?: string | null
     PHONE_NUMBER_PATTERN?: string | null
     HIDE_EVENT_REGISTER_INFORMATION?: boolean | null
+    TWO_FACTOR_AUTHENTICATION_ENABLED?: boolean | null
     ADDRESSES?: number | null
     COUNTRY_LOGO?: {
       __typename?: 'CountryLogo'
@@ -5245,6 +5292,22 @@ export type GetTotalCertificationsQuery = {
     __typename?: 'CertificationMetric'
     total: number
     eventType: string
+  }> | null
+}
+
+export type GetOfficewiseRegistrationsQueryVariables = Exact<{
+  locationId: Scalars['String']
+  timeStart: Scalars['String']
+  timeEnd: Scalars['String']
+  event: Scalars['String']
+}>
+
+export type GetOfficewiseRegistrationsQuery = {
+  __typename?: 'Query'
+  getOfficewiseRegistrations?: Array<{
+    __typename?: 'OfficewiseRegistration'
+    total: number
+    officeLocation: string
   }> | null
 }
 
