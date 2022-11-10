@@ -504,14 +504,7 @@ export const QRCodeTransformerTransformer = async (
   targetFieldName?: string,
   __?: IOfflineData
 ) => {
+  console.log(await QRCode.toDataURL(`web+opencrvs://${queryData.id}`))
   transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
-    await QRCode.toDataURL(
-      `${window.location.protocol}//${window.location.host}${formatUrl(
-        DECLARATION_RECORD_AUDIT,
-        {
-          tab: 'printTab',
-          declarationId: queryData.id
-        }
-      )}`
-    )
+    await QRCode.toDataURL(`web+opencrvs://${queryData.id}`)
 }
