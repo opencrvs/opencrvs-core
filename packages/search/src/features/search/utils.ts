@@ -164,6 +164,14 @@ export function advancedQueryBuilder(
     })
   }
 
+  if (params.eventCountry) {
+    must.push({
+      match: {
+        eventCountry: params.eventCountry
+      }
+    })
+  }
+
   const eventJurisdictionIds = [
     params.eventLocationLevel1,
     params.eventLocationLevel2,

@@ -30,6 +30,7 @@ export interface IAdvancedSearchParam {
   declarationLocationId?: string
   declarationJurisdictionId?: string
   eventLocationId?: string
+  eventCountry?: string
   eventLocationLevel1?: string
   eventLocationLevel2?: string
   eventLocationLevel3?: string

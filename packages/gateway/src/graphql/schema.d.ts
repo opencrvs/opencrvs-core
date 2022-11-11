@@ -341,6 +341,7 @@ export interface GQLAdvancedSearchParametersInput {
   declarationLocationId?: string
   declarationJurisdictionId?: string
   eventLocationId?: string
+  eventCountry?: string
   eventLocationLevel1?: string
   eventLocationLevel2?: string
   eventLocationLevel3?: string
@@ -1245,6 +1246,7 @@ export interface GQLAdvancedSeachParameters {
   declarationLocationId?: string
   declarationJurisdictionId?: string
   eventLocationId?: string
+  eventCountry?: string
   eventLocationLevel1?: string
   eventLocationLevel2?: string
   eventLocationLevel3?: string
@@ -5392,6 +5394,7 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   declarationLocationId?: AdvancedSeachParametersToDeclarationLocationIdResolver<TParent>
   declarationJurisdictionId?: AdvancedSeachParametersToDeclarationJurisdictionIdResolver<TParent>
   eventLocationId?: AdvancedSeachParametersToEventLocationIdResolver<TParent>
+  eventCountry?: AdvancedSeachParametersToEventCountryResolver<TParent>
   eventLocationLevel1?: AdvancedSeachParametersToEventLocationLevel1Resolver<TParent>
   eventLocationLevel2?: AdvancedSeachParametersToEventLocationLevel2Resolver<TParent>
   eventLocationLevel3?: AdvancedSeachParametersToEventLocationLevel3Resolver<TParent>
@@ -5537,6 +5540,13 @@ export interface AdvancedSeachParametersToDeclarationJurisdictionIdResolver<
 }
 
 export interface AdvancedSeachParametersToEventLocationIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AdvancedSeachParametersToEventCountryResolver<
   TParent = any,
   TResult = any
 > {
