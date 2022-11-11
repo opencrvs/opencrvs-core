@@ -92,7 +92,7 @@ const messagesToDefine: IConfigMessages = {
   },
   vsexport: {
     id: 'config.application.vsexport',
-    defaultMessage: 'Vital statistics export',
+    defaultMessage: 'Vital statistics',
     description: 'VS Export tab'
   },
   vitalStatisticsExport: {
@@ -105,6 +105,12 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.export',
     defaultMessage: 'Export',
     description: 'Download Export CSV'
+  },
+  vsEmptyStateText: {
+    id: 'config.application.emptystate',
+    defaultMessage:
+      "The previous year's vital statistics data (based on vital event registrations occurring within that year) will become available for you to export as of 1st January.",
+    description: 'Vital Statistics Export Empty State Text'
   },
   applicationNameChangeMessage: {
     id: 'config.application.nameChangeMessage',

@@ -62,6 +62,7 @@ import {
 } from '@client/SubmissionController'
 import styled from '@client/styledComponents'
 import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -575,7 +576,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.vsexports
                   ) && (
                     <NavigationItem
-                      icon={() => <Export color={'grey600'} />}
+                      icon={() => <Icon name="Share" size="small" />}
                       id={`navigation_${WORKQUEUE_TABS.vsexports}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.vsexports]
