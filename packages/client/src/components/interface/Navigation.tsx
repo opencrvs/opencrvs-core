@@ -31,12 +31,18 @@ import {
   goToPerformanceView,
   goToTeamView,
   goToFormConfigHome,
-  goToApplicationConfig
+  goToApplicationConfig,
+  goToVSExport
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { Activity, PaperPlane, Users } from '@opencrvs/components/lib/icons'
+import {
+  Activity,
+  Users,
+  Export,
+  PaperPlane
+} from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
@@ -73,6 +79,7 @@ export const WORKQUEUE_TABS = {
   outbox: 'outbox',
   externalValidation: 'waitingValidation',
   performance: 'performance',
+  vsexports: 'vsexports',
   team: 'team',
   config: 'config',
   application: 'application',
@@ -139,6 +146,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -153,6 +161,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
+    WORKQUEUE_TABS.vsexports,
     GROUP_ID.menuGroup
   ],
   PERFORMANCE_MANAGEMENT: [WORKQUEUE_TABS.performance, GROUP_ID.menuGroup]
@@ -188,6 +197,7 @@ interface IProps {
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
+  goToVSExportsAction: typeof goToVSExport
   goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
@@ -256,6 +266,7 @@ export const NavigationView = (props: IFullProps) => {
     loadWorkqueueStatuses = true,
     activeMenuItem,
     goToCertificateConfigAction,
+    goToVSExportsAction,
     goToFormConfigAction,
     goToApplicationConfigAction,
     navigationWidth,
@@ -550,12 +561,29 @@ export const NavigationView = (props: IFullProps) => {
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.performance]
                       )}
-                      onClick={() =>
+                      onClick={() => {
                         props.goToPerformanceViewAction(userDetails)
-                      }
+                      }}
                       isSelected={
                         enableMenuSelection &&
                         activeMenuItem === WORKQUEUE_TABS.performance
+                      }
+                    />
+                  )}
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.vsexports
+                  ) && (
+                    <NavigationItem
+                      icon={() => <Export color={'grey600'} />}
+                      id={`navigation_${WORKQUEUE_TABS.vsexports}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.vsexports]
+                      )}
+                      onClick={goToVSExportsAction}
+                      isSelected={
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TABS.vsexports
                       }
                     />
                   )}
@@ -576,6 +604,7 @@ export const NavigationView = (props: IFullProps) => {
                       }
                     />
                   )}
+
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
                     WORKQUEUE_TABS.config
@@ -678,6 +707,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.performance
       : window.location.href.includes(WORKQUEUE_TABS.team)
       ? WORKQUEUE_TABS.team
+      : window.location.href.includes(WORKQUEUE_TABS.vsexports)
+      ? WORKQUEUE_TABS.vsexports
       : window.location.href.includes(WORKQUEUE_TABS.application)
       ? WORKQUEUE_TABS.application
       : window.location.href.includes(WORKQUEUE_TABS.settings)
@@ -700,6 +731,7 @@ export const Navigation = connect<
   goToCertificateConfigAction: goToCertificateConfig,
   goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
+  goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
