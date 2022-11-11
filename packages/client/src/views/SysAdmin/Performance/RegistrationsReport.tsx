@@ -115,7 +115,7 @@ export function RegistrationsReport({
                 dispatch(
                   goToRegistrations(
                     selectedEvent,
-                    query.get('locationId')!,
+                    selectedLocationId!,
                     new Date(query.get('timeStart')!),
                     new Date(query.get('timeEnd')!)
                   )
