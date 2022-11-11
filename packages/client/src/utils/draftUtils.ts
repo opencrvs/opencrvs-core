@@ -26,17 +26,7 @@ import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const getInformantEngName = (sectionData: IFormSectionData): string => {
-  if (sectionData.firstNamesEng) {
-    if (sectionData.firstNamesEng && sectionData.familyNameEng) {
-      return `${sectionData.firstNamesEng as string} ${
-        sectionData.familyNameEng as string
-      }`
-    } else {
-      return `${sectionData.firstNamesEng as string}`
-    }
-  } else {
-    return sectionData.familyNameEng as string
-  }
+  return `${sectionData.firstNamesEng ?? ''} ${sectionData.familyNameEng ?? ''}`
 }
 
 const getInformantOthreName = (sectionData: IFormSectionData): string => {
