@@ -92,13 +92,11 @@ function onNewContentAvailable(waitingSW: ServiceWorker | null) {
 }
 
 function userOnlineStatus() {
-  window.ononline = () => {
-    const action = actions.showUserOnlineStatusNotificationToast()
-    store.dispatch(action)
-  }
+  const action = actions.showUserOnlineStatusNotificationToast()
+  store.dispatch(action)
 }
 
-userOnlineStatus()
+window.addEventListener('online', userOnlineStatus)
 
 ReactDOM.render(
   <App store={store} history={history} />,
