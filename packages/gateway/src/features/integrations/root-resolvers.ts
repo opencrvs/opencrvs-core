@@ -17,7 +17,7 @@ import fetch from 'node-fetch'
 export const resolvers: GQLResolver = {
   Mutation: {
     async refreshSystemClientSecret(_, { clientId }, authHeader) {
-      if (!hasScope(authHeader, 'natlsysadmin')) {
+      if (!hasScope(authHeader, 'sysadmin')) {
         throw new Error('Only system user can update refresh client secret')
       }
       const res = await fetch(

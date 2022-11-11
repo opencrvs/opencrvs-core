@@ -23,11 +23,11 @@ beforeEach(() => {
 
 describe('generate refresh token', () => {
   let authHeaderRegister: { Authorization: string }
-  let authHeaderNatlSysAdmin: { Authorization: string }
+  let authHeaderSysAdmin: { Authorization: string }
   beforeEach(() => {
     fetch.resetMocks()
-    const naltSysAdminToken = jwt.sign(
-      { scope: ['natlsysadmin'] },
+    const sysAdminToken = jwt.sign(
+      { scope: ['sysadmin'] },
       readFileSync('../auth/test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
@@ -36,8 +36,8 @@ describe('generate refresh token', () => {
         audience: 'opencrvs:gateway-user'
       }
     )
-    authHeaderNatlSysAdmin = {
-      Authorization: `Bearer ${naltSysAdminToken}`
+    authHeaderSysAdmin = {
+      Authorization: `Bearer ${sysAdminToken}`
     }
     const registerToken = jwt.sign(
       { scope: ['register'] },
@@ -61,13 +61,13 @@ describe('generate refresh token', () => {
     clientSecret: 'fb82cd2f-6c95-4dff-92f5-22c787b7f277'
   }
 
-  it('update refresh token for national system admin', async () => {
+  it('update refresh token for system admin', async () => {
     fetch.mockResponseOnce(JSON.stringify(fetchRefreshUser), { status: 200 })
 
     const response = await resolvers.Mutation.refreshSystemClientSecret(
       {},
       { clientId: '38ea3d84-6403-40f0-bce2-485caf655585' },
-      authHeaderNatlSysAdmin
+      authHeaderSysAdmin
     )
 
     expect(response).toEqual(fetchRefreshUser)
