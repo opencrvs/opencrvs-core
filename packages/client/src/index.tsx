@@ -91,17 +91,6 @@ function onNewContentAvailable(waitingSW: ServiceWorker | null) {
   }
 }
 
-function onBackGroundSync() {
-  if (typeof BroadcastChannel === 'undefined') {
-    return
-  }
-  const channel = new BroadcastChannel(BACKGROUND_SYNC_BROADCAST_CHANNEL)
-  channel.onmessage = (e) => {
-    const action = actions.showBackgroundSyncedNotification()
-    store.dispatch(action)
-  }
-}
-
 function userOnlineStatus() {
   window.ononline = () => {
     const action = actions.showUserOnlineStatusNotificationToast()
@@ -110,7 +99,6 @@ function userOnlineStatus() {
 }
 
 userOnlineStatus()
-onBackGroundSync()
 
 ReactDOM.render(
   <App store={store} history={history} />,

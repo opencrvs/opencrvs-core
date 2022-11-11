@@ -11,8 +11,6 @@ import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionMo
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const SHOW_BACKGROUND_SYNC_TRIGGERED = 'SHOW_BACKGROUND_SYNC_TRIGGERED'
-export const HIDE_BACKGROUND_SYNC_TRIGGERED = 'HIDE_BACKGROUND_SYNC_TRIGGERED'
 
 export const SHOW_ONLINE_USER_SUCCESS_TOAST = 'SHOW_ONLINE_USER_SUCCESS_TOAST'
 export const HIDE_ONLINE_USER_SUCCESS_TOAST = 'HIDE_ONLINE_USER_SUCCESS_TOAST'
@@ -123,14 +121,6 @@ export const toggleDraftSavedNotification =
     type: TOGGLE_DRAFT_SAVED_NOTIFICATION
   })
 
-export type ShowBackgroundSyncedAction = {
-  type: typeof SHOW_BACKGROUND_SYNC_TRIGGERED
-}
-
-export type HideBackgroundSyncedAction = {
-  type: typeof HIDE_BACKGROUND_SYNC_TRIGGERED
-}
-
 export type ShowOnlineUserStatusNotificationAction = {
   type: typeof SHOW_ONLINE_USER_SUCCESS_TOAST
 }
@@ -155,16 +145,6 @@ export type ShowUnassigned = {
 export type HideUnassigned = {
   type: typeof HIDE_UNASSIGNED
 }
-
-export const showBackgroundSyncedNotification =
-  (): ShowBackgroundSyncedAction => ({
-    type: SHOW_BACKGROUND_SYNC_TRIGGERED
-  })
-
-export const hideBackgroundSyncedNotification =
-  (): HideBackgroundSyncedAction => ({
-    type: HIDE_BACKGROUND_SYNC_TRIGGERED
-  })
 
 export const showUserOnlineStatusNotificationToast =
   (): ShowOnlineUserStatusNotificationAction => ({
@@ -266,8 +246,6 @@ export const hideUnassignedModal = (): HideUnassigned => ({
 })
 
 export type Action =
-  | ShowBackgroundSyncedAction
-  | HideBackgroundSyncedAction
   | SessionExpiredAction
   | ShowConfigurationErrorAction
   | HideConfigurationErrorAction

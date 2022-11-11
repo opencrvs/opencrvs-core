@@ -19,7 +19,6 @@ import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import {
-  hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification,
   hideSubmitFormSuccessToast,
@@ -51,7 +50,6 @@ type NotificationProps = {
 }
 
 type DispatchProps = {
-  hideBackgroundSyncedNotification: typeof hideBackgroundSyncedNotification
   hideConfigurationErrorNotification: typeof hideConfigurationErrorNotification
   hideSubmitFormSuccessToast: typeof hideSubmitFormSuccessToast
   hideSubmitFormErrorToast: typeof hideSubmitFormErrorToast
@@ -67,10 +65,6 @@ type DispatchProps = {
 class Component extends React.Component<
   NotificationProps & DispatchProps & IntlShapeProps & RouteComponentProps<{}>
 > {
-  hideBackgroundSyncedNotification = () => {
-    this.props.hideBackgroundSyncedNotification()
-  }
-
   hideConfigurationErrorNotification = () => {
     this.props.hideConfigurationErrorNotification()
   }
@@ -101,7 +95,6 @@ class Component extends React.Component<
   render() {
     const {
       children,
-      backgroundSyncMessageVisible,
       configurationErrorVisible,
       intl,
       saveDraftClicked,
@@ -118,15 +111,6 @@ class Component extends React.Component<
     return (
       <div>
         {children}
-        {backgroundSyncMessageVisible && (
-          <Toast
-            type="success"
-            id="backgroundSyncShowNotification"
-            onClose={this.hideBackgroundSyncedNotification}
-          >
-            {intl.formatMessage(messages.declarationsSynced)}
-          </Toast>
-        )}
         {onlineUserStatusToast && (
           <Toast
             type="success"
@@ -257,7 +241,6 @@ const mapStateToProps = (store: IStoreState) => {
 
 export const NotificationComponent = withRouter(
   connect<NotificationProps, DispatchProps, {}, IStoreState>(mapStateToProps, {
-    hideBackgroundSyncedNotification,
     hideConfigurationErrorNotification,
     hideSubmitFormSuccessToast,
     hideSubmitFormErrorToast,

@@ -72,16 +72,6 @@ export const notificationReducer: LoopReducer<
   action: actions.Action
 ): NotificationState | Loop<NotificationState, actions.Action> => {
   switch (action.type) {
-    case actions.SHOW_BACKGROUND_SYNC_TRIGGERED:
-      return {
-        ...state,
-        backgroundSyncMessageVisible: true
-      }
-    case actions.HIDE_BACKGROUND_SYNC_TRIGGERED:
-      return {
-        ...state,
-        backgroundSyncMessageVisible: false
-      }
     case actions.SESSION_EXPIRED:
       return {
         ...state,
