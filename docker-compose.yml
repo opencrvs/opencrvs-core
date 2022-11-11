@@ -117,6 +117,7 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
+      - METRICS_URL=http://metrics:1050
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION:-latest}
     build:
