@@ -57,8 +57,7 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:metrics-user',
   'opencrvs:countryconfig-user',
   'opencrvs:webhooks-user',
-  'opencrvs:config-user',
-  'opencrvs:documents-user'
+  'opencrvs:config-user'
 ]
 export const NOTIFICATION_API_USER_AUDIENCE = 'opencrvs:notification-api-user'
 export const VALIDATOR_API_USER_AUDIENCE = 'opencrvs:validator-api-user'
