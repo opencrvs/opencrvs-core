@@ -22,9 +22,11 @@ interface IName {
 type Props = WrappedComponentProps & IName
 
 class TitleProviderComponent extends Component<Props> {
-  render() {
+  componentDidUpdate(): void {
     const { applicationName } = this.props
     if (applicationName) document.title = applicationName
+  }
+  render() {
     return <>{this.props.children}</>
   }
 }
