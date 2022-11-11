@@ -37,12 +37,7 @@ import {
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import {
-  Activity,
-  Users,
-  Export,
-  PaperPlane
-} from '@opencrvs/components/lib/icons'
+import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
