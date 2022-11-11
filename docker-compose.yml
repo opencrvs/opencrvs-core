@@ -50,8 +50,6 @@ services:
       - WORKFLOW_URL=http://workflow:5050/
       - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
-      - MINIO_BUCKET=ocrvs
-      - DOCUMENTS_URL=http://document:9050
   # User facing services
   workflow:
     image: opencrvs/ocrvs-workflow:${VERSION:-latest}
@@ -92,19 +90,9 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - CONFIG_API_URL=http://config:2021
       - FHIR_URL=http://openhim-core:5001/fhir
-      - MONGO_URL=mongodb://mongo1/reports
-      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
-      - DOCUMENTS_URL=http://document:9050
   # END User facing services
-  scheduler:
-    image: opencrvs/ocrvs-scheduler:${VERSION:-latest}
-    build:
-      context: .
-      dockerfile: ./packages/scheduler/Dockerfile
-    environment:
-      - METRICS_URL=http://metrics:1050
   auth:
     image: opencrvs/ocrvs-auth:${VERSION:-latest}
     build:
@@ -129,6 +117,7 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
+      - METRICS_URL=http://metrics:1050
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION:-latest}
     build:
@@ -181,15 +170,3 @@ services:
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
       - WAIT_HOSTS=mongo1:27017,influxdb:8086
-
-  documents:
-    image: opencrvs/ocrvs-documents:${VERSION:-latest}
-    build:
-      context: .
-      dockerfile: ./packages/documents/Dockerfile
-    restart: unless-stopped
-    environment:
-      - COUNTRY_CONFIG_URL=http://countryconfig:3040
-      - MINIO_HOST=minio
-      - MINIO_PORT=3535
-      - MINIO_BUCKET=ocrvs

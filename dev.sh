@@ -24,7 +24,6 @@ function ask_yes_or_no() {
         *)     echo "no" ;;
     esac
 }
-
 if [[ "no" == $(ask_yes_or_no "If you are ready to continue, type: yes.  If you dont know, type: no to exit.") ]]
 then
     echo -e "\n\nExiting OpenCRVS."
@@ -34,28 +33,7 @@ fi
 echo
 echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
 echo
-if [[ $(docker ps -aq) ]] ; then
-  docker stop $(docker ps -aq)
-  sleep 5
-fi
-
-
-echo
-openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
-for x in "${openCRVSPorts[@]}"
-do
-   :
-    if lsof -i:$x; then
-      echo -e "OpenCRVS thinks that port: $x is in use by another application.\r"
-      echo "You need to find out which application is using this port and quit the application."
-      echo "You can find out the application by running:"
-      echo "lsof -i:$x"
-      exit 1
-    else
-        echo -e "$x \033[32m port is available!\033[0m :)"
-    fi
-done
-
+if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
 
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
   OS="UBUNTU"
