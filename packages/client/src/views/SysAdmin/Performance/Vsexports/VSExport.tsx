@@ -129,6 +129,7 @@ const VSExport = () => {
           <Content
             title={intl.formatMessage(messages.vsexport)}
             titleColor={'copy'}
+            subtitle={intl.formatMessage(messages.vsEmptyStateText)}
             tabBarContent={
               <FormTabs
                 sections={tabSections}

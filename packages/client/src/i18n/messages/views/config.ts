@@ -106,6 +106,12 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Export',
     description: 'Download Export CSV'
   },
+  vsEmptyStateText: {
+    id: 'config.application.emptystate',
+    defaultMessage:
+      "The previous year's vital statistics data (based on vital event registrations occurring within that year) will become available for you to export as of 1st January.",
+    description: 'Vital Statistics Export Empty State Text'
+  },
   applicationNameChangeMessage: {
     id: 'config.application.nameChangeMessage',
     defaultMessage: 'Choose a name for your CRVS system',

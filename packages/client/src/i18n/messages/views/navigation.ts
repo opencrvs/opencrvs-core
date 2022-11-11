@@ -92,7 +92,7 @@ const messagesToDefine: INavigationMessages = {
     id: 'navigation.certificate'
   },
   vsexports: {
-    defaultMessage: 'Vital Statistics Report',
+    defaultMessage: 'Vital statistics export',
     description: 'Reports label in navigation',
     id: 'navigation.reports'
   },
