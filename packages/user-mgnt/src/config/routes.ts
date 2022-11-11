@@ -61,7 +61,8 @@ import {
   verifySystemResSchema,
   getSystemRequestSchema,
   getSystemResponseSchema,
-  getSystemHandler, getAllSystemsHandler
+  getSystemHandler,
+  getAllSystemsHandler
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,

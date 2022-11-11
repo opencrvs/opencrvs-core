@@ -11,4 +11,6 @@
  */
 export interface IAuthHeader {
   Authorization: string
+  'x-real-ip': string
+  'x-real-user-agent': string
 }

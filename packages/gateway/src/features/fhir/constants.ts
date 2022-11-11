@@ -33,3 +33,4 @@ export const HAS_SHOWED_VERIFIED_DOCUMENT = `${OPENCRVS_SPECIFICATION_URL}extens
 
 export const BIRTH_REG_NO = 'birth-registration-number'
 export const DEATH_REG_NO = 'death-registration-number'
+export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'

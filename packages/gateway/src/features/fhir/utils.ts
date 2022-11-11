@@ -68,6 +68,9 @@ import {
 } from '@gateway/graphql/schema'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
 
+export type Composition = fhir.Composition & { id: string }
+export type Task = fhir.Task & { id: string }
+
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
@@ -75,6 +78,13 @@ export interface ITimeLoggedResponse {
 export interface IEventDurationResponse {
   status: string
   durationInSeconds: number
+}
+
+export enum FHIR_RESOURCE_TYPE {
+  COMPOSITION = 'Composition',
+  TASK = 'Task',
+  ENCOUNTER = 'Encounter',
+  PAYMENT_RECONCILIATION = 'PaymentReconciliation'
 }
 
 export function findCompositionSectionInBundle(
@@ -1348,4 +1358,9 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
     task.extension &&
     findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
   return extension
+}
+
+export function getClientIdFromToken(token: string) {
+  const payload = getTokenPayload(token)
+  return payload.sub
 }

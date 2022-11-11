@@ -16,7 +16,8 @@ import {
   REINSTATED_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
+  REQUEST_CORRECTION_EXTENSION_URL,
+  METRICS_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -27,7 +28,8 @@ import {
   getRegistrationIds,
   getDeclarationIds,
   getStatusFromTask,
-  setCertificateCollector
+  setCertificateCollector,
+  getClientIdFromToken
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -36,7 +38,7 @@ import {
   checkUserAssignment,
   taskBundleWithExtension
 } from '@gateway/features/registration/fhir-builders'
-import { hasScope, inScope } from '@gateway/features/user/utils'
+import { getUser, hasScope, inScope } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
@@ -52,6 +54,7 @@ import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments
 } from '@gateway/utils/validators'
+import { resolve } from 'url'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -536,7 +539,15 @@ async function createEventRegistration(
     }
   }
 
+  const userId = getClientIdFromToken(authHeader.Authorization)
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  const user = await getUser({ userId }, authHeader)
+  await postUserActionToMetricsWithBundle(
+    'INCOMPLETE',
+    user.practitionerId,
+    authHeader['x-real-ip'],
+    authHeader['x-real-user-agent']
+  )
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
     return await getRegistrationIdsFromResponse(res, event, authHeader)
@@ -699,4 +710,26 @@ export async function markRecordAsDownloadedOrAssigned(
 
   // return the full composition
   return fetchFHIR(`/Composition/${id}`, authHeader)
+}
+
+export async function postUserActionToMetricsWithBundle(
+  action: string,
+  practitionerId: string,
+  remoteAddress: string,
+  userAgent: string
+) {
+  const url = resolve(METRICS_URL, '/audit/events')
+  const body = {
+    action: action,
+    practitionerId: practitionerId
+  }
+  await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      'x-real-ip': remoteAddress,
+      'x-real-user-agent': userAgent
+    }
+  })
 }

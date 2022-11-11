@@ -168,7 +168,8 @@ const AuditDescriptionMapping: {
   EDIT_USER: messages.editUserAuditAction,
   CREATE_USER: messages.createUserAuditAction,
   PASSWORD_RESET: messages.passwordResetAuditAction,
-  USERNAME_REMINDER: messages.userNameReminderAuditAction
+  USERNAME_REMINDER: messages.userNameReminderAuditAction,
+  INCOMPLETE: messages.sentIncompleteAuditAction
 }
 
 export function getUserAuditDescription(
