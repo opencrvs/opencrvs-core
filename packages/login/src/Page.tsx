@@ -23,13 +23,18 @@ type IProps = {
   children: React.ReactNode
 }
 
-export function Page({ children }: IProps) {
+function useLoadConfigurations() {
   const dispatch = useDispatch()
-  const paramLanguage = useSearchQuery('lang')
   React.useEffect(() => {
     dispatch(loadLanguages())
     dispatch(applicationConfigLoadAction())
+  }, [dispatch])
+}
 
+function useSyncLanguage() {
+  const dispatch = useDispatch()
+  const paramLanguage = useSearchQuery('lang')
+  React.useEffect(() => {
     async function syncLanguage() {
       const languageToUse =
         paramLanguage ?? (await retrieveLanguage()) ?? getDefaultLanguage()
@@ -38,5 +43,11 @@ export function Page({ children }: IProps) {
     }
     syncLanguage()
   }, [dispatch, paramLanguage])
+}
+
+export function Page({ children }: IProps) {
+  useLoadConfigurations()
+  useSyncLanguage()
+
   return <>{children}</>
 }
