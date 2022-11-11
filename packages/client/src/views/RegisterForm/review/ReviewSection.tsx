@@ -456,7 +456,12 @@ const renderValue = (
 
   if (value && field.type === LOCATION_SEARCH_INPUT) {
     const searchableListOfLocations = generateLocations(
-      getListOfLocations(offlineCountryConfiguration, field.searchableResource),
+      field.searchableResource.reduce((locations, resource) => {
+        return {
+          ...locations,
+          ...getListOfLocations(offlineCountryConfiguration, resource)
+        }
+      }, {}),
       intl
     )
     const selectedLocation = searchableListOfLocations.find(

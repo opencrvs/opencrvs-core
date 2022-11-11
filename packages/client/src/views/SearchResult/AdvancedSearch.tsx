@@ -99,6 +99,9 @@ const BirthSection = () => {
   const intl = useIntl()
   const [isDisable, setDisable] = useState(true)
   const isOnline = useOnlineStatus()
+  const [formState, setFormState] = useState({
+    childDetails: { nestedFields: { eventCountry: 'FAR' } }
+  })
 
   const validateForm = (advancedSearch: IAdvancedSearch) => {
     let count = 0
@@ -127,9 +130,12 @@ const BirthSection = () => {
         id={advancedSearchBirthSectionFormType.id}
         onChange={(values) => {
           validateForm(values)
+          setFormState(values)
+          console.log(values)
         }}
         setAllFieldsDirty={false}
         fields={advancedSearchBirthSectionFormType.fields}
+        draftData={formState}
       />
 
       <PrimaryButton
@@ -149,6 +155,7 @@ const DeathSection = () => {
   const intl = useIntl()
   const [isDisable, setDisable] = useState(true)
   const isOnline = useOnlineStatus()
+  const [formState, setFormState] = useState({})
 
   const validateForm = (advancedSearch: IAdvancedSearch) => {
     let count = 0
@@ -178,6 +185,8 @@ const DeathSection = () => {
         id={advancedSearchDeathSectionFormType.id}
         onChange={(values) => {
           validateForm(values)
+          setFormState(values)
+          console.log(values)
         }}
         setAllFieldsDirty={false}
         fields={advancedSearchDeathSectionFormType.fields}

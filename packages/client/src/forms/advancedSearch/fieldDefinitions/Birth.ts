@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { countries } from '@client/forms/countries'
 import { AdvancedSearchSection, IFormSectionGroup } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
@@ -38,7 +39,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       nestedFields: {
         yes: [
           {
-            name: 'declarationLocationId',
+            name: 'placeOfRegistration',
             customisable: false,
             type: 'LOCATION_SEARCH_INPUT',
             label: advancedSearchForm.placeOfRegistrationlabel,
@@ -46,15 +47,10 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             placeholder: formMessageDescriptors.formSelectPlaceholder,
             required: false,
             initialValue: '',
-            searchableResource: 'offices',
-            searchableType: 'CRVS_OFFICE',
-            dynamicOptions: {
-              resource: 'CRVS_OFFICES & ADMIN_STRUCTURE'
-            },
+            searchableResource: ['locations', 'offices'],
+            searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
 
-            validate: [],
-
-            mapping: {}
+            validate: []
           },
           {
             name: 'dateOfRegistration',
@@ -104,39 +100,6 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
                 label: advancedSearchForm.recordStatusAchived
               }
             ]
-          },
-          {
-            name: ' eventLocationLevel1',
-            customisable: false,
-            type: 'LOCATION_SEARCH_INPUT',
-            label: formMessageDescriptors.placeOfBirth,
-            previewGroup: 'placeOfBirth',
-            required: false,
-            initialValue: '',
-            searchableResource: 'facilities',
-            searchableType: 'HEALTH_FACILITY',
-            dynamicOptions: {
-              resource: 'facilities'
-            },
-            validate: []
-          },
-          {
-            name: '  eventLocationLevel2',
-            customisable: false,
-            type: 'TEXT',
-            label: formMessageDescriptors.internationalDistrict,
-            required: false,
-            initialValue: '',
-            validate: []
-          },
-          {
-            name: '  eventLocationLevel1',
-            customisable: false,
-            type: 'TEXT',
-            label: formMessageDescriptors.internationalState,
-            required: false,
-            initialValue: '',
-            validate: []
           }
         ]
       }
@@ -164,7 +127,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
           {
             name: 'childDoB',
             customisable: false,
-            type: 'DATE',
+            type: 'DATE_RANGE_PICKER',
             label: formMessageDescriptors.childDateOfBirth,
             required: false,
             initialValue: '',
@@ -178,7 +141,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             label: formMessageDescriptors.childFirstNames,
             maxLength: 32,
             required: false,
-            initialValue: '',
+            initialValue: 'fasfasf',
             validate: []
           },
           {
@@ -215,6 +178,50 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
                 label: formMessageDescriptors.childSexUnknown
               }
             ]
+          },
+          {
+            name: 'placeOfBirth',
+            customisable: false,
+            type: 'SELECT_WITH_OPTIONS',
+            ignoreFieldLabelOnErrorMessage: true,
+            label: formMessageDescriptors.placeOfBirth,
+            required: false,
+            initialValue: '',
+            validate: [],
+            placeholder: formMessageDescriptors.formSelectPlaceholder,
+            options: [
+              {
+                value: 'HEALTH_FACILITY',
+                label: formMessageDescriptors.healthInstitution
+              },
+              {
+                value: 'PRIVATE_HOME',
+                label: formMessageDescriptors.privateHome
+              },
+              {
+                value: 'OTHER',
+                label: formMessageDescriptors.otherInstitution
+              }
+            ]
+          },
+          {
+            name: 'eventCountry',
+            customisable: false,
+            type: 'SELECT_WITH_OPTIONS',
+            label: {
+              defaultMessage: 'Country',
+              description: 'Title for the country select',
+              id: 'form.field.label.country'
+            },
+            required: false,
+            initialValue: window.config.COUNTRY.toUpperCase(),
+            validate: [],
+            placeholder: {
+              defaultMessage: 'Select',
+              description: 'Placeholder text for a select',
+              id: 'form.field.select.placeholder'
+            },
+            options: countries
           }
         ]
       }
@@ -240,7 +247,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       nestedFields: {
         yes: [
           {
-            name: ' motherDoB',
+            name: 'motherDoB',
             customisable: false,
             type: 'DATE',
             label: formMessageDescriptors.motherDateOfBirth,
@@ -249,7 +256,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: ' motherFirstNames',
+            name: 'motherFirstNames',
             previewGroup: 'motherFirstNamesEng',
             customisable: false,
             type: 'TEXT',
@@ -260,7 +267,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: ' motherFamilyName',
+            name: 'motherFamilyName',
             previewGroup: 'motherNameInEnglish',
             customisable: false,
             type: 'TEXT',
@@ -294,7 +301,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       nestedFields: {
         yes: [
           {
-            name: '  fatherDoB',
+            name: 'fatherDoB',
             customisable: false,
             type: 'DATE',
             label: formMessageDescriptors.fatherDateOfBirth,
@@ -348,7 +355,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
       nestedFields: {
         yes: [
           {
-            name: ' informantDoB',
+            name: 'informantDoB',
             customisable: false,
             type: 'DATE',
             label: formMessageDescriptors.motherDateOfBirth,
@@ -357,7 +364,7 @@ export const advancedSearchBirthSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: ' informantFirstNames',
+            name: 'informantFirstNames',
             previewGroup: 'informantNameInEnglish',
             customisable: false,
             type: 'TEXT',

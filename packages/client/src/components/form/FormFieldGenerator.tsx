@@ -908,8 +908,10 @@ class FormSectionComponent extends React.Component<Props> {
               touched[`${field.name}-yyyy`]
           }
 
-          const withDynamicallyGeneratedFields =
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS
+          const withDynamicallyGeneratedFields = (
+            field: IFormField
+          ): IFormField => {
+            return field.type === SELECT_WITH_DYNAMIC_OPTIONS
               ? ({
                   ...field,
                   type: SELECT_WITH_OPTIONS,
@@ -982,16 +984,19 @@ class FormSectionComponent extends React.Component<Props> {
               ? {
                   ...field,
                   locationList: generateLocations(
-                    getListOfLocations(
-                      offlineCountryConfig,
-                      field.searchableResource
-                    ),
+                    field.searchableResource.reduce((locations, resource) => {
+                      return {
+                        ...locations,
+                        ...getListOfLocations(offlineCountryConfig, resource)
+                      }
+                    }, {}),
                     intl,
                     undefined,
-                    [field.searchableType as LocationType]
+                    field.searchableType as LocationType[]
                   )
                 }
               : field
+          }
           if (
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
@@ -1007,7 +1012,7 @@ class FormSectionComponent extends React.Component<Props> {
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
                         intl,
-                        withDynamicallyGeneratedFields
+                        withDynamicallyGeneratedFields(field)
                       )}
                       onSetFieldValue={setFieldValue}
                       resetDependentSelectValues={
@@ -1065,7 +1070,7 @@ class FormSectionComponent extends React.Component<Props> {
                         {(formikFieldProps: FieldProps<any>) => (
                           <GeneratedInputField
                             fieldDefinition={internationaliseFieldObject(intl, {
-                              ...nestedField,
+                              ...withDynamicallyGeneratedFields(nestedField),
                               name: nestedFieldName
                             })}
                             onSetFieldValue={setFieldValue}
@@ -1101,7 +1106,7 @@ class FormSectionComponent extends React.Component<Props> {
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
                         intl,
-                        withDynamicallyGeneratedFields
+                        withDynamicallyGeneratedFields(field)
                       )}
                       onSetFieldValue={setFieldValue}
                       resetDependentSelectValues={
@@ -1131,7 +1136,7 @@ class FormSectionComponent extends React.Component<Props> {
                       <GeneratedInputField
                         fieldDefinition={internationaliseFieldObject(
                           intl,
-                          withDynamicallyGeneratedFields
+                          withDynamicallyGeneratedFields(field)
                         )}
                         onSetFieldValue={setFieldValue}
                         resetDependentSelectValues={

@@ -47,15 +47,9 @@ export const advancedSearchDeathSectionFormType: IFormSectionGroup = {
             placeholder: formMessageDescriptors.formSelectPlaceholder,
             required: false,
             initialValue: '',
-            searchableResource: 'offices',
-            searchableType: 'CRVS_OFFICE',
-            dynamicOptions: {
-              resource: 'CRVS_OFFICES & ADMIN_STRUCTURE'
-            },
-
-            validate: [],
-
-            mapping: {}
+            searchableResource: ['offices', 'locations'],
+            searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
+            validate: []
           },
           {
             name: 'dateOfRegistration',
@@ -107,14 +101,14 @@ export const advancedSearchDeathSectionFormType: IFormSectionGroup = {
             ]
           },
           {
-            name: 'declarationLocationId',
+            name: 'eventLocationLevel1',
             customisable: false,
             type: 'LOCATION_SEARCH_INPUT',
             label: formMessageDescriptors.placeOfBirth,
             previewGroup: 'placeOfBirth',
             required: false,
             initialValue: '',
-            searchableResource: 'facilities',
+            searchableResource: ['facilities'],
             searchableType: 'HEALTH_FACILITY',
             dynamicOptions: {
               resource: 'facilities'
@@ -131,7 +125,7 @@ export const advancedSearchDeathSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: 'eventLocationLevel1',
+            name: 'eventLocationLevel3',
             customisable: false,
             type: 'TEXT',
             label: formMessageDescriptors.internationalState,
@@ -294,7 +288,7 @@ export const advancedSearchDeathSectionFormType: IFormSectionGroup = {
       nestedFields: {
         yes: [
           {
-            name: ' informantDoB',
+            name: 'informantDoB',
             customisable: false,
             type: 'DATE',
             label: formMessageDescriptors.motherDateOfBirth,
@@ -303,7 +297,7 @@ export const advancedSearchDeathSectionFormType: IFormSectionGroup = {
             validate: []
           },
           {
-            name: ' informantFirstNames',
+            name: 'informantFirstNames',
             previewGroup: 'informantNameInEnglish',
             customisable: false,
             type: 'TEXT',

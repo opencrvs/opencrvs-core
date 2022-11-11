@@ -70,7 +70,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
-
+import _ from 'lodash'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -316,7 +316,8 @@ export const getFieldOptions = (
       `Dependency is undefined, the value should have an entry in the dynamic options object.`
     )
   }
-  const dependencyVal = values[field.dynamicOptions.dependency] as string
+  const dependencyVal = _.get(values, field.dynamicOptions.dependency) as string
+  console.log(_.get(values, 'childDetails.nestedFields.country'))
   if (field.dynamicOptions.jurisdictionType) {
     return generateOptions(
       Object.values(locations).filter((location: ILocation) => {
