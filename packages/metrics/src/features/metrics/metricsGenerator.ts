@@ -255,8 +255,7 @@ export async function fetchRegWithinTimeFrames(
     placeholders: {
       timeStart,
       timeEnd,
-      locationId,
-      registrationTargetInDays
+      locationId
     }
   })
 
@@ -429,8 +428,7 @@ export async function fetchKeyFigures(
     GROUP BY gender`,
     {
       placeholders: {
-        queryLocationId,
-        EXPECTED_BIRTH_REGISTRATION_IN_DAYS
+        queryLocationId
       }
     }
   )
