@@ -174,7 +174,6 @@ services:
       - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
       - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
       - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
-      - METRICS_MONGODB_PASSWORD=${METRICS_MONGODB_PASSWORD}
       - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
       - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     deploy:
@@ -211,7 +210,6 @@ services:
       - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
       - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
       - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
-      - METRICS_MONGODB_PASSWORD=${METRICS_MONGODB_PASSWORD}
       - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
       - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     networks:
@@ -258,48 +256,6 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'elasticsearch'
-
-  # Configure elasticsearch
-  minio:
-    environment:
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-    ports:
-      - '3535:3535'
-      - '3536:3536'
-    volumes:
-      - '/data/minio:/data/minio'
-      - '/data/backups/minio:/data/backups/minio'
-    command: server --address ":3535" --console-address ":3536" /data/minio
-    deploy:
-      labels:
-        - 'traefik.enable=true'
-        - 'traefik.http.routers.minio.rule=Host(`documents.{{hostname}}`)'
-        - 'traefik.http.services.minio.loadbalancer.server.port=3535'
-        - 'traefik.http.routers.minio.tls=true'
-        - 'traefik.http.routers.minio.tls.certresolver=certResolver'
-        - 'traefik.http.routers.minio.entrypoints=web,websecure'
-        - 'traefik.http.middlewares.minio.headers.stsseconds=31536000'
-        - 'traefik.http.middlewares.minio.headers.stsincludesubdomains=true'
-        - 'traefik.http.middlewares.minio.headers.stspreload=true'
-        - 'traefik.http.middlewares.minio.headers.customresponseheaders.Pragma=no-cache'
-        - 'traefik.http.middlewares.minio.headers.customresponseheaders.Cache-control=no-store'
-        - 'traefik.http.middlewares.minio.headers.customresponseheaders.X-Robots-Tag=none'
-
-        - 'traefik.http.routers.minio-console.rule=Host(`documents-console.{{hostname}}`)'
-        - 'traefik.http.services.minio-console.loadbalancer.server.port=3536'
-        - 'traefik.http.routers.minio-console.tls=true'
-        - 'traefik.http.routers.minio-console.tls.certresolver=certResolver'
-        - 'traefik.http.routers.minio-console.entrypoints=web,websecure'
-        - 'traefik.http.middlewares.minio-console.headers.stsseconds=31536000'
-        - 'traefik.http.middlewares.minio-console.headers.stsincludesubdomains=true'
-        - 'traefik.http.middlewares.minio-console.headers.stspreload=true'
-        - 'traefik.http.middlewares.minio-console.headers.customresponseheaders.Pragma=no-cache'
-        - 'traefik.http.middlewares.minio-console.headers.customresponseheaders.Cache-control=no-store'
-        - 'traefik.http.middlewares.minio-console.headers.customresponseheaders.X-Robots-Tag=none'
-        - 'traefik.docker.network=opencrvs_overlay_net'
-    networks:
-      - overlay_net
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
@@ -431,7 +387,6 @@ services:
     environment:
       - COUNTRY_CONFIG_URL=https://countryconfig.{{hostname}}
       - HOST={{hostname}}
-      - MINIO_URL=document.{{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -672,8 +627,6 @@ services:
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MONGO_URL=mongodb://metrics:${METRICS_MONGODB_PASSWORD}@mongo1/reports?replicaSet=rs0
-      - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
     deploy:
       replicas: 2
     networks:
@@ -683,31 +636,6 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'metrics'
-  scheduler:
-    deploy:
-      replicas: 1
-    networks:
-      - overlay_net
-    logging:
-      driver: gelf
-      options:
-        gelf-address: 'udp://127.0.0.1:12201'
-        tag: 'scheduler'
-  documents:
-    secrets:
-      - jwt-public-key.{{ts}}
-    environment:
-      - APN_SERVICE_URL=http://apm-server:8200
-      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-    networks:
-      - overlay_net
-    logging:
-      driver: gelf
-      options:
-        gelf-address: 'udp://127.0.0.1:12201'
-        tag: 'documents'
   config:
     secrets:
       - jwt-public-key.{{ts}}

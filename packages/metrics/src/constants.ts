@@ -19,18 +19,11 @@ export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030'
-export const DOCUMENTS_URL =
-  process.env.DOCUMENTS_URL || 'http://localhost:9050'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const PRODUCTION = process.env.NODE_ENV === 'production'
-export const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost/reports'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 export const EXPECTED_BIRTH_REGISTRATION_IN_DAYS =
   process.env.EXPECTED_BIRTH_REGISTRATION_IN_DAYS || 45
 export const CONFIG_API_URL =
   process.env.CONFIG_API_URL || 'http://localhost:2021'
 export const DEFAULT_TIMEOUT = 600000
-export const VS_EXPORT_SCRIPT_PATH =
-  process.env.NODE_ENV === 'production'
-    ? './build/dist/scripts/VSExportGenerator.js'
-    : './scripts/VSExportGenerator.ts'
