@@ -17,6 +17,12 @@ const RESEND_SMS_INVITE = gql`
     resendSMSInvite(userId: $userId)
   }
 `
+const USERNAME_SMS_REMINDER = gql`
+  mutation usernameSMSReminder($userId: String!) {
+    usernameSMSReminder(userId: $userId)
+  }
+`
+
 async function resendSMSInvite(
   userId: string,
   refetchQueries: InternalRefetchQueriesInclude
@@ -30,7 +36,42 @@ async function resendSMSInvite(
     })
   )
 }
+const RESET_PASSWORD_SMS = gql`
+  mutation resetPasswordSMS($userId: String!, $applicationName: String!) {
+    resetPasswordSMS(userId: $userId, applicationName: $applicationName)
+  }
+`
+async function sendResetPasswordSMS(
+  userId: string,
+  applicationName: string,
+  refetchQueries: InternalRefetchQueriesInclude
+) {
+  return (
+    client &&
+    client.mutate({
+      mutation: RESET_PASSWORD_SMS,
+      variables: { userId, applicationName },
+      refetchQueries
+    })
+  )
+}
+
+async function usernameSMSReminderSend(
+  userId: string,
+  refetchQueries: InternalRefetchQueriesInclude
+) {
+  return (
+    client &&
+    client.mutate({
+      mutation: USERNAME_SMS_REMINDER,
+      variables: { userId },
+      refetchQueries
+    })
+  )
+}
 
 export const userMutations = {
-  resendSMSInvite
+  resendSMSInvite,
+  usernameSMSReminderSend,
+  sendResetPasswordSMS
 }

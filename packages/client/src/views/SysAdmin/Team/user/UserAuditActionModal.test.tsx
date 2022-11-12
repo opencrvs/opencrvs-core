@@ -325,14 +325,10 @@ describe('user audit action modal tests', () => {
         )
         confirmButton.hostNodes().simulate('click')
 
-        await flushPromises()
         waitFor(
           () =>
             store.getState().notification.submitFormErrorToast ===
             'userFormFail'
-        )
-        expect(store.getState().notification.submitFormErrorToast).toBe(
-          'userFormFail'
         )
       })
     })
