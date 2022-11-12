@@ -187,7 +187,7 @@ export async function getAvgTimeSpentOnAppByPractitioners(
     totalTimeSpent: number
   }[]
 > {
-  const eventClause = (event && `AND eventType = $event`) || ''
+  const eventClause = (event && `AND eventType = '${event}'`) || ''
   const averageTimeForDeclarations: {
     practitionerId: string
     totalDeclarations: number
@@ -211,8 +211,7 @@ export async function getAvgTimeSpentOnAppByPractitioners(
         timeFrom,
         timeTo,
         locationId,
-        eventClause,
-        event
+        eventClause
       }
     }
   )
