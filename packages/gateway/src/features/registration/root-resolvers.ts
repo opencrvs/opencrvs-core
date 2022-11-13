@@ -398,6 +398,15 @@ export const resolvers: GQLResolver = {
         GQLRegStatus.ARCHIVED
       )
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+
+      const userId = getClientIdFromToken(authHeader.Authorization)
+      const user = await getUser({ userId }, authHeader)
+      await postUserActionToMetrics(
+        'ARCHIVED',
+        user.practitionerId,
+        authHeader['x-real-ip']!,
+        authHeader['x-real-user-agent']!
+      )
       // return the taskId
       return taskEntry.resource.id
     },
@@ -541,12 +550,16 @@ async function createEventRegistration(
 
   const userId = getClientIdFromToken(authHeader.Authorization)
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+  let action = 'SENT_FOR_REVIEW'
+  if (res.entry.length < 10) {
+    action = 'INCOMPLETE'
+  }
   const user = await getUser({ userId }, authHeader)
-  await postUserActionToMetricsWithBundle(
-    'INCOMPLETE',
+  await postUserActionToMetrics(
+    action,
     user.practitionerId,
-    authHeader['x-real-ip'],
-    authHeader['x-real-user-agent']
+    authHeader['x-real-ip']!,
+    authHeader['x-real-user-agent']!
   )
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
@@ -712,7 +725,7 @@ export async function markRecordAsDownloadedOrAssigned(
   return fetchFHIR(`/Composition/${id}`, authHeader)
 }
 
-export async function postUserActionToMetricsWithBundle(
+export async function postUserActionToMetrics(
   action: string,
   practitionerId: string,
   remoteAddress: string,
