@@ -114,9 +114,6 @@ const Loading = styled.div`
     height: calc(100vh - 104px);
   }
 `
-const LinkButtonWithoutSpacing = styled(LinkButton)`
-  height: auto !important;
-`
 
 const StatusBox = styled.div`
   padding: 4px 8px;
