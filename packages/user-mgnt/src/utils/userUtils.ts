@@ -23,7 +23,8 @@ export const statuses = {
 export const types = {
   NATIONAL_ID: 'NATIONAL_ID',
   HEALTH: 'HEALTH',
-  RECORD_SEARCH: 'RECORD_SEARCH'
+  RECORD_SEARCH: 'RECORD_SEARCH',
+  WEBHOOK: 'WEBHOOK'
 }
 
 interface IRoleScopeMapping {

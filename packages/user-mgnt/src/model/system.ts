@@ -30,6 +30,17 @@ export interface ISystem {
   type: string
 }
 
+export enum EventType {
+  Birth = 'birth',
+  Death = 'death'
+}
+
+const WebhookSchema = new Schema({
+  event: { type: String },
+  permissions: { type: [String] },
+  includePii: { type: Boolean }
+})
+
 export interface ISystemModel extends ISystem, Document {}
 
 const systemSchema = new Schema({
@@ -48,12 +59,13 @@ const systemSchema = new Schema({
     default: statuses.PENDING
   },
   settings: {
+    webhook: { type: [WebhookSchema], required: false },
     dailyQuota: { type: String, default: 0 }
   },
   creationDate: { type: Number, default: Date.now },
   type: {
     type: String,
-    enum: [types.HEALTH, types.NATIONAL_ID, types.RECORD_SEARCH]
+    enum: [types.HEALTH, types.NATIONAL_ID, types.RECORD_SEARCH, types.WEBHOOK]
   }
 })
 
