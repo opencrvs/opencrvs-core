@@ -166,7 +166,9 @@ export function updateDeclarationRegistrationWithCorrection(
       'boolean'
     ) {
       if (data.supportingDocuments.supportDocumentRequiredForCorrection) {
-        correctionValues.hasShowedVerifiedDocument = true
+        correctionValues.hasShowedVerifiedDocument = Boolean(
+          data.corrector?.hasShowedVerifiedDocument
+        )
       } else {
         correctionValues.noSupportingDocumentationRequired = true
       }

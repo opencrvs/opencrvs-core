@@ -35,7 +35,8 @@ import { isEmpty, find, flatten, values } from 'lodash'
 import { getFieldValue, getFormattedDate, getStatusLabel } from './utils'
 import {
   CollectorRelationLabelArray,
-  CorrectorRelationLabelArray
+  CorrectorRelationLabelArray,
+  CorrectorRelationship
 } from '@client/forms/correction/corrector'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
@@ -423,24 +424,27 @@ export const ActionDetailsModalListTable = ({
       )}
 
       {/* Correction Requester Id Verified */}
-      {actionDetailsData.requester && (
-        <Table
-          noResultText=" "
-          columns={certificateCollectorVerified}
-          content={[
-            {
-              hasShowedVerifiedDocument:
-                actionDetailsData.hasShowedVerifiedDocument
-                  ? intl.formatMessage(certificateMessages.idCheckVerify)
-                  : intl.formatMessage(certificateMessages.idCheckWithoutVerify)
-            }
-          ]}
-          pageSize={10}
-          totalItems={1}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
+      {actionDetailsData.requester !== CorrectorRelationship.ANOTHER_AGENT &&
+        actionDetailsData.requester !== CorrectorRelationship.REGISTRAR && (
+          <Table
+            noResultText=" "
+            columns={certificateCollectorVerified}
+            content={[
+              {
+                hasShowedVerifiedDocument:
+                  actionDetailsData.hasShowedVerifiedDocument
+                    ? intl.formatMessage(certificateMessages.idCheckVerify)
+                    : intl.formatMessage(
+                        certificateMessages.idCheckWithoutVerify
+                      )
+              }
+            ]}
+            pageSize={10}
+            totalItems={1}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
 
       {/* For Correction Reason */}
       {actionDetailsData.reason &&
