@@ -84,6 +84,8 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query as QueryType, User } from '@client/utils/gateway'
+import { Link } from '@client/../../components/lib'
+import { Roles } from '@client/utils/authUtils'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -613,12 +615,13 @@ function UserListComponent(props: IProps) {
             return {
               image: <AvatarSmall name={name} avatar={avatar || undefined} />,
               label: (
-                <LinkButtonWithoutSpacing
+                <Link
                   id="profile-link"
                   onClick={() => goToUserProfile(String(user.id))}
+                  disabled={userDetails?.role === Roles.FIELD_AGENT}
                 >
                   {name}
-                </LinkButtonWithoutSpacing>
+                </Link>
               ),
               value: <Value>{role}</Value>,
               actions: (

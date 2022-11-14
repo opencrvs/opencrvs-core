@@ -29,6 +29,7 @@ import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
 import { History, RegStatus } from '@client/utils/gateway'
+import { Link } from '@client/../../components/lib'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -148,6 +149,7 @@ export const GetHistory = ({
   userDetails
 }: CMethodParams & {
   toggleActionDetails: (actionItem: History, index?: number) => void
+  goToUserProfile: (user: string) => void
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
@@ -204,7 +206,6 @@ export const GetHistory = ({
     DEFAULT_HISTORY_RECORD_PAGE_SIZE,
     sortedHistory
   )
-
   const historyData = (historiesForDisplay as History[]).map((item, index) => ({
     date: getFormattedDate(item?.date),
     action: (
@@ -222,17 +223,23 @@ export const GetHistory = ({
         }}
       />
     ),
-    user:
-      item.dhis2Notification && !item.user?.id ? (
-        <HealthSystemUser />
-      ) : (
-        <GetNameWithAvatar
-          id={item?.user?.id as string}
-          nameObject={item?.user?.name as (GQLHumanName | null)[]}
-          avatar={item.user?.avatar as IAvatar}
-          language={window.config.LANGUAGES}
-        />
-      ),
+    user: (
+      <Link
+        id="profile-link"
+        onClick={() => goToUserProfile(String(item?.user?.id))}
+      >
+        {item.dhis2Notification && !item.user?.id ? (
+          <HealthSystemUser />
+        ) : (
+          <GetNameWithAvatar
+            id={item?.user?.id as string}
+            nameObject={item?.user?.name as (GQLHumanName | null)[]}
+            avatar={item.user?.avatar as IAvatar}
+            language={window.config.LANGUAGES}
+          />
+        )}
+      </Link>
+    ),
     type: intl.formatMessage(
       (item.dhis2Notification && !item.user?.role) || null === item.user?.role
         ? userMessages.healthSystem
