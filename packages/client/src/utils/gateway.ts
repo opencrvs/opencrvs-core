@@ -476,7 +476,8 @@ export enum CustomFieldType {
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
   Text = 'TEXT',
-  Textarea = 'TEXTAREA'
+  Textarea = 'TEXTAREA',
+  Select = 'SELECT_WITH_OPTIONS'
 }
 
 export type Death = {
