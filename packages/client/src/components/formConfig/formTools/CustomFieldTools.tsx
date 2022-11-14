@@ -16,7 +16,8 @@ import {
   TEXTAREA,
   BirthSection,
   DeathSection,
-  IFormField
+  IFormField,
+  SELECT_WITH_OPTIONS
 } from '@client/forms'
 import {
   getIdentifiersFromFieldId,
@@ -63,6 +64,8 @@ import { Condition } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { Icon } from '@opencrvs/components/src/Icon/Icon'
+import { FileSelectLink } from '@opencrvs/components/lib/FileSelectLink'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -77,6 +80,30 @@ const CTextInput = styled(TextInput)`
   height: 32px;
   border: solid 1px ${({ theme }) => theme.colors.grey600};
 `
+const CSelect = styled(Select)`
+  width: 100%;
+  margin: 20px 0px;
+  border-radius: 2px;
+  .react-select__control {
+    border: solid 1px ${({ theme }) => theme.colors.grey600};
+    max-height: 32px;
+    min-height: 32px;
+  }
+  .react-select__control:hover {
+    border: solid 1px ${({ theme }) => theme.colors.grey600};
+  }
+  .react-select__placeholder {
+    color: ${({ theme }) => theme.colors.grey400};
+  }
+  .react-select__value-container {
+    display: block;
+  }
+  div {
+    ${({ theme }) => theme.fonts.reg14};
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+`
+
 const ConditionalWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -164,6 +191,11 @@ const ListColumn = styled.div`
 
 const CErrorText = styled(ErrorText)`
   width: 200px;
+`
+
+const CustomSelectHeading = styled.p`
+  display: flex;
+  gap: 5px;
 `
 
 type IFormFieldWrapper = { formField: IFormField }
@@ -454,6 +486,10 @@ class CustomFieldToolsComp extends React.Component<
         return intl.formatMessage(
           customFieldFormMessages.customPhoneFieldHeading
         )
+      case SELECT_WITH_OPTIONS:
+        return intl.formatMessage(
+          customFieldFormMessages.customSelectFieldHeading
+        )
       default:
         return intl.formatMessage(
           customFieldFormMessages.customTextFieldHeading
@@ -607,20 +643,12 @@ class CustomFieldToolsComp extends React.Component<
   }
 
   inputFields() {
-    const {
-      intl,
-      selectedField,
-      modifyConfigField,
-      formField,
-      setSelectedField
-    } = this.props
+    const { intl, formField } = this.props
     const languages = this.getLanguages()
     const defaultLanguage = getDefaultLanguage()
-    const debouncedNullifySelectedField = debounce(() => {
-      setSelectedField(null)
-    }, 300)
     return (
       <>
+        {this.getLanguageDropDown()}
         {Object.keys(languages).map((language, index) => {
           return (
             <React.Fragment key={index}>
@@ -757,30 +785,126 @@ class CustomFieldToolsComp extends React.Component<
             />
           </CInputField>
         </FieldContainer>
-        <ListContainer>
-          <ListRow>
-            <ListColumn>
-              <CPrimaryButton
-                id={'custom-tool-save-button'}
-                onClick={() => {
-                  if (this.isFieldNameDuplicate()) {
-                    this.setState({
-                      isFieldDuplicate: true
-                    })
-                    return
-                  }
-                  const modifiedField = this.prepareModifiedFormField()
-                  modifyConfigField(selectedField.fieldId, modifiedField)
-                  debouncedNullifySelectedField()
-                }}
-                disabled={!this.isFormValid() || !this.isConditionalFormValid()}
-              >
-                {intl.formatMessage(buttonMessages.save)}
-              </CPrimaryButton>
-            </ListColumn>
-          </ListRow>
-        </ListContainer>
       </>
+    )
+  }
+
+  selectField() {
+    const { intl, formField } = this.props
+    const languages = this.getLanguages()
+    const defaultLanguage = getDefaultLanguage()
+
+    return (
+      <>
+        <Text variant="bold16" element="p">
+          <CustomSelectHeading>
+            <Icon color="currentColor" name="Type" size="large" />
+            {intl.formatMessage(customFieldFormMessages.copyHeading)}
+          </CustomSelectHeading>
+        </Text>
+        <Text color="grey500" variant="reg14" element="span">
+          {intl.formatMessage(customFieldFormMessages.copyDescription)}
+        </Text>
+        <br></br>
+        <br></br>
+
+        {this.getLanguageDropDown()}
+
+        {Object.keys(languages).map((language, index) => {
+          return (
+            <React.Fragment key={index}>
+              <FieldContainer hide={language !== this.state.selectedLanguage}>
+                <CInputField
+                  id={`custom-form-label-${language}`}
+                  label={intl.formatMessage(customFieldFormMessages.label)}
+                  touched={true}
+                >
+                  <CTextInput
+                    value={this.state.fieldForms[language].label}
+                    onChange={(event: any) => {
+                      const { value } = event.target
+                      this.setState({
+                        handleBars:
+                          defaultLanguage === this.state.selectedLanguage
+                            ? camelCase(
+                                value || getCertificateHandlebar(formField)
+                              )
+                            : this.state.handleBars,
+                        fieldForms: {
+                          ...this.state.fieldForms,
+                          [this.state.selectedLanguage]: {
+                            ...this.state.fieldForms[
+                              this.state.selectedLanguage
+                            ],
+                            label: value
+                          }
+                        }
+                      })
+                    }}
+                  />
+                </CInputField>
+              </FieldContainer>
+            </React.Fragment>
+          )
+        })}
+
+        <Text variant="bold16" element="p">
+          <CustomSelectHeading>
+            <Icon color="currentColor" name="Database" size="large" />
+            {intl.formatMessage(customFieldFormMessages.dataSourceHeading)}
+          </CustomSelectHeading>
+        </Text>
+        <Text color="grey500" variant="reg14" element="span">
+          {intl.formatMessage(customFieldFormMessages.dataSourceDescription)}
+          &nbsp;
+          <FileSelectLink
+            id="upload-data-source"
+            handleFileChange={(file: File) => {
+              console.log('File Selected', file)
+            }}
+            onClick={() => {
+              console.log('Clicked')
+            }}
+            title={intl.formatMessage(buttonMessages.upload)}
+          />
+        </Text>
+
+        <CSelect value="" onChange={() => {}} options={[]} />
+      </>
+    )
+  }
+
+  saveButton() {
+    const { intl, selectedField, modifyConfigField, setSelectedField } =
+      this.props
+    const debouncedNullifySelectedField = debounce(() => {
+      setSelectedField(null)
+    }, 300)
+
+    return (
+      <ListContainer>
+        <ListRow>
+          <ListColumn>
+            <CPrimaryButton
+              id={'custom-tool-save-button'}
+              onClick={() => {
+                if (this.isFieldNameDuplicate()) {
+                  this.setState({
+                    isFieldDuplicate: true
+                  })
+                  return
+                }
+                const modifiedField = this.prepareModifiedFormField()
+                modifyConfigField(selectedField.fieldId, modifiedField)
+                debouncedNullifySelectedField()
+              }}
+              disabled={!this.isFormValid() || !this.isConditionalFormValid()}
+            >
+              {intl.formatMessage(buttonMessages.save)}
+            </CPrimaryButton>
+          </ListColumn>
+        </ListRow>
+      </ListContainer>
     )
   }
 
@@ -797,8 +921,10 @@ class CustomFieldToolsComp extends React.Component<
             </>
           )}
         </RegisterFormFieldIds>
-        {this.getLanguageDropDown()}
-        {this.inputFields()}
+
+        {selectedField.fieldType !== SELECT_WITH_OPTIONS && this.inputFields()}
+        {selectedField.fieldType === SELECT_WITH_OPTIONS && this.selectField()}
+        {this.saveButton()}
         {this.state.isFieldDuplicate && (
           <CErrorText ignoreMediaQuery={true}>
             {intl.formatMessage(customFieldFormMessages.duplicateField)}

@@ -11,7 +11,12 @@
  */
 import { CustomFieldType, Event } from '@client/utils/gateway'
 import { Message } from 'typescript-react-intl'
-import { ISerializedForm, BirthSection, DeathSection } from '@client/forms'
+import {
+  ISerializedForm,
+  BirthSection,
+  DeathSection,
+  ISelectOption
+} from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
 import { defaultFormSectionToQuestionConfigs } from './transformers'
 
@@ -55,6 +60,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   fieldName: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]
+  options?: ISelectOption[]
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig
