@@ -177,10 +177,7 @@ generate_password() {
   echo $password
 }
 
-# Create new passwords for all MongoDB users created in
-# infrastructure/mongodb/docker-entrypoint-initdb.d/create-mongo-users.sh
-#
-# If you're adding a new MongoDB user, you'll need to also create a new update statement in
+# Create new passwords for all MongoDB users used in
 # infrastructure/mongodb/on-deploy.sh
 
 USER_MGNT_MONGODB_PASSWORD=`generate_password`
