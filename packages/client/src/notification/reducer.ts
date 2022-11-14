@@ -42,7 +42,7 @@ export type NotificationState = {
   downloadDeclarationFailedToast: boolean
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: userCreateDuplicateMobileFailedToastState
-  onlineUserStatusToast: boolean
+  userReconnectedToast: boolean
 }
 
 export const initialState: NotificationState = {
@@ -61,7 +61,7 @@ export const initialState: NotificationState = {
     visible: false,
     mobile: null
   },
-  onlineUserStatusToast: false
+  userReconnectedToast: false
 }
 
 export const notificationReducer: LoopReducer<
@@ -181,15 +181,15 @@ export const notificationReducer: LoopReducer<
         ...state,
         unassignedModal: null
       }
-    case actions.SHOW_ONLINE_USER_SUCCESS_TOAST:
+    case actions.SHOW_USER_RECONNECTED_TOAST:
       return {
         ...state,
-        onlineUserStatusToast: true
+        userReconnectedToast: true
       }
-    case actions.HIDE_ONLINE_USER_SUCCESS_TOAST:
+    case actions.HIDE_USER_RECONNECTED_TOAST:
       return {
         ...state,
-        onlineUserStatusToast: false
+        userReconnectedToast: false
       }
     default:
       return state

@@ -11,7 +11,6 @@
  */
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
-import { showUserOnlineStatusNotificationToast } from '@client/notification/actions'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { App } from '@client/App'
@@ -25,7 +24,6 @@ import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import WebFont from 'webfontloader'
-import { BACKGROUND_SYNC_BROADCAST_CHANNEL } from './utils/constants'
 import { BrowserTracing } from '@sentry/tracing'
 
 WebFont.load({
@@ -91,12 +89,12 @@ function onNewContentAvailable(waitingSW: ServiceWorker | null) {
   }
 }
 
-function userOnlineStatus() {
-  const action = actions.showUserOnlineStatusNotificationToast()
+function userReconnectedToast() {
+  const action = actions.showUserReconnectedToast()
   store.dispatch(action)
 }
 
-window.addEventListener('online', userOnlineStatus)
+window.addEventListener('online', userReconnectedToast)
 
 ReactDOM.render(
   <App store={store} history={history} />,

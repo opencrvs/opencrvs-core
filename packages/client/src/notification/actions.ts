@@ -12,8 +12,8 @@ import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionMo
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-export const SHOW_ONLINE_USER_SUCCESS_TOAST = 'SHOW_ONLINE_USER_SUCCESS_TOAST'
-export const HIDE_ONLINE_USER_SUCCESS_TOAST = 'HIDE_ONLINE_USER_SUCCESS_TOAST'
+export const SHOW_USER_RECONNECTED_TOAST = 'SHOW_ONLINE_USER_SUCCESS_TOAST'
+export const HIDE_USER_RECONNECTED_TOAST = 'HIDE_ONLINE_USER_SUCCESS_TOAST'
 
 export const SHOW_CONFIG_ERROR = 'SHOW_CONFIG_ERROR'
 export const HIDE_CONFIG_ERROR = 'HIDE_CONFIG_ERROR'
@@ -121,12 +121,12 @@ export const toggleDraftSavedNotification =
     type: TOGGLE_DRAFT_SAVED_NOTIFICATION
   })
 
-export type ShowOnlineUserStatusNotificationAction = {
-  type: typeof SHOW_ONLINE_USER_SUCCESS_TOAST
+export type ShowUserReconnectedToastAction = {
+  type: typeof SHOW_USER_RECONNECTED_TOAST
 }
 
-export type HideOnlineUserStatusNotificationAction = {
-  type: typeof HIDE_ONLINE_USER_SUCCESS_TOAST
+export type HideUserReconnectedToastAction = {
+  type: typeof HIDE_USER_RECONNECTED_TOAST
 }
 
 export type SessionExpiredAction = {
@@ -146,15 +146,13 @@ export type HideUnassigned = {
   type: typeof HIDE_UNASSIGNED
 }
 
-export const showUserOnlineStatusNotificationToast =
-  (): ShowOnlineUserStatusNotificationAction => ({
-    type: SHOW_ONLINE_USER_SUCCESS_TOAST
-  })
+export const showUserReconnectedToast = (): ShowUserReconnectedToastAction => ({
+  type: SHOW_USER_RECONNECTED_TOAST
+})
 
-export const hideUserOnlineStatusNotificationToast =
-  (): HideOnlineUserStatusNotificationAction => ({
-    type: HIDE_ONLINE_USER_SUCCESS_TOAST
-  })
+export const hideUserReconnectedToast = (): HideUserReconnectedToastAction => ({
+  type: HIDE_USER_RECONNECTED_TOAST
+})
 
 export const showSessionExpireConfirmation = (): SessionExpiredAction => ({
   type: SESSION_EXPIRED
@@ -264,5 +262,5 @@ export type Action =
   | HideUnassigned
   | ShowCreateUserErrorToast
   | HideCreateUserErrorToast
-  | ShowOnlineUserStatusNotificationAction
-  | HideOnlineUserStatusNotificationAction
+  | ShowUserReconnectedToastAction
+  | HideUserReconnectedToastAction

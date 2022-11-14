@@ -13,7 +13,6 @@ import { createTestApp } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
 import * as actions from '@client/notification/actions'
-import * as i18nActions from '@client/i18n/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -28,28 +27,28 @@ describe('when app notifies the user', () => {
     store = testApp.store
   })
 
-  describe('When user is online', () => {
+  describe('When user is reconnected', () => {
     beforeEach(() => {
-      const action = actions.showUserOnlineStatusNotificationToast()
+      const action = actions.showUserReconnectedToast()
       store.dispatch(action)
       app.update()
     })
 
     it('Should display notification', () => {
-      expect(store.getState().notification.onlineUserStatusToast).toEqual(true)
+      expect(store.getState().notification.userReconnectedToast).toEqual(true)
     })
 
     describe('When user clicks the close button', () => {
       beforeEach(() => {
         app
-          .find('#onlineUserStatusNotificationCancel')
+          .find('#userOnlineReconnectedToastCancel')
           .hostNodes()
           .simulate('click')
         app.update()
       })
 
       it('Should hide the notification', () => {
-        expect(store.getState().notification.onlineUserStatusToast).toEqual(
+        expect(store.getState().notification.userReconnectedToast).toEqual(
           false
         )
       })

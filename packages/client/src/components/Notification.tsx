@@ -29,7 +29,7 @@ import {
   ShowUnassignedPayload,
   hideUnassignedModal,
   hideCreateUserErrorToast,
-  hideUserOnlineStatusNotificationToast
+  hideUserReconnectedToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
@@ -37,7 +37,6 @@ import { NotificationState } from '@client/notification/reducer'
 type NotificationProps = {
   language?: string
   configurationErrorVisible: boolean
-  backgroundSyncMessageVisible: boolean
   saveDraftClicked: boolean
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
@@ -46,7 +45,7 @@ type NotificationProps = {
   downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
-  onlineUserStatusToast: boolean
+  userReconnectedToast: boolean
 }
 
 type DispatchProps = {
@@ -59,7 +58,7 @@ type DispatchProps = {
   hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
   hideUnassignedModal: typeof hideUnassignedModal
   hideCreateUserErrorToast: typeof hideCreateUserErrorToast
-  hideUserOnlineStatusNotificationToast: typeof hideUserOnlineStatusNotificationToast
+  hideUserReconnectedToast: typeof hideUserReconnectedToast
 }
 
 class Component extends React.Component<
@@ -88,8 +87,8 @@ class Component extends React.Component<
   hideUserAuditSuccessToast = () => {
     this.props.hideUserAuditSuccessToast()
   }
-  hideUserOnlineStatusNotificationToast = () => {
-    this.props.hideUserOnlineStatusNotificationToast()
+  hideUserReconnectedToast = () => {
+    this.props.hideUserReconnectedToast()
   }
 
   render() {
@@ -105,17 +104,17 @@ class Component extends React.Component<
       downloadDeclarationFailedToast,
       unassignedModal,
       userCreateDuplicateMobileFailedToast,
-      onlineUserStatusToast
+      userReconnectedToast
     } = this.props
 
     return (
       <div>
         {children}
-        {onlineUserStatusToast && (
+        {userReconnectedToast && (
           <Toast
             type="success"
-            id="onlineUserStatusNotification"
-            onClose={this.hideUserOnlineStatusNotificationToast}
+            id="userOnlineReconnectedToast"
+            onClose={this.hideUserReconnectedToast}
           >
             {intl.formatMessage(messages.onlineUserStatus)}
           </Toast>
@@ -235,7 +234,7 @@ const mapStateToProps = (store: IStoreState) => {
     unassignedModal: store.notification.unassignedModal,
     userCreateDuplicateMobileFailedToast:
       store.notification.userCreateDuplicateMobileFailedToast,
-    onlineUserStatusToast: store.notification.onlineUserStatusToast
+    userReconnectedToast: store.notification.userReconnectedToast
   }
 }
 
@@ -250,6 +249,6 @@ export const NotificationComponent = withRouter(
     hideDownloadDeclarationFailedToast,
     hideUnassignedModal,
     hideCreateUserErrorToast,
-    hideUserOnlineStatusNotificationToast
+    hideUserReconnectedToast
   })(injectIntl(Component))
 )
