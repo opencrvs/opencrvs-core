@@ -282,7 +282,8 @@ export const NavigationView = (props: IFullProps) => {
   const configTab: string[] = [
     WORKQUEUE_TABS.application,
     WORKQUEUE_TABS.certificate,
-    WORKQUEUE_TABS.declarationForms
+    WORKQUEUE_TABS.declarationForms,
+    WORKQUEUE_TABS.integrations
   ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { data, initialSyncDone } = workqueue
@@ -702,6 +703,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.certificate
       : window.location.href.includes(WORKQUEUE_TABS.declarationForms)
       ? WORKQUEUE_TABS.declarationForms
+      : window.location.href.includes(WORKQUEUE_TABS.integrations)
+      ? WORKQUEUE_TABS.integrations
       : ''
   }
 }
