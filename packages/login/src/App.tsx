@@ -31,7 +31,6 @@ import { SecurityQuestion } from './views/resetCredentialsForm/securityQuestionF
 import { UpdatePassword } from './views/resetCredentialsForm/updatePasswordForm'
 import { Page } from './Page'
 import { LanguageSelect } from './i18n/components/LanguageSelect'
-import { TitleProvider } from './TitleProvider'
 
 export const { store, history } = createStore()
 
@@ -59,52 +58,50 @@ export class App extends React.Component<IAppProps> {
             <ThemeProvider theme={getTheme()}>
               <ConnectedRouter history={this.props.history}>
                 <Page>
-                  <TitleProvider>
-                    <Switch>
-                      <Route exact path={routes.STEP_ONE}>
-                        <LanguageSelect>
-                          <DarkPageContainer>
-                            <StepOneContainer />
-                          </DarkPageContainer>
-                        </LanguageSelect>
-                      </Route>
-                      <Route exact path={routes.STEP_TWO}>
+                  <Switch>
+                    <Route exact path={routes.STEP_ONE}>
+                      <LanguageSelect>
                         <DarkPageContainer>
-                          <StepTwoContainer />
+                          <StepOneContainer />
                         </DarkPageContainer>
-                      </Route>
-                      <Route exact path={routes.FORGOTTEN_ITEM}>
-                        <PageContainer>
-                          <ForgottenItem />
-                        </PageContainer>
-                      </Route>
-                      <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
-                        <PageContainer>
-                          <PhoneNumberVerification />
-                        </PageContainer>
-                      </Route>
-                      <Route exact path={routes.RECOVERY_CODE_ENTRY}>
-                        <PageContainer>
-                          <RecoveryCodeEntry />
-                        </PageContainer>
-                      </Route>
-                      <Route exact path={routes.SECURITY_QUESTION}>
-                        <PageContainer>
-                          <SecurityQuestion />
-                        </PageContainer>
-                      </Route>
-                      <Route exact path={routes.UPDATE_PASSWORD}>
-                        <PageContainer>
-                          <UpdatePassword />
-                        </PageContainer>
-                      </Route>
-                      <Route
-                        exact
-                        path={routes.SUCCESS}
-                        component={ResetCredentialsSuccessPage}
-                      ></Route>
-                    </Switch>
-                  </TitleProvider>
+                      </LanguageSelect>
+                    </Route>
+                    <Route exact path={routes.STEP_TWO}>
+                      <DarkPageContainer>
+                        <StepTwoContainer />
+                      </DarkPageContainer>
+                    </Route>
+                    <Route exact path={routes.FORGOTTEN_ITEM}>
+                      <PageContainer>
+                        <ForgottenItem />
+                      </PageContainer>
+                    </Route>
+                    <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
+                      <PageContainer>
+                        <PhoneNumberVerification />
+                      </PageContainer>
+                    </Route>
+                    <Route exact path={routes.RECOVERY_CODE_ENTRY}>
+                      <PageContainer>
+                        <RecoveryCodeEntry />
+                      </PageContainer>
+                    </Route>
+                    <Route exact path={routes.SECURITY_QUESTION}>
+                      <PageContainer>
+                        <SecurityQuestion />
+                      </PageContainer>
+                    </Route>
+                    <Route exact path={routes.UPDATE_PASSWORD}>
+                      <PageContainer>
+                        <UpdatePassword />
+                      </PageContainer>
+                    </Route>
+                    <Route
+                      exact
+                      path={routes.SUCCESS}
+                      component={ResetCredentialsSuccessPage}
+                    ></Route>
+                  </Switch>
                 </Page>
               </ConnectedRouter>
             </ThemeProvider>
