@@ -25,7 +25,8 @@ import {
   storeToken,
   getToken,
   isTokenStillValid,
-  removeToken
+  removeToken,
+  getRedirectUrl
 } from '@client/utils/authUtils'
 
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
@@ -35,6 +36,7 @@ import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
+import { push } from 'connected-react-router'
 
 export type ProfileState = {
   authenticated: boolean
@@ -81,7 +83,9 @@ export const profileReducer: LoopReducer<
           Cmd.run(
             (getState: () => IStoreState) => {
               window.location.assign(
-                `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
+                `${window.config.LOGIN_URL}?lang=${
+                  getState().i18n.language
+                }&redirect_url=${encodeURIComponent(window.location.pathname)}`
               )
             },
             { args: [Cmd.getState] }
@@ -90,6 +94,7 @@ export const profileReducer: LoopReducer<
       )
     case actions.CHECK_AUTH:
       const token = getToken()
+      const redirectUrl = getRedirectUrl()
 
       // Remove token and language from url if these exists
       if (window.location.search.includes('token=')) {
@@ -120,7 +125,8 @@ export const profileReducer: LoopReducer<
               storeToken(token)
             }
           }),
-          Cmd.action(actions.setInitialUserDetails())
+          Cmd.action(actions.setInitialUserDetails()),
+          redirectUrl ? Cmd.action(push(redirectUrl)) : Cmd.none
         ])
       )
     case actions.SET_USER_DETAILS:

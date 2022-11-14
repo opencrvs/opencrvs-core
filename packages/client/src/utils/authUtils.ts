@@ -41,6 +41,13 @@ export const isTokenStillValid = (decoded: ITokenPayload) => {
   return Number(decoded.exp) * 1000 > Date.now()
 }
 
+export function getRedirectUrl() {
+  const redirectUrl = new URL(window.location.href).searchParams.get(
+    'redirect_url'
+  )
+  return redirectUrl
+}
+
 export function getToken(): string {
   return (
     (queryString.parse(window.location.search.replace(/^\?/, ''))
