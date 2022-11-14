@@ -48,7 +48,7 @@ const getInformantFullName = (
     return EMPTY_STRING
   }
   if (language === 'en') {
-    fullName = getInformantEngName(sectionData)
+    fullName = getInformantEngName(sectionData).trim()
   } else {
     if (sectionData.firstNames && sectionData.familyName) {
       fullName = `${sectionData.firstNames as string} ${
