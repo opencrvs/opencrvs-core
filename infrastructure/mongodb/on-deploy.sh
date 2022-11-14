@@ -76,7 +76,7 @@ function checkIfUserExists {
 CONFIG_USER=$(echo $(checkIfUserExists "config") | jq 'select(.user) | .user')
 if [[ $CONFIG_USER != *"config"* ]]; then
   echo "config user not found"
-  mongo <<EOF
+  mongo $(mongo_credentials) --host $HOST <<EOF
   use application-config
   db.createUser({
     user: 'config',
@@ -97,7 +97,7 @@ fi
 HEARTH_USER=$(echo $(checkIfUserExists "hearth") | jq 'select(.user) | .user')
 if [[ $HEARTH_USER != *"hearth"* ]]; then
   echo "hearth user not found"
-  mongo <<EOF
+  mongo $(mongo_credentials) --host $HOST <<EOF
   use hearth-dev
   db.createUser({
     user: 'hearth',
@@ -118,7 +118,7 @@ fi
 USER_MGNT_USER=$(echo $(checkIfUserExists "user-mgnt") | jq 'select(.user) | .user')
 if [[ $USER_MGNT_USER != *"user-mgnt"* ]]; then
   echo "user-mgnt user not found"
-  mongo <<EOF
+  mongo $(mongo_credentials) --host $HOST <<EOF
   use user-mgnt
   db.createUser({
     user: 'user-mgnt',
@@ -139,7 +139,7 @@ fi
 OPENHIM_USER=$(echo $(checkIfUserExists "openhim") | jq 'select(.user) | .user')
 if [[ $OPENHIM_USER != *"openhim"* ]]; then
   echo "openhim user not found"
-  mongo <<EOF
+  mongo $(mongo_credentials) --host $HOST <<EOF
   use openhim-dev
   db.createUser({
     user: 'openhim',
@@ -160,7 +160,7 @@ fi
 METRICS_USER=$(echo $(checkIfUserExists "metrics") | jq 'select(.user) | .user')
 if [[ $METRICS_USER != *"metrics"* ]]; then
   echo "metrics user not found"
-  mongo <<EOF
+  mongo $(mongo_credentials) --host $HOST <<EOF
   use metrics
   db.createUser({
     user: 'metrics',
@@ -181,6 +181,14 @@ fi
 WEBHOOKS_USER=$(echo $(checkIfUserExists "webhooks") | jq 'select(.user) | .user')
 if [[ $WEBHOOKS_USER != *"webhooks"* ]]; then
   echo "webhooks user not found"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use webhooks
+  db.createUser({
+    user: 'webhooks',
+    pwd: '$WEBHOOKS_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'webhooks' }]
+  })
+EOF
 else
   echo "webhooks user exists"
   mongo $(mongo_credentials) --host $HOST <<EOF
