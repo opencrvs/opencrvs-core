@@ -13,7 +13,7 @@
 # passwords of MongoDB users to passwords given to this service as environment varibles
 
 apt-get update
-apt-get install curl
+apt-get install -y curl
 
 curl -L https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait --output /wait
 chmod +x /wait
