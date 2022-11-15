@@ -1364,3 +1364,52 @@ export function getClientIdFromToken(token: string) {
   const payload = getTokenPayload(token)
   return payload.sub
 }
+
+export function getComposition(bundle: fhir.Bundle) {
+  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+}
+
+export function getCompositionIdFromCompositionOrTask(bundle: fhir.Bundle) {
+  const composition = getComposition(bundle)
+
+  if (composition) {
+    return composition.id
+  }
+
+  const task = getTask(bundle)
+  return task?.focus?.reference?.split('/')[1]
+}
+
+export function getTask(bundle: fhir.Bundle) {
+  return getResourceByType<Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
+}
+
+export function getResourceByType<T = fhir.Resource>(
+  bundle: fhir.Bundle,
+  type: string
+): T | undefined {
+  const bundleEntry =
+    bundle &&
+    bundle.entry &&
+    bundle.entry.find((entry) => {
+      if (!entry.resource) {
+        return false
+      } else {
+        return entry.resource.resourceType === type
+      }
+    })
+  return bundleEntry && (bundleEntry.resource as T)
+}
+
+export function getTrackingId(task: Task) {
+  const trackingIdentifier = task?.identifier?.find((identifier) => {
+    return (
+      identifier.system === `http://opencrvs.org/specs/id/birth-tracking-id` ||
+      identifier.system === `http://opencrvs.org/specs/id/death-tracking-id`
+    )
+  })
+  if (!trackingIdentifier || !trackingIdentifier.value) {
+    throw new Error("Didn't find any identifier for tracking id")
+  }
+  return trackingIdentifier.value
+}

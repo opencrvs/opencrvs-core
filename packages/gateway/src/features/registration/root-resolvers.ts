@@ -29,7 +29,10 @@ import {
   getDeclarationIds,
   getStatusFromTask,
   setCertificateCollector,
-  getClientIdFromToken
+  getClientIdFromToken,
+  getCompositionIdFromCompositionOrTask,
+  getTask,
+  getTrackingId
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -405,7 +408,8 @@ export const resolvers: GQLResolver = {
         'ARCHIVED',
         user.practitionerId,
         authHeader['x-real-ip']!,
-        authHeader['x-real-user-agent']!
+        authHeader['x-real-user-agent']!,
+        newTaskBundle
       )
       // return the taskId
       return taskEntry.resource.id
@@ -438,6 +442,16 @@ export const resolvers: GQLResolver = {
       const newTaskBundle = await updateFHIRTaskBundle(taskEntry, prevRegStatus)
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+
+      const userId = getClientIdFromToken(authHeader.Authorization)
+      const user = await getUser({ userId }, authHeader)
+      await postUserActionToMetrics(
+        'REINSTATED_' + prevRegStatus.toUpperCase(),
+        user.practitionerId,
+        authHeader['x-real-ip']!,
+        authHeader['x-real-user-agent']!,
+        newTaskBundle
+      )
 
       return {
         taskEntryResourceID: taskId,
@@ -550,16 +564,15 @@ async function createEventRegistration(
 
   const userId = getClientIdFromToken(authHeader.Authorization)
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  let action = 'SENT_FOR_REVIEW'
-  if (res.entry.length < 10) {
-    action = 'INCOMPLETE'
-  }
   const user = await getUser({ userId }, authHeader)
+
+  console.log(doc)
   await postUserActionToMetrics(
-    action,
+    'INCOMPLETE',
     user.practitionerId,
     authHeader['x-real-ip']!,
-    authHeader['x-real-user-agent']!
+    authHeader['x-real-user-agent']!,
+    doc
   )
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
@@ -640,6 +653,17 @@ async function markEventAsCertified(
   const doc = await buildFHIRBundle(details, event, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+
+  const userId = getClientIdFromToken(authHeader.Authorization)
+  const user = await getUser({ userId }, authHeader)
+  await postUserActionToMetrics(
+    'CERTIFIED',
+    user.practitionerId,
+    authHeader['x-real-ip']!,
+    authHeader['x-real-user-agent']!,
+    doc
+  )
+
   // return composition-id
   return getIDFromResponse(res)
 }
@@ -721,6 +745,15 @@ export async function markRecordAsDownloadedOrAssigned(
 
   await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
 
+  const userId = getClientIdFromToken(authHeader.Authorization)
+  const user = await getUser({ userId }, authHeader)
+  await postUserActionToMetrics(
+    'RETRIEVED',
+    user.practitionerId,
+    authHeader['x-real-ip']!,
+    authHeader['x-real-user-agent']!,
+    taskBundle
+  )
   // return the full composition
   return fetchFHIR(`/Composition/${id}`, authHeader)
 }
@@ -729,12 +762,24 @@ export async function postUserActionToMetrics(
   action: string,
   practitionerId: string,
   remoteAddress: string,
-  userAgent: string
+  userAgent: string,
+  bundle?: fhir.Bundle
 ) {
   const url = resolve(METRICS_URL, '/audit/events')
-  const body = {
-    action: action,
-    practitionerId: practitionerId
+  let body: {}
+  if (bundle) {
+    const compositionId = getCompositionIdFromCompositionOrTask(bundle)
+    const trackingId = getTrackingId(getTask(bundle)!)
+    body = {
+      action: action,
+      practitionerId: practitionerId,
+      additionalData: { compositionId, trackingId }
+    }
+  } else {
+    body = {
+      action: action,
+      practitionerId: practitionerId
+    }
   }
   await fetch(url, {
     method: 'POST',

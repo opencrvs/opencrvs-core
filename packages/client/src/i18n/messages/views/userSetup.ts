@@ -70,8 +70,11 @@ interface IUserSetupMessages
   editUserAuditAction: MessageDescriptor
   passwordResetAuditAction: MessageDescriptor
   userNameReminderAuditAction: MessageDescriptor
-  sentIncompleteAuditAction: MessageDescriptor
   sentForReviewAuditAction: MessageDescriptor
+  reInstatedInProgressAuditAction: MessageDescriptor
+  reInstatedInReviewAuditAction: MessageDescriptor
+  reInStatedRejectedAuditAction: MessageDescriptor
+  retrieveAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -363,15 +366,34 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for User username requested audit action',
     id: 'user.profile.auditList.usernameRequested'
   },
-  sentIncompleteAuditAction: {
-    defaultMessage: 'Sent Incomplete Registration',
-    description: 'Description for sending incomplete registration audit action',
-    id: 'user.profile.auditList.incompleteRegistration'
-  },
   sentForReviewAuditAction: {
-    defaultMessage: 'Sent for Review',
+    defaultMessage: 'Sent Incomplete Registration',
     description: 'Description for sending registration for review audit action',
     id: 'user.profile.auditList.sentForReview'
+  },
+  reInstatedInProgressAuditAction: {
+    defaultMessage: 'Reinstated to In Progress',
+    description:
+      'Description for sending registration from Reinstated to In progress audit action',
+    id: 'user.profile.auditList.reInstatedToInProgress'
+  },
+  reInstatedInReviewAuditAction: {
+    defaultMessage: 'Reinstated to In Review',
+    description:
+      'Description for sending registration from Reinstated to In review audit action',
+    id: 'user.profile.auditList.reInstatedToInReview'
+  },
+  retrieveAuditAction: {
+    defaultMessage: 'Retrieved',
+    description:
+      'Description for Retrieving registration to In review audit action',
+    id: 'user.profile.auditList.retrieve'
+  },
+  reInStatedRejectedAuditAction: {
+    defaultMessage: 'Reinstated to Require Updates',
+    description:
+      'Description for sending registration from Reinstated to require updates audit action',
+    id: 'user.profile.auditList.reInstatedToInReview'
   }
 }
 
