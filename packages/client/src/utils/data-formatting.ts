@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { getDefaultLanguage } from '@client/i18n/utils'
 import { GQLComment } from '@opencrvs/gateway/src/graphql/schema'
 import { HumanName } from './gateway'
 
@@ -28,7 +29,8 @@ export const createNamesMap = (names: HumanName[]): INamesMap =>
     prevNamesMap[name.use] = `${name.firstNames || ''} ${
       name.familyName || ''
     }`.trim()
-    prevNamesMap[name.use] = prevNamesMap[name.use] || prevNamesMap['en']
+    prevNamesMap[name.use] =
+      prevNamesMap[name.use] || prevNamesMap[getDefaultLanguage()]
     return prevNamesMap
   }, {})
 
