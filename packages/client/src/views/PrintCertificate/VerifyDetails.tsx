@@ -22,7 +22,7 @@ import gql from 'graphql-tag'
 import { Query } from '@client/components/Query'
 import { useParams } from 'react-router'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { camelCase } from 'lodash'
@@ -32,7 +32,9 @@ import {
   Spinner,
   ErrorToastNotification
 } from '@opencrvs/components/lib/interface'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
+import { goBack } from '@client/navigation'
 
 const VERIFY_QUERY = gql`
   query fetchRegistration($id: ID!) {
@@ -41,6 +43,8 @@ const VERIFY_QUERY = gql`
       registration {
         id
         type
+        informantType
+        contactPhoneNumber
         trackingId
         registrationNumber
         status {
@@ -122,23 +126,23 @@ export function VerifyDetails() {
   const { id } = useParams()
   const offlineData = useSelector(getOfflineData)
   const registerForm = useSelector(getRegisterForm)
+  const dispatch = useDispatch()
 
   return (
     <Query query={VERIFY_QUERY} variables={{ id }}>
-      {({ data, loading, error }) => {
+      {({ data, loading, error, refetch }) => {
         if (loading) {
           return <Spinner id="verify-details-loading" />
-        }
-
-        if (error) {
+        } else if (error) {
           return (
             <ErrorToastNotification
               retryButtonText={intl.formatMessage(buttonMessages.retry)}
-            />
+              retryButtonHandler={() => refetch()}
+            >
+              {intl.formatMessage(errorMessages.pageLoadFailed)}
+            </ErrorToastNotification>
           )
-        }
-
-        if (data?.fetchRegistration) {
+        } else if (data?.fetchRegistration) {
           const event = data.fetchRegistration.registration?.type ?? 'BIRTH'
           const registerFormForEvent =
             registerForm[camelCase(event) as 'birth' | 'death']
@@ -161,12 +165,20 @@ export function VerifyDetails() {
           return (
             <Content
               title={declarationData.name}
-              icon={() => <DeclarationIcon color="green" />}
+              icon={() => (
+                <DeclarationIcon
+                  color={
+                    STATUSTOCOLOR[
+                      data.fetchRegistration.registration?.status[0]?.type
+                    ] || 'green'
+                  }
+                />
+              )}
               size={ContentSize.LARGE}
               topActionButtons={[
                 <IconButton
                   icon={() => <Cross />}
-                  onClick={() => window.close()}
+                  onClick={() => dispatch(goBack())}
                 />
               ]}
               showTitleOnMobile
@@ -189,9 +201,7 @@ export function VerifyDetails() {
               />
             </Content>
           )
-        }
-
-        return null
+        } else return null
       }}
     </Query>
   )
