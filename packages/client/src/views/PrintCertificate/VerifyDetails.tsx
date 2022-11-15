@@ -175,12 +175,7 @@ export function VerifyDetails() {
                 />
               )}
               size={ContentSize.LARGE}
-              topActionButtons={[
-                <IconButton
-                  icon={() => <Cross />}
-                  onClick={() => dispatch(goBack())}
-                />
-              ]}
+              topActionButtons={[]}
               showTitleOnMobile
             >
               <GetDeclarationInfo
