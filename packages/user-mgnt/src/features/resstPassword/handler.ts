@@ -20,6 +20,7 @@ import {
 import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
 import { logger } from '@user-mgnt/logger'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 interface IResendSMSPayload {
   applicationName: string
@@ -38,6 +39,18 @@ export default async function resetPasswordSMSHandler(
   if (!user) {
     throw unauthorized()
   }
+
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
+
+  await postUserActionToMetrics(
+    'SEND_PASSWORD',
+    request.headers.authorization,
+    remoteAddress,
+    userAgent
+  )
 
   randomPassword = generateRandomPassword(hasDemoScope(request))
   const { hash, salt } = generateSaltedHash(randomPassword)
