@@ -121,7 +121,8 @@ const questionSchema = new Schema({
   required: { type: Boolean },
   enabled: { type: String },
   custom: { type: Boolean, default: false },
-  conditionals: [{ type: conditionals, required: false }]
+  conditionals: [{ type: conditionals, required: false }],
+  dataset: { type: Schema.Types.ObjectId, ref: 'FormDataset' }
 })
 
 export default model<IQuestionModel>('Question', questionSchema)
