@@ -29,7 +29,6 @@ else
   exit 1
 fi
 
-NETWORK=opencrvs_overlay_net
 WAIT_TIMEOUT=240 WAIT_HOSTS=$URI_HOST /wait
 
 mongo_credentials() {
@@ -67,7 +66,7 @@ function checkIfUserExists {
   local user=$1
   local JSON="{\"user\": \"$user\"}"
   CREDENTIALS=$(mongoexport_credentials)
-  CMD="docker run --rm --network=$NETWORK mongo:4.4 $CMD mongoexport --uri='"$CREDENTIALS"' --collection system.users --quiet --query='$JSON'"
+  CMD="mongoexport --uri='"$CREDENTIALS"' --collection system.users --quiet --query='$JSON'"
   eval $CMD
 }
 

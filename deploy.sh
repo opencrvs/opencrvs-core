@@ -247,6 +247,8 @@ ssh $SSH_USER@$SSH_HOST "SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME
 
 # Takes in a space separated string of docker-compose.yml files
 # returns a new line separated list of images defined in those files
+# This function gets a clean list of images and substitutes environment variables
+# So that we have a clean list to download
 get_docker_tags_from_compose_files() {
    COMPOSE_FILES=$1
 
@@ -307,6 +309,7 @@ docker_stack_deploy() {
 
 
   ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS=$(echo "$environment_compose" | sed "s|docker-compose.countryconfig|$COUNTRY_CONFIG_PATH/docker-compose.countryconfig|")
+  REPLICAS_COMPOSE_WITH_LOCAL_PATHS=$(echo "$replicas_compose" | sed "s|docker-compose.countryconfig|$COUNTRY_CONFIG_PATH/docker-compose.countryconfig|")
 
   ENV_VARIABLES="HOSTNAME=$HOST
   VERSION=$VERSION
@@ -337,7 +340,7 @@ docker_stack_deploy() {
   echo "Pulling all docker images. This might take a while"
 
   EXISTING_IMAGES=$(ssh $SSH_USER@$SSH_HOST "docker images --format '{{.Repository}}:{{.Tag}}'")
-  IMAGE_TAGS_TO_DOWNLOAD=$(get_docker_tags_from_compose_files "$SHARED_COMPOSE_FILES $ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS $replicas_compose")
+  IMAGE_TAGS_TO_DOWNLOAD=$(get_docker_tags_from_compose_files "$SHARED_COMPOSE_FILES $ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS $REPLICAS_COMPOSE_WITH_LOCAL_PATHS")
 
   for tag in ${IMAGE_TAGS_TO_DOWNLOAD[@]}; do
     if [[ $EXISTING_IMAGES == *"$tag"* ]]; then
