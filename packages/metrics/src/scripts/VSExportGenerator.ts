@@ -500,7 +500,7 @@ async function setInformantDetailsInComposition(
 
 async function createBirthDeclarationCSVWriter() {
   const birthCSV = createCSV({
-    path: './scripts/Birth_Report.csv',
+    path: './src/scripts/Birth_Report.csv',
     append: true,
     header: [
       'childGen',
@@ -583,7 +583,7 @@ async function createBirthDeclarationCSVWriter() {
 
 async function createDeathDeclarationCSVWriter() {
   const deathCSV = createCSV({
-    path: './scripts/Death_Report.csv',
+    path: './src/scripts/Death_Report.csv',
     append: true,
     header: [
       'deceasedGen',

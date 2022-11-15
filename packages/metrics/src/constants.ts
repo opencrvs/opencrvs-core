@@ -32,5 +32,5 @@ export const CONFIG_API_URL =
 export const DEFAULT_TIMEOUT = 600000
 export const VS_EXPORT_SCRIPT_PATH =
   process.env.NODE_ENV === 'production'
-    ? './build/dist/scripts/VSExportGenerator.js'
-    : './scripts/VSExportGenerator.ts'
+    ? './build/dist/src/scripts/VSExportGenerator.js'
+    : './src/scripts/VSExportGenerator.ts'

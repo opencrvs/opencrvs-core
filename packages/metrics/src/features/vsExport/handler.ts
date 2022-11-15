@@ -19,8 +19,8 @@ import * as fs from 'fs'
 import { join } from 'path'
 import { internal } from '@hapi/boom'
 
-const BIRTH_REPORT_PATH = join(__dirname, '../../../scripts/Birth_Report.csv')
-const DEATH_REPORT_PATH = join(__dirname, '../../../scripts/Death_Report.csv')
+const BIRTH_REPORT_PATH = join(__dirname, '../../scripts/Birth_Report.csv')
+const DEATH_REPORT_PATH = join(__dirname, '../../scripts/Death_Report.csv')
 
 export async function vsExportHandler(
   request: Hapi.Request,
