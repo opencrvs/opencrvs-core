@@ -28,6 +28,7 @@ export const createNamesMap = (names: HumanName[]): INamesMap =>
     prevNamesMap[name.use] = `${name.firstNames || ''} ${
       name.familyName || ''
     }`.trim()
+    prevNamesMap[name.use] = prevNamesMap[name.use] || prevNamesMap['en']
     return prevNamesMap
   }, {})
 
