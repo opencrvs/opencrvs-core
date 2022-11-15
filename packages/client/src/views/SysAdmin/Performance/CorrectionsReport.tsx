@@ -38,7 +38,9 @@ export function CorrectionsReport({ data }: CorrectionsReportProps) {
         <ListViewItemSimplified
           label={
             <div>
-              <PerformanceListHeader>Corrections</PerformanceListHeader>
+              <PerformanceListHeader>
+                {intl.formatMessage(messages.performanceTotalCorrectionsHeader)}
+              </PerformanceListHeader>
             </div>
           }
         />

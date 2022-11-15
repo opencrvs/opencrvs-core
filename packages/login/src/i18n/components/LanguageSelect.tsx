@@ -17,11 +17,7 @@ import {
   Select2
 } from '@opencrvs/components/lib/Select/Select2'
 import styled from 'styled-components'
-import {
-  retrieveLanguage,
-  getAvailableLanguages,
-  useSearchQuery
-} from '@login/i18n/utils'
+import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useHistory, useLocation } from 'react-router'
 
@@ -46,21 +42,6 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const languageOptions: ISelect2Option[] = Object.values(languages)
     .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
     .filter(({ value }) => applicationLangauges.includes(value))
-
-  React.useEffect(() => {
-    async function loadLanguage() {
-      const languageToUse = paramLanguage ?? (await retrieveLanguage())
-
-      if (
-        languageToUse !== selectedLanguage &&
-        getAvailableLanguages().some((language) => language === languageToUse)
-      )
-        dispatch(changeLanguage({ language: languageToUse }))
-    }
-
-    loadLanguage()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const onChange = ({ value }: ISelect2Option) => {
     if (paramLanguage) {

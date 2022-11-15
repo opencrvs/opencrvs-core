@@ -30,6 +30,7 @@ export const REQUEST_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}ex
 export const REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/otherReason`
 export const REQUESTING_INDIVIDUAL = `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividual`
 export const HAS_SHOWED_VERIFIED_DOCUMENT = `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
+export const VIEWED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regViewed`
 
 export const BIRTH_REG_NO = 'birth-registration-number'
 export const DEATH_REG_NO = 'death-registration-number'
