@@ -5,8 +5,8 @@
 1. Create a new Mongo user creation or updation entry block in `infrastructure/mongodb/on-deploy.sh`. This file is run on fresh deployments of OpenCRVS
 
 ```
-CONFIG_USER=$(echo $(checkIfUserExists "config") | jq 'select(.user) | .user')
-if [[ $CONFIG_USER != *"config"* ]]; then
+CONFIG_USER=$(echo $(checkIfUserExists "config"))
+if [[ $CONFIG_USER != *"FOUND"* ]]; then
   echo "config user not found"
   mongo <<EOF
   use application-config

@@ -19,29 +19,20 @@ curl -L https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/
 chmod +x /wait
 
 if [ "$REPLICAS" = "1" ]; then
-  URI_HOST=mongo1:27017
+  WAIT_TIMEOUT=240 WAIT_HOSTS=mongo1:27017 /wait
 elif [ "$REPLICAS" = "3" ]; then
-  URI_HOST=mongo1:27017,mongo2:27017,mongo3:27017
+  WAIT_TIMEOUT=240 WAIT_HOSTS=mongo1:27017,mongo2:27017,mongo3:27017 /wait
 elif [ "$REPLICAS" = "5" ]; then
-  URI_HOST=mongo1:27017,mongo2:27017,mongo3:27017,mongo4:27017,mongo5:27017
+  WAIT_TIMEOUT=240 WAIT_HOSTS=mongo1:27017,mongo2:27017,mongo3:27017,mongo4:27017,mongo5:27017 /wait
 else
   echo "Script must be passed an understandable number of replicas: 0,1,3 or 5"
   exit 1
 fi
 
-WAIT_TIMEOUT=240 WAIT_HOSTS=$URI_HOST /wait
 
 mongo_credentials() {
   if [ ! -z ${MONGODB_ADMIN_USER+x} ] || [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
     echo "--username $MONGODB_ADMIN_USER --password $MONGODB_ADMIN_PASSWORD --authenticationDatabase admin";
-  else
-    echo "";
-  fi
-}
-
-mongoexport_credentials() {
-  if [ ! -z ${MONGODB_ADMIN_USER+x} ] || [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
-    echo "mongodb://$MONGODB_ADMIN_USER:$MONGODB_ADMIN_PASSWORD@$URI_HOST/admin?replicaSet=rs0"
   else
     echo "";
   fi
@@ -65,15 +56,14 @@ fi
 function checkIfUserExists {
   local user=$1
   local JSON="{\"user\": \"$user\"}"
-  CREDENTIALS=$(mongoexport_credentials)
-  CMD="mongoexport --uri='"$CREDENTIALS"' --collection system.users --quiet --query='$JSON'"
+  CMD='mongo admin --host $HOST $(mongo_credentials) --quiet --eval "db.getCollection(\"system.users\").find($JSON).length() > 0 ? \"FOUND\" : \"NOT_FOUND\""'
   eval $CMD
 }
 
 # Rotate passwords to match the ones given to this script or create new users
 
-CONFIG_USER=$(echo $(checkIfUserExists "config") | jq 'select(.user) | .user')
-if [[ $CONFIG_USER != *"config"* ]]; then
+CONFIG_USER=$(echo $(checkIfUserExists "config"))
+if [[ $CONFIG_USER != *"FOUND"* ]]; then
   echo "config user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use application-config
@@ -93,8 +83,8 @@ else
 EOF
 fi
 
-HEARTH_USER=$(echo $(checkIfUserExists "hearth") | jq 'select(.user) | .user')
-if [[ $HEARTH_USER != *"hearth"* ]]; then
+HEARTH_USER=$(echo $(checkIfUserExists "hearth"))
+if [[ $HEARTH_USER != *"FOUND"* ]]; then
   echo "hearth user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use hearth-dev
@@ -114,8 +104,8 @@ else
 EOF
 fi
 
-USER_MGNT_USER=$(echo $(checkIfUserExists "user-mgnt") | jq 'select(.user) | .user')
-if [[ $USER_MGNT_USER != *"user-mgnt"* ]]; then
+USER_MGNT_USER=$(echo $(checkIfUserExists "user-mgnt"))
+if [[ $USER_MGNT_USER != *"FOUND"* ]]; then
   echo "user-mgnt user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use user-mgnt
@@ -135,8 +125,8 @@ else
 EOF
 fi
 
-OPENHIM_USER=$(echo $(checkIfUserExists "openhim") | jq 'select(.user) | .user')
-if [[ $OPENHIM_USER != *"openhim"* ]]; then
+OPENHIM_USER=$(echo $(checkIfUserExists "openhim"))
+if [[ $OPENHIM_USER != *"FOUND"* ]]; then
   echo "openhim user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use openhim-dev
@@ -156,8 +146,8 @@ else
 EOF
 fi
 
-METRICS_USER=$(echo $(checkIfUserExists "metrics") | jq 'select(.user) | .user')
-if [[ $METRICS_USER != *"metrics"* ]]; then
+METRICS_USER=$(echo $(checkIfUserExists "metrics"))
+if [[ $METRICS_USER != *"FOUND"* ]]; then
   echo "metrics user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use metrics
@@ -177,8 +167,8 @@ else
 EOF
 fi
 
-WEBHOOKS_USER=$(echo $(checkIfUserExists "webhooks") | jq 'select(.user) | .user')
-if [[ $WEBHOOKS_USER != *"webhooks"* ]]; then
+WEBHOOKS_USER=$(echo $(checkIfUserExists "webhooks"))
+if [[ $WEBHOOKS_USER != *"FOUND"* ]]; then
   echo "webhooks user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use webhooks
