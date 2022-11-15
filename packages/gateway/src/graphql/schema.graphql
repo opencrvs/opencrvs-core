@@ -111,7 +111,7 @@ type Query {
   ): UserAuditLogResultSet
   searchEvents(
     userId: String
-    advanceSearchParameters: AdvancedSearchParametersInput!
+    advancedSearchParameters: AdvancedSearchParametersInput!
     count: Int
     skip: Int
     sort: String

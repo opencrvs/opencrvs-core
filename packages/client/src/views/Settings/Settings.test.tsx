@@ -32,7 +32,7 @@ const graphqlMocks = [
     request: {
       query: SEARCH_EVENTS,
       variables: {
-        advanceSearchParameters: {
+        advancedSearchParameters: {
           registrationStatuses: ['REJECTED'],
           declarationLocationId: ['6327dbd9-e118-4dbe-9246-cb0f7649a666']
         }

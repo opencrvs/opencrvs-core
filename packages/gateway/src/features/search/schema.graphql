@@ -103,7 +103,7 @@ type EventProgressSet {
 type Query {
   searchEvents(
     userId: String
-    advanceSearchParameters: AdvancedSearchParametersInput!
+    advancedSearchParameters: AdvancedSearchParametersInput!
     count: Int
     skip: Int
     sort: String

@@ -114,6 +114,7 @@ export type AdvancedSeachParameters = {
   declarationJurisdictionId?: Maybe<Scalars['String']>
   declarationLocationId?: Maybe<Scalars['String']>
   event?: Maybe<Event>
+  eventCountry?: Maybe<Scalars['String']>
   eventLocationId?: Maybe<Scalars['String']>
   eventLocationLevel1?: Maybe<Scalars['String']>
   eventLocationLevel2?: Maybe<Scalars['String']>
@@ -170,6 +171,7 @@ export type AdvancedSearchParametersInput = {
   declarationJurisdictionId?: InputMaybe<Scalars['String']>
   declarationLocationId?: InputMaybe<Scalars['String']>
   event?: InputMaybe<Event>
+  eventCountry?: InputMaybe<Scalars['String']>
   eventLocationId?: InputMaybe<Scalars['String']>
   eventLocationLevel1?: InputMaybe<Scalars['String']>
   eventLocationLevel2?: InputMaybe<Scalars['String']>
@@ -1441,7 +1443,6 @@ export type Query = {
   searchDeathRegistrations?: Maybe<Array<Maybe<DeathRegistration>>>
   searchEvents?: Maybe<EventSearchResultSet>
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
-  searchRecord?: Maybe<EventProgressResultSet>
   searchUsers?: Maybe<SearchUserResult>
   verifyPasswordById?: Maybe<VerifyPasswordResult>
 }
@@ -1615,7 +1616,7 @@ export type QuerySearchDeathRegistrationsArgs = {
 }
 
 export type QuerySearchEventsArgs = {
-  advanceSearchParameters: AdvancedSearchParametersInput
+  advancedSearchParameters: AdvancedSearchParametersInput
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
   sort?: InputMaybe<Scalars['String']>
@@ -1634,60 +1635,6 @@ export type QuerySearchFieldAgentsArgs = {
   status?: InputMaybe<Scalars['String']>
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
-}
-
-export type QuerySearchRecordArgs = {
-  childDoB?: InputMaybe<Scalars['String']>
-  childDoBEnd?: InputMaybe<Scalars['String']>
-  childDoBStart?: InputMaybe<Scalars['String']>
-  childFirstNames?: InputMaybe<Scalars['String']>
-  childGender?: InputMaybe<Scalars['String']>
-  childLastName?: InputMaybe<Scalars['String']>
-  contactNumber?: InputMaybe<Scalars['String']>
-  dateOfEvent?: InputMaybe<Scalars['String']>
-  dateOfEventEnd?: InputMaybe<Scalars['String']>
-  dateOfEventStart?: InputMaybe<Scalars['String']>
-  dateOfRegistration?: InputMaybe<Scalars['String']>
-  dateOfRegistrationEnd?: InputMaybe<Scalars['String']>
-  dateOfRegistrationStart?: InputMaybe<Scalars['String']>
-  deceasedDoB?: InputMaybe<Scalars['String']>
-  deceasedDoBEnd?: InputMaybe<Scalars['String']>
-  deceasedDoBStart?: InputMaybe<Scalars['String']>
-  deceasedFamilyName?: InputMaybe<Scalars['String']>
-  deceasedFirstNames?: InputMaybe<Scalars['String']>
-  deceasedGender?: InputMaybe<Scalars['String']>
-  deceasedIdentifier?: InputMaybe<Scalars['String']>
-  declarationJurisdictionId?: InputMaybe<Scalars['String']>
-  declarationLocationId?: InputMaybe<Scalars['String']>
-  event?: InputMaybe<Event>
-  eventLocationId?: InputMaybe<Scalars['String']>
-  eventLocationLevel1?: InputMaybe<Scalars['String']>
-  eventLocationLevel2?: InputMaybe<Scalars['String']>
-  eventLocationLevel3?: InputMaybe<Scalars['String']>
-  eventLocationLevel4?: InputMaybe<Scalars['String']>
-  eventLocationLevel5?: InputMaybe<Scalars['String']>
-  fatherDoB?: InputMaybe<Scalars['String']>
-  fatherDoBEnd?: InputMaybe<Scalars['String']>
-  fatherDoBStart?: InputMaybe<Scalars['String']>
-  fatherFamilyName?: InputMaybe<Scalars['String']>
-  fatherFirstNames?: InputMaybe<Scalars['String']>
-  fatherIdentifier?: InputMaybe<Scalars['String']>
-  informantDoB?: InputMaybe<Scalars['String']>
-  informantDoBEnd?: InputMaybe<Scalars['String']>
-  informantDoBStart?: InputMaybe<Scalars['String']>
-  informantFamilyName?: InputMaybe<Scalars['String']>
-  informantFirstNames?: InputMaybe<Scalars['String']>
-  informantIdentifier?: InputMaybe<Scalars['String']>
-  motherDoB?: InputMaybe<Scalars['String']>
-  motherDoBEnd?: InputMaybe<Scalars['String']>
-  motherDoBStart?: InputMaybe<Scalars['String']>
-  motherFamilyName?: InputMaybe<Scalars['String']>
-  motherFirstNames?: InputMaybe<Scalars['String']>
-  motherIdentifier?: InputMaybe<Scalars['String']>
-  nationalId?: InputMaybe<Scalars['String']>
-  registrationNumber?: InputMaybe<Scalars['String']>
-  registrationStatuses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
-  trackingId?: InputMaybe<Scalars['String']>
 }
 
 export type QuerySearchUsersArgs = {
@@ -2248,7 +2195,7 @@ export type FetchUserQuery = {
 }
 
 export type SearchEventsQueryVariables = Exact<{
-  advanceSearchParameters: AdvancedSearchParametersInput
+  advancedSearchParameters: AdvancedSearchParametersInput
   sort?: InputMaybe<Scalars['String']>
 }>
 
@@ -3868,6 +3815,1106 @@ export type FetchDeathRegistrationForCertificationQuery = {
         } | null
       } | null> | null
     } | null> | null
+  } | null
+}
+
+type EventSearchFields_BirthEventSearchSet_Fragment = {
+  __typename?: 'BirthEventSearchSet'
+  dateOfBirth?: any | null
+  id: string
+  type?: string | null
+  childName?: Array<{
+    __typename?: 'HumanName'
+    firstNames?: string | null
+    familyName?: string | null
+    use?: string | null
+  } | null> | null
+  registration?: {
+    __typename?: 'RegistrationSearchSet'
+    status?: string | null
+    contactRelationship?: string | null
+    contactNumber?: string | null
+    trackingId?: string | null
+    eventLocationId?: string | null
+    registrationNumber?: string | null
+    registeredLocationId?: string | null
+    duplicates?: Array<string | null> | null
+    createdAt?: string | null
+    modifiedAt?: string | null
+    assignment?: {
+      __typename?: 'AssignmentData'
+      userId?: string | null
+      firstName?: string | null
+      lastName?: string | null
+      officeName?: string | null
+    } | null
+  } | null
+  operationHistories?: Array<{
+    __typename?: 'OperationHistorySearchSet'
+    operationType?: string | null
+    operatedOn?: any | null
+    operatorRole?: string | null
+    operatorOfficeName?: string | null
+    operatorOfficeAlias?: Array<string | null> | null
+    notificationFacilityName?: string | null
+    notificationFacilityAlias?: Array<string | null> | null
+    rejectReason?: string | null
+    rejectComment?: string | null
+    operatorName?: Array<{
+      __typename?: 'HumanName'
+      firstNames?: string | null
+      familyName?: string | null
+      use?: string | null
+    } | null> | null
+  } | null> | null
+}
+
+type EventSearchFields_DeathEventSearchSet_Fragment = {
+  __typename?: 'DeathEventSearchSet'
+  dateOfDeath?: any | null
+  id: string
+  type?: string | null
+  deceasedName?: Array<{
+    __typename?: 'HumanName'
+    firstNames?: string | null
+    familyName?: string | null
+    use?: string | null
+  } | null> | null
+  registration?: {
+    __typename?: 'RegistrationSearchSet'
+    status?: string | null
+    contactRelationship?: string | null
+    contactNumber?: string | null
+    trackingId?: string | null
+    eventLocationId?: string | null
+    registrationNumber?: string | null
+    registeredLocationId?: string | null
+    duplicates?: Array<string | null> | null
+    createdAt?: string | null
+    modifiedAt?: string | null
+    assignment?: {
+      __typename?: 'AssignmentData'
+      userId?: string | null
+      firstName?: string | null
+      lastName?: string | null
+      officeName?: string | null
+    } | null
+  } | null
+  operationHistories?: Array<{
+    __typename?: 'OperationHistorySearchSet'
+    operationType?: string | null
+    operatedOn?: any | null
+    operatorRole?: string | null
+    operatorOfficeName?: string | null
+    operatorOfficeAlias?: Array<string | null> | null
+    notificationFacilityName?: string | null
+    notificationFacilityAlias?: Array<string | null> | null
+    rejectReason?: string | null
+    rejectComment?: string | null
+    operatorName?: Array<{
+      __typename?: 'HumanName'
+      firstNames?: string | null
+      familyName?: string | null
+      use?: string | null
+    } | null> | null
+  } | null> | null
+}
+
+export type EventSearchFieldsFragment =
+  | EventSearchFields_BirthEventSearchSet_Fragment
+  | EventSearchFields_DeathEventSearchSet_Fragment
+
+export type RegistrationHomeQueryVariables = Exact<{
+  declarationLocationId: Scalars['String']
+  pageSize?: InputMaybe<Scalars['Int']>
+  inProgressSkip?: InputMaybe<Scalars['Int']>
+  healthSystemSkip?: InputMaybe<Scalars['Int']>
+  reviewStatuses?: InputMaybe<
+    Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
+  >
+  reviewSkip?: InputMaybe<Scalars['Int']>
+  rejectSkip?: InputMaybe<Scalars['Int']>
+  approvalSkip?: InputMaybe<Scalars['Int']>
+  externalValidationSkip?: InputMaybe<Scalars['Int']>
+  printSkip?: InputMaybe<Scalars['Int']>
+}>
+
+export type RegistrationHomeQuery = {
+  __typename?: 'Query'
+  inProgressTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
+  } | null
+  notificationTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
+  } | null
+  reviewTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
+  } | null
+  rejectTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
+  } | null
+  approvalTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
+  } | null
+  externalValidationTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
+  } | null
+  printTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
+  } | null
+}
+
+export type FieldAgentHomeQueryVariables = Exact<{
+  userId?: InputMaybe<Scalars['String']>
+  declarationLocationId: Scalars['String']
+  pageSize?: InputMaybe<Scalars['Int']>
+  reviewSkip?: InputMaybe<Scalars['Int']>
+  rejectSkip?: InputMaybe<Scalars['Int']>
+}>
+
+export type FieldAgentHomeQuery = {
+  __typename?: 'Query'
+  reviewTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
+  } | null
+  rejectTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
+          } | null
+          operationHistories?: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType?: string | null
+            operatedOn?: any | null
+            operatorRole?: string | null
+            operatorOfficeName?: string | null
+            operatorOfficeAlias?: Array<string | null> | null
+            notificationFacilityName?: string | null
+            notificationFacilityAlias?: Array<string | null> | null
+            rejectReason?: string | null
+            rejectComment?: string | null
+            operatorName?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null> | null
+        }
+      | null
+    > | null
   } | null
 }
 

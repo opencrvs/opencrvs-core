@@ -2166,7 +2166,7 @@ export interface QueryToGetUserAuditLogResolver<TParent = any, TResult = any> {
 
 export interface QueryToSearchEventsArgs {
   userId?: string
-  advanceSearchParameters: GQLAdvancedSearchParametersInput
+  advancedSearchParameters: GQLAdvancedSearchParametersInput
   count?: number
   skip?: number
   sort?: string

@@ -13,11 +13,11 @@ import { gql } from '@apollo/client'
 
 export const SEARCH_EVENTS = gql`
   query searchEvents(
-    $advanceSearchParameters: AdvancedSearchParametersInput!
+    $advancedSearchParameters: AdvancedSearchParametersInput!
     $sort: String
   ) {
     searchEvents(
-      advanceSearchParameters: $advanceSearchParameters
+      advancedSearchParameters: $advancedSearchParameters
       sort: $sort
     ) {
       totalItems

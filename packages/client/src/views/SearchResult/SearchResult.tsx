@@ -334,7 +334,7 @@ export class SearchResultView extends React.Component<
                   {
                     query: SEARCH_EVENTS,
                     variables: {
-                      advanceSearchParameters: {
+                      advancedSearchParameters: {
                         trackingId:
                           searchType === TRACKING_ID_TEXT ? searchText : '',
                         nationalId:
@@ -449,7 +449,7 @@ export class SearchResultView extends React.Component<
           <Query<SearchEventsQuery>
             query={SEARCH_EVENTS}
             variables={{
-              advanceSearchParameters: {
+              advancedSearchParameters: {
                 declarationLocationId: userDetails
                   ? getUserLocation(userDetails).id
                   : '',

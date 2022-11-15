@@ -83,7 +83,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     $printSkip: Int
   ) {
     inProgressTab: searchEvents(
-      advanceSearchParameters: {
+      advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["IN_PROGRESS"]
         compositionType: ["birth-declaration", "death-declaration"]
@@ -97,7 +97,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     notificationTab: searchEvents(
-      advanceSearchParameters: {
+      advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["IN_PROGRESS"]
         compositionType: ["birth-notification", "death-notification"]
@@ -111,7 +111,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     reviewTab: searchEvents(
-      advanceSearchParameters: {
+      advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: $reviewStatuses
       }
@@ -124,7 +124,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     rejectTab: searchEvents(
-      advanceSearchParameters: {
+      advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["REJECTED"]
       }
@@ -139,7 +139,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     approvalTab: searchEvents(
-      advanceSearchParameters: {
+      advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["VALIDATED"]
       }
@@ -152,7 +152,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     externalValidationTab: searchEvents(
-      advanceSearchParameters: {
+      advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["WAITING_VALIDATION"]
       }
@@ -165,7 +165,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     printTab: searchEvents(
-      advanceSearchParameters: {
+      advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["REGISTERED"]
       }
@@ -191,7 +191,7 @@ export const FIELD_AGENT_HOME_QUERY = gql`
   ) {
     reviewTab: searchEvents(
       userId: $userId
-      advanceSearchParameters: {
+      advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: [
           "DECLARED"
@@ -211,7 +211,7 @@ export const FIELD_AGENT_HOME_QUERY = gql`
     }
     rejectTab: searchEvents(
       userId: $userId
-      advanceSearchParameters: {
+      advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["REJECTED"]
       }

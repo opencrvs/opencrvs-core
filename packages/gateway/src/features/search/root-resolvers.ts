@@ -72,7 +72,7 @@ export const resolvers: GQLResolver = {
       _,
       {
         userId,
-        advanceSearchParameters,
+        advancedSearchParameters,
         count,
         skip,
         sortColumn,
@@ -82,7 +82,7 @@ export const resolvers: GQLResolver = {
     ) {
       const searchCriteria: ISearchCriteria = {
         sort,
-        parameters: advanceSearchParameters
+        parameters: advancedSearchParameters
       }
       // Only registrar or registration agent should be able to search user
       if (
@@ -149,7 +149,7 @@ export const resolvers: GQLResolver = {
             []
         }
       } else {
-        const hasAtLeastOneParam = Object.values(advanceSearchParameters).some(
+        const hasAtLeastOneParam = Object.values(advancedSearchParameters).some(
           (param) => Boolean(param)
         )
 
@@ -170,7 +170,7 @@ export const resolvers: GQLResolver = {
           searchCriteria.sortColumn = sortColumn
         }
 
-        searchCriteria.parameters = { ...advanceSearchParameters }
+        searchCriteria.parameters = { ...advancedSearchParameters }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)

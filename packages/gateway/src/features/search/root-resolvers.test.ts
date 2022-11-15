@@ -68,7 +68,7 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          advanceSearchParameters: {
+          advancedSearchParameters: {
             event: 'Birth'
           }
         },
@@ -93,7 +93,7 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          advanceSearchParameters: {
+          advancedSearchParameters: {
             registrationStatuses: ['DECLARED']
           }
         },
@@ -118,7 +118,7 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          advanceSearchParameters: {
+          advancedSearchParameters: {
             compositionType: ['birth-declaration', 'death-declaration']
           }
         },
@@ -143,8 +143,8 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          advanceSearchParameters: {
-            locationIds: ['0411ff3d-78a4-4348-8eb7-b023a0ee6dce']
+          advancedSearchParameters: {
+            eventLocationId: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
           }
         },
         authHeaderValidUserDeclare
@@ -170,7 +170,7 @@ describe('Search root resolvers', () => {
         resolvers.Query.searchEvents(
           {},
           {
-            advanceSearchParameters: {}
+            advancedSearchParameters: {}
           },
           authHeaderValidUserRegister
         )
@@ -190,7 +190,7 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          advanceSearchParameters: {
+          advancedSearchParameters: {
             trackingId: 'B123456'
           }
         },
@@ -215,7 +215,7 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          advanceSearchParameters: {
+          advancedSearchParameters: {
             trackingId: 'B123456'
           },
           sortColumn: 'modifiedAt.keyword'
@@ -241,7 +241,7 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          advanceSearchParameters: {
+          advancedSearchParameters: {
             trackingId: 'B123456'
           },
           count: 10,
@@ -263,9 +263,9 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          advanceSearchParameters: {
+          advancedSearchParameters: {
             event: 'Birth',
-            locationIds: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+            declarationLocationId: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
           }
         },
         authHeaderValidUserRegister
@@ -289,7 +289,7 @@ describe('Search root resolvers', () => {
       const result = await resolvers.Query.searchEvents(
         {},
         {
-          advanceSearchParameters: {
+          advancedSearchParameters: {
             name: 'Hasib'
           }
         },

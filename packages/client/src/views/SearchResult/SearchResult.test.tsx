@@ -88,7 +88,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            advanceSearchParameters: {
+            advancedSearchParameters: {
               declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: '',
               nationalId: '',
@@ -333,7 +333,7 @@ describe('SearchResult tests', () => {
         request: {
           query: SEARCH_EVENTS,
           variables: {
-            advanceSearchParameters: {
+            advancedSearchParameters: {
               trackingId: '',
               nationalId: '',
               registrationNumber: '',
@@ -410,7 +410,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            advanceSearchParameters: {
+            advancedSearchParameters: {
               declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
@@ -509,7 +509,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            advanceSearchParameters: {
+            advancedSearchParameters: {
               declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
@@ -616,7 +616,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            advanceSearchParameters: {
+            advancedSearchParameters: {
               declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
@@ -728,7 +728,7 @@ describe('SearchResult downloadButton tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            advanceSearchParameters: {
+            advancedSearchParameters: {
               declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
@@ -830,7 +830,7 @@ describe('SearchResult downloadButton tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            advanceSearchParameters: {
+            advancedSearchParameters: {
               declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
