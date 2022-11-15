@@ -71,6 +71,7 @@ services:
         cp /mongodb-keyfile /etc/mongodb-keyfile
         chmod 400 /etc/mongodb-keyfile
         chown 999:999 /etc/mongodb-keyfile
+        exec docker-entrypoint.sh $$@
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ADMIN_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ADMIN_PASSWORD}
@@ -105,6 +106,7 @@ services:
         cp /mongodb-keyfile /etc/mongodb-keyfile
         chmod 400 /etc/mongodb-keyfile
         chown 999:999 /etc/mongodb-keyfile
+        exec docker-entrypoint.sh $$@
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGODB_ADMIN_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ADMIN_PASSWORD}
