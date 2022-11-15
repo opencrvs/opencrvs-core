@@ -126,7 +126,7 @@ export const profileReducer: LoopReducer<
             }
           }),
           Cmd.action(actions.setInitialUserDetails()),
-          redirectUrl ? Cmd.run(() => window.open(redirectUrl)) : Cmd.none
+          redirectUrl ? Cmd.action(push(redirectUrl)) : Cmd.none
         ])
       )
     case actions.SET_USER_DETAILS:

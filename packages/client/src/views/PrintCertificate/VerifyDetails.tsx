@@ -32,7 +32,7 @@ import {
   Spinner,
   ErrorToastNotification
 } from '@opencrvs/components/lib/interface'
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 
 const VERIFY_QUERY = gql`
   query fetchRegistration($id: ID!) {
@@ -41,8 +41,6 @@ const VERIFY_QUERY = gql`
       registration {
         id
         type
-        informantType
-        contactPhoneNumber
         trackingId
         registrationNumber
         status {
@@ -127,19 +125,20 @@ export function VerifyDetails() {
 
   return (
     <Query query={VERIFY_QUERY} variables={{ id }}>
-      {({ data, loading, error, refetch }) => {
+      {({ data, loading, error }) => {
         if (loading) {
           return <Spinner id="verify-details-loading" />
-        } else if (error) {
+        }
+
+        if (error) {
           return (
             <ErrorToastNotification
               retryButtonText={intl.formatMessage(buttonMessages.retry)}
-              retryButtonHandler={() => refetch()}
-            >
-              {intl.formatMessage(errorMessages.pageLoadFailed)}
-            </ErrorToastNotification>
+            />
           )
-        } else if (data?.fetchRegistration) {
+        }
+
+        if (data?.fetchRegistration) {
           const event = data.fetchRegistration.registration?.type ?? 'BIRTH'
           const registerFormForEvent =
             registerForm[camelCase(event) as 'birth' | 'death']
@@ -190,7 +189,9 @@ export function VerifyDetails() {
               />
             </Content>
           )
-        } else return null
+        }
+
+        return null
       }}
     </Query>
   )

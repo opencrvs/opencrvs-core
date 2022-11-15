@@ -373,11 +373,6 @@ export class App extends React.Component<IAppProps> {
                                             path={routes.USER_PROFILE}
                                             component={UserProfile}
                                           />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.VERIFY_DETAILS}
-                                            component={VerifyDetails}
-                                          />
                                         </Switch>
                                       </TransitionWrapper>
                                     </>
@@ -385,6 +380,11 @@ export class App extends React.Component<IAppProps> {
                                 }}
                               />
                             </ProtectedPage>
+                            <ProtectedRoute
+                              exact
+                              path={routes.VERIFY_DETAILS}
+                              component={VerifyDetails}
+                            />
                           </MainSection>
                         </Page>
                       </NotificationComponent>
