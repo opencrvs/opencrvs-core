@@ -197,7 +197,7 @@ async function createDeceasedIndex(
   body.deceasedFamilyNameLocal =
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
   body.deathDate = deceased && deceased.deceasedDateTime
-  body.deceasedGender = deceased && deceased.gender
+  body.gender = deceased && deceased.gender
   body.deceasedIdentifier =
     deceased.identifier &&
     deceased.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')

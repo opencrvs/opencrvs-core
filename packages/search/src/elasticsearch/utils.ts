@@ -84,6 +84,7 @@ export interface ICompositionBody {
   registrationNumber?: string
   eventLocationId?: string
   eventJurisdictionIds?: string[]
+  eventCountry?: string
   declarationLocationId?: string
   declarationJurisdictionIds?: string[]
   rejectReason?: string
@@ -133,7 +134,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   deceasedFirstNamesLocal?: string
   deceasedFamilyNameLocal?: string
   deceasedDoB?: string
-  deceasedGender?: string
+  gender?: string
   deceasedIdentifier?: string
   deathDate?: string
   motherFirstNames?: string

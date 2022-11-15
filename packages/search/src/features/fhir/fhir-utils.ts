@@ -113,15 +113,27 @@ export async function addEventLocation(
       body.eventLocationId = location.id
     } else {
       body.declarationJurisdictionIds = []
+      if (location.address?.country) {
+        body.eventCountry = location.address.country
+      }
+      //eventLocationLevel1
       if (location.address?.state) {
         body.declarationJurisdictionIds.push(location.address.state)
-      } else if (location.address?.district) {
+      }
+      //eventLocationLevel2
+      if (location.address?.district) {
         body.declarationJurisdictionIds.push(location.address.district)
-      } else if (location.address?.line?.[10]) {
+      }
+      //eventLocationLevel3
+      if (location.address?.line?.[10]) {
         body.declarationJurisdictionIds.push(location.address.line[10])
-      } else if (location.address?.line?.[11]) {
+      }
+      //eventLocationLevel4
+      if (location.address?.line?.[11]) {
         body.declarationJurisdictionIds.push(location.address.line[11])
-      } else if (location.address?.line?.[12]) {
+      }
+      //eventLocationLevel5
+      if (location.address?.line?.[12]) {
         body.declarationJurisdictionIds.push(location.address.line[12])
       }
     }
