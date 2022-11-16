@@ -15,6 +15,7 @@ import User from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import { sendUserName } from './service'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
+import { logger } from '@user-mgnt/logger'
 
 interface IResendUsernameSMSPayload {
   userId: string
@@ -41,12 +42,16 @@ export default async function usernameSMSReminderHandler(
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-  await postUserActionToMetrics(
-    'SEND_USERNAME_REMINDER',
-    request.headers.authorization,
-    remoteAddress,
-    userAgent
-  )
+  try {
+    await postUserActionToMetrics(
+      'SEND_USERNAME_REMINDER',
+      request.headers.authorization,
+      remoteAddress,
+      userAgent
+    )
+  } catch (err) {
+    logger.error(err)
+  }
 
   return h.response(user).code(200)
 }

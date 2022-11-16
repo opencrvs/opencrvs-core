@@ -45,12 +45,16 @@ export default async function resetPasswordSMSHandler(
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-  await postUserActionToMetrics(
-    'SEND_PASSWORD',
-    request.headers.authorization,
-    remoteAddress,
-    userAgent
-  )
+  try {
+    await postUserActionToMetrics(
+      'SEND_PASSWORD',
+      request.headers.authorization,
+      remoteAddress,
+      userAgent
+    )
+  } catch (err) {
+    logger.error(err)
+  }
 
   randomPassword = generateRandomPassword(hasDemoScope(request))
   const { hash, salt } = generateSaltedHash(randomPassword)
