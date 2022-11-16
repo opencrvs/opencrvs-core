@@ -12314,6 +12314,35 @@
             "deprecationReason": null
           },
           {
+            "name": "fetchRegistrationForViewing",
+            "description": null,
+            "args": [
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "EventRegistration",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "getActiveCertificatesSVG",
             "description": null,
             "args": [],
@@ -14304,6 +14333,12 @@
           },
           {
             "name": "UNASSIGNED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "VIEWED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

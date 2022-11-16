@@ -50,7 +50,8 @@ import {
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
-  REGISTRAR_HOME_TAB_PAGE
+  REGISTRAR_HOME_TAB_PAGE,
+  VIEW_RECORD
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -74,6 +75,7 @@ import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { IntlShape } from 'react-intl'
 export interface IDynamicValues {
   [key: string]: any
 }
@@ -292,6 +294,14 @@ export function goToPrintCertificate(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'certCollector'
+    })
+  )
+}
+
+export function goToViewRecordPage(declarationId: string) {
+  return push(
+    formatUrl(VIEW_RECORD, {
+      declarationId
     })
   )
 }
