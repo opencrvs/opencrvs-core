@@ -16,10 +16,13 @@ type BookmarkedSeachItem {
 
 type AdvancedSeachParameters {
   event: Event
+  name: String
   registrationStatuses: [String]
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String
+  contactNumber: String
+  nationalId: String
   registrationNumber: String
   trackingId: String
   dateOfRegistration: String
@@ -28,6 +31,7 @@ type AdvancedSeachParameters {
   declarationLocationId: String
   declarationJurisdictionId: String
   eventLocationId: String
+  eventCountry: String
   eventLocationLevel1: String
   eventLocationLevel2: String
   eventLocationLevel3: String
@@ -45,21 +49,26 @@ type AdvancedSeachParameters {
   deceasedDoB: String
   deceasedDoBStart: String
   deceasedDoBEnd: String
+  deceasedIdentifier: String
   motherFirstNames: String
   motherFamilyName: String
   motherDoB: String
   motherDoBStart: String
   motherDoBEnd: String
+  motherIdentifier: String
   fatherFirstNames: String
   fatherFamilyName: String
   fatherDoB: String
   fatherDoBStart: String
   fatherDoBEnd: String
+  fatherIdentifier: String
   informantFirstNames: String
   informantFamilyName: String
   informantDoB: String
   informantDoBStart: String
   informantDoBEnd: String
+  informantIdentifier: String
+  compositionType: [String]
 }
 
 input BookmarkSearchInput {
@@ -70,10 +79,13 @@ input BookmarkSearchInput {
 
 input AdvancedSearchParametersInput {
   event: Event
-  registrationStatuses: [String!]
+  name: String
+  registrationStatuses: [String]
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String
+  contactNumber: String
+  nationalId: String
   registrationNumber: String
   trackingId: String
   dateOfRegistration: String
@@ -82,6 +94,7 @@ input AdvancedSearchParametersInput {
   declarationLocationId: String
   declarationJurisdictionId: String
   eventLocationId: String
+  eventCountry: String
   eventLocationLevel1: String
   eventLocationLevel2: String
   eventLocationLevel3: String
@@ -99,21 +112,26 @@ input AdvancedSearchParametersInput {
   deceasedDoB: String
   deceasedDoBStart: String
   deceasedDoBEnd: String
+  deceasedIdentifier: String
   motherFirstNames: String
   motherFamilyName: String
   motherDoB: String
   motherDoBStart: String
   motherDoBEnd: String
+  motherIdentifier: String
   fatherFirstNames: String
   fatherFamilyName: String
   fatherDoB: String
   fatherDoBStart: String
   fatherDoBEnd: String
+  fatherIdentifier: String
   informantFirstNames: String
   informantFamilyName: String
   informantDoB: String
   informantDoBStart: String
   informantDoBEnd: String
+  informantIdentifier: String
+  compositionType: [String]
 }
 
 input RemoveBookmarkedSeachInput {
