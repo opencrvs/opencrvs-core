@@ -615,7 +615,6 @@ function UserListComponent(props: IProps) {
                 <Link
                   id="profile-link"
                   onClick={() => goToUserProfile(String(user.id))}
-                  disabled={userDetails?.role === Roles.FIELD_AGENT}
                 >
                   {name}
                 </Link>

@@ -224,21 +224,23 @@ export const GetHistory = ({
       />
     ),
     user: (
-      <Link
-        id="profile-link"
-        onClick={() => goToUserProfile(String(item?.user?.id))}
-      >
+      <>
         {item.dhis2Notification && !item.user?.id ? (
           <HealthSystemUser />
         ) : (
-          <GetNameWithAvatar
-            id={item?.user?.id as string}
-            nameObject={item?.user?.name as (GQLHumanName | null)[]}
-            avatar={item.user?.avatar as IAvatar}
-            language={window.config.LANGUAGES}
-          />
+          <Link
+            id="profile-link"
+            onClick={() => goToUserProfile(String(item?.user?.id))}
+          >
+            <GetNameWithAvatar
+              id={item?.user?.id as string}
+              nameObject={item?.user?.name as (GQLHumanName | null)[]}
+              avatar={item.user?.avatar as IAvatar}
+              language={window.config.LANGUAGES}
+            />
+          </Link>
         )}
-      </Link>
+      </>
     ),
     type: intl.formatMessage(
       (item.dhis2Notification && !item.user?.role) || null === item.user?.role
