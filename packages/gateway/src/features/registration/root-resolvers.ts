@@ -416,8 +416,7 @@ export const resolvers: GQLResolver = {
       await postUserActionToMetrics(
         'ARCHIVED',
         user.practitionerId,
-        authHeader['x-real-ip']!,
-        authHeader['x-real-user-agent']!,
+        authHeader,
         newTaskBundle
       )
       // return the taskId
@@ -457,8 +456,7 @@ export const resolvers: GQLResolver = {
       await postUserActionToMetrics(
         'REINSTATED_' + prevRegStatus.toUpperCase(),
         user.practitionerId,
-        authHeader['x-real-ip']!,
-        authHeader['x-real-user-agent']!,
+        authHeader,
         newTaskBundle
       )
 
@@ -575,13 +573,16 @@ async function createEventRegistration(
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   const user = await getUser({ userId }, authHeader)
 
-  console.log(doc)
+  let action = 'INCOMPLETE'
+  if (user.role === 'REGISTRATION_AGENT') {
+    action = 'SENT_FOR_APPROVAL'
+  }
   await postUserActionToMetrics(
-    'INCOMPLETE',
+    action,
     user.practitionerId,
-    authHeader['x-real-ip']!,
-    authHeader['x-real-user-agent']!,
-    doc
+    authHeader,
+    doc,
+    res
   )
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
@@ -668,8 +669,7 @@ async function markEventAsCertified(
   await postUserActionToMetrics(
     'CERTIFIED',
     user.practitionerId,
-    authHeader['x-real-ip']!,
-    authHeader['x-real-user-agent']!,
+    authHeader,
     doc
   )
 
@@ -760,8 +760,7 @@ export async function markRecordAsDownloadedOrAssigned(
   await postUserActionToMetrics(
     'RETRIEVED',
     user.practitionerId,
-    authHeader['x-real-ip']!,
-    authHeader['x-real-user-agent']!,
+    authHeader,
     taskBundle
   )
   // return the full composition
@@ -771,24 +770,29 @@ export async function markRecordAsDownloadedOrAssigned(
 export async function postUserActionToMetrics(
   action: string,
   practitionerId: string,
-  remoteAddress: string,
-  userAgent: string,
-  bundle?: fhir.Bundle
+  authHeader: IAuthHeader,
+  bundle: fhir.Bundle,
+  response?: fhir.Bundle
 ) {
   const url = resolve(METRICS_URL, '/audit/events')
   let body: {}
-  if (bundle) {
+  if (action !== 'INCOMPLETE' && action !== 'SENT_FOR_APPROVAL') {
     const compositionId = getCompositionIdFromCompositionOrTask(bundle)
     const trackingId = getTrackingId(getTask(bundle)!)
     body = {
       action: action,
       practitionerId: practitionerId,
-      additionalData: { compositionId, trackingId }
+      additionalData: { compositionId: compositionId, trackingId: trackingId }
     }
   } else {
+    const additionalData = await getDeclarationIdsFromResponse(
+      response!,
+      authHeader
+    )
     body = {
       action: action,
-      practitionerId: practitionerId
+      practitionerId: practitionerId,
+      additionalData: additionalData
     }
   }
   await fetch(url, {
@@ -796,8 +800,8 @@ export async function postUserActionToMetrics(
     body: JSON.stringify(body),
     headers: {
       'Content-Type': 'application/json',
-      'x-real-ip': remoteAddress,
-      'x-real-user-agent': userAgent
+      'x-real-ip': authHeader['x-real-ip']!,
+      'x-real-user-agent': authHeader['x-real-user-agent']!
     }
   })
 }

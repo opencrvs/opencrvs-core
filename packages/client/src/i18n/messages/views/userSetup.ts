@@ -75,6 +75,7 @@ interface IUserSetupMessages
   reInstatedInReviewAuditAction: MessageDescriptor
   reInStatedRejectedAuditAction: MessageDescriptor
   retrieveAuditAction: MessageDescriptor
+  sentForApprovalAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -307,7 +308,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.auditList.unAssigned'
   },
   correctedAuditAction: {
-    defaultMessage: 'Corrected',
+    defaultMessage: 'Corrected Record',
     description: 'Description for declaration corrected',
     id: 'user.profile.auditList.corrected'
   },
@@ -394,6 +395,12 @@ const messagesToDefine: IUserSetupMessages = {
     description:
       'Description for sending registration from Reinstated to require updates audit action',
     id: 'user.profile.auditList.reInstatedToInReview'
+  },
+  sentForApprovalAuditAction: {
+    defaultMessage: 'Sent For Approval',
+    description:
+      'Description for sending registration for approval audit action',
+    id: 'user.profile.auditList.sentForApproval'
   }
 }
 

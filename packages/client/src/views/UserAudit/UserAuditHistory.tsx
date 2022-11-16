@@ -119,7 +119,7 @@ const AuditContent = styled.div`
 
 const BoldContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bold12};
+  ${({ theme }) => theme.fonts.bold14};
 `
 interface IBaseProp {
   practitionerId: string
