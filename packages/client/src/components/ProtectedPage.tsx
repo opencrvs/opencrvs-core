@@ -125,12 +125,16 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     this.setState({ loadingTimeout: true })
   }
 
+  isUnProtected(pathname: string) {
+    return this.props.unprotectedRouteElements.some((route) =>
+      pathname.includes(route)
+    )
+  }
+
   async handleVisibilityChange(isVisible: boolean) {
     const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
 
-    const onUnprotectedPage = this.props.unprotectedRouteElements.some(
-      (route) => this.props.location.pathname.includes(route)
-    )
+    const onUnprotectedPage = this.isUnProtected(this.props.location.pathname)
 
     const newState = { ...this.state }
 
@@ -230,8 +234,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     if (pendingUser) {
       return <ProtectedAccount />
     }
-
-    if (!pinExists || passwordVerified) {
+    const showPinPad = !this.isUnProtected(this.props.location.pathname)
+    if (showPinPad && (!pinExists || passwordVerified)) {
       return (
         <SecureAccount
           onComplete={() => {

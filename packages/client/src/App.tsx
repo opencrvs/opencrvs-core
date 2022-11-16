@@ -105,7 +105,8 @@ export class App extends React.Component<IAppProps> {
                             <ProtectedPage
                               unprotectedRouteElements={[
                                 'documents',
-                                'affidavit'
+                                'affidavit',
+                                'verify'
                               ]}
                             >
                               <ProtectedRoute
