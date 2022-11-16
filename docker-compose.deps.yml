@@ -10,7 +10,6 @@
 version: '3.3'
 volumes:
   metricbeat:
-  minio_data:
 services:
   mongo1:
     image: mongo:4.4
@@ -58,5 +57,5 @@ services:
     restart: unless-stopped
 
   minio:
-    image: quay.io/minio/minio
+    image: quay.io/minio/minio:latest
     restart: unless-stopped
