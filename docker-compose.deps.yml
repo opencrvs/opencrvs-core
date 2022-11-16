@@ -58,5 +58,5 @@ services:
     restart: unless-stopped
 
   minio:
-    image: minio/minio:RELEASE.2022-08-13T21-54-44Z
+    image: quay.io/minio/minio
     restart: unless-stopped
