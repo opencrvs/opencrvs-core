@@ -429,7 +429,7 @@ services:
     environment:
       - COUNTRY_CONFIG_URL=https://countryconfig.{{hostname}}
       - HOST={{hostname}}
-      - MINIO_URL=document.{{hostname}}
+      - MINIO_URL=https://documents.{{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
