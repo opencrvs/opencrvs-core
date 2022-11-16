@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import React from 'react'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Divider } from '@opencrvs/components/lib/Divider'
@@ -19,7 +18,6 @@ import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { getFormattedDate, getPageItems, getStatusLabel } from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
@@ -55,23 +53,6 @@ const NameAvatar = styled.div`
     margin-right: 10px;
   }
 `
-
-export const GetLink = ({
-  status,
-  onClick
-}: {
-  status: string
-  disabled?: boolean
-  onClick: () => void
-}) => {
-  return (
-    <>
-      <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
-        {status}
-      </LinkButton>
-    </>
-  )
-}
 
 const HealthSystemLogo = styled.div`
   border-radius: 100%;
@@ -209,19 +190,21 @@ export const GetHistory = ({
   const historyData = (historiesForDisplay as History[]).map((item, index) => ({
     date: getFormattedDate(item?.date),
     action: (
-      <GetLink
-        status={getStatusLabel(
+      <Link
+        font="bold14"
+        onClick={() => {
+          const actionIndex = getIndexByAction(historiesForDisplay, index)
+          toggleActionDetails(item, actionIndex)
+        }}
+      >
+        {getStatusLabel(
           item.action,
           item.regStatus,
           intl,
           item.user,
           userDetails
         )}
-        onClick={() => {
-          const actionIndex = getIndexByAction(historiesForDisplay, index)
-          toggleActionDetails(item, actionIndex)
-        }}
-      />
+      </Link>
     ),
     user: (
       <>
@@ -230,6 +213,7 @@ export const GetHistory = ({
         ) : (
           <Link
             id="profile-link"
+            font="bold14"
             onClick={() => goToUserProfile(String(item?.user?.id))}
           >
             <GetNameWithAvatar
@@ -253,12 +237,14 @@ export const GetHistory = ({
       ) : isFieldAgent ? (
         <>{item.office?.name}</>
       ) : (
-        <GetLink
-          status={item.office?.name as string}
+        <Link
+          font="bold14"
           onClick={() => {
             goToTeamUserList && goToTeamUserList(item?.office?.id as string)
           }}
-        />
+        >
+          {item.office?.name as string}
+        </Link>
       )
   }))
 
