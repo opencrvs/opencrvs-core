@@ -55,12 +55,18 @@ export default async function authenticateHandler(
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
-  await postUserActionToMetrics(
-    'LOGGED_IN',
-    response.token,
-    remoteAddress,
-    userAgent
-  )
+
+  try {
+    await postUserActionToMetrics(
+      'LOGGED_IN',
+      response.token,
+      remoteAddress,
+      userAgent
+    )
+  } catch (err) {
+    logger.error(err)
+  }
+
   return response
 }
 export const requestSchema = Joi.object({
