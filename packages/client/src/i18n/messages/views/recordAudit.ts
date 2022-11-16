@@ -215,6 +215,11 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.requestedCorrection',
     defaultMessage: 'Requested Correction',
     description: 'Requested Correction action'
+  },
+  [RegAction.Viewed]: {
+    id: 'recordAudit.regAction.viewed',
+    defaultMessage: 'Viewed',
+    description: 'Viewed Record action'
   }
 }
 

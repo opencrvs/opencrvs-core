@@ -33,7 +33,8 @@ import {
   goToCertificateCorrection,
   goToPrintCertificate,
   goToUserProfile,
-  goToTeamUserList
+  goToTeamUserList,
+  goToViewRecordPage
 } from '@client/navigation'
 import {
   injectIntl,
@@ -120,6 +121,7 @@ import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { Button } from '@opencrvs/components/lib/Button'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -313,6 +315,7 @@ function RecordAuditBody({
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
   const isOnline = useOnlineStatus()
+  const dispatch = useDispatch()
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
@@ -329,6 +332,28 @@ function RecordAuditBody({
   const actions: React.ReactElement[] = []
   const mobileActions: React.ReactElement[] = []
   const desktopActionsView: React.ReactElement[] = []
+
+  if (
+    declaration.status !== SUBMISSION_STATUS.DRAFT &&
+    (userHasRegisterScope || userHasValidateScope)
+  ) {
+    actions.push(
+      <Button
+        type="secondary"
+        onClick={() => {
+          dispatch(goToViewRecordPage(declaration.id as string))
+        }}
+      >
+        {intl.formatMessage(buttonMessages.view)}
+      </Button>
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
 
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||

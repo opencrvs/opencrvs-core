@@ -24,8 +24,8 @@ import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import WebFont from 'webfontloader'
-import { BACKGROUND_SYNC_BROADCAST_CHANNEL } from './utils/constants'
 import { BrowserTracing } from '@sentry/tracing'
+
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:400']
@@ -89,18 +89,12 @@ function onNewContentAvailable(waitingSW: ServiceWorker | null) {
   }
 }
 
-function onBackGroundSync() {
-  if (typeof BroadcastChannel === 'undefined') {
-    return
-  }
-  const channel = new BroadcastChannel(BACKGROUND_SYNC_BROADCAST_CHANNEL)
-  channel.onmessage = (e) => {
-    const action = actions.showBackgroundSyncedNotification()
-    store.dispatch(action)
-  }
+function userReconnectedToast() {
+  const action = actions.showUserReconnectedToast()
+  store.dispatch(action)
 }
 
-onBackGroundSync()
+window.addEventListener('online', userReconnectedToast)
 
 ReactDOM.render(
   <App store={store} history={history} />,
