@@ -26,34 +26,15 @@ export function questionnaireToCustomFieldTransformer(
           question.fieldId === field.customQuesstionMappingId
       )[0]
     if (selectedQuestion) {
-      transformedData[sectionId][field.name] = selectedQuestion.value
-    }
-  }
-}
-
-export const questionnaireToCustomFieldTemplateTransformer = (
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  field: IFormField
-) => {
-  if (queryData.questionnaire) {
-    const selectedQuestion: IQuestionnaireQuestion =
-      queryData.questionnaire.filter(
-        (question: IQuestionnaireQuestion) =>
-          question.fieldId === field.customQuesstionMappingId
-      )[0]
-    if (selectedQuestion) {
-      const handlerbarName = createCustomFieldHandlebarName(
-        selectedQuestion.fieldId
-      )
-      if (selectedQuestion) {
-        if (!transformedData[sectionId]) {
-          transformedData[sectionId] = {}
-        }
+      if (transformedData && Object.keys(transformedData).length === 0) {
+        const handlerbarName = createCustomFieldHandlebarName(
+          selectedQuestion.fieldId
+        )
+        transformedData[sectionId] = {}
         transformedData[sectionId][handlerbarName] = selectedQuestion.value
+      } else {
+        transformedData[sectionId][field.name] = selectedQuestion.value
       }
     }
   }
-  return transformedData
 }

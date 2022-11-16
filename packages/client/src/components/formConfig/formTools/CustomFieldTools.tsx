@@ -166,23 +166,8 @@ const ListColumn = styled.div`
 const CErrorText = styled(ErrorText)`
   width: 200px;
 `
-const Body = styled.span`
-  ${({ theme }) => theme.fonts.reg14}
-  color: ${({ theme }) => theme.colors.grey500};
-  text-overflow: ellipsis;
-  overflow: hidden;
-`
-const HandleBar = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-`
-
-const Subtitle = styled.span`
-  ${({ theme }) => theme.fonts.bold14}
-  display: flex;
-  align-items: center;
-  gap: 4px;
+const Body = styled.div`
+  margin: 16px 0px;
 `
 
 type IFormFieldWrapper = { formField: IFormField }
@@ -809,16 +794,20 @@ class CustomFieldToolsComp extends React.Component<
       selectedField.fieldId
     )
     return (
-      <HandleBar>
-        <Subtitle>
-          {intl.formatMessage(customFieldFormMessages.handleBardHeading)}
+      <Body>
+        <Stack>
+          <Text variant="bold14" element="span" color="grey600">
+            {intl.formatMessage(customFieldFormMessages.handleBardHeading)}
+          </Text>
           <ToolTip
             label={intl.formatMessage(messages.certHandelbarsTooltip)}
             id={'cert-handelbars'}
           />
-        </Subtitle>
-        <Body>{`{{ ${customHandlebarName} }}`}</Body>
-      </HandleBar>
+        </Stack>
+        <Text variant="reg14" element="span" color="grey500">
+          {`{{ ${customHandlebarName} }}`}
+        </Text>
+      </Body>
     )
   }
 

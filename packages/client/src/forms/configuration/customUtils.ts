@@ -83,7 +83,7 @@ export function createCustomField({
       },
       template: {
         fieldName: createCustomFieldHandlebarName(fieldId),
-        operation: 'questionnaireToCustomFieldTemplateTransformer'
+        operation: 'questionnaireToCustomFieldTransformer'
       }
     }
   }
