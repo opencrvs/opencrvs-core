@@ -20,7 +20,7 @@ import * as Minio from 'minio'
 export const minioClient = new Minio.Client({
   endPoint: MINIO_HOST,
   port: Number(MINIO_PORT),
-  useSSL: process.env.NODE_ENV === 'production' ? true : false,
+  useSSL: false,
   accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
   secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin'
 })
