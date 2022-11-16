@@ -122,6 +122,15 @@ if [ -z "$MINIO_SECRET_KEY" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$MINIO_ROOT_USER" ] ; then
+    echo 'Error: Missing environment variable MINIO_ROOT_USER.'
+    print_usage_and_exit
+fi
+
+if [ -z "$MINIO_ROOT_PASSWORD" ] ; then
+    echo 'Error: Missing environment variable MINIO_ROOT_PASSWORD.'
+    print_usage_and_exit
+fi
 
 if [ -z "$MONGODB_ADMIN_USER" ] ; then
     echo 'Error: Missing environment variable MONGODB_ADMIN_USER.'
@@ -325,6 +334,8 @@ docker_stack_deploy() {
   MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD
   MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY
   MINIO_SECRET_KEY=$MINIO_SECRET_KEY
+  MINIO_ROOT_USER=$MINIO_ROOT_USER
+  MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
   DOCKERHUB_ACCOUNT=$DOCKERHUB_ACCOUNT
   DOCKERHUB_REPO=$DOCKERHUB_REPO
   ELASTICSEARCH_SUPERUSER_PASSWORD=$ELASTICSEARCH_SUPERUSER_PASSWORD

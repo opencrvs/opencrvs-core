@@ -51,7 +51,7 @@ services:
       - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
       - MINIO_BUCKET=ocrvs
-      - DOCUMENTS_URL=http://document:9050
+      - DOCUMENTS_URL=http://documents:9050
   # User facing services
   workflow:
     image: opencrvs/ocrvs-workflow:${VERSION:-latest}
@@ -96,7 +96,7 @@ services:
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
-      - DOCUMENTS_URL=http://document:9050
+      - DOCUMENTS_URL=http://documents:9050
   # END User facing services
   scheduler:
     image: opencrvs/ocrvs-scheduler:${VERSION:-latest}

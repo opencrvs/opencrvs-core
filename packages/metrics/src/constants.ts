@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { join } from 'path'
+
 export const HOST = process.env.METRICS_HOST || '0.0.0.0'
 export const PORT = process.env.METRICS_PORT || 1050
 export const fhirUrl = process.env.FHIR_URL || 'http://localhost:5001/fhir/'
@@ -34,3 +36,12 @@ export const VS_EXPORT_SCRIPT_PATH =
   process.env.NODE_ENV === 'production'
     ? './build/dist/src/scripts/VSExportGenerator.js'
     : './src/scripts/VSExportGenerator.ts'
+
+export const BIRTH_REPORT_PATH =
+  process.env.NODE_ENV === 'production'
+    ? '/usr/src/app/packages/metrics/src/scripts/Birth_Report.csv'
+    : join(__dirname, '../../scripts/Birth_Report.csv')
+export const DEATH_REPORT_PATH =
+  process.env.NODE_ENV === 'production'
+    ? '/usr/src/app/packages/metrics/src/scripts/Death_Report.csv'
+    : join(__dirname, '../../scripts/Death_Report.csv')

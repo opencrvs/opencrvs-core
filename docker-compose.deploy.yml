@@ -261,6 +261,10 @@ services:
     environment:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_BROWSER_REDIRECT_URL=https://documents-console.{{hostname}}
+      - MINIO_SERVER_URL=https://documents.{{hostname}}
     ports:
       - '3535:3535'
       - '3536:3536'
