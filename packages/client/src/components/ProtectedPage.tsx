@@ -34,7 +34,6 @@ import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
-import { StyledText } from './Page'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -202,8 +201,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     if (loading || !loadingTimeout) {
       return this.renderLoadingScreen()
     }
+    const showPinPad = !this.isUnProtected(this.props.location.pathname)
 
-    if (secured) {
+    if (secured || !showPinPad) {
       return this.props.children
     }
 
@@ -235,6 +235,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       return <ProtectedAccount />
     }
     const showPinPad = !this.isUnProtected(this.props.location.pathname)
+
     if (showPinPad && (!pinExists || passwordVerified)) {
       return (
         <SecureAccount
