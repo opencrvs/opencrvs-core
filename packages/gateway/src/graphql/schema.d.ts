@@ -87,6 +87,7 @@ export interface GQLMutation {
   createFormDraft?: GQLFormDraft
   modifyDraftStatus?: GQLFormDraft
   deleteFormDraft?: string
+  createFormDataset?: GQLFormDataset
 }
 
 export interface GQLDummy {
@@ -521,6 +522,16 @@ export interface GQLFormDraftStatusModifyInput {
 
 export interface GQLDeleteFormDraftInput {
   event: GQLEvent
+}
+
+export interface GQLFormDataset {
+  status: string
+  msg: string
+}
+
+export interface GQLFormDatasetInput {
+  filename: string
+  base64Data: string
 }
 
 export type GQLMap = any
@@ -1474,6 +1485,7 @@ export interface GQLResolver {
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
+  FormDataset?: GQLFormDatasetTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -2205,6 +2217,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createFormDraft?: MutationToCreateFormDraftResolver<TParent>
   modifyDraftStatus?: MutationToModifyDraftStatusResolver<TParent>
   deleteFormDraft?: MutationToDeleteFormDraftResolver<TParent>
+  createFormDataset?: MutationToCreateFormDatasetResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2739,6 +2752,21 @@ export interface MutationToDeleteFormDraftResolver<
   (
     parent: TParent,
     args: MutationToDeleteFormDraftArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateFormDatasetArgs {
+  formDraft: GQLFormDatasetInput
+}
+export interface MutationToCreateFormDatasetResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateFormDatasetArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4113,6 +4141,19 @@ export interface ApplicationConfigurationToINTEGRATIONSResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLFormDatasetTypeResolver<TParent = any> {
+  status?: FormDatasetToStatusResolver<TParent>
+  msg?: FormDatasetToMsgResolver<TParent>
+}
+
+export interface FormDatasetToStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetToMsgResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -249,6 +249,7 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
+  createFormDataset(formDraft: FormDatasetInput!): FormDataset
 }
 
 type Dummy {
@@ -672,6 +673,16 @@ input FormDraftStatusModifyInput {
 
 input DeleteFormDraftInput {
   event: Event!
+}
+
+type FormDataset {
+  status: String!
+  msg: String!
+}
+
+input FormDatasetInput {
+  filename: String!
+  base64Data: String!
 }
 
 scalar Map
