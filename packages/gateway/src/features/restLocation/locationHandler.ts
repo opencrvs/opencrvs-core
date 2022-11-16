@@ -79,10 +79,10 @@ export type Facility = {
 }
 
 type UpdateLocation = {
-  name: string
-  alias: string
-  status: string
-  statistics: LocationStatistic
+  name?: string
+  alias?: string
+  status?: string
+  statistics?: LocationStatistic
 }
 
 const locationStatisticSchema = Joi.object({
