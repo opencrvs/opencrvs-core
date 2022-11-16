@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React, { useState } from 'react'
-import { connect } from 'react-redux'
+import React, { useEffect, useState } from 'react'
+import { connect, useDispatch, useSelector } from 'react-redux'
 
 import { injectIntl, useIntl } from 'react-intl'
 import { getScope } from '@client/profile/profileSelectors'
@@ -27,35 +27,76 @@ import { advancedSearchDeathSectionFormType } from '@client/forms/advancedSearch
 import { PrimaryButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { getPartialState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { modifyAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { goToAdvancedSearchResult, goToSearchResult } from '@client/navigation'
+import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import {
+  IDateRangePickerValue,
+  IFormData,
+  IFormFieldValue,
+  IFormSectionData
+} from '@client/forms'
+import { Online } from '@client/../../components/lib/icons'
+import { isValid } from 'date-fns'
 
 export enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
 
-const BirthTabContent = () => {
-  return <BirthSection />
-}
+const baseKeysSameAsStore = [
+  'event',
+  'registrationStatuses',
+  'registrationNumber',
+  'trackingId',
+  'declarationLocationId',
+  'declarationJurisdictionId',
+  'eventCountry',
+  'eventLocationId',
+  'eventLocationLevel1',
+  'eventLocationLevel2',
+  'eventLocationLevel3',
+  'eventLocationLevel4',
+  'eventLocationLevel5',
+  'childFirstNames',
+  'childLastName',
+  'childGender',
+  'deceasedFirstNames',
+  'deceasedFamilyName',
+  'deceasedGender',
+  'motherFirstNames',
+  'motherFamilyName',
+  'fatherFirstNames',
+  'fatherFamilyName',
+  'informantFirstNames',
+  'informantFamilyName'
+] as const
 
-const DeathTabContent = () => {
-  return <DeathSection />
-}
+const dateFieldTypes = [
+  'dateOfRegistration',
+  'dateOfEvent',
+  'childDoB',
+  'motherDoB',
+  'fatherDoB',
+  'deceasedDoB',
+  'informantDoB'
+]
 
-export interface IAdvancedSearch {
-  event?: Event
-  registrationStatuses?: string[]
-  dateOfEvent?: string
+export interface IBaseAdvancedSearchState {
+  event?: string
+  registrationStatuses?: string
+  dateOfEvent?: IDateRangePickerValue
   dateOfEventStart?: string
   dateOfEventEnd?: string
-  contactNumber?: string
-  nationalId?: string
   registrationNumber?: string
   trackingId?: string
-  dateOfRegistration?: string
+  dateOfRegistration?: IDateRangePickerValue
   dateOfRegistrationStart?: string
   dateOfRegistrationEnd?: string
   declarationLocationId?: string
   declarationJurisdictionId?: string
+  eventCountry?: string
   eventLocationId?: string
   eventLocationLevel1?: string
   eventLocationLevel2?: string
@@ -64,62 +105,285 @@ export interface IAdvancedSearch {
   eventLocationLevel5?: string
   childFirstNames?: string
   childLastName?: string
-  childDoB?: string
+  childDoB?: IDateRangePickerValue
   childDoBStart?: string
   childDoBEnd?: string
   childGender?: string
   deceasedFirstNames?: string
   deceasedFamilyName?: string
   deceasedGender?: string
-  deceasedDoB?: string
+  deceasedDoB?: IDateRangePickerValue
   deceasedDoBStart?: string
   deceasedDoBEnd?: string
-  deceasedIdentifier?: string
   motherFirstNames?: string
   motherFamilyName?: string
-  motherDoB?: string
+  motherDoB?: IDateRangePickerValue
   motherDoBStart?: string
   motherDoBEnd?: string
-  motherIdentifier?: string
   fatherFirstNames?: string
   fatherFamilyName?: string
-  fatherDoB?: string
+  fatherDoB?: IDateRangePickerValue
   fatherDoBStart?: string
   fatherDoBEnd?: string
-  fatherIdentifier?: string
   informantFirstNames?: string
   informantFamilyName?: string
-  informantDoB?: string
+  informantDoB?: IDateRangePickerValue
   informantDoBStart?: string
   informantDoBEnd?: string
-  informantIdentifier?: string
+}
+
+const determineDateFromDateRangePickerVal = (
+  dateRangePickerValue?: IDateRangePickerValue
+): Omit<IDateRangePickerValue, 'isDateRangeActive'> => {
+  if (!dateRangePickerValue) {
+    return { exact: undefined, rangeStart: undefined, rangeEnd: undefined }
+  }
+  const value = { ...dateRangePickerValue }
+  if (dateRangePickerValue.isDateRangeActive) {
+    value.exact = undefined
+  } else {
+    value.rangeStart = undefined
+    value.rangeEnd = undefined
+  }
+
+  return value
+}
+
+const convertDateValuesToDateRangePicker = (
+  exact?: string,
+  rangeStart?: string,
+  rangeEnd?: string
+): IDateRangePickerValue => {
+  let value: IDateRangePickerValue = {
+    isDateRangeActive: false
+  } as IDateRangePickerValue
+
+  if (rangeStart && rangeEnd) {
+    value = {
+      ...value,
+      rangeStart,
+      rangeEnd,
+      isDateRangeActive: true
+    }
+  } else if (exact) {
+    value = { ...value, exact }
+  }
+
+  return value
+}
+
+const isValidDateRangePickerValue = (
+  dateRangePickerValue: IDateRangePickerValue
+): boolean => {
+  let isValid = false
+  if (!dateRangePickerValue.isDateRangeActive) {
+    if (dateRangePickerValue.exact) {
+      isValid = true
+    }
+  } else {
+    if (dateRangePickerValue.rangeStart && dateRangePickerValue.rangeEnd) {
+      isValid = true
+    }
+  }
+  return isValid
+}
+
+const transformLocalFormDataToReduxData = (
+  localState: IBaseAdvancedSearchState
+): IAdvancedSearchParamState => {
+  let transformedStoreState: IAdvancedSearchParamState =
+    baseKeysSameAsStore.reduce((ac, curr) => {
+      return { ...ac, [curr]: localState[curr] }
+    }, {})
+
+  if (localState.registrationStatuses !== undefined) {
+    transformedStoreState.registrationStatuses =
+      localState.registrationStatuses === 'IN_REVIEW'
+        ? [' WAITING_VALIDATION', 'VALIDATED']
+        : [localState.registrationStatuses]
+  }
+
+  const {
+    exact: informantDoB,
+    rangeStart: informantDoBStart,
+    rangeEnd: informantDoBEnd
+  } = determineDateFromDateRangePickerVal(
+    localState.informantDoB
+  ) as IDateRangePickerValue
+
+  const {
+    exact: dateOfRegistration,
+    rangeStart: dateOfRegistrationStart,
+    rangeEnd: dateOfRegistrationEnd
+  } = determineDateFromDateRangePickerVal(
+    localState.dateOfRegistration
+  ) as IDateRangePickerValue
+
+  transformedStoreState = {
+    ...transformedStoreState,
+    informantDoB,
+    informantDoBStart,
+    informantDoBEnd,
+    dateOfRegistration,
+    dateOfRegistrationStart,
+    dateOfRegistrationEnd
+  }
+
+  if (localState.event && localState.event === 'birth') {
+    const {
+      exact: childDoB,
+      rangeStart: childDoBStart,
+      rangeEnd: childDoBEnd
+    } = determineDateFromDateRangePickerVal(localState.childDoB)
+
+    const {
+      exact: motherDoB,
+      rangeStart: motherDoBStart,
+      rangeEnd: motherDoBEnd
+    } = determineDateFromDateRangePickerVal(localState.motherDoB)
+    const {
+      exact: fatherDoB,
+      rangeStart: fatherDoBStart,
+      rangeEnd: fatherDoBEnd
+    } = determineDateFromDateRangePickerVal(localState.fatherDoB)
+    transformedStoreState = {
+      ...transformedStoreState,
+      childDoB,
+      childDoBStart,
+      childDoBEnd,
+      motherDoB,
+      motherDoBStart,
+      motherDoBEnd,
+      fatherDoB,
+      fatherDoBStart,
+      fatherDoBEnd
+    }
+  } else {
+    const {
+      exact: deceasedDoB,
+      rangeStart: deceasedDoBStart,
+      rangeEnd: deceasedDoBEnd
+    } = determineDateFromDateRangePickerVal(localState.deceasedDoB)
+    transformedStoreState = {
+      ...transformedStoreState,
+      deceasedDoB,
+      deceasedDoBStart,
+      deceasedDoBEnd
+    }
+  }
+
+  return transformedStoreState
+}
+
+const transformReduxDataToLocalState = (
+  reduxState: IAdvancedSearchParamState
+): IBaseAdvancedSearchState => {
+  const localState: IBaseAdvancedSearchState = baseKeysSameAsStore.reduce(
+    (ac, curr) => {
+      return { ...ac, [curr]: reduxState[curr] }
+    },
+    {}
+  )
+  if (
+    reduxState.registrationStatuses !== undefined &&
+    reduxState.registrationStatuses.length !== 0
+  ) {
+    localState.registrationStatuses =
+      reduxState.registrationStatuses.length > 1
+        ? 'IN_REVIEW'
+        : reduxState.registrationStatuses[0]
+  } else {
+    localState.registrationStatuses = ''
+  }
+
+  const { informantDoB, informantDoBStart, informantDoBEnd } = reduxState
+  localState.informantDoB = convertDateValuesToDateRangePicker(
+    informantDoB,
+    informantDoBStart,
+    informantDoBEnd
+  )
+  const { dateOfRegistration, dateOfRegistrationStart, dateOfRegistrationEnd } =
+    reduxState
+  localState.dateOfRegistration = convertDateValuesToDateRangePicker(
+    dateOfRegistration,
+    dateOfRegistrationStart,
+    dateOfRegistrationEnd
+  )
+
+  if (localState.event && localState.event === 'birth') {
+    const { childDoB, childDoBStart, childDoBEnd } = reduxState
+    localState.childDoB = convertDateValuesToDateRangePicker(
+      childDoB,
+      childDoBStart,
+      childDoBEnd
+    )
+    const { motherDoB, motherDoBStart, motherDoBEnd } = reduxState
+    localState.motherDoB = convertDateValuesToDateRangePicker(
+      motherDoB,
+      motherDoBStart,
+      motherDoBEnd
+    )
+    const { fatherDoB, fatherDoBStart, fatherDoBEnd } = reduxState
+    localState.fatherDoB = convertDateValuesToDateRangePicker(
+      fatherDoB,
+      fatherDoBStart,
+      fatherDoBEnd
+    )
+  } else {
+    const { deceasedDoB, deceasedDoBStart, deceasedDoBEnd } = reduxState
+    localState.deceasedDoB = convertDateValuesToDateRangePicker(
+      deceasedDoB,
+      deceasedDoBStart,
+      deceasedDoBEnd
+    )
+  }
+
+  return localState
+}
+
+const transformDraftData = (
+  state: IBaseAdvancedSearchState
+): IFormSectionData => {
+  let sectionData: IFormSectionData = {}
+  const sectionDataKeys = Object.keys(state)
+  for (const k of sectionDataKeys) {
+    sectionData = {
+      ...sectionData,
+      ...{ [k]: state[k as keyof IBaseAdvancedSearchState] as IFormFieldValue }
+    }
+  }
+
+  return sectionData
+}
+
+const isFormValid = (value: IBaseAdvancedSearchState) => {
+  const validNonDateFields = Object.keys(value).filter(
+    (key) =>
+      key !== 'event' &&
+      !dateFieldTypes.includes(key) &&
+      Boolean(value[key as keyof IBaseAdvancedSearchState])
+  )
+  //handle date fields separately
+  const validDateFields = dateFieldTypes.filter(
+    (key) =>
+      value[key as keyof IBaseAdvancedSearchState] &&
+      isValidDateRangePickerValue(
+        value[key as keyof IBaseAdvancedSearchState] as IDateRangePickerValue
+      )
+  )
+  const validCount = validNonDateFields.length + validDateFields.length
+  return validCount >= 2
 }
 
 const BirthSection = () => {
   const intl = useIntl()
-  const [isDisable, setDisable] = useState(true)
-  const isOnline = useOnlineStatus()
-  const [formState, setFormState] = useState({
-    childDetails: { nestedFields: { eventCountry: 'FAR' } }
+  const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
+  const [formState, setFormState] = useState<IBaseAdvancedSearchState>({
+    ...transformReduxDataToLocalState(advancedSearchParamsState),
+    event: 'birth'
   })
-
-  const validateForm = (advancedSearch: IAdvancedSearch) => {
-    let count = 0
-    for (const field of Object.values(advancedSearch)) {
-      const result = field.nestedFields
-      for (const value of Object.values(result)) {
-        if (value !== '') {
-          count++
-        }
-      }
-    }
-
-    if (count > 1 && isOnline) {
-      setDisable(false)
-    } else {
-      setDisable(true)
-    }
-  }
+  const [isDisable, setDisable] = useState(!isFormValid(formState))
+  const dispatch = useDispatch()
 
   return (
     <>
@@ -129,13 +393,17 @@ const BirthSection = () => {
       <FormFieldGenerator
         id={advancedSearchBirthSectionFormType.id}
         onChange={(values) => {
-          validateForm(values)
-          setFormState(values)
-          console.log(values)
+          const isValid = isFormValid(values)
+          if (isValid) {
+            setDisable(false)
+          } else {
+            setDisable(true)
+          }
+          setFormState({ ...formState, ...values })
         }}
         setAllFieldsDirty={false}
         fields={advancedSearchBirthSectionFormType.fields}
-        draftData={formState}
+        initialValues={formState}
       />
 
       <PrimaryButton
@@ -144,6 +412,15 @@ const BirthSection = () => {
         id="search"
         key="search"
         disabled={isDisable}
+        onClick={() => {
+          dispatch(
+            modifyAdvancedSearchParam({
+              ...transformLocalFormDataToReduxData(formState),
+              event: 'birth'
+            })
+          )
+          dispatch(goToAdvancedSearchResult())
+        }}
       >
         {intl.formatMessage(buttonMessages.search)}
       </PrimaryButton>
@@ -186,7 +463,6 @@ const DeathSection = () => {
         onChange={(values) => {
           validateForm(values)
           setFormState(values)
-          console.log(values)
         }}
         setAllFieldsDirty={false}
         fields={advancedSearchDeathSectionFormType.fields}
@@ -236,8 +512,8 @@ const AdvancedSearch = () => {
             />
           }
         >
-          {activeTabId === TabId.BIRTH && <BirthTabContent />}
-          {activeTabId === TabId.DEATH && <DeathTabContent />}
+          {activeTabId === TabId.BIRTH && <BirthSection />}
+          {activeTabId === TabId.DEATH && <DeathSection />}
         </Content>
       </SysAdminContentWrapper>
     </>

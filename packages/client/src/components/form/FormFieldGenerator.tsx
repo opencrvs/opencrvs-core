@@ -125,6 +125,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
+import { IBaseAdvancedSearchState } from '@client/views/SearchResult/AdvancedSearch'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -692,6 +693,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
+  initialValues?: IBaseAdvancedSearchState
 }
 
 interface IStateProps {
@@ -867,6 +869,7 @@ class FormSectionComponent extends React.Component<Props> {
     const fieldsWithValuesDefined = fields.filter(
       (field) => values[field.name] !== undefined
     )
+    console.log('formikVals:', values)
 
     return (
       <section>
@@ -1169,7 +1172,9 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionData
 >({
   mapPropsToValues: (props) =>
-    mapFieldsToValues(props.fields, props.userDetails),
+    props.initialValues
+      ? props.initialValues
+      : mapFieldsToValues(props.fields, props.userDetails),
   handleSubmit: (values) => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(

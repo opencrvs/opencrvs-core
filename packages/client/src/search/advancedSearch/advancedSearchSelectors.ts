@@ -10,20 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import { IStoreState } from '@client/store'
 
-export const CHANGE_ADVANCED_SEARCH_PARAM =
-  'ADVANCED_SEARCH/CHANGE_ADVANCED_SEARCH_PARAM'
-
-export type ModifyAdvancedSearchParamAction = {
-  type: typeof CHANGE_ADVANCED_SEARCH_PARAM
-  payload: Partial<IAdvancedSearchParamState>
-}
-
-export const modifyAdvancedSearchParam = (
-  paramsToUpdate: Partial<IAdvancedSearchParamState>
-): ModifyAdvancedSearchParamAction => ({
-  type: CHANGE_ADVANCED_SEARCH_PARAM,
-  payload: paramsToUpdate
-})
-
-export type AdvancedSearchParamActions = ModifyAdvancedSearchParamAction
+export const getPartialState = (
+  store: IStoreState
+): IAdvancedSearchParamState => store.advancedSearch

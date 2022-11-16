@@ -9,49 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Header } from '@client/components/Header/Header'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import {
-  Navigation,
-  WORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
+import { Navigation } from '@client/components/interface/Navigation'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
-import { connect } from 'react-redux'
-import {
-  goToCertificateCorrection,
-  goToHomeTab,
-  goToPage,
-  goToPrintCertificate,
-  goToTeamUserList,
-  goToUserProfile
-} from '@client/navigation'
+import { connect, useDispatch, useSelector } from 'react-redux'
+import { goToPage, goToAdvancedSearch } from '@client/navigation'
 import {
   injectIntl,
   IntlShape,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
-import {
-  archiveDeclaration,
-  clearCorrectionAndPrintChanges,
-  getProcessingDeclarationIds,
-  SUBMISSION_STATUS
-} from '@client/declarations'
+import { SUBMISSION_STATUS } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
-import {
-  CircleButton,
-  DangerButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
 import { ARCHIVED } from '@client/utils/constants'
 import { IQueryData } from '@client/workqueue'
-import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import {
   buttonMessages,
   constantsMessages,
@@ -60,21 +36,15 @@ import {
 import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { goBack } from 'connected-react-router'
-
-import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
 import {
   LoadingIndicator,
   useOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { RouteProps } from 'react-router'
-import { ErrorText, Link, Pill, Workqueue } from '@client/../../components/lib'
-import { Query } from '@apollo/client/react/components'
+import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '../OfficeHome/WQContentWrapper'
-import { messages } from '@client/i18n/messages/views/notifications'
-import { error } from 'logrocket'
-import ReactTooltip from 'react-tooltip'
+
 import {
   ColumnContentAlignment,
   Workqueue,
@@ -83,6 +53,7 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
 import { SearchEventsQuery } from '@client/utils/gateway'
+import { getPartialState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 
 const SearchParamPillsContainer = styled.div`
   margin: 16px 0px;
@@ -109,15 +80,9 @@ interface IStateProps {
 type QueryData = SearchEventsQuery['searchEvents']
 
 interface IDispatchProps {
-  archiveDeclaration: typeof archiveDeclaration
-  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
-  goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToHomeTab: typeof goToHomeTab
-  goToUserProfile: typeof goToUserProfile
-  goToTeamUserList: typeof goToTeamUserList
   goBack: typeof goBack
+  goToAdvancedSearch: typeof goToAdvancedSearch
 }
 
 export type IRecordAuditTabs = keyof IQueryData | 'search'
@@ -128,28 +93,31 @@ type IFullProps = IDispatchProps &
   RouteProps &
   ITheme
 
-const searchParams = {
-  event: 'Birth',
-  location: 'districtY',
-  status: 'readyToPrint',
-  event1: 'Birth',
-  location1: 'districtY',
-  status1: 'readyToPrint',
-  event2: 'Birth',
-  location2: 'districtY',
-  status2: 'readyToPrint'
-} as Record<string, string>
-
 const RecordAuditComp = (props: IFullProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+  const dispatch = useDispatch()
+  const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
   const { intl } = props
   const total = 0
-  const loading = true
+  const loading = false
   const error = false
   const data = {}
   const pageSize = 10
 
-  const getColumns = () => {
+  const recordWindowWidth = () => {
+    setWindowWidth(window.innerWidth)
+  }
+  useEffect(() => {
+    window.addEventListener('resize', recordWindowWidth)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('resize', recordWindowWidth)
+    }
+  }, [])
+
+  const getContentTableColumns = () => {
     if (windowWidth > props.theme.grid.breakpoints.lg) {
       return [
         {
@@ -365,16 +333,28 @@ const RecordAuditComp = (props: IFullProps) => {
       <>
         <BookMarkIconBody>BookMark Icon</BookMarkIconBody>
         <SearchParamPillsContainer>
-          {Object.keys(searchParams).map((e, i) => {
-            return (
-              <Pill
-                label={`${e} : ${searchParams[e]}`}
-                type="default"
-                size="medium"
-              ></Pill>
-            )
+          {Object.keys(advancedSearchParamsState).map((paramKey, i) => {
+            const paramValue =
+              advancedSearchParamsState[
+                paramKey as keyof typeof advancedSearchParamsState
+              ]
+            if (paramValue) {
+              return (
+                <Pill
+                  label={`${paramKey} : ${paramValue}`}
+                  type="default"
+                  size="medium"
+                ></Pill>
+              )
+            }
           })}
-          <Link>Edit</Link>
+          <Link
+            onClick={() => {
+              dispatch(goToAdvancedSearch())
+            }}
+          >
+            Edit
+          </Link>
         </SearchParamPillsContainer>
       </>
     )
@@ -395,10 +375,9 @@ const RecordAuditComp = (props: IFullProps) => {
         constantsMessages.skipToMainContent
       )}
     >
-      return (
       <WQContentWrapper
         title={'Search Result'}
-        isMobileSize={windowWidth < props.theme.grid.breakpoints.lg}
+        isMobileSize={false}
         noResultText={'No Results'}
         noContent={total < 1 && !loading}
         tabBarContent={<SearchModifierComponent />}
@@ -415,8 +394,8 @@ const RecordAuditComp = (props: IFullProps) => {
           total > 0 && (
             <>
               <Workqueue
-                content={transformSearchContent(data)}
-                columns={getColumns()}
+                content={transformAdvancedSearchContent(data)}
+                columns={getContentTableColumns()}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 hideLastBorder={true}
               />
@@ -424,7 +403,6 @@ const RecordAuditComp = (props: IFullProps) => {
           )
         )}
       </WQContentWrapper>
-      )
     </Frame>
   )
 }
@@ -445,13 +423,7 @@ export const AdvancedSearchResult = connect<
   RouteProps,
   IStoreState
 >(mapStateToProps, {
-  archiveDeclaration,
-  clearCorrectionAndPrintChanges,
-  goToCertificateCorrection,
   goToPage,
-  goToPrintCertificate,
-  goToHomeTab,
-  goToUserProfile,
-  goToTeamUserList,
+  goToAdvancedSearch,
   goBack
 })(injectIntl(RecordAuditComp))

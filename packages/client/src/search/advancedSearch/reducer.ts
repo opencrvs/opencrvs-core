@@ -15,6 +15,7 @@ import { Loop, LoopReducer } from 'redux-loop'
 
 export type IAdvancedSearchParamState = {
   event?: string
+  registrationStatuses?: string[]
   dateOfEvent?: string
   dateOfEventStart?: string
   dateOfEventEnd?: string
@@ -25,6 +26,7 @@ export type IAdvancedSearchParamState = {
   dateOfRegistrationEnd?: string
   declarationLocationId?: string
   declarationJurisdictionId?: string
+  eventCountry?: string
   eventLocationId?: string
   eventLocationLevel1?: string
   eventLocationLevel2?: string
@@ -66,6 +68,7 @@ export type IAdvancedSearchParamState = {
 
 export const initialState: IAdvancedSearchParamState = {
   event: '',
+  registrationStatuses: [],
   dateOfEvent: '',
   dateOfEventStart: '',
   dateOfEventEnd: '',

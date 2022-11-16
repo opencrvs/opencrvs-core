@@ -63,9 +63,11 @@ function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
     props.onChange({
       ...props.value,
       rangeStart: startDate?.toISOString(),
-      rangeEnd: endDate?.toISOString()
+      rangeEnd: endDate?.toISOString(),
+      isDateRangeActive: true
     })
   }
+
   const handleDateRangeActiveChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {

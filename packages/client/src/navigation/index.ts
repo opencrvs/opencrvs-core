@@ -50,7 +50,8 @@ import {
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
-  REGISTRAR_HOME_TAB_PAGE
+  REGISTRAR_HOME_TAB_PAGE,
+  ADVANCED_SEARCH_RESULT
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -254,6 +255,12 @@ export function goToSearchResult(
           searchType
         })
       )
+}
+
+export function goToAdvancedSearchResult(mobile?: boolean) {
+  return mobile
+    ? replace(formatUrl(ADVANCED_SEARCH_RESULT, {}))
+    : push(formatUrl(ADVANCED_SEARCH_RESULT, {}))
 }
 
 export function goToSearch() {
