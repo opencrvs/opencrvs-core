@@ -25,10 +25,10 @@ export const up = async (db) => {
       {
         measurement: 'in_complete_fields',
         fields: {
-          regStatus: FieldType.STRING
+          compositionId: FieldType.STRING
         },
         tags: [
-          'compositionId',
+          'regStatus',
           'eventType',
           'locationLevel5',
           'locationLevel4',
@@ -52,10 +52,10 @@ export const up = async (db) => {
   }))
 
   const updatePoints = previousPoints.map(
-    ({ regStatus, timestamp, ...tags }) => ({
+    ({ compositionId, timestamp, ...tags }) => ({
       measurement: 'in_complete_fields',
-      tags: { ...tags },
-      fields: { regStatus: 'IN_PROGRESS' },
+      tags: { ...tags, regStatus: 'IN_PROGRESS' },
+      fields: { compositionId },
       timestamp
     })
   )
