@@ -29,7 +29,7 @@ import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
 import { History, RegStatus } from '@client/utils/gateway'
-import { Link } from '@client/../../components/lib'
+import { Link } from '@opencrvs/components'
 
 const TableDiv = styled.div`
   overflow: auto;

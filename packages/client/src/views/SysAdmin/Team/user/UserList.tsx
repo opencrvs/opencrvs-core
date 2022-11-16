@@ -84,8 +84,7 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query as QueryType, User } from '@client/utils/gateway'
-import { Link } from '@client/../../components/lib'
-import { Roles } from '@client/utils/authUtils'
+import { Link } from '@opencrvs/components'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
