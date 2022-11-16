@@ -14,8 +14,8 @@ import { createObjectCsvWriter as createCSV } from 'csv-writer'
 import * as DateFNS from 'date-fns'
 import { CsvWriter } from 'csv-writer/src/lib/csv-writer'
 
-const HEARTH_MONGO_URL = process.env.HEARTH_MONGO_URL || 'mongodb://localhost'
-const DB_NAME = 'hearth-dev'
+const HEARTH_MONGO_URL =
+  process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'
 const client = new MongoClient(HEARTH_MONGO_URL)
 const officeLocationExtURL = 'http://opencrvs.org/specs/extension/regLastOffice'
 const patientOccupationExtURL =
@@ -172,7 +172,7 @@ const disconnect = async () => {
 }
 
 async function getCompositionCursor(startDate: string, endDate: string) {
-  const db = client.db(DB_NAME)
+  const db = client.db()
   return db
     .collection(COLLECTION_NAMES.COMPOSITION)
     .find({
@@ -185,7 +185,7 @@ async function getCompositionCursor(startDate: string, endDate: string) {
 }
 
 async function getCollectionDocuments(collectionName: string, ids: string[]) {
-  const db = client.db(DB_NAME)
+  const db = client.db()
   if (ids.length > 0) {
     return db
       .collection(collectionName)
@@ -199,7 +199,7 @@ async function getCollectionDocuments(collectionName: string, ids: string[]) {
 }
 
 async function getObservationDocByEncounterId(encounterId: string) {
-  const db = client.db(DB_NAME)
+  const db = client.db()
   return db
     .collection(COLLECTION_NAMES.OBSERVATION)
     .find({
@@ -209,7 +209,7 @@ async function getObservationDocByEncounterId(encounterId: string) {
 }
 
 async function getTaskDocByCompositionId(compositionId: string) {
-  const db = client.db(DB_NAME)
+  const db = client.db()
   return db
     .collection(COLLECTION_NAMES.TASK)
     .find({

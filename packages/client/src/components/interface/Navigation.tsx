@@ -37,12 +37,7 @@ import {
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import {
-  Activity,
-  Users,
-  Export,
-  PaperPlane
-} from '@opencrvs/components/lib/icons'
+import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
@@ -62,6 +57,7 @@ import {
 } from '@client/SubmissionController'
 import styled from '@client/styledComponents'
 import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -575,7 +571,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.vsexports
                   ) && (
                     <NavigationItem
-                      icon={() => <Export color={'grey600'} />}
+                      icon={() => <Icon name="Share" size="small" />}
                       id={`navigation_${WORKQUEUE_TABS.vsexports}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.vsexports]
