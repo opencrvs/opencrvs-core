@@ -1,9 +1,14 @@
 import { Document, model, Schema } from 'mongoose'
-import { messageDescriptor } from './question'
+import { IMessage, messageDescriptor } from './question'
 
-export interface IDataset {}
+export interface IDataset {
+  filename: string
+  options: IMessage[]
+  createdAt: string
+  createdBy: string
+}
 
-export interface IQuestionModel extends IDataset, Document {}
+export interface IDataSetModel extends IDataset, Document {}
 
 export const message = new Schema(
   {
@@ -25,4 +30,4 @@ const FormDatasetSchema = new Schema({
   createdAt: { type: Date, default: Date.now, required: true }
 })
 
-export default model<IDataset>('FormDataset', FormDatasetSchema)
+export default model<IDataSetModel>('FormDataset', FormDatasetSchema)
