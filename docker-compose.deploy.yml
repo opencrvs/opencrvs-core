@@ -49,11 +49,6 @@ services:
           - node.role == manager
     networks:
       - overlay_net
-    logging:
-      driver: gelf
-      options:
-        gelf-address: 'udp://127.0.0.1:12201'
-        tag: 'traefik'
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:7.17.0
 
