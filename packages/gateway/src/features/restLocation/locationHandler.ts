@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { fetchFhirWithHearth, sendToFhir } from '@gateway/features/fhir/utils'
+import { fetchFromHearth, sendToFhir } from '@gateway/features/fhir/utils'
 import * as Hapi from '@hapi/hapi'
-import { internal, badRequest, conflict } from '@hapi/boom'
+import { badRequest, conflict } from '@hapi/boom'
 import * as Joi from 'joi'
 import {
   composeFhirLocation,
@@ -86,26 +86,23 @@ type UpdateLocation = {
 }
 
 const locationStatisticSchema = Joi.object({
-  year: Joi.number(),
-  male_population: Joi.number(),
-  female_population: Joi.number(),
-  population: Joi.number(),
-  crude_birth_rate: Joi.number()
+  year: Joi.number().required(),
+  male_population: Joi.number().required(),
+  female_population: Joi.number().required(),
+  population: Joi.number().required(),
+  crude_birth_rate: Joi.number().required()
 })
 
 export const requestSchema = Joi.object({
-  statisticalID: Joi.string(),
-  name: Joi.string(),
-  partOf: Joi.string(),
-  code: Joi.string().valid(
-    Code.ADMIN_STRUCTURE,
-    Code.CRVS_OFFICE,
-    Code.HEALTH_FACILITY
-  ),
-  physicalType: Joi.string().valid(
-    PhysicalType.Building,
-    PhysicalType.Jurisdiction
-  ),
+  statisticalID: Joi.string().required(),
+  name: Joi.string().required(),
+  partOf: Joi.string().required(),
+  code: Joi.string()
+    .valid(Code.ADMIN_STRUCTURE, Code.CRVS_OFFICE, Code.HEALTH_FACILITY)
+    .required(),
+  physicalType: Joi.string()
+    .valid(PhysicalType.Building, PhysicalType.Jurisdiction)
+    .required(),
   jurisdictionType: Joi.string()
     .valid(JurisdictionType.DISTRICT, JurisdictionType.STATE)
     .optional(),
@@ -120,10 +117,10 @@ export const requestSchema = Joi.object({
   .without('district', 'statistics')
 
 export const updateSchema = Joi.object({
-  name: Joi.string(),
-  alias: Joi.string(),
-  status: Joi.string().valid(Status.ACTIVE, Status.INACTIVE),
-  statistics: locationStatisticSchema
+  name: Joi.string().optional(),
+  alias: Joi.string().optional(),
+  status: Joi.string().valid(Status.ACTIVE, Status.INACTIVE).optional(),
+  statistics: locationStatisticSchema.optional()
 })
 
 export async function fetchLocationHandler(
@@ -135,18 +132,12 @@ export async function fetchLocationHandler(
   let response
 
   if (locationId) {
-    response = await fetchFhirWithHearth(`/Location/${locationId}`)
+    response = await fetchFromHearth(`/Location/${locationId}`)
   } else {
-    response = await fetchFhirWithHearth(`/Location${searchParam}`)
+    response = await fetchFromHearth(`/Location${searchParam}`)
   }
 
-  if (!response) {
-    throw internal('No location has been found')
-  } else {
-    return {
-      location: response
-    }
-  }
+  return response
 }
 
 export async function createLocationHandler(
@@ -164,16 +155,11 @@ export async function createLocationHandler(
   })
 
   if (locations.length !== 0) {
-    throw conflict(`statisticalID ${payload.statisticalID} is already exist`)
+    throw conflict(`statisticalID ${payload.statisticalID} already exists`)
   }
 
-  if (
-    partOfLocation !== '0' &&
-    (partOfLocation !== null || partOfLocation !== '')
-  ) {
-    const response = await fetchFhirWithHearth(
-      `/Location?_id=${partOfLocation}`
-    )
+  if (partOfLocation !== '0' && Boolean(partOfLocation)) {
+    const response = await fetchFromHearth(`/Location?_id=${partOfLocation}`)
 
     if (response.total === 0) {
       throw badRequest(
@@ -189,16 +175,16 @@ export async function createLocationHandler(
     newLocation.extension = statisticalExtensions
   }
 
-  const res = await sendToFhir(
+  const response = await sendToFhir(
     newLocation,
     '/Location',
     'POST',
     request.headers.authorization
   ).catch((err) => {
-    throw Error('Cannot save location to FHIR')
+    throw Error('Cannot create location to FHIR')
   })
 
-  return res.statusText
+  return h.response(response.statusText)
 }
 
 export async function updateLocationHandler(
@@ -207,9 +193,7 @@ export async function updateLocationHandler(
 ) {
   const locationId = request.params.locationId
   const location = request.payload as UpdateLocation
-  const existingLocation = await fetchFhirWithHearth(
-    `/Location?_id=${locationId}`
-  )
+  const existingLocation = await fetchFromHearth(`/Location?_id=${locationId}`)
   const newLocation = existingLocation.entry[0].resource
 
   if (existingLocation.total === 0) {
@@ -233,20 +217,14 @@ export async function updateLocationHandler(
     newLocation.extension = statisticalExtensions
   }
 
-  const res = await sendToFhir(
+  const response = await sendToFhir(
     newLocation,
     `/Location/${locationId}`,
     'PUT',
     request.headers.authorization
   ).catch((err) => {
-    throw Error('Cannot save location to FHIR')
+    throw Error('Cannot update location to FHIR')
   })
 
-  if (!res.ok) {
-    throw new Error(
-      `FHIR put to /fhir failed with [${res.status}] body: ${await res.text()}`
-    )
-  }
-
-  return res.statusText
+  return h.response(response.statusText)
 }

@@ -1044,7 +1044,7 @@ export const fetchFHIR = <T = any>(
     })
 }
 
-export const fetchFhirWithHearth = <T = any>(
+export const fetchFromHearth = <T = any>(
   suffix: string,
   method = 'GET',
   body: string | undefined = undefined

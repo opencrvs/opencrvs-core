@@ -15,7 +15,6 @@ export const PORT = process.env.PORT || 7070
 export const HOSTNAME = process.env.DOMAIN || '*'
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
-export const ORG_URL = 'http://opencrvs.org'
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'

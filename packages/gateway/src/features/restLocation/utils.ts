@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { ORG_URL } from '@gateway/constants'
-import { fetchFhirWithHearth } from '@gateway/features/fhir/utils'
+import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
+import { fetchFromHearth } from '@gateway/features/fhir/utils'
 import {
   ExtensionUrl,
   Facility,
@@ -28,11 +28,11 @@ export const composeFhirLocation = (
       resourceType: 'Location',
       identifier: [
         {
-          system: `${ORG_URL}/specs/id/statistical-code`,
+          system: `${OPENCRVS_SPECIFICATION_URL}id/statistical-code`,
           value: `ADMIN_STRUCTURE_${String(location.statisticalID)}`
         },
         {
-          system: `${ORG_URL}/specs/id/jurisdiction-type`,
+          system: `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type`,
           value: location.jurisdictionType
         }
       ],
@@ -47,7 +47,7 @@ export const composeFhirLocation = (
       type: {
         coding: [
           {
-            system: `${ORG_URL}/specs/location-type`,
+            system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
             code: 'ADMIN_STRUCTURE'
           }
         ]
@@ -66,7 +66,7 @@ export const composeFhirLocation = (
       resourceType: 'Location',
       identifier: [
         {
-          system: `${ORG_URL}/specs/id/internal-id`,
+          system: `${OPENCRVS_SPECIFICATION_URL}id/internal-id`,
           value: `${location.code}_${String(location.statisticalID)}`
         }
       ],
@@ -80,7 +80,7 @@ export const composeFhirLocation = (
       type: {
         coding: [
           {
-            system: `${ORG_URL}/specs/location-type`,
+            system: `${OPENCRVS_SPECIFICATION_URL}location-type`,
             code: location.code
           }
         ]
@@ -239,7 +239,7 @@ export function updateStatisticalExtensions(
 }
 
 export async function getLocationsByIdentifier(identifier: string) {
-  const locationSearchResult = await fetchFhirWithHearth(
+  const locationSearchResult = await fetchFromHearth(
     `/Location/?identifier=${identifier}&_count=0`
   )
 
