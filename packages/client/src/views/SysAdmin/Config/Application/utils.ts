@@ -19,7 +19,6 @@ import {
 } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-import { IOfflineData } from '@client/offline/reducer'
 import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
@@ -73,6 +72,12 @@ export const getCurrencySymbol = (currency: ICurrency) => {
   })[0].symbol
   return currencySymbol
 }
+
+export const getCountryName = (isoCode: string) => {
+  const countryName = lookup.countries({ alpha3: isoCode })[0]
+  return countryName && countryName.name
+}
+
 export const getCurrencyObject = (value: string) => {
   const arr = value.split('-')
   return {

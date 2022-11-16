@@ -707,7 +707,7 @@ export const registerForms: IDefaultRegisterForms = {
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
-                    fieldName: 'informantGender',
+                    fieldName: 'childGender',
                     operation: 'selectTransformer'
                   }
                 },
@@ -788,6 +788,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: []
+                  },
+                  template: {
+                    fieldName: 'attendantAtBirth',
+                    operation: 'selectTransformer'
                   }
                 }
               },
@@ -835,6 +839,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: []
+                  },
+                  template: {
+                    fieldName: 'birthType',
+                    operation: 'selectTransformer'
                   }
                 }
               },
@@ -861,6 +869,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: []
+                  },
+                  template: {
+                    fieldName: 'weightAtBirth',
+                    operation: 'plainInputTransformer'
                   }
                 },
                 inputFieldWidth: '78px'
@@ -1015,6 +1027,10 @@ export const registerForms: IDefaultRegisterForms = {
                         operation: 'arrayToFieldTransformer'
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantNationality',
+                    operation: 'nationalityTransformer'
                   }
                 }
               },
@@ -1056,6 +1072,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['id', 'NATIONAL_ID']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantNID',
+                    operation: 'identityToFieldTransformer',
+                    parameters: ['id', 'NATIONAL_ID', 'individual']
                   }
                 }
               },
@@ -1096,6 +1117,16 @@ export const registerForms: IDefaultRegisterForms = {
                         operation: 'fieldValueTransformer',
                         parameters: ['birthDate']
                       }
+                    ]
+                  },
+                  template: {
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'informantBirthDate',
+                    parameters: [
+                      'birthDate',
+                      'en',
+                      'do MMMM yyyy',
+                      'individual'
                     ]
                   }
                 }
@@ -1138,6 +1169,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['en', 'firstNames']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantFirstName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames', 'informant', 'individual']
                   }
                 }
               },
@@ -1165,7 +1201,12 @@ export const registerForms: IDefaultRegisterForms = {
                       'individual',
                       {
                         operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'familyName']
+                        parameters: [
+                          'en',
+                          'familyName',
+                          'informant',
+                          'individual'
+                        ]
                       },
                       'name'
                     ]
@@ -1179,6 +1220,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['en', 'familyName']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
                   }
                 }
               }
@@ -1254,7 +1300,13 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [],
                 initialValue: '',
                 customisable: true,
-                required: true
+                required: true,
+                mapping: {
+                  template: {
+                    fieldName: 'motherReasonNotApplying',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'nationality',
@@ -1280,7 +1332,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'motherNationality',
-                    operation: 'selectTransformer'
+                    operation: 'nationalityTransformer'
                   },
                   mutation: {
                     operation: 'fieldToArrayTransformer'
@@ -1579,7 +1631,13 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'maxLength',
                     parameters: [2]
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'multipleBirth',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'occupation',
@@ -1599,7 +1657,13 @@ export const registerForms: IDefaultRegisterForms = {
                     expression:
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'motherOccupation',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'educationalAttainment',
@@ -1654,7 +1718,13 @@ export const registerForms: IDefaultRegisterForms = {
                       id: 'form.field.label.educationAttainmentISCED5'
                     }
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'motherEducationalAttainment',
+                    operation: 'selectTransformer'
+                  }
+                }
               }
               // PRIMARY ADDRESS SUBSECTION
               // PRIMARY ADDRESS
@@ -1736,7 +1806,13 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 validate: [],
                 initialValue: '',
-                required: true
+                required: true,
+                mapping: {
+                  template: {
+                    fieldName: 'fatherReasonNotApplying',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'nationality',
@@ -1762,7 +1838,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'fatherNationality',
-                    operation: 'selectTransformer'
+                    operation: 'nationalityTransformer'
                   },
                   mutation: {
                     operation: 'fieldToArrayTransformer'
@@ -2053,7 +2129,13 @@ export const registerForms: IDefaultRegisterForms = {
                     expression:
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'fatheroccupation',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'educationalAttainment',
@@ -2108,7 +2190,13 @@ export const registerForms: IDefaultRegisterForms = {
                       id: 'form.field.label.educationAttainmentISCED5'
                     }
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'fatherEducationalAttainment',
+                    operation: 'selectTransformer'
+                  }
+                }
               }
               // PRIMARY ADDRESS SAME AS MOTHER
               // PRIMARY ADDRESS SUBSECTION
@@ -2981,7 +3069,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'deceasedNationality',
-                    operation: 'selectTransformer'
+                    operation: 'nationalityTransformer'
                   },
                   mutation: {
                     operation: 'fieldToArrayTransformer'
