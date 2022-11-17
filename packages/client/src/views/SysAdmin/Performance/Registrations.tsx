@@ -66,6 +66,7 @@ export function Registrations() {
     return (
       <>
         <LocationPicker
+          disabled
           selectedLocationId={query.get('locationId')!}
           onChangeLocation={(locationId) => updateFilters({ locationId })}
         />

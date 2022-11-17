@@ -60,6 +60,8 @@ const Title = styled.h4`
   margin-bottom: 24px;
 `
 
+const AVAILABLE_EVENTS = [Event.Birth]
+
 function EventInfoComponet(props: IFullProps) {
   const {
     match: {
@@ -124,7 +126,11 @@ function EventInfoComponet(props: IFullProps) {
         </TertiaryButton>
         <Title>{intl.formatMessage(messages.title, { eventType })}</Title>
         <BulletList id={`${eventType}-info-bullet-list`} items={listItems} />
-        <PrimaryButton id="continue" onClick={handleContinue}>
+        <PrimaryButton
+          id="continue"
+          onClick={handleContinue}
+          disabled={!AVAILABLE_EVENTS.includes(eventType)}
+        >
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
       </BodyContent>

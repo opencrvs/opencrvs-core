@@ -131,10 +131,10 @@ export function registrationNumberTransformer(
   targetSectionId?: string,
   targetFieldName?: string
 ) {
-  if (queryData[sectionId].registrationNumber) {
+  if (queryData.registration.registrationNumber) {
     transformedData[targetSectionId || sectionId][
       targetFieldName || 'registrationNumber'
-    ] = queryData[sectionId].registrationNumber
+    ] = queryData.registration.registrationNumber
   }
 }
 
