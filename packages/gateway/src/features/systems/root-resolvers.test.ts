@@ -81,7 +81,7 @@ describe('Integrations root resolvers', () => {
         [JSON.stringify({})]
       )
 
-      const response = await resolvers.Mutation.deactivateSystemClient(
+      const response = await resolvers.Mutation.deactivateSystem(
         {},
         {
           clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
@@ -108,7 +108,7 @@ describe('Integrations root resolvers', () => {
         [JSON.stringify({})]
       )
       expect(
-        resolvers.Mutation.deactivateSystemClient(
+        resolvers.Mutation.deactivateSystem(
           {},
           {
             clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
