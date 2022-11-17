@@ -157,19 +157,14 @@ function RegistrationListComponent(props: IProps) {
     filterBy = FILTER_BY_OPTIONS.BY_TIME,
     currentPageNumber = '1'
   } = parse(search) as unknown as ISearchParams
-  const locationStatus = isLocationOffice(locationId)
+  const isOfficeSelected = isLocationOffice(locationId)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('time')
-  const [isOfficeSelected, setIsOfficeSelected] =
-    useState<boolean>(locationStatus)
+
   const currentPage = parseInt(currentPageNumber)
   const recordCount = DEFAULT_PAGE_SIZE * currentPage
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
-
-  useEffect(() => {
-    setIsOfficeSelected(locationStatus)
-  }, [locationStatus])
 
   const queryVariables: QueryGetRegistrationsListByFilterArgs = {
     timeStart: timeStart,
@@ -486,10 +481,7 @@ function RegistrationListComponent(props: IProps) {
   }
 
   function isLocationOffice(locationId: string) {
-    if (locationId) {
-      return Object.keys(props.offlineOffices).some((id) => id === locationId)
-    }
-    return false
+    return Boolean(props.offlineOffices[locationId])
   }
 
   const skip = (currentPage - 1) * DEFAULT_PAGE_SIZE
@@ -525,7 +517,6 @@ function RegistrationListComponent(props: IProps) {
                 )
                 if (isSelectedLocationOffice) {
                   filterCriteria = FILTER_BY_OPTIONS.BY_TIME
-                  setIsOfficeSelected(isSelectedLocationOffice)
                 }
 
                 props.goToRegistrationsList(
