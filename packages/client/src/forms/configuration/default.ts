@@ -1224,7 +1224,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     fieldName: 'informantFamilyName',
                     operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
+                    parameters: ['en', 'familyName', 'informant', 'individual']
                   }
                 }
               }
@@ -3362,7 +3362,7 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'manner',
+                name: 'mannerOfDeath',
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.manner,
                 required: false,
@@ -3399,6 +3399,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: ['mannerOfDeath']
+                  },
+                  template: {
+                    fieldName: 'mannerOfDeath',
+                    operation: 'selectTransformer'
                   }
                 }
               },
@@ -3421,6 +3425,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: ['causeOfDeathEstablished']
+                  },
+                  template: {
+                    fieldName: 'causeOfDeathEstablished',
+                    operation: 'plainInputTransformer'
                   }
                 }
               },
@@ -3465,6 +3473,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: ['causeOfDeathMethod']
+                  },
+                  template: {
+                    fieldName: 'causeOfDeathMethod',
+                    operation: 'selectTransformer'
                   }
                 }
               },
@@ -3492,6 +3504,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: ['deathDescription']
+                  },
+                  template: {
+                    fieldName: 'deathDescription',
+                    operation: 'plainInputTransformer'
                   }
                 }
               },
@@ -3622,6 +3638,10 @@ export const registerForms: IDefaultRegisterForms = {
                         operation: 'arrayToFieldTransformer'
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantNationality',
+                    operation: 'nationalityTransformer'
                   }
                 }
               },
@@ -3663,6 +3683,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['id', 'NATIONAL_ID']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantNID',
+                    operation: 'identityToFieldTransformer',
+                    parameters: ['id', 'NATIONAL_ID', 'individual']
                   }
                 }
               },
@@ -3704,6 +3729,16 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['birthDate']
                       }
                     ]
+                  },
+                  template: {
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'informantBirthDate',
+                    parameters: [
+                      'birthDate',
+                      'en',
+                      'do MMMM yyyy',
+                      'individual'
+                    ]
                   }
                 }
               },
@@ -3741,6 +3776,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['en', 'firstNames']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantFirstName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames', 'informant', 'individual']
                   }
                 }
               },
@@ -3778,6 +3818,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['en', 'familyName']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName', 'informant', 'individual']
                   }
                 }
               }
