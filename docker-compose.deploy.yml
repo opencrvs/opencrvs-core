@@ -269,8 +269,8 @@ services:
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-      - MINIO_DOMAIN=minio.{{hostname}}
-      - MINIO_SERVER_URL=https://minio.{{hostname}}
+      # - MINIO_DOMAIN=minio.{{hostname}}
+      # - MINIO_SERVER_URL=https://minio.{{hostname}}
       - MINIO_BROWSER_REDIRECT_URL=https://minio-console.{{hostname}}
     ports:
       - '9000:9000'
@@ -444,6 +444,7 @@ services:
         - 'traefik.enable=true'
         - 'traefik.http.routers.client.rule=Host(`register.{{hostname}}`,`{{hostname}}`)'
         - 'traefik.http.routers.client.middlewares=test-replacepathregex'
+        - 'traefik.http.routers.client.service=client'
         - 'traefik.http.services.client.loadbalancer.server.port=80'
         - 'traefik.http.routers.client.tls=true'
         - 'traefik.http.routers.client.tls.certresolver=certResolver'

@@ -110,8 +110,7 @@ import { isMobileDevice, isBase64FileString } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
-  REJECTED,
-  MINIO_URL
+  REJECTED
 } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
@@ -744,7 +743,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         }
 
         const documentData = !isBase64FileString(document.data)
-          ? `${MINIO_URL}${document.data}`
+          ? `${window.config.MINIO_URL}${document.data}`
           : document.data
 
         documentOptions.push({
