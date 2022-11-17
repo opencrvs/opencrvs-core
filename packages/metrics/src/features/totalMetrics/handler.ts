@@ -222,7 +222,7 @@ export async function totalMetricsByTime(
   const registrations = registrationsByGroup
 
   registrations.forEach((registration) => {
-    registration.month = format(new Date(registration.time), 'MMMM-yyyy')
+    registration.month = format(new Date(registration.time), 'MMMM yyyy')
   })
 
   const months = uniqBy(registrations, 'month').map((item) => item.month)
