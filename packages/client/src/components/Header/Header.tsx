@@ -37,6 +37,7 @@ import {
   NAME_TEXT,
   NATL_ADMIN_ROLES,
   PHONE_TEXT,
+  REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
@@ -72,6 +73,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import {
   HOME,
   PERFORMANCE_HOME,
+  REGISTRAR_HOME,
   TEAM_USER_LIST
 } from '@client/navigation/routes'
 
@@ -359,11 +361,13 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     const role = this.props.userDetails && this.props.userDetails.role
     const location = this.props.history.location.pathname
     if (
-      (FIELD_AGENT_ROLES.includes(role as string) && location.includes(HOME)) ||
+      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
       (NATL_ADMIN_ROLES.includes(role as string) &&
-        location.includes(PERFORMANCE_HOME)) ||
+        PERFORMANCE_HOME.includes(location)) ||
       (SYS_ADMIN_ROLES.includes(role as string) &&
-        location.includes(PERFORMANCE_HOME))
+        PERFORMANCE_HOME.includes(location)) ||
+      (REGISTRAR_ROLES.includes(role as string) &&
+        REGISTRAR_HOME.includes(location))
     ) {
       return true
     } else {
