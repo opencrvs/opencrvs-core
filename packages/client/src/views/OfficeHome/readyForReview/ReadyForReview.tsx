@@ -101,10 +101,17 @@ class ReadyForReviewComponent extends React.Component<
   }
 
   componentDidMount() {
+    window.addEventListener('popstate', this.popStateListener)
+
     window.addEventListener('resize', this.recordWindowWidth)
   }
 
+  popStateListener() {
+    window.history.pushState(null, document.title, window.location.href)
+  }
+
   componentWillUnmount() {
+    window.addEventListener('popstate', this.popStateListener)
     window.removeEventListener('resize', this.recordWindowWidth)
   }
 
