@@ -131,7 +131,7 @@ describe('registerSystem handler', () => {
     expect(res.statusCode).toBe(201)
   })
 
-  it('return unauthoried error if sysadmin not returned', async () => {
+  it('return unauthorized error if sysadmin not returned', async () => {
     mockingoose(User).toReturn(null, 'findOne')
 
     const res = await server.server.inject({
@@ -197,7 +197,7 @@ describe('deactivateSystem handler', () => {
       method: 'POST',
       url: '/deactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -206,14 +206,14 @@ describe('deactivateSystem handler', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('return unauthoried error if sysadmin not returned', async () => {
+  it('return unauthorized error if sysadmin not returned', async () => {
     mockingoose(User).toReturn(null, 'findOne')
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/deactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -228,7 +228,7 @@ describe('deactivateSystem handler', () => {
       method: 'POST',
       url: '/deactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${badToken}`
@@ -257,7 +257,7 @@ describe('reactivateSystem handler', () => {
       method: 'POST',
       url: '/reactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -266,14 +266,14 @@ describe('reactivateSystem handler', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('return unauthoried error if sysadmin not returned', async () => {
+  it('return unauthorized error if sysadmin not returned', async () => {
     mockingoose(User).toReturn(null, 'findOne')
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/reactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -288,7 +288,7 @@ describe('reactivateSystem handler', () => {
       method: 'POST',
       url: '/reactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${badToken}`
