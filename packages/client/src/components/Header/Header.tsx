@@ -37,7 +37,6 @@ import {
   NAME_TEXT,
   NATL_ADMIN_ROLES,
   PHONE_TEXT,
-  REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
@@ -73,7 +72,6 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import {
   HOME,
   PERFORMANCE_HOME,
-  REGISTRAR_HOME,
   TEAM_USER_LIST
 } from '@client/navigation/routes'
 
