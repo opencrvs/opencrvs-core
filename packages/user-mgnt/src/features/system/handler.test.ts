@@ -81,20 +81,17 @@ const mockUser = {
 } as unknown as IUser & { password: string }
 
 const mockSystem = {
-  name: [
-    {
-      use: 'en',
-      given: ['John', 'William'],
-      family: 'Doe'
-    }
-  ],
+  name: 'MOSIP',
+  createdBy: '123',
   username: 'j.doe1',
   client_id: '123',
-  status: statuses.ACTIVE,
-  practitionerId: '123',
+  secretHash: 'secretsecret',
   salt: '123',
+  practitionerId: '123',
   sha_secret: '123',
-  scope: ['nationalId']
+  scope: ['nationalId'],
+  status: statuses.ACTIVE,
+  type: 'NATIONAL_ID'
 } as unknown as ISystem & { secretHash: string }
 
 describe('registerSystem handler', () => {
