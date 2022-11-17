@@ -27,7 +27,7 @@ export default async function configHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const [certificates, questionConfig, formDrafts, config, integrations] =
+    const [certificates, questionConfig, formDrafts, config, systems] =
       await Promise.all([
         getActiveCertificatesHandler(request, h),
         getQuestionsHandler(request, h),
@@ -38,7 +38,7 @@ export default async function configHandler(
     return {
       config,
       certificates,
-      integrations,
+      systems,
       formConfig: {
         questionConfig,
         formDrafts

@@ -104,7 +104,7 @@ export const formConfig: IFormConfig = {
   ]
 }
 
-export const integrations = []
+export const systems = []
 
 export const mockConditionals = {
   presentAtBirthRegistration: {
@@ -685,7 +685,7 @@ export const mockOfflineData = {
     ADDRESSES: 1
   },
   formConfig,
-  integrations
+  systems
 }
 
 export const mockOfflineLocationsWithHierarchy: Record<

@@ -172,7 +172,7 @@ export const mockFetchConfig = {
     }
   ],
   formConfig: { questionConfig: [] },
-  integrations: [
+  systems: [
     {
       name: 'MOSIP',
       status: statuses.ACTIVE

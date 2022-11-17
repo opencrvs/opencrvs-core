@@ -99,7 +99,6 @@ export type ApplicationConfiguration = {
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
-  INTEGRATIONS?: Maybe<Array<Maybe<Integration>>>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -114,7 +113,6 @@ export type ApplicationConfigurationInput = {
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
-  INTEGRATIONS?: InputMaybe<Array<InputMaybe<IntegrationInput>>>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -625,10 +623,6 @@ export enum Event {
   Birth = 'birth',
   Death = 'death'
 }
-export enum WebhookOption {
-  birth = 'Birth',
-  death = 'Death'
-}
 
 export type EventMetrics = {
   __typename?: 'EventMetrics'
@@ -807,17 +801,6 @@ export type InputOutput = {
   valueString?: Maybe<Scalars['String']>
 }
 
-export type Integration = {
-  __typename?: 'Integration'
-  name?: Maybe<Scalars['String']>
-  status?: Maybe<Scalars['String']>
-}
-
-export type IntegrationInput = {
-  name?: InputMaybe<Scalars['String']>
-  status?: InputMaybe<Scalars['String']>
-}
-
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
@@ -960,6 +943,7 @@ export type Mutation = {
   createNotification: Notification
   createOrUpdateCertificateSVG?: Maybe<CertificateSvg>
   createOrUpdateUser: User
+  deactivateSystem?: Maybe<System>
   deleteFormDraft?: Maybe<Scalars['String']>
   markBirthAsCertified: Scalars['ID']
   markBirthAsRegistered: BirthRegistration
@@ -975,6 +959,8 @@ export type Mutation = {
   markEventAsVoided: Scalars['ID']
   modifyDraftStatus?: Maybe<FormDraft>
   notADuplicate: Scalars['ID']
+  reactivateSystem?: Maybe<System>
+  registerSystem?: Maybe<SystemSecret>
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
   resendSMSInvite?: Maybe<Scalars['String']>
@@ -1039,6 +1025,10 @@ export type MutationCreateOrUpdateCertificateSvgArgs = {
 
 export type MutationCreateOrUpdateUserArgs = {
   user: UserInput
+}
+
+export type MutationDeactivateSystemArgs = {
+  clientId: Scalars['ID']
 }
 
 export type MutationDeleteFormDraftArgs = {
@@ -1110,6 +1100,14 @@ export type MutationModifyDraftStatusArgs = {
 export type MutationNotADuplicateArgs = {
   duplicateId: Scalars['String']
   id: Scalars['String']
+}
+
+export type MutationReactivateSystemArgs = {
+  clientId: Scalars['ID']
+}
+
+export type MutationRegisterSystemArgs = {
+  system?: InputMaybe<SystemInput>
 }
 
 export type MutationRequestBirthRegistrationCorrectionArgs = {
@@ -1278,6 +1276,7 @@ export type Query = {
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
+  fetchSystem?: Maybe<System>
   getActiveCertificatesSVG?: Maybe<Array<Maybe<CertificateSvg>>>
   getCertificateSVG?: Maybe<CertificateSvg>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
@@ -1343,6 +1342,10 @@ export type QueryFetchRegistrationCountByStatusArgs = {
   event?: InputMaybe<Scalars['String']>
   locationId?: InputMaybe<Scalars['String']>
   status: Array<InputMaybe<Scalars['String']>>
+}
+
+export type QueryFetchSystemArgs = {
+  clientId: Scalars['ID']
 }
 
 export type QueryGetCertificateSvgArgs = {
@@ -1512,7 +1515,6 @@ export type QuerySearchRecordArgs = {
   contactNumber?: InputMaybe<Scalars['String']>
   dateOfRegistration?: InputMaybe<Scalars['String']>
   dateOfRegistrationEnd?: InputMaybe<Scalars['String']>
-  registerSystemClient?: InputMaybe<Scalars['String']>
   dateOfRegistrationStart?: InputMaybe<Scalars['String']>
   deathDate?: InputMaybe<Scalars['String']>
   deathDateEnd?: InputMaybe<Scalars['String']>
@@ -1786,6 +1788,43 @@ export type StatusWiseRegistrationCount = {
   __typename?: 'StatusWiseRegistrationCount'
   count: Scalars['Int']
   status: Scalars['String']
+}
+
+export type System = {
+  __typename?: 'System'
+  _id: Scalars['ID']
+  clientId: Scalars['ID']
+  name: Scalars['String']
+  shaSecret: Scalars['ID']
+  status: SystemStatus
+  type: SystemType
+}
+
+export type SystemInput = {
+  name: Scalars['String']
+  settings?: InputMaybe<SystemSettings>
+  type: SystemType
+}
+
+export type SystemSecret = {
+  __typename?: 'SystemSecret'
+  clientSecret: Scalars['ID']
+  system: System
+}
+
+export type SystemSettings = {
+  dailyQuota?: InputMaybe<Scalars['Int']>
+}
+
+export enum SystemStatus {
+  Active = 'active',
+  Deactivated = 'deactivated'
+}
+
+export enum SystemType {
+  Health = 'HEALTH',
+  NationalId = 'NATIONAL_ID',
+  RecordSearch = 'RECORD_SEARCH'
 }
 
 export type TotalMetricsResult = {
@@ -2334,6 +2373,16 @@ export type UsernameSmsReminderMutationVariables = Exact<{
 export type UsernameSmsReminderMutation = {
   __typename?: 'Mutation'
   usernameSMSReminder?: string | null
+}
+
+export type ResetPasswordSmsMutationVariables = Exact<{
+  userId: Scalars['String']
+  applicationName: Scalars['String']
+}>
+
+export type ResetPasswordSmsMutation = {
+  __typename?: 'Mutation'
+  resetPasswordSMS?: string | null
 }
 
 export type SearchUsersQueryVariables = Exact<{
@@ -5571,6 +5620,61 @@ export type CreateFormDraftMutation = {
       comment: string
       updatedAt: any
     }>
+  } | null
+}
+
+export type RegisterSystemMutationVariables = Exact<{
+  system?: InputMaybe<SystemInput>
+}>
+
+export type RegisterSystemMutation = {
+  __typename?: 'Mutation'
+  registerSystem?: {
+    __typename?: 'SystemSecret'
+    clientSecret: string
+    system: {
+      __typename?: 'System'
+      _id: string
+      clientId: string
+      name: string
+      shaSecret: string
+      status: SystemStatus
+      type: SystemType
+    }
+  } | null
+}
+
+export type DeactivateSystemMutationVariables = Exact<{
+  clientId: Scalars['ID']
+}>
+
+export type DeactivateSystemMutation = {
+  __typename?: 'Mutation'
+  deactivateSystem?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
+  } | null
+}
+
+export type ReactivateSystemMutationVariables = Exact<{
+  clientId: Scalars['ID']
+}>
+
+export type ReactivateSystemMutation = {
+  __typename?: 'Mutation'
+  reactivateSystem?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
   } | null
 }
 

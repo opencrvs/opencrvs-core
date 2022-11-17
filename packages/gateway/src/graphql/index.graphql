@@ -11,7 +11,6 @@
 # import Mutation.* from '../features/notification/schema.graphql'
 # import Query.* from '../features/registration/schema.graphql'
 # import Mutation.* from '../features/registration/schema.graphql'
-# import Mutation.* from '../features/clientRegistration/schema.graphql'
 # import Query.* from '../features/location/schema.graphql'
 # import Query.* from '../features/user/schema.graphql'
 # import Mutation.* from '../features/user/schema.graphql'
@@ -22,11 +21,11 @@
 # import Mutation.* from '../features/certificate/schema.graphql'
 # import Mutation.* from '../features/application/schema.graphql'
 # import Mutation.* from '../features/formDraft/schema.graphql'
-# import Mutation.* from '../features/integrations/schema.graphql'
 # import Query.* from '../features/formDraft/schema.graphql'
+# import Mutation.* from '../features/systems/schema.graphql'
+# import Query.* from '../features/systems/schema.graphql'
 # import * from '../features/questions/schema.graphql'
 # import * from 'common.graphql'
-# import Query.* from '../features/integrations/schema.graphql'
 
 # TODO
 # https://github.com/prismagraphql/graphql-import/issues/180

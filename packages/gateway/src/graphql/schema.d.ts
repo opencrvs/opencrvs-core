@@ -48,7 +48,7 @@ export interface GQLQuery {
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getFormDraft?: Array<GQLFormDraft>
-  fetchIntegration?: GQLSystemIntegrationsResponse
+  fetchSystem?: GQLSystem
 }
 
 export interface GQLMutation {
@@ -73,7 +73,6 @@ export interface GQLMutation {
   markDeathAsCertified: string
   requestDeathRegistrationCorrection: string
   markEventAsUnassigned: string
-  registerSystemClient?: GQLClientCreationResponse
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -88,8 +87,9 @@ export interface GQLMutation {
   createFormDraft?: GQLFormDraft
   modifyDraftStatus?: GQLFormDraft
   deleteFormDraft?: string
-  reactivateSystemClient?: GQLIntegrationResponse
-  deactivateSystemClient?: GQLIntegrationResponse
+  reactivateSystem?: GQLSystem
+  deactivateSystem?: GQLSystem
+  registerSystem?: GQLSystemSecret
 }
 
 export interface GQLDummy {
@@ -372,15 +372,13 @@ export interface GQLFormDraft {
   createdAt: GQLDate
 }
 
-export interface GQLSystemIntegrationsResponse {
-  name?: string
-  clientId?: string
-  shaSecret?: string
-}
-
-export interface GQLIdsInput {
-  systemId?: string
-  clientId?: string
+export interface GQLSystem {
+  _id: string
+  clientId: string
+  shaSecret: string
+  status: GQLSystemStatus
+  name: string
+  type: GQLSystemType
 }
 
 export interface GQLNotificationInput {
@@ -445,20 +443,6 @@ export interface GQLDeathRegistrationInput {
   medicalPractitioner?: GQLMedicalPractitionerInput
   createdAt?: GQLDate
   updatedAt?: GQLDate
-}
-
-export interface GQLClientCreationResponse {
-  client_id?: string
-  client_secret?: string
-  sha_secret?: string
-  name?: string
-  status?: string
-}
-
-export interface GQLClientRegistrationPayload {
-  scope: string
-  name: Array<GQLNameArray | null>
-  settings: GQLQuote
 }
 
 export interface GQLUserInput {
@@ -545,15 +529,15 @@ export interface GQLDeleteFormDraftInput {
   event: GQLEvent
 }
 
-export interface GQLIntegrationResponse {
-  status?: string
-  _id?: string
-  username?: string
-  client_id?: string
+export interface GQLSystemSecret {
+  system: GQLSystem
+  clientSecret: string
 }
 
-export interface GQLClientPayload {
-  client_id: string
+export interface GQLSystemInput {
+  name: string
+  type: GQLSystemType
+  settings?: GQLSystemSettings
 }
 
 export type GQLMap = any
@@ -871,6 +855,17 @@ export interface GQLDraftHistory {
   updatedAt: GQLDate
 }
 
+export const enum GQLSystemStatus {
+  active = 'active',
+  deactivated = 'deactivated'
+}
+
+export const enum GQLSystemType {
+  NATIONAL_ID = 'NATIONAL_ID',
+  HEALTH = 'HEALTH',
+  RECORD_SEARCH = 'RECORD_SEARCH'
+}
+
 export interface GQLPersonInput {
   _fhirID?: string
   identifier?: Array<GQLIdentityInput | null>
@@ -964,15 +959,6 @@ export interface GQLMedicalPractitionerInput {
   lastVisitDate?: GQLDate
 }
 
-export interface GQLNameArray {
-  use?: string
-  family?: string
-}
-
-export interface GQLQuote {
-  dailyQuota?: number
-}
-
 export interface GQLHumanNameInput {
   use?: string
   firstNames?: string
@@ -1047,6 +1033,10 @@ export interface GQLQuestionInput {
   enabled?: string
   custom?: boolean
   conditionals?: Array<GQLConditionalInput>
+}
+
+export interface GQLSystemSettings {
+  dailyQuota?: number
 }
 
 export const enum GQLInformantType {
@@ -1493,13 +1483,12 @@ export interface GQLResolver {
   Role?: GQLRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   FormDraft?: GQLFormDraftTypeResolver
-  SystemIntegrationsResponse?: GQLSystemIntegrationsResponseTypeResolver
+  System?: GQLSystemTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
-  ClientCreationResponse?: GQLClientCreationResponseTypeResolver
   Avatar?: GQLAvatarTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
-  IntegrationResponse?: GQLIntegrationResponseTypeResolver
+  SystemSecret?: GQLSystemSecretTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1592,7 +1581,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   getFormDraft?: QueryToGetFormDraftResolver<TParent>
-  fetchIntegration?: QueryToFetchIntegrationResolver<TParent>
+  fetchSystem?: QueryToFetchSystemResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2189,13 +2178,13 @@ export interface QueryToGetFormDraftResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface QueryToFetchIntegrationArgs {
-  ids?: GQLIdsInput
+export interface QueryToFetchSystemArgs {
+  clientId: string
 }
-export interface QueryToFetchIntegrationResolver<TParent = any, TResult = any> {
+export interface QueryToFetchSystemResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToFetchIntegrationArgs,
+    args: QueryToFetchSystemArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2223,7 +2212,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
-  registerSystemClient?: MutationToRegisterSystemClientResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2238,8 +2226,9 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createFormDraft?: MutationToCreateFormDraftResolver<TParent>
   modifyDraftStatus?: MutationToModifyDraftStatusResolver<TParent>
   deleteFormDraft?: MutationToDeleteFormDraftResolver<TParent>
-  reactivateSystemClient?: MutationToReactivateSystemClientResolver<TParent>
-  deactivateSystemClient?: MutationToDeactivateSystemClientResolver<TParent>
+  reactivateSystem?: MutationToReactivateSystemResolver<TParent>
+  deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
+  registerSystem?: MutationToRegisterSystemResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2569,21 +2558,6 @@ export interface MutationToMarkEventAsUnassignedResolver<
   ): TResult
 }
 
-export interface MutationToRegisterSystemClientArgs {
-  clientDetails?: GQLClientRegistrationPayload
-}
-export interface MutationToRegisterSystemClientResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToRegisterSystemClientArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface MutationToCreateOrUpdateUserArgs {
   user: GQLUserInput
 }
@@ -2794,31 +2768,46 @@ export interface MutationToDeleteFormDraftResolver<
   ): TResult
 }
 
-export interface MutationToReactivateSystemClientArgs {
-  clientDetails?: GQLClientPayload
+export interface MutationToReactivateSystemArgs {
+  clientId: string
 }
-export interface MutationToReactivateSystemClientResolver<
+export interface MutationToReactivateSystemResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationToReactivateSystemClientArgs,
+    args: MutationToReactivateSystemArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
 }
 
-export interface MutationToDeactivateSystemClientArgs {
-  clientDetails?: GQLClientPayload
+export interface MutationToDeactivateSystemArgs {
+  clientId: string
 }
-export interface MutationToDeactivateSystemClientResolver<
+export interface MutationToDeactivateSystemResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationToDeactivateSystemClientArgs,
+    args: MutationToDeactivateSystemArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRegisterSystemArgs {
+  system?: GQLSystemInput
+}
+export interface MutationToRegisterSystemResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRegisterSystemArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4033,30 +4022,36 @@ export interface FormDraftToCreatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLSystemIntegrationsResponseTypeResolver<TParent = any> {
-  name?: SystemIntegrationsResponseToNameResolver<TParent>
-  clientId?: SystemIntegrationsResponseToClientIdResolver<TParent>
-  shaSecret?: SystemIntegrationsResponseToShaSecretResolver<TParent>
+export interface GQLSystemTypeResolver<TParent = any> {
+  _id?: SystemTo_idResolver<TParent>
+  clientId?: SystemToClientIdResolver<TParent>
+  shaSecret?: SystemToShaSecretResolver<TParent>
+  status?: SystemToStatusResolver<TParent>
+  name?: SystemToNameResolver<TParent>
+  type?: SystemToTypeResolver<TParent>
 }
 
-export interface SystemIntegrationsResponseToNameResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface SystemTo_idResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SystemIntegrationsResponseToClientIdResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface SystemToClientIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SystemIntegrationsResponseToShaSecretResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface SystemToShaSecretResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4097,49 +4092,6 @@ export interface ReinstatedToTaskEntryResourceIDResolver<
 }
 
 export interface ReinstatedToRegistrationStatusResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLClientCreationResponseTypeResolver<TParent = any> {
-  client_id?: ClientCreationResponseToClient_idResolver<TParent>
-  client_secret?: ClientCreationResponseToClient_secretResolver<TParent>
-  sha_secret?: ClientCreationResponseToSha_secretResolver<TParent>
-  name?: ClientCreationResponseToNameResolver<TParent>
-  status?: ClientCreationResponseToStatusResolver<TParent>
-}
-
-export interface ClientCreationResponseToClient_idResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ClientCreationResponseToClient_secretResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ClientCreationResponseToSha_secretResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ClientCreationResponseToNameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ClientCreationResponseToStatusResolver<
   TParent = any,
   TResult = any
 > {
@@ -4250,35 +4202,16 @@ export interface ApplicationConfigurationToADDRESSESResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLIntegrationResponseTypeResolver<TParent = any> {
-  status?: IntegrationResponseToStatusResolver<TParent>
-  _id?: IntegrationResponseTo_idResolver<TParent>
-  username?: IntegrationResponseToUsernameResolver<TParent>
-  client_id?: IntegrationResponseToClient_idResolver<TParent>
+export interface GQLSystemSecretTypeResolver<TParent = any> {
+  system?: SystemSecretToSystemResolver<TParent>
+  clientSecret?: SystemSecretToClientSecretResolver<TParent>
 }
 
-export interface IntegrationResponseToStatusResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface SystemSecretToSystemResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface IntegrationResponseTo_idResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface IntegrationResponseToUsernameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface IntegrationResponseToClient_idResolver<
+export interface SystemSecretToClientSecretResolver<
   TParent = any,
   TResult = any
 > {

@@ -93,7 +93,7 @@ export async function registerSystemClient(
     Authorization: request.headers.authorization
   }
 
-  const url = resolve(USER_MANAGEMENT_URL, '/registerSystemClient')
+  const url = resolve(USER_MANAGEMENT_URL, '/registerSystem')
 
   const res = await fetch(url, {
     method: 'POST',

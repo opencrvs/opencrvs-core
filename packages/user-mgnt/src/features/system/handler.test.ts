@@ -97,7 +97,7 @@ const mockSystem = {
   scope: ['nationalId']
 } as unknown as ISystem & { secretHash: string }
 
-describe('registerSystemClient handler', () => {
+describe('registerSystem handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -116,7 +116,7 @@ describe('registerSystemClient handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/registerSystemClient',
+      url: '/registerSystem',
       payload: {
         type: 'RECORD_SEARCH',
         name: 'Fortune Green',
@@ -136,7 +136,7 @@ describe('registerSystemClient handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/registerSystemClient',
+      url: '/registerSystem',
       payload: {
         type: 'NATIONAL_ID'
       },
@@ -151,7 +151,7 @@ describe('registerSystemClient handler', () => {
   it('return an error if a token scope check fails', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/registerSystemClient',
+      url: '/registerSystem',
       payload: {
         type: 'NATIONAL_ID'
       },
@@ -166,7 +166,7 @@ describe('registerSystemClient handler', () => {
   it('return an error if system scope is not supported', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/registerSystemClient',
+      url: '/registerSystem',
       payload: {
         type: '123'
       },
@@ -179,7 +179,7 @@ describe('registerSystemClient handler', () => {
   })
 })
 
-describe('deactivateSystemClient handler', () => {
+describe('deactivateSystem handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -195,7 +195,7 @@ describe('deactivateSystemClient handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/deactivateSystemClient',
+      url: '/deactivateSystem',
       payload: {
         client_id: '123'
       },
@@ -211,7 +211,7 @@ describe('deactivateSystemClient handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/deactivateSystemClient',
+      url: '/deactivateSystem',
       payload: {
         client_id: '123'
       },
@@ -226,7 +226,7 @@ describe('deactivateSystemClient handler', () => {
   it('return an error if a token scope check fails', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/deactivateSystemClient',
+      url: '/deactivateSystem',
       payload: {
         client_id: '123'
       },
@@ -239,7 +239,7 @@ describe('deactivateSystemClient handler', () => {
   })
 })
 
-describe('reactivateSystemClient handler', () => {
+describe('reactivateSystem handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -255,7 +255,7 @@ describe('reactivateSystemClient handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/reactivateSystemClient',
+      url: '/reactivateSystem',
       payload: {
         client_id: '123'
       },
@@ -271,7 +271,7 @@ describe('reactivateSystemClient handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/reactivateSystemClient',
+      url: '/reactivateSystem',
       payload: {
         client_id: '123'
       },
@@ -286,7 +286,7 @@ describe('reactivateSystemClient handler', () => {
   it('return an error if a token scope check fails', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/reactivateSystemClient',
+      url: '/reactivateSystem',
       payload: {
         client_id: '123'
       },

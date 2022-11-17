@@ -16,15 +16,13 @@ import { getSystem, hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async reactivateSystemClient(_, { clientDetails }, authHeader) {
+    async reactivateSystem(_, { clientId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
-        return await Promise.reject(
-          new Error('Activate user is only allowed for sysadmin')
-        )
+        return new Error('Activate user is only allowed for sysadmin')
       }
-      const res = await fetch(`${USER_MANAGEMENT_URL}reactivateSystemClient`, {
+      const res = await fetch(`${USER_MANAGEMENT_URL}reactivateSystem`, {
         method: 'POST',
-        body: JSON.stringify(clientDetails),
+        body: JSON.stringify({ clientId }),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
@@ -32,23 +30,21 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on config service. Couldn't update application config`
-          )
+        return new Error(
+          `Something went wrong on user management service. Couldn't activate system`
         )
       }
-      return await res.json()
+      return res.json()
     },
-    async deactivateSystemClient(_, { clientDetails }, authHeader) {
+    async deactivateSystem(_, { clientId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error('Deactivate user is only allowed for sysadmin')
         )
       }
-      const res = await fetch(`${USER_MANAGEMENT_URL}deactivateSystemClient`, {
+      const res = await fetch(`${USER_MANAGEMENT_URL}deactivateSystem`, {
         method: 'POST',
-        body: JSON.stringify(clientDetails),
+        body: JSON.stringify({ clientId }),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
@@ -56,38 +52,50 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
+        return Promise.reject(
           new Error(
-            `Something went wrong on config service. Couldn't update application config`
+            `Something went wrong on user management service. Couldn't deactivate system`
           )
         )
       }
-      return await res.json()
+      return res.json()
+    },
+    async registerSystem(_, { system }, authHeader) {
+      if (!hasScope(authHeader, 'sysadmin')) {
+        return Promise.reject(
+          new Error('Only sysadmin is allowed to create client')
+        )
+      }
+
+      const res = await fetch(`${USER_MANAGEMENT_URL}registerSystem`, {
+        method: 'POST',
+        body: JSON.stringify(system),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 201) {
+        return await Promise.reject(
+          new Error(
+            `Something went wrong on user management service. Couldn't register new system`
+          )
+        )
+      }
+      return res.json()
     }
   },
 
   Query: {
-    async fetchIntegration(_, { ids }, authHeader) {
+    async fetchSystem(_, { clientId }, authHeader) {
       if (authHeader && !hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error('Fetch integration is only allowed for sysadmin')
         )
       }
 
-      let payload = {}
-      if (ids?.clientId) {
-        payload = { clientId: ids?.clientId }
-      }
-      if (ids?.systemId) {
-        payload = { systemId: ids?.systemId }
-      }
-      const systemRes = await getSystem(payload, authHeader)
-
-      return {
-        name: systemRes.name,
-        clientId: systemRes.client_id,
-        shaSecret: systemRes.sha_secret
-      }
+      return getSystem({ clientId }, authHeader)
     }
   }
 }
