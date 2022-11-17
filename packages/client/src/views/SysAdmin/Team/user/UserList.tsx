@@ -59,7 +59,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
 import {

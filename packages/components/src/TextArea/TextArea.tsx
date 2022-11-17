@@ -15,6 +15,7 @@ import styled from 'styled-components'
 interface ITextAreaProps {
   ignoreMediaQuery?: boolean
   maxLength?: number
+  readonly?: boolean
 }
 
 const StyledTextArea = styled.textarea<ITextAreaProps>`

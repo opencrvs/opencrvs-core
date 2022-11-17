@@ -36,6 +36,7 @@ const ShowOnMobile = styled.div`
   display: none;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: flex;
+    gap: 8px;
     margin-left: auto;
     margin-bottom: 32px;
     margin-top: 32px;

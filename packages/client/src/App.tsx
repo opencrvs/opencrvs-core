@@ -58,6 +58,7 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 
 interface IAppProps {
@@ -371,6 +372,12 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.USER_PROFILE}
                                             component={UserAudit}
+                                          />
+
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.VIEW_RECORD}
+                                            component={ViewRecord}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
