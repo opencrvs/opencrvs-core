@@ -121,7 +121,7 @@ export function BirthDelayedRegistrationTarget() {
       {showModal && (
         <ResponsiveModal
           id={`${id}Modal`}
-          title={intl.formatMessage(messages.birthLegallySpecifiedDialogTitle)}
+          title={intl.formatMessage(messages.birthDelayedDialogTitle)}
           autoHeight={true}
           titleHeightAuto={true}
           show={showModal}
