@@ -39,19 +39,21 @@ const updateInflux = (result, measurement, db) => {
       deathDays,
       ...tags
     }) => {
-      const task = await db.collection('Task').findOne({
+      let task = await db.collection('Task').findOne({
         focus: {
           reference: `Composition/${compositionId}`
         },
-        businessStatus: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/reg-status',
-              code: 'REGISTERED'
-            }
-          ]
-        }
+        'businessStatus.coding.code': 'REGISTERED'
       })
+
+      if (!task) {
+        task = await db.collection('Task_history').findOne({
+          focus: {
+            reference: `Composition/${compositionId}`
+          },
+          'businessStatus.coding.code': 'REGISTERED'
+        })
+      }
 
       const practitionerExtension = task.extension.find(
         (extension) =>
@@ -82,15 +84,6 @@ const updateInflux = (result, measurement, db) => {
         timestamp: time.getNanoTime()
       }
       const deleteQuery = `DELETE FROM ${measurement} WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
-
-      console.log(`==========${JSON.stringify(point)}===============`)
-      console.log({
-        ...tags,
-        registrarPractitionerId: practitioner.id
-      })
-      console.log('========================')
-      console.log(fields)
-
       await writePoints([point])
       return await query(deleteQuery)
     }
