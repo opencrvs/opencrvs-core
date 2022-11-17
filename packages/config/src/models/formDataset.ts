@@ -1,19 +1,23 @@
 import { Document, model, Schema } from 'mongoose'
-import { IMessage, messageDescriptor } from './question'
+import { IMessage, message } from './question'
 
+export interface IOption {
+  value: string
+  label: IMessage[]
+}
 export interface IDataset {
-  filename: string
-  options: IMessage[]
+  fileName: string
+  options: IOption[]
   createdAt: string
   createdBy: string
 }
 
 export interface IDataSetModel extends IDataset, Document {}
 
-export const message = new Schema(
+export const optionSchema = new Schema(
   {
     value: { type: String, required: true },
-    label: { type: messageDescriptor, required: true }
+    label: [{ type: message, required: true }]
   },
   { _id: false }
 )
@@ -21,7 +25,7 @@ export const message = new Schema(
 const FormDatasetSchema = new Schema({
   options: [
     {
-      type: message,
+      type: optionSchema,
       required: true
     }
   ],

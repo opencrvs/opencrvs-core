@@ -249,7 +249,7 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
-  createFormDataset(formDraft: FormDatasetInput!): FormDataset
+  createFormDataset(formDraft: FormDatasetInput!): FormDatasetResponse
 }
 
 type Dummy {
@@ -675,13 +675,14 @@ input DeleteFormDraftInput {
   event: Event!
 }
 
-type FormDataset {
+type FormDatasetResponse {
   status: String!
   msg: String!
+  data: FormDataset
 }
 
 input FormDatasetInput {
-  filename: String!
+  fileName: String!
   base64Data: String!
 }
 
@@ -1165,6 +1166,14 @@ input QuestionInput {
   conditionals: [ConditionalInput!]
 }
 
+type FormDataset {
+  options: [FormDatasetOption!]
+  fileName: String!
+  createdBy: String!
+  createdAt: String!
+  _id: String
+}
+
 enum InformantType {
   INFORMANT
   MOTHER
@@ -1492,6 +1501,11 @@ input ConditionalInput {
   regexp: String!
 }
 
+type FormDatasetOption {
+  value: String!
+  label: [FormDatasetOptionLabel]
+}
+
 type Payment {
   paymentId: ID
   type: PaymentType
@@ -1543,6 +1557,11 @@ input MesssageDescriptorInput {
   defaultMessage: String!
 }
 
+type FormDatasetOptionLabel {
+  lang: String!
+  descriptor: MesssageDescriptor!
+}
+
 enum PaymentType {
   MANUAL
 }
@@ -1551,4 +1570,10 @@ enum PaymentOutcomeType {
   COMPLETED
   ERROR
   PARTIAL
+}
+
+type MesssageDescriptor {
+  id: String!
+  description: String
+  defaultMessage: String!
 }

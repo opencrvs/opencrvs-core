@@ -161,6 +161,7 @@ services:
     restart: unless-stopped
     environment:
       - AUTH_URL=http://auth:4040
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config

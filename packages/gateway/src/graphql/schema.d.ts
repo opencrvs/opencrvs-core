@@ -87,7 +87,7 @@ export interface GQLMutation {
   createFormDraft?: GQLFormDraft
   modifyDraftStatus?: GQLFormDraft
   deleteFormDraft?: string
-  createFormDataset?: GQLFormDataset
+  createFormDataset?: GQLFormDatasetResponse
 }
 
 export interface GQLDummy {
@@ -524,13 +524,14 @@ export interface GQLDeleteFormDraftInput {
   event: GQLEvent
 }
 
-export interface GQLFormDataset {
+export interface GQLFormDatasetResponse {
   status: string
   msg: string
+  data?: GQLFormDataset
 }
 
 export interface GQLFormDatasetInput {
-  filename: string
+  fileName: string
   base64Data: string
 }
 
@@ -1036,6 +1037,14 @@ export interface GQLQuestionInput {
   conditionals?: Array<GQLConditionalInput>
 }
 
+export interface GQLFormDataset {
+  options?: Array<GQLFormDatasetOption>
+  fileName: string
+  createdBy: string
+  createdAt: string
+  _id?: string
+}
+
 export const enum GQLInformantType {
   INFORMANT = 'INFORMANT',
   MOTHER = 'MOTHER',
@@ -1364,6 +1373,11 @@ export interface GQLConditionalInput {
   regexp: string
 }
 
+export interface GQLFormDatasetOption {
+  value: string
+  label?: Array<GQLFormDatasetOptionLabel | null>
+}
+
 export interface GQLPayment {
   paymentId?: string
   type?: GQLPaymentType
@@ -1426,6 +1440,11 @@ export interface GQLMesssageDescriptorInput {
   defaultMessage: string
 }
 
+export interface GQLFormDatasetOptionLabel {
+  lang: string
+  descriptor: GQLMesssageDescriptor
+}
+
 export const enum GQLPaymentType {
   MANUAL = 'MANUAL'
 }
@@ -1434,6 +1453,12 @@ export const enum GQLPaymentOutcomeType {
   COMPLETED = 'COMPLETED',
   ERROR = 'ERROR',
   PARTIAL = 'PARTIAL'
+}
+
+export interface GQLMesssageDescriptor {
+  id: string
+  description?: string
+  defaultMessage: string
 }
 
 /*********************************
@@ -1485,7 +1510,7 @@ export interface GQLResolver {
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
-  FormDataset?: GQLFormDatasetTypeResolver
+  FormDatasetResponse?: GQLFormDatasetResponseTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1521,6 +1546,7 @@ export interface GQLResolver {
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
   Integration?: GQLIntegrationTypeResolver
+  FormDataset?: GQLFormDatasetTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -1536,12 +1562,15 @@ export interface GQLResolver {
   EventProgressData?: GQLEventProgressDataTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
+  FormDatasetOption?: GQLFormDatasetOptionTypeResolver
   Payment?: GQLPaymentTypeResolver
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
   }
 
   AdditionalIdWithCompositionId?: GQLAdditionalIdWithCompositionIdTypeResolver
+  FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
+  MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
@@ -4144,16 +4173,30 @@ export interface ApplicationConfigurationToINTEGRATIONSResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLFormDatasetTypeResolver<TParent = any> {
-  status?: FormDatasetToStatusResolver<TParent>
-  msg?: FormDatasetToMsgResolver<TParent>
+export interface GQLFormDatasetResponseTypeResolver<TParent = any> {
+  status?: FormDatasetResponseToStatusResolver<TParent>
+  msg?: FormDatasetResponseToMsgResolver<TParent>
+  data?: FormDatasetResponseToDataResolver<TParent>
 }
 
-export interface FormDatasetToStatusResolver<TParent = any, TResult = any> {
+export interface FormDatasetResponseToStatusResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface FormDatasetToMsgResolver<TParent = any, TResult = any> {
+export interface FormDatasetResponseToMsgResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetResponseToDataResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5145,6 +5188,34 @@ export interface IntegrationToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLFormDatasetTypeResolver<TParent = any> {
+  options?: FormDatasetToOptionsResolver<TParent>
+  fileName?: FormDatasetToFileNameResolver<TParent>
+  createdBy?: FormDatasetToCreatedByResolver<TParent>
+  createdAt?: FormDatasetToCreatedAtResolver<TParent>
+  _id?: FormDatasetTo_idResolver<TParent>
+}
+
+export interface FormDatasetToOptionsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetToFileNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetToCreatedByResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetToCreatedAtResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetTo_idResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLAssignmentDataTypeResolver<TParent = any> {
   userId?: AssignmentDataToUserIdResolver<TParent>
   firstName?: AssignmentDataToFirstNameResolver<TParent>
@@ -5770,6 +5841,25 @@ export interface DeathFeeToDELAYEDResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLFormDatasetOptionTypeResolver<TParent = any> {
+  value?: FormDatasetOptionToValueResolver<TParent>
+  label?: FormDatasetOptionToLabelResolver<TParent>
+}
+
+export interface FormDatasetOptionToValueResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetOptionToLabelResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLPaymentTypeResolver<TParent = any> {
   paymentId?: PaymentToPaymentIdResolver<TParent>
   type?: PaymentToTypeResolver<TParent>
@@ -5822,6 +5912,49 @@ export interface AdditionalIdWithCompositionIdToCompositionIdResolver<
 }
 
 export interface AdditionalIdWithCompositionIdToTrackingIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLFormDatasetOptionLabelTypeResolver<TParent = any> {
+  lang?: FormDatasetOptionLabelToLangResolver<TParent>
+  descriptor?: FormDatasetOptionLabelToDescriptorResolver<TParent>
+}
+
+export interface FormDatasetOptionLabelToLangResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetOptionLabelToDescriptorResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLMesssageDescriptorTypeResolver<TParent = any> {
+  id?: MesssageDescriptorToIdResolver<TParent>
+  description?: MesssageDescriptorToDescriptionResolver<TParent>
+  defaultMessage?: MesssageDescriptorToDefaultMessageResolver<TParent>
+}
+
+export interface MesssageDescriptorToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDescriptionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MesssageDescriptorToDefaultMessageResolver<
   TParent = any,
   TResult = any
 > {

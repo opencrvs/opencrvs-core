@@ -61,7 +61,7 @@ export const requestSchema = Joi.object({
 })
 
 export const formDatasetSchema = Joi.object({
-  filename: Joi.string().required(),
+  fileName: Joi.string().required(),
   base64Data: Joi.string().required()
 })
 
