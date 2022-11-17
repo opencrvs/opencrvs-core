@@ -44,7 +44,7 @@ export const up = async (db, client) => {
         const count = await compositionCursor.count()
         // eslint-disable-next-line no-console
         console.log(
-          `Migration - ElasticSearch :: Processing ${
+          `Migration - ElasticSearch :: Processing ${processedDocCount + 1} - ${
             processedDocCount + count
           } of ${totalCompositionCount} compositions...`
         )
@@ -61,7 +61,7 @@ export const up = async (db, client) => {
         ).toFixed(2)
         // eslint-disable-next-line no-console
         console.log(
-          `Migration - ElasticSearch :: Processing done ${percentage}% of 100%`
+          `Migration - ElasticSearch :: Processing done ${percentage}%`
         )
       }
     })
@@ -133,7 +133,7 @@ async function setInformantDeceasedAndLocationDetails(db, body, composition) {
       [patientId]
     )
     if (patientDoc.length > 0) {
-      body.deceasedGender = patientDoc[0].gender
+      body.gender = patientDoc[0].gender
       body.deceasedDoB = patientDoc[0].birthDate
       body.deceasedIdentifier =
         patientDoc[0].identifier &&
