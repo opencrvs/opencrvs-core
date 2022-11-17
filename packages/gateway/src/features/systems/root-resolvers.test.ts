@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { resolvers } from '@gateway/features/integrations/root-resolvers'
+import { resolvers } from '@gateway/features/systems/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -30,7 +30,7 @@ beforeEach(() => {
       audience: 'opencrvs:gateway-user'
     }
   )
-  const regsiterToken = jwt.sign(
+  const registerToken = jwt.sign(
     { scope: ['register'] },
     readFileSync('../auth/test/cert.key'),
     {
@@ -44,7 +44,7 @@ beforeEach(() => {
     Authorization: `Bearer ${sysAdminToken}`
   }
   authHeaderRegister = {
-    Authorization: `Bearer ${regsiterToken}`
+    Authorization: `Bearer ${registerToken}`
   }
 })
 
@@ -53,31 +53,29 @@ describe('Integrations root resolvers', () => {
     it('activate user mutation', async () => {
       fetch.mockResponses(
         [
-          JSON.stringify({ client_id: 'faf79994-2197-4007-af17-883bd1c3375b' }),
+          JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
           { status: 200 }
         ],
         [JSON.stringify({})]
       )
 
-      const response = await resolvers.Mutation.reactivateSystemClient(
+      const response = await resolvers.Mutation.reactivateSystem(
         {},
         {
-          clientDetails: {
-            client_id: 'faf79994-2197-4007-af17-883bd1c3375b'
-          }
+          clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
         },
         authHeaderSysAdmin
       )
 
       expect(response).toEqual({
-        client_id: 'faf79994-2197-4007-af17-883bd1c3375b'
+        clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
       })
     })
 
     it('deactivate user', async () => {
       fetch.mockResponses(
         [
-          JSON.stringify({ client_id: 'faf79994-2197-4007-af17-883bd1c3375b' }),
+          JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
           { status: 200 }
         ],
         [JSON.stringify({})]
@@ -86,15 +84,13 @@ describe('Integrations root resolvers', () => {
       const response = await resolvers.Mutation.deactivateSystemClient(
         {},
         {
-          clientDetails: {
-            client_id: 'faf79994-2197-4007-af17-883bd1c3375b'
-          }
+          clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
         },
         authHeaderSysAdmin
       )
 
       expect(response).toEqual({
-        client_id: 'faf79994-2197-4007-af17-883bd1c3375b'
+        clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
       })
     })
     it('should throw error for users other than the system admin who try to deactivate integration client', async () => {
@@ -106,7 +102,7 @@ describe('Integrations root resolvers', () => {
       )
       fetch.mockResponseOnce(
         [
-          JSON.stringify({ client_id: 'faf79994-2197-4007-af17-883bd1c3375b' }),
+          JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
           { status: 400 }
         ],
         [JSON.stringify({})]
@@ -115,9 +111,7 @@ describe('Integrations root resolvers', () => {
         resolvers.Mutation.deactivateSystemClient(
           {},
           {
-            clientDetails: {
-              client_id: 'faf79994-2197-4007-af17-883bd1c3375b'
-            }
+            clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
           },
           authHeaderRegister
         )
@@ -133,18 +127,16 @@ describe('Integrations root resolvers', () => {
     )
     fetch.mockResponseOnce(
       [
-        JSON.stringify({ client_id: 'faf79994-2197-4007-af17-883bd1c3375b' }),
+        JSON.stringify({ clientId: 'faf79994-2197-4007-af17-883bd1c3375b' }),
         { status: 400 }
       ],
       [JSON.stringify({})]
     )
     expect(
-      resolvers.Mutation.reactivateSystemClient(
+      resolvers.Mutation.reactivateSystem(
         {},
         {
-          clientDetails: {
-            client_id: 'faf79994-2197-4007-af17-883bd1c3375b'
-          }
+          clientId: 'faf79994-2197-4007-af17-883bd1c3375b'
         },
         authHeaderRegister
       )
