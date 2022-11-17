@@ -58,6 +58,7 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { UserAudit } from '@client/views/UserAudit/UserAudit'
 
@@ -379,6 +380,12 @@ export class App extends React.Component<IAppProps> {
                                               routes.PERFORMANCE_REGISTRATIONS_LIST
                                             }
                                             component={RegistrationList}
+                                          />
+
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.VIEW_RECORD}
+                                            component={ViewRecord}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
