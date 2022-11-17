@@ -11,7 +11,7 @@
  */
 import { NATIVE_LANGUAGE } from '@gateway/constants'
 import {
-  // GQLDate,
+  GQLAdvancedSearchParametersInput,
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
@@ -30,72 +30,12 @@ interface ISearchDataTemplate {
   [key: string]: any
 }
 export interface ISearchCriteria {
-  declarationLocationId?: string[] | string
-  declarationLocationHirarchyId?: string
-  status?: string[]
-  type?: string[]
-  nationalId?: string
-  trackingId?: string
-  contactNumber?: string
-  name?: string
-  registrationNumber?: string
+  parameters: GQLAdvancedSearchParametersInput
   sort?: string
   sortColumn?: string
   size?: number
   from?: number
   createdBy?: string
-}
-
-export interface IAdvancedSearchParam {
-  event?: string
-  dateOfEvent?: string
-  registrationStatuses?: string
-  eventLocationId?: string
-  childFirstNames?: string
-  childLastName?: string
-  childDoB?: string
-  deceasedFirstNames?: string
-  deceasedFamilyName?: string
-  deathDate?: string
-  dateOfEventStart?: string
-  dateOfEventEnd?: string
-  motherFirstNames?: string
-  motherFamilyName?: string
-  motherDoB?: string
-  motherIdentifier?: string
-  fatherFirstNames?: string
-  fatherFamilyName?: string
-  fatherDoB?: string
-  fatherIdentifier?: string
-  informantFirstNames?: string
-  informantFamilyName?: string
-  contactNumber?: string
-  registrationNumber?: string
-  trackingId?: string
-  dateOfRegistration?: string
-  dateOfRegistrationStart?: string
-  dateOfRegistrationEnd?: string
-  declarationLocationId?: string
-  declarationJurisdictionId?: string
-  eventLocationLevel1?: string
-  eventLocationLevel2?: string
-  eventLocationLevel3?: string
-  eventLocationLevel4?: string
-  eventLocationLevel5?: string
-  childDoBStart?: string
-  childDoBEnd?: string
-  childGender?: string
-  deceasedGender?: string
-  deceasedDoB?: string
-  deceasedDoBStart?: string
-  deceasedDoBEnd?: string
-  motherDoBStart?: string
-  motherDoBEnd?: string
-  fatherDoBStart?: string
-  fatherDoBEnd?: string
-  informantDoB?: string
-  informantDoBStart?: string
-  informantDoBEnd?: string
 }
 
 const getTimeLoggedDataByStatus = (

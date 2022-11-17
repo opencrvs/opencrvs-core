@@ -54,7 +54,8 @@ import {
   REQUEST_CORRECTION_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL
+  REINSTATED_EXTENSION_URL,
+  VIEWED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -968,6 +969,8 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.REQUESTED_CORRECTION
   } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {
     return GQLRegAction.REINSTATED
+  } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.VIEWED
   }
   return null
 }
@@ -1057,28 +1060,6 @@ export async function postAssignmentSearch(
     .catch((error) => {
       return Promise.reject(
         new Error(`Search assignment failed: ${error.message}`)
-      )
-    })
-}
-
-export const postSearch = (
-  authHeader: IAuthHeader,
-  criteria: ISearchCriteria
-) => {
-  return fetch(`${SEARCH_URL}search`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    },
-    body: JSON.stringify(criteria)
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Search request failed: ${error.message}`)
       )
     })
 }

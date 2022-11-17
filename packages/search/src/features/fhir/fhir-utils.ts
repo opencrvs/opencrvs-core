@@ -10,6 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { HEARTH_URL } from '@search/constants'
+import {
+  IBirthCompositionBody,
+  IDeathCompositionBody
+} from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
 import fetch from 'node-fetch'
 
@@ -78,7 +82,8 @@ export function findEntry(
   return findEntryResourceByUrl(reference, bundleEntries)
 }
 
-export async function findEventLocation(
+export async function addEventLocation(
+  body: IBirthCompositionBody | IDeathCompositionBody,
   code: string,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
@@ -88,17 +93,51 @@ export async function findEventLocation(
     data = findEntry(code, composition, bundleEntries)
   } else {
     const encounterSection = findCompositionSection(code, composition)
-    if (!encounterSection || !encounterSection.entry) {
-      return undefined
+    if (encounterSection && encounterSection.entry) {
+      data = await getFromFhir(
+        `/Encounter/${encounterSection.entry[0].reference}`
+      )
     }
-    data = await getFromFhir(
-      `/Encounter/${encounterSection.entry[0].reference}`
+  }
+  if (data && data.location && data.location[0].location) {
+    const location: fhir.Location = await getFromFhir(
+      `/${data.location[0].location.reference}`
     )
+
+    const isLocationHealthFacility =
+      location.type &&
+      location.type.coding &&
+      location.type.coding.find((obCode) => obCode.code === 'HEALTH_FACILITY')
+
+    if (isLocationHealthFacility) {
+      body.eventLocationId = location.id
+    } else {
+      body.declarationJurisdictionIds = []
+      if (location.address?.country) {
+        body.eventCountry = location.address.country
+      }
+      //eventLocationLevel1
+      if (location.address?.state) {
+        body.declarationJurisdictionIds.push(location.address.state)
+      }
+      //eventLocationLevel2
+      if (location.address?.district) {
+        body.declarationJurisdictionIds.push(location.address.district)
+      }
+      //eventLocationLevel3
+      if (location.address?.line?.[10]) {
+        body.declarationJurisdictionIds.push(location.address.line[10])
+      }
+      //eventLocationLevel4
+      if (location.address?.line?.[11]) {
+        body.declarationJurisdictionIds.push(location.address.line[11])
+      }
+      //eventLocationLevel5
+      if (location.address?.line?.[12]) {
+        body.declarationJurisdictionIds.push(location.address.line[12])
+      }
+    }
   }
-  if (!data || !data.location || !data.location[0].location) {
-    return null
-  }
-  return await getFromFhir(`/${data.location[0].location.reference}`)
 }
 
 export function findEntryResourceByUrl(

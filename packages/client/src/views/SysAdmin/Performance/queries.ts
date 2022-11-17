@@ -72,35 +72,20 @@ export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
   }
 `
 
-export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
-  query fetchRegistrationCountByStatus(
-    $locationId: String!
-    $status: [String]!
-  ) {
-    fetchRegistrationCountByStatus(locationId: $locationId, status: $status) {
-      results {
-        status
-        count
-      }
-      total
-    }
-  }
-`
-
 export const FETCH_EVENTS_WITH_PROGRESS = gql`
   query getEventsWithProgress(
-    $locationId: String!
+    $declarationJurisdictionId: String!
     $count: Int
     $skip: Int
-    $status: [String]
-    $type: [String]
+    $registrationStatuses: [String]
+    $compositionType: [String]
   ) {
     getEventsWithProgress(
       count: $count
       skip: $skip
-      locationId: $locationId
-      status: $status
-      type: $type
+      declarationJurisdictionId: $declarationJurisdictionId
+      registrationStatuses: $registrationStatuses
+      compositionType: $compositionType
     ) {
       totalItems
       results {
