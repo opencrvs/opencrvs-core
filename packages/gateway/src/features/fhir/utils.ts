@@ -1050,7 +1050,7 @@ export const getAllLocationIdsInDistrict = (
   locationType = 'CRVS_OFFICE'
 ): Promise<string[]> => {
   return fetchFHIR(
-    `/Location?partof=${districtLocationId}&type=${locationType}`,
+    `/Location?partof=${districtLocationId}&type=${locationType}&_count=0`,
     authHeader
   ).then((fhirBundle) =>
     fhirBundle.entry?.map(
