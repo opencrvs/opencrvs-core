@@ -50,7 +50,7 @@ import {
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
-  INTEGRATION_LIST
+  SYSTEM_LIST
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -232,8 +232,8 @@ export function goToTeamUserList(id: string) {
   })
 }
 
-export function goToIntegrationList() {
-  return push(INTEGRATION_LIST)
+export function goToSystemList() {
+  return push(SYSTEM_LIST)
 }
 
 export function goToSearchResult(

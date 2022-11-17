@@ -36,17 +36,18 @@ const messagesToDefine = {
     description: 'Label for the text Copy'
   },
 
-  supportingDescription: {
-    id: 'integrations.supportingDescription',
+  newIntegrationDescription: {
+    id: 'integrations.newIntegrationDescription',
     defaultMessage:
-      'Supporting description to help user make a decision and navigate the content',
-    description: 'Label for the  supporting description'
+      'Add a unique name and select the type of client you would like to create',
+    description:
+      'Description to help user fill name and type of a new integration client'
   },
 
   uniqueKeysDescription: {
     id: 'integrations.uniqueKeyDescription',
     defaultMessage:
-      'These unique keys will be required by the client integrating...',
+      'These unique keys will be required by the client integrating',
     description: 'Label for the unique key description'
   },
 
