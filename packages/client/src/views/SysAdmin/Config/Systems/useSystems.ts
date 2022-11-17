@@ -60,6 +60,29 @@ function useNewSystemDraft() {
   }
 }
 
+/** Handles communication with global state management */
+export function useSystemsGlobalState() {
+  const dispatch = useDispatch()
+  const existingSystems = useExistingSystems()
+
+  const dispatchStatusChange = (updatedSystem: System) => {
+    const systems = existingSystems.map((system) => {
+      if (system.clientId === updatedSystem.clientId) {
+        return updatedSystem
+      } else {
+        return system
+      }
+    })
+    dispatch(updateOfflineSystems({ systems }))
+  }
+
+  const dispatchNewSystem = (newSystem: System) => {
+    dispatch(updateOfflineSystems({ systems: [...existingSystems, newSystem] }))
+  }
+
+  return { dispatchStatusChange, dispatchNewSystem, existingSystems }
+}
+
 /** Lists systems, allows creation of new ones and enabling or disabling existing ones. */
 export function useSystems() {
   const [systemToToggleActivation, setSystemToToggleActivation] =
@@ -72,18 +95,8 @@ export function useSystems() {
     onChangeClientName,
     clearNewSystemDraft
   } = useNewSystemDraft()
-
-  const dispatch = useDispatch()
-  function dispatchStatusChange(updatedSystem: System) {
-    const systems = existingSystems.map((system) => {
-      if (system.clientId === updatedSystem.clientId) {
-        return updatedSystem
-      } else {
-        return system
-      }
-    })
-    dispatch(updateOfflineSystems({ systems }))
-  }
+  const { dispatchNewSystem, dispatchStatusChange, existingSystems } =
+    useSystemsGlobalState()
 
   const [
     activateSystemMutate,
@@ -128,7 +141,12 @@ export function useSystems() {
       reset: resetRegisterSystemData
     }
   ] = useMutation<RegisterSystemMutation, RegisterSystemMutationVariables>(
-    mutations.registerSystem
+    mutations.registerSystem,
+    {
+      onCompleted: ({ registerSystem }) => {
+        if (registerSystem) dispatchNewSystem(registerSystem.system)
+      }
+    }
   )
 
   const deactivateSystem = () => {
@@ -162,8 +180,6 @@ export function useSystems() {
       }
     })
   }
-
-  const existingSystems = useExistingSystems()
 
   const resetData = () => {
     resetActivateSystemData()
