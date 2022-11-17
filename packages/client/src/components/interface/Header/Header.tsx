@@ -232,6 +232,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         : ''
     }
 
+    const title = (userDetails && userDetails.title) ?? ''
     const role =
       userDetails && userDetails.role
         ? intl.formatMessage(userMessages[userDetails.role])
@@ -239,7 +240,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
 
-    const userInfo = { name, role, avatar }
+    const userInfo = { name, role, avatar, title }
 
     return (
       <>
