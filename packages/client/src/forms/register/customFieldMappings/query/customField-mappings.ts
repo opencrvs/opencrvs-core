@@ -11,7 +11,6 @@
  */
 
 import { IFormData, IFormField, IQuestionnaireQuestion } from '@client/forms'
-import { createCustomFieldHandlebarName } from '@client/forms/configuration/customUtils'
 
 export function questionnaireToCustomFieldTransformer(
   transformedData: IFormData,
@@ -26,15 +25,11 @@ export function questionnaireToCustomFieldTransformer(
           question.fieldId === field.customQuesstionMappingId
       )[0]
     if (selectedQuestion) {
-      if (transformedData && Object.keys(transformedData).length === 0) {
-        const handlerbarName = createCustomFieldHandlebarName(
-          selectedQuestion.fieldId
-        )
+      /* transformedData[sectionId] is undefined when mapping templates */
+      if (!transformedData[sectionId]) {
         transformedData[sectionId] = {}
-        transformedData[sectionId][handlerbarName] = selectedQuestion.value
-      } else {
-        transformedData[sectionId][field.name] = selectedQuestion.value
       }
+      transformedData[sectionId][field.name] = selectedQuestion.value
     }
   }
 }
