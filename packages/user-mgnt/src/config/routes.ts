@@ -62,7 +62,8 @@ import {
   getSystemRequestSchema,
   getSystemResponseSchema,
   getSystemHandler,
-  getAllSystemsHandler
+  getAllSystemsHandler,
+  SystemSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -509,6 +510,9 @@ export const getRoutes = () => {
         },
         validate: {
           payload: clientIdSchema
+        },
+        response: {
+          schema: SystemSchema
         }
       }
     },
@@ -524,6 +528,9 @@ export const getRoutes = () => {
         },
         validate: {
           payload: clientIdSchema
+        },
+        response: {
+          schema: SystemSchema
         }
       }
     },
