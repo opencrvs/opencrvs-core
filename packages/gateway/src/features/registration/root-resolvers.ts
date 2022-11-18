@@ -16,7 +16,8 @@ import {
   REINSTATED_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
+  REQUEST_CORRECTION_EXTENSION_URL,
+  VIEWED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -148,6 +149,14 @@ export const resolvers: GQLResolver = {
     async fetchRegistration(_, { id }, authHeader) {
       return await fetchFHIR(`/Composition/${id}`, authHeader)
     },
+    async fetchRegistrationForViewing(_, { id }, authHeader) {
+      const taskEntry = await getTaskEntry(id, authHeader)
+      const extension = { url: VIEWED_EXTENSION_URL }
+      const taskBundle = taskBundleWithExtension(taskEntry, extension)
+
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+      return fetchFHIR(`/Composition/${id}`, authHeader)
+    },
     async queryPersonByIdentifier(_, { identifier }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
@@ -212,11 +221,11 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'performance')
       ) {
         const payload: {
-          declarationLocationHirarchyId?: string
+          declarationJurisdictionId?: string
           status: string[]
           event?: string
         } = {
-          declarationLocationHirarchyId: locationId,
+          declarationJurisdictionId: locationId,
           status: status as string[],
           event
         }
@@ -625,7 +634,8 @@ const ACTION_EXTENSIONS = [
   UNASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
+  REQUEST_CORRECTION_EXTENSION_URL,
+  VIEWED_EXTENSION_URL
 ]
 
 async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {

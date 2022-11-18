@@ -128,9 +128,8 @@ export const advancedSearchParamReducer: LoopReducer<
   action: Actions
 ): IAdvancedSearchParamState | Loop<IAdvancedSearchParamState, Actions> => {
   switch (action.type) {
-    case actions.CHANGE_ADVANCED_SEARCH_PARAM: {
+    case actions.SET_ADVANCED_SEARCH_PARAM: {
       return {
-        ...state,
         ...action.payload
       }
     }

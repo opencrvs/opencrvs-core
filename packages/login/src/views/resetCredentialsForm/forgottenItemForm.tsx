@@ -59,6 +59,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
 
   render() {
     const { intl, goToHome } = this.props
+
     const forgottenItems = [
       {
         id: 'usernameOption',
