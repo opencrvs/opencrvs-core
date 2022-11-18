@@ -95,7 +95,7 @@ workbox.routing.registerRoute(
 
 // This caches the minio urls
 workbox.routing.registerRoute(
-  /http(.+)document\.(.+)opencrvs\.org\/+/,
+  /https(.+)minio\.(.+)\/ocrvs\/+/,
   new workbox.strategies.NetworkFirst()
 )
 

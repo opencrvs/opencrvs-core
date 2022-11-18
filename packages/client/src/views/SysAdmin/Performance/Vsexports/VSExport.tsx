@@ -27,7 +27,6 @@ import {
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { MINIO_URL } from '@client/utils/constants'
 import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
@@ -79,7 +78,10 @@ function TabContent(props: VSExportProps) {
                   id={item.url}
                   disabled={false}
                   onClick={() =>
-                    downloadURI(`${MINIO_URL}${item.url}`, fileName)
+                    downloadURI(
+                      `${window.config.MINIO_URL}${item.url}`,
+                      fileName
+                    )
                   }
                 >
                   {messages.export.defaultMessage}

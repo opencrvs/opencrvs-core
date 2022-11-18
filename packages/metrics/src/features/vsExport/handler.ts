@@ -12,15 +12,15 @@
 
 import * as Hapi from '@hapi/hapi'
 import { uploadFileToMinio } from '@metrics/api'
-import { VS_EXPORT_SCRIPT_PATH } from '@metrics/constants'
+import {
+  VS_EXPORT_SCRIPT_PATH,
+  BIRTH_REPORT_PATH,
+  DEATH_REPORT_PATH
+} from '@metrics/constants'
 import VS_Export, { Event, IVSExport } from '@metrics/models/vsExports'
 import { fork } from 'child_process'
 import * as fs from 'fs'
-import { join } from 'path'
 import { internal } from '@hapi/boom'
-
-const BIRTH_REPORT_PATH = join(__dirname, '../../../scripts/Birth_Report.csv')
-const DEATH_REPORT_PATH = join(__dirname, '../../../scripts/Death_Report.csv')
 
 export async function vsExportHandler(
   request: Hapi.Request,
