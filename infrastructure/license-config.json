@@ -35,7 +35,8 @@
     "packages/scheduler/start.sh",
     "packages/scheduler/cronTabFiles/*",
     "packages/scheduler/jobs/*",
-    ".nvmrc"
+    ".nvmrc",
+    ".idea"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {

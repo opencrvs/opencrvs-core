@@ -277,6 +277,7 @@ interface IProps {
   writeDeclaration: typeof writeDeclaration
   registrationSection: IFormSection
   documentsSection: IFormSection
+  viewRecord?: boolean
 }
 type State = {
   displayEditDialog: boolean
@@ -1457,8 +1458,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   shouldShowChangeAll = (section: IFormSection) => {
     const {
-      draft: { data, event }
+      draft: { data, event },
+      viewRecord
     } = this.props
+    if (viewRecord) {
+      return false
+    }
     return (
       event === Event.Birth &&
       ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
@@ -1474,7 +1479,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const overriddenFields =
       this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
-
     return formSections.map((section) => {
       let items: any[] = []
       const visitedTags: string[] = []
@@ -1560,9 +1564,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       documentsSection,
       offlineCountryConfiguration,
       draft: { event },
-      onContinue
+      onContinue,
+      viewRecord
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
+    if (viewRecord) {
+      formSections.map((section) => {
+        return section.groups.map((group) => {
+          return group.fields.map((field) => {
+            field.readonly = true
+            if (field.nestedFields) {
+              Object.keys(field.nestedFields).forEach(function (key) {
+                if (field.nestedFields) {
+                  if (isArray(field.nestedFields)) {
+                    return field.nestedFields[key].map((nestedField) => {
+                      return (nestedField.readonly = true)
+                    })
+                  }
+                }
+              })
+            }
+            return field
+          })
+        })
+      })
+    }
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
@@ -1674,7 +1700,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               })}
               {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                 this.getAllAttachmentInPreviewList(declaration)}
-              {!isCorrection(declaration) && (
+              {(!isCorrection(declaration) || viewRecord) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1682,7 +1708,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     required={false}
                     label={intl.formatMessage(messages.additionalComments)}
                   >
-                    <TextArea {...textAreaProps} />
+                    <TextArea {...{ ...textAreaProps, readonly: viewRecord }} />
                   </InputField>
                 </InputWrapper>
               )}
@@ -1693,33 +1719,37 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   })}
                 </Alert>
               )}
-              {!isCorrection(declaration) ? (
+              {viewRecord ? null : (
                 <>
-                  <DuplicateWarning duplicateIds={declaration.duplicates} />
-                  <ReviewAction
-                    completeDeclaration={isComplete}
-                    totalFileSizeExceeded={totalFileSizeExceeded}
-                    declarationToBeValidated={this.userHasValidateScope()}
-                    declarationToBeRegistered={this.userHasRegisterScope()}
-                    alreadyRejectedDeclaration={
-                      this.props.draft.registrationStatus === REJECTED
-                    }
-                    draftDeclaration={draft}
-                    declaration={declaration}
-                    submitDeclarationAction={submitClickEvent}
-                    rejectDeclarationAction={rejectDeclarationClickEvent}
-                  />
+                  {!isCorrection(declaration) ? (
+                    <>
+                      <DuplicateWarning duplicateIds={declaration.duplicates} />
+                      <ReviewAction
+                        completeDeclaration={isComplete}
+                        totalFileSizeExceeded={totalFileSizeExceeded}
+                        declarationToBeValidated={this.userHasValidateScope()}
+                        declarationToBeRegistered={this.userHasRegisterScope()}
+                        alreadyRejectedDeclaration={
+                          this.props.draft.registrationStatus === REJECTED
+                        }
+                        draftDeclaration={draft}
+                        declaration={declaration}
+                        submitDeclarationAction={submitClickEvent}
+                        rejectDeclarationAction={rejectDeclarationClickEvent}
+                      />
+                    </>
+                  ) : (
+                    <FooterArea>
+                      <PrimaryButton
+                        id="continue_button"
+                        onClick={onContinue}
+                        disabled={!isComplete || !this.hasChangesBeenMade}
+                      >
+                        {intl.formatMessage(buttonMessages.continueButton)}
+                      </PrimaryButton>
+                    </FooterArea>
+                  )}
                 </>
-              ) : (
-                <FooterArea>
-                  <PrimaryButton
-                    id="continue_button"
-                    onClick={onContinue}
-                    disabled={!isComplete || !this.hasChangesBeenMade}
-                  >
-                    {intl.formatMessage(buttonMessages.continueButton)}
-                  </PrimaryButton>
-                </FooterArea>
               )}
             </FormData>
           </LeftColumn>
@@ -1742,28 +1772,30 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })}
                   {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                     intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
-                  <LinkButton
-                    id="edit-document"
-                    disabled={
-                      isCorrection(declaration) ||
-                      motherDoesNotExistAndStateIsMother(
-                        declaration,
-                        sectionName
-                      ) ||
-                      fatherDoesNotExistAndStateIsFather(
-                        declaration,
-                        sectionName
-                      )
-                    }
-                    onClick={() =>
-                      this.editLinkClickHandlerForDraft(
-                        documentsSection.id,
-                        documentsSection.groups[0].id!
-                      )
-                    }
-                  >
-                    {intl.formatMessage(messages.editDocuments)}
-                  </LinkButton>
+                  {viewRecord ? null : (
+                    <LinkButton
+                      id="edit-document"
+                      disabled={
+                        isCorrection(declaration) ||
+                        motherDoesNotExistAndStateIsMother(
+                          declaration,
+                          sectionName
+                        ) ||
+                        fatherDoesNotExistAndStateIsFather(
+                          declaration,
+                          sectionName
+                        )
+                      }
+                      onClick={() =>
+                        this.editLinkClickHandlerForDraft(
+                          documentsSection.id,
+                          documentsSection.groups[0].id!
+                        )
+                      }
+                    >
+                      {intl.formatMessage(messages.editDocuments)}
+                    </LinkButton>
+                  )}
                 </ZeroDocument>
               </DocumentViewer>
             </ResponsiveDocumentViewer>

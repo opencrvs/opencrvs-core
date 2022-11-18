@@ -19,7 +19,6 @@ import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import {
-  hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification,
   hideSubmitFormSuccessToast,
@@ -29,7 +28,8 @@ import {
   hideDownloadDeclarationFailedToast,
   ShowUnassignedPayload,
   hideUnassignedModal,
-  hideCreateUserErrorToast
+  hideCreateUserErrorToast,
+  hideUserReconnectedToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
@@ -37,7 +37,6 @@ import { NotificationState } from '@client/notification/reducer'
 type NotificationProps = {
   language?: string
   configurationErrorVisible: boolean
-  backgroundSyncMessageVisible: boolean
   saveDraftClicked: boolean
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
@@ -46,10 +45,10 @@ type NotificationProps = {
   downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
+  userReconnectedToast: boolean
 }
 
 type DispatchProps = {
-  hideBackgroundSyncedNotification: typeof hideBackgroundSyncedNotification
   hideConfigurationErrorNotification: typeof hideConfigurationErrorNotification
   hideSubmitFormSuccessToast: typeof hideSubmitFormSuccessToast
   hideSubmitFormErrorToast: typeof hideSubmitFormErrorToast
@@ -59,15 +58,12 @@ type DispatchProps = {
   hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
   hideUnassignedModal: typeof hideUnassignedModal
   hideCreateUserErrorToast: typeof hideCreateUserErrorToast
+  hideUserReconnectedToast: typeof hideUserReconnectedToast
 }
 
 class Component extends React.Component<
   NotificationProps & DispatchProps & IntlShapeProps & RouteComponentProps<{}>
 > {
-  hideBackgroundSyncedNotification = () => {
-    this.props.hideBackgroundSyncedNotification()
-  }
-
   hideConfigurationErrorNotification = () => {
     this.props.hideConfigurationErrorNotification()
   }
@@ -91,11 +87,13 @@ class Component extends React.Component<
   hideUserAuditSuccessToast = () => {
     this.props.hideUserAuditSuccessToast()
   }
+  hideUserReconnectedToast = () => {
+    this.props.hideUserReconnectedToast()
+  }
 
   render() {
     const {
       children,
-      backgroundSyncMessageVisible,
       configurationErrorVisible,
       intl,
       saveDraftClicked,
@@ -105,19 +103,20 @@ class Component extends React.Component<
       showPINUpdateSuccess,
       downloadDeclarationFailedToast,
       unassignedModal,
-      userCreateDuplicateMobileFailedToast
+      userCreateDuplicateMobileFailedToast,
+      userReconnectedToast
     } = this.props
 
     return (
       <div>
         {children}
-        {backgroundSyncMessageVisible && (
+        {userReconnectedToast && (
           <Toast
             type="success"
-            id="backgroundSyncShowNotification"
-            onClose={this.hideBackgroundSyncedNotification}
+            id="userOnlineReconnectedToast"
+            onClose={this.hideUserReconnectedToast}
           >
-            {intl.formatMessage(messages.declarationsSynced)}
+            {intl.formatMessage(messages.onlineUserStatus)}
           </Toast>
         )}
         {configurationErrorVisible && (
@@ -234,13 +233,13 @@ const mapStateToProps = (store: IStoreState) => {
       store.notification.downloadDeclarationFailedToast,
     unassignedModal: store.notification.unassignedModal,
     userCreateDuplicateMobileFailedToast:
-      store.notification.userCreateDuplicateMobileFailedToast
+      store.notification.userCreateDuplicateMobileFailedToast,
+    userReconnectedToast: store.notification.userReconnectedToast
   }
 }
 
 export const NotificationComponent = withRouter(
   connect<NotificationProps, DispatchProps, {}, IStoreState>(mapStateToProps, {
-    hideBackgroundSyncedNotification,
     hideConfigurationErrorNotification,
     hideSubmitFormSuccessToast,
     hideSubmitFormErrorToast,
@@ -249,6 +248,7 @@ export const NotificationComponent = withRouter(
     hidePINUpdateSuccessToast,
     hideDownloadDeclarationFailedToast,
     hideUnassignedModal,
-    hideCreateUserErrorToast
+    hideCreateUserErrorToast,
+    hideUserReconnectedToast
   })(injectIntl(Component))
 )

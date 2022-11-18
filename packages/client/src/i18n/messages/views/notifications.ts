@@ -36,6 +36,7 @@ interface INotificationsMessages
   waitingToRetry: MessageDescriptor
   downloadDeclarationFailed: MessageDescriptor
   unassigned: MessageDescriptor
+  onlineUserStatus: MessageDescriptor
 }
 
 const messagesToDefine: INotificationsMessages = {
@@ -185,6 +186,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'You were unassigned from {trackingId}',
     id: 'misc.notif.unassign',
     description: 'Label for unassigned toast notification'
+  },
+  onlineUserStatus: {
+    defaultMessage: 'You are back online',
+    id: 'misc.notif.onlineUserStatus',
+    description: 'Label for online user status toast notification'
   }
 }
 
