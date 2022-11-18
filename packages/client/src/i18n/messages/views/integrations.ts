@@ -283,6 +283,10 @@ const messagesToDefine = {
     id: 'integrations.deactivatetext',
     defaultMessage: 'This will deactivate the client',
     description: 'This will deactivate the client'
+  },
+  onlyOneNationalIdError: {
+    id: 'integrations.onlyOneNationalId',
+    defaultMessage: 'Only one MOSIP integration is allowed.'
   }
 }
 

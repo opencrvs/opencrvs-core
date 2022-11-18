@@ -98,7 +98,8 @@ export function SystemList() {
     activateSystemError,
     deactivateSystemError,
     clearNewSystemDraft,
-    resetData
+    resetData,
+    shouldWarnAboutNationalId
   } = useSystems()
 
   function changeActiveStatusIntl(status: SystemStatus) {
@@ -314,7 +315,11 @@ export function SystemList() {
                   {intl.formatMessage(buttonMessages.cancel)}
                 </Link>,
                 <Button
-                  disabled={!newSystemType || newClientName === EMPTY_STRING}
+                  disabled={
+                    !newSystemType ||
+                    newClientName === EMPTY_STRING ||
+                    shouldWarnAboutNationalId
+                  }
                   onClick={() => {
                     registerSystem()
                   }}
@@ -401,6 +406,12 @@ export function SystemList() {
                 />
               </InputField>
             </Field>
+
+            {shouldWarnAboutNationalId && (
+              <PaddedAlert type="error">
+                {intl.formatMessage(integrationMessages.onlyOneNationalIdError)}
+              </PaddedAlert>
+            )}
 
             {newSystemType === SystemType.Health && (
               <PaddedAlert type="info">

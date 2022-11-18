@@ -27,12 +27,6 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as mutations from './mutations'
 
-/** Gets existing systems from offline data */
-function useExistingSystems() {
-  const offlineData = useSelector(getOfflineData)
-  return offlineData.systems
-}
-
 /** Handles the user input when creating a new system in a modal */
 function useNewSystemDraft() {
   const [newClientName, setNewClientName] = useState(EMPTY_STRING)
@@ -62,8 +56,11 @@ function useNewSystemDraft() {
 
 /** Handles communication with global state management */
 export function useSystemsGlobalState() {
+  const { systems: existingSystems } = useSelector(getOfflineData)
+  const doesNationalIdAlreadyExist = existingSystems.some(
+    (system) => system.type === SystemType.NationalId
+  )
   const dispatch = useDispatch()
-  const existingSystems = useExistingSystems()
 
   const dispatchStatusChange = (updatedSystem: System) => {
     const systems = existingSystems.map((system) => {
@@ -80,7 +77,12 @@ export function useSystemsGlobalState() {
     dispatch(updateOfflineSystems({ systems: [...existingSystems, newSystem] }))
   }
 
-  return { dispatchStatusChange, dispatchNewSystem, existingSystems }
+  return {
+    dispatchStatusChange,
+    dispatchNewSystem,
+    existingSystems,
+    doesNationalIdAlreadyExist
+  }
 }
 
 /** Lists systems, allows creation of new ones and enabling or disabling existing ones. */
@@ -95,8 +97,12 @@ export function useSystems() {
     onChangeClientName,
     clearNewSystemDraft
   } = useNewSystemDraft()
-  const { dispatchNewSystem, dispatchStatusChange, existingSystems } =
-    useSystemsGlobalState()
+  const {
+    dispatchNewSystem,
+    dispatchStatusChange,
+    existingSystems,
+    doesNationalIdAlreadyExist
+  } = useSystemsGlobalState()
 
   const [
     activateSystemMutate,
@@ -187,6 +193,9 @@ export function useSystems() {
     resetRegisterSystemData()
   }
 
+  const shouldWarnAboutNationalId =
+    newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
+
   return {
     existingSystems,
     deactivateSystem,
@@ -209,6 +218,7 @@ export function useSystems() {
     setNewSystemType,
     onChangeClientName,
     clearNewSystemDraft,
-    resetData
+    resetData,
+    shouldWarnAboutNationalId
   }
 }
