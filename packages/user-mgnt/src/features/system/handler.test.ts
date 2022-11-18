@@ -188,7 +188,7 @@ describe('deactivateSystem handler', () => {
   it('deactivates system client using mongoose', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     mockingoose(System).toReturn(mockSystem, 'findOne')
-    mockingoose(System).toReturn({}, 'update')
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
 
     const res = await server.server.inject({
       method: 'POST',
@@ -248,7 +248,7 @@ describe('reactivateSystem handler', () => {
   it('reactivates system client using mongoose', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     mockingoose(System).toReturn(mockSystem, 'findOne')
-    mockingoose(System).toReturn({}, 'update')
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
 
     const res = await server.server.inject({
       method: 'POST',
