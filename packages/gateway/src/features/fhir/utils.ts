@@ -1358,7 +1358,7 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
   return extension
 }
 
-export const fetchDOCUMENTS = async <T = any>(
+export const fetchDocuments = async <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
   method = 'GET',
@@ -1380,7 +1380,7 @@ export async function uploadBase64ToMinio(
   fileData: string,
   authHeader: IAuthHeader
 ): Promise<string> {
-  const docUploadResponse = await fetchDOCUMENTS(
+  const docUploadResponse = await fetchDocuments(
     '/upload',
     authHeader,
     'POST',

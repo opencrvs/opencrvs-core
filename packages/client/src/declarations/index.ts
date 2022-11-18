@@ -39,11 +39,6 @@ import {
   gqlToDraftTransformer,
   draftToGqlTransformer
 } from '@client/transformer'
-import { client } from '@client/utils/apolloClient'
-import {
-  DECLARED_DECLARATION_SEARCH_QUERY_COUNT,
-  MINIO_URL
-} from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
@@ -946,7 +941,7 @@ async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
   }
   const urlsWithMinioPath = attachments
     .filter((a) => a?.data && !isBase64FileString(a.data))
-    .map((a) => a && fetch(`${MINIO_URL}${a.data}`))
+    .map((a) => a && fetch(`${window.config.MINIO_URL}${a.data}`))
 
   return Promise.all(urlsWithMinioPath)
 }
@@ -1689,7 +1684,7 @@ export function getMinioUrlsFromDeclaration(
 
 export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
   const minioFullUrls = minioUrls.map(
-    (pathToImage) => `${MINIO_URL}${pathToImage}`
+    (pathToImage) => `${window.config.MINIO_URL}${pathToImage}`
   )
   navigator?.serviceWorker?.controller?.postMessage({
     minioUrls: minioFullUrls
