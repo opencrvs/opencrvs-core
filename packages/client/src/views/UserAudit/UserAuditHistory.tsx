@@ -384,14 +384,25 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             <BoldContent>{actionMessage}</BoldContent>
           ),
 
-        actionDescriptionWithAuditTime: (
-          <AuditDescTimeContainer>
-            <InformationTitle>{actionMessage}</InformationTitle>
-            <InformationCaption>
-              {format(new Date(userAuditItem.time), 'MMMM dd, yyyy hh:mm a')}
-            </InformationCaption>
-          </AuditDescTimeContainer>
-        ),
+        actionDescriptionWithAuditTime:
+          isSystemAdmin &&
+          isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
+            <GetLink
+              status={actionMessage}
+              onClick={() => {
+                this.toggleActionDetails(userAuditItem)
+              }}
+            />
+          ) : !isSystemAdmin ? (
+            <GetLink
+              status={actionMessage}
+              onClick={() => {
+                this.toggleActionDetails(userAuditItem)
+              }}
+            />
+          ) : (
+            <BoldContent>{actionMessage}</BoldContent>
+          ),
         trackingId:
           isUserAuditItemWithDeclarationDetials(userAuditItem) &&
           !isSystemAdmin ? (

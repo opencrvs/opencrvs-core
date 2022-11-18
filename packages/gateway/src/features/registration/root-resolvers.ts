@@ -569,7 +569,8 @@ async function createEventRegistration(
     }
   }
 
-  const userId = getClientIdFromToken(authHeader.Authorization)
+  const authorization = authHeader.Authorization
+  const userId = getClientIdFromToken(authorization)
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   const user = await getUser({ userId }, authHeader)
 
