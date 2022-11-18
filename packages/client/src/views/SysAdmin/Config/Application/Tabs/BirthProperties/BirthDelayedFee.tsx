@@ -80,7 +80,7 @@ export function BirthDelayedFee() {
             LATE_REGISTRATION_TARGET:
               offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET,
             FEE: {
-              ON_TIME: offlineCountryConfiguration.config.BIRTH.FEE.LATE,
+              ON_TIME: offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME,
               LATE: offlineCountryConfiguration.config.BIRTH.FEE.LATE,
               DELAYED: parseFloat(birthDelayedFee.replace(/,/g, ''))
             }
