@@ -193,7 +193,7 @@ const CErrorText = styled(ErrorText)`
   width: 200px;
 `
 
-const CustomSelectHeading = styled.p`
+const CustomSelectHeading = styled.span`
   display: flex;
   gap: 5px;
 `
