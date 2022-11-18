@@ -74,6 +74,8 @@ import {
   selectOrCreateEncounterParticipant,
   selectOrCreateQuestionnaireResource,
   setQuestionnaireItem,
+  uploadBase64ToMinio,
+  isBase64FileString,
   postAssignmentSearch
 } from '@gateway/features/fhir/utils'
 import {
@@ -2403,7 +2405,7 @@ export const builders: IFieldBuilders = {
             paymentResource.detail[0].date = fieldValue
           }
         },
-        data: (
+        data: async (
           fhirBundle: ITemplatedBundle,
           fieldValue: string,
           context: any
@@ -2416,6 +2418,13 @@ export const builders: IFieldBuilders = {
           )
           if (!certDocResource.content) {
             certDocResource.content = []
+          }
+          if (isBase64FileString(fieldValue)) {
+            const docUploadResponse = await uploadBase64ToMinio(
+              fieldValue,
+              context.authHeader
+            )
+            fieldValue = docUploadResponse
           }
 
           certDocResource.content.push({
@@ -2496,7 +2505,7 @@ export const builders: IFieldBuilders = {
           )
       },
       values: createActionTypesBuilder(),
-      data: (
+      data: async (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
         context: any
@@ -2509,6 +2518,13 @@ export const builders: IFieldBuilders = {
         )
         if (!certDocResource.content) {
           certDocResource.content = []
+        }
+        if (isBase64FileString(fieldValue)) {
+          const docUploadResponse = await uploadBase64ToMinio(
+            fieldValue,
+            context.authHeader
+          )
+          fieldValue = docUploadResponse
         }
 
         certDocResource.content.push({
@@ -2752,7 +2768,7 @@ export const builders: IFieldBuilders = {
         }
         docRef.content[0].attachment.contentType = fieldValue
       },
-      data: (
+      data: async (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
         context: any
@@ -2770,6 +2786,14 @@ export const builders: IFieldBuilders = {
               attachment: {}
             }
           ]
+        }
+
+        if (isBase64FileString(fieldValue)) {
+          const docUploadResponse = await uploadBase64ToMinio(
+            fieldValue,
+            context.authHeader
+          )
+          fieldValue = docUploadResponse
         }
         docRef.content[0].attachment.data = fieldValue
       },
@@ -2903,7 +2927,7 @@ export const builders: IFieldBuilders = {
               }
             }
           },
-          data: (
+          data: async (
             fhirBundle: ITemplatedBundle,
             fieldValue: string,
             context: any
@@ -2921,6 +2945,13 @@ export const builders: IFieldBuilders = {
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
+            if (isBase64FileString(fieldValue)) {
+              const docUploadResponse = await uploadBase64ToMinio(
+                fieldValue,
+                context.authHeader
+              )
+              fieldValue = docUploadResponse
+            }
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
@@ -3177,7 +3208,7 @@ export const builders: IFieldBuilders = {
           }
         }
       },
-      data: (
+      data: async (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
         context: any
@@ -3187,6 +3218,14 @@ export const builders: IFieldBuilders = {
           context,
           EVENT_TYPE.BIRTH
         )
+
+        if (isBase64FileString(fieldValue)) {
+          const docUploadResponse = await uploadBase64ToMinio(
+            fieldValue,
+            context.authHeader
+          )
+          fieldValue = docUploadResponse
+        }
         if (!certDocResource.content) {
           certDocResource.content = [
             {

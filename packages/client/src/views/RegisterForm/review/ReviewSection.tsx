@@ -106,7 +106,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice } from '@client/utils/commonUtils'
+import { isMobileDevice, isBase64FileString } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
@@ -743,8 +743,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           return true
         }
 
+        const documentData = !isBase64FileString(document.data)
+          ? `${window.config.MINIO_URL}${document.data}`
+          : document.data
+
         documentOptions.push({
-          value: document.data,
+          value: documentData,
           label
         })
         selectOptions.push({
