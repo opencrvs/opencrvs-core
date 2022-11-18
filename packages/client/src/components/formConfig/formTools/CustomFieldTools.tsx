@@ -66,6 +66,7 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Icon } from '@opencrvs/components/src/Icon/Icon'
 import { FileSelectLink } from '@opencrvs/components/lib/FileSelectLink'
+import { getBase64String } from '@client/utils/imageUtils'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -859,11 +860,11 @@ class CustomFieldToolsComp extends React.Component<
           &nbsp;
           <FileSelectLink
             id="upload-data-source"
-            handleFileChange={(file: File) => {
-              console.log('File Selected', file)
-            }}
-            onClick={() => {
-              console.log('Clicked')
+            accept="*/*"
+            handleFileChange={async (file: File) => {
+              const encodedFile = await getBase64String(file)
+              console.log('File: ', file)
+              console.log('Encoded: ', (encodedFile as string).split(',')[1])
             }}
             title={intl.formatMessage(buttonMessages.upload)}
           />

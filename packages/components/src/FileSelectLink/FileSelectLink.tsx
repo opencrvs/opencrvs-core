@@ -37,6 +37,7 @@ interface IImagePickerProps {
   handleFileChange: (file: File) => void
   onClick?: (event: React.MouseEvent<HTMLElement>) => void
   disabled?: boolean
+  accept?: string
 }
 
 export class FileSelectLink extends React.Component<IImagePickerProps, {}> {
@@ -51,7 +52,12 @@ export class FileSelectLink extends React.Component<IImagePickerProps, {}> {
   }
 
   render() {
-    const { title, disabled = false, ...otherProps } = this.props
+    const {
+      title,
+      disabled = false,
+      accept = 'image/*',
+      ...otherProps
+    } = this.props
     return (
       <ImageBase
         {...otherProps}
@@ -69,7 +75,7 @@ export class FileSelectLink extends React.Component<IImagePickerProps, {}> {
           ref={this.fileUploader}
           id="image_file_uploader_field"
           type="file"
-          accept="image/*"
+          accept={accept}
           onChange={this.handleFileChange}
         />
       </ImageBase>
