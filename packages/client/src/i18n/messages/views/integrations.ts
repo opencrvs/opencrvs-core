@@ -194,7 +194,11 @@ const messagesToDefine = {
     defaultMessage: 'Webhook',
     description: 'Label for web hook'
   },
-
+  healthSystem: {
+    id: 'integrations.type.healthSystem',
+    defaultMessage: 'Health integration',
+    description: 'Label for health system type'
+  },
   healthnotificationAlertDescription: {
     id: 'integrations.healthnotificationDescription',
     defaultMessage:

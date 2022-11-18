@@ -74,6 +74,13 @@ export function SystemList() {
     selectedClient: null
   })
 
+  const sysType = {
+    HEALTH: intl.formatMessage(integrationMessages.healthSystem),
+    NATIONAL_ID: intl.formatMessage(integrationMessages.mosip),
+    RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
+    WEBHOOK: intl.formatMessage(integrationMessages.webhook)
+  }
+
   const toggleModal = () => {
     setShowModal((prev) => !prev)
   }
@@ -93,6 +100,7 @@ export function SystemList() {
     activateSystemLoading,
     deactivateSystemLoading,
     registerSystemLoading,
+    registerSystemError,
     activateSystemData,
     deactivateSystemData,
     activateSystemError,
@@ -192,7 +200,7 @@ export function SystemList() {
                 </>
               }
               label={system.name}
-              value={system.type}
+              value={sysType[system.type]}
             />
           ))}
           {systemToToggleActivation && (
@@ -645,15 +653,17 @@ export function SystemList() {
           {intl.formatMessage(integrationMessages.deactivateClientStatus)}
         </Toast>
       )}
-      {(activateSystemError || deactivateSystemError) && (
+      {(activateSystemError ||
+        deactivateSystemError ||
+        registerSystemError) && (
         <Toast
-          type="success"
+          type="error"
           id="toggleClientStatusToast"
           onClose={() => {
             resetData()
           }}
         >
-          {intl.formatMessage(integrationMessages.deactivateClientStatus)}
+          {intl.formatMessage(integrationMessages.error)}
         </Toast>
       )}
     </Frame>
