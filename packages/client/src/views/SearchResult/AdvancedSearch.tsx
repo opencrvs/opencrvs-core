@@ -28,7 +28,7 @@ import { PrimaryButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { getPartialState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { modifyAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { goToAdvancedSearchResult, goToSearchResult } from '@client/navigation'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import {
@@ -414,7 +414,7 @@ const BirthSection = () => {
         disabled={isDisable}
         onClick={() => {
           dispatch(
-            modifyAdvancedSearchParam({
+            setAdvancedSearchParam({
               ...transformLocalFormDataToReduxData(formState),
               event: 'birth'
             })

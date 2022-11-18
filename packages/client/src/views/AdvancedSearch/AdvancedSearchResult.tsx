@@ -9,51 +9,73 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { connect, useDispatch, useSelector } from 'react-redux'
-import { goToPage, goToAdvancedSearch } from '@client/navigation'
 import {
-  injectIntl,
-  IntlShape,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
-import { SUBMISSION_STATUS } from '@client/declarations'
+  goToAdvancedSearch,
+  goToDeclarationRecordAudit,
+  goToEvents as goToEventsAction,
+  goToPage as goToPageAction,
+  goToPrintCertificate as goToPrintCertificateAction
+} from '@client/navigation'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  DOWNLOAD_STATUS,
+  getProcessingDeclarationIds,
+  IDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
-import { ARCHIVED } from '@client/utils/constants'
-import { IQueryData } from '@client/workqueue'
+import {
+  BRN_DRN_TEXT,
+  NAME_TEXT,
+  NATIONAL_ID_TEXT,
+  PHONE_TEXT,
+  SEARCH_RESULT_SORT,
+  TRACKING_ID_TEXT
+} from '@client/utils/constants'
 import {
   buttonMessages,
   constantsMessages,
+  dynamicConstantsMessages,
   errorMessages
 } from '@client/i18n/messages'
-import { getLanguage } from '@client/i18n/selectors'
-import { IUserDetails } from '@client/utils/userUtils'
-import { goBack } from 'connected-react-router'
+import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import {
-  LoadingIndicator,
-  useOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
-import { RouteProps } from 'react-router'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { RouteComponentProps } from 'react-router'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '../OfficeHome/WQContentWrapper'
 
 import {
   ColumnContentAlignment,
-  Workqueue,
+  COLUMNS,
   IAction,
-  COLUMNS
+  Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
 import { SearchEventsQuery } from '@client/utils/gateway'
 import { getPartialState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { Query } from '@apollo/client/react/components'
+import { SEARCH_EVENTS } from '@client/search/queries'
+import {
+  IconWithName,
+  IconWithNameEvent,
+  NameContainer,
+  NoNameContainer
+} from '../OfficeHome/components'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { convertToMSISDN } from '@client/forms/utils'
+import { DownloadAction } from '@client/forms'
+import { formattedDuration } from '@client/utils/date-formatting'
+import { IViewHeadingProps } from '@client/components/ViewHeading'
+import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 
 const SearchParamPillsContainer = styled.div`
   margin: 16px 0px;
@@ -69,40 +91,36 @@ const BookMarkIconBody = styled.div`
   right: 10px;
 `
 
-interface IStateProps {
-  userDetails: IUserDetails | null
-  language: string
-  resources: IOfflineData
-  scope: Scope | null
-  offlineData: Partial<IOfflineData>
-}
-
 type QueryData = SearchEventsQuery['searchEvents']
 
-interface IDispatchProps {
-  goToPage: typeof goToPage
-  goBack: typeof goBack
-  goToAdvancedSearch: typeof goToAdvancedSearch
+interface IBaseSearchResultProps {
+  theme: ITheme
+  language: string
+  scope: Scope | null
+  goToEvents: typeof goToEventsAction
+  userDetails: IUserDetails | null
+  outboxDeclarations: IDeclaration[]
+  goToPage: typeof goToPageAction
+  goToPrintCertificate: typeof goToPrintCertificateAction
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
-export type IRecordAuditTabs = keyof IQueryData | 'search'
+interface IMatchParams {
+  searchText: string
+  searchType: string
+}
 
-type IFullProps = IDispatchProps &
-  IStateProps &
-  IntlShapeProps &
-  RouteProps &
-  ITheme
+type IFullProps = IntlShapeProps &
+  IViewHeadingProps &
+  ISearchInputProps &
+  IBaseSearchResultProps &
+  RouteComponentProps<IMatchParams>
 
 const RecordAuditComp = (props: IFullProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const dispatch = useDispatch()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
   const { intl } = props
-  const total = 0
-  const loading = false
-  const error = false
-  const data = {}
-  const pageSize = 10
 
   const recordWindowWidth = () => {
     setWindowWidth(window.innerWidth)
@@ -116,6 +134,10 @@ const RecordAuditComp = (props: IFullProps) => {
       window.removeEventListener('resize', recordWindowWidth)
     }
   }, [])
+
+  const isEnoughParams = () => {
+    return true
+  }
 
   const getContentTableColumns = () => {
     if (windowWidth > props.theme.grid.breakpoints.lg) {
@@ -159,175 +181,194 @@ const RecordAuditComp = (props: IFullProps) => {
     }
   }
 
-  const transformAdvancedSearchContent = (data: QueryData) => {
+  const userHasRegisterScope = () => {
+    return props.scope && props.scope.includes('register')
+  }
+  const userHasValidateScope = () => {
+    return props.scope && props.scope.includes('validate')
+  }
+  const userHasCertifyScope = () => {
+    return props.scope && props.scope.includes('certify')
+  }
+  const userHasValidateOrRegistrarScope = () => {
+    return userHasValidateScope() || userHasRegisterScope()
+  }
+
+  const transformSearchContent = (data: QueryData) => {
     if (!data || !data.results) {
       return []
     }
-
     const transformedData = transformData(data, props.intl)
 
-    return transformedData.map((reg, index) => {
-      const foundDeclaration = props.outboxDeclarations.find(
-        (declaration) => declaration.id === reg.id
-      )
-      const actions: IAction[] = []
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+    const processingDeclarationIds = getProcessingDeclarationIds(
+      props.outboxDeclarations
+    )
 
-      const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
-      const declarationIsRequestedCorrection =
-        reg.declarationStatus === 'REQUESTED_CORRECTION'
-      const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
-      const declarationIsCertified = reg.declarationStatus === 'CERTIFIED'
-      const declarationIsRejected = reg.declarationStatus === 'REJECTED'
-      const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
-      const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
-      const isDuplicate =
-        reg.duplicates &&
-        reg.duplicates.length > 0 &&
-        reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
-        reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
-      const { intl, match, userDetails } = props
-      const { searchText, searchType } = match.params
-      if (windowWidth > props.theme.grid.breakpoints.lg) {
-        if (
-          (declarationIsRegistered || declarationIsCertified) &&
-          userHasCertifyScope()
-        ) {
-          actions.push({
-            label: props.intl.formatMessage(buttonMessages.print),
-            handler: (
-              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-            ) => {
-              e && e.stopPropagation()
-              props.goToPrintCertificate(reg.id, reg.event)
-            },
-            disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
-          })
-        } else if (
-          (declarationIsValidated && userHasRegisterScope()) ||
-          (!declarationIsValidated &&
-            !declarationIsRegistered &&
-            !declarationIsCertified &&
-            !declarationIsArchived &&
-            userHasValidateOrRegistrarScope())
-        ) {
-          actions.push({
-            label:
-              declarationIsRejected || declarationIsInProgress
-                ? props.intl.formatMessage(constantsMessages.update)
-                : props.intl.formatMessage(constantsMessages.review),
-            handler: () =>
-              props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event.toLowerCase()
-              ),
-            disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
-          })
-        }
-      }
-      actions.push({
-        actionComponent: (
-          <DownloadButton
-            key={reg.id}
-            downloadConfigs={{
-              event: reg.event,
-              compositionId: reg.id,
-              assignment: reg.assignment,
-              refetchQueries: [
-                {
-                  query: SEARCH_EVENTS,
-                  variables: {
-                    locationIds: userHasRegisterScope()
-                      ? null
-                      : userDetails
-                      ? [getUserLocation(userDetails).id]
-                      : [],
-                    sort: SEARCH_RESULT_SORT,
-                    trackingId:
-                      searchType === TRACKING_ID_TEXT ? searchText : '',
-                    nationalId:
-                      searchType === NATIONAL_ID_TEXT ? searchText : '',
-                    registrationNumber:
-                      searchType === BRN_DRN_TEXT ? searchText : '',
-                    contactNumber:
-                      searchType === PHONE_TEXT
-                        ? convertToMSISDN(searchText)
-                        : '',
-                    name: searchType === NAME_TEXT ? searchText : ''
-                  }
-                }
-              ],
-              action:
-                ((declarationIsRegistered || declarationIsCertified) &&
-                  DownloadAction.LOAD_CERTIFICATE_DECLARATION) ||
-                (declarationIsRequestedCorrection &&
-                  DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
-                DownloadAction.LOAD_REVIEW_DECLARATION
-            }}
-            status={downloadStatus as DOWNLOAD_STATUS}
-          />
+    return transformedData
+      .filter(({ id }) => !processingDeclarationIds.includes(id))
+      .map((reg, index) => {
+        const foundDeclaration = props.outboxDeclarations.find(
+          (declaration) => declaration.id === reg.id
         )
+        const actions: IAction[] = []
+        const downloadStatus =
+          (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+
+        const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
+        const declarationIsRequestedCorrection =
+          reg.declarationStatus === 'REQUESTED_CORRECTION'
+        const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
+        const declarationIsCertified = reg.declarationStatus === 'CERTIFIED'
+        const declarationIsRejected = reg.declarationStatus === 'REJECTED'
+        const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
+        const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
+        const isDuplicate =
+          reg.duplicates &&
+          reg.duplicates.length > 0 &&
+          reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
+          reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
+        const { intl, match, userDetails } = props
+        const { searchText, searchType } = match.params
+        if (windowWidth > props.theme.grid.breakpoints.lg) {
+          if (
+            (declarationIsRegistered || declarationIsCertified) &&
+            userHasCertifyScope()
+          ) {
+            actions.push({
+              label: props.intl.formatMessage(buttonMessages.print),
+              handler: (
+                e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+              ) => {
+                e && e.stopPropagation()
+                props.goToPrintCertificate(reg.id, reg.event)
+              },
+              disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+            })
+          } else if (
+            (declarationIsValidated && userHasRegisterScope()) ||
+            (!declarationIsValidated &&
+              !declarationIsRegistered &&
+              !declarationIsCertified &&
+              !declarationIsArchived &&
+              userHasValidateOrRegistrarScope())
+          ) {
+            actions.push({
+              label:
+                declarationIsRejected || declarationIsInProgress
+                  ? props.intl.formatMessage(constantsMessages.update)
+                  : props.intl.formatMessage(constantsMessages.review),
+              handler: () =>
+                props.goToPage(
+                  REVIEW_EVENT_PARENT_FORM_PAGE,
+                  reg.id,
+                  'review',
+                  reg.event.toLowerCase()
+                ),
+              disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+            })
+          }
+        }
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              key={reg.id}
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                assignment: reg.assignment,
+                refetchQueries: [
+                  {
+                    query: SEARCH_EVENTS,
+                    variables: {
+                      advancedSearchParameters: {
+                        trackingId:
+                          searchType === TRACKING_ID_TEXT ? searchText : '',
+                        nationalId:
+                          searchType === NATIONAL_ID_TEXT ? searchText : '',
+                        registrationNumber:
+                          searchType === BRN_DRN_TEXT ? searchText : '',
+                        contactNumber:
+                          searchType === PHONE_TEXT
+                            ? convertToMSISDN(searchText)
+                            : '',
+                        name: searchType === NAME_TEXT ? searchText : '',
+                        declarationLocationId: userDetails
+                          ? getUserLocation(userDetails).id
+                          : ''
+                      },
+                      sort: SEARCH_RESULT_SORT
+                    }
+                  }
+                ],
+                action:
+                  ((declarationIsRegistered || declarationIsCertified) &&
+                    DownloadAction.LOAD_CERTIFICATE_DECLARATION) ||
+                  (declarationIsRequestedCorrection &&
+                    DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
+                  DownloadAction.LOAD_REVIEW_DECLARATION
+              }}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
+        const event =
+          (reg.event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[reg.event.toLowerCase()]
+            )) ||
+          ''
+        const dateOfEvent =
+          reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))
+        const isValidatedOnReview =
+          reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
+          userHasRegisterScope()
+            ? true
+            : false
+        const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
+        const NameComponent = reg.name ? (
+          <NameContainer
+            id={`name_${index}`}
+            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+          >
+            {reg.name}
+          </NameContainer>
+        ) : (
+          <NoNameContainer
+            id={`name_${index}`}
+            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+          >
+            {intl.formatMessage(constantsMessages.noNameProvided)}
+          </NoNameContainer>
+        )
+        return {
+          ...reg,
+          event,
+          name: reg.name && reg.name.toLowerCase(),
+          iconWithName: (
+            <IconWithName
+              status={reg.declarationStatus}
+              name={NameComponent}
+              isValidatedOnReview={isValidatedOnReview}
+              isDuplicate={isDuplicate}
+              isArchived={isArchived}
+            />
+          ),
+          iconWithNameEvent: (
+            <IconWithNameEvent
+              status={reg.declarationStatus}
+              name={NameComponent}
+              event={event}
+              isDuplicate={isDuplicate}
+              isValidatedOnReview={isValidatedOnReview}
+              isArchived={isArchived}
+            />
+          ),
+          dateOfEvent,
+          actions
+        }
       })
-      const event =
-        (reg.event &&
-          intl.formatMessage(
-            dynamicConstantsMessages[reg.event.toLowerCase()]
-          )) ||
-        ''
-      const dateOfEvent =
-        reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))
-      const isValidatedOnReview =
-        reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
-        userHasRegisterScope()
-          ? true
-          : false
-      const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
-      const NameComponent = reg.name ? (
-        <NameContainer
-          id={`name_${index}`}
-          onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
-        >
-          {reg.name}
-        </NameContainer>
-      ) : (
-        <NoNameContainer
-          id={`name_${index}`}
-          onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
-        >
-          {intl.formatMessage(constantsMessages.noNameProvided)}
-        </NoNameContainer>
-      )
-      return {
-        ...reg,
-        event,
-        name: reg.name && reg.name.toLowerCase(),
-        iconWithName: (
-          <IconWithName
-            status={reg.declarationStatus}
-            name={NameComponent}
-            isValidatedOnReview={isValidatedOnReview}
-            isDuplicate={isDuplicate}
-            isArchived={isArchived}
-          />
-        ),
-        iconWithNameEvent: (
-          <IconWithNameEvent
-            status={reg.declarationStatus}
-            name={NameComponent}
-            event={event}
-            isDuplicate={isDuplicate}
-            isValidatedOnReview={isValidatedOnReview}
-            isArchived={isArchived}
-          />
-        ),
-        dateOfEvent,
-        actions
-      }
-    })
   }
+
   const SearchModifierComponent = () => {
     return (
       <>
@@ -359,7 +400,7 @@ const RecordAuditComp = (props: IFullProps) => {
       </>
     )
   }
-
+  console.log(advancedSearchParamsState.registrationStatuses)
   return (
     <Frame
       header={
@@ -375,55 +416,74 @@ const RecordAuditComp = (props: IFullProps) => {
         constantsMessages.skipToMainContent
       )}
     >
-      <WQContentWrapper
-        title={'Search Result'}
-        isMobileSize={false}
-        noResultText={'No Results'}
-        noContent={total < 1 && !loading}
-        tabBarContent={<SearchModifierComponent />}
-      >
-        {loading ? (
-          <div id="advanced-search_loader">
-            <LoadingIndicator loading={true} />
-          </div>
-        ) : error ? (
-          <ErrorText id="advanced-search-result-error-text">
-            {intl.formatMessage(errorMessages.queryError)}
-          </ErrorText>
-        ) : (
-          total > 0 && (
-            <>
-              <Workqueue
-                content={transformAdvancedSearchContent(data)}
-                columns={getContentTableColumns()}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-                hideLastBorder={true}
-              />
-            </>
-          )
-        )}
-      </WQContentWrapper>
+      {isEnoughParams() && (
+        <Query<SearchEventsQuery>
+          query={SEARCH_EVENTS}
+          variables={{
+            advancedSearchParameters: {
+              ...advancedSearchParamsState
+            },
+            count: 10,
+            skip: 0
+          }}
+          fetchPolicy="cache-and-network"
+        >
+          {({ loading, error, data }) => {
+            const total = loading ? -1 : data?.searchEvents?.totalItems || 0
+            return (
+              <WQContentWrapper
+                title={'Search Result'}
+                isMobileSize={false}
+                noResultText={'No Results'}
+                noContent={total < 1 && !loading}
+                tabBarContent={<SearchModifierComponent />}
+                isShowPagination={true}
+                totalPages={2}
+                paginationId={1}
+              >
+                {loading ? (
+                  <div id="advanced-search_loader">
+                    <LoadingIndicator loading={true} />
+                  </div>
+                ) : error ? (
+                  <ErrorText id="advanced-search-result-error-text">
+                    {intl.formatMessage(errorMessages.queryError)}
+                  </ErrorText>
+                ) : (
+                  data?.searchEvents &&
+                  total > 0 && (
+                    <>
+                      <Workqueue
+                        content={transformSearchContent(data?.searchEvents)}
+                        columns={getContentTableColumns()}
+                        noResultText={intl.formatMessage(
+                          constantsMessages.noResults
+                        )}
+                        hideLastBorder={true}
+                      />
+                    </>
+                  )
+                )}
+              </WQContentWrapper>
+            )
+          }}
+        </Query>
+      )}
     </Frame>
   )
 }
 
-function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
-  return {
-    language: getLanguage(state),
-    resources: getOfflineData(state),
+export const AdvancedSearchResult = connect(
+  (state: IStoreState) => ({
+    language: state.i18n.language,
     scope: getScope(state),
-    userDetails: state.profile.userDetails,
-    offlineData: state.offline.offlineData
+    userDetails: getUserDetails(state),
+    outboxDeclarations: state.declarationsState.declarations
+  }),
+  {
+    goToEvents: goToEventsAction,
+    goToPage: goToPageAction,
+    goToPrintCertificate: goToPrintCertificateAction,
+    goToDeclarationRecordAudit
   }
-}
-
-export const AdvancedSearchResult = connect<
-  IStateProps,
-  IDispatchProps,
-  RouteProps,
-  IStoreState
->(mapStateToProps, {
-  goToPage,
-  goToAdvancedSearch,
-  goBack
-})(injectIntl(RecordAuditComp))
+)(injectIntl(withTheme(RecordAuditComp)))

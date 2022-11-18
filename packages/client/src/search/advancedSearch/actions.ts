@@ -11,18 +11,18 @@
  */
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 
-export const CHANGE_ADVANCED_SEARCH_PARAM =
-  'ADVANCED_SEARCH/CHANGE_ADVANCED_SEARCH_PARAM'
+export const SET_ADVANCED_SEARCH_PARAM =
+  'ADVANCED_SEARCH/SET_ADVANCED_SEARCH_PARAM'
 
 export type ModifyAdvancedSearchParamAction = {
-  type: typeof CHANGE_ADVANCED_SEARCH_PARAM
+  type: typeof SET_ADVANCED_SEARCH_PARAM
   payload: Partial<IAdvancedSearchParamState>
 }
 
-export const modifyAdvancedSearchParam = (
+export const setAdvancedSearchParam = (
   paramsToUpdate: Partial<IAdvancedSearchParamState>
 ): ModifyAdvancedSearchParamAction => ({
-  type: CHANGE_ADVANCED_SEARCH_PARAM,
+  type: SET_ADVANCED_SEARCH_PARAM,
   payload: paramsToUpdate
 })
 
