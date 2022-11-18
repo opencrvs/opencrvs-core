@@ -16,3 +16,4 @@ export * from '@client/forms/register/fieldMappings/birth/mutation/registration-
 export * from '@client/forms/register/fieldMappings/death/mutation/informant-mapping'
 export * from '@client/forms/register/fieldMappings/death/mutation/event-mappings'
 export * from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+export * from '@client/forms/register/customFieldMappings/mutation/customField-mappings'
