@@ -23,6 +23,7 @@ type Query {
   fetchDeathRegistration(id: ID!): DeathRegistration
   fetchEventRegistration(id: ID!): EventRegistration
   fetchRegistration(id: ID!): EventRegistration
+  fetchRegistrationForViewing(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
     status: [String]!
@@ -64,7 +65,6 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
-  getVSExports: TotalVSExport
   getTotalPayments(
     timeStart: String!
     timeEnd: String!
@@ -416,10 +416,6 @@ type VerifyPasswordResult {
 type TotalMetricsResult {
   estimated: Estimation!
   results: [EventMetrics!]!
-}
-
-type TotalVSExport {
-  results: [VSExport!]
 }
 
 type PaymentMetric {
@@ -937,14 +933,6 @@ type EventMetrics {
   practitionerRole: String!
 }
 
-type VSExport {
-  event: String!
-  year: Int!
-  fileSize: String!
-  url: String!
-  createdOn: String!
-}
-
 union UserAuditLogResultItem =
     UserAuditLogItemWithComposition
   | UserAuditLogItem
@@ -1231,6 +1219,7 @@ enum RegAction {
   REINSTATED
   REQUESTED_CORRECTION
   DOWNLOADED
+  VIEWED
 }
 
 type StatusReason {
