@@ -59,7 +59,6 @@ import styled from 'styled-components'
 
 const ToolTipContainer = styled.span`
   text-align: center;
-  font-weight: bold;
 `
 const DEFAULT_PAGE_SIZE = 10
 const { useState, useEffect } = React
