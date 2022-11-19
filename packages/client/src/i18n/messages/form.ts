@@ -1966,7 +1966,7 @@ export const formMessageDescriptors = {
   },
   akwa: {
     id: 'form.field.label.state.akwa',
-    defaultMessage: 'Akwa',
+    defaultMessage: 'Akwa Ibom',
     description: 'Label for Akwa state'
   },
   anambra: {
@@ -1996,7 +1996,7 @@ export const formMessageDescriptors = {
   },
   cross: {
     id: 'form.field.label.state.cross',
-    defaultMessage: 'Cross',
+    defaultMessage: 'Cross River',
     description: 'Label for Cross state'
   },
   delta: {
@@ -2026,7 +2026,7 @@ export const formMessageDescriptors = {
   },
   federal: {
     id: 'form.field.label.state.federal',
-    defaultMessage: 'Federal',
+    defaultMessage: 'Federal Capital Territory',
     description: 'Label for Federal state'
   },
   gombe: {
@@ -2136,7 +2136,7 @@ export const formMessageDescriptors = {
   },
   zamfara: {
     id: 'form.field.label.state.zamfara',
-    defaultMessage: 'Zamfara  ',
+    defaultMessage: 'Zamfara',
     description: 'Label for Zamfara state'
   },
   docTypeCoronersReport: {

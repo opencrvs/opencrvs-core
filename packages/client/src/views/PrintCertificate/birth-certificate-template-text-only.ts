@@ -106,6 +106,12 @@ const birthCertificateTemplateTextOnly = `<svg width="421" height="595" viewBox=
     <rect x="143.447" y="498.472" width="106.06" height="37.1756" fill="url(#pattern0)" />
   </g>
   <line x1="136.006" y1="536.5" x2="256.756" y2="536.5" stroke="#A5A5A5" />
+
+  <image
+    width="54" height="56"
+    x="326" y="503.565"
+    xlink:href="{{ qrCode }}"
+  />
   <defs>
     <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
       <use xlink:href="#image0_226_222" transform="scale(0.000818331 0.00224215)" />

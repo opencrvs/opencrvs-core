@@ -28,7 +28,7 @@ import {
   ISelectFormFieldWithOptions
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { cloneDeep, get } from 'lodash'
+import { cloneDeep, capitalize, get } from 'lodash'
 import format from '@client/utils/date-formatting'
 import {
   IOfflineData,
@@ -51,6 +51,38 @@ interface IIgnoreAddressFields {
   fieldsToIgnoreForLocalAddress: string[]
   fieldsToIgnoreForInternationalAddress: string[]
 }
+
+export const capitalizedNameToFieldTransformer =
+  (language: string, transformedFieldName?: string, fromSectionId?: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const selectSectionId = fromSectionId ? fromSectionId : sectionId
+    const selectedName: IName | undefined =
+      queryData[selectSectionId] &&
+      queryData[selectSectionId].name &&
+      (queryData[selectSectionId].name as GQLHumanName[]).find(
+        (name) => name.use === language
+      )
+    const nameKey = transformedFieldName ? transformedFieldName : field.name
+    if (!selectedName || !selectedName[nameKey]) {
+      return transformedData
+    }
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    const name = selectedName[nameKey]
+      .split(' ')
+      .map((s: string) => s.toLowerCase())
+      .map(capitalize)
+      .join(' ')
+
+    transformedData[sectionId][field.name] = name
+    return transformedData
+  }
 
 export const nameToFieldTransformer =
   (language: string, transformedFieldName?: string, fromSectionId?: string) =>
