@@ -39,6 +39,11 @@ interface IRecordAuditMessages
   reinstateDeclarationDialogCancel: MessageDescriptor
   reinstateDeclarationDialogConfirm: MessageDescriptor
   reinstateDeclarationDialogDescription: MessageDescriptor
+  childGender: MessageDescriptor
+  registrar: MessageDescriptor
+  registrationLocation: MessageDescriptor
+  registrationDate: MessageDescriptor
+  certificateDate: MessageDescriptor
 }
 
 const messagesToDefine: IRecordAuditMessages = {
@@ -174,6 +179,32 @@ const messagesToDefine: IRecordAuditMessages = {
     defaultMessage:
       'This will revert the application back to its original status and add it to your workqueue.',
     description: 'Description for the dialog when reinstate declaration'
+  },
+  /* template */
+  childGender: {
+    id: 'recordAudit.declaration.childGender',
+    defaultMessage: 'Sex',
+    description: 'Data label for child gender'
+  },
+  registrationLocation: {
+    id: 'recordAudit.declaration.registrationLocation',
+    defaultMessage: 'Registration centre',
+    description: 'Data label for Registration location'
+  },
+  registrar: {
+    id: 'recordAudit.declaration.registrar',
+    defaultMessage: 'Registrar',
+    description: 'Data label for Registrar'
+  },
+  registrationDate: {
+    id: 'recordAudit.declaration.registrationDate',
+    defaultMessage: 'Registration date',
+    description: 'Data label for Registration date'
+  },
+  certificateDate: {
+    id: 'recordAudit.declaration.certificateDate',
+    defaultMessage: 'Certification date',
+    description: 'Data label for Certification date'
   }
 }
 export const recordAuditMessages: IRecordAuditMessages =

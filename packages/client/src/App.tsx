@@ -61,6 +61,7 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
 import { Registrations } from '@client/views/SysAdmin/Performance/Registrations'
+import { VerifyDetails } from '@client/views/PrintCertificate/VerifyDetails'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -104,7 +105,8 @@ export class App extends React.Component<IAppProps> {
                             <ProtectedPage
                               unprotectedRouteElements={[
                                 'documents',
-                                'affidavit'
+                                'affidavit',
+                                'verify'
                               ]}
                             >
                               <ProtectedRoute
@@ -371,6 +373,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.USER_PROFILE}
                                             component={UserProfile}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.VERIFY_DETAILS}
+                                            component={VerifyDetails}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

@@ -39,7 +39,7 @@ import { MessageDescriptor } from 'react-intl'
 
 import QRCode from 'qrcode'
 import { formatUrl } from '@client/navigation'
-import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
+import { VERIFY_DETAILS } from '@client/navigation/routes'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -507,10 +507,9 @@ export const QRCodeTransformerTransformer = async (
   transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
     await QRCode.toDataURL(
       `${window.location.protocol}//${window.location.host}${formatUrl(
-        DECLARATION_RECORD_AUDIT,
+        VERIFY_DETAILS,
         {
-          tab: 'printTab',
-          declarationId: queryData.id
+          id: queryData.id
         }
       )}`
     )

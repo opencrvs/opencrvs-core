@@ -34,7 +34,6 @@ import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
-import { StyledText } from './Page'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -125,12 +124,16 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     this.setState({ loadingTimeout: true })
   }
 
+  isUnProtected(pathname: string) {
+    return this.props.unprotectedRouteElements.some((route) =>
+      pathname.includes(route)
+    )
+  }
+
   async handleVisibilityChange(isVisible: boolean) {
     const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
 
-    const onUnprotectedPage = this.props.unprotectedRouteElements.some(
-      (route) => this.props.location.pathname.includes(route)
-    )
+    const onUnprotectedPage = this.isUnProtected(this.props.location.pathname)
 
     const newState = { ...this.state }
 
@@ -198,8 +201,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     if (loading || !loadingTimeout) {
       return this.renderLoadingScreen()
     }
+    const showPinPad = !this.isUnProtected(this.props.location.pathname)
 
-    if (secured) {
+    if (secured || !showPinPad) {
       return this.props.children
     }
 
@@ -230,8 +234,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     if (pendingUser) {
       return <ProtectedAccount />
     }
+    const showPinPad = !this.isUnProtected(this.props.location.pathname)
 
-    if (!pinExists || passwordVerified) {
+    if (showPinPad && (!pinExists || passwordVerified)) {
       return (
         <SecureAccount
           onComplete={() => {

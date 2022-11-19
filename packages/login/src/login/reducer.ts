@@ -102,6 +102,9 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         errorCode: action.payload.response && action.payload.response.status
       }
     case actions.AUTHENTICATION_COMPLETED:
+      const redirectUrl = new URL(window.location.href).searchParams.get(
+        'redirect_url'
+      )
       return loop(
         {
           ...state,
@@ -117,10 +120,21 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         (action.payload.token &&
           Cmd.run(() => {
             window.location.assign(
-              `${window.config.CLIENT_APP_URL}?token=${action.payload.token}`
+              `${window.config.CLIENT_APP_URL}?token=${action.payload.token}${
+                redirectUrl
+                  ? `&redirect_url=${encodeURIComponent(redirectUrl)}`
+                  : ''
+              }`
             )
           })) ||
-          Cmd.action(push(routes.STEP_TWO))
+          Cmd.action(
+            push(
+              routes.STEP_TWO +
+                (redirectUrl
+                  ? `?redirect_url=${encodeURIComponent(redirectUrl)}`
+                  : '')
+            )
+          )
       )
     case actions.RESEND_SMS:
       return loop(
