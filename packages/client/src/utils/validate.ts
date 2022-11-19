@@ -32,6 +32,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getListOfLocations } from '@client/forms/utils'
 import _ from 'lodash'
 import format from '@client/utils/date-formatting'
+import differenceInYears from 'date-fns/differenceInYears'
 
 export interface IValidationResult {
   message: MessageDescriptor
@@ -231,6 +232,10 @@ export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(Date.now())
 }
 
+export const underYears = (date: string, years: number) => {
+  return differenceInYears(new Date(), new Date(date)) < years
+}
+
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
   const birthDate = drafts.deceased && drafts.deceased.birthDate
   return birthDate
@@ -297,7 +302,8 @@ export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
     ? { message: messages.required }
     : childBirthDate &&
       isAValidDateFormat(childBirthDate) &&
-      isDateNotInFuture(childBirthDate)
+      isDateNotInFuture(childBirthDate) &&
+      underYears(childBirthDate, 18)
     ? undefined
     : { message: messages.isValidBirthDate }
 }

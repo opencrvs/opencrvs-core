@@ -125,7 +125,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'childFamilyName',
-                    operation: 'nameToFieldTransformer',
+                    operation: 'capitalizedNameToFieldTransformer',
                     parameters: ['en', 'familyName']
                   },
                   mutation: {
@@ -162,7 +162,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'childFirstName',
-                    operation: 'nameToFieldTransformer',
+                    operation: 'capitalizedNameToFieldTransformer',
                     parameters: ['en', 'firstNames']
                   },
                   mutation: {
@@ -380,11 +380,8 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [
                   {
-                    operation: 'greaterThanZero'
-                  },
-                  {
-                    operation: 'maxLength',
-                    parameters: [2]
+                    operation: 'isInBetween',
+                    parameters: [0, 24]
                   }
                 ]
               }
@@ -409,11 +406,13 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'mother-view-group',
+            includeHiddenValues: true,
             fields: [
               {
                 name: 'detailsExist',
                 type: 'RADIO_GROUP',
                 label: formMessageDescriptors.mothersDetailsExist,
+                hidden: true,
                 required: true,
                 initialValue: true,
                 validate: [],
@@ -481,7 +480,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'motherFamilyName',
-                    operation: 'nameToFieldTransformer',
+                    operation: 'capitalizedNameToFieldTransformer',
                     parameters: ['en', 'familyName']
                   },
                   mutation: {
@@ -528,7 +527,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'motherFirstName',
-                    operation: 'nameToFieldTransformer',
+                    operation: 'capitalizedNameToFieldTransformer',
                     parameters: ['en', 'firstNames']
                   },
                   mutation: {
@@ -582,11 +581,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'isInBetween',
-                    parameters: [6, 99]
-                  },
-                  {
-                    operation: 'maxLength',
-                    parameters: [2]
+                    parameters: [9, 99]
                   }
                 ],
                 mapping: {
@@ -1406,6 +1401,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'hide',
+                    expression: 'values.literacy === "ILLITERATE"'
                   }
                 ],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -1705,7 +1704,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'fatherFamilyName',
-                    operation: 'nameToFieldTransformer',
+                    operation: 'capitalizedNameToFieldTransformer',
                     parameters: ['en', 'familyName']
                   },
                   mutation: {
@@ -1753,7 +1752,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'fatherFirstName',
-                    operation: 'nameToFieldTransformer',
+                    operation: 'capitalizedNameToFieldTransformer',
                     parameters: ['en', 'firstNames']
                   },
                   mutation: {
@@ -1809,7 +1808,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'isInBetween',
-                    parameters: [6, 99]
+                    parameters: [9, 99]
                   },
                   {
                     operation: 'maxLength',
@@ -2636,6 +2635,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'hide',
+                    expression: 'values.literacy === "ILLITERATE"'
                   }
                 ],
                 options: [

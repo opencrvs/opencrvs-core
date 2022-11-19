@@ -603,8 +603,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'countryPrimary',
-        initialValue: 'agentDefault'
+        dependency: 'countryPrimary'
       },
       conditionals: [
         {
@@ -670,8 +669,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'statePrimary',
-        initialValue: 'agentDefault'
+        dependency: 'statePrimary'
       },
       conditionals: [
         {
@@ -1683,8 +1681,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'countrySecondary',
-        initialValue: 'agentDefault'
+        dependency: 'countrySecondary'
       },
       conditionals: [
         {
@@ -1750,8 +1747,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'stateSecondary',
-        initialValue: 'agentDefault'
+        dependency: 'stateSecondary'
       },
       conditionals: [
         {
@@ -2791,8 +2787,7 @@ export function getPlaceOfEventAddressFields(
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'country',
-        initialValue: 'agentDefault'
+        dependency: 'country'
       },
       conditionals: [
         {
@@ -2857,8 +2852,7 @@ export function getPlaceOfEventAddressFields(
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'state',
-        initialValue: 'agentDefault'
+        dependency: 'state'
       },
       conditionals: [
         {
