@@ -126,7 +126,6 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
               onClick={() => {
                 setSelectedField(fieldId)
               }}
-              movable={isCustom && isSelected}
               status={
                 isHidden ? intl.formatMessage(messages.hidden) : undefined
               }
