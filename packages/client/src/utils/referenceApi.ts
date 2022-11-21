@@ -13,7 +13,7 @@ import { IFormConfig } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
-import { Event } from '@client/utils/gateway'
+import { Event, System } from '@client/utils/gateway'
 import { questionsTransformer } from '@client/forms/questionConfig'
 
 export interface ILocationDataResponse {
@@ -47,12 +47,6 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
-export interface Integration {
-  name: string
-  status: string
-  client_id: string
-  sha_secret: string
-}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {
@@ -85,7 +79,7 @@ export interface IApplicationConfigResponse {
   config: IApplicationConfig
   certificates: ICertificateTemplateData[]
   formConfig: IFormConfig
-  integrations: Integration[]
+  systems: System[]
 }
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {

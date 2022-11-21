@@ -58,7 +58,7 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
-import { IntegrationList } from './views/SysAdmin/Config/Integrations/Integrations'
+import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import { UserAudit } from './views/UserAudit/UserAudit'
 
 interface IAppProps {
@@ -311,8 +311,8 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={routes.INTEGRATION_LIST}
-                                            component={IntegrationList}
+                                            path={routes.SYSTEM_LIST}
+                                            component={SystemList}
                                           />
                                           <ProtectedRoute
                                             exact

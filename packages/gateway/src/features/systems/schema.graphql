@@ -17,35 +17,46 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-input ClientPayload {
-  client_id: String!
+enum SystemStatus {
+  active
+  deactivated
 }
 
-type IntegrationResponse {
-  status: String
-  _id: String
-  username: String
-  client_id: String
+enum SystemType {
+  NATIONAL_ID
+  HEALTH
+  RECORD_SEARCH
 }
 
-input IdsInput {
-  systemId: String
-  clientId: String
+type System {
+  _id: ID!
+  clientId: ID!
+  shaSecret: ID!
+  status: SystemStatus!
+  name: String!
+  type: SystemType!
 }
 
-type SystemIntegrationsResponse {
-  name: String
-  clientId: String
-  shaSecret: String
+type SystemSecret {
+  system: System!
+  clientSecret: ID!
+}
+
+input SystemSettings {
+  dailyQuota: Int
+}
+input SystemInput {
+  name: String!
+  type: SystemType!
+  settings: SystemSettings
 }
 
 type Query {
-  fetchIntegration(ids: IdsInput): SystemIntegrationsResponse
+  fetchSystem(clientId: ID!): System
 }
 
 type Mutation {
-  reactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
-}
-type Mutation {
-  deactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
+  reactivateSystem(clientId: ID!): System
+  deactivateSystem(clientId: ID!): System
+  registerSystem(system: SystemInput): SystemSecret
 }

@@ -170,7 +170,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
-  fetchIntegration(ids: IdsInput): SystemIntegrationsResponse
+  fetchSystem(clientId: ID!): System
 }
 
 type Mutation {
@@ -213,9 +213,6 @@ type Mutation {
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID!
-  registerSystemClient(
-    clientDetails: ClientRegistrationPayload
-  ): ClientCreationResponse
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -252,8 +249,9 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
-  reactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
-  deactivateSystemClient(clientDetails: ClientPayload): IntegrationResponse
+  reactivateSystem(clientId: ID!): System
+  deactivateSystem(clientId: ID!): System
+  registerSystem(system: SystemInput): SystemSecret
 }
 
 type Dummy {
@@ -525,15 +523,13 @@ type FormDraft {
   createdAt: Date!
 }
 
-type SystemIntegrationsResponse {
-  name: String
-  clientId: String
-  shaSecret: String
-}
-
-input IdsInput {
-  systemId: String
-  clientId: String
+type System {
+  _id: ID!
+  clientId: ID!
+  shaSecret: ID!
+  status: SystemStatus!
+  name: String!
+  type: SystemType!
 }
 
 input NotificationInput {
@@ -598,20 +594,6 @@ input DeathRegistrationInput {
   medicalPractitioner: MedicalPractitionerInput
   createdAt: Date
   updatedAt: Date
-}
-
-type ClientCreationResponse {
-  client_id: String
-  client_secret: String
-  sha_secret: String
-  name: String
-  status: String
-}
-
-input ClientRegistrationPayload {
-  scope: String!
-  name: [NameArray]!
-  settings: Quote!
 }
 
 input UserInput {
@@ -698,15 +680,15 @@ input DeleteFormDraftInput {
   event: Event!
 }
 
-type IntegrationResponse {
-  status: String
-  _id: String
-  username: String
-  client_id: String
+type SystemSecret {
+  system: System!
+  clientSecret: ID!
 }
 
-input ClientPayload {
-  client_id: String!
+input SystemInput {
+  name: String!
+  type: SystemType!
+  settings: SystemSettings
 }
 
 scalar Map
@@ -1002,6 +984,17 @@ type DraftHistory {
   updatedAt: Date!
 }
 
+enum SystemStatus {
+  active
+  deactivated
+}
+
+enum SystemType {
+  NATIONAL_ID
+  HEALTH
+  RECORD_SEARCH
+}
+
 input PersonInput {
   _fhirID: ID
   identifier: [IdentityInput]
@@ -1095,15 +1088,6 @@ input MedicalPractitionerInput {
   lastVisitDate: Date
 }
 
-input NameArray {
-  use: String
-  family: String
-}
-
-input Quote {
-  dailyQuota: Int
-}
-
 input HumanNameInput {
   use: String
   firstNames: String
@@ -1178,6 +1162,10 @@ input QuestionInput {
   enabled: String
   custom: Boolean
   conditionals: [ConditionalInput!]
+}
+
+input SystemSettings {
+  dailyQuota: Int
 }
 
 enum InformantType {

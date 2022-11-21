@@ -15,17 +15,15 @@ import {
   ILocationDataResponse,
   IFacilitiesDataResponse,
   IContentResponse,
-  IAssetResponse,
   IApplicationConfigResponse,
   IApplicationConfig,
-  ICertificateTemplateData,
-  Integration
+  ICertificateTemplateData
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IFormConfig } from '@client/forms'
 import { IQuestionConfig } from '@client/forms/questionConfig'
-import { IntegrationType } from '@client/views/SysAdmin/Config/Integrations/Integrations'
+import { System } from '@client/utils/gateway'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -92,11 +90,10 @@ export type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
   payload: { config: IApplicationConfig }
 }
-export const UPDATE_OFFLINE_INTEGRATIONS =
-  'OFFLINE/UPDATE_OFFLINE_INTEGRATIONS' as const
-export type UpdateOfflineIntegrationsAction = {
-  type: typeof UPDATE_OFFLINE_INTEGRATIONS
-  payload: { integrations: Integration[] }
+export const UPDATE_OFFLINE_SYSTEMS = 'OFFLINE/UPDATE_OFFLINE_SYSTEMS' as const
+export type UpdateOfflineSystemsAction = {
+  type: typeof UPDATE_OFFLINE_SYSTEMS
+  payload: { systems: System[] }
 }
 
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
@@ -224,10 +221,10 @@ export const updateOfflineConfigData = (payload: {
   type: UPDATE_OFFLINE_CONFIG,
   payload: payload
 })
-export const updateOfflineIntegrations = (payload: {
-  integrations: Integration[]
-}): UpdateOfflineIntegrationsAction => ({
-  type: UPDATE_OFFLINE_INTEGRATIONS,
+export const updateOfflineSystems = (payload: {
+  systems: System[]
+}): UpdateOfflineSystemsAction => ({
+  type: UPDATE_OFFLINE_SYSTEMS,
   payload: payload
 })
 
@@ -306,7 +303,7 @@ export type Action =
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | UpdateOfflineIntegrationsAction
+  | UpdateOfflineSystemsAction
   | UpdateOfflineFormConfigAction
   | UpdateOfflineCertificateAction
   | OfflineFormConfigUpdatedAction

@@ -1914,7 +1914,7 @@ export const mockConfigResponse = {
   config: mockOfflineData.config,
   certificates: mockFetchCertificatesTemplatesDefinition,
   formConfig: mockOfflineData.formConfig,
-  integrations: mockOfflineData.integrations
+  systems: mockOfflineData.systems
 }
 
 export const mockOfflineDataDispatch = {
@@ -1927,7 +1927,7 @@ export const mockOfflineDataDispatch = {
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
   formConfig: mockOfflineData.formConfig,
-  integrations: mockOfflineData.integrations
+  systems: mockOfflineData.systems
 }
 
 export async function createTestStore() {
