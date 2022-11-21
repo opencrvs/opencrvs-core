@@ -62,7 +62,7 @@ import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
-import { getUser } from '@gateway/features/user/utils'
+import { getSystem, getUser } from '@gateway/features/user/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -817,6 +817,16 @@ export const typeResolvers: GQLResolver = {
         }
       })
       return await res.json()
+    },
+    system: async (task: fhir.Task, _: any, authHeader) => {
+      const systemIdentifier = task.identifier?.find(
+        ({ system }) =>
+          system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+      )
+      if (!systemIdentifier || !systemIdentifier.value) {
+        return null
+      }
+      return await getSystem({ systemId: systemIdentifier.value }, authHeader)
     },
     location: async (task: fhir.Task, _: any, authHeader: any) => {
       const taskLocation = findExtension(
