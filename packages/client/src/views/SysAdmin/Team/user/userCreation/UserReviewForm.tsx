@@ -266,7 +266,12 @@ class UserReviewFormComponent extends React.Component<
 
   isSubmitDisabled = () => {
     const { skippedOfficeSelction, ...formData } = this.props.formData
-    return isEqual(this.props.originalUserFormData, formData)
+    return (
+      ((this.props.formData.role === 'LOCAL_REGISTRAR' ||
+        this.props.formData.role === 'NATIONAL_REGISTRAR') &&
+        !this.props.formData.signature) ||
+      isEqual(this.props.originalUserFormData, formData)
+    )
   }
 
   render() {
@@ -305,6 +310,11 @@ class UserReviewFormComponent extends React.Component<
       actionComponent = (
         <PrimaryButton
           id="submit_user_form"
+          disabled={
+            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
+              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
+            !this.props.formData.signature
+          }
           onClick={() => this.props.submitForm(userFormSection)}
         >
           {intl.formatMessage(messages.createUser)}

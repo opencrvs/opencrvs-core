@@ -254,6 +254,38 @@ export const userSectionFormType: ISerializedFormSection = {
           validate: []
         }
       ]
+    },
+    {
+      id: 'signature-attachment',
+      title: userFormMessages.userSignatureAttachmentTitle,
+      conditionals: [
+        {
+          action: 'hide',
+          expression:
+            'values.role!=="LOCAL_REGISTRAR" && values.role!=="NATIONAL_REGISTRAR"'
+        }
+      ],
+      fields: [
+        {
+          name: 'attachmentTitle',
+          type: FIELD_GROUP_TITLE,
+          hidden: true,
+          label: userFormMessages.userAttachmentSection,
+          required: false,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'signature',
+          type: SIMPLE_DOCUMENT_UPLOADER,
+          label: userFormMessages.userSignatureAttachment,
+          description: userFormMessages.userSignatureAttachmentDesc,
+          allowedDocType: ['image/png'],
+          initialValue: '',
+          required: true,
+          validate: []
+        }
+      ]
     }
   ]
 }

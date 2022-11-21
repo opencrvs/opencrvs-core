@@ -96,19 +96,28 @@ const birthCertificateTemplateTextOnly = `<svg width="421" height="595" viewBox=
   <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
     <tspan x="162.709" y="481.191">{{ certificateDate }}</tspan>
   </text>
+  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="6" letter-spacing="0px">
+    <tspan x="166.247" y="548.977">Signature of registrar</tspan>
+  </text>
   <mask id="mask0_226_222" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="138" y="498" width="116" height="37">
     <rect x="138.881" y="498.472" width="115" height="36.1429" fill="#FCC7C7" />
   </mask>
   <g mask="url(#mask0_226_222)">
     <rect x="143.447" y="498.472" width="106.06" height="37.1756" fill="url(#pattern0)" />
   </g>
-
+  <line x1="136.006" y1="536.5" x2="256.756" y2="536.5" stroke="#A5A5A5" />
 
   <image
     width="54" height="56"
     x="326" y="503.565"
     xlink:href="{{ qrCode }}"
   />
+  <defs>
+    <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+      <use xlink:href="#image0_226_222" transform="scale(0.000818331 0.00224215)" />
+    </pattern>
+    <image id="image0_226_222" data-content="signature" width="1222" height="446" xlink:href="" />
+  </defs>
 </svg>`
 
 export default birthCertificateTemplateTextOnly
