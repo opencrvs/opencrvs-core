@@ -238,6 +238,7 @@ type History {
   requester: String
   hasShowedVerifiedDocument: Boolean
   otherReason: String
+  system: System # -> identitifier(system='http://opencrvs.org/specs/extension/system_identifier')
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
   dhis2Notification: Boolean # -> identitifier(system='http://opencrvs.org/specs/extension/dhis2_event_identifier')
