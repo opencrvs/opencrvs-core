@@ -505,7 +505,7 @@ export const typeResolvers: GQLResolver = {
       await getCertificatesFromTask(task, _, authHeader),
     assignment: async (task, _, authHeader) => {
       const assignmentExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
         task.extension
       )
       const regLastOfficeExtension = findExtension(
@@ -514,8 +514,13 @@ export const typeResolvers: GQLResolver = {
       )
 
       if (assignmentExtension) {
+        const lastAssignmentExtension = findExtension(
+          `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+          task.extension
+        )
+
         const practitionerId =
-          assignmentExtension.valueReference?.reference?.split('/')?.[1]
+          lastAssignmentExtension?.valueReference?.reference?.split('/')?.[1]
 
         if (practitionerId) {
           const user = await getUser({ practitionerId }, authHeader)
