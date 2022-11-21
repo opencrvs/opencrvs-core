@@ -176,7 +176,6 @@ export function useSystems() {
   >(mutations.refreshClientSecret)
 
   const clientRefreshToken = (clientId: string) => {
-    debugger
     if (!clientId) return
     clientRefreshTokenMutate({
       variables: {

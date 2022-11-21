@@ -307,8 +307,6 @@ export function SystemList() {
             ) : (
               <ButtonLink
                 onClick={() => {
-                  console.log(toggleKeyModal.selectedClient?.clientId)
-                  // setSystemToToggleActivation(system)
                   clientRefreshToken(
                     toggleKeyModal.selectedClient?.clientId as string
                   )
