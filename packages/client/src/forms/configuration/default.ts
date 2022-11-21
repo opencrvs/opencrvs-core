@@ -381,7 +381,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'isInBetween',
-                    parameters: [0, 24]
+                    parameters: [1, 24]
                   }
                 ]
               }
