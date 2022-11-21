@@ -106,6 +106,10 @@ export function SystemList() {
     activateSystemError,
     deactivateSystemError,
     clearNewSystemDraft,
+    clientRefreshToken,
+    refreshTokenData,
+    refreshTokenLoading,
+    refreshTokenError,
     resetData,
     shouldWarnAboutNationalId
   } = useSystems()
@@ -293,9 +297,26 @@ export function SystemList() {
             <TopText variant="bold16" element="span">
               {intl.formatMessage(integrationMessages.clientSecret)}
             </TopText>
-            <ButtonLink>
-              {intl.formatMessage(buttonMessages.refresh)}
-            </ButtonLink>
+            {refreshTokenLoading ? (
+              <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
+            ) : refreshTokenData &&
+              refreshTokenData?.refreshSystemClientSecret ? (
+              <Text variant="reg16" element="p">
+                {refreshTokenData.refreshSystemClientSecret.clientSecret}
+              </Text>
+            ) : (
+              <ButtonLink
+                onClick={() => {
+                  console.log(toggleKeyModal.selectedClient?.clientId)
+                  // setSystemToToggleActivation(system)
+                  clientRefreshToken(
+                    toggleKeyModal.selectedClient?.clientId as string
+                  )
+                }}
+              >
+                {intl.formatMessage(buttonMessages.refresh)}
+              </ButtonLink>
+            )}
           </Stack>
 
           <Stack direction="column" alignItems="flex-start">
@@ -655,7 +676,8 @@ export function SystemList() {
       )}
       {(activateSystemError ||
         deactivateSystemError ||
-        registerSystemError) && (
+        registerSystemError ||
+        refreshTokenError) && (
         <Toast
           type="error"
           id="toggleClientStatusToast"

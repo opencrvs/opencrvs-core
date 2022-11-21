@@ -365,3 +365,62 @@ export const resRegisterSystemSchema = Joi.object({
   clientSecret: Joi.string().uuid(),
   system: SystemSchema
 })
+
+interface IRefreshSYSClientSecretPayload {
+  clientId: string
+}
+
+interface IRefreshClientSecretResponse {
+  name: string
+  clientId: string
+  clientSecret: string
+  shaSecret: string
+}
+
+export async function refreshSystemClientSecretHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const { clientId } = request.payload as IRefreshSYSClientSecretPayload
+
+    const systemUser: ISystemModel | null = await System.findOne({
+      client_id: clientId
+    })
+
+    if (!systemUser) {
+      logger.error(`No user details found by given clientId: ${clientId}`)
+      throw unauthorized()
+    }
+
+    const client_secret = uuid()
+    const { hash, salt } = generateSaltedHash(client_secret)
+
+    systemUser.salt = salt
+    systemUser.secretHash = hash
+
+    await System.updateOne({ client_id: clientId }, systemUser)
+
+    const response: IRefreshClientSecretResponse = {
+      clientId: clientId,
+      clientSecret: client_secret,
+      name: systemUser.username,
+      shaSecret: systemUser.sha_secret
+    }
+
+    return h.response(response).code(200)
+  } catch (e) {
+    return h.response(e.message).code(400)
+  }
+}
+
+export const getClientSecretSystemRequestSchema = Joi.object({
+  clientId: Joi.string()
+})
+
+export const getClientSecretSystemResponseSchema = Joi.object({
+  name: Joi.string(),
+  clientId: Joi.string(),
+  clientSecret: Joi.string(),
+  shaSecret: Joi.string()
+})

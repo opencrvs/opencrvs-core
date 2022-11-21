@@ -63,7 +63,10 @@ import {
   getSystemResponseSchema,
   getSystemHandler,
   getAllSystemsHandler,
-  SystemSchema
+  SystemSchema,
+  refreshSystemClientSecretHandler,
+  getClientSecretSystemRequestSchema,
+  getClientSecretSystemResponseSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -598,6 +601,25 @@ export const getRoutes = () => {
           query: Joi.object({
             role: Joi.string().required()
           })
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/refreshSystemClientSecret',
+      handler: refreshSystemClientSecretHandler,
+      config: {
+        tags: ['api'],
+        description: 'Refresh client secret ',
+        notes: 'Refresh client secret',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: getClientSecretSystemRequestSchema
+        },
+        response: {
+          schema: getClientSecretSystemResponseSchema
         }
       }
     }

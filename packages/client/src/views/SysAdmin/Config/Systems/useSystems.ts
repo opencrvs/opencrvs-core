@@ -16,8 +16,10 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import {
   DeactivateSystemMutation,
   DeactivateSystemMutationVariables,
+  MutationRefreshSystemClientSecretArgs,
   ReactivateSystemMutation,
   ReactivateSystemMutationVariables,
+  RefreshSystemClientSecret,
   RegisterSystemMutation,
   RegisterSystemMutationVariables,
   System,
@@ -25,6 +27,7 @@ import {
 } from '@client/utils/gateway'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { refreshClientSecret } from './mutations'
 import * as mutations from './mutations'
 
 /** Handles the user input when creating a new system in a modal */
@@ -155,6 +158,33 @@ export function useSystems() {
     }
   )
 
+  interface IRefreshSystemClientSecret {
+    refreshSystemClientSecret: RefreshSystemClientSecret
+  }
+
+  const [
+    clientRefreshTokenMutate,
+    {
+      data: refreshTokenData,
+      loading: refreshTokenLoading,
+      error: refreshTokenError,
+      reset: resetRefreshTokenData
+    }
+  ] = useMutation<
+    IRefreshSystemClientSecret,
+    MutationRefreshSystemClientSecretArgs
+  >(mutations.refreshClientSecret)
+
+  const clientRefreshToken = (clientId: string) => {
+    debugger
+    if (!clientId) return
+    clientRefreshTokenMutate({
+      variables: {
+        clientId
+      }
+    })
+  }
+
   const deactivateSystem = () => {
     if (!systemToToggleActivation) return
 
@@ -191,6 +221,7 @@ export function useSystems() {
     resetActivateSystemData()
     resetDeactivateSystemData()
     resetRegisterSystemData()
+    resetRefreshTokenData()
   }
 
   const shouldWarnAboutNationalId =
@@ -218,6 +249,11 @@ export function useSystems() {
     setNewSystemType,
     onChangeClientName,
     clearNewSystemDraft,
+    clientRefreshToken,
+    refreshTokenData,
+    refreshTokenLoading,
+    refreshTokenError,
+    resetRefreshTokenData,
     resetData,
     shouldWarnAboutNationalId
   }

@@ -960,6 +960,7 @@ export type Mutation = {
   modifyDraftStatus?: Maybe<FormDraft>
   notADuplicate: Scalars['ID']
   reactivateSystem?: Maybe<System>
+  refreshSystemClientSecret?: Maybe<RefreshSystemClientSecret>
   registerSystem?: Maybe<SystemSecret>
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
@@ -1104,6 +1105,10 @@ export type MutationNotADuplicateArgs = {
 
 export type MutationReactivateSystemArgs = {
   clientId: Scalars['ID']
+}
+
+export type MutationRefreshSystemClientSecretArgs = {
+  clientId: Scalars['String']
 }
 
 export type MutationRegisterSystemArgs = {
@@ -1586,6 +1591,14 @@ export type QuestionnaireQuestion = {
 export type QuestionnaireQuestionInput = {
   fieldId?: InputMaybe<Scalars['String']>
   value?: InputMaybe<Scalars['String']>
+}
+
+export type RefreshSystemClientSecret = {
+  __typename?: 'RefreshSystemClientSecret'
+  clientId: Scalars['String']
+  clientSecret: Scalars['String']
+  name: Scalars['String']
+  shaSecret: Scalars['String']
 }
 
 export enum RegAction {
@@ -5696,6 +5709,21 @@ export type ReactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
+  } | null
+}
+
+export type RefreshSystemClientSecretMutationVariables = Exact<{
+  clientId: Scalars['String']
+}>
+
+export type RefreshSystemClientSecretMutation = {
+  __typename?: 'Mutation'
+  refreshSystemClientSecret?: {
+    __typename?: 'RefreshSystemClientSecret'
+    name: string
+    clientId: string
+    shaSecret: string
+    clientSecret: string
   } | null
 }
 

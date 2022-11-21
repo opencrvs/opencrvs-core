@@ -21,7 +21,6 @@
 # import Mutation.* from '../features/certificate/schema.graphql'
 # import Mutation.* from '../features/application/schema.graphql'
 # import Mutation.* from '../features/formDraft/schema.graphql'
-# import Mutation.* from '../features/integrations/schema.graphql'
 # import Query.* from '../features/formDraft/schema.graphql'
 # import Mutation.* from '../features/systems/schema.graphql'
 # import Query.* from '../features/systems/schema.graphql'

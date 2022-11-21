@@ -254,6 +254,7 @@ type Mutation {
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
+  refreshSystemClientSecret(clientId: String!): RefreshSystemClientSecret
 }
 
 type Dummy {
@@ -695,6 +696,13 @@ input SystemInput {
   name: String!
   type: SystemType!
   settings: SystemSettings
+}
+
+type RefreshSystemClientSecret {
+  name: String!
+  clientId: String!
+  shaSecret: String!
+  clientSecret: String!
 }
 
 scalar Map

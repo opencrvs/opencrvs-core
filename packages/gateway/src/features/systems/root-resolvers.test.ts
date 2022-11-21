@@ -143,3 +143,69 @@ describe('Integrations root resolvers', () => {
     ).rejects.toThrowError('Activate user is only allowed for sysadmin')
   })
 })
+
+describe('generate refresh token', () => {
+  let authHeaderRegister: { Authorization: string }
+  let authHeaderSysAdmin: { Authorization: string }
+  beforeEach(() => {
+    fetch.resetMocks()
+    const sysAdminToken = jwt.sign(
+      { scope: ['sysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderSysAdmin = {
+      Authorization: `Bearer ${sysAdminToken}`
+    }
+    const registerToken = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderRegister = {
+      Authorization: `Bearer ${registerToken}`
+    }
+  })
+
+  const fetchRefreshUser = {
+    name: 'emmanuel.mayuka',
+    clientId: '38ea3d84-6403-40f0-bce2-485caf655585',
+    shaSecret: 'c2844fd0-ce88-4d5c-8bbb-634e9618ec63',
+    clientSecret: 'fb82cd2f-6c95-4dff-92f5-22c787b7f277'
+  }
+
+  it('update refresh token for system admin', async () => {
+    fetch.mockResponseOnce(JSON.stringify(fetchRefreshUser), { status: 200 })
+
+    const response = await resolvers.Mutation.refreshSystemClientSecret(
+      {},
+      { clientId: '38ea3d84-6403-40f0-bce2-485caf655585' },
+      authHeaderSysAdmin
+    )
+
+    expect(response).toEqual(fetchRefreshUser)
+  })
+
+  it('should throw error for register user', async () => {
+    fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
+
+    const response = resolvers.Mutation.refreshSystemClientSecret(
+      {},
+      { clientId: '38ea3d84-6403-40f0-bce2-485caf655585' },
+      authHeaderRegister
+    )
+    await expect(response).rejects.toThrowError(
+      'Only system user can update refresh client secret'
+    )
+  })
+})
