@@ -87,6 +87,8 @@ drop_database user-mgnt;
 
 drop_database application-config
 
+drop_database metrics
+
 # Delete all data from elasticsearch
 #-----------------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elasticsearch_host)/ocrvs" -v

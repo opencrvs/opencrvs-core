@@ -65,6 +65,7 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
+  getVSExports: TotalVSExport
   getTotalPayments(
     timeStart: String!
     timeEnd: String!
@@ -415,6 +416,10 @@ type VerifyPasswordResult {
 type TotalMetricsResult {
   estimated: Estimation!
   results: [EventMetrics!]!
+}
+
+type TotalVSExport {
+  results: [VSExport!]
 }
 
 type PaymentMetric {
@@ -919,6 +924,14 @@ type EventMetrics {
   eventLocationType: String!
   timeLabel: String!
   practitionerRole: String!
+}
+
+type VSExport {
+  event: String!
+  year: Int!
+  fileSize: String!
+  url: String!
+  createdOn: String!
 }
 
 union UserAuditLogResultItem =

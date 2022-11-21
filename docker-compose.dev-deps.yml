@@ -35,6 +35,14 @@ services:
       - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
       - bootstrap.system_call_filter=false
 
+  minio:
+    ports:
+      - '3535:3535'
+      - '3536:3536'
+    volumes:
+      - './data/minio:/data'
+    command: server --address ":3535" --console-address ":3536" /data
+
   influxdb:
     ports:
       - '8086:8086'
