@@ -28,13 +28,15 @@ import { resolvers as applicationRootResolvers } from '@gateway/features/applica
 import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
 import { resolvers as advancedSearchResolvers } from '@gateway/features/advanceSearch/root-resolvers'
 import {
+  ISystemModelData,
   IUserModelData,
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
 import {
   getUser,
   getUserId,
-  getTokenPayload
+  getTokenPayload,
+  getSystem
 } from '@gateway/features/user/utils'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 import { loadSchemaSync } from '@graphql-tools/load'
@@ -102,10 +104,17 @@ export const getApolloConfig = (): Config => {
         const userId = getUserId({
           Authorization: request.headers.authorization
         })
-        const user: IUserModelData = await getUser(
+        let user: IUserModelData | ISystemModelData
+        user = await getUser(
           { userId },
           { Authorization: request.headers.authorization }
         )
+        if (!user) {
+          user = await getSystem(
+            { systemId: userId },
+            { Authorization: request.headers.authorization }
+          )
+        }
         if (!user || !['active', 'pending'].includes(user.status)) {
           throw new AuthenticationError('Authentication failed')
         }
