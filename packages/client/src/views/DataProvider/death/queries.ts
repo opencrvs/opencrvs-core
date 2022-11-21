@@ -188,6 +188,9 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           id
           name
         }
+        system {
+          name
+        }
         user {
           id
           type
@@ -421,6 +424,9 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         office {
           id
+          name
+        }
+        system {
           name
         }
         user {
