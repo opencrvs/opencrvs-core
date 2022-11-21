@@ -63,6 +63,7 @@ import { Condition } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { createCustomFieldHandlebarName } from '@client/forms/configuration/customUtils'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -164,6 +165,9 @@ const ListColumn = styled.div`
 
 const CErrorText = styled(ErrorText)`
   width: 200px;
+`
+const Body = styled.div`
+  margin: 16px 0px;
 `
 
 type IFormFieldWrapper = { formField: IFormField }
@@ -784,6 +788,29 @@ class CustomFieldToolsComp extends React.Component<
     )
   }
 
+  showHandlebar() {
+    const { selectedField, intl } = this.props
+    const customHandlebarName = createCustomFieldHandlebarName(
+      selectedField.fieldId
+    )
+    return (
+      <Body>
+        <Stack>
+          <Text variant="bold14" element="span" color="grey600">
+            {intl.formatMessage(customFieldFormMessages.handleBardHeading)}
+          </Text>
+          <ToolTip
+            label={intl.formatMessage(messages.certHandelbarsTooltip)}
+            id={'cert-handelbars'}
+          />
+        </Stack>
+        <Text variant="reg14" element="span" color="grey500">
+          {`{{ ${customHandlebarName} }}`}
+        </Text>
+      </Body>
+    )
+  }
+
   render(): React.ReactNode {
     const { intl, selectedField } = this.props
     return (
@@ -799,6 +826,7 @@ class CustomFieldToolsComp extends React.Component<
         </RegisterFormFieldIds>
         {this.getLanguageDropDown()}
         {this.inputFields()}
+        {this.showHandlebar()}
         {this.state.isFieldDuplicate && (
           <CErrorText ignoreMediaQuery={true}>
             {intl.formatMessage(customFieldFormMessages.duplicateField)}

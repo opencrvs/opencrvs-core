@@ -13,8 +13,7 @@ import {
   IFormData,
   TransformedData,
   IFormField,
-  IFormFieldQueryMapFunction,
-  IQuestionnaireQuestion
+  IFormFieldQueryMapFunction
 } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
@@ -238,24 +237,6 @@ export const changeHirerchyQueryTransformer =
 
     return transformedData
   }
-
-export function questionnaireToCustomFieldTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  field: IFormField
-) {
-  if (queryData.questionnaire) {
-    const selectedQuestion: IQuestionnaireQuestion =
-      queryData.questionnaire.filter(
-        (question: IQuestionnaireQuestion) =>
-          question.fieldId === field.customQuesstionMappingId
-      )[0]
-    if (selectedQuestion) {
-      transformedData[sectionId][field.name] = selectedQuestion.value
-    }
-  }
-}
 
 export const registrarNameUserTransformer = (
   transformedData: IFormData,

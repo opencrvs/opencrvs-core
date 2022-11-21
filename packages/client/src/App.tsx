@@ -58,6 +58,8 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import VSExport from './views/SysAdmin/Performance/Vsexports/VSExport'
+import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 
 interface IAppProps {
@@ -350,6 +352,15 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.VS_EXPORTS}
+                                            component={VSExport}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={
                                               routes.EVENT_COMPLETENESS_RATES
                                             }
@@ -371,6 +382,12 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.USER_PROFILE}
                                             component={UserAudit}
+                                          />
+
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.VIEW_RECORD}
+                                            component={ViewRecord}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

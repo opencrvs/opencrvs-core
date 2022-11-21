@@ -69,6 +69,9 @@ export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const PERFORMANCE_HOME = '/performance'
+
+export const VS_EXPORTS = '/vsexports'
+
 export const EVENT_COMPLETENESS_RATES =
   '/performance/operations/completenessRates/:eventType'
 export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'
@@ -86,3 +89,5 @@ export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
 export const USER_PROFILE = '/userProfile/:userId'
 
 export const FORM_CONFIG_WIZARD = '/config/form/wizard/:event/:section'
+
+export const VIEW_RECORD = '/:declarationId/viewRecord'

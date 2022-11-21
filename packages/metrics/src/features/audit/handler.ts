@@ -18,8 +18,8 @@ import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
 import { countUserAuditEvents, getUserAuditEvents } from './service'
 import { getClientIdFromToken } from '@metrics/utils/authUtils'
 import fetch from 'node-fetch'
-export const USER_MANAGEMENT_URL =
-  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
+import { USER_MANAGEMENT_URL } from '@metrics/constants'
+
 export async function newAuditHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -63,7 +63,7 @@ export async function getUser(
   userId: string,
   authHeader: { Authorization: string }
 ) {
-  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+  const res = await fetch(`${USER_MANAGEMENT_URL}/getUser`, {
     method: 'POST',
     body: JSON.stringify({ userId }),
     headers: {

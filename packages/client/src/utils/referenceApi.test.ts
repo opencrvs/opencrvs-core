@@ -131,6 +131,7 @@ export const mockFetchConfig = {
     CONFIG_API_URL: 'http://localhost:2021',
     LOGIN_URL: 'http://localhost:3020',
     AUTH_URL: 'http://localhost:4040',
+    MINIO_URL: 'http://localhost:3535',
     RESOURCES_URL: 'http://localhost:3040',
     APPLICATION_NAME: 'Farajaland CRVS',
     FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',

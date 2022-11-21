@@ -46,7 +46,8 @@ import {
   FHIR_URL,
   SEARCH_URL,
   METRICS_URL,
-  HEARTH_URL
+  HEARTH_URL,
+  DOCUMENTS_URL
 } from '@gateway/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import {
@@ -59,7 +60,8 @@ import {
   REQUEST_CORRECTION_EXTENSION_URL,
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL
+  REINSTATED_EXTENSION_URL,
+  VIEWED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -973,6 +975,8 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.REQUESTED_CORRECTION
   } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {
     return GQLRegAction.REINSTATED
+  } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.VIEWED
   }
   return null
 }
@@ -1399,4 +1403,44 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
     task.extension &&
     findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
   return extension
+}
+
+export const fetchDocuments = async <T = any>(
+  suffix: string,
+  authHeader: IAuthHeader,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  const result = await fetch(`${DOCUMENTS_URL}${suffix}`, {
+    method,
+    headers: {
+      ...authHeader,
+      'Content-Type': 'application/json'
+    },
+    body
+  })
+  const res = await result.json()
+  return await res
+}
+
+export async function uploadBase64ToMinio(
+  fileData: string,
+  authHeader: IAuthHeader
+): Promise<string> {
+  const docUploadResponse = await fetchDocuments(
+    '/upload',
+    authHeader,
+    'POST',
+    JSON.stringify({ fileData: fileData })
+  )
+
+  return docUploadResponse.refUrl
+}
+
+export function isBase64FileString(str: string) {
+  if (str === '' || str.trim() === '') {
+    return false
+  }
+  const strSplit = str.split(':')
+  return strSplit.length > 0 && strSplit[0] === 'data'
 }

@@ -142,12 +142,17 @@ export default async function createUser(
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
-  await postUserActionToMetrics(
-    'CREATE_USER',
-    request.headers.authorization,
-    remoteAddress,
-    userAgent
-  )
+
+  try {
+    await postUserActionToMetrics(
+      'CREATE_USER',
+      request.headers.authorization,
+      remoteAddress,
+      userAgent
+    )
+  } catch (err) {
+    logger.error(err.message)
+  }
 
   const resUser = _.omit(userModelObject.toObject(), ['passwordHash', 'salt'])
   return h.response(resUser).code(201)
