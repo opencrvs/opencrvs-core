@@ -85,7 +85,22 @@ export function SystemList() {
   })
 
   const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
-  const [selectedItems, setSelectedItems] = React.useState([''])
+
+  const [selectedItems, setSelectedItems] = React.useState<
+    string[] | undefined
+  >(undefined)
+
+  const [selectedDeathItems, setSelectedDeathItems] = React.useState<
+    string[] | undefined
+  >(undefined)
+
+  const checkboxHandler = (items: string[], type: string) => {
+    const val = items.filter((it) => it !== '')
+
+    type === WebhookOption.birth
+      ? setSelectedItems(val)
+      : setSelectedDeathItems(val)
+  }
 
   const sysType = {
     HEALTH: intl.formatMessage(integrationMessages.healthSystem),
@@ -93,6 +108,17 @@ export function SystemList() {
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook)
   }
+
+  const webhook = [
+    {
+      dailyQuota: '0',
+      permission: selectedItems
+    },
+    {
+      dailyQuota: '0',
+      permission: selectedDeathItems
+    }
+  ]
 
   const toggleModal = () => {
     setShowModal((prev) => !prev)
@@ -152,6 +178,7 @@ export function SystemList() {
   const clientType = newSystemType
   console.log(clientType)
   console.log(selectedItems)
+
   return (
     <Frame
       header={<Header />}
@@ -531,9 +558,9 @@ export function SystemList() {
                         }
                       ]}
                       name="test-checkbox-group1"
-                      value={selectedItems}
+                      value={selectedItems ?? ['']}
                       onChange={(newValue) => {
-                        setSelectedItems(newValue)
+                        checkboxHandler(newValue, WebhookOption.birth)
                       }}
                     />
                   </>
@@ -580,9 +607,9 @@ export function SystemList() {
                         }
                       ]}
                       name="test-checkbox-group1"
-                      value={selectedItems}
+                      value={selectedDeathItems ?? ['']}
                       onChange={(newValue) => {
-                        setSelectedItems(newValue)
+                        checkboxHandler(newValue, WebhookOption.death)
                       }}
                     />
                   </>
