@@ -97,12 +97,11 @@ export async function subscribeWebhooksHandler(
         })
         .code(400)
     }
-    const isNationalIDAPIUser = system.scope.indexOf('nationalId') > -1
     const webhookId = uuid()
     const createdBy = {
       client_id: system.client_id,
       name: system.name,
-      type: isNationalIDAPIUser ? 'nationalId' : 'health',
+      type: getScopeType(system.scope),
       username: system.username
     }
     const webhook = {
@@ -151,6 +150,15 @@ export async function subscribeWebhooksHandler(
   }
 }
 
+const getScopeType = (scopes: string[]) => {
+  const isWebhookUser = scopes.indexOf('webhook') > -1
+  const isNationalIDAPIUser = scopes.indexOf('nationalId') > -1
+  return isWebhookUser
+    ? 'webhook'
+    : isNationalIDAPIUser
+    ? 'nationalId'
+    : 'health'
+}
 export const reqSubscribeWebhookSchema = Joi.object({
   hub: Joi.object({
     callback: Joi.string(),

@@ -29,19 +29,20 @@ export function createRequestSignature(
 export async function transformBirthBundle(
   bundle: fhir.Bundle,
   scope: string,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  permissions: string[] = []
 ) {
   if (!bundle || !bundle.entry || !bundle.entry[0].resource) {
     throw new Error('Invalid FHIR bundle found')
   }
   const task: fhir.Task = bundle.entry[0].resource as fhir.Task
   if (task && task.focus && task.focus.reference) {
+    const composition = await getComposition(
+      task.focus.reference as string,
+      authHeader
+    )
     switch (scope) {
       case 'nationalId':
-        const composition = await getComposition(
-          task.focus.reference as string,
-          authHeader
-        )
         const child: fhir.Patient = await getResourceBySection(
           composition,
           'child-details',
@@ -75,6 +76,13 @@ export async function transformBirthBundle(
           bundle.entry.push({ resource: document } as fhir.BundleEntry)
         }
         return bundle
+      case 'webhook':
+        return getPermissionsBundle(
+          bundle,
+          permissions,
+          composition,
+          authHeader
+        )
       default:
         return bundle
     }
@@ -86,19 +94,20 @@ export async function transformBirthBundle(
 export async function transformDeathBundle(
   bundle: fhir.Bundle,
   scope: string,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  permissions: string[] = []
 ) {
   if (!bundle || !bundle.entry || !bundle.entry[0].resource) {
     throw new Error('Invalid FHIR bundle found')
   }
   const task: fhir.Task = bundle.entry[0].resource as fhir.Task
   if (task && task.focus && task.focus.reference) {
+    const composition = await getComposition(
+      task.focus.reference as string,
+      authHeader
+    )
     switch (scope) {
       case 'nationalId':
-        const composition = await getComposition(
-          task.focus.reference as string,
-          authHeader
-        )
         const deceased: fhir.Patient = await getResourceBySection(
           composition,
           'deceased-details',
@@ -124,12 +133,39 @@ export async function transformDeathBundle(
           bundle.entry.push({ resource: informant } as fhir.BundleEntry)
         }
         return bundle
+      case 'webhook':
+        return getPermissionsBundle(
+          bundle,
+          permissions,
+          composition,
+          authHeader
+        )
       default:
         return bundle
     }
   } else {
     throw new Error('Task has no composition reference')
   }
+}
+
+const getPermissionsBundle = async (
+  bundle: fhir.Bundle,
+  permissions: string[] = [],
+  composition: fhir.Composition,
+  authHeader: IAuthHeader
+) => {
+  const resources = await Promise.all(
+    permissions.map((sectionCode) =>
+      getResourceBySection(composition, sectionCode, authHeader)
+    )
+  )
+  resources.map((resource: fhir.BundleEntry) => {
+    if (resource) {
+      bundle.entry!.push({ resource })
+    }
+  })
+
+  return bundle
 }
 
 const getFromFhir = (suffix: string, authHeader: IAuthHeader) => {
