@@ -9,38 +9,48 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useCallback, useState } from 'react'
-import { Content } from '@opencrvs/components/lib/Content'
-import { useIntl } from 'react-intl'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
-import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
+import { Navigation } from '@client/components/interface/Navigation'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import { EMPTY_STRING } from '@client/utils/constants'
+import {
+  System,
+  SystemStatus,
+  SystemType,
+  WebhookOption
+} from '@client/utils/gateway'
+import { Label } from '@client/views/Settings/items/components'
 import {
   Alert,
+  CheckboxGroup,
+  Divider,
   InputField,
   Link,
   Pill,
   Select,
   Spinner,
+  Stack,
   TextInput,
-  ToggleMenu,
   Toast,
-  Stack
-} from '@opencrvs/components/lib'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+  ToggleMenu
+} from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
-import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import styled from 'styled-components'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Content } from '@opencrvs/components/lib/Content'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { System, SystemStatus, SystemType } from '@client/utils/gateway'
+import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Text } from '@opencrvs/components/lib/Text'
+
+import React, { useCallback, useState } from 'react'
+import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 import { useSystems } from './useSystems'
 
 interface ToggleModal {
@@ -73,6 +83,9 @@ export function SystemList() {
     modalVisible: false,
     selectedClient: null
   })
+
+  const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
+  const [selectedItems, setSelectedItems] = React.useState([''])
 
   const sysType = {
     HEALTH: intl.formatMessage(integrationMessages.healthSystem),
@@ -136,6 +149,9 @@ export function SystemList() {
     [toggleKeyModal]
   )
 
+  const clientType = newSystemType
+  console.log(clientType)
+  console.log(selectedItems)
   return (
     <Frame
       header={<Header />}
@@ -404,12 +420,11 @@ export function SystemList() {
                         integrationMessages.recordSearch
                       ),
                       value: SystemType.RecordSearch
-                    }
-                    /* TODO: Note, this will be amended in OCRVS-4160
+                    },
                     {
                       label: intl.formatMessage(integrationMessages.webhook),
                       value: SystemType.Webhook
-                    } */
+                    }
                   ]}
                 />
               </InputField>
@@ -453,8 +468,7 @@ export function SystemList() {
               </PaddedAlert>
             )}
 
-            {/* TODO: Note, webhooks will be amended in OCRVS-4160
-            clientType === 'webhook' && (
+            {clientType === SystemType.Webhook && (
               <>
                 <InputField
                   id="select-input"
@@ -477,7 +491,7 @@ export function SystemList() {
                     }
                   ]}
                   activeTabId={selectedTab}
-                  onTabClick={(tabId) => setSelectedTab(tabId)}
+                  onTabClick={(tabId: WebhookOption) => setSelectedTab(tabId)}
                 />
                 <Divider />
                 {selectedTab === WebhookOption.birth ? (
@@ -522,69 +536,59 @@ export function SystemList() {
                         setSelectedItems(newValue)
                       }}
                     />
-                    <Divider />
-
-                    {NoPII && (
-                      <CheckboxGroup
-                        id="test-checkbox-group1"
-                        options={[
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.registrationDetailsNoPII
-                            ),
-                            value: 'registration-details-noPII'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.childDetailsNoPII
-                            ),
-                            value: 'child-details-noPII'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.motherDetailsNoPII
-                            ),
-                            value: 'mothers-details-noPII'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.fatherDetailsNoPII
-                            ),
-                            value: 'fathers-details-noPII'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.informantDetailsNoPII
-                            ),
-                            value: 'informant-details-noPII'
-                          }
-                        ]}
-                        name="test-checkbox-group1"
-                        value={selectedItemsNoPII}
-                        onChange={(newValue) => setSelectedItemsNoPII(newValue)}
-                      />
-                    )}
-
-                    <Stack
-                      alignItems="center"
-                      direction="row"
-                      gap={8}
-                      justifyContent="flex-start"
-                    >
-                      <Toggle
-                        defaultChecked={!NoPII}
-                        onChange={toggleOnChange}
-                      />
-                      <div>
-                        {intl.formatMessage(integrationMessages.PIIDataLabel)}
-                      </div>
-                    </Stack>
                   </>
                 ) : (
-                  <></>
+                  <>
+                    <CheckboxGroup
+                      id="test-checkbox-group1"
+                      options={[
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.registrationDetails
+                          ),
+                          value: 'registration-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.childDetails
+                          ),
+                          value: 'child-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.motherDetails
+                          ),
+                          value: 'mothers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.fatherDetails
+                          ),
+                          value: 'fathers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.informantDetails
+                          ),
+                          value: 'informant-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.informantDetails
+                          ),
+                          value: 'informant-details'
+                        }
+                      ]}
+                      name="test-checkbox-group1"
+                      value={selectedItems}
+                      onChange={(newValue) => {
+                        setSelectedItems(newValue)
+                      }}
+                    />
+                  </>
                 )}
               </>
-                )*/}
+            )}
           </>
         )}
 

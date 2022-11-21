@@ -1831,7 +1831,13 @@ export enum SystemStatus {
 export enum SystemType {
   Health = 'HEALTH',
   NationalId = 'NATIONAL_ID',
-  RecordSearch = 'RECORD_SEARCH'
+  RecordSearch = 'RECORD_SEARCH',
+  Webhook = 'WEBHOOK'
+}
+
+export enum WebhookOption {
+  birth = 'BIRTH',
+  death = 'DEATH'
 }
 
 export type TotalMetricsResult = {
