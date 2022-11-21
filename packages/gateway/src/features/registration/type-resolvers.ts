@@ -514,13 +514,13 @@ export const typeResolvers: GQLResolver = {
       )
 
       if (assignmentExtension) {
-        const lastAssignmentExtension = findExtension(
+        const regLastUserExtension = findExtension(
           `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
           task.extension
         )
 
         const practitionerId =
-          lastAssignmentExtension?.valueReference?.reference?.split('/')?.[1]
+          regLastUserExtension?.valueReference?.reference?.split('/')?.[1]
 
         if (practitionerId) {
           const user = await getUser({ practitionerId }, authHeader)
