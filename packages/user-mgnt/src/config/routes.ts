@@ -63,7 +63,9 @@ import {
   getSystemResponseSchema,
   getSystemHandler,
   getAllSystemsHandler,
-  SystemSchema
+  SystemSchema,
+  updateSystemClient,
+  reqUpdateSystemSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -495,6 +497,21 @@ export const getRoutes = () => {
         },
         response: {
           schema: resRegisterSystemSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateSystem',
+      handler: updateSystemClient,
+      config: {
+        tags: ['api'],
+        description: 'Creates a new system client',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: reqUpdateSystemSchema
         }
       }
     },

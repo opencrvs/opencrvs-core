@@ -25,6 +25,7 @@ export interface ISystem {
   status: string
   settings: {
     dailyQuota: number
+    webhook: WebHook[]
   }
   creationDate?: number
   type: string
@@ -33,6 +34,20 @@ export interface ISystem {
 export enum EventType {
   Birth = 'birth',
   Death = 'death'
+}
+
+export interface WebHook {
+  event: EventType
+  permissions: WebhookPermissions[]
+}
+
+export enum WebhookPermissions {
+  REGISTRATION_DETAILS = 'registration-details',
+  CHILDS_DETAILS = 'childs-details',
+  MOTHERS_DETAILS = 'mothers-details',
+  FATHERS_DETAILS = 'fathers-details',
+  INFORMANT_DETAILS = 'informant-details',
+  DISEASE_DETAILS = 'disease-details'
 }
 
 const WebhookSchema = new Schema({

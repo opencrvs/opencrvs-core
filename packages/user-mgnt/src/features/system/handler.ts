@@ -11,7 +11,10 @@
  */
 
 import { logger } from '@user-mgnt/logger'
-import System, { ISystemModel } from '@user-mgnt/model/system'
+import System, {
+  ISystemModel,
+  WebhookPermissions
+} from '@user-mgnt/model/system'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
 import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
@@ -29,14 +32,23 @@ import {
 import { pick } from 'lodash'
 import { Types } from 'mongoose'
 
-type SystemType = 'HEALTH' | 'RECORD_SEARCH' | 'NATIONAL_ID'
+export enum EventType {
+  Birth = 'birth',
+  Death = 'death'
+}
+
+interface WebHookPayload {
+  event: EventType
+  permissions: WebhookPermissions[]
+}
 
 interface IRegisterSystemPayload {
   name: string
-  type: SystemType
-  settings?: {
-    dailyQuota?: number
+  settings: {
+    dailyQuota: number
+    webhook: WebHookPayload[]
   }
+  type: string
 }
 
 /** Returns a curated System with only the params we want to expose */
@@ -54,6 +66,10 @@ export async function registerSystem(
 ) {
   const { name, settings, type } = request.payload as IRegisterSystemPayload
   try {
+    if (type === types.WEBHOOK && !settings.webhook) {
+      logger.error('Webhook payloads are required !')
+      return h.response('Webhook payloads are required !').code(400)
+    }
     const token: ITokenPayload = getTokenPayload(
       request.headers.authorization.split(' ')[1]
     )
@@ -141,14 +157,6 @@ export async function registerSystem(
     return h.response().code(400)
   }
 }
-
-export const reqRegisterSystemSchema = Joi.object({
-  type: Joi.string().required(),
-  name: Joi.string(),
-  settings: Joi.object({
-    dailyQuota: Joi.number()
-  })
-})
 
 interface SystemClientIdPayload {
   clientId: string
@@ -364,4 +372,60 @@ export const SystemSchema = Joi.object({
 export const resRegisterSystemSchema = Joi.object({
   clientSecret: Joi.string().uuid(),
   system: SystemSchema
+})
+
+interface IUpdateSystemPayload {
+  client_id: string
+  webhook: WebHookPayload[]
+}
+
+export async function updateSystemClient(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const { client_id, webhook } = request.payload as IUpdateSystemPayload
+
+    const existingSystem: ISystemModel | null = await System.findOne({
+      client_id
+    })
+
+    if (!existingSystem) {
+      logger.error('No system client is found !')
+      return h.response('No system client is found').code(404)
+    }
+
+    existingSystem.settings.webhook = webhook
+    await existingSystem.save()
+
+    const response: IUpdateSystemPayload = {
+      client_id: existingSystem.client_id,
+      webhook: existingSystem.settings.webhook
+    }
+
+    return h.response(response).code(200)
+  } catch (err) {
+    logger.error(err)
+    return h.response(err.message).code(400)
+  }
+}
+
+const webHookSchema = Joi.array().items(
+  Joi.object({
+    event: Joi.string().required(),
+    permissions: Joi.array().items(Joi.string()).required()
+  })
+)
+export const reqUpdateSystemSchema = Joi.object({
+  client_id: Joi.string().required(),
+  webhook: webHookSchema.required()
+})
+
+export const reqRegisterSystemSchema = Joi.object({
+  type: Joi.string().required(),
+  name: Joi.string(),
+  settings: Joi.object({
+    dailyQuota: Joi.number(),
+    webhook: webHookSchema
+  })
 })
