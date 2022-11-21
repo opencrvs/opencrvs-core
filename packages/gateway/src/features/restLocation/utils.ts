@@ -16,6 +16,7 @@ import {
   ExtensionUrl,
   Facility,
   Location,
+  JurisdictionType,
   LocationStatistic,
   Statistics
 } from './locationHandler'
@@ -23,7 +24,7 @@ import {
 export const composeFhirLocation = (
   location: Location | Facility
 ): fhir.Location => {
-  if ('statistics' in location) {
+  if (location.code === 'ADMIN_STRUCTURE') {
     return {
       resourceType: 'Location',
       identifier: [
@@ -33,11 +34,16 @@ export const composeFhirLocation = (
         },
         {
           system: `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type`,
-          value: location.jurisdictionType
+          value:
+            location.jurisdictionType === JurisdictionType.LOCATION_LEVEL_1
+              ? JurisdictionType.STATE
+              : location.jurisdictionType === JurisdictionType.LOCATION_LEVEL_2
+              ? JurisdictionType.DISTRICT
+              : location.jurisdictionType
         }
       ],
       name: location.name,
-      alias: [location.name],
+      alias: location.alias ? [location.alias] : [],
       description: location.statisticalID,
       status: 'active',
       mode: 'instance',
@@ -71,7 +77,7 @@ export const composeFhirLocation = (
         }
       ],
       name: location.name,
-      alias: [location.name],
+      alias: location.alias ? [location.alias] : [],
       status: 'active',
       mode: 'instance',
       partOf: {
@@ -92,12 +98,6 @@ export const composeFhirLocation = (
             display: 'Building'
           }
         ]
-      },
-      telecom: [],
-      address: {
-        line: [],
-        district: location.district,
-        state: location.state
       }
     }
   }

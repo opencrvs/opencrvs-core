@@ -31,9 +31,6 @@ export const getRoutes = () => {
       path: '/tokenTest',
       handler: (request: any, h: any) => {
         return 'success'
-      },
-      config: {
-        tags: ['api']
       }
     },
     // health check endpoint for all services
@@ -42,7 +39,6 @@ export const getRoutes = () => {
       path: '/ping',
       handler: healthCheckHandler,
       config: {
-        tags: ['api'],
         auth: false,
         description: 'Checks the health of all services.',
         notes: 'Pass the service as a query param: service',

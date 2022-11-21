@@ -26,14 +26,14 @@ enum Code {
   HEALTH_FACILITY = 'HEALTH_FACILITY'
 }
 
-enum PhysicalType {
-  Jurisdiction = 'Jurisdiction',
-  Building = 'Building'
-}
-
-enum JurisdictionType {
+export enum JurisdictionType {
   STATE = 'STATE',
-  DISTRICT = 'DISTRICT'
+  DISTRICT = 'DISTRICT',
+  LOCATION_LEVEL_1 = 'LOCATION_LEVEL_1',
+  LOCATION_LEVEL_2 = 'LOCATION_LEVEL_2',
+  LOCATION_LEVEL_3 = 'LOCATION_LEVEL_3',
+  LOCATION_LEVEL_4 = 'LOCATION_LEVEL_4',
+  LOCATION_LEVEL_5 = 'LOCATION_LEVEL_5'
 }
 
 enum Status {
@@ -63,9 +63,9 @@ export type Location = {
   name: string
   partOf: string
   code: string
+  alias?: string
   jurisdictionType: string
-  physicalType: string
-  statistics: LocationStatistic[]
+  statistics?: LocationStatistic[]
 }
 
 export type Facility = {
@@ -73,9 +73,8 @@ export type Facility = {
   name: string
   partOf: string
   code: string
-  physicalType: string
-  district: string
-  state: string
+  alias?: string
+  jurisdictionType?: string
 }
 
 type UpdateLocation = {
@@ -93,28 +92,31 @@ const locationStatisticSchema = Joi.object({
   crude_birth_rate: Joi.number().required()
 })
 
+function instanceOfJurisdiction(object: any): object is Location {
+  return 'statistics' in object
+}
+
 export const requestSchema = Joi.object({
   statisticalID: Joi.string().required(),
   name: Joi.string().required(),
+  alias: Joi.string().optional(),
   partOf: Joi.string().required(),
   code: Joi.string()
     .valid(Code.ADMIN_STRUCTURE, Code.CRVS_OFFICE, Code.HEALTH_FACILITY)
     .required(),
-  physicalType: Joi.string()
-    .valid(PhysicalType.Building, PhysicalType.Jurisdiction)
-    .required(),
   jurisdictionType: Joi.string()
-    .valid(JurisdictionType.DISTRICT, JurisdictionType.STATE)
+    .valid(
+      JurisdictionType.DISTRICT,
+      JurisdictionType.STATE,
+      JurisdictionType.LOCATION_LEVEL_1,
+      JurisdictionType.LOCATION_LEVEL_2,
+      JurisdictionType.LOCATION_LEVEL_3,
+      JurisdictionType.LOCATION_LEVEL_4,
+      JurisdictionType.LOCATION_LEVEL_5
+    )
     .optional(),
-  district: Joi.string().optional(),
-  state: Joi.string().optional(),
   statistics: Joi.array().items(locationStatisticSchema).optional()
 })
-  .with('district', 'state')
-  .with('state', 'district')
-  .with('jurisdictionType', 'statistics')
-  .with('statistics', 'jurisdictionType')
-  .without('district', 'statistics')
 
 export const updateSchema = Joi.object({
   name: Joi.string().optional(),
@@ -168,7 +170,7 @@ export async function createLocationHandler(
     }
   }
 
-  if ('statistics' in payload) {
+  if (instanceOfJurisdiction(payload) && payload.statistics) {
     const statisticalExtensions = generateStatisticalExtensions(
       payload.statistics
     )

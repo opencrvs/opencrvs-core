@@ -41,7 +41,7 @@ services:
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
       - FHIR_URL=http://openhim-core:5001/fhir
-      - HEARTH_URL=http://localhost:3447/fhir
+      - HEARTH_URL=http://hearth:3447/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
