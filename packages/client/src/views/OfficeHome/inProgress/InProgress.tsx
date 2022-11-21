@@ -80,6 +80,7 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { startCase } from 'lodash'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -254,7 +255,7 @@ export class InProgressComponent extends React.Component<
             )
           }
         >
-          {name}
+          {startCase(name)}
         </NameContainer>
       ) : (
         <NoNameContainer

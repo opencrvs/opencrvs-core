@@ -51,6 +51,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { startCase } from 'lodash'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -240,7 +241,7 @@ class ReadyToPrintComponent extends React.Component<
             this.props.goToDeclarationRecordAudit('printTab', reg.id)
           }
         >
-          {reg.name}
+          {startCase(reg.name)}
         </NameContainer>
       ) : (
         <NoNameContainer

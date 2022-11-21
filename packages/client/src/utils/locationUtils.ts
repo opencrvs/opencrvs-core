@@ -15,6 +15,7 @@ import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSear
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/forms/countries'
+import { startCase } from 'lodash'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -89,7 +90,7 @@ export function generateFullLocation(
   const country =
     countryCode && intl.formatMessage(countryMessages[countryCode])
   let location = ''
-  if (city) location = location + city + ', '
+  if (city) location = location + startCase(city) + ', '
   if (district) location = location + district.name + ', '
   if (state) location = location + state.name + ', '
   location = location + country
@@ -114,7 +115,6 @@ export function getJurisdictionTypeForUser(
   if (shouldSeeCountryLevel(user)) {
     return 'COUNTRY'
   }
-  console.log(user.supervisoryArea)
 
   return (
     (locations[user.supervisoryArea].jurisdictionType as

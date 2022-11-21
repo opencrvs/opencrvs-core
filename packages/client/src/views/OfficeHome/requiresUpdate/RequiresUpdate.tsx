@@ -52,6 +52,7 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { startCase } from 'lodash'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -254,7 +255,7 @@ class RequiresUpdateComponent extends React.Component<
             this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
           }
         >
-          {reg.name}
+          {startCase(reg.name)}
         </NameContainer>
       ) : (
         <NoNameContainer
