@@ -22,6 +22,7 @@ export interface GQLQuery {
   fetchDeathRegistration?: GQLDeathRegistration
   fetchEventRegistration?: GQLEventRegistration
   fetchRegistration?: GQLEventRegistration
+  fetchRegistrationForViewing?: GQLEventRegistration
   queryPersonByNidIdentifier?: GQLPerson
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   locationsByParent?: Array<GQLLocation | null>
@@ -33,6 +34,7 @@ export interface GQLQuery {
   searchFieldAgents?: GQLSearchFieldAgentResult
   verifyPasswordById?: GQLVerifyPasswordResult
   getTotalMetrics?: GQLTotalMetricsResult
+  getVSExports?: GQLTotalVSExport
   getTotalPayments?: Array<GQLPaymentMetric>
   getTotalCertifications?: Array<GQLCertificationMetric>
   getTotalCorrections?: Array<GQLCorrectionMetric>
@@ -267,6 +269,10 @@ export interface GQLVerifyPasswordResult {
 export interface GQLTotalMetricsResult {
   estimated: GQLEstimation
   results: Array<GQLEventMetrics>
+}
+
+export interface GQLTotalVSExport {
+  results?: Array<GQLVSExport>
 }
 
 export interface GQLPaymentMetric {
@@ -791,6 +797,14 @@ export interface GQLEventMetrics {
   practitionerRole: string
 }
 
+export interface GQLVSExport {
+  event: string
+  year: number
+  fileSize: string
+  url: string
+  createdOn: string
+}
+
 export type GQLUserAuditLogResultItem =
   | GQLUserAuditLogItemWithComposition
   | GQLUserAuditLogItem
@@ -1095,7 +1109,8 @@ export const enum GQLRegAction {
   UNASSIGNED = 'UNASSIGNED',
   REINSTATED = 'REINSTATED',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
-  DOWNLOADED = 'DOWNLOADED'
+  DOWNLOADED = 'DOWNLOADED',
+  VIEWED = 'VIEWED'
 }
 
 export interface GQLStatusReason {
@@ -1470,6 +1485,7 @@ export interface GQLResolver {
   SearchFieldAgentResult?: GQLSearchFieldAgentResultTypeResolver
   VerifyPasswordResult?: GQLVerifyPasswordResultTypeResolver
   TotalMetricsResult?: GQLTotalMetricsResultTypeResolver
+  TotalVSExport?: GQLTotalVSExportTypeResolver
   PaymentMetric?: GQLPaymentMetricTypeResolver
   CertificationMetric?: GQLCertificationMetricTypeResolver
   CorrectionMetric?: GQLCorrectionMetricTypeResolver
@@ -1508,6 +1524,7 @@ export interface GQLResolver {
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
+  VSExport?: GQLVSExportTypeResolver
   UserAuditLogResultItem?: {
     __resolveType: GQLUserAuditLogResultItemTypeResolver
   }
@@ -1555,6 +1572,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchDeathRegistration?: QueryToFetchDeathRegistrationResolver<TParent>
   fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
   fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
+  fetchRegistrationForViewing?: QueryToFetchRegistrationForViewingResolver<TParent>
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
@@ -1566,6 +1584,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   getTotalMetrics?: QueryToGetTotalMetricsResolver<TParent>
+  getVSExports?: QueryToGetVSExportsResolver<TParent>
   getTotalPayments?: QueryToGetTotalPaymentsResolver<TParent>
   getTotalCertifications?: QueryToGetTotalCertificationsResolver<TParent>
   getTotalCorrections?: QueryToGetTotalCorrectionsResolver<TParent>
@@ -1746,6 +1765,21 @@ export interface QueryToFetchRegistrationResolver<
   ): TResult
 }
 
+export interface QueryToFetchRegistrationForViewingArgs {
+  id: string
+}
+export interface QueryToFetchRegistrationForViewingResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchRegistrationForViewingArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface QueryToQueryPersonByNidIdentifierArgs {
   dob?: string
   nid?: string
@@ -1917,6 +1951,10 @@ export interface QueryToGetTotalMetricsResolver<TParent = any, TResult = any> {
     context: any,
     info: GraphQLResolveInfo
   ): TResult
+}
+
+export interface QueryToGetVSExportsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface QueryToGetTotalPaymentsArgs {
@@ -3619,6 +3657,14 @@ export interface TotalMetricsResultToResultsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLTotalVSExportTypeResolver<TParent = any> {
+  results?: TotalVSExportToResultsResolver<TParent>
+}
+
+export interface TotalVSExportToResultsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLPaymentMetricTypeResolver<TParent = any> {
   total?: PaymentMetricToTotalResolver<TParent>
   paymentType?: PaymentMetricToPaymentTypeResolver<TParent>
@@ -4987,6 +5033,34 @@ export interface EventMetricsToPractitionerRoleResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLVSExportTypeResolver<TParent = any> {
+  event?: VSExportToEventResolver<TParent>
+  year?: VSExportToYearResolver<TParent>
+  fileSize?: VSExportToFileSizeResolver<TParent>
+  url?: VSExportToUrlResolver<TParent>
+  createdOn?: VSExportToCreatedOnResolver<TParent>
+}
+
+export interface VSExportToEventResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToYearResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToFileSizeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToUrlResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToCreatedOnResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

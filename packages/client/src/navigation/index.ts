@@ -50,7 +50,9 @@ import {
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
-  SYSTEM_LIST
+  SYSTEM_LIST,
+  VS_EXPORTS,
+  VIEW_RECORD
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -166,6 +168,9 @@ export function goToHome() {
 
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+export function goToVSExport() {
+  return push(VS_EXPORTS)
 }
 
 export function goToFormConfigHome() {
@@ -292,6 +297,14 @@ export function goToPrintCertificate(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'certCollector'
+    })
+  )
+}
+
+export function goToViewRecordPage(declarationId: string) {
+  return push(
+    formatUrl(VIEW_RECORD, {
+      declarationId
     })
   )
 }

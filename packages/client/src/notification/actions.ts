@@ -11,8 +11,10 @@ import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionMo
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const SHOW_BACKGROUND_SYNC_TRIGGERED = 'SHOW_BACKGROUND_SYNC_TRIGGERED'
-export const HIDE_BACKGROUND_SYNC_TRIGGERED = 'HIDE_BACKGROUND_SYNC_TRIGGERED'
+
+export const SHOW_USER_RECONNECTED_TOAST = 'SHOW_ONLINE_USER_SUCCESS_TOAST'
+export const HIDE_USER_RECONNECTED_TOAST = 'HIDE_ONLINE_USER_SUCCESS_TOAST'
+
 export const SHOW_CONFIG_ERROR = 'SHOW_CONFIG_ERROR'
 export const HIDE_CONFIG_ERROR = 'HIDE_CONFIG_ERROR'
 export const SESSION_EXPIRED = 'AUTH/SESSION_EXPIRED'
@@ -119,12 +121,12 @@ export const toggleDraftSavedNotification =
     type: TOGGLE_DRAFT_SAVED_NOTIFICATION
   })
 
-export type ShowBackgroundSyncedAction = {
-  type: typeof SHOW_BACKGROUND_SYNC_TRIGGERED
+export type ShowUserReconnectedToastAction = {
+  type: typeof SHOW_USER_RECONNECTED_TOAST
 }
 
-export type HideBackgroundSyncedAction = {
-  type: typeof HIDE_BACKGROUND_SYNC_TRIGGERED
+export type HideUserReconnectedToastAction = {
+  type: typeof HIDE_USER_RECONNECTED_TOAST
 }
 
 export type SessionExpiredAction = {
@@ -144,15 +146,13 @@ export type HideUnassigned = {
   type: typeof HIDE_UNASSIGNED
 }
 
-export const showBackgroundSyncedNotification =
-  (): ShowBackgroundSyncedAction => ({
-    type: SHOW_BACKGROUND_SYNC_TRIGGERED
-  })
+export const showUserReconnectedToast = (): ShowUserReconnectedToastAction => ({
+  type: SHOW_USER_RECONNECTED_TOAST
+})
 
-export const hideBackgroundSyncedNotification =
-  (): HideBackgroundSyncedAction => ({
-    type: HIDE_BACKGROUND_SYNC_TRIGGERED
-  })
+export const hideUserReconnectedToast = (): HideUserReconnectedToastAction => ({
+  type: HIDE_USER_RECONNECTED_TOAST
+})
 
 export const showSessionExpireConfirmation = (): SessionExpiredAction => ({
   type: SESSION_EXPIRED
@@ -244,8 +244,6 @@ export const hideUnassignedModal = (): HideUnassigned => ({
 })
 
 export type Action =
-  | ShowBackgroundSyncedAction
-  | HideBackgroundSyncedAction
   | SessionExpiredAction
   | ShowConfigurationErrorAction
   | HideConfigurationErrorAction
@@ -264,3 +262,5 @@ export type Action =
   | HideUnassigned
   | ShowCreateUserErrorToast
   | HideCreateUserErrorToast
+  | ShowUserReconnectedToastAction
+  | HideUserReconnectedToastAction

@@ -8,7 +8,8 @@
 
 # production
 /build
-
+/src/scripts/Birth_report.csv
+/src/scripts/Death_report.csv
 # misc
 .DS_Store
 .env.local

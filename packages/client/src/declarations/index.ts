@@ -17,9 +17,11 @@ import {
   IFormData,
   IFormFieldValue,
   IContactPoint,
-  FieldValueMap
+  Sort,
+  FieldValueMap,
+  IAttachmentValue
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, Query } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -72,6 +74,8 @@ import {
   IQueryData,
   IWorkqueue
 } from '@client/workqueue'
+import { isBase64FileString } from '@client/utils/commonUtils'
+import { at } from 'lodash'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -918,11 +922,28 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
+      await fetchAllMinioUrlsInAttachment(data.data as Query)
       resolve({ data, store, client })
     } catch (error) {
       reject(error)
     }
   })
+}
+
+async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
+  const registration =
+    queryResultData.fetchBirthRegistration?.registration ||
+    queryResultData.fetchDeathRegistration?.registration
+
+  const attachments = registration?.attachments
+  if (!attachments) {
+    return
+  }
+  const urlsWithMinioPath = attachments
+    .filter((a) => a?.data && !isBase64FileString(a.data))
+    .map((a) => a && fetch(`${window.config.MINIO_URL}${a.data}`))
+
+  return Promise.all(urlsWithMinioPath)
 }
 
 function getDataKey(declaration: IDeclaration) {
@@ -1062,6 +1083,13 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       )
     }
     case DELETE_DECLARATION_SUCCESS:
+      const declarationToDelete = state.declarations.find(
+        (declaration) => declaration.id === action.payload
+      )
+      const declarationMinioUrls =
+        getMinioUrlsFromDeclaration(declarationToDelete)
+
+      postMinioUrlsToServiceWorker(declarationMinioUrls)
       return {
         ...state,
         declarations: state.declarations.filter(
@@ -1628,6 +1656,40 @@ export function filterProcessingDeclarations(
   }
 }
 
+export function getMinioUrlsFromDeclaration(
+  declaration: IDeclaration | undefined
+) {
+  const minioUrls: string[] = []
+  if (!declaration) {
+    return minioUrls
+  }
+  const documentsData = declaration.originalData?.documents as Record<
+    string,
+    IAttachmentValue[]
+  >
+  if (!documentsData) {
+    return minioUrls
+  }
+  const docSections = Object.values(documentsData)
+
+  for (const docSection of docSections) {
+    for (const doc of docSection) {
+      if (doc.data && !isBase64FileString(doc.data)) {
+        minioUrls.push(doc.data)
+      }
+    }
+  }
+  return minioUrls
+}
+
+export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
+  const minioFullUrls = minioUrls.map(
+    (pathToImage) => `${window.config.MINIO_URL}${pathToImage}`
+  )
+  navigator?.serviceWorker?.controller?.postMessage({
+    minioUrls: minioFullUrls
+  })
+}
 export function getProcessingDeclarationIds(declarations: IDeclaration[]) {
   return declarations
     .filter(

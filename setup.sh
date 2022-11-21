@@ -267,7 +267,7 @@ fi
 
 
 echo
-openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021)
+openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
 for x in "${openCRVSPorts[@]}"
 do
    :
@@ -339,6 +339,8 @@ mkdir -p data/mongo
 chmod 775 data/mongo
 mkdir -p data/influxdb
 chmod 775 data/influxdb
+mkdir -p data/minio
+chmod 775 data/minio
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
@@ -363,6 +365,7 @@ echo "wait-on tcp:9200" && wait-on -l tcp:9200
 echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
 echo "wait-on tcp:8086" && wait-on -l tcp:8086
+echo "wait-on tcp:3535" && wait-on -l tcp:3535
 
 
 set -- $(stty size) #$1=rows, $2=columns
