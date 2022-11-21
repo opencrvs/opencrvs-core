@@ -246,7 +246,9 @@ export async function fhirWorkflowEventHandler(
     return h.response().code(401)
   }
 
-  setupSystemIdentifier(request)
+  if (event != Events.UNKNOWN) {
+    setupSystemIdentifier(request)
+  }
 
   let response
 
