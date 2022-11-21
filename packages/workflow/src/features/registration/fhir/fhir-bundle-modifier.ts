@@ -40,11 +40,13 @@ import {
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
+import * as Hapi from '@hapi/hapi'
 import {
   APPLICATION_CONFIG_URL,
   RESOURCE_SERVICE_URL
 } from '@workflow/constants'
 import {
+  getToken,
   getTokenPayload,
   ITokenPayload,
   USER_SCOPE
@@ -468,6 +470,32 @@ export async function setupLastRegLocation(
     })
   }
   return taskResource
+}
+
+const SYSTEM_SCOPES = ['recordsearch', 'notification-api']
+
+function isSystemInitiated(scopes: string[] | undefined) {
+  return Boolean(scopes?.some((scope) => SYSTEM_SCOPES.includes(scope)))
+}
+
+export function setupSystemIdentifier(request: Hapi.Request) {
+  const token = getToken(request)
+  const { sub: systemId } = getTokenPayload(token)
+  const bundle = request.payload as fhir.Bundle
+  const taskResource = getTaskResource(bundle)
+  const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+  if (!taskResource.identifier) {
+    taskResource.identifier = []
+  }
+  taskResource.identifier = taskResource.identifier.filter(
+    ({ system }) => system != systemIdentifierUrl
+  )
+  if (isSystemInitiated(request.auth.credentials.scope)) {
+    taskResource.identifier.push({
+      system: systemIdentifierUrl,
+      value: systemId
+    })
+  }
 }
 
 export function setupLastRegUser(
