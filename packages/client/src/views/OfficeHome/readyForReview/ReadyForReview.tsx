@@ -57,6 +57,7 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { startCase } from 'lodash'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -207,7 +208,7 @@ class ReadyForReviewComponent extends React.Component<
             this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
           }
         >
-          {reg.name}
+          {startCase(reg.name)}
         </NameContainer>
       ) : (
         <NoNameContainer

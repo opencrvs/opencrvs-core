@@ -917,6 +917,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Refresh',
     description: 'label for refresh',
     id: 'constants.refresh'
+  },
+  verifyQrCodeInfo: {
+    id: 'constants.verifyQrCodeInfo',
+    defaultMessage:
+      'This verifies that you have scanned a valid government {event, select, BIRTH {birth} DEATH {death} other {birth}} certificate with the following data'
   }
 }
 

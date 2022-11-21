@@ -51,6 +51,7 @@ import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { startCase } from 'lodash'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
@@ -234,7 +235,7 @@ class SentForReviewComponent extends React.Component<
               : this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
           }
         >
-          {reg.name}
+          {startCase(reg.name)}
         </NameContainer>
       ) : (
         <NoNameContainer

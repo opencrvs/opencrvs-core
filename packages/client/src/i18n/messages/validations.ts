@@ -115,6 +115,12 @@ const messagesToDefine: IValidationMessages = {
       'The error message appears when input is less than or equal to 0',
     id: 'validations.greaterThanZero'
   },
+  isValidBirthDateWithinRange: {
+    defaultMessage: 'Age must be between {min} - {max} years',
+    description:
+      'The error message appears when the given birth date is not valid',
+    id: 'validations.isValidBirthDateWithinRange'
+  },
   isValidBirthDate: {
     defaultMessage: 'Must be a valid birth date',
     description:

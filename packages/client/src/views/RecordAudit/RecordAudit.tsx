@@ -91,7 +91,7 @@ import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import NotificationToast from '@client/views/OfficeHome/NotificationToast'
-import { get } from 'lodash'
+import { get, startCase } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
 import {
@@ -560,7 +560,8 @@ function RecordAuditBody({
       )}
       <Content
         title={
-          declaration.name || intl.formatMessage(recordAuditMessages.noName)
+          (declaration.name && startCase(declaration.name)) ||
+          intl.formatMessage(recordAuditMessages.noName)
         }
         titleColor={declaration.name ? 'copy' : 'grey600'}
         size={ContentSize.LARGE}
