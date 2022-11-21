@@ -50,8 +50,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { RouteComponentProps } from 'react-router'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
-import { WQContentWrapper } from '../OfficeHome/WQContentWrapper'
-
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import {
   ColumnContentAlignment,
   COLUMNS,
@@ -61,14 +60,13 @@ import {
 import { transformData } from '@client/search/transformer'
 import { SearchEventsQuery } from '@client/utils/gateway'
 import { getPartialState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { Query } from '@apollo/client/react/components'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import {
   IconWithName,
   IconWithNameEvent,
   NameContainer,
   NoNameContainer
-} from '../OfficeHome/components'
+} from '@client/views/OfficeHome/components'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { convertToMSISDN } from '@client/forms/utils'
@@ -76,6 +74,8 @@ import { DownloadAction } from '@client/forms'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
+import { Query } from '@client/components/Query'
+import { BookmarkAdvancedSearchResult } from './BookmarkAdvancedSearchResult'
 
 const SearchParamPillsContainer = styled.div`
   margin: 16px 0px;
@@ -83,9 +83,9 @@ const SearchParamPillsContainer = styled.div`
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
-  color: #2b4573;
+  color: ${({ theme }) => theme.colors.primaryDarker};
 `
-const BookMarkIconBody = styled.div`
+const BookmarkIconBody = styled.div`
   position: absolute;
   top: -20px;
   right: 10px;
@@ -372,7 +372,9 @@ const RecordAuditComp = (props: IFullProps) => {
   const SearchModifierComponent = () => {
     return (
       <>
-        <BookMarkIconBody>BookMark Icon</BookMarkIconBody>
+        <BookmarkIconBody>
+          <BookmarkAdvancedSearchResult />
+        </BookmarkIconBody>
         <SearchParamPillsContainer>
           {Object.keys(advancedSearchParamsState).map((paramKey, i) => {
             const paramValue =

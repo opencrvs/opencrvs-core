@@ -37,8 +37,6 @@ import {
   IFormFieldValue,
   IFormSectionData
 } from '@client/forms'
-import { Online } from '@client/../../components/lib/icons'
-import { isValid } from 'date-fns'
 
 export enum TabId {
   BIRTH = 'birth',

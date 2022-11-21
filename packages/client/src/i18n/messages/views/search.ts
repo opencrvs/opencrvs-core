@@ -22,6 +22,10 @@ interface ISearchMessages
   noResultFor: MessageDescriptor
   totalResultText: MessageDescriptor
   locationNotFound: MessageDescriptor
+  bookmarkAdvancedSearchModalTitle: MessageDescriptor
+  bookmarkAdvancedSearchModalBody: MessageDescriptor
+  removeBookmarkAdvancedSearchModalTitle: MessageDescriptor
+  removeBookmarkAdvancedSearchModalBody: MessageDescriptor
 }
 
 const messagesToDefine: ISearchMessages = {
@@ -73,6 +77,28 @@ const messagesToDefine: ISearchMessages = {
     id: 'search.locationNotFound',
     defaultMessage: 'Location not found',
     description: 'Label for location not found'
+  },
+  bookmarkAdvancedSearchModalTitle: {
+    id: 'search.bookmarkAdvancedSearchModalTitle',
+    defaultMessage: 'Save search query?',
+    description: 'Modal title for bookmark advacnced search'
+  },
+  bookmarkAdvancedSearchModalBody: {
+    id: 'search.bookmarkAdvancedSearchModalBody',
+    defaultMessage:
+      'A shortcut will be added to the side bar so you can rerun this search query',
+    description: 'Modal body for bookmark advacnced search'
+  },
+  removeBookmarkAdvancedSearchModalTitle: {
+    id: 'search.removeBookmarkAdvancedSearchModalTitle',
+    defaultMessage: 'Remove search query?',
+    description: 'Modal title for remove bookmark advacnced search'
+  },
+  removeBookmarkAdvancedSearchModalBody: {
+    id: 'search.removeBbookmarkAdvancedSearchModalBody',
+    defaultMessage:
+      'This advanced search bookmark will be removed from the side bar shortcut',
+    description: 'Modal body for remove bookmark advacnced search'
   }
 }
 
