@@ -34,7 +34,7 @@ import {
   GQLRegWorkflow
 } from '@opencrvs/gateway/src/graphql/schema'
 import { callingCountries } from 'country-data'
-import { cloneDeep, get } from 'lodash'
+import { capitalize, cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 
 import QRCode from 'qrcode'
@@ -374,7 +374,7 @@ export const placeOfBirthLocalityTransformer = (
 
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'placeOfBirthLocality'
-  ] = city
+  ] = capitalize(city)
 }
 
 export const placeOfBirthStateTransformer = (
