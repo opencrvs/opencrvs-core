@@ -65,18 +65,14 @@ const HealthSystemLogo = styled.div`
   background-color: ${({ theme }) => theme.colors.grey200};
 `
 
-const HealthSystemLocation = styled.p`
-  ${({ theme }) => theme.fonts.reg16}
-`
-
-function HealthSystemUser() {
+function HealthSystemUser({ name }: { name?: string }) {
   const intl = useIntl()
   return (
     <NameAvatar>
       <HealthSystemLogo>
         <Box />
       </HealthSystemLogo>
-      <span>{intl.formatMessage(userMessages.healthSystem)}</span>
+      <span>{name ?? intl.formatMessage(userMessages.healthSystem)}</span>
     </NameAvatar>
   )
 }
@@ -102,6 +98,12 @@ const GetNameWithAvatar = ({
       <AvatarSmall avatar={avatar} name={userName} />
       <span>{userName}</span>
     </NameAvatar>
+  )
+}
+
+function isSystemInitiated(history: History) {
+  return Boolean(
+    (history.dhis2Notification && !history.user?.id) || history.system
   )
 }
 
@@ -208,8 +210,8 @@ export const GetHistory = ({
     ),
     user: (
       <>
-        {item.dhis2Notification && !item.user?.id ? (
-          <HealthSystemUser />
+        {isSystemInitiated(item) ? (
+          <HealthSystemUser name={item.system?.name} />
         ) : (
           <Link
             id="profile-link"
@@ -231,21 +233,18 @@ export const GetHistory = ({
         ? userMessages.healthSystem
         : userMessages[item?.user?.role as string]
     ),
-    location:
-      item.dhis2Notification && !item.user?.role ? (
-        <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
-      ) : isFieldAgent ? (
-        <>{item.office?.name}</>
-      ) : (
-        <Link
-          font="bold14"
-          onClick={() => {
-            goToTeamUserList && goToTeamUserList(item?.office?.id as string)
-          }}
-        >
-          {item.office?.name as string}
-        </Link>
-      )
+    location: isSystemInitiated(item) ? null : isFieldAgent ? (
+      <>{item.office?.name}</>
+    ) : (
+      <Link
+        font="bold14"
+        onClick={() => {
+          goToTeamUserList && goToTeamUserList(item?.office?.id as string)
+        }}
+      >
+        {item.office?.name as string}
+      </Link>
+    )
   }))
 
   const columns = [
