@@ -14,9 +14,9 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
-import { GetDeclarationInfo } from '@client/views/PrintCertificate/DeclarationInfo'
-import { useIntl } from 'react-intl'
+import { Warning } from '@opencrvs/components/lib/icons'
+import { CertificateInfo } from '@client/views/PrintCertificate/CertificateInfo'
+import { useIntl, MessageDescriptor } from 'react-intl'
 import gql from 'graphql-tag'
 import { Query } from '@client/components/Query'
 import { useParams } from 'react-router'
@@ -24,17 +24,21 @@ import { gqlToDraftTransformer } from '@client/transformer'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { getDraftDeclarationData } from '@client/views/RecordAudit/utils'
-import { IDeclaration } from '@client/declarations'
+import { getName } from '@client/views/RecordAudit/utils'
 import {
   Spinner,
-  ErrorToastNotification
+  ErrorToastNotification,
+  Box
 } from '@opencrvs/components/lib/interface'
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
-import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
+import {
+  buttonMessages,
+  errorMessages,
+  constantsMessages
+} from '@client/i18n/messages'
 import styled from '@client/styledComponents'
 import { Event } from '@client/utils/gateway'
-import { IFormFieldValue, IFormSectionData } from '@client/forms'
+import { startCase } from 'lodash'
+import { formatAllNonStringValues } from './PDFUtils'
 
 const FullPageCenter = styled.div`
   height: 100vh;
@@ -47,9 +51,28 @@ const FullPageCenter = styled.div`
     margin-top: -36px;
   }
 `
-function toString(delimiter = '', ...values: IFormFieldValue[]): string {
-  return values.map((v) => v.toString()).join(delimiter)
-}
+const Heading = styled.h2`
+  ${({ theme }) => theme.fonts.h1};
+  padding-bottom: 16px;
+  border-bottom: solid 1px ${({ theme }) => theme.colors.grey200};
+`
+const StyledBox = styled(Box)`
+  display: flex;
+  margin-bottom: 16px;
+  align-items: center;
+`
+
+const IconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+`
+const GreyInfo = styled(Warning)`
+  transform: rotate(0.5turn);
+  path {
+    fill: ${({ theme }) => theme.colors.grey500};
+  }
+`
 
 function getEvent(event: string): Event {
   switch (event) {
@@ -184,73 +207,36 @@ export function VerifyDetails() {
         } else if (data?.fetchRegistration) {
           const event = data.fetchRegistration.registration?.type ?? 'BIRTH'
           const registerFormForEvent = registerForm[getEvent(event)]
-          const regStatus = data.fetchRegistration.registration?.status[0]?.type
-          const draftDeclarationData = gqlToDraftTransformer(
+          const declaration = gqlToDraftTransformer(
             registerFormForEvent,
             data.fetchRegistration,
             offlineData
           )
-          const declarationData = {
-            ...getDraftDeclarationData(
-              {
-                id,
-                data: draftDeclarationData,
-                event: getEvent(event),
-                registrationStatus: regStatus
-              } as IDeclaration,
-              offlineData,
-              intl,
-              data.fetchRegistration.registration?.trackingId ?? ''
-            ),
-            status: regStatus
-          }
-
-          const templateInfo = {
-            registrationLocation: toString(
-              ', ',
-              draftDeclarationData.template?.registrationCentre,
-              draftDeclarationData.template?.registrationLGA,
-              draftDeclarationData.template?.registrationState
-            ),
-            registrationDate:
-              draftDeclarationData.template?.registrationDate?.toString(),
-            certificateDate:
-              draftDeclarationData.template?.certificateDate?.toString(),
-            registrar: draftDeclarationData.template?.registrarName?.toString(),
-            childGender: (
-              draftDeclarationData.template?.informantGender as IFormSectionData
-            )?.defaultMessage?.toString()
-          }
 
           return (
-            <Content
-              title={declarationData.name}
-              icon={() => (
-                <DeclarationIcon color={STATUSTOCOLOR[regStatus] || 'green'} />
-              )}
-              size={ContentSize.LARGE}
-              topActionButtons={[]}
-              showTitleOnMobile
-            >
-              <GetDeclarationInfo
-                isDownloaded
-                actions={[]}
-                intl={intl}
-                declaration={declarationData}
-                additionalInfo={templateInfo}
-                order={[
-                  'status',
-                  'type',
-                  'trackingId',
-                  getEvent(event) === Event.Death ? 'drn' : 'brn',
-                  'registrationLocation',
-                  'registrationDate',
-                  'childGender',
-                  'dateOfBirth',
-                  'placeOfBirth',
-                  'registrar',
-                  'certificateDate'
-                ]}
+            <Content size={ContentSize.LARGE} showTitleOnMobile>
+              <StyledBox>
+                <IconContainer>
+                  <GreyInfo />
+                </IconContainer>
+                <span>
+                  {intl.formatMessage(constantsMessages.verifyQrCodeInfo, {
+                    event
+                  })}
+                </span>
+              </StyledBox>
+              <Heading>
+                {startCase(
+                  getName(data.fetchRegistration.child.name, intl.locale)
+                )}
+              </Heading>
+              <CertificateInfo
+                data={formatAllNonStringValues(
+                  declaration.template as Record<
+                    string,
+                    string | MessageDescriptor | Array<string>
+                  >
+                )}
               />
             </Content>
           )
