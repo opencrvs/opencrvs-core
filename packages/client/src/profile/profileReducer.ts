@@ -65,6 +65,13 @@ export const profileReducer: LoopReducer<
   | Loop<ProfileState, actions.Action | changeLanguageActions.Action> => {
   switch (action.type) {
     case actions.REDIRECT_TO_AUTHENTICATION:
+      let redirectParam = ''
+
+      if (window.location.pathname.includes('/verify')) {
+        redirectParam = `&redirect_url=${encodeURIComponent(
+          window.location.pathname
+        )}`
+      }
       return loop(
         {
           ...state,
@@ -85,7 +92,7 @@ export const profileReducer: LoopReducer<
               window.location.assign(
                 `${window.config.LOGIN_URL}?lang=${
                   getState().i18n.language
-                }&redirect_url=${encodeURIComponent(window.location.pathname)}`
+                }${redirectParam}`
               )
             },
             { args: [Cmd.getState] }
