@@ -177,15 +177,14 @@ describe('generate refresh token', () => {
     }
   })
 
-  const fetchRefreshUser = {
-    name: 'emmanuel.mayuka',
-    clientId: '38ea3d84-6403-40f0-bce2-485caf655585',
-    shaSecret: 'c2844fd0-ce88-4d5c-8bbb-634e9618ec63',
-    clientSecret: 'fb82cd2f-6c95-4dff-92f5-22c787b7f277'
-  }
-
   it('update refresh token for system admin', async () => {
-    fetch.mockResponseOnce(JSON.stringify(fetchRefreshUser), { status: 200 })
+    fetch.mockResponses(
+      [
+        JSON.stringify({ clientId: '38ea3d84-6403-40f0-bce2-485caf655585' }),
+        { status: 200 }
+      ],
+      [JSON.stringify({})]
+    )
 
     const response = await resolvers.Mutation.refreshSystemClientSecret(
       {},
@@ -193,7 +192,9 @@ describe('generate refresh token', () => {
       authHeaderSysAdmin
     )
 
-    expect(response).toEqual(fetchRefreshUser)
+    expect(response).toEqual({
+      clientId: '38ea3d84-6403-40f0-bce2-485caf655585'
+    })
   })
 
   it('should throw error for register user', async () => {

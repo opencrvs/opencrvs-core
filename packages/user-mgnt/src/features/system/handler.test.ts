@@ -306,14 +306,15 @@ describe('refresh secret system user', () => {
   })
 
   it('generate refresh secret key', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
     mockingoose(System).toReturn(mockSystem, 'findOne')
-    mockingoose(System).toReturn({}, 'update')
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/refreshSystemClientSecret',
       payload: {
-        clientId: '38ea3d84-6403-40f0-bce2-485caf655585'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -323,13 +324,13 @@ describe('refresh secret system user', () => {
   })
 
   it('return unauthorized error if no system user is found', async () => {
-    mockingoose(User).toReturn(null, 'findOne')
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/refreshSystemClientSecret',
       payload: {
-        clientId: '12345'
+        clientId: '12367'
       },
       headers: {
         Authorization: `Bearer ${token}`
