@@ -52,8 +52,7 @@ export enum WebhookPermissions {
 
 const WebhookSchema = new Schema({
   event: { type: String },
-  permissions: { type: [String] },
-  includePii: { type: Boolean }
+  permissions: { type: [String] }
 })
 
 export interface ISystemModel extends ISystem, Document {}

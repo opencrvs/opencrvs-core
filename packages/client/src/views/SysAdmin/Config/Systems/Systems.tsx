@@ -14,12 +14,7 @@ import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
-import {
-  System,
-  SystemStatus,
-  SystemType,
-  WebhookOption
-} from '@client/utils/gateway'
+import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
 import {
   Alert,
@@ -76,6 +71,16 @@ const Field = styled.div`
   margin-top: 16px;
 `
 
+export enum WebhookOption {
+  birth = 'BIRTH',
+  death = 'DEATH'
+}
+
+export interface WebHookSetting {
+  event: string
+  permissions: string[]
+}
+
 export function SystemList() {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
@@ -86,20 +91,14 @@ export function SystemList() {
 
   const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
 
-  const [selectedItems, setSelectedItems] = React.useState<
-    string[] | undefined
-  >(undefined)
-
-  const [selectedDeathItems, setSelectedDeathItems] = React.useState<
-    string[] | undefined
-  >(undefined)
-
   const checkboxHandler = (items: string[], type: string) => {
-    const val = items.filter((it) => it !== '')
-
+    const val: WebHookSetting = {
+      event: type,
+      permissions: items
+    }
     type === WebhookOption.birth
-      ? setSelectedItems(val)
-      : setSelectedDeathItems(val)
+      ? setBirthPermissions(val)
+      : setDeathPermissions(val)
   }
 
   const sysType = {
@@ -109,22 +108,15 @@ export function SystemList() {
     WEBHOOK: intl.formatMessage(integrationMessages.webhook)
   }
 
-  const webhook = [
-    {
-      dailyQuota: '0',
-      permission: selectedItems
-    },
-    {
-      dailyQuota: '0',
-      permission: selectedDeathItems
-    }
-  ]
-
   const toggleModal = () => {
     setShowModal((prev) => !prev)
   }
 
   const {
+    birthPermissions,
+    setBirthPermissions,
+    deathPermissions,
+    setDeathPermissions,
     existingSystems,
     deactivateSystem,
     systemToToggleActivation,
@@ -174,11 +166,6 @@ export function SystemList() {
     },
     [toggleKeyModal]
   )
-
-  const clientType = newSystemType
-  console.log(clientType)
-  console.log(selectedItems)
-
   return (
     <Frame
       header={<Header />}
@@ -260,7 +247,9 @@ export function SystemList() {
                   type="tertiary"
                   id="cancel"
                   key="cancel"
-                  onClick={() => setSystemToToggleActivation(undefined)}
+                  onClick={() => {
+                    setSystemToToggleActivation(undefined)
+                  }}
                 >
                   {intl.formatMessage(buttonMessages.cancel)}
                 </Button>,
@@ -372,7 +361,7 @@ export function SystemList() {
                     shouldWarnAboutNationalId
                   }
                   onClick={() => {
-                    registerSystem()
+                    registerSystem(birthPermissions, deathPermissions)
                   }}
                   type="primary"
                 >
@@ -495,7 +484,7 @@ export function SystemList() {
               </PaddedAlert>
             )}
 
-            {clientType === SystemType.Webhook && (
+            {newSystemType === SystemType.Webhook && (
               <>
                 <InputField
                   id="select-input"
@@ -558,7 +547,7 @@ export function SystemList() {
                         }
                       ]}
                       name="test-checkbox-group1"
-                      value={selectedItems ?? ['']}
+                      value={birthPermissions.permissions ?? []}
                       onChange={(newValue) => {
                         checkboxHandler(newValue, WebhookOption.birth)
                       }}
@@ -567,19 +556,13 @@ export function SystemList() {
                 ) : (
                   <>
                     <CheckboxGroup
-                      id="test-checkbox-group1"
+                      id="test-checkbox-group2"
                       options={[
                         {
                           label: intl.formatMessage(
                             integrationMessages.registrationDetails
                           ),
                           value: 'registration-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.childDetails
-                          ),
-                          value: 'child-details'
                         },
                         {
                           label: intl.formatMessage(
@@ -600,14 +583,12 @@ export function SystemList() {
                           value: 'informant-details'
                         },
                         {
-                          label: intl.formatMessage(
-                            integrationMessages.informantDetails
-                          ),
-                          value: 'informant-details'
+                          label: 'Disease Details',
+                          value: 'disease-details'
                         }
                       ]}
                       name="test-checkbox-group1"
-                      value={selectedDeathItems ?? ['']}
+                      value={deathPermissions.permissions ?? []}
                       onChange={(newValue) => {
                         checkboxHandler(newValue, WebhookOption.death)
                       }}

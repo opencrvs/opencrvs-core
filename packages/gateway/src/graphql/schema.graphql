@@ -1007,6 +1007,7 @@ enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
+  WEBHOOK
 }
 
 input PersonInput {
@@ -1180,6 +1181,7 @@ input QuestionInput {
 
 input SystemSettings {
   dailyQuota: Int
+  webhook: [Webhook]
 }
 
 enum InformantType {
@@ -1508,6 +1510,11 @@ enum CustomFieldType {
 input ConditionalInput {
   fieldId: String!
   regexp: String!
+}
+
+input Webhook {
+  event: String!
+  permissions: [String]!
 }
 
 type Payment {

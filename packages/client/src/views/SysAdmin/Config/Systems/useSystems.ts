@@ -23,9 +23,19 @@ import {
   System,
   SystemType
 } from '@client/utils/gateway'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as mutations from './mutations'
+
+export enum WebhookOption {
+  birth = 'BIRTH',
+  death = 'DEATH'
+}
+
+export interface WebHookSetting {
+  event: string
+  permissions: string[]
+}
 
 /** Handles the user input when creating a new system in a modal */
 function useNewSystemDraft() {
@@ -104,6 +114,17 @@ export function useSystems() {
     doesNationalIdAlreadyExist
   } = useSystemsGlobalState()
 
+  const initWebHook: WebHookSetting = {
+    event: EMPTY_STRING,
+    permissions: []
+  }
+
+  const [birthPermissions, setBirthPermissions] =
+    React.useState<WebHookSetting>(initWebHook)
+
+  const [deathPermissions, setDeathPermissions] =
+    React.useState<WebHookSetting>(initWebHook)
+
   const [
     activateSystemMutate,
     {
@@ -175,13 +196,19 @@ export function useSystems() {
     })
   }
 
-  const registerSystem = () => {
+  const registerSystem = (birth: WebHookSetting, death: WebHookSetting) => {
+    if (newSystemType !== 'WEBHOOK') {
+      setDeathPermissions(initWebHook)
+      setBirthPermissions(initWebHook)
+    }
     registerSystemMutate({
       variables: {
         system: {
           type: newSystemType,
           name: newClientName,
-          settings: {}
+          settings: {
+            webhook: [birth, death]
+          }
         }
       }
     })
@@ -191,12 +218,18 @@ export function useSystems() {
     resetActivateSystemData()
     resetDeactivateSystemData()
     resetRegisterSystemData()
+    setDeathPermissions(initWebHook)
+    setBirthPermissions(initWebHook)
   }
 
   const shouldWarnAboutNationalId =
     newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
 
   return {
+    birthPermissions,
+    setBirthPermissions,
+    deathPermissions,
+    setDeathPermissions,
     existingSystems,
     deactivateSystem,
     activateSystem,

@@ -877,7 +877,8 @@ export const enum GQLSystemStatus {
 export const enum GQLSystemType {
   NATIONAL_ID = 'NATIONAL_ID',
   HEALTH = 'HEALTH',
-  RECORD_SEARCH = 'RECORD_SEARCH'
+  RECORD_SEARCH = 'RECORD_SEARCH',
+  WEBHOOK = 'WEBHOOK'
 }
 
 export interface GQLPersonInput {
@@ -1051,6 +1052,7 @@ export interface GQLQuestionInput {
 
 export interface GQLSystemSettings {
   dailyQuota?: number
+  webhook?: Array<GQLWebhook | null>
 }
 
 export const enum GQLInformantType {
@@ -1380,6 +1382,11 @@ export const enum GQLCustomFieldType {
 export interface GQLConditionalInput {
   fieldId: string
   regexp: string
+}
+
+export interface GQLWebhook {
+  event: string
+  permissions: Array<string | null>
 }
 
 export interface GQLPayment {

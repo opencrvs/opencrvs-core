@@ -1821,6 +1821,7 @@ export type SystemSecret = {
 
 export type SystemSettings = {
   dailyQuota?: InputMaybe<Scalars['Int']>
+  webhook?: InputMaybe<Array<InputMaybe<Webhook>>>
 }
 
 export enum SystemStatus {
@@ -1833,11 +1834,6 @@ export enum SystemType {
   NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
   Webhook = 'WEBHOOK'
-}
-
-export enum WebhookOption {
-  birth = 'BIRTH',
-  death = 'DEATH'
 }
 
 export type TotalMetricsResult = {
@@ -1940,6 +1936,11 @@ export type VerifyPasswordResult = {
   scrope?: Maybe<Array<Maybe<Scalars['String']>>>
   status?: Maybe<Scalars['String']>
   username?: Maybe<Scalars['String']>
+}
+
+export type Webhook = {
+  event: Scalars['String']
+  permissions: Array<InputMaybe<Scalars['String']>>
 }
 
 export type CreateOrUpdateCertificateSvgMutationVariables = Exact<{

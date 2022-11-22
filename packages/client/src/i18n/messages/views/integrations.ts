@@ -153,6 +153,14 @@ const messagesToDefine = {
     description: 'Label for informant details'
   },
 
+  /*
+    diseaseDetails: {
+      id: 'integrations.diseaseDetails',
+      defaultMessage: 'Disease Details',
+      description: 'Label for Disease details'
+    },
+  */
+
   registrationDetailsNoPII: {
     id: 'integrations.registrationDetailsnNoPII',
     defaultMessage: 'Registration Details (No PII)',

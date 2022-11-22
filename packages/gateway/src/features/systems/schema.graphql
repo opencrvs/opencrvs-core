@@ -26,6 +26,7 @@ enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
+  WEBHOOK
 }
 
 type System {
@@ -42,8 +43,14 @@ type SystemSecret {
   clientSecret: ID!
 }
 
+input Webhook {
+  event: String!
+  permissions: [String]!
+}
+
 input SystemSettings {
   dailyQuota: Int
+  webhook: [Webhook]
 }
 input SystemInput {
   name: String!
