@@ -451,15 +451,6 @@ export const resolvers: GQLResolver = {
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
 
-      const userId = getClientIdFromToken(authHeader.Authorization)
-      const user = await getUser({ userId }, authHeader)
-      await postUserActionToMetrics(
-        'REINSTATED_' + prevRegStatus.toUpperCase(),
-        user.practitionerId,
-        authHeader,
-        newTaskBundle
-      )
-
       return {
         taskEntryResourceID: taskId,
         registrationStatus: prevRegStatus
@@ -568,23 +559,7 @@ async function createEventRegistration(
       return await getDeclarationIds(duplicateCompostion, authHeader)
     }
   }
-
-  const authorization = authHeader.Authorization
-  const userId = getClientIdFromToken(authorization)
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  const user = await getUser({ userId }, authHeader)
-
-  let action = 'INCOMPLETE'
-  if (user.role === 'REGISTRATION_AGENT') {
-    action = 'SENT_FOR_APPROVAL'
-  }
-  await postUserActionToMetrics(
-    action,
-    user.practitionerId,
-    authHeader,
-    doc,
-    res
-  )
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
     return await getRegistrationIdsFromResponse(res, event, authHeader)
@@ -664,16 +639,6 @@ async function markEventAsCertified(
   const doc = await buildFHIRBundle(details, event, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-
-  const userId = getClientIdFromToken(authHeader.Authorization)
-  const user = await getUser({ userId }, authHeader)
-  await postUserActionToMetrics(
-    'CERTIFIED',
-    user.practitionerId,
-    authHeader,
-    doc
-  )
-
   // return composition-id
   return getIDFromResponse(res)
 }
@@ -755,15 +720,6 @@ export async function markRecordAsDownloadedOrAssigned(
   const taskBundle = taskBundleWithExtension(taskEntry, extension)
 
   await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
-
-  const userId = getClientIdFromToken(authHeader.Authorization)
-  const user = await getUser({ userId }, authHeader)
-  await postUserActionToMetrics(
-    'RETRIEVED',
-    user.practitionerId,
-    authHeader,
-    taskBundle
-  )
   // return the full composition
   return fetchFHIR(`/Composition/${id}`, authHeader)
 }

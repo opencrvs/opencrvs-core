@@ -73,10 +73,15 @@ export async function postUserActionToMetrics(
   token: string,
   remoteAddress: string,
   userAgent: string,
-  practitionerId?: string
+  practitionerId?: string,
+  subjectPractitionerId?: string
 ) {
   const url = resolve(METRICS_URL, '/audit/events')
-  const body = { action: action, practitionerId: practitionerId }
+  const body = {
+    action: action,
+    practitionerId: practitionerId,
+    subjectPractitionerId: subjectPractitionerId
+  }
   const authentication = 'Bearer ' + token
   await fetch(url, {
     method: 'POST',

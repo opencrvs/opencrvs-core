@@ -16,7 +16,7 @@ import User, {
   IAuditHistory,
   IUserModel
 } from '@user-mgnt/model/user'
-import { statuses } from '@user-mgnt/utils/userUtils'
+import { getUserId, statuses } from '@user-mgnt/utils/userUtils'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
@@ -41,6 +41,9 @@ export async function userAuditHandler(
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   const user: IUserModel | null = await User.findById(auditUserPayload.userId)
+  const systemAdminUser: IUserModel | null = await User.findById(
+    getUserId({ Authorization: request.headers.authorization })
+  )
 
   if (!user) {
     logger.error(
@@ -92,7 +95,6 @@ export async function userAuditHandler(
     } else {
       user.auditHistory = [auditData]
     }
-
     if (
       AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE ||
       AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.DEACTIVATE
@@ -103,11 +105,15 @@ export async function userAuditHandler(
       } else {
         action = 'DEACTIVATE'
       }
+      const subjectPractitionerId = user.practitionerId
+      const practitionerId = systemAdminUser!.practitionerId
       await postUserActionToMetrics(
         action,
         request.headers.authorization,
         remoteAddress,
-        userAgent
+        userAgent,
+        practitionerId,
+        subjectPractitionerId
       )
     }
     try {

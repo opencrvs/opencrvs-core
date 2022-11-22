@@ -207,7 +207,7 @@ export const influx = new Influx.InfluxDB({
         ipAddress: Influx.FieldType.STRING,
         userAgent: Influx.FieldType.STRING
       },
-      tags: ['action', 'practitionerId']
+      tags: ['action', 'practitionerId', 'subjectPractitionerId']
     }
   ]
 })

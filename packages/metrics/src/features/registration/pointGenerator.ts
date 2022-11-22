@@ -626,11 +626,13 @@ export const generateAuditPoint = (
   action: string,
   ipAddress: string,
   userAgent: string,
-  additionalData?: Record<string, any>
+  additionalData?: Record<string, any>,
+  subjectPractitionerId?: string
 ): IPoints => {
   const tags: IUserAuditTags = {
     action: action,
-    practitionerId: practitionerId
+    practitionerId: practitionerId,
+    subjectPractitionerId: subjectPractitionerId
   }
   const fields: IUserAuditFields = {
     data: JSON.stringify(additionalData),
