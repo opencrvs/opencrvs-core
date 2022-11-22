@@ -65,7 +65,8 @@ const config = {
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   NID_NUMBER_PATTERN: /^[0-9]{9}$/,
   PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
-  ADDRESSES: 1
+  ADDRESSES: 1,
+  ADMIN_LEVELS: 2
 }
 
 vi.stubGlobal('config', config)

@@ -149,6 +149,7 @@ export const mockFetchConfig = {
     },
     LANGUAGES: 'en',
     ADDRESSES: 1,
+    ADMIN_LEVELS: 2,
     INTEGRATIONS: [
       {
         name: 'MOSIP',
