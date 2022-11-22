@@ -55,10 +55,15 @@ export const activateSystem = gql`
 export const refreshClientSecret = gql`
   mutation refreshSystemClientSecret($clientId: String!) {
     refreshSystemClientSecret(clientId: $clientId) {
-      name
-      clientId
-      shaSecret
       clientSecret
+      system {
+        _id
+        clientId
+        name
+        shaSecret
+        status
+        type
+      }
     }
   }
 `

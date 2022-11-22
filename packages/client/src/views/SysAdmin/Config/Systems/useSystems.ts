@@ -16,10 +16,10 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import {
   DeactivateSystemMutation,
   DeactivateSystemMutationVariables,
-  MutationRefreshSystemClientSecretArgs,
   ReactivateSystemMutation,
   ReactivateSystemMutationVariables,
-  RefreshSystemClientSecret,
+  RefreshSystemClientSecretMutation,
+  RefreshSystemClientSecretMutationVariables,
   RegisterSystemMutation,
   RegisterSystemMutationVariables,
   System,
@@ -27,7 +27,6 @@ import {
 } from '@client/utils/gateway'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { refreshClientSecret } from './mutations'
 import * as mutations from './mutations'
 
 /** Handles the user input when creating a new system in a modal */
@@ -158,10 +157,6 @@ export function useSystems() {
     }
   )
 
-  interface IRefreshSystemClientSecret {
-    refreshSystemClientSecret: RefreshSystemClientSecret
-  }
-
   const [
     clientRefreshTokenMutate,
     {
@@ -171,11 +166,11 @@ export function useSystems() {
       reset: resetRefreshTokenData
     }
   ] = useMutation<
-    IRefreshSystemClientSecret,
-    MutationRefreshSystemClientSecretArgs
+    RefreshSystemClientSecretMutation,
+    RefreshSystemClientSecretMutationVariables
   >(mutations.refreshClientSecret)
 
-  const clientRefreshToken = (clientId: string) => {
+  const clientRefreshToken = (clientId: string | undefined) => {
     if (!clientId) return
     clientRefreshTokenMutate({
       variables: {

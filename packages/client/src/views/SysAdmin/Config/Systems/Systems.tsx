@@ -302,14 +302,12 @@ export function SystemList() {
             ) : refreshTokenData &&
               refreshTokenData?.refreshSystemClientSecret ? (
               <Text variant="reg16" element="p">
-                {refreshTokenData.refreshSystemClientSecret.clientSecret}
+                {refreshTokenData.refreshSystemClientSecret?.clientSecret}
               </Text>
             ) : (
               <ButtonLink
                 onClick={() => {
-                  clientRefreshToken(
-                    toggleKeyModal.selectedClient?.clientId as string
-                  )
+                  clientRefreshToken(toggleKeyModal.selectedClient?.clientId)
                 }}
               >
                 {intl.formatMessage(buttonMessages.refresh)}
