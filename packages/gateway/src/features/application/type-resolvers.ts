@@ -30,5 +30,6 @@ export interface IApplicationConfigPayload {
   PHONE_NUMBER_PATTERN: string
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
+  ADMIN_LEVELS: number
   INTEGRATIONS: GQLIntegrationInput[]
 }

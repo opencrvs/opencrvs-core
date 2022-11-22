@@ -159,7 +159,6 @@ vi.doMock(
     referenceApi: {
       loadLocations: () => Promise.resolve(mockOfflineData.locations),
       loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
-      loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
       loadContent: () =>
         Promise.resolve({
           languages: mockOfflineData.languages

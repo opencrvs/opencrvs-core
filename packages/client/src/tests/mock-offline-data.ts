@@ -609,26 +609,6 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE'
     }
   },
-  pilotLocations: {
-    'bfe8306c-0910-48fe-8bf5-0db906cf3155': {
-      alias: 'বানিয়াজান',
-      id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
-      jurisdictionType: 'UNION',
-      name: 'Baniajan',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    'd3cef1d4-6187-4f0e-a024-61abd3fce9d4': {
-      alias: 'দুওজ',
-      id: 'd3cef1d4-6187-4f0e-a024-61abd3fce9d4',
-      jurisdictionType: 'UNION',
-      name: 'Duaz',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    }
-  },
   languages: JSON.parse(
     readFileSync(join(__dirname, './languages.json')).toString()
   ).data,

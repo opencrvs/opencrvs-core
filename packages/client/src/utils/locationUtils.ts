@@ -154,18 +154,6 @@ export function generateLocations(
   return generateSearchableLocations(locationArray, locations, intl)
 }
 
-export function generatePilotLocations(
-  pilotLocations: { [key: string]: ILocation },
-  offlineLocations: { [key: string]: ILocation },
-  intl: IntlShape
-) {
-  return generateSearchableLocations(
-    Object.values(pilotLocations),
-    offlineLocations,
-    intl
-  )
-}
-
 export function getJurisidictionType(
   locations: { [key: string]: ILocation },
   locationId: string

@@ -223,13 +223,6 @@ describe('referenceApi', () => {
     expect(data).toEqual(mockFetchFacilities.data)
   })
 
-  it('retrieves the pilot location list from the server', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockFetchPilotLocations))
-
-    const data = await referenceApi.loadPilotLocations()
-    expect(data).toEqual(mockFetchPilotLocations.data)
-  })
-
   it('retrieves the config from the server', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockFetchConfig))
     const data = await referenceApi.loadConfig()

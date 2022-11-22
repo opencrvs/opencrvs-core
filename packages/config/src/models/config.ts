@@ -48,6 +48,7 @@ export interface IApplicationConfigurationModel extends Document {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
+  ADMIN_LEVELS: number
   INTEGRATIONS: [IIntegration]
 }
 
@@ -138,6 +139,12 @@ const systemSchema = new Schema({
     required: false,
     enum: [1, 2],
     default: 1
+  },
+  ADMIN_LEVELS: {
+    type: Number,
+    required: true,
+    enum: [1, 2, 3, 4, 5],
+    default: 2
   },
   INTEGRATIONS: [integrationsSchema]
 })
