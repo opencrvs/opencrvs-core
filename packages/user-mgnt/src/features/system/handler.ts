@@ -361,28 +361,17 @@ export const SystemSchema = Joi.object({
   clientId: Joi.string()
 })
 
-export const resRegisterSystemSchema = Joi.object({
+export const resSystemSchema = Joi.object({
   clientSecret: Joi.string().uuid(),
   system: SystemSchema
 })
-
-interface IRefreshSYSClientSecretPayload {
-  clientId: string
-}
-
-interface IRefreshClientSecretResponse {
-  name: string
-  clientId: string
-  clientSecret: string
-  shaSecret: string
-}
 
 export async function refreshSystemClientSecretHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const { clientId } = request.payload as IRefreshSYSClientSecretPayload
+    const { clientId } = request.payload as SystemClientIdPayload
 
     const systemUser: ISystemModel | null = await System.findOne({
       client_id: clientId
@@ -399,28 +388,24 @@ export async function refreshSystemClientSecretHandler(
     systemUser.salt = salt
     systemUser.secretHash = hash
 
-    await System.updateOne({ client_id: clientId }, systemUser)
-
-    const response: IRefreshClientSecretResponse = {
-      clientId: clientId,
-      clientSecret: client_secret,
-      name: systemUser.username,
-      shaSecret: systemUser.sha_secret
-    }
-
-    return h.response(response).code(200)
+    const newSystem = await System.findOneAndUpdate(
+      { client_id: clientId },
+      systemUser,
+      {
+        new: true
+      }
+    )
+    return h
+      .response({
+        clientSecret: client_secret,
+        system: pickSystem(newSystem!)
+      })
+      .code(200)
   } catch (e) {
     return h.response(e.message).code(400)
   }
 }
 
-export const getClientSecretSystemRequestSchema = Joi.object({
+export const systemSecretRequestSchema = Joi.object({
   clientId: Joi.string()
-})
-
-export const getClientSecretSystemResponseSchema = Joi.object({
-  name: Joi.string(),
-  clientId: Joi.string(),
-  clientSecret: Joi.string(),
-  shaSecret: Joi.string()
 })

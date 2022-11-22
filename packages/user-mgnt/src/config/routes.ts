@@ -52,7 +52,7 @@ import verifySecurityAnswer, {
 import {
   registerSystem,
   reqRegisterSystemSchema,
-  resRegisterSystemSchema,
+  resSystemSchema,
   deactivateSystem,
   reactivateSystem,
   clientIdSchema,
@@ -65,8 +65,7 @@ import {
   getAllSystemsHandler,
   SystemSchema,
   refreshSystemClientSecretHandler,
-  getClientSecretSystemRequestSchema,
-  getClientSecretSystemResponseSchema
+  systemSecretRequestSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -497,7 +496,7 @@ export const getRoutes = () => {
           payload: reqRegisterSystemSchema
         },
         response: {
-          schema: resRegisterSystemSchema
+          schema: resSystemSchema
         }
       }
     },
@@ -616,10 +615,10 @@ export const getRoutes = () => {
           scope: [RouteScope.SYSADMIN]
         },
         validate: {
-          payload: getClientSecretSystemRequestSchema
+          payload: systemSecretRequestSchema
         },
         response: {
-          schema: getClientSecretSystemResponseSchema
+          schema: resSystemSchema
         }
       }
     }
