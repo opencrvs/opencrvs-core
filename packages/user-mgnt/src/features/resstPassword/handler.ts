@@ -11,13 +11,13 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import User from '@user-mgnt/model/user'
+import User, { IUserModel } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import {
   generateRandomPassword,
   generateSaltedHash
 } from '@user-mgnt/utils/hash'
-import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
+import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
 import { logger } from '@user-mgnt/logger'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
@@ -36,6 +36,10 @@ export default async function resetPasswordSMSHandler(
 
   const user = await User.findById(userId)
 
+  const systemAdminUser: IUserModel | null = await User.findById(
+    getUserId({ Authorization: request.headers.authorization })
+  )
+
   if (!user) {
     throw unauthorized()
   }
@@ -45,12 +49,15 @@ export default async function resetPasswordSMSHandler(
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
+  const subjectPractitionerId = systemAdminUser!.practitionerId
+
   try {
     await postUserActionToMetrics(
       'SEND_PASSWORD',
       request.headers.authorization,
       remoteAddress,
-      userAgent
+      userAgent,
+      subjectPractitionerId
     )
   } catch (err) {
     logger.error(err)

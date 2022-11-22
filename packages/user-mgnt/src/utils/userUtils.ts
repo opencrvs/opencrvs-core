@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import { ITokenPayload } from '@user-mgnt/utils/token'
+import { IAuthHeader, ITokenPayload } from '@user-mgnt/utils/token'
 import * as decode from 'jwt-decode'
 
 export const statuses = {
@@ -67,4 +67,12 @@ export const getTokenPayload = (token: string): ITokenPayload => {
     )
   }
   return decoded
+}
+
+export const getUserId = (authHeader: IAuthHeader): string => {
+  if (!authHeader || !authHeader.Authorization) {
+    throw new Error(`getUserId: Error occurred during token decode`)
+  }
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  return tokenPayload.sub
 }

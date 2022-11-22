@@ -11,7 +11,8 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import User from '@user-mgnt/model/user'
+import { getUserId } from '@user-mgnt/utils/userUtils'
+import User, { IUserModel } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import { sendUserName } from './service'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
@@ -29,6 +30,10 @@ export default async function usernameSMSReminderHandler(
 
   const user = await User.findById(userId)
 
+  const systemAdminUser: IUserModel | null = await User.findById(
+    getUserId({ Authorization: request.headers.authorization })
+  )
+
   if (!user) {
     throw unauthorized()
   }
@@ -42,12 +47,15 @@ export default async function usernameSMSReminderHandler(
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
+  const subjectPractitionerId = systemAdminUser!.practitionerId
+
   try {
     await postUserActionToMetrics(
       'SEND_USERNAME_REMINDER',
       request.headers.authorization,
       remoteAddress,
-      userAgent
+      userAgent,
+      subjectPractitionerId
     )
   } catch (err) {
     logger.error(err)
