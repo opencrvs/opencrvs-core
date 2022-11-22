@@ -126,8 +126,13 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
-        identifiers: getFieldIdentifiers(fieldId, defaultForms[event]),
-        required: required ?? false
+        identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
+      }
+      /* Setting required = false for default fields results
+       * in "optional" showing up in some of the fields
+       */
+      if (required) {
+        defaultQuestionConfig.required = true
       }
       return defaultQuestionConfig
     }
