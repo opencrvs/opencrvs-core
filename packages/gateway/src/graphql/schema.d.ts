@@ -92,7 +92,7 @@ export interface GQLMutation {
   reactivateSystem?: GQLSystem
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
-  refreshSystemClientSecret?: GQLRefreshSystemClientSecret
+  refreshSystemClientSecret?: GQLSystemSecret
 }
 
 export interface GQLDummy {
@@ -545,13 +545,6 @@ export interface GQLSystemInput {
   name: string
   type: GQLSystemType
   settings?: GQLSystemSettings
-}
-
-export interface GQLRefreshSystemClientSecret {
-  name: string
-  clientId: string
-  shaSecret: string
-  clientSecret: string
 }
 
 export type GQLMap = any
@@ -1513,7 +1506,6 @@ export interface GQLResolver {
   Avatar?: GQLAvatarTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
   SystemSecret?: GQLSystemSecretTypeResolver
-  RefreshSystemClientSecret?: GQLRefreshSystemClientSecretTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -4283,41 +4275,6 @@ export interface SystemSecretToSystemResolver<TParent = any, TResult = any> {
 }
 
 export interface SystemSecretToClientSecretResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLRefreshSystemClientSecretTypeResolver<TParent = any> {
-  name?: RefreshSystemClientSecretToNameResolver<TParent>
-  clientId?: RefreshSystemClientSecretToClientIdResolver<TParent>
-  shaSecret?: RefreshSystemClientSecretToShaSecretResolver<TParent>
-  clientSecret?: RefreshSystemClientSecretToClientSecretResolver<TParent>
-}
-
-export interface RefreshSystemClientSecretToNameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface RefreshSystemClientSecretToClientIdResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface RefreshSystemClientSecretToShaSecretResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface RefreshSystemClientSecretToClientSecretResolver<
   TParent = any,
   TResult = any
 > {

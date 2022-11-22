@@ -66,5 +66,5 @@ type Mutation {
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
-  refreshSystemClientSecret(clientId: String!): RefreshSystemClientSecret
+  refreshSystemClientSecret(clientId: String!): SystemSecret
 }
