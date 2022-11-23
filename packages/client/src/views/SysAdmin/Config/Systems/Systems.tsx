@@ -91,6 +91,8 @@ export function SystemList() {
 
   const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
 
+  const [showPermission, setPermission] = React.useState(false)
+
   const checkboxHandler = (items: string[], type: string) => {
     const val: WebHookSetting = {
       event: type,
@@ -166,6 +168,40 @@ export function SystemList() {
     },
     [toggleKeyModal]
   )
+
+  const getMenuItems = (system: System) => {
+    const menuItems: { handler: () => void; label: string }[] = [
+      {
+        handler: () => {
+          toggleRevealKeyModal(system)
+        },
+        label: intl.formatMessage(integrationMessages.revealKeys)
+      }
+    ]
+
+    if (system.type === SystemType.Webhook) {
+      menuItems.push({
+        handler: () => {
+          setPermission((prevState) => !prevState)
+        },
+        label: 'Edit '
+      })
+    }
+
+    menuItems.push({
+      handler: () => {
+        setSystemToToggleActivation(system)
+      },
+      label: changeActiveStatusIntl(system.status)
+    })
+
+    menuItems.push({
+      handler: () => {},
+      label: intl.formatMessage(integrationMessages.delete)
+    })
+
+    return menuItems
+  }
   return (
     <Frame
       header={<Header />}
@@ -205,26 +241,7 @@ export function SystemList() {
 
                   <ToggleMenu
                     id="toggleMenu"
-                    menuItems={[
-                      {
-                        handler: () => {
-                          toggleRevealKeyModal(system)
-                        },
-                        label: intl.formatMessage(
-                          integrationMessages.revealKeys
-                        )
-                      },
-                      {
-                        handler: () => {
-                          setSystemToToggleActivation(system)
-                        },
-                        label: changeActiveStatusIntl(system.status)
-                      },
-                      {
-                        handler: () => {},
-                        label: intl.formatMessage(integrationMessages.delete)
-                      }
-                    ]}
+                    menuItems={getMenuItems(system)}
                     toggleButton={<VerticalThreeDots />}
                   />
                 </>
@@ -233,6 +250,150 @@ export function SystemList() {
               value={sysType[system.type]}
             />
           ))}
+
+          {showPermission && (
+            <ResponsiveModal
+              actions={[
+                <Button
+                  onClick={() => {
+                    setPermission(false)
+                  }}
+                  type="primary"
+                >
+                  Submit
+                </Button>,
+                <Button
+                  onClick={() => {
+                    setPermission(false)
+                  }}
+                  type="secondary"
+                >
+                  Cancel
+                </Button>
+              ]}
+              show={showPermission}
+              handleClose={() => {
+                setPermission(false)
+              }}
+              title="Webhook"
+              autoHeight={true}
+              titleHeightAuto={true}
+            >
+              <>
+                <InputField
+                  id="select-input"
+                  touched={false}
+                  label={intl.formatMessage(integrationMessages.label)}
+                >
+                  <Label>
+                    {intl.formatMessage(integrationMessages.webhookDescription)}
+                  </Label>
+                </InputField>
+                <FormTabs
+                  sections={[
+                    {
+                      id: WebhookOption.birth,
+                      title: intl.formatMessage(integrationMessages.birth)
+                    },
+                    {
+                      id: WebhookOption.death,
+                      title: intl.formatMessage(integrationMessages.death)
+                    }
+                  ]}
+                  activeTabId={selectedTab}
+                  onTabClick={(tabId: WebhookOption) => setSelectedTab(tabId)}
+                />
+                <Divider />
+                {selectedTab === WebhookOption.birth ? (
+                  <>
+                    <CheckboxGroup
+                      id="test-checkbox-group1"
+                      options={[
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.registrationDetails
+                          ),
+                          value: 'registration-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.childDetails
+                          ),
+                          value: 'child-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.motherDetails
+                          ),
+                          value: 'mothers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.fatherDetails
+                          ),
+                          value: 'fathers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.informantDetails
+                          ),
+                          value: 'informant-details'
+                        }
+                      ]}
+                      name="test-checkbox-group1"
+                      value={birthPermissions.permissions ?? []}
+                      onChange={(newValue) => {
+                        console.log('new val', newValue)
+                        checkboxHandler(newValue, WebhookOption.birth)
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <CheckboxGroup
+                      id="test-checkbox-group2"
+                      options={[
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.registrationDetails
+                          ),
+                          value: 'registration-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.motherDetails
+                          ),
+                          value: 'mothers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.fatherDetails
+                          ),
+                          value: 'fathers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.informantDetails
+                          ),
+                          value: 'informant-details'
+                        },
+                        {
+                          label: 'Disease Details',
+                          value: 'disease-details'
+                        }
+                      ]}
+                      name="test-checkbox-group1"
+                      value={deathPermissions.permissions ?? []}
+                      onChange={(newValue) => {
+                        checkboxHandler(newValue, WebhookOption.death)
+                      }}
+                    />
+                  </>
+                )}
+              </>
+            </ResponsiveModal>
+          )}
+
           {systemToToggleActivation && (
             <ResponsiveModal
               title={
