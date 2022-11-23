@@ -14,14 +14,6 @@ import * as React from 'react'
 import { Icon, IconProps } from '../Icon'
 import { Button } from '../Button'
 
-const CheckBoxWrapper = styled.div`
-  position: relative;
-  width: 46px;
-  height: 24px;
-  :focus-within {
-    box-shadow: 0px 0px 0px 2px ${({ theme }) => theme.colors.yellow};
-  }
-`
 const CheckBoxLabel = styled.label<{ checked: boolean }>`
   cursor: pointer;
 `
@@ -36,20 +28,17 @@ export function ToggleIcon({
   color = 'currentColor',
   fill = 'currentColor',
   ...rest
-}: IconProps & React.HTMLAttributes<HTMLInputElement>) {
+}: IconProps & React.HTMLAttributes<HTMLButtonElement>) {
   const { defaultChecked } = rest
   return (
-    <Button type="icon">
-      <CheckBoxWrapper>
-        <CheckBox type="checkbox" id="checkboxwithicon" {...rest} />
-        <CheckBoxLabel checked={!!defaultChecked} htmlFor="checkboxwithicon">
-          <Icon
-            name={name}
-            color={color}
-            fill={defaultChecked ? fill : 'white'}
-          ></Icon>
-        </CheckBoxLabel>
-      </CheckBoxWrapper>
-    </Button>
+    <>
+      <Button type="icon" {...rest}>
+        <Icon
+          name={name}
+          color={color}
+          fill={defaultChecked ? fill : 'white'}
+        ></Icon>
+      </Button>
+    </>
   )
 }
