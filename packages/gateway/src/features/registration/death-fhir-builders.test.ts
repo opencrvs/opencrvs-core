@@ -11,8 +11,16 @@
  */
 import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import * as fetchMock from 'jest-fetch-mock'
+
+const fetch = fetchMock as fetchMock.FetchMock
 
 test('should build a minimal FHIR registration document without error', async () => {
+  fetch.mockResponse(
+    JSON.stringify({
+      refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+    })
+  )
   const fhir = await buildFHIRBundle(
     {
       deceased: {
@@ -225,6 +233,11 @@ test('should build a minimal FHIR registration document without error', async ()
 })
 
 test('should build a minimal FHIR registration document without error', async () => {
+  fetch.mockResponse(
+    JSON.stringify({
+      refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+    })
+  )
   const fhir = await buildFHIRBundle(
     {
       deceased: {

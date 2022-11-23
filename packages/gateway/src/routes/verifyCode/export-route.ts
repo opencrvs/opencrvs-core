@@ -21,7 +21,6 @@ export default {
   path: '/sendVerifyCode',
   handler: sendVerifyCodeHandler,
   config: {
-    tags: ['api'],
     description: 'Send verify code to user phone number',
     notes:
       'Generate a 6 digit verification code.' +

@@ -65,7 +65,8 @@ import {
   IAttachmentValue,
   SubmissionAction,
   ICheckboxFormField,
-  CHECKBOX
+  CHECKBOX,
+  INestedInputFields
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -106,7 +107,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice } from '@client/utils/commonUtils'
+import { isMobileDevice, isBase64FileString } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
@@ -743,8 +744,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           return true
         }
 
+        const documentData = !isBase64FileString(document.data)
+          ? `${window.config.MINIO_URL}${document.data}`
+          : document.data
+
         documentOptions.push({
-          value: document.data,
+          value: documentData,
           label
         })
         selectOptions.push({
@@ -1562,28 +1567,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onContinue,
       viewRecord
     } = this.props
-    const formSections = this.getViewableSection(registerForm[event])
-    if (viewRecord) {
-      formSections.map((section) => {
-        return section.groups.map((group) => {
-          return group.fields.map((field) => {
-            field.readonly = true
-            if (field.nestedFields) {
-              Object.keys(field.nestedFields).forEach(function (key) {
-                if (field.nestedFields) {
-                  if (isArray(field.nestedFields)) {
-                    return field.nestedFields[key].map((nestedField) => {
-                      return (nestedField.readonly = true)
-                    })
-                  }
-                }
-              })
-            }
-            return field
-          })
+    const formSections = viewRecord
+      ? this.getViewableSection(registerForm[event]).map((section) => {
+          return {
+            ...section,
+            groups: section.groups.map((group) => {
+              return {
+                ...group,
+                fields: group.fields.map(fieldToReadOnlyFields)
+              }
+            })
+          }
         })
-      })
-    }
+      : this.getViewableSection(registerForm[event])
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
@@ -1839,6 +1835,27 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       </FullBodyContent>
     )
   }
+}
+
+function fieldToReadOnlyFields(field: IFormField): IFormField {
+  const readyOnlyField = {
+    ...field,
+    readonly: true
+  }
+  if (field.nestedFields) {
+    readyOnlyField.nestedFields = Object.entries(
+      field.nestedFields
+    ).reduce<INestedInputFields>((nestedInputFields, [key, nestedFields]) => {
+      return {
+        ...nestedInputFields,
+        [key]: nestedFields.map((nestedField) => ({
+          ...nestedField,
+          readonly: true
+        }))
+      }
+    }, {})
+  }
+  return readyOnlyField
 }
 
 function motherDoesNotExistAndStateIsMother(

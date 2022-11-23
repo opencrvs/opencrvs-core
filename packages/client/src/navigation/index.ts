@@ -50,6 +50,7 @@ import {
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
+  VS_EXPORTS,
   VIEW_RECORD
 } from '@client/navigation/routes'
 import {
@@ -167,6 +168,9 @@ export function goToHome() {
 
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+export function goToVSExport() {
+  return push(VS_EXPORTS)
 }
 
 export function goToFormConfigHome() {
