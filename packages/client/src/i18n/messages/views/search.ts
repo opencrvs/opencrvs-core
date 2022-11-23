@@ -26,6 +26,11 @@ interface ISearchMessages
   bookmarkAdvancedSearchModalBody: MessageDescriptor
   removeBookmarkAdvancedSearchModalTitle: MessageDescriptor
   removeBookmarkAdvancedSearchModalBody: MessageDescriptor
+  advancedSearchBookmarkSuccessNotification: MessageDescriptor
+  removedAdvancedSearchBookmarkSuccessNotification: MessageDescriptor
+  advancedSearchBookmarkErrorNotification: MessageDescriptor
+  advancedSearchBookmarkLoadingNotification: MessageDescriptor
+  removeAdvancedSearchBookmarkLoadingNotification: MessageDescriptor
 }
 
 const messagesToDefine: ISearchMessages = {
@@ -99,6 +104,38 @@ const messagesToDefine: ISearchMessages = {
     defaultMessage:
       'This advanced search bookmark will be removed from the side bar shortcut',
     description: 'Modal body for remove bookmark advacnced search'
+  },
+  advancedSearchBookmarkSuccessNotification: {
+    id: 'search.bookmark.success.notification',
+    defaultMessage:
+      'Your advanced search result has been bookmarked successfully',
+    description:
+      'Success Notification messages for bookmark advanced search result'
+  },
+  removedAdvancedSearchBookmarkSuccessNotification: {
+    id: 'search.bookmark.remove.success.notification',
+    defaultMessage:
+      'Your advanced search bookmark has been removed successfully',
+    description:
+      'Success Notification messages for remove advanced search bookmark'
+  },
+  advancedSearchBookmarkErrorNotification: {
+    id: 'search.bookmark.error.notification',
+    defaultMessage: 'Sorry, something went wrong. Please try again',
+    description:
+      'Error Notification messages for bookmark advanced search result'
+  },
+  advancedSearchBookmarkLoadingNotification: {
+    id: 'search.bookmark.loading.notification',
+    defaultMessage: 'Bookmarking your advanced search results...',
+    description:
+      'Loading Notification messages for bookmark advanced search result'
+  },
+  removeAdvancedSearchBookmarkLoadingNotification: {
+    id: 'search.bookmark.remove.loading.notification',
+    defaultMessage: 'Removing your advanced search bookmark...',
+    description:
+      'Loading Notification messages for remove advanced search bookmark'
   }
 }
 

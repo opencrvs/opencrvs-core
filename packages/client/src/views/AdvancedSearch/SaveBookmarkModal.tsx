@@ -1,0 +1,198 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION } from '@client/profile/mutations'
+import {
+  AdvancedSearchParametersInput,
+  BookMarkedSearches,
+  MutationBookmarkAdvancedSearchArgs
+} from '@client/utils/gateway'
+import { useDispatch, useSelector } from 'react-redux'
+import { useMutation } from '@apollo/client'
+import { getPartialState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { modifyUserDetails } from '@client/profile/profileActions'
+import { GQLBookmarkedSeachItem } from '@opencrvs/gateway/src/graphql/schema'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { messages as messagesSearch } from '@client/i18n/messages/views/search'
+import { Button } from '@opencrvs/components/lib/Button'
+import { buttonMessages } from '@client/i18n/messages'
+import styled from '@client/styledComponents'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { omitBy } from 'lodash'
+
+export const Message = styled.div`
+  margin-bottom: 16px;
+`
+
+interface IBookmarkModalProps {
+  showBookmarkModal: boolean
+  toggleBookmarkModal: () => void
+  setNotificationStatus: (status: NOTIFICATION_STATUS) => void
+  setNotificationMessages: (notificationMessage: string) => void
+}
+
+interface ISaveBookmarkData {
+  bookmarkAdvancedSearch: BookMarkedSearches
+}
+
+export function BookmarkAdvancedSearchModal({
+  showBookmarkModal,
+  toggleBookmarkModal,
+  setNotificationStatus,
+  setNotificationMessages
+}: IBookmarkModalProps) {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  const userDetails = useSelector(getUserDetails)
+  const { saved, error, named, searchId, ...advancedSearchParams } =
+    useSelector(getPartialState)
+  //remove null properties
+  const filteredAdvancedSearchParams = omitBy(
+    advancedSearchParams,
+    (v) => v === null
+  ) as AdvancedSearchParametersInput
+  const [queryName, setQueryName] = React.useState('')
+  const onChangeQueryName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setQueryName(value)
+  }
+
+  const [bookmarkAdvancedSearchResult] = useMutation<
+    ISaveBookmarkData,
+    MutationBookmarkAdvancedSearchArgs
+  >(BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION, {
+    onError() {
+      setNotificationMessages(
+        intl.formatMessage(
+          messagesSearch.advancedSearchBookmarkErrorNotification
+        )
+      )
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
+    },
+    onCompleted() {
+      setNotificationMessages(
+        intl.formatMessage(
+          messagesSearch.advancedSearchBookmarkSuccessNotification
+        )
+      )
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
+    }
+  })
+
+  const bookmarkAdvancedSearchHandler = async () => {
+    const mutatedData = await bookmarkAdvancedSearchResult({
+      variables: {
+        bookmarkSearchInput: {
+          userId: userDetails?.userMgntUserID as string,
+          name: queryName,
+          parameters: {
+            ...filteredAdvancedSearchParams
+          }
+        }
+      }
+    })
+    if (mutatedData.data) {
+      const { __typename, ...rest } = mutatedData.data.bookmarkAdvancedSearch
+      const filteredSearchListData =
+        rest.searchList &&
+        rest.searchList.map((item) => {
+          const { __typename, ...restParams } = item.parameters
+          return {
+            name: item.name,
+            searchId: item.searchId,
+            parameters: restParams
+          }
+        })
+      dispatch(
+        modifyUserDetails({
+          ...userDetails,
+          searches: filteredSearchListData as GQLBookmarkedSeachItem[]
+        })
+      )
+      dispatch(
+        setAdvancedSearchParam({
+          ...advancedSearchParams,
+          searchId: rest.searchList?.[rest.searchList.length - 1].searchId
+        })
+      )
+    }
+  }
+
+  return (
+    <>
+      <ResponsiveModal
+        id="bookmarkModal"
+        show={showBookmarkModal}
+        title={intl.formatMessage(
+          messagesSearch.bookmarkAdvancedSearchModalTitle
+        )}
+        autoHeight={true}
+        actions={[
+          <Button
+            type="tertiary"
+            id="cancel"
+            key="cancel"
+            onClick={() => {
+              toggleBookmarkModal()
+              setQueryName('')
+            }}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="primary"
+            id="bookmark_advanced_search_result"
+            onClick={async () => {
+              setNotificationMessages(
+                intl.formatMessage(
+                  messagesSearch.advancedSearchBookmarkLoadingNotification
+                )
+              )
+              setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
+              toggleBookmarkModal()
+              setQueryName('')
+              await bookmarkAdvancedSearchHandler()
+            }}
+            disabled={!Boolean(queryName)}
+          >
+            {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
+        ]}
+        handleClose={() => {
+          toggleBookmarkModal()
+          setQueryName('')
+        }}
+      >
+        <Message>
+          {intl.formatMessage(messagesSearch.bookmarkAdvancedSearchModalBody)}
+        </Message>
+
+        <InputField id="queryName" touched={true} required={false}>
+          <TextInput
+            id="queryName"
+            type="text"
+            placeholder="Name of query"
+            touched={true}
+            error={false}
+            value={queryName}
+            onChange={onChangeQueryName}
+          />
+        </InputField>
+      </ResponsiveModal>
+    </>
+  )
+}

@@ -12,13 +12,16 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { ToggleIcon } from '@opencrvs/components/lib/ToggleIcon'
-import { Button } from '@opencrvs/components/lib/Button'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { messages as messagesSearch } from '@client/i18n/messages/views/search'
-import { buttonMessages } from '@client/i18n/messages'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
 import styled from '@client/styledComponents'
+import { useSelector } from 'react-redux'
+import { getPartialState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import { BookmarkAdvancedSearchModal } from '@client/views/AdvancedSearch/SaveBookmarkModal'
+import { RemoveBookmarkAdvancedSearchModal } from './RemoveBookmarkModal'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 export const Message = styled.div`
   margin-bottom: 16px;
@@ -30,21 +33,15 @@ export const Field = styled.div`
     margin-bottom: 0px;
   }
 `
-interface IBookmarkModalProps {
-  showBookmarkModal: boolean
-  queryName: string
-  toggleBookmarkModal: () => void
-  onChangeQueryName: (event: React.ChangeEvent<HTMLInputElement>) => void
-}
-
-interface IRemoveBookmarkModalProps {
-  showRemoveBookmarkModal: boolean
-  toggleRemoveBookmarkModal: () => void
+export interface IBookmarkAdvancedSearch {
+  name: string
+  parameters: IAdvancedSearchParamState
+  userId: string
 }
 
 export function BookmarkAdvancedSearchResult() {
-  const [bookmark, setBookmark] = React.useState(false)
-  const [queryName, setQueryName] = React.useState('')
+  const advancedSearchState = useSelector(getPartialState)
+  const bookmark = Boolean(advancedSearchState.searchId)
   const [showBookmarkModal, setShowBookmarkModal] = React.useState(false)
   const [showRemoveBookmarkModal, setShowRemoveBookmarkModal] =
     React.useState(false)
@@ -54,133 +51,58 @@ export function BookmarkAdvancedSearchResult() {
   const toggleRemoveBookmarkModal = () => {
     setShowRemoveBookmarkModal((prev) => !prev)
   }
-  const onChangeQueryName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    setQueryName(value)
-  }
+  const [notificationMessages, setNotificationMessages] =
+    React.useState(EMPTY_STRING)
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
+  const isOnline = useOnlineStatus()
 
   return (
     <>
-      <ToggleIcon
-        defaultChecked={bookmark}
-        onChange={() => {
-          setBookmark(!bookmark)
-          if (bookmark) {
-            toggleRemoveBookmarkModal()
-          } else {
-            toggleBookmarkModal()
-          }
-        }}
-        name={'Star'}
-        color={bookmark ? 'yellow' : 'blue'}
-        fill={'yellow'}
-      />
+      {isOnline && (
+        <ToggleIcon
+          defaultChecked={bookmark}
+          onClick={() => {
+            if (bookmark) {
+              toggleRemoveBookmarkModal()
+            } else {
+              toggleBookmarkModal()
+            }
+          }}
+          name={'Star'}
+          color={bookmark ? 'yellow' : 'blue'}
+          fill={'yellow'}
+        />
+      )}
       <BookmarkAdvancedSearchModal
         showBookmarkModal={showBookmarkModal}
         toggleBookmarkModal={toggleBookmarkModal}
-        onChangeQueryName={onChangeQueryName}
-        queryName={queryName}
+        setNotificationStatus={setNotificationStatus}
+        setNotificationMessages={setNotificationMessages}
       />
       <RemoveBookmarkAdvancedSearchModal
         showRemoveBookmarkModal={showRemoveBookmarkModal}
         toggleRemoveBookmarkModal={toggleRemoveBookmarkModal}
+        setNotificationStatus={setNotificationStatus}
+        setNotificationMessages={setNotificationMessages}
       />
+      {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
+        <Toast
+          id="success-save-bookmark-notification"
+          type={
+            notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+              ? 'loading'
+              : notificationStatus === NOTIFICATION_STATUS.ERROR
+              ? 'error'
+              : 'success'
+          }
+          onClose={() => {
+            setNotificationStatus(NOTIFICATION_STATUS.IDLE)
+          }}
+        >
+          {notificationMessages}
+        </Toast>
+      )}
     </>
-  )
-}
-
-export function BookmarkAdvancedSearchModal({
-  showBookmarkModal,
-  toggleBookmarkModal,
-  onChangeQueryName,
-  queryName
-}: IBookmarkModalProps) {
-  const intl = useIntl()
-  return (
-    <ResponsiveModal
-      id="bookmarkModal"
-      show={showBookmarkModal}
-      title={intl.formatMessage(
-        messagesSearch.bookmarkAdvancedSearchModalTitle
-      )}
-      autoHeight={true}
-      actions={[
-        <Button
-          type="tertiary"
-          id="cancel"
-          key="cancel"
-          onClick={toggleBookmarkModal}
-        >
-          {intl.formatMessage(buttonMessages.cancel)}
-        </Button>,
-        <Button
-          type="primary"
-          id="bookmark_advanced_search_result"
-          onClick={() => {}}
-          disabled={!Boolean(queryName)}
-        >
-          {intl.formatMessage(buttonMessages.confirm)}
-        </Button>
-      ]}
-      handleClose={toggleBookmarkModal}
-    >
-      <Message>
-        {intl.formatMessage(messagesSearch.bookmarkAdvancedSearchModalBody)}
-      </Message>
-
-      <InputField id="queryName" touched={true} required={false}>
-        <TextInput
-          id="queryName"
-          type="text"
-          placeholder="Name of query"
-          touched={true}
-          error={false}
-          value={queryName}
-          onChange={onChangeQueryName}
-        />
-      </InputField>
-    </ResponsiveModal>
-  )
-}
-
-export function RemoveBookmarkAdvancedSearchModal({
-  showRemoveBookmarkModal,
-  toggleRemoveBookmarkModal
-}: IRemoveBookmarkModalProps) {
-  const intl = useIntl()
-  return (
-    <ResponsiveModal
-      id="removeBookmarkModal"
-      show={showRemoveBookmarkModal}
-      title={intl.formatMessage(
-        messagesSearch.removeBookmarkAdvancedSearchModalTitle
-      )}
-      autoHeight={true}
-      actions={[
-        <Button
-          type="tertiary"
-          id="cancel"
-          key="cancel"
-          onClick={toggleRemoveBookmarkModal}
-        >
-          {intl.formatMessage(buttonMessages.cancel)}
-        </Button>,
-        <Button
-          type="primary"
-          id="bookmark_advanced_search_result"
-          onClick={() => {}}
-          disabled={false}
-        >
-          {intl.formatMessage(buttonMessages.confirm)}
-        </Button>
-      ]}
-      handleClose={toggleRemoveBookmarkModal}
-    >
-      <Message>
-        {intl.formatMessage(
-          messagesSearch.removeBookmarkAdvancedSearchModalBody
-        )}
-      </Message>
-    </ResponsiveModal>
   )
 }

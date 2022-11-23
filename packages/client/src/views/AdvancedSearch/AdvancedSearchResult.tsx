@@ -118,9 +118,10 @@ type IFullProps = IntlShapeProps &
 
 const RecordAuditComp = (props: IFullProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-  const dispatch = useDispatch()
-  const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
   const { intl } = props
+  const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
+  const { named, saved, error, searchId, ...restAdvancedSearchParams } =
+    advancedSearchParamsState
 
   const recordWindowWidth = () => {
     setWindowWidth(window.innerWidth)
@@ -369,40 +370,6 @@ const RecordAuditComp = (props: IFullProps) => {
       })
   }
 
-  const SearchModifierComponent = () => {
-    return (
-      <>
-        <BookmarkIconBody>
-          <BookmarkAdvancedSearchResult />
-        </BookmarkIconBody>
-        <SearchParamPillsContainer>
-          {Object.keys(advancedSearchParamsState).map((paramKey, i) => {
-            const paramValue =
-              advancedSearchParamsState[
-                paramKey as keyof typeof advancedSearchParamsState
-              ]
-            if (paramValue) {
-              return (
-                <Pill
-                  label={`${paramKey} : ${paramValue}`}
-                  type="default"
-                  size="medium"
-                ></Pill>
-              )
-            }
-          })}
-          <Link
-            onClick={() => {
-              dispatch(goToAdvancedSearch())
-            }}
-          >
-            Edit
-          </Link>
-        </SearchParamPillsContainer>
-      </>
-    )
-  }
-  console.log(advancedSearchParamsState.registrationStatuses)
   return (
     <Frame
       header={
@@ -418,60 +385,94 @@ const RecordAuditComp = (props: IFullProps) => {
         constantsMessages.skipToMainContent
       )}
     >
-      {isEnoughParams() && (
-        <Query<SearchEventsQuery>
-          query={SEARCH_EVENTS}
-          variables={{
-            advancedSearchParameters: {
-              ...advancedSearchParamsState
-            },
-            count: 10,
-            skip: 0
-          }}
-          fetchPolicy="cache-and-network"
-        >
-          {({ loading, error, data }) => {
-            const total = loading ? -1 : data?.searchEvents?.totalItems || 0
-            return (
-              <WQContentWrapper
-                title={'Search Result'}
-                isMobileSize={false}
-                noResultText={'No Results'}
-                noContent={total < 1 && !loading}
-                tabBarContent={<SearchModifierComponent />}
-                isShowPagination={true}
-                totalPages={2}
-                paginationId={1}
-              >
-                {loading ? (
-                  <div id="advanced-search_loader">
-                    <LoadingIndicator loading={true} />
-                  </div>
-                ) : error ? (
-                  <ErrorText id="advanced-search-result-error-text">
-                    {intl.formatMessage(errorMessages.queryError)}
-                  </ErrorText>
-                ) : (
-                  data?.searchEvents &&
-                  total > 0 && (
-                    <>
-                      <Workqueue
-                        content={transformSearchContent(data?.searchEvents)}
-                        columns={getContentTableColumns()}
-                        noResultText={intl.formatMessage(
-                          constantsMessages.noResults
-                        )}
-                        hideLastBorder={true}
-                      />
-                    </>
-                  )
-                )}
-              </WQContentWrapper>
-            )
-          }}
-        </Query>
-      )}
+      <Query<SearchEventsQuery>
+        query={SEARCH_EVENTS}
+        variables={{
+          advancedSearchParameters: {
+            ...restAdvancedSearchParams
+          },
+          count: 10,
+          skip: 0
+        }}
+        fetchPolicy="cache-and-network"
+      >
+        {({ loading, error, data }) => {
+          const total = loading ? -1 : data?.searchEvents?.totalItems || 0
+          return (
+            <WQContentWrapper
+              title={'Search Result'}
+              isMobileSize={false}
+              noResultText={'No Results'}
+              noContent={total < 1 && !loading}
+              tabBarContent={<SearchModifierComponent />}
+              isShowPagination={true}
+              totalPages={2}
+              paginationId={1}
+            >
+              {loading ? (
+                <div id="advanced-search_loader">
+                  <LoadingIndicator loading={true} />
+                </div>
+              ) : error ? (
+                <ErrorText id="advanced-search-result-error-text">
+                  {intl.formatMessage(errorMessages.queryError)}
+                </ErrorText>
+              ) : (
+                data?.searchEvents &&
+                total > 0 && (
+                  <>
+                    <Workqueue
+                      content={transformSearchContent(data?.searchEvents)}
+                      columns={getContentTableColumns()}
+                      noResultText={intl.formatMessage(
+                        constantsMessages.noResults
+                      )}
+                      hideLastBorder={true}
+                    />
+                  </>
+                )
+              )}
+            </WQContentWrapper>
+          )
+        }}
+      </Query>
     </Frame>
+  )
+}
+
+const SearchModifierComponent = () => {
+  const dispatch = useDispatch()
+  const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
+  return (
+    <>
+      <BookmarkIconBody>
+        <BookmarkAdvancedSearchResult />
+      </BookmarkIconBody>
+      <SearchParamPillsContainer>
+        {Object.keys(advancedSearchParamsState).map((paramKey, i) => {
+          const paramValue =
+            advancedSearchParamsState[
+              paramKey as keyof typeof advancedSearchParamsState
+            ]
+          if (paramValue) {
+            return (
+              <Pill
+                label={`${paramKey} : ${paramValue}`}
+                type="default"
+                size="medium"
+              ></Pill>
+            )
+          }
+        })}
+        <Link
+          onClick={() => {
+            dispatch(goToAdvancedSearch())
+          }}
+        >
+          Edit
+        </Link>
+      </SearchParamPillsContainer>
+    </>
   )
 }
 
