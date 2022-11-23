@@ -148,36 +148,24 @@ async function loadLocations(): Promise<ILocationDataResponse> {
   }
 
   const response = await res.json()
-  const locations = response.entry.reduce(
-    (accumulator: { [key: string]: ILocation }, entry: fhir.BundleEntry) => {
-      if (!entry.resource || !entry.resource.id) {
-        throw new Error('Resource in entry not valid')
-      }
+  const locations = {
+    data: response.entry.reduce(
+      (accumulator: { [key: string]: ILocation }, entry: fhir.BundleEntry) => {
+        if (!entry.resource || !entry.resource.id) {
+          throw new Error('Resource in entry not valid')
+        }
 
-      accumulator[entry.resource.id] = generateLocationResource(
-        entry.resource as fhir.Location
-      )
+        accumulator[entry.resource.id] = generateLocationResource(
+          entry.resource as fhir.Location
+        )
 
-      return accumulator
-    },
-    {}
-  )
-
-  return locations
-}
-
-function generateLocationAddress(
-  fhirAddress: fhir.Address | undefined
-): string {
-  let address = ''
-
-  if (fhirAddress) {
-    address = Object.values(fhirAddress)
-      .filter((x) => typeof x === 'string' && x.length > 0)
-      .join(', ')
+        return accumulator
+      },
+      {}
+    )
   }
 
-  return address
+  return locations.data
 }
 
 function generateLocationResource(fhirLocation: fhir.Location): ILocation {
@@ -186,7 +174,7 @@ function generateLocationResource(fhirLocation: fhir.Location): ILocation {
   loc.name = fhirLocation.name as string
   loc.alias =
     fhirLocation.alias && fhirLocation.alias[0] ? fhirLocation.alias[0] : ''
-  loc.address = generateLocationAddress(fhirLocation.address)
+  loc.status = fhirLocation.status as string
   loc.physicalType =
     fhirLocation.physicalType &&
     fhirLocation.physicalType.coding &&

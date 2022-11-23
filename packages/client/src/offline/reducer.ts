@@ -49,6 +49,7 @@ export enum LocationType {
 export interface ILocation {
   id: string
   name: string
+  status: string
   alias: string
   address?: string
   physicalType: string
