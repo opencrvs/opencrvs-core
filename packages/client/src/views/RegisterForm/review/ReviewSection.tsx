@@ -271,6 +271,12 @@ const SignaturePreview = styled.img`
   max-width: 100%;
   display: block;
 `
+const Description = styled.div`
+  ${({ theme }) => theme.fonts.reg16}
+  padding: 8px 24px;
+  text-align: left;
+  background-color: ${({ theme }) => theme.colors.white};
+`
 
 function SignCanvas({
   value,
@@ -1693,6 +1699,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       formSections,
       errorsOnFields
     )
+    const description = intl.formatMessage(messages.reviewDescription, {
+      event
+    })
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
     return (
       <FullBodyContent>
@@ -1713,6 +1722,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })
               }
             />
+            {description && <Description>{description}</Description>}
             <FormData>
               {transformedSectionData.map((sec, index) => {
                 const { uploadedDocuments, selectOptions } =

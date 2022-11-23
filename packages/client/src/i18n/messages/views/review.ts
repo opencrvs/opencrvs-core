@@ -177,6 +177,11 @@ const messagesToDefine = {
     description: 'Form section title for Review',
     id: 'review.form.section.review.title'
   },
+  reviewDescription: {
+    defaultMessage: '',
+    description: 'Description content Review',
+    id: 'review.form.section.review.desc'
+  },
   submitConfirmationDesc: {
     defaultMessage:
       '{completeDeclaration, select, true {This declaration will be sent to the registrar for them to review.} false {This declaration will be sent to the Registrar for completion. Please inform the Informant that they will need to visit the office with the missing information and supporting documents.}}',
