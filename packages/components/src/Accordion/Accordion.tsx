@@ -17,6 +17,7 @@ const Container = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   padding-bottom: 16px;
   width: 100%;
+  margin-bottom: 20px;
 
   details > summary::before {
     border-style: solid;
@@ -55,11 +56,6 @@ const Container = styled.div`
     cursor: pointer;
   }
 
-  &:focus-within {
-    background: ${({ theme }) => theme.colors.yellow};
-    border-bottom: 3px solid ${({ theme }) => theme.colors.grey600};
-  }
-
   &:has(details[open]) {
     background: ${({ theme }) => theme.colors.white};
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
@@ -74,11 +70,6 @@ const Summary = styled.summary`
   display: inline;
 
   &:hover {
-    text-decoration: underline;
-  }
-
-  &:focus-within {
-    color: ${({ theme }) => theme.colors.grey600};
     text-decoration: underline;
   }
 
@@ -111,45 +102,29 @@ export interface IAccordionOption {
 export interface IAccordionProps {
   name: string
   label: string
-  showLabel: string
-  hideLabel: string
-  options: IAccordionOption[]
-  value: string
-  nestedFields: { [key: string]: JSX.Element[] }
-  onChange: (value: string) => void
+  toggleButtonLabelWhenClosed: string
+  toggleButtonLabelWhenOpen: string
+  children: React.ReactNode
 }
 
 export const Accordion = ({
   name,
   label,
-  showLabel,
-  hideLabel,
-  options,
-  value,
-  nestedFields,
-  onChange
+  toggleButtonLabelWhenClosed,
+  toggleButtonLabelWhenOpen,
+  children
 }: IAccordionProps) => {
   return (
     <Container>
       <h2>{label}</h2>
-      <details onToggle={() => onChange(value)}>
+      <details>
         <Summary
           id={name}
-          data-open={hideLabel}
-          data-close={showLabel}
+          data-open={toggleButtonLabelWhenClosed}
+          data-close={toggleButtonLabelWhenOpen}
         ></Summary>
         <List>
-          {options.map((option, index) => {
-            return (
-              <div key={`nestedField-${index}`}>
-                {nestedFields &&
-                  value === option.value &&
-                  nestedFields[value] && (
-                    <NestedChildren>{nestedFields[value]}</NestedChildren>
-                  )}
-              </div>
-            )
-          })}
+          <NestedChildren>{children}</NestedChildren>
         </List>
       </details>
     </Container>

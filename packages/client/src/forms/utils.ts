@@ -317,7 +317,6 @@ export const getFieldOptions = (
     )
   }
   const dependencyVal = _.get(values, field.dynamicOptions.dependency) as string
-  console.log(_.get(values, 'childDetails.nestedFields.country'))
   if (field.dynamicOptions.jurisdictionType) {
     return generateOptions(
       Object.values(locations).filter((location: ILocation) => {

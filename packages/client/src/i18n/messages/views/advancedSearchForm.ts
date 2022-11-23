@@ -14,10 +14,15 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IAdvancedSearchMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   registrationDetails: MessageDescriptor
+  childDetails: MessageDescriptor
+  eventDetails: MessageDescriptor
+  motherDetails: MessageDescriptor
+  fatherDetails: MessageDescriptor
   placeOfRegistrationlabel: MessageDescriptor
   placeOfRegistrationHelperText: MessageDescriptor
   dateOfRegistration: MessageDescriptor
   statusOfRecordLabel: MessageDescriptor
+  deceasedDetails: MessageDescriptor
   informantDetails: MessageDescriptor
   recordStatusAny: MessageDescriptor
   recordStatusInprogress: MessageDescriptor
@@ -26,14 +31,33 @@ interface IAdvancedSearchMessages
   recordStatusRegistered: MessageDescriptor
   recordStatusCertified: MessageDescriptor
   recordStatusAchived: MessageDescriptor
-  placeOfDeath: MessageDescriptor
 }
 
 const messagesToDefine: IAdvancedSearchMessages = {
   registrationDetails: {
     defaultMessage: 'Registration details',
-    description: 'The title of advanced search birth tab form',
-    id: 'advancedSearch.birth.title'
+    description: 'The title of Registration details accordion',
+    id: 'advancedSearch.birth.registrationDetails'
+  },
+  childDetails: {
+    defaultMessage: 'Child details',
+    description: 'The title of Child details accordion',
+    id: 'advancedSearch.birth.childDetails'
+  },
+  eventDetails: {
+    defaultMessage: 'Event details',
+    description: 'The title of event details accordion',
+    id: 'advancedSearch.birth.eventDetails'
+  },
+  motherDetails: {
+    defaultMessage: 'Mother details',
+    description: 'The title of Mother details accordion',
+    id: 'advancedSearch.birth.motherDetails'
+  },
+  fatherDetails: {
+    defaultMessage: 'Father details',
+    description: 'The title of Father details accordion',
+    id: 'advancedSearch.birth.fatherDetails'
   },
   placeOfRegistrationlabel: {
     defaultMessage: 'Place of registration',
@@ -54,6 +78,11 @@ const messagesToDefine: IAdvancedSearchMessages = {
     defaultMessage: 'Status of record',
     description: 'Label for input Status of record',
     id: 'advancedSearch.birth.statusOfRecordLabel'
+  },
+  deceasedDetails: {
+    defaultMessage: 'Deceased details',
+    description: 'The title of Deceased details accordion',
+    id: 'advancedSearch.birth.fatherDetails'
   },
   informantDetails: {
     defaultMessage: 'Informant details',
@@ -95,10 +124,15 @@ const messagesToDefine: IAdvancedSearchMessages = {
     description: 'Option for form field: status of record',
     id: 'advancedSearch.birth.recordStatusAchived'
   },
-  placeOfDeath: {
-    defaultMessage: 'Place of death',
-    description: 'Label for input place of death',
-    id: 'advancedSearch.death.placeOfDeath'
+  hide: {
+    defaultMessage: 'Hide',
+    description: 'Label for hide button when accordion is closed',
+    id: 'advancedSearch.accordion.hide'
+  },
+  show: {
+    defaultMessage: 'Show',
+    description: 'Label for show button when accordion is closed',
+    id: 'advancedSearch.accordion.show'
   }
 }
 export const messages: IAdvancedSearchMessages =

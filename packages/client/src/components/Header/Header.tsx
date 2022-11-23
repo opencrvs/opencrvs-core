@@ -81,6 +81,7 @@ import {
   TEAM_USER_LIST
 } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 
 type IStateProps = {
   userDetails: IUserDetails | null
@@ -432,7 +433,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         label: intl.formatMessage(messages.advancedSearch),
         id: ADVANCED_SEARCH_TEXT,
         onClick: () => {
-          this.props.setAdvancedSearchParam({})
+          this.props.setAdvancedSearchParam(advancedSearchInitialState)
           this.props.goToAdvancedSearch()
         }
       }

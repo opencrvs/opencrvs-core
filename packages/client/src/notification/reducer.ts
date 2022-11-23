@@ -171,7 +171,6 @@ export const notificationReducer: LoopReducer<
         showPINUpdateSuccess: false
       }
     case actions.SHOW_UNASSIGNED:
-      console.log(action.payload)
       return {
         ...state,
         unassignedModal: action.payload

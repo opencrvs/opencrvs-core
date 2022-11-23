@@ -12,7 +12,6 @@
 import * as React from 'react'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
-import { Accordion } from '@opencrvs/components/lib/Accordion'
 import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
@@ -341,34 +340,6 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={value as string}
           notice={fieldDefinition.notice}
-        />
-      </InputField>
-    )
-  }
-
-  if (
-    fieldDefinition.type === ACCORDION_WITH_NESTED_FIELDS &&
-    nestedFields &&
-    resetNestedInputValues
-  ) {
-    return (
-      <InputField {...inputFieldProps}>
-        <Accordion
-          {...inputProps}
-          onChange={(val: string) => {
-            resetNestedInputValues(fieldDefinition)
-            onSetFieldValue(
-              `${fieldDefinition.name}.value`,
-              val === 'no' ? 'yes' : 'no'
-            )
-          }}
-          label={fieldDefinition.label}
-          nestedFields={nestedFields}
-          options={fieldDefinition.options}
-          name={fieldDefinition.name}
-          value={value as string}
-          showLabel={intl.formatMessage(fieldDefinition.showLabel) as string}
-          hideLabel={intl.formatMessage(fieldDefinition.hideLabel) as string}
         />
       </InputField>
     )
@@ -869,7 +840,6 @@ class FormSectionComponent extends React.Component<Props> {
     const fieldsWithValuesDefined = fields.filter(
       (field) => values[field.name] !== undefined
     )
-    console.log('formikVals:', values)
 
     return (
       <section>
