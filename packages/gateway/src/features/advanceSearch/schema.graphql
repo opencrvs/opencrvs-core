@@ -140,7 +140,7 @@ input RemoveBookmarkedSeachInput {
 }
 
 type BookMarkedSearches {
-  searchList: [BookmarkedSeachItem]
+  searchList: [BookmarkedSeachItem!]
 }
 
 type Mutation {

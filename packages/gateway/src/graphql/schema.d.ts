@@ -579,7 +579,7 @@ export interface GQLDeleteFormDraftInput {
 }
 
 export interface GQLBookMarkedSearches {
-  searchList?: Array<GQLBookmarkedSeachItem | null>
+  searchList?: Array<GQLBookmarkedSeachItem>
 }
 
 export interface GQLBookmarkSearchInput {

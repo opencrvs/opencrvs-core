@@ -701,7 +701,7 @@ input DeleteFormDraftInput {
 }
 
 type BookMarkedSearches {
-  searchList: [BookmarkedSeachItem]
+  searchList: [BookmarkedSeachItem!]
 }
 
 input BookmarkSearchInput {
