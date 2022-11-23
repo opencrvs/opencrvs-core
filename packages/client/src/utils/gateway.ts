@@ -1805,6 +1805,7 @@ export type System = {
   shaSecret: Scalars['ID']
   status: SystemStatus
   type: SystemType
+  webhookPermissions?: Maybe<Array<WebhookPermission>>
 }
 
 export type SystemInput = {
@@ -1821,7 +1822,7 @@ export type SystemSecret = {
 
 export type SystemSettings = {
   dailyQuota?: InputMaybe<Scalars['Int']>
-  webhook?: InputMaybe<Array<InputMaybe<Webhook>>>
+  webhook?: InputMaybe<Array<InputMaybe<WebhookInput>>>
 }
 
 export enum SystemStatus {
@@ -1938,9 +1939,15 @@ export type VerifyPasswordResult = {
   username?: Maybe<Scalars['String']>
 }
 
-export type Webhook = {
+export type WebhookInput = {
   event: Scalars['String']
   permissions: Array<InputMaybe<Scalars['String']>>
+}
+
+export type WebhookPermission = {
+  __typename?: 'WebhookPermission'
+  event: Scalars['String']
+  permissions: Array<Scalars['String']>
 }
 
 export type CreateOrUpdateCertificateSvgMutationVariables = Exact<{

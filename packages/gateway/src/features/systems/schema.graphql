@@ -36,6 +36,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
+  webhookPermissions: [WebhookPermission!]
 }
 
 type SystemSecret {
@@ -43,14 +44,19 @@ type SystemSecret {
   clientSecret: ID!
 }
 
-input Webhook {
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
+}
+
+input WebhookInput {
   event: String!
   permissions: [String]!
 }
 
 input SystemSettings {
   dailyQuota: Int
-  webhook: [Webhook]
+  webhook: [WebhookInput]
 }
 input SystemInput {
   name: String!

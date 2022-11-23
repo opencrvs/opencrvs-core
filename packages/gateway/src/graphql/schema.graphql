@@ -536,6 +536,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
+  webhookPermissions: [WebhookPermission!]
 }
 
 input NotificationInput {
@@ -1010,6 +1011,11 @@ enum SystemType {
   WEBHOOK
 }
 
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
+}
+
 input PersonInput {
   _fhirID: ID
   identifier: [IdentityInput]
@@ -1181,7 +1187,7 @@ input QuestionInput {
 
 input SystemSettings {
   dailyQuota: Int
-  webhook: [Webhook]
+  webhook: [WebhookInput]
 }
 
 enum InformantType {
@@ -1512,7 +1518,7 @@ input ConditionalInput {
   regexp: String!
 }
 
-input Webhook {
+input WebhookInput {
   event: String!
   permissions: [String]!
 }

@@ -57,7 +57,8 @@ const pickSystem = (system: ISystemModel & { _id: Types.ObjectId }) => ({
   // TODO: client_id and sha_secret should be camelCased in the Mongoose-model
   _id: system._id.toString(),
   shaSecret: system.sha_secret,
-  clientId: system.client_id
+  clientId: system.client_id,
+  webhook: system.settings.webhook
 })
 
 export async function registerSystem(

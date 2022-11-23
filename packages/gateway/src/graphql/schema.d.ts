@@ -385,6 +385,7 @@ export interface GQLSystem {
   status: GQLSystemStatus
   name: string
   type: GQLSystemType
+  webhookPermissions?: Array<GQLWebhookPermission>
 }
 
 export interface GQLNotificationInput {
@@ -881,6 +882,11 @@ export const enum GQLSystemType {
   WEBHOOK = 'WEBHOOK'
 }
 
+export interface GQLWebhookPermission {
+  event: string
+  permissions: Array<string>
+}
+
 export interface GQLPersonInput {
   _fhirID?: string
   identifier?: Array<GQLIdentityInput | null>
@@ -1052,7 +1058,7 @@ export interface GQLQuestionInput {
 
 export interface GQLSystemSettings {
   dailyQuota?: number
-  webhook?: Array<GQLWebhook | null>
+  webhook?: Array<GQLWebhookInput | null>
 }
 
 export const enum GQLInformantType {
@@ -1384,7 +1390,7 @@ export interface GQLConditionalInput {
   regexp: string
 }
 
-export interface GQLWebhook {
+export interface GQLWebhookInput {
   event: string
   permissions: Array<string | null>
 }
@@ -1542,6 +1548,7 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
+  WebhookPermission?: GQLWebhookPermissionTypeResolver
   Birth?: GQLBirthTypeResolver
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
@@ -4082,6 +4089,7 @@ export interface GQLSystemTypeResolver<TParent = any> {
   status?: SystemToStatusResolver<TParent>
   name?: SystemToNameResolver<TParent>
   type?: SystemToTypeResolver<TParent>
+  webhookPermissions?: SystemToWebhookPermissionsResolver<TParent>
 }
 
 export interface SystemTo_idResolver<TParent = any, TResult = any> {
@@ -4105,6 +4113,13 @@ export interface SystemToNameResolver<TParent = any, TResult = any> {
 }
 
 export interface SystemToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToWebhookPermissionsResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5174,6 +5189,25 @@ export interface DraftHistoryToCommentResolver<TParent = any, TResult = any> {
 }
 
 export interface DraftHistoryToUpdatedAtResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLWebhookPermissionTypeResolver<TParent = any> {
+  event?: WebhookPermissionToEventResolver<TParent>
+  permissions?: WebhookPermissionToPermissionsResolver<TParent>
+}
+
+export interface WebhookPermissionToEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface WebhookPermissionToPermissionsResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

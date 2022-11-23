@@ -81,6 +81,15 @@ export interface WebHookSetting {
   permissions: string[]
 }
 
+export interface ISystem {
+  clientId: string
+  name: string
+  shaSecret: string
+  status: SystemStatus
+  type: SystemType
+  webhook?: WebHookSetting[]
+}
+
 export function SystemList() {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
@@ -92,6 +101,10 @@ export function SystemList() {
   const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
 
   const [showPermission, setPermission] = React.useState(false)
+
+  const [systemToShowPermission, setSystemToShowPermission] = React.useState<
+    ISystem | undefined
+  >()
 
   const checkboxHandler = (items: string[], type: string) => {
     const val: WebHookSetting = {
@@ -182,7 +195,7 @@ export function SystemList() {
     if (system.type === SystemType.Webhook) {
       menuItems.push({
         handler: () => {
-          setPermission((prevState) => !prevState)
+          setSystemToShowPermission(system)
         },
         label: 'Edit '
       })
@@ -202,6 +215,7 @@ export function SystemList() {
 
     return menuItems
   }
+
   return (
     <Frame
       header={<Header />}
@@ -250,149 +264,6 @@ export function SystemList() {
               value={sysType[system.type]}
             />
           ))}
-
-          {showPermission && (
-            <ResponsiveModal
-              actions={[
-                <Button
-                  onClick={() => {
-                    setPermission(false)
-                  }}
-                  type="primary"
-                >
-                  Submit
-                </Button>,
-                <Button
-                  onClick={() => {
-                    setPermission(false)
-                  }}
-                  type="secondary"
-                >
-                  Cancel
-                </Button>
-              ]}
-              show={showPermission}
-              handleClose={() => {
-                setPermission(false)
-              }}
-              title="Webhook"
-              autoHeight={true}
-              titleHeightAuto={true}
-            >
-              <>
-                <InputField
-                  id="select-input"
-                  touched={false}
-                  label={intl.formatMessage(integrationMessages.label)}
-                >
-                  <Label>
-                    {intl.formatMessage(integrationMessages.webhookDescription)}
-                  </Label>
-                </InputField>
-                <FormTabs
-                  sections={[
-                    {
-                      id: WebhookOption.birth,
-                      title: intl.formatMessage(integrationMessages.birth)
-                    },
-                    {
-                      id: WebhookOption.death,
-                      title: intl.formatMessage(integrationMessages.death)
-                    }
-                  ]}
-                  activeTabId={selectedTab}
-                  onTabClick={(tabId: WebhookOption) => setSelectedTab(tabId)}
-                />
-                <Divider />
-                {selectedTab === WebhookOption.birth ? (
-                  <>
-                    <CheckboxGroup
-                      id="test-checkbox-group1"
-                      options={[
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.registrationDetails
-                          ),
-                          value: 'registration-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.childDetails
-                          ),
-                          value: 'child-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.motherDetails
-                          ),
-                          value: 'mothers-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.fatherDetails
-                          ),
-                          value: 'fathers-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.informantDetails
-                          ),
-                          value: 'informant-details'
-                        }
-                      ]}
-                      name="test-checkbox-group1"
-                      value={birthPermissions.permissions ?? []}
-                      onChange={(newValue) => {
-                        console.log('new val', newValue)
-                        checkboxHandler(newValue, WebhookOption.birth)
-                      }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <CheckboxGroup
-                      id="test-checkbox-group2"
-                      options={[
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.registrationDetails
-                          ),
-                          value: 'registration-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.motherDetails
-                          ),
-                          value: 'mothers-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.fatherDetails
-                          ),
-                          value: 'fathers-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.informantDetails
-                          ),
-                          value: 'informant-details'
-                        },
-                        {
-                          label: 'Disease Details',
-                          value: 'disease-details'
-                        }
-                      ]}
-                      name="test-checkbox-group1"
-                      value={deathPermissions.permissions ?? []}
-                      onChange={(newValue) => {
-                        checkboxHandler(newValue, WebhookOption.death)
-                      }}
-                    />
-                  </>
-                )}
-              </>
-            </ResponsiveModal>
-          )}
 
           {systemToToggleActivation && (
             <ResponsiveModal
@@ -450,7 +321,6 @@ export function SystemList() {
             </ResponsiveModal>
           )}
         </ListViewSimplified>
-
         <ResponsiveModal
           actions={[
             <Link
