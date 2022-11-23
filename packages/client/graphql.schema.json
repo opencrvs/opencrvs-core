@@ -8900,7 +8900,7 @@
             "deprecationReason": null
           },
           {
-            "name": "refreshSystemClientSecret",
+            "name": "refreshSystemSecret",
             "description": null,
             "args": [
               {

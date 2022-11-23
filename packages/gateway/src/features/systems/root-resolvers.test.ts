@@ -178,31 +178,34 @@ describe('generate refresh token', () => {
   })
 
   it('update refresh token for system admin', async () => {
-    fetch.mockResponses(
-      [
-        JSON.stringify({ clientId: '38ea3d84-6403-40f0-bce2-485caf655585' }),
-        { status: 200 }
-      ],
-      [JSON.stringify({})]
-    )
+    const responsePayload = {
+      clientSecret: '38ea3d84-6403-40f0-bce2-485caf655585',
+      system: {
+        _id: '234241',
+        name: 'Dummy System',
+        status: 'active',
+        type: 'HEALTH',
+        shaSecret: '823823',
+        clientId: '1239014'
+      }
+    }
+    fetch.mockResponseOnce(JSON.stringify(responsePayload), { status: 200 })
 
-    const response = await resolvers.Mutation.refreshSystemClientSecret(
+    const response = await resolvers.Mutation.refreshSystemSecret(
       {},
-      { clientId: '38ea3d84-6403-40f0-bce2-485caf655585' },
+      { clientId: '1231234' },
       authHeaderSysAdmin
     )
 
-    expect(response).toEqual({
-      clientId: '38ea3d84-6403-40f0-bce2-485caf655585'
-    })
+    expect(response).toEqual(responsePayload)
   })
 
   it('should throw error for register user', async () => {
     fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
 
-    const response = resolvers.Mutation.refreshSystemClientSecret(
+    const response = resolvers.Mutation.refreshSystemSecret(
       {},
-      { clientId: '38ea3d84-6403-40f0-bce2-485caf655585' },
+      { clientId: '1231234' },
       authHeaderRegister
     )
     await expect(response).rejects.toThrowError(

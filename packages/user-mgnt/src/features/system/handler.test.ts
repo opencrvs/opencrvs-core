@@ -312,7 +312,7 @@ describe('refresh secret system user', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/refreshSystemClientSecret',
+      url: '/refreshSystemSecret',
       payload: {
         clientId: '123'
       },
@@ -328,7 +328,7 @@ describe('refresh secret system user', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/refreshSystemClientSecret',
+      url: '/refreshSystemSecret',
       payload: {
         clientId: '12367'
       },

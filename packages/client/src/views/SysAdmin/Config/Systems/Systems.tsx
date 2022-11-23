@@ -299,10 +299,9 @@ export function SystemList() {
             </TopText>
             {refreshTokenLoading ? (
               <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
-            ) : refreshTokenData &&
-              refreshTokenData?.refreshSystemClientSecret ? (
+            ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
               <Text variant="reg16" element="p">
-                {refreshTokenData.refreshSystemClientSecret?.clientSecret}
+                {refreshTokenData.refreshSystemSecret?.clientSecret}
               </Text>
             ) : (
               <ButtonLink

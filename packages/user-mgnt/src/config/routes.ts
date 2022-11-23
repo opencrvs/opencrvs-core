@@ -64,7 +64,7 @@ import {
   getSystemHandler,
   getAllSystemsHandler,
   SystemSchema,
-  refreshSystemClientSecretHandler,
+  refreshSystemSecretHandler,
   systemSecretRequestSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
@@ -605,8 +605,8 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/refreshSystemClientSecret',
-      handler: refreshSystemClientSecretHandler,
+      path: '/refreshSystemSecret',
+      handler: refreshSystemSecretHandler,
       config: {
         tags: ['api'],
         description: 'Refresh client secret ',

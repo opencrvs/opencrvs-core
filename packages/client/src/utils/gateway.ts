@@ -960,7 +960,7 @@ export type Mutation = {
   modifyDraftStatus?: Maybe<FormDraft>
   notADuplicate: Scalars['ID']
   reactivateSystem?: Maybe<System>
-  refreshSystemClientSecret?: Maybe<SystemSecret>
+  refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
@@ -1107,7 +1107,7 @@ export type MutationReactivateSystemArgs = {
   clientId: Scalars['ID']
 }
 
-export type MutationRefreshSystemClientSecretArgs = {
+export type MutationRefreshSystemSecretArgs = {
   clientId: Scalars['String']
 }
 
@@ -5704,13 +5704,13 @@ export type ReactivateSystemMutation = {
   } | null
 }
 
-export type RefreshSystemClientSecretMutationVariables = Exact<{
+export type RefreshSystemSecretMutationVariables = Exact<{
   clientId: Scalars['String']
 }>
 
-export type RefreshSystemClientSecretMutation = {
+export type RefreshSystemSecretMutation = {
   __typename?: 'Mutation'
-  refreshSystemClientSecret?: {
+  refreshSystemSecret?: {
     __typename?: 'SystemSecret'
     clientSecret: string
     system: {

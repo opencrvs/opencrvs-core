@@ -18,7 +18,9 @@ export const resolvers: GQLResolver = {
   Mutation: {
     async reactivateSystem(_, { clientId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
-        return new Error('Activate user is only allowed for sysadmin')
+        return Promise.reject(
+          new Error('Activate user is only allowed for sysadmin')
+        )
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}reactivateSystem`, {
         method: 'POST',
@@ -85,21 +87,18 @@ export const resolvers: GQLResolver = {
       }
       return res.json()
     },
-    async refreshSystemClientSecret(_, { clientId }, authHeader) {
+    async refreshSystemSecret(_, { clientId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
         throw new Error('Only system user can update refresh client secret')
       }
-      const res = await fetch(
-        `${USER_MANAGEMENT_URL}refreshSystemClientSecret`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ clientId: clientId }),
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader
-          }
+      const res = await fetch(`${USER_MANAGEMENT_URL}refreshSystemSecret`, {
+        method: 'POST',
+        body: JSON.stringify({ clientId: clientId }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
         }
-      )
+      })
       if (res.status !== 200) {
         throw new Error(`No user details found by given clientId`)
       }

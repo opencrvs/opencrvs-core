@@ -18,8 +18,8 @@ import {
   DeactivateSystemMutationVariables,
   ReactivateSystemMutation,
   ReactivateSystemMutationVariables,
-  RefreshSystemClientSecretMutation,
-  RefreshSystemClientSecretMutationVariables,
+  RefreshSystemSecretMutation,
+  RefreshSystemSecretMutationVariables,
   RegisterSystemMutation,
   RegisterSystemMutationVariables,
   System,
@@ -166,8 +166,8 @@ export function useSystems() {
       reset: resetRefreshTokenData
     }
   ] = useMutation<
-    RefreshSystemClientSecretMutation,
-    RefreshSystemClientSecretMutationVariables
+    RefreshSystemSecretMutation,
+    RefreshSystemSecretMutationVariables
   >(mutations.refreshClientSecret)
 
   const clientRefreshToken = (clientId: string | undefined) => {

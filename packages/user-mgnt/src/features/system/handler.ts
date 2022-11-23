@@ -366,7 +366,7 @@ export const resSystemSchema = Joi.object({
   system: SystemSchema
 })
 
-export async function refreshSystemClientSecretHandler(
+export async function refreshSystemSecretHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {

@@ -254,7 +254,7 @@ type Mutation {
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
-  refreshSystemClientSecret(clientId: String!): SystemSecret
+  refreshSystemSecret(clientId: String!): SystemSecret
 }
 
 type Dummy {
