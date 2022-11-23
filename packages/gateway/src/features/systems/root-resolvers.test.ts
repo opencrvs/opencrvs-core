@@ -143,3 +143,73 @@ describe('Integrations root resolvers', () => {
     ).rejects.toThrowError('Activate user is only allowed for sysadmin')
   })
 })
+
+describe('generate refresh token', () => {
+  let authHeaderRegister: { Authorization: string }
+  let authHeaderSysAdmin: { Authorization: string }
+  beforeEach(() => {
+    fetch.resetMocks()
+    const sysAdminToken = jwt.sign(
+      { scope: ['sysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderSysAdmin = {
+      Authorization: `Bearer ${sysAdminToken}`
+    }
+    const registerToken = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderRegister = {
+      Authorization: `Bearer ${registerToken}`
+    }
+  })
+
+  it('update refresh token for system admin', async () => {
+    const responsePayload = {
+      clientSecret: '38ea3d84-6403-40f0-bce2-485caf655585',
+      system: {
+        _id: '234241',
+        name: 'Dummy System',
+        status: 'active',
+        type: 'HEALTH',
+        shaSecret: '823823',
+        clientId: '1239014'
+      }
+    }
+    fetch.mockResponseOnce(JSON.stringify(responsePayload), { status: 200 })
+
+    const response = await resolvers.Mutation.refreshSystemSecret(
+      {},
+      { clientId: '1231234' },
+      authHeaderSysAdmin
+    )
+
+    expect(response).toEqual(responsePayload)
+  })
+
+  it('should throw error for register user', async () => {
+    fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
+
+    const response = resolvers.Mutation.refreshSystemSecret(
+      {},
+      { clientId: '1231234' },
+      authHeaderRegister
+    )
+    await expect(response).rejects.toThrowError(
+      'Only system user can update refresh client secret'
+    )
+  })
+})

@@ -52,7 +52,7 @@ import verifySecurityAnswer, {
 import {
   registerSystem,
   reqRegisterSystemSchema,
-  resRegisterSystemSchema,
+  resSystemSchema,
   deactivateSystem,
   reactivateSystem,
   clientIdSchema,
@@ -63,7 +63,9 @@ import {
   getSystemResponseSchema,
   getSystemHandler,
   getAllSystemsHandler,
-  SystemSchema
+  SystemSchema,
+  refreshSystemSecretHandler,
+  systemSecretRequestSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -494,7 +496,7 @@ export const getRoutes = () => {
           payload: reqRegisterSystemSchema
         },
         response: {
-          schema: resRegisterSystemSchema
+          schema: resSystemSchema
         }
       }
     },
@@ -598,6 +600,25 @@ export const getRoutes = () => {
           query: Joi.object({
             role: Joi.string().required()
           })
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/refreshSystemSecret',
+      handler: refreshSystemSecretHandler,
+      config: {
+        tags: ['api'],
+        description: 'Refresh client secret ',
+        notes: 'Refresh client secret',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: systemSecretRequestSchema
+        },
+        response: {
+          schema: resSystemSchema
         }
       }
     }

@@ -51,6 +51,13 @@ input SystemInput {
   settings: SystemSettings
 }
 
+type RefreshSystemClientSecret {
+  name: String!
+  clientId: String!
+  shaSecret: String!
+  clientSecret: String!
+}
+
 type Query {
   fetchSystem(clientId: ID!): System
 }
@@ -59,4 +66,5 @@ type Mutation {
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
+  refreshSystemSecret(clientId: String!): SystemSecret
 }

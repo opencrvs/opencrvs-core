@@ -18,6 +18,8 @@ import {
   DeactivateSystemMutationVariables,
   ReactivateSystemMutation,
   ReactivateSystemMutationVariables,
+  RefreshSystemSecretMutation,
+  RefreshSystemSecretMutationVariables,
   RegisterSystemMutation,
   RegisterSystemMutationVariables,
   System,
@@ -155,6 +157,28 @@ export function useSystems() {
     }
   )
 
+  const [
+    clientRefreshTokenMutate,
+    {
+      data: refreshTokenData,
+      loading: refreshTokenLoading,
+      error: refreshTokenError,
+      reset: resetRefreshTokenData
+    }
+  ] = useMutation<
+    RefreshSystemSecretMutation,
+    RefreshSystemSecretMutationVariables
+  >(mutations.refreshClientSecret)
+
+  const clientRefreshToken = (clientId: string | undefined) => {
+    if (!clientId) return
+    clientRefreshTokenMutate({
+      variables: {
+        clientId
+      }
+    })
+  }
+
   const deactivateSystem = () => {
     if (!systemToToggleActivation) return
 
@@ -191,6 +215,7 @@ export function useSystems() {
     resetActivateSystemData()
     resetDeactivateSystemData()
     resetRegisterSystemData()
+    resetRefreshTokenData()
   }
 
   const shouldWarnAboutNationalId =
@@ -218,6 +243,11 @@ export function useSystems() {
     setNewSystemType,
     onChangeClientName,
     clearNewSystemDraft,
+    clientRefreshToken,
+    refreshTokenData,
+    refreshTokenLoading,
+    refreshTokenError,
+    resetRefreshTokenData,
     resetData,
     shouldWarnAboutNationalId
   }
