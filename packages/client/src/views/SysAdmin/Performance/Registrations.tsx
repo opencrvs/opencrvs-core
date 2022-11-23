@@ -31,7 +31,6 @@ import {
   NOTIFICATION_TYPE
 } from '@client/components/interface/ToastNotification'
 import { RegistrationsDataTable } from './reports/registrations/RegistrationsDataTable'
-import intervalToDuration from 'date-fns/intervalToDuration'
 import differenceInDays from 'date-fns/differenceInDays'
 
 interface ISearchParams {

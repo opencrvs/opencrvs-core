@@ -405,8 +405,8 @@ export function goToCompletenessRates(
 export function goToRegistrations(
   eventType: 'BIRTH' | 'DEATH',
   locationId: string,
-  timeStart: Date,
-  timeEnd: Date
+  timeStart: Date = subYears(new Date(Date.now()), 1),
+  timeEnd: Date = new Date(Date.now())
 ) {
   return push({
     pathname: EVENT_REGISTRATIONS,
