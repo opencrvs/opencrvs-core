@@ -1668,3 +1668,71 @@ export const mockUserDetails = {
   creationDate: 1559054406433,
   auditHistory: []
 }
+
+export const mockFhirLocation = {
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/statistical-code',
+      value: 'ADMIN_STRUCTURE_AWn3s2RqgAN'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+      value: 'STATE'
+    }
+  ],
+  name: 'Central',
+  alias: ['Central'],
+  description: 'AWn3s2RqgAN',
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/0'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'ADMIN_STRUCTURE'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'jdn',
+        display: 'Jurisdiction'
+      }
+    ]
+  },
+  extension: [
+    {
+      url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
+      valueAttachment: {
+        contentType: 'application/geo+json',
+        data: '<base64>'
+      }
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+      valueString: '[{"2020":372995},{"2021":387162}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+      valueString: '[{"2020":329978},{"2021":299071}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+      valueString: '[{"2020":702973},{"2021":686234}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+      valueString: '[{"2020":6.8375},{"2021":6.9875}]'
+    }
+  ],
+  meta: {
+    lastUpdated: '2022-06-27T12:04:39.175+00:00',
+    versionId: '39d24680-f610-45bd-8d74-2becd7defea2'
+  },
+  id: '7dbf10a9-23d9-4038-8b1c-9f6547ab4877'
+}
