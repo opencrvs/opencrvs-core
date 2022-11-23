@@ -21,7 +21,7 @@ import {
   goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
   DOWNLOAD_STATUS,
   getProcessingDeclarationIds,
@@ -32,6 +32,7 @@ import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import {
+  ADVANCED_SEARCH_TEXT,
   BRN_DRN_TEXT,
   NAME_TEXT,
   NATIONAL_ID_TEXT,
@@ -43,14 +44,17 @@ import {
   buttonMessages,
   constantsMessages,
   dynamicConstantsMessages,
-  errorMessages
+  errorMessages,
+  formMessages
 } from '@client/i18n/messages'
+import { messages as advancedSearchPillMessages } from '@client/i18n/messages/views/advancedSearchResult'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { HOME, REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import {
   ColumnContentAlignment,
   COLUMNS,
@@ -67,15 +71,21 @@ import {
   NameContainer,
   NoNameContainer
 } from '@client/views/OfficeHome/components'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { convertToMSISDN } from '@client/forms/utils'
 import { DownloadAction } from '@client/forms'
-import { formattedDuration } from '@client/utils/date-formatting'
+import format, { formattedDuration } from '@client/utils/date-formatting'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 import { Query } from '@client/components/Query'
 import { BookmarkAdvancedSearchResult } from './BookmarkAdvancedSearchResult'
+import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import {
+  isAdvancedSearchFormValid,
+  transformReduxDataToLocalState
+} from '@client/views//SearchResult/AdvancedSearch'
+import { getOfflineData } from '@client/offline/selectors'
+import { messages as headerMessages } from '@client/i18n/messages/views/header'
 
 const SearchParamPillsContainer = styled.div`
   margin: 16px 0px;
@@ -83,7 +93,7 @@ const SearchParamPillsContainer = styled.div`
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
-  color: ${({ theme }) => theme.colors.primaryDarker};
+  color: ${({ theme }) => theme.colors.primaryLight};
 `
 const BookmarkIconBody = styled.div`
   position: absolute;
@@ -110,19 +120,18 @@ interface IMatchParams {
   searchType: string
 }
 
-type IFullProps = IntlShapeProps &
-  IViewHeadingProps &
+type IFullProps = IViewHeadingProps &
   ISearchInputProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
 
 const RecordAuditComp = (props: IFullProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-  const { intl } = props
+  const intl = useIntl()
+  const offlineData = useSelector(getOfflineData)
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
   const { named, saved, error, searchId, ...restAdvancedSearchParams } =
     advancedSearchParamsState
-
   const recordWindowWidth = () => {
     setWindowWidth(window.innerWidth)
   }
@@ -137,7 +146,13 @@ const RecordAuditComp = (props: IFullProps) => {
   }, [])
 
   const isEnoughParams = () => {
-    return true
+    return isAdvancedSearchFormValid(
+      transformReduxDataToLocalState(
+        advancedSearchParamsState,
+        offlineData,
+        advancedSearchParamsState.event || 'birth'
+      )
+    )
   }
 
   const getContentTableColumns = () => {
@@ -145,16 +160,16 @@ const RecordAuditComp = (props: IFullProps) => {
       return [
         {
           width: 35,
-          label: props.intl.formatMessage(constantsMessages.name),
+          label: intl.formatMessage(constantsMessages.name),
           key: COLUMNS.ICON_WITH_NAME
         },
         {
-          label: props.intl.formatMessage(constantsMessages.event),
+          label: intl.formatMessage(constantsMessages.event),
           width: 20,
           key: COLUMNS.EVENT
         },
         {
-          label: props.intl.formatMessage(constantsMessages.eventDate),
+          label: intl.formatMessage(constantsMessages.eventDate),
           width: 20,
           key: COLUMNS.DATE_OF_EVENT
         },
@@ -168,7 +183,7 @@ const RecordAuditComp = (props: IFullProps) => {
     } else {
       return [
         {
-          label: props.intl.formatMessage(constantsMessages.name),
+          label: intl.formatMessage(constantsMessages.name),
           width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
         },
@@ -199,7 +214,7 @@ const RecordAuditComp = (props: IFullProps) => {
     if (!data || !data.results) {
       return []
     }
-    const transformedData = transformData(data, props.intl)
+    const transformedData = transformData(data, intl)
 
     const processingDeclarationIds = getProcessingDeclarationIds(
       props.outboxDeclarations
@@ -228,7 +243,7 @@ const RecordAuditComp = (props: IFullProps) => {
           reg.duplicates.length > 0 &&
           reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
           reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
-        const { intl, match, userDetails } = props
+        const { match, userDetails } = props
         const { searchText, searchType } = match.params
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
@@ -236,7 +251,7 @@ const RecordAuditComp = (props: IFullProps) => {
             userHasCertifyScope()
           ) {
             actions.push({
-              label: props.intl.formatMessage(buttonMessages.print),
+              label: intl.formatMessage(buttonMessages.print),
               handler: (
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
@@ -256,8 +271,8 @@ const RecordAuditComp = (props: IFullProps) => {
             actions.push({
               label:
                 declarationIsRejected || declarationIsInProgress
-                  ? props.intl.formatMessage(constantsMessages.update)
-                  : props.intl.formatMessage(constantsMessages.review),
+                  ? intl.formatMessage(constantsMessages.update)
+                  : intl.formatMessage(constantsMessages.review),
               handler: () =>
                 props.goToPage(
                   REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -374,8 +389,8 @@ const RecordAuditComp = (props: IFullProps) => {
     <Frame
       header={
         <Header
-          searchText={''}
-          selectedSearchType={''}
+          searchText={intl.formatMessage(headerMessages.advancedSearch)}
+          selectedSearchType={ADVANCED_SEARCH_TEXT}
           mobileSearchBar={true}
           enableMenuSelection={false}
         />
@@ -443,33 +458,325 @@ const RecordAuditComp = (props: IFullProps) => {
 const SearchModifierComponent = () => {
   const dispatch = useDispatch()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
+  const intl = useIntl()
+
+  const formatDateRangeLabel = (
+    rangeStart: string | undefined,
+    rangeEnd: string | undefined
+  ) => {
+    if (!rangeStart || !rangeEnd) {
+      return
+    }
+    const dateStartLocale =
+      rangeStart && format(new Date(rangeStart), 'MMMM yyyy')
+    const dateEndLocale = rangeEnd && format(new Date(rangeEnd), 'MMMM yyyy')
+
+    return intl.formatMessage(formMessages.dateRangePickerCheckboxLabel, {
+      rangeStart: dateStartLocale,
+      rangeEnd: dateEndLocale
+    })
+  }
+  const getFormattedAdvancedSerachParams = (
+    advancedSearchParamsState: IAdvancedSearchParamState
+  ): Record<string, string> => {
+    const formattedMapOfParams: Record<string, string> = {}
+
+    if (advancedSearchParamsState.event) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.event)
+      ] =
+        advancedSearchParamsState.event === 'birth'
+          ? intl.formatMessage(constantsMessages.birth)
+          : intl.formatMessage(constantsMessages.death)
+    }
+
+    if (
+      advancedSearchParamsState.registrationStatuses &&
+      advancedSearchParamsState.registrationStatuses.length > 0
+    ) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.registationStatus)
+      ] = advancedSearchParamsState.registrationStatuses.join(' , ')
+    }
+    if (advancedSearchParamsState.trackingId) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.trackingId)
+      ] = advancedSearchParamsState.trackingId
+    }
+    if (advancedSearchParamsState.registrationNumber) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.regNumber)
+      ] = advancedSearchParamsState.registrationNumber
+    }
+    if (advancedSearchParamsState.childFirstNames) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.childFirstName)
+      ] = advancedSearchParamsState.childFirstNames
+    }
+
+    if (advancedSearchParamsState.childLastName) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.childLastName)
+      ] = advancedSearchParamsState.childLastName
+    }
+
+    if (advancedSearchParamsState.motherFirstNames) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.motherFirstName)
+      ] = advancedSearchParamsState.motherFirstNames
+    }
+
+    if (advancedSearchParamsState.motherFamilyName) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.motherLastName)
+      ] = advancedSearchParamsState.motherFamilyName
+    }
+
+    if (advancedSearchParamsState.fatherFirstNames) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.fatherFirstName)
+      ] = advancedSearchParamsState.fatherFirstNames
+    }
+
+    if (advancedSearchParamsState.fatherFamilyName) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.fatherLastName)
+      ] = advancedSearchParamsState.fatherFamilyName
+    }
+
+    if (advancedSearchParamsState.informantFirstNames) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.informantFirstName)
+      ] = advancedSearchParamsState.informantFirstNames
+    }
+
+    if (advancedSearchParamsState.informantFamilyName) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.informantLastName)
+      ] = advancedSearchParamsState.informantFamilyName
+    }
+
+    if (advancedSearchParamsState.deceasedFirstNames) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.deceasedFirstName)
+      ] = advancedSearchParamsState.deceasedFirstNames
+    }
+
+    if (advancedSearchParamsState.deceasedFamilyName) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.deceasedLastName)
+      ] = advancedSearchParamsState.deceasedFamilyName
+    }
+
+    if (advancedSearchParamsState.childGender) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.gender)
+      ] = advancedSearchParamsState.childGender
+    }
+    if (advancedSearchParamsState.deceasedGender) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.gender)
+      ] = advancedSearchParamsState.deceasedGender
+    }
+
+    if (advancedSearchParamsState.declarationLocationId) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.regLocation)
+      ] = advancedSearchParamsState.declarationLocationId
+    }
+    if (advancedSearchParamsState.declarationJurisdictionId) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.regLocation)
+      ] = advancedSearchParamsState.declarationJurisdictionId
+    }
+
+    if (advancedSearchParamsState.eventCountry) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.eventlocation)
+      ] = advancedSearchParamsState.eventCountry
+    }
+    if (advancedSearchParamsState.eventLocationId) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.eventlocation)
+      ] = advancedSearchParamsState.eventLocationId
+    }
+
+    if (advancedSearchParamsState.eventLocationLevel1) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.eventlocation)
+      ] = advancedSearchParamsState.eventLocationLevel1
+    }
+    if (advancedSearchParamsState.eventLocationLevel2) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.eventlocation)
+      ] = advancedSearchParamsState.eventLocationLevel2
+    }
+    if (advancedSearchParamsState.eventLocationLevel3) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.eventlocation)
+      ] = advancedSearchParamsState.eventLocationLevel3
+    }
+
+    //dates
+    if (advancedSearchParamsState.dateOfEvent) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.eventDate)
+      ] = advancedSearchParamsState.dateOfEvent
+    }
+    if (
+      advancedSearchParamsState.dateOfEventStart ||
+      advancedSearchParamsState.dateOfEventEnd
+    ) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.eventDate)
+      ] =
+        formatDateRangeLabel(
+          advancedSearchParamsState.dateOfEventStart,
+          advancedSearchParamsState.dateOfEventEnd
+        ) || ''
+    }
+
+    if (advancedSearchParamsState.dateOfRegistration) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.regDate)
+      ] = advancedSearchParamsState.dateOfRegistration
+    }
+
+    if (
+      advancedSearchParamsState.dateOfRegistrationStart ||
+      advancedSearchParamsState.dateOfRegistrationEnd
+    ) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.regDate)
+      ] =
+        formatDateRangeLabel(
+          advancedSearchParamsState.dateOfRegistrationStart,
+          advancedSearchParamsState.dateOfRegistrationEnd
+        ) || ''
+    }
+
+    if (advancedSearchParamsState.childDoB) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.childDoB)
+      ] = advancedSearchParamsState.childDoB
+    }
+
+    if (
+      advancedSearchParamsState.childDoBStart ||
+      advancedSearchParamsState.childDoBEnd
+    ) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.childDoB)
+      ] =
+        formatDateRangeLabel(
+          advancedSearchParamsState.childDoBStart,
+          advancedSearchParamsState.childDoBEnd
+        ) || ''
+    }
+
+    if (advancedSearchParamsState.motherDoB) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.motherDoB)
+      ] = advancedSearchParamsState.motherDoB
+    }
+
+    if (
+      advancedSearchParamsState.motherDoBStart ||
+      advancedSearchParamsState.motherDoBEnd
+    ) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.motherDoB)
+      ] =
+        formatDateRangeLabel(
+          advancedSearchParamsState.motherDoBStart,
+          advancedSearchParamsState.motherDoBEnd
+        ) || ''
+    }
+
+    if (advancedSearchParamsState.fatherDoB) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.fatherDoB)
+      ] = advancedSearchParamsState.fatherDoB
+    }
+
+    if (
+      advancedSearchParamsState.fatherDoBStart ||
+      advancedSearchParamsState.fatherDoBEnd
+    ) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.fatherDoB)
+      ] =
+        formatDateRangeLabel(
+          advancedSearchParamsState.fatherDoBStart,
+          advancedSearchParamsState.fatherDoBEnd
+        ) || ''
+    }
+
+    if (advancedSearchParamsState.deceasedDoB) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.deceasedDoB)
+      ] = advancedSearchParamsState.deceasedDoB
+    }
+
+    if (
+      advancedSearchParamsState.deceasedDoBStart ||
+      advancedSearchParamsState.deceasedDoBEnd
+    ) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.deceasedDoB)
+      ] =
+        formatDateRangeLabel(
+          advancedSearchParamsState.deceasedDoBStart,
+          advancedSearchParamsState.deceasedDoBEnd
+        ) || ''
+    }
+
+    if (advancedSearchParamsState.informantDoB) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.informantDoB)
+      ] = advancedSearchParamsState.informantDoB
+    }
+
+    if (
+      advancedSearchParamsState.informantDoBStart ||
+      advancedSearchParamsState.informantDoBEnd
+    ) {
+      formattedMapOfParams[
+        intl.formatMessage(advancedSearchPillMessages.informantDoB)
+      ] =
+        formatDateRangeLabel(
+          advancedSearchParamsState.informantDoBStart,
+          advancedSearchParamsState.informantDoBEnd
+        ) || ''
+    }
+
+    return formattedMapOfParams
+  }
+
+  const formattedMapOfParams = getFormattedAdvancedSerachParams(
+    advancedSearchParamsState
+  )
   return (
     <>
       <BookmarkIconBody>
         <BookmarkAdvancedSearchResult />
       </BookmarkIconBody>
       <SearchParamPillsContainer>
-        {Object.keys(advancedSearchParamsState).map((paramKey, i) => {
-          const paramValue =
-            advancedSearchParamsState[
-              paramKey as keyof typeof advancedSearchParamsState
-            ]
-          if (paramValue) {
-            return (
-              <Pill
-                label={`${paramKey} : ${paramValue}`}
-                type="default"
-                size="medium"
-              ></Pill>
-            )
-          }
+        {Object.keys(formattedMapOfParams).map((paramKey, i) => {
+          return (
+            <Pill
+              label={`${paramKey} : ${formattedMapOfParams[paramKey]}`}
+              type="default"
+              size="medium"
+            ></Pill>
+          )
         })}
         <Link
           onClick={() => {
             dispatch(goToAdvancedSearch())
           }}
         >
-          Edit
+          {intl.formatMessage(buttonMessages.edit)}
         </Link>
       </SearchParamPillsContainer>
     </>
@@ -489,4 +796,4 @@ export const AdvancedSearchResult = connect(
     goToPrintCertificate: goToPrintCertificateAction,
     goToDeclarationRecordAudit
   }
-)(injectIntl(withTheme(RecordAuditComp)))
+)(withTheme(RecordAuditComp))

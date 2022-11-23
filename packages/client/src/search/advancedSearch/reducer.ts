@@ -66,13 +66,14 @@ export type IAdvancedSearchParamState = {
   named?: string
 }
 
-export const initialState: IAdvancedSearchParamState = {
+export const advancedSearchInitialState: IAdvancedSearchParamState = {
   event: '',
-  registrationStatuses: [],
+  registrationStatuses: undefined,
   dateOfEvent: '',
   dateOfEventStart: '',
   dateOfEventEnd: '',
   registrationNumber: '',
+  eventCountry: window.config.COUNTRY.toUpperCase(),
   trackingId: '',
   dateOfRegistration: '',
   dateOfRegistrationStart: '',
@@ -124,7 +125,7 @@ export const advancedSearchParamReducer: LoopReducer<
   IAdvancedSearchParamState,
   Actions
 > = (
-  state: IAdvancedSearchParamState = initialState,
+  state: IAdvancedSearchParamState = advancedSearchInitialState,
   action: Actions
 ): IAdvancedSearchParamState | Loop<IAdvancedSearchParamState, Actions> => {
   switch (action.type) {
