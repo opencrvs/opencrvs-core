@@ -17,18 +17,23 @@ import fetch from 'node-fetch'
 export const resolvers: GQLResolver = {
   Query: {},
   Mutation: {
-    async createFormDataset(_, { formDraft }, authHeader) {
-      const resp = await fetch(`${APPLICATION_CONFIG_URL}createFormDataset`, {
-        method: 'POST',
-        body: JSON.stringify(formDraft),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
+    async createFormDataset(_, { formDataset }, authHeader) {
+      try {
+        const resp = await fetch(`${APPLICATION_CONFIG_URL}createFormDataset`, {
+          method: 'POST',
+          body: JSON.stringify(formDataset),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
+        })
 
-      const result = await resp.json()
-      return result
+        const result = await resp.json()
+        if (!result.status) throw Error(result.msg)
+        return result
+      } catch (ex) {
+        throw Error(ex.message)
+      }
     }
   }
 }

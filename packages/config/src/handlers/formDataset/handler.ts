@@ -27,6 +27,13 @@ interface IFormDataset {
   base64Data: string
 }
 
+export enum RESPONSE_MESSAGES {
+  SUCCESSFUL = 'SUCCESSFULL',
+  NO_DATA_FOUND = 'NO_DATA_FOUND',
+  TRANSLATION_MISSING = 'TRANSLATION_MISSING',
+  FAILED = 'FAILED'
+}
+
 const getLanguages = async () => {
   const response = await fetch(`${COUNTRY_CONFIG_URL}/content/login`)
   const languages = (await response.json()).languages.reduce(
@@ -45,7 +52,7 @@ export default async function createFormDatasetHandler(
 ) {
   let result = {
     status: false,
-    msg: 'Failed',
+    msg: RESPONSE_MESSAGES.FAILED,
     data: {} as IDataSetModel
   }
   try {
@@ -55,7 +62,7 @@ export default async function createFormDatasetHandler(
 
     const csvJSON = await csvToJSON(options)
     if (csvJSON.length === 0) {
-      throw Error('No data found')
+      throw Error(RESPONSE_MESSAGES.NO_DATA_FOUND)
     }
 
     const languages: string[] = await getLanguages()
@@ -73,7 +80,7 @@ export default async function createFormDatasetHandler(
       }
       languages.forEach((language) => {
         if (isEmpty(optionRow[language])) {
-          throw Error('Translation missing')
+          throw Error(RESPONSE_MESSAGES.TRANSLATION_MISSING)
         }
         option.label.push({
           lang: language,
@@ -89,11 +96,12 @@ export default async function createFormDatasetHandler(
     const newFormDataset = await FormDataset.create(formDataset)
 
     result.status = true
-    result.msg = 'Successful'
+    result.msg = RESPONSE_MESSAGES.SUCCESSFUL
     result.data = newFormDataset
   } catch (e) {
     internal(e.message)
-    result.msg = e.message
+    result.msg =
+      e.message in RESPONSE_MESSAGES ? e.message : RESPONSE_MESSAGES.FAILED
   }
   return result
 }

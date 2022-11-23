@@ -249,7 +249,7 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
-  createFormDataset(formDraft: FormDatasetInput!): FormDatasetResponse
+  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
 }
 
 type Dummy {

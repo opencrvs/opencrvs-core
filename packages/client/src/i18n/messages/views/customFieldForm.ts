@@ -36,6 +36,14 @@ interface ICustomFieldFormMessages
   copyDescription: MessageDescriptor
   dataSourceHeading: MessageDescriptor
   dataSourceDescription: MessageDescriptor
+  validatingCSVFile: MessageDescriptor
+  validatingCSVFilesValidatingDescription: MessageDescriptor
+  statusValidating: MessageDescriptor
+  statusValidated: MessageDescriptor
+  statusFailed: MessageDescriptor
+  statusAppliedToCustomSelect: MessageDescriptor
+  statusNoDataFound: MessageDescriptor
+  statusTranslationMissing: MessageDescriptor
 }
 
 const messagesToDefine: ICustomFieldFormMessages = {
@@ -157,6 +165,39 @@ const messagesToDefine: ICustomFieldFormMessages = {
     defaultMessage:
       'Use an existing data source or upload a csv file containing the select options for each language.',
     description: 'Description for Data source'
+  },
+  validatingCSVFile: {
+    id: 'custom.select.text.validatingCSVFile',
+    defaultMessage: 'Validating CSV file'
+  },
+  validatingCSVFilesValidatingDescription: {
+    id: 'custom.select.text.csvValidatingDescription',
+    defaultMessage:
+      'We are checking your .csv file for... this should take a few minutes... link to documentation'
+  },
+  statusValidating: {
+    id: 'custom.select.text.statusValidating',
+    defaultMessage: 'Validating .csv'
+  },
+  statusValidated: {
+    id: 'custom.select.text.statusValidated',
+    defaultMessage: 'Validated .csv'
+  },
+  statusFailed: {
+    id: 'custom.select.text.statusFailed',
+    defaultMessage: 'Failed to validate. Please try again'
+  },
+  statusAppliedToCustomSelect: {
+    id: 'custom.select.text.statusAppliedToCustomSelect',
+    defaultMessage: 'Applied to custom select'
+  },
+  statusNoDataFound: {
+    id: 'custom.select.text.statusNoDataFound',
+    defaultMessage: 'No option was found'
+  },
+  statusTranslationMissing: {
+    id: 'custom.select.text.statusTranslationMissing',
+    defaultMessage: 'Translation is missing'
   }
 }
 

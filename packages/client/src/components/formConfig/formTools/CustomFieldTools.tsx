@@ -31,11 +31,16 @@ import {
 } from '@client/forms/configuration/formConfig/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
-import { ILanguageState, initLanguages } from '@client/i18n/reducer'
+import {
+  ILanguageState,
+  initLanguages,
+  IntlMessages
+} from '@client/i18n/reducer'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/src/Button'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
@@ -67,6 +72,10 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { Icon } from '@opencrvs/components/src/Icon/Icon'
 import { FileSelectLink } from '@opencrvs/components/lib/FileSelectLink'
 import { getBase64String } from '@client/utils/imageUtils'
+import { ResponsiveModal } from '@client/../../components/lib'
+import { client } from '@client/utils/apolloClient'
+import { CREATE_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/mutations'
+import { Alert } from '@opencrvs/components/lib/Alert'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -199,6 +208,31 @@ const CustomSelectHeading = styled.span`
   gap: 5px;
 `
 
+const CFileSelectLink = styled(FileSelectLink)`
+  border: 2px solid ${({ theme }) => theme.colors.primary};
+  border-radius: 4px;
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 0px 12px;
+  height: 40px;
+
+  &:hover {
+    text-decoration: none;
+    background: ${({ theme }) => theme.colors.grey100};
+    border: 2px solid ${({ theme }) => theme.colors.primaryDark};
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDarker};
+  }
+  &:focus-visible {
+    border: 2px solid ${({ theme }) => theme.colors.grey600};
+    background: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.grey600};
+    box-shadow: none;
+  }
+`
+
 type IFormFieldWrapper = { formField: IFormField }
 
 type IProps = {
@@ -230,6 +264,17 @@ interface IConditionalFieldForms {
   regex: string
 }
 
+enum STATUS_TYPES {
+  INPROGRESS = 'loading',
+  COMPLETED = 'success',
+  ERROR = 'error'
+}
+
+interface CSVUploadStatus {
+  statusType: STATUS_TYPES
+  message: string
+}
+
 interface ICustomFieldState {
   isFieldDuplicate: boolean
   selectedLanguage: string
@@ -237,6 +282,9 @@ interface ICustomFieldState {
   handleBars: string
   maxLength: number
   fieldForms: IFieldForms
+  showCSVUploadingModal: boolean
+  CSVUploadStatuses: CSVUploadStatus[]
+  CSVUploaderModalActions: JSX.Element[]
 }
 
 interface IOptionalContent {
@@ -287,7 +335,10 @@ class CustomFieldToolsComp extends React.Component<
         regex: conditionalfield?.regexp ?? EMPTY_STRING
       },
       maxLength: selectedField.maxLength ?? DEFAULT_MAX_LENGTH,
-      fieldForms
+      fieldForms,
+      showCSVUploadingModal: false,
+      CSVUploadStatuses: [],
+      CSVUploaderModalActions: []
     }
   }
 
@@ -790,6 +841,23 @@ class CustomFieldToolsComp extends React.Component<
     )
   }
 
+  showErrorMessage(errCode: string) {
+    const { intl } = this.props
+    const messages: IntlMessages = {
+      SUCCESSFUL: intl.formatMessage(customFieldFormMessages.statusValidated),
+      NO_DATA_FOUND: intl.formatMessage(
+        customFieldFormMessages.statusNoDataFound
+      ),
+      TRANSLATION_MISSING: intl.formatMessage(
+        customFieldFormMessages.statusTranslationMissing
+      ),
+      FAILED: intl.formatMessage(customFieldFormMessages.statusFailed)
+    }
+
+    if (errCode in messages) return messages[errCode]
+    return messages.FAILED
+  }
+
   selectField() {
     const { intl, formField } = this.props
     const languages = this.getLanguages()
@@ -860,19 +928,80 @@ class CustomFieldToolsComp extends React.Component<
           &nbsp;
           <FileSelectLink
             id="upload-data-source"
-            accept="*/*"
-            handleFileChange={async (file: File) => {
-              const encodedFile = await getBase64String(file)
-              console.log('File: ', file)
-              console.log('Encoded: ', (encodedFile as string).split(',')[1])
-            }}
+            accept=".csv"
+            handleFileChange={this.onFileChangeHandler.bind(this)}
             title={intl.formatMessage(buttonMessages.upload)}
           />
         </Text>
 
+        {this.CSVUploadModal()}
+
         <CSelect value="" onChange={() => {}} options={[]} />
       </>
     )
+  }
+
+  async onFileChangeHandler(file: File) {
+    const { intl } = this.props
+    try {
+      const encodedFile = await getBase64String(file)
+      const base64Data = (encodedFile as string).split(',')[1]
+      const fileName = file.name
+
+      this.setState({
+        showCSVUploadingModal: true,
+        CSVUploadStatuses: [
+          {
+            message: intl.formatMessage(
+              customFieldFormMessages.statusValidating
+            ),
+            statusType: STATUS_TYPES.INPROGRESS
+          }
+        ]
+      })
+      const res = await client.mutate({
+        mutation: CREATE_FORM_DATA_SET,
+        variables: { formDataset: { fileName, base64Data } }
+      })
+      console.log(res)
+      this.setState({
+        CSVUploaderModalActions: [],
+        CSVUploadStatuses: [
+          {
+            message: intl.formatMessage(
+              customFieldFormMessages.statusValidated
+            ),
+            statusType: STATUS_TYPES.COMPLETED
+          },
+          {
+            message: intl.formatMessage(
+              customFieldFormMessages.statusAppliedToCustomSelect
+            ),
+            statusType: STATUS_TYPES.COMPLETED
+          }
+        ]
+      })
+    } catch (ex) {
+      this.setState({
+        CSVUploadStatuses: [
+          {
+            message: this.showErrorMessage(ex.message),
+            statusType: STATUS_TYPES.ERROR
+          }
+        ],
+        CSVUploaderModalActions: [
+          <Button onClick={this.closeCSVUploadModal.bind(this)} type="tertiary">
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <CFileSelectLink
+            id="upload-data-source"
+            accept=".csv"
+            handleFileChange={this.onFileChangeHandler.bind(this)}
+            title={intl.formatMessage(buttonMessages.upload)}
+          />
+        ]
+      })
+    }
   }
 
   saveButton() {
@@ -906,6 +1035,45 @@ class CustomFieldToolsComp extends React.Component<
           </ListColumn>
         </ListRow>
       </ListContainer>
+    )
+  }
+
+  closeCSVUploadModal() {
+    this.setState({ showCSVUploadingModal: false })
+  }
+
+  CSVUploadModal() {
+    const { intl } = this.props
+    return (
+      <ResponsiveModal
+        title={intl.formatMessage(customFieldFormMessages.validatingCSVFile)}
+        handleClose={this.closeCSVUploadModal.bind(this)}
+        show={this.state.showCSVUploadingModal}
+        actions={this.state.CSVUploaderModalActions}
+      >
+        <>
+          {intl.formatMessage(
+            customFieldFormMessages.validatingCSVFilesValidatingDescription
+          )}
+          <br />
+          <br />
+
+          {this.state.CSVUploadStatuses.map((status, key) => {
+            return (
+              <>
+                <Alert
+                  key={key}
+                  onActionClick={() => {}}
+                  type={status.statusType}
+                >
+                  {status.message}
+                </Alert>
+                <br />
+              </>
+            )
+          })}
+        </>
+      </ResponsiveModal>
     )
   }
 

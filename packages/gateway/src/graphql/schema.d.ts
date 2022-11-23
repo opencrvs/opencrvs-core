@@ -2785,7 +2785,7 @@ export interface MutationToDeleteFormDraftResolver<
 }
 
 export interface MutationToCreateFormDatasetArgs {
-  formDraft: GQLFormDatasetInput
+  formDataset: GQLFormDatasetInput
 }
 export interface MutationToCreateFormDatasetResolver<
   TParent = any,

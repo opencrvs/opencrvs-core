@@ -11,6 +11,7 @@
  */
 import { gql } from '@apollo/client'
 import { FORM_DRAFT_FIELDS } from '@client/forms/configuration/formDrafts/queries'
+import { client } from '@client/utils/apolloClient'
 
 export const CHANGE_FORM_DRAFT_STATUS = gql`
   ${FORM_DRAFT_FIELDS}
@@ -38,6 +39,31 @@ export const CREATE_FORM_DRAFT = gql`
       formDraft: { event: $event, comment: $comment, questions: $questions }
     ) {
       ...FormDraftFields
+    }
+  }
+`
+
+export const CREATE_FORM_DATA_SET = gql`
+  mutation createFormDataset($formDataset: FormDatasetInput!) {
+    createFormDataset(formDataset: $formDataset) {
+      status
+      msg
+      data {
+        options {
+          value
+          label {
+            lang
+            descriptor {
+              id
+              defaultMessage
+            }
+          }
+        }
+        fileName
+        createdBy
+        createdAt
+        _id
+      }
     }
   }
 `

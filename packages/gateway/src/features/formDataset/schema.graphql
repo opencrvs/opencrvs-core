@@ -38,5 +38,5 @@ type FormDatasetResponse {
 }
 
 type Mutation {
-  createFormDataset(formDraft: FormDatasetInput!): FormDatasetResponse
+  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
 }
