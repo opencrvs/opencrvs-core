@@ -1580,8 +1580,7 @@ export enum RegAction {
   Downloaded = 'DOWNLOADED',
   Reinstated = 'REINSTATED',
   RequestedCorrection = 'REQUESTED_CORRECTION',
-  Unassigned = 'UNASSIGNED',
-  Certified = 'CERTIFIED'
+  Unassigned = 'UNASSIGNED'
 }
 
 export enum RegStatus {
