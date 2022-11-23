@@ -31,7 +31,8 @@ import {
   goToPerformanceView,
   goToTeamView,
   goToFormConfigHome,
-  goToApplicationConfig
+  goToApplicationConfig,
+  goToAdvancedSearchResult
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -56,6 +57,10 @@ import {
 } from '@client/SubmissionController'
 import styled from '@client/styledComponents'
 import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import { omit } from 'lodash'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -190,11 +195,13 @@ interface IDispatchProps {
   goToCertificateConfigAction: typeof goToCertificateConfig
   goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
+  goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
+  setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
 interface IStateProps {
@@ -258,6 +265,7 @@ export const NavigationView = (props: IFullProps) => {
     goToCertificateConfigAction,
     goToFormConfigAction,
     goToApplicationConfigAction,
+    goToAdvancedSearchResultAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
@@ -266,6 +274,7 @@ export const NavigationView = (props: IFullProps) => {
     userInfo,
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
+    setAdvancedSearchParam,
     className
   } = props
   const tabId = deselectAllTabs
@@ -648,6 +657,33 @@ export const NavigationView = (props: IFullProps) => {
             )}
         </>
       )}
+
+      {userDetails?.searches && userDetails?.searches.length > 0 ? (
+        userDetails?.searches.map((bookmarkResult, index) => {
+          return (
+            <NavigationItem
+              icon={() => (
+                <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
+              )}
+              id={`bookmarked_advanced_search_${index}`}
+              label={bookmarkResult.name}
+              onClick={() => {
+                const filteredParam = omit(
+                  bookmarkResult.parameters,
+                  '__typename'
+                ) as IAdvancedSearchParamState
+                setAdvancedSearchParam({
+                  ...filteredParam,
+                  searchId: bookmarkResult.searchId
+                })
+                goToAdvancedSearchResultAction()
+              }}
+            />
+          )
+        })
+      ) : (
+        <></>
+      )}
     </LeftNavigation>
   )
 }
@@ -700,11 +736,13 @@ export const Navigation = connect<
   goToCertificateConfigAction: goToCertificateConfig,
   goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
+  goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
   goToSettings,
-  updateRegistrarWorkqueue
+  updateRegistrarWorkqueue,
+  setAdvancedSearchParam
 })(injectIntl(withRouter(NavigationView)))
 
 /** @deprecated since the introduction of `<Frame>` */
