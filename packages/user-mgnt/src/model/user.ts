@@ -87,6 +87,7 @@ export interface ISearch {
     declarationLocationId?: string
     declarationJurisdictionId?: string
     eventLocationId?: string
+    eventCountry?: string
     eventLocationLevel1?: string
     eventLocationLevel2?: string
     eventLocationLevel3?: string
@@ -236,6 +237,7 @@ const AdvanceSearchParameters = new Schema(
     dateOfRegistrationEnd: { type: String },
     declarationLocationId: { type: String },
     declarationJurisdictionId: { type: String },
+    eventCountry: { type: String },
     eventLocationId: { type: String },
     eventLocationLevel1: { type: String },
     eventLocationLevel2: { type: String },

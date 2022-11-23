@@ -182,6 +182,7 @@ export const createSearchrequestSchema = Joi.object({
     dateOfRegistrationEnd: Joi.string(),
     declarationLocationId: Joi.string(),
     declarationJurisdictionId: Joi.string(),
+    eventCountry: Joi.string(),
     eventLocationId: Joi.string(),
     eventLocationLevel1: Joi.string(),
     eventLocationLevel2: Joi.string(),

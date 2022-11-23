@@ -33,6 +33,7 @@ import styled from '@client/styledComponents'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { omitBy } from 'lodash'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 export const Message = styled.div`
   margin-bottom: 16px;
@@ -60,10 +61,10 @@ export function BookmarkAdvancedSearchModal({
   const userDetails = useSelector(getUserDetails)
   const { saved, error, named, searchId, ...advancedSearchParams } =
     useSelector(getPartialState)
-  //remove null properties
+  //remove null and empty properties
   const filteredAdvancedSearchParams = omitBy(
     advancedSearchParams,
-    (v) => v === null
+    (properties) => properties === null || properties === EMPTY_STRING
   ) as AdvancedSearchParametersInput
   const [queryName, setQueryName] = React.useState('')
   const onChangeQueryName = (event: React.ChangeEvent<HTMLInputElement>) => {
