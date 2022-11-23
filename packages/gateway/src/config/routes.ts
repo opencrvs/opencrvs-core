@@ -15,6 +15,13 @@ import healthCheckHandler, {
   querySchema as healthCheckQuerySchema,
   responseSchema as healthCheckResponseSchema
 } from '@gateway/features/healthCheck/handler'
+import {
+  createLocationHandler,
+  requestSchema,
+  updateLocationHandler,
+  updateSchema,
+  fetchLocationHandler
+} from '@gateway/features/restLocation/locationHandler'
 
 export const getRoutes = () => {
   const routes = [
@@ -24,9 +31,6 @@ export const getRoutes = () => {
       path: '/tokenTest',
       handler: (request: any, h: any) => {
         return 'success'
-      },
-      config: {
-        tags: ['api']
       }
     },
     // health check endpoint for all services
@@ -35,7 +39,6 @@ export const getRoutes = () => {
       path: '/ping',
       handler: healthCheckHandler,
       config: {
-        tags: ['api'],
         auth: false,
         description: 'Checks the health of all services.',
         notes: 'Pass the service as a query param: service',
@@ -44,6 +47,59 @@ export const getRoutes = () => {
         },
         response: {
           schema: healthCheckResponseSchema
+        }
+      }
+    },
+    // get all locations
+    {
+      method: 'GET',
+      path: '/location',
+      handler: fetchLocationHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description: 'Get all locations'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/location/{locationId}',
+      handler: fetchLocationHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description: 'Get a single location'
+      }
+    },
+    // create Location/Facility
+    {
+      method: 'POST',
+      path: '/location',
+      handler: createLocationHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: ['natlsysadmin']
+        },
+        description: 'Create a location',
+        validate: {
+          payload: requestSchema
+        }
+      }
+    },
+    // update Location/Facility
+    {
+      method: 'PUT',
+      path: '/location/{locationId}',
+      handler: updateLocationHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: ['natlsysadmin']
+        },
+        description: 'Update a location or facility',
+        validate: {
+          payload: updateSchema
         }
       }
     }

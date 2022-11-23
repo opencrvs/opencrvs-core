@@ -26,6 +26,7 @@ import {
   INFLUX_HOST,
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
+import * as database from '@metrics/config/database'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -79,6 +80,7 @@ export async function createServer() {
       .then(async () => {
         server.log('info', `InfluxDB started on ${INFLUX_HOST}:${INFLUX_PORT}`)
         await server.start()
+        await database.start()
         server.log('info', `Metrics server started on ${HOST}:${PORT}`)
       })
       .catch((err: Error) => {
@@ -89,6 +91,7 @@ export async function createServer() {
 
   async function stop() {
     await server.stop()
+    await database.stop()
     server.log('info', 'Metrics server stopped')
   }
 
