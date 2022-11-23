@@ -300,7 +300,7 @@ export function SystemList() {
             {refreshTokenLoading ? (
               <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
             ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
-              <Text variant="reg16" element="p">
+              <Text variant="reg16" element="span">
                 {refreshTokenData.refreshSystemSecret?.clientSecret}
               </Text>
             ) : (
