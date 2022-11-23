@@ -14,7 +14,6 @@ import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
 
 const Wrapper = styled.li`
-  padding-top: 5px;
   padding-bottom: 5px;
   list-style-type: none;
   display: flex;
@@ -51,7 +50,7 @@ const Check = styled.span<{ size?: string }>`
         ? `height: 36px;
     width: 36px;`
         : ` height: 16px;
-    width: 16px;`}
+    width: 17.2px;`}
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
