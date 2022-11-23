@@ -424,8 +424,8 @@ export const ActionDetailsModalListTable = ({
       )}
 
       {/* Correction Requester Id Verified */}
-      {(actionDetailsData.action == RegAction.RequestedCorrection ||
-        actionDetailsData.regStatus == RegStatus.Certified) &&
+      {(actionDetailsData.action === RegAction.RequestedCorrection ||
+        actionDetailsData.regStatus === RegStatus.Certified) &&
         actionDetailsData.requester !== CorrectorRelationship.ANOTHER_AGENT &&
         actionDetailsData.requester !== CorrectorRelationship.REGISTRAR && (
           <Table
