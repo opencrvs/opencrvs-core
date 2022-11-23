@@ -58,6 +58,64 @@ export const FETCH_USER = gql`
         type
         data
       }
+      searches {
+        parameters {
+          event
+          name
+          registrationStatuses
+          dateOfEvent
+          dateOfEventStart
+          dateOfEventEnd
+          contactNumber
+          nationalId
+          registrationNumber
+          trackingId
+          dateOfRegistration
+          dateOfRegistrationStart
+          dateOfRegistrationEnd
+          declarationLocationId
+          declarationJurisdictionId
+          eventLocationId
+          eventCountry
+          eventLocationLevel1
+          eventLocationLevel2
+          eventLocationLevel3
+          eventLocationLevel4
+          eventLocationLevel5
+          childFirstNames
+          childLastName
+          childDoB
+          childDoBStart
+          childDoBEnd
+          childGender
+          deceasedFirstNames
+          deceasedFamilyName
+          deceasedGender
+          deceasedDoB
+          deceasedDoBStart
+          deceasedDoBEnd
+          deceasedIdentifier
+          motherFirstNames
+          motherFamilyName
+          motherDoB
+          motherDoBStart
+          motherDoBEnd
+          motherIdentifier
+          fatherFirstNames
+          fatherFamilyName
+          fatherDoB
+          fatherDoBStart
+          fatherDoBEnd
+          fatherIdentifier
+          informantFirstNames
+          informantFamilyName
+          informantDoB
+          informantDoBStart
+          informantDoBEnd
+          informantIdentifier
+          compositionType
+        }
+      }
     }
   }
 `
