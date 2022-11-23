@@ -46,6 +46,7 @@ import {
   FHIR_URL,
   SEARCH_URL,
   METRICS_URL,
+  HEARTH_URL,
   DOCUMENTS_URL
 } from '@gateway/constants'
 import { IAuthHeader } from '@gateway/common-types'
@@ -1044,6 +1045,52 @@ export const fetchFHIR = <T = any>(
     })
     .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
+    })
+}
+
+export const fetchFromHearth = <T = any>(
+  suffix: string,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  return fetch(`${HEARTH_URL}${suffix}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    },
+    body
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`FHIR with Hearth request failed: ${error.message}`)
+      )
+    })
+}
+
+export const sendToFhir = (
+  doc: fhir.Location,
+  suffix: string,
+  method: string,
+  token: string
+) => {
+  return fetch(`${FHIR_URL}${suffix}`, {
+    method,
+    body: JSON.stringify(doc),
+    headers: {
+      'Content-Type': 'application/fhir+json',
+      Authorization: `${token}`
+    }
+  })
+    .then((response) => {
+      return response
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`FHIR ${method} failed: ${error.message}`)
+      )
     })
 }
 
