@@ -74,6 +74,7 @@ type Query {
     skip: Int!
     size: Int!
   ): MixedTotalMetricsResult
+  getVSExports: TotalVSExport
   getTotalPayments(
     timeStart: String!
     timeEnd: String!
@@ -430,6 +431,10 @@ union MixedTotalMetricsResult =
     TotalMetricsByRegistrar
   | TotalMetricsByLocation
   | TotalMetricsByTime
+
+type TotalVSExport {
+  results: [VSExport!]
+}
 
 type PaymentMetric {
   total: Float!
@@ -948,6 +953,14 @@ type TotalMetricsByLocation {
 type TotalMetricsByTime {
   results: [EventMetricsByTime!]!
   total: Int
+}
+
+type VSExport {
+  event: String!
+  year: Int!
+  fileSize: String!
+  url: String!
+  createdOn: String!
 }
 
 union UserAuditLogResultItem =

@@ -58,6 +58,7 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import VSExport from './views/SysAdmin/Performance/Vsexports/VSExport'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { UserAudit } from '@client/views/UserAudit/UserAudit'
@@ -349,6 +350,15 @@ export class App extends React.Component<IAppProps> {
                                             ]}
                                             path={routes.PERFORMANCE_HOME}
                                             component={PerformanceHome}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.VS_EXPORTS}
+                                            component={VSExport}
                                           />
                                           <ProtectedRoute
                                             exact

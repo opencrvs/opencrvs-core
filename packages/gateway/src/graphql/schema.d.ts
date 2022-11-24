@@ -35,6 +35,7 @@ export interface GQLQuery {
   verifyPasswordById?: GQLVerifyPasswordResult
   getTotalMetrics?: GQLTotalMetricsResult
   getRegistrationsListByFilter?: GQLMixedTotalMetricsResult
+  getVSExports?: GQLTotalVSExport
   getTotalPayments?: Array<GQLPaymentMetric>
   getTotalCertifications?: Array<GQLCertificationMetric>
   getTotalCorrections?: Array<GQLCorrectionMetric>
@@ -283,6 +284,10 @@ export interface GQLMixedTotalMetricsResultNameMap {
   TotalMetricsByRegistrar: GQLTotalMetricsByRegistrar
   TotalMetricsByLocation: GQLTotalMetricsByLocation
   TotalMetricsByTime: GQLTotalMetricsByTime
+}
+
+export interface GQLTotalVSExport {
+  results?: Array<GQLVSExport>
 }
 
 export interface GQLPaymentMetric {
@@ -802,6 +807,14 @@ export interface GQLTotalMetricsByLocation {
 export interface GQLTotalMetricsByTime {
   results: Array<GQLEventMetricsByTime>
   total?: number
+}
+
+export interface GQLVSExport {
+  event: string
+  year: number
+  fileSize: string
+  url: string
+  createdOn: string
 }
 
 export type GQLUserAuditLogResultItem =
@@ -1509,6 +1522,7 @@ export interface GQLResolver {
     __resolveType: GQLMixedTotalMetricsResultTypeResolver
   }
 
+  TotalVSExport?: GQLTotalVSExportTypeResolver
   PaymentMetric?: GQLPaymentMetricTypeResolver
   CertificationMetric?: GQLCertificationMetricTypeResolver
   CorrectionMetric?: GQLCorrectionMetricTypeResolver
@@ -1548,6 +1562,7 @@ export interface GQLResolver {
   TotalMetricsByRegistrar?: GQLTotalMetricsByRegistrarTypeResolver
   TotalMetricsByLocation?: GQLTotalMetricsByLocationTypeResolver
   TotalMetricsByTime?: GQLTotalMetricsByTimeTypeResolver
+  VSExport?: GQLVSExportTypeResolver
   UserAuditLogResultItem?: {
     __resolveType: GQLUserAuditLogResultItemTypeResolver
   }
@@ -1612,6 +1627,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   getTotalMetrics?: QueryToGetTotalMetricsResolver<TParent>
   getRegistrationsListByFilter?: QueryToGetRegistrationsListByFilterResolver<TParent>
+  getVSExports?: QueryToGetVSExportsResolver<TParent>
   getTotalPayments?: QueryToGetTotalPaymentsResolver<TParent>
   getTotalCertifications?: QueryToGetTotalCertificationsResolver<TParent>
   getTotalCorrections?: QueryToGetTotalCorrectionsResolver<TParent>
@@ -1998,6 +2014,10 @@ export interface QueryToGetRegistrationsListByFilterResolver<
     context: any,
     info: GraphQLResolveInfo
   ): TResult
+}
+
+export interface QueryToGetVSExportsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface QueryToGetTotalPaymentsArgs {
@@ -3651,6 +3671,14 @@ export interface GQLMixedTotalMetricsResultTypeResolver<TParent = any> {
         | 'TotalMetricsByTime'
       >
 }
+export interface GQLTotalVSExportTypeResolver<TParent = any> {
+  results?: TotalVSExportToResultsResolver<TParent>
+}
+
+export interface TotalVSExportToResultsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLPaymentMetricTypeResolver<TParent = any> {
   total?: PaymentMetricToTotalResolver<TParent>
   paymentType?: PaymentMetricToPaymentTypeResolver<TParent>
@@ -5035,6 +5063,34 @@ export interface TotalMetricsByTimeToTotalResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLVSExportTypeResolver<TParent = any> {
+  event?: VSExportToEventResolver<TParent>
+  year?: VSExportToYearResolver<TParent>
+  fileSize?: VSExportToFileSizeResolver<TParent>
+  url?: VSExportToUrlResolver<TParent>
+  createdOn?: VSExportToCreatedOnResolver<TParent>
+}
+
+export interface VSExportToEventResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToYearResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToFileSizeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToUrlResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToCreatedOnResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

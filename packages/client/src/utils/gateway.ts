@@ -1324,6 +1324,7 @@ export type Query = {
   getUser?: Maybe<User>
   getUserAuditLog?: Maybe<UserAuditLogResultSet>
   getUserByMobile?: Maybe<User>
+  getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   listNotifications?: Maybe<Array<Maybe<Notification>>>
@@ -1858,6 +1859,11 @@ export type TotalMetricsResult = {
   results: Array<EventMetrics>
 }
 
+export type TotalVsExport = {
+  __typename?: 'TotalVSExport'
+  results?: Maybe<Array<VsExport>>
+}
+
 export type User = {
   __typename?: 'User'
   avatar?: Maybe<Avatar>
@@ -1929,6 +1935,15 @@ export type UserInput = {
   signature?: InputMaybe<SignatureInput>
   type?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
+}
+
+export type VsExport = {
+  __typename?: 'VSExport'
+  createdOn: Scalars['String']
+  event: Scalars['String']
+  fileSize: Scalars['String']
+  url: Scalars['String']
+  year: Scalars['Int']
 }
 
 export type VerifyPasswordResult = {
@@ -5645,6 +5660,23 @@ export type CreateFormDraftMutation = {
       comment: string
       updatedAt: any
     }>
+  } | null
+}
+
+export type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetVsExportsQuery = {
+  __typename?: 'Query'
+  getVSExports?: {
+    __typename?: 'TotalVSExport'
+    results?: Array<{
+      __typename?: 'VSExport'
+      event: string
+      year: number
+      url: string
+      createdOn: string
+      fileSize: string
+    }> | null
   } | null
 }
 
