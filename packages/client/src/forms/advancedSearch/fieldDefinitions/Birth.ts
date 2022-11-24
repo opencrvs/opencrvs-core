@@ -64,7 +64,7 @@ export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
             label: advancedSearchForm.recordStatusInReview
           },
           {
-            value: ' REJECTED',
+            value: 'REJECTED',
             label: advancedSearchForm.recordStatusRequireUpdate
           },
           {
@@ -72,7 +72,7 @@ export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
             label: advancedSearchForm.recordStatusRegistered
           },
           {
-            value: ' CERTIFIED',
+            value: 'CERTIFIED',
             label: advancedSearchForm.recordStatusCertified
           },
           {

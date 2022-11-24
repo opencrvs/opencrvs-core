@@ -55,7 +55,7 @@ import { Redirect, RouteComponentProps } from 'react-router'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { HOME, REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
-
+import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import {
   ColumnContentAlignment,
   COLUMNS,
@@ -63,7 +63,7 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
-import { SearchEventsQuery } from '@client/utils/gateway'
+import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { getPartialState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { Query } from '@client/components/Query'
 import { SEARCH_EVENTS } from '@client/search/queries'
@@ -86,6 +86,8 @@ import {
 } from '@client/views//SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
+import { isEqual } from 'lodash'
+import { IOfflineData } from '@client/offline/reducer'
 
 const SearchParamPillsContainer = styled.div`
   margin: 16px 0px;
@@ -93,7 +95,7 @@ const SearchParamPillsContainer = styled.div`
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
-  color: ${({ theme }) => theme.colors.primaryLight};
+  color: ${({ theme }) => theme.colors.primaryDark};
 `
 const BookMarkIconBody = styled.div`
   position: absolute;
@@ -125,7 +127,7 @@ type IFullProps = IViewHeadingProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
 
-const RecordAuditComp = (props: IFullProps) => {
+const AdvancedSearchResultComp = (props: IFullProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
@@ -459,6 +461,7 @@ const RecordAuditComp = (props: IFullProps) => {
 const SearchModifierComponent = () => {
   const dispatch = useDispatch()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
+  const offlineData = useSelector(getOfflineData)
   const intl = useIntl()
 
   const formatDateRangeLabel = (
@@ -477,6 +480,92 @@ const SearchModifierComponent = () => {
       rangeEnd: dateEndLocale
     })
   }
+
+  const getLabelForRegistrationStatus = (statusList: string[]) => {
+    const statusLabelMapping: Record<string, string[]> = {
+      ALL: [
+        RegStatus.Archived,
+        RegStatus.Certified,
+        RegStatus.DeclarationUpdated,
+        RegStatus.Declared,
+        RegStatus.InProgress,
+        RegStatus.Registered,
+        RegStatus.Rejected,
+        RegStatus.Validated,
+        RegStatus.WaitingValidation
+      ],
+      IN_REVIEW: [RegStatus.WaitingValidation, RegStatus.Validated],
+      ARCHIVED: [RegStatus.Archived],
+      CERTIFIED: [RegStatus.Certified],
+      DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
+      DECLARED: [RegStatus.Declared],
+      IN_PROGRESS: [RegStatus.InProgress],
+      REGISTERED: [RegStatus.Registered],
+      REJECTED: [RegStatus.Rejected],
+      VALIDATED: [RegStatus.Validated],
+      WAITING_VALIDATION: [RegStatus.WaitingValidation]
+    }
+
+    const statusType = Object.keys(statusLabelMapping).find((key, i) => {
+      if (isEqual(statusList, statusLabelMapping[key])) {
+        return true
+      }
+      return false
+    })
+
+    const forMattedStatusList = [
+      {
+        value: 'ALL',
+        label: intl.formatMessage(advancedSearchForm.recordStatusAny)
+      },
+      {
+        value: RegStatus.InProgress,
+        label: intl.formatMessage(advancedSearchForm.recordStatusInprogress)
+      },
+      {
+        value: 'IN_REVIEW',
+        label: intl.formatMessage(advancedSearchForm.recordStatusInReview)
+      },
+      {
+        value: RegStatus.Rejected,
+        label: intl.formatMessage(advancedSearchForm.recordStatusRequireUpdate)
+      },
+      {
+        value: RegStatus.Registered,
+        label: intl.formatMessage(advancedSearchForm.recordStatusRegistered)
+      },
+      {
+        value: RegStatus.Certified,
+        label: intl.formatMessage(advancedSearchForm.recordStatusCertified)
+      },
+      {
+        value: RegStatus.Archived,
+        label: intl.formatMessage(advancedSearchForm.recordStatusAchived)
+      }
+    ]
+
+    const formattedLabel =
+      forMattedStatusList.find((e, i) => statusType === e.value)?.label ||
+      statusList[0]
+
+    return formattedLabel
+  }
+
+  const getFormattedPlaceNameById = (
+    placeId: string,
+    offlineData: IOfflineData
+  ): string => {
+    const facilities = Object.values(offlineData.facilities)
+    const locations = Object.values(offlineData.locations)
+    const offices = Object.values(offlineData.offices)
+
+    return (
+      [...facilities, ...locations, ...offices].find(
+        (place) => place.id === placeId
+      )?.name || ''
+    )
+  }
+
   const getFormattedAdvancedSerachParams = (
     advancedSearchParamsState: IAdvancedSearchParamState
   ): Record<string, string> => {
@@ -497,7 +586,9 @@ const SearchModifierComponent = () => {
     ) {
       formattedMapOfParams[
         intl.formatMessage(advancedSearchPillMessages.registationStatus)
-      ] = advancedSearchParamsState.registrationStatuses.join(' , ')
+      ] = getLabelForRegistrationStatus(
+        advancedSearchParamsState.registrationStatuses
+      )
     }
     if (advancedSearchParamsState.trackingId) {
       formattedMapOfParams[
@@ -583,12 +674,18 @@ const SearchModifierComponent = () => {
     if (advancedSearchParamsState.declarationLocationId) {
       formattedMapOfParams[
         intl.formatMessage(advancedSearchPillMessages.regLocation)
-      ] = advancedSearchParamsState.declarationLocationId
+      ] = getFormattedPlaceNameById(
+        advancedSearchParamsState.declarationLocationId,
+        offlineData
+      )
     }
     if (advancedSearchParamsState.declarationJurisdictionId) {
       formattedMapOfParams[
         intl.formatMessage(advancedSearchPillMessages.regLocation)
-      ] = advancedSearchParamsState.declarationJurisdictionId
+      ] = getFormattedPlaceNameById(
+        advancedSearchParamsState.declarationJurisdictionId,
+        offlineData
+      )
     }
 
     if (advancedSearchParamsState.eventCountry) {
@@ -795,4 +892,4 @@ export const AdvancedSearchResult = connect(
     goToPrintCertificate: goToPrintCertificateAction,
     goToDeclarationRecordAudit
   }
-)(withTheme(RecordAuditComp))
+)(withTheme(AdvancedSearchResultComp))

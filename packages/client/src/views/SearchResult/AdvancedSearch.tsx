@@ -209,7 +209,7 @@ const transformLocalFormDataToReduxData = (
   ) {
     transformedStoreState.registrationStatuses =
       localState.registrationStatuses === 'IN_REVIEW'
-        ? [' WAITING_VALIDATION', 'VALIDATED']
+        ? [RegStatus.WaitingValidation, RegStatus.Validated]
         : localState.registrationStatuses === 'ALL'
         ? Object.values(RegStatus)
         : [localState.registrationStatuses]
@@ -722,6 +722,45 @@ const DeathSection = () => {
             'deceasedFamilyName',
             'deceasedGender',
             'placeOfDeath'
+          ])}
+        />
+      </Accordion>
+
+      <Accordion
+        name={advancedSearchDeathSections.eventSection.id}
+        label={intl.formatMessage(advancedSearchFormMessages.eventDetails)}
+        toggleButtonLabelWhenClosed={intl.formatMessage(
+          advancedSearchFormMessages.show
+        )}
+        toggleButtonLabelWhenOpen={intl.formatMessage(
+          advancedSearchFormMessages.hide
+        )}
+      >
+        <FormFieldGenerator
+          id={advancedSearchDeathSections.eventSection.id}
+          onChange={(values) => {
+            const nextVal =
+              values.eventLocationType === LocationType.HealthFacility
+                ? {
+                    ...values,
+                    eventCountry: '',
+                    eventLocationLevel1: '',
+                    eventLocationLevel2: ''
+                  }
+                : {
+                    ...values,
+                    eventLocationId: ''
+                  }
+            setFormState({ ...formState, ...nextVal })
+          }}
+          setAllFieldsDirty={false}
+          fields={advancedSearchDeathSections.eventSection.fields}
+          initialValues={pick(formState, [
+            'eventLocationType',
+            'eventLocationId',
+            'eventCountry',
+            'eventLocationLevel1',
+            'eventLocationLevel2'
           ])}
         />
       </Accordion>
