@@ -242,11 +242,6 @@ interface ToggleModal {
   selectedUser: User | null
 }
 
-interface ToggleModal {
-  modalVisible: boolean
-  selectedUser: User | null
-}
-
 export const Status = (statusProps: IStatusProps) => {
   const status = statusProps.status
   const intl = useIntl()
