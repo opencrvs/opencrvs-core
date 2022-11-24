@@ -88,12 +88,14 @@ const Input = styled.input`
     border-radius: 4px;
     border: 4px solid ${({ theme }) => theme.colors.grey600};
     box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
-  }
-  &:hover ~ ${Check}::after {
-    border: 4px solid ${({ theme }) => theme.colors.grey600};
-    box-shadow: ${({ theme, disabled }) => theme.colors.grey300} 0 0 0 8px;
-    border-radius: 4px;
   } */
+  &:hover ~ ${Check} {
+    &::after {
+      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme, disabled }) => theme.colors.grey300} 0 0 0 8px;
+      border-radius: 4px;
+    }
+  }
 `
 type Size = 'large' | 'small'
 
