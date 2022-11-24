@@ -19,7 +19,7 @@ interface ISaltedHash {
 
 export function generateRandomPassword(demoUser?: boolean) {
   if (!!demoUser) {
-    return 'test'
+    return 'Test12345'
   }
 
   const length = 6
