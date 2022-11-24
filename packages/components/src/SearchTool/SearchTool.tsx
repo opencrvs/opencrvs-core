@@ -15,7 +15,7 @@ import { Button } from '../buttons'
 import styled from 'styled-components'
 
 const SearchBox = styled.div`
-  background: ${({ theme }) => theme.colors.grey200};
+  background: ${({ theme }) => theme.colors.grey100};
   box-sizing: border-box;
   border-radius: 40px;
   width: 664px;
@@ -52,7 +52,8 @@ const Wrapper = styled.form`
   align-items: center;
   border-radius: 2px;
   display: flex;
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.bold14};
+  color: ${({ theme }) => theme.colors.primary};
   padding: 0px 10px;
   padding-right: 0;
   margin-bottom: 1px;
@@ -62,7 +63,7 @@ const SearchTextInput = styled.input`
   border: none;
   margin: 0px 4px;
   ${({ theme }) => theme.fonts.reg16};
-  background-color: ${({ theme }) => theme.colors.grey200};
+  background-color: ${({ theme }) => theme.colors.grey100};
   flex-grow: 1;
   &:focus {
     outline: none;
