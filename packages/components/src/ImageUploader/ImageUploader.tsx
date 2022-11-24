@@ -34,6 +34,7 @@ const Icon = styled.div`
 interface IImagePickerProps {
   id: string
   title: string
+  photoMode: boolean
   icon?: () => React.ReactNode
   handleFileChange: (file: File) => void
   onClick?: (event: React.MouseEvent<HTMLElement>) => void

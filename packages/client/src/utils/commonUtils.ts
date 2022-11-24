@@ -11,7 +11,7 @@
  */
 
 export function isMobileDevice() {
-  const IS_MOBILE = true
+  /*const IS_MOBILE = true
   const IS_DESKTOP = false
 
   if (
@@ -25,12 +25,12 @@ export function isMobileDevice() {
   ) {
     return IS_MOBILE
   }
-
   if (window.outerWidth < 1033) {
     return IS_MOBILE
   }
 
-  return IS_DESKTOP
+  return IS_DESKTOP*/
+  return true
 }
 
 export function isBase64FileString(str: string) {
