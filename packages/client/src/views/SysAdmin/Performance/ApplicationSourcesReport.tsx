@@ -129,7 +129,6 @@ export function ApplicationSourcesReport(
         <ListViewItemSimplified
           label={
             <PerformanceTitle>
-              {' '}
               {intl.formatMessage(
                 messages.performanceRegistrationAgentsApplicationsLabel
               )}
