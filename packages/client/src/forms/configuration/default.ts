@@ -125,7 +125,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'childFamilyName',
-                    operation: 'capitalizedNameToFieldTransformer',
+                    operation: 'upperCaseNameToFieldTransformer',
                     parameters: ['en', 'familyName']
                   },
                   mutation: {
@@ -162,7 +162,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'childFirstName',
-                    operation: 'capitalizedNameToFieldTransformer',
+                    operation: 'upperCaseNameToFieldTransformer',
                     parameters: ['en', 'firstNames']
                   },
                   mutation: {
@@ -480,7 +480,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'motherFamilyName',
-                    operation: 'capitalizedNameToFieldTransformer',
+                    operation: 'upperCaseNameToFieldTransformer',
                     parameters: ['en', 'familyName']
                   },
                   mutation: {
@@ -527,7 +527,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'motherFirstName',
-                    operation: 'capitalizedNameToFieldTransformer',
+                    operation: 'upperCaseNameToFieldTransformer',
                     parameters: ['en', 'firstNames']
                   },
                   mutation: {
@@ -1704,7 +1704,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'fatherFamilyName',
-                    operation: 'capitalizedNameToFieldTransformer',
+                    operation: 'upperCaseNameToFieldTransformer',
                     parameters: ['en', 'familyName']
                   },
                   mutation: {
@@ -1752,7 +1752,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'fatherFirstName',
-                    operation: 'capitalizedNameToFieldTransformer',
+                    operation: 'upperCaseNameToFieldTransformer',
                     parameters: ['en', 'firstNames']
                   },
                   mutation: {

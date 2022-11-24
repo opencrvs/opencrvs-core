@@ -51,6 +51,17 @@ export function RegistrationsReport({
   const shouldShowViewLink =
     selectedLocationId &&
     locations[selectedLocationId]?.jurisdictionType === 'DISTRICT'
+  const timeStartFromQuery = query.get('timeStart')
+  const timeEndFromQuery = query.get('timeEnd')
+  const timeStart =
+    typeof timeStartFromQuery === 'string'
+      ? new Date(timeStartFromQuery)
+      : undefined
+  const timeEnd =
+    typeof timeEndFromQuery === 'string'
+      ? new Date(timeEndFromQuery)
+      : undefined
+
   return (
     <ReportContainer>
       <ListViewItemSimplified
@@ -116,8 +127,8 @@ export function RegistrationsReport({
                   goToRegistrations(
                     selectedEvent,
                     selectedLocationId!,
-                    new Date(query.get('timeStart')!),
-                    new Date(query.get('timeEnd')!)
+                    timeStart,
+                    timeEnd
                   )
                 )
               }

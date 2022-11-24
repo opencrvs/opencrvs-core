@@ -556,9 +556,13 @@ const mapStateToProps = (
       userOfficeId &&
       registeringOfficeId &&
       userOfficeId !== registeringOfficeId
+    const supervisoryOffice = userDetails?.supervisoryArea
     collectorField.options = collectorField.options.map((opt) => ({
       ...opt,
-      disabled: opt.value === 'PRINT_IN_ADVANCE' && isDifferentOffice
+      disabled:
+        opt.value === 'PRINT_IN_ADVANCE' &&
+        isDifferentOffice &&
+        !supervisoryOffice
     }))
   }
   const fields = replaceInitialValues(
