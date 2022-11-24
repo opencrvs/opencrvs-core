@@ -54,10 +54,12 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
+    "@types/w3c-image-capture": "^1.0.7",
     "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
     "patch-package": "^6.1.2",
-    "postinstall-postinstall": "^2.0.0"
+    "postinstall-postinstall": "^2.0.0",
+    "webrtc-sdk": "^2.2.7"
   },
   "resolutions": {
     "//": "See https://github.com/facebook/create-react-app/issues/11773",
