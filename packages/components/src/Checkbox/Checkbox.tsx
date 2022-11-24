@@ -84,11 +84,22 @@ const Input = styled.input`
   opacity: 0;
   z-index: 2;
   cursor: pointer;
-  /* &:focus ~ ${Check}::after, &:active ~ ${Check}::after {
-    border-radius: 4px;
-    border: 4px solid ${({ theme }) => theme.colors.grey600};
-    box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
-  } */
+
+  &:active ~ ${Check} {
+    &::after {
+      border-radius: 4px;
+      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
+    }
+  }
+
+  &:focus ~ ${Check} {
+    &::after {
+      border-radius: 4px;
+      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
+    }
+  }
   &:hover ~ ${Check} {
     &::after {
       border: 4px solid ${({ theme }) => theme.colors.grey600};
