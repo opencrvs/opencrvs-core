@@ -16,6 +16,7 @@ import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
+import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import {
   Alert,
   CheckboxGroup,
@@ -100,12 +101,6 @@ export function SystemList() {
 
   const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
 
-  const [showPermission, setPermission] = React.useState(false)
-
-  const [systemToShowPermission, setSystemToShowPermission] = React.useState<
-    ISystem | undefined
-  >()
-
   const checkboxHandler = (items: string[], type: string) => {
     const val: WebHookSetting = {
       event: type,
@@ -128,6 +123,8 @@ export function SystemList() {
   }
 
   const {
+    systemToShowPermission,
+    setSystemToShowPermission,
     birthPermissions,
     setBirthPermissions,
     deathPermissions,
@@ -199,6 +196,7 @@ export function SystemList() {
     if (system.type === SystemType.Webhook) {
       menuItems.push({
         handler: () => {
+          console.log(system)
           setSystemToShowPermission(system)
         },
         label: 'Edit '
@@ -693,6 +691,8 @@ export function SystemList() {
           </Stack>
         )}
       </ResponsiveModal>
+
+      {systemToShowPermission && <WebhookModal />}
 
       {activateSystemData && (
         <Toast

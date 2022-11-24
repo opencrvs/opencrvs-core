@@ -402,7 +402,7 @@ export const resSystemSchema = Joi.object({
 })
 
 interface IUpdateSystemPayload {
-  client_id: string
+  clientId: string
   webhook: WebHookPayload[]
 }
 
@@ -411,26 +411,26 @@ export async function updateSystemClient(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const { client_id, webhook } = request.payload as IUpdateSystemPayload
+    const { clientId, webhook } = request.payload as IUpdateSystemPayload
 
     const existingSystem: ISystemModel | null = await System.findOne({
-      client_id
+      client_id: clientId
     })
 
     if (!existingSystem) {
       logger.error('No system client is found !')
       return h.response('No system client is found').code(404)
     }
-
     existingSystem.settings.webhook = webhook
-    await existingSystem.save()
+    const newSystem = await System.findOneAndUpdate(
+      { client_id: clientId },
+      existingSystem,
+      {
+        new: true
+      }
+    )
 
-    const response: IUpdateSystemPayload = {
-      client_id: existingSystem.client_id,
-      webhook: existingSystem.settings.webhook
-    }
-
-    return h.response(response).code(200)
+    return h.response(pickSystem(newSystem!)).code(200)
   } catch (err) {
     logger.error(err)
     return h.response(err.message).code(400)

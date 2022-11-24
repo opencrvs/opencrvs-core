@@ -63,6 +63,26 @@ export const refreshClientSecret = gql`
         shaSecret
         status
         type
+        type
+        type
+        type
+        type
+        type
+      }
+    }
+  }
+`
+export const updateSystemPermissions = gql`
+  mutation updatePermissionsSystem($setting: UpdatePermissionsInput!) {
+    updatePermissionsSystem(setting: $setting) {
+      clientSecret
+      system {
+        _id
+        clientId
+        name
+        shaSecret
+        status
+        type
       }
     }
   }

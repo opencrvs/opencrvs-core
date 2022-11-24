@@ -25,8 +25,10 @@ import {
   System,
   SystemType
 } from '@client/utils/gateway'
+import { ISystem } from '@client/views/SysAdmin/Config/Systems/Systems'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { updateSystemPermissions } from './mutations'
 import * as mutations from './mutations'
 
 export enum WebhookOption {
@@ -127,6 +129,9 @@ export function useSystems() {
   const [deathPermissions, setDeathPermissions] =
     React.useState<WebHookSetting>(initWebHook)
 
+  const [systemToShowPermission, setSystemToShowPermission] =
+    React.useState<ISystem>()
+
   const [
     activateSystemMutate,
     {
@@ -200,6 +205,20 @@ export function useSystems() {
     })
   }
 
+  const [
+    updateWebhookSystemMutate,
+    {
+      data: updateWebhookSystemData,
+      error: updateWebhookSystemError,
+      loading: updateWebhookSystemLoading,
+      reset: resetWebhookSystemSystemData
+    }
+  ] = useMutation(mutations.updateSystemPermissions, {
+    onCompleted: ({ registerSystem }) => {
+      if (registerSystem) dispatchNewSystem(registerSystem.system)
+    }
+  })
+
   const deactivateSystem = () => {
     if (!systemToToggleActivation) return
 
@@ -246,8 +265,14 @@ export function useSystems() {
         }
       })
     }
+  }
 
-    debugger
+  const updateWebhookPermissions = () => {
+    updateWebhookSystemMutate({
+      variables: {
+        clientId: systemToShowPermission?.clientId
+      }
+    })
   }
 
   const resetData = () => {
@@ -263,6 +288,9 @@ export function useSystems() {
     newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
 
   return {
+    updateWebhookPermissions,
+    systemToShowPermission,
+    setSystemToShowPermission,
     birthPermissions,
     setBirthPermissions,
     deathPermissions,

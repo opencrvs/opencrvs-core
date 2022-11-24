@@ -29,32 +29,21 @@ import { Button } from '@opencrvs/components/lib/Button'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 
-interface IWebhookModal {
-  onClose: () => void
-  clientId: string
-  system: ISystem
-}
-
-export function WebhookModal({ onClose, clientId, system }: IWebhookModal) {
+export function WebhookModal() {
   const intl = useIntl()
 
-  const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
+  const [selectedTab, setSelectedTab] = useState(WebhookOption.birth)
   const {
-    existingSystems,
-    setBirthPermissions,
+    updateWebhookPermissions,
+    systemToShowPermission,
+    setSystemToShowPermission,
+    birthPermissions,
     setDeathPermissions,
-    deathPermissions,
-    birthPermissions
+    setBirthPermissions,
+    deathPermissions
   } = useSystems()
 
-  const selectedSystem = existingSystems.find(
-    (system) => system.clientId === clientId
-  )!
-
-  const [permissions, setPermissions] = useState(
-    selectedSystem.webhookPermissions || []
-  )
-
+  console.log('systemToShowPermission', systemToShowPermission)
   const checkboxHandler = (items: string[], type: string) => {
     const val: WebHookSetting = {
       event: type,
@@ -81,15 +70,18 @@ export function WebhookModal({ onClose, clientId, system }: IWebhookModal) {
     <>
       <ResponsiveModal
         actions={[
-          <Button onClick={onClose} type="primary">
+          <Button onClick={() => updateWebhookPermissions()} type="primary">
             Submit
           </Button>,
-          <Button onClick={onClose} type="secondary">
+          <Button
+            onClick={() => setSystemToShowPermission(undefined)}
+            type="secondary"
+          >
             Cancel
           </Button>
         ]}
         show
-        handleClose={onClose}
+        handleClose={() => setSystemToShowPermission(undefined)}
         title="Webhook"
         autoHeight
         titleHeightAuto
@@ -156,7 +148,7 @@ export function WebhookModal({ onClose, clientId, system }: IWebhookModal) {
                 name="test-checkbox-group1"
                 value={
                   populatePermissions(
-                    system.webhook as WebHookSetting[],
+                    systemToShowPermission?.webhook as WebHookSetting[],
                     WebhookOption.birth
                   ) ?? []
                 }
@@ -201,7 +193,12 @@ export function WebhookModal({ onClose, clientId, system }: IWebhookModal) {
                   }
                 ]}
                 name="test-checkbox-group1"
-                value={deathPermissions.permissions ?? []}
+                value={
+                  populatePermissions(
+                    systemToShowPermission?.webhook as WebHookSetting[],
+                    WebhookOption.death
+                  ) ?? []
+                }
                 onChange={(newValue) => {
                   checkboxHandler(newValue, WebhookOption.death)
                 }}

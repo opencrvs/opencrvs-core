@@ -255,6 +255,7 @@ type Mutation {
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
   refreshSystemSecret(clientId: String!): SystemSecret
+  updatePermissionsSystem(setting: UpdatePermissionsInput!): SystemSecret
 }
 
 type Dummy {
@@ -697,6 +698,11 @@ input SystemInput {
   name: String!
   type: SystemType!
   settings: SystemSettings
+}
+
+input UpdatePermissionsInput {
+  clientId: String!
+  permissions: [WebhookInput!]
 }
 
 scalar Map
@@ -1191,6 +1197,11 @@ input SystemSettings {
   webhook: [WebhookInput]
 }
 
+input WebhookInput {
+  event: String!
+  permissions: [String]!
+}
+
 enum InformantType {
   INFORMANT
   MOTHER
@@ -1517,11 +1528,6 @@ enum CustomFieldType {
 input ConditionalInput {
   fieldId: String!
   regexp: String!
-}
-
-input WebhookInput {
-  event: String!
-  permissions: [String]!
 }
 
 type Payment {

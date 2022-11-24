@@ -93,6 +93,7 @@ export interface GQLMutation {
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
   refreshSystemSecret?: GQLSystemSecret
+  updatePermissionsSystem?: GQLSystemSecret
 }
 
 export interface GQLDummy {
@@ -546,6 +547,11 @@ export interface GQLSystemInput {
   name: string
   type: GQLSystemType
   settings?: GQLSystemSettings
+}
+
+export interface GQLUpdatePermissionsInput {
+  clientId: string
+  permissions?: Array<GQLWebhookInput>
 }
 
 export type GQLMap = any
@@ -1062,6 +1068,11 @@ export interface GQLSystemSettings {
   webhook?: Array<GQLWebhookInput | null>
 }
 
+export interface GQLWebhookInput {
+  event: string
+  permissions: Array<string | null>
+}
+
 export const enum GQLInformantType {
   INFORMANT = 'INFORMANT',
   MOTHER = 'MOTHER',
@@ -1389,11 +1400,6 @@ export const enum GQLCustomFieldType {
 export interface GQLConditionalInput {
   fieldId: string
   regexp: string
-}
-
-export interface GQLWebhookInput {
-  event: string
-  permissions: Array<string | null>
 }
 
 export interface GQLPayment {
@@ -2283,6 +2289,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>
   refreshSystemSecret?: MutationToRefreshSystemSecretResolver<TParent>
+  updatePermissionsSystem?: MutationToUpdatePermissionsSystemResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2877,6 +2884,21 @@ export interface MutationToRefreshSystemSecretResolver<
   (
     parent: TParent,
     args: MutationToRefreshSystemSecretArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpdatePermissionsSystemArgs {
+  setting: GQLUpdatePermissionsInput
+}
+export interface MutationToUpdatePermissionsSystemResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToUpdatePermissionsSystemArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
