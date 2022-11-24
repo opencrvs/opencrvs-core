@@ -128,8 +128,7 @@ interface IMatchParams {
   searchType: string
 }
 
-type IFullProps = IViewHeadingProps &
-  ISearchInputProps &
+type IFullProps = ISearchInputProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
 
@@ -886,7 +885,7 @@ const SearchModifierComponent = () => {
             dispatch(goToAdvancedSearch())
           }}
         >
-          Edit
+          {intl.formatMessage(buttonMessages.edit)}
         </Link>
       </SearchParamPillsContainer>
     </>

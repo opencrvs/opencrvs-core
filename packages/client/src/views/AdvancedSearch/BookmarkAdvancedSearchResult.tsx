@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { useIntl } from 'react-intl'
 import { ToggleIcon } from '@opencrvs/components/lib/ToggleIcon'
 import styled from '@client/styledComponents'
 import { useSelector } from 'react-redux'
@@ -56,11 +55,11 @@ export function BookmarkAdvancedSearchResult() {
   const [notificationStatus, setNotificationStatus] =
     React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const isOnline = useOnlineStatus()
-
   return (
     <>
       {isOnline && (
         <ToggleIcon
+          id={bookmark ? 'toggleIconFill' : 'toggleIconEmpty'}
           defaultChecked={bookmark}
           onClick={() => {
             if (bookmark) {
@@ -88,7 +87,7 @@ export function BookmarkAdvancedSearchResult() {
       />
       {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
         <Toast
-          id="success-save-bookmark-notification"
+          id={`${notificationStatus}-save-bookmark-notification`}
           type={
             notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
               ? 'loading'

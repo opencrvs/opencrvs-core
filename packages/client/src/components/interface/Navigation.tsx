@@ -62,6 +62,7 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { omit } from 'lodash'
 import { getPartialState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -671,7 +672,8 @@ export const NavigationView = (props: IFullProps) => {
               id={`bookmarked_advanced_search_${index}`}
               label={bookmarkResult.name}
               disabled={
-                advancedSearchParams.searchId === bookmarkResult.searchId
+                advancedSearchParams.searchId === bookmarkResult.searchId &&
+                props.location.pathname === ADVANCED_SEARCH_RESULT
               }
               onClick={() => {
                 const filteredParam = omit(
