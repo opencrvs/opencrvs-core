@@ -107,14 +107,19 @@ export async function userAuditHandler(
       }
       const subjectPractitionerId = user.practitionerId
       const practitionerId = systemAdminUser!.practitionerId
-      await postUserActionToMetrics(
-        action,
-        request.headers.authorization,
-        remoteAddress,
-        userAgent,
-        practitionerId,
-        subjectPractitionerId
-      )
+
+      try {
+        await postUserActionToMetrics(
+          action,
+          request.headers.authorization,
+          remoteAddress,
+          userAgent,
+          practitionerId,
+          subjectPractitionerId
+        )
+      } catch (err) {
+        logger.error(err)
+      }
     }
     try {
       await User.update({ _id: user._id }, user)

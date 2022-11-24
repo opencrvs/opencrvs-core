@@ -80,8 +80,11 @@ export function createCustomField({
       },
       query: {
         operation: 'questionnaireToCustomFieldTransformer'
+      },
+      template: {
+        fieldName: createCustomFieldHandlebarName(fieldId),
+        operation: 'questionnaireToCustomFieldTransformer'
       }
-      /* TODO: Add template mapping so that handlebars work */
     }
   }
   const { sectionId } = getIdentifiersFromFieldId(fieldId)
@@ -124,6 +127,20 @@ export function createCustomField({
     baseField.maxLength = maxLength
   }
   return baseField
+}
+
+export function createCustomFieldHandlebarName(fieldId: string) {
+  const fieldIdNameArray = fieldId.split('.').map((field, index) => {
+    if (index !== 0) {
+      return field.charAt(0).toUpperCase() + field.slice(1)
+    } else {
+      return field
+    }
+  })
+
+  return `${fieldIdNameArray[0]}${fieldIdNameArray[1]}${
+    fieldIdNameArray[fieldIdNameArray.length - 1]
+  }`
 }
 
 function escapeRegExp(value: string) {

@@ -125,7 +125,9 @@ export function Currency() {
         ]}
         handleClose={toggleModal}
       >
-        <Message>{intl.formatMessage(messages.govtLogoChangeMessage)}</Message>
+        <Message>
+          {intl.formatMessage(messages.applicationCurrencyChangeMessage)}
+        </Message>
         <Content>
           <Field>
             <InputField
