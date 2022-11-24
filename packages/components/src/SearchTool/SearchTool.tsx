@@ -22,16 +22,16 @@ const SearchBox = styled.div`
   height: 40px;
 
   &:hover {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    outline: 2px solid ${({ theme }) => theme.colors.grey600};
   }
 
   &:focus-within {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    outline: 2px solid ${({ theme }) => theme.colors.grey600};
     background: ${({ theme }) => theme.colors.white};
   }
 
   &:active {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    outline: 2px solid ${({ theme }) => theme.colors.grey600};
   }
 
   &:focus-within input {
