@@ -188,6 +188,157 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
   ]
 }
 
+export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
+  id: 'BirthEventDetails',
+  title: advancedSearchForm.registrationDetails,
+  fields: [
+    {
+      name: 'eventLocationType',
+      customisable: false,
+      type: 'SELECT_WITH_OPTIONS',
+      previewGroup: 'placeOfBirth',
+      ignoreFieldLabelOnErrorMessage: true,
+      label: formMessageDescriptors.placeOfBirth,
+      required: false,
+      initialValue: '',
+      validate: [],
+      placeholder: formMessageDescriptors.formSelectPlaceholder,
+      options: [
+        {
+          value: 'HEALTH_FACILITY',
+          label: formMessageDescriptors.healthInstitution
+        },
+        {
+          value: 'PRIVATE_HOME',
+          label: formMessageDescriptors.privateHome
+        }
+      ]
+    },
+    {
+      name: 'eventLocationId',
+      customisable: false,
+      type: 'LOCATION_SEARCH_INPUT',
+      label: formMessageDescriptors.healthInstitution,
+      required: false,
+      initialValue: '',
+      searchableResource: ['facilities'],
+      searchableType: 'HEALTH_FACILITY',
+      dynamicOptions: {
+        resource: 'facilities'
+      },
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '(values.eventLocationType!="HEALTH_FACILITY")'
+        }
+      ]
+    },
+    {
+      name: 'eventCountry',
+      customisable: false,
+      type: 'SELECT_WITH_OPTIONS',
+      label: {
+        defaultMessage: 'Country',
+        description: 'Title for the country select',
+        id: 'form.field.label.country'
+      },
+      required: false,
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
+      },
+      options: countries,
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '(values.eventLocationType!=="PRIVATE_HOME")'
+        }
+      ]
+    },
+    {
+      name: 'eventLocationLevel1',
+      customisable: false,
+      type: 'SELECT_WITH_DYNAMIC_OPTIONS',
+      label: {
+        defaultMessage: 'Province',
+        description: 'Title for the event location1 select',
+        id: 'form.field.label.state'
+      },
+      required: true,
+      initialValue: '',
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
+      },
+      dynamicOptions: {
+        resource: 'locations',
+        dependency: 'eventCountry',
+        initialValue: 'agentDefault'
+      },
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.eventCountry'
+        },
+        {
+          action: 'hide',
+          expression: `(values.eventLocationType!="PRIVATE_HOME")`
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.eventCountry)'
+        }
+      ]
+    },
+    {
+      name: 'eventLocationLevel2',
+      customisable: false,
+      type: 'SELECT_WITH_DYNAMIC_OPTIONS',
+      label: {
+        defaultMessage: 'District',
+        description: 'Title for the event location 2 select',
+        id: 'form.field.label.district'
+      },
+      required: true,
+      initialValue: '',
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
+      },
+      dynamicOptions: {
+        resource: 'locations',
+        dependency: 'eventLocationLevel1',
+        initialValue: 'agentDefault'
+      },
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.eventCountry'
+        },
+        {
+          action: 'hide',
+          expression: '!values.eventLocationLevel1'
+        },
+        {
+          action: 'hide',
+          expression: `(values.eventLocationType!="PRIVATE_HOME")`
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.eventCountry)'
+        }
+      ]
+    }
+  ]
+}
+
 export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
   id: 'DeathInformantDetails',
   title: advancedSearchForm.registrationDetails,
@@ -229,5 +380,6 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
 export const advancedSearchDeathSections = {
   registrationSection: advancedSearchDeathSectionRegistrationDetails,
   deceasedSection: advancedSearchDeathSectiondeceasedDetails,
+  eventSection: advancedSearchDeathSectionEventDetails,
   informantSection: advancedSearchDeathSectionInformantDetails
 }

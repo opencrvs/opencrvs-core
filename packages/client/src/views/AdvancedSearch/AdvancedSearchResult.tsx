@@ -34,6 +34,7 @@ import { Scope } from '@client/utils/authUtils'
 import {
   ADVANCED_SEARCH_TEXT,
   BRN_DRN_TEXT,
+  EMPTY_STRING,
   NAME_TEXT,
   NATIONAL_ID_TEXT,
   PHONE_TEXT,
@@ -55,6 +56,7 @@ import { Redirect, RouteComponentProps } from 'react-router'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { HOME, REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import {
   ColumnContentAlignment,
   COLUMNS,
@@ -62,8 +64,13 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
-import { SearchEventsQuery } from '@client/utils/gateway'
+import {
+  AdvancedSearchParametersInput,
+  RegStatus,
+  SearchEventsQuery
+} from '@client/utils/gateway'
 import { getPartialState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { Query } from '@client/components/Query'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import {
   IconWithName,
@@ -77,8 +84,6 @@ import { DownloadAction } from '@client/forms'
 import format, { formattedDuration } from '@client/utils/date-formatting'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
-import { Query } from '@client/components/Query'
-import { BookmarkAdvancedSearchResult } from './BookmarkAdvancedSearchResult'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import {
   isAdvancedSearchFormValid,
@@ -86,6 +91,9 @@ import {
 } from '@client/views//SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
+import { isEqual, omitBy } from 'lodash'
+import { IOfflineData } from '@client/offline/reducer'
+import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
 
 const SearchParamPillsContainer = styled.div`
   margin: 16px 0px;
@@ -93,9 +101,9 @@ const SearchParamPillsContainer = styled.div`
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
-  color: ${({ theme }) => theme.colors.primaryLight};
+  color: ${({ theme }) => theme.colors.primaryDark};
 `
-const BookmarkIconBody = styled.div`
+const BookMarkIconBody = styled.div`
   position: absolute;
   top: -20px;
   right: 10px;
@@ -125,13 +133,17 @@ type IFullProps = IViewHeadingProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
 
-const RecordAuditComp = (props: IFullProps) => {
+const AdvancedSearchResultComp = (props: IFullProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const intl = useIntl()
-  const offlineData = useSelector(getOfflineData)
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
-  const { named, saved, error, searchId, ...restAdvancedSearchParams } =
-    advancedSearchParamsState
+  const { saved, error, named, searchId, ...advancedSearchParams } =
+    useSelector(AdvancedSearchParamsState)
+  const filteredAdvancedSearchParams = omitBy(
+    advancedSearchParams,
+    (properties) => properties === null || properties === EMPTY_STRING
+  ) as AdvancedSearchParametersInput
+  const offlineData = useSelector(getOfflineData)
   const recordWindowWidth = () => {
     setWindowWidth(window.innerWidth)
   }
@@ -400,57 +412,60 @@ const RecordAuditComp = (props: IFullProps) => {
         constantsMessages.skipToMainContent
       )}
     >
-      <Query<SearchEventsQuery>
-        query={SEARCH_EVENTS}
-        variables={{
-          advancedSearchParameters: {
-            ...restAdvancedSearchParams
-          },
-          count: 10,
-          skip: 0
-        }}
-        fetchPolicy="cache-and-network"
-      >
-        {({ loading, error, data }) => {
-          const total = loading ? -1 : data?.searchEvents?.totalItems || 0
-          return (
-            <WQContentWrapper
-              title={'Search Result'}
-              isMobileSize={false}
-              noResultText={'No Results'}
-              noContent={total < 1 && !loading}
-              tabBarContent={<SearchModifierComponent />}
-              isShowPagination={true}
-              totalPages={2}
-              paginationId={1}
-            >
-              {loading ? (
-                <div id="advanced-search_loader">
-                  <LoadingIndicator loading={true} />
-                </div>
-              ) : error ? (
-                <ErrorText id="advanced-search-result-error-text">
-                  {intl.formatMessage(errorMessages.queryError)}
-                </ErrorText>
-              ) : (
-                data?.searchEvents &&
-                total > 0 && (
-                  <>
-                    <Workqueue
-                      content={transformSearchContent(data?.searchEvents)}
-                      columns={getContentTableColumns()}
-                      noResultText={intl.formatMessage(
-                        constantsMessages.noResults
-                      )}
-                      hideLastBorder={true}
-                    />
-                  </>
-                )
-              )}
-            </WQContentWrapper>
-          )
-        }}
-      </Query>
+      {isEnoughParams() && (
+        <Query<SearchEventsQuery>
+          query={SEARCH_EVENTS}
+          variables={{
+            advancedSearchParameters: {
+              ...filteredAdvancedSearchParams
+            },
+            count: 10,
+            skip: 0
+          }}
+          fetchPolicy="cache-and-network"
+        >
+          {({ loading, error, data }) => {
+            const total = loading ? -1 : data?.searchEvents?.totalItems || 0
+            return (
+              <WQContentWrapper
+                title={'Search Result'}
+                isMobileSize={false}
+                noResultText={'No Results'}
+                noContent={total < 1 && !loading}
+                tabBarContent={<SearchModifierComponent />}
+                isShowPagination={true}
+                totalPages={2}
+                paginationId={1}
+              >
+                {loading ? (
+                  <div id="advanced-search_loader">
+                    <LoadingIndicator loading={true} />
+                  </div>
+                ) : error ? (
+                  <ErrorText id="advanced-search-result-error-text">
+                    {intl.formatMessage(errorMessages.queryError)}
+                  </ErrorText>
+                ) : (
+                  data?.searchEvents &&
+                  total > 0 && (
+                    <>
+                      <Workqueue
+                        content={transformSearchContent(data?.searchEvents)}
+                        columns={getContentTableColumns()}
+                        noResultText={intl.formatMessage(
+                          constantsMessages.noResults
+                        )}
+                        hideLastBorder={true}
+                      />
+                    </>
+                  )
+                )}
+              </WQContentWrapper>
+            )
+          }}
+        </Query>
+      )}
+      {!isEnoughParams() && <Redirect to={HOME} />}
     </Frame>
   )
 }
@@ -458,6 +473,7 @@ const RecordAuditComp = (props: IFullProps) => {
 const SearchModifierComponent = () => {
   const dispatch = useDispatch()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
+  const offlineData = useSelector(getOfflineData)
   const intl = useIntl()
 
   const formatDateRangeLabel = (
@@ -476,6 +492,92 @@ const SearchModifierComponent = () => {
       rangeEnd: dateEndLocale
     })
   }
+
+  const getLabelForRegistrationStatus = (statusList: string[]) => {
+    const statusLabelMapping: Record<string, string[]> = {
+      ALL: [
+        RegStatus.Archived,
+        RegStatus.Certified,
+        RegStatus.DeclarationUpdated,
+        RegStatus.Declared,
+        RegStatus.InProgress,
+        RegStatus.Registered,
+        RegStatus.Rejected,
+        RegStatus.Validated,
+        RegStatus.WaitingValidation
+      ],
+      IN_REVIEW: [RegStatus.WaitingValidation, RegStatus.Validated],
+      ARCHIVED: [RegStatus.Archived],
+      CERTIFIED: [RegStatus.Certified],
+      DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
+      DECLARED: [RegStatus.Declared],
+      IN_PROGRESS: [RegStatus.InProgress],
+      REGISTERED: [RegStatus.Registered],
+      REJECTED: [RegStatus.Rejected],
+      VALIDATED: [RegStatus.Validated],
+      WAITING_VALIDATION: [RegStatus.WaitingValidation]
+    }
+
+    const statusType = Object.keys(statusLabelMapping).find((key, i) => {
+      if (isEqual(statusList, statusLabelMapping[key])) {
+        return true
+      }
+      return false
+    })
+
+    const forMattedStatusList = [
+      {
+        value: 'ALL',
+        label: intl.formatMessage(advancedSearchForm.recordStatusAny)
+      },
+      {
+        value: RegStatus.InProgress,
+        label: intl.formatMessage(advancedSearchForm.recordStatusInprogress)
+      },
+      {
+        value: 'IN_REVIEW',
+        label: intl.formatMessage(advancedSearchForm.recordStatusInReview)
+      },
+      {
+        value: RegStatus.Rejected,
+        label: intl.formatMessage(advancedSearchForm.recordStatusRequireUpdate)
+      },
+      {
+        value: RegStatus.Registered,
+        label: intl.formatMessage(advancedSearchForm.recordStatusRegistered)
+      },
+      {
+        value: RegStatus.Certified,
+        label: intl.formatMessage(advancedSearchForm.recordStatusCertified)
+      },
+      {
+        value: RegStatus.Archived,
+        label: intl.formatMessage(advancedSearchForm.recordStatusAchived)
+      }
+    ]
+
+    const formattedLabel =
+      forMattedStatusList.find((e, i) => statusType === e.value)?.label ||
+      statusList[0]
+
+    return formattedLabel
+  }
+
+  const getFormattedPlaceNameById = (
+    placeId: string,
+    offlineData: IOfflineData
+  ): string => {
+    const facilities = Object.values(offlineData.facilities)
+    const locations = Object.values(offlineData.locations)
+    const offices = Object.values(offlineData.offices)
+
+    return (
+      [...facilities, ...locations, ...offices].find(
+        (place) => place.id === placeId
+      )?.name || ''
+    )
+  }
+
   const getFormattedAdvancedSerachParams = (
     advancedSearchParamsState: IAdvancedSearchParamState
   ): Record<string, string> => {
@@ -496,7 +598,9 @@ const SearchModifierComponent = () => {
     ) {
       formattedMapOfParams[
         intl.formatMessage(advancedSearchPillMessages.registationStatus)
-      ] = advancedSearchParamsState.registrationStatuses.join(' , ')
+      ] = getLabelForRegistrationStatus(
+        advancedSearchParamsState.registrationStatuses
+      )
     }
     if (advancedSearchParamsState.trackingId) {
       formattedMapOfParams[
@@ -582,12 +686,18 @@ const SearchModifierComponent = () => {
     if (advancedSearchParamsState.declarationLocationId) {
       formattedMapOfParams[
         intl.formatMessage(advancedSearchPillMessages.regLocation)
-      ] = advancedSearchParamsState.declarationLocationId
+      ] = getFormattedPlaceNameById(
+        advancedSearchParamsState.declarationLocationId,
+        offlineData
+      )
     }
     if (advancedSearchParamsState.declarationJurisdictionId) {
       formattedMapOfParams[
         intl.formatMessage(advancedSearchPillMessages.regLocation)
-      ] = advancedSearchParamsState.declarationJurisdictionId
+      ] = getFormattedPlaceNameById(
+        advancedSearchParamsState.declarationJurisdictionId,
+        offlineData
+      )
     }
 
     if (advancedSearchParamsState.eventCountry) {
@@ -758,9 +868,9 @@ const SearchModifierComponent = () => {
   )
   return (
     <>
-      <BookmarkIconBody>
+      <BookMarkIconBody>
         <BookmarkAdvancedSearchResult />
-      </BookmarkIconBody>
+      </BookMarkIconBody>
       <SearchParamPillsContainer>
         {Object.keys(formattedMapOfParams).map((paramKey, i) => {
           return (
@@ -776,7 +886,7 @@ const SearchModifierComponent = () => {
             dispatch(goToAdvancedSearch())
           }}
         >
-          {intl.formatMessage(buttonMessages.edit)}
+          Edit
         </Link>
       </SearchParamPillsContainer>
     </>
@@ -796,4 +906,4 @@ export const AdvancedSearchResult = connect(
     goToPrintCertificate: goToPrintCertificateAction,
     goToDeclarationRecordAudit
   }
-)(withTheme(RecordAuditComp))
+)(withTheme(AdvancedSearchResultComp))

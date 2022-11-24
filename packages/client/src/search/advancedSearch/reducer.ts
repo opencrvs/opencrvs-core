@@ -73,7 +73,7 @@ export const advancedSearchInitialState: IAdvancedSearchParamState = {
   dateOfEventStart: '',
   dateOfEventEnd: '',
   registrationNumber: '',
-  eventCountry: window.config.COUNTRY.toUpperCase(),
+  eventCountry: '',
   trackingId: '',
   dateOfRegistration: '',
   dateOfRegistrationStart: '',
