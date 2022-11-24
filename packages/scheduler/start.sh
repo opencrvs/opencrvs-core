@@ -9,6 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export interface IAuthHeader {
-  Authorization: string
-}
+
+#!/bin/bash
+
+# Select the crontab file based on the environment
+CRON_FILE="VSExportCrontab"
+
+echo "Loading crontab file: $CRON_FILE"
+
+# Load the crontab file
+crontab $CRON_FILE
+
+# Start cron
+echo "Starting cron..."
+crond -f

@@ -69,7 +69,6 @@ export interface IBirthRegistrationTags {
 export interface IUserAuditTags {
   action: string | USER_ACTION
   practitionerId: string | undefined
-  subjectPractitionerId: string | undefined
 }
 
 export interface IDeathRegistrationTags {
@@ -189,7 +188,6 @@ export interface IUserAuditBody {
   practitionerId?: string
   action: USER_ACTION | string
   additionalData?: Record<string, any>
-  subjectPractitionerId?: string
 }
 export interface IPaymentPoints {
   measurement: string

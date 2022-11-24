@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export interface IAuthHeader {
-  Authorization: string
-}
+export const MINIO_HOST = process.env.MINIO_HOST || 'localhost'
+export const MINIO_PORT = process.env.MINIO_PORT || 3535
+export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'
+export const MINIO_BUCKET_REGION = process.env.MINIO_BUCKET_REGION || 'local'

@@ -31,9 +31,7 @@ export async function newAuditHandler(
     const userAgent =
       request.headers['x-real-user-agent'] || request.headers['user-agent']
     const payload = request.payload as IUserAuditBody
-
     let practitionerId
-    let subjectPractitionerId
     if (payload.practitionerId) {
       practitionerId = payload.practitionerId!
     } else {
@@ -43,9 +41,6 @@ export async function newAuditHandler(
       })
       practitionerId = user.practitionerId
     }
-    if (payload.subjectPractitionerId) {
-      subjectPractitionerId = payload.subjectPractitionerId
-    }
 
     points.push(
       generateAuditPoint(
@@ -53,8 +48,7 @@ export async function newAuditHandler(
         payload.action,
         remoteAddress,
         userAgent,
-        payload.additionalData,
-        subjectPractitionerId
+        payload.additionalData
       )
     )
     await writePoints(points)

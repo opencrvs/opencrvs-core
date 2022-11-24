@@ -9,6 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export interface IAuthHeader {
-  Authorization: string
-}
+import gql from 'graphql-tag'
+
+export const GET_TOTAL_VSEXPORT = gql`
+  query getVSExports {
+    getVSExports {
+      results {
+        event
+        year
+        url
+        createdOn
+        fileSize
+      }
+    }
+  }
+`

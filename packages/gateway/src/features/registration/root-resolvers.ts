@@ -17,7 +17,6 @@ import {
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  METRICS_URL,
   VIEWED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
@@ -29,11 +28,7 @@ import {
   getRegistrationIds,
   getDeclarationIds,
   getStatusFromTask,
-  setCertificateCollector,
-  getClientIdFromToken,
-  getCompositionIdFromCompositionOrTask,
-  getTask,
-  getTrackingId
+  setCertificateCollector
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -42,7 +37,7 @@ import {
   checkUserAssignment,
   taskBundleWithExtension
 } from '@gateway/features/registration/fhir-builders'
-import { getUser, hasScope, inScope } from '@gateway/features/user/utils'
+import { hasScope, inScope } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
@@ -58,7 +53,6 @@ import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments
 } from '@gateway/utils/validators'
-import { resolve } from 'url'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -410,15 +404,6 @@ export const resolvers: GQLResolver = {
         GQLRegStatus.ARCHIVED
       )
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
-
-      const userId = getClientIdFromToken(authHeader.Authorization)
-      const user = await getUser({ userId }, authHeader)
-      await postUserActionToMetrics(
-        'ARCHIVED',
-        user.practitionerId,
-        authHeader,
-        newTaskBundle
-      )
       // return the taskId
       return taskEntry.resource.id
     },
@@ -722,43 +707,4 @@ export async function markRecordAsDownloadedOrAssigned(
   await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
   // return the full composition
   return fetchFHIR(`/Composition/${id}`, authHeader)
-}
-
-export async function postUserActionToMetrics(
-  action: string,
-  practitionerId: string,
-  authHeader: IAuthHeader,
-  bundle: fhir.Bundle,
-  response?: fhir.Bundle
-) {
-  const url = resolve(METRICS_URL, '/audit/events')
-  let body: {}
-  if (action !== 'INCOMPLETE' && action !== 'SENT_FOR_APPROVAL') {
-    const compositionId = getCompositionIdFromCompositionOrTask(bundle)
-    const trackingId = getTrackingId(getTask(bundle)!)
-    body = {
-      action: action,
-      practitionerId: practitionerId,
-      additionalData: { compositionId: compositionId, trackingId: trackingId }
-    }
-  } else {
-    const additionalData = await getDeclarationIdsFromResponse(
-      response!,
-      authHeader
-    )
-    body = {
-      action: action,
-      practitionerId: practitionerId,
-      additionalData: additionalData
-    }
-  }
-  await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      'x-real-ip': authHeader['x-real-ip']!,
-      'x-real-user-agent': authHeader['x-real-user-agent']!
-    }
-  })
 }
