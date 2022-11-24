@@ -295,3 +295,48 @@ describe('reactivateSystem handler', () => {
     expect(res.statusCode).toBe(403)
   })
 })
+
+describe('refresh secret system user', () => {
+  let server: any
+
+  beforeEach(async () => {
+    mockingoose.resetAll()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  it('generate refresh secret key', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(System).toReturn(mockSystem, 'findOne')
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/refreshSystemSecret',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('return unauthorized error if no system user is found', async () => {
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/refreshSystemSecret',
+      payload: {
+        clientId: '12367'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
+  })
+})

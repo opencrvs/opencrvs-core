@@ -18,6 +18,8 @@ import {
   DeactivateSystemMutationVariables,
   ReactivateSystemMutation,
   ReactivateSystemMutationVariables,
+  RefreshSystemSecretMutation,
+  RefreshSystemSecretMutationVariables,
   RegisterSystemMutation,
   RegisterSystemMutationVariables,
   System,
@@ -176,6 +178,28 @@ export function useSystems() {
     }
   )
 
+  const [
+    clientRefreshTokenMutate,
+    {
+      data: refreshTokenData,
+      loading: refreshTokenLoading,
+      error: refreshTokenError,
+      reset: resetRefreshTokenData
+    }
+  ] = useMutation<
+    RefreshSystemSecretMutation,
+    RefreshSystemSecretMutationVariables
+  >(mutations.refreshClientSecret)
+
+  const clientRefreshToken = (clientId: string | undefined) => {
+    if (!clientId) return
+    clientRefreshTokenMutate({
+      variables: {
+        clientId
+      }
+    })
+  }
+
   const deactivateSystem = () => {
     if (!systemToToggleActivation) return
 
@@ -197,21 +221,33 @@ export function useSystems() {
   }
 
   const registerSystem = (birth: WebHookSetting, death: WebHookSetting) => {
-    if (newSystemType !== 'WEBHOOK') {
-      setDeathPermissions(initWebHook)
-      setBirthPermissions(initWebHook)
-    }
-    registerSystemMutate({
-      variables: {
-        system: {
-          type: newSystemType,
-          name: newClientName,
-          settings: {
-            webhook: [birth, death]
+    if (newSystemType === 'WEBHOOK') {
+      registerSystemMutate({
+        variables: {
+          system: {
+            type: newSystemType,
+            name: newClientName,
+            settings: {
+              dailyQuota: 0,
+              webhook: [birth, death]
+            }
           }
         }
-      }
-    })
+      })
+    } else {
+      setDeathPermissions(initWebHook)
+      setBirthPermissions(initWebHook)
+      registerSystemMutate({
+        variables: {
+          system: {
+            type: newSystemType,
+            name: newClientName
+          }
+        }
+      })
+    }
+
+    debugger
   }
 
   const resetData = () => {
@@ -220,6 +256,7 @@ export function useSystems() {
     resetRegisterSystemData()
     setDeathPermissions(initWebHook)
     setBirthPermissions(initWebHook)
+    resetRefreshTokenData()
   }
 
   const shouldWarnAboutNationalId =
@@ -251,6 +288,11 @@ export function useSystems() {
     setNewSystemType,
     onChangeClientName,
     clearNewSystemDraft,
+    clientRefreshToken,
+    refreshTokenData,
+    refreshTokenLoading,
+    refreshTokenError,
+    resetRefreshTokenData,
     resetData,
     shouldWarnAboutNationalId
   }

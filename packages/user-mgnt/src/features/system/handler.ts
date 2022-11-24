@@ -67,7 +67,7 @@ export async function registerSystem(
 ) {
   const { name, settings, type } = request.payload as IRegisterSystemPayload
   try {
-    if (type === types.WEBHOOK && !settings.webhook) {
+    if (type === types.WEBHOOK && !settings) {
       logger.error('Webhook payloads are required !')
       return h.response('Webhook payloads are required !').code(400)
     }
@@ -129,6 +129,33 @@ export async function registerSystem(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
+
+    if (type === types.WEBHOOK) {
+      const systemDetails = {
+        client_id,
+        name: name || systemAdminUser.username,
+        createdBy: userId,
+        username: systemAdminUser.username,
+        status: statuses.ACTIVE,
+        scope: systemScopes,
+        practitionerId,
+        secretHash: hash,
+        salt,
+        sha_secret,
+        settings,
+        type
+      }
+      const newSystem = await System.create(systemDetails)
+
+      return h
+        .response({
+          // NOTE! Client secret is visible for only this response and then forever gone
+          clientSecret,
+          system: pickSystem(newSystem)
+        })
+        .code(201)
+    }
+
     const systemDetails = {
       client_id,
       name: name || systemAdminUser.username,
@@ -140,7 +167,6 @@ export async function registerSystem(
       secretHash: hash,
       salt,
       sha_secret,
-      settings,
       type
     }
     const newSystem = await System.create(systemDetails)
@@ -370,7 +396,7 @@ export const SystemSchema = Joi.object({
   clientId: Joi.string()
 })
 
-export const resRegisterSystemSchema = Joi.object({
+export const resSystemSchema = Joi.object({
   clientSecret: Joi.string().uuid(),
   system: SystemSchema
 })
@@ -424,9 +450,53 @@ export const reqUpdateSystemSchema = Joi.object({
 
 export const reqRegisterSystemSchema = Joi.object({
   type: Joi.string().required(),
-  name: Joi.string(),
+  name: Joi.string().required(),
   settings: Joi.object({
     dailyQuota: Joi.number(),
     webhook: webHookSchema
-  })
+  }).optional()
+})
+
+export async function refreshSystemSecretHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const { clientId } = request.payload as SystemClientIdPayload
+
+    const systemUser: ISystemModel | null = await System.findOne({
+      client_id: clientId
+    })
+
+    if (!systemUser) {
+      logger.error(`No user details found by given clientId: ${clientId}`)
+      throw unauthorized()
+    }
+
+    const client_secret = uuid()
+    const { hash, salt } = generateSaltedHash(client_secret)
+
+    systemUser.salt = salt
+    systemUser.secretHash = hash
+
+    const newSystem = await System.findOneAndUpdate(
+      { client_id: clientId },
+      systemUser,
+      {
+        new: true
+      }
+    )
+    return h
+      .response({
+        clientSecret: client_secret,
+        system: pickSystem(newSystem!)
+      })
+      .code(200)
+  } catch (e) {
+    return h.response(e.message).code(400)
+  }
+}
+
+export const systemSecretRequestSchema = Joi.object({
+  clientId: Joi.string()
 })

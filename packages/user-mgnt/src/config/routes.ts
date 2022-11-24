@@ -52,7 +52,7 @@ import verifySecurityAnswer, {
 import {
   registerSystem,
   reqRegisterSystemSchema,
-  resRegisterSystemSchema,
+  // resSystemSchema,
   deactivateSystem,
   reactivateSystem,
   clientIdSchema,
@@ -63,9 +63,11 @@ import {
   getSystemResponseSchema,
   getSystemHandler,
   getAllSystemsHandler,
-  SystemSchema,
   updateSystemClient,
-  reqUpdateSystemSchema
+  reqUpdateSystemSchema,
+  // SystemSchema,
+  refreshSystemSecretHandler,
+  systemSecretRequestSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -494,10 +496,10 @@ export const getRoutes = () => {
         },
         validate: {
           payload: reqRegisterSystemSchema
-        },
-        response: {
-          schema: resRegisterSystemSchema
         }
+        /*  response: {
+            schema: resSystemSchema
+          }*/
       }
     },
     {
@@ -527,10 +529,10 @@ export const getRoutes = () => {
         },
         validate: {
           payload: clientIdSchema
-        },
-        response: {
-          schema: SystemSchema
         }
+        /*response: {
+          schema: SystemSchema
+        }*/
       }
     },
     {
@@ -545,10 +547,10 @@ export const getRoutes = () => {
         },
         validate: {
           payload: clientIdSchema
-        },
-        response: {
-          schema: SystemSchema
         }
+        /* response: {
+           schema: SystemSchema
+         }*/
       }
     },
     {
@@ -616,6 +618,25 @@ export const getRoutes = () => {
             role: Joi.string().required()
           })
         }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/refreshSystemSecret',
+      handler: refreshSystemSecretHandler,
+      config: {
+        tags: ['api'],
+        description: 'Refresh client secret ',
+        notes: 'Refresh client secret',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: systemSecretRequestSchema
+        }
+        /* response: {
+           schema: resSystemSchema
+         }*/
       }
     }
   ]

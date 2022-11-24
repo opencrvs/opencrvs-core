@@ -92,6 +92,7 @@ export interface GQLMutation {
   reactivateSystem?: GQLSystem
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
+  refreshSystemSecret?: GQLSystemSecret
 }
 
 export interface GQLDummy {
@@ -2281,6 +2282,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   reactivateSystem?: MutationToReactivateSystemResolver<TParent>
   deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>
+  refreshSystemSecret?: MutationToRefreshSystemSecretResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2860,6 +2862,21 @@ export interface MutationToRegisterSystemResolver<
   (
     parent: TParent,
     args: MutationToRegisterSystemArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRefreshSystemSecretArgs {
+  clientId: string
+}
+export interface MutationToRefreshSystemSecretResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRefreshSystemSecretArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
