@@ -340,7 +340,7 @@ export const transformReduxDataToLocalState = (
   )
   localState.event = eventType
   if (
-    reduxState.registrationStatuses !== undefined &&
+    reduxState.registrationStatuses &&
     reduxState.registrationStatuses.length !== 0
   ) {
     localState.registrationStatuses =

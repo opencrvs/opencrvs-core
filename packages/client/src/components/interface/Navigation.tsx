@@ -61,6 +61,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { omit } from 'lodash'
+import { getPartialState } from '@client/search/advancedSearch/advancedSearchSelectors'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -208,6 +209,7 @@ interface IStateProps {
   draftDeclarations: IDeclaration[]
   declarationsReadyToSend: IDeclaration[]
   userDetails: IUserDetails | null
+  advancedSearchParams: IAdvancedSearchParamState
   activeMenuItem: string
   workqueue: IWorkqueue
   offlineCountryConfiguration: IOfflineData
@@ -258,6 +260,7 @@ export const NavigationView = (props: IFullProps) => {
     intl,
     match,
     userDetails,
+    advancedSearchParams,
     deselectAllTabs,
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
@@ -667,6 +670,9 @@ export const NavigationView = (props: IFullProps) => {
               )}
               id={`bookmarked_advanced_search_${index}`}
               label={bookmarkResult.name}
+              disabled={
+                advancedSearchParams.searchId === bookmarkResult.searchId
+              }
               onClick={() => {
                 const filteredParam = omit(
                   bookmarkResult.parameters,
@@ -710,6 +716,7 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     workqueue: state.workqueueState.workqueue,
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
+    advancedSearchParams: getPartialState(state),
     activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
       : window.location.href.includes(WORKQUEUE_TABS.team)
