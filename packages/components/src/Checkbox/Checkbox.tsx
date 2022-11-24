@@ -12,9 +12,11 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
+import { Text } from '../Text'
 
 const Wrapper = styled.li`
-  padding-bottom: 5px;
+  padding-bottom: 10px;
+  padding-top: 10px;
   list-style-type: none;
   display: flex;
   align-items: center;
@@ -29,6 +31,7 @@ const Label = styled.label`
 
 const Check = styled.span<{ size?: string }>`
   display: inline-block;
+  border-radius: 4px;
   background: ${({ theme }) => theme.colors.copy};
   ${({ size }) =>
     size === 'large'
@@ -40,7 +43,6 @@ const Check = styled.span<{ size?: string }>`
   -webkit-transition: border 0.25s linear;
   position: relative;
   color: ${({ theme }) => theme.colors.copy};
-  z-index: 1;
   &::after {
     position: absolute;
     content: '';
@@ -82,15 +84,23 @@ const Input = styled.input`
   opacity: 0;
   z-index: 2;
   cursor: pointer;
-  &:focus ~ ${Check} {
+  /* &:focus ~ ${Check}::after, &:active ~ ${Check}::after {
+    border-radius: 4px;
+    border: 4px solid ${({ theme }) => theme.colors.grey600};
     box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
   }
+  &:hover ~ ${Check}::after {
+    border: 4px solid ${({ theme }) => theme.colors.grey600};
+    box-shadow: ${({ theme, disabled }) => theme.colors.grey300} 0 0 0 8px;
+    border-radius: 4px;
+  } */
 `
 type Size = 'large' | 'small'
 
 interface ICheckbox extends React.OptionHTMLAttributes<{}> {
   name: string
   label: string
+  hint?: string
   value: string
   selected: boolean
   size?: Size
@@ -104,27 +114,33 @@ export class Checkbox extends React.Component<ICheckbox> {
       id,
       selected,
       label,
+      hint,
       value,
       onChange,
       size = 'small'
     } = this.props
     return (
-      <Wrapper>
-        <Input
-          id={id}
-          role="checkbox"
-          checked={selected}
-          type="checkbox"
-          name={name}
-          value={value}
-          onChange={onChange}
-          size={size === 'large' ? 40 : 16}
-        />
-        <Check size={size}>
-          {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
-        </Check>
-        <Label htmlFor={id}>{label}</Label>
-      </Wrapper>
+      <>
+        <Text variant={'reg16'} element={'h2'}>
+          {hint}
+        </Text>
+        <Wrapper>
+          <Input
+            id={id}
+            role="checkbox"
+            checked={selected}
+            type="checkbox"
+            name={name}
+            value={value}
+            onChange={onChange}
+            size={size === 'large' ? 40 : 16}
+          />
+          <Check size={size}>
+            {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
+          </Check>
+          <Label htmlFor={id}>{label}</Label>
+        </Wrapper>
+      </>
     )
   }
 }

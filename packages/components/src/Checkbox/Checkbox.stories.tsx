@@ -34,6 +34,7 @@ Default.args = {
   name: 'Banana',
   label: 'Banana',
   value: 'banana',
+  hint: 'A fruit',
   selected: true
 }
 
