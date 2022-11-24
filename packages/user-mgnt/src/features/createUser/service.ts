@@ -330,6 +330,7 @@ export async function sendCredentialsNotification(
       authHeader
     )
   } catch (err) {
+    // tslint:disable-next-line:no-console
     console.log(err)
     logger.error(`Unable to send notification for error : ${err}`)
   }

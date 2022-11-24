@@ -628,11 +628,15 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
+              if (error) {
+                return (
+                  <>
+                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                  </>
+                )
+              }
               return (
                 <>
-                  {error && (
-                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                  )}
                   <ResponsiveModal
                     title={intl.formatMessage(constantsMessages.status)}
                     show={toggleStatus}
