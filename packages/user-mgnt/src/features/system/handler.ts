@@ -406,7 +406,7 @@ interface IUpdateSystemPayload {
   webhook: WebHookPayload[]
 }
 
-export async function updateSystemClient(
+export async function updatePermissions(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -444,7 +444,7 @@ const webHookSchema = Joi.array().items(
   })
 )
 export const reqUpdateSystemSchema = Joi.object({
-  client_id: Joi.string().required(),
+  clientId: Joi.string().required(),
   webhook: webHookSchema.required()
 })
 

@@ -73,8 +73,8 @@ export const refreshClientSecret = gql`
   }
 `
 export const updateSystemPermissions = gql`
-  mutation updatePermissionsSystem($setting: UpdatePermissionsInput!) {
-    updatePermissionsSystem(setting: $setting) {
+  mutation updatePermissions($setting: UpdatePermissionsInput!) {
+    updatePermissions(setting: $setting) {
       clientSecret
       system {
         _id

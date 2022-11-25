@@ -84,16 +84,10 @@ export function SystemList() {
 
   const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
 
-  const checkboxHandler = (items: string[], type: WebhookOption) => {
-    type === WebhookOption.birth
-      ? setBirthPermissions({
-          event: type,
-          permissions: items
-        })
-      : setDeathPermissions({
-          event: type,
-          permissions: items
-        })
+  const checkboxHandler = (permissions: string[], event: WebhookOption) => {
+    event === WebhookOption.birth
+      ? setBirthPermissions({ event, permissions })
+      : setDeathPermissions({ event, permissions })
   }
 
   const toggleModal = () => {
@@ -390,7 +384,7 @@ export function SystemList() {
                     shouldWarnAboutNationalId
                   }
                   onClick={() => {
-                    registerSystem(birthPermissions, deathPermissions)
+                    registerSystem()
                   }}
                   type="primary"
                 >

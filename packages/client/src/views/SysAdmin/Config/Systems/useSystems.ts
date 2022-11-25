@@ -197,20 +197,6 @@ export function useSystems() {
     })
   }
 
-  const [
-    updateWebhookSystemMutate,
-    {
-      data: updateWebhookSystemData,
-      error: updateWebhookSystemError,
-      loading: updateWebhookSystemLoading,
-      reset: resetWebhookSystemSystemData
-    }
-  ] = useMutation(mutations.updateSystemPermissions, {
-    onCompleted: ({ registerSystem }) => {
-      if (registerSystem) dispatchNewSystem(registerSystem.system)
-    }
-  })
-
   const deactivateSystem = () => {
     if (!systemToToggleActivation) return
 
@@ -231,7 +217,7 @@ export function useSystems() {
     })
   }
 
-  const registerSystem = (birth: WebHookSetting, death: WebHookSetting) => {
+  const registerSystem = () => {
     if (newSystemType === 'WEBHOOK') {
       registerSystemMutate({
         variables: {
@@ -240,14 +226,12 @@ export function useSystems() {
             name: newClientName,
             settings: {
               dailyQuota: 0,
-              webhook: [birth, death]
+              webhook: [birthPermissions, deathPermissions]
             }
           }
         }
       })
     } else {
-      setDeathPermissions(initWebHook)
-      setBirthPermissions(initWebHook)
       registerSystemMutate({
         variables: {
           system: {
@@ -257,14 +241,6 @@ export function useSystems() {
         }
       })
     }
-  }
-
-  const updateWebhookPermissions = () => {
-    updateWebhookSystemMutate({
-      variables: {
-        clientId: systemToShowPermission?.clientId
-      }
-    })
   }
 
   const resetData = () => {
@@ -280,7 +256,6 @@ export function useSystems() {
     newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
 
   return {
-    updateWebhookPermissions,
     systemToShowPermission,
     setSystemToShowPermission,
     birthPermissions,

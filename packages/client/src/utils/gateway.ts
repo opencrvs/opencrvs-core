@@ -969,6 +969,7 @@ export type Mutation = {
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
+  updatePermissions?: Maybe<SystemSecret>
   usernameSMSReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
@@ -1146,6 +1147,10 @@ export type MutationUpdateBirthRegistrationArgs = {
 export type MutationUpdateDeathRegistrationArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
+}
+
+export type MutationUpdatePermissionsArgs = {
+  setting: UpdatePermissionsInput
 }
 
 export type MutationUsernameSmsReminderArgs = {
@@ -1851,6 +1856,11 @@ export type TotalMetricsResult = {
 export type TotalVsExport = {
   __typename?: 'TotalVSExport'
   results?: Maybe<Array<VsExport>>
+}
+
+export type UpdatePermissionsInput = {
+  clientId: Scalars['String']
+  webhook: Array<WebhookInput>
 }
 
 export type User = {
@@ -5725,6 +5735,27 @@ export type RefreshSystemSecretMutationVariables = Exact<{
 export type RefreshSystemSecretMutation = {
   __typename?: 'Mutation'
   refreshSystemSecret?: {
+    __typename?: 'SystemSecret'
+    clientSecret: string
+    system: {
+      __typename?: 'System'
+      _id: string
+      clientId: string
+      name: string
+      shaSecret: string
+      status: SystemStatus
+      type: SystemType
+    }
+  } | null
+}
+
+export type UpdatePermissionsMutationVariables = Exact<{
+  setting: UpdatePermissionsInput
+}>
+
+export type UpdatePermissionsMutation = {
+  __typename?: 'Mutation'
+  updatePermissions?: {
     __typename?: 'SystemSecret'
     clientSecret: string
     system: {

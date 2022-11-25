@@ -10,13 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { useMutation } from '@apollo/client'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import {
+  UpdatePermissionsMutation,
+  UpdatePermissionsMutationVariables
+} from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
 import {
-  ISystem,
+  ISystemProps,
   WebhookOption,
   WebHookSetting
 } from '@client/views/SysAdmin/Config/Systems/model'
+import * as mutations from '@client/views/SysAdmin/Config/Systems/mutations'
 
 import { useSystems } from '@client/views/SysAdmin/Config/Systems/useSystems'
 import {
@@ -24,16 +31,12 @@ import {
   Divider,
   FormTabs,
   InputField,
-  ResponsiveModal
+  ResponsiveModal,
+  Toast
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
-
-interface ISystemProps {
-  cancel: () => void
-  system: ISystem
-}
 
 const populatePermissions = (webhooks: WebHookSetting[] = [], type: string) => {
   return webhooks.find((ite) => ite.event === type)!
@@ -41,7 +44,6 @@ const populatePermissions = (webhooks: WebHookSetting[] = [], type: string) => {
 
 export function WebhookModal({ cancel, system }: ISystemProps) {
   const intl = useIntl()
-  const { updateWebhookPermissions } = useSystems()
   const [selectedTab, setSelectedTab] = useState(WebhookOption.birth)
 
   const [birthPermissions, setBirthPermissions] = useState(
@@ -52,23 +54,64 @@ export function WebhookModal({ cancel, system }: ISystemProps) {
     populatePermissions(system.webhook, WebhookOption.death)
   )
 
-  const checkboxHandler = (items: string[], type: WebhookOption) => {
-    type === WebhookOption.birth
-      ? setBirthPermissions({
-          event: type,
-          permissions: items
-        })
-      : setDeathPermissions({
-          event: type,
-          permissions: items
-        })
+  const [
+    updateWebhookPermissions,
+    {
+      data: updateWebhookSystemData,
+      error: updateWebhookSystemError,
+      loading: updateWebhookSystemLoading,
+      reset: resetWebhookSystemSystemData
+    }
+  ] = useMutation<
+    UpdatePermissionsMutation,
+    UpdatePermissionsMutationVariables
+  >(mutations.updateSystemPermissions, {
+    onCompleted: ({ updatePermissions }) => {
+      //if (registerSystem) dispatchNewSystem(registerSystem.system)
+    }
+  })
+
+  const checkboxHandler = (permissions: string[], event: WebhookOption) => {
+    event === WebhookOption.birth
+      ? setBirthPermissions({ event, permissions })
+      : setDeathPermissions({ event, permissions })
+  }
+
+  const updateHandler = () => {
+    updateWebhookPermissions({
+      variables: {
+        setting: {
+          clientId: system.clientId,
+          webhook: [birthPermissions, deathPermissions]
+        }
+      }
+    })
+  }
+
+  if (updateWebhookSystemError) {
+    return (
+      <Toast
+        type="error"
+        id="toggleClientStatusToast"
+        onClose={() => {
+          resetWebhookSystemSystemData()
+          cancel()
+        }}
+      >
+        {intl.formatMessage(integrationMessages.error)}
+      </Toast>
+    )
   }
 
   return (
     <>
       <ResponsiveModal
         actions={[
-          <Button onClick={() => updateWebhookPermissions()} type="primary">
+          <Button
+            onClick={() => updateHandler()}
+            type="primary"
+            loading={updateWebhookSystemLoading}
+          >
             Submit
           </Button>,
           <Button onClick={cancel} type="secondary">
@@ -142,8 +185,8 @@ export function WebhookModal({ cancel, system }: ISystemProps) {
                 ]}
                 name="test-checkbox-group1"
                 value={birthPermissions && birthPermissions.permissions}
-                onChange={(newValue) => {
-                  checkboxHandler(newValue, WebhookOption.birth)
+                onChange={(permissions) => {
+                  checkboxHandler(permissions, WebhookOption.birth)
                 }}
               />
             </>
@@ -183,8 +226,8 @@ export function WebhookModal({ cancel, system }: ISystemProps) {
                 ]}
                 name="test-checkbox-group1"
                 value={deathPermissions && deathPermissions.permissions}
-                onChange={(newValue) => {
-                  checkboxHandler(newValue, WebhookOption.death)
+                onChange={(permissions) => {
+                  checkboxHandler(permissions, WebhookOption.death)
                 }}
               />
             </>

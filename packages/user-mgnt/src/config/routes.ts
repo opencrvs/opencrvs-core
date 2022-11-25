@@ -63,7 +63,7 @@ import {
   getSystemResponseSchema,
   getSystemHandler,
   getAllSystemsHandler,
-  updateSystemClient,
+  updatePermissions,
   reqUpdateSystemSchema,
   // SystemSchema,
   refreshSystemSecretHandler,
@@ -504,11 +504,11 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/updateSystem',
-      handler: updateSystemClient,
+      path: '/updatePermissions',
+      handler: updatePermissions,
       config: {
         tags: ['api'],
-        description: 'Creates a new system client',
+        description: 'Update system permissions',
         auth: {
           scope: [RouteScope.SYSADMIN]
         },

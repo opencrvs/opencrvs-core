@@ -104,6 +104,24 @@ export const resolvers: GQLResolver = {
       }
 
       return await res.json()
+    },
+    async updatePermissions(_, { setting }, authHeader) {
+      if (!hasScope(authHeader, 'sysadmin')) {
+        throw new Error('Only system user can update refresh client secret')
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}updatePermissions`, {
+        method: 'POST',
+        body: JSON.stringify(setting),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      if (res.status !== 200) {
+        throw new Error(`Something went wrong`)
+      }
+
+      return await res.json()
     }
   },
 

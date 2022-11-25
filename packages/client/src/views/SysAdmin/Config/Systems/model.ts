@@ -30,3 +30,8 @@ export interface ISystem {
   type: SystemType
   webhook?: WebHookSetting[]
 }
+
+export interface ISystemProps {
+  cancel: () => void
+  system: ISystem
+}
