@@ -9271,7 +9271,7 @@
             ],
             "type": {
               "kind": "OBJECT",
-              "name": "SystemSecret",
+              "name": "System",
               "ofType": null
             },
             "isDeprecated": false,

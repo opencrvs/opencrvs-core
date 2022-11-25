@@ -93,7 +93,7 @@ export interface GQLMutation {
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
   refreshSystemSecret?: GQLSystemSecret
-  updatePermissions?: GQLSystemSecret
+  updatePermissions?: GQLSystem
 }
 
 export interface GQLDummy {

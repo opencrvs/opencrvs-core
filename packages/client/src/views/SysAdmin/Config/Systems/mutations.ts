@@ -75,15 +75,14 @@ export const refreshClientSecret = gql`
 export const updateSystemPermissions = gql`
   mutation updatePermissions($setting: UpdatePermissionsInput!) {
     updatePermissions(setting: $setting) {
-      clientSecret
-      system {
-        _id
-        clientId
-        name
-        shaSecret
-        status
-        type
-      }
+      _id
+      clientId
+      name
+      shaSecret
+      status
+      type
+      webhookPermissions
     }
+  }
   }
 `

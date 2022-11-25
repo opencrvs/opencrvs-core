@@ -78,6 +78,14 @@ export function WebhookModal({ cancel, system }: ISystemProps) {
   }
 
   const updateHandler = () => {
+    const payload = {
+      setting: {
+        clientId: system.clientId,
+        webhook: [birthPermissions, deathPermissions]
+      }
+    }
+    console.log()
+    debugger
     updateWebhookPermissions({
       variables: {
         setting: {

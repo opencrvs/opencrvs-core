@@ -65,6 +65,7 @@ const BackButton = styled(CircleButton)`
   position: absolute;
   top: 30px;
   left: 20px;
+
   svg {
     path {
       stroke: ${({ theme }) => theme.colors.white};
