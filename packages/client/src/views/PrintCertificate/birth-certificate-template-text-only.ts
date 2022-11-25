@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="420" height="595" fill="white" />
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="199.666">Registration Centre: </tspan>
@@ -31,7 +31,11 @@ const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox=
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
   <tspan x="59.3275" y="260.226">This is to certify that the birth, details of which are recorded herein, has been </tspan>
-  <tspan x="59.3275" y="274.626">registered on {{ registrationDate }} at this registration centre.</tspan>
+  <tspan x="59.3275" y="274.626">registered on</tspan>
+  <tspan x="185.046" y="274.626">at this registration centre.</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
+  <tspan x="109.663" y="274.626"> {{ registrationDate }} </tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="300.392">BRN:</tspan>
