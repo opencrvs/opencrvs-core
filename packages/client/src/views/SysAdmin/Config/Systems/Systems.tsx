@@ -15,13 +15,13 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
+  Event,
   System,
   SystemStatus,
   SystemType,
   WebhookPermission
 } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
-import { WebhookOption } from '@client/views/SysAdmin/Config/Systems/model'
 import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import {
   Alert,
@@ -91,10 +91,10 @@ export function SystemList() {
     selectedClient: null
   })
 
-  const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
+  const [selectedTab, setSelectedTab] = React.useState(Event.Birth)
 
-  const checkboxHandler = (permissions: string[], event: WebhookOption) => {
-    event === WebhookOption.birth
+  const checkboxHandler = (permissions: string[], event: Event) => {
+    event === Event.Birth
       ? setBirthPermissions({ event, permissions })
       : setDeathPermissions({ event, permissions })
   }
@@ -183,13 +183,13 @@ export function SystemList() {
         handler: () => {
           setSystemToShowPermission(system)
           setBirthPermissions(
-            populatePermissions(system.webhookPermissions!, WebhookOption.birth)
+            populatePermissions(system.webhookPermissions!, Event.Birth)
           )
           setDeathPermissions(
-            populatePermissions(system.webhookPermissions!, WebhookOption.death)
+            populatePermissions(system.webhookPermissions!, Event.Death)
           )
         },
-        label: 'Edit '
+        label: intl.formatMessage(buttonMessages.edit)
       })
     }
 
@@ -541,19 +541,19 @@ export function SystemList() {
                 <FormTabs
                   sections={[
                     {
-                      id: WebhookOption.birth,
+                      id: Event.Birth,
                       title: intl.formatMessage(integrationMessages.birth)
                     },
                     {
-                      id: WebhookOption.death,
+                      id: Event.Death,
                       title: intl.formatMessage(integrationMessages.death)
                     }
                   ]}
                   activeTabId={selectedTab}
-                  onTabClick={(tabId: WebhookOption) => setSelectedTab(tabId)}
+                  onTabClick={(tabId: Event) => setSelectedTab(tabId)}
                 />
                 <Divider />
-                {selectedTab === WebhookOption.birth ? (
+                {selectedTab === Event.Birth ? (
                   <>
                     <CheckboxGroup
                       id="test-checkbox-group1"
@@ -592,7 +592,7 @@ export function SystemList() {
                       name="test-checkbox-group1"
                       value={birthPermissions.permissions ?? []}
                       onChange={(newValue) => {
-                        checkboxHandler(newValue, WebhookOption.birth)
+                        checkboxHandler(newValue, Event.Birth)
                       }}
                     />
                   </>
@@ -633,7 +633,7 @@ export function SystemList() {
                       name="test-checkbox-group1"
                       value={deathPermissions.permissions ?? []}
                       onChange={(newValue) => {
-                        checkboxHandler(newValue, WebhookOption.death)
+                        checkboxHandler(newValue, Event.Death)
                       }}
                     />
                   </>
@@ -692,6 +692,7 @@ export function SystemList() {
 
       {systemToShowPermission && (
         <WebhookModal
+          system={systemToShowPermission}
           loading={updatePermissionsLoading}
           updatePermissions={updatePermissions}
           birthPermissions={birthPermissions}
@@ -705,22 +706,30 @@ export function SystemList() {
       {activateSystemData && (
         <Toast
           type="success"
-          id="toggleClientStatusToast"
+          id="toggleClientActiveStatusToast"
           onClose={() => resetData()}
         >
           {intl.formatMessage(integrationMessages.activateClientStatus)}
         </Toast>
       )}
-      {deactivateSystemData ||
-        (updatePermissionsData && (
-          <Toast
-            type="success"
-            id="toggleClientStatusToast"
-            onClose={() => resetData()}
-          >
-            {intl.formatMessage(integrationMessages.deactivateClientStatus)}
-          </Toast>
-        ))}
+      {deactivateSystemData && (
+        <Toast
+          type="success"
+          id="toggleClientDeActiveStatusToast"
+          onClose={() => resetData()}
+        >
+          {intl.formatMessage(integrationMessages.deactivateClientStatus)}
+        </Toast>
+      )}
+      {updatePermissionsData && (
+        <Toast
+          type="success"
+          id="updaPermissionsSuccess"
+          onClose={() => resetData()}
+        >
+          {intl.formatMessage(integrationMessages.updatePermissionsStatus)}
+        </Toast>
+      )}
       {(activateSystemError ||
         deactivateSystemError ||
         registerSystemError ||

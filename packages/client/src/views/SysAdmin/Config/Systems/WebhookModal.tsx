@@ -9,62 +9,46 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { useIntl } from 'react-intl'
 
-import { useMutation } from '@apollo/client'
+import { buttonMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import {
-  System,
-  UpdatePermissionsMutation,
-  UpdatePermissionsMutationVariables,
-  WebhookPermission
-} from '@client/utils/gateway'
-import { Label } from '@client/views/Settings/items/components'
-import { WebhookOption } from '@client/views/SysAdmin/Config/Systems/model'
-import * as mutations from '@client/views/SysAdmin/Config/Systems/mutations'
-import { useSystems } from '@client/views/SysAdmin/Config/Systems/useSystems'
+import { System, WebhookPermission, Event } from '@client/utils/gateway'
 import {
   CheckboxGroup,
   Divider,
   FormTabs,
-  InputField,
-  ResponsiveModal,
-  Toast
+  ResponsiveModal
 } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import React, { useState } from 'react'
-import { useIntl } from 'react-intl'
 
 interface ISystemProps {
+  system: System
+  loading: boolean
+  closeModal: () => void
   updatePermissions: () => void
   birthPermissions: WebhookPermission
   deathPermissions: WebhookPermission
-  setBirthPermissions: React.Dispatch<WebhookPermission>
   setDeathPermissions: React.Dispatch<WebhookPermission>
-  closeModal: () => void
-  loading: boolean
-}
-
-const populatePermissions = (
-  webhooks: WebhookPermission[] = [],
-  type: string
-) => {
-  return webhooks.find((ite) => ite.event === type)!
+  setBirthPermissions: React.Dispatch<WebhookPermission>
 }
 
 export function WebhookModal({
-  updatePermissions,
+  loading,
+  system,
+  closeModal,
   birthPermissions,
   deathPermissions,
+  updatePermissions,
   setDeathPermissions,
-  setBirthPermissions,
-  closeModal,
-  loading
+  setBirthPermissions
 }: ISystemProps) {
   const intl = useIntl()
-  const [selectedTab, setSelectedTab] = useState(WebhookOption.birth)
+  const [selectedTab, setSelectedTab] = useState(Event.Birth)
 
-  const checkboxHandler = (permissions: string[], event: WebhookOption) => {
-    event === WebhookOption.birth
+  const checkboxHandler = (permissions: string[], event: Event) => {
+    event === Event.Birth
       ? setBirthPermissions({ event, permissions })
       : setDeathPermissions({ event, permissions })
   }
@@ -73,45 +57,36 @@ export function WebhookModal({
     <>
       <ResponsiveModal
         actions={[
-          <Button onClick={updatePermissions} type="primary" loading={loading}>
-            Submit
-          </Button>,
           <Button onClick={closeModal} type="secondary">
-            Cancel
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button onClick={updatePermissions} type="primary" loading={loading}>
+            {intl.formatMessage(buttonMessages.confirm)}
           </Button>
         ]}
         show
         handleClose={closeModal}
-        title="Webhook"
+        title={system.name}
         autoHeight
         titleHeightAuto
       >
         <>
-          <InputField
-            id="select-input"
-            touched={false}
-            label={intl.formatMessage(integrationMessages.label)}
-          >
-            <Label>
-              {intl.formatMessage(integrationMessages.webhookDescription)}
-            </Label>
-          </InputField>
           <FormTabs
             sections={[
               {
-                id: WebhookOption.birth,
+                id: Event.Birth,
                 title: intl.formatMessage(integrationMessages.birth)
               },
               {
-                id: WebhookOption.death,
+                id: Event.Death,
                 title: intl.formatMessage(integrationMessages.death)
               }
             ]}
             activeTabId={selectedTab}
-            onTabClick={(tabId: WebhookOption) => setSelectedTab(tabId)}
+            onTabClick={(tabId: Event) => setSelectedTab(tabId)}
           />
           <Divider />
-          {selectedTab === WebhookOption.birth ? (
+          {selectedTab === Event.Birth ? (
             <>
               <CheckboxGroup
                 id="test-checkbox-group1"
@@ -148,8 +123,7 @@ export function WebhookModal({
                 name="test-checkbox-group1"
                 value={birthPermissions && birthPermissions.permissions}
                 onChange={(permissions) => {
-                  debugger
-                  checkboxHandler(permissions, WebhookOption.birth)
+                  checkboxHandler(permissions, Event.Birth)
                 }}
               />
             </>
@@ -190,7 +164,7 @@ export function WebhookModal({
                 name="test-checkbox-group1"
                 value={deathPermissions && deathPermissions.permissions}
                 onChange={(permissions) => {
-                  checkboxHandler(permissions, WebhookOption.death)
+                  checkboxHandler(permissions, Event.Death)
                 }}
               />
             </>

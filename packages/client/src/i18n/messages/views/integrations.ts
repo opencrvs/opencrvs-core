@@ -153,13 +153,11 @@ const messagesToDefine = {
     description: 'Label for informant details'
   },
 
-  /*
-    diseaseDetails: {
-      id: 'integrations.diseaseDetails',
-      defaultMessage: 'Disease Details',
-      description: 'Label for Disease details'
-    },
-  */
+  diseaseDetails: {
+    id: 'integrations.diseaseDetails',
+    defaultMessage: 'Disease Details',
+    description: 'Label for Disease details'
+  },
 
   registrationDetailsNoPII: {
     id: 'integrations.registrationDetailsnNoPII',
@@ -299,6 +297,11 @@ const messagesToDefine = {
   onlyOneNationalIdError: {
     id: 'integrations.onlyOneNationalId',
     defaultMessage: 'Only one MOSIP integration is allowed.'
+  },
+  updatePermissionsStatus: {
+    id: 'integrations.updatePermissions.status',
+    defaultMessage: 'Permissions update successfully',
+    description: 'Label for update permissions'
   }
 }
 

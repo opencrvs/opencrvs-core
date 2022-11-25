@@ -85,9 +85,7 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      const promise = await res.json()
-      console.log('promise', promise)
-      return promise
+      return await res.json()
     },
     async refreshSystemSecret(_, { clientId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {

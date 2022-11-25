@@ -68,7 +68,7 @@ export function useSystemsGlobalState() {
   )
   const dispatch = useDispatch()
 
-  const dispatchStatusChange = (updatedSystem: System) => {
+  const dispatchSystemUpdate = (updatedSystem: System) => {
     const systems = existingSystems.map((system) => {
       if (system.clientId === updatedSystem.clientId) {
         return updatedSystem
@@ -84,7 +84,7 @@ export function useSystemsGlobalState() {
   }
 
   return {
-    dispatchStatusChange,
+    dispatchStatusChange: dispatchSystemUpdate,
     dispatchNewSystem,
     existingSystems,
     doesNationalIdAlreadyExist
@@ -170,7 +170,6 @@ export function useSystems() {
     mutations.registerSystem,
     {
       onCompleted: ({ registerSystem }) => {
-        console.log('registerSystem', registerSystem)
         if (registerSystem) dispatchNewSystem(registerSystem.system)
       }
     }
