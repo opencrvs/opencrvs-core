@@ -1023,10 +1023,12 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantsSignature: String
   informantType: InformantType
   otherInformantType: String
   contact: String
   contactRelationship: String
+  informantsSignature: String
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType

@@ -402,6 +402,14 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
+
+    informantsSignature: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
     contactRelationship: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
