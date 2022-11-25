@@ -216,6 +216,12 @@ const messagesToDefine = {
     defaultMessage: 'Government of the peoples republic of Bangladesh',
     description: 'Header title that shows bgd govt name'
   },
+
+  zeroDocumentsTextForAnySection: {
+    defaultMessage: 'No supporting documents',
+    description: 'Zero documents text',
+    id: 'review.documents.zeroDocumentsTextForAnySection'
+  },
   documentForWhom: {
     defaultMessage: `{section, select, child {Child's} mother {Mother's} father {Father's} deceased {Deceased's} informant {Informant's} primaryCaregiver {Parents' } parent {Parents' } other {}}`,
     description: 'Describes for whom the document has been uploaded',
