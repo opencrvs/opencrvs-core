@@ -271,7 +271,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.Birth,
       toggleStatus: false,
-      officeSelected: false,
+      officeSelected: Boolean(this.props.offices[locationId]),
       isAccessibleOffice: false
     }
   }
