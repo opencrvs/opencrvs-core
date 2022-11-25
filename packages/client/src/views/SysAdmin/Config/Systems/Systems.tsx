@@ -14,12 +14,14 @@ import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { System, SystemStatus, SystemType } from '@client/utils/gateway'
-import { Label } from '@client/views/Settings/items/components'
 import {
-  WebhookOption,
-  WebHookSetting
-} from '@client/views/SysAdmin/Config/Systems/model'
+  System,
+  SystemStatus,
+  SystemType,
+  WebhookPermission
+} from '@client/utils/gateway'
+import { Label } from '@client/views/Settings/items/components'
+import { WebhookOption } from '@client/views/SysAdmin/Config/Systems/model'
 import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import {
   Alert,
@@ -73,6 +75,12 @@ const StyledSpinner = styled(Spinner)`
 const Field = styled.div`
   margin-top: 16px;
 `
+const populatePermissions = (
+  webhooks: WebhookPermission[] = [],
+  type: string
+) => {
+  return webhooks.find((ite) => ite.event === type)!
+}
 
 export function SystemList() {
   const intl = useIntl()
@@ -95,6 +103,9 @@ export function SystemList() {
   }
 
   const {
+    updateWebhookSystemError,
+    updateWebhookSystemLoading,
+    updatePermissions,
     systemToShowPermission,
     setSystemToShowPermission,
     birthPermissions,
@@ -169,6 +180,12 @@ export function SystemList() {
       menuItems.push({
         handler: () => {
           setSystemToShowPermission(system)
+          setBirthPermissions(
+            populatePermissions(system.webhookPermissions!, WebhookOption.birth)
+          )
+          setDeathPermissions(
+            populatePermissions(system.webhookPermissions!, WebhookOption.death)
+          )
         },
         label: 'Edit '
       })
@@ -673,8 +690,13 @@ export function SystemList() {
 
       {systemToShowPermission && (
         <WebhookModal
-          system={systemToShowPermission}
-          cancel={() => setSystemToShowPermission(undefined)}
+          loading={updateWebhookSystemLoading}
+          updatePermissions={updatePermissions}
+          birthPermissions={birthPermissions}
+          deathPermissions={deathPermissions}
+          setBirthPermissions={setBirthPermissions}
+          setDeathPermissions={setDeathPermissions}
+          closeModal={() => setSystemToShowPermission(undefined)}
         />
       )}
 
@@ -699,7 +721,8 @@ export function SystemList() {
       {(activateSystemError ||
         deactivateSystemError ||
         registerSystemError ||
-        refreshTokenError) && (
+        refreshTokenError ||
+        updateWebhookSystemError) && (
         <Toast
           type="error"
           id="toggleClientStatusToast"

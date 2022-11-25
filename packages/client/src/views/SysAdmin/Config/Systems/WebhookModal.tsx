@@ -11,20 +11,16 @@
  */
 
 import { useMutation } from '@apollo/client'
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import {
+  System,
   UpdatePermissionsMutation,
-  UpdatePermissionsMutationVariables
+  UpdatePermissionsMutationVariables,
+  WebhookPermission
 } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
-import {
-  ISystemProps,
-  WebhookOption,
-  WebHookSetting
-} from '@client/views/SysAdmin/Config/Systems/model'
+import { WebhookOption } from '@client/views/SysAdmin/Config/Systems/model'
 import * as mutations from '@client/views/SysAdmin/Config/Systems/mutations'
-
 import { useSystems } from '@client/views/SysAdmin/Config/Systems/useSystems'
 import {
   CheckboxGroup,
@@ -38,38 +34,34 @@ import { Button } from '@opencrvs/components/lib/Button'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 
-const populatePermissions = (webhooks: WebHookSetting[] = [], type: string) => {
+interface ISystemProps {
+  updatePermissions: () => void
+  birthPermissions: WebhookPermission
+  deathPermissions: WebhookPermission
+  setBirthPermissions: React.Dispatch<WebhookPermission>
+  setDeathPermissions: React.Dispatch<WebhookPermission>
+  closeModal: () => void
+  loading: boolean
+}
+
+const populatePermissions = (
+  webhooks: WebhookPermission[] = [],
+  type: string
+) => {
   return webhooks.find((ite) => ite.event === type)!
 }
 
-export function WebhookModal({ cancel, system }: ISystemProps) {
+export function WebhookModal({
+  updatePermissions,
+  birthPermissions,
+  deathPermissions,
+  setDeathPermissions,
+  setBirthPermissions,
+  closeModal,
+  loading
+}: ISystemProps) {
   const intl = useIntl()
   const [selectedTab, setSelectedTab] = useState(WebhookOption.birth)
-
-  const [birthPermissions, setBirthPermissions] = useState(
-    populatePermissions(system.webhook, WebhookOption.birth)
-  )
-
-  const [deathPermissions, setDeathPermissions] = useState(
-    populatePermissions(system.webhook, WebhookOption.death)
-  )
-
-  const [
-    updateWebhookPermissions,
-    {
-      data: updateWebhookSystemData,
-      error: updateWebhookSystemError,
-      loading: updateWebhookSystemLoading,
-      reset: resetWebhookSystemSystemData
-    }
-  ] = useMutation<
-    UpdatePermissionsMutation,
-    UpdatePermissionsMutationVariables
-  >(mutations.updateSystemPermissions, {
-    onCompleted: ({ updatePermissions }) => {
-      //if (registerSystem) dispatchNewSystem(registerSystem.system)
-    }
-  })
 
   const checkboxHandler = (permissions: string[], event: WebhookOption) => {
     event === WebhookOption.birth
@@ -77,57 +69,19 @@ export function WebhookModal({ cancel, system }: ISystemProps) {
       : setDeathPermissions({ event, permissions })
   }
 
-  const updateHandler = () => {
-    const payload = {
-      setting: {
-        clientId: system.clientId,
-        webhook: [birthPermissions, deathPermissions]
-      }
-    }
-    console.log()
-    debugger
-    updateWebhookPermissions({
-      variables: {
-        setting: {
-          clientId: system.clientId,
-          webhook: [birthPermissions, deathPermissions]
-        }
-      }
-    })
-  }
-
-  if (updateWebhookSystemError) {
-    return (
-      <Toast
-        type="error"
-        id="toggleClientStatusToast"
-        onClose={() => {
-          resetWebhookSystemSystemData()
-          cancel()
-        }}
-      >
-        {intl.formatMessage(integrationMessages.error)}
-      </Toast>
-    )
-  }
-
   return (
     <>
       <ResponsiveModal
         actions={[
-          <Button
-            onClick={() => updateHandler()}
-            type="primary"
-            loading={updateWebhookSystemLoading}
-          >
+          <Button onClick={updatePermissions} type="primary" loading={loading}>
             Submit
           </Button>,
-          <Button onClick={cancel} type="secondary">
+          <Button onClick={closeModal} type="secondary">
             Cancel
           </Button>
         ]}
         show
-        handleClose={cancel}
+        handleClose={closeModal}
         title="Webhook"
         autoHeight
         titleHeightAuto
@@ -194,6 +148,7 @@ export function WebhookModal({ cancel, system }: ISystemProps) {
                 name="test-checkbox-group1"
                 value={birthPermissions && birthPermissions.permissions}
                 onChange={(permissions) => {
+                  debugger
                   checkboxHandler(permissions, WebhookOption.birth)
                 }}
               />

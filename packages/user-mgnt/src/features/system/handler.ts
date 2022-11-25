@@ -58,7 +58,7 @@ const pickSystem = (system: ISystemModel & { _id: Types.ObjectId }) => ({
   _id: system._id.toString(),
   shaSecret: system.sha_secret,
   clientId: system.client_id,
-  webhook: system.settings.webhook
+  webhookPermissions: system.settings.webhook
 })
 
 export async function registerSystem(

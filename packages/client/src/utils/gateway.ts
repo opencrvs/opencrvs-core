@@ -5673,6 +5673,119 @@ export type CreateFormDraftMutation = {
   } | null
 }
 
+export type RegisterSystemMutationVariables = Exact<{
+  system?: InputMaybe<SystemInput>
+}>
+
+export type RegisterSystemMutation = {
+  __typename?: 'Mutation'
+  registerSystem?: {
+    __typename?: 'SystemSecret'
+    clientSecret: string
+    system: {
+      __typename?: 'System'
+      _id: string
+      clientId: string
+      name: string
+      shaSecret: string
+      status: SystemStatus
+      type: SystemType
+      webhookPermissions?: Array<{
+        __typename?: 'WebhookPermission'
+        event: string
+        permissions: Array<string>
+      }> | null
+    }
+  } | null
+}
+
+export type DeactivateSystemMutationVariables = Exact<{
+  clientId: Scalars['ID']
+}>
+
+export type DeactivateSystemMutation = {
+  __typename?: 'Mutation'
+  deactivateSystem?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
+    webhookPermissions?: Array<{
+      __typename?: 'WebhookPermission'
+      event: string
+      permissions: Array<string>
+    }> | null
+  } | null
+}
+
+export type ReactivateSystemMutationVariables = Exact<{
+  clientId: Scalars['ID']
+}>
+
+export type ReactivateSystemMutation = {
+  __typename?: 'Mutation'
+  reactivateSystem?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
+    webhookPermissions?: Array<{
+      __typename?: 'WebhookPermission'
+      event: string
+      permissions: Array<string>
+    }> | null
+  } | null
+}
+
+export type RefreshSystemSecretMutationVariables = Exact<{
+  clientId: Scalars['String']
+}>
+
+export type RefreshSystemSecretMutation = {
+  __typename?: 'Mutation'
+  refreshSystemSecret?: {
+    __typename?: 'SystemSecret'
+    clientSecret: string
+    system: {
+      __typename?: 'System'
+      _id: string
+      clientId: string
+      name: string
+      shaSecret: string
+      status: SystemStatus
+      type: SystemType
+    }
+  } | null
+}
+
+export type UpdatePermissionsMutationVariables = Exact<{
+  setting: UpdatePermissionsInput
+}>
+
+export type UpdatePermissionsMutation = {
+  __typename?: 'Mutation'
+  updatePermissions?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
+    webhookPermissions?: Array<{
+      __typename?: 'WebhookPermission'
+      event: string
+      permissions: Array<string>
+    }> | null
+  } | null
+}
+
 export type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
 
 export type GetVsExportsQuery = {

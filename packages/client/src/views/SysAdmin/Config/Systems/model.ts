@@ -9,29 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
-import { SystemStatus, SystemType } from '@client/utils/gateway'
+import { System, WebhookPermission } from '@client/utils/gateway'
 
 export enum WebhookOption {
   birth = 'BIRTH',
   death = 'DEATH'
-}
-
-export interface WebHookSetting {
-  event: string
-  permissions: string[]
-}
-
-export interface ISystem {
-  clientId: string
-  name: string
-  shaSecret: string
-  status: SystemStatus
-  type: SystemType
-  webhook?: WebHookSetting[]
-}
-
-export interface ISystemProps {
-  cancel: () => void
-  system: ISystem
 }

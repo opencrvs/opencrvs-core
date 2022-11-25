@@ -23,6 +23,10 @@ export const registerSystem = gql`
         shaSecret
         status
         type
+        webhookPermissions {
+          event
+          permissions
+        }
       }
     }
   }
@@ -37,6 +41,10 @@ export const deactivateSystem = gql`
       shaSecret
       status
       type
+      webhookPermissions {
+        event
+        permissions
+      }
     }
   }
 `
@@ -49,6 +57,10 @@ export const activateSystem = gql`
       shaSecret
       status
       type
+      webhookPermissions {
+        event
+        permissions
+      }
     }
   }
 `
@@ -63,11 +75,6 @@ export const refreshClientSecret = gql`
         shaSecret
         status
         type
-        type
-        type
-        type
-        type
-        type
       }
     }
   }
@@ -81,8 +88,10 @@ export const updateSystemPermissions = gql`
       shaSecret
       status
       type
-      webhookPermissions
+      webhookPermissions {
+        event
+        permissions
+      }
     }
-  }
   }
 `
