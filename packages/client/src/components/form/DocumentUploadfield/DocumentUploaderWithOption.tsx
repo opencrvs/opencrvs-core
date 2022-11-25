@@ -62,6 +62,12 @@ const DocumentUploader = styled(ImageUploader)`
   }
 `
 
+const TakePhotoButton = styled(ImageUploader)`
+  position: 'absolute';
+  left: -50;
+  top: -50;
+`
+
 type IFullProps = {
   name: string
   label: string
@@ -88,7 +94,7 @@ type IState = {
   filesBeingProcessed: Array<{ label: string }>
   dropDownOptions: ISelectOption[]
   imageSource: string
-  videoSource: MediaStream
+  showVideo: boolean
 }
 
 export const getBase64String = (file: File) => {
@@ -104,14 +110,11 @@ export const getBase64String = (file: File) => {
   })
 }
 
-export const blobToFile = (theBlob: Blob, fileName: string): File => {
-  const b: any = theBlob
-  //A Blob() is almost a File() - it's just missing the two properties below which we will add
-  b.lastModifiedDate = new Date()
-  b.name = fileName
-
-  //Cast to a File() type
-  return theBlob as File
+export const blobToFile = (blob: Blob, fileName: string): File => {
+  return new File([blob], fileName, {
+    lastModified: new Date().getTime(),
+    type: blob.type
+  })
 }
 
 class DocumentUploaderWithOptionComp extends React.Component<
@@ -119,6 +122,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
   IState
 > {
   private videoRef: React.RefObject<HTMLVideoElement>
+  private stream: MediaStream
   constructor(props: IFullProps) {
     super(props)
     this.stream = new MediaStream()
@@ -133,11 +137,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
         documentData: EMPTY_STRING
       },
       imageSource: EMPTY_STRING,
-      videoSource: this.stream
+      showVideo: false
     }
   }
-
-  stream: MediaStream
 
   initializeDropDownOption = (): ISelectOption[] => {
     const options = clone(this.props.options)
@@ -296,32 +298,43 @@ class DocumentUploaderWithOptionComp extends React.Component<
       audio: false,
       video: true
     })
+    this.setState(() => {
+      console.log('startStreaming: setting showVideo to true')
+      return {
+        ...this.state,
+        showVideo: true
+      }
+    })
     this.videoRef.current!.srcObject = this.stream
   }
 
   takePhoto = async () => {
-    this.setState((prevState) => {
-      return { ...prevState, videoSource: this.stream }
-    })
+    console.log(this.stream.getVideoTracks())
     const imageCapture = new (window as any).ImageCapture(
       this.stream.getVideoTracks()[0]
     )
 
     imageCapture
       .takePhoto()
-      .then((blob) => {
+      .then((blob: Blob) => {
         console.log('Took photo:', blob)
         this.setState((prevState) => {
           return { ...prevState, imageSource: URL.createObjectURL(blob) }
         })
         const file = blobToFile(blob, 'some-name.jpg')
         this.handleFileChange(file)
-        //this.stream.getVideoTracks()[0].stop()
         this.stream.getTracks().forEach((track) => {
           track.stop()
         })
+        this.setState(() => {
+          console.log('startStreaming: setting showVideo to false')
+          return {
+            ...this.state,
+            showVideo: false
+          }
+        })
       })
-      .catch(function (error) {
+      .catch(function (error: Error) {
         console.log('takePhoto() error: ', error)
       })
   }
@@ -349,7 +362,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
           <DocumentUploader
             id={`upload_document${idx}`}
             title={intl.formatMessage(formMessages.addFile)}
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
               this.onChange(opt.value)
               return !this.isValid() && e.preventDefault()
             }}
@@ -374,7 +387,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
               ? 'Take photo'
               : intl.formatMessage(formMessages.addFile)
           }
-          onClick={(e) => {
+          onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
             if (this.isValid() && isMobileDevice()) {
               e.preventDefault()
               this.startStreaming()
@@ -391,7 +404,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
   render() {
     const { label, intl, requiredErrorMessage } = this.props
-    console.log('isMobile: ', isMobileDevice())
+    console.log('(re-)rendering with showVideo set to ', this.state.showVideo)
+    console.log(this.state.showVideo ? undefined : { display: 'none' })
     return (
       <UploaderWrapper>
         <ErrorMessage id="upload-error">
@@ -404,9 +418,21 @@ class DocumentUploaderWithOptionComp extends React.Component<
           )}
         </ErrorMessage>
         <Label>{label}</Label>
-        {this.stream && (
-          <video autoPlay playsInline ref={this.videoRef}></video>
-        )}
+        {
+          <div style={this.state.showVideo ? undefined : { display: 'none' }}>
+            <video autoPlay playsInline ref={this.videoRef}></video>
+            <TakePhotoButton
+              id="take_photo"
+              title={'Click!'}
+              onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                e.preventDefault()
+                this.takePhoto()
+              }}
+              handleFileChange={this.handleFileChange}
+              disabled={this.state.filesBeingProcessed.length > 0}
+            />
+          </div>
+        }
         <DocumentListPreview
           processingDocuments={this.state.filesBeingProcessed}
           documents={this.props.files}
