@@ -643,6 +643,8 @@ type ApplicationConfiguration {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   INTEGRATIONS: [Integration]
+  INFORMANT_SIGNATURE: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
 }
 
 input ApplicationConfigurationInput {
@@ -658,6 +660,8 @@ input ApplicationConfigurationInput {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   INTEGRATIONS: [IntegrationInput]
+  INFORMANT_SIGNATURE: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
 }
 
 input FormDraftInput {

@@ -48,7 +48,10 @@ export const resolvers: GQLResolver = {
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
         ADDRESSES: applicationConfig.ADDRESSES as number,
-        INTEGRATIONS: applicationConfig.INTEGRATIONS as GQLIntegrationInput[]
+        INTEGRATIONS: applicationConfig.INTEGRATIONS as GQLIntegrationInput[],
+        DATE_OF_BIRTH_UNKNOWN:
+          applicationConfig.DATE_OF_BIRTH_UNKNOWN as boolean,
+        INFORMANT_SIGNATURE: applicationConfig.INFORMANT_SIGNATURE as boolean
       }
 
       const res = await fetch(

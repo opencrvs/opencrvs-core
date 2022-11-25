@@ -79,6 +79,8 @@ export interface IApplicationConfig {
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
   INTEGRATIONS?: [IIntegration]
+  DATE_OF_BIRTH_UNKNOWN: boolean
+  INFORMANT_SIGNATURE: boolean
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig

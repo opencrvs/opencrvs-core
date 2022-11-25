@@ -76,7 +76,9 @@ const DescriptionMessage = styled.div`
 
 export enum ConfigActionType {
   HIDE_EVENT_REGISTER_INFORMATION = 'HIDE_EVENT_REGISTER_INFORMATION',
-  ADDRESSES = 'ADDRESSES'
+  ADDRESSES = 'ADDRESSES',
+  DATE_OF_BIRTH_UNKNOWN = 'DATE_OF_BIRTH_UNKNOWN',
+  INFORMANT_SIGNATURE = ' INFORMANT_SIGNATURE'
 }
 
 function FormConfigSettingsComponent() {
@@ -94,6 +96,12 @@ function FormConfigSettingsComponent() {
   const [numberOfAddresses, setNumberOfAddresses] = React.useState(
     offlineCountryConfiguration.config.ADDRESSES
   )
+  const [dateOfBirthUnknown, setDateOfBirthUnknown] = React.useState(
+    offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN
+  )
+  const [informantSignature, setInformantSignature] = React.useState(
+    offlineCountryConfiguration.config.INFORMANT_SIGNATURE
+  )
   const [showModal, setShowModal] = React.useState(false)
   const [errorOccured, setErrorOccured] = React.useState(false)
   const [showNotification, setShowNotification] = React.useState(false)
@@ -105,7 +113,9 @@ function FormConfigSettingsComponent() {
   const changeValue = async () => {
     if (
       modalName === ConfigActionType.ADDRESSES ||
-      modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION
+      modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION ||
+      modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN ||
+      modalName == ConfigActionType.INFORMANT_SIGNATURE
     ) {
       try {
         await callApplicationConfigMutation(
@@ -115,6 +125,18 @@ function FormConfigSettingsComponent() {
                 ...offlineCountryConfiguration.config,
                 [ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION]:
                   introductionPage
+              }
+            : modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN
+            ? {
+                ...offlineCountryConfiguration.config,
+                [ConfigActionType.DATE_OF_BIRTH_UNKNOWN]: dateOfBirthUnknown
+              }
+            : modalName == ConfigActionType.INFORMANT_SIGNATURE
+            ? {
+                // ...offlineCountryConfiguration.config,
+                // [ConfigActionType.INFORMANT_SIGNATURE]: informantSignature
+                ...offlineCountryConfiguration.config,
+                [ConfigActionType.ADDRESSES]: numberOfAddresses
               }
             : {
                 ...offlineCountryConfiguration.config,

@@ -492,6 +492,8 @@ export interface GQLApplicationConfiguration {
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
   INTEGRATIONS?: Array<GQLIntegration | null>
+  INFORMANT_SIGNATURE?: boolean
+  DATE_OF_BIRTH_UNKNOWN?: boolean
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -507,6 +509,8 @@ export interface GQLApplicationConfigurationInput {
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
   INTEGRATIONS?: Array<GQLIntegrationInput | null>
+  INFORMANT_SIGNATURE?: boolean
+  DATE_OF_BIRTH_UNKNOWN?: boolean
 }
 
 export interface GQLFormDraftInput {
@@ -4048,6 +4052,8 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
   INTEGRATIONS?: ApplicationConfigurationToINTEGRATIONSResolver<TParent>
+  INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
+  DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -4128,6 +4134,20 @@ export interface ApplicationConfigurationToADDRESSESResolver<
 }
 
 export interface ApplicationConfigurationToINTEGRATIONSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<
   TParent = any,
   TResult = any
 > {

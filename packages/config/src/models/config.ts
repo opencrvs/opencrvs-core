@@ -49,6 +49,8 @@ export interface IApplicationConfigurationModel extends Document {
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
   INTEGRATIONS: [IIntegration]
+  DATE_OF_BIRTH_UNKNOWN: boolean
+  INFORMANT_SIGNATURE: boolean
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -105,7 +107,7 @@ const integrationsSchema = new Schema<IIntegration>({
   }
 })
 
-const systemSchema = new Schema({
+const configSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   BIRTH: { type: birthSchema, required: false },
   COUNTRY_LOGO: { type: countryLogoSchema, required: false },
@@ -139,7 +141,9 @@ const systemSchema = new Schema({
     enum: [1, 2],
     default: 1
   },
-  INTEGRATIONS: [integrationsSchema]
+  INTEGRATIONS: [integrationsSchema],
+  DATE_OF_BIRTH_UNKNOWN: { type: Boolean, required: true, default: false },
+  INFORMANT_SIGNATURE: { type: Boolean, required: true, default: true }
 })
 
-export default model<IApplicationConfigurationModel>('Config', systemSchema)
+export default model<IApplicationConfigurationModel>('Config', configSchema)
