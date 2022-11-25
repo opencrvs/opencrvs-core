@@ -52,7 +52,7 @@ export const registerForms: IDefaultRegisterForms = {
             {
               fieldName: 'certificateDate',
               operation: 'certificateDateTransformer',
-              parameters: ['en', 'dd MMMM yyyy']
+              parameters: ['en', 'do MMMM yyyy']
             },
             {
               fieldName: 'registrarName',

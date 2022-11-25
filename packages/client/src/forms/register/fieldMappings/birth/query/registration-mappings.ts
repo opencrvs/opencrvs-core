@@ -336,7 +336,7 @@ export const registrationDateTransformer = (
 
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationDate'
-  ] = history?.date ? format(new Date(history.date), 'dd MMMM yyyy') : ''
+  ] = history?.date ? format(new Date(history.date), 'do MMMM yyyy') : ''
 }
 
 export const registrarNameUserTransformer = (

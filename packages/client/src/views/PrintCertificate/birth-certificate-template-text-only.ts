@@ -47,7 +47,7 @@ const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox=
   <tspan x="59.3275" y="320.392">Full Name:</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-  <tspan x="162.619" y="319.992">{{ childFirstName }}, {{ childFamilyName }}</tspan>
+  <tspan x="162.619" y="319.992">{{ childFamilyName }}, {{ childFirstName }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="340.392">Sex:</tspan>
