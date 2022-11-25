@@ -237,6 +237,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <Select
           {...inputProps}
+          inputId={fieldDefinition.name}
           isDisabled={fieldDefinition.disabled}
           value={value as string}
           onChange={(val: string) => {
