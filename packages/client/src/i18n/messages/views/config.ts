@@ -17,7 +17,9 @@ interface IConfigMessages
   vsexport: MessageDescriptor
   vitalStatisticsExport: MessageDescriptor
   export: MessageDescriptor
+  vsEmptyStateText: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
+  applicationNameChangeNotification: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
   govtLogoChangeError: MessageDescriptor
@@ -34,6 +36,13 @@ interface IConfigMessages
   birthDefaultTempDesc: MessageDescriptor
   eventUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
+  certificateUploading: MessageDescriptor
+  certificateUpdated: MessageDescriptor
+  certificateValidationError: MessageDescriptor
+  uploadCertificateDialogTitle: MessageDescriptor
+  uploadCertificateDialogDescription: MessageDescriptor
+  uploadCertificateDialogConfirm: MessageDescriptor
+  uploadCertificateDialogCancel: MessageDescriptor
   listDetailsQsn: MessageDescriptor
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
@@ -73,7 +82,9 @@ interface IConfigMessages
   withinLegallySpecifiedTimeLabel: MessageDescriptor
   generalTabTitle: MessageDescriptor
   birthTabTitle: MessageDescriptor
+  birthTabTitleExport: MessageDescriptor
   deathTabTitle: MessageDescriptor
+  deathTabTitleExport: MessageDescriptor
   registrationTimePeriodsGroupTitle: MessageDescriptor
   registrationFeesGroupTitle: MessageDescriptor
   eventTargetInputLabel: MessageDescriptor
