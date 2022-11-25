@@ -413,6 +413,7 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'RADIO_GROUP',
                 label: formMessageDescriptors.mothersDetailsExist,
                 hidden: true,
+                hideInPreview: true,
                 required: true,
                 initialValue: true,
                 validate: [],
