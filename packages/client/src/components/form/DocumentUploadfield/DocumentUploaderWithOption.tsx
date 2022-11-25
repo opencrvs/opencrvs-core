@@ -28,6 +28,7 @@ import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
 import { isMobileDevice } from '@client/utils/commonUtils'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const options = {
   maxSizeMB: 0.4,
@@ -63,9 +64,9 @@ const DocumentUploader = styled(ImageUploader)`
 `
 
 const TakePhotoButton = styled(ImageUploader)`
-  position: 'absolute';
-  left: -50;
-  top: -50;
+  position: absolute;
+  top: 50;
+  left: 50;
 `
 
 type IFullProps = {
@@ -93,6 +94,7 @@ type IState = {
   previewImage: IFileValue | null
   filesBeingProcessed: Array<{ label: string }>
   dropDownOptions: ISelectOption[]
+  cameraOptions: ISelectOption[]
   imageSource: string
   showVideo: boolean
 }
@@ -131,6 +133,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
       errorMessage: EMPTY_STRING,
       previewImage: null,
       dropDownOptions: this.initializeDropDownOption(),
+      cameraOptions: [],
       filesBeingProcessed: [],
       fields: {
         documentType: EMPTY_STRING,
@@ -294,22 +297,44 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   startStreaming = async () => {
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      console.log('camera devices: ', devices)
+      let mediaOptions: ISelectOption[] = []
+      devices.map((mediaDeviceInfo, index, arr) => {
+        if (mediaDeviceInfo.kind === 'videoinput') {
+          console.log(mediaDeviceInfo)
+          mediaOptions = mediaOptions.concat({
+            value: mediaDeviceInfo.deviceId,
+            label: mediaDeviceInfo.label || 'Camera ' + (index + 1)
+          })
+          console.log('camera device options: ', mediaOptions)
+          this.setState((prevState) => {
+            return { ...prevState, cameraOptions: mediaOptions }
+          })
+        }
+      })
+    })
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        loadingVideo: true
+      }
+    })
     this.stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: true
     })
-    this.setState(() => {
-      console.log('startStreaming: setting showVideo to true')
+    this.setState((prevState) => {
       return {
-        ...this.state,
-        showVideo: true
+        ...prevState,
+        showVideo: true,
+        loadingVideo: false
       }
     })
     this.videoRef.current!.srcObject = this.stream
   }
 
   takePhoto = async () => {
-    console.log(this.stream.getVideoTracks())
     const imageCapture = new (window as any).ImageCapture(
       this.stream.getVideoTracks()[0]
     )
@@ -317,21 +342,17 @@ class DocumentUploaderWithOptionComp extends React.Component<
     imageCapture
       .takePhoto()
       .then((blob: Blob) => {
-        console.log('Took photo:', blob)
         this.setState((prevState) => {
-          return { ...prevState, imageSource: URL.createObjectURL(blob) }
+          return {
+            ...prevState,
+            imageSource: URL.createObjectURL(blob),
+            showVideo: false
+          }
         })
         const file = blobToFile(blob, 'some-name.jpg')
         this.handleFileChange(file)
         this.stream.getTracks().forEach((track) => {
           track.stop()
-        })
-        this.setState(() => {
-          console.log('startStreaming: setting showVideo to false')
-          return {
-            ...this.state,
-            showVideo: false
-          }
         })
       })
       .catch(function (error: Error) {
@@ -404,8 +425,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
   render() {
     const { label, intl, requiredErrorMessage } = this.props
-    console.log('(re-)rendering with showVideo set to ', this.state.showVideo)
-    console.log(this.state.showVideo ? undefined : { display: 'none' })
+    console.log('rendering with camera options: ', this.state.cameraOptions)
+    console.log('rendering with options: ', this.state.dropDownOptions)
     return (
       <UploaderWrapper>
         <ErrorMessage id="upload-error">
@@ -418,19 +439,53 @@ class DocumentUploaderWithOptionComp extends React.Component<
           )}
         </ErrorMessage>
         <Label>{label}</Label>
+        <br />
+        <Select options={[this.state.cameraOptions]} />
+
         {
-          <div style={this.state.showVideo ? undefined : { display: 'none' }}>
+          <div
+            style={
+              this.state.showVideo
+                ? {
+                    position: 'relative',
+                    display: 'inline-block',
+                    width: 400,
+                    height: 400
+                  }
+                : {
+                    position: 'relative',
+                    display: 'none',
+                    width: 400,
+                    height: 400
+                  }
+            }
+          >
             <video autoPlay playsInline ref={this.videoRef}></video>
-            <TakePhotoButton
-              id="take_photo"
-              title={'Click!'}
-              onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                e.preventDefault()
-                this.takePhoto()
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                right: '50%',
+                WebkitTransform: 'translate(-50%, -50%)',
+                transform: 'translate(-50%, -50%)'
               }}
-              handleFileChange={this.handleFileChange}
-              disabled={this.state.filesBeingProcessed.length > 0}
-            />
+            >
+              <LoadingIndicator loading={true} />
+            </div>
+            <div style={{ position: 'absolute', left: 50, top: 50 }}>
+              <TakePhotoButton
+                id="take_photo"
+                title={'Click!'}
+                onClick={(
+                  e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                ) => {
+                  e.preventDefault()
+                  this.takePhoto()
+                }}
+                handleFileChange={this.handleFileChange}
+                disabled={this.state.filesBeingProcessed.length > 0}
+              />
+            </div>
           </div>
         }
         <DocumentListPreview
