@@ -25,21 +25,13 @@ import {
   System,
   SystemType
 } from '@client/utils/gateway'
-import { ISystem } from '@client/views/SysAdmin/Config/Systems/Systems'
+import {
+  ISystem,
+  WebHookSetting
+} from '@client/views/SysAdmin/Config/Systems/model'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateSystemPermissions } from './mutations'
 import * as mutations from './mutations'
-
-export enum WebhookOption {
-  birth = 'BIRTH',
-  death = 'DEATH'
-}
-
-export interface WebHookSetting {
-  event: string
-  permissions: string[]
-}
 
 /** Handles the user input when creating a new system in a modal */
 function useNewSystemDraft() {

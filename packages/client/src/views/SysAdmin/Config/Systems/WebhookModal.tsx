@@ -16,7 +16,8 @@ import {
   ISystem,
   WebhookOption,
   WebHookSetting
-} from '@client/views/SysAdmin/Config/Systems/Systems'
+} from '@client/views/SysAdmin/Config/Systems/model'
+
 import { useSystems } from '@client/views/SysAdmin/Config/Systems/useSystems'
 import {
   CheckboxGroup,
@@ -29,41 +30,38 @@ import { Button } from '@opencrvs/components/lib/Button'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 
-export function WebhookModal() {
+interface ISystemProps {
+  cancel: () => void
+  system: ISystem
+}
+
+const populatePermissions = (webhooks: WebHookSetting[] = [], type: string) => {
+  return webhooks.find((ite) => ite.event === type)!
+}
+
+export function WebhookModal({ cancel, system }: ISystemProps) {
   const intl = useIntl()
-
+  const { updateWebhookPermissions } = useSystems()
   const [selectedTab, setSelectedTab] = useState(WebhookOption.birth)
-  const {
-    updateWebhookPermissions,
-    systemToShowPermission,
-    setSystemToShowPermission,
-    birthPermissions,
-    setDeathPermissions,
-    setBirthPermissions,
-    deathPermissions
-  } = useSystems()
 
-  console.log('systemToShowPermission', systemToShowPermission)
-  const checkboxHandler = (items: string[], type: string) => {
-    const val: WebHookSetting = {
-      event: type,
-      permissions: items
-    }
+  const [birthPermissions, setBirthPermissions] = useState(
+    populatePermissions(system.webhook, WebhookOption.birth)
+  )
+
+  const [deathPermissions, setDeathPermissions] = useState(
+    populatePermissions(system.webhook, WebhookOption.death)
+  )
+
+  const checkboxHandler = (items: string[], type: WebhookOption) => {
     type === WebhookOption.birth
-      ? setBirthPermissions(val)
-      : setDeathPermissions(val)
-  }
-
-  const populatePermissions = (
-    webhooks: WebHookSetting[] = [],
-    type: string
-  ) => {
-    const res = webhooks
-      .filter((item: WebHookSetting) => item.event === type)
-      .map((it) => it.permissions)
-
-    console.log(res)
-    return []
+      ? setBirthPermissions({
+          event: type,
+          permissions: items
+        })
+      : setDeathPermissions({
+          event: type,
+          permissions: items
+        })
   }
 
   return (
@@ -73,15 +71,12 @@ export function WebhookModal() {
           <Button onClick={() => updateWebhookPermissions()} type="primary">
             Submit
           </Button>,
-          <Button
-            onClick={() => setSystemToShowPermission(undefined)}
-            type="secondary"
-          >
+          <Button onClick={cancel} type="secondary">
             Cancel
           </Button>
         ]}
         show
-        handleClose={() => setSystemToShowPermission(undefined)}
+        handleClose={cancel}
         title="Webhook"
         autoHeight
         titleHeightAuto
@@ -146,14 +141,8 @@ export function WebhookModal() {
                   }
                 ]}
                 name="test-checkbox-group1"
-                value={
-                  populatePermissions(
-                    systemToShowPermission?.webhook as WebHookSetting[],
-                    WebhookOption.birth
-                  ) ?? []
-                }
+                value={birthPermissions && birthPermissions.permissions}
                 onChange={(newValue) => {
-                  console.log('new val', newValue)
                   checkboxHandler(newValue, WebhookOption.birth)
                 }}
               />
@@ -193,12 +182,7 @@ export function WebhookModal() {
                   }
                 ]}
                 name="test-checkbox-group1"
-                value={
-                  populatePermissions(
-                    systemToShowPermission?.webhook as WebHookSetting[],
-                    WebhookOption.death
-                  ) ?? []
-                }
+                value={deathPermissions && deathPermissions.permissions}
                 onChange={(newValue) => {
                   checkboxHandler(newValue, WebhookOption.death)
                 }}

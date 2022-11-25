@@ -16,6 +16,10 @@ import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
+import {
+  WebhookOption,
+  WebHookSetting
+} from '@client/views/SysAdmin/Config/Systems/model'
 import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import {
   Alert,
@@ -23,6 +27,8 @@ import {
   Divider,
   InputField,
   Link,
+  ListViewItemSimplified,
+  ListViewSimplified,
   Pill,
   Select,
   Spinner,
@@ -37,10 +43,6 @@ import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Text } from '@opencrvs/components/lib/Text'
 
@@ -72,25 +74,6 @@ const Field = styled.div`
   margin-top: 16px;
 `
 
-export enum WebhookOption {
-  birth = 'BIRTH',
-  death = 'DEATH'
-}
-
-export interface WebHookSetting {
-  event: string
-  permissions: string[]
-}
-
-export interface ISystem {
-  clientId: string
-  name: string
-  shaSecret: string
-  status: SystemStatus
-  type: SystemType
-  webhook?: WebHookSetting[]
-}
-
 export function SystemList() {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
@@ -101,21 +84,16 @@ export function SystemList() {
 
   const [selectedTab, setSelectedTab] = React.useState(WebhookOption.birth)
 
-  const checkboxHandler = (items: string[], type: string) => {
-    const val: WebHookSetting = {
-      event: type,
-      permissions: items
-    }
+  const checkboxHandler = (items: string[], type: WebhookOption) => {
     type === WebhookOption.birth
-      ? setBirthPermissions(val)
-      : setDeathPermissions(val)
-  }
-
-  const sysType = {
-    HEALTH: intl.formatMessage(integrationMessages.healthSystem),
-    NATIONAL_ID: intl.formatMessage(integrationMessages.mosip),
-    RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
-    WEBHOOK: intl.formatMessage(integrationMessages.webhook)
+      ? setBirthPermissions({
+          event: type,
+          permissions: items
+        })
+      : setDeathPermissions({
+          event: type,
+          permissions: items
+        })
   }
 
   const toggleModal = () => {
@@ -196,7 +174,6 @@ export function SystemList() {
     if (system.type === SystemType.Webhook) {
       menuItems.push({
         handler: () => {
-          console.log(system)
           setSystemToShowPermission(system)
         },
         label: 'Edit '
@@ -216,6 +193,13 @@ export function SystemList() {
     })
 
     return menuItems
+  }
+
+  const sysType = {
+    HEALTH: intl.formatMessage(integrationMessages.healthSystem),
+    NATIONAL_ID: intl.formatMessage(integrationMessages.mosip),
+    RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
+    WEBHOOK: intl.formatMessage(integrationMessages.webhook)
   }
 
   return (
@@ -487,6 +471,7 @@ export function SystemList() {
                       value: SystemType.Webhook
                     }
                   ]}
+                  id={'permissions-selectors'}
                 />
               </InputField>
             </Field>
@@ -692,7 +677,12 @@ export function SystemList() {
         )}
       </ResponsiveModal>
 
-      {systemToShowPermission && <WebhookModal />}
+      {systemToShowPermission && (
+        <WebhookModal
+          system={systemToShowPermission}
+          cancel={() => setSystemToShowPermission(undefined)}
+        />
+      )}
 
       {activateSystemData && (
         <Toast
