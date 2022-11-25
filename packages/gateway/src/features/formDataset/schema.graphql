@@ -26,7 +26,7 @@ type FormDatasetOption {
 type FormDataset {
   options: [FormDatasetOption!]
   fileName: String!
-  createdBy: String!
+  createdBy: User!
   createdAt: String!
   _id: String
 }
@@ -37,6 +37,9 @@ type FormDatasetResponse {
   data: FormDataset
 }
 
+type Query {
+  getFormDataset: [FormDataset!]
+}
 type Mutation {
   createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
 }

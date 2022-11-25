@@ -49,6 +49,7 @@ export interface GQLQuery {
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getFormDraft?: Array<GQLFormDraft>
+  getFormDataset?: Array<GQLFormDataset>
 }
 
 export interface GQLMutation {
@@ -368,6 +369,14 @@ export interface GQLFormDraft {
   history: Array<GQLDraftHistory>
   updatedAt: GQLDate
   createdAt: GQLDate
+}
+
+export interface GQLFormDataset {
+  options?: Array<GQLFormDatasetOption>
+  fileName: string
+  createdBy: GQLUser
+  createdAt: string
+  _id?: string
 }
 
 export interface GQLNotificationInput {
@@ -846,6 +855,11 @@ export interface GQLDraftHistory {
   updatedAt: GQLDate
 }
 
+export interface GQLFormDatasetOption {
+  value: string
+  label?: Array<GQLFormDatasetOptionLabel | null>
+}
+
 export interface GQLPersonInput {
   _fhirID?: string
   identifier?: Array<GQLIdentityInput | null>
@@ -1023,14 +1037,7 @@ export interface GQLQuestionInput {
   enabled?: string
   custom?: boolean
   conditionals?: Array<GQLConditionalInput>
-}
-
-export interface GQLFormDataset {
-  options?: Array<GQLFormDatasetOption>
-  fileName: string
-  createdBy: string
-  createdAt: string
-  _id?: string
+  datasetId?: string
 }
 
 export const enum GQLInformantType {
@@ -1246,6 +1253,11 @@ export interface GQLEventProgressData {
   timeInReadyToPrint?: number
 }
 
+export interface GQLFormDatasetOptionLabel {
+  lang: string
+  descriptor: GQLMesssageDescriptor
+}
+
 export interface GQLIdentityInput {
   id?: string
   type?: GQLIdentityIDType
@@ -1354,17 +1366,13 @@ export const enum GQLCustomFieldType {
   TEXTAREA = 'TEXTAREA',
   NUMBER = 'NUMBER',
   SUBSECTION = 'SUBSECTION',
-  PARAGRAPH = 'PARAGRAPH'
+  PARAGRAPH = 'PARAGRAPH',
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 }
 
 export interface GQLConditionalInput {
   fieldId: string
   regexp: string
-}
-
-export interface GQLFormDatasetOption {
-  value: string
-  label?: Array<GQLFormDatasetOptionLabel | null>
 }
 
 export interface GQLPayment {
@@ -1400,6 +1408,12 @@ export interface GQLAdditionalIdWithCompositionId {
   trackingId: string
 }
 
+export interface GQLMesssageDescriptor {
+  id: string
+  description?: string
+  defaultMessage: string
+}
+
 export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
@@ -1429,11 +1443,6 @@ export interface GQLMesssageDescriptorInput {
   defaultMessage: string
 }
 
-export interface GQLFormDatasetOptionLabel {
-  lang: string
-  descriptor: GQLMesssageDescriptor
-}
-
 export const enum GQLPaymentType {
   MANUAL = 'MANUAL'
 }
@@ -1442,12 +1451,6 @@ export const enum GQLPaymentOutcomeType {
   COMPLETED = 'COMPLETED',
   ERROR = 'ERROR',
   PARTIAL = 'PARTIAL'
-}
-
-export interface GQLMesssageDescriptor {
-  id: string
-  description?: string
-  defaultMessage: string
 }
 
 /*********************************
@@ -1494,6 +1497,7 @@ export interface GQLResolver {
   Role?: GQLRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   FormDraft?: GQLFormDraftTypeResolver
+  FormDataset?: GQLFormDatasetTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -1528,12 +1532,12 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
+  FormDatasetOption?: GQLFormDatasetOptionTypeResolver
   Birth?: GQLBirthTypeResolver
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
   Integration?: GQLIntegrationTypeResolver
-  FormDataset?: GQLFormDatasetTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -1547,16 +1551,15 @@ export interface GQLResolver {
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
+  FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
-  FormDatasetOption?: GQLFormDatasetOptionTypeResolver
   Payment?: GQLPaymentTypeResolver
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
   }
 
   AdditionalIdWithCompositionId?: GQLAdditionalIdWithCompositionIdTypeResolver
-  FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
   MesssageDescriptor?: GQLMesssageDescriptorTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
@@ -1597,6 +1600,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   getFormDraft?: QueryToGetFormDraftResolver<TParent>
+  getFormDataset?: QueryToGetFormDatasetResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2205,6 +2209,10 @@ export interface QueryToGetActiveCertificatesSVGResolver<
 }
 
 export interface QueryToGetFormDraftResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface QueryToGetFormDatasetResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4008,6 +4016,34 @@ export interface FormDraftToCreatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLFormDatasetTypeResolver<TParent = any> {
+  options?: FormDatasetToOptionsResolver<TParent>
+  fileName?: FormDatasetToFileNameResolver<TParent>
+  createdBy?: FormDatasetToCreatedByResolver<TParent>
+  createdAt?: FormDatasetToCreatedAtResolver<TParent>
+  _id?: FormDatasetTo_idResolver<TParent>
+}
+
+export interface FormDatasetToOptionsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetToFileNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetToCreatedByResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetToCreatedAtResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetTo_idResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -5068,6 +5104,25 @@ export interface DraftHistoryToUpdatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLFormDatasetOptionTypeResolver<TParent = any> {
+  value?: FormDatasetOptionToValueResolver<TParent>
+  label?: FormDatasetOptionToLabelResolver<TParent>
+}
+
+export interface FormDatasetOptionToValueResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetOptionToLabelResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLBirthTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: BirthToREGISTRATION_TARGETResolver<TParent>
   LATE_REGISTRATION_TARGET?: BirthToLATE_REGISTRATION_TARGETResolver<TParent>
@@ -5147,34 +5202,6 @@ export interface IntegrationToNameResolver<TParent = any, TResult = any> {
 }
 
 export interface IntegrationToStatusResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLFormDatasetTypeResolver<TParent = any> {
-  options?: FormDatasetToOptionsResolver<TParent>
-  fileName?: FormDatasetToFileNameResolver<TParent>
-  createdBy?: FormDatasetToCreatedByResolver<TParent>
-  createdAt?: FormDatasetToCreatedAtResolver<TParent>
-  _id?: FormDatasetTo_idResolver<TParent>
-}
-
-export interface FormDatasetToOptionsResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface FormDatasetToFileNameResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface FormDatasetToCreatedByResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface FormDatasetToCreatedAtResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface FormDatasetTo_idResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5772,6 +5799,25 @@ export interface EventProgressDataToTimeInReadyToPrintResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLFormDatasetOptionLabelTypeResolver<TParent = any> {
+  lang?: FormDatasetOptionLabelToLangResolver<TParent>
+  descriptor?: FormDatasetOptionLabelToDescriptorResolver<TParent>
+}
+
+export interface FormDatasetOptionLabelToLangResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface FormDatasetOptionLabelToDescriptorResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLBirthFeeTypeResolver<TParent = any> {
   ON_TIME?: BirthFeeToON_TIMEResolver<TParent>
   LATE?: BirthFeeToLATEResolver<TParent>
@@ -5800,25 +5846,6 @@ export interface DeathFeeToON_TIMEResolver<TParent = any, TResult = any> {
 }
 
 export interface DeathFeeToDELAYEDResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLFormDatasetOptionTypeResolver<TParent = any> {
-  value?: FormDatasetOptionToValueResolver<TParent>
-  label?: FormDatasetOptionToLabelResolver<TParent>
-}
-
-export interface FormDatasetOptionToValueResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface FormDatasetOptionToLabelResolver<
-  TParent = any,
-  TResult = any
-> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5874,25 +5901,6 @@ export interface AdditionalIdWithCompositionIdToCompositionIdResolver<
 }
 
 export interface AdditionalIdWithCompositionIdToTrackingIdResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLFormDatasetOptionLabelTypeResolver<TParent = any> {
-  lang?: FormDatasetOptionLabelToLangResolver<TParent>
-  descriptor?: FormDatasetOptionLabelToDescriptorResolver<TParent>
-}
-
-export interface FormDatasetOptionLabelToLangResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface FormDatasetOptionLabelToDescriptorResolver<
   TParent = any,
   TResult = any
 > {

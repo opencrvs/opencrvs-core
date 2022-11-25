@@ -46,7 +46,14 @@ const getLanguages = async () => {
   return languages
 }
 
-export default async function createFormDatasetHandler(
+export async function getFormDatasetHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  return await FormDataset.find()
+}
+
+export async function createFormDatasetHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {

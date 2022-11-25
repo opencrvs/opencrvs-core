@@ -15,7 +15,19 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 
 export const resolvers: GQLResolver = {
-  Query: {},
+  Query: {
+    async getFormDataset(_, {}, authHeader) {
+      const resp = await fetch(`${APPLICATION_CONFIG_URL}getFormDataset`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      return await resp.json()
+    }
+  },
   Mutation: {
     async createFormDataset(_, { formDataset }, authHeader) {
       try {

@@ -42,6 +42,7 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+  SELECT_WITH_OPTIONS
 }
 
 input QuestionInput {
@@ -59,4 +60,5 @@ input QuestionInput {
   enabled: String
   custom: Boolean
   conditionals: [ConditionalInput!]
+  datasetId: String
 }

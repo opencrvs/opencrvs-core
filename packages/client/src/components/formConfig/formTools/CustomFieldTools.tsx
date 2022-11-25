@@ -17,13 +17,18 @@ import {
   BirthSection,
   DeathSection,
   IFormField,
-  SELECT_WITH_OPTIONS
+  SELECT_WITH_OPTIONS,
+  ISelectOption
 } from '@client/forms'
 import {
   getIdentifiersFromFieldId,
   IMessage
 } from '@client/forms/questionConfig'
-import { Event } from '@client/utils/gateway'
+import {
+  CreateFormDatasetMutation,
+  Event,
+  GetFormDatasetQuery
+} from '@client/utils/gateway'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
   getCertificateHandlebar,
@@ -44,7 +49,10 @@ import { Button } from '@opencrvs/components/src/Button'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
-import { Select } from '@opencrvs/components/lib/Select'
+import {
+  Select,
+  ISelectOption as IDataSourceOption
+} from '@opencrvs/components/lib/Select'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import {
   ListViewSimplified,
@@ -76,6 +84,8 @@ import { ResponsiveModal } from '@client/../../components/lib'
 import { client } from '@client/utils/apolloClient'
 import { CREATE_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/mutations'
 import { Alert } from '@opencrvs/components/lib/Alert'
+import { Query } from '@client/components/Query'
+import { FETCH_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/Wizard/query'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -275,6 +285,8 @@ interface CSVUploadStatus {
   message: string
 }
 
+type IDataSourceSelectOption = IDataSourceOption & { options: ISelectOption[] }
+
 interface ICustomFieldState {
   isFieldDuplicate: boolean
   selectedLanguage: string
@@ -285,11 +297,15 @@ interface ICustomFieldState {
   showCSVUploadingModal: boolean
   CSVUploadStatuses: CSVUploadStatus[]
   CSVUploaderModalActions: JSX.Element[]
+  dataSourceSelectOptions: IDataSourceSelectOption[]
+  selectedDataSource: string | null
 }
 
 interface IOptionalContent {
   [key: string]: IMessage[]
 }
+
+const HEALTH_FACILITY = 'HEALTH_FACILITY'
 
 class CustomFieldToolsComp extends React.Component<
   IFullProps,
@@ -298,6 +314,43 @@ class CustomFieldToolsComp extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = this.getInitialState()
+    this.fetchDataSources()
+  }
+
+  async fetchDataSources() {
+    const { selectedLanguage } = this.props
+    const data: { data: GetFormDatasetQuery } = await client.query({
+      query: FETCH_FORM_DATA_SET,
+      fetchPolicy: 'no-cache'
+    })
+
+    const options: IDataSourceSelectOption[] =
+      data.data?.getFormDataset?.map((dataset) => {
+        return {
+          value: dataset._id as string,
+          label: dataset.fileName as string,
+          options: dataset?.options
+            ?.map((option) => {
+              const label = option?.label
+                ? option.label.find((i) => i?.lang === selectedLanguage)
+                : null
+
+              if (label)
+                return {
+                  value: option.value,
+                  label: label.descriptor
+                } as ISelectOption
+            })
+            .filter((i) => i) as ISelectOption[]
+        }
+      }) || []
+
+    this.setState({
+      dataSourceSelectOptions: [
+        ...this.state.dataSourceSelectOptions,
+        ...options
+      ]
+    })
   }
 
   componentDidUpdate({ selectedField: { fieldId } }: IFullProps) {
@@ -309,7 +362,7 @@ class CustomFieldToolsComp extends React.Component<
   getInitialState() {
     const defaultLanguage = getDefaultLanguage()
     const languages = this.getLanguages()
-    const { selectedField, formField } = this.props
+    const { intl, selectedField, formField, facilities } = this.props
     const fieldForms: { [key: string]: ICustomField } = {}
     const conditionalfield = selectedField.conditionals?.[0]
 
@@ -338,7 +391,25 @@ class CustomFieldToolsComp extends React.Component<
       fieldForms,
       showCSVUploadingModal: false,
       CSVUploadStatuses: [],
-      CSVUploaderModalActions: []
+      CSVUploaderModalActions: [],
+      dataSourceSelectOptions: [
+        {
+          label: intl.formatMessage(
+            customFieldFormMessages.optionHealthFacility
+          ),
+          value: 'HEALTH_FACILITY',
+          options: facilities
+            ? Object.keys(facilities).map((id) => ({
+                label: {
+                  id: `facility.${id}`,
+                  defaultMessage: facilities[id].name
+                },
+                value: facilities[id].id
+              }))
+            : []
+        }
+      ],
+      selectedDataSource: null
     }
   }
 
@@ -936,9 +1007,32 @@ class CustomFieldToolsComp extends React.Component<
 
         {this.CSVUploadModal()}
 
-        <CSelect value="" onChange={() => {}} options={[]} />
+        <CSelect
+          value={this.state.selectedDataSource}
+          onChange={(selectedDataSource: string) => {
+            this.dataSourceSelected(selectedDataSource)
+          }}
+          options={this.state.dataSourceSelectOptions.map((option) => ({
+            label: option.label,
+            value: option.value
+          }))}
+        />
       </>
     )
+  }
+
+  dataSourceSelected(selectedDataSource: string) {
+    const { selectedField, modifyConfigField } = this.props
+    this.setState({ selectedDataSource })
+
+    const options = this.state.dataSourceSelectOptions.find(
+      (option) => option.value === selectedDataSource
+    )
+
+    const modifiedField = this.prepareModifiedFormField()
+    modifiedField.options = options ? options.options : []
+
+    modifyConfigField(selectedField.fieldId, modifiedField)
   }
 
   async onFileChangeHandler(file: File) {
@@ -959,11 +1053,15 @@ class CustomFieldToolsComp extends React.Component<
           }
         ]
       })
-      const res = await client.mutate({
+      const res: { data: CreateFormDatasetMutation } = await client.mutate({
         mutation: CREATE_FORM_DATA_SET,
         variables: { formDataset: { fileName, base64Data } }
       })
-      console.log(res)
+      await this.fetchDataSources()
+
+      if (res?.data?.createFormDataset?.data?._id) {
+        this.dataSourceSelected(res.data.createFormDataset.data._id)
+      }
       this.setState({
         CSVUploaderModalActions: [],
         CSVUploadStatuses: [
@@ -1116,7 +1214,9 @@ function withFieldDefinition<T extends { selectedField: ICustomConfigField }>(
 const mapStateToProps = (store: IStoreState, props: IProps) => {
   const { event, section } = props
   return {
-    fieldsMap: selectConfigFields(store, event, section)
+    fieldsMap: selectConfigFields(store, event, section),
+    facilities: store.offline.offlineData.facilities,
+    selectedLanguage: store.i18n.language
   }
 }
 

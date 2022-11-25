@@ -47,7 +47,10 @@ import {
   deleteFormDraftHandler,
   requestSchema as deleteFormDraftReqSchema
 } from '@config/handlers/formDraft/deleteFormDraft/handler'
-import createFormDatasetHandler from '@config/handlers/formDataset/handler'
+import {
+  createFormDatasetHandler,
+  getFormDatasetHandler
+} from '@config/handlers/formDataset/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -315,6 +318,18 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Get question',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/getFormDataset',
+      handler: getFormDatasetHandler,
+      config: {
+        tags: ['api'],
+        description: 'fetch form dataset',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         }

@@ -171,6 +171,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
+  getFormDataset: [FormDataset!]
 }
 
 type Mutation {
@@ -519,6 +520,14 @@ type FormDraft {
   history: [DraftHistory!]!
   updatedAt: Date!
   createdAt: Date!
+}
+
+type FormDataset {
+  options: [FormDatasetOption!]
+  fileName: String!
+  createdBy: User!
+  createdAt: String!
+  _id: String
 }
 
 input NotificationInput {
@@ -975,6 +984,11 @@ type DraftHistory {
   updatedAt: Date!
 }
 
+type FormDatasetOption {
+  value: String!
+  label: [FormDatasetOptionLabel]
+}
+
 input PersonInput {
   _fhirID: ID
   identifier: [IdentityInput]
@@ -1152,14 +1166,7 @@ input QuestionInput {
   enabled: String
   custom: Boolean
   conditionals: [ConditionalInput!]
-}
-
-type FormDataset {
-  options: [FormDatasetOption!]
-  fileName: String!
-  createdBy: String!
-  createdAt: String!
-  _id: String
+  datasetId: String
 }
 
 enum InformantType {
@@ -1374,6 +1381,11 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
+type FormDatasetOptionLabel {
+  lang: String!
+  descriptor: MesssageDescriptor!
+}
+
 input IdentityInput {
   id: ID
   type: IdentityIDType
@@ -1483,16 +1495,12 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+  SELECT_WITH_OPTIONS
 }
 
 input ConditionalInput {
   fieldId: String!
   regexp: String!
-}
-
-type FormDatasetOption {
-  value: String!
-  label: [FormDatasetOptionLabel]
 }
 
 type Payment {
@@ -1515,6 +1523,12 @@ interface AuditLogItemBase {
 type AdditionalIdWithCompositionId {
   compositionId: String!
   trackingId: String!
+}
+
+type MesssageDescriptor {
+  id: String!
+  description: String
+  defaultMessage: String!
 }
 
 input CommentInput {
@@ -1546,11 +1560,6 @@ input MesssageDescriptorInput {
   defaultMessage: String!
 }
 
-type FormDatasetOptionLabel {
-  lang: String!
-  descriptor: MesssageDescriptor!
-}
-
 enum PaymentType {
   MANUAL
 }
@@ -1559,10 +1568,4 @@ enum PaymentOutcomeType {
   COMPLETED
   ERROR
   PARTIAL
-}
-
-type MesssageDescriptor {
-  id: String!
-  description: String
-  defaultMessage: String!
 }
