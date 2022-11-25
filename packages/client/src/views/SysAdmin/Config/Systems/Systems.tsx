@@ -79,7 +79,8 @@ const populatePermissions = (
   webhooks: WebhookPermission[] = [],
   type: string
 ) => {
-  return webhooks.find((ite) => ite.event === type)!
+  const { __typename, ...rest } = webhooks.find((ite) => ite.event === type)!
+  return rest
 }
 
 export function SystemList() {
@@ -103,8 +104,9 @@ export function SystemList() {
   }
 
   const {
-    updateWebhookSystemError,
-    updateWebhookSystemLoading,
+    updatePermissionsData,
+    updatePermissionsLoading,
+    updatePermissionsError,
     updatePermissions,
     systemToShowPermission,
     setSystemToShowPermission,
@@ -690,7 +692,7 @@ export function SystemList() {
 
       {systemToShowPermission && (
         <WebhookModal
-          loading={updateWebhookSystemLoading}
+          loading={updatePermissionsLoading}
           updatePermissions={updatePermissions}
           birthPermissions={birthPermissions}
           deathPermissions={deathPermissions}
@@ -709,20 +711,21 @@ export function SystemList() {
           {intl.formatMessage(integrationMessages.activateClientStatus)}
         </Toast>
       )}
-      {deactivateSystemData && (
-        <Toast
-          type="success"
-          id="toggleClientStatusToast"
-          onClose={() => resetData()}
-        >
-          {intl.formatMessage(integrationMessages.deactivateClientStatus)}
-        </Toast>
-      )}
+      {deactivateSystemData ||
+        (updatePermissionsData && (
+          <Toast
+            type="success"
+            id="toggleClientStatusToast"
+            onClose={() => resetData()}
+          >
+            {intl.formatMessage(integrationMessages.deactivateClientStatus)}
+          </Toast>
+        ))}
       {(activateSystemError ||
         deactivateSystemError ||
         registerSystemError ||
         refreshTokenError ||
-        updateWebhookSystemError) && (
+        updatePermissionsError) && (
         <Toast
           type="error"
           id="toggleClientStatusToast"

@@ -200,7 +200,12 @@ export function useSystems() {
 
   const [
     updateWebhookPermissions,
-    { error: updateWebhookSystemError, loading: updateWebhookSystemLoading }
+    {
+      data: updatePermissionsData,
+      loading: updatePermissionsLoading,
+      error: updatePermissionsError,
+      reset: updatePermissionsReset
+    }
   ] = useMutation<
     UpdatePermissionsMutation,
     UpdatePermissionsMutationVariables
@@ -210,6 +215,9 @@ export function useSystems() {
         dispatchStatusChange(updatePermissions)
         setSystemToShowPermission(undefined)
       }
+    },
+    onError: () => {
+      setSystemToShowPermission(undefined)
     }
   })
 
@@ -270,14 +278,16 @@ export function useSystems() {
     setDeathPermissions(initWebHook)
     setBirthPermissions(initWebHook)
     resetRefreshTokenData()
+    updatePermissionsReset()
   }
 
   const shouldWarnAboutNationalId =
     newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
 
   return {
-    updateWebhookSystemError,
-    updateWebhookSystemLoading,
+    updatePermissionsData,
+    updatePermissionsLoading,
+    updatePermissionsError,
     updatePermissions,
     systemToShowPermission,
     setSystemToShowPermission,
