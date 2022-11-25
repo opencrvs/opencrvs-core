@@ -9,115 +9,106 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const birthCertificateTemplateTextOnly = `<svg width="421" height="595" viewBox="0 0 421 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <rect width="420" height="595" transform="translate(0.381287)" fill="white" />
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="199.666">Registration Centre: </tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="199.666">{{ registrationCentre }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="219.666">LGA:</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="219.666">{{ registrationLGA }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="239.666">State:</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="239.666">{{ registrationState }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
-    <tspan x="59.7088" y="260.226">This is to certify that the birth, details of which are recorded herein, has been </tspan>
-    <tspan x="59.7088" y="274.626">registered on</tspan>
-    <tspan x="183.217" y="274.626"> at this registration centre.</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
-    <tspan x="110.045" y="274.626">{{ registrationDate }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="300.392">BRN:</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="300.392">{{ registrationNumber }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="320.392">Full Name:</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="320.392">{{ childFirstName }}, {{ childFamilyName }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="340.392">Sex:</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="340.392">{{ informantGender }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="360.392">Date of Birth:</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="360.392">{{ eventDate }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="379.008">Place of Birth:</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="379.008">{{ placeOfBirthLocality }}, &#x2028;</tspan>
-    <tspan x="162.709" y="392.008">{{ placeOfBirthLGA }}, {{ placeOfBirthState }}</tspan>
-  </text>
-  {{#if motherFirstName}}
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="413.392">Full Name of Mother: </tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="413.392">{{ motherFamilyName }}, {{ motherFirstName }}</tspan>
-  </text>
-  {{/if}}
-  {{#if fatherFirstName}}
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="432.021">Full Name of Father:</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="432.021">{{ fatherFamilyName }}, {{ fatherFirstName }}</tspan>
-  </text>
-  {{/if}}
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="461.191">Name of Registrar: </tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="461.191">{{ registrarName }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-    <tspan x="59.7088" y="481.191">Date:</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
-    <tspan x="162.709" y="481.191">{{ certificateDate }}</tspan>
-  </text>
-  <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="6" letter-spacing="0px">
-    <tspan x="166.247" y="548.977">Signature of registrar</tspan>
-  </text>
-  <mask id="mask0_226_222" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="138" y="498" width="116" height="37">
-    <rect x="138.881" y="498.472" width="115" height="36.1429" fill="#FCC7C7" />
-  </mask>
-  <g mask="url(#mask0_226_222)">
-    <rect x="143.447" y="498.472" width="106.06" height="37.1756" fill="url(#pattern0)" />
-  </g>
-  <line x1="136.006" y1="536.5" x2="256.756" y2="536.5" stroke="#A5A5A5" />
-
-  <image
-    width="54" height="56"
-    x="326" y="503.565"
-    xlink:href="{{ qrCode }}"
-  />
-  <defs>
-    <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
-      <use xlink:href="#image0_226_222" transform="scale(0.000818331 0.00224215)" />
-    </pattern>
-    <image id="image0_226_222" data-content="signature" width="1222" height="446" xlink:href="" />
-  </defs>
+const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="420" height="595" fill="white" />
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="199.666">Registration Centre: </tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0em">
+  <tspan x="162.619" y="199.992">{{ registrationCentre }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="219.666">LGA:</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.619" y="219.992">{{ registrationLGA }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="239.666">State:</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.328" y="239.666">{{ registrationState }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
+  <tspan x="59.3275" y="260.226">This is to certify that the birth, details of which are recorded herein, has been </tspan>
+  <tspan x="59.3275" y="274.626">registered on {{ registrationDate }} at this registration centre.</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="300.392">BRN:</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.619" y="299.992">{{ registrationNumber }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="320.392">Full Name:</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.619" y="319.992">{{ childFirstName }}, {{ childFamilyName }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="340.392">Sex:</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.619" y="339.992">{{ informantGender }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="360.392">Date of Birth:</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.328" y="360.392">{{ eventDate }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="379.008">Place of Birth:</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.328" y="379.008">{{ placeOfBirthLocality }},&#x2028;</tspan>
+  <tspan x="162.328" y="392.008">{{ placeOfBirthLGA }}, {{ placeOfBirthState }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="413.392">Full Name of Mother: </tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.619" y="412.992">{{ motherFamilyName }}, {{ motherFirstName }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="432.021">Full Name of Father:</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.619" y="431.621">{{ fatherFamilyName }}, {{ fatherFirstName }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="461.191">Name of Registrar: </tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.328" y="461.191">{{ registrarName }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
+  <tspan x="59.3275" y="481.191">Date:</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.328" y="481.191">{{ certificateDate }}</tspan>
+</text>
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="6" letter-spacing="0px">
+  <tspan x="180.24" y="548.977">Signature of registrar</tspan>
+</text>
+<line x1="150" y1="536.5" x2="270.75" y2="536.5" stroke="#A5A5A5" />
+<path d="M63.6187 501.5H103.619C105.552 501.5 107.119 503.067 107.119 505V545C107.119 546.933 105.552 548.5 103.619 548.5H63.6187C61.6857 548.5 60.1187 546.933 60.1187 545V505C60.1187 503.067 61.6857 501.5 63.6187 501.5Z" fill="white" stroke="#EEEEEE" />
+<g opacity="0.2">
+  <path d="M119.267 385.536C117.38 386.857 115.668 387.802 114.13 388.372C112.57 388.911 111.172 389.152 109.934 389.097C108.697 389.041 107.621 388.757 106.709 388.243C105.774 387.699 105.025 387.024 104.462 386.22C103.834 385.323 103.526 384.455 103.538 383.616C103.529 382.747 103.767 381.935 104.253 381.18C104.769 380.403 105.43 379.733 106.234 379.17C107.37 380.726 108.597 381.919 109.915 382.748C111.233 383.577 112.584 383.991 113.967 383.991C115.359 383.938 116.72 383.446 118.051 382.514C119.969 381.171 121.118 379.652 121.498 377.956C121.888 376.208 121.52 374.53 120.393 372.921C119.635 371.838 118.722 371.094 117.655 370.689C116.587 370.284 115.269 370.146 113.7 370.276C112.132 370.407 110.216 370.733 107.955 371.256C106.006 371.699 104.225 371.955 102.613 372.023C101.001 372.091 99.573 371.961 98.3291 371.634C97.0852 371.306 95.9574 370.782 94.9455 370.061C93.9429 369.287 93.0192 368.297 92.1744 367.091C90.8962 365.266 90.271 363.352 90.2985 361.35C90.3044 359.317 90.8781 357.371 92.0196 355.511C93.1394 353.621 94.7512 351.939 96.8549 350.466C98.9587 348.993 100.88 348.016 102.619 347.536C104.336 347.026 105.816 346.934 107.06 347.262C108.335 347.568 109.308 348.201 109.98 349.16C110.716 350.212 110.905 351.37 110.547 352.636C110.166 353.87 109.156 355.062 107.516 356.21C106.888 355.313 106.068 354.504 105.056 353.783C104.075 353.041 102.986 352.604 101.789 352.475C100.601 352.292 99.3877 352.634 98.1502 353.501C97.1912 354.172 96.4549 354.965 95.9414 355.877C95.4372 356.738 95.2176 357.675 95.2827 358.69C95.3262 359.674 95.6945 360.661 96.3877 361.651C97.1026 362.672 97.9474 363.417 98.9221 363.888C99.8968 364.358 101.175 364.57 102.756 364.523C104.337 364.476 106.399 364.162 108.942 363.58C111.516 362.976 113.763 362.694 115.681 362.734C117.609 362.722 119.293 363.086 120.735 363.829C122.187 364.519 123.454 365.637 124.537 367.184C125.923 369.164 126.626 371.254 126.645 373.454C126.673 375.601 126.067 377.731 124.826 379.845C123.595 381.906 121.742 383.803 119.267 385.536Z" fill="#D53F3F" />
+  <path d="M141.93 385.573L140.338 383.299L140.802 382.974C141.359 382.585 141.846 382.128 142.264 381.605C142.734 381.091 142.977 380.483 142.992 379.781C143.06 379.088 142.78 378.293 142.152 377.396L124.54 352.243C123.868 351.284 123.226 350.696 122.614 350.48C121.979 350.232 121.356 350.231 120.743 350.475C120.14 350.667 119.529 350.98 118.91 351.413L118.493 351.706L116.9 349.432L125.625 343.323L129.018 346.687L129.204 346.557C128.974 344.781 129.146 343.117 129.718 341.563C130.3 339.957 131.487 338.526 133.282 337.27C136.345 335.125 139.406 334.526 142.466 335.472C145.557 336.397 148.674 339.102 151.815 343.588C154.956 348.074 156.448 351.917 156.29 355.116C156.111 358.285 154.506 360.93 151.474 363.053C149.711 364.288 148.034 364.955 146.443 365.054C144.831 365.123 143.273 364.807 141.77 364.108L141.491 364.303C141.9 364.755 142.368 365.326 142.898 366.016C143.458 366.684 143.981 367.332 144.467 367.96C144.952 368.588 145.347 369.119 145.65 369.552L148.217 373.218C148.846 374.115 149.481 374.661 150.125 374.856C150.8 375.029 151.443 374.993 152.056 374.749C152.721 374.514 153.317 374.212 153.842 373.844L154.539 373.356L156.131 375.63L141.93 385.573ZM147.575 360.942C148.751 360.119 149.445 359.102 149.659 357.893C149.85 356.652 149.603 355.212 148.915 353.572C148.259 351.91 147.184 350.012 145.689 347.878C144.216 345.774 142.811 344.13 141.474 342.945C140.147 341.707 138.878 340.982 137.668 340.769C136.437 340.524 135.233 340.814 134.058 341.637C132.696 342.59 131.863 343.704 131.556 344.979C131.281 346.232 131.498 347.694 132.207 349.365C132.916 351.035 134.006 352.923 135.48 355.026C136.974 357.161 138.385 358.847 139.713 360.085C141.019 361.291 142.308 361.979 143.579 362.149C144.882 362.298 146.214 361.895 147.575 360.942Z" fill="#D53F3F" />
+  <path d="M177.003 345.109C173.29 347.708 169.649 348.598 166.078 347.779C162.517 346.907 159.328 344.46 156.512 340.438C153.479 336.107 152.152 332.171 152.533 328.631C152.922 325.039 154.865 322.019 158.361 319.571C161.609 317.296 164.807 316.464 167.953 317.073C171.109 317.629 173.976 319.748 176.554 323.43L178.147 325.704L162.832 336.427C164.411 338.549 165.924 340.118 167.372 341.132C168.829 342.095 170.25 342.575 171.633 342.575C173.047 342.553 174.434 342.066 175.796 341.113C176.878 340.355 177.729 339.528 178.348 338.634C178.976 337.687 179.415 336.734 179.666 335.775C179.894 334.785 179.967 333.835 179.883 332.925C180.332 332.842 180.779 332.92 181.225 333.162C181.679 333.35 182.069 333.677 182.394 334.141C182.936 334.914 183.142 335.9 183.012 337.097C182.913 338.273 182.387 339.563 181.435 340.968C180.491 342.32 179.014 343.701 177.003 345.109ZM170.025 327.241C168.92 325.663 167.817 324.384 166.715 323.403C165.613 322.423 164.537 321.84 163.485 321.654C162.442 321.416 161.41 321.655 160.389 322.369C159.399 323.063 158.754 323.952 158.454 325.038C158.185 326.103 158.261 327.364 158.682 328.821C159.112 330.225 159.877 331.811 160.975 333.578L170.025 327.241Z" fill="#D53F3F" />
+  <path d="M202.417 327.313C200.251 328.83 198.041 329.755 195.785 330.09C193.53 330.424 191.273 329.999 189.014 328.814C186.733 327.599 184.499 325.428 182.311 322.304C179.993 318.993 178.653 316.059 178.291 313.5C177.937 310.889 178.299 308.607 179.376 306.654C180.483 304.68 182.073 302.967 184.146 301.516C185.879 300.303 187.535 299.442 189.116 298.935C190.728 298.405 192.155 298.237 193.395 298.428C194.636 298.62 195.603 299.211 196.296 300.201C196.773 300.881 197.036 301.619 197.086 302.415C197.144 303.157 196.896 303.954 196.339 304.805C195.782 305.656 194.838 306.547 193.508 307.478C192.771 306.427 191.992 305.543 191.168 304.829C190.376 304.092 189.549 303.635 188.685 303.455C187.853 303.254 186.988 303.468 186.091 304.096C185.101 304.789 184.436 305.716 184.096 306.876C183.765 307.984 183.929 309.437 184.588 311.234C185.248 313.032 186.52 315.277 188.404 317.968C189.899 320.103 191.361 321.73 192.791 322.85C194.199 323.939 195.585 324.536 196.949 324.641C198.345 324.724 199.77 324.257 201.224 323.239C202.245 322.524 203.064 321.719 203.683 320.825C204.333 319.909 204.783 318.971 205.033 318.012C205.293 317 205.355 316.035 205.219 315.116C205.68 315.116 206.107 315.232 206.5 315.464C206.924 315.674 207.287 315.996 207.59 316.429C208.132 317.203 208.353 318.177 208.254 319.353C208.156 320.529 207.645 321.808 206.723 323.191C205.833 324.553 204.397 325.927 202.417 327.313Z" fill="#D53F3F" />
+  <path d="M213.354 318.964L211.761 316.69L212.365 316.268C212.891 315.899 213.373 315.469 213.813 314.977C214.261 314.432 214.504 313.824 214.541 313.153C214.609 312.46 214.34 311.68 213.733 310.814L203.66 296.428C203.053 295.562 202.424 295.057 201.771 294.915C201.096 294.742 200.453 294.778 199.84 295.022C199.227 295.267 198.658 295.573 198.132 295.941L197.715 296.234L196.122 293.96L206.053 287.006L219.701 306.497C220.329 307.394 220.976 307.956 221.641 308.181C222.285 308.376 222.939 308.356 223.604 308.121C224.248 307.855 224.833 307.537 225.359 307.169L225.916 306.779L227.508 309.053L213.354 318.964ZM199.75 284.918C198.791 285.59 197.798 285.917 196.771 285.898C195.775 285.858 194.887 285.281 194.107 284.167C193.305 283.023 193.067 281.991 193.392 281.072C193.726 280.1 194.388 279.268 195.378 278.575C196.306 277.925 197.283 277.609 198.311 277.627C199.316 277.615 200.22 278.181 201.021 279.326C201.801 280.44 202.024 281.482 201.69 282.454C201.356 283.425 200.71 284.247 199.75 284.918Z" fill="#D53F3F" />
+  <path d="M229.31 307.791L227.718 305.517L227.997 305.322C228.708 304.824 229.273 304.313 229.69 303.79C230.139 303.246 230.355 302.633 230.34 301.952C230.324 301.272 229.992 300.467 229.342 299.539L219.463 285.431C218.835 284.534 218.215 283.977 217.602 283.761C217.02 283.523 216.423 283.526 215.811 283.77C215.207 283.962 214.565 284.297 213.885 284.773L213.745 284.871L212.218 282.689L221.036 276.516L224.076 279.574L224.308 279.411C224.103 277.802 224.162 276.47 224.484 275.415C224.784 274.329 225.286 273.401 225.992 272.63C226.728 271.838 227.576 271.106 228.535 270.435C229.618 269.676 230.705 269.122 231.797 268.773C232.889 268.423 233.982 268.304 235.074 268.415C236.144 268.495 237.212 268.9 238.276 269.63L238.648 269.37C238.443 267.762 238.533 266.408 238.916 265.309C239.278 264.18 239.827 263.219 240.563 262.427C241.331 261.613 242.209 260.86 243.199 260.166C245.581 258.498 247.936 257.91 250.263 258.402C252.621 258.872 254.904 260.685 257.114 263.84L264.717 274.699C265.389 275.658 266.011 276.283 266.583 276.574C267.187 276.843 267.79 276.882 268.394 276.69C268.997 276.498 269.639 276.164 270.319 275.687L270.459 275.59L272.051 277.864L262.584 284.492L251.698 268.946C250.29 266.935 248.898 265.605 247.521 264.955C246.122 264.275 244.665 264.465 243.149 265.527C242.066 266.285 241.401 267.212 241.154 268.307C240.937 269.381 241.032 270.537 241.437 271.774C241.874 272.99 242.514 274.201 243.359 275.408L250.053 284.968C250.703 285.896 251.325 286.521 251.919 286.842C252.522 287.111 253.126 287.15 253.729 286.958C254.332 286.766 254.974 286.432 255.655 285.955L255.794 285.858L257.386 288.132L247.919 294.761L237.034 279.214C235.626 277.203 234.233 275.873 232.856 275.224C231.458 274.543 230 274.734 228.484 275.795C227.34 276.597 226.665 277.576 226.461 278.733C226.288 279.869 226.452 281.091 226.954 282.4C227.455 283.708 228.161 285.012 229.071 286.312L235.505 295.5C236.133 296.398 236.753 296.954 237.366 297.171C237.979 297.387 238.602 297.389 239.236 297.175C239.849 296.931 240.495 296.57 241.176 296.094L241.315 295.996L242.908 298.27L229.31 307.791Z" fill="#D53F3F" />
+  <path d="M287.445 267.776C283.733 270.375 280.091 271.266 276.521 270.446C272.959 269.574 269.77 267.127 266.954 263.105C263.921 258.774 262.595 254.838 262.975 251.299C263.364 247.706 265.307 244.686 268.803 242.238C272.052 239.964 275.249 239.131 278.396 239.74C281.552 240.297 284.419 242.416 286.997 246.097L288.589 248.371L273.275 259.094C274.853 261.217 276.366 262.785 277.814 263.8C279.272 264.762 280.692 265.243 282.075 265.243C283.489 265.221 284.877 264.733 286.238 263.78C287.321 263.022 288.172 262.196 288.79 261.301C289.418 260.355 289.858 259.401 290.108 258.442C290.337 257.452 290.409 256.502 290.326 255.593C290.774 255.509 291.222 255.588 291.667 255.829C292.122 256.018 292.512 256.344 292.837 256.808C293.378 257.582 293.584 258.567 293.454 259.765C293.356 260.94 292.83 262.231 291.877 263.635C290.934 264.988 289.456 266.368 287.445 267.776ZM280.467 249.909C279.362 248.331 278.259 247.052 277.158 246.071C276.056 245.09 274.979 244.507 273.927 244.322C272.884 244.083 271.853 244.322 270.832 245.037C269.842 245.73 269.197 246.62 268.897 247.706C268.628 248.77 268.704 250.031 269.125 251.488C269.555 252.893 270.319 254.478 271.418 256.245L280.467 249.909Z" fill="#D53F3F" />
+  <path d="M300.144 258.193L298.552 255.919L298.737 255.789C299.449 255.291 300.029 254.769 300.478 254.224C300.926 253.68 301.143 253.067 301.127 252.386C301.142 251.684 300.825 250.869 300.175 249.941L290.362 235.926C289.734 235.029 289.113 234.472 288.501 234.255C287.888 234.039 287.275 234.053 286.663 234.297C286.06 234.489 285.418 234.824 284.737 235.3L284.551 235.43L282.959 233.156L291.869 226.917L294.91 229.975L295.142 229.813C294.937 228.204 294.996 226.872 295.317 225.817C295.648 224.709 296.166 223.77 296.872 222.999C297.608 222.207 298.471 221.465 299.461 220.771C301.874 219.082 304.26 218.472 306.618 218.942C308.975 219.412 311.259 221.225 313.469 224.38L321.072 235.239C321.744 236.198 322.366 236.823 322.938 237.114C323.542 237.383 324.13 237.433 324.702 237.262C325.305 237.071 325.947 236.736 326.628 236.26L326.813 236.13L328.406 238.404L318.939 245.032L308.053 229.486C306.645 227.475 305.237 226.156 303.829 225.528C302.431 224.847 300.958 225.049 299.411 226.132C298.235 226.955 297.545 227.945 297.341 229.102C297.168 230.238 297.317 231.471 297.787 232.801C298.289 234.11 298.994 235.414 299.904 236.714L306.338 245.902C306.966 246.799 307.571 247.367 308.153 247.605C308.766 247.822 309.389 247.823 310.023 247.61C310.636 247.365 311.283 247.004 311.963 246.528L312.149 246.398L313.741 248.672L300.144 258.193Z" fill="#D53F3F" />
+  <rect x="53.8555" y="360.862" width="322.047" height="84.5282" rx="1.4163" transform="rotate(-35 53.8555 360.862)" stroke="#D53F3F" stroke-width="2.8326" />
+</g>
+<image
+  width="54" height="56"
+  x="53.8555" y="499.5"
+  xlink:href="{{ qrCode }}"
+/>
 </svg>`
 
 export default birthCertificateTemplateTextOnly
