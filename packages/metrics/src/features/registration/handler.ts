@@ -488,3 +488,17 @@ export async function declarationUnassignedHandler(
   await createUserAuditPointFromFHIR('UNASSIGNED', request)
   return h.response().code(200)
 }
+export async function declarationDownloadedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('RETRIEVED', request)
+  return h.response().code(200)
+}
+export async function declarationViewedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('VIEWED', request)
+  return h.response().code(200)
+}

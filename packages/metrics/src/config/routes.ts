@@ -42,7 +42,9 @@ import {
   requestForRegistrarValidationHandler,
   declarationAssignedHandler,
   declarationUnassignedHandler,
-  waitingExternalValidationHandler
+  waitingExternalValidationHandler,
+  declarationViewedHandler,
+  declarationDownloadedHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -289,6 +291,22 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/assigned',
       handler: declarationAssignedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/downloaded',
+      handler: declarationDownloadedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/viewed',
+      handler: declarationViewedHandler,
       config: {
         tags: ['api']
       }

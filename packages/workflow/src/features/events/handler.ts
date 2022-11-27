@@ -421,6 +421,7 @@ export async function fhirWorkflowEventHandler(
     case Events.DOWNLOADED:
     case Events.VIEWED:
       response = await actionEventHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.ASSIGNED_EVENT:
     case Events.UNASSIGNED_EVENT:
