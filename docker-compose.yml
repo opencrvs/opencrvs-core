@@ -169,4 +169,5 @@ services:
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
-      - WAIT_HOSTS=mongo1:27017,influxdb:8086
+      - ES_HOST=elasticsearch:9200
+      - WAIT_HOSTS=mongo1:27017,influxdb:8086,elasticsearch:9200
