@@ -12,6 +12,12 @@
 import { Story, ComponentMeta } from '@storybook/react'
 import { Accordion, IAccordionProps } from './Accordion'
 import React from 'react'
+import styled from 'styled-components'
+
+const AccorDionContent = styled.div`
+  width: 100%;
+  height: 100px;
+`
 
 export default {
   title: 'Data/Accordion',
@@ -19,28 +25,20 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: `\`<Accordion />\` `
+        component: `The accordion \`<Accordion />\` component is a wrapper container which allows user to hide or expand the relevant content inside.`
       }
     }
   }
 } as ComponentMeta<typeof Accordion>
 
-const Template: Story<IAccordionProps> = (args) => <Accordion {...args} />
+const Template: Story<IAccordionProps> = (args) => (
+  <Accordion {...args}>This is the content of the accordion.</Accordion>
+)
 
 export const AccordionView = Template.bind({})
 AccordionView.args = {
   name: 'accordion-component',
-  label: 'Section name',
-  showLabel: 'Show',
-  hideLabel: 'Hide',
-  value: 'no',
-  options: [
-    {
-      value: 'yes'
-    },
-    {
-      value: 'no'
-    }
-  ],
-  onChange: () => alert('Clicked')
+  label: 'Accordion Label',
+  labelForHideAction: 'Hide',
+  labelForShowAction: 'Show'
 }
