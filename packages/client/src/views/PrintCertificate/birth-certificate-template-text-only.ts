@@ -71,15 +71,27 @@ const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox=
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="413.392">Full Name of Mother: </tspan>
 </text>
+{{#if motherFirstName}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
   <tspan x="162.619" y="412.992">{{ motherFamilyName }}, {{ motherFirstName }}</tspan>
 </text>
+{{else}}
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.619" y="412.992">-</tspan>
+</text>
+{{/if}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="432.021">Full Name of Father:</tspan>
 </text>
+{{#if fatherFirstName}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
   <tspan x="162.619" y="431.621">{{ fatherFamilyName }}, {{ fatherFirstName }}</tspan>
 </text>
+{{else}}
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+  <tspan x="162.619" y="431.621">-</tspan>
+</text>
+{{/if}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="461.191">Name of Registrar: </tspan>
 </text>
