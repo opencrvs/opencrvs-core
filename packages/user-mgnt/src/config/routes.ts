@@ -65,9 +65,10 @@ import {
   getAllSystemsHandler,
   updatePermissions,
   reqUpdateSystemSchema,
-  // SystemSchema,
   refreshSystemSecretHandler,
-  systemSecretRequestSchema
+  systemSecretRequestSchema,
+  resSystemSchema,
+  SystemSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -496,10 +497,10 @@ export const getRoutes = () => {
         },
         validate: {
           payload: reqRegisterSystemSchema
+        },
+        response: {
+          schema: resSystemSchema
         }
-        /*  response: {
-            schema: resSystemSchema
-          }*/
       }
     },
     {
@@ -529,10 +530,10 @@ export const getRoutes = () => {
         },
         validate: {
           payload: clientIdSchema
-        }
-        /*response: {
+        },
+        response: {
           schema: SystemSchema
-        }*/
+        }
       }
     },
     {
@@ -547,10 +548,10 @@ export const getRoutes = () => {
         },
         validate: {
           payload: clientIdSchema
+        },
+        response: {
+          schema: SystemSchema
         }
-        /* response: {
-           schema: SystemSchema
-         }*/
       }
     },
     {
@@ -633,10 +634,10 @@ export const getRoutes = () => {
         },
         validate: {
           payload: systemSecretRequestSchema
+        },
+        response: {
+          schema: resSystemSchema
         }
-        /* response: {
-           schema: resSystemSchema
-         }*/
       }
     }
   ]

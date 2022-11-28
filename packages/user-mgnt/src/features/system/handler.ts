@@ -58,7 +58,10 @@ const pickSystem = (system: ISystemModel & { _id: Types.ObjectId }) => ({
   _id: system._id.toString(),
   shaSecret: system.sha_secret,
   clientId: system.client_id,
-  webhookPermissions: system.settings.webhook
+  webhookPermissions: system.settings.webhook.map((ite) => ({
+    event: ite.event,
+    permissions: ite.permissions
+  }))
 })
 
 export async function registerSystem(
@@ -387,13 +390,21 @@ export const clientIdSchema = Joi.object({
   clientId: Joi.string()
 })
 
+const webHookSchema = Joi.array().items(
+  Joi.object({
+    event: Joi.string().required(),
+    permissions: Joi.array()
+  })
+)
+
 export const SystemSchema = Joi.object({
   _id: Joi.string(),
   name: Joi.string(),
   status: Joi.string(),
   type: Joi.string(),
   shaSecret: Joi.string(),
-  clientId: Joi.string()
+  clientId: Joi.string(),
+  webhookPermissions: webHookSchema.optional()
 })
 
 export const resSystemSchema = Joi.object({
@@ -437,12 +448,6 @@ export async function updatePermissions(
   }
 }
 
-const webHookSchema = Joi.array().items(
-  Joi.object({
-    event: Joi.string().required(),
-    permissions: Joi.array().items(Joi.string()).required()
-  })
-)
 export const reqUpdateSystemSchema = Joi.object({
   clientId: Joi.string().required(),
   webhook: webHookSchema.required()

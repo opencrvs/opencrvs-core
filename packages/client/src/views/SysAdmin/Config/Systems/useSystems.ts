@@ -26,7 +26,8 @@ import {
   SystemType,
   UpdatePermissionsMutation,
   UpdatePermissionsMutationVariables,
-  WebhookPermission
+  WebhookPermission,
+  Event
 } from '@client/utils/gateway'
 
 import React, { useState } from 'react'
@@ -84,10 +85,17 @@ export function useSystemsGlobalState() {
   }
 
   return {
-    dispatchStatusChange: dispatchSystemUpdate,
+    dispatchSystemUpdate,
     dispatchNewSystem,
     existingSystems,
     doesNationalIdAlreadyExist
+  }
+}
+
+function initWebHook(event: string) {
+  return {
+    event: event,
+    permissions: []
   }
 }
 
@@ -105,24 +113,20 @@ export function useSystems() {
   } = useNewSystemDraft()
   const {
     dispatchNewSystem,
-    dispatchStatusChange,
+    dispatchSystemUpdate,
     existingSystems,
     doesNationalIdAlreadyExist
   } = useSystemsGlobalState()
 
-  const initWebHook: WebhookPermission = {
-    event: EMPTY_STRING,
-    permissions: []
-  }
+  const [birthPermissions, setBirthPermissions] = useState<WebhookPermission>(
+    initWebHook(Event.Birth)
+  )
 
-  const [birthPermissions, setBirthPermissions] =
-    React.useState<WebhookPermission>(initWebHook)
+  const [deathPermissions, setDeathPermissions] = useState<WebhookPermission>(
+    initWebHook(Event.Death)
+  )
 
-  const [deathPermissions, setDeathPermissions] =
-    React.useState<WebhookPermission>(initWebHook)
-
-  const [systemToShowPermission, setSystemToShowPermission] =
-    React.useState<System>()
+  const [systemToShowPermission, setSystemToShowPermission] = useState<System>()
 
   const [
     activateSystemMutate,
@@ -136,7 +140,7 @@ export function useSystems() {
     mutations.activateSystem,
     {
       onCompleted: ({ reactivateSystem }) => {
-        if (reactivateSystem) dispatchStatusChange(reactivateSystem)
+        if (reactivateSystem) dispatchSystemUpdate(reactivateSystem)
         setSystemToToggleActivation(undefined)
       }
     }
@@ -153,7 +157,7 @@ export function useSystems() {
     mutations.deactivateSystem,
     {
       onCompleted: ({ deactivateSystem }) => {
-        if (deactivateSystem) dispatchStatusChange(deactivateSystem)
+        if (deactivateSystem) dispatchSystemUpdate(deactivateSystem)
         setSystemToToggleActivation(undefined)
       }
     }
@@ -211,7 +215,7 @@ export function useSystems() {
   >(mutations.updateSystemPermissions, {
     onCompleted: ({ updatePermissions }) => {
       if (updatePermissions) {
-        dispatchStatusChange(updatePermissions)
+        dispatchSystemUpdate(updatePermissions)
         setSystemToShowPermission(undefined)
       }
     },
@@ -274,8 +278,8 @@ export function useSystems() {
     resetActivateSystemData()
     resetDeactivateSystemData()
     resetRegisterSystemData()
-    setDeathPermissions(initWebHook)
-    setBirthPermissions(initWebHook)
+    setDeathPermissions(initWebHook(Event.Death))
+    setBirthPermissions(initWebHook(Event.Birth))
     resetRefreshTokenData()
     updatePermissionsReset()
   }
@@ -296,7 +300,7 @@ export function useSystems() {
     setDeathPermissions,
     existingSystems,
     deactivateSystem,
-    dispatchStatusChange,
+    dispatchSystemUpdate,
     activateSystem,
     registerSystem,
     registerSystemData,
