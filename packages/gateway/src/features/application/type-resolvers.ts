@@ -31,6 +31,6 @@ export interface IApplicationConfigPayload {
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
   INTEGRATIONS: GQLIntegrationInput[]
-  DATE_OF_BIRTH_UNKNOWN: Boolean
-  INFORMANT_SIGNATURE: Boolean
+  DATE_OF_BIRTH_UNKNOWN: boolean
+  INFORMANT_SIGNATURE: boolean
 }

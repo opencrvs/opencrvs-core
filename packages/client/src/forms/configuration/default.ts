@@ -1378,6 +1378,31 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                required: true,
+                flip: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: 'window.config.DATE_OF_BIRTH_UNKNOWN === true'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  }
+                }
+              },
+              {
                 name: 'firstNamesEng',
                 previewGroup: 'motherNameInEnglish',
                 type: 'TEXT',

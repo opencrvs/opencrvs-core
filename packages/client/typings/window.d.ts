@@ -57,6 +57,8 @@ interface Window {
     SENTRY: string
     ADDRESSES: number
     INTEGRATIONS: any[]
+    DATE_OF_BIRTH_UNKNOWN: boolean
+    INFORMANT_SIGNATURE: boolean
   }
   __localeId__: string
 }

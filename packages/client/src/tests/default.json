@@ -1206,10 +1206,7 @@
                     "template": {
                       "fieldName": "placeOfBirth",
                       "operation": "eventLocationNameQueryOfflineTransformer",
-                      "parameters": [
-                        "facilities",
-                        "placeOfBirth"
-                      ]
+                      "parameters": ["facilities", "placeOfBirth"]
                     },
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
@@ -1683,6 +1680,31 @@
                     "query": {
                       "operation": "fieldValueTransformer",
                       "parameters": ["birthDate"]
+                    }
+                  }
+                },
+                {
+                  "name": "exactDateOfBirthUnknown",
+                  "type": "CHECKBOX",
+                  "label": {
+                    "defaultMessage": "Exact date of birth unknown",
+                    "description": "Checkbox for exact date of birth unknown",
+                    "id": "form.field.label.exactDateOfBirthUnknown"
+                  },
+                  "required": true,
+                  "flip": true,
+                  "hideHeader": true,
+                  "initialValue": false,
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "window.config.DATE_OF_BIRTH_UNKNOWN"
+                    }
+                  ],
+                  "mapping": {
+                    "query": {
+                      "operation": "booleanTransformer"
                     }
                   }
                 },
@@ -4234,10 +4256,7 @@
                     "template": {
                       "fieldName": "placeOfDeath",
                       "operation": "eventLocationNameQueryOfflineTransformer",
-                      "parameters": [
-                        "facilities",
-                        "placeOfDeath"
-                      ]
+                      "parameters": ["facilities", "placeOfDeath"]
                     },
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
@@ -4429,9 +4448,7 @@
                         "individual",
                         {
                           "operation": "longDateTransformer",
-                          "parameters": [
-                            "birthDate"
-                          ]
+                          "parameters": ["birthDate"]
                         },
                         "birthDate"
                       ]
@@ -4442,9 +4459,7 @@
                         "individual",
                         {
                           "operation": "fieldValueTransformer",
-                          "parameters": [
-                            "birthDate"
-                          ]
+                          "parameters": ["birthDate"]
                         }
                       ]
                     }
