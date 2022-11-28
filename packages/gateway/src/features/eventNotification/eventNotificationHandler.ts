@@ -11,6 +11,8 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
+import { badRequest } from '@hapi/boom'
+import { sendToFhir } from '@gateway/features/fhir/utils'
 
 const RESOURCE_TYPES = [
   'Composition',
@@ -49,9 +51,41 @@ export function validationFailedAction(
   throw e
 }
 
-export function eventNotificationHandler(
+function validateTask(bundle: fhir.Bundle) {
+  const taskEntry = bundle.entry?.find(
+    (entry) => entry.resource?.resourceType === 'Task'
+  )
+  const compositionEntry = bundle.entry?.find(
+    (entry) => entry.resource?.resourceType === 'Composition'
+  )
+  if (!taskEntry) {
+    throw new Error('Task entry not found in bundle')
+  }
+  if (!compositionEntry) {
+    throw new Error('Composition entry not found in bundle')
+  }
+  const task = taskEntry.resource as fhir.Task
+  if (task.status !== 'draft') {
+    throw new Error('Task status should be draft')
+  }
+  if (task.focus?.reference !== compositionEntry.fullUrl) {
+    throw new Error('Task must reference the composition entry')
+  }
+}
+
+export async function eventNotificationHandler(
   req: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  return h.response('Yay!')
+  try {
+    validateTask(req.payload as fhir.Bundle)
+  } catch (e) {
+    return badRequest(e)
+  }
+  return sendToFhir(
+    JSON.stringify(req.payload),
+    '',
+    'POST',
+    req.headers.authorization
+  )
 }
