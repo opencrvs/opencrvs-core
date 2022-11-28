@@ -62,6 +62,7 @@ import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
 import { Registrations } from '@client/views/SysAdmin/Performance/Registrations'
 import { VerifyDetails } from '@client/views/PrintCertificate/VerifyDetails'
+import { ReviewSection } from './views/RegisterForm/review/ReviewSection'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -378,6 +379,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.VERIFY_DETAILS}
                                             component={VerifyDetails}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.DUPLICATE_COMPARISON}
+                                            component={ReviewSection}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

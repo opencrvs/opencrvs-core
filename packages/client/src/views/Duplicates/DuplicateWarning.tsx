@@ -19,7 +19,12 @@ import {
   FetchDuplicateDeatilsQuery,
   createDuplicateDetailsQuery
 } from './utils'
+import { Link } from '@opencrvs/components/lib/typography'
 
+const BoldErrorLink = styled(Link)`
+  color: ${({ theme }) => theme.colors.red};
+  ${({ theme }) => theme.fonts.bold16}
+`
 const WarningContainer = styled.div`
   margin: 16px auto;
   max-width: 1140px;
@@ -56,7 +61,11 @@ export function DuplicateWarning({
                 return (
                   <Warning
                     label={intl.formatMessage(errorMessages.duplicateWarning, {
-                      trackingId: duplicateQuery.registration.trackingId
+                      trackingId: (
+                        <BoldErrorLink>
+                          {duplicateQuery.registration.trackingId}
+                        </BoldErrorLink>
+                      )
                     })}
                   />
                 )
