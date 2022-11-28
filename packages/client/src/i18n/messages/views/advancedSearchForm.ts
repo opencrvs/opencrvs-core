@@ -37,92 +37,92 @@ const messagesToDefine: IAdvancedSearchMessages = {
   registrationDetails: {
     defaultMessage: 'Registration details',
     description: 'The title of Registration details accordion',
-    id: 'advancedSearch.birth.registrationDetails'
+    id: 'advancedSearch.form.registrationDetails'
   },
   childDetails: {
     defaultMessage: 'Child details',
     description: 'The title of Child details accordion',
-    id: 'advancedSearch.birth.childDetails'
+    id: 'advancedSearch.form.childDetails'
   },
   eventDetails: {
     defaultMessage: 'Event details',
     description: 'The title of event details accordion',
-    id: 'advancedSearch.birth.eventDetails'
+    id: 'advancedSearch.form.eventDetails'
   },
   motherDetails: {
     defaultMessage: 'Mother details',
     description: 'The title of Mother details accordion',
-    id: 'advancedSearch.birth.motherDetails'
+    id: 'advancedSearch.form.motherDetails'
   },
   fatherDetails: {
     defaultMessage: 'Father details',
     description: 'The title of Father details accordion',
-    id: 'advancedSearch.birth.fatherDetails'
+    id: 'advancedSearch.form.fatherDetails'
   },
   placeOfRegistrationlabel: {
     defaultMessage: 'Place of registration',
     description: 'Label for input Place of registration',
-    id: 'advancedSearch.birth.placeOfRegistration'
+    id: 'advancedSearch.form.placeOfRegistration'
   },
   placeOfRegistrationHelperText: {
     defaultMessage: 'Search for a province, district or registration office',
     description: 'Helper text for input Place of registration',
-    id: 'advancedSearch.birth.placeOfRegistrationHelperText'
+    id: 'advancedSearch.form.placeOfRegistrationHelperText'
   },
   dateOfRegistration: {
     defaultMessage: 'Date of registration',
     description: 'Label for input date of registration',
-    id: 'advancedSearch.birth.dateOfRegistration'
+    id: 'advancedSearch.form.dateOfRegistration'
   },
   statusOfRecordLabel: {
     defaultMessage: 'Status of record',
     description: 'Label for input Status of record',
-    id: 'advancedSearch.birth.statusOfRecordLabel'
+    id: 'advancedSearch.form.statusOfRecordLabel'
   },
   deceasedDetails: {
     defaultMessage: 'Deceased details',
     description: 'The title of Deceased details accordion',
-    id: 'advancedSearch.birth.fatherDetails'
+    id: 'advancedSearch.form.deceasedDetails'
   },
   informantDetails: {
     defaultMessage: 'Informant details',
     description: 'The title informant details form',
-    id: 'advancedSearch.birth.informantDetails'
+    id: 'advancedSearch.form.informantDetails'
   },
   recordStatusAny: {
     defaultMessage: 'Any status',
     description: 'Option for form field: status of record',
-    id: 'advancedSearch.birth.recordStatusAny'
+    id: 'advancedSearch.form.recordStatusAny'
   },
   recordStatusInprogress: {
     defaultMessage: 'In progress',
     description: 'Option for form field: status of record',
-    id: 'advancedSearch.birth.recordStatusInprogress'
+    id: 'advancedSearch.form.recordStatusInprogress'
   },
   recordStatusInReview: {
     defaultMessage: 'In review',
     description: 'Option for form field: status of record',
-    id: 'advancedSearch.birth.recordStatusInReview'
+    id: 'advancedSearch.form.recordStatusInReview'
   },
   recordStatusRequireUpdate: {
     defaultMessage: 'Requires updates',
     description: 'Option for form field: status of record',
-    id: 'advancedSearch.birth.recordStatusRequireUpdate'
+    id: 'advancedSearch.form.recordStatusRequireUpdate'
   },
   recordStatusRegistered: {
     defaultMessage: 'Registered',
     description: 'Option for form field: status of record',
-    id: 'advancedSearch.birth.recordStatusRegistered'
+    id: 'advancedSearch.form.recordStatusRegistered'
   },
   recordStatusCertified: {
     defaultMessage: 'Certified',
     description: 'Option for form field: status of record',
-    id: 'advancedSearch.birth.recordStatusCertified'
+    id: 'advancedSearch.form.recordStatusCertified'
   },
   recordStatusAchived: {
     defaultMessage: 'Archived',
     description: 'Option for form field: status of record',
-    id: 'advancedSearch.birth.recordStatusAchived'
+    id: 'advancedSearch.form.recordStatusAchived'
   },
   hide: {
     defaultMessage: 'Hide',

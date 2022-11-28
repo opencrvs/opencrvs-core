@@ -462,7 +462,7 @@ export function advancedQueryBuilder(
         'informantDoBStart must be provided along with informantDoBEnd'
       )
     }
-    if (!params.deceasedDoBEnd) {
+    if (!params.informantDoBEnd) {
       throw new Error(
         'informantDoBEnd must be provided along with informantDoBStart'
       )

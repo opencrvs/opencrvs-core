@@ -105,7 +105,7 @@ export const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
       label: formMessageDescriptors.childFirstNames,
       maxLength: 32,
       required: false,
-      initialValue: 'fasfasf',
+      initialValue: '',
       validate: []
     },
     {
@@ -225,7 +225,7 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
         description: 'Title for the event location1 select',
         id: 'form.field.label.state'
       },
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       placeholder: {
@@ -262,7 +262,7 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
         description: 'Title for the event location 2 select',
         id: 'form.field.label.district'
       },
-      required: true,
+      required: false,
       initialValue: '',
       validate: [],
       placeholder: {
@@ -352,7 +352,7 @@ export const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
       name: 'fatherFirstNames',
       customisable: false,
       type: 'TEXT',
-      label: formMessageDescriptors.fatherFirstNames,
+      label: formMessageDescriptors.fatherFirstNamesEng,
       maxLength: 32,
       required: false,
       initialValue: '',
@@ -362,7 +362,7 @@ export const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
       name: 'fatherFamilyName',
       customisable: false,
       type: 'TEXT',
-      label: formMessageDescriptors.fatherFamilyName,
+      label: formMessageDescriptors.fatherFamilyNameEng,
       maxLength: 32,
       required: false,
       initialValue: '',
@@ -408,10 +408,10 @@ export const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
 }
 
 export const advancedSearchBirthSections = {
-  registrationSection: advancedSearchBirthSectionRegistrationDetails,
-  childSection: advancedSearchBirthSectionChildDetails,
-  eventSection: advancedSearchBirthSectionEventDetails,
-  motherSection: advancedSearchBirthSectionMotherDetails,
-  fatherSection: advancedSearchBirthSectionFatherDetails,
-  informantSection: advancedSearchBirthSectionInformantDetails
+  birthSearchRegistrationSection: advancedSearchBirthSectionRegistrationDetails,
+  birthSearchChildSection: advancedSearchBirthSectionChildDetails,
+  birthSearchEventSection: advancedSearchBirthSectionEventDetails,
+  birthSearchMotherSection: advancedSearchBirthSectionMotherDetails,
+  birthSearchFatherSection: advancedSearchBirthSectionFatherDetails,
+  birthSearchInformantSection: advancedSearchBirthSectionInformantDetails
 }

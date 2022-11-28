@@ -12,6 +12,6 @@
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { IStoreState } from '@client/store'
 
-export const getPartialState = (
+export const getAdvancedSearchParamsState = (
   store: IStoreState
 ): IAdvancedSearchParamState => store.advancedSearch

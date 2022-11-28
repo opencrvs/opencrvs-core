@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
 
 import { injectIntl, useIntl } from 'react-intl'
@@ -24,10 +24,10 @@ import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
 import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
-import { PrimaryButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
+import { ICON_ALIGNMENT, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
-import { getPartialState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { goToAdvancedSearchResult } from '@client/navigation'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
@@ -37,11 +37,37 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Accordion } from '@client/../../components/lib/Accordion'
 import { LocationType, RegStatus } from '@client/utils/gateway'
+import {
+  convertDateValuesToDateRangePicker,
+  determineDateFromDateRangePickerVal,
+  getAccordionActiveStateMap,
+  isValidDateRangePickerValue
+} from '@client/search/advancedSearch/utils'
+import styled from 'styled-components'
 
 export enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
+
+const StyledPrimaryButton = styled(PrimaryButton)`
+  margin-top: 32px;
+`
+
+const {
+  birthSearchRegistrationSection,
+  birthSearchChildSection,
+  birthSearchMotherSection,
+  birthSearchFatherSection,
+  birthSearchEventSection,
+  birthSearchInformantSection
+} = advancedSearchBirthSections
+const {
+  deathSearchRegistrationSection,
+  deathSearchDeceasedSection,
+  deathSearchEventSection,
+  deathSearchInformantSection
+} = advancedSearchDeathSections
 
 const baseKeysSameAsStore = [
   'event',
@@ -130,62 +156,6 @@ export interface IBaseAdvancedSearchState {
   informantDoB?: IDateRangePickerValue
   informantDoBStart?: string
   informantDoBEnd?: string
-}
-
-const determineDateFromDateRangePickerVal = (
-  dateRangePickerValue?: IDateRangePickerValue
-): Omit<IDateRangePickerValue, 'isDateRangeActive'> => {
-  if (!dateRangePickerValue) {
-    return { exact: undefined, rangeStart: undefined, rangeEnd: undefined }
-  }
-  const value = { ...dateRangePickerValue }
-  if (dateRangePickerValue.isDateRangeActive) {
-    value.exact = undefined
-  } else {
-    value.rangeStart = undefined
-    value.rangeEnd = undefined
-  }
-
-  return value
-}
-
-const convertDateValuesToDateRangePicker = (
-  exact?: string,
-  rangeStart?: string,
-  rangeEnd?: string
-): IDateRangePickerValue => {
-  let value: IDateRangePickerValue = {
-    isDateRangeActive: false
-  } as IDateRangePickerValue
-
-  if (rangeStart && rangeEnd) {
-    value = {
-      ...value,
-      rangeStart,
-      rangeEnd,
-      isDateRangeActive: true
-    }
-  } else if (exact) {
-    value = { ...value, exact }
-  }
-
-  return value
-}
-
-const isValidDateRangePickerValue = (
-  dateRangePickerValue: IDateRangePickerValue
-): boolean => {
-  let isValid = false
-  if (!dateRangePickerValue.isDateRangeActive) {
-    if (dateRangePickerValue.exact) {
-      isValid = true
-    }
-  } else {
-    if (dateRangePickerValue.rangeStart && dateRangePickerValue.rangeEnd) {
-      isValid = true
-    }
-  }
-  return isValid
 }
 
 const transformLocalFormDataToReduxData = (
@@ -456,8 +426,19 @@ const BirthSection = () => {
     )
   })
 
+  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+    getAccordionActiveStateMap(advancedSearchParamsState)
+  )
+
   const isDisabled = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
+
+  const accordionShowingLabel = intl.formatMessage(
+    advancedSearchFormMessages.show
+  )
+  const accordionHidingLabel = intl.formatMessage(
+    advancedSearchFormMessages.hide
+  )
 
   return (
     <>
@@ -465,24 +446,21 @@ const BirthSection = () => {
         {intl.formatMessage(messages.advancedSearchInstruction)}
       </Text>
       <Accordion
-        name={advancedSearchBirthSections.registrationSection.id}
+        name={birthSearchRegistrationSection.id}
         label={intl.formatMessage(
           advancedSearchFormMessages.registrationDetails
         )}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchRegistrationSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchBirthSections.registrationSection.id}
+          id={birthSearchRegistrationSection.id}
           onChange={(values) => {
             setFormState({ ...formState, ...values })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchBirthSections.registrationSection.fields}
+          fields={birthSearchRegistrationSection.fields}
           initialValues={pick(formState, [
             'placeOfRegistration',
             'dateOfRegistration',
@@ -492,22 +470,19 @@ const BirthSection = () => {
       </Accordion>
 
       <Accordion
-        name={advancedSearchBirthSections.childSection.id}
+        name={birthSearchChildSection.id}
         label={intl.formatMessage(advancedSearchFormMessages.childDetails)}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchChildSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchBirthSections.childSection.id}
+          id={birthSearchChildSection.id}
           onChange={(values) => {
             setFormState({ ...formState, ...values })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchBirthSections.childSection.fields}
+          fields={birthSearchChildSection.fields}
           initialValues={pick(formState, [
             'childDoB',
             'childFirstNames',
@@ -518,17 +493,14 @@ const BirthSection = () => {
       </Accordion>
 
       <Accordion
-        name={advancedSearchBirthSections.eventSection.id}
+        name={birthSearchEventSection.id}
         label={intl.formatMessage(advancedSearchFormMessages.eventDetails)}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchEventSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchBirthSections.eventSection.id}
+          id={birthSearchEventSection.id}
           onChange={(values) => {
             const nextVal =
               values.eventLocationType === LocationType.HealthFacility
@@ -545,7 +517,7 @@ const BirthSection = () => {
             setFormState({ ...formState, ...nextVal })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchBirthSections.eventSection.fields}
+          fields={birthSearchEventSection.fields}
           initialValues={pick(formState, [
             'eventLocationType',
             'eventLocationId',
@@ -557,22 +529,19 @@ const BirthSection = () => {
       </Accordion>
 
       <Accordion
-        name={advancedSearchBirthSections.motherSection.id}
+        name={birthSearchMotherSection.id}
         label={intl.formatMessage(advancedSearchFormMessages.motherDetails)}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchMotherSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchBirthSections.motherSection.id}
+          id={birthSearchMotherSection.id}
           onChange={(values) => {
             setFormState({ ...formState, ...values })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchBirthSections.motherSection.fields}
+          fields={birthSearchMotherSection.fields}
           initialValues={pick(formState, [
             'motherDoB',
             'motherFirstNames',
@@ -582,22 +551,19 @@ const BirthSection = () => {
       </Accordion>
 
       <Accordion
-        name={advancedSearchBirthSections.fatherSection.id}
+        name={birthSearchFatherSection.id}
         label={intl.formatMessage(advancedSearchFormMessages.fatherDetails)}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchFatherSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchBirthSections.fatherSection.id}
+          id={birthSearchFatherSection.id}
           onChange={(values) => {
             setFormState({ ...formState, ...values })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchBirthSections.fatherSection.fields}
+          fields={birthSearchFatherSection.fields}
           initialValues={pick(formState, [
             'fatherDoB',
             'fatherFirstNames',
@@ -607,22 +573,19 @@ const BirthSection = () => {
       </Accordion>
 
       <Accordion
-        name={advancedSearchBirthSections.informantSection.id}
+        name={birthSearchInformantSection.id}
         label={intl.formatMessage(advancedSearchFormMessages.informantDetails)}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchInformantSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchBirthSections.informantSection.id}
+          id={birthSearchInformantSection.id}
           onChange={(values) => {
             setFormState({ ...formState, ...values })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchBirthSections.informantSection.fields}
+          fields={birthSearchInformantSection.fields}
           initialValues={pick(formState, [
             'informantDoB',
             'informantFirstNames',
@@ -631,7 +594,7 @@ const BirthSection = () => {
         />
       </Accordion>
 
-      <PrimaryButton
+      <StyledPrimaryButton
         icon={() => <Icon name={'Search'} />}
         align={ICON_ALIGNMENT.LEFT}
         id="search"
@@ -648,7 +611,7 @@ const BirthSection = () => {
         }}
       >
         {intl.formatMessage(buttonMessages.search)}
-      </PrimaryButton>
+      </StyledPrimaryButton>
     </>
   )
 }
@@ -664,8 +627,18 @@ const DeathSection = () => {
       'death'
     )
   })
+  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+    getAccordionActiveStateMap(advancedSearchParamsState)
+  )
+
   const isDisable = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
+  const accordionShowingLabel = intl.formatMessage(
+    advancedSearchFormMessages.show
+  )
+  const accordionHidingLabel = intl.formatMessage(
+    advancedSearchFormMessages.hide
+  )
 
   return (
     <>
@@ -673,24 +646,21 @@ const DeathSection = () => {
         {intl.formatMessage(messages.advancedSearchInstruction)}
       </Text>
       <Accordion
-        name={advancedSearchDeathSections.registrationSection.id}
+        name={birthSearchRegistrationSection.id}
         label={intl.formatMessage(
           advancedSearchFormMessages.registrationDetails
         )}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[deathSearchRegistrationSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchDeathSections.registrationSection.id}
+          id={birthSearchRegistrationSection.id}
           onChange={(values) => {
             setFormState({ ...formState, ...values })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchDeathSections.registrationSection.fields}
+          fields={birthSearchRegistrationSection.fields}
           initialValues={pick(formState, [
             'placeOfRegistration',
             'dateOfRegistration',
@@ -700,22 +670,19 @@ const DeathSection = () => {
       </Accordion>
 
       <Accordion
-        name={advancedSearchDeathSections.deceasedSection.id}
+        name={deathSearchDeceasedSection.id}
         label={intl.formatMessage(advancedSearchFormMessages.deceasedDetails)}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[deathSearchDeceasedSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchDeathSections.deceasedSection.id}
+          id={deathSearchDeceasedSection.id}
           onChange={(values) => {
             setFormState({ ...formState, ...values })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchDeathSections.deceasedSection.fields}
+          fields={deathSearchDeceasedSection.fields}
           initialValues={pick(formState, [
             'deceasedDoB',
             'deceasedFirstNames',
@@ -727,17 +694,14 @@ const DeathSection = () => {
       </Accordion>
 
       <Accordion
-        name={advancedSearchDeathSections.eventSection.id}
+        name={deathSearchEventSection.id}
         label={intl.formatMessage(advancedSearchFormMessages.eventDetails)}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[deathSearchEventSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchDeathSections.eventSection.id}
+          id={deathSearchEventSection.id}
           onChange={(values) => {
             const nextVal =
               values.eventLocationType === LocationType.HealthFacility
@@ -754,7 +718,7 @@ const DeathSection = () => {
             setFormState({ ...formState, ...nextVal })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchDeathSections.eventSection.fields}
+          fields={deathSearchEventSection.fields}
           initialValues={pick(formState, [
             'eventLocationType',
             'eventLocationId',
@@ -766,22 +730,19 @@ const DeathSection = () => {
       </Accordion>
 
       <Accordion
-        name={advancedSearchDeathSections.informantSection.id}
+        name={deathSearchInformantSection.id}
         label={intl.formatMessage(advancedSearchFormMessages.informantDetails)}
-        toggleButtonLabelWhenClosed={intl.formatMessage(
-          advancedSearchFormMessages.show
-        )}
-        toggleButtonLabelWhenOpen={intl.formatMessage(
-          advancedSearchFormMessages.hide
-        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[deathSearchInformantSection.id]}
       >
         <FormFieldGenerator
-          id={advancedSearchDeathSections.informantSection.id}
+          id={deathSearchInformantSection.id}
           onChange={(values) => {
             setFormState({ ...formState, ...values })
           }}
           setAllFieldsDirty={false}
-          fields={advancedSearchBirthSections.informantSection.fields}
+          fields={deathSearchInformantSection.fields}
           initialValues={pick(formState, [
             'informantDoB',
             'informantFirstNames',
@@ -790,7 +751,7 @@ const DeathSection = () => {
         />
       </Accordion>
 
-      <PrimaryButton
+      <StyledPrimaryButton
         icon={() => <Icon name={'Search'} />}
         align={ICON_ALIGNMENT.LEFT}
         id="search"
@@ -807,7 +768,7 @@ const DeathSection = () => {
         }}
       >
         {intl.formatMessage(buttonMessages.search)}
-      </PrimaryButton>
+      </StyledPrimaryButton>
     </>
   )
 }
