@@ -53,6 +53,7 @@ import {
   IDefaultConfigFieldWithPreviewGroup
 } from './defaultConfig'
 import { getField } from '@client/forms/configuration/defaultUtils'
+import { ISelectOption as IDataSourceOption } from '@opencrvs/components/lib/Select'
 
 export * from './previewGroup'
 export * from './motion'
@@ -72,6 +73,10 @@ export type IConfigField =
 export type IConfigFieldMap = Record<string, IConfigField>
 
 export type ISectionFieldMap = Record<string, IConfigFieldMap>
+
+export type IDataSourceSelectOption = IDataSourceOption & {
+  options: ISelectOption[]
+}
 
 export function getFieldDefinition(
   configField: IDefaultConfigField | ICustomConfigField,

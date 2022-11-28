@@ -61,6 +61,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]
   options?: ISelectOption[]
+  datasetId?: string
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig

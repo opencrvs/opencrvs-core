@@ -31,12 +31,14 @@ import {
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default'
 import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
+import { IDataSourceSelectOption } from '@client/forms/configuration/formConfig/utils'
 
 export type IFormConfigState =
   | {
       state: 'LOADING'
       birth: null
       death: null
+      formDataset: null
     }
   | {
       state: 'READY'
@@ -48,12 +50,14 @@ export type IFormConfigState =
         formDraft: IFormDraft
         configFields: ISectionFieldMap
       }
+      formDataset: IDataSourceSelectOption[]
     }
 
 export const initialState: IFormConfigState = {
   state: 'LOADING',
   birth: null,
-  death: null
+  death: null,
+  formDataset: null
 }
 
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
@@ -112,7 +116,8 @@ function getReadyState(formConfig: IFormConfig) {
         defaultDeathForm,
         questionConfig
       )
-    }
+    },
+    formDataset: []
   }
 }
 

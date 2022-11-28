@@ -32,7 +32,8 @@ import {
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
   getCertificateHandlebar,
-  ICustomConfigField
+  ICustomConfigField,
+  IDataSourceSelectOption
 } from '@client/forms/configuration/formConfig/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
@@ -284,8 +285,6 @@ interface CSVUploadStatus {
   statusType: STATUS_TYPES
   message: string
 }
-
-type IDataSourceSelectOption = IDataSourceOption & { options: ISelectOption[] }
 
 interface ICustomFieldState {
   isFieldDuplicate: boolean
