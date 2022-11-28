@@ -157,7 +157,9 @@ export function WebhookModal({
                     value: 'informant-details'
                   },
                   {
-                    label: 'Disease Details',
+                    label: intl.formatMessage(
+                      integrationMessages.diseaseDetails
+                    ),
                     value: 'disease-details'
                   }
                 ]}

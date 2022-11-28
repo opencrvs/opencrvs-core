@@ -626,7 +626,9 @@ export function SystemList() {
                           value: 'informant-details'
                         },
                         {
-                          label: 'Disease Details',
+                          label: intl.formatMessage(
+                            integrationMessages.diseaseDetails
+                          ),
                           value: 'disease-details'
                         }
                       ]}
@@ -727,7 +729,7 @@ export function SystemList() {
           id="updaPermissionsSuccess"
           onClose={() => resetData()}
         >
-          {intl.formatMessage(integrationMessages.updatePermissionsStatus)}
+          {intl.formatMessage(integrationMessages.updatePermissionsMsg)}
         </Toast>
       )}
       {(activateSystemError ||

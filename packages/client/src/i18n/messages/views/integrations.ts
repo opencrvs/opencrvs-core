@@ -298,10 +298,10 @@ const messagesToDefine = {
     id: 'integrations.onlyOneNationalId',
     defaultMessage: 'Only one MOSIP integration is allowed.'
   },
-  updatePermissionsStatus: {
-    id: 'integrations.updatePermissions.status',
+  updatePermissionsMsg: {
+    id: 'integrations.updatePermissionsMsg',
     defaultMessage: 'Permissions update successfully',
-    description: 'Label for update permissions'
+    description: 'Label for update permissions message'
   }
 }
 
