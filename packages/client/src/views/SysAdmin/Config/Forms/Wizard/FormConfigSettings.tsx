@@ -237,8 +237,8 @@ function FormConfigSettingsComponent() {
             value={
               <span id="exactDateOfBirthUnknown">
                 {dateOfBirthUnknown
-                  ? intl.formatMessage(messages.disable)
-                  : intl.formatMessage(messages.enable)}
+                  ? intl.formatMessage(messages.enable)
+                  : intl.formatMessage(messages.disable)}
               </span>
             }
             actions={[
@@ -368,7 +368,7 @@ function FormConfigSettingsComponent() {
               actions={
                 <CenteredToggle
                   id="dateOfBirthUnknown"
-                  defaultChecked={!dateOfBirthUnknown}
+                  defaultChecked={dateOfBirthUnknown}
                   onChange={handleDateOfBirthUnknown}
                 />
               }

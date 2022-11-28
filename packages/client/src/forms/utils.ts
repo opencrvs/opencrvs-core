@@ -561,9 +561,6 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   // eslint-disable-next-line no-unused-vars
   const values = sectionData
   // set some constants that are used in conditionals
-  console.log(values.exactDateOfBirthUnknown)
-  console.log(window.config.DATE_OF_BIRTH_UNKNOWN, 'window value')
-
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)
 

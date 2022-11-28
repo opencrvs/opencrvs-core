@@ -382,10 +382,7 @@ function reducer(
      */
     case actions.APPLICATION_CONFIG_LOADED: {
       const { certificates, config, formConfig } = action.payload
-      console.log(config, 'reducer page')
-
       merge(window.config, config)
-      console.log(window.config, 'after merge page')
       let newOfflineData
       const birthCertificateTemplate = certificates.find(
         ({ event, status }) => event === Event.Birth && status === 'ACTIVE'

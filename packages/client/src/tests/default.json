@@ -1692,14 +1692,13 @@
                     "id": "form.field.label.exactDateOfBirthUnknown"
                   },
                   "required": true,
-                  "flip": true,
                   "hideHeader": true,
                   "initialValue": false,
                   "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "window.config.DATE_OF_BIRTH_UNKNOWN"
+                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN"
                     }
                   ],
                   "mapping": {
@@ -1707,6 +1706,28 @@
                       "operation": "booleanTransformer"
                     }
                   }
+                },
+                {
+                  "name": "ageOfIndividualInYears",
+                  "type": "NUMBER",
+                  "label": {
+                    "defaultMessage": "Age of mother",
+                    "description": "Label for form field: Age of mother",
+                    "id": "form.field.label.ageOfMother"
+                  },
+                  "customisable": true,
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.exactDateOfBirthUnknown"
+                    }
+                  ],
+                  "postfix": "years",
+
+                  "inputFieldWidth": "78px"
                 },
                 {
                   "name": "firstNamesEng",
@@ -2197,6 +2218,52 @@
                       "parameters": ["birthDate"]
                     }
                   }
+                },
+                {
+                  "name": "exactDateOfBirthUnknown",
+                  "type": "CHECKBOX",
+                  "label": {
+                    "defaultMessage": "Exact date of birth unknown",
+                    "description": "Checkbox for exact date of birth unknown",
+                    "id": "form.field.label.exactDateOfBirthUnknown"
+                  },
+                  "required": true,
+                  "hideHeader": true,
+                  "initialValue": false,
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN"
+                    }
+                  ],
+                  "mapping": {
+                    "query": {
+                      "operation": "booleanTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "ageOfIndividualInYears",
+                  "type": "NUMBER",
+                  "label": {
+                    "defaultMessage": "Age of father",
+                    "description": "Label for form field: Age of father",
+                    "id": "form.field.label.ageOfFather"
+                  },
+                  "customisable": true,
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.exactDateOfBirthUnknown"
+                    }
+                  ],
+                  "postfix": "years",
+
+                  "inputFieldWidth": "78px"
                 },
                 {
                   "name": "firstNamesEng",

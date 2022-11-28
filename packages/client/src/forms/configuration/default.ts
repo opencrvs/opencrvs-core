@@ -1386,14 +1386,13 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
                 required: true,
-                flip: true,
                 hideHeader: true,
                 initialValue: false,
                 validate: [],
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: 'window.config.DATE_OF_BIRTH_UNKNOWN === true'
+                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
                   }
                 ],
                 mapping: {
@@ -1401,6 +1400,24 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'booleanTransformer'
                   }
                 }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfMother,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.exactDateOfBirthUnknown'
+                  }
+                ],
+                postfix: 'years',
+
+                inputFieldWidth: '78px'
               },
               {
                 name: 'firstNamesEng',
@@ -1883,6 +1900,48 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['birthDate']
                   }
                 }
+              },
+              {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                required: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  }
+                }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfFather,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.exactDateOfBirthUnknown'
+                  }
+                ],
+                postfix: 'years',
+
+                inputFieldWidth: '78px'
               },
               {
                 name: 'firstNamesEng',

@@ -22,6 +22,8 @@ const applicationConfigMutation = gql`
       NID_NUMBER_PATTERN
       PHONE_NUMBER_PATTERN
       HIDE_EVENT_REGISTER_INFORMATION
+      DATE_OF_BIRTH_UNKNOWN
+      INFORMANT_SIGNATURE
       ADDRESSES
       COUNTRY_LOGO {
         fileName

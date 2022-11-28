@@ -81,7 +81,6 @@ const Input = styled.input`
   width: ${({ size }) => `${size}px`};
   height: ${({ size }) => `${size}px`};
   opacity: 0;
-  z-index: 2;
   cursor: pointer;
   &:focus ~ ${Check} {
     box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
