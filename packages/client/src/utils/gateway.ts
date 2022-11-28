@@ -102,6 +102,7 @@ export type ApplicationConfiguration = {
   INTEGRATIONS?: Maybe<Array<Maybe<Integration>>>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
+  LOGIN_BACKGROUND?: Maybe<LoginBackground>
 }
 
 export type ApplicationConfigurationInput = {
@@ -117,6 +118,7 @@ export type ApplicationConfigurationInput = {
   INTEGRATIONS?: InputMaybe<Array<InputMaybe<IntegrationInput>>>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
+  LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
 }
 
 export type AssignmentData = {
@@ -450,6 +452,19 @@ export type CountryLogo = {
 export type CountryLogoInput = {
   file?: InputMaybe<Scalars['String']>
   fileName?: InputMaybe<Scalars['String']>
+}
+
+export type LoginBackground = {
+  __typename?: 'LoginBackground'
+  backgroundColor?: Maybe<Scalars['String']>
+  backgroundImage?: Maybe<Scalars['String']>
+  imageFit?: Maybe<Scalars['String']>
+}
+
+export type LoginBackgroundInput = {
+  backgroundColor?: InputMaybe<Scalars['String']>
+  backgroundImage?: InputMaybe<Scalars['String']>
+  imageFit?: InputMaybe<Scalars['String']>
 }
 
 export type CreatedIds = {
@@ -5536,6 +5551,12 @@ export type UpdateApplicationConfigMutation = {
         ON_TIME?: number | null
         DELAYED?: number | null
       } | null
+    } | null
+    LOGIN_BACKGROUND?: {
+      __typename?: 'LoginBackground'
+      backgroundColor?: string | null
+      backgroundImage?: string | null
+      imageFit?: string | null
     } | null
   } | null
 }

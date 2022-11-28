@@ -33,9 +33,9 @@ import {
   isValidRegEx,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { EMPTY_STRING } from '@client/utils/constants'
 import ContentComponent from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties/NIDPhoneNumContent'
+import { Link } from '@client/../../components/lib'
 
 export function NIDNumPattern() {
   const intl = useIntl()
@@ -98,9 +98,9 @@ export function NIDNumPattern() {
           </Value>
         }
         actions={
-          <LinkButton id={id} onClick={toggleModal}>
+          <Link id={id} onClick={toggleModal}>
             {intl.formatMessage(buttonMessages.change)}
-          </LinkButton>
+          </Link>
         }
       />
 

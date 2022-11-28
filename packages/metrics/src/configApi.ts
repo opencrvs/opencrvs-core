@@ -32,6 +32,11 @@ export interface ICountryLogo {
   file: string
 }
 
+export interface ILoginBackground {
+  backgroundColor: string
+  backgroundImage: string
+  imageFit: string
+}
 interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
@@ -49,6 +54,7 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
   ADDRESSES: number
+  LOGIN_BACKGROUND: ILoginBackground
 }
 
 export async function getApplicationConfig(

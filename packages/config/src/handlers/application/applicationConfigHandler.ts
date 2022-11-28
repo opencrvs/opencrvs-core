@@ -105,8 +105,7 @@ export async function updateApplicationConfigHandler(
     }
     // Update existing application config fields
     merge(existingApllicationConfig, applicationConfig)
-
-    await ApplicationConfig.update(
+    await ApplicationConfig.updateOne(
       { _id: existingApllicationConfig._id },
       existingApllicationConfig
     )
@@ -155,5 +154,10 @@ export const updateApplicationConfig = Joi.object({
   INTEGRATIONS: Joi.array().items({
     name: Joi.string().required(),
     status: Joi.string().required()
+  }),
+  LOGIN_BACKGROUND: Joi.object({
+    backgroundColor: Joi.string().optional(),
+    backgroundImage: Joi.string().optional(),
+    imageFit: Joi.string().optional()
   })
 })

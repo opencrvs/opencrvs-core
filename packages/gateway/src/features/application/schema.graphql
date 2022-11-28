@@ -97,6 +97,23 @@ input CurrencyInput {
   languagesAndCountry: [String]
 }
 
+enum ImageFit {
+  FILL
+  TILE
+}
+
+input LoginBackgroundInput {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
+type LoginBackground {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
 input ApplicationConfigurationInput {
   APPLICATION_NAME: String
   BIRTH: BirthInput
@@ -110,6 +127,7 @@ input ApplicationConfigurationInput {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   INTEGRATIONS: [IntegrationInput]
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 type ApplicationConfiguration {
@@ -125,6 +143,7 @@ type ApplicationConfiguration {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   INTEGRATIONS: [Integration]
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 type Mutation {

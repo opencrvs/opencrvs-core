@@ -15,7 +15,8 @@ import {
   GQLDeathInput,
   GQLCountryLogoInput,
   GQLIntegrationInput,
-  GQLResolver
+  GQLResolver,
+  GQLLoginBackgroundInput
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
@@ -26,6 +27,7 @@ export const resolvers: GQLResolver = {
   Mutation: {
     async updateApplicationConfig(_, { applicationConfig = {} }, authHeader) {
       // Only natlsysadmin should be able to update application config
+
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
           new Error(
@@ -48,7 +50,9 @@ export const resolvers: GQLResolver = {
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
         ADDRESSES: applicationConfig.ADDRESSES as number,
-        INTEGRATIONS: applicationConfig.INTEGRATIONS as GQLIntegrationInput[]
+        INTEGRATIONS: applicationConfig.INTEGRATIONS as GQLIntegrationInput[],
+        LOGIN_BACKGROUND:
+          applicationConfig.LOGIN_BACKGROUND as GQLLoginBackgroundInput
       }
 
       const res = await fetch(

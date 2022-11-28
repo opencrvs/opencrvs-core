@@ -15,7 +15,6 @@ import styled from '@client/styledComponents'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { IntlShape } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import SuccessSmall from '@opencrvs/components/lib/icons/SuccessSmall'
 import { Cross } from '@opencrvs/components/lib/icons/Cross'
 import {
@@ -27,6 +26,7 @@ import {
   Field,
   HalfWidthInput
 } from '@client/views/SysAdmin/Config/Application/Components'
+import { Link } from '@client/../../components/lib'
 
 const ErrorMessage = styled.div`
   ${({ theme }) => theme.fonts.bold14}
@@ -69,7 +69,7 @@ const ValidityIconContainer = styled.div`
   margin-right: 8px;
 `
 
-const LinkButtonContainer = styled(LinkButton)`
+const LinkContainer = styled(Link)`
   margin-top: 13px;
   ${({ theme }) => theme.fonts.bold14}
 `
@@ -138,14 +138,14 @@ function ContentComponent({
                 ignoreMediaQuery={true}
               />
             </InputField>
-            <LinkButtonContainer
+            <LinkContainer
               id={`test-${changeModalName}-example`}
               onClick={() => {
                 setShowExampleValidation(true)
               }}
             >
               {intl.formatMessage(messages.testNumber)}
-            </LinkButtonContainer>
+            </LinkContainer>
           </div>
           {showExampleValidation && (
             <ExampleValidityContainer>
