@@ -560,12 +560,6 @@ export function SystemList() {
                       options={[
                         {
                           label: intl.formatMessage(
-                            integrationMessages.registrationDetails
-                          ),
-                          value: 'registration-details'
-                        },
-                        {
-                          label: intl.formatMessage(
                             integrationMessages.childDetails
                           ),
                           value: 'child-details'
@@ -601,12 +595,6 @@ export function SystemList() {
                     <CheckboxGroup
                       id="test-checkbox-group2"
                       options={[
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.registrationDetails
-                          ),
-                          value: 'registration-details'
-                        },
                         {
                           label: intl.formatMessage(
                             integrationMessages.motherDetails

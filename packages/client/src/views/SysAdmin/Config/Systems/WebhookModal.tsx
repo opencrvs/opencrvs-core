@@ -92,12 +92,6 @@ export function WebhookModal({
                 id="test-checkbox-group1"
                 options={[
                   {
-                    label: intl.formatMessage(
-                      integrationMessages.registrationDetails
-                    ),
-                    value: 'registration-details'
-                  },
-                  {
                     label: intl.formatMessage(integrationMessages.childDetails),
                     value: 'child-details'
                   },
@@ -132,12 +126,6 @@ export function WebhookModal({
               <CheckboxGroup
                 id="test-checkbox-group2"
                 options={[
-                  {
-                    label: intl.formatMessage(
-                      integrationMessages.registrationDetails
-                    ),
-                    value: 'registration-details'
-                  },
                   {
                     label: intl.formatMessage(
                       integrationMessages.motherDetails

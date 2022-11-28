@@ -42,7 +42,6 @@ export interface WebHook {
 }
 
 export enum WebhookPermissions {
-  REGISTRATION_DETAILS = 'registration-details',
   CHILDS_DETAILS = 'childs-details',
   MOTHERS_DETAILS = 'mothers-details',
   FATHERS_DETAILS = 'fathers-details',
