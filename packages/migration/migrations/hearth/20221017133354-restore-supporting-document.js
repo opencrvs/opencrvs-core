@@ -30,7 +30,7 @@ export const up = async (db, client) => {
           )
         })
         const immediatePrevComp = compositionHistory[correctionIndex - 1]
-        const hasDocumentSection = immediatePrevComp.section.find(
+        const hasDocumentSection = immediatePrevComp?.section.find(
           (section) => section.code.coding[0].code === 'supporting-documents'
         )
         if (hasDocumentSection) {
