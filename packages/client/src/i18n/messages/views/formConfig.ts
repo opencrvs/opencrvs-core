@@ -52,6 +52,8 @@ interface IFormConfigMessages
   settingsTitle: MessageDescriptor
   introductionSettings: MessageDescriptor
   addressesSettings: MessageDescriptor
+  exactDateOfBirthUnknownSettings: MessageDescriptor
+  informantSignatureSettings: MessageDescriptor
   enable: MessageDescriptor
   disable: MessageDescriptor
   globalSettingsDescription: MessageDescriptor
@@ -59,9 +61,16 @@ interface IFormConfigMessages
   introductionPageSettingsDialogDesc: MessageDescriptor
   addressesSettingsDialogTitle: MessageDescriptor
   addressesSettingsDialogDesc: MessageDescriptor
+  exactDateOfBirthUnknownSettingsDialogDesc: MessageDescriptor
+  informantSignatureSettingsDialogDesc: MessageDescriptor
   showIntroductionPage: MessageDescriptor
+  showAllowAgeInYears: MessageDescriptor
+  showCaptureInformantSignature: MessageDescriptor
+  showRequiredForRegistration: MessageDescriptor
   introductionPageSuccessNotification: MessageDescriptor
   noOfAddressesSuccessNotification: MessageDescriptor
+  informantSignatureSuccessNotification: MessageDescriptor
+  dateOfBirthUnknownSuccessNotification: MessageDescriptor
   fieldGroup: MessageDescriptor
   documents: MessageDescriptor
   list: MessageDescriptor
@@ -284,6 +293,16 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'No. of addresses',
     description: 'Label for addresses settings'
   },
+  exactDateOfBirthUnknownSettings: {
+    id: 'config.form.exactDateOfBirthUnknownSettings',
+    defaultMessage: 'Exact date of birth unknown',
+    description: 'Label for exact date of birth unknown settings'
+  },
+  informantSignatureSettings: {
+    id: 'config.form.informantSignatureSettings',
+    defaultMessage: "Informant's signature",
+    description: 'Label for informant signature settings'
+  },
   enable: {
     id: 'config.form.settings.enable',
     defaultMessage: 'Enabled',
@@ -316,10 +335,37 @@ const messagesToDefine: IFormConfigMessages = {
       'How many address do you want to capture for the parents, informant and deceased?',
     description: 'Description for addresses settings dialog'
   },
+  exactDateOfBirthUnknownSettingsDialogDesc: {
+    id: 'config.form.settings.exactDateOfBirthUnknown.dialogDesc',
+    defaultMessage:
+      'If enabled the informant can provide an age in years if the exact date of birth is unknown',
+    description: 'Title for exact date of birth unknown settings dialog'
+  },
+  informantSignatureSettingsDialogDesc: {
+    id: 'config.form.settings.informantSignature.dialogDesc',
+    defaultMessage:
+      'If enabled the informant’s digital signature can be captured on the declaration review page',
+    description: 'Description for informant signature settings dialog'
+  },
   showIntroductionPage: {
     id: 'config.form.settings.showIntroductionPage',
     defaultMessage: 'Show introduction page',
     description: 'Label for introduction page toggle settings'
+  },
+  showAllowAgeInYears: {
+    id: 'config.form.settings.showAllowAgeInYears',
+    defaultMessage: 'Allow age in years',
+    description: 'Label for allow age in years toggle settings'
+  },
+  showRequiredForRegistration: {
+    id: 'config.form.settings.showRequiredForRegistration',
+    defaultMessage: 'Required for registration',
+    description: 'Label for required for registration toggle settings'
+  },
+  showCaptureInformantSignature: {
+    id: 'config.form.settings.captureInformantSignature',
+    defaultMessage: 'Capture informant signature',
+    description: 'Label for capture informant signature toggle settings'
   },
   introductionPageSuccessNotification: {
     id: 'config.form.settings.introductionPage.successNotification',
@@ -330,6 +376,16 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.settings.addresses.successNotification',
     defaultMessage: 'The number of address has been updated',
     description: 'Success notification label for number of addresses settings'
+  },
+  informantSignatureSuccessNotification: {
+    id: 'config.form.settings.informantSignature.successNotification',
+    defaultMessage: 'Informant’s signature setting updates',
+    description: ''
+  },
+  dateOfBirthUnknownSuccessNotification: {
+    id: 'config.form.settings.dateOfBirthUnknown.successNotification',
+    defaultMessage: 'Exact date of birth unknown setting updated',
+    description: ''
   },
   fieldGroup: {
     id: 'config.form.settings.fieldGroup',
