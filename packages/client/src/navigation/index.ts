@@ -50,6 +50,7 @@ import {
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
+  PERFORMANCE_REGISTRATIONS_LIST,
   VS_EXPORTS,
   VIEW_RECORD
 } from '@client/navigation/routes'
@@ -75,7 +76,6 @@ import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { IntlShape } from 'react-intl'
 export interface IDynamicValues {
   [key: string]: any
 }
@@ -433,6 +433,27 @@ export function goToFieldAgentList(
       locationId,
       timeStart,
       timeEnd
+    })
+  })
+}
+
+export function goToRegistrationsList(
+  timeStart: string,
+  timeEnd: string,
+  locationId?: string,
+  event?: string,
+  filterBy?: string,
+  currentPageNumber?: number
+) {
+  return push({
+    pathname: PERFORMANCE_REGISTRATIONS_LIST,
+    search: stringify({
+      locationId,
+      timeStart,
+      timeEnd,
+      event,
+      filterBy,
+      currentPageNumber
     })
   })
 }

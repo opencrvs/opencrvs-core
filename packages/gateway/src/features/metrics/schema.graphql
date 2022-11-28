@@ -16,6 +16,13 @@ type EventMetrics {
   practitionerRole: String!
 }
 
+type EventMetricsByRegistrar {
+  registrarPractitioner: User
+  total: Int!
+  late: Int!
+  delayed: Int!
+}
+
 type Estimation {
   totalEstimation: Int!
   maleEstimation: Int!
@@ -39,6 +46,40 @@ type TotalMetricsResult {
 }
 type TotalVSExport {
   results: [VSExport!]
+}
+
+type TotalMetricsByRegistrar {
+  results: [EventMetricsByRegistrar!]!
+  total: Int
+}
+
+type EventMetricsByLocation {
+  location: Location!
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+}
+
+type TotalMetricsByLocation {
+  results: [EventMetricsByLocation!]!
+  total: Int
+}
+
+type EventMetricsByTime {
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+  month: String!
+  time: String!
+}
+
+type TotalMetricsByTime {
+  results: [EventMetricsByTime!]!
+  total: Int
 }
 
 type PaymentMetric {
@@ -139,6 +180,11 @@ type LocationStatisticsResponse {
   offices: Int!
 }
 
+union MixedTotalMetricsResult =
+    TotalMetricsByRegistrar
+  | TotalMetricsByLocation
+  | TotalMetricsByTime
+
 type Query {
   getTotalMetrics(
     timeStart: String!
@@ -146,6 +192,15 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
+  getRegistrationsListByFilter(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+    filterBy: String!
+    skip: Int!
+    size: Int!
+  ): MixedTotalMetricsResult
   getVSExports: TotalVSExport
   getTotalPayments(
     timeStart: String!

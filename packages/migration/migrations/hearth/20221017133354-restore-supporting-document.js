@@ -30,9 +30,11 @@ export const up = async (db, client) => {
           )
         })
         const immediatePrevComp = compositionHistory[correctionIndex - 1]
-        const hasDocumentSection = immediatePrevComp?.section.find(
-          (section) => section.code.coding[0].code === 'supporting-documents'
-        )
+        const hasDocumentSection =
+          immediatePrevComp &&
+          immediatePrevComp.section.find(
+            (section) => section.code.coding[0].code === 'supporting-documents'
+          )
         if (hasDocumentSection) {
           await db
             .collection('Composition')
