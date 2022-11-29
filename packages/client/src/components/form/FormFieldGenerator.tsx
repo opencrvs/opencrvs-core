@@ -496,7 +496,8 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === LINK) {
     return (
-      <Link type='reg16'
+      <Link
+        type="reg16"
         onClick={() => onSetFieldValue(fieldDefinition.name, true)}
       >
         {fieldDefinition.label}

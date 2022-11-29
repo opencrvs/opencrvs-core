@@ -285,9 +285,15 @@ export class SearchTool extends React.Component<IProps, IState> {
     return (
       <SearchBox className={this.props.className}>
         <Wrapper onSubmit={this.search}>
-        <Button type="icon" size="medium" aria-label="Search" id="searchIconButton" onClick={this.search}> 
-           <Icon color="currentColor" name="Search" size="large"/>       
-        </Button>
+          <Button
+            type="icon"
+            size="medium"
+            aria-label="Search"
+            id="searchIconButton"
+            onClick={this.search}
+          >
+            <Icon color="currentColor" name="Search" size="large" />
+          </Button>
           <SearchTextInput
             id="searchText"
             type="text"
