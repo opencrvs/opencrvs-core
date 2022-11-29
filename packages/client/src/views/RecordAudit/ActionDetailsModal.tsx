@@ -400,6 +400,7 @@ export const ActionDetailsModalListTable = ({
     <>
       {/* For Reject Reason */}
       {actionDetailsData.reason &&
+        !actionDetailsData.action &&
         actionDetailsData.regStatus === RegStatus.Rejected && (
           <Table
             noResultText=" "
