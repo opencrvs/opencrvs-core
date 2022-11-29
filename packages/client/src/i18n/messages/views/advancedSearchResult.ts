@@ -11,15 +11,14 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IAdvancedSearchResultMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
+export type IAdvancedSearchResultMessages = {
   event: MessageDescriptor
   registationStatus: MessageDescriptor
   eventDate: MessageDescriptor
   regNumber: MessageDescriptor
   trackingId: MessageDescriptor
   regDate: MessageDescriptor
-  eventlocation: MessageDescriptor
+  eventLocation: MessageDescriptor
   regLocation: MessageDescriptor
   childFirstName: MessageDescriptor
   childLastName: MessageDescriptor
@@ -76,10 +75,10 @@ const messagesToDefine: IAdvancedSearchResultMessages = {
       'The label for  registration date in active advancedSearchParams',
     id: 'advancedSearchResult.pill.regDate'
   },
-  eventlocation: {
+  eventLocation: {
     defaultMessage: 'Event Location',
     description: 'The label for event location in active advancedSearchParams',
-    id: 'advancedSearchResult.pill.eventlocation'
+    id: 'advancedSearchResult.pill.eventLocation'
   },
   regLocation: {
     defaultMessage: 'Location',

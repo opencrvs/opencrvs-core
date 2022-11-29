@@ -14,6 +14,8 @@ import { ReactWrapper } from 'enzyme'
 import { createTestComponent } from '@client/tests/util'
 import { AdvancedSearchConfig } from './AdvancedSearch'
 import { createStore } from '@client/store'
+import { waitForElement } from '@client/tests/wait-for-element'
+
 let testComponent: ReactWrapper
 beforeEach(async () => {
   const { store, history } = createStore()
@@ -25,9 +27,26 @@ beforeEach(async () => {
   testComponent.update()
 })
 
-describe('advanced search page test', () => {
+describe('should render both birth and death tabs', () => {
   it('should shows birth, and death tab button', async () => {
     expect(testComponent.find('#tab_birth').hostNodes().text()).toBe('Birth')
     expect(testComponent.find('#tab_death').hostNodes().text()).toBe('Death')
+  })
+})
+
+describe('should open birth tab by default', () => {
+  it('render registration details accordion', async () => {
+    expect(
+      testComponent.find('#BirthRegistrationDetails-accordion').hostNodes()
+        .length
+    ).toBe(1)
+  })
+
+  it('should open the accordion when clicked on it', async () => {
+    testComponent
+      .find('#BirthRegistrationDetails-accordion-header')
+      .hostNodes()
+      .simulate('click')
+    await waitForElement(testComponent, '#BirthRegistrationDetails-content')
   })
 })

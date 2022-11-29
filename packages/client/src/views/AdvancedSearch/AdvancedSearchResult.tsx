@@ -82,7 +82,10 @@ import {
 } from '@client/views//SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
-import { getFormattedAdvanceSearchParamPills } from '@client/search/advancedSearch/utils'
+import {
+  advancedSearchPillKey,
+  getFormattedAdvanceSearchParamPills
+} from '@client/search/advancedSearch/utils'
 
 const SearchParamPillsContainer = styled.div`
   margin: 16px 0px;
@@ -481,10 +484,12 @@ const SearchModifierComponent = () => {
   return (
     <>
       <SearchParamPillsContainer>
-        {Object.keys(formattedMapOfParams).map((paramKey, i) => {
+        {Object.keys(formattedMapOfParams).map((pillKey, i) => {
           return (
             <Pill
-              label={`${paramKey} : ${formattedMapOfParams[paramKey]}`}
+              label={`${intl.formatMessage(
+                advancedSearchResultMessages[pillKey as advancedSearchPillKey]
+              )} : ${formattedMapOfParams[pillKey as advancedSearchPillKey]}`}
               type="default"
               size="medium"
             ></Pill>

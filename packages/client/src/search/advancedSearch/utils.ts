@@ -13,7 +13,7 @@ import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer
 import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
 import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
 import { IDateRangePickerValue } from '@client/forms'
-import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
+import { IAdvancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
 import { constantsMessages, formMessages } from '@client/i18n/messages'
 import {
   IOfflineData,
@@ -30,6 +30,15 @@ import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import format from '@client/utils/date-formatting'
 import { ISearchLocation } from '@opencrvs/components'
+
+export type advancedSearchPillKey = Exclude<
+  keyof IAdvancedSearchResultMessages,
+  'searchResult' | 'noResult'
+>
+
+type pillKeyValueMap = {
+  [key in advancedSearchPillKey]: string | undefined
+}
 
 const {
   birthSearchRegistrationSection,
@@ -181,7 +190,7 @@ const getFormattedOfficeName = (
   return offices.find((place) => place.id === placeId)?.name || ''
 }
 
-const getFormattedJurisDictionName = (
+const getFormattedJurisdictionName = (
   locationId: string,
   offlineData: IOfflineData,
   intl: IntlShape
@@ -311,9 +320,9 @@ const getFormattedResidentialAddressForPill = (
   eventCountry?: string
 ) => {
   return [
-    getFormattedJurisDictionName(eventLocationLevel1 || '', offlineData, intl)
+    getFormattedJurisdictionName(eventLocationLevel1 || '', offlineData, intl)
       ?.displayLabel,
-    getFormattedJurisDictionName(eventLocationLevel2 || '', offlineData, intl)
+    getFormattedJurisdictionName(eventLocationLevel2 || '', offlineData, intl)
       ?.searchableText,
     eventCountry || ''
   ]
@@ -325,77 +334,52 @@ export const getFormattedAdvanceSearchParamPills = (
   advancedSearchParamsState: IAdvancedSearchParamState,
   intl: IntlShape,
   offlineData: IOfflineData
-): Record<string, string> => {
-  const intlFormattedMapOfParams = {
-    [intl.formatMessage(advancedSearchResultMessages.event)]:
+): pillKeyValueMap => {
+  const intlFormattedMapOfParams: pillKeyValueMap = {
+    event:
       advancedSearchParamsState.event === 'birth'
         ? intl.formatMessage(constantsMessages.birth)
         : intl.formatMessage(constantsMessages.death),
 
-    [intl.formatMessage(advancedSearchResultMessages.registationStatus)]:
+    registationStatus:
       advancedSearchParamsState.registrationStatuses &&
-      advancedSearchParamsState.registrationStatuses.length > 0 &&
-      getLabelForRegistrationStatus(
-        advancedSearchParamsState.registrationStatuses,
-        intl
-      ),
+      advancedSearchParamsState.registrationStatuses.length > 0
+        ? getLabelForRegistrationStatus(
+            advancedSearchParamsState.registrationStatuses,
+            intl
+          )
+        : '',
 
-    [intl.formatMessage(advancedSearchResultMessages.trackingId)]:
-      advancedSearchParamsState.trackingId,
-
-    [intl.formatMessage(advancedSearchResultMessages.regNumber)]:
-      advancedSearchParamsState.registrationNumber,
-
-    [intl.formatMessage(advancedSearchResultMessages.childFirstName)]:
-      advancedSearchParamsState.childFirstNames,
-
-    [intl.formatMessage(advancedSearchResultMessages.childLastName)]:
-      advancedSearchParamsState.childLastName,
-
-    [intl.formatMessage(advancedSearchResultMessages.motherFirstName)]:
-      advancedSearchParamsState.motherFirstNames,
-
-    [intl.formatMessage(advancedSearchResultMessages.motherLastName)]:
-      advancedSearchParamsState.motherFamilyName,
-
-    [intl.formatMessage(advancedSearchResultMessages.fatherFirstName)]:
-      advancedSearchParamsState.fatherFirstNames,
-
-    [intl.formatMessage(advancedSearchResultMessages.fatherLastName)]:
-      advancedSearchParamsState.fatherFamilyName,
-
-    [intl.formatMessage(advancedSearchResultMessages.informantFirstName)]:
-      advancedSearchParamsState.informantFirstNames,
-
-    [intl.formatMessage(advancedSearchResultMessages.informantLastName)]:
-      advancedSearchParamsState.informantFamilyName,
-
-    [intl.formatMessage(advancedSearchResultMessages.deceasedFirstName)]:
-      advancedSearchParamsState.deceasedFirstNames,
-
-    [intl.formatMessage(advancedSearchResultMessages.deceasedLastName)]:
-      advancedSearchParamsState.deceasedFamilyName,
-
-    [intl.formatMessage(advancedSearchResultMessages.gender)]:
-      advancedSearchParamsState.childGender,
-
-    [intl.formatMessage(advancedSearchResultMessages.gender)]:
-      advancedSearchParamsState.deceasedGender,
-
-    [intl.formatMessage(advancedSearchResultMessages.regLocation)]:
+    trackingId: advancedSearchParamsState.trackingId,
+    regNumber: advancedSearchParamsState.registrationNumber,
+    childFirstName: advancedSearchParamsState.childFirstNames,
+    childLastName: advancedSearchParamsState.childLastName,
+    motherFirstName: advancedSearchParamsState.motherFirstNames,
+    motherLastName: advancedSearchParamsState.motherFamilyName,
+    fatherFirstName: advancedSearchParamsState.fatherFirstNames,
+    fatherLastName: advancedSearchParamsState.fatherFamilyName,
+    informantFirstName: advancedSearchParamsState.informantFirstNames,
+    informantLastName: advancedSearchParamsState.informantFamilyName,
+    deceasedFirstName: advancedSearchParamsState.deceasedFirstNames,
+    deceasedLastName: advancedSearchParamsState.deceasedFamilyName,
+    gender:
+      advancedSearchParamsState.event === 'birth'
+        ? advancedSearchParamsState.childGender
+        : advancedSearchParamsState.deceasedGender || '',
+    regLocation:
       (advancedSearchParamsState.declarationLocationId &&
         getFormattedOfficeName(
           advancedSearchParamsState.declarationLocationId,
           offlineData
         )) ||
       (advancedSearchParamsState.declarationJurisdictionId &&
-        getFormattedJurisDictionName(
+        getFormattedJurisdictionName(
           advancedSearchParamsState.declarationJurisdictionId,
           offlineData,
           intl
         )?.displayLabel),
 
-    [intl.formatMessage(advancedSearchResultMessages.eventlocation)]:
+    eventLocation:
       (advancedSearchParamsState.eventLocationId &&
         getFacilityNameById(
           advancedSearchParamsState.eventLocationId,
@@ -409,7 +393,7 @@ export const getFormattedAdvanceSearchParamPills = (
         advancedSearchParamsState.eventCountry
       ),
 
-    [intl.formatMessage(advancedSearchResultMessages.eventDate)]:
+    eventDate:
       (advancedSearchParamsState.dateOfEventStart &&
         advancedSearchParamsState.dateOfEventEnd &&
         formatDateRangeLabel(
@@ -419,7 +403,7 @@ export const getFormattedAdvanceSearchParamPills = (
         )) ||
       advancedSearchParamsState.dateOfEvent,
 
-    [intl.formatMessage(advancedSearchResultMessages.regDate)]:
+    regDate:
       (advancedSearchParamsState.dateOfRegistrationStart &&
         advancedSearchParamsState.dateOfRegistrationEnd &&
         formatDateRangeLabel(
@@ -429,7 +413,7 @@ export const getFormattedAdvanceSearchParamPills = (
         )) ||
       advancedSearchParamsState.dateOfRegistration,
 
-    [intl.formatMessage(advancedSearchResultMessages.childDoB)]:
+    childDoB:
       (advancedSearchParamsState.event === 'birth' &&
         advancedSearchParamsState.childDoBStart &&
         advancedSearchParamsState.childDoBEnd &&
@@ -440,7 +424,7 @@ export const getFormattedAdvanceSearchParamPills = (
         )) ||
       advancedSearchParamsState.childDoB,
 
-    [intl.formatMessage(advancedSearchResultMessages.motherDoB)]:
+    motherDoB:
       (advancedSearchParamsState.event === 'birth' &&
         advancedSearchParamsState.motherDoBStart &&
         advancedSearchParamsState.motherDoBEnd &&
@@ -451,7 +435,7 @@ export const getFormattedAdvanceSearchParamPills = (
         )) ||
       advancedSearchParamsState.motherDoB,
 
-    [intl.formatMessage(advancedSearchResultMessages.fatherDoB)]:
+    fatherDoB:
       (advancedSearchParamsState.event === 'birth' &&
         advancedSearchParamsState.fatherDoBStart &&
         advancedSearchParamsState.fatherDoBEnd &&
@@ -462,7 +446,7 @@ export const getFormattedAdvanceSearchParamPills = (
         )) ||
       advancedSearchParamsState.fatherDoB,
 
-    [intl.formatMessage(advancedSearchResultMessages.deceasedDoB)]:
+    deceasedDoB:
       (advancedSearchParamsState.event === 'death' &&
         advancedSearchParamsState.deceasedDoBStart &&
         advancedSearchParamsState.deceasedDoBEnd &&
@@ -473,7 +457,7 @@ export const getFormattedAdvanceSearchParamPills = (
         )) ||
       advancedSearchParamsState.deceasedDoB,
 
-    [intl.formatMessage(advancedSearchResultMessages.informantDoB)]:
+    informantDoB:
       (advancedSearchParamsState.informantDoBStart &&
         advancedSearchParamsState.informantDoBEnd &&
         formatDateRangeLabel(
@@ -485,13 +469,15 @@ export const getFormattedAdvanceSearchParamPills = (
   }
 
   return Object.keys(intlFormattedMapOfParams)
-    .filter((key) => Boolean(intlFormattedMapOfParams[key]))
+    .filter((key) =>
+      Boolean(intlFormattedMapOfParams[key as advancedSearchPillKey])
+    )
     .reduce((ac, curr) => {
       return {
         ...ac,
         ...{
-          [curr]: intlFormattedMapOfParams[curr]
+          [curr]: intlFormattedMapOfParams[curr as advancedSearchPillKey]
         }
       }
-    }, {})
+    }, {} as pillKeyValueMap)
 }
