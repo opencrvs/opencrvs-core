@@ -670,6 +670,11 @@ export const mockOfflineData = {
       fileName: 'logo.png',
       file: `data:image;base64,${validImageB64String}`
     },
+    LOGIN_BACKGROUND: {
+      backgroundColor: 'FFF',
+      backgroundImage: '',
+      imageFit: 'FILL'
+    },
     CURRENCY: {
       isoCode: 'ZMW',
       languagesAndCountry: ['en-ZM']
