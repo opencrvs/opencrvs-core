@@ -274,6 +274,7 @@ input BirthRegistrationInput {
   lastPreviousLiveBirth: Date # Not in BDRIS2
   createdAt: Date
   updatedAt: Date
+  ageOfIndividualInYears: String
 }
 
 type BirthRegistration implements EventRegistration { # -> Composition
@@ -297,6 +298,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
   history: [History]
+  ageOfIndividualInYears: String
 }
 
 input DeathRegistrationInput {

@@ -1389,6 +1389,52 @@
                   }
                 },
                 {
+                  "name": "exactDateOfBirthUnknown",
+                  "type": "CHECKBOX",
+                  "label": {
+                    "defaultMessage": "Exact date of birth unknown",
+                    "description": "Checkbox for exact date of birth unknown",
+                    "id": "form.field.label.exactDateOfBirthUnknown"
+                  },
+                  "required": true,
+                  "hideHeader": true,
+                  "initialValue": false,
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN"
+                    }
+                  ],
+                  "mapping": {
+                    "query": {
+                      "operation": "booleanTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "ageOfIndividualInYears",
+                  "type": "NUMBER",
+                  "label": {
+                    "defaultMessage": "Age of informant",
+                    "description": "Label for form field: Age of informant",
+                    "id": "form.field.label.ageOfInformant"
+                  },
+                  "customisable": true,
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.exactDateOfBirthUnknown"
+                    }
+                  ],
+                  "postfix": "years",
+
+                  "inputFieldWidth": "78px"
+                },
+                {
                   "name": "firstNamesEng",
                   "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
@@ -3753,6 +3799,52 @@
                       "parameters": []
                     }
                   }
+                },
+                {
+                  "name": "exactDateOfBirthUnknown",
+                  "type": "CHECKBOX",
+                  "label": {
+                    "defaultMessage": "Exact date of birth unknown",
+                    "description": "Checkbox for exact date of birth unknown",
+                    "id": "form.field.label.exactDateOfBirthUnknown"
+                  },
+                  "required": true,
+                  "hideHeader": true,
+                  "initialValue": false,
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN"
+                    }
+                  ],
+                  "mapping": {
+                    "query": {
+                      "operation": "booleanTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "ageOfIndividualInYears",
+                  "type": "NUMBER",
+                  "label": {
+                    "defaultMessage": "Age of deceased",
+                    "description": "Label for form field: Age of deceased",
+                    "id": "form.field.label.ageOfDeceased"
+                  },
+                  "customisable": true,
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.exactDateOfBirthUnknown"
+                    }
+                  ],
+                  "postfix": "years",
+
+                  "inputFieldWidth": "78px"
                 },
                 {
                   "name": "firstNamesEng",

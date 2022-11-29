@@ -421,7 +421,7 @@ export interface IFormFieldBase {
   required?: boolean
   prefix?: string
   postfix?: string
-  disabled?: boolean
+  disabled?: boolean | string
   enabled?: string
   custom?: boolean
   initialValue?: IFormFieldValue

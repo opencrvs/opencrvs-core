@@ -26,6 +26,7 @@ import {
   deathDocumentForWhomFhirMapping,
   deathDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+import { conditionals } from '../utils'
 
 // THIS FILE CONTAINS THE DEFAULT, FACTORY RESET FORM CONFIGURATIONS
 
@@ -3120,6 +3121,7 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'isValidBirthDate'
                   }
                 ],
+
                 mapping: {
                   template: {
                     operation: 'dateFormatTransformer',
@@ -3131,6 +3133,48 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: []
                   }
                 }
+              },
+              {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                required: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  }
+                }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfDeceased,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.exactDateOfBirthUnknown'
+                  }
+                ],
+                postfix: 'years',
+
+                inputFieldWidth: '78px'
               },
               {
                 name: 'firstNamesEng',
@@ -3702,6 +3746,48 @@ export const registerForms: IDefaultRegisterForms = {
                     ]
                   }
                 }
+              },
+              {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                required: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  }
+                }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfInformant,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.exactDateOfBirthUnknown'
+                  }
+                ],
+                postfix: 'years',
+
+                inputFieldWidth: '78px'
               },
               {
                 name: 'firstNamesEng',

@@ -41,7 +41,6 @@ const Check = styled.span<{ size?: string }>`
   -webkit-transition: border 0.25s linear;
   position: relative;
   color: ${({ theme }) => theme.colors.copy};
-  z-index: 1;
   &::after {
     position: absolute;
     content: '';
@@ -81,6 +80,7 @@ const Input = styled.input`
   width: ${({ size }) => `${size}px`};
   height: ${({ size }) => `${size}px`};
   opacity: 0;
+  z-index: 2;
   cursor: pointer;
   &:focus ~ ${Check} {
     box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
