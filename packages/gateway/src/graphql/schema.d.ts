@@ -223,23 +223,23 @@ export interface GQLLocation {
 }
 
 export interface GQLUser {
-  id?: string
-  userMgntUserID?: string
-  practitionerId?: string
-  name?: Array<GQLHumanName | null>
-  username?: string
-  mobile?: string
-  role?: string
-  type?: string
-  email?: string
-  status?: string
-  underInvestigation?: boolean
-  primaryOffice?: GQLLocation
-  catchmentArea?: Array<GQLLocation | null>
-  localRegistrar?: GQLLocalRegistrar
+  id: string
+  userMgntUserID: string
+  practitionerId: string
+  name: Array<GQLHumanName | null>
+  username: string
+  mobile: string
+  role: string
+  type: string
+  email: string
+  status: string
+  underInvestigation: boolean
+  primaryOffice: GQLLocation
+  catchmentArea: Array<GQLLocation>
+  localRegistrar: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
-  creationDate?: string
+  creationDate: string
   avatar?: GQLAvatar
   device?: string
 }

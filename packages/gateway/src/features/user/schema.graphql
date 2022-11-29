@@ -56,23 +56,23 @@ type Avatar {
 }
 
 type User {
-  id: ID
-  userMgntUserID: ID
-  practitionerId: String
-  name: [HumanName] # -> .name
-  username: String
-  mobile: String
-  role: String
-  type: String
-  email: String
-  status: String
-  underInvestigation: Boolean
-  primaryOffice: Location
-  catchmentArea: [Location]
-  localRegistrar: LocalRegistrar
+  id: ID!
+  userMgntUserID: ID!
+  practitionerId: String!
+  name: [HumanName]! # -> .name
+  username: String!
+  mobile: String!
+  role: String!
+  type: String!
+  email: String!
+  status: String!
+  underInvestigation: Boolean!
+  primaryOffice: Location!
+  catchmentArea: [Location!]!
+  localRegistrar: LocalRegistrar!
   identifier: Identifier
   signature: Signature
-  creationDate: String
+  creationDate: String!
   avatar: Avatar
   device: String
 }
