@@ -260,9 +260,7 @@ export function goToSearchResult(
 }
 
 export function goToAdvancedSearchResult(mobile?: boolean) {
-  return mobile
-    ? replace(formatUrl(ADVANCED_SEARCH_RESULT, {}))
-    : push(formatUrl(ADVANCED_SEARCH_RESULT, {}))
+  return push(formatUrl(ADVANCED_SEARCH_RESULT, {}))
 }
 
 export function goToSearch() {

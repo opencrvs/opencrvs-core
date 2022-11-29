@@ -11,73 +11,81 @@
  */
 import { gql } from '@apollo/client'
 
+export const ADVANCED_SEARCH_PARAM_FIELDS = gql`
+  fragment AdvancedSeachParameters on AdvancedSeachParameters {
+    event
+    name
+    registrationStatuses
+    dateOfEvent
+    dateOfEventStart
+    dateOfEventEnd
+    contactNumber
+    nationalId
+    registrationNumber
+    trackingId
+    dateOfRegistration
+    dateOfRegistrationStart
+    dateOfRegistrationEnd
+    declarationLocationId
+    declarationJurisdictionId
+    eventLocationId
+    eventCountry
+    eventLocationLevel1
+    eventLocationLevel2
+    eventLocationLevel3
+    eventLocationLevel4
+    eventLocationLevel5
+    childFirstNames
+    childLastName
+    childDoB
+    childDoBStart
+    childDoBEnd
+    childGender
+    deceasedFirstNames
+    deceasedFamilyName
+    deceasedGender
+    deceasedDoB
+    deceasedDoBStart
+    deceasedDoBEnd
+    deceasedIdentifier
+    motherFirstNames
+    motherFamilyName
+    motherDoB
+    motherDoBStart
+    motherDoBEnd
+    motherIdentifier
+    fatherFirstNames
+    fatherFamilyName
+    fatherDoB
+    fatherDoBStart
+    fatherDoBEnd
+    fatherIdentifier
+    informantFirstNames
+    informantFamilyName
+    informantDoB
+    informantDoBStart
+    informantDoBEnd
+    informantIdentifier
+    compositionType
+  }
+`
+
 export const BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION = gql`
+  ${ADVANCED_SEARCH_PARAM_FIELDS}
   mutation bookmarkAdvancedSearch($bookmarkSearchInput: BookmarkSearchInput!) {
     bookmarkAdvancedSearch(bookmarkSearchInput: $bookmarkSearchInput) {
       searchList {
         searchId
         name
         parameters {
-          event
-          name
-          registrationStatuses
-          dateOfEvent
-          dateOfEventStart
-          dateOfEventEnd
-          contactNumber
-          nationalId
-          registrationNumber
-          trackingId
-          dateOfRegistration
-          dateOfRegistrationStart
-          dateOfRegistrationEnd
-          declarationLocationId
-          declarationJurisdictionId
-          eventLocationId
-          eventCountry
-          eventLocationLevel1
-          eventLocationLevel2
-          eventLocationLevel3
-          eventLocationLevel4
-          eventLocationLevel5
-          childFirstNames
-          childLastName
-          childDoB
-          childDoBStart
-          childDoBEnd
-          childGender
-          deceasedFirstNames
-          deceasedFamilyName
-          deceasedGender
-          deceasedDoB
-          deceasedDoBStart
-          deceasedDoBEnd
-          deceasedIdentifier
-          motherFirstNames
-          motherFamilyName
-          motherDoB
-          motherDoBStart
-          motherDoBEnd
-          motherIdentifier
-          fatherFirstNames
-          fatherFamilyName
-          fatherDoB
-          fatherDoBStart
-          fatherDoBEnd
-          fatherIdentifier
-          informantFirstNames
-          informantFamilyName
-          informantDoB
-          informantDoBStart
-          informantDoBEnd
-          informantIdentifier
-          compositionType
+          ...AdvancedSeachParameters
         }
       }
     }
   }
 `
 export const REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION = gql`
+  ${ADVANCED_SEARCH_PARAM_FIELDS}
   mutation removeBookmarkedAdvancedSearch(
     $removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ) {
@@ -88,60 +96,7 @@ export const REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION = gql`
         searchId
         name
         parameters {
-          event
-          name
-          registrationStatuses
-          dateOfEvent
-          dateOfEventStart
-          dateOfEventEnd
-          contactNumber
-          nationalId
-          registrationNumber
-          trackingId
-          dateOfRegistration
-          dateOfRegistrationStart
-          dateOfRegistrationEnd
-          declarationLocationId
-          declarationJurisdictionId
-          eventLocationId
-          eventCountry
-          eventLocationLevel1
-          eventLocationLevel2
-          eventLocationLevel3
-          eventLocationLevel4
-          eventLocationLevel5
-          childFirstNames
-          childLastName
-          childDoB
-          childDoBStart
-          childDoBEnd
-          childGender
-          deceasedFirstNames
-          deceasedFamilyName
-          deceasedGender
-          deceasedDoB
-          deceasedDoBStart
-          deceasedDoBEnd
-          deceasedIdentifier
-          motherFirstNames
-          motherFamilyName
-          motherDoB
-          motherDoBStart
-          motherDoBEnd
-          motherIdentifier
-          fatherFirstNames
-          fatherFamilyName
-          fatherDoB
-          fatherDoBStart
-          fatherDoBEnd
-          fatherIdentifier
-          informantFirstNames
-          informantFamilyName
-          informantDoB
-          informantDoBStart
-          informantDoBEnd
-          informantIdentifier
-          compositionType
+          ...AdvancedSeachParameters
         }
       }
     }

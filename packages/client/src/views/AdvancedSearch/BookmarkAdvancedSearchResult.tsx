@@ -13,7 +13,7 @@ import * as React from 'react'
 import { ToggleIcon } from '@opencrvs/components/lib/ToggleIcon'
 import styled from '@client/styledComponents'
 import { useSelector } from 'react-redux'
-import { getPartialState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { BookmarkAdvancedSearchModal } from '@client/views/AdvancedSearch/SaveBookmarkModal'
 import { RemoveBookmarkAdvancedSearchModal } from './RemoveBookmarkModal'
@@ -39,7 +39,7 @@ export interface IBookmarkAdvancedSearch {
 }
 
 export function BookmarkAdvancedSearchResult() {
-  const advancedSearchState = useSelector(getPartialState)
+  const advancedSearchState = useSelector(getAdvancedSearchParamsState)
   const bookmark = Boolean(advancedSearchState.searchId)
   const [showBookmarkModal, setShowBookmarkModal] = React.useState(false)
   const [showRemoveBookmarkModal, setShowRemoveBookmarkModal] =

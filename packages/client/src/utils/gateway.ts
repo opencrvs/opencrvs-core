@@ -2153,6 +2153,137 @@ export type BookmarkAdvancedSearchMutation = {
     searchList?: Array<{
       __typename?: 'BookmarkedSeachItem'
       searchId: string
+      name: string
+      parameters: {
+        __typename?: 'AdvancedSeachParameters'
+        event?: Event | null
+        name?: string | null
+        registrationStatuses?: Array<string | null> | null
+        dateOfEvent?: string | null
+        dateOfEventStart?: string | null
+        dateOfEventEnd?: string | null
+        contactNumber?: string | null
+        nationalId?: string | null
+        registrationNumber?: string | null
+        trackingId?: string | null
+        dateOfRegistration?: string | null
+        dateOfRegistrationStart?: string | null
+        dateOfRegistrationEnd?: string | null
+        declarationLocationId?: string | null
+        declarationJurisdictionId?: string | null
+        eventLocationId?: string | null
+        eventCountry?: string | null
+        eventLocationLevel1?: string | null
+        eventLocationLevel2?: string | null
+        eventLocationLevel3?: string | null
+        eventLocationLevel4?: string | null
+        eventLocationLevel5?: string | null
+        childFirstNames?: string | null
+        childLastName?: string | null
+        childDoB?: string | null
+        childDoBStart?: string | null
+        childDoBEnd?: string | null
+        childGender?: string | null
+        deceasedFirstNames?: string | null
+        deceasedFamilyName?: string | null
+        deceasedGender?: string | null
+        deceasedDoB?: string | null
+        deceasedDoBStart?: string | null
+        deceasedDoBEnd?: string | null
+        deceasedIdentifier?: string | null
+        motherFirstNames?: string | null
+        motherFamilyName?: string | null
+        motherDoB?: string | null
+        motherDoBStart?: string | null
+        motherDoBEnd?: string | null
+        motherIdentifier?: string | null
+        fatherFirstNames?: string | null
+        fatherFamilyName?: string | null
+        fatherDoB?: string | null
+        fatherDoBStart?: string | null
+        fatherDoBEnd?: string | null
+        fatherIdentifier?: string | null
+        informantFirstNames?: string | null
+        informantFamilyName?: string | null
+        informantDoB?: string | null
+        informantDoBStart?: string | null
+        informantDoBEnd?: string | null
+        informantIdentifier?: string | null
+        compositionType?: Array<string | null> | null
+      }
+    }> | null
+  } | null
+}
+
+export type RemoveBookmarkedAdvancedSearchMutationVariables = Exact<{
+  removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
+}>
+
+export type RemoveBookmarkedAdvancedSearchMutation = {
+  __typename?: 'Mutation'
+  removeBookmarkedAdvancedSearch?: {
+    __typename?: 'BookMarkedSearches'
+    searchList?: Array<{
+      __typename?: 'BookmarkedSeachItem'
+      searchId: string
+      name: string
+      parameters: {
+        __typename?: 'AdvancedSeachParameters'
+        event?: Event | null
+        name?: string | null
+        registrationStatuses?: Array<string | null> | null
+        dateOfEvent?: string | null
+        dateOfEventStart?: string | null
+        dateOfEventEnd?: string | null
+        contactNumber?: string | null
+        nationalId?: string | null
+        registrationNumber?: string | null
+        trackingId?: string | null
+        dateOfRegistration?: string | null
+        dateOfRegistrationStart?: string | null
+        dateOfRegistrationEnd?: string | null
+        declarationLocationId?: string | null
+        declarationJurisdictionId?: string | null
+        eventLocationId?: string | null
+        eventCountry?: string | null
+        eventLocationLevel1?: string | null
+        eventLocationLevel2?: string | null
+        eventLocationLevel3?: string | null
+        eventLocationLevel4?: string | null
+        eventLocationLevel5?: string | null
+        childFirstNames?: string | null
+        childLastName?: string | null
+        childDoB?: string | null
+        childDoBStart?: string | null
+        childDoBEnd?: string | null
+        childGender?: string | null
+        deceasedFirstNames?: string | null
+        deceasedFamilyName?: string | null
+        deceasedGender?: string | null
+        deceasedDoB?: string | null
+        deceasedDoBStart?: string | null
+        deceasedDoBEnd?: string | null
+        deceasedIdentifier?: string | null
+        motherFirstNames?: string | null
+        motherFamilyName?: string | null
+        motherDoB?: string | null
+        motherDoBStart?: string | null
+        motherDoBEnd?: string | null
+        motherIdentifier?: string | null
+        fatherFirstNames?: string | null
+        fatherFamilyName?: string | null
+        fatherDoB?: string | null
+        fatherDoBStart?: string | null
+        fatherDoBEnd?: string | null
+        fatherIdentifier?: string | null
+        informantFirstNames?: string | null
+        informantFamilyName?: string | null
+        informantDoB?: string | null
+        informantDoBStart?: string | null
+        informantDoBEnd?: string | null
+        informantIdentifier?: string | null
+        compositionType?: Array<string | null> | null
+      }
     }> | null
   } | null
 }

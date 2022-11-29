@@ -45,10 +45,9 @@ import {
   buttonMessages,
   constantsMessages,
   dynamicConstantsMessages,
-  errorMessages,
-  formMessages
+  errorMessages
 } from '@client/i18n/messages'
-import { messages as advancedSearchPillMessages } from '@client/i18n/messages/views/advancedSearchResult'
+import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
@@ -56,7 +55,6 @@ import { Redirect, RouteComponentProps } from 'react-router'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { HOME, REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
-import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import {
   ColumnContentAlignment,
   COLUMNS,
@@ -64,12 +62,8 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
-import {
-  AdvancedSearchParametersInput,
-  RegStatus,
-  SearchEventsQuery
-} from '@client/utils/gateway'
-import { getPartialState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
+import { getAdvancedSearchParamsState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { Query } from '@client/components/Query'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import {
@@ -81,19 +75,20 @@ import {
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { convertToMSISDN } from '@client/forms/utils'
 import { DownloadAction } from '@client/forms'
-import format, { formattedDuration } from '@client/utils/date-formatting'
-import { IViewHeadingProps } from '@client/components/ViewHeading'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
-import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import {
   isAdvancedSearchFormValid,
   transformReduxDataToLocalState
 } from '@client/views//SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
-import { isEqual, omitBy } from 'lodash'
-import { IOfflineData } from '@client/offline/reducer'
-import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
+import {
+  advancedSearchPillKey,
+  getFormattedAdvanceSearchParamPills
+} from '@client/search/advancedSearch/utils'
+import { omitBy } from 'lodash'
+import { BookmarkAdvancedSearchResult } from './BookmarkAdvancedSearchResult'
 
 const SearchParamPillsContainer = styled.div`
   margin: 16px 0px;
@@ -102,11 +97,10 @@ const SearchParamPillsContainer = styled.div`
   flex-wrap: wrap;
   align-items: center;
   color: ${({ theme }) => theme.colors.primaryDark};
-`
-const BookMarkIconBody = styled.div`
-  position: absolute;
-  top: -20px;
-  right: 10px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    max-height: 200px;
+    overflow-y: scroll;
+  }
 `
 
 type QueryData = SearchEventsQuery['searchEvents']
@@ -136,24 +130,24 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
-  const { saved, error, named, searchId, ...advancedSearchParams } =
-    useSelector(AdvancedSearchParamsState)
+  const { searchId, ...advancedSearchParams } = useSelector(
+    AdvancedSearchParamsState
+  )
   const filteredAdvancedSearchParams = omitBy(
     advancedSearchParams,
-    (properties) => properties === null || properties === EMPTY_STRING
-  ) as AdvancedSearchParametersInput
+    (properties: string | null) =>
+      properties === null || properties === EMPTY_STRING
+  )
   const offlineData = useSelector(getOfflineData)
-  const recordWindowWidth = () => {
-    setWindowWidth(window.innerWidth)
-  }
-  useEffect(() => {
-    window.addEventListener('resize', recordWindowWidth)
-  }, [])
+  const DEFAULT_PAGE_SIZE = 10
+  const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
 
   useEffect(() => {
-    return () => {
-      window.removeEventListener('resize', recordWindowWidth)
+    const recordWindowWidth = () => {
+      setWindowWidth(window.innerWidth)
     }
+    window.addEventListener('resize', recordWindowWidth)
+    return () => window.removeEventListener('resize', recordWindowWidth)
   }, [])
 
   const isEnoughParams = () => {
@@ -241,14 +235,20 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         const downloadStatus =
           (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-        const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
+        const declarationIsArchived =
+          reg.declarationStatus === RegStatus.Archived
         const declarationIsRequestedCorrection =
           reg.declarationStatus === 'REQUESTED_CORRECTION'
-        const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
-        const declarationIsCertified = reg.declarationStatus === 'CERTIFIED'
-        const declarationIsRejected = reg.declarationStatus === 'REJECTED'
-        const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
-        const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
+        const declarationIsRegistered =
+          reg.declarationStatus === RegStatus.Registered
+        const declarationIsCertified =
+          reg.declarationStatus === RegStatus.Certified
+        const declarationIsRejected =
+          reg.declarationStatus === RegStatus.Rejected
+        const declarationIsValidated =
+          reg.declarationStatus === RegStatus.Validated
+        const declarationIsInProgress =
+          reg.declarationStatus === RegStatus.InProgress
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
@@ -418,8 +418,8 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
             advancedSearchParameters: {
               ...filteredAdvancedSearchParams
             },
-            count: 10,
-            skip: 0
+            count: DEFAULT_PAGE_SIZE,
+            skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1)
           }}
           fetchPolicy="cache-and-network"
         >
@@ -427,14 +427,21 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
             const total = loading ? -1 : data?.searchEvents?.totalItems || 0
             return (
               <WQContentWrapper
-                title={'Search Result'}
+                title={intl.formatMessage(
+                  advancedSearchResultMessages.searchResult
+                )}
                 isMobileSize={false}
-                noResultText={'No Results'}
+                noResultText={intl.formatMessage(
+                  advancedSearchResultMessages.noResult
+                )}
                 noContent={total < 1 && !loading}
                 tabBarContent={<SearchModifierComponent />}
-                isShowPagination={true}
-                totalPages={2}
-                paginationId={1}
+                isShowPagination={!loading && total > DEFAULT_PAGE_SIZE}
+                totalPages={Math.ceil(total / DEFAULT_PAGE_SIZE)}
+                paginationId={currentPageNumber}
+                onPageChange={(page: any) => setCurrentPageNumber(page)}
+                topActionButtons={[<BookmarkAdvancedSearchResult />]}
+                showTitleOnMobile={true}
               >
                 {loading ? (
                   <div id="advanced-search_loader">
@@ -475,406 +482,21 @@ const SearchModifierComponent = () => {
   const offlineData = useSelector(getOfflineData)
   const intl = useIntl()
 
-  const formatDateRangeLabel = (
-    rangeStart: string | undefined,
-    rangeEnd: string | undefined
-  ) => {
-    if (!rangeStart || !rangeEnd) {
-      return
-    }
-    const dateStartLocale =
-      rangeStart && format(new Date(rangeStart), 'MMMM yyyy')
-    const dateEndLocale = rangeEnd && format(new Date(rangeEnd), 'MMMM yyyy')
-
-    return intl.formatMessage(formMessages.dateRangePickerCheckboxLabel, {
-      rangeStart: dateStartLocale,
-      rangeEnd: dateEndLocale
-    })
-  }
-
-  const getLabelForRegistrationStatus = (statusList: string[]) => {
-    const statusLabelMapping: Record<string, string[]> = {
-      ALL: [
-        RegStatus.Archived,
-        RegStatus.Certified,
-        RegStatus.DeclarationUpdated,
-        RegStatus.Declared,
-        RegStatus.InProgress,
-        RegStatus.Registered,
-        RegStatus.Rejected,
-        RegStatus.Validated,
-        RegStatus.WaitingValidation
-      ],
-      IN_REVIEW: [RegStatus.WaitingValidation, RegStatus.Validated],
-      ARCHIVED: [RegStatus.Archived],
-      CERTIFIED: [RegStatus.Certified],
-      DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
-      DECLARED: [RegStatus.Declared],
-      IN_PROGRESS: [RegStatus.InProgress],
-      REGISTERED: [RegStatus.Registered],
-      REJECTED: [RegStatus.Rejected],
-      VALIDATED: [RegStatus.Validated],
-      WAITING_VALIDATION: [RegStatus.WaitingValidation]
-    }
-
-    const statusType = Object.keys(statusLabelMapping).find((key, i) => {
-      if (isEqual(statusList, statusLabelMapping[key])) {
-        return true
-      }
-      return false
-    })
-
-    const forMattedStatusList = [
-      {
-        value: 'ALL',
-        label: intl.formatMessage(advancedSearchForm.recordStatusAny)
-      },
-      {
-        value: RegStatus.InProgress,
-        label: intl.formatMessage(advancedSearchForm.recordStatusInprogress)
-      },
-      {
-        value: 'IN_REVIEW',
-        label: intl.formatMessage(advancedSearchForm.recordStatusInReview)
-      },
-      {
-        value: RegStatus.Rejected,
-        label: intl.formatMessage(advancedSearchForm.recordStatusRequireUpdate)
-      },
-      {
-        value: RegStatus.Registered,
-        label: intl.formatMessage(advancedSearchForm.recordStatusRegistered)
-      },
-      {
-        value: RegStatus.Certified,
-        label: intl.formatMessage(advancedSearchForm.recordStatusCertified)
-      },
-      {
-        value: RegStatus.Archived,
-        label: intl.formatMessage(advancedSearchForm.recordStatusAchived)
-      }
-    ]
-
-    const formattedLabel =
-      forMattedStatusList.find((e, i) => statusType === e.value)?.label ||
-      statusList[0]
-
-    return formattedLabel
-  }
-
-  const getFormattedPlaceNameById = (
-    placeId: string,
-    offlineData: IOfflineData
-  ): string => {
-    const facilities = Object.values(offlineData.facilities)
-    const locations = Object.values(offlineData.locations)
-    const offices = Object.values(offlineData.offices)
-
-    return (
-      [...facilities, ...locations, ...offices].find(
-        (place) => place.id === placeId
-      )?.name || ''
-    )
-  }
-
-  const getFormattedAdvancedSerachParams = (
-    advancedSearchParamsState: IAdvancedSearchParamState
-  ): Record<string, string> => {
-    const formattedMapOfParams: Record<string, string> = {}
-
-    if (advancedSearchParamsState.event) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.event)
-      ] =
-        advancedSearchParamsState.event === 'birth'
-          ? intl.formatMessage(constantsMessages.birth)
-          : intl.formatMessage(constantsMessages.death)
-    }
-
-    if (
-      advancedSearchParamsState.registrationStatuses &&
-      advancedSearchParamsState.registrationStatuses.length > 0
-    ) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.registationStatus)
-      ] = getLabelForRegistrationStatus(
-        advancedSearchParamsState.registrationStatuses
-      )
-    }
-    if (advancedSearchParamsState.trackingId) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.trackingId)
-      ] = advancedSearchParamsState.trackingId
-    }
-    if (advancedSearchParamsState.registrationNumber) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.regNumber)
-      ] = advancedSearchParamsState.registrationNumber
-    }
-    if (advancedSearchParamsState.childFirstNames) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.childFirstName)
-      ] = advancedSearchParamsState.childFirstNames
-    }
-
-    if (advancedSearchParamsState.childLastName) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.childLastName)
-      ] = advancedSearchParamsState.childLastName
-    }
-
-    if (advancedSearchParamsState.motherFirstNames) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.motherFirstName)
-      ] = advancedSearchParamsState.motherFirstNames
-    }
-
-    if (advancedSearchParamsState.motherFamilyName) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.motherLastName)
-      ] = advancedSearchParamsState.motherFamilyName
-    }
-
-    if (advancedSearchParamsState.fatherFirstNames) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.fatherFirstName)
-      ] = advancedSearchParamsState.fatherFirstNames
-    }
-
-    if (advancedSearchParamsState.fatherFamilyName) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.fatherLastName)
-      ] = advancedSearchParamsState.fatherFamilyName
-    }
-
-    if (advancedSearchParamsState.informantFirstNames) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.informantFirstName)
-      ] = advancedSearchParamsState.informantFirstNames
-    }
-
-    if (advancedSearchParamsState.informantFamilyName) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.informantLastName)
-      ] = advancedSearchParamsState.informantFamilyName
-    }
-
-    if (advancedSearchParamsState.deceasedFirstNames) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.deceasedFirstName)
-      ] = advancedSearchParamsState.deceasedFirstNames
-    }
-
-    if (advancedSearchParamsState.deceasedFamilyName) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.deceasedLastName)
-      ] = advancedSearchParamsState.deceasedFamilyName
-    }
-
-    if (advancedSearchParamsState.childGender) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.gender)
-      ] = advancedSearchParamsState.childGender
-    }
-    if (advancedSearchParamsState.deceasedGender) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.gender)
-      ] = advancedSearchParamsState.deceasedGender
-    }
-
-    if (advancedSearchParamsState.declarationLocationId) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.regLocation)
-      ] = getFormattedPlaceNameById(
-        advancedSearchParamsState.declarationLocationId,
-        offlineData
-      )
-    }
-    if (advancedSearchParamsState.declarationJurisdictionId) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.regLocation)
-      ] = getFormattedPlaceNameById(
-        advancedSearchParamsState.declarationJurisdictionId,
-        offlineData
-      )
-    }
-
-    if (advancedSearchParamsState.eventCountry) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.eventlocation)
-      ] = advancedSearchParamsState.eventCountry
-    }
-    if (advancedSearchParamsState.eventLocationId) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.eventlocation)
-      ] = advancedSearchParamsState.eventLocationId
-    }
-
-    if (advancedSearchParamsState.eventLocationLevel1) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.eventlocation)
-      ] = advancedSearchParamsState.eventLocationLevel1
-    }
-    if (advancedSearchParamsState.eventLocationLevel2) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.eventlocation)
-      ] = advancedSearchParamsState.eventLocationLevel2
-    }
-    if (advancedSearchParamsState.eventLocationLevel3) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.eventlocation)
-      ] = advancedSearchParamsState.eventLocationLevel3
-    }
-
-    //dates
-    if (advancedSearchParamsState.dateOfEvent) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.eventDate)
-      ] = advancedSearchParamsState.dateOfEvent
-    }
-    if (
-      advancedSearchParamsState.dateOfEventStart ||
-      advancedSearchParamsState.dateOfEventEnd
-    ) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.eventDate)
-      ] =
-        formatDateRangeLabel(
-          advancedSearchParamsState.dateOfEventStart,
-          advancedSearchParamsState.dateOfEventEnd
-        ) || ''
-    }
-
-    if (advancedSearchParamsState.dateOfRegistration) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.regDate)
-      ] = advancedSearchParamsState.dateOfRegistration
-    }
-
-    if (
-      advancedSearchParamsState.dateOfRegistrationStart ||
-      advancedSearchParamsState.dateOfRegistrationEnd
-    ) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.regDate)
-      ] =
-        formatDateRangeLabel(
-          advancedSearchParamsState.dateOfRegistrationStart,
-          advancedSearchParamsState.dateOfRegistrationEnd
-        ) || ''
-    }
-
-    if (advancedSearchParamsState.childDoB) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.childDoB)
-      ] = advancedSearchParamsState.childDoB
-    }
-
-    if (
-      advancedSearchParamsState.childDoBStart ||
-      advancedSearchParamsState.childDoBEnd
-    ) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.childDoB)
-      ] =
-        formatDateRangeLabel(
-          advancedSearchParamsState.childDoBStart,
-          advancedSearchParamsState.childDoBEnd
-        ) || ''
-    }
-
-    if (advancedSearchParamsState.motherDoB) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.motherDoB)
-      ] = advancedSearchParamsState.motherDoB
-    }
-
-    if (
-      advancedSearchParamsState.motherDoBStart ||
-      advancedSearchParamsState.motherDoBEnd
-    ) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.motherDoB)
-      ] =
-        formatDateRangeLabel(
-          advancedSearchParamsState.motherDoBStart,
-          advancedSearchParamsState.motherDoBEnd
-        ) || ''
-    }
-
-    if (advancedSearchParamsState.fatherDoB) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.fatherDoB)
-      ] = advancedSearchParamsState.fatherDoB
-    }
-
-    if (
-      advancedSearchParamsState.fatherDoBStart ||
-      advancedSearchParamsState.fatherDoBEnd
-    ) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.fatherDoB)
-      ] =
-        formatDateRangeLabel(
-          advancedSearchParamsState.fatherDoBStart,
-          advancedSearchParamsState.fatherDoBEnd
-        ) || ''
-    }
-
-    if (advancedSearchParamsState.deceasedDoB) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.deceasedDoB)
-      ] = advancedSearchParamsState.deceasedDoB
-    }
-
-    if (
-      advancedSearchParamsState.deceasedDoBStart ||
-      advancedSearchParamsState.deceasedDoBEnd
-    ) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.deceasedDoB)
-      ] =
-        formatDateRangeLabel(
-          advancedSearchParamsState.deceasedDoBStart,
-          advancedSearchParamsState.deceasedDoBEnd
-        ) || ''
-    }
-
-    if (advancedSearchParamsState.informantDoB) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.informantDoB)
-      ] = advancedSearchParamsState.informantDoB
-    }
-
-    if (
-      advancedSearchParamsState.informantDoBStart ||
-      advancedSearchParamsState.informantDoBEnd
-    ) {
-      formattedMapOfParams[
-        intl.formatMessage(advancedSearchPillMessages.informantDoB)
-      ] =
-        formatDateRangeLabel(
-          advancedSearchParamsState.informantDoBStart,
-          advancedSearchParamsState.informantDoBEnd
-        ) || ''
-    }
-
-    return formattedMapOfParams
-  }
-
-  const formattedMapOfParams = getFormattedAdvancedSerachParams(
-    advancedSearchParamsState
+  const formattedMapOfParams = getFormattedAdvanceSearchParamPills(
+    advancedSearchParamsState,
+    intl,
+    offlineData
   )
+
   return (
     <>
-      <BookMarkIconBody>
-        <BookmarkAdvancedSearchResult />
-      </BookMarkIconBody>
       <SearchParamPillsContainer>
-        {Object.keys(formattedMapOfParams).map((paramKey, i) => {
+        {Object.keys(formattedMapOfParams).map((pillKey, i) => {
           return (
             <Pill
-              label={`${paramKey} : ${formattedMapOfParams[paramKey]}`}
+              label={`${intl.formatMessage(
+                advancedSearchResultMessages[pillKey as advancedSearchPillKey]
+              )} : ${formattedMapOfParams[pillKey as advancedSearchPillKey]}`}
               type="default"
               size="medium"
             ></Pill>

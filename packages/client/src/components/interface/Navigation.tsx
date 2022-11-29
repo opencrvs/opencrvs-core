@@ -61,7 +61,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { omit } from 'lodash'
-import { getPartialState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 
 const SCREEN_LOCK = 'screenLock'
@@ -669,7 +669,7 @@ export const NavigationView = (props: IFullProps) => {
               icon={() => (
                 <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
               )}
-              id={`bookmarked_advanced_search_${index}`}
+              id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
               label={bookmarkResult.name}
               disabled={
                 advancedSearchParams.searchId === bookmarkResult.searchId &&
@@ -718,7 +718,7 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     workqueue: state.workqueueState.workqueue,
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
-    advancedSearchParams: getPartialState(state),
+    advancedSearchParams: getAdvancedSearchParamsState(state),
     activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
       : window.location.href.includes(WORKQUEUE_TABS.team)

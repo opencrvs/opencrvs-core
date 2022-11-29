@@ -11,23 +11,83 @@
  */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent } from '@client/tests/util'
+import { createRouterProps, createTestComponent } from '@client/tests/util'
 import { AdvancedSearchConfig } from './AdvancedSearch'
 import { createStore } from '@client/store'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { formatUrl } from '@client/navigation'
+import {
+  ADVANCED_SEARCH,
+  ADVANCED_SEARCH_RESULT
+} from '@client/navigation/routes'
+
 let testComponent: ReactWrapper
 beforeEach(async () => {
   const { store, history } = createStore()
-
   testComponent = await createTestComponent(
-    <AdvancedSearchConfig></AdvancedSearchConfig>,
+    // @ts-ignore
+    <AdvancedSearchConfig
+      {...createRouterProps(formatUrl(ADVANCED_SEARCH, {}), {
+        isNavigatedInsideApp: false
+      })}
+    ></AdvancedSearchConfig>,
     { store, history }
   )
   testComponent.update()
 })
 
-describe('advanced search page test', () => {
+describe('should render both birth and death tabs', () => {
   it('should shows birth, and death tab button', async () => {
     expect(testComponent.find('#tab_birth').hostNodes().text()).toBe('Birth')
     expect(testComponent.find('#tab_death').hostNodes().text()).toBe('Death')
+  })
+})
+
+describe('when advancedSearchPage renders with no active params in store', () => {
+  it('renders searchbutton as disabled', async () => {
+    expect(
+      testComponent.find('#search').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+  it('renders all accordions as closed', async () => {
+    expect(
+      testComponent.find('#BirthRegistrationDetails-content').hostNodes().length
+    ).toBe(0)
+  })
+})
+
+describe('when advancedSearchPage renders with 2 or more active params in store', () => {
+  let testComponent: ReactWrapper
+  beforeEach(async () => {
+    const { store, history } = createStore()
+    store.dispatch(
+      setAdvancedSearchParam({
+        event: 'birth',
+        declarationLocationId: 'asda',
+        registrationStatuses: ['IN_PROGRESS']
+      })
+    )
+    testComponent = await createTestComponent(
+      <AdvancedSearchConfig></AdvancedSearchConfig>,
+      { store, history }
+    )
+    testComponent.update()
+  })
+
+  it('renders searchbutton as enabled', async () => {
+    expect(
+      testComponent.find('#search').hostNodes().props().disabled
+    ).toBeFalsy()
+  })
+
+  it('renders accordions with active params as opened', async () => {
+    expect(
+      testComponent.find('#BirthRegistrationDetails-content').hostNodes().length
+    ).toBe(1)
+  })
+
+  it('goes to advancedSearch Result page if search button is clicked', async () => {
+    testComponent.find('#search').hostNodes().simulate('click')
+    expect(window.location.href).toContain(`${ADVANCED_SEARCH_RESULT}`)
   })
 })

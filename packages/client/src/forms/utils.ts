@@ -316,7 +316,7 @@ export const getFieldOptions = (
       `Dependency is undefined, the value should have an entry in the dynamic options object.`
     )
   }
-  const dependencyVal = _.get(values, field.dynamicOptions.dependency) as string
+  const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (field.dynamicOptions.jurisdictionType) {
     return generateOptions(
       Object.values(locations).filter((location: ILocation) => {

@@ -61,9 +61,6 @@ export type IAdvancedSearchParamState = {
   informantDoBStart?: string
   informantDoBEnd?: string
   searchId?: string
-  saved?: string
-  error?: string
-  named?: string
 }
 
 export const advancedSearchInitialState: IAdvancedSearchParamState = {
@@ -113,10 +110,7 @@ export const advancedSearchInitialState: IAdvancedSearchParamState = {
   informantDoB: '',
   informantDoBStart: '',
   informantDoBEnd: '',
-  searchId: '',
-  saved: '',
-  error: '',
-  named: ''
+  searchId: ''
 }
 
 type Actions = actions.AdvancedSearchParamActions | offlineActions.Action

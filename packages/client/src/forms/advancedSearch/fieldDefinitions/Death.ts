@@ -378,8 +378,8 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
 }
 
 export const advancedSearchDeathSections = {
-  registrationSection: advancedSearchDeathSectionRegistrationDetails,
-  deceasedSection: advancedSearchDeathSectiondeceasedDetails,
-  eventSection: advancedSearchDeathSectionEventDetails,
-  informantSection: advancedSearchDeathSectionInformantDetails
+  deathSearchRegistrationSection: advancedSearchDeathSectionRegistrationDetails,
+  deathSearchDeceasedSection: advancedSearchDeathSectiondeceasedDetails,
+  deathSearchEventSection: advancedSearchDeathSectionEventDetails,
+  deathSearchInformantSection: advancedSearchDeathSectionInformantDetails
 }

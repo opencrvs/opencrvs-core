@@ -16,12 +16,12 @@ import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION } from '@client/profile/mutations'
 import {
   AdvancedSearchParametersInput,
-  BookMarkedSearches,
-  MutationBookmarkAdvancedSearchArgs
+  BookmarkAdvancedSearchMutation,
+  BookmarkAdvancedSearchMutationVariables
 } from '@client/utils/gateway'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@apollo/client'
-import { getPartialState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
 import { GQLBookmarkedSeachItem } from '@opencrvs/gateway/src/graphql/schema'
@@ -34,6 +34,7 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { omitBy } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 export const Message = styled.div`
   margin-bottom: 16px;
@@ -46,10 +47,6 @@ interface IBookmarkModalProps {
   setNotificationMessages: (notificationMessage: string) => void
 }
 
-interface ISaveBookmarkData {
-  bookmarkAdvancedSearch: BookMarkedSearches
-}
-
 export function BookmarkAdvancedSearchModal({
   showBookmarkModal,
   toggleBookmarkModal,
@@ -57,10 +54,12 @@ export function BookmarkAdvancedSearchModal({
   setNotificationMessages
 }: IBookmarkModalProps) {
   const intl = useIntl()
+  const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
   const userDetails = useSelector(getUserDetails)
-  const { saved, error, named, searchId, ...advancedSearchParams } =
-    useSelector(getPartialState)
+  const { searchId, ...advancedSearchParams } = useSelector(
+    getAdvancedSearchParamsState
+  )
   //remove null and empty properties
   const filteredAdvancedSearchParams = omitBy(
     advancedSearchParams,
@@ -73,8 +72,8 @@ export function BookmarkAdvancedSearchModal({
   }
 
   const [bookmarkAdvancedSearchResult] = useMutation<
-    ISaveBookmarkData,
-    MutationBookmarkAdvancedSearchArgs
+    BookmarkAdvancedSearchMutation,
+    BookmarkAdvancedSearchMutationVariables
   >(BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION, {
     onError() {
       setNotificationMessages(
@@ -106,7 +105,7 @@ export function BookmarkAdvancedSearchModal({
         }
       }
     })
-    if (mutatedData.data) {
+    if (mutatedData.data?.bookmarkAdvancedSearch) {
       const { __typename, ...rest } = mutatedData.data.bookmarkAdvancedSearch
       const filteredSearchListData =
         rest.searchList &&
@@ -168,7 +167,7 @@ export function BookmarkAdvancedSearchModal({
               setQueryName('')
               await bookmarkAdvancedSearchHandler()
             }}
-            disabled={!Boolean(queryName)}
+            disabled={!Boolean(queryName) && !isOnline}
           >
             {intl.formatMessage(buttonMessages.confirm)}
           </Button>

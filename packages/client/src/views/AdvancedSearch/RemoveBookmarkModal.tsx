@@ -13,8 +13,8 @@ import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION } from '@client/profile/mutations'
 import {
-  BookMarkedSearches,
-  MutationRemoveBookmarkedAdvancedSearchArgs
+  RemoveBookmarkedAdvancedSearchMutation,
+  RemoveBookmarkedAdvancedSearchMutationVariables
 } from '@client/utils/gateway'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@apollo/client'
@@ -26,20 +26,17 @@ import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { Button } from '@opencrvs/components/lib/Button'
 import { buttonMessages } from '@client/i18n/messages'
 import { Message } from '@client/views/AdvancedSearch/SaveBookmarkModal'
-import { getPartialState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 interface IRemoveBookmarkModalProps {
   showRemoveBookmarkModal: boolean
   toggleRemoveBookmarkModal: () => void
   setNotificationStatus: (status: NOTIFICATION_STATUS) => void
   setNotificationMessages: (notificationMessage: string) => void
-}
-
-interface IRemoveBookmarkData {
-  removeBookmarkedAdvancedSearch: BookMarkedSearches
 }
 
 export function RemoveBookmarkAdvancedSearchModal({
@@ -50,12 +47,13 @@ export function RemoveBookmarkAdvancedSearchModal({
 }: IRemoveBookmarkModalProps) {
   const intl = useIntl()
   const dispatch = useDispatch()
-  const { searchId, ...rest } = useSelector(getPartialState)
+  const { searchId, ...rest } = useSelector(getAdvancedSearchParamsState)
   const userDetails = useSelector(getUserDetails)
+  const isOnline = useOnlineStatus()
 
   const [removeAdvancedSearchResultBookmark] = useMutation<
-    IRemoveBookmarkData,
-    MutationRemoveBookmarkedAdvancedSearchArgs
+    RemoveBookmarkedAdvancedSearchMutation,
+    RemoveBookmarkedAdvancedSearchMutationVariables
   >(REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION, {
     onError() {
       setNotificationMessages(
@@ -84,7 +82,7 @@ export function RemoveBookmarkAdvancedSearchModal({
         }
       }
     })
-    if (mutatedData.data) {
+    if (mutatedData.data?.removeBookmarkedAdvancedSearch) {
       dispatch(
         modifyUserDetails({
           ...userDetails,
@@ -126,7 +124,7 @@ export function RemoveBookmarkAdvancedSearchModal({
               toggleRemoveBookmarkModal()
               await removeAdvancedSearchBookmarkHandler()
             }}
-            disabled={false}
+            disabled={!isOnline}
           >
             {intl.formatMessage(buttonMessages.confirm)}
           </Button>
