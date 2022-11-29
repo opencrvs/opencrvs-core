@@ -15,7 +15,7 @@ import {
   Description,
   SubHeader
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
-import { ProgressBar } from '@opencrvs/components/lib/forms'
+import { ProgressBar } from '@opencrvs/components/lib/ProgressBar'
 import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import {

@@ -219,12 +219,12 @@ do
         fi
         if [ $i == "node" ] ; then
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
-            echo "We recommend you install Node v.14.17.0, v.14.17.6, v14.18.0 or v14.18.1 as this release has been tested on those versions."
+            echo "We recommend you install Node 14.18.0 or v14.18.1 as this release has been tested on those versions."
             echo "There are various ways you can install Node.  The easiest way to get Node running with the version of your choice is using Node Version Manager."
             echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:\033[0m"
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
             echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
-            echo "nvm install 14.17.0"
+            echo "nvm install 14.18.0"
         fi
         if [ $i == "yarn" ] ; then
            echo "You need to install the Yarn Package Manager for Node."
@@ -267,7 +267,7 @@ fi
 
 
 echo
-openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021)
+openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
 for x in "${openCRVSPorts[@]}"
 do
    :
@@ -293,7 +293,7 @@ if [ "$versionTest" == "LOWER" ] ; then
   echo "We recommend you install Node v.14.17.0, v.14.17.6, v14.18.0 or v14.18.1 as this release has been tested on those versions."
   echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
   echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
-  echo "nvm install 14.17.0"
+  echo "nvm install 14.18.0"
   exit 1
   else
     echo -e "Your Node version: $myNodeVersion is \033[32msupported!\033[0m :)"
@@ -339,6 +339,8 @@ mkdir -p data/mongo
 chmod 775 data/mongo
 mkdir -p data/influxdb
 chmod 775 data/influxdb
+mkdir -p data/minio
+chmod 775 data/minio
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
@@ -363,6 +365,7 @@ echo "wait-on tcp:9200" && wait-on -l tcp:9200
 echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
 echo "wait-on tcp:8086" && wait-on -l tcp:8086
+echo "wait-on tcp:3535" && wait-on -l tcp:3535
 
 
 set -- $(stty size) #$1=rows, $2=columns

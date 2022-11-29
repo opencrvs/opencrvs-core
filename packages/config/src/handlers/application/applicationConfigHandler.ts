@@ -72,8 +72,23 @@ export async function getLoginConfigHandler(
   }
   const refineConfigResponse = pick(loginConfig, [
     'APPLICATION_NAME',
-    'COUNTRY_LOGO'
+    'COUNTRY_LOGO',
+    'PHONE_NUMBER_PATTERN'
   ])
+  return { config: refineConfigResponse }
+}
+
+export async function getIntegrationConfigHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  let integrationConfig: IApplicationConfigurationModel | null
+  try {
+    integrationConfig = await ApplicationConfig.findOne({})
+  } catch (error) {
+    throw internal(error.message)
+  }
+  const refineConfigResponse = pick(integrationConfig, ['INTEGRATIONS'])
   return { config: refineConfigResponse }
 }
 
@@ -136,5 +151,9 @@ export const updateApplicationConfig = Joi.object({
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.string(),
-  ADDRESSES: Joi.number().valid(...[1, 2])
+  ADDRESSES: Joi.number().valid(...[1, 2]),
+  INTEGRATIONS: Joi.array().items({
+    name: Joi.string().required(),
+    status: Joi.string().required()
+  })
 })

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/forms'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
   BirthSection,
   ISerializedForm,
@@ -561,6 +561,14 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrationNumberTransformer'
             },
             {
+              fieldName: 'mosipAid',
+              operation: 'mosipAidTransformer'
+            },
+            {
+              fieldName: 'mosipAIDLabel',
+              operation: 'mosipAidLabelTransformer'
+            },
+            {
               fieldName: 'certificateDate',
               operation: 'certificateDateTransformer',
               parameters: ['en', 'dd MMMM yyyy']
@@ -930,7 +938,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     fieldName: 'placeOfBirth',
                     operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
+                    parameters: ['facilities', 'placeOfBirth']
                   },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
@@ -1212,21 +1220,14 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'detailsExist',
-                type: 'RADIO_GROUP',
+                type: 'CHECKBOX',
                 label: formMessageDescriptors.mothersDetailsExist,
                 required: true,
+                checkedValue: false,
+                uncheckedValue: true,
+                hideHeader: true,
                 initialValue: true,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1701,26 +1702,14 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'detailsExist',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage: "Do you have the father's details?",
-                  description:
-                    "Question to ask the user if they have the father's details",
-                  id: 'form.field.label.fathersDetailsExist'
-                },
+                type: 'CHECKBOX',
+                label: formMessageDescriptors.fathersDetailsExist,
                 required: true,
+                checkedValue: false,
+                uncheckedValue: true,
+                hideHeader: true,
                 initialValue: true,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -2160,14 +2149,6 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'documents-view-group',
-            conditionals: [
-              {
-                description: 'Hidden for record correction',
-                action: 'hide',
-                expression:
-                  'draftData && draftData.corrector && draftData.corrector.relationship'
-              }
-            ],
             fields: [
               {
                 name: 'paragraph',
@@ -3335,23 +3316,15 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'causeOfDeathEstablished',
-                type: 'RADIO_GROUP',
+                type: 'CHECKBOX',
                 label: formMessageDescriptors.causeOfDeathEstablished,
                 required: true,
+                checkedValue: 'true',
+                uncheckedValue: 'false',
                 customisable: true,
-                initialValue: 'true',
-                size: RadioSize.NORMAL,
+                hideHeader: true,
+                initialValue: 'false',
                 validate: [],
-                options: [
-                  {
-                    value: 'true',
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: 'false',
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 mapping: {
                   mutation: {
                     operation: 'sectionFieldToBundleFieldTransformer',
@@ -3415,7 +3388,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      'values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
+                      'values.causeOfDeathEstablished !== "true" || values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
                   }
                 ],
                 initialValue: '',
@@ -3503,7 +3476,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     fieldName: 'placeOfDeath',
                     operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
+                    parameters: ['facilities', 'placeOfDeath']
                   },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',

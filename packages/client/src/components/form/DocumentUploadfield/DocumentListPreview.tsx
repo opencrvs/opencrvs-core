@@ -12,12 +12,12 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { PaperClip, Delete } from '@opencrvs/components/lib/icons'
-import { IFileValue, IAttachmentValue, IFormFieldValue } from '@client/forms'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { IFileValue, IAttachmentValue } from '@client/forms'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { withTheme, ITheme } from '@client/styledComponents'
-import { ISelectOption } from '@opencrvs/components/lib/forms'
-import { Button } from '@opencrvs/components/lib/buttons/Button'
+import { ISelectOption } from '@opencrvs/components/lib/Select'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { ENABLE_REVIEW_ATTACHMENTS_SCROLLING } from '@client/utils/constants'
 const Wrapper = styled.div`
   ${({ theme }) => theme.fonts.reg16};
 `
@@ -65,6 +65,7 @@ type IProps = {
   onSelect: (document: IFileValue | IAttachmentValue) => void
   dropdownOptions?: ISelectOption[]
   onDelete?: (image: IFileValue | IAttachmentValue) => void
+  inReviewSection?: boolean
 }
 
 class DocumentListPreviewComponent extends React.Component<IProps> {
@@ -99,9 +100,14 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
               >
                 <PaperClip />
                 <span>
-                  {this.getFormattedLabelForDocType(
-                    document.optionValues[1] as string
-                  ) || document.optionValues[1]}
+                  {(!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                    this.props.inReviewSection &&
+                    this.props.dropdownOptions &&
+                    this.props.dropdownOptions[key]?.label) ||
+                    this.getFormattedLabelForDocType(
+                      document.optionValues[1] as string
+                    ) ||
+                    document.optionValues[1]}
                 </span>
               </PreviewLink>
               {onDelete && (

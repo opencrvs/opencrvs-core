@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import React from 'react'
 import {
   calculateTotal,
@@ -38,7 +38,9 @@ export function CorrectionsReport({ data }: CorrectionsReportProps) {
         <ListViewItemSimplified
           label={
             <div>
-              <PerformanceListHeader>Corrections</PerformanceListHeader>
+              <PerformanceListHeader>
+                {intl.formatMessage(messages.performanceTotalCorrectionsHeader)}
+              </PerformanceListHeader>
             </div>
           }
         />

@@ -19,9 +19,6 @@ import { ThemeProvider } from '@client/styledComponents'
 import { getSchema } from '@client/tests/graphql-schema-mock'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import ApolloClient, { NetworkStatus } from 'apollo-client'
-import { ApolloLink, Observable } from 'apollo-link'
 import {
   configure,
   mount,
@@ -34,8 +31,15 @@ import { readFileSync } from 'fs'
 import { graphql, print } from 'graphql'
 import * as jwt from 'jsonwebtoken'
 import * as React from 'react'
-import { ApolloProvider } from 'react-apollo'
-import { MockedProvider } from 'react-apollo/test-utils'
+import {
+  ApolloProvider,
+  NetworkStatus,
+  ApolloClient,
+  InMemoryCache,
+  ApolloLink,
+  Observable
+} from '@apollo/client'
+import { MockedProvider } from '@apollo/client/testing'
 import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
@@ -46,8 +50,13 @@ import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
 import { ConnectedRouter } from 'connected-react-router'
 import { mockOfflineData } from './mock-offline-data'
-import { SubmissionAction } from '@client/forms'
+import { Section, SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '@client/declarations'
+import { vi } from 'vitest'
+import { getRolesQuery } from '@client/forms/user/query/queries'
+import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
+import { draftToGqlTransformer } from '@client/transformer'
+import { deserializeFormSection } from '@client/forms/mappings/deserializer'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -91,14 +100,13 @@ export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
 }
 
-export const getItem = window.localStorage.getItem as jest.Mock
-export const setItem = window.localStorage.setItem as jest.Mock
+export const getItem = vi.fn()
+export const setItem = vi.fn()
 
 configure({ adapter: new Adapter() })
 
 function createGraphQLClient() {
   const schema = getSchema()
-
   return new ApolloClient({
     cache: new InMemoryCache(),
     link: new ApolloLink((operation) => {
@@ -131,7 +139,7 @@ export function waitForReady(app: ReactWrapper) {
 export async function createTestApp(
   config = { waitUntilOfflineCountryConfigLoaded: true }
 ) {
-  const { store, history } = createStore()
+  const { store, history } = await createTestStore()
   const app = mount(
     <App store={store} history={history} client={createGraphQLClient()} />
   )
@@ -1879,24 +1887,24 @@ export const mockDeathRegistrationSectionData = {
 
 export const mockFetchCertificatesTemplatesDefinition = [
   {
-    _id: '12313546',
-    event: 'birth',
+    id: '12313546',
+    event: Event.Birth,
     status: 'ACTIVE',
     svgCode:
       '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="209.884" y="549.336">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="210" y="445.552">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Died on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of death&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="211" y="384.004">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfDeath}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Death Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
-    svgDateCreated: 1640696680593,
-    svgDateUpdated: 1644326332088,
+    svgDateCreated: '1640696680593',
+    svgDateUpdated: '1644326332088',
     svgFilename: 'oCRVS_DefaultZambia_Death_v1.svg',
     user: '61d42359f1a2c25ea01beb4b'
   },
   {
-    _id: '25313546',
-    event: 'death',
+    id: '25313546',
+    event: Event.Death,
     status: 'ACTIVE',
     svgCode:
       '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="549.336" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="445.552" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Was born on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of birth&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="50%" y="384.004" text-anchor="middle">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfBirth}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Birth Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
-    svgDateCreated: 1640696804785,
-    svgDateUpdated: 1643885502999,
+    svgDateCreated: '1640696804785',
+    svgDateUpdated: '1643885502999',
     svgFilename: 'oCRVS_DefaultZambia_Birth_v1.svg',
     user: '61d42359f1a2c25ea01beb4b'
   }
@@ -2173,9 +2181,11 @@ export function loginAsFieldAgent(store: AppStore) {
     setUserDetails({
       loading: false,
       networkStatus: NetworkStatus.ready,
-      stale: false,
       data: {
         getUser: {
+          id: '5eba726866458970cf2e23c2',
+          username: 'a.alhasan',
+          creationDate: '2022-10-03T10:42:46.920Z',
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
@@ -2225,7 +2235,10 @@ export function loginAsFieldAgent(store: AppStore) {
   )
 }
 
-export function createRouterProps<T, Params>(
+export function createRouterProps<
+  T,
+  Params extends { [K in keyof Params]?: string | undefined }
+>(
   path: string,
   locationState?: T,
   {
@@ -2256,4 +2269,455 @@ export function createRouterProps<T, Params>(
   return { location, history, match }
 }
 
-export { mockOfflineData } from './mock-offline-data'
+export const mockFetchRoleGraphqlOperation = {
+  request: {
+    query: getRolesQuery,
+    variables: {}
+  },
+  result: {
+    data: {
+      getRoles: [
+        {
+          title: 'Field Agent',
+          value: 'FIELD_AGENT',
+          types: ['HOSPITAL', 'CHA']
+        },
+        {
+          title: 'Registration Agent',
+          value: 'REGISTRATION_AGENT',
+          types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK']
+        },
+        {
+          title: 'Registrar',
+          value: 'LOCAL_REGISTRAR',
+          types: ['SECRETARY', 'CHAIRMAN', 'MAYOR']
+        },
+        {
+          title: 'System admin (local)',
+          value: 'LOCAL_SYSTEM_ADMIN',
+          types: ['LOCAL_SYSTEM_ADMIN']
+        },
+        {
+          title: 'System admin (national)',
+          value: 'NATIONAL_SYSTEM_ADMIN',
+          types: ['NATIONAL_SYSTEM_ADMIN']
+        },
+        {
+          title: 'Performance Management',
+          value: 'PERFORMANCE_MANAGEMENT',
+          types: ['HEALTH_DIVISION', 'ORG_DIVISION']
+        }
+      ]
+    }
+  }
+}
+
+export const mockCompleteFormData = {
+  accountDetails: '',
+  assignedRegistrationOffice: '',
+  device: '',
+  familyName: 'হোসেন',
+  familyNameEng: 'Hossain',
+  firstNames: 'Jeff',
+  firstNamesEng: 'Jeff',
+  nid: '123456789',
+  phoneNumber: '01662132132',
+  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
+  role: 'FIELD_AGENT',
+  type: 'HOSPITAL',
+  userDetails: '',
+  username: ''
+}
+
+export const mockUserGraphqlOperation = {
+  request: {
+    query: createOrUpdateUserMutation,
+    variables: draftToGqlTransformer(
+      {
+        sections: [
+          deserializeFormSection({
+            id: 'user' as Section,
+            viewType: 'form',
+            name: {
+              defaultMessage: 'User',
+              description: 'The name of the user form',
+              id: 'constants.user'
+            },
+            title: {
+              defaultMessage: 'Create new user',
+              description: 'The title of user form',
+              id: 'form.section.user.title'
+            },
+            groups: [
+              {
+                id: 'registration-office',
+                title: {
+                  defaultMessage: 'Assigned Registration Office',
+                  description: 'Assigned Registration Office section',
+                  id: 'form.section.assignedRegistrationOffice'
+                },
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'values.skippedOfficeSelction && values.registrationOffice'
+                  }
+                ],
+                fields: [
+                  {
+                    name: 'assignedRegistrationOffice',
+                    type: 'FIELD_GROUP_TITLE',
+                    label: {
+                      defaultMessage: 'Assigned registration office',
+                      description: 'Assigned Registration Office section',
+                      id: 'form.section.assignedRegistrationOfficeGroupTitle'
+                    },
+                    required: false,
+                    hidden: true,
+                    initialValue: '',
+                    validate: []
+                  },
+                  {
+                    name: 'registrationOffice',
+                    type: 'LOCATION_SEARCH_INPUT',
+                    label: {
+                      defaultMessage: 'Registration Office',
+                      description: 'Registration office',
+                      id: 'form.field.label.registrationOffice'
+                    },
+                    required: true,
+                    initialValue: '',
+                    searchableResource: 'facilities',
+                    searchableType: 'CRVS_OFFICE',
+                    locationList: [],
+                    validate: [
+                      {
+                        operation: 'officeMustBeSelected'
+                      }
+                    ],
+                    mapping: {
+                      mutation: {
+                        operation: 'fieldNameTransformer',
+                        parameters: ['primaryOffice']
+                      },
+                      query: {
+                        operation: 'locationIDToFieldTransformer',
+                        parameters: ['primaryOffice']
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                id: 'user-view-group',
+                fields: [
+                  {
+                    name: 'userDetails',
+                    type: 'FIELD_GROUP_TITLE',
+                    label: {
+                      defaultMessage: 'User details',
+                      description: 'User details section',
+                      id: 'form.section.userDetails'
+                    },
+                    required: false,
+                    initialValue: '',
+                    validate: []
+                  },
+                  {
+                    name: 'firstNames',
+                    type: 'TEXT',
+                    label: {
+                      defaultMessage: 'Bengali first name',
+                      description: 'Bengali first name',
+                      id: 'form.field.label.firstNameBN'
+                    },
+                    required: false,
+                    initialValue: '',
+                    validate: [{ operation: 'bengaliOnlyNameFormat' }],
+                    mapping: {
+                      mutation: {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['bn']
+                      },
+                      query: {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['bn']
+                      }
+                    }
+                  },
+                  {
+                    name: 'familyName',
+                    type: 'TEXT',
+                    label: {
+                      defaultMessage: 'Bengali last name',
+                      description: 'Bengali last name',
+                      id: 'form.field.label.lastNameBN'
+                    },
+                    required: true,
+                    initialValue: '',
+                    validate: [{ operation: 'bengaliOnlyNameFormat' }],
+                    mapping: {
+                      mutation: {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['bn']
+                      },
+                      query: {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['bn']
+                      }
+                    }
+                  },
+                  {
+                    name: 'firstNamesEng',
+                    type: 'TEXT',
+                    label: {
+                      defaultMessage: 'English first name',
+                      description: 'English first name',
+                      id: 'form.field.label.firstNameEN'
+                    },
+                    required: false,
+                    initialValue: '',
+                    validate: [{ operation: 'englishOnlyNameFormat' }],
+                    mapping: {
+                      mutation: {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'firstNames']
+                      },
+                      query: {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'firstNames']
+                      }
+                    }
+                  },
+                  {
+                    name: 'familyNameEng',
+                    type: 'TEXT',
+                    label: {
+                      defaultMessage: 'English last name',
+                      description: 'English last name',
+                      id: 'form.field.label.lastNameEN'
+                    },
+                    required: true,
+                    initialValue: '',
+                    validate: [{ operation: 'englishOnlyNameFormat' }],
+                    mapping: {
+                      mutation: {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'familyName']
+                      },
+                      query: {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'familyName']
+                      }
+                    }
+                  },
+                  {
+                    name: 'phoneNumber',
+                    type: 'TEXT',
+                    label: {
+                      defaultMessage: 'Phone number',
+                      description: 'Input label for phone input',
+                      id: 'form.field.label.phoneNumber'
+                    },
+                    required: true,
+                    initialValue: '',
+                    validate: [{ operation: 'phoneNumberFormat' }],
+                    mapping: {
+                      mutation: {
+                        operation: 'msisdnTransformer',
+                        parameters: ['user.mobile']
+                      },
+                      query: {
+                        operation: 'localPhoneTransformer',
+                        parameters: ['user.mobile']
+                      }
+                    }
+                  },
+                  {
+                    name: 'nid',
+                    type: 'TEXT',
+                    label: {
+                      defaultMessage: 'NID',
+                      description: 'National ID',
+                      id: 'form.field.label.NID'
+                    },
+                    required: true,
+                    initialValue: '',
+                    validate: [
+                      {
+                        operation: 'validIDNumber',
+                        parameters: ['NATIONAL_ID']
+                      }
+                    ],
+                    mapping: {
+                      mutation: {
+                        operation: 'fieldToIdentifierWithTypeTransformer',
+                        parameters: ['NATIONAL_ID']
+                      },
+                      query: {
+                        operation: 'identifierWithTypeToFieldTransformer',
+                        parameters: ['NATIONAL_ID']
+                      }
+                    }
+                  },
+                  {
+                    name: 'accountDetails',
+                    type: 'FIELD_GROUP_TITLE',
+                    label: {
+                      defaultMessage: 'Account details',
+                      description: 'Account details section',
+                      id: 'form.section.accountDetails'
+                    },
+                    required: false,
+                    initialValue: '',
+                    validate: []
+                  },
+                  {
+                    name: 'role',
+                    type: 'SELECT_WITH_OPTIONS',
+                    label: {
+                      defaultMessage: 'Role',
+                      description: 'Role label',
+                      id: 'constants.role'
+                    },
+                    required: true,
+                    initialValue: '',
+                    validate: [],
+                    options: []
+                  },
+                  {
+                    name: 'type',
+                    type: 'SELECT_WITH_DYNAMIC_OPTIONS',
+                    label: {
+                      defaultMessage: 'Type',
+                      description:
+                        'Label for type of event in work queue list item',
+                      id: 'constants.type'
+                    },
+                    required: true,
+                    initialValue: '',
+                    validate: [],
+                    dynamicOptions: {
+                      dependency: 'role',
+                      options: {}
+                    }
+                  },
+                  {
+                    name: 'device',
+                    type: 'TEXT',
+                    label: {
+                      defaultMessage: 'Device',
+                      description: 'User device',
+                      id: 'form.field.label.userDevice'
+                    },
+                    required: false,
+                    initialValue: '',
+                    validate: []
+                  }
+                ]
+              },
+              {
+                id: 'signature-attachment',
+                title: {
+                  defaultMessage: 'Attach the signature',
+                  description: 'Title for user signature attachment',
+                  id: 'form.field.label.userSignatureAttachmentTitle'
+                },
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'values.role!=="LOCAL_REGISTRAR" && values.role!=="REGISTRATION_AGENT"'
+                  }
+                ],
+                fields: [
+                  {
+                    name: 'attachmentTitle',
+                    type: 'FIELD_GROUP_TITLE',
+                    hidden: true,
+                    label: {
+                      defaultMessage: 'Attachments',
+                      description: 'label for user signature attachment',
+                      id: 'form.field.label.userAttachmentSection'
+                    },
+                    required: false,
+                    initialValue: '',
+                    validate: []
+                  },
+                  {
+                    name: 'signature',
+                    type: 'SIMPLE_DOCUMENT_UPLOADER',
+                    label: {
+                      defaultMessage: 'User’s signature',
+                      description: 'Input label for user signature attachment',
+                      id: 'form.field.label.userSignatureAttachment'
+                    },
+                    description: {
+                      defaultMessage:
+                        'Ask the user to sign a piece of paper and then scan or take a photo.',
+                      description: 'Description for user signature attachment',
+                      id: 'form.field.label.userSignatureAttachmentDesc'
+                    },
+                    allowedDocType: ['image/png'],
+                    initialValue: '',
+                    required: false,
+                    validate: []
+                  }
+                ]
+              }
+            ]
+          })
+        ]
+      },
+      { user: mockCompleteFormData }
+    )
+  },
+  result: {
+    data: {
+      createOrUpdateUserMutation: { username: 'hossain123', __typename: 'User' }
+    }
+  }
+}
+
+export const mockIncompleteFormData = {
+  accountDetails: '',
+  assignedRegistrationOffice: '',
+  device: '',
+  familyName: 'হোসেন',
+  familyNameEng: 'Hossain',
+  firstNames: 'Jeff',
+  firstNamesEng: 'Jeff',
+  nid: '101488192',
+  phoneNumber: '',
+  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
+  role: 'FIELD_AGENT',
+  userDetails: '',
+  username: ''
+}
+
+export const mockDataWithRegistarRoleSelected = {
+  accountDetails: '',
+  assignedRegistrationOffice: '',
+  device: '',
+  familyName: 'হোসেন',
+  familyNameEng: 'Hossain',
+  firstNames: 'Jeff',
+  firstNamesEng: 'Jeff',
+  nid: '101488192',
+  phoneNumber: '01662132132',
+  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
+  role: 'LOCAL_REGISTRAR',
+  type: 'SECRETARY',
+  userDetails: '',
+  username: '',
+  signature: {
+    type: 'image/png',
+    data: 'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
+  }
+}
+
+export {
+  mockOfflineData,
+  mockOfflineDataWithLocationHierarchy,
+  mockOfflineLocationsWithHierarchy
+} from './mock-offline-data'

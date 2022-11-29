@@ -22,10 +22,7 @@ import { userMessages, buttonMessages } from '@client/i18n/messages'
 import { ImageLoader } from '@client/views/Settings/ImageLoader'
 import { IImage } from '@client/utils/imageUtils'
 import { AvatarChangeModal } from '@client/views/Settings/AvatarChangeModal'
-import {
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { IUserDetails, useUserName } from '@client/utils/userUtils'
@@ -122,23 +119,20 @@ export function ProfileImage() {
         onConfirmAvatarChange={handleConfirmAvatarChange}
         onAvatarChanged={changeAvatar}
       />
-      <FloatingNotification
-        type={
-          imageUploading
-            ? NOTIFICATION_TYPE.IN_PROGRESS
-            : NOTIFICATION_TYPE.SUCCESS
-        }
-        show={showSuccessNotification}
-        callback={
-          imageUploading ? undefined : () => toggleSuccessNotification()
-        }
-      >
-        <FormattedMessage
-          {...(imageUploading
-            ? userMessages.avatarUpdating
-            : userMessages.avatarUpdated)}
-        />
-      </FloatingNotification>
+      {showSuccessNotification && (
+        <Toast
+          type={imageUploading ? 'loading' : 'success'}
+          onClose={
+            imageUploading ? undefined : () => toggleSuccessNotification()
+          }
+        >
+          <FormattedMessage
+            {...(imageUploading
+              ? userMessages.avatarUpdating
+              : userMessages.avatarUpdated)}
+          />
+        </Toast>
+      )}
     </>
   )
 }

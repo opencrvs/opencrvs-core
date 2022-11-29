@@ -15,12 +15,9 @@ import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
-import {
-  Box,
-  ISearchLocation,
-  ResponsiveModal,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -29,10 +26,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subYears from 'date-fns/subYears'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
@@ -46,11 +40,8 @@ import {
   PERFORMANCE_METRICS,
   PERFORMANCE_STATS
 } from './metricsQuery'
-import { ApolloError } from 'apollo-client'
-import {
-  ToastNotification,
-  NOTIFICATION_TYPE
-} from '@client/components/interface/ToastNotification'
+import { ApolloError } from '@apollo/client'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
 import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
 import {
@@ -81,6 +72,7 @@ import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
+import { Box } from '@opencrvs/components/lib/Box'
 
 const Layout = styled.div`
   display: flex;
@@ -449,11 +441,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       data?: IMetricsQueryResult
                     }) => {
                       if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
+                        return <GenericErrorToast />
                       }
 
                       if (loading) {
@@ -478,6 +466,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             selectedEvent={
                               event.toUpperCase() as 'BIRTH' | 'DEATH'
                             }
+                            timeStart={timeStart.toISOString()}
+                            timeEnd={timeEnd.toISOString()}
+                            locationId={this.state.selectedLocation.id}
                           />
                           <CertificationRatesReport
                             totalRegistrations={calculateTotal(
@@ -529,11 +520,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       data?: ICorrectionsQueryResult
                     }) => {
                       if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
+                        return <GenericErrorToast />
                       }
 
                       if (loading) {
@@ -559,11 +546,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   >
                     {({ loading, data, error }) => {
                       if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
+                        return <GenericErrorToast />
                       }
                       if (loading) {
                         return null
@@ -615,11 +598,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
+              if (error) {
+                return <GenericErrorToast />
+              }
               return (
                 <>
-                  {error && (
-                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                  )}
                   <ResponsiveModal
                     title={intl.formatMessage(constantsMessages.status)}
                     show={toggleStatus}

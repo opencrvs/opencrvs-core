@@ -70,21 +70,27 @@ import {
   selectOrCreateInformantSection,
   selectOrCreateInformantResource,
   setInformantReference,
-  fetchFHIR,
   selectOrCreateEncounterPartitioner,
   selectOrCreateEncounterParticipant,
   selectOrCreateQuestionnaireResource,
-  findExtension,
-  setQuestionnaireItem
+  setQuestionnaireItem,
+  uploadBase64ToMinio,
+  isBase64FileString,
+  postAssignmentSearch
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
   FHIR_SPECIFICATION_URL,
   EVENT_TYPE,
-  ASSIGNED_EXTENSION_URL
+  REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL,
+  HAS_SHOWED_VERIFIED_DOCUMENT
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
-import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import { getTokenPayload } from '@gateway/features/user/utils'
+import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput
+} from '@gateway/graphql/schema'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -153,21 +159,6 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'value',
         context
       )
-      if (!person.id) {
-        const personSearchSet = await fetchFHIR(
-          `/Patient?identifier=${fieldValue}`,
-          context.authHeader
-        )
-        if (
-          person &&
-          personSearchSet &&
-          personSearchSet.entry &&
-          personSearchSet.entry[0] &&
-          personSearchSet.entry[0].resource
-        ) {
-          person.id = personSearchSet.entry[0].resource.id
-        }
-      }
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -2126,6 +2117,14 @@ export const builders: IFieldBuilders = {
       }
       return setResourceIdentifier(taskResource, `${trackingId}`, fieldValue)
     },
+    mosipAid: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return setResourceIdentifier(taskResource, 'mosip-aid', fieldValue)
+    },
     registrationNumber: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2158,7 +2157,7 @@ export const builders: IFieldBuilders = {
       return setResourceIdentifier(taskResource, 'paper-form-id', fieldValue)
     },
     correction: {
-      requester: (
+      requester: async (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
         context: any
@@ -2191,21 +2190,40 @@ export const builders: IFieldBuilders = {
           context.event,
           true
         )
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
         if (!certDocResource.extension) {
           certDocResource.extension = []
         }
+        if (!taskResource.extension) {
+          taskResource.extension = []
+        }
+
         const hasVerifiedExt = certDocResource.extension.find(
-          (extention) =>
-            extention.url ===
-            `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
+          (ext) => ext.url === HAS_SHOWED_VERIFIED_DOCUMENT
         )
+
+        const hasVerifiedExtInTask = taskResource.extension.find(
+          (ext) => ext.url === HAS_SHOWED_VERIFIED_DOCUMENT
+        )
+
+        //  pushing HAS_SHOWED_VERIFIED_DOCUMENT in DocReference
         if (!hasVerifiedExt) {
           certDocResource.extension.push({
-            url: `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
+            url: HAS_SHOWED_VERIFIED_DOCUMENT,
             valueString: fieldValue
           })
         } else {
           hasVerifiedExt.valueString = fieldValue
+        }
+
+        //  pushing HAS_SHOWED_VERIFIED_DOCUMENT in Task
+        if (!hasVerifiedExtInTask) {
+          taskResource.extension.push({
+            url: HAS_SHOWED_VERIFIED_DOCUMENT,
+            valueString: fieldValue
+          })
+        } else {
+          hasVerifiedExtInTask.valueString = fieldValue
         }
       },
       attestedAndCopied: (
@@ -2387,7 +2405,7 @@ export const builders: IFieldBuilders = {
             paymentResource.detail[0].date = fieldValue
           }
         },
-        data: (
+        data: async (
           fhirBundle: ITemplatedBundle,
           fieldValue: string,
           context: any
@@ -2400,6 +2418,13 @@ export const builders: IFieldBuilders = {
           )
           if (!certDocResource.content) {
             certDocResource.content = []
+          }
+          if (isBase64FileString(fieldValue)) {
+            const docUploadResponse = await uploadBase64ToMinio(
+              fieldValue,
+              context.authHeader
+            )
+            fieldValue = docUploadResponse
           }
 
           certDocResource.content.push({
@@ -2440,8 +2465,7 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          let location
-          location = selectOrCreateLocationRefResource(
+          const location = selectOrCreateLocationRefResource(
             context.event === EVENT_TYPE.BIRTH
               ? BIRTH_CORRECTION_ENCOUNTER_CODE
               : DEATH_CORRECTION_ENCOUNTER_CODE,
@@ -2481,7 +2505,7 @@ export const builders: IFieldBuilders = {
           )
       },
       values: createActionTypesBuilder(),
-      data: (
+      data: async (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
         context: any
@@ -2494,6 +2518,13 @@ export const builders: IFieldBuilders = {
         )
         if (!certDocResource.content) {
           certDocResource.content = []
+        }
+        if (isBase64FileString(fieldValue)) {
+          const docUploadResponse = await uploadBase64ToMinio(
+            fieldValue,
+            context.authHeader
+          )
+          fieldValue = docUploadResponse
         }
 
         certDocResource.content.push({
@@ -2513,6 +2544,22 @@ export const builders: IFieldBuilders = {
           taskResource.reason = {}
         }
         taskResource.reason.text = fieldValue
+      },
+      otherReason: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        if (!taskResource.reason) {
+          taskResource.reason = {}
+        }
+        taskResource.reason.extension = [
+          {
+            url: REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL,
+            valueString: fieldValue
+          }
+        ]
       },
       note: (
         fhirBundle: ITemplatedBundle,
@@ -2721,7 +2768,7 @@ export const builders: IFieldBuilders = {
         }
         docRef.content[0].attachment.contentType = fieldValue
       },
-      data: (
+      data: async (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
         context: any
@@ -2739,6 +2786,14 @@ export const builders: IFieldBuilders = {
               attachment: {}
             }
           ]
+        }
+
+        if (isBase64FileString(fieldValue)) {
+          const docUploadResponse = await uploadBase64ToMinio(
+            fieldValue,
+            context.authHeader
+          )
+          fieldValue = docUploadResponse
         }
         docRef.content[0].attachment.data = fieldValue
       },
@@ -2872,7 +2927,7 @@ export const builders: IFieldBuilders = {
               }
             }
           },
-          data: (
+          data: async (
             fhirBundle: ITemplatedBundle,
             fieldValue: string,
             context: any
@@ -2890,6 +2945,13 @@ export const builders: IFieldBuilders = {
                 extention.url ===
                 `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`
             )
+            if (isBase64FileString(fieldValue)) {
+              const docUploadResponse = await uploadBase64ToMinio(
+                fieldValue,
+                context.authHeader
+              )
+              fieldValue = docUploadResponse
+            }
             if (!hasAffidavit) {
               relatedPersonResource.extension.push({
                 url: `${OPENCRVS_SPECIFICATION_URL}extension/relatedperson-affidavittype`,
@@ -3017,9 +3079,7 @@ export const builders: IFieldBuilders = {
           certDocResource.extension = []
         }
         const hasVerifiedExt = certDocResource.extension.find(
-          (extention) =>
-            extention.url ===
-            `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
+          (extention) => extention.url === HAS_SHOWED_VERIFIED_DOCUMENT
         )
         if (!hasVerifiedExt) {
           certDocResource.extension.push({
@@ -3148,7 +3208,7 @@ export const builders: IFieldBuilders = {
           }
         }
       },
-      data: (
+      data: async (
         fhirBundle: ITemplatedBundle,
         fieldValue: string,
         context: any
@@ -3158,6 +3218,14 @@ export const builders: IFieldBuilders = {
           context,
           EVENT_TYPE.BIRTH
         )
+
+        if (isBase64FileString(fieldValue)) {
+          const docUploadResponse = await uploadBase64ToMinio(
+            fieldValue,
+            context.authHeader
+          )
+          fieldValue = docUploadResponse
+        }
         if (!certDocResource.content) {
           certDocResource.content = [
             {
@@ -3544,7 +3612,7 @@ export const builders: IFieldBuilders = {
 }
 
 export async function buildFHIRBundle(
-  reg: object,
+  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
@@ -3561,7 +3629,12 @@ export async function buildFHIRBundle(
   if (authHeader) {
     context.authHeader = authHeader
   }
-  await transformObj(reg, fhirBundle, builders, context)
+  await transformObj(
+    reg as Record<string, unknown>,
+    fhirBundle,
+    builders,
+    context
+  )
   return fhirBundle
 }
 
@@ -3573,6 +3646,7 @@ export async function updateFHIRTaskBundle(
 ) {
   const taskResource = taskEntry.resource
   taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
+  taskEntry.resource.lastModified = new Date().toISOString()
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
@@ -3581,44 +3655,17 @@ export async function updateFHIRTaskBundle(
   return fhirBundle
 }
 
-export function addOrUpdateExtension(
+export function taskBundleWithExtension(
   taskEntry: ITaskBundleEntry,
-  extensions: fhir.Extension[],
-  code: 'downloaded' | 'reinstated'
+  extension: fhir.Extension
 ) {
   const task = taskEntry.resource
-
-  if (!task.extension) {
-    task.extension = []
-  }
-
-  for (const extension of extensions) {
-    const previousExtension = findExtension(extension.url, task.extension)
-
-    if (!previousExtension) {
-      task.extension.push(extension)
-    } else {
-      previousExtension.valueString = extension.valueString
-    }
-  }
-
-  taskEntry.request = {
-    method: 'PUT',
-    url: `Task/${taskEntry.resource.id}`
-  } as fhir.BundleEntryRequest
-
+  task.lastModified = new Date().toISOString()
+  task.extension = [...(task.extension ?? []), extension]
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [taskEntry],
-    signature: {
-      type: [
-        {
-          code
-        }
-      ],
-      when: Date().toString()
-    }
+    entry: [taskEntry]
   }
   return fhirBundle
 }
@@ -3632,34 +3679,8 @@ export async function checkUserAssignment(
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   const userId = tokenPayload.sub
-  const taskBundle: ITaskBundle = await fetchFHIR(
-    `/Task?focus=Composition/${id}`,
-    authHeader
-  )
-  const taskEntryData = taskBundle.entry[0]
-  if (
-    !taskEntryData ||
-    !taskEntryData.resource ||
-    !taskEntryData.resource.extension
-  ) {
-    return false
-  }
-  const assignedExtensionData = findExtension(
-    ASSIGNED_EXTENSION_URL,
-    taskEntryData.resource.extension
-  )
-  if (!assignedExtensionData) {
-    return false
-  }
-  const practitionerId =
-    assignedExtensionData?.valueReference?.reference?.split('/')[1]
-
-  const userDetails = await getUser({ userId }, authHeader)
-
-  if (practitionerId === userDetails.practitionerId) {
-    return true
-  }
-  return false
+  const res: { userId?: string } = await postAssignmentSearch(authHeader, id)
+  return userId === res?.userId
 }
 
 export interface ITemplatedComposition extends fhir.Composition {

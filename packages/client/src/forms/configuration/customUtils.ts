@@ -10,11 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { SerializedFormField, BirthSection } from '@client/forms/index'
-import { IMessage, ICustomQuestionConfig } from '@client/forms/questionConfig'
+import {
+  IMessage,
+  ICustomQuestionConfig,
+  getIdentifiersFromFieldId,
+  IConditionalConfig
+} from '@client/forms/questionConfig'
 import { find } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { getConfigFieldIdentifiers } from './formConfig/utils'
 import {
   FATHER_DETAILS_DONT_EXIST,
   MOTHER_DETAILS_DONT_EXIST
@@ -30,6 +34,22 @@ function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   return defaultMessage?.descriptor
 }
 
+function getOtherConditionalsAction(
+  conditionals: IConditionalConfig[] | undefined
+) {
+  if (!conditionals) return []
+  return conditionals.map((condition) => {
+    const escapeRegExpValue = escapeRegExp(condition.regexp)
+    const { fieldName, sectionId } = getIdentifiersFromFieldId(
+      condition.fieldId
+    )
+    return {
+      action: 'hide',
+      expression: `!(new RegExp("${escapeRegExpValue}").test(draftData && draftData.${sectionId} && draftData.${sectionId}.${fieldName}))`
+    }
+  })
+}
+
 export function createCustomField({
   fieldName,
   fieldId,
@@ -40,7 +60,8 @@ export function createCustomField({
   tooltip,
   placeholder,
   required,
-  maxLength
+  maxLength,
+  conditionals
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -59,11 +80,17 @@ export function createCustomField({
       },
       query: {
         operation: 'questionnaireToCustomFieldTransformer'
+      },
+      template: {
+        fieldName: createCustomFieldHandlebarName(fieldId),
+        operation: 'questionnaireToCustomFieldTransformer'
       }
-      /* TODO: Add template mapping so that handlebars work */
     }
   }
-  const { sectionId } = getConfigFieldIdentifiers(fieldId)
+  const { sectionId } = getIdentifiersFromFieldId(fieldId)
+
+  const othersConditionals = getOtherConditionalsAction(conditionals)
+
   if (sectionId === BirthSection.Father) {
     baseField.conditionals = [
       { action: 'hide', expression: FATHER_DETAILS_DONT_EXIST }
@@ -73,6 +100,14 @@ export function createCustomField({
       { action: 'hide', expression: MOTHER_DETAILS_DONT_EXIST }
     ]
   }
+
+  if (othersConditionals) {
+    baseField.conditionals = [
+      ...(baseField.conditionals ?? []),
+      ...othersConditionals
+    ]
+  }
+
   if (
     baseField.type === 'TEXT' ||
     baseField.type === 'NUMBER' ||
@@ -92,4 +127,22 @@ export function createCustomField({
     baseField.maxLength = maxLength
   }
   return baseField
+}
+
+export function createCustomFieldHandlebarName(fieldId: string) {
+  const fieldIdNameArray = fieldId.split('.').map((field, index) => {
+    if (index !== 0) {
+      return field.charAt(0).toUpperCase() + field.slice(1)
+    } else {
+      return field
+    }
+  })
+
+  return `${fieldIdNameArray[0]}${fieldIdNameArray[1]}${
+    fieldIdNameArray[fieldIdNameArray.length - 1]
+  }`
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }

@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { getAvailableLanguages } from './utils'
+// eslint-disable-next-line import/no-unassigned-import
 import './components/I18nContainer'
 import { locales } from '@client/utils/date-formatting'
 

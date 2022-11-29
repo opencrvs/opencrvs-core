@@ -46,8 +46,26 @@ interface IGroupByEventDate {
 
 interface IMetricsTotalGroup extends IGroupedByGender {
   practitionerRole: string
+  registrarPractitionerId: string
   timeLabel: string
 }
+
+interface IMetricsTotalGroupByLocation {
+  time: string
+  total: number
+  eventLocationType: string
+  officeLocation: string
+  timeLabel: string
+}
+
+interface IMetricsTotalGroupByTime {
+  time: string
+  month: string
+  total: number
+  eventLocationType: string
+  timeLabel: string
+}
+
 export interface IBirthKeyFigures {
   label: string
   value: number
@@ -324,7 +342,7 @@ export async function getCurrentAndLowerLocationLevels(
     )
   const oneLevelLowerLocationColumn =
     locationLevelOfQueryId &&
-    locationLevelOfQueryId.replace(/\d/, (level) =>
+    locationLevelOfQueryId.replace(/\d/, (level: string) =>
       level === '5' ? level : String(Number(level) + 1)
     )
 
@@ -468,7 +486,10 @@ const populateBirthKeyFigurePoint = (
   groupedByGenderData: IGroupedByGender[],
   estimation: number
 ): IBirthKeyFigures => {
-  if (!groupedByGenderData || groupedByGenderData === []) {
+  if (
+    !groupedByGenderData ||
+    (Array.isArray(groupedByGenderData) && groupedByGenderData.length === 0)
+  ) {
     return generateEmptyBirthKeyFigure(figureLabel, estimation)
   }
   let percentage = 0
@@ -766,9 +787,9 @@ export async function fetchLocationWiseEventEstimations(
     GROUP BY gender`
   )
 
-  let totalRegistrationInTargetDay: number = 0
-  let totalMaleRegistrationInTargetDay: number = 0
-  let totalFemaleRegistrationInTargetDay: number = 0
+  let totalRegistrationInTargetDay = 0
+  let totalMaleRegistrationInTargetDay = 0
+  let totalFemaleRegistrationInTargetDay = 0
   registrationsInTargetDaysPoints.forEach((point) => {
     totalRegistrationInTargetDay += point.total
     if (point.gender === 'male') {
@@ -914,7 +935,7 @@ export async function getTotalMetrics(
       OR officeLocation = '${locationId}')`
           : ``
       }
-    GROUP BY gender, timeLabel, eventLocationType, practitionerRole`
+    GROUP BY gender, timeLabel, eventLocationType, practitionerRole, registrarPractitionerId`
   )
 
   const estimationOfTimeRange: IEstimation =
@@ -930,6 +951,68 @@ export async function getTotalMetrics(
     estimated: estimationOfTimeRange,
     results: totalMetrics || []
   }
+}
+
+export async function fetchRegistrationsGroupByOfficeLocation(
+  timeFrom: string,
+  timeTo: string,
+  event: EVENT_TYPE,
+  locationId: string | undefined
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+
+  const result: IMetricsTotalGroupByLocation[] = await query(
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}' 
+      ${
+        locationId
+          ? `AND ( locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}'
+      OR officeLocation = '${locationId}')`
+          : ``
+      }     
+    GROUP BY officeLocation, eventLocationType, timeLabel`
+  )
+
+  return result
+}
+
+export async function fetchRegistrationsGroupByTime(
+  timeFrom: string,
+  timeTo: string,
+  event: EVENT_TYPE,
+  locationId: string | undefined
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+
+  const result: IMetricsTotalGroupByTime[] = await query(
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}    
+      WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}' 
+      ${
+        locationId
+          ? `AND ( locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}'
+      OR officeLocation = '${locationId}')`
+          : ``
+      }   
+    GROUP BY time(30d), timeLabel, eventLocationType ORDER BY time DESC
+
+    `
+  )
+
+  return result
 }
 
 function populateGenderBasisMetrics(

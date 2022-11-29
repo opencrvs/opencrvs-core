@@ -24,12 +24,9 @@ import {
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { IStoreState } from '@client/store'
-import {
-  FloatingNotification,
-  ListViewItemSimplified,
-  NOTIFICATION_TYPE,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -113,9 +110,7 @@ export function GovtLogo() {
         )
       } catch {
         setNotificationStatus(NOTIFICATION_STATUS.ERROR)
-        setErrorMessages(
-          intl.formatMessage(messages.govtLogoChangeNotification)
-        )
+        setErrorMessages(intl.formatMessage(messages.govtLogoChangeError))
       }
     }
   }
@@ -197,27 +192,27 @@ export function GovtLogo() {
           </Field>
         </Content>
       </ResponsiveModal>
-
-      <FloatingNotification
-        id="print-cert-notification"
-        type={
-          notificationStatus === NOTIFICATION_STATUS.SUCCESS
-            ? NOTIFICATION_TYPE.SUCCESS
-            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? NOTIFICATION_TYPE.IN_PROGRESS
-            : NOTIFICATION_TYPE.ERROR
-        }
-        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
-        callback={() => {
-          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
-        }}
-      >
-        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
-          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
-          ? intl.formatMessage(messages.govtLogoChangeNotification)
-          : errorMessages}
-      </FloatingNotification>
+      {notificationStatus !== NOTIFICATION_STATUS.IDLE && (
+        <Toast
+          id="print-cert-notification"
+          type={
+            notificationStatus === NOTIFICATION_STATUS.SUCCESS
+              ? 'success'
+              : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+              ? 'loading'
+              : 'warning'
+          }
+          onClose={() => {
+            setNotificationStatus(NOTIFICATION_STATUS.IDLE)
+          }}
+        >
+          {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+            : notificationStatus === NOTIFICATION_STATUS.SUCCESS
+            ? intl.formatMessage(messages.govtLogoChangeNotification)
+            : errorMessages}
+        </Toast>
+      )}
     </>
   )
 }

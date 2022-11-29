@@ -10,11 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
 import { errorMessages, constantsMessages } from '@client/i18n/messages'
+import { isNavigatorOnline } from '@client/utils'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -108,8 +109,6 @@ export class LoadingIndicatorComp extends React.Component<IProps> {
 export function withOnlineStatus<T>(
   WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
 ) {
-  const ONLINE_CHECK_INTERVAL = 500
-
   return function WithOnlineStatus(props: T) {
     const isOnline = useOnlineStatus()
     return <WrappedComponent isOnline={isOnline} {...props} />
@@ -117,11 +116,11 @@ export function withOnlineStatus<T>(
 }
 
 export function useOnlineStatus() {
-  const [isOnline, setOnline] = React.useState(navigator.onLine)
+  const [isOnline, setOnline] = React.useState(isNavigatorOnline())
   const ONLINE_CHECK_INTERVAL = 500
   React.useEffect(() => {
     const intervalID = setInterval(
-      () => setOnline(navigator.onLine),
+      () => setOnline(isNavigatorOnline()),
       ONLINE_CHECK_INTERVAL
     )
 

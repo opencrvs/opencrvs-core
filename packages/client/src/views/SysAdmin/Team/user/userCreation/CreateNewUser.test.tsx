@@ -18,15 +18,13 @@ import {
   createTestComponent,
   flushPromises,
   loginAsFieldAgent,
+  mockCompleteFormData,
+  mockDataWithRegistarRoleSelected,
   mockOfflineData,
   mockOfflineDataDispatch
 } from '@client/tests/util'
 import { modifyUserFormData, processRoles } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import {
-  mockCompleteFormData,
-  mockDataWithRegistarRoleSelected
-} from '@client/views/SysAdmin/Team/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import {
@@ -35,8 +33,10 @@ import {
 } from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
+import { vi, Mock } from 'vitest'
+
 export const mockRoles = {
   data: {
     getRoles: [
@@ -216,8 +216,8 @@ describe('create new user tests', () => {
   let testComponent: ReactWrapper
 
   beforeEach(async () => {
-    ;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     const s = createStore()
     store = s.store
     history = s.history
@@ -333,7 +333,7 @@ describe('create new user tests', () => {
 describe('edit user tests', () => {
   const { store, history } = createStore()
   let component: ReactWrapper<{}, {}>
-  const submitMock: jest.Mock = jest.fn()
+  const submitMock: Mock = vi.fn()
 
   const graphqlMocks = [
     {
@@ -394,8 +394,8 @@ describe('edit user tests', () => {
   ]
 
   beforeEach(() => {
-    ;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 

@@ -29,6 +29,7 @@ if [ -z "$3" ] ; then
     print_usage_and_exit
 fi
 
+COMPOSE_FILE="docker-compose.yml"
 DOCKERHUB_USERNAME=$1
 DOCKERHUB_PASSWORD=$2
 IMAGE_TAG=$3
@@ -38,15 +39,28 @@ function docker_tag_exists() {
     curl --silent -f --head -lL https://hub.docker.com/v2/repositories/$1/tags/$2/ > /dev/null
 }
 
-images=( "opencrvs/ocrvs-webhooks" "opencrvs/ocrvs-user-mgnt" "opencrvs/ocrvs-auth" "opencrvs/ocrvs-metrics" "opencrvs/ocrvs-search" "opencrvs/ocrvs-workflow" "opencrvs/ocrvs-gateway" "opencrvs/ocrvs-client" "opencrvs/ocrvs-components" "opencrvs/ocrvs-config" "opencrvs/ocrvs-notification")
+# Takes in a docker-compose.yml file name and returns
+# a new line separated list of images defined in the file
+get_docker_tags_from_compose_files() {
+   COMPOSE_FILE=$1
+   IMAGE_TAG_LIST_WITH_VERSION=$(cat $COMPOSE_FILE \
+   `# Select rows with the image tag` \
+   | grep image: \
+   `# Only keep the image version` \
+   | sed "s/image://")
+   
+   IMAGE_TAG_LIST=$(echo $IMAGE_TAG_LIST_WITH_VERSION | sed s/':${VERSION:-latest}'//g)
+   echo $IMAGE_TAG_LIST
+}
+
 imagesAlreadyBuilt="true"
-for i in "${images[@]}"
-do
-   :
-    if docker_tag_exists $i $IMAGE_TAG; then
-        echo -e "OpenCRVS thinks $i is already built.\r"
+IMAGE_TAGS_TO_CHECK=$(get_docker_tags_from_compose_files "$COMPOSE_FILE")
+
+for tag in ${IMAGE_TAGS_TO_CHECK[@]}; do
+    if docker_tag_exists $tag $IMAGE_TAG; then
+        echo -e "OpenCRVS thinks $tag is already built.\r"
     else
-        echo -e "OpenCRVS thinks $i is not built.\r"
+        echo -e "OpenCRVS thinks $tag is not built.\r"
         imagesAlreadyBuilt="false"
         break
     fi
@@ -55,8 +69,3 @@ done
 if [ $imagesAlreadyBuilt == "false" ]; then
   yarn compose:push:version
 fi
-
-
-
-
-

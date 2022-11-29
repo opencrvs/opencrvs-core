@@ -12,13 +12,12 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { changeLanguage } from '@login/i18n/actions'
-import { ISelectOption, Select } from '@opencrvs/components/lib/select'
-import styled from 'styled-components'
 import {
-  retrieveLanguage,
-  getAvailableLanguages,
-  useSearchQuery
-} from '@login/i18n/utils'
+  ISelect2Option,
+  Select2
+} from '@opencrvs/components/lib/Select/Select2'
+import styled from 'styled-components'
+import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useHistory, useLocation } from 'react-router'
 
@@ -40,26 +39,11 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const dispatch = useDispatch()
   const languages = useSelector(getLanguages)
 
-  const languageOptions: ISelectOption[] = Object.values(languages)
+  const languageOptions: ISelect2Option[] = Object.values(languages)
     .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
     .filter(({ value }) => applicationLangauges.includes(value))
 
-  React.useEffect(() => {
-    async function loadLanguage() {
-      const languageToUse = paramLanguage ?? (await retrieveLanguage())
-
-      if (
-        languageToUse !== selectedLanguage &&
-        getAvailableLanguages().some((language) => language === languageToUse)
-      )
-        dispatch(changeLanguage({ language: languageToUse }))
-    }
-
-    loadLanguage()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const onChange = ({ value }: ISelectOption) => {
+  const onChange = ({ value }: ISelect2Option) => {
     if (paramLanguage) {
       history.replace({
         pathname: location.pathname,
@@ -83,7 +67,7 @@ export function LanguageSelect({ children }: IProps) {
     <>
       {languageOptions.length > 1 && (
         <SelectContainer>
-          <Select
+          <Select2
             value={selectedLanguage}
             options={languageOptions}
             onChange={onLanguageChange}

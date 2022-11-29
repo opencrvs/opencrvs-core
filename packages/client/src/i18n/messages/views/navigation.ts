@@ -23,6 +23,7 @@ interface INavigationMessages
   application: MessageDescriptor
   performance: MessageDescriptor
   team: MessageDescriptor
+  vsexports: MessageDescriptor
   config: MessageDescriptor
   certificate: MessageDescriptor
   completenessRates: MessageDescriptor
@@ -90,6 +91,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Certificates label in navigation',
     id: 'navigation.certificate'
   },
+  vsexports: {
+    defaultMessage: 'Vital statistics',
+    description: 'Reports label in navigation',
+    id: 'navigation.reports'
+  },
   completenessRates: {
     defaultMessage: 'Completeness rates',
     description: 'Completeness rates in navigation',
@@ -99,6 +105,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Declaration forms',
     description: 'Declaration forms label in navigation',
     id: 'navigation.declarationForms'
+  },
+  outbox: {
+    defaultMessage: 'Outbox',
+    description: 'Label for navigation item outbox',
+    id: 'navigation.outbox'
   }
 }
 

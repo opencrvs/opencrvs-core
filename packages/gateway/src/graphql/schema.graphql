@@ -23,6 +23,7 @@ type Query {
   fetchDeathRegistration(id: ID!): DeathRegistration
   fetchEventRegistration(id: ID!): EventRegistration
   fetchRegistration(id: ID!): EventRegistration
+  fetchRegistrationForViewing(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
     status: [String]!
@@ -64,6 +65,16 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
+  getRegistrationsListByFilter(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+    filterBy: String!
+    skip: Int!
+    size: Int!
+  ): MixedTotalMetricsResult
+  getVSExports: TotalVSExport
   getTotalPayments(
     timeStart: String!
     timeEnd: String!
@@ -102,13 +113,13 @@ type Query {
     locationId: String
     event: String!
   ): [LocationWiseEstimationMetric!]
-  fetchTimeLoggedMetricsByPractitioner(
-    timeStart: String!
-    timeEnd: String!
+  getUserAuditLog(
     practitionerId: String!
-    locationId: String!
+    skip: Int
     count: Int!
-  ): TimeLoggedMetricsResultSet
+    timeStart: String
+    timeEnd: String
+  ): UserAuditLogResultSet
   searchEvents(
     userId: String
     locationIds: [String!]
@@ -130,6 +141,34 @@ type Query {
     sort: String
     status: [String]
     type: [String]
+  ): EventProgressResultSet
+  searchRecord(
+    event: String
+    eventLocationId: String
+    childFirstName: String
+    childLastName: String
+    childDoB: String
+    deceasedFirstNames: String
+    deceasedFamilyName: String
+    deathDate: String
+    deathDateStart: String
+    deathDateEnd: String
+    motherFirstNames: String
+    motherFamilyName: String
+    motherDoB: String
+    motherIdentifier: String
+    fatherFirstNames: String
+    fatherFamilyName: String
+    fatherDoB: String
+    fatherIdentifier: String
+    informantFirstNames: String
+    informantFamilyName: String
+    contactNumber: String
+    registrationNumber: String
+    trackingId: String
+    dateOfRegistration: String
+    dateOfRegistrationStart: String
+    dateOfRegistrationEnd: String
   ): EventProgressResultSet
   getRoles(
     title: String
@@ -209,6 +248,8 @@ type Mutation {
     comment: String
   ): String
   resendSMSInvite(userId: String!): String
+  usernameSMSReminder(userId: String!): String
+  resetPasswordSMS(userId: String!, applicationName: String!): String
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -386,6 +427,15 @@ type TotalMetricsResult {
   results: [EventMetrics!]!
 }
 
+union MixedTotalMetricsResult =
+    TotalMetricsByRegistrar
+  | TotalMetricsByLocation
+  | TotalMetricsByTime
+
+type TotalVSExport {
+  results: [VSExport!]
+}
+
 type PaymentMetric {
   total: Float!
   paymentType: String!
@@ -433,9 +483,9 @@ type LocationWiseEstimationMetric {
   locationName: String!
 }
 
-type TimeLoggedMetricsResultSet {
-  results: [TimeLoggedMetrics]
-  totalItems: Int
+type UserAuditLogResultSet {
+  total: Int!
+  results: [UserAuditLogResultItem!]!
 }
 
 type EventSearchResultSet {
@@ -606,6 +656,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INTEGRATIONS: [Integration]
 }
 
 input ApplicationConfigurationInput {
@@ -620,6 +671,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INTEGRATIONS: [IntegrationInput]
 }
 
 input FormDraftInput {
@@ -644,6 +696,7 @@ type Registration {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -707,10 +760,13 @@ enum BirthRegType {
 type History {
   user: User
   date: Date
-  action: RegStatus
+  regStatus: RegStatus
+  action: RegAction
   statusReason: StatusReason
   reason: String
-  reinstated: Boolean
+  requester: String
+  hasShowedVerifiedDocument: Boolean
+  otherReason: String
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -884,17 +940,38 @@ type EventMetrics {
   practitionerRole: String!
 }
 
-type TimeLoggedMetrics {
-  status: String!
-  trackingId: String
-  eventType: String!
-  time: String!
+type TotalMetricsByRegistrar {
+  results: [EventMetricsByRegistrar!]!
+  total: Int
 }
+
+type TotalMetricsByLocation {
+  results: [EventMetricsByLocation!]!
+  total: Int
+}
+
+type TotalMetricsByTime {
+  results: [EventMetricsByTime!]!
+  total: Int
+}
+
+type VSExport {
+  event: String!
+  year: Int!
+  fileSize: String!
+  url: String!
+  createdOn: String!
+}
+
+union UserAuditLogResultItem =
+    UserAuditLogItemWithComposition
+  | UserAuditLogItem
 
 interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressSet {
@@ -970,6 +1047,7 @@ input RegistrationInput {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -1012,8 +1090,6 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
-  REQUESTED_CORRECTION
-  DOWNLOADED
 }
 
 input MedicalPractitionerInput {
@@ -1060,6 +1136,11 @@ type Death {
   FEE: DeathFee
 }
 
+type Integration {
+  name: String
+  status: String
+}
+
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1081,6 +1162,11 @@ input DeathInput {
   FEE: DeathFeeInput
 }
 
+input IntegrationInput {
+  name: String
+  status: String
+}
+
 input QuestionInput {
   fieldId: String!
   label: [MesssageInput!]
@@ -1095,6 +1181,7 @@ input QuestionInput {
   required: Boolean
   enabled: String
   custom: Boolean
+  conditionals: [ConditionalInput!]
 }
 
 enum InformantType {
@@ -1148,6 +1235,15 @@ type Certificate {
   data: String
 }
 
+enum RegAction {
+  ASSIGNED
+  UNASSIGNED
+  REINSTATED
+  REQUESTED_CORRECTION
+  DOWNLOADED
+  VIEWED
+}
+
 type StatusReason {
   text: String
 }
@@ -1168,6 +1264,9 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
+  MOSIP_UINTOKEN
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
@@ -1223,6 +1322,49 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
 }
 
+type EventMetricsByRegistrar {
+  registrarPractitioner: User
+  total: Int!
+  late: Int!
+  delayed: Int!
+}
+
+type EventMetricsByLocation {
+  location: Location!
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+}
+
+type EventMetricsByTime {
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+  month: String!
+  time: String!
+}
+
+type UserAuditLogItemWithComposition implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+  data: AdditionalIdWithCompositionId!
+}
+
+type UserAuditLogItem implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
 type RegistrationSearchSet {
   status: String
   contactNumber: String
@@ -1240,12 +1382,26 @@ type RegistrationSearchSet {
   assignment: AssignmentData
 }
 
+type OperationHistorySearchSet {
+  operationType: String
+  operatedOn: Date
+  operatorRole: String
+  operatorName: [HumanName]
+  operatorOfficeName: String
+  operatorOfficeAlias: [String]
+  notificationFacilityName: String
+  notificationFacilityAlias: [String]
+  rejectReason: String
+  rejectComment: String
+}
+
 type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -1254,6 +1410,7 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressData {
@@ -1336,6 +1493,7 @@ input CorrectionInput {
   location: LocationInput
   data: String
   reason: String
+  otherReason: String
   note: String
 }
 
@@ -1375,6 +1533,11 @@ enum CustomFieldType {
   PARAGRAPH
 }
 
+input ConditionalInput {
+  fieldId: String!
+  regexp: String!
+}
+
 type Payment {
   paymentId: ID
   type: PaymentType
@@ -1382,6 +1545,19 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+interface AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
+type AdditionalIdWithCompositionId {
+  compositionId: String!
+  trackingId: String!
 }
 
 input CommentInput {

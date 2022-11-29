@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as moxios from 'moxios'
 import * as actions from '@login/login/actions'
 import { initialState } from '@login/login/reducer'
 import { createStore, AppStore } from '@login/store'
@@ -45,16 +44,6 @@ describe('reducer', () => {
   beforeEach(() => {
     const storebundle = createStore()
     store = storebundle.store
-
-    moxios.install(client)
-    moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
-      status: 200,
-      responseText: "{ nonce: '12345' }"
-    })
-  })
-
-  afterEach(() => {
-    moxios.uninstall(client)
   })
 
   it('updates the state with data ready to send to authorise service', async () => {

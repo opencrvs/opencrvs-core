@@ -10,11 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { referenceApi } from '@client/utils/referenceApi'
-import * as fetchMock from 'jest-fetch-mock'
+import { vi } from 'vitest'
+import createFetchMock from 'vitest-fetch-mock'
 
-jest.unmock('@client/utils/referenceApi')
+vi.unmock('@client/utils/referenceApi')
 
-const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+const fetch = createFetchMock(vi)
+fetch.enableMocks()
 
 export const mockFetchLocations = {
   data: {
@@ -116,12 +118,20 @@ export const mockCertificateTemplate = {
   }
 }
 
+const statuses = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  DISABLED: 'disabled',
+  DEACTIVATED: 'deactivated'
+}
+
 export const mockFetchConfig = {
   config: {
     API_GATEWAY_URL: 'http://localhost:7070/',
     CONFIG_API_URL: 'http://localhost:2021',
     LOGIN_URL: 'http://localhost:3020',
     AUTH_URL: 'http://localhost:4040',
+    MINIO_URL: 'http://localhost:3535',
     RESOURCES_URL: 'http://localhost:3040',
     APPLICATION_NAME: 'Farajaland CRVS',
     FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
@@ -138,7 +148,13 @@ export const mockFetchConfig = {
       languagesAndCountry: ['en-ZM']
     },
     LANGUAGES: 'en',
-    ADDRESSES: 1
+    ADDRESSES: 1,
+    INTEGRATIONS: [
+      {
+        name: 'MOSIP',
+        status: statuses.ACTIVE
+      }
+    ]
   },
   certificates: [
     {

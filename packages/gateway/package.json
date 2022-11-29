@@ -17,8 +17,8 @@
     "gen:schema:watch": "nodemon --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
     "gen:types:watch": "nodemon --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "tslint --project ./tsconfig.json",
-    "precommit": "tslint --project ./tsconfig.json && lint-staged"
+    "lint": "eslint -c .eslintrc.js --fix ./src",
+    "precommit": "yarn lint && lint-staged"
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.17.0",
@@ -26,6 +26,8 @@
     "@graphql-tools/load": "^6.0.9",
     "@graphql-tools/schema": "^6.0.9",
     "@hapi/hapi": "^20.0.1",
+    "@hapi/inert": "^7.0.0",
+    "@hapi/vision": "^7.0.0",
     "@opencrvs/commons": "^1.0.0",
     "@sentry/node": "^5.10.2",
     "@types/archiver": "^3.0.0",
@@ -42,6 +44,7 @@
     "dotenv": "^6.1.0",
     "file-type": "^16.5.3",
     "flat": "^5.0.0",
+    "fp-ts": "^2.12.3",
     "glob": "^7.1.2",
     "graphql": "^15.0.0",
     "graphql-import": "^0.5.2",
@@ -49,7 +52,8 @@
     "hapi-auth-jwt2": "10.2.0",
     "hapi-boom-decorators": "^3.0.0",
     "hapi-pino": "^8.5.0",
-    "io-ts": "^1.2.1",
+    "hapi-swagger": "^14.5.5",
+    "io-ts": "^2.2.18",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
@@ -71,6 +75,8 @@
     "@types/fhir": "^0.0.30",
     "@types/glob": "^5.0.35",
     "@types/hapi__hapi": "^20.0.0",
+    "@types/hapi__inert": "^5.2.3",
+    "@types/hapi__vision": "^5.5.3",
     "@types/jest": "^26.0.14",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.108",
@@ -90,10 +96,7 @@
     "opener": "^1.5.1",
     "prettier": "2.5.1",
     "ts-jest": "^26.4.4",
-    "tslint": "^5.17.0",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "^3.7.2",
+    "typescript": "^4.8.3",
     "typestyle": "^1.3.7"
   },
   "lint-staged": {

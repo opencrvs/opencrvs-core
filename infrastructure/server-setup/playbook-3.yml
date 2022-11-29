@@ -34,6 +34,15 @@
         mongodb_admin_username={{ mongodb_admin_username }}
         elasticsearch_superuser_password={{elasticsearch_superuser_password}}
         disk_encryption_key={{ disk_encryption_key }}
+        # MOSIP integration requires wireguard and some secrets to be installed
+        # Here is an example configuration that we use on our 3 node demo production environment
+        # mosip_wireguard_peer_1_path={{ mosip_wireguard_peer_1_path }}
+        # mosip_wireguard_peer_2_path={{ mosip_wireguard_peer_2_path }}
+        # mosip_wireguard_peer_3_path={{ mosip_wireguard_peer_3_path }}
+        # mosip_seeder_encrypt_cert_path={{ mosip_seeder_encrypt_cert_path }}
+        # mosip_seeder_encrypt_cert_filename={{ mosip_seeder_encrypt_cert_filename }}
+        # mosip_seeder_encrypt_sig_path={{ mosip_seeder_encrypt_sig_path }}
+        # mosip_seeder_encrypt_sig_filename={{ mosip_seeder_encrypt_sig_filename }}
 
     - name: 'Add docker repository key'
       apt_key:
@@ -219,7 +228,7 @@
         state: directory
         group: 1000
         owner: 1000
-        mode: ugo+rwx
+        mode: g+rwx
       when: not elasticsearch_data_backup.stat.exists
 
     - name: Check influxdb data directory
@@ -246,6 +255,34 @@
         owner: 1000
         mode: g+rwx
       when: not influxdb_data_backup.stat.exists
+
+    - name: Check minio data directory
+      stat:
+        path: /data/minio
+      register: minio_data
+
+    - name: 'Create minio data directory'
+      file:
+        path: /data/minio
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: ugo+rwx
+      when: not minio_data.stat.exists
+
+    - name: Check minio data backup directory
+      stat:
+        path: /data/backups/minio
+      register: minio_data_backup
+
+    - name: 'Create minio backup directory'
+      file:
+        path: /data/backups/minio
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: ugo+rwx
+      when: not minio_data_backup.stat.exists
 
     - name: 'Install UFW'
       apt:

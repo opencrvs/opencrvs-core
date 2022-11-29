@@ -28,6 +28,8 @@ import { unauthorized } from '@hapi/boom'
 import { logger } from '@gateway/logger'
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 import * as t from 'io-ts'
+import { pipe } from 'fp-ts/function'
+import { chainW, tryCatch } from 'fp-ts/Either'
 
 interface ICodeDetails {
   code: string
@@ -60,7 +62,6 @@ export async function generateVerificationCode(
   nonce: string,
   mobile: string
 ): Promise<SixDigitVerificationCode> {
-  // tslint:disable-next-line
   const code = Math.floor(100000 + Math.random() * 900000).toString()
 
   await storeVerificationCode(nonce, code)
@@ -136,9 +137,12 @@ export async function generateAndSendVerificationCode(
   token: string
 ) {
   const isDemoUser = scope.indexOf('demo') > -1
-  logger.info('isDemoUser', {
-    isDemoUser: isDemoUser
-  })
+  logger.info(
+    `isDemoUser,
+      ${JSON.stringify({
+        isDemoUser: isDemoUser
+      })}`
+  )
   let verificationCode
   if (isDemoUser) {
     verificationCode = '000000'
@@ -147,10 +151,13 @@ export async function generateAndSendVerificationCode(
     verificationCode = await generateVerificationCode(nonce, mobile)
   }
   if (!PRODUCTION || QA_ENV) {
-    logger.info('Sending a verification SMS', {
-      mobile: mobile,
-      verificationCode
-    })
+    logger.info(
+      `Sending a verification SMS ,
+        ${JSON.stringify({
+          mobile: mobile,
+          verificationCode
+        })}`
+    )
   } else {
     if (isDemoUser) {
       throw unauthorized()
@@ -167,8 +174,12 @@ export default async function sendVerifyCodeHandler(
   const payload = request.payload as ISendVerifyCodePayload
   const { phoneNumber } = payload
   const token = request.headers.authorization.replace('Bearer ', '') as string
-  const tokenDecoded = verifyToken(token)
-  const { sub: userId, scope } = tokenDecoded
+  const decodedOrError = verifyToken(token)
+  if (decodedOrError._tag === 'Left') {
+    return unauthorized()
+  }
+  const decoded = decodedOrError.right
+  const { sub: userId, scope } = decoded
   const nonce = generateNonce()
   const response: ISendVerifyCodeResponse = {
     userId,
@@ -201,11 +212,17 @@ const tokenPayload = t.type({
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
-export function verifyToken(token: string): ITokenPayload {
-  const decoded = jwt.verify(token, publicCert, {
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  })
-  const result = tokenPayload.decode(decoded)
-  return result.value as ITokenPayload
+function safeVerifyJwt(token: string) {
+  return tryCatch(
+    () =>
+      jwt.verify(token, publicCert, {
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }),
+    (e) => (e instanceof Error ? e : new Error('Unkown error'))
+  )
+}
+
+export function verifyToken(token: string) {
+  return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
 }

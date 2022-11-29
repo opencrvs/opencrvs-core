@@ -23,7 +23,7 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton, CircleButton } from '@opencrvs/components/lib/buttons'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
-import { EventTopBar } from '@opencrvs/components/lib/interface'
+import { EventTopBar } from '@opencrvs/components/lib/EventTopBar'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { BirthSection, DeathSection, WizardSection } from '@client/forms'
@@ -53,8 +53,7 @@ const Container = styled.div`
 `
 
 const WizardContainer = styled.div`
-  margin-top: 56px;
-  height: calc(100% - 56px);
+  height: 100%;
   overflow: hidden;
   display: flex;
   justify-content: space-between;

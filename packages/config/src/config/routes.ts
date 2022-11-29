@@ -21,6 +21,7 @@ import {
 } from '@config/handlers/certificate/certificateHandler'
 import configHandler, {
   getLoginConfigHandler,
+  getIntegrationConfigHandler,
   updateApplicationConfig,
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
@@ -102,6 +103,15 @@ export default function getRoutes() {
         auth: false,
         tags: ['api'],
         description: 'Retrieve Application configuration'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/integrationConfig',
+      handler: getIntegrationConfigHandler,
+      config: {
+        tags: ['api'],
+        description: 'Retrieve Application integration configuration'
       }
     },
     {

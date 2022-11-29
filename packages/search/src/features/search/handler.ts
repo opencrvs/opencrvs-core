@@ -11,17 +11,24 @@
  */
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@search/logger'
-import { internal } from '@hapi/boom'
+import { badRequest, internal } from '@hapi/boom'
 import {
   searchComposition,
-  DEFAULT_SIZE
+  DEFAULT_SIZE,
+  advancedSearch
 } from '@search/features/search/service'
-import { ISearchQuery } from '@search/features/search/types'
+import {
+  IAdvancedSearchParam,
+  ISearchQuery
+} from '@search/features/search/types'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
-import { updateComposition } from '@search/elasticsearch/dbhelper'
+import {
+  searchByCompositionId,
+  updateComposition
+} from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
@@ -34,6 +41,27 @@ export async function searchDeclaration(
     return h.response(result).code(200)
   } catch (error) {
     logger.error(`Search/searchDeclarationHandler: error: ${error}`)
+    return internal(error)
+  }
+}
+
+type IAssignmentPayload = {
+  compositionId: string
+}
+
+export async function searchAssignment(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IAssignmentPayload
+  try {
+    const results = await searchByCompositionId(payload.compositionId)
+    const result = results?.body?.hits?.hits[0]?._source as
+      | ICompositionBody
+      | undefined
+    return h.response({ userId: result?.assignment?.userId }).code(200)
+  } catch (error) {
+    logger.error(`Search/searchAssginment: ${error}`)
     return internal(error)
   }
 }
@@ -249,5 +277,19 @@ export async function populateHierarchicalLocationIdsHandler(
     return h.response(updatedCompositionCounts).code(200)
   } catch (err) {
     return internal(err)
+  }
+}
+
+export async function advancedRecordSearch(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const response = await advancedSearch(
+      request.payload as IAdvancedSearchParam
+    )
+    return h.response(response).code(200)
+  } catch (err) {
+    return badRequest(err.message)
   }
 }

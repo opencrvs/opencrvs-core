@@ -44,6 +44,7 @@ describe('Verify handler', () => {
   it('modifyTaskBundle returns correct bundle', async () => {
     jest
       .spyOn(
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         require('../../../utils/formDraftUtils'),
         'checkFormDraftStatusToAddTestExtension'
       )

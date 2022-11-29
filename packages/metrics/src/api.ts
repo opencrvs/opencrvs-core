@@ -15,13 +15,14 @@ import {
   fhirUrl,
   COUNTRY_CONFIG_URL,
   SEARCH_URL,
-  USER_MANAGEMENT_URL
+  USER_MANAGEMENT_URL,
+  DOCUMENTS_URL
 } from '@metrics/constants'
 
 export function fetchFHIR<T = any>(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET',
+  method = 'GET',
   body?: string
 ) {
   const url = [fhirUrl.replace(/\/$/, ''), suffix].join('/')
@@ -122,7 +123,7 @@ export async function fetchChildLocationsWithTypeByParentId(
 export function fetchFromResource(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET',
+  method = 'GET',
   body?: string
 ) {
   const url = [COUNTRY_CONFIG_URL.replace(/\/$/, ''), suffix].join('/')
@@ -215,4 +216,21 @@ export async function countUsersByLocation(
     }
   )
   return res.json()
+}
+
+export async function uploadFileToMinio(fileData: Buffer): Promise<string> {
+  try {
+    const result = await fetch(`${DOCUMENTS_URL}/upload-vs-export`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'text/csv'
+      },
+      body: fileData
+    })
+    const res = await result.json()
+    return res.refUrl
+  } catch (err) {
+    console.log(err)
+    return err
+  }
 }

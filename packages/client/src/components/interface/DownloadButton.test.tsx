@@ -17,6 +17,7 @@ import * as React from 'react'
 import { DownloadAction } from '@client/forms'
 import { ReactWrapper } from 'enzyme'
 import * as declarationReducer from '@client/declarations'
+import { vi, SpyInstance } from 'vitest'
 
 const { DOWNLOAD_STATUS } = declarationReducer
 
@@ -42,13 +43,13 @@ describe('download button tests', () => {
   let store: AppStore
   let history: History<unknown>
   let testComponent: ReactWrapper<{}, {}>
-  let deleteSpy: jest.SpyInstance
-  let unassignSpy: jest.SpyInstance
+  let deleteSpy: SpyInstance
+  let unassignSpy: SpyInstance
 
   describe('for download status downloaded', () => {
     describe('when assignment object is undefined in props', () => {
       beforeEach(async () => {
-        deleteSpy = jest.spyOn(declarationReducer, 'deleteDeclaration')
+        deleteSpy = vi.spyOn(declarationReducer, 'deleteDeclaration')
         const testStore = await createTestStore()
         store = testStore.store
         history = testStore.history
@@ -83,7 +84,7 @@ describe('download button tests', () => {
     })
     describe('when assignment object is defined in props', () => {
       beforeEach(async () => {
-        unassignSpy = jest.spyOn(declarationReducer, 'unassignDeclaration')
+        unassignSpy = vi.spyOn(declarationReducer, 'unassignDeclaration')
         const testStore = await createTestStore()
         store = testStore.store
         history = testStore.history

@@ -22,6 +22,7 @@ import {
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { logger } from '@auth/logger'
 import { PRODUCTION } from '@auth/constants'
+import { postUserActionToMetrics } from '@auth/features/authenticate/service'
 
 interface IPayload {
   nonce: string
@@ -43,17 +44,37 @@ export default async function sendUserNameHandler(
   }
 
   const isDemoUser = retrievalStepInformation.scope.indexOf('demo') > -1
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
   if (!PRODUCTION || isDemoUser) {
-    logger.info('Sending a verification SMS', {
-      mobile: retrievalStepInformation.mobile,
-      username: retrievalStepInformation.username
-    })
+    logger.info(
+      `Sending a verification SMS,
+        ${JSON.stringify({
+          mobile: retrievalStepInformation.mobile,
+          username: retrievalStepInformation.username
+        })}`
+    )
   } else {
     await sendUserName(
       retrievalStepInformation.mobile,
       retrievalStepInformation.username
     )
   }
+
+  try {
+    await postUserActionToMetrics(
+      'USERNAME_REMINDER',
+      request.headers.authorization,
+      remoteAddress,
+      userAgent,
+      retrievalStepInformation.practitionerId
+    )
+  } catch (err) {
+    logger.error(err.message)
+  }
+
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)
 }

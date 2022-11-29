@@ -18,7 +18,9 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   requiredForRegistrationTooltip: MessageDescriptor
+  conditionalForRegistrationTooltip: MessageDescriptor
   contentKeyTooltip: MessageDescriptor
+  fieldIdTooltip: MessageDescriptor
   certHandelbarsTooltip: MessageDescriptor
   showHiddenFields: MessageDescriptor
   defaultComment: MessageDescriptor
@@ -36,6 +38,7 @@ interface IFormConfigMessages
   publishedDescription: MessageDescriptor
   publishedWarning: MessageDescriptor
   contentKey: MessageDescriptor
+  feildId: MessageDescriptor
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
   requiredForRegistration: MessageDescriptor
@@ -78,6 +81,7 @@ interface IFormConfigMessages
   radioGroupWithNestedField: MessageDescriptor
   informativeRadioGroup: MessageDescriptor
   checkboxGroup: MessageDescriptor
+  checkbox: MessageDescriptor
   date: MessageDescriptor
   dynamicList: MessageDescriptor
   formConfigMobileModalTitle: MessageDescriptor
@@ -135,10 +139,21 @@ const messagesToDefine: IFormConfigMessages = {
       'Select if this field is mandatory to complete registration',
     description: 'Default tooltip message for required for registration'
   },
+  conditionalForRegistrationTooltip: {
+    id: 'config.form.tooltip.conditionalForRegistration',
+    defaultMessage:
+      'Select if this field is conditional to complete registration',
+    description: 'Default tooltip message for conditional for registration'
+  },
   contentKeyTooltip: {
     id: 'config.form.tooltip.contentKey',
     defaultMessage: 'Use these keys to update copy for this field',
     description: 'Default tooltip message for content key'
+  },
+  fieldIdTooltip: {
+    id: 'config.form.tooltip.fieldId',
+    defaultMessage: 'Use these keys to search for specific field items',
+    description: 'Default tooltip message for fieldId'
   },
   certHandelbarsTooltip: {
     id: 'config.form.tooltip.certHandelbars',
@@ -233,6 +248,11 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.tools.contentKey',
     defaultMessage: 'Content Key',
     description: 'Content key label for formTools'
+  },
+  feildId: {
+    id: 'config.form.tools.fieldId',
+    defaultMessage: 'Field ID',
+    description: 'Content id for formTools'
   },
   certificateHandlebars: {
     id: 'config.form.tools.certificateHandlebars',
@@ -402,9 +422,14 @@ const messagesToDefine: IFormConfigMessages = {
     description: 'Success notification label for number of addresses settings'
   },
   checkboxGroup: {
+    id: 'config.form.settings.checkboxGroup',
+    defaultMessage: 'Checkbox group',
+    description: 'Checkbox group Label'
+  },
+  checkbox: {
     id: 'config.form.settings.checkbox',
     defaultMessage: 'Checkbox',
-    description: 'Success notification label for number of addresses settings'
+    description: 'Checkbox Label'
   },
   date: {
     id: 'config.form.settings.date',

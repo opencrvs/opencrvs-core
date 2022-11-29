@@ -25,7 +25,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { IActionObject } from '@opencrvs/components/lib/interface'
+import { IActionObject } from '@opencrvs/components/lib/common-types'
 import format from '@client/utils/date-formatting'
 import subDays from 'date-fns/subDays'
 import subMonths from 'date-fns/subMonths'
@@ -89,6 +89,7 @@ function isPresetNavButton(button: IPresetButton): button is IPresetNavButton {
 
 interface IDateRangePickerProps extends WrappedComponentProps, IDateRange {
   onDatesChange: ({ startDate, endDate }: IDateRange) => void
+  className?: string
 }
 
 interface PresetSelectorProps {
@@ -667,7 +668,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
       </PickerButton>
       {modalVisible && (
         <>
-          <ModalContainer id="picker-modal">
+          <ModalContainer className={props.className} id="picker-modal">
             <ModalHeader hide={routes[activeRoute].hideHeader}>
               <TitleContent>
                 <CalendarGrey />

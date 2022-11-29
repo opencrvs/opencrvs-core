@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
 
 export const SEARCH_USERS = gql`
@@ -25,12 +25,53 @@ export const SEARCH_USERS = gql`
         }
         username
         role
+        mobile
         type
         status
         underInvestigation
         avatar {
           type
           data
+        }
+      }
+    }
+  }
+`
+
+export const GET_USER_AUDIT_LOG = gql`
+  query getUserAuditLog(
+    $practitionerId: String!
+    $count: Int!
+    $skip: Int!
+    $timeStart: String
+    $timeEnd: String
+  ) {
+    getUserAuditLog(
+      practitionerId: $practitionerId
+      count: $count
+      skip: $skip
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+    ) {
+      total
+      results {
+        ... on UserAuditLogItem {
+          time
+          userAgent
+          practitionerId
+          ipAddress
+          action
+        }
+        ... on UserAuditLogItemWithComposition {
+          time
+          userAgent
+          practitionerId
+          ipAddress
+          action
+          data {
+            compositionId
+            trackingId
+          }
         }
       }
     }
@@ -81,32 +122,6 @@ export const GET_USER = gql`
         type
         data
       }
-    }
-  }
-`
-
-export const FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER = gql`
-  query fetchTimeLoggedMetricsByPractitioner(
-    $timeStart: String!
-    $timeEnd: String!
-    $practitionerId: String!
-    $locationId: String!
-    $count: Int!
-  ) {
-    fetchTimeLoggedMetricsByPractitioner(
-      timeStart: $timeStart
-      timeEnd: $timeEnd
-      practitionerId: $practitionerId
-      locationId: $locationId
-      count: $count
-    ) {
-      results {
-        status
-        trackingId
-        eventType
-        time
-      }
-      totalItems
     }
   }
 `

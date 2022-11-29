@@ -11,11 +11,9 @@
  */
 jest.mock('mongoose', () => ({
   connection: {
-    // tslint:disable-next-line no-empty
     on: jest.fn()
   },
   connect: () => Promise.reject(),
-  // tslint:disable-next-line no-empty
   disconnect: () => {}
 }))
 
@@ -23,7 +21,8 @@ import * as mongoose from 'mongoose'
 import { start, stop } from '@user-mgnt/database'
 import { logger } from '@user-mgnt/logger'
 
-const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
+const wait = (time: number) =>
+  new Promise((resolve) => setTimeout(resolve, time))
 
 describe('Database connector', () => {
   it('keeps on retrying a connection on startup', async () => {
@@ -36,8 +35,8 @@ describe('Database connector', () => {
   })
   it('attaches loggers to database events', async () => {
     const spy = jest.spyOn(logger, 'info')
-    const [[, disconnectFn], [, connectedFn]] = (mongoose.connection
-      .on as any).mock.calls
+    const [[, disconnectFn], [, connectedFn]] = (mongoose.connection.on as any)
+      .mock.calls
     disconnectFn()
     connectedFn()
     expect(spy).toHaveBeenCalledTimes(2)

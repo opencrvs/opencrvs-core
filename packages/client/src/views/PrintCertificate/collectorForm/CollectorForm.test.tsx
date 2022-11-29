@@ -27,6 +27,8 @@ import { createLocation, History } from 'history'
 import { merge } from 'lodash'
 import { Event } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
+import { lateBirthCertificationResponseWithFather } from '@client/tests/mock-graphql-responses'
+import { vi } from 'vitest'
 
 let store: AppStore
 let history: History
@@ -36,7 +38,7 @@ const declarationsHistory = [
   {
     date: '2022-04-14T12:52:34.112+00:00',
     action: 'DOWNLOADED',
-    reinstated: false,
+    regStatus: 'DECLARED',
     statusReason: null,
     location: {
       id: '852b103f-2fe0-4871-a323-51e51c6d9198',
@@ -72,8 +74,7 @@ const declarationsHistory = [
   },
   {
     date: '2022-04-14T12:52:25.951+00:00',
-    action: 'REGISTERED',
-    reinstated: false,
+    regStatus: 'REGISTERED',
     statusReason: null,
     location: {
       id: '852b103f-2fe0-4871-a323-51e51c6d9198',
@@ -108,8 +109,7 @@ const declarationsHistory = [
   },
   {
     date: '2022-04-14T12:52:25.798+00:00',
-    action: 'WAITING_VALIDATION',
-    reinstated: false,
+    regStatus: 'WAITING_VALIDATION',
     statusReason: null,
     location: {
       id: '852b103f-2fe0-4871-a323-51e51c6d9198',
@@ -410,7 +410,7 @@ describe('Certificate collector test for a birth registration without father det
       })
 
       it('continue to payment section when the mandatory fields are filled and birth event is between 45 days and 5 years', async () => {
-        Date.now = jest.fn(() => 1538352000000) // 2018-10-01
+        Date.now = vi.fn(() => 1538352000000) // 2018-10-01
         await waitForElement(component, '#noAffidavitAgreementAFFIDAVIT')
         component
           .find('#noAffidavitAgreementAFFIDAVIT')
@@ -487,7 +487,8 @@ describe('Certificate collector test for a birth registration without father det
 
 describe('Certificate collector test for a birth registration with father details', () => {
   const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
+  const mockLocation: any = vi.fn()
+  const graphqlMock = lateBirthCertificationResponseWithFather
 
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>

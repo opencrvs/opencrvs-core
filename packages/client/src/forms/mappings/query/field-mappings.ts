@@ -28,7 +28,7 @@ import {
   ISelectFormFieldWithOptions
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { cloneDeep, get } from 'lodash'
+import { camelCase, cloneDeep, get } from 'lodash'
 import format from '@client/utils/date-formatting'
 import {
   IOfflineData,
@@ -40,7 +40,7 @@ import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/forms/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
-import { getFullLocationNameOfFacility } from '@client/utils/locationUtils'
+import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 
 interface IName {
   [key: string]: any
@@ -460,7 +460,7 @@ export const locationIDToFieldTransformer =
   }
 
 export const eventLocationNameQueryOfflineTransformer =
-  (resourceKey: string) =>
+  (resourceKey: string, transformedFieldName?: string) =>
   (
     transformedData: IFormData,
     queryData: any,
@@ -494,12 +494,25 @@ export const eventLocationNameQueryOfflineTransformer =
       selectedLocation = offlineData[resourceKey][locationId]
 
       if (selectedLocation) {
-        transformedData[sectionId][field.name] = getFullLocationNameOfFacility(
+        const locationNameMap = getLocationNameMapOfFacility(
           selectedLocation,
           offlineData.locations
-        ) as Record<string, string | MessageDescriptor>[]
+        )
+
+        transformedData[sectionId][transformedFieldName || field.name] =
+          Object.values(locationNameMap) as Record<
+            string,
+            string | MessageDescriptor
+          >[]
+
+        Object.keys(locationNameMap).forEach((type) => {
+          transformedData[sectionId][
+            camelCase(`${transformedFieldName || field.name}_${type}`)
+          ] = locationNameMap[type] as string | Record<string, string>
+        })
       }
     }
+    return transformedData
   }
 
 export const nestedValueToFieldTransformer =
@@ -625,19 +638,22 @@ export const sectionTransformer =
       if (!localTransformedData[sectionId]) {
         return
       }
-      if (
-        Array.isArray(transformedData[transformedSectionId][targetNameKey]) &&
-        Array.isArray(localTransformedData[sectionId][field.name])
-      ) {
-        transformedData[transformedSectionId][targetNameKey] =
-          mergeArraysRemovingEmptyStrings(
-            transformedData[transformedSectionId][targetNameKey],
-            localTransformedData[sectionId][field.name] as string[]
-          )
-      } else {
-        transformedData[transformedSectionId][targetNameKey] =
-          localTransformedData[sectionId][field.name]
-      }
+      Object.keys(localTransformedData[sectionId]).forEach((key) => {
+        const targetKey = key === field.name ? targetNameKey : key
+        if (
+          Array.isArray(transformedData[transformedSectionId][targetKey]) &&
+          Array.isArray(localTransformedData[sectionId][key])
+        ) {
+          transformedData[transformedSectionId][targetKey] =
+            mergeArraysRemovingEmptyStrings(
+              transformedData[transformedSectionId][targetKey],
+              localTransformedData[sectionId][key] as string[]
+            )
+        } else {
+          transformedData[transformedSectionId][targetKey] =
+            localTransformedData[sectionId][key]
+        }
+      })
     } else {
       transformedData[transformedSectionId][targetNameKey] =
         queryData[sectionId]?.[field.name] || ''
@@ -701,9 +717,7 @@ const transformAddressTemplateArray = (
   if (!transformedData[sectionId][nameKey]) {
     transformedData[sectionId][nameKey] = Array(3).fill('')
   }
-  ;(transformedData[sectionId][nameKey] as Array<string | MessageDescriptor>)[
-    LocationLevel[addressLocationLevel]
-  ] =
+  const addressName =
     addressLocationLevel === 'country'
       ? countries.find(
           ({ value }) => value === addressFromQuery?.[addressLocationLevel]
@@ -713,6 +727,12 @@ const transformAddressTemplateArray = (
         ]?.name ||
         addressFromQuery[addressLocationLevel] ||
         ''
+  ;(transformedData[sectionId][nameKey] as Array<string | MessageDescriptor>)[
+    LocationLevel[addressLocationLevel]
+  ] = addressName
+
+  transformedData[sectionId][camelCase(`${nameKey}_${addressLocationLevel}`)] =
+    addressName as string | Record<string, string>
 }
 
 export const addressOfflineTransformer =

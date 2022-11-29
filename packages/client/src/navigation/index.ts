@@ -48,7 +48,11 @@ import {
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
-  FORM_CONFIG_HOME
+  FORM_CONFIG_HOME,
+  REGISTRAR_HOME_TAB_PAGE,
+  PERFORMANCE_REGISTRATIONS_LIST,
+  VS_EXPORTS,
+  VIEW_RECORD
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -59,11 +63,8 @@ import {
 } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import {
-  getJurisdictionLocationIdFromUserDetails,
-  CompletenessRateTime
-} from '@client/views/SysAdmin/Performance/utils'
-import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import {
   goBack as back,
   push,
@@ -75,7 +76,6 @@ import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
-
 export interface IDynamicValues {
   [key: string]: any
 }
@@ -87,7 +87,6 @@ export function formatUrl(url: string, props: { [key: string]: string }) {
   )
   return formattedUrl.endsWith('?') ? formattedUrl.slice(0, -1) : formattedUrl
 }
-
 export const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
 type GoToPageAction = {
   type: typeof GO_TO_PAGE
@@ -170,6 +169,9 @@ export function goToHome() {
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
+export function goToVSExport() {
+  return push(VS_EXPORTS)
+}
 
 export function goToFormConfigHome() {
   return push(FORM_CONFIG_HOME)
@@ -179,8 +181,26 @@ export function goToApplicationConfig() {
   return push(APPLICATION_CONFIG)
 }
 
-export function goToHomeTab(tabId: IWORKQUEUE_TABS, selectorId = '') {
-  return push(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
+export function goToHomeTab(
+  tabId: IWORKQUEUE_TABS,
+  selectorId = '',
+  pageId = 1
+) {
+  if (tabId === 'progress') {
+    if (selectorId) {
+      return push(
+        formatUrl(REGISTRAR_HOME_TAB_PAGE, {
+          tabId,
+          selectorId,
+          pageId: String(pageId)
+        })
+      )
+    }
+    return push(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
+  }
+  return push(
+    formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId: String(pageId) })
+  )
 }
 
 type searchedLocation = {
@@ -273,6 +293,14 @@ export function goToPrintCertificate(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'certCollector'
+    })
+  )
+}
+
+export function goToViewRecordPage(declarationId: string) {
+  return push(
+    formatUrl(VIEW_RECORD, {
+      declarationId
     })
   )
 }
@@ -405,6 +433,27 @@ export function goToFieldAgentList(
       locationId,
       timeStart,
       timeEnd
+    })
+  })
+}
+
+export function goToRegistrationsList(
+  timeStart: string,
+  timeEnd: string,
+  locationId?: string,
+  event?: string,
+  filterBy?: string,
+  currentPageNumber?: number
+) {
+  return push({
+    pathname: PERFORMANCE_REGISTRATIONS_LIST,
+    search: stringify({
+      locationId,
+      timeStart,
+      timeEnd,
+      event,
+      filterBy,
+      currentPageNumber
     })
   })
 }
@@ -579,13 +628,9 @@ export function goToPerformanceView(userDetails: IUserDetails) {
 
 export function goToTeamView(userDetails: IUserDetails) {
   if (userDetails && userDetails.role) {
-    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
-      return goToTeamSearch()
-    } else {
-      return goToTeamUserList(
-        (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
-      )
-    }
+    return goToTeamUserList(
+      (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
+    )
   }
 }
 

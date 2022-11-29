@@ -35,9 +35,7 @@ export default async function getUser(
   if (mobile) {
     criteria = { ...criteria, mobile }
   }
-  // tslint:disable-next-line
   const user: IUserModel | null = await User.findOne(criteria)
-
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()

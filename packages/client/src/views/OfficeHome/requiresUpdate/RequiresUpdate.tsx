@@ -18,11 +18,11 @@ import { ITheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
-  GridTable,
-  IAction,
+  Workqueue,
   COLUMNS,
   SORT_ORDER
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/Workqueue'
+import { IAction } from '@opencrvs/components/lib/common-types'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -41,6 +41,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
@@ -52,6 +53,7 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { RegStatus } from '@client/utils/gateway'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -239,9 +241,11 @@ class RequiresUpdateComponent extends React.Component<
           )) ||
         ''
       const sentForUpdates =
-        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-          ? new Date(reg.modifiedAt)
-          : new Date(Number(reg.modifiedAt))) || ''
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.Rejected
+        ) || ''
+
       const dateOfEvent =
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&
@@ -249,7 +253,6 @@ class RequiresUpdateComponent extends React.Component<
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          isBoldLink={true}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
           }
@@ -330,12 +333,11 @@ class RequiresUpdateComponent extends React.Component<
         noResultText={intl.formatMessage(wqMessages.noRecordsRequireUpdates)}
         noContent={this.transformRejectedContent(data).length <= 0}
       >
-        <GridTable
+        <Workqueue
           content={this.transformRejectedContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
           hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>

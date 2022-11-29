@@ -13,9 +13,11 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as utils from '@notification/features/sms/utils'
 import { createServer } from '@notification/server'
-import { createServerWithEnvironment } from '@notification/tests/util'
+import {
+  createServerWithEnvironment,
+  translationsMock
+} from '@notification/tests/util'
 import * as fetchAny from 'jest-fetch-mock'
-import { translationsMock } from '@notification/tests/util'
 
 const fetch = fetchAny as any
 describe('Verify user handlers', () => {
@@ -358,6 +360,98 @@ describe('Verify user handlers', () => {
         payload: {
           msisdn: '447789778823',
           username: 'anik'
+        },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(spy).toHaveBeenCalled()
+
+      expect(res.statusCode).toBe(500)
+    })
+  })
+  describe('sendResetPasswordSMS', () => {
+    it('returns OK if the sms gets sent', async () => {
+      server = await createServerWithEnvironment({ SMS_PROVIDER: 'clickatell' })
+
+      const token = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:notification-user'
+        }
+      )
+      fetch.mockResponse(JSON.stringify(translationsMock))
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/resetPasswordSMS',
+        payload: {
+          msisdn: '447789778823',
+          applicationName: 'opencrvs',
+          password: 'B123456'
+        },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      console.log(res.data)
+
+      expect(res.statusCode).toBe(200)
+    })
+    it('returns 400 if called with no application name', async () => {
+      const token = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:notification-user'
+        }
+      )
+      fetch.mockResponse(JSON.stringify(translationsMock))
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/resetPasswordSMS',
+        payload: {
+          msisdn: '447789778823',
+          password: 'B123456'
+        },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(400)
+    })
+    it('returns 500 the sms is not sent', async () => {
+      const spy = jest
+        .spyOn(utils, 'buildAndSendSMS')
+        .mockImplementationOnce(() => Promise.reject(new Error()))
+
+      const token = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:notification-user'
+        }
+      )
+
+      fetch.mockResponse(JSON.stringify(translationsMock))
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/resetPasswordSMS',
+        payload: {
+          msisdn: '447789778823',
+          applicationName: 'opencrvs',
+          password: 'B123456'
         },
         headers: {
           Authorization: `Bearer ${token}`

@@ -13,8 +13,7 @@ import {
   IFormData,
   TransformedData,
   IFormField,
-  IFormFieldQueryMapFunction,
-  IQuestionnaireQuestion
+  IFormFieldQueryMapFunction
 } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
@@ -123,6 +122,34 @@ export function registrationNumberTransformer(
   }
 }
 
+export function mosipAidTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].mosipAid) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'mosipAid'
+    ] = queryData[sectionId].mosipAid
+  }
+}
+
+export function mosipAidLabelTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].mosipAid) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'mosipAIDLabel'
+    ] = 'MOSIP Application ID'
+  }
+}
+
 export const certificateDateTransformer =
   (locale: string, dateFormat: string) =>
   (
@@ -211,24 +238,6 @@ export const changeHirerchyQueryTransformer =
     return transformedData
   }
 
-export function questionnaireToCustomFieldTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  field: IFormField
-) {
-  if (queryData.questionnaire) {
-    const selectedQuestion: IQuestionnaireQuestion =
-      queryData.questionnaire.filter(
-        (question: IQuestionnaireQuestion) =>
-          question.fieldId === field.customQuesstionMappingId
-      )[0]
-    if (selectedQuestion) {
-      transformedData[sectionId][field.name] = selectedQuestion.value
-    }
-  }
-}
-
 export const registrarNameUserTransformer = (
   transformedData: IFormData,
   _: any,
@@ -243,7 +252,8 @@ export const registrarNameUserTransformer = (
   }
 
   const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
+    ({ action, regStatus }: History) =>
+      !action && regStatus === RegStatus.Registered
   )
   transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
     history?.user ? getUserName(history.user) : ''
@@ -263,7 +273,8 @@ export const roleUserTransformer = (
   }
 
   const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
+    ({ action, regStatus }: History) =>
+      !action && regStatus === RegStatus.Registered
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
@@ -309,7 +320,8 @@ export const registrarSignatureUserTransformer = (
   }
 
   const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
+    ({ action, regStatus }: History) =>
+      !action && regStatus === RegStatus.Registered
   )
 
   transformedData[targetSectionId || sectionId][

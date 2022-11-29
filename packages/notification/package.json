@@ -10,8 +10,8 @@
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "tslint --project ./tsconfig.json",
-    "precommit": "tslint --project ./tsconfig.json && lint-staged",
+    "lint": "eslint -c .eslintrc.js --fix ./src",
+    "precommit": "yarn lint && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
     "build:clean": "rm -rf build",
@@ -30,13 +30,12 @@
     "hapi-i18n": "^2.0.0",
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.1.0",
-    "iconv": "^2.3.1",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.6.7",
     "pino": "^6.0.0",
     "tsconfig-paths": "^3.13.0",
-    "typescript": "^3.7.2"
+    "typescript": "^4.8.3"
   },
   "devDependencies": {
     "@types/fhir": "^0.0.30",
@@ -53,9 +52,7 @@
     "nodemon": "^1.17.5",
     "prettier": "^2.5.1",
     "ts-jest": "^26.4.4",
-    "ts-node": "^6.1.1",
-    "tslint": "^5.17.0",
-    "tslint-microsoft-contrib": "^6.2.0"
+    "ts-node": "^6.1.1"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

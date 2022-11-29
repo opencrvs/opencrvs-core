@@ -14,12 +14,13 @@ import {
   COUNTRY_CONFIG_URL
 } from '@notification/constants'
 import { internal } from '@hapi/boom'
-import { sendSMS } from '@notification/features/sms/service'
+import { notifyCountryConfig } from '@notification/features/sms/service'
 import fetch from 'node-fetch'
 import * as Handlebars from 'handlebars'
 import * as Hapi from '@hapi/hapi'
 import { getDefaultLanguage } from '@notification/i18n/utils'
 interface ISendSMSPayload {
+  applicationName?: string
   name?: string
   authCode?: string
   trackingId?: string
@@ -83,10 +84,12 @@ export async function buildAndSendSMS(
   msisdn: string,
   message: string
 ) {
+  const token = request.headers.authorization
   try {
-    return await sendSMS(
+    return await notifyCountryConfig(
       msisdn,
       message,
+      token,
       /* send unicoded sms if provided local is not in non unicoded set */
       NON_UNICODED_LANGUAGES.indexOf(getDefaultLanguage()) < 0
     )

@@ -15,7 +15,7 @@ import {
   IPrintableDeclaration
 } from '@client/declarations'
 import { BirthSection, DeathSection, IFormSectionData } from '@client/forms'
-import { Event, History } from '@client/utils/gateway'
+import { Event, History, RegStatus } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -26,13 +26,7 @@ import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const getInformantEngName = (sectionData: IFormSectionData): string => {
-  if (sectionData.firstNamesEng) {
-    return `${sectionData.firstNamesEng as string} ${
-      sectionData.familyNameEng as string
-    }`
-  } else {
-    return sectionData.familyNameEng as string
-  }
+  return `${sectionData.firstNamesEng ?? ''} ${sectionData.familyNameEng ?? ''}`
 }
 
 const getInformantOthreName = (sectionData: IFormSectionData): string => {
@@ -54,7 +48,7 @@ const getInformantFullName = (
     return EMPTY_STRING
   }
   if (language === 'en') {
-    fullName = getInformantEngName(sectionData)
+    fullName = getInformantEngName(sectionData).trim()
   } else {
     if (sectionData.firstNames && sectionData.familyName) {
       fullName = `${sectionData.firstNames as string} ${
@@ -208,7 +202,7 @@ export function getRegisteringOfficeId(
 ): string | null {
   const registeringHistory = (
     declaration?.data?.history as unknown as History[]
-  )?.find((h) => h.action === 'REGISTERED')
+  )?.find((h) => !h.action && h.regStatus === RegStatus.Registered)
 
   return registeringHistory?.office?.id || null
 }

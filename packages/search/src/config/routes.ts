@@ -16,7 +16,9 @@ import {
   searchDeclaration,
   getAllDocumentsHandler,
   getStatusWiseRegistrationCountHandler,
-  populateHierarchicalLocationIdsHandler
+  populateHierarchicalLocationIdsHandler,
+  advancedRecordSearch,
+  searchAssignment
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import {
@@ -25,14 +27,15 @@ import {
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 
-const enum RouteScope {
+export const enum RouteScope {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
   SYSADMIN = 'sysadmin',
   CERTIFY = 'certify',
   NATLSYSADMIN = 'natlsysadmin',
-  PERFORMANCE = 'performance'
+  PERFORMANCE = 'performance',
+  RECORD_SEARCH = 'recordsearch'
 }
 
 export const getRoutes = () => {
@@ -79,6 +82,18 @@ export const getRoutes = () => {
           ]
         },
         description: 'Handles searching from declarations'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/search/assignment',
+      handler: searchAssignment,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
+        },
+        description: 'Handles searching declaration assignment'
       }
     },
     {
@@ -180,6 +195,19 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [RouteScope.SYSADMIN]
+        },
+        description:
+          'Populates hierarchical location ids for the legacy indexes'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/advancedRecordSearch',
+      handler: advancedRecordSearch,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.RECORD_SEARCH]
         },
         description:
           'Populates hierarchical location ids for the legacy indexes'

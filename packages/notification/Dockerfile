@@ -1,9 +1,4 @@
-FROM node:erbium-alpine
-
-# this package has dependencies (iconv) that require build tools
-# --no-cache: download package index on-the-fly, no need to cleanup afterwards
-# --virtual: bundle packages, remove whole bundle at once, when done
-RUN apk --no-cache --virtual build-dependencies add python3 make g++
+FROM node:fermium-alpine
 
 WORKDIR /usr/src/app
 
@@ -17,8 +12,6 @@ COPY packages/notification/package.json packages/notification/package.json
 COPY packages/commons packages/commons
 COPY yarn.lock yarn.lock
 RUN yarn install --production
-
-RUN apk del build-dependencies
 
 # Copy package build
 COPY --from=opencrvs-build packages/notification/build packages/notification/build
