@@ -130,17 +130,13 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   const offlineData = useSelector(getOfflineData)
   const DEFAULT_PAGE_SIZE = 10
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
-  const recordWindowWidth = () => {
-    setWindowWidth(window.innerWidth)
-  }
-  useEffect(() => {
-    window.addEventListener('resize', recordWindowWidth)
-  }, [])
 
   useEffect(() => {
-    return () => {
-      window.removeEventListener('resize', recordWindowWidth)
+    const recordWindowWidth = () => {
+      setWindowWidth(window.innerWidth)
     }
+    window.addEventListener('resize', recordWindowWidth)
+    return () => window.removeEventListener('resize', recordWindowWidth)
   }, [])
 
   const isEnoughParams = () => {

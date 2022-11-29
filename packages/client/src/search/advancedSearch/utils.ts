@@ -186,8 +186,7 @@ const getFormattedOfficeName = (
   placeId: string,
   offlineData: IOfflineData
 ): string => {
-  const offices = Object.values(offlineData.offices)
-  return offices.find((place) => place.id === placeId)?.name || ''
+  return offlineData.offices[placeId]?.name || ''
 }
 
 const getFormattedJurisdictionName = (
