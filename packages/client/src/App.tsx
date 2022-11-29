@@ -60,7 +60,8 @@ import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
 import VSExport from './views/SysAdmin/Performance/Vsexports/VSExport'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
-import { UserAudit } from './views/UserAudit/UserAudit'
+import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { UserAudit } from '@client/views/UserAudit/UserAudit'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -382,6 +383,13 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.USER_PROFILE}
                                             component={UserAudit}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.PERFORMANCE_REGISTRATIONS_LIST
+                                            }
+                                            component={RegistrationList}
                                           />
 
                                           <ProtectedRoute
