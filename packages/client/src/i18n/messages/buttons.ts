@@ -68,6 +68,7 @@ interface IButtonsMessages
   makeCorrection: MessageDescriptor
   publish: MessageDescriptor
   add: MessageDescriptor
+  close: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -355,6 +356,11 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.add',
     defaultMessage: 'Add',
     description: 'Add button text on form config'
+  },
+  close: {
+    id: 'buttons.close',
+    defaultMessage: 'Close',
+    description: 'Close button label'
   }
 }
 

@@ -527,6 +527,7 @@ export const NavigationView = (props: IFullProps) => {
                     />
                   )}
                 {userDetails?.role &&
+                  userDetails.supervisoryArea === '0' &&
                   USER_SCOPE[userDetails.role].includes(
                     WORKQUEUE_TABS.config
                   ) && (

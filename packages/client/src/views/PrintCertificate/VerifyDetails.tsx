@@ -39,6 +39,7 @@ import styled from '@client/styledComponents'
 import { Event } from '@client/utils/gateway'
 import { startCase } from 'lodash'
 import { formatAllNonStringValues } from './PDFUtils'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 const FullPageCenter = styled.div`
   height: 100vh;
@@ -72,6 +73,12 @@ const GreyInfo = styled(Warning)`
   path {
     fill: ${({ theme }) => theme.colors.grey500};
   }
+`
+const Footer = styled.div`
+  border-top: 2px solid ${({ theme }) => theme.colors.grey200};
+  ${({ theme }) => theme.fonts.reg14}
+  font-style:italic;
+  padding-top: 16px;
 `
 
 function getEvent(event: string): Event {
@@ -185,6 +192,22 @@ export function VerifyDetails() {
   const { id } = useParams()
   const offlineData = useSelector(getOfflineData)
   const registerForm = useSelector(getRegisterForm)
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+  let bottomActionButtons: JSX.Element[] | undefined = []
+  let footer: null | JSX.Element = null
+  if (isStandalone) {
+    bottomActionButtons = [
+      <PrimaryButton onClick={() => window.close()}>
+        {intl.formatMessage(buttonMessages.close)}
+      </PrimaryButton>
+    ]
+  } else {
+    footer = (
+      <Footer>
+        {intl.formatMessage(constantsMessages.verfiyQrCodeBrowserInstruction)}
+      </Footer>
+    )
+  }
 
   return (
     <Query query={VERIFY_QUERY} variables={{ id }}>
@@ -214,7 +237,11 @@ export function VerifyDetails() {
           )
 
           return (
-            <Content size={ContentSize.LARGE} showTitleOnMobile>
+            <Content
+              size={ContentSize.LARGE}
+              showTitleOnMobile
+              bottomActionButtons={bottomActionButtons}
+            >
               <StyledBox>
                 <IconContainer>
                   <GreyInfo />
@@ -238,6 +265,7 @@ export function VerifyDetails() {
                   >
                 )}
               />
+              {footer}
             </Content>
           )
         } else return null

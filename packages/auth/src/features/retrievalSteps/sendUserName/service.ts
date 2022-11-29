@@ -15,9 +15,8 @@ import {
   JWT_ISSUER,
   APPLICATION_CONFIG_URL
 } from '@auth/constants'
-import { resolve } from 'url'
+import { resolve, URL } from 'url'
 import { createToken } from '@auth/features/authenticate/service'
-import { URL } from 'url'
 import { logger } from '@auth/logger'
 
 export async function sendUserName(mobile: string, username: string) {

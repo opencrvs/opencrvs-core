@@ -922,6 +922,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.verifyQrCodeInfo',
     defaultMessage:
       'This verifies that you have scanned a valid government {event, select, BIRTH {birth} DEATH {death} other {birth}} certificate with the following data'
+  },
+  verfiyQrCodeBrowserInstruction: {
+    id: 'constants.verifyQrCodeBrowserInstruction',
+    defaultMessage:
+      'When you have completed the verification of this record, please close the browser window.'
   }
 }
 
