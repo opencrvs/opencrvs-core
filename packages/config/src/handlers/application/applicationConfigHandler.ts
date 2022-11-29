@@ -156,8 +156,8 @@ export const updateApplicationConfig = Joi.object({
     status: Joi.string().required()
   }),
   LOGIN_BACKGROUND: Joi.object({
-    backgroundColor: Joi.string().optional(),
-    backgroundImage: Joi.string().optional(),
-    imageFit: Joi.string().optional()
+    backgroundColor: Joi.string().allow('').optional(),
+    backgroundImage: Joi.string().allow('').optional(),
+    imageFit: Joi.string().allow('').optional()
   })
 })

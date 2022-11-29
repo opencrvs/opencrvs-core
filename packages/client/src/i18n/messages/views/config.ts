@@ -20,6 +20,8 @@ interface IConfigMessages
   applicationNameChangeMessage: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
+  backgroundImageChangeNotification: MessageDescriptor
+  backgroundImageFileLimitError: MessageDescriptor
   govtLogoChangeError: MessageDescriptor
   govtLogoFileLimitError: MessageDescriptor
   applicationConfigChangeError: MessageDescriptor
@@ -148,6 +150,16 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.govtLogoChangeNotification',
     defaultMessage: 'Government logo updated',
     description: 'Message for government logo change notification'
+  },
+  backgroundImageChangeNotification: {
+    id: 'config.application.backgroundImageChangeNotification',
+    defaultMessage: 'Background image updated',
+    description: 'Message for background image change notification'
+  },
+  backgroundImageFileLimitError: {
+    id: 'config.application.backgroundImageFileLimitError',
+    defaultMessage: 'Background image file must be less than 2mb',
+    description: 'Error message for large Background file'
   },
   govtLogoFileLimitError: {
     id: 'config.application.govtLogoFileLimitError',

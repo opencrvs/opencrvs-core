@@ -29,7 +29,6 @@ import {
   Link,
   ListViewItemSimplified,
   ResponsiveModal,
-  Select,
   Stack,
   Text,
   Toast
@@ -60,11 +59,11 @@ enum BackgroundSize {
   FILL = 'FILL',
   TILE = 'TILE'
 }
-const Badge = styled.span`
+const Box = styled.span`
   width: 40px;
   height: 40px;
   margin-left: 5px;
-  border: 2px solid '#d0d4d0';
+  border: 2px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${(p) => (p.color ? p.color : '#fff')};
 `
 const HexInput = styled(HalfWidthInput)`
@@ -76,7 +75,8 @@ export const LoginBackground = () => {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [loginBackground, setBackgroundFileName] = React.useState(EMPTY_STRING)
+  const [loginBackgroundFileName, setBackgroundFileName] =
+    React.useState(EMPTY_STRING)
   const [hexValue, setHexValue] = React.useState(EMPTY_STRING)
   const [isRequestValid, setRequestValid] = React.useState(false)
   const selectOptions = () => {
@@ -98,7 +98,7 @@ export const LoginBackground = () => {
   const [errorMessages, setErrorMessages] = React.useState(EMPTY_STRING)
   const [backgroundImage, setBackgroundImage] = React.useState(EMPTY_STRING)
   const [isFileUploading, setIsFileUploading] = React.useState(false)
-  const [logoFile, setBackgroundFile] = React.useState<{
+  const [backgroundFile, setBackgroundFile] = React.useState<{
     name?: string
     type: string
     data: string
@@ -140,6 +140,16 @@ export const LoginBackground = () => {
     setBackgroundImage(data)
     setRequestValid(true)
   }
+  const clearInputs = () => {
+    setBackgroundImage(EMPTY_STRING)
+    setRequestValid(false)
+    setHexValue(EMPTY_STRING)
+    handleBackgroundImageFile({
+      name: EMPTY_STRING,
+      type: EMPTY_STRING,
+      data: EMPTY_STRING
+    })
+  }
 
   const handleBackgroundImageFile = (data: IAttachmentValue) => {
     setBackgroundFile(data)
@@ -159,7 +169,9 @@ export const LoginBackground = () => {
 
   async function backgroundMutationHandler() {
     if (!isWithinFileLength(backgroundImage)) {
-      setErrorMessages(intl.formatMessage(messages.govtLogoFileLimitError))
+      setErrorMessages(
+        intl.formatMessage(messages.backgroundImageFileLimitError)
+      )
       setBackgroundImage(EMPTY_STRING)
       setRequestValid(false)
       handleBackgroundImageFile({
@@ -200,12 +212,34 @@ export const LoginBackground = () => {
           </Label>
         }
         value={
-          <CountryLogo
-            src={
-              offlineCountryConfiguration.config.LOGIN_BACKGROUND
-                .backgroundImage
-            }
-          />
+          !offlineCountryConfiguration.config.LOGIN_BACKGROUND ? (
+            <Box id="Box" color={'#FFF'}></Box>
+          ) : (
+            <>
+              {offlineCountryConfiguration.config.LOGIN_BACKGROUND
+                .backgroundImage ? (
+                <>
+                  <CountryLogo
+                    src={
+                      offlineCountryConfiguration.config.LOGIN_BACKGROUND
+                        .backgroundImage
+                    }
+                  />
+                </>
+              ) : (
+                <>
+                  <Box
+                    id="Box"
+                    color={
+                      '#' +
+                      offlineCountryConfiguration.config.LOGIN_BACKGROUND
+                        .backgroundColor
+                    }
+                  ></Box>
+                </>
+              )}
+            </>
+          )
         }
         actions={
           <Link id={id} onClick={toggleModal}>
@@ -249,7 +283,10 @@ export const LoginBackground = () => {
         <FormTabs
           sections={tabSections}
           activeTabId={activeTabId}
-          onTabClick={(id: TabId) => setActiveTabId(id)}
+          onTabClick={(id: TabId) => {
+            setActiveTabId(id)
+            clearInputs()
+          }}
         />
         {activeTabId === TabId.COLOUR && (
           <Field id="colortab">
@@ -267,9 +304,9 @@ export const LoginBackground = () => {
                 onChange={handleColorChange}
               />
               {showColour ? (
-                <Badge id="Box" color={'#' + hexValue}></Badge>
+                <Box id="Box" color={'#' + hexValue}></Box>
               ) : (
-                <Badge id="Box"></Badge>
+                <Box id="Box"></Box>
               )}
               <Message></Message>
             </InputField>
@@ -283,9 +320,9 @@ export const LoginBackground = () => {
               </Text>
 
               <SimpleDocumentUploader
-                label={logoFile.name ? logoFile.name : ''}
+                label={backgroundFile.name ? backgroundFile.name : ''}
                 disableDeleteInPreview={false}
-                name={intl.formatMessage(messages.govermentLogoLabel)}
+                name={intl.formatMessage(messages.loginBackgroundLabel)}
                 allowedDocType={['image/png', 'image/svg']}
                 onComplete={(file) => {
                   setErrorOccured(false)
@@ -296,7 +333,7 @@ export const LoginBackground = () => {
                   handleBackgroundImageFile(file as IAttachmentValue)
                   handleBackgroundImageFileName(file as IAttachmentValue)
                 }}
-                files={logoFile}
+                files={backgroundFile}
                 onUploadingStateChanged={onUploadingStateChanged}
                 touched
                 error={errorMessages}
@@ -339,7 +376,7 @@ export const LoginBackground = () => {
           {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
             ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
             : notificationStatus === NOTIFICATION_STATUS.SUCCESS
-            ? intl.formatMessage(messages.govtLogoChangeNotification)
+            ? intl.formatMessage(messages.backgroundImageChangeNotification)
             : errorMessages}
         </Toast>
       )}
