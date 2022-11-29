@@ -9,15 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Story, ComponentMeta } from '@storybook/react'
+import { ComponentMeta, Story } from '@storybook/react'
 import { Accordion, IAccordionProps } from './Accordion'
 import React from 'react'
-import styled from 'styled-components'
-
-const AccorDionContent = styled.div`
-  width: 100%;
-  height: 100px;
-`
 
 export default {
   title: 'Data/Accordion',

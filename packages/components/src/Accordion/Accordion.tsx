@@ -58,29 +58,30 @@ export const Accordion = ({
 }: IAccordionProps) => {
   const [isActive, setIsActive] = useState<boolean>(expand || false)
 
-  React.useEffect(() => {
-    setIsActive(expand || false)
-  }, [expand])
-
   return (
-    <Container>
-      <AccordionHeader id={name} onClick={() => setIsActive(!isActive)}>
+    <Container id={`${name}-accordion`}>
+      <AccordionHeader
+        id={`${name}-accordion-header`}
+        onClick={() => setIsActive(!isActive)}
+      >
         <Text element={'h3'} variant={'h3'}>
           {label}
         </Text>
-        <Stack id={name}>
-          {isActive && (
-            <Icon name={'ChevronDown'} color={'primary'} size={'large'} />
-          )}
-          {!isActive && (
+        {!isActive && (
+          <Stack>
             <Icon name={'ChevronRight'} color={'primary'} size={'large'} />
-          )}
-          {isActive && <Link>{labelForHideAction}</Link>}
-          {!isActive && <Link>{labelForShowAction}</Link>}
-        </Stack>
+            <Link>{labelForShowAction}</Link>
+          </Stack>
+        )}
+        {isActive && (
+          <Stack>
+            <Icon name={'ChevronDown'} color={'primary'} size={'large'} />
+            <Link>{labelForHideAction}</Link>
+          </Stack>
+        )}
       </AccordionHeader>
 
-      {isActive && <Content>{children}</Content>}
+      {isActive && <Content id={`${name}-content`}>{children}</Content>}
     </Container>
   )
 }
