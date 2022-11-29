@@ -63,6 +63,7 @@ import { Roles } from '@client/utils/authUtils'
 import { Registrations } from '@client/views/SysAdmin/Performance/Registrations'
 import { VerifyDetails } from '@client/views/PrintCertificate/VerifyDetails'
 import { ReviewSection } from './views/RegisterForm/review/ReviewSection'
+import { ReviewDuplicate } from './views/Duplicates/ReviewDuplicate'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -382,8 +383,8 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={routes.DUPLICATE_COMPARISON}
-                                            component={ReviewSection}
+                                            path={routes.REVIEW_DUPLICATE}
+                                            component={ReviewDuplicate}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

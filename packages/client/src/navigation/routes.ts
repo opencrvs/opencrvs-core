@@ -86,4 +86,4 @@ export const USER_PROFILE = '/userProfile/:userId'
 
 export const FORM_CONFIG_WIZARD = '/config/form/wizard/:event/:section'
 export const VERIFY_DETAILS = '/verify/:id'
-export const DUPLICATE_COMPARISON = '/duplicate/:given/:existing'
+export const REVIEW_DUPLICATE = '/review-duplicate/:event/:id/:existingId'
