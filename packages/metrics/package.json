@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/metrics",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "OpenCRVS metrics service",
   "license": "MPL-2.0",
   "private": true,
@@ -33,6 +33,7 @@
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
+    "lodash": "^4.17.21",
     "mongodb": "3.7.3",
     "mongoose": "^6.6.1",
     "node-fetch": "^2.6.7",
