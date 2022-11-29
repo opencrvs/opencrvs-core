@@ -212,4 +212,25 @@ describe('generate refresh token', () => {
       'Only system user can update refresh client secret'
     )
   })
+
+  it('delete system', async () => {
+    const responsePayload = {
+      system: {
+        _id: '234241',
+        name: 'Dummy System',
+        status: 'active',
+        shaSecret: '823823',
+        clientId: '1231234'
+      }
+    }
+    fetch.mockResponseOnce(JSON.stringify(responsePayload), { status: 200 })
+
+    const response = await resolvers.Mutation.deleteSystem(
+      {},
+      { clientId: '1231234' },
+      authHeaderSysAdmin
+    )
+
+    expect(response).toEqual(responsePayload)
+  })
 })

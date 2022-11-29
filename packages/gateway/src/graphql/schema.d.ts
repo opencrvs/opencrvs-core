@@ -94,6 +94,7 @@ export interface GQLMutation {
   registerSystem?: GQLSystemSecret
   refreshSystemSecret?: GQLSystemSecret
   updatePermissions?: GQLSystem
+  deleteSystem?: GQLSystem
 }
 
 export interface GQLDummy {
@@ -2290,6 +2291,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   registerSystem?: MutationToRegisterSystemResolver<TParent>
   refreshSystemSecret?: MutationToRefreshSystemSecretResolver<TParent>
   updatePermissions?: MutationToUpdatePermissionsResolver<TParent>
+  deleteSystem?: MutationToDeleteSystemResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2899,6 +2901,18 @@ export interface MutationToUpdatePermissionsResolver<
   (
     parent: TParent,
     args: MutationToUpdatePermissionsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToDeleteSystemArgs {
+  clientId: string
+}
+export interface MutationToDeleteSystemResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToDeleteSystemArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

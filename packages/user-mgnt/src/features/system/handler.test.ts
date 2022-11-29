@@ -340,3 +340,62 @@ describe('refresh secret system user', () => {
     expect(res.statusCode).toBe(400)
   })
 })
+
+describe('delete system ', () => {
+  let server: any
+
+  beforeEach(async () => {
+    mockingoose.resetAll()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  it('delete system using mongoose', async () => {
+    mockingoose(System).toReturn(mockSystem, 'findOne')
+    mockingoose(System).toReturn({}, 'deleteOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/deleteSystem',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('return unauthorized error if sysadmin not returned', async () => {
+    mockingoose(User).toReturn(null, 'findOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/deleteSystem',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('return an error if a token scope check fails', async () => {
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/deleteSystem',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${badToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(403)
+  })
+})

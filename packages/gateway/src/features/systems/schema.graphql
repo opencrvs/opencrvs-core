@@ -79,4 +79,5 @@ type Mutation {
   registerSystem(system: SystemInput): SystemSecret
   refreshSystemSecret(clientId: String!): SystemSecret
   updatePermissions(setting: UpdatePermissionsInput!): System
+  deleteSystem(clientId: ID!): System
 }
