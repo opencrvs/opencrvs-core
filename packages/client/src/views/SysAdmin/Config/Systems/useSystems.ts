@@ -27,7 +27,9 @@ import {
   UpdatePermissionsMutation,
   UpdatePermissionsMutationVariables,
   WebhookPermission,
-  Event
+  Event,
+  DeleteSystemMutation,
+  DeleteSystemMutationVariables
 } from '@client/utils/gateway'
 
 import React, { useState } from 'react'
@@ -84,10 +86,18 @@ export function useSystemsGlobalState() {
     dispatch(updateOfflineSystems({ systems: [...existingSystems, newSystem] }))
   }
 
+  const dispatchSystemRemove = (system: System) => {
+    const systems = existingSystems.filter(
+      (ite) => ite.clientId !== system.clientId
+    )
+    dispatch(updateOfflineSystems({ systems }))
+  }
+
   return {
     dispatchSystemUpdate,
     dispatchNewSystem,
     existingSystems,
+    dispatchSystemRemove,
     doesNationalIdAlreadyExist
   }
 }
@@ -115,7 +125,8 @@ export function useSystems() {
     dispatchNewSystem,
     dispatchSystemUpdate,
     existingSystems,
-    doesNationalIdAlreadyExist
+    doesNationalIdAlreadyExist,
+    dispatchSystemRemove
   } = useSystemsGlobalState()
 
   const [birthPermissions, setBirthPermissions] = useState<WebhookPermission>(
@@ -127,6 +138,8 @@ export function useSystems() {
   )
 
   const [systemToShowPermission, setSystemToShowPermission] = useState<System>()
+
+  const [systemToDelete, setSystemToDelete] = useState<System>()
 
   const [
     activateSystemMutate,
@@ -224,6 +237,26 @@ export function useSystems() {
     }
   })
 
+  const [
+    deleteSystemMutate,
+    {
+      data: systemToDeleteData,
+      loading: systemToDeleteLoading,
+      error: systemToDeleteError,
+      reset: systemToDeleteReset
+    }
+  ] = useMutation<DeleteSystemMutation, DeleteSystemMutationVariables>(
+    mutations.deleteSystem,
+    {
+      onCompleted: ({ deleteSystem }) => {
+        if (deleteSystem) {
+          dispatchSystemRemove(deleteSystem)
+          setSystemToDelete(undefined)
+        }
+      }
+    }
+  )
+
   const updatePermissions = () => {
     if (!systemToShowPermission) return
 
@@ -274,6 +307,15 @@ export function useSystems() {
     })
   }
 
+  const deleteSystem = () => {
+    if (!systemToDelete) return
+
+    deleteSystemMutate({
+      variables: {
+        clientId: systemToDelete.clientId
+      }
+    })
+  }
   const resetData = () => {
     resetActivateSystemData()
     resetDeactivateSystemData()
@@ -282,12 +324,19 @@ export function useSystems() {
     setBirthPermissions(initWebHook(Event.Birth))
     resetRefreshTokenData()
     updatePermissionsReset()
+    systemToDeleteReset()
   }
 
   const shouldWarnAboutNationalId =
     newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
 
   return {
+    systemToDeleteData,
+    deleteSystem,
+    systemToDelete,
+    setSystemToDelete,
+    systemToDeleteLoading,
+    systemToDeleteError,
     updatePermissionsData,
     updatePermissionsLoading,
     updatePermissionsError,

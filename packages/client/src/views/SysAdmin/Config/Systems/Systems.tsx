@@ -22,6 +22,7 @@ import {
   WebhookPermission
 } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
+import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
 import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import {
   Alert,
@@ -104,6 +105,12 @@ export function SystemList() {
   }
 
   const {
+    systemToDeleteData,
+    deleteSystem,
+    systemToDelete,
+    setSystemToDelete,
+    systemToDeleteLoading,
+    systemToDeleteError,
     updatePermissionsData,
     updatePermissionsLoading,
     updatePermissionsError,
@@ -201,7 +208,9 @@ export function SystemList() {
     })
 
     menuItems.push({
-      handler: () => {},
+      handler: () => {
+        setSystemToDelete(system)
+      },
       label: intl.formatMessage(integrationMessages.delete)
     })
 
@@ -693,6 +702,15 @@ export function SystemList() {
         />
       )}
 
+      {systemToDelete && (
+        <DeleteSystemModal
+          system={systemToDelete}
+          loading={systemToDeleteLoading}
+          closeModal={() => setSystemToDelete(undefined)}
+          deleteSystem={deleteSystem}
+        />
+      )}
+
       {activateSystemData && (
         <Toast
           type="success"
@@ -720,11 +738,23 @@ export function SystemList() {
           {intl.formatMessage(integrationMessages.updatePermissionsMsg)}
         </Toast>
       )}
+
+      {systemToDeleteData && (
+        <Toast
+          type="success"
+          id="systemToDeleteSuccess"
+          onClose={() => resetData()}
+        >
+          {intl.formatMessage(integrationMessages.deleteSystemMsg)}
+        </Toast>
+      )}
+
       {(activateSystemError ||
         deactivateSystemError ||
         registerSystemError ||
         refreshTokenError ||
-        updatePermissionsError) && (
+        updatePermissionsError ||
+        systemToDeleteError) && (
         <Toast
           type="error"
           id="toggleClientStatusToast"

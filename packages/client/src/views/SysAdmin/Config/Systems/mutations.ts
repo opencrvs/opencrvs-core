@@ -95,3 +95,16 @@ export const updateSystemPermissions = gql`
     }
   }
 `
+
+export const deleteSystem = gql`
+  mutation deleteSystem($clientId: ID!) {
+    deleteSystem(clientId: $clientId) {
+      _id
+      clientId
+      name
+      shaSecret
+      status
+      type
+    }
+  }
+`
