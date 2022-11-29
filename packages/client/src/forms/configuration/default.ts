@@ -26,7 +26,6 @@ import {
   deathDocumentForWhomFhirMapping,
   deathDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
-import { conditionals } from '../utils'
 
 // THIS FILE CONTAINS THE DEFAULT, FACTORY RESET FORM CONFIGURATIONS
 
