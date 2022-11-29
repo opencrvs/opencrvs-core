@@ -21,12 +21,19 @@ export interface ICountryLogo {
   fileName: string
   file: string
 }
+
+type ICountryBackground = {
+  backgroundColor: string // hex value
+  backgroundImage: string //base64 string
+  imageFit: 'FILL' | 'TILE'
+}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
   SENTRY: string
   LOGROCKET: string
+  COUNTRY_BACKGROUND: ICountryBackground
 }
 
 export interface IApplicationConfigResponse {

@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { DarkPageContainer, PageContainer } from '@login/common/PageContainer'
+import {
+  LoginBackgroundContainer,
+  PageContainer
+} from '@login/common/PageContainer'
 import { ErrorBoundary } from '@login/ErrorBoundary'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
 import * as routes from '@login/navigation/routes'
@@ -61,15 +64,15 @@ export class App extends React.Component<IAppProps> {
                   <Switch>
                     <Route exact path={routes.STEP_ONE}>
                       <LanguageSelect>
-                        <DarkPageContainer>
+                        <LoginBackgroundContainer>
                           <StepOneContainer />
-                        </DarkPageContainer>
+                        </LoginBackgroundContainer>
                       </LanguageSelect>
                     </Route>
                     <Route exact path={routes.STEP_TWO}>
-                      <DarkPageContainer>
+                      <LoginBackgroundContainer>
                         <StepTwoContainer />
-                      </DarkPageContainer>
+                      </LoginBackgroundContainer>
                     </Route>
                     <Route exact path={routes.FORGOTTEN_ITEM}>
                       <PageContainer>
