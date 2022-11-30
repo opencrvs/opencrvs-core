@@ -1753,7 +1753,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN"
+                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant)"
                     }
                   ],
                   "mapping": {
@@ -1785,6 +1785,16 @@
                       "expression": "!values.exactDateOfBirthUnknown"
                     }
                   ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "sectionFieldToBundleFieldTransformer",
+                      "parameters": []
+                    },
+                    "query": {
+                      "operation": "bundleFieldToSectionFieldTransformer",
+                      "parameters": []
+                    }
+                  },
                   "postfix": "years",
 
                   "inputFieldWidth": "78px"
@@ -2298,7 +2308,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN"
+                      "expression": "!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)"
                     }
                   ],
                   "mapping": {

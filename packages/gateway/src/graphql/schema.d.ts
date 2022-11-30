@@ -128,6 +128,7 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   createdAt?: GQLDate
   updatedAt?: GQLDate
   history?: Array<GQLHistory | null>
+  ageOfIndividualInYears?: string
 }
 
 export interface GQLDeathRegistration extends GQLEventRegistration {
@@ -409,6 +410,7 @@ export interface GQLBirthRegistrationInput {
   lastPreviousLiveBirth?: GQLDate
   createdAt?: GQLDate
   updatedAt?: GQLDate
+  ageOfIndividualInYears?: string
 }
 
 export interface GQLReinstated {
@@ -2838,6 +2840,7 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   createdAt?: BirthRegistrationToCreatedAtResolver<TParent>
   updatedAt?: BirthRegistrationToUpdatedAtResolver<TParent>
   history?: BirthRegistrationToHistoryResolver<TParent>
+  ageOfIndividualInYears?: BirthRegistrationToAgeOfIndividualInYearsResolver<TParent>
 }
 
 export interface BirthRegistrationToIdResolver<TParent = any, TResult = any> {
@@ -2971,6 +2974,13 @@ export interface BirthRegistrationToUpdatedAtResolver<
 }
 
 export interface BirthRegistrationToHistoryResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationToAgeOfIndividualInYearsResolver<
   TParent = any,
   TResult = any
 > {

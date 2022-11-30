@@ -290,6 +290,7 @@ type BirthRegistration implements EventRegistration {
   createdAt: Date
   updatedAt: Date
   history: [History]
+  ageOfIndividualInYears: String
 }
 
 type DeathRegistration implements EventRegistration {
@@ -560,6 +561,7 @@ input BirthRegistrationInput {
   lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
+  ageOfIndividualInYears: String
 }
 
 type Reinstated {

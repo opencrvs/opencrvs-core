@@ -1396,7 +1396,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                    expression:
+                      '!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant)'
                   }
                 ],
                 mapping: {
@@ -1416,6 +1417,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'range',
                     parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
                   }
                 ],
                 conditionals: [
@@ -1424,6 +1429,16 @@ export const registerForms: IDefaultRegisterForms = {
                     expression: '!values.exactDateOfBirthUnknown'
                   }
                 ],
+                mapping: {
+                  mutation: {
+                    operation: 'sectionFieldToBundleFieldTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'bundleFieldToSectionFieldTransformer',
+                    parameters: []
+                  }
+                },
                 postfix: 'years',
                 inputFieldWidth: '78px'
               },
@@ -1928,7 +1943,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                    expression:
+                      '!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)'
                   }
                 ],
                 mapping: {
@@ -1948,6 +1964,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'range',
                     parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
                   }
                 ],
                 conditionals: [
@@ -1957,7 +1977,16 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 postfix: 'years',
-
+                mapping: {
+                  // mutation: {
+                  //   operation: 'ageOfIndividualInYearsTransformer',
+                  //   parameters: ['birthDate', 'child.childBirthDate']
+                  // },
+                  // query: {
+                  //   operation: 'ageOfIndividualInYearsTransformer',
+                  //   parameters: ['birthDate']
+                  // }
+                },
                 inputFieldWidth: '78px'
               },
               {
@@ -3190,6 +3219,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'range',
                     parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
                   }
                 ],
                 conditionals: [
@@ -3814,6 +3847,10 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'range',
                     parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
                   }
                 ],
                 conditionals: [

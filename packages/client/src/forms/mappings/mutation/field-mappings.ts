@@ -197,11 +197,23 @@ export const sectionFieldToBundleFieldTransformer =
     sectionId: string,
     field: IFormField
   ) => {
+    console.log('reached!!!!!!!!!!!!!!!!!')
+
     if (transformedFieldName) {
       transformedData[transformedFieldName] = draftData[sectionId][field.name]
+      console.log(
+        transformedData[transformedFieldName],
+        ' reached!!!!!!!!!!!!!!!!! 111 ',
+        draftData[sectionId][field.name]
+      )
     } else {
       transformedData[field.name] = draftData[sectionId][field.name]
     }
+    console.log(
+      transformedData[field.name],
+      ' reached!!!!!!!!!!!!!!!!! ',
+      draftData[sectionId][field.name]
+    )
     return transformedData
   }
 
