@@ -9,149 +9,79 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
+import { Link, Stack, Text } from '../'
+import { Icon } from '../Icon'
 
 const Container = styled.div`
   box-sizing: border-box;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-  padding-bottom: 16px;
+  padding: 0;
   width: 100%;
-
-  details > summary::before {
-    border-style: solid;
-    border-width: 3px 3px 0 0;
-    content: '';
-    display: inline-block;
-    height: 8px;
-    position: relative;
-    top: 7px;
-    vertical-align: top;
-    width: 8px;
-    left: 0;
-    margin-right: 10px;
-    transform: rotate(45deg);
-  }
-
-  details[open] > summary {
-    color: ${({ theme }) => theme.colors.primary};
-  }
-
-  details[open] > summary::before {
-    top: 6px;
-    transform: rotate(135deg);
-  }
-
-  details[open] > summary::after {
-    content: attr(data-open);
-  }
-
-  details:not([open]) > summary::after {
-    content: attr(data-close);
-  }
+`
+const AccordionHeader = styled.div`
+  padding: 16px 0;
 
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
     cursor: pointer;
   }
 
-  &:focus-within {
-    background: ${({ theme }) => theme.colors.yellow};
-    border-bottom: 3px solid ${({ theme }) => theme.colors.grey600};
-  }
-
-  &:has(details[open]) {
-    background: ${({ theme }) => theme.colors.white};
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
   }
 `
-const Summary = styled.summary`
-  ${({ theme }) => theme.fonts.bold18};
-  color: ${({ theme }) => theme.colors.primary};
-  padding-bottom: 2px;
-  list-style-type: none;
-  margin-top: 5px;
-  display: inline;
-
-  &:hover {
-    text-decoration: underline;
-  }
-
-  &:focus-within {
-    color: ${({ theme }) => theme.colors.grey600};
-    text-decoration: underline;
-  }
-
-  &::-webkit-details-marker {
-    display: none;
-  }
-`
-const NestedChildren = styled.div`
+const Content = styled.div`
   margin-top: 15px;
   padding-top: 0px !important;
+  padding-bottom: 15px;
 `
-const List = styled.ul<{ flexDirection?: string }>`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  & > div {
-    margin-bottom: 16px;
-  }
-  ${({ flexDirection }) =>
-    flexDirection &&
-    `display: flex;
-    & > div {
-      margin-right: 16px;
-    }`}
-`
-export interface IAccordionOption {
-  value: string
-}
 
 export interface IAccordionProps {
   name: string
   label: string
-  showLabel: string
-  hideLabel: string
-  options: IAccordionOption[]
-  value: string
-  nestedFields: { [key: string]: JSX.Element[] }
-  onChange: (value: string) => void
+  labelForShowAction: string
+  labelForHideAction: string
+  children: React.ReactNode
+  expand?: boolean
 }
 
 export const Accordion = ({
   name,
   label,
-  showLabel,
-  hideLabel,
-  options,
-  value,
-  nestedFields,
-  onChange
+  labelForShowAction,
+  labelForHideAction,
+  children,
+  expand
 }: IAccordionProps) => {
+  const [isActive, setIsActive] = useState<boolean>(expand || false)
+
   return (
-    <Container>
-      <h2>{label}</h2>
-      <details onToggle={() => onChange(value)}>
-        <Summary
-          id={name}
-          data-open={hideLabel}
-          data-close={showLabel}
-        ></Summary>
-        <List>
-          {options.map((option, index) => {
-            return (
-              <div key={`nestedField-${index}`}>
-                {nestedFields &&
-                  value === option.value &&
-                  nestedFields[value] && (
-                    <NestedChildren>{nestedFields[value]}</NestedChildren>
-                  )}
-              </div>
-            )
-          })}
-        </List>
-      </details>
+    <Container id={`${name}-accordion`}>
+      <AccordionHeader
+        id={`${name}-accordion-header`}
+        onClick={() => setIsActive(!isActive)}
+      >
+        <Text element={'h3'} variant={'h3'}>
+          {label}
+        </Text>
+        {!isActive && (
+          <Stack>
+            <Icon name={'ChevronRight'} color={'primary'} size={'large'} />
+            <Link>{labelForShowAction}</Link>
+          </Stack>
+        )}
+        {isActive && (
+          <Stack>
+            <Icon name={'ChevronDown'} color={'primary'} size={'large'} />
+            <Link>{labelForHideAction}</Link>
+          </Stack>
+        )}
+      </AccordionHeader>
+
+      {isActive && <Content id={`${name}-content`}>{children}</Content>}
     </Container>
   )
 }

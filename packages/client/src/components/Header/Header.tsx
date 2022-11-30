@@ -80,6 +80,8 @@ import {
   REGISTRAR_HOME,
   TEAM_USER_LIST
 } from '@client/navigation/routes'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 
 type IStateProps = {
   userDetails: IUserDetails | null
@@ -100,6 +102,7 @@ type IDispatchProps = {
   goToTeamSearchAction: typeof goToTeamSearch
   goToTeamUserListAction: typeof goToTeamUserList
   goToAdvancedSearch: typeof goToAdvancedSearch
+  setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
 interface IProps extends RouteComponentProps {
@@ -429,7 +432,10 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(messages.advancedSearch),
         id: ADVANCED_SEARCH_TEXT,
-        onClick: () => this.props.goToAdvancedSearch()
+        onClick: () => {
+          this.props.setAdvancedSearchParam(advancedSearchInitialState)
+          this.props.goToAdvancedSearch()
+        }
       }
     ]
 
@@ -621,7 +627,8 @@ export const Header = connect(
     goToCreateNewUser,
     goToTeamSearchAction: goToTeamSearch,
     goToTeamUserListAction: goToTeamUserList,
-    goToAdvancedSearch: goToAdvancedSearch
+    goToAdvancedSearch: goToAdvancedSearch,
+    setAdvancedSearchParam: setAdvancedSearchParam
   }
 )(injectIntl(withTheme(withRouter(HeaderComp))))
 

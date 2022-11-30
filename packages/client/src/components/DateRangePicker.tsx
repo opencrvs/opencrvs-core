@@ -133,7 +133,7 @@ export const ContentWrapper = styled.div`
 `
 
 export const ModalContainer = styled.div`
-  position: fixed;
+  position: absolute;
   z-index: 2;
   width: 608px;
   overflow: hidden;

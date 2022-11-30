@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Story, ComponentMeta } from '@storybook/react'
+import { ComponentMeta, Story } from '@storybook/react'
 import { Accordion, IAccordionProps } from './Accordion'
 import React from 'react'
 
@@ -19,28 +19,20 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: `\`<Accordion />\` `
+        component: `The accordion \`<Accordion />\` component is a wrapper container which allows user to hide or expand the relevant content inside.`
       }
     }
   }
 } as ComponentMeta<typeof Accordion>
 
-const Template: Story<IAccordionProps> = (args) => <Accordion {...args} />
+const Template: Story<IAccordionProps> = (args) => (
+  <Accordion {...args}>This is the content of the accordion.</Accordion>
+)
 
 export const AccordionView = Template.bind({})
 AccordionView.args = {
   name: 'accordion-component',
-  label: 'Section name',
-  showLabel: 'Show',
-  hideLabel: 'Hide',
-  value: 'no',
-  options: [
-    {
-      value: 'yes'
-    },
-    {
-      value: 'no'
-    }
-  ],
-  onChange: () => alert('Clicked')
+  label: 'Accordion Label',
+  labelForHideAction: 'Hide',
+  labelForShowAction: 'Show'
 }

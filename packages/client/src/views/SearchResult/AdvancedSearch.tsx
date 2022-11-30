@@ -11,7 +11,7 @@
  */
 
 import React, { useState } from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 
 import { injectIntl, useIntl } from 'react-intl'
 import { getScope } from '@client/profile/profileSelectors'
@@ -22,183 +22,452 @@ import { messages } from '@client/i18n/messages/views/config'
 import { Content, FormTabs, Text } from '@client/../../components/lib'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { advancedSearchBirthSectionFormType } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
-import { advancedSearchDeathSectionFormType } from '@client/forms/advancedSearch/fieldDefinitions/Death'
-import { PrimaryButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
+import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
+import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
+import { ICON_ALIGNMENT, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
+import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { goToAdvancedSearchResult } from '@client/navigation'
+import { pick } from 'lodash'
+import { IDateRangePickerValue } from '@client/forms'
+import { getOfflineData } from '@client/offline/selectors'
+import { Accordion } from '@client/../../components/lib/Accordion'
+import { LocationType } from '@client/utils/gateway'
+import {
+  getAccordionActiveStateMap,
+  IBaseAdvancedSearchState,
+  isValidDateRangePickerValue,
+  transformAdvancedSearchLocalStateToStoreData,
+  transformStoreDataToAdvancedSearchLocalState
+} from '@client/search/advancedSearch/utils'
+import styled from 'styled-components'
 
 export enum TabId {
   BIRTH = 'birth',
   DEATH = 'death'
 }
 
-const BirthTabContent = () => {
-  return <BirthSection />
-}
+const StyledPrimaryButton = styled(PrimaryButton)`
+  margin-top: 32px;
+`
 
-const DeathTabContent = () => {
-  return <DeathSection />
-}
+const {
+  birthSearchRegistrationSection,
+  birthSearchChildSection,
+  birthSearchMotherSection,
+  birthSearchFatherSection,
+  birthSearchEventSection,
+  birthSearchInformantSection
+} = advancedSearchBirthSections
+const {
+  deathSearchRegistrationSection,
+  deathSearchDeceasedSection,
+  deathSearchEventSection,
+  deathSearchInformantSection
+} = advancedSearchDeathSections
 
-export interface IAdvancedSearch {
-  event?: Event
-  registrationStatuses?: string[]
-  dateOfEvent?: string
-  dateOfEventStart?: string
-  dateOfEventEnd?: string
-  contactNumber?: string
-  nationalId?: string
-  registrationNumber?: string
-  trackingId?: string
-  dateOfRegistration?: string
-  dateOfRegistrationStart?: string
-  dateOfRegistrationEnd?: string
-  declarationLocationId?: string
-  declarationJurisdictionId?: string
-  eventLocationId?: string
-  eventLocationLevel1?: string
-  eventLocationLevel2?: string
-  eventLocationLevel3?: string
-  eventLocationLevel4?: string
-  eventLocationLevel5?: string
-  childFirstNames?: string
-  childLastName?: string
-  childDoB?: string
-  childDoBStart?: string
-  childDoBEnd?: string
-  childGender?: string
-  deceasedFirstNames?: string
-  deceasedFamilyName?: string
-  deceasedGender?: string
-  deceasedDoB?: string
-  deceasedDoBStart?: string
-  deceasedDoBEnd?: string
-  deceasedIdentifier?: string
-  motherFirstNames?: string
-  motherFamilyName?: string
-  motherDoB?: string
-  motherDoBStart?: string
-  motherDoBEnd?: string
-  motherIdentifier?: string
-  fatherFirstNames?: string
-  fatherFamilyName?: string
-  fatherDoB?: string
-  fatherDoBStart?: string
-  fatherDoBEnd?: string
-  fatherIdentifier?: string
-  informantFirstNames?: string
-  informantFamilyName?: string
-  informantDoB?: string
-  informantDoBStart?: string
-  informantDoBEnd?: string
-  informantIdentifier?: string
+const dateFieldTypes = [
+  'dateOfRegistration',
+  'dateOfEvent',
+  'childDoB',
+  'motherDoB',
+  'fatherDoB',
+  'deceasedDoB',
+  'informantDoB'
+]
+
+export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
+  const validNonDateFields = Object.keys(value).filter(
+    (key) =>
+      !['event', 'eventLocationType'].includes(key) &&
+      !dateFieldTypes.includes(key) &&
+      Boolean(value[key as keyof IBaseAdvancedSearchState])
+  )
+  //handle date fields separately
+  const validDateFields = dateFieldTypes.filter(
+    (key) =>
+      value[key as keyof IBaseAdvancedSearchState] &&
+      isValidDateRangePickerValue(
+        value[key as keyof IBaseAdvancedSearchState] as IDateRangePickerValue
+      )
+  )
+
+  const validCount = validNonDateFields.length + validDateFields.length
+  return validCount >= 2
 }
 
 const BirthSection = () => {
   const intl = useIntl()
-  const [isDisable, setDisable] = useState(true)
-  const isOnline = useOnlineStatus()
+  const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
+  const offlineData = useSelector(getOfflineData)
+  const [formState, setFormState] = useState<IBaseAdvancedSearchState>({
+    ...transformStoreDataToAdvancedSearchLocalState(
+      advancedSearchParamsState,
+      offlineData,
+      'birth'
+    )
+  })
 
-  const validateForm = (advancedSearch: IAdvancedSearch) => {
-    let count = 0
-    for (const field of Object.values(advancedSearch)) {
-      const result = field.nestedFields
-      for (const value of Object.values(result)) {
-        if (value !== '') {
-          count++
-        }
-      }
-    }
+  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+    getAccordionActiveStateMap(advancedSearchParamsState)
+  )
 
-    if (count > 1 && isOnline) {
-      setDisable(false)
-    } else {
-      setDisable(true)
-    }
-  }
+  const isDisabled = !isAdvancedSearchFormValid(formState)
+  const dispatch = useDispatch()
+
+  const accordionShowingLabel = intl.formatMessage(
+    advancedSearchFormMessages.show
+  )
+  const accordionHidingLabel = intl.formatMessage(
+    advancedSearchFormMessages.hide
+  )
 
   return (
     <>
       <Text element={'p'} variant={'reg18'}>
         {intl.formatMessage(messages.advancedSearchInstruction)}
       </Text>
-      <FormFieldGenerator
-        id={advancedSearchBirthSectionFormType.id}
-        onChange={(values) => {
-          validateForm(values)
-        }}
-        setAllFieldsDirty={false}
-        fields={advancedSearchBirthSectionFormType.fields}
-      />
+      <Accordion
+        name={birthSearchRegistrationSection.id}
+        label={intl.formatMessage(
+          advancedSearchFormMessages.registrationDetails
+        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchRegistrationSection.id]}
+      >
+        <FormFieldGenerator
+          id={birthSearchRegistrationSection.id}
+          onChange={(values) => {
+            setFormState({ ...formState, ...values })
+          }}
+          setAllFieldsDirty={false}
+          fields={birthSearchRegistrationSection.fields}
+          initialValues={pick(formState, [
+            'placeOfRegistration',
+            'dateOfRegistration',
+            'registrationStatuses'
+          ])}
+        />
+      </Accordion>
 
-      <PrimaryButton
+      <Accordion
+        name={birthSearchChildSection.id}
+        label={intl.formatMessage(advancedSearchFormMessages.childDetails)}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchChildSection.id]}
+      >
+        <FormFieldGenerator
+          id={birthSearchChildSection.id}
+          onChange={(values) => {
+            setFormState({ ...formState, ...values })
+          }}
+          setAllFieldsDirty={false}
+          fields={birthSearchChildSection.fields}
+          initialValues={pick(formState, [
+            'childDoB',
+            'childFirstNames',
+            'childLastName',
+            'childGender'
+          ])}
+        />
+      </Accordion>
+
+      <Accordion
+        name={birthSearchEventSection.id}
+        label={intl.formatMessage(advancedSearchFormMessages.eventDetails)}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchEventSection.id]}
+      >
+        <FormFieldGenerator
+          id={birthSearchEventSection.id}
+          onChange={(values) => {
+            const nextVal =
+              values.eventLocationType === LocationType.HealthFacility
+                ? {
+                    ...values,
+                    eventCountry: '',
+                    eventLocationLevel1: '',
+                    eventLocationLevel2: ''
+                  }
+                : {
+                    ...values,
+                    eventLocationId: ''
+                  }
+            setFormState({ ...formState, ...nextVal })
+          }}
+          setAllFieldsDirty={false}
+          fields={birthSearchEventSection.fields}
+          initialValues={pick(formState, [
+            'eventLocationType',
+            'eventLocationId',
+            'eventCountry',
+            'eventLocationLevel1',
+            'eventLocationLevel2'
+          ])}
+        />
+      </Accordion>
+
+      <Accordion
+        name={birthSearchMotherSection.id}
+        label={intl.formatMessage(advancedSearchFormMessages.motherDetails)}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchMotherSection.id]}
+      >
+        <FormFieldGenerator
+          id={birthSearchMotherSection.id}
+          onChange={(values) => {
+            setFormState({ ...formState, ...values })
+          }}
+          setAllFieldsDirty={false}
+          fields={birthSearchMotherSection.fields}
+          initialValues={pick(formState, [
+            'motherDoB',
+            'motherFirstNames',
+            'motherFamilyName'
+          ])}
+        />
+      </Accordion>
+
+      <Accordion
+        name={birthSearchFatherSection.id}
+        label={intl.formatMessage(advancedSearchFormMessages.fatherDetails)}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchFatherSection.id]}
+      >
+        <FormFieldGenerator
+          id={birthSearchFatherSection.id}
+          onChange={(values) => {
+            setFormState({ ...formState, ...values })
+          }}
+          setAllFieldsDirty={false}
+          fields={birthSearchFatherSection.fields}
+          initialValues={pick(formState, [
+            'fatherDoB',
+            'fatherFirstNames',
+            'fatherFamilyName'
+          ])}
+        />
+      </Accordion>
+
+      <Accordion
+        name={birthSearchInformantSection.id}
+        label={intl.formatMessage(advancedSearchFormMessages.informantDetails)}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[birthSearchInformantSection.id]}
+      >
+        <FormFieldGenerator
+          id={birthSearchInformantSection.id}
+          onChange={(values) => {
+            setFormState({ ...formState, ...values })
+          }}
+          setAllFieldsDirty={false}
+          fields={birthSearchInformantSection.fields}
+          initialValues={pick(formState, [
+            'informantDoB',
+            'informantFirstNames',
+            'informantFamilyName'
+          ])}
+        />
+      </Accordion>
+
+      <StyledPrimaryButton
         icon={() => <Icon name={'Search'} />}
         align={ICON_ALIGNMENT.LEFT}
         id="search"
         key="search"
-        disabled={isDisable}
+        disabled={isDisabled}
+        onClick={() => {
+          dispatch(
+            setAdvancedSearchParam({
+              ...transformAdvancedSearchLocalStateToStoreData(
+                formState,
+                offlineData
+              ),
+              event: 'birth'
+            })
+          )
+          dispatch(goToAdvancedSearchResult())
+        }}
       >
         {intl.formatMessage(buttonMessages.search)}
-      </PrimaryButton>
+      </StyledPrimaryButton>
     </>
   )
 }
 
 const DeathSection = () => {
   const intl = useIntl()
-  const [isDisable, setDisable] = useState(true)
-  const isOnline = useOnlineStatus()
+  const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
+  const offlineData = useSelector(getOfflineData)
+  const [formState, setFormState] = useState<IBaseAdvancedSearchState>({
+    ...transformStoreDataToAdvancedSearchLocalState(
+      advancedSearchParamsState,
+      offlineData,
+      'death'
+    )
+  })
+  const [accordionActiveStateMap, setAccordionActiveStateMap] = useState(
+    getAccordionActiveStateMap(advancedSearchParamsState)
+  )
 
-  const validateForm = (advancedSearch: IAdvancedSearch) => {
-    let count = 0
-
-    for (const field of Object.values(advancedSearch)) {
-      const result = field.nestedFields
-      for (const value of Object.values(result)) {
-        if (value !== '') {
-          count++
-        }
-      }
-    }
-
-    if (count > 1 && isOnline) {
-      setDisable(false)
-    } else {
-      setDisable(true)
-    }
-  }
+  const isDisable = !isAdvancedSearchFormValid(formState)
+  const dispatch = useDispatch()
+  const accordionShowingLabel = intl.formatMessage(
+    advancedSearchFormMessages.show
+  )
+  const accordionHidingLabel = intl.formatMessage(
+    advancedSearchFormMessages.hide
+  )
 
   return (
     <>
       <Text element={'p'} variant={'reg18'}>
         {intl.formatMessage(messages.advancedSearchInstruction)}
       </Text>
-      <FormFieldGenerator
-        id={advancedSearchDeathSectionFormType.id}
-        onChange={(values) => {
-          validateForm(values)
-        }}
-        setAllFieldsDirty={false}
-        fields={advancedSearchDeathSectionFormType.fields}
-      />
+      <Accordion
+        name={birthSearchRegistrationSection.id}
+        label={intl.formatMessage(
+          advancedSearchFormMessages.registrationDetails
+        )}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[deathSearchRegistrationSection.id]}
+      >
+        <FormFieldGenerator
+          id={birthSearchRegistrationSection.id}
+          onChange={(values) => {
+            setFormState({ ...formState, ...values })
+          }}
+          setAllFieldsDirty={false}
+          fields={birthSearchRegistrationSection.fields}
+          initialValues={pick(formState, [
+            'placeOfRegistration',
+            'dateOfRegistration',
+            'registrationStatuses'
+          ])}
+        />
+      </Accordion>
 
-      <PrimaryButton
+      <Accordion
+        name={deathSearchDeceasedSection.id}
+        label={intl.formatMessage(advancedSearchFormMessages.deceasedDetails)}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[deathSearchDeceasedSection.id]}
+      >
+        <FormFieldGenerator
+          id={deathSearchDeceasedSection.id}
+          onChange={(values) => {
+            setFormState({ ...formState, ...values })
+          }}
+          setAllFieldsDirty={false}
+          fields={deathSearchDeceasedSection.fields}
+          initialValues={pick(formState, [
+            'deceasedDoB',
+            'deceasedFirstNames',
+            'deceasedFamilyName',
+            'deceasedGender',
+            'placeOfDeath'
+          ])}
+        />
+      </Accordion>
+
+      <Accordion
+        name={deathSearchEventSection.id}
+        label={intl.formatMessage(advancedSearchFormMessages.eventDetails)}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[deathSearchEventSection.id]}
+      >
+        <FormFieldGenerator
+          id={deathSearchEventSection.id}
+          onChange={(values) => {
+            const nextVal =
+              values.eventLocationType === LocationType.HealthFacility
+                ? {
+                    ...values,
+                    eventCountry: '',
+                    eventLocationLevel1: '',
+                    eventLocationLevel2: ''
+                  }
+                : {
+                    ...values,
+                    eventLocationId: ''
+                  }
+            setFormState({ ...formState, ...nextVal })
+          }}
+          setAllFieldsDirty={false}
+          fields={deathSearchEventSection.fields}
+          initialValues={pick(formState, [
+            'eventLocationType',
+            'eventLocationId',
+            'eventCountry',
+            'eventLocationLevel1',
+            'eventLocationLevel2'
+          ])}
+        />
+      </Accordion>
+
+      <Accordion
+        name={deathSearchInformantSection.id}
+        label={intl.formatMessage(advancedSearchFormMessages.informantDetails)}
+        labelForShowAction={accordionShowingLabel}
+        labelForHideAction={accordionHidingLabel}
+        expand={accordionActiveStateMap[deathSearchInformantSection.id]}
+      >
+        <FormFieldGenerator
+          id={deathSearchInformantSection.id}
+          onChange={(values) => {
+            setFormState({ ...formState, ...values })
+          }}
+          setAllFieldsDirty={false}
+          fields={deathSearchInformantSection.fields}
+          initialValues={pick(formState, [
+            'informantDoB',
+            'informantFirstNames',
+            'informantFamilyName'
+          ])}
+        />
+      </Accordion>
+
+      <StyledPrimaryButton
         icon={() => <Icon name={'Search'} />}
         align={ICON_ALIGNMENT.LEFT}
         id="search"
         key="search"
         disabled={isDisable}
+        onClick={() => {
+          dispatch(
+            setAdvancedSearchParam({
+              ...transformAdvancedSearchLocalStateToStoreData(
+                formState,
+                offlineData
+              ),
+              event: 'death'
+            })
+          )
+          dispatch(goToAdvancedSearchResult())
+        }}
       >
         {intl.formatMessage(buttonMessages.search)}
-      </PrimaryButton>
+      </StyledPrimaryButton>
     </>
   )
 }
 
 const AdvancedSearch = () => {
   const intl = useIntl()
-  const [activeTabId, setActiveTabId] = useState(TabId.BIRTH)
+  const advancedSearchParamState = useSelector(AdvancedSearchParamsSelector)
+  const activeTabId = advancedSearchParamState.event || TabId.BIRTH
+  const dispatch = useDispatch()
 
   const tabSections = [
     {
@@ -223,12 +492,19 @@ const AdvancedSearch = () => {
             <FormTabs
               sections={tabSections}
               activeTabId={activeTabId}
-              onTabClick={(id: TabId) => setActiveTabId(id)}
+              onTabClick={(id: TabId) => {
+                dispatch(
+                  setAdvancedSearchParam({
+                    ...advancedSearchParamState,
+                    event: id
+                  })
+                )
+              }}
             />
           }
         >
-          {activeTabId === TabId.BIRTH && <BirthTabContent />}
-          {activeTabId === TabId.DEATH && <DeathTabContent />}
+          {activeTabId === TabId.BIRTH && <BirthSection />}
+          {activeTabId === TabId.DEATH && <DeathSection />}
         </Content>
       </SysAdminContentWrapper>
     </>

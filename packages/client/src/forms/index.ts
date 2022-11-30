@@ -620,12 +620,11 @@ export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
 
 export interface ILocationSearchInputFormField extends IFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
+  searchableResource: Array<
+    Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>
   >
   locationList?: ISearchLocation[]
-  searchableType: string
+  searchableType: string | string[]
   dispatchOptions?: IDispatchOptions
   dynamicOptions?: IDynamicOptions
 }
@@ -1183,11 +1182,10 @@ export interface Ii18nSimpleDocumentUploaderFormField
 
 export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
+  searchableResource: Array<
+    Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>
   >
-  searchableType: string
+  searchableType: string | string[]
   locationList?: ISearchLocation[]
   dispatchOptions?: IDispatchOptions
 

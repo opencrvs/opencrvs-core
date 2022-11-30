@@ -12,7 +12,6 @@
 import * as React from 'react'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
-import { Accordion } from '@opencrvs/components/lib/Accordion'
 import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
@@ -125,6 +124,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
+import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -340,34 +340,6 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={value as string}
           notice={fieldDefinition.notice}
-        />
-      </InputField>
-    )
-  }
-
-  if (
-    fieldDefinition.type === ACCORDION_WITH_NESTED_FIELDS &&
-    nestedFields &&
-    resetNestedInputValues
-  ) {
-    return (
-      <InputField {...inputFieldProps}>
-        <Accordion
-          {...inputProps}
-          onChange={(val: string) => {
-            resetNestedInputValues(fieldDefinition)
-            onSetFieldValue(
-              `${fieldDefinition.name}.value`,
-              val === 'no' ? 'yes' : 'no'
-            )
-          }}
-          label={fieldDefinition.label}
-          nestedFields={nestedFields}
-          options={fieldDefinition.options}
-          name={fieldDefinition.name}
-          value={value as string}
-          showLabel={intl.formatMessage(fieldDefinition.showLabel) as string}
-          hideLabel={intl.formatMessage(fieldDefinition.hideLabel) as string}
         />
       </InputField>
     )
@@ -692,6 +664,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
+  initialValues?: IBaseAdvancedSearchState
 }
 
 interface IStateProps {
@@ -907,7 +880,6 @@ class FormSectionComponent extends React.Component<Props> {
               touched[`${field.name}-mm`] &&
               touched[`${field.name}-yyyy`]
           }
-
           const withDynamicallyGeneratedFields =
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
               ? ({
@@ -982,16 +954,19 @@ class FormSectionComponent extends React.Component<Props> {
               ? {
                   ...field,
                   locationList: generateLocations(
-                    getListOfLocations(
-                      offlineCountryConfig,
-                      field.searchableResource
-                    ),
+                    field.searchableResource.reduce((locations, resource) => {
+                      return {
+                        ...locations,
+                        ...getListOfLocations(offlineCountryConfig, resource)
+                      }
+                    }, {}),
                     intl,
                     undefined,
-                    [field.searchableType as LocationType]
+                    field.searchableType as LocationType[]
                   )
                 }
               : field
+
           if (
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
@@ -1065,7 +1040,7 @@ class FormSectionComponent extends React.Component<Props> {
                         {(formikFieldProps: FieldProps<any>) => (
                           <GeneratedInputField
                             fieldDefinition={internationaliseFieldObject(intl, {
-                              ...nestedField,
+                              ...withDynamicallyGeneratedFields,
                               name: nestedFieldName
                             })}
                             onSetFieldValue={setFieldValue}
@@ -1164,7 +1139,9 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionData
 >({
   mapPropsToValues: (props) =>
-    mapFieldsToValues(props.fields, props.userDetails),
+    props.initialValues
+      ? props.initialValues
+      : mapFieldsToValues(props.fields, props.userDetails),
   handleSubmit: (values) => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(

@@ -55,7 +55,7 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.registrationOffice,
           required: true,
           initialValue: '',
-          searchableResource: 'offices',
+          searchableResource: ['offices'],
           searchableType: 'CRVS_OFFICE',
           validate: [
             {

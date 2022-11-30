@@ -61,6 +61,7 @@ import { Roles } from '@client/utils/authUtils'
 import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
+import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -224,6 +225,12 @@ export class App extends React.Component<IAppProps> {
                                             roles={[Roles.LOCAL_REGISTRAR]}
                                             path={routes.ADVANCED_SEARCH}
                                             component={AdvancedSearchConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[Roles.LOCAL_REGISTRAR]}
+                                            path={routes.ADVANCED_SEARCH_RESULT}
+                                            component={AdvancedSearchResult}
                                           />
                                           <ProtectedRoute
                                             exact
