@@ -334,6 +334,7 @@ export interface IMosipSeederResponse {
 export async function getMosipUINToken(
   patient: fhir.Patient
 ): Promise<IMosipSeederResponse> {
+  logger.info(`getMosipUINToken: ${JSON.stringify(patient)}`)
   let submittedNationalIDInForm = ''
   const identifiers = patient?.identifier?.filter(
     (identifier: fhir.Identifier) => {
