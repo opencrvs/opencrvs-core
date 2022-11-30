@@ -502,3 +502,31 @@ export async function declarationViewedHandler(
   await createUserAuditPointFromFHIR('VIEWED', request)
   return h.response().code(200)
 }
+export async function birthDeclarationArchivedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ARCHIVED', request)
+  return h.response().code(200)
+}
+export async function deathDeclarationArchivedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ARCHIVED', request)
+  return h.response().code(200)
+}
+export async function birthDeclarationReinstatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('REINSTATED', request)
+  return h.response().code(200)
+}
+export async function deathDeclarationReinstatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('REINSTATED', request)
+  return h.response().code(200)
+}

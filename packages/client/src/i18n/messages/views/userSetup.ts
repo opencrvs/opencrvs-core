@@ -72,6 +72,7 @@ interface IUserSetupMessages
   userNameReminderAuditAction: MessageDescriptor
   retrievedAuditAction: MessageDescriptor
   viewedAuditAction: MessageDescriptor
+  reinstatedAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -372,6 +373,11 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Viewed',
     description: 'Description for declaration viewed audit action',
     id: 'user.profile.auditList.viewed'
+  },
+  reinstatedAuditAction: {
+    defaultMessage: 'Reinstated',
+    description: 'Description for declaration reinstated audit action',
+    id: 'user.profile.auditList.reinstated'
   }
 }
 

@@ -33,6 +33,8 @@ type UserAuditAction =
   | 'UNASSIGNED'
   | 'RETRIEVED'
   | 'VIEWED'
+  | 'ARCHIVED'
+  | 'REINSTATED'
 
 type RawUserAuditDataPoint = {
   practitionerId: number
@@ -65,6 +67,8 @@ type UserAuditDataPoint =
   | UserAuditDataPointWithComposition<'UNASSIGNED'>
   | UserAuditDataPointWithComposition<'RETRIEVED'>
   | UserAuditDataPointWithComposition<'VIEWED'>
+  | UserAuditDataPointWithComposition<'ARCHIVED'>
+  | UserAuditDataPointWithComposition<'REINSTATED'>
 
 export async function createUserAuditPointFromFHIR(
   action: UserAuditAction,
