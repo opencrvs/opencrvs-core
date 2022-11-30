@@ -76,15 +76,13 @@ import { convertToMSISDN } from '@client/forms/utils'
 import { DownloadAction } from '@client/forms'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
-import {
-  isAdvancedSearchFormValid,
-  transformReduxDataToLocalState
-} from '@client/views//SearchResult/AdvancedSearch'
+import { isAdvancedSearchFormValid } from '@client/views//SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import {
   advancedSearchPillKey,
-  getFormattedAdvanceSearchParamPills
+  getFormattedAdvanceSearchParamPills,
+  transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
 
 const SearchParamPillsContainer = styled.div`
@@ -141,7 +139,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
 
   const isEnoughParams = () => {
     return isAdvancedSearchFormValid(
-      transformReduxDataToLocalState(
+      transformStoreDataToAdvancedSearchLocalState(
         advancedSearchParamsState,
         offlineData,
         advancedSearchParamsState.event || 'birth'

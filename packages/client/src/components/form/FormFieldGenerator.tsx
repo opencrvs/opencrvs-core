@@ -124,7 +124,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
-import { IBaseAdvancedSearchState } from '@client/views/SearchResult/AdvancedSearch'
+import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }

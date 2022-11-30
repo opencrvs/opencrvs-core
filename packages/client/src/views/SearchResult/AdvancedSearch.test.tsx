@@ -63,7 +63,7 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
     store.dispatch(
       setAdvancedSearchParam({
         event: 'birth',
-        declarationLocationId: 'asda',
+        declarationLocationId: '0d8474da-0361-4d32-979e-af91f012340a',
         registrationStatuses: ['IN_PROGRESS']
       })
     )
