@@ -86,14 +86,6 @@ export interface IEventDurationResponse {
   status: string
   durationInSeconds: number
 }
-
-export enum FHIR_RESOURCE_TYPE {
-  COMPOSITION = 'Composition',
-  TASK = 'Task',
-  ENCOUNTER = 'Encounter',
-  PAYMENT_RECONCILIATION = 'PaymentReconciliation'
-}
-
 export function findCompositionSectionInBundle(
   code: string,
   fhirBundle: ITemplatedBundle

@@ -74,7 +74,6 @@ interface IUserSetupMessages
   reInstatedInProgressAuditAction: MessageDescriptor
   reInstatedInReviewAuditAction: MessageDescriptor
   reInStatedRejectedAuditAction: MessageDescriptor
-  retrieveAuditAction: MessageDescriptor
   sentForApprovalAuditAction: MessageDescriptor
 }
 
@@ -384,17 +383,11 @@ const messagesToDefine: IUserSetupMessages = {
       'Description for sending registration from Reinstated to In review audit action',
     id: 'user.profile.auditList.reInstatedToInReview'
   },
-  retrieveAuditAction: {
-    defaultMessage: 'Retrieved',
-    description:
-      'Description for Retrieving registration to In review audit action',
-    id: 'user.profile.auditList.retrieve'
-  },
   reInStatedRejectedAuditAction: {
     defaultMessage: 'Reinstated to Require Updates',
     description:
       'Description for sending registration from Reinstated to require updates audit action',
-    id: 'user.profile.auditList.reInstatedToInReview'
+    id: 'user.profile.auditList.reInstatedToUpdate'
   },
   sentForApprovalAuditAction: {
     defaultMessage: 'Sent For Approval',

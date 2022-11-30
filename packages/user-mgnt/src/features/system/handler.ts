@@ -328,24 +328,6 @@ export async function getSystemHandler(
   }
 }
 
-export async function getAllSystemsHandler() {
-  const systems: ISystemModel[] = await System.find()
-  const allSystemsResponseArray: AllSystemResponse[] = []
-
-  systems.forEach((system) => {
-    const allSystemsResponse = {} as AllSystemResponse
-    const systemName = `${system.name[0]?.given || ''} ${
-      system.name[0]?.family || ''
-    }`.trim()
-    allSystemsResponse.client_id = system.client_id
-    allSystemsResponse.name = systemName
-    allSystemsResponse.sha_secret = system.sha_secret
-    allSystemsResponse.status = system.status
-    allSystemsResponseArray.push(allSystemsResponse)
-  })
-  return allSystemsResponseArray
-}
-
 export const getSystemRequestSchema = Joi.object({
   systemId: Joi.string()
 })

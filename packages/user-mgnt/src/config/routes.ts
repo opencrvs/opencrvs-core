@@ -61,8 +61,7 @@ import {
   verifySystemResSchema,
   getSystemRequestSchema,
   getSystemResponseSchema,
-  getSystemHandler,
-  getAllSystemsHandler
+  getSystemHandler
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -561,16 +560,6 @@ export const getRoutes = () => {
         }
       }
     },
-    {
-      method: 'GET',
-      path: '/getAllSystems',
-      handler: getAllSystemsHandler,
-      config: {
-        tags: ['api'],
-        description: 'Returns all systems '
-      }
-    },
-
     {
       method: 'GET',
       path: '/countUsersByLocation',
