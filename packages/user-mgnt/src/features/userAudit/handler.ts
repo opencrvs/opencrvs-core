@@ -20,6 +20,7 @@ import { statuses } from '@user-mgnt/utils/userUtils'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 interface IAuditUserPayload {
   userId: string
@@ -34,8 +35,13 @@ export async function userAuditHandler(
   h: Hapi.ResponseToolkit
 ) {
   const auditUserPayload = request.payload as IAuditUserPayload
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   const user: IUserModel | null = await User.findById(auditUserPayload.userId)
+
   if (!user) {
     logger.error(
       `No user details found for requested userId: ${auditUserPayload.userId}`
@@ -87,6 +93,28 @@ export async function userAuditHandler(
       user.auditHistory = [auditData]
     }
 
+    if (
+      AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE ||
+      AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.DEACTIVATE
+    ) {
+      let action
+      if (AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE) {
+        action = 'REACTIVATE'
+      } else {
+        action = 'DEACTIVATE'
+      }
+
+      try {
+        await postUserActionToMetrics(
+          action,
+          request.headers.authorization,
+          remoteAddress,
+          userAgent
+        )
+      } catch (err) {
+        logger.error(err)
+      }
+    }
     try {
       await User.update({ _id: user._id }, user)
     } catch (err) {

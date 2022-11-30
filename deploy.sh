@@ -112,6 +112,16 @@ if [ -z "$ELASTICSEARCH_SUPERUSER_PASSWORD" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$MINIO_ROOT_USER" ] ; then
+    echo 'Error: Missing environment variable MINIO_ROOT_USER.'
+    print_usage_and_exit
+fi
+
+if [ -z "$MINIO_ROOT_PASSWORD" ] ; then
+    echo 'Error: Missing environment variable MINIO_ROOT_PASSWORD.'
+    print_usage_and_exit
+fi
+
 if [ -z "$MONGODB_ADMIN_USER" ] ; then
     echo 'Error: Missing environment variable MONGODB_ADMIN_USER.'
     print_usage_and_exit
@@ -166,15 +176,13 @@ generate_password() {
   echo $password
 }
 
-# Create new passwords for all MongoDB users created in
-# infrastructure/mongodb/docker-entrypoint-initdb.d/create-mongo-users.sh
-#
-# If you're adding a new MongoDB user, you'll need to also create a new update statement in
+# Create new passwords for all MongoDB users used in
 # infrastructure/mongodb/on-deploy.sh
 
 USER_MGNT_MONGODB_PASSWORD=`generate_password`
 HEARTH_MONGODB_PASSWORD=`generate_password`
 CONFIG_MONGODB_PASSWORD=`generate_password`
+METRICS_MONGODB_PASSWORD=`generate_password`
 OPENHIM_MONGODB_PASSWORD=`generate_password`
 WEBHOOKS_MONGODB_PASSWORD=`generate_password`
 
@@ -238,6 +246,8 @@ ssh $SSH_USER@$SSH_HOST "SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME
 
 # Takes in a space separated string of docker-compose.yml files
 # returns a new line separated list of images defined in those files
+# This function gets a clean list of images and substitutes environment variables
+# So that we have a clean list to download
 get_docker_tags_from_compose_files() {
    COMPOSE_FILES=$1
 
@@ -298,6 +308,7 @@ docker_stack_deploy() {
 
 
   ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS=$(echo "$environment_compose" | sed "s|docker-compose.countryconfig|$COUNTRY_CONFIG_PATH/docker-compose.countryconfig|")
+  REPLICAS_COMPOSE_WITH_LOCAL_PATHS=$(echo "$replicas_compose" | sed "s|docker-compose.countryconfig|$COUNTRY_CONFIG_PATH/docker-compose.countryconfig|")
 
   ENV_VARIABLES="HOSTNAME=$HOST
   VERSION=$VERSION
@@ -306,10 +317,13 @@ docker_stack_deploy() {
   USER_MGNT_MONGODB_PASSWORD=$USER_MGNT_MONGODB_PASSWORD
   HEARTH_MONGODB_PASSWORD=$HEARTH_MONGODB_PASSWORD
   CONFIG_MONGODB_PASSWORD=$CONFIG_MONGODB_PASSWORD
+  METRICS_MONGODB_PASSWORD=$METRICS_MONGODB_PASSWORD
   OPENHIM_MONGODB_PASSWORD=$OPENHIM_MONGODB_PASSWORD
   WEBHOOKS_MONGODB_PASSWORD=$WEBHOOKS_MONGODB_PASSWORD
   MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER
   MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD
+  MINIO_ROOT_USER=$MINIO_ROOT_USER
+  MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
   DOCKERHUB_ACCOUNT=$DOCKERHUB_ACCOUNT
   DOCKERHUB_REPO=$DOCKERHUB_REPO
   ELASTICSEARCH_SUPERUSER_PASSWORD=$ELASTICSEARCH_SUPERUSER_PASSWORD
@@ -325,7 +339,7 @@ docker_stack_deploy() {
   echo "Pulling all docker images. This might take a while"
 
   EXISTING_IMAGES=$(ssh $SSH_USER@$SSH_HOST "docker images --format '{{.Repository}}:{{.Tag}}'")
-  IMAGE_TAGS_TO_DOWNLOAD=$(get_docker_tags_from_compose_files "$SHARED_COMPOSE_FILES $ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS $replicas_compose")
+  IMAGE_TAGS_TO_DOWNLOAD=$(get_docker_tags_from_compose_files "$SHARED_COMPOSE_FILES $ENVIRONMENT_COMPOSE_WITH_LOCAL_PATHS $REPLICAS_COMPOSE_WITH_LOCAL_PATHS")
 
   for tag in ${IMAGE_TAGS_TO_DOWNLOAD[@]}; do
     if [[ $EXISTING_IMAGES == *"$tag"* ]]; then

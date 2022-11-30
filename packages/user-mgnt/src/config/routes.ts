@@ -71,12 +71,18 @@ import * as Hapi from '@hapi/hapi'
 import resendSMSInviteHandler, {
   requestSchema as resendSMSRequestSchema
 } from '@user-mgnt/features/resendSMSInvite/handler'
+import usernameSMSReminderHandler, {
+  requestSchema as usernameSMSReminderRequestSchema
+} from '@user-mgnt/features/usernameSMSReminderInvite/handler'
 import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
 import * as Joi from 'joi'
 import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
 import getUserAvatar from '@user-mgnt/features/getAvatar/handler'
+import resetPasswordSMSHandler, {
+  requestSchema as resetPasswordRequestSchema
+} from '@user-mgnt/features/resstPassword/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -440,6 +446,36 @@ export const getRoutes = () => {
         },
         description:
           'Resend sms for given mobile number and make the corresponding user pending'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/usernameSMSReminder',
+      handler: usernameSMSReminderHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: usernameSMSReminderRequestSchema
+        },
+        description:
+          'Resend sms for given username and make the corresponding user pending'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/resetPasswordSMS',
+      handler: resetPasswordSMSHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: resetPasswordRequestSchema
+        },
+        description:
+          'Reset password via sms for given userid and make the corresponding user pending'
       }
     },
     {

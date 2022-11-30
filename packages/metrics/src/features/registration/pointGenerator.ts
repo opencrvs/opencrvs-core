@@ -30,7 +30,9 @@ import {
   IPaymentPoints,
   IDeclarationsStartedPoints,
   IRejectedPoints,
-  ICorrectionPoint
+  ICorrectionPoint,
+  IUserAuditTags,
+  IUserAuditFields
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -118,7 +120,7 @@ export const generateInCompleteFieldPoints = async (
         missingFieldGroupId: missingFieldIds[1],
         missingFieldId: missingFieldIds[2],
         eventType: getDeclarationType(task),
-        regStatus: 'IN_PROGESS',
+        regStatus: 'IN_PROGRESS',
         ...locationTags
       }
       return {
@@ -181,9 +183,7 @@ export const generateBirthRegPoint = async (
   if (!child) {
     throw new Error('No child found!')
   }
-
   const composition = getComposition(payload)
-
   if (!composition) {
     throw new Error('Composition not found')
   }
@@ -192,6 +192,7 @@ export const generateBirthRegPoint = async (
     payload,
     authHeader
   )
+  const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
 
   const ageInDays =
     (child.birthDate &&
@@ -207,6 +208,7 @@ export const generateBirthRegPoint = async (
     regStatus: regStatus,
     eventLocationType: await getEncounterLocationType(payload, authHeader),
     gender: child.gender,
+    registrarPractitionerId,
     practitionerRole,
     ageLabel: (ageInDays && getAgeLabel(ageInDays)) || undefined,
     dateLabel: !Number.isNaN(compositionDate.getTime())
@@ -260,6 +262,8 @@ export const generateDeathRegPoint = async (
     authHeader
   )
 
+  const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
+
   const deathDays =
     (deceased.deceasedDateTime &&
       getDurationInDays(
@@ -284,6 +288,7 @@ export const generateDeathRegPoint = async (
     regStatus: regStatus,
     gender: deceased.gender,
     practitionerRole,
+    registrarPractitionerId,
     ageLabel:
       (deceasedAgeInDays && getAgeLabel(deceasedAgeInDays)) || undefined,
     timeLabel:
@@ -618,5 +623,29 @@ export async function generateRejectedPoints(
     tags,
     fields,
     timestamp: toInfluxTimestamp(task.lastModified)
+  }
+}
+
+export const generateAuditPoint = (
+  practitionerId: string,
+  action: string,
+  ipAddress: string,
+  userAgent: string,
+  additionalData?: Record<string, any>
+): IPoints => {
+  const tags: IUserAuditTags = {
+    action: action,
+    practitionerId: practitionerId
+  }
+  const fields: IUserAuditFields = {
+    data: JSON.stringify(additionalData),
+    ipAddress: ipAddress,
+    userAgent: userAgent
+  }
+  return {
+    measurement: 'user_audit_event',
+    tags,
+    fields,
+    timestamp: toInfluxTimestamp(new Date())
   }
 }

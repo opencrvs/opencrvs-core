@@ -33,13 +33,19 @@ import {
 import * as _ from 'lodash'
 import { mockTask } from '@gateway/utils/testUtils'
 import { findExtension } from '@gateway/features/fhir/utils'
-import * as fetchAny from 'jest-fetch-mock'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { IAuthHeader } from '@gateway/common-types'
+import * as fetchMock from 'jest-fetch-mock'
 
+const fetch = fetchMock as fetchMock.FetchMock
 type AuthHeader = { Authorization?: string } & IAuthHeader
 test('should build a minimal FHIR registration document without error', async () => {
+  fetch.mockResponse(
+    JSON.stringify({
+      refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+    })
+  )
   const fhir = await buildFHIRBundle(
     {
       mother: {
@@ -172,7 +178,7 @@ test('should build a minimal FHIR registration document without error', async ()
               relationship: 'OTHER',
               affidavit: {
                 contentType: 'image/jpg',
-                data: 'ExampleData'
+                data: 'data:image/png;base64,2324256'
               },
               individual: {
                 name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
@@ -190,7 +196,7 @@ test('should build a minimal FHIR registration document without error', async ()
                 date: '2018-10-22'
               }
             ],
-            data: 'DUMMY-DATA'
+            data: 'data:image/png;base64,2324256'
           }
         ]
       },
@@ -508,7 +514,7 @@ test('should build a minimal FHIR registration document without error', async ()
     {
       attachment: {
         contentType: 'application/pdf',
-        data: 'DUMMY-DATA'
+        data: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
       }
     }
   ])
@@ -519,7 +525,7 @@ test('should build a minimal FHIR registration document without error', async ()
       url: 'http://opencrvs.org/specs/extension/relatedperson-affidavittype',
       valueAttachment: {
         contentType: 'image/jpg',
-        data: 'ExampleData'
+        data: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
       }
     }
   ])
@@ -718,6 +724,11 @@ test('should build a minimal FHIR registration document without error', async ()
 })
 
 test('should update a task document as rejected', async () => {
+  fetch.mockResponse(
+    JSON.stringify({
+      refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+    })
+  )
   const fhir = await updateFHIRTaskBundle(
     {
       fullUrl:
@@ -780,6 +791,11 @@ test('should update a task document as rejected', async () => {
 })
 
 test('creates task with contact other relationship', async () => {
+  fetch.mockResponse(
+    JSON.stringify({
+      refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+    })
+  )
   const simpleFhir: fhir.Bundle = await buildFHIRBundle(
     {
       registration: {
@@ -892,6 +908,11 @@ test('creates task with contact other relationship', async () => {
 })
 
 test('should build bundle for correction fhir builders', async () => {
+  fetch.mockResponse(
+    JSON.stringify({
+      refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
+    })
+  )
   const fhir = await buildFHIRBundle(
     {
       child: {
@@ -1000,7 +1021,7 @@ describe('taskBundleWithExtension()', () => {
 })
 
 describe('checkUserAssignment()', () => {
-  const fetch = fetchAny as fetchAny.FetchMock
+  const fetch = fetchMock as fetchMock.FetchMock
   const registerCertifyToken = jwt.sign(
     { scope: ['register', 'certify'] },
     readFileSync('../auth/test/cert.key'),

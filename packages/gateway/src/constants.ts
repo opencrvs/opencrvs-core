@@ -14,6 +14,7 @@ export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 7070
 export const HOSTNAME = process.env.DOMAIN || '*'
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
+export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
@@ -30,6 +31,8 @@ export const NOTIFICATION_URL =
 export const WORKFLOW_URL = process.env.WORKFLOW_URL || 'http://localhost:5050/'
 export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
+export const DOCUMENTS_URL =
+  process.env.DOCUMENTS_URL || 'http://localhost:9050'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
@@ -63,3 +66,4 @@ export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS = process.env
   ? parseInt(process.env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS, 10)
   : 600
 export const DEFAULT_TIMEOUT = 600000
+export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'

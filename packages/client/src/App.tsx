@@ -42,7 +42,6 @@ import { CompletenessRates } from '@client/views/SysAdmin/Performance/Completene
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { UserProfile } from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { ApolloClient, ApolloProvider } from '@apollo/client'
 import { ConnectedRouter } from 'connected-react-router'
@@ -59,7 +58,10 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import VSExport from './views/SysAdmin/Performance/Vsexports/VSExport'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
+import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { UserAudit } from '@client/views/UserAudit/UserAudit'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -351,6 +353,15 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.VS_EXPORTS}
+                                            component={VSExport}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={
                                               routes.EVENT_COMPLETENESS_RATES
                                             }
@@ -371,7 +382,14 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.USER_PROFILE}
-                                            component={UserProfile}
+                                            component={UserAudit}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.PERFORMANCE_REGISTRATIONS_LIST
+                                            }
+                                            component={RegistrationList}
                                           />
 
                                           <ProtectedRoute

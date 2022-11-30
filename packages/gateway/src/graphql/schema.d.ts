@@ -34,6 +34,8 @@ export interface GQLQuery {
   searchFieldAgents?: GQLSearchFieldAgentResult
   verifyPasswordById?: GQLVerifyPasswordResult
   getTotalMetrics?: GQLTotalMetricsResult
+  getRegistrationsListByFilter?: GQLMixedTotalMetricsResult
+  getVSExports?: GQLTotalVSExport
   getTotalPayments?: Array<GQLPaymentMetric>
   getTotalCertifications?: Array<GQLCertificationMetric>
   getTotalCorrections?: Array<GQLCorrectionMetric>
@@ -41,7 +43,7 @@ export interface GQLQuery {
   getDeclarationsStartedMetrics?: GQLDeclarationsStartedMetrics
   fetchMonthWiseEventMetrics?: Array<GQLMonthWiseEstimationMetric>
   fetchLocationWiseEventMetrics?: Array<GQLLocationWiseEstimationMetric>
-  fetchTimeLoggedMetricsByPractitioner?: GQLTimeLoggedMetricsResultSet
+  getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   searchRecord?: GQLEventProgressResultSet
@@ -80,6 +82,8 @@ export interface GQLMutation {
   changeAvatar?: GQLAvatar
   auditUser?: string
   resendSMSInvite?: string
+  usernameSMSReminder?: string
+  resetPasswordSMS?: string
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
   createFormDraft?: GQLFormDraft
@@ -264,6 +268,28 @@ export interface GQLTotalMetricsResult {
   results: Array<GQLEventMetrics>
 }
 
+export type GQLMixedTotalMetricsResult =
+  | GQLTotalMetricsByRegistrar
+  | GQLTotalMetricsByLocation
+  | GQLTotalMetricsByTime
+
+/** Use this to resolve union type MixedTotalMetricsResult */
+export type GQLPossibleMixedTotalMetricsResultTypeNames =
+  | 'TotalMetricsByRegistrar'
+  | 'TotalMetricsByLocation'
+  | 'TotalMetricsByTime'
+
+export interface GQLMixedTotalMetricsResultNameMap {
+  MixedTotalMetricsResult: GQLMixedTotalMetricsResult
+  TotalMetricsByRegistrar: GQLTotalMetricsByRegistrar
+  TotalMetricsByLocation: GQLTotalMetricsByLocation
+  TotalMetricsByTime: GQLTotalMetricsByTime
+}
+
+export interface GQLTotalVSExport {
+  results?: Array<GQLVSExport>
+}
+
 export interface GQLPaymentMetric {
   total: number
   paymentType: string
@@ -311,9 +337,9 @@ export interface GQLLocationWiseEstimationMetric {
   locationName: string
 }
 
-export interface GQLTimeLoggedMetricsResultSet {
-  results?: Array<GQLTimeLoggedMetrics | null>
-  totalItems?: number
+export interface GQLUserAuditLogResultSet {
+  total: number
+  results: Array<GQLUserAuditLogResultItem>
 }
 
 export interface GQLEventSearchResultSet {
@@ -768,11 +794,42 @@ export interface GQLEventMetrics {
   practitionerRole: string
 }
 
-export interface GQLTimeLoggedMetrics {
-  status: string
-  trackingId?: string
-  eventType: string
-  time: string
+export interface GQLTotalMetricsByRegistrar {
+  results: Array<GQLEventMetricsByRegistrar>
+  total?: number
+}
+
+export interface GQLTotalMetricsByLocation {
+  results: Array<GQLEventMetricsByLocation>
+  total?: number
+}
+
+export interface GQLTotalMetricsByTime {
+  results: Array<GQLEventMetricsByTime>
+  total?: number
+}
+
+export interface GQLVSExport {
+  event: string
+  year: number
+  fileSize: string
+  url: string
+  createdOn: string
+}
+
+export type GQLUserAuditLogResultItem =
+  | GQLUserAuditLogItemWithComposition
+  | GQLUserAuditLogItem
+
+/** Use this to resolve union type UserAuditLogResultItem */
+export type GQLPossibleUserAuditLogResultItemTypeNames =
+  | 'UserAuditLogItemWithComposition'
+  | 'UserAuditLogItem'
+
+export interface GQLUserAuditLogResultItemNameMap {
+  UserAuditLogResultItem: GQLUserAuditLogResultItem
+  UserAuditLogItemWithComposition: GQLUserAuditLogItemWithComposition
+  UserAuditLogItem: GQLUserAuditLogItem
 }
 
 export interface GQLEventSearchSet {
@@ -1141,6 +1198,50 @@ export const enum GQLAttachmentSubject {
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF'
 }
 
+export interface GQLEventMetricsByRegistrar {
+  registrarPractitioner?: GQLUser
+  total: number
+  late: number
+  delayed: number
+}
+
+export interface GQLEventMetricsByLocation {
+  location: GQLLocation
+  total: number
+  late: number
+  delayed: number
+  home: number
+  healthFacility: number
+}
+
+export interface GQLEventMetricsByTime {
+  total: number
+  late: number
+  delayed: number
+  home: number
+  healthFacility: number
+  month: string
+  time: string
+}
+
+export interface GQLUserAuditLogItemWithComposition
+  extends GQLAuditLogItemBase {
+  time: string
+  ipAddress: string
+  userAgent: string
+  action: string
+  practitionerId: string
+  data: GQLAdditionalIdWithCompositionId
+}
+
+export interface GQLUserAuditLogItem extends GQLAuditLogItemBase {
+  time: string
+  ipAddress: string
+  userAgent: string
+  action: string
+  practitionerId: string
+}
+
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
@@ -1323,6 +1424,30 @@ export interface GQLPayment {
   date?: GQLDate
 }
 
+export interface GQLAuditLogItemBase {
+  time: string
+  ipAddress: string
+  userAgent: string
+  action: string
+  practitionerId: string
+}
+
+/** Use this to resolve interface type AuditLogItemBase */
+export type GQLPossibleAuditLogItemBaseTypeNames =
+  | 'UserAuditLogItemWithComposition'
+  | 'UserAuditLogItem'
+
+export interface GQLAuditLogItemBaseNameMap {
+  AuditLogItemBase: GQLAuditLogItemBase
+  UserAuditLogItemWithComposition: GQLUserAuditLogItemWithComposition
+  UserAuditLogItem: GQLUserAuditLogItem
+}
+
+export interface GQLAdditionalIdWithCompositionId {
+  compositionId: string
+  trackingId: string
+}
+
 export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
@@ -1393,6 +1518,11 @@ export interface GQLResolver {
   SearchFieldAgentResult?: GQLSearchFieldAgentResultTypeResolver
   VerifyPasswordResult?: GQLVerifyPasswordResultTypeResolver
   TotalMetricsResult?: GQLTotalMetricsResultTypeResolver
+  MixedTotalMetricsResult?: {
+    __resolveType: GQLMixedTotalMetricsResultTypeResolver
+  }
+
+  TotalVSExport?: GQLTotalVSExportTypeResolver
   PaymentMetric?: GQLPaymentMetricTypeResolver
   CertificationMetric?: GQLCertificationMetricTypeResolver
   CorrectionMetric?: GQLCorrectionMetricTypeResolver
@@ -1400,7 +1530,7 @@ export interface GQLResolver {
   DeclarationsStartedMetrics?: GQLDeclarationsStartedMetricsTypeResolver
   MonthWiseEstimationMetric?: GQLMonthWiseEstimationMetricTypeResolver
   LocationWiseEstimationMetric?: GQLLocationWiseEstimationMetricTypeResolver
-  TimeLoggedMetricsResultSet?: GQLTimeLoggedMetricsResultSetTypeResolver
+  UserAuditLogResultSet?: GQLUserAuditLogResultSetTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   Role?: GQLRoleTypeResolver
@@ -1429,7 +1559,14 @@ export interface GQLResolver {
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
-  TimeLoggedMetrics?: GQLTimeLoggedMetricsTypeResolver
+  TotalMetricsByRegistrar?: GQLTotalMetricsByRegistrarTypeResolver
+  TotalMetricsByLocation?: GQLTotalMetricsByLocationTypeResolver
+  TotalMetricsByTime?: GQLTotalMetricsByTimeTypeResolver
+  VSExport?: GQLVSExportTypeResolver
+  UserAuditLogResultItem?: {
+    __resolveType: GQLUserAuditLogResultItemTypeResolver
+  }
+
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
   }
@@ -1447,6 +1584,11 @@ export interface GQLResolver {
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
+  EventMetricsByRegistrar?: GQLEventMetricsByRegistrarTypeResolver
+  EventMetricsByLocation?: GQLEventMetricsByLocationTypeResolver
+  EventMetricsByTime?: GQLEventMetricsByTimeTypeResolver
+  UserAuditLogItemWithComposition?: GQLUserAuditLogItemWithCompositionTypeResolver
+  UserAuditLogItem?: GQLUserAuditLogItemTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   OperationHistorySearchSet?: GQLOperationHistorySearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
@@ -1455,6 +1597,11 @@ export interface GQLResolver {
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
+  AuditLogItemBase?: {
+    __resolveType: GQLAuditLogItemBaseTypeResolver
+  }
+
+  AdditionalIdWithCompositionId?: GQLAdditionalIdWithCompositionIdTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
@@ -1479,6 +1626,8 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   getTotalMetrics?: QueryToGetTotalMetricsResolver<TParent>
+  getRegistrationsListByFilter?: QueryToGetRegistrationsListByFilterResolver<TParent>
+  getVSExports?: QueryToGetVSExportsResolver<TParent>
   getTotalPayments?: QueryToGetTotalPaymentsResolver<TParent>
   getTotalCertifications?: QueryToGetTotalCertificationsResolver<TParent>
   getTotalCorrections?: QueryToGetTotalCorrectionsResolver<TParent>
@@ -1486,7 +1635,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getDeclarationsStartedMetrics?: QueryToGetDeclarationsStartedMetricsResolver<TParent>
   fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
-  fetchTimeLoggedMetricsByPractitioner?: QueryToFetchTimeLoggedMetricsByPractitionerResolver<TParent>
+  getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   searchRecord?: QueryToSearchRecordResolver<TParent>
@@ -1846,6 +1995,31 @@ export interface QueryToGetTotalMetricsResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface QueryToGetRegistrationsListByFilterArgs {
+  timeStart: string
+  timeEnd: string
+  locationId?: string
+  event: string
+  filterBy: string
+  skip: number
+  size: number
+}
+export interface QueryToGetRegistrationsListByFilterResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToGetRegistrationsListByFilterArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetVSExportsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface QueryToGetTotalPaymentsArgs {
   timeStart: string
   timeEnd: string
@@ -1965,20 +2139,17 @@ export interface QueryToFetchLocationWiseEventMetricsResolver<
   ): TResult
 }
 
-export interface QueryToFetchTimeLoggedMetricsByPractitionerArgs {
-  timeStart: string
-  timeEnd: string
+export interface QueryToGetUserAuditLogArgs {
   practitionerId: string
-  locationId: string
+  skip?: number
   count: number
+  timeStart?: string
+  timeEnd?: string
 }
-export interface QueryToFetchTimeLoggedMetricsByPractitionerResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface QueryToGetUserAuditLogResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToFetchTimeLoggedMetricsByPractitionerArgs,
+    args: QueryToGetUserAuditLogArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2137,6 +2308,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   changeAvatar?: MutationToChangeAvatarResolver<TParent>
   auditUser?: MutationToAuditUserResolver<TParent>
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
+  usernameSMSReminder?: MutationToUsernameSMSReminderResolver<TParent>
+  resetPasswordSMS?: MutationToResetPasswordSMSResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   createFormDraft?: MutationToCreateFormDraftResolver<TParent>
@@ -2570,6 +2743,37 @@ export interface MutationToResendSMSInviteResolver<
   (
     parent: TParent,
     args: MutationToResendSMSInviteArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUsernameSMSReminderArgs {
+  userId: string
+}
+export interface MutationToUsernameSMSReminderResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToUsernameSMSReminderArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToResetPasswordSMSArgs {
+  userId: string
+  applicationName: string
+}
+export interface MutationToResetPasswordSMSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToResetPasswordSMSArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3456,6 +3660,25 @@ export interface TotalMetricsResultToResultsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLMixedTotalMetricsResultTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'TotalMetricsByRegistrar'
+    | 'TotalMetricsByLocation'
+    | 'TotalMetricsByTime'
+    | Promise<
+        | 'TotalMetricsByRegistrar'
+        | 'TotalMetricsByLocation'
+        | 'TotalMetricsByTime'
+      >
+}
+export interface GQLTotalVSExportTypeResolver<TParent = any> {
+  results?: TotalVSExportToResultsResolver<TParent>
+}
+
+export interface TotalVSExportToResultsResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLPaymentMetricTypeResolver<TParent = any> {
   total?: PaymentMetricToTotalResolver<TParent>
   paymentType?: PaymentMetricToPaymentTypeResolver<TParent>
@@ -3679,19 +3902,19 @@ export interface LocationWiseEstimationMetricToLocationNameResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLTimeLoggedMetricsResultSetTypeResolver<TParent = any> {
-  results?: TimeLoggedMetricsResultSetToResultsResolver<TParent>
-  totalItems?: TimeLoggedMetricsResultSetToTotalItemsResolver<TParent>
+export interface GQLUserAuditLogResultSetTypeResolver<TParent = any> {
+  total?: UserAuditLogResultSetToTotalResolver<TParent>
+  results?: UserAuditLogResultSetToResultsResolver<TParent>
 }
 
-export interface TimeLoggedMetricsResultSetToResultsResolver<
+export interface UserAuditLogResultSetToTotalResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeLoggedMetricsResultSetToTotalItemsResolver<
+export interface UserAuditLogResultSetToResultsResolver<
   TParent = any,
   TResult = any
 > {
@@ -4786,38 +5009,97 @@ export interface EventMetricsToPractitionerRoleResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLTimeLoggedMetricsTypeResolver<TParent = any> {
-  status?: TimeLoggedMetricsToStatusResolver<TParent>
-  trackingId?: TimeLoggedMetricsToTrackingIdResolver<TParent>
-  eventType?: TimeLoggedMetricsToEventTypeResolver<TParent>
-  time?: TimeLoggedMetricsToTimeResolver<TParent>
+export interface GQLTotalMetricsByRegistrarTypeResolver<TParent = any> {
+  results?: TotalMetricsByRegistrarToResultsResolver<TParent>
+  total?: TotalMetricsByRegistrarToTotalResolver<TParent>
 }
 
-export interface TimeLoggedMetricsToStatusResolver<
+export interface TotalMetricsByRegistrarToResultsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeLoggedMetricsToTrackingIdResolver<
+export interface TotalMetricsByRegistrarToTotalResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeLoggedMetricsToEventTypeResolver<
+export interface GQLTotalMetricsByLocationTypeResolver<TParent = any> {
+  results?: TotalMetricsByLocationToResultsResolver<TParent>
+  total?: TotalMetricsByLocationToTotalResolver<TParent>
+}
+
+export interface TotalMetricsByLocationToResultsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface TimeLoggedMetricsToTimeResolver<TParent = any, TResult = any> {
+export interface TotalMetricsByLocationToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLTotalMetricsByTimeTypeResolver<TParent = any> {
+  results?: TotalMetricsByTimeToResultsResolver<TParent>
+  total?: TotalMetricsByTimeToTotalResolver<TParent>
+}
+
+export interface TotalMetricsByTimeToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface TotalMetricsByTimeToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLVSExportTypeResolver<TParent = any> {
+  event?: VSExportToEventResolver<TParent>
+  year?: VSExportToYearResolver<TParent>
+  fileSize?: VSExportToFileSizeResolver<TParent>
+  url?: VSExportToUrlResolver<TParent>
+  createdOn?: VSExportToCreatedOnResolver<TParent>
+}
+
+export interface VSExportToEventResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToYearResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToFileSizeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToUrlResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToCreatedOnResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLUserAuditLogResultItemTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'UserAuditLogItemWithComposition'
+    | 'UserAuditLogItem'
+    | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>
+}
 export interface GQLEventSearchSetTypeResolver<TParent = any> {
   (parent: TParent, context: any, info: GraphQLResolveInfo):
     | 'BirthEventSearchSet'
@@ -5152,6 +5434,242 @@ export interface InputOutputToValueIdResolver<TParent = any, TResult = any> {
 }
 
 export interface InputOutputToValueStringResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventMetricsByRegistrarTypeResolver<TParent = any> {
+  registrarPractitioner?: EventMetricsByRegistrarToRegistrarPractitionerResolver<TParent>
+  total?: EventMetricsByRegistrarToTotalResolver<TParent>
+  late?: EventMetricsByRegistrarToLateResolver<TParent>
+  delayed?: EventMetricsByRegistrarToDelayedResolver<TParent>
+}
+
+export interface EventMetricsByRegistrarToRegistrarPractitionerResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByRegistrarToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByRegistrarToLateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByRegistrarToDelayedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventMetricsByLocationTypeResolver<TParent = any> {
+  location?: EventMetricsByLocationToLocationResolver<TParent>
+  total?: EventMetricsByLocationToTotalResolver<TParent>
+  late?: EventMetricsByLocationToLateResolver<TParent>
+  delayed?: EventMetricsByLocationToDelayedResolver<TParent>
+  home?: EventMetricsByLocationToHomeResolver<TParent>
+  healthFacility?: EventMetricsByLocationToHealthFacilityResolver<TParent>
+}
+
+export interface EventMetricsByLocationToLocationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToLateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToDelayedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToHomeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByLocationToHealthFacilityResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventMetricsByTimeTypeResolver<TParent = any> {
+  total?: EventMetricsByTimeToTotalResolver<TParent>
+  late?: EventMetricsByTimeToLateResolver<TParent>
+  delayed?: EventMetricsByTimeToDelayedResolver<TParent>
+  home?: EventMetricsByTimeToHomeResolver<TParent>
+  healthFacility?: EventMetricsByTimeToHealthFacilityResolver<TParent>
+  month?: EventMetricsByTimeToMonthResolver<TParent>
+  time?: EventMetricsByTimeToTimeResolver<TParent>
+}
+
+export interface EventMetricsByTimeToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByTimeToLateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByTimeToDelayedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByTimeToHomeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByTimeToHealthFacilityResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByTimeToMonthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsByTimeToTimeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLUserAuditLogItemWithCompositionTypeResolver<TParent = any> {
+  time?: UserAuditLogItemWithCompositionToTimeResolver<TParent>
+  ipAddress?: UserAuditLogItemWithCompositionToIpAddressResolver<TParent>
+  userAgent?: UserAuditLogItemWithCompositionToUserAgentResolver<TParent>
+  action?: UserAuditLogItemWithCompositionToActionResolver<TParent>
+  practitionerId?: UserAuditLogItemWithCompositionToPractitionerIdResolver<TParent>
+  data?: UserAuditLogItemWithCompositionToDataResolver<TParent>
+}
+
+export interface UserAuditLogItemWithCompositionToTimeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToIpAddressResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToUserAgentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToActionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToPractitionerIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemWithCompositionToDataResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLUserAuditLogItemTypeResolver<TParent = any> {
+  time?: UserAuditLogItemToTimeResolver<TParent>
+  ipAddress?: UserAuditLogItemToIpAddressResolver<TParent>
+  userAgent?: UserAuditLogItemToUserAgentResolver<TParent>
+  action?: UserAuditLogItemToActionResolver<TParent>
+  practitionerId?: UserAuditLogItemToPractitionerIdResolver<TParent>
+}
+
+export interface UserAuditLogItemToTimeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemToIpAddressResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemToUserAgentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemToActionResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserAuditLogItemToPractitionerIdResolver<
   TParent = any,
   TResult = any
 > {
@@ -5564,5 +6082,30 @@ export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
 }
 
 export interface PaymentToDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLAuditLogItemBaseTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'UserAuditLogItemWithComposition'
+    | 'UserAuditLogItem'
+    | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>
+}
+export interface GQLAdditionalIdWithCompositionIdTypeResolver<TParent = any> {
+  compositionId?: AdditionalIdWithCompositionIdToCompositionIdResolver<TParent>
+  trackingId?: AdditionalIdWithCompositionIdToTrackingIdResolver<TParent>
+}
+
+export interface AdditionalIdWithCompositionIdToCompositionIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AdditionalIdWithCompositionIdToTrackingIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }

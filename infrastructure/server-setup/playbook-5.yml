@@ -162,10 +162,21 @@
       tags:
         - swap.file.swapon
 
+    - name: Check mongo data directory
+      stat:
+        path: /data/mongo
+      register: mongo_data
+
     - name: 'Create mongo data directory'
       file:
         path: /data/mongo
         state: directory
+      when: not mongo_data.stat.exists
+
+    - name: Check mongo data backup directory
+      stat:
+        path: /data/backups/mongo
+      register: mongo_data_backup
 
     - name: 'Create mongo backup directory'
       file:
@@ -174,11 +185,17 @@
         group: 1000
         owner: 1000
         mode: g+rwx
+      when: not mongo_data_backup.stat.exists
 
     - name: 'Create traefik data directory'
       file:
         path: /data/traefik
         state: directory
+
+    - name: Check elasticsearch data directory
+      stat:
+        path: /data/elasticsearch
+      register: elasticsearch_data
 
     - name: 'Create elasticsearch data directory'
       file:
@@ -187,6 +204,12 @@
         group: 1000
         owner: 1000
         mode: g+rwx
+      when: not elasticsearch_data.stat.exists
+
+    - name: Check elasticsearch data backup directory
+      stat:
+        path: /data/backups/elasticsearch
+      register: elasticsearch_data_backup
 
     - name: 'Create elasticsearch backup directory'
       file:
@@ -194,7 +217,61 @@
         state: directory
         group: 1000
         owner: 1000
+        mode: g+rwx
+      when: not elasticsearch_data_backup.stat.exists
+
+    - name: Check influxdb data directory
+      stat:
+        path: /data/influxdb
+      register: influxdb_data
+
+    - name: 'Create influxdb data directory'
+      file:
+        path: /data/influxdb
+        state: directory
+      when: not influxdb_data.stat.exists
+
+    - name: Check influxdb data backup directory
+      stat:
+        path: /data/backups/influxdb
+      register: influxdb_data_backup
+
+    - name: 'Create influxdb backup directory'
+      file:
+        path: /data/backups/influxdb
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+      when: not influxdb_data_backup.stat.exists
+
+    - name: Check minio data directory
+      stat:
+        path: /data/minio
+      register: minio_data
+
+    - name: 'Create minio data directory'
+      file:
+        path: /data/minio
+        state: directory
+        group: 1000
+        owner: 1000
         mode: ugo+rwx
+      when: not minio_data.stat.exists
+
+    - name: Check minio data backup directory
+      stat:
+        path: /data/backups/minio
+      register: minio_data_backup
+
+    - name: 'Create minio backup directory'
+      file:
+        path: /data/backups/minio
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: ugo+rwx
+      when: not minio_data_backup.stat.exists
 
     - name: 'Install UFW'
       apt:
@@ -272,19 +349,6 @@
         name: vm.max_map_count
         value: 262144
         state: present
-
-    - name: 'Create influxdb data directory'
-      file:
-        path: /data/influxdb
-        state: directory
-
-    - name: 'Create influxdb backup directory'
-      file:
-        path: /data/backups/influxdb
-        state: directory
-        group: 1000
-        owner: 1000
-        mode: g+rwx
 
     - name: 'Create acme file for traefik'
       file:

@@ -12,9 +12,9 @@
 
 import React from 'react'
 import {
+  createReviewDeclaration,
   IDeclaration,
-  SUBMISSION_STATUS,
-  createReviewDeclaration
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router'
@@ -22,18 +22,61 @@ import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
 import { goBack } from '@client/navigation'
 import { Event } from '@client/utils/gateway'
+import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/Button'
-import { AppBar, Frame } from '@opencrvs/components'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
+import { AppBar, Frame, Spinner } from '@opencrvs/components'
+import { messages } from '@client/i18n/messages/views/review'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { getReviewForm } from '@client/forms/register/review-selectors'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import { FETCH_VIEW_RECORD_BY_COMPOSITION } from '@client/views/ViewRecord/query'
+
+const Container = styled.div`
+  height: 100%;
+  padding: 30px;
+  display: flex;
+  flex: 1;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    flex-direction: column;
+  }
+`
+
+const FormPreview = styled.div`
+  width: 60%;
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 100%;
+    margin-bottom: 0px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    border: 0;
+  }
+`
+
+const DocumentPreview = styled.div`
+  height: 90%;
+  width: 40%;
+  border-radius: 4px;
+  margin-left: 24px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
+
+const SpinnerWrapper = styled.div`
+  padding: 10px;
+`
 
 const getDeclarationIconColor = (declaration: IDeclaration): string => {
   return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
@@ -41,6 +84,49 @@ const getDeclarationIconColor = (declaration: IDeclaration): string => {
     : declaration.registrationStatus
     ? STATUSTOCOLOR[declaration.registrationStatus]
     : 'orange'
+}
+
+const LoadingState = () => {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  return (
+    <Frame
+      header={
+        <AppBar
+          desktopRight={
+            <Button
+              size="large"
+              type="tertiary"
+              onClick={() => dispatch(goBack())}
+            >
+              {intl.formatMessage(buttonMessages.exitButton)}
+            </Button>
+          }
+          mobileRight={
+            <Button
+              size="large"
+              type="tertiary"
+              onClick={() => dispatch(goBack())}
+            >
+              {intl.formatMessage(buttonMessages.exitButton)}
+            </Button>
+          }
+        />
+      }
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+    >
+      <Container>
+        <FormPreview>
+          <SpinnerWrapper>
+            <Spinner id={'view-record-spinner'} size={24} />
+          </SpinnerWrapper>
+        </FormPreview>
+        <DocumentPreview></DocumentPreview>
+      </Container>
+    </Frame>
+  )
 }
 
 export const ViewRecord = () => {
@@ -55,18 +141,18 @@ export const ViewRecord = () => {
     variables: { id: declarationId }
   })
 
-  if (loading) return <>Loading</>
+  if (loading) return <LoadingState />
 
-  if (error) return <>Error</>
+  if (error) return <GenericErrorToast />
 
   const eventType =
-    data?.fetchRegistration?.__typename === 'BirthRegistration'
+    data?.fetchRegistrationForViewing?.__typename === 'BirthRegistration'
       ? Event.Birth
       : Event.Death
-  const eventData = data?.fetchRegistration
+  const eventData = data?.fetchRegistrationForViewing
   const transData: IFormData = gqlToDraftTransformer(
     form[eventType],
-    data?.fetchRegistration,
+    data?.fetchRegistrationForViewing,
     offlineData,
     userDetails!
   )
@@ -82,8 +168,9 @@ export const ViewRecord = () => {
     eventType,
     downloadedAppStatus
   )
-  const declarationType = declaration?.event === Event.Death ? 'Death' : 'Birth'
-  const headerTitle = declarationType + ' declaration'
+  const headerTitle = intl.formatMessage(messages.headerSubjectWithoutName, {
+    eventType: eventType
+  })
   const iconColor = getDeclarationIconColor(declaration)
 
   return (
@@ -119,6 +206,7 @@ export const ViewRecord = () => {
       )}
     >
       <ReviewSection
+        viewRecord
         submitClickEvent={() => {}}
         pageRoute={''}
         draft={declaration}

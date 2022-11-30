@@ -65,6 +65,16 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
+  getRegistrationsListByFilter(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+    filterBy: String!
+    skip: Int!
+    size: Int!
+  ): MixedTotalMetricsResult
+  getVSExports: TotalVSExport
   getTotalPayments(
     timeStart: String!
     timeEnd: String!
@@ -103,13 +113,13 @@ type Query {
     locationId: String
     event: String!
   ): [LocationWiseEstimationMetric!]
-  fetchTimeLoggedMetricsByPractitioner(
-    timeStart: String!
-    timeEnd: String!
+  getUserAuditLog(
     practitionerId: String!
-    locationId: String!
+    skip: Int
     count: Int!
-  ): TimeLoggedMetricsResultSet
+    timeStart: String
+    timeEnd: String
+  ): UserAuditLogResultSet
   searchEvents(
     userId: String
     locationIds: [String!]
@@ -238,6 +248,8 @@ type Mutation {
     comment: String
   ): String
   resendSMSInvite(userId: String!): String
+  usernameSMSReminder(userId: String!): String
+  resetPasswordSMS(userId: String!, applicationName: String!): String
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -415,6 +427,15 @@ type TotalMetricsResult {
   results: [EventMetrics!]!
 }
 
+union MixedTotalMetricsResult =
+    TotalMetricsByRegistrar
+  | TotalMetricsByLocation
+  | TotalMetricsByTime
+
+type TotalVSExport {
+  results: [VSExport!]
+}
+
 type PaymentMetric {
   total: Float!
   paymentType: String!
@@ -462,9 +483,9 @@ type LocationWiseEstimationMetric {
   locationName: String!
 }
 
-type TimeLoggedMetricsResultSet {
-  results: [TimeLoggedMetrics]
-  totalItems: Int
+type UserAuditLogResultSet {
+  total: Int!
+  results: [UserAuditLogResultItem!]!
 }
 
 type EventSearchResultSet {
@@ -919,12 +940,32 @@ type EventMetrics {
   practitionerRole: String!
 }
 
-type TimeLoggedMetrics {
-  status: String!
-  trackingId: String
-  eventType: String!
-  time: String!
+type TotalMetricsByRegistrar {
+  results: [EventMetricsByRegistrar!]!
+  total: Int
 }
+
+type TotalMetricsByLocation {
+  results: [EventMetricsByLocation!]!
+  total: Int
+}
+
+type TotalMetricsByTime {
+  results: [EventMetricsByTime!]!
+  total: Int
+}
+
+type VSExport {
+  event: String!
+  year: Int!
+  fileSize: String!
+  url: String!
+  createdOn: String!
+}
+
+union UserAuditLogResultItem =
+    UserAuditLogItemWithComposition
+  | UserAuditLogItem
 
 interface EventSearchSet {
   id: ID!
@@ -1281,6 +1322,49 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
 }
 
+type EventMetricsByRegistrar {
+  registrarPractitioner: User
+  total: Int!
+  late: Int!
+  delayed: Int!
+}
+
+type EventMetricsByLocation {
+  location: Location!
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+}
+
+type EventMetricsByTime {
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+  month: String!
+  time: String!
+}
+
+type UserAuditLogItemWithComposition implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+  data: AdditionalIdWithCompositionId!
+}
+
+type UserAuditLogItem implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
 type RegistrationSearchSet {
   status: String
   contactNumber: String
@@ -1461,6 +1545,19 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+interface AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
+type AdditionalIdWithCompositionId {
+  compositionId: String!
+  trackingId: String!
 }
 
 input CommentInput {
