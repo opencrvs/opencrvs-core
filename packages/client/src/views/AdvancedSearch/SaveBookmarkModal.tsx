@@ -167,7 +167,7 @@ export function BookmarkAdvancedSearchModal({
               setQueryName('')
               await bookmarkAdvancedSearchHandler()
             }}
-            disabled={!Boolean(queryName) && !isOnline}
+            disabled={!Boolean(queryName) || !isOnline}
           >
             {intl.formatMessage(buttonMessages.confirm)}
           </Button>

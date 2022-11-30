@@ -20,7 +20,6 @@ import { RemoveBookmarkAdvancedSearchModal } from './RemoveBookmarkModal'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 export const Message = styled.div`
   margin-bottom: 16px;
@@ -54,25 +53,23 @@ export function BookmarkAdvancedSearchResult() {
     React.useState(EMPTY_STRING)
   const [notificationStatus, setNotificationStatus] =
     React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
-  const isOnline = useOnlineStatus()
   return (
     <>
-      {isOnline && (
-        <ToggleIcon
-          id={bookmark ? 'toggleIconFill' : 'toggleIconEmpty'}
-          defaultChecked={bookmark}
-          onClick={() => {
-            if (bookmark) {
-              toggleRemoveBookmarkModal()
-            } else {
-              toggleBookmarkModal()
-            }
-          }}
-          name={'Star'}
-          color={bookmark ? 'yellow' : 'blue'}
-          fill={'yellow'}
-        />
-      )}
+      <ToggleIcon
+        id={bookmark ? 'toggleIconFill' : 'toggleIconEmpty'}
+        defaultChecked={bookmark}
+        onClick={() => {
+          if (bookmark) {
+            toggleRemoveBookmarkModal()
+          } else {
+            toggleBookmarkModal()
+          }
+        }}
+        name={'Star'}
+        color={bookmark ? 'yellow' : 'blue'}
+        fill={'yellow'}
+      />
+
       <BookmarkAdvancedSearchModal
         showBookmarkModal={showBookmarkModal}
         toggleBookmarkModal={toggleBookmarkModal}
