@@ -108,7 +108,13 @@ export function ReviewDuplicate() {
           pageIcon={<Duplicate />}
           goHome={() => dispatch(goBack())}
         />
-        <ReviewSection pageRoute="" readonly draft={left} draft2={right} />
+        <ReviewSection
+          pageRoute=""
+          readonly
+          duplicate
+          draft={left}
+          draft2={right}
+        />
       </>
     )
   }

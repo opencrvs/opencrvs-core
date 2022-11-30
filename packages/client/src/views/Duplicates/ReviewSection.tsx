@@ -89,7 +89,11 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -159,9 +163,25 @@ const Row = styled.div`
     flex-direction: column;
   }
 `
-const RightColumn = styled.div<{ hasDeclaration2?: boolean }>`
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  width: ${({ hasDeclaration2 }) => (hasDeclaration2 ? 50 : 40)}%;
+
+const RightColumn = styled.div<{
+  hasDeclaration2?: boolean
+}>`
+  ${({ hasDeclaration2, theme }) =>
+    hasDeclaration2
+      ? `
+      width: 50%;
+      @media (max-width: ${theme.grid.breakpoints.lg}px) {
+        width: 100%;
+        margin-top: 24px;
+        margin-left: 0;
+      }`
+      : `
+      width: 40%;
+      @media (max-width: ${theme.grid.breakpoints.lg}px) {
+        display: none;
+      }
+      `};
   margin-left: 24px;
 
   &:first-child {
@@ -170,22 +190,15 @@ const RightColumn = styled.div<{ hasDeclaration2?: boolean }>`
   &:last-child {
     margin-right: -24px;
   }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    ${({ hasDeclaration2 }) =>
-      hasDeclaration2
-        ? `width: 100%;
-    margin-top: 24px;
-    margin-left: 0;`
-        : `display: none;`}
-  }
 `
-
-const LeftColumn = styled.div<{ hasDeclaration2?: boolean }>`
+const Content = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
+`
+const LeftColumn = styled.div<{
+  hasDeclaration2?: boolean
+  duplicate?: boolean
+}>`
   width: ${({ hasDeclaration2 }) => (hasDeclaration2 ? 50 : 60)}%;
-  margin-bottom: 200px;
-
   &:first-child {
     margin-left: 0px;
   }
@@ -281,6 +294,23 @@ const Description = styled.div`
   padding: 8px 24px;
   text-align: left;
   background-color: ${({ theme }) => theme.colors.white};
+`
+const DuplicateWarningGreen = styled(Warning)`
+  background-color: #f4fff3;
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.colors.green};
+  color: ${({ theme }) => theme.colors.green};
+  svg {
+    path,
+    circle {
+      stroke: ${({ theme }) => theme.colors.green};
+    }
+  }
+  margin-bottom: 16px;
+`
+
+const DuplicateWarningRed = styled(Warning)`
+  margin-bottom: 16px;
 `
 
 function SignCanvas({
@@ -463,6 +493,7 @@ interface IProps {
   writeDeclaration: typeof writeDeclaration
   registrationSection: IFormSection
   documentsSection: IFormSection
+  duplicate?: boolean
 }
 type State = {
   displayEditDialog: boolean
@@ -1658,7 +1689,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineCountryConfiguration,
       draft: { event },
       readonly,
-      onContinue
+      onContinue,
+      duplicate
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
     const errorsOnFields = getErrorsOnFieldsBySection(
@@ -1726,145 +1758,163 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       <FullBodyContent>
         <Row>
           <LeftColumn hasDeclaration2={Boolean(declaration2)}>
-            <ReviewHeader
-              id="review_header"
-              logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
-              title={intl.formatMessage(messages.govtName)}
-              subject={
-                informantName
-                  ? intl.formatMessage(messages.headerSubjectWithName, {
-                      eventType: event,
-                      name: informantName
-                    })
-                  : intl.formatMessage(messages.headerSubjectWithoutName, {
-                      eventType: event
-                    })
-              }
-            />
-            {description && !readonly && (
-              <Description>{description}</Description>
+            {duplicate && (
+              <DuplicateWarningGreen
+                label={intl.formatMessage(messages.originalDeclaration, {
+                  trackingId: declaration.data.registration?.trackingId
+                })}
+              />
             )}
-            <FormData>
-              {transformedSectionData.map((sec, index) => {
-                const { uploadedDocuments, selectOptions } =
-                  this.prepSectionDocuments(declaration, sec.id)
+            <Content>
+              <ReviewHeader
+                id="review_header"
+                logoSource={
+                  offlineCountryConfiguration.config.COUNTRY_LOGO.file
+                }
+                title={intl.formatMessage(messages.govtName)}
+                subject={
+                  informantName
+                    ? intl.formatMessage(messages.headerSubjectWithName, {
+                        eventType: event,
+                        name: informantName
+                      })
+                    : intl.formatMessage(messages.headerSubjectWithoutName, {
+                        eventType: event
+                      })
+                }
+              />
+              {description && !readonly && (
+                <Description>{description}</Description>
+              )}
+              <FormData>
+                {transformedSectionData.map((sec, index) => {
+                  const { uploadedDocuments, selectOptions } =
+                    this.prepSectionDocuments(declaration, sec.id)
 
-                return (
-                  <SectionContainer key={index}>
-                    {sec.title && (
-                      <Title>
-                        {sec.title}
-                        {sec.action && (
-                          <LinkButton onClick={sec.action.handler}>
-                            {sec.action.label}
-                          </LinkButton>
-                        )}
-                      </Title>
+                  return (
+                    <SectionContainer key={index}>
+                      {sec.title && (
+                        <Title>
+                          {sec.title}
+                          {sec.action && (
+                            <LinkButton onClick={sec.action.handler}>
+                              {sec.action.label}
+                            </LinkButton>
+                          )}
+                        </Title>
+                      )}
+                      <DocumentListPreviewContainer>
+                        <DocumentListPreview
+                          id={sec.id}
+                          documents={uploadedDocuments}
+                          onSelect={this.selectForPreview}
+                          dropdownOptions={selectOptions}
+                        />
+                      </DocumentListPreviewContainer>
+                      <ListViewSimplified id={'Section_' + sec.id}>
+                        {sec.items.map((item, index) => {
+                          return (
+                            <ListViewItemSimplified
+                              key={index}
+                              label={<Label>{item.label}</Label>}
+                              value={
+                                <Value id={item.label.split(' ')[0]}>
+                                  {item.value}
+                                </Value>
+                              }
+                              actions={
+                                <LinkButton
+                                  id={item.action.id}
+                                  disabled={item.action.disabled}
+                                  onClick={item.action.handler}
+                                >
+                                  {item.action.label}
+                                </LinkButton>
+                              }
+                            />
+                          )
+                        })}
+                      </ListViewSimplified>
+                    </SectionContainer>
+                  )
+                })}
+                {!isCorrection(declaration) && (
+                  <InputWrapper>
+                    <InputField
+                      id="additional_comments"
+                      touched={false}
+                      required={false}
+                      label={intl.formatMessage(messages.additionalComments)}
+                    >
+                      <TextArea {...textAreaProps} />
+                    </InputField>
+                  </InputWrapper>
+                )}
+                {!isCorrection(declaration) && !hasB1Form(declaration) && (
+                  <InputWrapper>
+                    <InputField
+                      id="informant_signature"
+                      touched={false}
+                      required={true}
+                      label={intl.formatMessage(messages.informantsSignature)}
+                    >
+                      <SignatureInput {...signatureInputProps} />
+                    </InputField>
+                  </InputWrapper>
+                )}
+                {totalFileSizeExceeded && (
+                  <Warning
+                    label={intl.formatMessage(
+                      constantsMessages.totalFileSizeExceed,
+                      { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
                     )}
-                    <DocumentListPreviewContainer>
-                      <DocumentListPreview
-                        id={sec.id}
-                        documents={uploadedDocuments}
-                        onSelect={this.selectForPreview}
-                        dropdownOptions={selectOptions}
+                  />
+                )}
+                {!isCorrection(declaration) ? (
+                  <>
+                    {!readonly && (
+                      <DuplicateWarning duplicateIds={declaration.duplicates} />
+                    )}
+                    {submitClickEvent && !readonly && (
+                      <ReviewAction
+                        completeDeclaration={isComplete}
+                        totalFileSizeExceeded={totalFileSizeExceeded}
+                        declarationToBeValidated={this.userHasValidateScope()}
+                        declarationToBeRegistered={this.userHasRegisterScope()}
+                        alreadyRejectedDeclaration={
+                          this.props.draft.registrationStatus === REJECTED
+                        }
+                        draftDeclaration={draft}
+                        declaration={declaration}
+                        submitDeclarationAction={submitClickEvent}
+                        rejectDeclarationAction={rejectDeclarationClickEvent}
                       />
-                    </DocumentListPreviewContainer>
-                    <ListViewSimplified id={'Section_' + sec.id}>
-                      {sec.items.map((item, index) => {
-                        return (
-                          <ListViewItemSimplified
-                            key={index}
-                            label={<Label>{item.label}</Label>}
-                            value={
-                              <Value id={item.label.split(' ')[0]}>
-                                {item.value}
-                              </Value>
-                            }
-                            actions={
-                              <LinkButton
-                                id={item.action.id}
-                                disabled={item.action.disabled}
-                                onClick={item.action.handler}
-                              >
-                                {item.action.label}
-                              </LinkButton>
-                            }
-                          />
-                        )
-                      })}
-                    </ListViewSimplified>
-                  </SectionContainer>
-                )
-              })}
-              {!isCorrection(declaration) && (
-                <InputWrapper>
-                  <InputField
-                    id="additional_comments"
-                    touched={false}
-                    required={false}
-                    label={intl.formatMessage(messages.additionalComments)}
-                  >
-                    <TextArea {...textAreaProps} />
-                  </InputField>
-                </InputWrapper>
-              )}
-              {!isCorrection(declaration) && !hasB1Form(declaration) && (
-                <InputWrapper>
-                  <InputField
-                    id="informant_signature"
-                    touched={false}
-                    required={true}
-                    label={intl.formatMessage(messages.informantsSignature)}
-                  >
-                    <SignatureInput {...signatureInputProps} />
-                  </InputField>
-                </InputWrapper>
-              )}
-              {totalFileSizeExceeded && (
-                <Warning
-                  label={intl.formatMessage(
-                    constantsMessages.totalFileSizeExceed,
-                    { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
-                  )}
-                />
-              )}
-              {!isCorrection(declaration) ? (
-                <>
-                  {!readonly && (
-                    <DuplicateWarning duplicateIds={declaration.duplicates} />
-                  )}
-                  {submitClickEvent && !readonly && (
-                    <ReviewAction
-                      completeDeclaration={isComplete}
-                      totalFileSizeExceeded={totalFileSizeExceeded}
-                      declarationToBeValidated={this.userHasValidateScope()}
-                      declarationToBeRegistered={this.userHasRegisterScope()}
-                      alreadyRejectedDeclaration={
-                        this.props.draft.registrationStatus === REJECTED
-                      }
-                      draftDeclaration={draft}
-                      declaration={declaration}
-                      submitDeclarationAction={submitClickEvent}
-                      rejectDeclarationAction={rejectDeclarationClickEvent}
-                    />
-                  )}
-                </>
-              ) : (
-                <FooterArea>
-                  <PrimaryButton
-                    id="continue_button"
-                    onClick={onContinue}
-                    disabled={!isComplete || !this.hasChangesBeenMade}
-                  >
-                    {intl.formatMessage(buttonMessages.continueButton)}
-                  </PrimaryButton>
-                </FooterArea>
-              )}
-            </FormData>
+                    )}
+                  </>
+                ) : (
+                  <FooterArea>
+                    <PrimaryButton
+                      id="continue_button"
+                      onClick={onContinue}
+                      disabled={!isComplete || !this.hasChangesBeenMade}
+                    >
+                      {intl.formatMessage(buttonMessages.continueButton)}
+                    </PrimaryButton>
+                  </FooterArea>
+                )}
+              </FormData>
+            </Content>
           </LeftColumn>
           <RightColumn hasDeclaration2={Boolean(declaration2)}>
+            {duplicate && (
+              <DuplicateWarningRed
+                label={intl.formatMessage(errorMessages.duplicateWarning, {
+                  trackingId: declaration2.data.registration?.trackingId
+                })}
+              />
+            )}
             {declaration2 ? (
-              <>
+              <Content>
                 <ReviewHeader
                   id="review_header"
                   logoSource={
@@ -2010,7 +2060,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </FooterArea>
                   )}
                 </FormData>
-              </>
+              </Content>
             ) : (
               <ResponsiveDocumentViewer
                 isRegisterScope={this.userHasRegisterScope()}
