@@ -576,14 +576,18 @@ export const ActionDetailsModal = ({
           <>{userName}</>
           <span> — {getFormattedDate(actionDetailsData.date)}</span>
         </div>
-        <ActionDetailsModalListTable
-          actionDetailsData={actionDetailsData}
-          actionDetailsIndex={actionDetailsIndex}
-          registerForm={registerForm}
-          intl={intl}
-          offlineData={offlineData}
-          draft={draft}
-        />
+        {!actionDetailsData.action ||
+          (actionDetailsData.action &&
+            actionDetailsData.action === RegAction.RequestedCorrection && (
+              <ActionDetailsModalListTable
+                actionDetailsData={actionDetailsData}
+                actionDetailsIndex={actionDetailsIndex}
+                registerForm={registerForm}
+                intl={intl}
+                offlineData={offlineData}
+                draft={draft}
+              />
+            ))}
       </>
     </ResponsiveModal>
   )
