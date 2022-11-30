@@ -365,7 +365,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       (NATL_ADMIN_ROLES.includes(role as string) &&
         location.includes(PERFORMANCE_HOME)) ||
       (SYS_ADMIN_ROLES.includes(role as string) &&
-        location.includes(PERFORMANCE_HOME))
+        location.includes(PERFORMANCE_HOME)) ||
+      (REGISTRAR_ROLES.includes(role as string) &&
+        location.includes(REGISTRAR_HOME))
     ) {
       return true
     } else {
