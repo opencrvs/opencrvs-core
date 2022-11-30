@@ -14,19 +14,30 @@ import * as Joi from 'joi'
 import { badRequest } from '@hapi/boom'
 import { sendToFhir } from '@gateway/features/fhir/utils'
 
-const RESOURCE_TYPES = [
-  'Composition',
-  'Task',
-  'Patient',
-  'RelatedPerson',
-  'Encounter',
-  'Observation'
-]
+const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
 const resourceSchema = Joi.object({
   resourceType: Joi.string()
     .required()
     .valid(...RESOURCE_TYPES)
+})
+
+const compositionSchema = Joi.object({
+  fullUrl: Joi.string().required(),
+  resource: Joi.object({
+    resourceType: Joi.string().required().valid('Composition')
+  })
+    .required()
+    .unknown()
+})
+
+const taskSchema = Joi.object({
+  fullUrl: Joi.string().required(),
+  resource: Joi.object({
+    resourceType: Joi.string().required().valid('Task')
+  })
+    .required()
+    .unknown()
 })
 
 const entrySchema = Joi.object({
@@ -40,7 +51,10 @@ export const fhirBundleSchema = Joi.object({
   meta: Joi.object({
     lastUpdated: Joi.date().iso().required()
   }).required(),
-  entry: Joi.array().items(entrySchema).required()
+  entry: Joi.array()
+    .ordered(compositionSchema, taskSchema)
+    .items(entrySchema)
+    .required()
 })
 
 export function validationFailedAction(
