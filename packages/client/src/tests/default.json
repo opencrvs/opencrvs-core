@@ -1423,7 +1423,12 @@
                   "customisable": true,
                   "required": true,
                   "initialValue": "",
-                  "validate": [],
+                  "validate": [
+                    {
+                      "operation": "range",
+                      "parameters": [12, 120]
+                    }
+                  ],
                   "conditionals": [
                     {
                       "action": "hide",
@@ -1695,6 +1700,10 @@
                     {
                       "action": "hide",
                       "expression": "!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "values.exactDateOfBirthUnknown"
                     }
                   ],
                   "required": true,
@@ -1764,7 +1773,12 @@
                   "customisable": true,
                   "required": true,
                   "initialValue": "",
-                  "validate": [],
+                  "validate": [
+                    {
+                      "operation": "range",
+                      "parameters": [12, 120]
+                    }
+                  ],
                   "conditionals": [
                     {
                       "action": "hide",
@@ -2247,6 +2261,10 @@
                     {
                       "action": "hide",
                       "expression": "!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "values.exactDateOfBirthUnknown"
                     }
                   ],
                   "mapping": {
@@ -2300,7 +2318,12 @@
                   "customisable": true,
                   "required": true,
                   "initialValue": "",
-                  "validate": [],
+                  "validate": [
+                    {
+                      "operation": "range",
+                      "parameters": [12, 120]
+                    }
+                  ],
                   "conditionals": [
                     {
                       "action": "hide",
@@ -3783,6 +3806,12 @@
                   },
                   "required": true,
                   "initialValue": "",
+                  "conditionals": [
+                    {
+                      "action": "disable",
+                      "expression": "values.exactDateOfBirthUnknown"
+                    }
+                  ],
                   "validate": [
                     {
                       "operation": "isValidBirthDate"
@@ -3835,7 +3864,12 @@
                   "customisable": true,
                   "required": true,
                   "initialValue": "",
-                  "validate": [],
+                  "validate": [
+                    {
+                      "operation": "range",
+                      "parameters": [12, 120]
+                    }
+                  ],
                   "conditionals": [
                     {
                       "action": "hide",
@@ -4545,6 +4579,12 @@
                   "required": true,
                   "customisable": true,
                   "initialValue": "",
+                  "conditionals": [
+                    {
+                      "action": "disable",
+                      "expression": "values.exactDateOfBirthUnknown"
+                    }
+                  ],
                   "validate": [
                     {
                       "operation": "dateFormatIsCorrect",

@@ -1343,6 +1343,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'disable',
+                    expression: 'values.exactDateOfBirthUnknown'
                   }
                 ],
                 required: true,
@@ -1408,7 +1412,12 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: true,
                 initialValue: '',
-                validate: [],
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  }
+                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1416,7 +1425,6 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 postfix: 'years',
-
                 inputFieldWidth: '78px'
               },
               {
@@ -1883,6 +1891,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'disable',
+                    expression: 'values.exactDateOfBirthUnknown'
                   }
                 ],
                 mapping: {
@@ -1932,7 +1944,12 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: true,
                 initialValue: '',
-                validate: [],
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  }
+                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -3115,12 +3132,17 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.deceasedDateOfBirth,
                 required: true,
                 initialValue: '',
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: "!!'values.exactDateOfBirthUnknown'"
+                  }
+                ],
                 validate: [
                   {
                     operation: 'isValidBirthDate'
                   }
                 ],
-
                 mapping: {
                   template: {
                     operation: 'dateFormatTransformer',
@@ -3164,7 +3186,12 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: true,
                 initialValue: '',
-                validate: [],
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  }
+                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -3712,6 +3739,12 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 customisable: true,
                 initialValue: '',
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: "!!'values.exactDateOfBirthUnknown'"
+                  }
+                ],
                 validate: [
                   {
                     operation: 'dateFormatIsCorrect',
@@ -3777,7 +3810,12 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 required: true,
                 initialValue: '',
-                validate: [],
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  }
+                ],
                 conditionals: [
                   {
                     action: 'hide',
