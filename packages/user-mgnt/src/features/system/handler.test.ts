@@ -351,7 +351,9 @@ describe('delete system ', () => {
   })
 
   it('delete system using mongoose', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
     mockingoose(System).toReturn(mockSystem, 'findOne')
+    mockingoose(System).toReturn(mockSystem, 'findOneAndDelete')
     mockingoose(System).toReturn({}, 'deleteOne')
 
     const res = await server.server.inject({
@@ -367,8 +369,8 @@ describe('delete system ', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('return unauthorized error if sysadmin not returned', async () => {
-    mockingoose(User).toReturn(null, 'findOne')
+  it('return error if system is not found', async () => {
+    mockingoose(User).toReturn(null, 'findOneAndDelete')
 
     const res = await server.server.inject({
       method: 'POST',
@@ -381,7 +383,7 @@ describe('delete system ', () => {
       }
     })
 
-    expect(res.statusCode).toBe(400)
+    expect(res.statusCode).toBe(404)
   })
 
   it('return an error if a token scope check fails', async () => {

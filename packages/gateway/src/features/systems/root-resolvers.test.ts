@@ -212,15 +212,50 @@ describe('generate refresh token', () => {
       'Only system user can update refresh client secret'
     )
   })
+})
 
-  it('delete system', async () => {
+describe('delete system integration', () => {
+  let authHeaderRegister: { Authorization: string }
+  let authHeaderSysAdmin: { Authorization: string }
+  beforeEach(() => {
+    fetch.resetMocks()
+    const sysAdminToken = jwt.sign(
+      { scope: ['sysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderSysAdmin = {
+      Authorization: `Bearer ${sysAdminToken}`
+    }
+    const registerToken = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderRegister = {
+      Authorization: `Bearer ${registerToken}`
+    }
+  })
+
+  it('delete system by system admin', async () => {
     const responsePayload = {
       system: {
         _id: '234241',
         name: 'Dummy System',
         status: 'active',
+        type: 'HEALTH',
         shaSecret: '823823',
-        clientId: '1231234'
+        clientId: '1239014'
       }
     }
     fetch.mockResponseOnce(JSON.stringify(responsePayload), { status: 200 })
@@ -232,5 +267,18 @@ describe('generate refresh token', () => {
     )
 
     expect(response).toEqual(responsePayload)
+  })
+
+  it('should throw error for register user', async () => {
+    fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
+
+    const response = resolvers.Mutation.deleteSystem(
+      {},
+      { clientId: '1231234' },
+      authHeaderRegister
+    )
+    await expect(response).rejects.toThrowError(
+      'Only system user can delete the system'
+    )
   })
 })
