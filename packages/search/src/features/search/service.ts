@@ -32,9 +32,9 @@ export const searchComposition = async (params: ISearchQuery) => {
     if (err.statusCode === 400) {
       logger.error('Search: bad request')
     } else {
-      logger.error('Search error: ', err)
+      logger.error(`Search error: ${err}`)
     }
-    return undefined
+    throw err
   }
   return response
 }

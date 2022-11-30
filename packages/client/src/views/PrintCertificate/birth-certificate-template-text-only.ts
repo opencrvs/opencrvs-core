@@ -12,96 +12,94 @@
 const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect width="420" height="595" fill="white" />
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-  <tspan x="59.3275" y="199.666">Registration Centre: </tspan>
+  <tspan x="59.3275" y="199.666">Registration centre: </tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0em">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0em">
   <tspan x="162.619" y="199.992">{{ registrationCentre }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="219.666">LGA:</tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.619" y="219.992">{{ registrationLGA }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="239.666">State:</tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.328" y="239.666">{{ registrationState }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px">
   <tspan x="59.3275" y="260.226">This is to certify that the birth, details of which are recorded herein, has been </tspan>
-  <tspan x="59.3275" y="274.626">registered on</tspan>
-  <tspan x="185.046" y="274.626">at this registration centre.</tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="600" letter-spacing="0px">
-  <tspan x="109.663" y="274.626"> {{ registrationDate }} </tspan>
+<text fill="#222222" style="white-space: normal" font-family="Noto Sans" font-size="8" letter-spacing="0px" x="59.3275" y="274.626">
+  registered on <tspan font-weight="700">{{ registrationDate }}</tspan> at this registration centre.
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="300.392">BRN:</tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.619" y="299.992">{{ registrationNumber }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-  <tspan x="59.3275" y="320.392">Full Name:</tspan>
+  <tspan x="59.3275" y="320.392">Full name:</tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.619" y="319.992">{{ childFamilyName }}, {{ childFirstName }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="340.392">Sex:</tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.619" y="339.992">{{ informantGender }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-  <tspan x="59.3275" y="360.392">Date of Birth:</tspan>
+  <tspan x="59.3275" y="360.392">Date of birth:</tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.328" y="360.392">{{ eventDate }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-  <tspan x="59.3275" y="379.008">Place of Birth:</tspan>
+  <tspan x="59.3275" y="379.008">Place of birth:</tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.328" y="379.008">{{ placeOfBirthLocality }},&#x2028;</tspan>
   <tspan x="162.328" y="392.008">{{ placeOfBirthLGA }}, {{ placeOfBirthState }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-  <tspan x="59.3275" y="413.392">Full Name of Mother: </tspan>
+  <tspan x="59.3275" y="413.392">Full name of mother: </tspan>
 </text>
 {{#if motherFirstName}}
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.619" y="412.992">{{ motherFamilyName }}, {{ motherFirstName }}</tspan>
 </text>
 {{else}}
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.619" y="412.992">-</tspan>
 </text>
 {{/if}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-  <tspan x="59.3275" y="432.021">Full Name of Father:</tspan>
+  <tspan x="59.3275" y="432.021">Full name of father:</tspan>
 </text>
 {{#if fatherFirstName}}
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.619" y="431.621">{{ fatherFamilyName }}, {{ fatherFirstName }}</tspan>
 </text>
 {{else}}
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.619" y="431.621">-</tspan>
 </text>
 {{/if}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
-  <tspan x="59.3275" y="461.191">Name of Registrar: </tspan>
+  <tspan x="59.3275" y="461.191">Name of registrar: </tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.328" y="461.191">{{ registrarName }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="481.191">Date:</tspan>
 </text>
-<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="600" letter-spacing="0px">
+<text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
   <tspan x="162.328" y="481.191">{{ certificateDate }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="6" letter-spacing="0px">
