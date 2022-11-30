@@ -103,7 +103,11 @@ function prepareComments(
   actionDetailsData: History,
   draft: IDeclaration | null
 ) {
-  if (!draft || actionDetailsData.action) {
+  if (
+    !draft ||
+    (actionDetailsData.action &&
+      actionDetailsData.action !== RegAction.RequestedCorrection)
+  ) {
     return []
   }
 
