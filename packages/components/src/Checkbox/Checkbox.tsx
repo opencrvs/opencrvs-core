@@ -24,7 +24,8 @@ const Wrapper = styled.li`
 
 const Label = styled.label`
   position: relative;
-  margin-left: 16px;
+  cursor: pointer;
+  padding-left: 15px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
 `
@@ -52,7 +53,7 @@ const Check = styled.span<{ size?: string }>`
         ? `height: 36px;
     width: 36px;`
         : ` height: 16px;
-    width: 17.2px;`}
+    width: 17px;`}
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -136,9 +137,12 @@ export class Checkbox extends React.Component<ICheckbox> {
     } = this.props
     return (
       <>
-        <Text variant={'reg16'} element={'h2'}>
-          {hint}
-        </Text>
+        {hint && (
+          <Text variant={'reg16'} element={'p'} color={'grey500'}>
+            {hint}
+          </Text>
+        )}
+
         <Wrapper>
           <Input
             id={id}
