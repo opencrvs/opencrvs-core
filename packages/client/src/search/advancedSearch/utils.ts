@@ -25,7 +25,7 @@ import {
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
 import { IntlShape } from 'react-intl'
-import { RegStatus } from '@client/utils/gateway'
+import { LocationType, RegStatus } from '@client/utils/gateway'
 import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import format from '@client/utils/date-formatting'
@@ -54,6 +54,321 @@ const {
   deathSearchEventSection,
   deathSearchInformantSection
 } = advancedSearchDeathSections
+
+const baseKeysSameAsStore = [
+  'event',
+  'registrationStatuses',
+  'registrationNumber',
+  'trackingId',
+  'declarationLocationId',
+  'declarationJurisdictionId',
+  'eventCountry',
+  'eventLocationId',
+  'eventLocationLevel1',
+  'eventLocationLevel2',
+  'eventLocationLevel3',
+  'eventLocationLevel4',
+  'eventLocationLevel5',
+  'childFirstNames',
+  'childLastName',
+  'childGender',
+  'deceasedFirstNames',
+  'deceasedFamilyName',
+  'deceasedGender',
+  'motherFirstNames',
+  'motherFamilyName',
+  'fatherFirstNames',
+  'fatherFamilyName',
+  'informantFirstNames',
+  'informantFamilyName'
+] as const
+
+export interface IBaseAdvancedSearchState {
+  event?: string
+  registrationStatuses?: string
+  dateOfEvent?: IDateRangePickerValue
+  dateOfEventStart?: string
+  dateOfEventEnd?: string
+  registrationNumber?: string
+  trackingId?: string
+  dateOfRegistration?: IDateRangePickerValue
+  dateOfRegistrationStart?: string
+  dateOfRegistrationEnd?: string
+  placeOfRegistration?: string
+  declarationLocationId?: string
+  declarationJurisdictionId?: string
+  eventLocationType?: string
+  eventCountry?: string
+  eventLocationId?: string
+  eventLocationLevel1?: string
+  eventLocationLevel2?: string
+  eventLocationLevel3?: string
+  eventLocationLevel4?: string
+  eventLocationLevel5?: string
+  childFirstNames?: string
+  childLastName?: string
+  childDoB?: IDateRangePickerValue
+  childDoBStart?: string
+  childDoBEnd?: string
+  childGender?: string
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deceasedGender?: string
+  deceasedDoB?: IDateRangePickerValue
+  deceasedDoBStart?: string
+  deceasedDoBEnd?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: IDateRangePickerValue
+  motherDoBStart?: string
+  motherDoBEnd?: string
+  fatherFirstNames?: string
+  fatherFamilyName?: string
+  fatherDoB?: IDateRangePickerValue
+  fatherDoBStart?: string
+  fatherDoBEnd?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  informantDoB?: IDateRangePickerValue
+  informantDoBStart?: string
+  informantDoBEnd?: string
+}
+
+export const transformAdvancedSearchLocalStateToStoreData = (
+  localState: IBaseAdvancedSearchState,
+  offlineData: IOfflineData
+): IAdvancedSearchParamState => {
+  let transformedStoreState: IAdvancedSearchParamState =
+    baseKeysSameAsStore.reduce((ac, curr) => {
+      return { ...ac, [curr]: localState[curr] }
+    }, {})
+  let declarationLocationId,
+    declarationJurisdictionId,
+    eventLocationId,
+    eventCountry,
+    eventLocationLevel1,
+    eventLocationLevel2
+
+  if (
+    localState.registrationStatuses !== undefined &&
+    localState.registrationStatuses.length > 0
+  ) {
+    transformedStoreState.registrationStatuses =
+      localState.registrationStatuses === 'IN_REVIEW'
+        ? [RegStatus.WaitingValidation, RegStatus.Validated]
+        : localState.registrationStatuses === 'ALL'
+        ? Object.values(RegStatus)
+        : [localState.registrationStatuses]
+  } else {
+    transformedStoreState.registrationStatuses = undefined
+  }
+
+  if (localState.placeOfRegistration) {
+    if (
+      Object.keys(offlineData.offices).includes(localState.placeOfRegistration)
+    ) {
+      declarationLocationId = localState.placeOfRegistration
+    }
+    if (
+      Object.keys(offlineData.locations).includes(
+        localState.placeOfRegistration
+      )
+    ) {
+      declarationJurisdictionId = localState.placeOfRegistration
+    }
+  }
+
+  if (localState.eventLocationType === LocationType.HealthFacility) {
+    eventLocationId = localState.eventLocationId
+    eventCountry = ''
+    eventLocationLevel1 = ''
+    eventLocationLevel2 = ''
+  } else {
+    eventCountry = localState.eventCountry
+    eventLocationLevel1 = localState.eventLocationLevel1
+    eventLocationLevel2 = localState.eventLocationLevel2
+    eventLocationId = ''
+  }
+
+  const {
+    exact: informantDoB,
+    rangeStart: informantDoBStart,
+    rangeEnd: informantDoBEnd
+  } = determineDateFromDateRangePickerVal(
+    localState.informantDoB
+  ) as IDateRangePickerValue
+
+  const {
+    exact: dateOfRegistration,
+    rangeStart: dateOfRegistrationStart,
+    rangeEnd: dateOfRegistrationEnd
+  } = determineDateFromDateRangePickerVal(
+    localState.dateOfRegistration
+  ) as IDateRangePickerValue
+
+  transformedStoreState = {
+    ...transformedStoreState,
+    informantDoB,
+    informantDoBStart,
+    informantDoBEnd,
+    dateOfRegistration,
+    dateOfRegistrationStart,
+    dateOfRegistrationEnd,
+    declarationLocationId,
+    declarationJurisdictionId,
+    eventCountry,
+    eventLocationId,
+    eventLocationLevel1,
+    eventLocationLevel2
+  }
+
+  if (localState.event && localState.event === 'birth') {
+    const {
+      exact: childDoB,
+      rangeStart: childDoBStart,
+      rangeEnd: childDoBEnd
+    } = determineDateFromDateRangePickerVal(localState.childDoB)
+
+    const {
+      exact: motherDoB,
+      rangeStart: motherDoBStart,
+      rangeEnd: motherDoBEnd
+    } = determineDateFromDateRangePickerVal(localState.motherDoB)
+    const {
+      exact: fatherDoB,
+      rangeStart: fatherDoBStart,
+      rangeEnd: fatherDoBEnd
+    } = determineDateFromDateRangePickerVal(localState.fatherDoB)
+    transformedStoreState = {
+      ...transformedStoreState,
+      childDoB,
+      childDoBStart,
+      childDoBEnd,
+      motherDoB,
+      motherDoBStart,
+      motherDoBEnd,
+      fatherDoB,
+      fatherDoBStart,
+      fatherDoBEnd
+    }
+  } else {
+    const {
+      exact: deceasedDoB,
+      rangeStart: deceasedDoBStart,
+      rangeEnd: deceasedDoBEnd
+    } = determineDateFromDateRangePickerVal(localState.deceasedDoB)
+    transformedStoreState = {
+      ...transformedStoreState,
+      deceasedDoB,
+      deceasedDoBStart,
+      deceasedDoBEnd
+    }
+  }
+
+  return transformedStoreState
+}
+
+export const transformStoreDataToAdvancedSearchLocalState = (
+  reduxState: IAdvancedSearchParamState,
+  offlineData: IOfflineData,
+  eventType: string
+): IBaseAdvancedSearchState => {
+  const localState: IBaseAdvancedSearchState = baseKeysSameAsStore.reduce(
+    (ac, curr) => {
+      return { ...ac, [curr]: reduxState[curr] }
+    },
+    {}
+  )
+  localState.event = eventType
+  if (
+    reduxState.registrationStatuses !== undefined &&
+    reduxState.registrationStatuses.length !== 0
+  ) {
+    localState.registrationStatuses =
+      reduxState.registrationStatuses.length === 1
+        ? reduxState.registrationStatuses[0]
+        : reduxState.registrationStatuses.length === 2
+        ? 'IN_REVIEW'
+        : 'ALL'
+  } else {
+    localState.registrationStatuses = ''
+  }
+
+  localState.placeOfRegistration = ''
+  if (
+    reduxState.declarationLocationId &&
+    Object.keys(offlineData.offices).includes(reduxState.declarationLocationId)
+  ) {
+    localState.placeOfRegistration = reduxState.declarationLocationId
+  }
+  if (
+    reduxState.declarationJurisdictionId &&
+    Object.keys(offlineData.locations).includes(
+      reduxState.declarationJurisdictionId
+    )
+  ) {
+    localState.placeOfRegistration = reduxState.declarationJurisdictionId
+  }
+
+  localState.eventLocationId = ''
+  localState.eventCountry = ''
+  localState.eventLocationType = ''
+  if (reduxState.eventLocationId) {
+    localState.eventLocationType = LocationType.HealthFacility
+    localState.eventLocationId = reduxState.eventLocationId
+  }
+
+  if (reduxState.eventCountry) {
+    localState.eventLocationType = LocationType.PrivateHome
+    localState.eventCountry = reduxState.eventCountry
+    localState.eventLocationLevel1 = reduxState.eventLocationLevel1 || ''
+    localState.eventLocationLevel2 = reduxState.eventLocationLevel2 || ''
+  }
+
+  const { informantDoB, informantDoBStart, informantDoBEnd } = reduxState
+  localState.informantDoB = convertDateValuesToDateRangePicker(
+    informantDoB,
+    informantDoBStart,
+    informantDoBEnd
+  )
+  const { dateOfRegistration, dateOfRegistrationStart, dateOfRegistrationEnd } =
+    reduxState
+  localState.dateOfRegistration = convertDateValuesToDateRangePicker(
+    dateOfRegistration,
+    dateOfRegistrationStart,
+    dateOfRegistrationEnd
+  )
+
+  if (localState.event && localState.event === 'birth') {
+    const { childDoB, childDoBStart, childDoBEnd } = reduxState
+    localState.childDoB = convertDateValuesToDateRangePicker(
+      childDoB,
+      childDoBStart,
+      childDoBEnd
+    )
+    const { motherDoB, motherDoBStart, motherDoBEnd } = reduxState
+    localState.motherDoB = convertDateValuesToDateRangePicker(
+      motherDoB,
+      motherDoBStart,
+      motherDoBEnd
+    )
+    const { fatherDoB, fatherDoBStart, fatherDoBEnd } = reduxState
+    localState.fatherDoB = convertDateValuesToDateRangePicker(
+      fatherDoB,
+      fatherDoBStart,
+      fatherDoBEnd
+    )
+  } else {
+    const { deceasedDoB, deceasedDoBStart, deceasedDoBEnd } = reduxState
+    localState.deceasedDoB = convertDateValuesToDateRangePicker(
+      deceasedDoB,
+      deceasedDoBStart,
+      deceasedDoBEnd
+    )
+  }
+
+  return localState
+}
 
 export const getAccordionActiveStateMap = (
   storeState: IAdvancedSearchParamState
