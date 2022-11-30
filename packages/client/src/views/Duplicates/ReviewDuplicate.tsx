@@ -13,7 +13,7 @@ import * as React from 'react'
 import { useParams } from 'react-router'
 import { client } from '@client/utils/apolloClient'
 import { IDeclaration } from '@client/declarations'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { ReviewSection } from '@client/views/Duplicates/ReviewSection'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
@@ -21,7 +21,11 @@ import { DownloadAction, IForm } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { Event } from '@client/utils/gateway'
-import { Loader } from '@opencrvs/components/lib/interface'
+import { Loader, EventTopBar } from '@opencrvs/components/lib/interface'
+import { useIntl } from 'react-intl'
+import { messages as registerMessages } from '@client/i18n/messages/views/register'
+import { Duplicate } from '@opencrvs/components/lib/icons'
+import { goBack } from '@client/navigation'
 
 function findDeclarationById(id: string, declarations: IDeclaration[]) {
   return declarations.find((declaration) => declaration.id === id)
@@ -56,6 +60,8 @@ export function ReviewDuplicate() {
   const declarations = useSelector<IStoreState, IDeclaration[]>(
     (state) => state.declarationsState.declarations
   )
+  const intl = useIntl()
+  const dispatch = useDispatch()
   const form = useSelector(getRegisterForm)
   const [loading, setLoading] = React.useState(2)
   const [left, setLeft] = React.useState(findDeclarationById(id, declarations))
@@ -77,9 +83,13 @@ export function ReviewDuplicate() {
 
     if (!left) {
       fetchLeft()
+    } else {
+      setLoading((l) => l - 1)
     }
     if (!right) {
       fetchRight()
+    } else {
+      setLoading((l) => l - 1)
     }
   }, [id, existingId, event, form, left, right])
 
@@ -88,7 +98,19 @@ export function ReviewDuplicate() {
   }
 
   if (left && right) {
-    return <ReviewSection pageRoute="" readonly draft={left} draft2={right} />
+    return (
+      <>
+        <EventTopBar
+          title={intl.formatMessage(
+            registerMessages.newVitalEventRegistration,
+            { event }
+          )}
+          pageIcon={<Duplicate />}
+          goHome={() => dispatch(goBack())}
+        />
+        <ReviewSection pageRoute="" readonly draft={left} draft2={right} />
+      </>
+    )
   }
   return null
 }

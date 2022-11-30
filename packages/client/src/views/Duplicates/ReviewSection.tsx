@@ -160,8 +160,8 @@ const Row = styled.div`
   }
 `
 const RightColumn = styled.div<{ hasDeclaration2?: boolean }>`
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   width: ${({ hasDeclaration2 }) => (hasDeclaration2 ? 50 : 40)}%;
-  border-radius: 4px;
   margin-left: 24px;
 
   &:first-child {
@@ -172,7 +172,12 @@ const RightColumn = styled.div<{ hasDeclaration2?: boolean }>`
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
+    ${({ hasDeclaration2 }) =>
+      hasDeclaration2
+        ? `width: 100%;
+    margin-top: 24px;
+    margin-left: 0;`
+        : `display: none;`}
   }
 `
 
@@ -1825,7 +1830,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               )}
               {!isCorrection(declaration) ? (
                 <>
-                  <DuplicateWarning duplicateIds={declaration.duplicates} />
+                  {!readonly && (
+                    <DuplicateWarning duplicateIds={declaration.duplicates} />
+                  )}
                   {submitClickEvent && !readonly && (
                     <ReviewAction
                       completeDeclaration={isComplete}
@@ -1970,7 +1977,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   )}
                   {!isCorrection(declaration2) ? (
                     <>
-                      <DuplicateWarning duplicateIds={declaration.duplicates} />
+                      {!readonly && (
+                        <DuplicateWarning
+                          duplicateIds={declaration2.duplicates}
+                        />
+                      )}
                       {submitClickEvent && !readonly && (
                         <ReviewAction
                           completeDeclaration={isComplete}
