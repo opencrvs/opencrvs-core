@@ -52,7 +52,6 @@ export function SettingsPage() {
           <ListViewSimplified>
             <Name />
             <PhoneNumber />
-            <Role />
             <Title />
             <Language />
             <Password />

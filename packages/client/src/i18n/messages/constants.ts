@@ -488,7 +488,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.role'
   },
   labelTitle: {
-    defaultMessage: 'Title',
+    defaultMessage: 'Role',
     description: 'Title label',
     id: 'constants.title'
   },

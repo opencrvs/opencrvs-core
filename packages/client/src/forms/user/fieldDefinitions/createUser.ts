@@ -29,18 +29,19 @@ const TITLES_AND_ROLES = {
   REGISTRATION_AGENT: [],
   LOCAL_REGISTRAR: ['REGISTRAR', 'DCR'],
   NATIONAL_SYSTEM_ADMIN: [
-    // Where to put these?
-    'STATE_DIRECTOR',
-    'FEDERAL_COMMISSIONER',
-    'DIRECTOR_VRD',
-    'DIRECTOR_GENERAL',
-    'CHAIRMAN',
-    //
     'STATE_SYSTEM_ADMIN',
     'NATIONAL_SYSTEM_ADMIN',
     'E_CRVS_PROJECT_ADMIN'
   ],
-  PERFORMANCE_MANAGEMENT: ['HEAD_OF_DEPARTMENT', 'E_CRVS_PROJECT_SUPPORT'],
+  PERFORMANCE_MANAGEMENT: [
+    'HEAD_OF_DEPARTMENT',
+    'E_CRVS_PROJECT_SUPPORT',
+    'STATE_DIRECTOR',
+    'FEDERAL_COMMISSIONER',
+    'DIRECTOR_VRD',
+    'DIRECTOR_GENERAL',
+    'CHAIRMAN'
+  ],
   NATIONAL_REGISTRAR: []
 }
 
@@ -138,50 +139,6 @@ export const userSectionFormType: ISerializedFormSection = {
           }
         },
         {
-          name: 'title',
-          type: SELECT_WITH_OPTIONS,
-          label: userFormMessages.title,
-          required: true,
-          initialValue: '',
-          validate: [],
-          options: [
-            { value: 'FIELD_AGENT', label: userMessages.FIELD_AGENT },
-            { value: 'REGISTRAR', label: userMessages.REGISTRAR },
-            { value: 'DCR', label: userMessages.DCR },
-            {
-              value: 'HEAD_OF_DEPARTMENT',
-              label: userMessages.HEAD_OF_DEPARTMENT
-            },
-            { value: 'STATE_DIRECTOR', label: userMessages.STATE_DIRECTOR },
-            {
-              value: 'FEDERAL_COMMISSIONER',
-              label: userMessages.FEDERAL_COMMISSIONER
-            },
-            { value: 'DIRECTOR_VRD', label: userMessages.DIRECTOR_VRD },
-            {
-              value: 'DIRECTOR_GENERAL',
-              label: userMessages.DIRECTOR_GENERAL
-            },
-            { value: 'CHAIRMAN', label: userMessages.CHAIRMAN },
-            {
-              value: 'STATE_SYSTEM_ADMIN',
-              label: userMessages.STATE_SYSTEM_ADMIN
-            },
-            {
-              value: 'NATIONAL_SYSTEM_ADMIN',
-              label: userMessages.NATIONAL_SYSTEM_ADMIN
-            },
-            {
-              value: 'E_CRVS_PROJECT_ADMIN',
-              label: userMessages.E_CRVS_PROJECT_ADMIN
-            },
-            {
-              value: 'E_CRVS_PROJECT_SUPPORT',
-              label: userMessages.E_CRVS_PROJECT_SUPPORT
-            }
-          ]
-        },
-        {
           name: 'username',
           type: TEXT,
           label: userFormMessages.username,
@@ -245,6 +202,50 @@ export const userSectionFormType: ISerializedFormSection = {
           ignoreBottomMargin: true,
           validate: [],
           conditionals: []
+        },
+        {
+          name: 'title',
+          type: SELECT_WITH_OPTIONS,
+          label: userFormMessages.labelRole,
+          required: true,
+          initialValue: '',
+          validate: [],
+          options: [
+            { value: 'FIELD_AGENT', label: userMessages.FIELD_AGENT },
+            { value: 'REGISTRAR', label: userMessages.REGISTRAR },
+            { value: 'DCR', label: userMessages.DCR },
+            {
+              value: 'HEAD_OF_DEPARTMENT',
+              label: userMessages.HEAD_OF_DEPARTMENT
+            },
+            { value: 'STATE_DIRECTOR', label: userMessages.STATE_DIRECTOR },
+            {
+              value: 'FEDERAL_COMMISSIONER',
+              label: userMessages.FEDERAL_COMMISSIONER
+            },
+            { value: 'DIRECTOR_VRD', label: userMessages.DIRECTOR_VRD },
+            {
+              value: 'DIRECTOR_GENERAL',
+              label: userMessages.DIRECTOR_GENERAL
+            },
+            { value: 'CHAIRMAN', label: userMessages.CHAIRMAN },
+            {
+              value: 'STATE_SYSTEM_ADMIN',
+              label: userMessages.STATE_SYSTEM_ADMIN
+            },
+            {
+              value: 'NATIONAL_SYSTEM_ADMIN',
+              label: userMessages.NATIONAL_SYSTEM_ADMIN
+            },
+            {
+              value: 'E_CRVS_PROJECT_ADMIN',
+              label: userMessages.E_CRVS_PROJECT_ADMIN
+            },
+            {
+              value: 'E_CRVS_PROJECT_SUPPORT',
+              label: userMessages.E_CRVS_PROJECT_SUPPORT
+            }
+          ]
         },
         {
           name: 'role',
