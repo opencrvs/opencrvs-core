@@ -36,7 +36,7 @@ import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { find, merge } from 'lodash'
+import { find, isEmpty, merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -128,6 +128,11 @@ function extractMessages(questions: IQuestionConfig[], language: string) {
     const errorMessage = find(question.errorMessage, {
       lang: language
     })
+    const optionMessages = question?.options?.map((option) => {
+      return find(option.label, {
+        lang: language
+      })
+    })
     if (labelMessage?.descriptor?.id) {
       const labelID: string = labelMessage.descriptor.id as string
       messages[labelID] = labelMessage?.descriptor?.defaultMessage as string
@@ -152,6 +157,15 @@ function extractMessages(questions: IQuestionConfig[], language: string) {
     if (errorMessage?.descriptor?.id) {
       const errID = errorMessage.descriptor.id as string
       messages[errID] = errorMessage.descriptor.defaultMessage as string
+    }
+
+    if (!isEmpty(optionMessages)) {
+      optionMessages?.forEach((option) => {
+        if (option?.descriptor?.id) {
+          const errID = option.descriptor.id as string
+          messages[errID] = option.descriptor.defaultMessage as string
+        }
+      })
     }
   })
   return messages

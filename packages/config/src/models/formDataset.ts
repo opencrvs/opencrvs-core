@@ -1,13 +1,9 @@
 import { Document, model, Schema } from 'mongoose'
-import { IMessage, message } from './question'
+import { ISelectOption, message } from './question'
 
-export interface IOption {
-  value: string
-  label: IMessage[]
-}
 export interface IDataset {
   fileName: string
-  options: IOption[]
+  options: ISelectOption[]
   createdAt: string
   createdBy: string
 }

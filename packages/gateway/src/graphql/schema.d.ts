@@ -1038,6 +1038,7 @@ export interface GQLQuestionInput {
   custom?: boolean
   conditionals?: Array<GQLConditionalInput>
   datasetId?: string
+  options?: Array<GQLCustomSelectOption>
 }
 
 export const enum GQLInformantType {
@@ -1373,6 +1374,11 @@ export const enum GQLCustomFieldType {
 export interface GQLConditionalInput {
   fieldId: string
   regexp: string
+}
+
+export interface GQLCustomSelectOption {
+  value: string
+  label: GQLMesssageDescriptorInput
 }
 
 export interface GQLPayment {

@@ -22,6 +22,7 @@ import {
 } from '@client/forms'
 import {
   getIdentifiersFromFieldId,
+  ICustomSelectOption,
   IMessage
 } from '@client/forms/questionConfig'
 import {
@@ -59,7 +60,7 @@ import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
-import { camelCase, debounce } from 'lodash'
+import { camelCase, debounce, isEmpty } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
@@ -334,11 +335,13 @@ class CustomFieldToolsComp extends React.Component<
                 ? option.label.find((i) => i?.lang === selectedLanguage)
                 : null
 
-              if (label)
+              if (label) {
+                delete label.descriptor.__typename
                 return {
                   value: option.value,
                   label: label.descriptor
                 } as ISelectOption
+              }
             })
             .filter((i) => i) as ISelectOption[]
         }
@@ -408,7 +411,7 @@ class CustomFieldToolsComp extends React.Component<
             : []
         }
       ],
-      selectedDataSource: null
+      selectedDataSource: this.props.selectedField.datasetId
     }
   }
 
@@ -1029,7 +1032,10 @@ class CustomFieldToolsComp extends React.Component<
     )
 
     const modifiedField = this.prepareModifiedFormField()
-    modifiedField.options = options ? options.options : []
+    modifiedField.options = options
+      ? (options.options as ICustomSelectOption[])
+      : []
+    modifiedField.datasetId = selectedDataSource
 
     modifyConfigField(selectedField.fieldId, modifiedField)
   }
@@ -1182,7 +1188,7 @@ class CustomFieldToolsComp extends React.Component<
           {(fieldIds: string[]) => (
             <>
               {this.toggleButtons(fieldIds)}
-              {selectedField.conditionals &&
+              {!isEmpty(selectedField.conditionals) &&
                 this.conditionalParameters(fieldIds)}
             </>
           )}

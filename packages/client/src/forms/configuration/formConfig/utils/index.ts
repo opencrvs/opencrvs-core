@@ -32,7 +32,8 @@ import {
   isDefaultQuestionConfig,
   configFieldToQuestionConfig,
   getConfiguredQuestions,
-  getIdentifiersFromFieldId
+  getIdentifiersFromFieldId,
+  ICustomSelectOption
 } from '@client/forms/questionConfig'
 import { Event, QuestionInput } from '@client/utils/gateway'
 import { FieldPosition } from '@client/forms/configuration'
@@ -75,7 +76,7 @@ export type IConfigFieldMap = Record<string, IConfigField>
 export type ISectionFieldMap = Record<string, IConfigFieldMap>
 
 export type IDataSourceSelectOption = IDataSourceOption & {
-  options: ISelectOption[]
+  options: ICustomSelectOption[] | ISelectOption[]
 }
 
 export function getFieldDefinition(
@@ -418,6 +419,8 @@ export function generateModifiedQuestionConfigs(
         const { identifiers, ...rest } = questionConfig
         return rest
       }
-      return questionConfig
+
+      delete questionConfig.options
+      return questionConfig as QuestionInput
     })
 }

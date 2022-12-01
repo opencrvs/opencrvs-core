@@ -35,7 +35,7 @@ import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { IQuestionConfig } from './questionConfig'
+import { IQuestionConfig } from '@client/forms/questionConfig'
 import { IFont } from '@opencrvs/components/lib/fonts'
 
 export const TEXT = 'TEXT'

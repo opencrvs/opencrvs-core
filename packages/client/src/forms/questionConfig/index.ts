@@ -31,6 +31,11 @@ export interface IConditionalConfig {
   regexp: string
 }
 
+export interface ICustomSelectOption {
+  label: IMessage[]
+  value: string
+}
+
 interface IBaseQuestionConfig {
   fieldId: string
   precedingFieldId: string
@@ -60,7 +65,7 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   fieldName: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]
-  options?: ISelectOption[]
+  options?: ICustomSelectOption[]
   datasetId?: string
 }
 

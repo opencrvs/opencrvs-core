@@ -1614,6 +1614,8 @@ export type QuestionInput = {
   precedingFieldId: Scalars['String']
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
+  options?: InputMaybe<Array<MesssageInput>>
+  datasetId?: InputMaybe<Scalars['String']>
 }
 
 export type QuestionnaireQuestion = {

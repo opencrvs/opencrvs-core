@@ -45,6 +45,12 @@ enum CustomFieldType {
   SELECT_WITH_OPTIONS
 }
 
+input CustomSelectOption {
+  value: String!
+  # label: [MesssageInput!]
+  label: MesssageDescriptorInput!
+}
+
 input QuestionInput {
   fieldId: String!
   label: [MesssageInput!]
@@ -61,4 +67,5 @@ input QuestionInput {
   custom: Boolean
   conditionals: [ConditionalInput!]
   datasetId: String
+  options: [CustomSelectOption!]
 }

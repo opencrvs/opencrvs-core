@@ -1167,6 +1167,7 @@ input QuestionInput {
   custom: Boolean
   conditionals: [ConditionalInput!]
   datasetId: String
+  options: [CustomSelectOption!]
 }
 
 enum InformantType {
@@ -1501,6 +1502,11 @@ enum CustomFieldType {
 input ConditionalInput {
   fieldId: String!
   regexp: String!
+}
+
+input CustomSelectOption {
+  value: String!
+  label: MesssageDescriptorInput!
 }
 
 type Payment {

@@ -126,7 +126,15 @@ export function createCustomField({
     baseField.maxLength = maxLength
   }
   if (baseField.type === CustomFieldType.Select) {
-    baseField.options = options || []
+    baseField.options =
+      options?.map((option) => {
+        return {
+          ...option,
+          label: Array.isArray(option.label)
+            ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+            : option.label
+        }
+      }) || []
   }
   return baseField
 }
