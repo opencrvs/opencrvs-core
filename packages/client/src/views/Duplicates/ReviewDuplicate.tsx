@@ -83,64 +83,60 @@ export function ReviewDuplicate() {
         setLeft(declaration)
       } catch (e) {
         setError(true)
+        setLoading((l) => l - 1)
       }
     }
+    if (!left) {
+      fetchLeft()
+    } else {
+      setLoading((l) => l - 1)
+    }
+  }, [id, event, form, left])
+
+  React.useEffect(() => {
     async function fetchRight() {
       try {
         const declaration = await fetchDeclaration(existingId, event, form)
         setRight(declaration)
       } catch (e) {
         setError(true)
+        setLoading((l) => l - 1)
       }
     }
-
-    try {
-      if (!left) {
-        fetchLeft()
-      }
-    } finally {
+    if (!right) {
+      fetchRight()
+    } else {
       setLoading((l) => l - 1)
     }
+  }, [existingId, event, form, right])
 
-    try {
-      if (!right) {
-        fetchRight()
-      }
-    } finally {
-      setLoading((l) => l - 1)
-    }
-  }, [id, existingId, event, form, left, right])
-
-  if (error) {
-    return (
-      <ErrorToastNotification
-        retryButtonText={intl.formatMessage(buttonMessages.retry)}
-        retryButtonHandler={() => history.go(0)}
-      >
-        {intl.formatMessage(errorMessages.pageLoadFailed)}
-      </ErrorToastNotification>
-    )
-  } else if (left && right) {
-    return (
-      <>
-        <EventTopBar
-          title={intl.formatMessage(
-            registerMessages.newVitalEventRegistration,
-            { event }
-          )}
-          pageIcon={<Duplicate />}
-          goHome={() => dispatch(goBack())}
-        />
+  return (
+    <>
+      <EventTopBar
+        title={intl.formatMessage(registerMessages.newVitalEventRegistration, {
+          event
+        })}
+        pageIcon={<Duplicate />}
+        goHome={() => dispatch(goBack())}
+      />
+      {error ? (
+        <ErrorToastNotification
+          retryButtonText={intl.formatMessage(buttonMessages.retry)}
+          retryButtonHandler={() => history.go(0)}
+        >
+          {intl.formatMessage(errorMessages.pageLoadFailed)}
+        </ErrorToastNotification>
+      ) : loading > 0 ? (
+        <Loader id="review-duplicate-loader" marginPercent={23} />
+      ) : left && right ? (
         <ReviewSection
           pageRoute=""
           readonly
           duplicate
-          draft={left!}
+          draft={left}
           draft2={right}
         />
-      </>
-    )
-  } else {
-    return <Loader id="review-duplicate-loader" marginPercent={23}></Loader>
-  }
+      ) : null}
+    </>
+  )
 }
