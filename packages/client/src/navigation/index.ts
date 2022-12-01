@@ -49,7 +49,8 @@ import {
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
-  EVENT_REGISTRATIONS
+  EVENT_REGISTRATIONS,
+  REVIEW_DUPLICATE
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -374,6 +375,20 @@ export function goToCreateNewUser() {
 
 export function goToCreateNewUserWithLocationId(locationId: string) {
   return push(formatUrl(CREATE_USER_ON_LOCATION, { locationId }))
+}
+
+export function goToReviewDuplicate(
+  event: Event,
+  declarationId: string,
+  existingDeclarationId: string
+) {
+  return push(
+    formatUrl(REVIEW_DUPLICATE, {
+      event,
+      id: declarationId,
+      existingId: existingDeclarationId
+    })
+  )
 }
 
 export function goToCompletenessRates(

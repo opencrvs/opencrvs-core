@@ -2075,3 +2075,9 @@ export function filterProcessingDeclarationsFromQuery(
     )
   }
 }
+
+export function getDeclarationEvent(event: string): Event {
+  if (event.toLowerCase() === 'death') {
+    return Event.Death
+  } else return Event.Birth
+}

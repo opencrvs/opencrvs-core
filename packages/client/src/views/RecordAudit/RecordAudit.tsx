@@ -553,6 +553,8 @@ function RecordAuditBody({
       <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
       {hasDuplicates && (
         <StyledDuplicateWarning
+          event={declaration.type as Event}
+          declarationId={declaration.id}
           duplicateIds={duplicates?.filter(
             (duplicate): duplicate is string => !!duplicate
           )}

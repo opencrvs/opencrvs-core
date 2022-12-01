@@ -89,7 +89,11 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -120,7 +124,7 @@ import {
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { ReviewHeader } from './ReviewHeader'
+import { ReviewHeader } from '@client/views/RegisterForm/review/ReviewHeader'
 import { IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
@@ -159,9 +163,25 @@ const Row = styled.div`
     flex-direction: column;
   }
 `
-const RightColumn = styled.div`
-  width: 40%;
-  border-radius: 4px;
+
+const RightColumn = styled.div<{
+  hasDeclaration2?: boolean
+}>`
+  ${({ hasDeclaration2, theme }) =>
+    hasDeclaration2
+      ? `
+      width: 50%;
+      @media (max-width: ${theme.grid.breakpoints.lg}px) {
+        width: 100%;
+        margin-top: 24px;
+        margin-left: 0;
+      }`
+      : `
+      width: 40%;
+      @media (max-width: ${theme.grid.breakpoints.lg}px) {
+        display: none;
+      }
+      `};
   margin-left: 24px;
 
   &:first-child {
@@ -170,17 +190,15 @@ const RightColumn = styled.div`
   &:last-child {
     margin-right: -24px;
   }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
 `
-
-const LeftColumn = styled.div`
+const Content = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
-  width: 60%;
-  margin-bottom: 200px;
-
+`
+const LeftColumn = styled.div<{
+  hasDeclaration2?: boolean
+  duplicate?: boolean
+}>`
+  width: ${({ hasDeclaration2 }) => (hasDeclaration2 ? 50 : 60)}%;
   &:first-child {
     margin-left: 0px;
   }
@@ -277,6 +295,23 @@ const Description = styled.div`
   text-align: left;
   background-color: ${({ theme }) => theme.colors.white};
 `
+const DuplicateWarningGreen = styled(Warning)`
+  background-color: #f4fff3;
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.colors.green};
+  color: ${({ theme }) => theme.colors.green};
+  svg {
+    path,
+    circle {
+      stroke: ${({ theme }) => theme.colors.green};
+    }
+  }
+  margin-bottom: 16px;
+`
+
+const DuplicateWarningRed = styled(Warning)`
+  margin-bottom: 16px;
+`
 
 function SignCanvas({
   value,
@@ -346,6 +381,7 @@ type SignatureInputProps = {
   id?: string
   value?: string
   onChange: (value: string) => void
+  readonly?: boolean
 }
 
 const SignatureDescription = styled.p`
@@ -354,7 +390,12 @@ const SignatureDescription = styled.p`
   color: ${({ theme }) => theme.colors.grey500};
 `
 
-function SignatureInput({ id, value, onChange }: SignatureInputProps) {
+function SignatureInput({
+  id,
+  value,
+  onChange,
+  readonly
+}: SignatureInputProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = React.useState(false)
   const [signatureValue, setSignatureValue] = React.useState('')
 
@@ -370,7 +411,7 @@ function SignatureInput({ id, value, onChange }: SignatureInputProps) {
       <SignatureDescription>
         {intl.formatMessage(messages.signatureDescription)}
       </SignatureDescription>
-      {!value && (
+      {!value && !readonly && (
         <>
           <SecondaryButton onClick={() => setSignatureDialogOpen(true)}>
             {intl.formatMessage(messages.signatureOpenSignatureInput)}
@@ -385,7 +426,7 @@ function SignatureInput({ id, value, onChange }: SignatureInputProps) {
         </>
       )}
       {value && <SignaturePreview alt="Informant's signature" src={value} />}
-      {value && (
+      {value && !readonly && (
         <TertiaryButton onClick={() => onChange('')}>
           {intl.formatMessage(messages.signatureDelete)}
         </TertiaryButton>
@@ -433,15 +474,17 @@ type onChangeReviewForm = (
 ) => void
 interface IProps {
   draft: IDeclaration
+  draft2?: IDeclaration
   registerForm: { [key: string]: IForm }
   pageRoute: string
   rejectDeclarationClickEvent?: () => void
   goToPageGroup: typeof goToPageGroup
-  submitClickEvent: (
+  submitClickEvent?: (
     declaration: IDeclaration,
     submissionStatus: string,
     action: SubmissionAction
   ) => void
+  readonly?: boolean
   scope: Scope | null
   offlineCountryConfiguration: IOfflineData
   language: string
@@ -450,6 +493,7 @@ interface IProps {
   writeDeclaration: typeof writeDeclaration
   registrationSection: IFormSection
   documentsSection: IFormSection
+  duplicate?: boolean
 }
 type State = {
   displayEditDialog: boolean
@@ -1220,7 +1264,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         (tagDef[0] && tagDef[0].label) || field.label,
         (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
         completeValue,
-        field.readonly
+        field.readonly || this.props.readonly
       )
     }
   }
@@ -1339,7 +1383,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field.label,
       field.name,
       value,
-      field.readonly
+      field.readonly || this.props.readonly
     )
   }
 
@@ -1395,7 +1439,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               nestedField,
               sectionErrors[section.id][field.name]
             ),
-            nestedField.readonly
+            nestedField.readonly || this.props.readonly
           )
         )
       }
@@ -1544,7 +1588,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return (
       event === Event.Birth &&
       ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
-        (section.id === BirthSection.Father && !!data.father?.detailsExist))
+        (section.id === BirthSection.Father && !!data.father?.detailsExist)) &&
+      !this.props.readonly
     )
   }
 
@@ -1635,6 +1680,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const {
       intl,
       draft: declaration,
+      draft2: declaration2,
       registerForm,
       rejectDeclarationClickEvent,
       submitClickEvent,
@@ -1642,7 +1688,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       documentsSection,
       offlineCountryConfiguration,
       draft: { event },
-      onContinue
+      readonly,
+      onContinue,
+      duplicate
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
     const errorsOnFields = getErrorsOnFieldsBySection(
@@ -1676,6 +1724,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         (declaration.data.registration &&
           declaration.data.registration.commentsOrNotes) ||
         '',
+      disabled: readonly,
       ignoreMediaQuery: true
     }
 
@@ -1689,11 +1738,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             declaration
           )
       },
-      value: declaration.data.registration?.informantsSignature as string
+      value: declaration.data.registration?.informantsSignature as string,
+      readonly
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
     const informantName = getDraftInformantFullName(declaration, intl.locale)
+    const informantName2 = declaration2
+      ? getDraftInformantFullName(declaration2, intl.locale)
+      : ''
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
@@ -1706,165 +1759,339 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return (
       <FullBodyContent>
         <Row>
-          <LeftColumn>
-            <ReviewHeader
-              id="review_header"
-              logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
-              title={intl.formatMessage(messages.govtName)}
-              subject={
-                informantName
-                  ? intl.formatMessage(messages.headerSubjectWithName, {
-                      eventType: event,
-                      name: informantName
-                    })
-                  : intl.formatMessage(messages.headerSubjectWithoutName, {
-                      eventType: event
-                    })
-              }
-            />
-            {description && <Description>{description}</Description>}
-            <FormData>
-              {transformedSectionData.map((sec, index) => {
-                const { uploadedDocuments, selectOptions } =
-                  this.prepSectionDocuments(declaration, sec.id)
+          <LeftColumn hasDeclaration2={Boolean(declaration2)}>
+            {duplicate && (
+              <DuplicateWarningGreen
+                label={intl.formatMessage(messages.originalDeclaration, {
+                  trackingId: declaration.data.registration?.trackingId
+                })}
+              />
+            )}
+            <Content>
+              <ReviewHeader
+                id="review_header"
+                logoSource={
+                  offlineCountryConfiguration.config.COUNTRY_LOGO.file
+                }
+                title={intl.formatMessage(messages.govtName)}
+                subject={
+                  informantName
+                    ? intl.formatMessage(messages.headerSubjectWithName, {
+                        eventType: event,
+                        name: informantName
+                      })
+                    : intl.formatMessage(messages.headerSubjectWithoutName, {
+                        eventType: event
+                      })
+                }
+              />
+              {description && !readonly && (
+                <Description>{description}</Description>
+              )}
+              <FormData>
+                {transformedSectionData.map((sec, index) => {
+                  const { uploadedDocuments, selectOptions } =
+                    this.prepSectionDocuments(declaration, sec.id)
 
-                return (
-                  <SectionContainer key={index}>
-                    {sec.title && (
-                      <Title>
-                        {sec.title}
-                        {sec.action && (
-                          <LinkButton onClick={sec.action.handler}>
-                            {sec.action.label}
-                          </LinkButton>
-                        )}
-                      </Title>
+                  return (
+                    <SectionContainer key={index}>
+                      {sec.title && (
+                        <Title>
+                          {sec.title}
+                          {sec.action && (
+                            <LinkButton onClick={sec.action.handler}>
+                              {sec.action.label}
+                            </LinkButton>
+                          )}
+                        </Title>
+                      )}
+                      <DocumentListPreviewContainer>
+                        <DocumentListPreview
+                          id={sec.id}
+                          documents={uploadedDocuments}
+                          onSelect={this.selectForPreview}
+                          dropdownOptions={selectOptions}
+                        />
+                      </DocumentListPreviewContainer>
+                      <ListViewSimplified id={'Section_' + sec.id}>
+                        {sec.items.map((item, index) => {
+                          return (
+                            <ListViewItemSimplified
+                              key={index}
+                              label={<Label>{item.label}</Label>}
+                              value={
+                                <Value id={item.label.split(' ')[0]}>
+                                  {item.value}
+                                </Value>
+                              }
+                              actions={
+                                <LinkButton
+                                  id={item.action.id}
+                                  disabled={item.action.disabled}
+                                  onClick={item.action.handler}
+                                >
+                                  {item.action.label}
+                                </LinkButton>
+                              }
+                            />
+                          )
+                        })}
+                      </ListViewSimplified>
+                    </SectionContainer>
+                  )
+                })}
+                {!isCorrection(declaration) && (
+                  <InputWrapper>
+                    <InputField
+                      id="additional_comments"
+                      touched={false}
+                      required={false}
+                      label={intl.formatMessage(messages.additionalComments)}
+                    >
+                      <TextArea {...textAreaProps} />
+                    </InputField>
+                  </InputWrapper>
+                )}
+                {!isCorrection(declaration) && !hasB1Form(declaration) && (
+                  <InputWrapper>
+                    <InputField
+                      id="informant_signature"
+                      touched={false}
+                      required={true}
+                      label={intl.formatMessage(messages.informantsSignature)}
+                    >
+                      <SignatureInput {...signatureInputProps} />
+                    </InputField>
+                  </InputWrapper>
+                )}
+                {totalFileSizeExceeded && (
+                  <Warning
+                    label={intl.formatMessage(
+                      constantsMessages.totalFileSizeExceed,
+                      { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
                     )}
-                    <DocumentListPreviewContainer>
-                      <DocumentListPreview
-                        id={sec.id}
-                        documents={uploadedDocuments}
-                        onSelect={this.selectForPreview}
-                        dropdownOptions={selectOptions}
-                      />
-                    </DocumentListPreviewContainer>
-                    <ListViewSimplified id={'Section_' + sec.id}>
-                      {sec.items.map((item, index) => {
-                        return (
-                          <ListViewItemSimplified
-                            key={index}
-                            label={<Label>{item.label}</Label>}
-                            value={
-                              <Value id={item.label.split(' ')[0]}>
-                                {item.value}
-                              </Value>
-                            }
-                            actions={
-                              <LinkButton
-                                id={item.action.id}
-                                disabled={item.action.disabled}
-                                onClick={item.action.handler}
-                              >
-                                {item.action.label}
-                              </LinkButton>
-                            }
-                          />
-                        )
-                      })}
-                    </ListViewSimplified>
-                  </SectionContainer>
-                )
-              })}
-              {!isCorrection(declaration) && (
-                <InputWrapper>
-                  <InputField
-                    id="additional_comments"
-                    touched={false}
-                    required={false}
-                    label={intl.formatMessage(messages.additionalComments)}
-                  >
-                    <TextArea {...textAreaProps} />
-                  </InputField>
-                </InputWrapper>
-              )}
-              {!isCorrection(declaration) && !hasB1Form(declaration) && (
-                <InputWrapper>
-                  <InputField
-                    id="informant_signature"
-                    touched={false}
-                    required={true}
-                    label={intl.formatMessage(messages.informantsSignature)}
-                  >
-                    <SignatureInput {...signatureInputProps} />
-                  </InputField>
-                </InputWrapper>
-              )}
-              {totalFileSizeExceeded && (
-                <Warning
-                  label={intl.formatMessage(
-                    constantsMessages.totalFileSizeExceed,
-                    { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
-                  )}
-                />
-              )}
-              {!isCorrection(declaration) ? (
-                <>
-                  <DuplicateWarning duplicateIds={declaration.duplicates} />
-                  <ReviewAction
-                    completeDeclaration={isComplete}
-                    totalFileSizeExceeded={totalFileSizeExceeded}
-                    declarationToBeValidated={this.userHasValidateScope()}
-                    declarationToBeRegistered={this.userHasRegisterScope()}
-                    alreadyRejectedDeclaration={
-                      this.props.draft.registrationStatus === REJECTED
-                    }
-                    draftDeclaration={draft}
-                    declaration={declaration}
-                    submitDeclarationAction={submitClickEvent}
-                    rejectDeclarationAction={rejectDeclarationClickEvent}
                   />
-                </>
-              ) : (
-                <FooterArea>
-                  <PrimaryButton
-                    id="continue_button"
-                    onClick={onContinue}
-                    disabled={!isComplete || !this.hasChangesBeenMade}
-                  >
-                    {intl.formatMessage(buttonMessages.continueButton)}
-                  </PrimaryButton>
-                </FooterArea>
-              )}
-            </FormData>
+                )}
+                {!isCorrection(declaration) ? (
+                  <>
+                    {!readonly && (
+                      <DuplicateWarning duplicateIds={declaration.duplicates} />
+                    )}
+                    {submitClickEvent && !readonly && (
+                      <ReviewAction
+                        completeDeclaration={isComplete}
+                        totalFileSizeExceeded={totalFileSizeExceeded}
+                        declarationToBeValidated={this.userHasValidateScope()}
+                        declarationToBeRegistered={this.userHasRegisterScope()}
+                        alreadyRejectedDeclaration={
+                          this.props.draft.registrationStatus === REJECTED
+                        }
+                        draftDeclaration={draft}
+                        declaration={declaration}
+                        submitDeclarationAction={submitClickEvent}
+                        rejectDeclarationAction={rejectDeclarationClickEvent}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <FooterArea>
+                    <PrimaryButton
+                      id="continue_button"
+                      onClick={onContinue}
+                      disabled={!isComplete || !this.hasChangesBeenMade}
+                    >
+                      {intl.formatMessage(buttonMessages.continueButton)}
+                    </PrimaryButton>
+                  </FooterArea>
+                )}
+              </FormData>
+            </Content>
           </LeftColumn>
-          <RightColumn>
-            <ResponsiveDocumentViewer
-              isRegisterScope={this.userHasRegisterScope()}
-            >
-              <DocumentViewer
-                id={'document_section_' + this.state.activeSection}
-                key={'Document_section_' + this.state.activeSection}
-                options={this.prepSectionDocuments(declaration)}
-              >
-                <ZeroDocument id={`zero_document_${sectionName}`}>
-                  {intl.formatMessage(messages.zeroDocumentsText, {
-                    section: sectionName
+          <RightColumn hasDeclaration2={Boolean(declaration2)}>
+            {duplicate && (
+              <DuplicateWarningRed
+                label={intl.formatMessage(errorMessages.duplicateWarning, {
+                  trackingId: declaration2?.data?.registration?.trackingId ?? ''
+                })}
+              />
+            )}
+            {declaration2 ? (
+              <Content>
+                <ReviewHeader
+                  id="review_header"
+                  logoSource={
+                    offlineCountryConfiguration.config.COUNTRY_LOGO.file
+                  }
+                  title={intl.formatMessage(messages.govtName)}
+                  subject={
+                    informantName2
+                      ? intl.formatMessage(messages.headerSubjectWithName, {
+                          eventType: event,
+                          name: informantName2
+                        })
+                      : intl.formatMessage(messages.headerSubjectWithoutName, {
+                          eventType: event
+                        })
+                  }
+                />
+                {description && !readonly && (
+                  <Description>{description}</Description>
+                )}
+                <FormData>
+                  {transformedSectionData.map((sec, index) => {
+                    const { uploadedDocuments, selectOptions } =
+                      this.prepSectionDocuments(declaration2, sec.id)
+
+                    return (
+                      <SectionContainer key={index}>
+                        {sec.title && (
+                          <Title>
+                            {sec.title}
+                            {sec.action && (
+                              <LinkButton onClick={sec.action.handler}>
+                                {sec.action.label}
+                              </LinkButton>
+                            )}
+                          </Title>
+                        )}
+                        <DocumentListPreviewContainer>
+                          <DocumentListPreview
+                            id={sec.id}
+                            documents={uploadedDocuments}
+                            onSelect={this.selectForPreview}
+                            dropdownOptions={selectOptions}
+                          />
+                        </DocumentListPreviewContainer>
+                        <ListViewSimplified id={'Section_' + sec.id}>
+                          {sec.items.map((item, index) => {
+                            return (
+                              <ListViewItemSimplified
+                                key={index}
+                                label={<Label>{item.label}</Label>}
+                                value={
+                                  <Value id={item.label.split(' ')[0]}>
+                                    {item.value}
+                                  </Value>
+                                }
+                                actions={
+                                  <LinkButton
+                                    id={item.action.id}
+                                    disabled={item.action.disabled}
+                                    onClick={item.action.handler}
+                                  >
+                                    {item.action.label}
+                                  </LinkButton>
+                                }
+                              />
+                            )
+                          })}
+                        </ListViewSimplified>
+                      </SectionContainer>
+                    )
                   })}
-                  <LinkButton
-                    id="edit-document"
-                    disabled={isCorrection(declaration)}
-                    onClick={() =>
-                      this.editLinkClickHandlerForDraft(
-                        documentsSection.id,
-                        documentsSection.groups[0].id!
-                      )
-                    }
-                  >
-                    {intl.formatMessage(messages.editDocuments)}
-                  </LinkButton>
-                </ZeroDocument>
-              </DocumentViewer>
-            </ResponsiveDocumentViewer>
+                  {!isCorrection(declaration2) && (
+                    <InputWrapper>
+                      <InputField
+                        id="additional_comments"
+                        touched={false}
+                        required={false}
+                        label={intl.formatMessage(messages.additionalComments)}
+                      >
+                        <TextArea {...textAreaProps} />
+                      </InputField>
+                    </InputWrapper>
+                  )}
+                  {!isCorrection(declaration2) && !hasB1Form(declaration2) && (
+                    <InputWrapper>
+                      <InputField
+                        id="informant_signature"
+                        touched={false}
+                        required={true}
+                        label={intl.formatMessage(messages.informantsSignature)}
+                      >
+                        <SignatureInput
+                          {...signatureInputProps}
+                          value={
+                            declaration2.data.registration
+                              ?.informantsSignature as string
+                          }
+                        />
+                      </InputField>
+                    </InputWrapper>
+                  )}
+                  {totalFileSizeExceeded && (
+                    <Warning
+                      label={intl.formatMessage(
+                        constantsMessages.totalFileSizeExceed,
+                        { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
+                      )}
+                    />
+                  )}
+                  {!isCorrection(declaration2) ? (
+                    <>
+                      {!readonly && (
+                        <DuplicateWarning
+                          duplicateIds={declaration2.duplicates}
+                        />
+                      )}
+                      {submitClickEvent && !readonly && (
+                        <ReviewAction
+                          completeDeclaration={isComplete}
+                          totalFileSizeExceeded={totalFileSizeExceeded}
+                          declarationToBeValidated={this.userHasValidateScope()}
+                          declarationToBeRegistered={this.userHasRegisterScope()}
+                          alreadyRejectedDeclaration={
+                            this.props.draft.registrationStatus === REJECTED
+                          }
+                          draftDeclaration={draft}
+                          declaration={declaration}
+                          submitDeclarationAction={submitClickEvent}
+                          rejectDeclarationAction={rejectDeclarationClickEvent}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <FooterArea>
+                      <PrimaryButton
+                        id="continue_button"
+                        onClick={onContinue}
+                        disabled={!isComplete || !this.hasChangesBeenMade}
+                      >
+                        {intl.formatMessage(buttonMessages.continueButton)}
+                      </PrimaryButton>
+                    </FooterArea>
+                  )}
+                </FormData>
+              </Content>
+            ) : (
+              <ResponsiveDocumentViewer
+                isRegisterScope={this.userHasRegisterScope()}
+              >
+                <DocumentViewer
+                  id={'document_section_' + this.state.activeSection}
+                  key={'Document_section_' + this.state.activeSection}
+                  options={this.prepSectionDocuments(declaration)}
+                >
+                  <ZeroDocument id={`zero_document_${sectionName}`}>
+                    {intl.formatMessage(messages.zeroDocumentsText, {
+                      section: sectionName
+                    })}
+                    <LinkButton
+                      id="edit-document"
+                      disabled={isCorrection(declaration)}
+                      onClick={() =>
+                        this.editLinkClickHandlerForDraft(
+                          documentsSection.id,
+                          documentsSection.groups[0].id!
+                        )
+                      }
+                    >
+                      {intl.formatMessage(messages.editDocuments)}
+                    </LinkButton>
+                  </ZeroDocument>
+                </DocumentViewer>
+              </ResponsiveDocumentViewer>
+            )}
           </RightColumn>
         </Row>
         <ResponsiveModal
