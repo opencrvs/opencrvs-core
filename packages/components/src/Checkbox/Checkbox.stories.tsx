@@ -34,44 +34,5 @@ Default.args = {
   name: 'Banana',
   label: 'Banana',
   value: 'banana',
-  hint: 'A fruit',
   selected: true
-}
-
-export const Group: ComponentStory<typeof CheckboxGroup> = () => {
-  const [selectedItems, setSelectedItems] = useState(['bananas'])
-
-  return (
-    <CheckboxGroup
-      id="test-checkbox-group1"
-      options={[
-        {
-          label: 'Bananas',
-          value: 'bananas'
-        },
-        {
-          label: 'Oranges',
-          value: 'oranges'
-        }
-      ]}
-      name="test-checkbox-group1"
-      value={selectedItems}
-      onChange={(newValue) => setSelectedItems(newValue)}
-    />
-  )
-}
-
-Group.args = {
-  options: [
-    {
-      label: 'Bananas',
-      value: 'bananas'
-    },
-    {
-      label: 'Oranges',
-      value: 'oranges'
-    }
-  ],
-  name: 'test-checkbox-group1',
-  value: ['bananas']
 }
