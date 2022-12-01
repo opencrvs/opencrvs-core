@@ -171,7 +171,9 @@ const AuditDescriptionMapping: {
   USERNAME_REMINDER: messages.userNameReminderAuditAction,
   RETRIEVED: messages.retrievedAuditAction,
   VIEWED: messages.viewedAuditAction,
-  REINSTATED: messages.reinstatedAuditAction
+  REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
+  REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
+  REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction
 }
 
 export function getUserAuditDescription(

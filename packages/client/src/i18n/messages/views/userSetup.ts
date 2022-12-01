@@ -72,7 +72,9 @@ interface IUserSetupMessages
   userNameReminderAuditAction: MessageDescriptor
   retrievedAuditAction: MessageDescriptor
   viewedAuditAction: MessageDescriptor
-  reinstatedAuditAction: MessageDescriptor
+  reInStatedRejectedAuditAction: MessageDescriptor
+  reInstatedInReviewAuditAction: MessageDescriptor
+  reInstatedInProgressAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -374,10 +376,23 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for declaration viewed audit action',
     id: 'user.profile.auditList.viewed'
   },
-  reinstatedAuditAction: {
-    defaultMessage: 'Reinstated',
-    description: 'Description for declaration reinstated audit action',
-    id: 'user.profile.auditList.reinstated'
+  reInstatedInProgressAuditAction: {
+    defaultMessage: 'Reinstated to In Progress',
+    description:
+      'Description for sending registration from Reinstated to In progress audit action',
+    id: 'user.profile.auditList.reInstatedToInProgress'
+  },
+  reInstatedInReviewAuditAction: {
+    defaultMessage: 'Reinstated to In Review',
+    description:
+      'Description for sending registration from Reinstated to In review audit action',
+    id: 'user.profile.auditList.reInstatedToInReview'
+  },
+  reInStatedRejectedAuditAction: {
+    defaultMessage: 'Reinstated to Require Updates',
+    description:
+      'Description for sending registration from Reinstated to require updates audit action',
+    id: 'user.profile.auditList.reInstatedToUpdate'
   }
 }
 
