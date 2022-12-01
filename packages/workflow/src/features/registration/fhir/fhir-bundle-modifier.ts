@@ -31,6 +31,7 @@ import {
   generateDeathTrackingId,
   getEventType,
   getMosipUINToken,
+  isEventNotification,
   isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
@@ -92,8 +93,10 @@ export async function modifyRegistrationBundle(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
+  if (!isEventNotification(fhirBundle)) {
+    /* setting lastRegLocation here */
+    await setupLastRegLocation(taskResource, practitioner)
+  }
 
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
