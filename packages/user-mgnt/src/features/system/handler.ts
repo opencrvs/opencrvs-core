@@ -248,13 +248,6 @@ interface IVerifyResponse {
   id: string
 }
 
-interface AllSystemResponse {
-  client_id: string
-  sha_secret: string
-  name: string
-  status: string
-}
-
 export async function verifySystemHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit

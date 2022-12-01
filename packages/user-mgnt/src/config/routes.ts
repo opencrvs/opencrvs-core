@@ -543,7 +543,6 @@ export const getRoutes = () => {
         }
       }
     },
-
     {
       method: 'POST',
       path: '/getSystem',

@@ -74,10 +74,6 @@ import {
   GQLRegStatus
 } from '@gateway/graphql/schema'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
-
-export type Composition = fhir.Composition & { id: string }
-export type Task = fhir.Task & { id: string }
-
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
