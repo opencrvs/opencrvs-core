@@ -686,6 +686,10 @@ export const NavigationView = (props: IFullProps) => {
                 })
                 goToAdvancedSearchResultAction()
               }}
+              isSelected={
+                advancedSearchParams.searchId === bookmarkResult.searchId &&
+                props.location.pathname === ADVANCED_SEARCH_RESULT
+              }
             />
           )
         })

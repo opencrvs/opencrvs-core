@@ -347,7 +347,7 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
       name: 'informantDoB',
       customisable: false,
       type: 'DATE_RANGE_PICKER',
-      label: formMessageDescriptors.fatherDateOfDeath,
+      label: formMessageDescriptors.fatherDateOfBirth,
       required: false,
       initialValue: '',
       validate: []

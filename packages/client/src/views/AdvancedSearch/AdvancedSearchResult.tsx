@@ -396,14 +396,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
 
   return (
     <Frame
-      header={
-        <Header
-          searchText={intl.formatMessage(headerMessages.advancedSearch)}
-          selectedSearchType={ADVANCED_SEARCH_TEXT}
-          mobileSearchBar={true}
-          enableMenuSelection={false}
-        />
-      }
+      header={<Header mobileSearchBar={true} enableMenuSelection={false} />}
       navigation={<Navigation />}
       skipToContentText={intl.formatMessage(
         constantsMessages.skipToMainContent
