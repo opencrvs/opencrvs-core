@@ -173,7 +173,6 @@ const AuditDescriptionMapping: {
   REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
   REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
   REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
-  RETRIEVED: messages.retrieveAuditAction,
   SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction
 }
 

@@ -345,8 +345,8 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
 
   getActionMessage(auditLog: UserAuditLogResultItem) {
     const actionDescriptor = getUserAuditDescription(auditLog.action)
-    return actionDescriptor?.defaultMessage
-      ? actionDescriptor?.defaultMessage
+    return actionDescriptor
+      ? this.props.intl.formatMessage(actionDescriptor)
       : ''
   }
 

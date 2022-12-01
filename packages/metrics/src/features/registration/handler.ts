@@ -98,9 +98,6 @@ export async function registrarRegistrationWaitingExternalValidationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
-
-  await createUserAuditPointFromFHIR('SENT_FOR_APPROVAL', request)
-
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
