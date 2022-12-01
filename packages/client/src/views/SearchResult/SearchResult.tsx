@@ -61,7 +61,11 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 
 import { SearchEventsQuery } from '@client/utils/gateway'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
@@ -100,19 +104,40 @@ export const ActionPageWrapper = styled.div`
   overflow-y: scroll;
 `
 
-export function getRejectionReasonDisplayValue(reason: string) {
-  switch (reason.toLowerCase()) {
-    case 'duplicate':
-      return rejectMessages.rejectionReasonDuplicate
-    case 'misspelling':
-      return rejectMessages.rejectionReasonMisspelling
-    case 'missing_supporting_doc':
-      return rejectMessages.rejectionReasonMissingSupportingDoc
-    case 'other':
-      return rejectMessages.rejectionReasonOther
-    default:
-      return rejectMessages.rejectionReasonOther
+export function getRejectionReasonDisplayValue(
+  reason: string,
+  intl: IntlShape
+) {
+  const reasonMessages: { text: string }[] = []
+  const reasonArray = reason.split(',')
+  if (reasonArray.length > 0) {
+    reasonArray.forEach((reason) => {
+      if (reason.toLowerCase() === 'duplicate') {
+        reasonMessages.push({
+          text: intl.formatMessage(rejectMessages.rejectionReasonDuplicate)
+        })
+      } else if (reason.toLowerCase() === 'misspelling') {
+        reasonMessages.push({
+          text: intl.formatMessage(rejectMessages.rejectionReasonMisspelling)
+        })
+      } else if (reason.toLowerCase() === 'missing_supporting_doc') {
+        reasonMessages.push({
+          text: intl.formatMessage(
+            rejectMessages.rejectionReasonMissingSupportingDoc
+          )
+        })
+      } else if (reason.toLowerCase() === 'other') {
+        reasonMessages.push({
+          text: intl.formatMessage(rejectMessages.rejectionReasonOther)
+        })
+      } else {
+        reasonMessages.push({
+          text: intl.formatMessage(rejectMessages.rejectionReasonOther)
+        })
+      }
+    })
   }
+  return reasonMessages
 }
 
 export interface ISerachInputCustomProps {

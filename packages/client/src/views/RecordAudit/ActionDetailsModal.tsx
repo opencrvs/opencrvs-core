@@ -405,13 +405,10 @@ export const ActionDetailsModalListTable = ({
           <Table
             noResultText=" "
             columns={reasonColumn}
-            content={[
-              {
-                text: intl.formatMessage(
-                  getRejectionReasonDisplayValue(actionDetailsData.reason)
-                )
-              }
-            ]}
+            content={getRejectionReasonDisplayValue(
+              actionDetailsData.reason,
+              intl
+            )}
           />
         )}
 
