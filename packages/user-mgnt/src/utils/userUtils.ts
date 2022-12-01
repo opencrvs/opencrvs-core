@@ -24,6 +24,10 @@ interface IRoleScopeMapping {
   [key: string]: string[]
 }
 
+export interface IAuthHeader {
+  Authorization: string
+}
+
 export const roleScopeMapping: IRoleScopeMapping = {
   FIELD_AGENT: ['declare'],
   REGISTRATION_AGENT: ['validate', 'performance', 'certify'],

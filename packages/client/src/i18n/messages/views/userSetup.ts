@@ -69,9 +69,14 @@ interface IUserSetupMessages
   createUserAuditAction: MessageDescriptor
   editUserAuditAction: MessageDescriptor
   passwordResetAuditAction: MessageDescriptor
+  sendUserNameReminder: MessageDescriptor
   sendPasswordAuditAction: MessageDescriptor
   userNameReminderAuditAction: MessageDescriptor
-  sendUserNameReminder: MessageDescriptor
+  sentForReviewAuditAction: MessageDescriptor
+  reInstatedInProgressAuditAction: MessageDescriptor
+  reInstatedInReviewAuditAction: MessageDescriptor
+  reInStatedRejectedAuditAction: MessageDescriptor
+  sentForApprovalAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -304,7 +309,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.auditList.unAssigned'
   },
   correctedAuditAction: {
-    defaultMessage: 'Corrected',
+    defaultMessage: 'Corrected Record',
     description: 'Description for declaration corrected',
     id: 'user.profile.auditList.corrected'
   },
@@ -358,6 +363,11 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for User reset password action',
     id: 'user.profile.auditList.passwordReset'
   },
+  userNameReminderAuditAction: {
+    defaultMessage: 'Username Reminder Requested',
+    description: 'Description for User username requested audit action',
+    id: 'user.profile.auditList.usernameRequested'
+  },
 
   sendPasswordAuditAction: {
     defaultMessage: 'Sent Password',
@@ -365,16 +375,40 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.auditList.sentPassword'
   },
 
-  userNameReminderAuditAction: {
-    defaultMessage: 'Username Reminder Requested',
-    description: 'Description for User username requested audit action',
-    id: 'user.profile.auditList.usernameRequested'
-  },
-
   sendUserNameReminder: {
     defaultMessage: 'Sent Username Reminder',
     description: 'Description for send username reminder audit action',
     id: 'user.profile.auditList.sentUsernameReminder'
+  },
+
+  sentForReviewAuditAction: {
+    defaultMessage: 'Sent Incomplete Registration',
+    description: 'Description for sending registration for review audit action',
+    id: 'user.profile.auditList.sentForReview'
+  },
+  reInstatedInProgressAuditAction: {
+    defaultMessage: 'Reinstated to In Progress',
+    description:
+      'Description for sending registration from Reinstated to In progress audit action',
+    id: 'user.profile.auditList.reInstatedToInProgress'
+  },
+  reInstatedInReviewAuditAction: {
+    defaultMessage: 'Reinstated to In Review',
+    description:
+      'Description for sending registration from Reinstated to In review audit action',
+    id: 'user.profile.auditList.reInstatedToInReview'
+  },
+  reInStatedRejectedAuditAction: {
+    defaultMessage: 'Reinstated to Require Updates',
+    description:
+      'Description for sending registration from Reinstated to require updates audit action',
+    id: 'user.profile.auditList.reInstatedToUpdate'
+  },
+  sentForApprovalAuditAction: {
+    defaultMessage: 'Sent For Approval',
+    description:
+      'Description for sending registration for approval audit action',
+    id: 'user.profile.auditList.sentForApproval'
   }
 }
 

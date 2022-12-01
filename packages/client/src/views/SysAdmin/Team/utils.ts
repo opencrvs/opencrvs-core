@@ -170,7 +170,12 @@ const AuditDescriptionMapping: {
   PASSWORD_RESET: messages.passwordResetAuditAction,
   USERNAME_REMINDER: messages.userNameReminderAuditAction,
   SEND_USERNAME_REMINDER: messages.sendUserNameReminder,
-  SEND_PASSWORD: messages.sendPasswordAuditAction
+  SEND_PASSWORD: messages.sendPasswordAuditAction,
+  INCOMPLETE: messages.sentForReviewAuditAction,
+  REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
+  REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
+  REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
+  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction
 }
 
 export function getUserAuditDescription(

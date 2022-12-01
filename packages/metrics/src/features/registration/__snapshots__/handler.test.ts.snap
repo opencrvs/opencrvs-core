@@ -208,7 +208,7 @@ Object {
     "missingFieldGroupId": "child-view-group",
     "missingFieldId": "placeOfBirth",
     "missingFieldSectionId": "child",
-    "regStatus": "IN_PROGESS",
+    "regStatus": "IN_PROGRESS",
   },
   "timestamp": 1551785895844000000,
 }

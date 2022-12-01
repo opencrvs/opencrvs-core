@@ -120,7 +120,7 @@ export const generateInCompleteFieldPoints = async (
         missingFieldGroupId: missingFieldIds[1],
         missingFieldId: missingFieldIds[2],
         eventType: getDeclarationType(task),
-        regStatus: 'IN_PROGESS',
+        regStatus: 'IN_PROGRESS',
         ...locationTags
       }
       return {

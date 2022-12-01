@@ -66,7 +66,7 @@ export async function requestForRegistrarValidationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
-
+  await createUserAuditPointFromFHIR('SENT_FOR_APPROVAL', request)
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -98,7 +98,6 @@ export async function registrarRegistrationWaitingExternalValidationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
-
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -377,6 +376,7 @@ export async function markCertifiedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('CERTIFIED', request)
   try {
     const points = await Promise.all([
       generateCertificationPoint(request.payload as fhir.Bundle, {
