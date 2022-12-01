@@ -24,6 +24,7 @@ interface IFormMessages
   informantName: MessageDescriptor
   otherInformantType: MessageDescriptor
   informantsDateOfBirth: MessageDescriptor
+  informantsFirstName: MessageDescriptor
   informantsFamilyName: MessageDescriptor
   informantsFamilyNameEng: MessageDescriptor
   informantsGivenNames: MessageDescriptor
@@ -228,6 +229,7 @@ interface IFormMessages
   motherTitle: MessageDescriptor
   multipleBirth: MessageDescriptor
   nationality: MessageDescriptor
+  informantNationality: MessageDescriptor
   nationalityBangladesh: MessageDescriptor
   NID: MessageDescriptor
   officeLocationId: MessageDescriptor
@@ -498,6 +500,12 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english',
     id: 'form.field.label.informantsFamilyNameEng'
+  },
+
+  informantsFirstName: {
+    defaultMessage: 'First Name(s) in English',
+    description: 'Label for form field: First name in english',
+    id: 'form.field.label.informantsFirstNames'
   },
   informantsGivenNames: {
     defaultMessage: 'নামের প্রথমাংশ বাংলায়',
@@ -1485,6 +1493,13 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for form field: Nationality',
     id: 'form.field.label.deceased.nationality'
   },
+
+  informantNationality: {
+    defaultMessage: 'Nationality',
+    description: 'Label for form field: Nationality',
+    id: 'form.field.label.deceased.informant.nationality'
+  },
+
   nationalityBangladesh: {
     defaultMessage: 'Bangladesh',
     description: 'Option for form field: Nationality',

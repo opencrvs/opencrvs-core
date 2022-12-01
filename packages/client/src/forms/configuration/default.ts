@@ -998,7 +998,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'nationality',
                 type: 'SELECT_WITH_OPTIONS',
-                label: formMessageDescriptors.nationality,
+                label: formMessageDescriptors.informantsNationality,
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
@@ -1083,7 +1083,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'informantBirthDate',
                 type: 'DATE',
-                label: formMessageDescriptors.motherDateOfBirth,
+                label: formMessageDescriptors.informantsDateOfBirth,
                 required: true,
                 customisable: true,
                 initialValue: '',
@@ -1138,7 +1138,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: {
                   defaultMessage: 'First name(s)',
                   description: 'Label for form field: Given names',
-                  id: 'form.field.label.childFirstNames'
+                  id: 'form.field.label.informantsFirstNames'
                 },
                 maxLength: 32,
                 required: true,
@@ -1184,7 +1184,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: {
                   defaultMessage: 'Last name',
                   description: 'Label for form field: Last name in english',
-                  id: 'form.field.label.childFamilyName'
+                  id: 'form.field.label.informantsFamilyName'
                 },
                 maxLength: 32,
                 required: true,
@@ -1889,7 +1889,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: {
                   defaultMessage: 'Date of birth',
                   description: 'Label for form field: Date of birth',
-                  id: 'form.field.label.motherDateOfBirth'
+                  id: 'form.field.label.fatherDateOfBirth'
                 },
                 required: true,
                 initialValue: '',
@@ -2138,7 +2138,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: {
                   defaultMessage: 'level of education',
                   description: 'Label for form field: Mother education',
-                  id: 'form.field.label.motherEducationAttainment'
+                  id: 'form.field.label.fatherEducationAttainment'
                 },
                 customisable: true,
                 required: false,
@@ -3604,7 +3604,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'nationality',
                 type: 'SELECT_WITH_OPTIONS',
-                label: formMessageDescriptors.nationality,
+                label: formMessageDescriptors.informantNationality,
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
