@@ -18,7 +18,8 @@ import {
   IFormSectionData,
   IFormFieldMutationMapFunction
 } from '@client/forms'
-import { set } from 'lodash'
+import subYears from 'date-fns/subYears'
+import { get, set } from 'lodash'
 
 interface IPersonName {
   [key: string]: string
@@ -197,23 +198,42 @@ export const sectionFieldToBundleFieldTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    console.log('reached!!!!!!!!!!!!!!!!!')
-
     if (transformedFieldName) {
       transformedData[transformedFieldName] = draftData[sectionId][field.name]
-      console.log(
-        transformedData[transformedFieldName],
-        ' reached!!!!!!!!!!!!!!!!! 111 ',
-        draftData[sectionId][field.name]
-      )
     } else {
       transformedData[field.name] = draftData[sectionId][field.name]
     }
-    console.log(
-      transformedData[field.name],
-      ' reached!!!!!!!!!!!!!!!!! ',
-      draftData[sectionId][field.name]
-    )
+
+    return transformedData
+  }
+
+export const ageOfIndividualInYearsTransformer =
+  (transformedFieldName: string, pathToChildsBirthdate: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const fieldName = transformedFieldName || field.name
+    const sectionData = draftData[sectionId][field.name] as string
+
+    const childsBirthDate = get(draftData, pathToChildsBirthdate)
+    console.log('reached')
+
+    if (!childsBirthDate) {
+      return transformedData
+    }
+
+    if (sectionData) {
+      const childsDoB = new Date(childsBirthDate as unknown as string)
+
+      transformedData[sectionId][fieldName] = formatDate(
+        subYears(childsDoB, Number.parseInt(sectionData)).toISOString()
+      )
+    }
+    console.log(transformedData)
+
     return transformedData
   }
 

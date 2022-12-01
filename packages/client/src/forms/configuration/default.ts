@@ -1978,14 +1978,14 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 postfix: 'years',
                 mapping: {
-                  // mutation: {
-                  //   operation: 'ageOfIndividualInYearsTransformer',
-                  //   parameters: ['birthDate', 'child.childBirthDate']
-                  // },
-                  // query: {
-                  //   operation: 'ageOfIndividualInYearsTransformer',
-                  //   parameters: ['birthDate']
-                  // }
+                  mutation: {
+                    operation: 'ageOfIndividualInYearsTransformer',
+                    parameters: ['birthDate', 'child.childBirthDate']
+                  },
+                  query: {
+                    operation: 'ageOfIndividualInYearsTransformer',
+                    parameters: ['birthDate']
+                  }
                 },
                 inputFieldWidth: '78px'
               },
@@ -3232,7 +3232,16 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 postfix: 'years',
-
+                mapping: {
+                  mutation: {
+                    operation: 'ageOfIndividualInYearsTransformer',
+                    parameters: ['birthDate', 'child.childBirthDate']
+                  },
+                  query: {
+                    operation: 'ageOfIndividualInYearsTransformer',
+                    parameters: ['birthDate']
+                  }
+                },
                 inputFieldWidth: '78px'
               },
               {
@@ -3860,7 +3869,16 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 postfix: 'years',
-
+                mapping: {
+                  mutation: {
+                    operation: 'ageOfIndividualInYearsTransformer',
+                    parameters: ['birthDate', 'child.childBirthDate']
+                  },
+                  query: {
+                    operation: 'ageOfIndividualInYearsTransformer',
+                    parameters: ['birthDate']
+                  }
+                },
                 inputFieldWidth: '78px'
               },
               {
