@@ -41,7 +41,7 @@ import { countries } from '@client/forms/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
-import { differenceInYears } from 'date-fns/differenceInYears'
+import differenceInYears from 'date-fns/differenceInYears'
 
 interface IName {
   [key: string]: any
