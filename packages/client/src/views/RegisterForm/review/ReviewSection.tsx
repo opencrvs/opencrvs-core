@@ -475,6 +475,9 @@ const renderValue = (
       ? intl.formatMessage(buttonMessages.yes)
       : intl.formatMessage(buttonMessages.no)
   }
+  if (field.postfix && value) {
+    return String(value).concat(` ${field.postfix.toLowerCase()}`)
+  }
   return value
 }
 
