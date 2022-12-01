@@ -161,6 +161,36 @@ export function fetchAllFromSearch(authHeader: IAuthHeader) {
     })
 }
 
+export const fetchPractitionerTitle = async (
+  practitionerId: string,
+  authHeader: IAuthHeader
+) => {
+  const roleBundle: fhir.Bundle = await fetchFHIR(
+    `PractitionerRole?practitioner=${practitionerId}`,
+    authHeader
+  )
+  const practitionerRole =
+    roleBundle &&
+    roleBundle.entry &&
+    roleBundle.entry &&
+    roleBundle.entry.length > 0 &&
+    (roleBundle.entry[0].resource as fhir.PractitionerRole)
+
+  const codes =
+    practitionerRole && practitionerRole.code
+      ? practitionerRole.code.flatMap((code) => code.coding || [])
+      : []
+
+  const titleCode = codes.find(
+    (coding) => coding.system === 'http://opencrvs.org/specs/titles'
+  )?.code
+
+  if (titleCode) {
+    return titleCode
+  } else {
+    return Promise.reject(new Error(`Title code cannot be found`))
+  }
+}
 export const fetchPractitionerRole = async (
   practitionerId: string,
   authHeader: IAuthHeader

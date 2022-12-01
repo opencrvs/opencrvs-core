@@ -88,6 +88,11 @@ const messagesToDefine = {
     description: 'The description for Local Leader type',
     id: 'constants.localLeader'
   },
+  VOLUNTEER: {
+    defaultMessage: 'Volunteer',
+    description: 'The description for Volunteer type',
+    id: 'constants.volunteer'
+  },
   HEALTHCARE_WORKER: {
     defaultMessage: 'Healthcare Worker',
     description: 'The description for Healthcare Worker type',

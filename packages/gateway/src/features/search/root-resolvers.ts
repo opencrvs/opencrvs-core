@@ -144,12 +144,12 @@ export const resolvers: GQLResolver = {
       return {
         totalItems:
           (searchResult &&
-            searchResult.body.hits &&
+            searchResult.body?.hits &&
             searchResult.body.hits.total.value) ||
           0,
         results:
           (searchResult &&
-            searchResult.body.hits &&
+            searchResult.body?.hits &&
             searchResult.body.hits.hits) ||
           []
       }

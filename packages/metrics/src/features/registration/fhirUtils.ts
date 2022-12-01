@@ -13,6 +13,7 @@ import { IAuthHeader } from '@metrics/features/registration'
 import {
   fetchLocation,
   fetchPractitionerRole,
+  fetchPractitionerTitle,
   fetchTaskHistory
 } from '@metrics/api'
 
@@ -434,7 +435,9 @@ export async function fetchDeclarationsBeginnerRole(
       if (!practitionerId) {
         throw new Error('Practitioner id not found')
       }
-      startedByRole = await fetchPractitionerRole(practitionerId, authHeader)
+      startedByRole =
+        (await fetchPractitionerTitle(practitionerId, authHeader)) ||
+        (await fetchPractitionerRole(practitionerId, authHeader))
     }
   }
   return startedByRole

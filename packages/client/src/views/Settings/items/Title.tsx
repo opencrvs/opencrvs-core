@@ -29,7 +29,9 @@ export function Title() {
   const intl = useIntl()
   const title = useSelector<IStoreState, string>((state) => {
     const role = state.profile.userDetails?.title
-    return role || ''
+    return role && userMessages[role]
+      ? intl.formatMessage(userMessages[role])
+      : ''
   })
   return (
     <ListViewItemSimplified

@@ -109,49 +109,6 @@ export function ApplicationSourcesReport(
             <PerformanceTitle>
               {' '}
               {intl.formatMessage(
-                messages.performanceHospitalApplicationsLabel
-              )}
-            </PerformanceTitle>
-          }
-          value={
-            <PerformanceValue>
-              <TotalDisplayWithPercentage
-                total={calculateTotal(
-                  data.results.filter(
-                    (item) => item.practitionerRole === 'AUTOMATED'
-                  )
-                )}
-                ofNumber={calculateTotal(data.results)}
-              ></TotalDisplayWithPercentage>
-            </PerformanceValue>
-          }
-        />
-        <ListViewItemSimplified
-          label={
-            <PerformanceTitle>
-              {intl.formatMessage(
-                messages.performanceRegistrationAgentsApplicationsLabel
-              )}
-            </PerformanceTitle>
-          }
-          value={
-            <PerformanceValue>
-              <TotalDisplayWithPercentage
-                total={calculateTotal(
-                  data.results.filter(
-                    (item) => item.practitionerRole === 'REGISTRATION_AGENT'
-                  )
-                )}
-                ofNumber={calculateTotal(data.results)}
-              ></TotalDisplayWithPercentage>
-            </PerformanceValue>
-          }
-        />
-        <ListViewItemSimplified
-          label={
-            <PerformanceTitle>
-              {' '}
-              {intl.formatMessage(
                 messages.performanceRegistrarsApplicationsLabel
               )}
             </PerformanceTitle>
@@ -164,7 +121,8 @@ export function ApplicationSourcesReport(
                     [
                       'LOCAL_REGISTRAR',
                       'DISTRICT_REGISTRAR',
-                      'STATE_REGISTRAR'
+                      'STATE_REGISTRAR',
+                      'REGISTRAR'
                     ].includes(item.practitionerRole)
                   )
                 )}
@@ -186,8 +144,28 @@ export function ApplicationSourcesReport(
             <PerformanceValue>
               <TotalDisplayWithPercentage
                 total={calculateTotal(
-                  data.results.filter((item) =>
-                    ['NATIONAL_REGISTRAR'].includes(item.practitionerRole)
+                  data.results.filter((item) => item.practitionerRole === 'DCR')
+                )}
+                ofNumber={calculateTotal(data.results)}
+              ></TotalDisplayWithPercentage>
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {' '}
+              {intl.formatMessage(
+                messages.performanceHospitalApplicationsLabel
+              )}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              <TotalDisplayWithPercentage
+                total={calculateTotal(
+                  data.results.filter(
+                    (item) => item.practitionerRole === 'AUTOMATED'
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}

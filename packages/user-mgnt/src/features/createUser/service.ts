@@ -124,6 +124,14 @@ export const createFhirPractitionerRole = (
               code: user.type
             }
           ]
+        },
+        {
+          coding: [
+            {
+              system: `http://opencrvs.org/specs/titles`,
+              code: user.title
+            }
+          ]
         }
       ],
       location: (user.catchmentAreaIds || []).map((id) => ({

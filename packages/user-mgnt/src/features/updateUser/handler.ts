@@ -44,10 +44,15 @@ export default async function updateUser(
     token,
     `/Practitioner/${existingUser.practitionerId}`
   )
-  const existingPractitionerRole = await getFromFhir(
+
+  const existingPractitionerRoleBundle = await getFromFhir(
     token,
     `/PractitionerRole?practitioner=${existingUser.practitionerId}`
   )
+
+  const existingPractitionerRole =
+    existingPractitionerRoleBundle.entry[0].resource
+
   // Update existing user's fields
   existingUser.name = user.name
   existingUser.identifiers = user.identifiers
@@ -111,8 +116,14 @@ export default async function updateUser(
     existingUser.practitionerId,
     false
   )
-  practitionerRole.id = existingPractitionerRole.id
-  const practitionerRoleId = await postFhir(token, practitioner)
+
+  // Bit of a temporary hack as I should really save the newly created PractitionerRole
+  // Just don't want to risk something else breaking now that I got here after noticing
+  // locations disappeared when user was updated
+  existingPractitionerRole.code = practitionerRole.code
+
+  const practitionerRoleId = await postFhir(token, existingPractitionerRole)
+
   if (!practitionerRoleId) {
     throw new Error(
       'PractitionerRole resource not updated correctly, practitionerRole ID not returned'
