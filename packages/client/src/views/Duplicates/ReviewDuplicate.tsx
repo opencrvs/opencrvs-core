@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { useParams } from 'react-router'
+import { useParams, useHistory } from 'react-router'
 import { client } from '@client/utils/apolloClient'
 import { IDeclaration } from '@client/declarations'
 import { useSelector, useDispatch } from 'react-redux'
@@ -21,11 +21,16 @@ import { DownloadAction, IForm } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { Event } from '@client/utils/gateway'
-import { Loader, EventTopBar } from '@opencrvs/components/lib/interface'
+import {
+  Loader,
+  EventTopBar,
+  ErrorToastNotification
+} from '@opencrvs/components/lib/interface'
 import { useIntl } from 'react-intl'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { goBack } from '@client/navigation'
+import { errorMessages, buttonMessages } from '@client/i18n/messages'
 
 function findDeclarationById(id: string, declarations: IDeclaration[]) {
   return declarations.find((declaration) => declaration.id === id)
@@ -64,40 +69,58 @@ export function ReviewDuplicate() {
   const dispatch = useDispatch()
   const form = useSelector(getRegisterForm)
   const [loading, setLoading] = React.useState(2)
+  const [error, setError] = React.useState(false)
   const [left, setLeft] = React.useState(findDeclarationById(id, declarations))
   const [right, setRight] = React.useState(
     findDeclarationById(existingId, declarations)
   )
+  const history = useHistory()
 
   React.useEffect(() => {
     async function fetchLeft() {
-      const declaration = await fetchDeclaration(id, event, form)
-      setLeft(declaration)
-      setLoading((l) => l - 1)
+      try {
+        const declaration = await fetchDeclaration(id, event, form)
+        setLeft(declaration)
+      } catch (e) {
+        setError(true)
+      }
     }
     async function fetchRight() {
-      const declaration = await fetchDeclaration(existingId, event, form)
-      setRight(declaration)
+      try {
+        const declaration = await fetchDeclaration(existingId, event, form)
+        setRight(declaration)
+      } catch (e) {
+        setError(true)
+      }
+    }
+
+    try {
+      if (!left) {
+        fetchLeft()
+      }
+    } finally {
       setLoading((l) => l - 1)
     }
 
-    if (!left) {
-      fetchLeft()
-    } else {
-      setLoading((l) => l - 1)
-    }
-    if (!right) {
-      fetchRight()
-    } else {
+    try {
+      if (!right) {
+        fetchRight()
+      }
+    } finally {
       setLoading((l) => l - 1)
     }
   }, [id, existingId, event, form, left, right])
 
-  if (loading > 0) {
-    return <Loader id="review-duplicate-loader" marginPercent={23}></Loader>
-  }
-
-  if (left && right) {
+  if (error) {
+    return (
+      <ErrorToastNotification
+        retryButtonText={intl.formatMessage(buttonMessages.retry)}
+        retryButtonHandler={() => history.go(0)}
+      >
+        {intl.formatMessage(errorMessages.pageLoadFailed)}
+      </ErrorToastNotification>
+    )
+  } else if (left && right) {
     return (
       <>
         <EventTopBar
@@ -112,11 +135,12 @@ export function ReviewDuplicate() {
           pageRoute=""
           readonly
           duplicate
-          draft={left}
+          draft={left!}
           draft2={right}
         />
       </>
     )
+  } else {
+    return <Loader id="review-duplicate-loader" marginPercent={23}></Loader>
   }
-  return null
 }
