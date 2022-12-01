@@ -112,7 +112,7 @@ export default async function updateUser(
     false
   )
   practitionerRole.id = existingPractitionerRole.id
-  const practitionerRoleId = await postFhir(token, practitioner)
+  const practitionerRoleId = await postFhir(token, practitionerRole)
   if (!practitionerRoleId) {
     throw new Error(
       'PractitionerRole resource not updated correctly, practitionerRole ID not returned'
