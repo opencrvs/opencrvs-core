@@ -879,11 +879,11 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.webhook.rule=Host(`webhook.{{hostname}}`)'
-        - 'traefik.http.services.webhook.loadbalancer.server.port=2525'
-        - 'traefik.http.routers.webhook.tls=true'
-        - 'traefik.http.routers.webhook.tls.certresolver=certResolver'
-        - 'traefik.http.routers.webhook.entrypoints=web,websecure'
+        - 'traefik.http.routers.webhooks.rule=Host(`webhooks.{{hostname}}`)'
+        - 'traefik.http.services.webhooks.loadbalancer.server.port=2525'
+        - 'traefik.http.routers.webhooks.tls=true'
+        - 'traefik.http.routers.webhooks.tls.certresolver=certResolver'
+        - 'traefik.http.routers.webhooks.entrypoints=web,websecure'
         - 'traefik.docker.network=opencrvs_overlay_net'
         - 'traefik.http.middlewares.webhooks.headers.customresponseheaders.Pragma=no-cache'
         - 'traefik.http.middlewares.webhooks.headers.customresponseheaders.Cache-control=no-store'
