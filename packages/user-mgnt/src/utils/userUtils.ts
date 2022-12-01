@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import { IAuthHeader, ITokenPayload } from '@user-mgnt/utils/token'
+import { ITokenPayload } from '@user-mgnt/utils/token'
 import * as decode from 'jwt-decode'
 
 export const statuses = {
