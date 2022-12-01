@@ -21,87 +21,13 @@ export enum QUESTION_KEYS {
   FAVORITE_FOOD,
   FIRST_CHILD_NAME
 }
-interface IUserMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  accountTitle: MessageDescriptor
-  BIRTH_TOWN: MessageDescriptor
-  CHA: MessageDescriptor
-  CHAIRMAN: MessageDescriptor
-  changeLanguageMessege: MessageDescriptor
-  changeLanguageSuccessMessage: MessageDescriptor
-  changeLanguageTitle: MessageDescriptor
-  DATA_ENTRY_CLERK: MessageDescriptor
-  DISTRICT_REGISTRAR: MessageDescriptor
-  ENTREPENEUR: MessageDescriptor
-  FAVORITE_FOOD: MessageDescriptor
-  FAVORITE_MOVIE: MessageDescriptor
-  FAVORITE_SONG: MessageDescriptor
-  FAVORITE_TEACHER: MessageDescriptor
-  FIRST_CHILD_NAME: MessageDescriptor
-  HEALTH_DIVISION: MessageDescriptor
-  HIGH_SCHOOL: MessageDescriptor
-  HOSPITAL: MessageDescriptor
-  healthSystem: MessageDescriptor
-  labelEnglishName: MessageDescriptor
-  LOCAL_REGISTRAR: MessageDescriptor
-  LOCAL_SYSTEM_ADMIN: MessageDescriptor
-  MAYOR: MessageDescriptor
-  MOTHER_NAME: MessageDescriptor
-  NATIONAL_REGISTRAR: MessageDescriptor
-  NATIONAL_SYSTEM_ADMIN: MessageDescriptor
-  ORG_DIVISION: MessageDescriptor
-  PERFORMANCE_MANAGEMENT: MessageDescriptor
-  profileTitle: MessageDescriptor
-  REGISTRATION_AGENT: MessageDescriptor
-  SECRETARY: MessageDescriptor
-  securityTitle: MessageDescriptor
-  settingsTitle: MessageDescriptor
-  STATE_REGISTRAR: MessageDescriptor
-  API_USER: MessageDescriptor
-  NOTIFICATION_API_USER: MessageDescriptor
-  VALIDATOR_API_USER: MessageDescriptor
-  AGE_VERIFICATION_API_USER: MessageDescriptor
-  systemTitle: MessageDescriptor
-  FIELD_AGENT: MessageDescriptor
-  currentPassword: MessageDescriptor
-  changePassword: MessageDescriptor
-  changePasswordMessage: MessageDescriptor
-  changePhoneTitle: MessageDescriptor
-  verifyPhoneTitle: MessageDescriptor
-  changePhoneLabel: MessageDescriptor
-  verifyPhoneLabel: MessageDescriptor
-  confirmationPhoneMsg: MessageDescriptor
-  phoneNumberChangeFormValidationMsg: MessageDescriptor
-  changeAvatar: MessageDescriptor
-  changeImage: MessageDescriptor
-  resizeAvatar: MessageDescriptor
-  newPasswordLabel: MessageDescriptor
-  passwordUpdateFormValidationMsg: MessageDescriptor
-  passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
-  passwordCaseCharacteristicsForPasswordUpdateForm: MessageDescriptor
-  passwordNumberCharacteristicsForPasswordUpdateForm: MessageDescriptor
-  confirmPasswordLabel: MessageDescriptor
-  matchedPasswordMsg: MessageDescriptor
-  mismatchedPasswordMsg: MessageDescriptor
-  confirmButtonLabel: MessageDescriptor
-  requiredfield: MessageDescriptor
-  incorrectPassword: MessageDescriptor
-  incorrectVerifyCode: MessageDescriptor
-  passwordUpdated: MessageDescriptor
-  phoneNumberUpdated: MessageDescriptor
-  avatarUpdating: MessageDescriptor
-  avatarUpdated: MessageDescriptor
-  name: MessageDescriptor
-  systemLanguage: MessageDescriptor
-  profileImage: MessageDescriptor
-  duplicateUserMobileErrorMessege: MessageDescriptor
-}
+
 interface IDynamicUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   [key: string]: MessageDescriptor
 }
 
-const messagesToDefine: IUserMessages = {
+const messagesToDefine = {
   accountTitle: {
     defaultMessage: 'Account',
     description: 'Account header',
@@ -491,8 +417,58 @@ const messagesToDefine: IUserMessages = {
     description:
       'This error messege shows when user try to input already exsisted mobile number',
     id: 'system.user.duplicateMobileError'
+  },
+  REGISTRAR: {
+    defaultMessage: 'Registrar',
+    description: 'Label for Registraruser role',
+    id: 'system.user.roles.roleRegistrar'
+  },
+  DCR: {
+    defaultMessage: 'DCR',
+    description: 'Label for DCRuser role',
+    id: 'system.user.roles.roleDcr'
+  },
+  HEAD_OF_DEPARTMENT: {
+    defaultMessage: 'Head of Department ',
+    description: 'Label for Head of Department user role',
+    id: 'system.user.roles.roleHeadOfDepartment'
+  },
+  STATE_DIRECTOR: {
+    defaultMessage: 'State Director',
+    description: 'Label for State Directoruser role',
+    id: 'system.user.roles.roleStateDirector'
+  },
+  FEDERAL_COMMISSIONER: {
+    defaultMessage: 'Federal Commissioner',
+    description: 'Label for Federal Commissioneruser role',
+    id: 'system.user.roles.roleFederalCommissioner'
+  },
+  DIRECTOR_VRD: {
+    defaultMessage: 'Director, VRD',
+    description: 'Label for Director, VRDuser role',
+    id: 'system.user.roles.roleDirectorVrd'
+  },
+  DIRECTOR_GENERAL: {
+    defaultMessage: 'Director General',
+    description: 'Label for Director Generaluser role',
+    id: 'system.user.roles.roleDirectorGeneral'
+  },
+  STATE_SYSTEM_ADMIN: {
+    defaultMessage: 'State System Admin',
+    description: 'Label for State System Adminuser role',
+    id: 'system.user.roles.roleStateSystemAdmin'
+  },
+  E_CRVS_PROJECT_ADMIN: {
+    defaultMessage: 'eCRVS Project Admin',
+    description: 'Label for eCRVS Project Adminuser role',
+    id: 'system.user.roles.roleECrvsProjectAdmin'
+  },
+  E_CRVS_PROJECT_SUPPORT: {
+    defaultMessage: 'eCRVS Project Support',
+    description: 'Label for eCRVS Project Supportuser role',
+    id: 'system.user.roles.roleECrvsProjectSupport'
   }
 }
 
-export const userMessages: IUserMessages | IDynamicUserMessages =
+export const userMessages: IDynamicUserMessages =
   defineMessages(messagesToDefine)

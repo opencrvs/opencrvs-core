@@ -232,7 +232,10 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         : ''
     }
 
-    const title = (userDetails && userDetails.title) ?? ''
+    const title =
+      (userDetails?.title &&
+        intl.formatMessage(userMessages[userDetails.title])) ??
+      ''
     const role =
       userDetails && userDetails.role
         ? intl.formatMessage(userMessages[userDetails.role])

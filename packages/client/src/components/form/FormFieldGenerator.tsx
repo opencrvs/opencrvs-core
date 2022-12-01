@@ -80,7 +80,8 @@ import {
   Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
   Ii18nTextareaFormField,
-  TEXT
+  TEXT,
+  HIDDEN
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -231,6 +232,16 @@ function GeneratedInputField({
     error: Boolean(error),
     touched: Boolean(touched),
     placeholder: fieldDefinition.placeholder
+  }
+  if (fieldDefinition.type === HIDDEN) {
+    return (
+      <input
+        type="hidden"
+        {...inputProps}
+        id={fieldDefinition.name}
+        value={value as string}
+      />
+    )
   }
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (
@@ -1068,7 +1079,36 @@ class FormSectionComponent extends React.Component<Props> {
                           intl,
                           withDynamicallyGeneratedFields
                         )}
-                        onSetFieldValue={setFieldValue}
+                        onSetFieldValue={(
+                          name: string,
+                          value: IFormFieldValue
+                        ) => {
+                          setFieldValue(name, value)
+
+                          const dependentFields = fields.filter(
+                            (field) => field?.dependsOn?.fieldName === name
+                          )
+
+                          if (dependentFields.length === 0) {
+                            return
+                          }
+                          /*
+                           * If the changed field affects the value of some other field
+                           * (think Title -> Role)
+                           * The other field's value is changed here with this logic only
+                           */
+                          dependentFields.forEach((field) => {
+                            const sourceFieldValue = value
+                            const result =
+                              Object.entries(
+                                field.dependsOn!.valueMapping
+                              ).find(([_resultingValue, allowedValues]) => {
+                                return allowedValues.includes(sourceFieldValue)
+                              })?.[0] || ''
+
+                            setFieldValue(field.name, result)
+                          })
+                        }}
                         resetDependentSelectValues={
                           this.resetDependentSelectValues
                         }

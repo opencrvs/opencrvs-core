@@ -40,6 +40,7 @@ import { IQuestionConfig } from './questionConfig'
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
+export const HIDDEN = 'HIDDEN'
 export const BIG_NUMBER = 'BIG_NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
 export const RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS'
@@ -419,6 +420,10 @@ export interface IFormFieldBase {
   required?: boolean
   prefix?: string
   postfix?: string
+  dependsOn?: {
+    fieldName: string
+    valueMapping: Record<string, Array<IFormFieldValue>>
+  }
   disabled?: boolean
   enabled?: string
   custom?: boolean
@@ -511,6 +516,10 @@ export interface ITextFormField extends IFormFieldBase {
   type: typeof TEXT
   maxLength?: number
   dependency?: string
+}
+
+export interface IHiddenFormField extends IFormFieldBase {
+  type: typeof HIDDEN
 }
 
 export interface ITelFormField extends IFormFieldBase {
@@ -630,6 +639,7 @@ export interface ILoaderButton extends IFormFieldBase {
 export type IFormField =
   | ITextFormField
   | ITelFormField
+  | IHiddenFormField
   | INumberFormField
   | IBigNumberFormField
   | ISelectFormFieldWithOptions
@@ -1054,6 +1064,9 @@ export interface Ii18nTelFormField extends Ii18nFormFieldBase {
   type: typeof TEL
   isSmallSized?: boolean
 }
+export interface Ii18nHiddenFormField extends Ii18nFormFieldBase {
+  type: typeof HIDDEN
+}
 export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
@@ -1150,6 +1163,7 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
+  | Ii18nHiddenFormField
   | Ii18nNumberFormField
   | Ii18nBigNumberFormField
   | Ii18nSelectFormField
@@ -1228,6 +1242,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
     INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
     CHECKBOX_GROUP: messages.checkboxGroup,
+    HIDDEN: messages.hidden,
     DATE: messages.date,
     DYNAMIC_LIST: messages.dynamicList
   }

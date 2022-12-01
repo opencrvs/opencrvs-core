@@ -12,6 +12,7 @@
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
   FIELD_GROUP_TITLE,
+  HIDDEN,
   IAttachmentValue,
   IFormField,
   IFormFieldValue,
@@ -146,9 +147,10 @@ class UserReviewFormComponent extends React.Component<
       this.props.formData
     ).forEach((group) => {
       group.fields.forEach((field: IFormField, idx) => {
-        if (field.type == SUBSECTION) {
+        if (field.type === SUBSECTION || field.type === HIDDEN) {
           return
-        } else if (field && field.type === FIELD_GROUP_TITLE) {
+        }
+        if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
         } else if (field && sections.length > 0) {
           if (field.name === 'username' && !this.getValue(field)) return
@@ -242,7 +244,9 @@ class UserReviewFormComponent extends React.Component<
 
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
-        ? field.name === 'role'
+        ? field.name === 'title'
+          ? intl.formatMessage(userMessages[formData.title as string])
+          : field.name === 'role'
           ? intl.formatMessage(userMessages[formData.role as string])
           : field.name === 'type'
           ? intl.formatMessage(userMessages[formData.type as string])

@@ -17,11 +17,32 @@ import {
   SIMPLE_DOCUMENT_UPLOADER,
   TEXT,
   UserSection,
-  ISerializedFormSection
+  ISerializedFormSection,
+  HIDDEN
 } from '@client/forms/index'
 import { NATIONAL_ID } from '@client/forms/identity'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { userMessages } from '@client/i18n/messages/user'
+
+const TITLES_AND_ROLES = {
+  FIELD_AGENT: ['FIELD_AGENT'],
+  REGISTRATION_AGENT: [],
+  LOCAL_REGISTRAR: ['REGISTRAR', 'DCR'],
+  NATIONAL_SYSTEM_ADMIN: [
+    // Where to put these?
+    'STATE_DIRECTOR',
+    'FEDERAL_COMMISSIONER',
+    'DIRECTOR_VRD',
+    'DIRECTOR_GENERAL',
+    'CHAIRMAN',
+    //
+    'STATE_SYSTEM_ADMIN',
+    'NATIONAL_SYSTEM_ADMIN',
+    'E_CRVS_PROJECT_ADMIN'
+  ],
+  PERFORMANCE_MANAGEMENT: ['HEAD_OF_DEPARTMENT', 'E_CRVS_PROJECT_SUPPORT'],
+  NATIONAL_REGISTRAR: []
+}
 
 export const userSectionFormType: ISerializedFormSection = {
   id: UserSection.User,
@@ -118,11 +139,47 @@ export const userSectionFormType: ISerializedFormSection = {
         },
         {
           name: 'title',
-          type: TEXT,
+          type: SELECT_WITH_OPTIONS,
           label: userFormMessages.title,
-          required: false,
+          required: true,
           initialValue: '',
-          validate: []
+          validate: [],
+          options: [
+            { value: 'FIELD_AGENT', label: userMessages.FIELD_AGENT },
+            { value: 'REGISTRAR', label: userMessages.REGISTRAR },
+            { value: 'DCR', label: userMessages.DCR },
+            {
+              value: 'HEAD_OF_DEPARTMENT',
+              label: userMessages.HEAD_OF_DEPARTMENT
+            },
+            { value: 'STATE_DIRECTOR', label: userMessages.STATE_DIRECTOR },
+            {
+              value: 'FEDERAL_COMMISSIONER',
+              label: userMessages.FEDERAL_COMMISSIONER
+            },
+            { value: 'DIRECTOR_VRD', label: userMessages.DIRECTOR_VRD },
+            {
+              value: 'DIRECTOR_GENERAL',
+              label: userMessages.DIRECTOR_GENERAL
+            },
+            { value: 'CHAIRMAN', label: userMessages.CHAIRMAN },
+            {
+              value: 'STATE_SYSTEM_ADMIN',
+              label: userMessages.STATE_SYSTEM_ADMIN
+            },
+            {
+              value: 'NATIONAL_SYSTEM_ADMIN',
+              label: userMessages.NATIONAL_SYSTEM_ADMIN
+            },
+            {
+              value: 'E_CRVS_PROJECT_ADMIN',
+              label: userMessages.E_CRVS_PROJECT_ADMIN
+            },
+            {
+              value: 'E_CRVS_PROJECT_SUPPORT',
+              label: userMessages.E_CRVS_PROJECT_SUPPORT
+            }
+          ]
         },
         {
           name: 'username',
@@ -191,41 +248,15 @@ export const userSectionFormType: ISerializedFormSection = {
         },
         {
           name: 'role',
-          type: SELECT_WITH_OPTIONS,
+          type: HIDDEN,
           label: userFormMessages.labelRole,
           required: true,
           initialValue: '',
           validate: [],
-          options: [
-            {
-              value: 'FIELD_AGENT',
-              label: userMessages.FIELD_AGENT
-            },
-            {
-              value: 'REGISTRATION_AGENT',
-              label: userMessages.REGISTRATION_AGENT
-            },
-            {
-              value: 'LOCAL_REGISTRAR',
-              label: userMessages.LOCAL_REGISTRAR
-            },
-            {
-              value: 'LOCAL_SYSTEM_ADMIN',
-              label: userMessages.LOCAL_SYSTEM_ADMIN
-            },
-            {
-              value: 'NATIONAL_SYSTEM_ADMIN',
-              label: userMessages.NATIONAL_SYSTEM_ADMIN
-            },
-            {
-              value: 'PERFORMANCE_MANAGEMENT',
-              label: userMessages.PERFORMANCE_MANAGEMENT
-            },
-            {
-              value: 'NATIONAL_REGISTRAR',
-              label: userMessages.NATIONAL_REGISTRAR
-            }
-          ]
+          dependsOn: {
+            fieldName: 'title',
+            valueMapping: TITLES_AND_ROLES
+          }
         },
         {
           name: 'type',

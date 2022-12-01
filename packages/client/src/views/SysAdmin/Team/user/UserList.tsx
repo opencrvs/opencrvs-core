@@ -519,7 +519,7 @@ function UserListComponent(props: IProps) {
               ''
 
             const role =
-              user.title ||
+              (user.title && intl.formatMessage(userMessages[user.title])) ||
               (user.role && intl.formatMessage(userMessages[user.role])) ||
               '-'
 
