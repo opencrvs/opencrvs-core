@@ -120,7 +120,7 @@ export const generateInCompleteFieldPoints = async (
         missingFieldGroupId: missingFieldIds[1],
         missingFieldId: missingFieldIds[2],
         eventType: getDeclarationType(task),
-        regStatus: 'IN_PROGESS',
+        regStatus: 'IN_PROGRESS',
         ...locationTags
       }
       return {
@@ -192,6 +192,7 @@ export const generateBirthRegPoint = async (
     payload,
     authHeader
   )
+  const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
 
   const ageInDays =
     (child.birthDate &&
@@ -207,6 +208,7 @@ export const generateBirthRegPoint = async (
     regStatus: regStatus,
     eventLocationType: await getEncounterLocationType(payload, authHeader),
     gender: child.gender,
+    registrarPractitionerId,
     practitionerRole,
     ageLabel: (ageInDays && getAgeLabel(ageInDays)) || undefined,
     dateLabel: !Number.isNaN(compositionDate.getTime())
@@ -260,6 +262,8 @@ export const generateDeathRegPoint = async (
     authHeader
   )
 
+  const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
+
   const deathDays =
     (deceased.deceasedDateTime &&
       getDurationInDays(
@@ -284,6 +288,7 @@ export const generateDeathRegPoint = async (
     regStatus: regStatus,
     gender: deceased.gender,
     practitionerRole,
+    registrarPractitionerId,
     ageLabel:
       (deceasedAgeInDays && getAgeLabel(deceasedAgeInDays)) || undefined,
     timeLabel:

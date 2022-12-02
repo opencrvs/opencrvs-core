@@ -103,12 +103,17 @@ export async function userAuditHandler(
       } else {
         action = 'DEACTIVATE'
       }
-      await postUserActionToMetrics(
-        action,
-        request.headers.authorization,
-        remoteAddress,
-        userAgent
-      )
+
+      try {
+        await postUserActionToMetrics(
+          action,
+          request.headers.authorization,
+          remoteAddress,
+          userAgent
+        )
+      } catch (err) {
+        logger.error(err)
+      }
     }
     try {
       await User.update({ _id: user._id }, user)

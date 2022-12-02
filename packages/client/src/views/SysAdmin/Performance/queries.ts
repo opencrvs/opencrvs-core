@@ -129,6 +129,76 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
     }
   }
 `
+
+export const FETCH_REGISTRATIONS = gql`
+  query getRegistrationsListByFilter(
+    $event: String!
+    $timeStart: String!
+    $timeEnd: String!
+    $filterBy: String!
+    $locationId: String
+    $skip: Int!
+    $size: Int!
+  ) {
+    getRegistrationsListByFilter(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+      event: $event
+      filterBy: $filterBy
+      skip: $skip
+      size: $size
+    ) {
+      __typename
+      ... on TotalMetricsByRegistrar {
+        __typename
+        results {
+          total
+          late
+          delayed
+          registrarPractitioner {
+            role
+            primaryOffice {
+              name
+            }
+            name {
+              firstNames
+              familyName
+              use
+            }
+          }
+        }
+        total
+      }
+      ... on TotalMetricsByLocation {
+        results {
+          total
+          late
+          delayed
+          home
+          healthFacility
+          location {
+            name
+          }
+        }
+        total
+      }
+      ... on TotalMetricsByTime {
+        results {
+          total
+          delayed
+          late
+          home
+          healthFacility
+          month
+          time
+        }
+        total
+      }
+    }
+  }
+`
+
 export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
   query searchFieldAgents(
     $locationId: String

@@ -158,11 +158,16 @@ export default async function updateUser(
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-  await postUserActionToMetrics(
-    'EDIT_USER',
-    request.headers.authorization,
-    remoteAddress,
-    userAgent
-  )
+  try {
+    await postUserActionToMetrics(
+      'EDIT_USER',
+      request.headers.authorization,
+      remoteAddress,
+      userAgent
+    )
+  } catch (err) {
+    logger.error(err.message)
+  }
+
   return h.response(resUser).code(201)
 }

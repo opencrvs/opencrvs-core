@@ -32,6 +32,7 @@ export class DocumentImage extends React.Component<IProps> {
 
   render() {
     const { image, id } = this.props
+
     return (
       <ImageContainer id={id}>
         {image && <PanViewer key={Math.random()} image={image} />}
