@@ -69,6 +69,8 @@ interface IUserSetupMessages
   createUserAuditAction: MessageDescriptor
   editUserAuditAction: MessageDescriptor
   passwordResetAuditAction: MessageDescriptor
+  sendUserNameReminder: MessageDescriptor
+  sendPasswordAuditAction: MessageDescriptor
   userNameReminderAuditAction: MessageDescriptor
   retrievedAuditAction: MessageDescriptor
   viewedAuditAction: MessageDescriptor
@@ -367,6 +369,16 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Username Reminder Requested',
     description: 'Description for User username requested audit action',
     id: 'user.profile.auditList.usernameRequested'
+  },
+  sendPasswordAuditAction: {
+    defaultMessage: 'Sent Password',
+    description: 'Description for sending temporal password action',
+    id: 'user.profile.auditList.sentPassword'
+  },
+  sendUserNameReminder: {
+    defaultMessage: 'Sent Username Reminder',
+    description: 'Description for send username reminder audit action',
+    id: 'user.profile.auditList.sentUsernameReminder'
   },
   retrievedAuditAction: {
     defaultMessage: 'Retrieved',
