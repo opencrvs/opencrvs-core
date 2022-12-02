@@ -77,18 +77,10 @@ export async function postUserActionToMetrics(
   subjectPractitionerId?: string
 ) {
   const url = resolve(METRICS_URL, '/audit/events')
-  let body
-  if (subjectPractitionerId) {
-    body = {
-      action: action,
-      practitionerId: practitionerId,
-      additionalData: { subjectPractitionerId: subjectPractitionerId }
-    }
-  } else {
-    body = {
-      action: action,
-      practitionerId: practitionerId
-    }
+  const body = {
+    action,
+    practitionerId,
+    ...(subjectPractitionerId && { additionalData: { subjectPractitionerId } })
   }
   const authentication = 'Bearer ' + token
   await fetch(url, {
