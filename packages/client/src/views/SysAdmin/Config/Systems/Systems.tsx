@@ -53,6 +53,7 @@ import React, { useCallback, useState } from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
+import { Copy } from '@client/views/SysAdmin/Config/Systems/Copy'
 
 interface ToggleModal {
   modalVisible: boolean
@@ -75,6 +76,13 @@ const StyledSpinner = styled(Spinner)`
 `
 const Field = styled.div`
   margin-top: 16px;
+`
+
+const Details = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 `
 const populatePermissions = (
   webhooks: WebhookPermission[] = [],
@@ -342,6 +350,7 @@ export function SystemList() {
             </Link>
           ]}
           autoHeight={true}
+          width={500}
           titleHeightAuto={true}
           show={toggleKeyModal.modalVisible}
           handleClose={() => {
@@ -356,9 +365,12 @@ export function SystemList() {
             <TopText variant="bold16" element="span">
               {intl.formatMessage(integrationMessages.clientId)}
             </TopText>
-            <Text variant="reg16" element="span">
-              {toggleKeyModal.selectedClient?.clientId}
-            </Text>
+            <Details>
+              <Text variant="reg16" element="span">
+                {toggleKeyModal.selectedClient?.clientId}
+              </Text>
+              <Copy data={toggleKeyModal.selectedClient?.clientId as string} />
+            </Details>
           </Stack>
 
           <Stack direction="column" alignItems="flex-start">
@@ -368,9 +380,16 @@ export function SystemList() {
             {refreshTokenLoading ? (
               <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
             ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
-              <Text variant="reg16" element="span">
-                {refreshTokenData.refreshSystemSecret?.clientSecret}
-              </Text>
+              <Details>
+                <Text variant="reg16" element="span">
+                  {refreshTokenData.refreshSystemSecret?.clientSecret}
+                </Text>
+                <Copy
+                  data={
+                    refreshTokenData.refreshSystemSecret?.clientSecret as string
+                  }
+                />
+              </Details>
             ) : (
               <ButtonLink
                 onClick={() => {
@@ -386,9 +405,12 @@ export function SystemList() {
             <TopText variant="bold16" element="span">
               {intl.formatMessage(integrationMessages.shaSecret)}
             </TopText>
-            <Text variant="reg16" element="span">
-              {toggleKeyModal.selectedClient?.shaSecret}
-            </Text>
+            <Details>
+              <Text variant="reg16" element="span">
+                {toggleKeyModal.selectedClient?.shaSecret}
+              </Text>
+              <Copy data={toggleKeyModal.selectedClient?.shaSecret as string} />
+            </Details>
           </Stack>
         </ResponsiveModal>
       </Content>
@@ -666,25 +688,46 @@ export function SystemList() {
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientId)}
               </Text>
-              <Text variant="reg16" element="span">
-                {registerSystemData.registerSystem.system.clientId}
-              </Text>
+              <Details>
+                <Text variant="reg16" element="span">
+                  {registerSystemData.registerSystem.system.clientId}
+                </Text>
+                <Copy
+                  data={
+                    registerSystemData.registerSystem.system.clientId as string
+                  }
+                />
+              </Details>
             </Stack>
             <Stack alignItems="flex-start" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientSecret)}
               </Text>
-              <Text variant="reg16" element="span">
-                {registerSystemData.registerSystem.clientSecret}
-              </Text>
+              <Details>
+                <Text variant="reg16" element="span">
+                  {registerSystemData.registerSystem.clientSecret}
+                </Text>
+                <Copy
+                  data={
+                    registerSystemData.registerSystem.clientSecret as string
+                  }
+                />
+              </Details>
             </Stack>
             <Stack alignItems="flex-start" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.shaSecret)}
               </Text>
-              <Text variant="reg16" element="span">
-                {registerSystemData.registerSystem.system.shaSecret}
-              </Text>
+              <Details>
+                <Text variant="reg16" element="span">
+                  {registerSystemData.registerSystem.system.shaSecret}
+                </Text>
+                <Copy
+                  data={
+                    registerSystemData.registerSystem.system.shaSecret as string
+                  }
+                />
+              </Details>
             </Stack>
           </Stack>
         )}
