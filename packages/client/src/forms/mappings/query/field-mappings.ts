@@ -101,7 +101,7 @@ export const ageOfIndividualInYearsTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    if (!queryData.child.birthDate) {
+    if (!queryData?.child?.birthDate) {
       return transformedData
     }
 
@@ -110,11 +110,10 @@ export const ageOfIndividualInYearsTransformer =
       return transformedData
     }
 
-    transformedData[sectionId]['ageAtBirthOfChild'] = differenceInYears(
+    transformedData[sectionId]['ageOfIndividualInYears'] = differenceInYears(
       new Date(queryData.child.birthDate),
       new Date(mothersBirthDate)
     )
-    console.log('reached')
   }
 
 export const bundleFieldToSectionFieldTransformer =

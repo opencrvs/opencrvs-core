@@ -219,7 +219,6 @@ export const ageOfIndividualInYearsTransformer =
     const sectionData = draftData[sectionId][field.name] as string
 
     const childsBirthDate = get(draftData, pathToChildsBirthdate)
-    console.log('reached')
 
     if (!childsBirthDate) {
       return transformedData
@@ -232,7 +231,6 @@ export const ageOfIndividualInYearsTransformer =
         subYears(childsDoB, Number.parseInt(sectionData)).toISOString()
       )
     }
-    console.log(transformedData)
 
     return transformedData
   }
