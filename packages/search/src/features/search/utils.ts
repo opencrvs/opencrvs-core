@@ -239,7 +239,7 @@ export function advancedQueryBuilder(
   }
 
   if (params.childGender) {
-    should.push({
+    must.push({
       match: {
         gender: params.childGender
       }
@@ -267,7 +267,7 @@ export function advancedQueryBuilder(
   }
 
   if (params.deceasedGender) {
-    should.push({
+    must.push({
       match: {
         gender: params.deceasedGender
       }

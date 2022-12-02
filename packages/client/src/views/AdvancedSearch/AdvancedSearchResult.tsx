@@ -34,6 +34,7 @@ import { Scope } from '@client/utils/authUtils'
 import {
   ADVANCED_SEARCH_TEXT,
   BRN_DRN_TEXT,
+  EMPTY_STRING,
   NAME_TEXT,
   NATIONAL_ID_TEXT,
   PHONE_TEXT,
@@ -76,7 +77,7 @@ import { convertToMSISDN } from '@client/forms/utils'
 import { DownloadAction } from '@client/forms'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
-import { isAdvancedSearchFormValid } from '@client/views//SearchResult/AdvancedSearch'
+import { isAdvancedSearchFormValid } from '@client/views/SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import {
@@ -84,6 +85,8 @@ import {
   getFormattedAdvanceSearchParamPills,
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
+import { omitBy } from 'lodash'
+import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
 
 const SearchParamPillsContainer = styled.div`
   margin: 16px 0px;
@@ -125,6 +128,14 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
+  const { searchId, ...advancedSearchParams } = useSelector(
+    AdvancedSearchParamsState
+  )
+  const filteredAdvancedSearchParams = omitBy(
+    advancedSearchParams,
+    (properties: string | null) =>
+      properties === null || properties === EMPTY_STRING
+  )
   const offlineData = useSelector(getOfflineData)
   const DEFAULT_PAGE_SIZE = 10
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
@@ -385,14 +396,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
 
   return (
     <Frame
-      header={
-        <Header
-          searchText={intl.formatMessage(headerMessages.advancedSearch)}
-          selectedSearchType={ADVANCED_SEARCH_TEXT}
-          mobileSearchBar={true}
-          enableMenuSelection={false}
-        />
-      }
+      header={<Header mobileSearchBar={true} enableMenuSelection={false} />}
       navigation={<Navigation />}
       skipToContentText={intl.formatMessage(
         constantsMessages.skipToMainContent
@@ -403,7 +407,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
           query={SEARCH_EVENTS}
           variables={{
             advancedSearchParameters: {
-              ...advancedSearchParamsState
+              ...filteredAdvancedSearchParams
             },
             count: DEFAULT_PAGE_SIZE,
             skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1)
@@ -427,7 +431,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 totalPages={Math.ceil(total / DEFAULT_PAGE_SIZE)}
                 paginationId={currentPageNumber}
                 onPageChange={(page: any) => setCurrentPageNumber(page)}
-                topActionButtons={[<p>BookMark Icon</p>]}
+                topActionButtons={[<BookmarkAdvancedSearchResult />]}
                 showTitleOnMobile={true}
               >
                 {loading ? (

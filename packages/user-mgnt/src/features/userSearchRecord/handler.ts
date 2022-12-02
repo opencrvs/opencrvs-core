@@ -15,6 +15,18 @@ import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import * as uuid from 'uuid/v4'
+
+enum RegStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  ARCHIVED = 'ARCHIVED',
+  DECLARED = 'DECLARED',
+  DECLARATION_UPDATED = 'DECLARATION_UPDATED',
+  WAITING_VALIDATION = 'WAITING_VALIDATION',
+  VALIDATED = 'VALIDATED',
+  REGISTERED = 'REGISTERED',
+  CERTIFIED = 'CERTIFIED',
+  REJECTED = 'REJECTED'
+}
 interface IUserCreateSearchPayload {
   userId: string
   name: string
@@ -147,7 +159,19 @@ export const createSearchrequestSchema = Joi.object({
   name: Joi.string().required(),
   parameters: Joi.object({
     event: Joi.string().valid(...validEvent),
-    registrationStatuses: Joi.string(),
+    registrationStatuses: Joi.array().items(
+      Joi.string().valid(
+        RegStatus.IN_PROGRESS,
+        RegStatus.ARCHIVED,
+        RegStatus.DECLARED,
+        RegStatus.DECLARATION_UPDATED,
+        RegStatus.WAITING_VALIDATION,
+        RegStatus.VALIDATED,
+        RegStatus.REGISTERED,
+        RegStatus.CERTIFIED,
+        RegStatus.REJECTED
+      )
+    ),
     dateOfEvent: Joi.string(),
     dateOfEventStart: Joi.string(),
     dateOfEventEnd: Joi.string(),
@@ -158,6 +182,7 @@ export const createSearchrequestSchema = Joi.object({
     dateOfRegistrationEnd: Joi.string(),
     declarationLocationId: Joi.string(),
     declarationJurisdictionId: Joi.string(),
+    eventCountry: Joi.string(),
     eventLocationId: Joi.string(),
     eventLocationLevel1: Joi.string(),
     eventLocationLevel2: Joi.string(),
