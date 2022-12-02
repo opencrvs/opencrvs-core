@@ -636,6 +636,35 @@ export type EventMetrics = {
   total: Scalars['Int']
 }
 
+export type EventMetricsByLocation = {
+  __typename?: 'EventMetricsByLocation'
+  delayed: Scalars['Int']
+  healthFacility: Scalars['Int']
+  home: Scalars['Int']
+  late: Scalars['Int']
+  location: Location
+  total: Scalars['Int']
+}
+
+export type EventMetricsByRegistrar = {
+  __typename?: 'EventMetricsByRegistrar'
+  delayed: Scalars['Int']
+  late: Scalars['Int']
+  registrarPractitioner?: Maybe<User>
+  total: Scalars['Int']
+}
+
+export type EventMetricsByTime = {
+  __typename?: 'EventMetricsByTime'
+  delayed: Scalars['Int']
+  healthFacility: Scalars['Int']
+  home: Scalars['Int']
+  late: Scalars['Int']
+  month: Scalars['String']
+  time: Scalars['String']
+  total: Scalars['Int']
+}
+
 export type EventProgressData = {
   __typename?: 'EventProgressData'
   timeInProgress?: Maybe<Scalars['Int']>
@@ -972,6 +1001,11 @@ export type MesssageInput = {
   descriptor: MesssageDescriptorInput
   lang: Scalars['String']
 }
+
+export type MixedTotalMetricsResult =
+  | TotalMetricsByLocation
+  | TotalMetricsByRegistrar
+  | TotalMetricsByTime
 
 export type MonthWiseEstimationMetric = {
   __typename?: 'MonthWiseEstimationMetric'
@@ -1328,6 +1362,7 @@ export type Query = {
   getFormDataset?: Maybe<Array<FormDataset>>
   getFormDraft?: Maybe<Array<FormDraft>>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
+  getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
   getRoles?: Maybe<Array<Maybe<Role>>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
   getTotalCorrections?: Maybe<Array<CorrectionMetric>>
@@ -1336,6 +1371,7 @@ export type Query = {
   getUser?: Maybe<User>
   getUserAuditLog?: Maybe<UserAuditLogResultSet>
   getUserByMobile?: Maybe<User>
+  getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   listNotifications?: Maybe<Array<Maybe<Notification>>>
@@ -1416,6 +1452,16 @@ export type QueryGetEventsWithProgressArgs = {
 export type QueryGetLocationStatisticsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   populationYear: Scalars['Int']
+}
+
+export type QueryGetRegistrationsListByFilterArgs = {
+  event: Scalars['String']
+  filterBy: Scalars['String']
+  locationId?: InputMaybe<Scalars['String']>
+  size: Scalars['Int']
+  skip: Scalars['Int']
+  timeEnd: Scalars['String']
+  timeStart: Scalars['String']
 }
 
 export type QueryGetRolesArgs = {
@@ -1838,10 +1884,33 @@ export type StatusWiseRegistrationCount = {
   status: Scalars['String']
 }
 
+export type TotalMetricsByLocation = {
+  __typename?: 'TotalMetricsByLocation'
+  results: Array<EventMetricsByLocation>
+  total?: Maybe<Scalars['Int']>
+}
+
+export type TotalMetricsByRegistrar = {
+  __typename?: 'TotalMetricsByRegistrar'
+  results: Array<EventMetricsByRegistrar>
+  total?: Maybe<Scalars['Int']>
+}
+
+export type TotalMetricsByTime = {
+  __typename?: 'TotalMetricsByTime'
+  results: Array<EventMetricsByTime>
+  total?: Maybe<Scalars['Int']>
+}
+
 export type TotalMetricsResult = {
   __typename?: 'TotalMetricsResult'
   estimated: Estimation
   results: Array<EventMetrics>
+}
+
+export type TotalVsExport = {
+  __typename?: 'TotalVSExport'
+  results?: Maybe<Array<VsExport>>
 }
 
 export type User = {
@@ -1915,6 +1984,15 @@ export type UserInput = {
   signature?: InputMaybe<SignatureInput>
   type?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
+}
+
+export type VsExport = {
+  __typename?: 'VSExport'
+  createdOn: Scalars['String']
+  event: Scalars['String']
+  fileSize: Scalars['String']
+  url: Scalars['String']
+  year: Scalars['Int']
 }
 
 export type VerifyPasswordResult = {
@@ -5700,6 +5778,23 @@ export type CreateFormDatasetMutation = {
   } | null
 }
 
+export type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetVsExportsQuery = {
+  __typename?: 'Query'
+  getVSExports?: {
+    __typename?: 'TotalVSExport'
+    results?: Array<{
+      __typename?: 'VSExport'
+      event: string
+      year: number
+      url: string
+      createdOn: string
+      fileSize: string
+    }> | null
+  } | null
+}
+
 export type GetTotalCorrectionsQueryVariables = Exact<{
   event: Scalars['String']
   timeStart: Scalars['String']
@@ -5914,6 +6009,73 @@ export type GetEventsWithProgressQuery = {
       } | null
     } | null> | null
   } | null
+}
+
+export type GetRegistrationsListByFilterQueryVariables = Exact<{
+  event: Scalars['String']
+  timeStart: Scalars['String']
+  timeEnd: Scalars['String']
+  filterBy: Scalars['String']
+  locationId: Scalars['String']
+  skip: Scalars['Int']
+  size: Scalars['Int']
+}>
+
+export type GetRegistrationsListByFilterQuery = {
+  __typename?: 'Query'
+  getRegistrationsListByFilter?:
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          late: number
+          delayed: number
+          home: number
+          healthFacility: number
+          location: { __typename?: 'Location'; name?: string | null }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          late: number
+          delayed: number
+          registrarPractitioner?: {
+            __typename?: 'User'
+            role?: string | null
+            primaryOffice?: {
+              __typename?: 'Location'
+              name?: string | null
+            } | null
+            name?: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            } | null> | null
+          } | null
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByTime'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByTime'
+          total: number
+          delayed: number
+          late: number
+          home: number
+          healthFacility: number
+          month: string
+          time: string
+        }>
+      }
+    | null
 }
 
 export type SearchFieldAgentsQueryVariables = Exact<{

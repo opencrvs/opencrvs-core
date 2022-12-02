@@ -131,10 +131,7 @@ const FormItem = styled.div<{
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '40px'};
-`
-const LinkFormField = styled(Link)`
-  ${({ theme }) => theme.fonts.reg16};
+    ignoreBottomMargin ? '0px' : '28px'};
 `
 
 const FieldGroupTitle = styled.div`
@@ -499,11 +496,12 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === LINK) {
     return (
-      <LinkFormField
+      <Link
+        type="reg16"
         onClick={() => onSetFieldValue(fieldDefinition.name, true)}
       >
         {fieldDefinition.label}
-      </LinkFormField>
+      </Link>
     )
   }
 

@@ -10,28 +10,30 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { SearchBlue, ClearText } from '../icons'
-import { Button } from '../buttons'
+import { ClearText } from '../icons'
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 import styled from 'styled-components'
 
 const SearchBox = styled.div`
-  background: ${({ theme }) => theme.colors.grey200};
+  background: ${({ theme }) => theme.colors.grey100};
   box-sizing: border-box;
-  border-radius: 40px;
   width: 664px;
   height: 40px;
+  border-radius: 40px;
 
   &:hover {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    outline: 1px solid ${({ theme }) => theme.colors.grey400};
+    background: ${({ theme }) => theme.colors.grey100};
   }
 
   &:focus-within {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    outline: 2px solid ${({ theme }) => theme.colors.grey600};
     background: ${({ theme }) => theme.colors.white};
   }
 
   &:active {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    outline: 2px solid ${({ theme }) => theme.colors.grey600};
   }
 
   &:focus-within input {
@@ -52,17 +54,16 @@ const Wrapper = styled.form`
   align-items: center;
   border-radius: 2px;
   display: flex;
-  ${({ theme }) => theme.fonts.reg16};
-  padding: 0px 10px;
-  padding-right: 0;
-  margin-bottom: 1px;
+  ${({ theme }) => theme.fonts.bold14};
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 0px 8px 0px 4px;
   position: relative;
 `
 const SearchTextInput = styled.input`
   border: none;
   margin: 0px 4px;
   ${({ theme }) => theme.fonts.reg16};
-  background-color: ${({ theme }) => theme.colors.grey200};
+  background-color: transparent;
   flex-grow: 1;
   &:focus {
     outline: none;
@@ -150,7 +151,7 @@ const DropDown = styled.div`
   }
 `
 const ClearTextIcon = styled((props) => <ClearText {...props} />)`
-  margin: 0 5px;
+  margin: 0 12px;
 `
 export interface ISearchType {
   label: string
@@ -284,7 +285,15 @@ export class SearchTool extends React.Component<IProps, IState> {
     return (
       <SearchBox className={this.props.className}>
         <Wrapper onSubmit={this.search}>
-          <SearchBlue id="searchIconButton" onClick={this.search} />
+          <Button
+            type="icon"
+            size="medium"
+            aria-label="Search"
+            id="searchIconButton"
+            onClick={this.search}
+          >
+            <Icon color="currentColor" name="Search" size="large" />
+          </Button>
           <SearchTextInput
             id="searchText"
             type="text"

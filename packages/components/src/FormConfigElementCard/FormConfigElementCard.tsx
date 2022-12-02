@@ -62,7 +62,6 @@ export interface IFormConfigElementCardProps {
   id: string
   children: React.ReactNode
   selected?: boolean
-  movable?: boolean
   removable?: boolean
   status?: string
   isUpDisabled?: boolean
@@ -78,7 +77,6 @@ export function FormConfigElementCard({
   id,
   children,
   selected = false,
-  movable = false,
   removable = false,
   isUpDisabled = false,
   isDownDisabled = false,
@@ -102,7 +100,7 @@ export function FormConfigElementCard({
         {children}
       </ChildrenContainer>
       <Controls>
-        {movable && selected && (
+        {selected && (
           <MovementControls>
             <CircleButton
               id={`${id}_up`}

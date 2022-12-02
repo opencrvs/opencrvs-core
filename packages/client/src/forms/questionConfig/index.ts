@@ -9,16 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ISerializedForm } from '@client/forms'
+import { FieldPosition } from '@client/forms/configuration'
+import { getSection } from '@client/forms/configuration/defaultUtils'
+import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
 import { CustomFieldType, Event } from '@client/utils/gateway'
 import { Message } from 'typescript-react-intl'
-import {
-  ISerializedForm,
-  BirthSection,
-  DeathSection,
-  ISelectOption
-} from '@client/forms'
-import { FieldPosition } from '@client/forms/configuration'
-import { defaultFormSectionToQuestionConfigs } from './transformers'
 
 export * from './transformers'
 
@@ -148,7 +144,7 @@ export function getFieldIdentifiers(fieldId: string, form: ISerializedForm) {
   }
 }
 
-function orderByPosition(questions: IQuestionConfig[]) {
+export function orderByPosition(questions: IQuestionConfig[]) {
   const questionsMap = questions.reduce<Record<string, IQuestionConfig>>(
     (accum, question) => ({ ...accum, [question.fieldId]: question }),
     {}
@@ -176,31 +172,46 @@ function orderByPosition(questions: IQuestionConfig[]) {
 export function getConfiguredQuestions(
   event: Event,
   defaultForm: ISerializedForm,
-  customizedQuestions: IQuestionConfig[]
+  questions: IQuestionConfig[]
 ) {
-  const sections = Object.values<BirthSection | DeathSection>(
-    event === Event.Birth ? BirthSection : DeathSection
+  const defaultQuestions = questions.filter(isDefaultQuestionConfig)
+
+  const customQuestions = questions.filter(
+    (question): question is ICustomQuestionConfig =>
+      !isDefaultQuestionConfig(question)
   )
-  return sections.reduce<IQuestionConfig[]>((orderedQuestions, section) => {
-    const isPreviouslyCustomized = (fieldId: string) =>
-      customizedQuestions.some(
-        (customizedQuestion) => customizedQuestion.fieldId === fieldId
-      )
 
-    const nonCustomizedQuestions = defaultFormSectionToQuestionConfigs(
+  const toQuestionConfig = (identifiers: IFieldIdentifiers) => {
+    const questionConfig = fieldIdentifiersToQuestionConfig(
       event,
-      section,
-      defaultForm
-    ).filter((question) => !isPreviouslyCustomized(question.fieldId))
+      defaultForm,
+      identifiers
+    )
+    const previouslyCustomizedQuestionConfig = defaultQuestions.find(
+      ({ fieldId }) => fieldId === questionConfig.fieldId
+    )
+    return previouslyCustomizedQuestionConfig ?? questionConfig
+  }
 
-    return [
-      ...orderedQuestions,
-      ...orderByPosition([
-        ...customizedQuestions.filter(({ fieldId }) =>
-          fieldId.startsWith(`${event}.${section}`)
-        ),
-        ...nonCustomizedQuestions
-      ])
-    ]
-  }, [])
+  return defaultForm.sections
+    .map((section, sectionIndex) =>
+      section.groups.flatMap((group, groupIndex) =>
+        group.fields.map((_, fieldIndex) => ({
+          sectionIndex,
+          groupIndex,
+          fieldIndex
+        }))
+      )
+    )
+    .map((sectionFieldIdentifiers) => {
+      if (sectionFieldIdentifiers.length === 0) return []
+      const section = getSection(sectionFieldIdentifiers[0], defaultForm)
+      return [
+        ...sectionFieldIdentifiers.map(toQuestionConfig),
+        ...customQuestions.filter((question) =>
+          question.fieldId.startsWith(`${event}.${section.id}`)
+        )
+      ]
+    })
+    .map(orderByPosition)
 }
