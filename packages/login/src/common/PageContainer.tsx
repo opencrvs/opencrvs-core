@@ -15,10 +15,6 @@ import { IStoreState } from '@login/store'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { LoginBackground } from '@login/common/LoginBackground/LoginBackground'
 import React from 'react'
-import {
-  selectCountryBackground,
-  selectCountryLogo
-} from '@login/login/selectors'
 
 const mapStateToProps = (store: IStoreState): IPage => {
   return {
