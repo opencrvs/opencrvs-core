@@ -42,7 +42,13 @@ import {
   requestForRegistrarValidationHandler,
   declarationAssignedHandler,
   declarationUnassignedHandler,
-  waitingExternalValidationHandler
+  waitingExternalValidationHandler,
+  declarationViewedHandler,
+  declarationDownloadedHandler,
+  birthDeclarationArchivedHandler,
+  deathDeclarationArchivedHandler,
+  birthDeclarationReinstatedHandler,
+  deathDeclarationReinstatedHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -289,6 +295,54 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/assigned',
       handler: declarationAssignedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/downloaded',
+      handler: declarationDownloadedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/viewed',
+      handler: declarationViewedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-archived',
+      handler: birthDeclarationArchivedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-archived',
+      handler: deathDeclarationArchivedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-reinstated',
+      handler: birthDeclarationReinstatedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-reinstated',
+      handler: deathDeclarationReinstatedHandler,
       config: {
         tags: ['api']
       }

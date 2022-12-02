@@ -31,6 +31,12 @@ type UserAuditAction =
   | 'VALIDATED'
   | 'ASSIGNED'
   | 'UNASSIGNED'
+  | 'RETRIEVED'
+  | 'VIEWED'
+  | 'ARCHIVED'
+  | 'REINSTATED_IN_PROGRESS'
+  | 'REINSTATED_DECLARED'
+  | 'REINSTATED_REJECTED'
   | 'SENT_FOR_APPROVAL'
   | 'CERTIFIED'
 
@@ -63,6 +69,12 @@ type UserAuditDataPoint =
   | UserAuditDataPointWithComposition<'VALIDATED'>
   | UserAuditDataPointWithComposition<'ASSIGNED'>
   | UserAuditDataPointWithComposition<'UNASSIGNED'>
+  | UserAuditDataPointWithComposition<'RETRIEVED'>
+  | UserAuditDataPointWithComposition<'VIEWED'>
+  | UserAuditDataPointWithComposition<'ARCHIVED'>
+  | UserAuditDataPointWithComposition<'REINSTATED_IN_PROGRESS'>
+  | UserAuditDataPointWithComposition<'REINSTATED_DECLARED'>
+  | UserAuditDataPointWithComposition<'REINSTATED_REJECTED'>
   | UserAuditDataPointWithComposition<'SENT_FOR_APPROVAL'>
   | UserAuditDataPointWithComposition<'CERTIFIED'>
 

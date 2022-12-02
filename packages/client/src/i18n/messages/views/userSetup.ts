@@ -70,6 +70,8 @@ interface IUserSetupMessages
   editUserAuditAction: MessageDescriptor
   passwordResetAuditAction: MessageDescriptor
   userNameReminderAuditAction: MessageDescriptor
+  retrievedAuditAction: MessageDescriptor
+  viewedAuditAction: MessageDescriptor
   sentForReviewAuditAction: MessageDescriptor
   reInstatedInProgressAuditAction: MessageDescriptor
   reInstatedInReviewAuditAction: MessageDescriptor
@@ -365,6 +367,16 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Username Reminder Requested',
     description: 'Description for User username requested audit action',
     id: 'user.profile.auditList.usernameRequested'
+  },
+  retrievedAuditAction: {
+    defaultMessage: 'Retrieved',
+    description: 'Description for declaration retrieved audit action',
+    id: 'user.profile.auditList.retrieved'
+  },
+  viewedAuditAction: {
+    defaultMessage: 'Viewed',
+    description: 'Description for declaration viewed audit action',
+    id: 'user.profile.auditList.viewed'
   },
   sentForReviewAuditAction: {
     defaultMessage: 'Sent Incomplete Registration',
