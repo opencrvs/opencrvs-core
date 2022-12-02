@@ -80,7 +80,6 @@ import {
   LOCATION_SEARCH_INPUT,
   Ii18nTextareaFormField,
   TEXT,
-  ACCORDION_WITH_NESTED_FIELDS,
   DATE_RANGE_PICKER,
   IDateRangePickerValue
 } from '@client/forms'
@@ -618,10 +617,7 @@ const mapFieldsToValues = (
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
-    if (
-      (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) ||
-      field.type === ACCORDION_WITH_NESTED_FIELDS
-    ) {
+    if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
       const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
 
       const nestedInitialValues = nestedFieldsFlatted.reduce(
@@ -878,6 +874,7 @@ class FormSectionComponent extends React.Component<Props> {
               touched[`${field.name}-mm`] &&
               touched[`${field.name}-yyyy`]
           }
+
           const withDynamicallyGeneratedFields =
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
               ? ({
@@ -998,8 +995,7 @@ class FormSectionComponent extends React.Component<Props> {
               </FormItem>
             )
           } else if (
-            (field.type === RADIO_GROUP_WITH_NESTED_FIELDS ||
-              field.type === ACCORDION_WITH_NESTED_FIELDS) &&
+            field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
             field.nestedFields
           ) {
             let nestedFieldElements = Object.create(null)
@@ -1038,7 +1034,7 @@ class FormSectionComponent extends React.Component<Props> {
                         {(formikFieldProps: FieldProps<any>) => (
                           <GeneratedInputField
                             fieldDefinition={internationaliseFieldObject(intl, {
-                              ...withDynamicallyGeneratedFields,
+                              ...nestedField,
                               name: nestedFieldName
                             })}
                             onSetFieldValue={setFieldValue}

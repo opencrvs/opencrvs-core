@@ -931,7 +931,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 searchableResource: ['facilities'],
-                searchableType: 'HEALTH_FACILITY',
+                searchableType: ['HEALTH_FACILITY'],
                 dynamicOptions: {
                   resource: 'facilities'
                 },
@@ -3556,7 +3556,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue: '',
                 searchableResource: ['facilities'],
-                searchableType: 'HEALTH_FACILITY',
+                searchableType: ['HEALTH_FACILITY'],
                 dynamicOptions: {
                   resource: 'facilities'
                 },

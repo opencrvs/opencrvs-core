@@ -1187,7 +1187,7 @@
                   "required": true,
                   "initialValue": "",
                   "searchableResource": ["facilities"],
-                  "searchableType": "HEALTH_FACILITY",
+                  "searchableType": ["HEALTH_FACILITY"],
                   "dynamicOptions": {
                     "resource": "facilities"
                   },
@@ -4212,7 +4212,7 @@
                   "required": true,
                   "initialValue": "",
                   "searchableResource": ["facilities"],
-                  "searchableType": "HEALTH_FACILITY",
+                  "searchableType": ["HEALTH_FACILITY"],
                   "dynamicOptions": {
                     "resource": "facilities"
                   },
@@ -4869,7 +4869,7 @@
                 "required": true,
                 "initialValue": "",
                 "searchableResource": ["offices"],
-                "searchableType": "CRVS_OFFICE",
+                "searchableType": ["CRVS_OFFICE"],
                 "validate": [
                   {
                     "operation": "officeMustBeSelected"
@@ -5226,7 +5226,7 @@
                 "required": true,
                 "initialValue": "",
                 "searchableResource": ["offices"],
-                "searchableType": "CRVS_OFFICE",
+                "searchableType": ["CRVS_OFFICE"],
                 "validate": [
                   {
                     "operation": "officeMustBeSelected"

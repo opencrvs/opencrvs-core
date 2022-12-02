@@ -169,7 +169,7 @@ describe('when field definition has location search input', () => {
             label: formMessages.placeOfBirth,
             initialValue: '',
             searchableResource: ['facilities'],
-            searchableType: LocationType.HEALTH_FACILITY,
+            searchableType: [LocationType.HEALTH_FACILITY],
             locationList: []
           }
         ]}

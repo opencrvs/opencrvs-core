@@ -2388,7 +2388,7 @@ export const mockUserGraphqlOperation = {
                     required: true,
                     initialValue: '',
                     searchableResource: ['facilities'],
-                    searchableType: 'CRVS_OFFICE',
+                    searchableType: ['CRVS_OFFICE'],
                     locationList: [],
                     validate: [
                       {

@@ -56,7 +56,7 @@ export const userSectionFormType: ISerializedFormSection = {
           required: true,
           initialValue: '',
           searchableResource: ['offices'],
-          searchableType: 'CRVS_OFFICE',
+          searchableType: ['CRVS_OFFICE'],
           validate: [
             {
               operation: 'officeMustBeSelected'

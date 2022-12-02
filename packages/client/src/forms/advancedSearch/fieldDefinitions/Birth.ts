@@ -180,7 +180,7 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
       required: false,
       initialValue: '',
       searchableResource: ['facilities'],
-      searchableType: 'HEALTH_FACILITY',
+      searchableType: ['HEALTH_FACILITY'],
       dynamicOptions: {
         resource: 'facilities'
       },

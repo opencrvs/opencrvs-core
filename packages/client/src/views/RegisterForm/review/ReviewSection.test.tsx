@@ -537,7 +537,7 @@ describe('when in device of large viewport', () => {
                       name: 'birthLocation',
                       type: LOCATION_SEARCH_INPUT,
                       searchableResource: ['facilities'],
-                      searchableType: LocationType.HEALTH_FACILITY,
+                      searchableType: [LocationType.HEALTH_FACILITY],
                       locationList: [],
                       required: true,
                       validate: [],
