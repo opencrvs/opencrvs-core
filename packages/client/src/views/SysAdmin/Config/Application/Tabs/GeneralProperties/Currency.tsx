@@ -40,7 +40,7 @@ import {
 import { lookup } from 'country-data'
 import { ICurrency } from '@client/utils/referenceApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
-import { Link } from '@client/../../components/lib'
+import { Link } from '@opencrvs/components/lib/Link'
 
 export function Currency() {
   const intl = useIntl()

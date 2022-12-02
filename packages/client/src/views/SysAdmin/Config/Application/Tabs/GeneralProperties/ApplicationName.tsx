@@ -36,7 +36,7 @@ import {
   callApplicationConfigMutation,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
-import { Link } from '@client/../../components/lib'
+import { Link } from '@opencrvs/components/lib/Link'
 
 export function ApplicationName() {
   const intl = useIntl()

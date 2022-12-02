@@ -26,7 +26,7 @@ import {
   Field,
   HalfWidthInput
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { Link } from '@client/../../components/lib'
+import { Link } from '@opencrvs/components/lib/Link'
 
 const ErrorMessage = styled.div`
   ${({ theme }) => theme.fonts.bold14}

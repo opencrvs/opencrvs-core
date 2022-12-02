@@ -19,7 +19,9 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import {
   NOTIFICATION_STATUS,
   isWithinFileLength,
-  callApplicationConfigMutation
+  callApplicationConfigMutation,
+  isValidHexColorCodeEntry,
+  isValidHexColorCode
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { messages } from '@client/i18n/messages/views/config'
 import { buttonMessages } from '@client/i18n/messages'
@@ -32,7 +34,7 @@ import {
   Stack,
   Text,
   Toast
-} from '@client/../../components/lib'
+} from '@opencrvs/components/lib'
 import {
   ApplyButton,
   CancelButton,
@@ -50,7 +52,7 @@ import { IAttachmentValue } from '@client/forms'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { InputField } from '@client/components/form/InputField'
-import { Select2 } from '@client/../../components/lib/Select/Select2'
+import { Select2 } from '@opencrvs/components/lib/Select/Select2'
 export enum TabId {
   COLOUR = 'Colour',
   IMAGE = 'Image'
@@ -124,10 +126,10 @@ export const LoginBackground = () => {
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
 
-    if (/^[A-Fa-f0-9]{0,6}$/.test(value)) {
+    if (isValidHexColorCodeEntry(value)) {
       setHexValue(value)
     }
-    if (/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
+    if (isValidHexColorCode(value)) {
       setShowColour(true)
       setRequestValid(true)
     } else {

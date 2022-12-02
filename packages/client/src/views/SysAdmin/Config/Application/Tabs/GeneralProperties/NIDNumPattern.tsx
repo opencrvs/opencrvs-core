@@ -35,7 +35,7 @@ import {
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import ContentComponent from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties/NIDPhoneNumContent'
-import { Link } from '@client/../../components/lib'
+import { Link } from '@opencrvs/components/lib/Link'
 
 export function NIDNumPattern() {
   const intl = useIntl()

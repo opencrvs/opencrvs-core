@@ -42,7 +42,7 @@ import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { IAttachmentValue } from '@client/forms'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { Link } from '@client/../../components/lib'
+import { Link } from '@opencrvs/components/lib/Link'
 
 export function GovtLogo() {
   const intl = useIntl()

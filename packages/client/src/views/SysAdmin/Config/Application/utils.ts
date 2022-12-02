@@ -91,6 +91,27 @@ export function isValidRegEx(pattern: string): boolean {
   if (pattern === '') return false
   return true
 }
+export function isValidHexColorCode(value: string): boolean {
+  const pattern = /^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+
+  try {
+    pattern.test(value)
+  } catch {
+    return false
+  }
+  if (!pattern.test(value)) return false
+  return true
+}
+export function isValidHexColorCodeEntry(value: string): boolean {
+  const pattern = /^[A-Fa-f0-9]{0,6}$/
+  try {
+    pattern.test(value)
+  } catch {
+    return false
+  }
+  if (!pattern.test(value)) return false
+  return true
+}
 
 export function isValidExample(pattern: string, example: string) {
   if (
