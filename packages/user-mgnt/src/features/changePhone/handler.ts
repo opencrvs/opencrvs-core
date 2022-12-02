@@ -73,10 +73,23 @@ export async function postUserActionToMetrics(
   token: string,
   remoteAddress: string,
   userAgent: string,
-  practitionerId?: string
+  practitionerId?: string,
+  subjectPractitionerId?: string
 ) {
   const url = resolve(METRICS_URL, '/audit/events')
-  const body = { action: action, practitionerId: practitionerId }
+  let body
+  if (subjectPractitionerId) {
+    body = {
+      action: action,
+      practitionerId: practitionerId,
+      additionalData: { subjectPractitionerId: subjectPractitionerId }
+    }
+  } else {
+    body = {
+      action: action,
+      practitionerId: practitionerId
+    }
+  }
   const authentication = 'Bearer ' + token
   await fetch(url, {
     method: 'POST',
@@ -89,7 +102,6 @@ export async function postUserActionToMetrics(
     }
   })
 }
-
 export const changePhoneRequestSchema = Joi.object({
   userId: Joi.string().required(),
   phoneNumber: Joi.string().required()

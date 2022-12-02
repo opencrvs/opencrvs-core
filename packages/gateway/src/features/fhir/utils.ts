@@ -74,7 +74,6 @@ import {
   GQLRegStatus
 } from '@gateway/graphql/schema'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
-
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
@@ -83,7 +82,6 @@ export interface IEventDurationResponse {
   status: string
   durationInSeconds: number
 }
-
 export function findCompositionSectionInBundle(
   code: string,
   fhirBundle: ITemplatedBundle
@@ -1404,7 +1402,6 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
     findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
   return extension
 }
-
 export const fetchDocuments = async <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
