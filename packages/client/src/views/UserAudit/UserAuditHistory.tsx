@@ -19,7 +19,6 @@ import { Query } from '@client/components/Query'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
 import { connect } from 'react-redux'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-
 import {
   GQLUserAuditLogItemWithComposition,
   GQLUserAuditLogResultItem,
@@ -36,7 +35,6 @@ import {
   StatusWaitingValidation
 } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
@@ -58,9 +56,9 @@ import {
   GetUserAuditLogQuery,
   UserAuditLogResultItem
 } from '@client/utils/gateway'
-import { GetLink } from '@client/views/RecordAudit/History'
 import { getFormattedDate } from '@client/views/RecordAudit/utils'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Link } from '@opencrvs/components'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -367,19 +365,23 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         actionDescription:
           isSystemAdmin &&
           isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
-            <GetLink
-              status={actionMessage}
+            <Link
+              font="bold14"
               onClick={() => {
                 this.toggleActionDetails(userAuditItem)
               }}
-            />
+            >
+              {actionMessage}
+            </Link>
           ) : !isSystemAdmin ? (
-            <GetLink
-              status={actionMessage}
+            <Link
+              font="bold14"
               onClick={() => {
                 this.toggleActionDetails(userAuditItem)
               }}
-            />
+            >
+              {actionMessage}
+            </Link>
           ) : (
             <BoldContent>{actionMessage}</BoldContent>
           ),
@@ -395,7 +397,8 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         trackingId:
           isUserAuditItemWithDeclarationDetials(userAuditItem) &&
           !isSystemAdmin ? (
-            <LinkButton
+            <Link
+              font="bold14"
               onClick={() =>
                 this.props.goToDeclarationRecordAudit(
                   'printTab',
@@ -404,7 +407,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
               }
             >
               {userAuditItem.data.trackingId}
-            </LinkButton>
+            </Link>
           ) : isUserAuditItemWithDeclarationDetials(userAuditItem) ? (
             <AuditContent>{userAuditItem.data.trackingId}</AuditContent>
           ) : null,

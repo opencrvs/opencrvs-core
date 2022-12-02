@@ -13,10 +13,8 @@
 import React, { useState } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import {
-  userMessages as messages,
-  constantsMessages
-} from '@client/i18n/messages'
+import { constantsMessages, buttonMessages } from '@client/i18n/messages'
+import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { useIntl } from 'react-intl'
@@ -28,6 +26,7 @@ import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
@@ -41,7 +40,6 @@ import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { VerticalThreeDots } from '@client/../../components/lib/icons'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { userMutations } from '@client/user/mutations'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { Summary } from '@opencrvs/components/lib/Summary'
@@ -49,6 +47,8 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { GetUserQuery, HumanName } from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { getOfflineData } from '@client/offline/selectors'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -71,7 +71,6 @@ interface IRouteProps {
 export const UserAudit = () => {
   const intl = useIntl()
   const { userId } = useParams<IRouteProps>()
-
   const dispatch = useDispatch()
   const [showResendSMSSuccess, setShowResendSMSSuccess] =
     useState<boolean>(false)
@@ -79,9 +78,28 @@ export const UserAudit = () => {
   const [modalVisible, setModalVisible] = useState(false)
   const scope = useSelector((store: IStoreState) => getScope(store))
   const userDetails = useSelector((store: IStoreState) => getUserDetails(store))
+  const [showUsernameSMSReminderSuccess, setShowUsernameSMSReminderSuccess] =
+    useState(false)
+  const [showUsernameSMSReminderError, setShowUsernameSMSReminderError] =
+    useState(false)
+  const [showResetPasswordSMSSuccess, setShowResetPasswordSMSSuccess] =
+    useState(false)
+  const [showResetPasswordSMSError, setShowResetPasswordSMSError] =
+    useState(false)
+  const [toggleUsernameReminder, setToggleUsernameReminder] = useState(false)
+  const [toggleResetPassword, setToggleResetPassword] = useState(false)
+  const offLineData = useSelector(getOfflineData)
 
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
+  }
+
+  const toggleUsernameReminderModal = () => {
+    setToggleUsernameReminder((prevValue) => !prevValue)
+  }
+
+  const toggleUserResetPasswordModal = () => {
+    setToggleResetPassword((prevValue) => !prevValue)
   }
 
   const resendSMS = async (userId: string) => {
@@ -102,6 +120,42 @@ export const UserAudit = () => {
     }
   }
 
+  const usernameSMSReminder = async (userId: string) => {
+    try {
+      const res = await userMutations.usernameSMSReminderSend(userId, [
+        {
+          query: GET_USER,
+          variables: { userId: userId }
+        }
+      ])
+      if (res && res.data && res.data.usernameSMSReminder) {
+        setShowUsernameSMSReminderSuccess(true)
+      }
+    } catch (err) {
+      setShowUsernameSMSReminderError(true)
+    }
+  }
+
+  const resetPassword = async (userId: string) => {
+    try {
+      const res = await userMutations.sendResetPasswordSMS(
+        userId,
+        offLineData.config.APPLICATION_NAME,
+        [
+          {
+            query: GET_USER,
+            variables: { userId: userId }
+          }
+        ]
+      )
+      if (res && res.data && res.data.resetPasswordSMS) {
+        setShowResetPasswordSMSSuccess(true)
+      }
+    } catch (err) {
+      setShowResetPasswordSMSError(true)
+    }
+  }
+
   const getMenuItems = (userId: string, status: string) => {
     const menuItems: { label: string; handler: () => void }[] = [
       {
@@ -110,13 +164,21 @@ export const UserAudit = () => {
       }
     ]
 
-    if (status !== 'deactivated' && status !== 'disabled') {
-      menuItems.push({
-        label: intl.formatMessage(sysMessages.resendSMS),
-        handler: () => {
-          resendSMS(userId)
+    if (status === 'pending' || status === 'active') {
+      menuItems.push(
+        {
+          label: intl.formatMessage(sysMessages.sendUsernameReminderSMS),
+          handler: () => {
+            toggleUsernameReminderModal()
+          }
+        },
+        {
+          label: intl.formatMessage(sysMessages.resetUserPasswordTitle),
+          handler: () => {
+            toggleUserResetPasswordModal()
+          }
         }
-      })
+      )
     }
 
     if (status === 'active') {
@@ -130,6 +192,15 @@ export const UserAudit = () => {
       menuItems.push({
         label: intl.formatMessage(sysMessages.reactivate),
         handler: () => toggleUserActivationModal()
+      })
+    }
+
+    if (status === 'pending') {
+      menuItems.push({
+        label: intl.formatMessage(sysMessages.resendSMS),
+        handler: () => {
+          resendSMS(userId)
+        }
       })
     }
     return menuItems
@@ -281,6 +352,81 @@ export const UserAudit = () => {
                   }
                 ]}
               />
+              <ResponsiveModal
+                id="username-reminder-modal"
+                show={toggleUsernameReminder}
+                handleClose={() => toggleUsernameReminderModal()}
+                title={intl.formatMessage(
+                  sysMessages.sendUsernameReminderSMSModalTitle
+                )}
+                actions={[
+                  <Button
+                    type="tertiary"
+                    id="username-reminder-cancel"
+                    key="username-reminusernameSMSReminderder-cancel"
+                    onClick={() => toggleUsernameReminderModal()}
+                  >
+                    {intl.formatMessage(buttonMessages.cancel)}
+                  </Button>,
+                  <Button
+                    type="primary"
+                    id="username-reminder-send"
+                    key="username-reminder-send"
+                    onClick={() => {
+                      if (toggleUsernameReminder) {
+                        usernameSMSReminder(userId)
+                      }
+                      toggleUsernameReminderModal()
+                    }}
+                  >
+                    {intl.formatMessage(buttonMessages.send)}
+                  </Button>
+                ]}
+                responsive={false}
+                autoHeight={true}
+              >
+                {intl.formatMessage(
+                  sysMessages.sendUsernameReminderSMSModalMessage,
+                  { phoneNumber: user.number }
+                )}
+              </ResponsiveModal>
+              <ResponsiveModal
+                id="user-reset-password-modal"
+                show={toggleResetPassword}
+                handleClose={() => toggleUserResetPasswordModal()}
+                title={intl.formatMessage(
+                  sysMessages.resetUserPasswordModalTitle
+                )}
+                actions={[
+                  <Button
+                    type="tertiary"
+                    id="reset-password-cancel"
+                    key="reset-password-cancel"
+                    onClick={() => toggleUserResetPasswordModal()}
+                  >
+                    {intl.formatMessage(buttonMessages.cancel)}
+                  </Button>,
+                  <Button
+                    type="primary"
+                    id="reset-password-send"
+                    key="reset-password-send"
+                    onClick={() => {
+                      if (toggleResetPassword) {
+                        resetPassword(userId)
+                      }
+                      toggleUserResetPasswordModal()
+                    }}
+                  >
+                    {intl.formatMessage(buttonMessages.send)}
+                  </Button>
+                ]}
+                responsive={false}
+                autoHeight={true}
+              >
+                {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
+                  phoneNumber: user.number ?? ''
+                })}
+              </ResponsiveModal>
               {showResendSMSSuccess && (
                 <Toast
                   id="resend_invite_success"
@@ -297,6 +443,52 @@ export const UserAudit = () => {
                   onClose={() => setShowResendSMSError(false)}
                 >
                   {intl.formatMessage(sysMessages.resendSMSError)}
+                </Toast>
+              )}
+              {showUsernameSMSReminderSuccess && (
+                <Toast
+                  id="username_reminder_success"
+                  type="success"
+                  onClose={() => setShowUsernameSMSReminderSuccess(false)}
+                >
+                  {intl.formatMessage(
+                    sysMessages.sendUsernameReminderSMSSuccess,
+                    {
+                      name: user.name
+                    }
+                  )}
+                </Toast>
+              )}
+              {showUsernameSMSReminderError && (
+                <Toast
+                  id="username_reminder_error"
+                  type="warning"
+                  onClose={() => setShowUsernameSMSReminderError(false)}
+                >
+                  {intl.formatMessage(sysMessages.sendUsernameReminderSMSError)}
+                </Toast>
+              )}
+
+              {showResetPasswordSMSSuccess && (
+                <Toast
+                  id="reset_password_success"
+                  type="success"
+                  onClose={() => {
+                    setShowResetPasswordSMSSuccess(false)
+                  }}
+                >
+                  {intl.formatMessage(sysMessages.resetPasswordSMSSuccess, {
+                    username: user.name
+                  })}
+                </Toast>
+              )}
+              {showResetPasswordSMSError && (
+                <Toast
+                  id="reset_password_error"
+                  type="warning"
+                  onClose={() => setShowResetPasswordSMSError(false)}
+                >
+                  {intl.formatMessage(sysMessages.resetPasswordSMSError)}
                 </Toast>
               )}
             </Content>

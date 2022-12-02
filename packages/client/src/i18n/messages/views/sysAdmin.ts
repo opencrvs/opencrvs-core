@@ -163,7 +163,7 @@ const messagesToDefine: ISysAdminMessages = {
   resetUserPasswordModalMessage: {
     id: 'sysAdHome.user.resetPasswordModal.message',
     defaultMessage:
-      'The user will recieve a temporary password via SMS sent to {phoneNumber}. They will then be prompted to create a new password on succcessful login',
+      'The user will receive a temporary password via SMS sent to {phoneNumber}. They will then be prompted to create a new password on successful login',
     description: 'Message for reset password modal'
   },
   reactivateUserTitle: {
@@ -229,7 +229,7 @@ const messagesToDefine: ISysAdminMessages = {
   },
   sendUsernameReminderSMSModalMessage: {
     defaultMessage:
-      'The user will recieve a username reminder via an SMS sent to {phoneNumber}',
+      'The user will receive a username reminder via an SMS sent to {phoneNumber}',
     description: 'Message for send username reminder',
     id: 'sysAdHome.sendUsernameReminderSMSModalMessage'
   },

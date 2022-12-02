@@ -18,7 +18,6 @@ export default {
   path: '/files/avatar/{userId}.jpg',
   handler: getUserAvatarHandler,
   config: {
-    tags: ['api'],
     auth: false,
     description: 'Get the user avatar as buffer',
     notes: 'Pass the usreId as url param'

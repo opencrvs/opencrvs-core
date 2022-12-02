@@ -369,13 +369,13 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     const role = this.props.userDetails && this.props.userDetails.role
     const location = this.props.history.location.pathname
     if (
-      (FIELD_AGENT_ROLES.includes(role as string) && location.includes(HOME)) ||
+      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
       (NATL_ADMIN_ROLES.includes(role as string) &&
-        location.includes(PERFORMANCE_HOME)) ||
+        PERFORMANCE_HOME.includes(location)) ||
       (SYS_ADMIN_ROLES.includes(role as string) &&
-        location.includes(PERFORMANCE_HOME)) ||
+        PERFORMANCE_HOME.includes(location)) ||
       (REGISTRAR_ROLES.includes(role as string) &&
-        location.includes(REGISTRAR_HOME))
+        REGISTRAR_HOME.includes(location))
     ) {
       return true
     } else {

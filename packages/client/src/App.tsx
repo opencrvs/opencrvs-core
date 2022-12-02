@@ -62,6 +62,8 @@ import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
+import VSExport from './views/SysAdmin/Performance/Vsexports/VSExport'
+import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -365,6 +367,15 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.VS_EXPORTS}
+                                            component={VSExport}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={
                                               routes.EVENT_COMPLETENESS_RATES
                                             }
@@ -391,6 +402,13 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.VIEW_RECORD}
                                             component={ViewRecord}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.PERFORMANCE_REGISTRATIONS_LIST
+                                            }
+                                            component={RegistrationList}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

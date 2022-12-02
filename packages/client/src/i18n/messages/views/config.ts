@@ -16,6 +16,9 @@ interface IConfigMessages
   applicationSettings: MessageDescriptor
   advancedSearch: MessageDescriptor
   advancedSearchInstruction: MessageDescriptor
+  vsexport: MessageDescriptor
+  vitalStatisticsExport: MessageDescriptor
+  export: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
@@ -99,6 +102,28 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage:
       'Select the options to build an advanced search. A minimum of two search parameters is required.',
     description: 'This is used for the advanced search'
+  },
+  vsexport: {
+    id: 'config.application.vsexport',
+    defaultMessage: 'Vital statistics',
+    description: 'VS Export tab'
+  },
+  vitalStatisticsExport: {
+    id: 'config.application.vitalStatistics',
+    defaultMessage:
+      '{year}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
+    description: 'Vital Statistics Export'
+  },
+  export: {
+    id: 'config.application.export',
+    defaultMessage: 'Export',
+    description: 'Download Export CSV'
+  },
+  vsEmptyStateText: {
+    id: 'config.application.emptystate',
+    defaultMessage:
+      "The previous year's vital statistics data (based on vital event registrations occurring within that year) will become available for you to export as of 1st January.",
+    description: 'Vital Statistics Export Empty State Text'
   },
   applicationNameChangeMessage: {
     id: 'config.application.nameChangeMessage',
@@ -403,10 +428,20 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Birth',
     description: 'The title for birth tab'
   },
+  birthTabTitleExport: {
+    id: 'config.application.birthTabTitleExport',
+    defaultMessage: 'Births',
+    description: 'The title for birth tab for VSExport'
+  },
   deathTabTitle: {
     id: 'config.application.deathTabTitle',
     defaultMessage: 'Death',
     description: 'The title for death tab'
+  },
+  deathTabTitleExport: {
+    id: 'config.application.deathTabTitleExport',
+    defaultMessage: 'Deaths',
+    description: 'The title for death tab for VSExport'
   },
   registrationTimePeriodsGroupTitle: {
     id: 'config.application.registrationTimePeriodsGroupTitle',
