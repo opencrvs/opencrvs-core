@@ -381,7 +381,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'isInBetween',
-                    parameters: [1, 24]
+                    parameters: [1, 20]
                   }
                 ]
               }
@@ -1809,7 +1809,7 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'isInBetween',
-                    parameters: [9, 99]
+                    parameters: [13, 99]
                   },
                   {
                     operation: 'maxLength',

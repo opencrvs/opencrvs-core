@@ -19,7 +19,16 @@ import {
   FetchDuplicateDeatilsQuery,
   createDuplicateDetailsQuery
 } from './utils'
+import { Link } from '@opencrvs/components/lib/typography'
+import { useDispatch } from 'react-redux'
+import { goToReviewDuplicate } from '@client/navigation'
+import { Event } from '@client/utils/gateway'
+import { getDeclarationEvent } from '@client/declarations'
 
+const BoldErrorLink = styled(Link)`
+  color: ${({ theme }) => theme.colors.red};
+  ${({ theme }) => theme.fonts.bold16}
+`
 const WarningContainer = styled.div`
   margin: 16px auto;
   max-width: 1140px;
@@ -30,12 +39,18 @@ const WarningContainer = styled.div`
 
 export function DuplicateWarning({
   duplicateIds,
+  declarationId,
+  event,
   className
 }: {
+  declarationId?: string
+  event?: Event
   duplicateIds: string[] | undefined
   className?: string
 }) {
   const intl = useIntl()
+  const dispatch = useDispatch()
+
   return (
     <WarningContainer className={className}>
       {duplicateIds && (
@@ -50,13 +65,30 @@ export function DuplicateWarning({
           )}
         >
           {({ data }) => {
-            return duplicateIds.map((_, idx) => {
+            return duplicateIds.slice(0, 1).map((duplicateId, idx) => {
               const duplicateQuery = data?.[`duplicate${idx}`]
               if (duplicateQuery?.registration?.trackingId) {
                 return (
                   <Warning
                     label={intl.formatMessage(errorMessages.duplicateWarning, {
-                      trackingId: duplicateQuery.registration.trackingId
+                      trackingId:
+                        declarationId && event ? (
+                          <BoldErrorLink
+                            onClick={() =>
+                              dispatch(
+                                goToReviewDuplicate(
+                                  getDeclarationEvent(event),
+                                  declarationId,
+                                  duplicateId
+                                )
+                              )
+                            }
+                          >
+                            {duplicateQuery.registration.trackingId}
+                          </BoldErrorLink>
+                        ) : (
+                          duplicateQuery.registration.trackingId
+                        )
                     })}
                   />
                 )

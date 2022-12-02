@@ -225,6 +225,11 @@ const messagesToDefine = {
     defaultMessage: `{section, select, child {Child's} mother {Mother's} father {Father's} deceased {Deceased's} informant {Informant's} primaryCaregiver {Parents' } parent {Parents' } other {}}`,
     description: 'Describes for whom the document has been uploaded',
     id: 'review.documents.documentForWhom'
+  },
+  originalDeclaration: {
+    id: 'review.duplicate.originalDeclaration',
+    defaultMessage: 'Original record with tracking number {trackingId}',
+    description: 'Label for original record'
   }
 }
 
