@@ -519,7 +519,7 @@ export async function deleteSystem(
 
     if (system) {
       logger.info(`System has been deleted by clientId ${clientId}`)
-      return h.response(pickSystem(system!)).code(200)
+      return h.response(pickSystem(system)).code(200)
     }
 
     return h.response(`No system found by clientId: ${clientId}`).code(404)
