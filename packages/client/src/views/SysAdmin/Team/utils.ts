@@ -172,6 +172,8 @@ const AuditDescriptionMapping: {
   SEND_USERNAME_REMINDER: messages.sendUserNameReminder,
   SEND_PASSWORD: messages.sendPasswordAuditAction,
   INCOMPLETE: messages.sentForReviewAuditAction,
+  RETRIEVED: messages.retrievedAuditAction,
+  VIEWED: messages.viewedAuditAction,
   REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
   REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
   REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,

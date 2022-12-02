@@ -29,6 +29,10 @@ import { Events } from '@metrics/features/metrics/constants'
 import { IPoints } from '@metrics/features/registration'
 
 import { createUserAuditPointFromFHIR } from '@metrics/features/audit/service'
+import {
+  getActionFromTask,
+  getTask
+} from '@metrics/features/registration/fhirUtils'
 
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,
@@ -486,5 +490,70 @@ export async function declarationUnassignedHandler(
   h: Hapi.ResponseToolkit
 ) {
   await createUserAuditPointFromFHIR('UNASSIGNED', request)
+  return h.response().code(200)
+}
+export async function declarationDownloadedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('RETRIEVED', request)
+  return h.response().code(200)
+}
+export async function declarationViewedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('VIEWED', request)
+  return h.response().code(200)
+}
+export async function birthDeclarationArchivedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ARCHIVED', request)
+  return h.response().code(200)
+}
+export async function deathDeclarationArchivedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ARCHIVED', request)
+  return h.response().code(200)
+}
+export async function birthDeclarationReinstatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const bundle = request.payload as fhir.Bundle
+  const task = getTask(bundle)
+  const previousAction = getActionFromTask(task!)
+  if (previousAction === 'IN_PROGRESS') {
+    await createUserAuditPointFromFHIR('REINSTATED_IN_PROGRESS', request)
+  }
+  if (previousAction === 'DECLARED') {
+    await createUserAuditPointFromFHIR('REINSTATED_DECLARED', request)
+  }
+  if (previousAction === 'REJECTED') {
+    await createUserAuditPointFromFHIR('REINSTATED_REJECTED', request)
+  }
+
+  return h.response().code(200)
+}
+export async function deathDeclarationReinstatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const bundle = request.payload as fhir.Bundle
+  const task = getTask(bundle)
+  const previousAction = getActionFromTask(task!)
+  if (previousAction === 'IN_PROGRESS') {
+    await createUserAuditPointFromFHIR('REINSTATED_IN_PROGRESS', request)
+  }
+  if (previousAction === 'DECLARED') {
+    await createUserAuditPointFromFHIR('REINSTATED_DECLARED', request)
+  }
+  if (previousAction === 'REJECTED') {
+    await createUserAuditPointFromFHIR('REINSTATED_REJECTED', request)
+  }
   return h.response().code(200)
 }
