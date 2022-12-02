@@ -449,7 +449,7 @@ describe('when field definition has date field', () => {
               type: DATE,
               required: true,
               validate: [dateNotInFuture()],
-              label: formMessages.childDateOfBirth,
+              label: formMessages.dateOfBirth,
               initialValue: ''
             }
           ]}
