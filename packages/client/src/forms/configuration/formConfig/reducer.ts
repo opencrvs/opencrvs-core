@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig } from '@client/forms'
+import { IFormConfig, IFormDataSet } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { FieldPosition } from '@client/forms/configuration'
 import * as actions from '@client/forms/configuration/formConfig/actions'
@@ -50,7 +50,7 @@ export type IFormConfigState =
         formDraft: IFormDraft
         configFields: ISectionFieldMap
       }
-      formDataset: IDataSourceSelectOption[]
+      formDataset: IFormDataSet[]
     }
 
 export const initialState: IFormConfigState = {
@@ -83,7 +83,7 @@ function getNextField(fieldMap: IConfigFieldMap, fieldId: string) {
 }
 
 function getReadyState(formConfig: IFormConfig) {
-  const { formDrafts, questionConfig } = formConfig
+  const { formDrafts, questionConfig, formDataset = [] } = formConfig
 
   const defaultBirthForm = populateRegisterFormsWithAddresses(
     registerForms[Event.Birth],
@@ -117,7 +117,7 @@ function getReadyState(formConfig: IFormConfig) {
         questionConfig
       )
     },
-    formDataset: []
+    formDataset
   }
 }
 

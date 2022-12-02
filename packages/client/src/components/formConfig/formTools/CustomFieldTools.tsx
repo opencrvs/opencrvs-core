@@ -18,7 +18,8 @@ import {
   DeathSection,
   IFormField,
   SELECT_WITH_OPTIONS,
-  ISelectOption
+  ISelectOption,
+  IFormDataSet
 } from '@client/forms'
 import {
   getIdentifiersFromFieldId,
@@ -298,14 +299,14 @@ interface ICustomFieldState {
   CSVUploadStatuses: CSVUploadStatus[]
   CSVUploaderModalActions: JSX.Element[]
   dataSourceSelectOptions: IDataSourceSelectOption[]
-  selectedDataSource: string | null
+  selectedDataSource: string | null | undefined
 }
 
 interface IOptionalContent {
   [key: string]: IMessage[]
 }
 
-const HEALTH_FACILITY = 'HEALTH_FACILITY'
+const HEALTH_FACILITY = 'Health Facility'
 
 class CustomFieldToolsComp extends React.Component<
   IFullProps,
@@ -314,36 +315,95 @@ class CustomFieldToolsComp extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = this.getInitialState()
-    this.fetchDataSources()
+    // this.fetchDataSources()
   }
 
+  prepareDataSourceOptions(
+    formDataset: IFormDataSet[]
+  ): IDataSourceSelectOption[] {
+    const { selectedLanguage, facilities } = this.props
+    const healthFacilityOptions = facilities
+      ? Object.keys(facilities).map((id) => ({
+          label: {
+            id: `facility.${id}`,
+            defaultMessage: facilities[id].name
+          },
+          value: facilities[id].id
+        }))
+      : []
+
+    return (
+      formDataset.map((dataset) => {
+        const optionsFromCSV = dataset?.options
+          ?.map((option) => {
+            const label = option?.label
+              ? option.label.find((i) => i?.lang === selectedLanguage)
+              : null
+
+            if (label) {
+              return {
+                value: option.value,
+                label: label.descriptor
+              } as ISelectOption
+            }
+          })
+          .filter((i) => i) as ISelectOption[]
+
+        return {
+          value: dataset._id,
+          label: dataset.fileName,
+          options:
+            dataset.fileName === HEALTH_FACILITY
+              ? healthFacilityOptions
+              : optionsFromCSV
+        }
+      }) || []
+    )
+  }
+
+  //  TODO: This method should be deleted
   async fetchDataSources() {
-    const { selectedLanguage } = this.props
+    const { selectedLanguage, facilities } = this.props
     const data: { data: GetFormDatasetQuery } = await client.query({
       query: FETCH_FORM_DATA_SET,
       fetchPolicy: 'no-cache'
     })
 
+    const healthFacilityOptions = facilities
+      ? Object.keys(facilities).map((id) => ({
+          label: {
+            id: `facility.${id}`,
+            defaultMessage: facilities[id].name
+          },
+          value: facilities[id].id
+        }))
+      : []
+
     const options: IDataSourceSelectOption[] =
       data.data?.getFormDataset?.map((dataset) => {
+        const optionsFromCSV = dataset?.options
+          ?.map((option) => {
+            const label = option?.label
+              ? option.label.find((i) => i?.lang === selectedLanguage)
+              : null
+
+            if (label) {
+              delete label.descriptor.__typename
+              return {
+                value: option.value,
+                label: label.descriptor
+              } as ISelectOption
+            }
+          })
+          .filter((i) => i) as ISelectOption[]
+
         return {
           value: dataset._id as string,
           label: dataset.fileName as string,
-          options: dataset?.options
-            ?.map((option) => {
-              const label = option?.label
-                ? option.label.find((i) => i?.lang === selectedLanguage)
-                : null
-
-              if (label) {
-                delete label.descriptor.__typename
-                return {
-                  value: option.value,
-                  label: label.descriptor
-                } as ISelectOption
-              }
-            })
-            .filter((i) => i) as ISelectOption[]
+          options:
+            dataset.fileName === HEALTH_FACILITY
+              ? healthFacilityOptions
+              : optionsFromCSV
         }
       }) || []
 
@@ -364,7 +424,7 @@ class CustomFieldToolsComp extends React.Component<
   getInitialState() {
     const defaultLanguage = getDefaultLanguage()
     const languages = this.getLanguages()
-    const { intl, selectedField, formField, facilities } = this.props
+    const { selectedField, formField } = this.props
     const fieldForms: { [key: string]: ICustomField } = {}
     const conditionalfield = selectedField.conditionals?.[0]
 
@@ -394,23 +454,9 @@ class CustomFieldToolsComp extends React.Component<
       showCSVUploadingModal: false,
       CSVUploadStatuses: [],
       CSVUploaderModalActions: [],
-      dataSourceSelectOptions: [
-        {
-          label: intl.formatMessage(
-            customFieldFormMessages.optionHealthFacility
-          ),
-          value: 'HEALTH_FACILITY',
-          options: facilities
-            ? Object.keys(facilities).map((id) => ({
-                label: {
-                  id: `facility.${id}`,
-                  defaultMessage: facilities[id].name
-                },
-                value: facilities[id].id
-              }))
-            : []
-        }
-      ],
+      dataSourceSelectOptions: this.prepareDataSourceOptions(
+        this.props.formDataset || []
+      ),
       selectedDataSource: this.props.selectedField.datasetId
     }
   }
@@ -1221,7 +1267,8 @@ const mapStateToProps = (store: IStoreState, props: IProps) => {
   return {
     fieldsMap: selectConfigFields(store, event, section),
     facilities: store.offline.offlineData.facilities,
-    selectedLanguage: store.i18n.language
+    selectedLanguage: store.i18n.language,
+    formDataset: store.formConfig.formDataset
   }
 }
 
