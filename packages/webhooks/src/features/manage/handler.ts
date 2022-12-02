@@ -151,8 +151,8 @@ export async function subscribeWebhooksHandler(
 }
 
 const getScopeType = (scopes: string[]) => {
-  const isWebhookUser = scopes.indexOf('webhook') > -1
-  const isNationalIDAPIUser = scopes.indexOf('nationalId') > -1
+  const isWebhookUser = scopes.includes('webhook')
+  const isNationalIDAPIUser = scopes.includes('nationalId')
   return isWebhookUser
     ? 'webhook'
     : isNationalIDAPIUser

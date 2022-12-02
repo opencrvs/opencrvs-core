@@ -105,6 +105,7 @@ export function SystemList() {
   }
 
   const {
+    closePermissionModal,
     systemToDeleteData,
     deleteSystem,
     systemToDelete,
@@ -190,10 +191,10 @@ export function SystemList() {
         handler: () => {
           setSystemToShowPermission(system)
           setBirthPermissions(
-            populatePermissions(system.webhookPermissions!, Event.Birth)
+            populatePermissions(system.settings!, Event.Birth)
           )
           setDeathPermissions(
-            populatePermissions(system.webhookPermissions!, Event.Death)
+            populatePermissions(system.settings!, Event.Death)
           )
         },
         label: intl.formatMessage(buttonMessages.edit)
@@ -698,7 +699,7 @@ export function SystemList() {
           deathPermissions={deathPermissions}
           setBirthPermissions={setBirthPermissions}
           setDeathPermissions={setDeathPermissions}
-          closeModal={() => setSystemToShowPermission(undefined)}
+          closeModal={closePermissionModal}
         />
       )}
 

@@ -300,7 +300,7 @@ const messagesToDefine = {
   },
   updatePermissionsMsg: {
     id: 'integrations.updatePermissionsMsg',
-    defaultMessage: 'Permissions update successfully',
+    defaultMessage: 'Permissions updated successfully',
     description: 'Label for update permissions message'
   },
   deleteSystemText: {

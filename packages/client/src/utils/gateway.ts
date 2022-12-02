@@ -1817,10 +1817,10 @@ export type System = {
   _id: Scalars['ID']
   clientId: Scalars['ID']
   name: Scalars['String']
+  settings?: Maybe<Array<WebhookPermission>>
   shaSecret: Scalars['ID']
   status: SystemStatus
   type: SystemType
-  webhookPermissions?: Maybe<Array<WebhookPermission>>
 }
 
 export type SystemInput = {
@@ -5695,7 +5695,7 @@ export type RegisterSystemMutation = {
       shaSecret: string
       status: SystemStatus
       type: SystemType
-      webhookPermissions?: Array<{
+      settings?: Array<{
         __typename?: 'WebhookPermission'
         event: string
         permissions: Array<string>
@@ -5718,7 +5718,7 @@ export type DeactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    webhookPermissions?: Array<{
+    settings?: Array<{
       __typename?: 'WebhookPermission'
       event: string
       permissions: Array<string>
@@ -5740,7 +5740,7 @@ export type ReactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    webhookPermissions?: Array<{
+    settings?: Array<{
       __typename?: 'WebhookPermission'
       event: string
       permissions: Array<string>
@@ -5783,7 +5783,7 @@ export type UpdatePermissionsMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-    webhookPermissions?: Array<{
+    settings?: Array<{
       __typename?: 'WebhookPermission'
       event: string
       permissions: Array<string>

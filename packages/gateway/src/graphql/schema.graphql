@@ -539,7 +539,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
-  webhookPermissions: [WebhookPermission!]
+  settings: [WebhookPermission!]
 }
 
 input NotificationInput {

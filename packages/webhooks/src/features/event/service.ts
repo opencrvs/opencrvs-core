@@ -159,7 +159,7 @@ const getPermissionsBundle = async (
       getResourceBySection(composition, sectionCode, authHeader)
     )
   )
-  resources.map((resource: fhir.BundleEntry) => {
+  resources.forEach((resource: fhir.BundleEntry) => {
     if (resource) {
       bundle.entry!.push({ resource })
     }

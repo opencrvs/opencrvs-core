@@ -85,7 +85,7 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      return await res.json()
+      return res.json()
     },
     async refreshSystemSecret(_, { clientId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -103,7 +103,7 @@ export const resolvers: GQLResolver = {
         throw new Error(`No user details found by given clientId`)
       }
 
-      return await res.json()
+      return res.json()
     },
     async updatePermissions(_, { setting }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -121,7 +121,7 @@ export const resolvers: GQLResolver = {
         throw new Error(`Something went wrong`)
       }
 
-      return await res.json()
+      return res.json()
     },
     async deleteSystem(_, { clientId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -139,7 +139,7 @@ export const resolvers: GQLResolver = {
         throw new Error(`No System found by given clientId`)
       }
 
-      return await res.json()
+      return res.json()
     }
   },
 

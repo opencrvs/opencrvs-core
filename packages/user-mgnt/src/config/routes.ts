@@ -52,7 +52,6 @@ import verifySecurityAnswer, {
 import {
   registerSystem,
   reqRegisterSystemSchema,
-  // resSystemSchema,
   deactivateSystem,
   reactivateSystem,
   clientIdSchema,

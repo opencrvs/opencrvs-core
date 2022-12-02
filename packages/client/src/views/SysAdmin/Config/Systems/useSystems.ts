@@ -327,10 +327,17 @@ export function useSystems() {
     systemToDeleteReset()
   }
 
+  const closePermissionModal = () => {
+    setSystemToShowPermission(undefined)
+    setDeathPermissions(initWebHook(Event.Death))
+    setBirthPermissions(initWebHook(Event.Birth))
+  }
+
   const shouldWarnAboutNationalId =
     newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
 
   return {
+    closePermissionModal,
     systemToDeleteData,
     deleteSystem,
     systemToDelete,

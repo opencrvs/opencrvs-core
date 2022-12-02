@@ -58,7 +58,7 @@ const pickSystem = (system: ISystemModel & { _id: Types.ObjectId }) => ({
   _id: system._id.toString(),
   shaSecret: system.sha_secret,
   clientId: system.client_id,
-  webhookPermissions: system.settings.webhook.map((ite) => ({
+  settings: system.settings.webhook.map((ite) => ({
     event: ite.event,
     permissions: ite.permissions
   }))
@@ -404,7 +404,7 @@ export const SystemSchema = Joi.object({
   type: Joi.string(),
   shaSecret: Joi.string(),
   clientId: Joi.string(),
-  webhookPermissions: webHookSchema.optional()
+  settings: webHookSchema.optional()
 })
 
 export const resSystemSchema = Joi.object({

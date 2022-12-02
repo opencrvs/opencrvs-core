@@ -23,7 +23,7 @@ export const registerSystem = gql`
         shaSecret
         status
         type
-        webhookPermissions {
+        settings {
           event
           permissions
         }
@@ -41,7 +41,7 @@ export const deactivateSystem = gql`
       shaSecret
       status
       type
-      webhookPermissions {
+      settings {
         event
         permissions
       }
@@ -57,7 +57,7 @@ export const activateSystem = gql`
       shaSecret
       status
       type
-      webhookPermissions {
+      settings {
         event
         permissions
       }
@@ -88,7 +88,7 @@ export const updateSystemPermissions = gql`
       shaSecret
       status
       type
-      webhookPermissions {
+      settings {
         event
         permissions
       }
