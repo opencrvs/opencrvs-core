@@ -70,6 +70,8 @@ interface IButtonsMessages
   makeCorrection: MessageDescriptor
   publish: MessageDescriptor
   add: MessageDescriptor
+  copy: MessageDescriptor
+  copied: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {

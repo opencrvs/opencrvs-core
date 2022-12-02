@@ -53,16 +53,13 @@ import React, { useCallback, useState } from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
-import { Copy } from '@client/views/SysAdmin/Config/Systems/Copy'
+import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 
 interface ToggleModal {
   modalVisible: boolean
   selectedClient: System | null
 }
 
-const TopText = styled(Text)`
-  margin-top: 20px;
-`
 const ButtonLink = styled(Link)`
   text-align: left;
 `
@@ -76,13 +73,6 @@ const StyledSpinner = styled(Spinner)`
 `
 const Field = styled.div`
   margin-top: 16px;
-`
-
-const Details = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
 `
 const populatePermissions = (
   webhooks: WebhookPermission[] = [],
@@ -350,7 +340,7 @@ export function SystemList() {
             </Link>
           ]}
           autoHeight={true}
-          width={500}
+          width={512}
           titleHeightAuto={true}
           show={toggleKeyModal.modalVisible}
           handleClose={() => {
@@ -359,58 +349,71 @@ export function SystemList() {
           }}
           title={toggleKeyModal.selectedClient?.name ?? ''}
         >
-          {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+          <Text variant="reg16" element="p">
+            {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+          </Text>
 
-          <Stack direction="column" alignItems="flex-start">
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.clientId)}
-            </TopText>
-            <Details>
-              <Text variant="reg16" element="span">
-                {toggleKeyModal.selectedClient?.clientId}
+          <Stack alignItems="stretch" direction="column" gap={16}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.clientId)}
               </Text>
-              <Copy data={toggleKeyModal.selectedClient?.clientId as string} />
-            </Details>
-          </Stack>
-
-          <Stack direction="column" alignItems="flex-start">
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.clientSecret)}
-            </TopText>
-            {refreshTokenLoading ? (
-              <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
-            ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
-              <Details>
+              <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
-                  {refreshTokenData.refreshSystemSecret?.clientSecret}
+                  {toggleKeyModal.selectedClient?.clientId}
                 </Text>
-                <Copy
-                  data={
-                    refreshTokenData.refreshSystemSecret?.clientSecret as string
-                  }
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={toggleKeyModal.selectedClient?.clientId as string}
                 />
-              </Details>
-            ) : (
-              <ButtonLink
-                onClick={() => {
-                  clientRefreshToken(toggleKeyModal.selectedClient?.clientId)
-                }}
-              >
-                {intl.formatMessage(buttonMessages.refresh)}
-              </ButtonLink>
-            )}
-          </Stack>
-
-          <Stack direction="column" alignItems="flex-start">
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.shaSecret)}
-            </TopText>
-            <Details>
-              <Text variant="reg16" element="span">
-                {toggleKeyModal.selectedClient?.shaSecret}
+              </Stack>
+            </Stack>
+            <Stack direction="column" alignItems="stretch" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.clientSecret)}
               </Text>
-              <Copy data={toggleKeyModal.selectedClient?.shaSecret as string} />
-            </Details>
+              {refreshTokenLoading ? (
+                <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
+              ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
+                <Stack justifyContent="space-between" alignItems="center">
+                  <Text variant="reg16" element="span">
+                    {refreshTokenData.refreshSystemSecret?.clientSecret}
+                  </Text>
+                  <CopyButton
+                    copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                    copyLabel={intl.formatMessage(buttonMessages.copy)}
+                    data={
+                      refreshTokenData.refreshSystemSecret
+                        ?.clientSecret as string
+                    }
+                  />
+                </Stack>
+              ) : (
+                <ButtonLink
+                  onClick={() => {
+                    clientRefreshToken(toggleKeyModal.selectedClient?.clientId)
+                  }}
+                >
+                  {intl.formatMessage(buttonMessages.refresh)}
+                </ButtonLink>
+              )}
+            </Stack>
+            <Stack direction="column" alignItems="stretch" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.shaSecret)}
+              </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {toggleKeyModal.selectedClient?.shaSecret}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={toggleKeyModal.selectedClient?.shaSecret as string}
+                />
+              </Stack>
+            </Stack>
           </Stack>
         </ResponsiveModal>
       </Content>
@@ -443,6 +446,7 @@ export function SystemList() {
                 </Button>
               ]
         }
+        width={512}
         autoHeight={true}
         titleHeightAuto={true}
         show={showModal}
@@ -683,51 +687,57 @@ export function SystemList() {
         )}
 
         {registerSystemData?.registerSystem && (
-          <Stack alignItems="flex-start" direction="column" gap={16}>
-            <Stack alignItems="flex-start" direction="column" gap={8}>
+          <Stack alignItems="stretch" direction="column" gap={16}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientId)}
               </Text>
-              <Details>
+              <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
                   {registerSystemData.registerSystem.system.clientId}
                 </Text>
-                <Copy
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
                   data={
                     registerSystemData.registerSystem.system.clientId as string
                   }
                 />
-              </Details>
+              </Stack>
             </Stack>
-            <Stack alignItems="flex-start" direction="column" gap={8}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientSecret)}
               </Text>
-              <Details>
+              <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
                   {registerSystemData.registerSystem.clientSecret}
                 </Text>
-                <Copy
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
                   data={
                     registerSystemData.registerSystem.clientSecret as string
                   }
                 />
-              </Details>
+              </Stack>
             </Stack>
-            <Stack alignItems="flex-start" direction="column" gap={8}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.shaSecret)}
               </Text>
-              <Details>
+              <Stack justifyContent="space-between" alignItems="center">
                 <Text variant="reg16" element="span">
                   {registerSystemData.registerSystem.system.shaSecret}
                 </Text>
-                <Copy
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
                   data={
                     registerSystemData.registerSystem.system.shaSecret as string
                   }
                 />
-              </Details>
+              </Stack>
             </Stack>
           </Stack>
         )}
