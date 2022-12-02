@@ -37,6 +37,7 @@ import { messages } from '@client/i18n/messages/views/formConfig'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IQuestionConfig } from './questionConfig'
 import { IFont } from '@opencrvs/components/lib/fonts'
+import { LocationType } from '@client/utils/gateway'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -48,6 +49,7 @@ export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
+export const DATE_RANGE_PICKER = 'DATE_RANGE_PICKER'
 export const TEXTAREA = 'TEXTAREA'
 export const SUBSECTION = 'SUBSECTION'
 export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
@@ -227,6 +229,7 @@ export type IFormFieldValue =
   | FieldValueMap
   | IContactPoint
   | IInformant
+  | IDateRangePickerValue
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
 export interface FieldValueMap {
@@ -263,6 +266,13 @@ export interface IInformant {
 export interface IContactPoint {
   value: string
   nestedFields: IContactPointPhone
+}
+
+export interface IDateRangePickerValue {
+  exact: string | undefined
+  rangeStart: string | undefined
+  rangeEnd: string | undefined
+  isDateRangeActive: boolean | undefined
 }
 
 export interface IAttachmentValue {
@@ -543,6 +553,12 @@ export interface IDateFormField extends IFormFieldBase {
   notice?: MessageDescriptor
   ignorePlaceHolder?: boolean
 }
+export interface IDateRangePickerFormField extends IFormFieldBase {
+  type: typeof DATE_RANGE_PICKER
+  notice?: MessageDescriptor
+  ignorePlaceHolder?: boolean
+}
+
 export interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
@@ -586,12 +602,11 @@ export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
 
 export interface ILocationSearchInputFormField extends IFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
+  searchableResource: Array<
+    Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>
   >
   locationList?: ISearchLocation[]
-  searchableType: string
+  searchableType: string[]
   dispatchOptions?: IDispatchOptions
   dynamicOptions?: IDynamicOptions
 }
@@ -662,6 +677,7 @@ export type IFormField =
   | ILoaderButton
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
+  | IDateRangePickerFormField
 
 export interface IPreviewGroup {
   id: string
@@ -893,6 +909,11 @@ export enum UserSection {
   Preview = 'preview'
 }
 
+export enum AdvancedSearchSection {
+  Birth = 'birth',
+  Death = 'death'
+}
+
 export enum CertificateSection {
   Collector = 'collector',
   CollectCertificate = 'collectCertificate',
@@ -1088,6 +1109,11 @@ export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   notice?: string
   ignorePlaceHolder?: boolean
 }
+export interface Ii18nDateRangePickerFormField extends Ii18nFormFieldBase {
+  type: typeof DATE_RANGE_PICKER
+  notice?: string
+  ignorePlaceHolder?: boolean
+}
 export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
@@ -1128,11 +1154,10 @@ export interface Ii18nSimpleDocumentUploaderFormField
 
 export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
+  searchableResource: Array<
+    Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>
   >
-  searchableType: string
+  searchableType: string[]
   locationList?: ISearchLocation[]
   dispatchOptions?: IDispatchOptions
 
@@ -1185,6 +1210,7 @@ export type Ii18nFormField =
   | Ii18nLoaderButtonField
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
+  | Ii18nDateRangePickerFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
@@ -1244,6 +1270,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     CHECKBOX_GROUP: messages.checkboxGroup,
     CHECKBOX: messages.checkbox,
     DATE: messages.date,
+    DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
     DYNAMIC_LIST: messages.dynamicList
   }
 

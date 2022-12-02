@@ -930,8 +930,8 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'placeOfBirth',
                 required: true,
                 initialValue: '',
-                searchableResource: 'facilities',
-                searchableType: 'HEALTH_FACILITY',
+                searchableResource: ['facilities'],
+                searchableType: ['HEALTH_FACILITY'],
                 dynamicOptions: {
                   resource: 'facilities'
                 },
@@ -3555,8 +3555,8 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'placeOfDeath',
                 required: true,
                 initialValue: '',
-                searchableResource: 'facilities',
-                searchableType: 'HEALTH_FACILITY',
+                searchableResource: ['facilities'],
+                searchableType: ['HEALTH_FACILITY'],
                 dynamicOptions: {
                   resource: 'facilities'
                 },
