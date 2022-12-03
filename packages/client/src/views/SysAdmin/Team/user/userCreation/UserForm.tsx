@@ -11,6 +11,7 @@
  */
 import { FormFieldGenerator } from '@client/components/form'
 import {
+  HIDDEN,
   IFormSection,
   IFormSectionData,
   IFormSectionGroup
@@ -44,6 +45,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
+import { RouteComponentProps } from 'react-router'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -79,7 +81,18 @@ type IDispatchProps = {
   goToUserReviewForm: typeof goToUserReviewForm
   clearUserFormData: typeof clearUserFormData
 }
-type IFullProps = IntlShapeProps & IProps & IDispatchProps
+
+interface IMatchParams {
+  userId?: string
+  locationId?: string
+  sectionId: string
+  groupId: string
+}
+
+type IFullProps = RouteComponentProps<IMatchParams> &
+  IntlShapeProps &
+  IProps &
+  IDispatchProps
 
 class UserFormComponent extends React.Component<IFullProps, IState> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -170,7 +183,19 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               id={section.id}
               onChange={(values) => this.modifyData(values)}
               setAllFieldsDirty={false}
-              fields={getVisibleGroupFields(activeGroup)}
+              fields={getVisibleGroupFields(activeGroup).concat({
+                /*
+                 *  Office ID added to the form field data so it can be
+                 *  used to validate that only right roles can be created
+                 *  based on the type of the location
+                 */
+                name: 'office',
+                type: HIDDEN,
+                label: section.title,
+                validate: [],
+                required: true,
+                initialValue: this.props.match.params.locationId
+              })}
               onSetTouched={(setTouchedFunc) => {
                 this.setAllFormFieldsTouched = setTouchedFunc
               }}
