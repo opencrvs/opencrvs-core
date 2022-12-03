@@ -39,6 +39,7 @@ export const REGISTER_BIRTH_DECLARATION = gql`
             name {
               use
               firstNames
+              middleNames
               familyName
             }
             role

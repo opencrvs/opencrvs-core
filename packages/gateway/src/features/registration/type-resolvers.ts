@@ -76,7 +76,10 @@ export const typeResolvers: GQLResolver = {
   },
   HumanName: {
     firstNames(name) {
-      return (name.given && name.given.join(' ')) || ''
+      return name.given?.[0] || ''
+    },
+    middleNames(name) {
+      return name.given?.slice(1).join(' ') || ''
     },
     familyName(name) {
       if (!name.family) {

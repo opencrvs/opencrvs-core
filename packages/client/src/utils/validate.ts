@@ -545,6 +545,15 @@ export const englishOnlyNameFormat: Validation = (value: IFormFieldValue) => {
     : { message: messages.englishOnlyNameFormat }
 }
 
+export const maxNames =
+  (max: number): Validation =>
+  (value: IFormFieldValue) => {
+    const cast = value.toString()
+    return cast.split(' ').length <= max
+      ? undefined
+      : { message: messages.maxNames, props: { max } }
+  }
+
 export const range: RangeValidation =
   (min: number, max: number) => (value: IFormFieldValue) => {
     const cast = value as string

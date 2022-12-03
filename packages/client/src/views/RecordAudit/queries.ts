@@ -36,6 +36,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           name {
             use
             firstNames
+            middleNames
             familyName
           }
         }

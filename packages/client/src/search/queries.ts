@@ -52,6 +52,7 @@ export const SEARCH_EVENTS = gql`
           dateOfBirth
           childName {
             firstNames
+            middleNames
             familyName
             use
           }
@@ -60,6 +61,7 @@ export const SEARCH_EVENTS = gql`
           dateOfDeath
           deceasedName {
             firstNames
+            middleNames
             familyName
             use
           }
@@ -102,6 +104,7 @@ export const SEARCH_DECLARATIONS_USER_WISE = gql`
           childName {
             use
             firstNames
+            middleNames
             familyName
           }
         }
@@ -110,6 +113,7 @@ export const SEARCH_DECLARATIONS_USER_WISE = gql`
           deceasedName {
             use
             firstNames
+            middleNames
             familyName
           }
         }

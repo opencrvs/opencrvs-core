@@ -777,6 +777,7 @@ type IdentityType {
 type HumanName {
   use: String
   firstNames: String
+  middleNames: String
   familyName: String
 }
 
@@ -1069,6 +1070,7 @@ input MedicalPractitionerInput {
 input HumanNameInput {
   use: String
   firstNames: String
+  middleNames: String
   familyName: String
 }
 

@@ -25,6 +25,7 @@ export const FETCH_REGISTRATION = gql`
         name {
           use
           firstNames
+          middleNames
           familyName
         }
         birthDate
