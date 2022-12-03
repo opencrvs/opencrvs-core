@@ -1075,7 +1075,7 @@ export interface Ii18nHiddenFormField extends Ii18nFormFieldBase {
 export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
-  max?: number
+  maxLength?: number
   inputFieldWidth?: string
 }
 

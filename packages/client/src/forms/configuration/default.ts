@@ -631,12 +631,13 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'ageAtBirthOfChild',
                 type: 'NUMBER',
+                maxLength: 2,
                 label: {
                   defaultMessage: 'Age at birth of child',
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
-                inputFieldWidth: '180px',
+                inputFieldWidth: '60px',
                 conditionals: [
                   {
                     action: 'hide',
@@ -1862,12 +1863,13 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'ageAtBirthOfChild',
                 type: 'NUMBER',
+                maxLength: 2,
                 label: {
                   defaultMessage: 'Age at birth of child',
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
-                inputFieldWidth: '180px',
+                inputFieldWidth: '60px',
                 conditionals: [
                   {
                     action: 'hide',
