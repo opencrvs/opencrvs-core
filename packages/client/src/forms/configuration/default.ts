@@ -540,6 +540,10 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 conditionals: [
@@ -576,6 +580,10 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 conditionals: [
@@ -1794,6 +1802,10 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 conditionals: [
@@ -1831,6 +1843,10 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 mapping: {
@@ -3256,6 +3272,10 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 conditionals: [
@@ -3300,6 +3320,10 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 conditionals: [
