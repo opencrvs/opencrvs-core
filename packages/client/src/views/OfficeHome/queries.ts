@@ -37,6 +37,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
       dateOfBirth
       childName {
         firstNames
+        middleNames
         familyName
         use
       }
@@ -238,6 +239,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
             name {
               use
               firstNames
+              middleNames
               familyName
             }
             role
@@ -271,6 +273,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
           name {
             use
             firstNames
+            middleNames
             familyName
           }
           birthDate

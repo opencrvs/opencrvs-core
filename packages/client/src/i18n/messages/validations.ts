@@ -20,6 +20,7 @@ interface IValidationMessages
   domLaterThanDob: MessageDescriptor
   emailAddressFormat: MessageDescriptor
   englishOnlyNameFormat: MessageDescriptor
+  maxNames: MessageDescriptor
   facilityMustBeSelected: MessageDescriptor
   officeMustBeSelected: MessageDescriptor
   greaterThanZero: MessageDescriptor
@@ -98,6 +99,13 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message that appears when a non English character is used in an English name',
     id: 'validations.englishOnlyNameFormat'
+  },
+  maxNames: {
+    defaultMessage:
+      'Only {max, plural, =0 {no names} one {one name} other {# names}} allowed',
+    description:
+      'The error message that appears when a user enters more than the maximum number of names',
+    id: 'validations.maxNames'
   },
   facilityMustBeSelected: {
     defaultMessage: 'No facility selected',

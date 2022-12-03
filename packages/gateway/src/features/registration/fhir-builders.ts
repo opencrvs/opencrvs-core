@@ -109,10 +109,24 @@ function createNameBuilder(sectionCode: string, sectionTitle: string) {
       setObjectPropInResourceArray(
         person,
         'name',
-        fieldValue.split(' '),
+        [fieldValue],
         'given',
         context
       )
+    },
+    middleNames: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        sectionCode,
+        sectionTitle,
+        fhirBundle
+      )
+      person.name?.forEach((name) => {
+        name.given = name.given?.slice(0, 1).concat(fieldValue.split(' '))
+      })
     },
     familyName: (
       fhirBundle: ITemplatedBundle,
@@ -1778,10 +1792,21 @@ export const builders: IFieldBuilders = {
           setObjectPropInResourceArray(
             person,
             'name',
-            fieldValue.split(' '),
+            [fieldValue],
             'given',
             context
           )
+        },
+        middleNames: (
+          fhirBundle: ITemplatedBundle,
+          fieldValue: string,
+          context: any
+        ) => {
+          const person = selectOrCreateInformantResource(fhirBundle)
+
+          person.name?.forEach((name) => {
+            name.given = name.given?.slice(0, 1).concat(fieldValue.split(' '))
+          })
         },
         familyName: (
           fhirBundle: ITemplatedBundle,
@@ -3103,10 +3128,27 @@ export const builders: IFieldBuilders = {
               setObjectPropInResourceArray(
                 person,
                 'name',
-                fieldValue.split(' '),
+                [fieldValue],
                 'given',
                 context
               )
+            },
+            middleNames: (
+              fhirBundle: ITemplatedBundle,
+              fieldValue: string,
+              context: any
+            ) => {
+              const person = selectOrCreateCollectorPersonResource(
+                fhirBundle,
+                context,
+                context.event
+              )
+
+              person.name?.forEach((name) => {
+                name.given = name.given
+                  ?.slice(0, 1)
+                  .concat(fieldValue.split(' '))
+              })
             },
             familyName: (
               fhirBundle: ITemplatedBundle,
@@ -3709,6 +3751,7 @@ export async function buildFHIRBundle(
     context.authHeader = authHeader
   }
   await transformObj(reg, fhirBundle, builders, context)
+
   return fhirBundle
 }
 

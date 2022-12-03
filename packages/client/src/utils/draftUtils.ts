@@ -14,7 +14,12 @@ import {
   SUBMISSION_STATUS,
   IPrintableDeclaration
 } from '@client/declarations'
-import { BirthSection, DeathSection, IFormSectionData } from '@client/forms'
+import {
+  BirthSection,
+  DeathSection,
+  IFormFieldValue,
+  IFormSectionData
+} from '@client/forms'
 import { Event, History } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
@@ -27,9 +32,12 @@ import { EMPTY_STRING } from '@client/utils/constants'
 
 const getInformantEngName = (sectionData: IFormSectionData): string => {
   if (sectionData.firstNamesEng) {
-    return `${sectionData.firstNamesEng as string} ${
-      sectionData.familyNameEng as string
-    }`
+    return ([] as IFormFieldValue[])
+      .concat(sectionData.firstNamesEng)
+      .concat(sectionData.middleNamesEng)
+      .concat(sectionData.familyNameEng)
+      .filter(Boolean)
+      .join(' ')
   } else {
     return sectionData.familyNameEng as string
   }
@@ -57,9 +65,12 @@ const getInformantFullName = (
     fullName = getInformantEngName(sectionData)
   } else {
     if (sectionData.firstNames && sectionData.familyName) {
-      fullName = `${sectionData.firstNames as string} ${
-        sectionData.familyName as string
-      }`
+      fullName = ([] as IFormFieldValue[])
+        .concat(sectionData.firstNames)
+        .concat(sectionData.middleNames)
+        .concat(sectionData.familyName)
+        .filter(Boolean)
+        .join(' ')
     } else {
       fullName =
         getInformantOthreName(sectionData) || getInformantEngName(sectionData)

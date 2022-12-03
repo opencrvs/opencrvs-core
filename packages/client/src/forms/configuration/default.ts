@@ -145,18 +145,15 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'TEXT',
                 label: formMessageDescriptors.childFirstNames,
                 maxLength: 32,
-                description: {
-                  defaultMessage:
-                    'Middle name (if any) should be entered after the first name',
-                  description:
-                    'Description for form field: First names in english',
-                  id: 'form.field.label.firstNamesDesc'
-                },
                 required: true,
                 initialValue: '',
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 mapping: {
@@ -172,6 +169,40 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'nameToFieldTransformer',
                     parameters: ['en', 'firstNames']
+                  }
+                }
+              },
+              {
+                name: 'middleNamesEng',
+                previewGroup: 'childNameInEnglish',
+                customisable: false,
+                type: 'TEXT',
+                label: formMessageDescriptors.middleNames,
+                maxLength: 32,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'childMiddleNames',
+                    operation: 'upperCaseNameToFieldTransformer',
+                    parameters: ['en', 'middleNames']
+                  },
+                  mutation: {
+                    operation: 'fieldToNameTransformer',
+                    parameters: ['en', 'middleNames']
+                  },
+                  query: {
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'middleNames']
                   }
                 }
               },
@@ -503,19 +534,16 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: First names in english',
                   id: 'form.field.label.motherFirstNamesEng'
                 },
-                description: {
-                  defaultMessage:
-                    'Middle name (if any) should be entered after the first name',
-                  description:
-                    'Description for form field: First names in english',
-                  id: 'form.field.label.firstNamesDesc'
-                },
                 maxLength: 32,
                 required: true,
                 initialValue: '',
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 conditionals: [
@@ -538,6 +566,46 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'nameToFieldTransformer',
                     parameters: ['en', 'firstNames']
+                  }
+                }
+              },
+              {
+                name: 'middleNamesEng',
+                previewGroup: 'motherNameInEnglish',
+                type: 'TEXT',
+                label: formMessageDescriptors.middleNames,
+                maxLength: 32,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'motherMiddleNames',
+                    operation: 'upperCaseNameToFieldTransformer',
+                    parameters: ['en', 'middleNames']
+                  },
+                  mutation: {
+                    operation: 'fieldToNameTransformer',
+                    parameters: ['en', 'middleNames']
+                  },
+                  query: {
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'middleNames']
                   }
                 }
               },
@@ -1728,19 +1796,16 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: First names in english',
                   id: 'form.field.label.fatherFirstNamesEng'
                 },
-                description: {
-                  defaultMessage:
-                    'Middle name (if any) should be entered after the first name',
-                  description:
-                    'Description for form field: First names in english',
-                  id: 'form.field.label.firstNamesDesc'
-                },
                 maxLength: 32,
                 required: true,
                 initialValue: '',
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 conditionals: [
@@ -1763,6 +1828,40 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'nameToFieldTransformer',
                     parameters: ['en', 'firstNames']
+                  }
+                }
+              },
+              {
+                name: 'middleNamesEng',
+                previewGroup: 'fatherNameInEnglish',
+                customisable: false,
+                type: 'TEXT',
+                label: formMessageDescriptors.middleNames,
+                maxLength: 32,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'fatherMiddleNames',
+                    operation: 'upperCaseNameToFieldTransformer',
+                    parameters: ['en', 'middleNames']
+                  },
+                  mutation: {
+                    operation: 'fieldToNameTransformer',
+                    parameters: ['en', 'middleNames']
+                  },
+                  query: {
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'middleNames']
                   }
                 }
               },
@@ -3167,19 +3266,16 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Given names',
                   id: 'form.field.label.childFirstNames'
                 },
-                description: {
-                  defaultMessage:
-                    'Middle name (if any) should be entered after the first name',
-                  description:
-                    'Description for form field: First names in english',
-                  id: 'form.field.label.firstNamesDesc'
-                },
                 maxLength: 32,
                 required: true,
                 initialValue: '',
                 validate: [
                   {
                     operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
                   }
                 ],
                 conditionals: [
@@ -3208,6 +3304,54 @@ export const registerForms: IDefaultRegisterForms = {
                       {
                         operation: 'nameToFieldTransformer',
                         parameters: ['en', 'firstNames']
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'middleNamesEng',
+                previewGroup: 'informantNameInEnglish',
+                label: formMessageDescriptors.middleNames,
+                type: 'TEXT',
+                maxLength: 32,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  },
+                  {
+                    operation: 'maxNames',
+                    parameters: [1]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.informantType || values.informantType == "MOTHER" || values.informantType == "FATHER"'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'middleNames']
+                      },
+                      'name'
+                    ]
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'middleNames']
                       }
                     ]
                   }

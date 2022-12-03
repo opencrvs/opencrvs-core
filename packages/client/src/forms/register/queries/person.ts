@@ -20,6 +20,7 @@ export const FETCH_PERSON = gql`
       name {
         use
         firstNames
+        middleNames
         familyName
       }
       birthDate
@@ -43,6 +44,7 @@ export const FETCH_PERSON_NID = gql`
       name {
         use
         firstNames
+        middleNames
         familyName
       }
       gender

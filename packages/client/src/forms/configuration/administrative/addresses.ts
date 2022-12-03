@@ -101,7 +101,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     configurations: [{ config: EventLocationAddressCases.PLACE_OF_DEATH }]
   },
   {
-    precedingFieldId: 'birth.informant.informant-view-group.firstNamesEng',
+    precedingFieldId: 'birth.informant.informant-view-group.middleNamesEng',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -126,7 +126,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    precedingFieldId: 'birth.mother.mother-view-group.firstNamesEng',
+    precedingFieldId: 'birth.mother.mother-view-group.middleNamesEng',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -151,7 +151,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    precedingFieldId: 'birth.father.father-view-group.firstNamesEng',
+    precedingFieldId: 'birth.father.father-view-group.middleNamesEng',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,

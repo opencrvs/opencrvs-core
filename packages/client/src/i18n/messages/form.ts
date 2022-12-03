@@ -2479,6 +2479,11 @@ export const formMessageDescriptors = {
     description: 'Label for form field: First names',
     id: 'form.field.label.childFirstNames'
   },
+  middleNames: {
+    defaultMessage: 'Middle name',
+    description: 'Label for form field: middle names',
+    id: 'form.field.label.middleNames'
+  },
   childFirstNamesEng: {
     defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: First names in english',

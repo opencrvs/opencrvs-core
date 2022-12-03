@@ -22,6 +22,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleNames
           familyName
         }
         multipleBirth
@@ -42,6 +43,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           name {
             use
             firstNames
+            middleNames
             familyName
           }
           occupation
@@ -63,6 +65,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleNames
           familyName
         }
         birthDate
@@ -100,6 +103,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         name {
           use
           firstNames
+          middleNames
           familyName
         }
         birthDate
@@ -210,6 +214,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           title
           name {
             firstNames
+            middleNames
             familyName
             use
           }
@@ -253,6 +258,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               name {
                 use
                 firstNames
+                middleNames
                 familyName
               }
               telecom {
@@ -279,6 +285,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleNames
           familyName
         }
         birthDate
@@ -289,6 +296,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleNames
           familyName
         }
         birthDate
@@ -326,6 +334,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         name {
           use
           firstNames
+          middleNames
           familyName
         }
         birthDate
@@ -372,6 +381,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           name {
             use
             firstNames
+            middleNames
             familyName
           }
           nationality
@@ -460,6 +470,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           title
           name {
             firstNames
+            middleNames
             familyName
             use
           }
@@ -503,6 +514,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
               name {
                 use
                 firstNames
+                middleNames
                 familyName
               }
               telecom {

@@ -899,7 +899,8 @@ export async function setCertificateCollector(
   const name = userDetails.name.map((nameItem) => ({
     use: nameItem.use,
     familyName: nameItem.family,
-    firstNames: nameItem.given.join(' ')
+    middleNames: nameItem.given.slice(1).join(' '),
+    firstNames: nameItem.given.slice(0, 1)
   }))
 
   ;(details?.registration?.certificates || []).map((certificate: any) => {
