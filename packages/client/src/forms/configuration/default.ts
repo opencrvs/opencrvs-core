@@ -2902,13 +2902,9 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'detailsExist',
                 type: 'CHECKBOX',
-                label: {
-                  defaultMessage: "Do you have the father's details?",
-                  description:
-                    "Question to ask the user if they have the father's details",
-                  id: 'form.field.label.fathersDetailsExist'
-                },
+                label: formMessageDescriptors.fathersDetailsExist,
                 required: true,
+                hideHeader: true,
                 initialValue: true,
                 validate: [],
                 conditionals: [

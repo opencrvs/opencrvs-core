@@ -392,7 +392,7 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           selected={Boolean(value)}
           value="true"
-          label="Yes"
+          label={fieldDefinition.label}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             onSetFieldValue(fieldDefinition.name, e.target.checked)
           }}
