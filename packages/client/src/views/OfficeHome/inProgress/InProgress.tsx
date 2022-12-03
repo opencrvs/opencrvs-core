@@ -587,11 +587,13 @@ export class InProgressComponent extends React.Component<
           ? true
           : false
         : this.props.selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? this.props.queryData.inProgressData.totalItems &&
+        ? this.props.queryData.inProgressData &&
+          this.props.queryData.inProgressData.totalItems &&
           this.props.queryData.inProgressData.totalItems > this.props.pageSize
           ? true
           : false
-        : this.props.queryData.notificationData.totalItems &&
+        : this.props.queryData.notificationData &&
+          this.props.queryData.notificationData.totalItems &&
           this.props.queryData.notificationData.totalItems > this.props.pageSize
         ? true
         : false
@@ -608,11 +610,13 @@ export class InProgressComponent extends React.Component<
       !selectorId || selectorId === SELECTOR_ID.ownDrafts
         ? Math.ceil(this.props.drafts.length / this.props.pageSize)
         : selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? this.props.queryData.inProgressData.totalItems &&
+        ? this.props.queryData.inProgressData &&
+          this.props.queryData.inProgressData.totalItems &&
           Math.ceil(
             this.props.queryData.inProgressData.totalItems / this.props.pageSize
           )
-        : this.props.queryData.notificationData.totalItems &&
+        : this.props.queryData.notificationData &&
+          this.props.queryData.notificationData.totalItems &&
           Math.ceil(
             this.props.queryData.notificationData.totalItems /
               this.props.pageSize
@@ -643,8 +647,8 @@ export class InProgressComponent extends React.Component<
           this.getTabs(
             selectorId,
             drafts,
-            inProgressData.totalItems || 0,
-            notificationData.totalItems || 0
+            (inProgressData && inProgressData.totalItems) || 0,
+            (notificationData && notificationData.totalItems) || 0
           )
         }
         isShowPagination={isShowPagination}

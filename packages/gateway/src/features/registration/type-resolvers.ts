@@ -63,6 +63,7 @@ import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
 import { getUser } from '@gateway/features/user/utils'
+import { logger } from '@gateway/logger'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -549,6 +550,23 @@ export const typeResolvers: GQLResolver = {
       if (!user || !user.valueReference || !user.valueReference.reference) {
         return null
       }
+      const practitionerId = user.valueReference.reference.split('/')[1]
+      const practitioner: fhir.Practitioner = await fetchFHIR(
+        `/Practitioner/${practitionerId}`,
+        authHeader
+      )
+      console.log('WTF: ', JSON.stringify(practitioner))
+      /*  if (
+        !practitioner &&
+        !practitioner.identifier &&
+        !practitioner.identifier[0] &&
+        !practitioner.identifier[0].value
+      ) {
+        throw new Error('Practitioner mobile cannot be found')
+      }
+      // return role from practitioner and the rest from user using mobile to find the user
+      const mobile = practitioner.identifier[0].value*/
+
       const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
         method: 'POST',
         body: JSON.stringify({
