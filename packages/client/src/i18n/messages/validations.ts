@@ -35,6 +35,7 @@ interface IValidationMessages
   minLength: MessageDescriptor
   notGreaterThan: MessageDescriptor
   isInBetween: MessageDescriptor
+  isValidMotherBirth: MessageDescriptor
   numberRequired: MessageDescriptor
   phoneNumberFormat: MessageDescriptor
   range: MessageDescriptor
@@ -196,6 +197,12 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message that appears on numeric fields that are not in between a range',
     id: 'validations.isInBetween'
+  },
+  isValidMotherBirth: {
+    defaultMessage: 'Please check age of Mother',
+    description:
+      'The error message that appears ageAtBirthOfChild depending on birth order',
+    id: 'validations.isValidMotherBirth'
   },
   numberRequired: {
     defaultMessage: 'Must be a number',

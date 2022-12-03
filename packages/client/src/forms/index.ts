@@ -40,6 +40,7 @@ import { IQuestionConfig } from './questionConfig'
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
+export const FORCED_NUMBER_MAX_LENGTH = 'FORCED_NUMBER_MAX_LENGTH'
 export const HIDDEN = 'HIDDEN'
 export const BIG_NUMBER = 'BIG_NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
@@ -532,6 +533,12 @@ export interface INumberFormField extends IFormFieldBase {
   max?: number
   inputFieldWidth?: string
 }
+
+export interface IForcedNumberFormField extends IFormFieldBase {
+  type: typeof FORCED_NUMBER_MAX_LENGTH
+  maxLength?: number
+  inputFieldWidth?: string
+}
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
   step?: number
@@ -641,6 +648,7 @@ export type IFormField =
   | ITelFormField
   | IHiddenFormField
   | INumberFormField
+  | IForcedNumberFormField
   | IBigNumberFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
@@ -1070,6 +1078,12 @@ export interface Ii18nHiddenFormField extends Ii18nFormFieldBase {
 export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
+  max?: number
+  inputFieldWidth?: string
+}
+
+export interface Ii18nNumberForcedFormField extends Ii18nFormFieldBase {
+  type: typeof FORCED_NUMBER_MAX_LENGTH
   maxLength?: number
   inputFieldWidth?: string
 }
@@ -1165,6 +1179,7 @@ export type Ii18nFormField =
   | Ii18nTelFormField
   | Ii18nHiddenFormField
   | Ii18nNumberFormField
+  | Ii18nNumberForcedFormField
   | Ii18nBigNumberFormField
   | Ii18nSelectFormField
   | Ii18nRadioGroupFormField
@@ -1234,6 +1249,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     FETCH_BUTTON: messages.fetchButton,
     TEL: messages.tel,
     NUMBER: messages.numberInput,
+    FORCED_NUMBER_MAX_LENGTH: messages.numberInput,
     BIG_NUMBER: messages.numberInput,
     SELECT_WITH_OPTIONS: messages.selectWithOption,
     SELECT_WITH_DYNAMIC_OPTIONS: messages.selectWithDynamicOption,
