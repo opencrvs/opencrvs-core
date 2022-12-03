@@ -360,7 +360,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Type of birth',
                   id: 'form.field.label.birthType'
                 },
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -401,13 +401,13 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'multipleBirth',
                 type: 'NUMBER',
+                required: true,
                 label: {
                   defaultMessage: 'No. of previous births',
                   description: 'Label for form field: multipleBirth',
                   id: 'form.field.label.multipleBirth'
                 },
                 customisable: true,
-                required: false,
                 initialValue: '',
                 validate: [
                   {
@@ -1423,7 +1423,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Mother literacy',
                   id: 'form.field.label.motherLiteracy'
                 },
-                required: false,
+                required: true,
                 customisable: true,
                 initialValue: '',
                 validate: [],
@@ -1462,7 +1462,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Mother education',
                   id: 'form.field.label.motherEducationAttainment'
                 },
-                required: false,
+                required: true,
                 customisable: true,
                 initialValue: '',
                 validate: [],
@@ -2688,7 +2688,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Mother literacy',
                   id: 'form.field.label.motherLiteracy'
                 },
-                required: false,
+                required: true,
                 customisable: true,
                 initialValue: '',
                 validate: [],
@@ -2728,7 +2728,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.motherEducationAttainment'
                 },
                 customisable: true,
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
