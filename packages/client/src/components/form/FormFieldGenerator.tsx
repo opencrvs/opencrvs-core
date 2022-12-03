@@ -450,7 +450,7 @@ function GeneratedInputField({
         <TextInput
           type="number"
           step={fieldDefinition.step}
-          max={fieldDefinition.max}
+          maxLength={fieldDefinition.maxLength}
           {...inputProps}
           onKeyPress={(e) => {
             if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
