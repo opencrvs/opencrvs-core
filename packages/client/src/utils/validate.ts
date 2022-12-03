@@ -11,7 +11,11 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
+import {
+  IFormFieldValue,
+  IFormData,
+  IFormSectionData
+} from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_ALPHA_NUMERIC,
@@ -51,7 +55,8 @@ export type MaxLengthValidation = (
 export type Validation = (
   value: IFormFieldValue,
   drafts?: IFormData,
-  offlineCountryConfig?: IOfflineData
+  offlineCountryConfig?: IOfflineData,
+  allValuesInForm?: IFormSectionData
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
@@ -193,6 +198,66 @@ export const officeMustBeSelected: Validation = (
   )
   const isValid = !value || locationsList[value as string]
   return isValid ? undefined : { message: messages.officeMustBeSelected }
+}
+
+const ROLE_RESTRICTIONS = {
+  NATIONAL_SYSTEM_ADMIN: 'COUNTRY',
+  STATE_SYSTEM_ADMIN: 'STATE',
+  DIRECTOR_VRD: 'COUNTRY',
+  DIRECTOR_GENERAL: 'COUNTRY',
+  CHAIRMAN: 'COUNTRY',
+  HEAD_OF_DEPARTMENT: 'STATE',
+  STATE_DIRECTOR: 'STATE',
+  FEDERAL_COMMISSIONER: 'STATE',
+  DCR: 'DISTRICT'
+}
+
+export const roleMustMatchOfficeType: Validation = (
+  value: IFormFieldValue,
+  drafts,
+  offlineCountryConfig,
+  allFormValues
+) => {
+  const roleRestriction =
+    ROLE_RESTRICTIONS[value as keyof typeof ROLE_RESTRICTIONS]
+  if (!roleRestriction) {
+    return undefined
+  }
+  if (!allFormValues?.office) {
+    console.warn(
+      'roleMustMatchOfficeType validation is used without office being available'
+    )
+    return undefined
+  }
+
+  const offices = getListOfLocations(
+    offlineCountryConfig as IOfflineData,
+    'offices'
+  )
+  const locations = getListOfLocations(
+    offlineCountryConfig as IOfflineData,
+    'locations'
+  )
+  const office = offices[allFormValues.office as string]
+
+  if (
+    office.supervisoryArea === 'Location/0' &&
+    roleRestriction === 'COUNTRY'
+  ) {
+    return undefined
+  }
+
+  if (!office.supervisoryArea) {
+    return { message: messages.roleMustMatchOfficeType }
+  }
+
+  const location = locations[office.supervisoryArea.replace('Location/', '')]
+
+  if (location.jurisdictionType === roleRestriction) {
+    return undefined
+  }
+
+  return { message: messages.roleMustMatchOfficeType }
 }
 
 export const phoneNumberFormat: Validation = (value: IFormFieldValue) => {

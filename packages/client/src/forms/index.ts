@@ -47,6 +47,7 @@ export const RADIO_GROUP = 'RADIO_GROUP'
 export const RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS'
 export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
+export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
 export const TEXTAREA = 'TEXTAREA'
 export const SUBSECTION = 'SUBSECTION'
@@ -547,6 +548,9 @@ export interface ICheckboxGroupFormField extends IFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: ICheckboxOption[]
 }
+export interface ICheckboxFormField extends IFormFieldBase {
+  type: typeof CHECKBOX
+}
 export interface IDateFormField extends IFormFieldBase {
   type: typeof DATE
   notice?: MessageDescriptor
@@ -656,6 +660,7 @@ export type IFormField =
   | IRadioGroupFormField
   | IRadioGroupWithNestedFieldsFormField
   | IInformativeRadioGroupFormField
+  | ICheckboxFormField
   | ICheckboxGroupFormField
   | IDateFormField
   | ITextareaFormField
@@ -1078,7 +1083,7 @@ export interface Ii18nHiddenFormField extends Ii18nFormFieldBase {
 export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
-  max?: number
+  maxLength?: number
   inputFieldWidth?: string
 }
 
@@ -1091,6 +1096,10 @@ export interface Ii18nNumberForcedFormField extends Ii18nFormFieldBase {
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
   type: typeof BIG_NUMBER
   step?: number
+}
+
+export interface Ii18nCheckboxFormField extends Ii18nFormFieldBase {
+  type: typeof CHECKBOX
 }
 
 export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
@@ -1185,6 +1194,7 @@ export type Ii18nFormField =
   | Ii18nRadioGroupFormField
   | Ii18nRadioGroupWithNestedFieldsFormField
   | Ii18nInformativeRadioGroupFormField
+  | Ii18nCheckboxFormField
   | Ii18nCheckboxGroupFormField
   | Ii18nDateFormField
   | Ii18nTextareaFormField
@@ -1258,6 +1268,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
     INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
     CHECKBOX_GROUP: messages.checkboxGroup,
+    CHECKBOX: messages.checkbox,
     HIDDEN: messages.hidden,
     DATE: messages.date,
     DYNAMIC_LIST: messages.dynamicList

@@ -124,6 +124,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
     ref
   ) => {
     const $element = React.useRef<HTMLInputElement>(null)
+
     function focusField(): void {
       /*
        * Needs to be run on the next tick

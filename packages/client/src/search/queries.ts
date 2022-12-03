@@ -72,7 +72,7 @@ export const SEARCH_EVENTS = gql`
 `
 export const SEARCH_DECLARATIONS_USER_WISE = gql`
   query searchDeclarationsUserWise(
-    $status: [String]
+    $status: [String!]
     $userId: String
     $locationIds: [String!]
     $sort: String
@@ -124,7 +124,7 @@ export const SEARCH_DECLARATIONS_USER_WISE = gql`
 
 export const COUNT_USER_WISE_DECLARATIONS = gql`
   query countUserWiseDeclarations(
-    $status: [String]
+    $status: [String!]
     $userId: String
     $locationIds: [String!]
   ) {

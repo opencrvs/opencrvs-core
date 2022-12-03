@@ -18,6 +18,7 @@ import {
   TextArea,
   TextInput,
   WarningMessage,
+  Checkbox,
   RadioSize
 } from '@opencrvs/components/lib/forms'
 import { Paragraph, Link } from '@opencrvs/components/lib/typography'
@@ -82,7 +83,8 @@ import {
   LOCATION_SEARCH_INPUT,
   Ii18nTextareaFormField,
   TEXT,
-  HIDDEN
+  HIDDEN,
+  CHECKBOX
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -382,6 +384,23 @@ function GeneratedInputField({
     )
   }
 
+  if (fieldDefinition.type === CHECKBOX) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Checkbox
+          {...inputProps}
+          name={fieldDefinition.name}
+          selected={Boolean(value)}
+          value="true"
+          label="Yes"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            onSetFieldValue(fieldDefinition.name, e.target.checked)
+          }}
+        />
+      </InputField>
+    )
+  }
+
   if (fieldDefinition.type === DATE) {
     return (
       <InputField {...inputFieldProps}>
@@ -451,7 +470,7 @@ function GeneratedInputField({
         <TextInput
           type="number"
           step={fieldDefinition.step}
-          max={fieldDefinition.max}
+          maxLength={fieldDefinition.maxLength}
           {...inputProps}
           onKeyPress={(e) => {
             if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {

@@ -1696,41 +1696,6 @@ export const registerForms: IDefaultRegisterForms = {
           {
             id: 'father-view-group',
             fields: [
-              // Details exists
-              {
-                name: 'detailsExist',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage: "Do you have the father's details?",
-                  description:
-                    "Question to ask the user if they have the father's details",
-                  id: 'form.field.label.fathersDetailsExist'
-                },
-                required: true,
-                initialValue: true,
-                validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression: 'fathersDetailsExistBasedOnContactAndInformant'
-                  }
-                ],
-                mapping: {
-                  query: {
-                    operation: 'booleanTransformer'
-                  }
-                }
-              },
               {
                 name: 'reasonNotApplying',
                 conditionals: [
@@ -1832,6 +1797,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 }
               },
+              // Middle name
               {
                 name: 'middleNamesEng',
                 previewGroup: 'fatherNameInEnglish',
@@ -1848,6 +1814,13 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'maxNames',
                     parameters: [1]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2922,6 +2895,31 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'identityToFieldTransformer',
                     parameters: ['id', 'NATIONAL_ID']
+                  }
+                }
+              },
+              // Details exists
+              {
+                name: 'detailsExist',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: "Do you have the father's details?",
+                  description:
+                    "Question to ask the user if they have the father's details",
+                  id: 'form.field.label.fathersDetailsExist'
+                },
+                required: true,
+                initialValue: true,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: 'fathersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
                   }
                 }
               }
