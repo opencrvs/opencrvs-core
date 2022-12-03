@@ -17,11 +17,7 @@ import {
   getAllLocationIdsInDistrict
 } from '@gateway/features/fhir/utils'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
-import {
-  getTokenPayload,
-  hasScope,
-  inScope
-} from '@gateway/features/user/utils'
+import { hasScope, inScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 
 // Complete definition of the Search response
