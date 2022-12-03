@@ -96,7 +96,6 @@ export default async function createUser(
     }
 
     autoGenPassword = generateRandomPassword(hasDemoScope(request))
-
     const { hash, salt } = generateSaltedHash(autoGenPassword)
     user.salt = salt
     user.passwordHash = hash
