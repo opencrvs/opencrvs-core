@@ -60,7 +60,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     $pageSize: Int
     $inProgressSkip: Int
     $healthSystemSkip: Int
-    $reviewStatuses: [String]
+    $reviewStatuses: [String!]
     $reviewSkip: Int
     $rejectSkip: Int
     $approvalSkip: Int
@@ -202,7 +202,7 @@ export const SEARCH_EVENTS = gql`
     $trackingId: String
     $contactNumber: String
     $registrationNumber: String
-    $status: [String]
+    $status: [String!]
     $locationIds: [String!]
     $count: Int
     $skip: Int

@@ -50,6 +50,7 @@ interface IValidationMessages
   validPassportNumber: MessageDescriptor
   phoneNumberNotValid: MessageDescriptor
   validDrivingLicenseNumber: MessageDescriptor
+  roleMustMatchOfficeType: MessageDescriptor
   nonDecimalPointNumber: MessageDescriptor
 }
 
@@ -294,6 +295,12 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Informant details does not exist',
     description:
       'The error message that appears when an informant missing details is selected'
+  },
+  roleMustMatchOfficeType: {
+    id: 'validations.roleMustMatchOfficeType',
+    defaultMessage: 'Selected role cannot be assigned to this office type',
+    description:
+      'The error message that appears when you try to create a state user to country level office'
   }
 }
 

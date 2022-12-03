@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ApiResponse } from '@elastic/elasticsearch'
+import { IAuthHeader } from '@gateway/common-types'
 import {
   postSearch,
   getSupervisoryArea,
@@ -60,6 +61,28 @@ export interface ISearchResponse<T> {
   aggregations?: any
 }
 
+async function expandLocationSearchToSupervisoryArea(
+  locationId: string,
+  authHeader: IAuthHeader,
+  status: string[]
+) {
+  const locationFHIRObject = await getFHIRLocation(locationId, authHeader)
+  // Expand search to a supervisory area
+  //
+  // - If the user belongs to an office that is supervisory office for a location
+  // - If they are a registrar
+  // - If they are a registration agent and are searching for "Ready to print" records
+  const supervisesThisArea = getSupervisoryArea(locationFHIRObject)
+  const isRegistrar = hasScope(authHeader, 'register')
+  const searchesForReadyToPrint = status.includes('REGISTERED')
+
+  if (supervisesThisArea && (isRegistrar || searchesForReadyToPrint)) {
+    return getAllLocationIdsInDistrict(supervisesThisArea, authHeader)
+  }
+
+  return locationId
+}
+
 export const resolvers: GQLResolver = {
   Query: {
     async searchEvents(
@@ -88,17 +111,12 @@ export const resolvers: GQLResolver = {
           return await Promise.reject(new Error('Invalid location id'))
         }
         if (locationIds.length === 1) {
-          const locationFHIRObject = await getFHIRLocation(
-            locationIds[0],
-            authHeader
-          )
-          const supervisesThisArea = getSupervisoryArea(locationFHIRObject)
-          if (supervisesThisArea) {
-            searchCriteria.declarationLocationId =
-              await getAllLocationIdsInDistrict(supervisesThisArea, authHeader)
-          } else {
-            searchCriteria.declarationLocationId = locationIds[0]
-          }
+          searchCriteria.declarationLocationId =
+            await expandLocationSearchToSupervisoryArea(
+              locationIds[0],
+              authHeader,
+              status || []
+            )
         } else {
           searchCriteria.declarationLocationId = locationIds
         }
