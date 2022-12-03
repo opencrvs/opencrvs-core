@@ -116,7 +116,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
     ref
   ) => {
     const $element = React.useRef<HTMLInputElement>(null)
-
+    const [value, setValue] = React.useState('')
     function focusField(): void {
       /*
        * Needs to be run on the next tick
@@ -140,17 +140,43 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
       }
     }, [focusInput])
 
-    return (
-      <StyledInput
-        ref={$element}
-        name={otherProps.id}
-        {...otherProps}
-        autoComplete={process.env.NODE_ENV === 'production' ? 'off' : undefined}
-        maxLength={maxLength}
-        disabled={isDisabled}
-        inputFieldWidth={inputFieldWidth}
-      />
-    )
+    if (otherProps.type === 'number') {
+      otherProps.type = 'text'
+      return (
+        <StyledInput
+          ref={$element}
+          name={otherProps.id}
+          {...otherProps}
+          autoComplete={
+            process.env.NODE_ENV === 'production' ? 'off' : undefined
+          }
+          maxLength={maxLength}
+          disabled={isDisabled}
+          value={value}
+          inputFieldWidth={inputFieldWidth}
+          onChange={(e) => {
+            const re = /^[0-9\b]+$/
+            if (e.target.value === '' || re.test(e.target.value)) {
+              setValue(e.target.value)
+            }
+          }}
+        />
+      )
+    } else {
+      return (
+        <StyledInput
+          ref={$element}
+          name={otherProps.id}
+          {...otherProps}
+          autoComplete={
+            process.env.NODE_ENV === 'production' ? 'off' : undefined
+          }
+          maxLength={maxLength}
+          disabled={isDisabled}
+          inputFieldWidth={inputFieldWidth}
+        />
+      )
+    }
   }
 )
 
