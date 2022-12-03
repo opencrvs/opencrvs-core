@@ -108,15 +108,23 @@ const StyledInput = styled.input<ITextInputProps>`
 
 export interface IRef {
   focusField: () => void
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export const TextInput = React.forwardRef<IRef, ITextInputProps>(
   (
-    { focusInput, maxLength = 250, isDisabled, inputFieldWidth, ...otherProps },
+    {
+      focusInput,
+      maxLength = 250,
+      isDisabled,
+      inputFieldWidth,
+      onChange,
+      ...otherProps
+    },
     ref
   ) => {
     const $element = React.useRef<HTMLInputElement>(null)
-    const [value, setValue] = React.useState('')
+
     function focusField(): void {
       /*
        * Needs to be run on the next tick
@@ -140,8 +148,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
       }
     }, [focusInput])
 
-    if (otherProps.type === 'number') {
-      otherProps.type = 'text'
+    if (onChange) {
       return (
         <StyledInput
           ref={$element}
@@ -152,14 +159,8 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
           }
           maxLength={maxLength}
           disabled={isDisabled}
-          value={value}
           inputFieldWidth={inputFieldWidth}
-          onChange={(e) => {
-            const re = /^[0-9\b]+$/
-            if (e.target.value === '' || re.test(e.target.value)) {
-              setValue(e.target.value)
-            }
-          }}
+          onChange={onChange}
         />
       )
     } else {

@@ -750,6 +750,29 @@ export const greaterThanZero: Validation = (value: IFormFieldValue) => {
     : { message: messages.greaterThanZero }
 }
 
+function calulateMinMotherAge(age: number, birthOrder: number): boolean {
+  // If order of birth = 2, age of mother must be 9 years + 11 months
+  // If order of birth = 3, age of mother must be 9 years + 22 months
+  // If order of birth = 4, age of mother must be 9 years + 33 months
+  const limit = Math.floor(((birthOrder - 1) * 11) / 12) + 9
+  return age < limit ? false : true
+}
+
+export const isValidMotherBirth =
+  (birthOrder: string): Validation =>
+  (value: IFormFieldValue, drafts) => {
+    const valueToCheck = _.get(drafts, birthOrder)
+    return !value
+      ? { message: messages.required }
+      : valueToCheck === undefined
+      ? undefined
+      : value &&
+        Number(value) >= 9 &&
+        calulateMinMotherAge(Number(value), Number(valueToCheck))
+      ? undefined
+      : { message: messages.isValidMotherBirth }
+  }
+
 export const isInBetween =
   (minValue: number, maxValue: number): Validation =>
   (value: IFormFieldValue) => {

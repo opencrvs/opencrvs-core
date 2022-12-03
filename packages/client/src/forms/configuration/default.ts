@@ -630,7 +630,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'ageAtBirthOfChild',
-                type: 'NUMBER',
+                type: 'FORCED_NUMBER_MAX_LENGTH',
                 maxLength: 2,
                 label: {
                   defaultMessage: 'Age at birth of child',
@@ -650,8 +650,8 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [
                   {
-                    operation: 'isInBetween',
-                    parameters: [9, 99]
+                    operation: 'isValidMotherBirth',
+                    parameters: ['child.multipleBirth']
                   }
                 ],
                 mapping: {
@@ -1862,7 +1862,7 @@ export const registerForms: IDefaultRegisterForms = {
               // Birthdate
               {
                 name: 'ageAtBirthOfChild',
-                type: 'NUMBER',
+                type: 'FORCED_NUMBER_MAX_LENGTH',
                 maxLength: 2,
                 label: {
                   defaultMessage: 'Age at birth of child',
