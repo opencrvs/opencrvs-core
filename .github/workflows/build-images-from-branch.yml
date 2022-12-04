@@ -48,7 +48,7 @@ jobs:
         id: get-services
         run: |
           services=$(grep "^  [^ ]" docker-compose.yml | grep -v '#' | awk -F: '{print $1}' | sed -e 's/^ *//')
-          services_json=$(echo $services | tr '\n' ',' | sed 's/,$//' | jq -R 'split(" ")')
+          services_json=$(echo $services | tr '\n' ',' | sed 's/,$//' | jq -R 'split(" ")' | tr -d '\n')
 
           # Set the list of service names as an output variable
           echo "services='$services_json'" >> $GITHUB_OUTPUT
