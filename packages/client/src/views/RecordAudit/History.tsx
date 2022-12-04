@@ -103,6 +103,19 @@ const HealthSystemLocation = styled.p`
   ${({ theme }) => theme.fonts.reg16}
 `
 
+function getCustomisedRoleType(role: string) {
+  switch (role) {
+    case 'LOCAL_REGISTRAR':
+      return 'DCR'
+    case 'REGISTRAR':
+      return 'DCR'
+    case 'REGISTRATION_AGENT':
+      return 'REGISTRAR'
+    default:
+      return role
+  }
+}
+
 function HealthSystemUser() {
   const intl = useIntl()
   return (
@@ -251,9 +264,11 @@ export const GetHistory = ({
     type:
       item.dhis2Notification && !item.user?.role
         ? intl.formatMessage(userMessages.healthSystem)
-        : item.user?.title
+        : item.user?.title && !item.user?.role
         ? item.user?.title
-        : intl.formatMessage(userMessages[item?.user?.role as string]),
+        : intl.formatMessage(
+            userMessages[getCustomisedRoleType(item?.user?.role as string)]
+          ),
     location:
       item.dhis2Notification && !item.user?.role ? (
         <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
