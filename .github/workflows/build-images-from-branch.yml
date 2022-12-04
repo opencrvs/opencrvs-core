@@ -52,7 +52,7 @@ jobs:
 
           # Set the list of service names as an output variable
           echo $services_json
-          echo "services=$services_json" >> $GITHUB_OUTPUT
+          echo "services='$services_json'" >> $GITHUB_OUTPUT
 
       # - name: Build base image
       #   id: base-image
