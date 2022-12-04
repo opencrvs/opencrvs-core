@@ -51,8 +51,8 @@ jobs:
           services_json=$(echo $services | tr '\n' ',' | sed 's/,$//' | jq -R 'split(" ")')
 
           # Set the list of service names as an output variable
-          echo $services_json
           echo "services='$services_json'" >> $GITHUB_OUTPUT
+          echo "services='$services_json'"
 
       # - name: Build base image
       #   id: base-image
