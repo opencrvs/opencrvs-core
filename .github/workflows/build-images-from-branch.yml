@@ -42,7 +42,7 @@ jobs:
         id: set-version
         run: |
           export VERSION=`git log -1 --pretty=format:%h`
-          echo "::set-output name=version::$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Build base image
         id: base-image
@@ -60,7 +60,7 @@ jobs:
           # Read the docker-compose.yml file and get a list of the service names
           services=$(grep "^  [^ ]" docker-compose.yml | grep -v '#' | awk -F: '{print $1}' | sed -e 's/^ *//')
           # Set the list of service names as an output variable
-          echo "::set-output name=services::$services"
+          echo "services=$services" >> $GITHUB_OUTPUT
     outputs:
       services: ${{ steps.get-services.outputs.services }}
       version: ${{ steps.set-version.outputs.version }}
@@ -72,6 +72,20 @@ jobs:
         service: ${{ needs.facts.outputs.services }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          ref: '${{ github.event.inputs.branch_name }}'
+
+      - uses: actions/checkout@v2
+        if: github.event_name == 'push'
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - uses: actions/download-artifact@master
         with:
           name: my-artifact
@@ -79,6 +93,7 @@ jobs:
       - name: Build $
         run: |
           echo $
+          docker load --input action_image_artifact_opencrvs-build_ ${{ needs.facts.outputs.version }}
           export VERSION=`git log -1 --pretty=format:%h`
           docker-compose --build $
           docker-compose --push $
