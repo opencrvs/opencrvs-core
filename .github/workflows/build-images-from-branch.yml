@@ -37,7 +37,11 @@ jobs:
 
       - name: Build base image
         id: base-image
-        run: yarn build:image
+        run: |
+          pwd
+          ls
+          cd opencrvs-core
+          yarn build:image
 
       - name: Upload image
         uses: ishworkh/docker-image-artifact-upload@v1
