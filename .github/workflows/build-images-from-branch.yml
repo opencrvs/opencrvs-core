@@ -21,19 +21,73 @@ on:
       - 'release-v1.1.0-nigeria'
 
 jobs:
-  push:
+  facts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_name }}'
-      - uses: actions/checkout@v2
-        if: github.event_name == 'push'
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
+
+      - name: Set version
+        id: set-version
+        run: |
+          export VERSION=`git log -1 --pretty=format:%h`
+          echo "::set-output name=version::$VERSION"
+
+      - name: Build base image
+        id: base-image
+        run: yarn build:image
+
+      - name: Upload image
+        uses: ishworkh/docker-image-artifact-upload@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push image
-        run: yarn compose:push:version
+          image: 'opencrvs-build:${{ steps.set-version.outputs.version }}'
+
+      - name: Get list of services
+        id: get-services
+        run: |
+          # Read the docker-compose.yml file and get a list of the service names
+          services=$(grep "^  [^ ]" docker-compose.yml | grep -v '#' | awk -F: '{print $1}' | sed -e 's/^ *//')
+          # Set the list of service names as an output variable
+          echo "::set-output name=services::$services"
+    outputs:
+      services: ${{ steps.get-services.outputs.services }}
+      version: ${{ steps.set-version.outputs.version }}
+
+  build:
+    needs: facts
+    strategy:
+      matrix:
+        service: ${{ needs.facts.outputs.services }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: my-artifact
+          path: 'action_image_artifact_opencrvs-build_ ${{ needs.facts.outputs.version }}'
+      - name: Build $
+        run: |
+          echo $
+          export VERSION=`git log -1 --pretty=format:%h`
+          docker-compose --build $
+          docker-compose --push $
+
+      # - uses: actions/checkout@v2
+      #   if: github.event_name == 'push'
+      # - name: Login to DockerHub
+      #   uses: docker/login-action@v1
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+      # - name: Push image
+      #   run: |
+      #     export VERSION=`git log -1 --pretty=format:%h`
+
+      #     yarn build:image
+      #     yarn compose:build
+      #     docker-compose push
+
+      #     unset VERSION
+
+      #   yarn compose:push:version
