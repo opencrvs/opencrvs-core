@@ -72,7 +72,7 @@ jobs:
     needs: facts
     strategy:
       matrix:
-        service: ${{ needs.facts.outputs.services }}
+        service: ${{ fromJSON(needs.facts.outputs.services) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
