@@ -21,7 +21,7 @@ on:
       - 'release-v1.1.0-nigeria'
 
 jobs:
-  facts:
+  base:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -63,10 +63,10 @@ jobs:
       version: ${{ steps.set-version.outputs.version }}
 
   build:
-    needs: facts
+    needs: base
     strategy:
       matrix:
-        service: ${{ fromJSON(needs.facts.outputs.services) }}
+        service: ${{ fromJSON(needs.base.outputs.services) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -92,5 +92,5 @@ jobs:
         run: |
           echo ${{ matrix.service }}
           export VERSION=`git log -1 --pretty=format:%h`
-          docker-compose --build ${{ matrix.service }}
-          docker-compose --push ${{ matrix.service }}
+          docker-compose build ${{ matrix.service }}
+          docker-compose push ${{ matrix.service }}
