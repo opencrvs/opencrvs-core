@@ -86,26 +86,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - uses: actions/download-artifact@master
+      - name: Download image
+        uses: ishworkh/docker-image-artifact-download@v1
         with:
-          name: my-artifact
-          path: 'action_image_artifact_opencrvs-build_ ${{ needs.facts.outputs.version }}'
+          image: 'opencrvs-build:${{ needs.facts.outputs.version }}'
+
       - name: Build $
         run: |
           echo $
-          docker load --input action_image_artifact_opencrvs-build_ ${{ needs.facts.outputs.version }}
           export VERSION=`git log -1 --pretty=format:%h`
           docker-compose --build $
           docker-compose --push $
-
-      # - name: Push image
-      #   run: |
-      #     export VERSION=`git log -1 --pretty=format:%h`
-
-      #     yarn build:image
-      #     yarn compose:build
-      #     docker-compose push
-
-      #     unset VERSION
-
-      #   yarn compose:push:version
