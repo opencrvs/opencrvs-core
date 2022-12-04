@@ -39,7 +39,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: String
+    role: Role
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -380,7 +380,7 @@ type User {
   name: [HumanName]!
   username: String!
   mobile: String!
-  role: String!
+  role: Role!
   type: String!
   email: String!
   status: String!
@@ -398,6 +398,14 @@ type User {
 type SearchUserResult {
   results: [User]
   totalItems: Int
+}
+
+type Role {
+  id: ID!
+  title: String
+  value: String
+  types: [String]
+  active: Boolean
 }
 
 type SearchFieldAgentResult {
@@ -482,14 +490,6 @@ type EventSearchResultSet {
 type EventProgressResultSet {
   results: [EventProgressSet]
   totalItems: Int
-}
-
-type Role {
-  id: ID!
-  title: String
-  value: String
-  types: [String]
-  active: Boolean
 }
 
 input ComparisonInput {
@@ -595,7 +595,7 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
-  role: String
+  role: Role
   type: String
   email: String
   primaryOffice: String
@@ -886,7 +886,7 @@ enum LocationType {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: String!
+  role: Role!
   signature: Signature
 }
 

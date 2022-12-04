@@ -24,13 +24,23 @@ input SignatureInput {
   type: String
 }
 
+enum Role {
+  FIELD_AGENT
+  REGISTRATION_AGENT
+  LOCAL_REGISTRAR
+  LOCAL_SYSTEM_ADMIN
+  NATIONAL_SYSTEM_ADMIN
+  PERFORMANCE_MANAGEMENT
+  NATIONAL_REGISTRAR
+}
+
 input UserInput {
   id: ID
   name: [HumanNameInput]
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
-  role: String
+  role: Role
   type: String
   email: String
   primaryOffice: String
@@ -46,7 +56,7 @@ type Signature {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: String!
+  role: Role!
   signature: Signature
 }
 
@@ -62,7 +72,7 @@ type User {
   name: [HumanName]! # -> .name
   username: String!
   mobile: String!
-  role: String!
+  role: Role!
   type: String!
   email: String!
   status: String!
@@ -126,7 +136,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: String
+    role: Role
     primaryOfficeId: String
     locationId: String
     count: Int
