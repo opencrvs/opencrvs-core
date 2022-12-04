@@ -44,6 +44,16 @@ jobs:
           export VERSION=`git log -1 --pretty=format:%h`
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Get list of services
+        id: get-services
+        run: |
+          services=$(grep "^  [^ ]" docker-compose.yml | grep -v '#' | awk -F: '{print $1}' | sed -e 's/^ *//')
+          services_json=$(echo $services | tr '\n' ',' | sed 's/,$//' | jq -R 'split(" ")')
+
+          # Set the list of service names as an output variable
+          echo $services_json
+          echo "services=$services_json" >> $GITHUB_OUTPUT
+
       - name: Build base image
         id: base-image
         run: |
@@ -54,13 +64,6 @@ jobs:
         with:
           image: 'opencrvs-build:latest'
 
-      - name: Get list of services
-        id: get-services
-        run: |
-          # Read the docker-compose.yml file and get a list of the service names
-          services=$(grep "^  [^ ]" docker-compose.yml | grep -v '#' | awk -F: '{print $1}' | sed -e 's/^ *//')
-          # Set the list of service names as an output variable
-          echo "services=$services" >> $GITHUB_OUTPUT
     outputs:
       services: ${{ steps.get-services.outputs.services }}
       version: ${{ steps.set-version.outputs.version }}
