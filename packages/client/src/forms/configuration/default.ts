@@ -575,7 +575,7 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'TEXT',
                 label: formMessageDescriptors.middleNames,
                 maxLength: 32,
-                required: true,
+                required: false,
                 initialValue: '',
                 validate: [
                   {
