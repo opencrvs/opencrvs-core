@@ -360,7 +360,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Type of birth',
                   id: 'form.field.label.birthType'
                 },
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -401,13 +401,13 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'multipleBirth',
                 type: 'NUMBER',
+                required: true,
                 label: {
                   defaultMessage: 'No. of previous births',
                   description: 'Label for form field: multipleBirth',
                   id: 'form.field.label.multipleBirth'
                 },
                 customisable: true,
-                required: false,
                 initialValue: '',
                 validate: [
                   {
@@ -575,7 +575,7 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'TEXT',
                 label: formMessageDescriptors.middleNames,
                 maxLength: 32,
-                required: true,
+                required: false,
                 initialValue: '',
                 validate: [
                   {
@@ -630,13 +630,14 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'ageAtBirthOfChild',
-                type: 'NUMBER',
+                type: 'FORCED_NUMBER_MAX_LENGTH',
+                maxLength: 2,
                 label: {
                   defaultMessage: 'Age at birth of child',
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
-                inputFieldWidth: '180px',
+                inputFieldWidth: '60px',
                 conditionals: [
                   {
                     action: 'hide',
@@ -649,8 +650,8 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [
                   {
-                    operation: 'isInBetween',
-                    parameters: [9, 99]
+                    operation: 'isValidMotherBirth',
+                    parameters: ['child.multipleBirth']
                   }
                 ],
                 mapping: {
@@ -1422,7 +1423,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Mother literacy',
                   id: 'form.field.label.motherLiteracy'
                 },
-                required: false,
+                required: true,
                 customisable: true,
                 initialValue: '',
                 validate: [],
@@ -1461,7 +1462,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Mother education',
                   id: 'form.field.label.motherEducationAttainment'
                 },
-                required: false,
+                required: true,
                 customisable: true,
                 initialValue: '',
                 validate: [],
@@ -1695,41 +1696,6 @@ export const registerForms: IDefaultRegisterForms = {
           {
             id: 'father-view-group',
             fields: [
-              // Details exists
-              {
-                name: 'detailsExist',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage: "Do you have the father's details?",
-                  description:
-                    "Question to ask the user if they have the father's details",
-                  id: 'form.field.label.fathersDetailsExist'
-                },
-                required: true,
-                initialValue: true,
-                validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression: 'fathersDetailsExistBasedOnContactAndInformant'
-                  }
-                ],
-                mapping: {
-                  query: {
-                    operation: 'booleanTransformer'
-                  }
-                }
-              },
               {
                 name: 'reasonNotApplying',
                 conditionals: [
@@ -1831,6 +1797,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 }
               },
+              // Middle name
               {
                 name: 'middleNamesEng',
                 previewGroup: 'fatherNameInEnglish',
@@ -1847,6 +1814,13 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'maxNames',
                     parameters: [1]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -1888,13 +1862,14 @@ export const registerForms: IDefaultRegisterForms = {
               // Birthdate
               {
                 name: 'ageAtBirthOfChild',
-                type: 'NUMBER',
+                type: 'FORCED_NUMBER_MAX_LENGTH',
+                maxLength: 2,
                 label: {
                   defaultMessage: 'Age at birth of child',
                   description: 'Label for form field: ageAtBirthOfChild',
                   id: 'form.field.label.ageAtBirthOfChild'
                 },
-                inputFieldWidth: '180px',
+                inputFieldWidth: '60px',
                 conditionals: [
                   {
                     action: 'hide',
@@ -2686,7 +2661,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Mother literacy',
                   id: 'form.field.label.motherLiteracy'
                 },
-                required: false,
+                required: true,
                 customisable: true,
                 initialValue: '',
                 validate: [],
@@ -2726,7 +2701,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.motherEducationAttainment'
                 },
                 customisable: true,
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -2920,6 +2895,27 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'identityToFieldTransformer',
                     parameters: ['id', 'NATIONAL_ID']
+                  }
+                }
+              },
+              // Details exists
+              {
+                name: 'detailsExist',
+                type: 'CHECKBOX',
+                label: formMessageDescriptors.fathersDetailsExist,
+                required: true,
+                hideHeader: true,
+                initialValue: true,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: 'fathersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
                   }
                 }
               }

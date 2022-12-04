@@ -108,11 +108,19 @@ const StyledInput = styled.input<ITextInputProps>`
 
 export interface IRef {
   focusField: () => void
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export const TextInput = React.forwardRef<IRef, ITextInputProps>(
   (
-    { focusInput, maxLength = 250, isDisabled, inputFieldWidth, ...otherProps },
+    {
+      focusInput,
+      maxLength = 250,
+      isDisabled,
+      inputFieldWidth,
+      onChange,
+      ...otherProps
+    },
     ref
   ) => {
     const $element = React.useRef<HTMLInputElement>(null)
@@ -140,17 +148,36 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
       }
     }, [focusInput])
 
-    return (
-      <StyledInput
-        ref={$element}
-        name={otherProps.id}
-        {...otherProps}
-        autoComplete={process.env.NODE_ENV === 'production' ? 'off' : undefined}
-        maxLength={maxLength}
-        disabled={isDisabled}
-        inputFieldWidth={inputFieldWidth}
-      />
-    )
+    if (onChange) {
+      return (
+        <StyledInput
+          ref={$element}
+          name={otherProps.id}
+          {...otherProps}
+          autoComplete={
+            process.env.NODE_ENV === 'production' ? 'off' : undefined
+          }
+          maxLength={maxLength}
+          disabled={isDisabled}
+          inputFieldWidth={inputFieldWidth}
+          onChange={onChange}
+        />
+      )
+    } else {
+      return (
+        <StyledInput
+          ref={$element}
+          name={otherProps.id}
+          {...otherProps}
+          autoComplete={
+            process.env.NODE_ENV === 'production' ? 'off' : undefined
+          }
+          maxLength={maxLength}
+          disabled={isDisabled}
+          inputFieldWidth={inputFieldWidth}
+        />
+      )
+    }
   }
 )
 

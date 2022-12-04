@@ -18,6 +18,7 @@ import {
   TextArea,
   TextInput,
   WarningMessage,
+  Checkbox,
   RadioSize
 } from '@opencrvs/components/lib/forms'
 import { Paragraph, Link } from '@opencrvs/components/lib/typography'
@@ -64,6 +65,7 @@ import {
   LINK,
   LIST,
   NUMBER,
+  FORCED_NUMBER_MAX_LENGTH,
   BIG_NUMBER,
   PARAGRAPH,
   DYNAMIC_LIST,
@@ -81,7 +83,8 @@ import {
   LOCATION_SEARCH_INPUT,
   Ii18nTextareaFormField,
   TEXT,
-  HIDDEN
+  HIDDEN,
+  CHECKBOX
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -381,6 +384,23 @@ function GeneratedInputField({
     )
   }
 
+  if (fieldDefinition.type === CHECKBOX) {
+    return (
+      <InputField {...inputFieldProps}>
+        <Checkbox
+          {...inputProps}
+          name={fieldDefinition.name}
+          selected={Boolean(value)}
+          value="true"
+          label={fieldDefinition.label}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            onSetFieldValue(fieldDefinition.name, e.target.checked)
+          }}
+        />
+      </InputField>
+    )
+  }
+
   if (fieldDefinition.type === DATE) {
     return (
       <InputField {...inputFieldProps}>
@@ -450,11 +470,42 @@ function GeneratedInputField({
         <TextInput
           type="number"
           step={fieldDefinition.step}
-          max={fieldDefinition.max}
+          maxLength={fieldDefinition.maxLength}
           {...inputProps}
           onKeyPress={(e) => {
             if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
               e.preventDefault()
+            }
+          }}
+          value={inputProps.value as string}
+          onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+            event.currentTarget.blur()
+          }}
+          inputFieldWidth={fieldDefinition.inputFieldWidth}
+        />
+      </InputField>
+    )
+  }
+
+  if (fieldDefinition.type === FORCED_NUMBER_MAX_LENGTH) {
+    return (
+      <InputField {...inputFieldProps}>
+        <TextInput
+          type="text"
+          maxLength={fieldDefinition.maxLength}
+          {...inputProps}
+          onKeyPress={(e) => {
+            if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
+              e.preventDefault()
+            }
+          }}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const re = /^[0-9\b]+$/
+            const val = e.target.value
+            if (val === '' || re.test(val)) {
+              onSetFieldValue(fieldDefinition.name, val)
+            } else {
+              onSetFieldValue(fieldDefinition.name, '')
             }
           }}
           value={inputProps.value as string}

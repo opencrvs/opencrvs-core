@@ -52,6 +52,7 @@ export interface ILocation {
   address?: string
   physicalType: string
   jurisdictionType?: string
+  supervisoryArea?: string
   type: string
   partOf: string
 }

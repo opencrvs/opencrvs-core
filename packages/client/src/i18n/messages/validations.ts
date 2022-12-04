@@ -35,6 +35,7 @@ interface IValidationMessages
   minLength: MessageDescriptor
   notGreaterThan: MessageDescriptor
   isInBetween: MessageDescriptor
+  isValidMotherBirth: MessageDescriptor
   numberRequired: MessageDescriptor
   phoneNumberFormat: MessageDescriptor
   range: MessageDescriptor
@@ -50,6 +51,7 @@ interface IValidationMessages
   validPassportNumber: MessageDescriptor
   phoneNumberNotValid: MessageDescriptor
   validDrivingLicenseNumber: MessageDescriptor
+  roleMustMatchOfficeType: MessageDescriptor
   nonDecimalPointNumber: MessageDescriptor
 }
 
@@ -197,6 +199,12 @@ const messagesToDefine: IValidationMessages = {
       'The error message that appears on numeric fields that are not in between a range',
     id: 'validations.isInBetween'
   },
+  isValidMotherBirth: {
+    defaultMessage: 'Please check age of Mother',
+    description:
+      'The error message that appears ageAtBirthOfChild depending on birth order',
+    id: 'validations.isValidMotherBirth'
+  },
   numberRequired: {
     defaultMessage: 'Must be a number',
     description:
@@ -294,6 +302,12 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Informant details does not exist',
     description:
       'The error message that appears when an informant missing details is selected'
+  },
+  roleMustMatchOfficeType: {
+    id: 'validations.roleMustMatchOfficeType',
+    defaultMessage: 'Selected role cannot be assigned to this office type',
+    description:
+      'The error message that appears when you try to create a state user to country level office'
   }
 }
 

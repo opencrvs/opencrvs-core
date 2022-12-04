@@ -1987,7 +1987,7 @@ export interface QueryToGetOfficewiseRegistrationsResolver<
 export interface QueryToSearchEventsArgs {
   userId?: string
   locationIds?: Array<string>
-  status?: Array<string | null>
+  status?: Array<string>
   type?: Array<string | null>
   trackingId?: string
   registrationNumber?: string

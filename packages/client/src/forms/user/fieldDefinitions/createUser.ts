@@ -99,6 +99,11 @@ export const userSectionFormType: ISerializedFormSection = {
       id: 'user-view-group',
       title: userFormMessages.userDetails,
       fields: [
+        // If you are looking for where the "office field is defined"
+        // look into packages/client/src/views/SysAdmin/Team/user/userCreation/UserForm.tsx line 187
+        // {
+        //   name: 'office',
+        // },
         {
           name: 'firstNamesEng',
           type: TEXT,
@@ -206,7 +211,11 @@ export const userSectionFormType: ISerializedFormSection = {
           label: userFormMessages.labelRole,
           required: true,
           initialValue: '',
-          validate: [],
+          validate: [
+            {
+              operation: 'roleMustMatchOfficeType'
+            }
+          ],
           options: [
             { value: 'FIELD_AGENT', label: userMessages.FIELD_AGENT },
             { value: 'REGISTRAR', label: userMessages.REGISTRAR },

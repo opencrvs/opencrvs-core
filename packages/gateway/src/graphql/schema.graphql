@@ -118,7 +118,7 @@ type Query {
   searchEvents(
     userId: String
     locationIds: [String!]
-    status: [String]
+    status: [String!]
     type: [String]
     trackingId: String
     registrationNumber: String
