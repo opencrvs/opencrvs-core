@@ -271,7 +271,7 @@ export const StatusMapping: IStatusMapping = {
     color: colors.orange
   },
   REJECTED: {
-    labelDescriptor: statusMessages.sentForUpdates,
+    labelDescriptor: statusMessages.requiresUpdates,
     color: colors.red
   },
   VALIDATED: {

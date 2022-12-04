@@ -121,6 +121,11 @@ const messagesToDefine: IOfficeHomeMessages = {
     description: 'The title of sent for updates tab',
     id: 'regHome.sentForUpdates'
   },
+  requiresUpdates: {
+    defaultMessage: 'Requires updates',
+    description: 'Requires updates status',
+    id: 'constants.requiresUpdates.status'
+  },
   validatedDeclarationTooltipForRegistrar: {
     defaultMessage: 'Declaration has been validated by a registration agent',
     description: 'Text to display for validated declaration as tooltip',

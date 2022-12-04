@@ -58,7 +58,7 @@ import {
   GQLTotalMetricsResult
 } from '@opencrvs/gateway/src/graphql/schema'
 import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
-import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
+/*import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'*/
 import { CertificationRatesReport } from '@client/views/SysAdmin/Performance/CertificationRatesReport'
 import {
   StatusMapping,
@@ -555,42 +555,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       return (
                         <CorrectionsReport data={data!.getTotalCorrections} />
                       )
-                    }}
-                  </Query>
-                  <Query
-                    fetchPolicy="no-cache"
-                    query={GET_TOTAL_PAYMENTS}
-                    variables={
-                      this.state.selectedLocation &&
-                      !isCountry(this.state.selectedLocation)
-                        ? {
-                            ...queryVariablesWithoutLocationId,
-                            locationId: this.state.selectedLocation.id
-                          }
-                        : queryVariablesWithoutLocationId
-                    }
-                  >
-                    {({ loading, data, error }) => {
-                      if (error) {
-                        return (
-                          <>
-                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                          </>
-                        )
-                      }
-                      if (loading) {
-                        return null
-                      }
-                      if (data && data.getTotalPayments) {
-                        return (
-                          <PaymentsAmountComponent
-                            currency={this.props.currency}
-                            data={data!.getTotalPayments}
-                          />
-                        )
-                      }
-
-                      return <></>
                     }}
                   </Query>
                 </>
