@@ -54,15 +54,15 @@ jobs:
           echo $services_json
           echo "services=$services_json" >> $GITHUB_OUTPUT
 
-      - name: Build base image
-        id: base-image
-        run: |
-          yarn build:image
+      # - name: Build base image
+      #   id: base-image
+      #   run: |
+      #     yarn build:image
 
-      - name: Upload image
-        uses: ishworkh/docker-image-artifact-upload@v1
-        with:
-          image: 'opencrvs-build:latest'
+      # - name: Upload image
+      #   uses: ishworkh/docker-image-artifact-upload@v1
+      #   with:
+      #     image: 'opencrvs-build:latest'
 
     outputs:
       services: ${{ steps.get-services.outputs.services }}
@@ -88,15 +88,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Download image
-        uses: ishworkh/docker-image-artifact-download@v1
-        with:
-          image: 'opencrvs-build:latest'
-
       - name: Build $
-        run: |
-          echo $
-          export VERSION=`git log -1 --pretty=format:%h`
-          docker-compose --build $
-          docker-compose --push $
+        run: echo $
+      # - name: Download image
+      #   uses: ishworkh/docker-image-artifact-download@v1
+      #   with:
+      #     image: 'opencrvs-build:latest'
+
+      # - name: Build $
+      #   run: |
+      #     echo $
+      #     export VERSION=`git log -1 --pretty=format:%h`
+      #     docker-compose --build $
+      #     docker-compose --push $
