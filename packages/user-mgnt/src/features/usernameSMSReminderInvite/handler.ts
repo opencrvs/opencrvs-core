@@ -50,7 +50,7 @@ export default async function usernameSMSReminderHandler(
       getUserId({ Authorization: request.headers.authorization })
     )
     await postUserActionToMetrics(
-      'SEND_USERNAME_REMINDER',
+      'USERNAME_REMINDER_BY_ADMIN',
       request.headers.authorization,
       remoteAddress,
       userAgent,

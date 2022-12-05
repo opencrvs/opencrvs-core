@@ -52,7 +52,7 @@ export default async function resetPasswordSMSHandler(
       getUserId({ Authorization: request.headers.authorization })
     )
     await postUserActionToMetrics(
-      'SEND_PASSWORD',
+      'PASSWORD_RESET_BY_ADMIN',
       request.headers.authorization,
       remoteAddress,
       userAgent,
