@@ -2904,6 +2904,8 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'CHECKBOX',
                 label: formMessageDescriptors.fathersDetailsExist,
                 required: true,
+                checkedValue: false,
+                uncheckedValue: true,
                 hideHeader: true,
                 initialValue: true,
                 validate: [],

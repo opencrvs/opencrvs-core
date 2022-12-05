@@ -385,17 +385,23 @@ function GeneratedInputField({
   }
 
   if (fieldDefinition.type === CHECKBOX) {
+    const { checkedValue = true, uncheckedValue = false } = fieldDefinition
     return (
       <InputField {...inputFieldProps}>
         <Checkbox
           {...inputProps}
-          name={fieldDefinition.name}
-          selected={Boolean(value)}
-          value="true"
           label={fieldDefinition.label}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            onSetFieldValue(fieldDefinition.name, e.target.checked)
-          }}
+          name={fieldDefinition.name}
+          value={String(value)}
+          selected={(value as string) === checkedValue}
+          onChange={(event) =>
+            onSetFieldValue(
+              fieldDefinition.name,
+              event.target.value === String(checkedValue)
+                ? uncheckedValue
+                : checkedValue
+            )
+          }
         />
       </InputField>
     )
