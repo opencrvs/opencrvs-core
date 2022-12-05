@@ -13,233 +13,15 @@ import {
   CERTIFIED_STATUS,
   REGISTERED_STATUS
 } from '@search/elasticsearch/utils'
-import {
-  IAdvancedSearchParam,
-  IFilter,
-  INameCombination
-} from '@search/features/search/types'
-const SEARCHABLE_FIELDS = [
-  'childFirstNames',
-  'childFamilyName',
-  'childFirstNamesLocal',
-  'childFamilyNameLocal',
-  'deceasedFirstNames',
-  'deceasedFamilyName',
-  'deceasedFirstNamesLocal',
-  'deceasedFamilyNameLocal',
-  'trackingId',
-  'registrationNumber',
-  'contactNumber'
-]
+import { IAdvancedSearchParam } from '@search/features/search/types'
 
-const allNameFields = [
-  'childFirstNames',
-  'childFamilyName',
-  'childFirstNamesLocal',
-  'childFamilyNameLocal',
-  'motherFirstNames',
-  'motherFamilyName',
-  'motherFirstNamesLocal',
-  'motherFamilyNameLocal',
-  'fatherFirstNames',
-  'fatherFamilyName',
-  'fatherFirstNamesLocal',
-  'fatherFamilyNameLocal',
-  'informantFirstNames',
-  'informantFamilyName',
-  'informantFirstNamesLocal',
-  'informantFamilyNameLocal',
-  'deceasedFirstNames',
-  'deceasedFamilyName',
-  'deceasedFirstNamesLocal',
-  'deceasedFamilyNameLocal',
-  'spouseFirstNames',
-  'spouseFamilyName',
-  'spouseFirstNamesLocal',
-  'spouseFamilyNameLocal'
-]
-
-const childFirstNameFields = ['childFirstNames', 'childFirstNamesLocal']
-
-const motherFirstNameFields = ['motherFirstNames', 'motherFirstNamesLocal']
-
-const fatherFirstNameFields = ['fatherFirstNames', 'fatherFirstNamesLocal']
-
-const childFamilyNameFields = ['childFamilyName', 'childFamilyNameLocal']
-
-const motherFamilyNameFields = ['motherFamilyName', 'motherFamilyNameLocal']
-
-const fatherFamilyNameFields = ['fatherFamilyName', 'fatherFamilyNameLocal']
-
-export const EMPTY_STRING = ''
-
-export function queryBuilder(
-  query: string,
-  trackingId: string,
-  contactNumber: string,
-  registrationNumber: string,
-  eventLocationId: string,
-  gender: string,
-  nameCombinations: INameCombination[],
-  declarationLocationId: string | string[],
-  declarationLocationHirarchyId: string,
+export function advancedQueryBuilder(
+  params: IAdvancedSearchParam,
   createdBy: string,
-  filters: IFilter
+  isExternalSearch: boolean
 ) {
   const must: any[] = []
   const should: any[] = []
-
-  if (query !== EMPTY_STRING) {
-    must.push({
-      multi_match: {
-        query: `${query}`,
-        fields: SEARCHABLE_FIELDS,
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (nameCombinations.length > 0) {
-    nameCombinations.forEach((nameCombination: INameCombination) => {
-      must.push({
-        multi_match: {
-          query: nameCombination.name,
-          fields: selectNameFields(nameCombination.fields),
-          fuzziness: 'AUTO'
-        }
-      })
-    })
-  }
-
-  if (trackingId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'trackingId.keyword': trackingId
-      }
-    })
-  }
-
-  if (contactNumber !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'contactNumber.keyword': contactNumber
-      }
-    })
-  }
-
-  if (registrationNumber !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'registrationNumber.keyword': registrationNumber
-      }
-    })
-  }
-
-  if (gender !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'gender.keyword': gender
-      }
-    })
-  }
-
-  if (eventLocationId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'eventLocationId.keyword': {
-          value: eventLocationId,
-          boost: 2.0
-        }
-      }
-    })
-  }
-  if (Array.isArray(declarationLocationId)) {
-    // If you are searching multiple locations at once
-    declarationLocationId.forEach((id) => {
-      must.push({
-        bool: {
-          should: declarationLocationId.map((locationId: string) => ({
-            term: {
-              'declarationLocationId.keyword': locationId
-            }
-          }))
-        }
-      })
-    })
-  } else if (declarationLocationId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'declarationLocationId.keyword': {
-          value: declarationLocationId,
-          boost: 2
-        }
-      }
-    })
-  }
-
-  if (declarationLocationHirarchyId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'declarationLocationHirarchyIds.keyword': {
-          value: declarationLocationHirarchyId,
-
-          boost: 2.0
-        }
-      }
-    })
-  }
-
-  if (createdBy !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'createdBy.keyword': {
-          value: createdBy
-        }
-      }
-    })
-  }
-
-  if (filters.event !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'event.keyword': filters.event
-      }
-    })
-  }
-
-  if (filters.status) {
-    must.push({
-      terms: {
-        'type.keyword': filters.status
-      }
-    })
-  }
-
-  if (filters.type) {
-    must.push({
-      terms: {
-        'compositionType.keyword': filters.type
-      }
-    })
-  }
-
-  return {
-    bool: {
-      must,
-      should
-    }
-  }
-}
-
-export function advancedQueryBuilder(params: IAdvancedSearchParam) {
-  const must: any[] = [
-    {
-      query_string: {
-        default_field: 'type',
-        query: `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS})`
-      }
-    }
-  ]
 
   if (params.event) {
     must.push({
@@ -249,74 +31,53 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     })
   }
 
-  if (params.eventLocationId) {
+  if (params.name) {
+    must.push({
+      multi_match: {
+        query: params.name,
+        fields: [
+          'childFirstNames',
+          'childFamilyName',
+          'motherFirstNames',
+          'motherFamilyName',
+          'fatherFirstNames',
+          'fatherFamilyName',
+          'informantFirstNames',
+          'informantFamilyName',
+          'deceasedFirstNames',
+          'deceasedFamilyName',
+          'spouseFirstNames',
+          'spouseFamilyName'
+        ],
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.registrationStatuses) {
+    must.push({
+      query_string: {
+        default_field: 'type',
+        query: isExternalSearch
+          ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS})`
+          : `(${params.registrationStatuses.join(') OR (')})`
+      }
+    })
+  }
+
+  if (
+    !params.dateOfEventStart &&
+    !params.dateOfEventEnd &&
+    params.dateOfEvent
+  ) {
     must.push({
       match: {
-        eventLocationId: params.eventLocationId
-      }
-    })
-  }
-
-  if (params.childFirstNames) {
-    must.push({
-      multi_match: {
-        query: params.childFirstNames,
-        fields: ['childFirstNames'],
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (params.childLastName) {
-    must.push({
-      multi_match: {
-        query: params.childLastName,
-        fields: 'childLastName',
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (!params.dateOfEventStart && !params.dateOfEventEnd && params.childDoB) {
-    must.push({
-      match: {
-        childDoB: params.childDoB
-      }
-    })
-  }
-
-  if (params.deceasedFirstNames) {
-    must.push({
-      multi_match: {
-        query: params.deceasedFirstNames,
-        fields: 'deceasedFirstNames',
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (params.deceasedFamilyName) {
-    must.push({
-      multi_match: {
-        query: params.deceasedFamilyName,
-        fields: 'deceasedFamilyName',
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (!params.dateOfEventStart && !params.dateOfEventEnd && params.deathDate) {
-    must.push({
-      match: {
-        deathDate: params.deathDate
+        deathDate: params.dateOfEvent
       }
     })
   }
 
   if (params.dateOfEventStart || params.dateOfEventEnd) {
-    if (!params.event) {
-      throw new Error('Event is required for date range search')
-    }
     if (!params.dateOfEventStart) {
       throw new Error(
         'dateOfEventStart must be provided along with dateOfEventEnd'
@@ -328,139 +89,12 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
       )
     }
 
-    let fieldName
-    const eventWiseFieldName = {
-      Birth: 'childDoB',
-      Death: 'deathDate'
-    }
-    if (params.event in eventWiseFieldName) {
-      fieldName = eventWiseFieldName[params.event]
-    } else {
-      throw Error('Invalid Event. Valid events are: Birth, Death, etc.')
-    }
-
     must.push({
       range: {
-        [fieldName]: {
+        deathDate: {
           gte: params.dateOfEventStart,
           lte: params.dateOfEventEnd
         }
-      }
-    })
-  }
-
-  if (params.motherFirstNames) {
-    must.push({
-      multi_match: {
-        query: params.motherFirstNames,
-        fields: 'motherFirstNames',
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (params.motherFamilyName) {
-    must.push({
-      multi_match: {
-        query: params.motherFamilyName,
-        fields: 'motherFamilyName',
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (params.motherDoB) {
-    must.push({
-      match: {
-        motherDoB: params.motherDoB
-      }
-    })
-  }
-
-  if (params.motherIdentifier) {
-    must.push({
-      match: {
-        motherIdentifier: params.motherIdentifier
-      }
-    })
-  }
-
-  if (params.fatherFirstNames) {
-    must.push({
-      multi_match: {
-        query: params.fatherFirstNames,
-        fields: 'fatherFirstNames',
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (params.fatherFamilyName) {
-    must.push({
-      multi_match: {
-        query: params.fatherFamilyName,
-        fields: 'fatherFamilyName',
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (params.fatherDoB) {
-    must.push({
-      match: {
-        fatherDoB: params.fatherDoB
-      }
-    })
-  }
-
-  if (params.fatherIdentifier) {
-    must.push({
-      match: {
-        fatherIdentifier: params.fatherIdentifier
-      }
-    })
-  }
-
-  if (params.informantFirstNames) {
-    must.push({
-      multi_match: {
-        query: params.informantFirstNames,
-        fields: 'informantFirstNames',
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (params.informantFamilyName) {
-    must.push({
-      multi_match: {
-        query: params.informantFamilyName,
-        fields: 'informantFamilyName',
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (params.contactNumber) {
-    must.push({
-      match: {
-        contactNumber: params.contactNumber
-      }
-    })
-  }
-
-  if (params.registrationNumber) {
-    must.push({
-      match: {
-        registrationNumber: params.registrationNumber
-      }
-    })
-  }
-
-  if (params.trackingId) {
-    must.push({
-      match: {
-        trackingId: params.trackingId
       }
     })
   }
@@ -500,29 +134,430 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     })
   }
 
+  if (params.declarationLocationId) {
+    must.push({
+      match: {
+        declarationLocationId: {
+          query: params.declarationLocationId,
+          boost: 2.0
+        }
+      }
+    })
+  }
+
+  if (params.declarationJurisdictionId) {
+    must.push({
+      match: {
+        declarationJurisdictionId: {
+          query: params.declarationJurisdictionId,
+          boost: 2.0
+        }
+      }
+    })
+  }
+
+  if (params.eventLocationId) {
+    must.push({
+      match: {
+        eventLocationId: params.eventLocationId
+      }
+    })
+  }
+
+  if (params.eventCountry) {
+    must.push({
+      match: {
+        eventCountry: params.eventCountry
+      }
+    })
+  }
+
+  const eventJurisdictionIds = [
+    params.eventLocationLevel1,
+    params.eventLocationLevel2,
+    params.eventLocationLevel3,
+    params.eventLocationLevel4,
+    params.eventLocationLevel5
+  ].filter((id) => Boolean(id))
+
+  if (eventJurisdictionIds.length > 0) {
+    must.push({
+      bool: {
+        should: eventJurisdictionIds.map((locationId: string) => ({
+          match: {
+            eventJurisdictionIds: locationId
+          }
+        }))
+      }
+    })
+  }
+
+  if (params.childFirstNames) {
+    must.push({
+      multi_match: {
+        query: params.childFirstNames,
+        fields: ['childFirstNames'],
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.childLastName) {
+    must.push({
+      multi_match: {
+        query: params.childLastName,
+        fields: 'childLastName',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (!params.childDoBStart && !params.childDoBEnd && params.childDoB) {
+    must.push({
+      match: {
+        childDoB: params.childDoB
+      }
+    })
+  }
+
+  if (params.childDoBStart || params.childDoBEnd) {
+    if (!params.childDoBStart) {
+      throw new Error('childDoBStart must be provided along with childDoBEnd')
+    }
+    if (!params.childDoBEnd) {
+      throw new Error('childDoBEnd must be provided along with childDoBStart')
+    }
+
+    must.push({
+      range: {
+        childDoB: {
+          gte: params.childDoBStart,
+          lte: params.childDoBEnd
+        }
+      }
+    })
+  }
+
+  if (params.childGender) {
+    must.push({
+      match: {
+        gender: params.childGender
+      }
+    })
+  }
+
+  if (params.deceasedFirstNames) {
+    must.push({
+      multi_match: {
+        query: params.deceasedFirstNames,
+        fields: 'deceasedFirstNames',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.deceasedFamilyName) {
+    must.push({
+      multi_match: {
+        query: params.deceasedFamilyName,
+        fields: 'deceasedFamilyName',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.deceasedGender) {
+    must.push({
+      match: {
+        gender: params.deceasedGender
+      }
+    })
+  }
+
+  if (
+    !params.deceasedDoBStart &&
+    !params.deceasedDoBEnd &&
+    params.deceasedDoB
+  ) {
+    must.push({
+      match: {
+        deceasedDoB: params.deceasedDoB
+      }
+    })
+  }
+
+  if (params.deceasedDoBStart || params.deceasedDoBEnd) {
+    if (!params.deceasedDoBStart) {
+      throw new Error(
+        'deceasedDoBStart must be provided along with deceasedDoBEnd'
+      )
+    }
+    if (!params.deceasedDoBEnd) {
+      throw new Error(
+        'deceasedDoBEnd must be provided along with deceasedDoBStart'
+      )
+    }
+
+    must.push({
+      range: {
+        childDoB: {
+          gte: params.deceasedDoBStart,
+          lte: params.deceasedDoBEnd
+        }
+      }
+    })
+  }
+
+  if (params.deceasedIdentifier) {
+    must.push({
+      match: {
+        deceasedIdentifier: params.deceasedIdentifier
+      }
+    })
+  }
+
+  if (params.motherFirstNames) {
+    must.push({
+      multi_match: {
+        query: params.motherFirstNames,
+        fields: 'motherFirstNames',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.motherFamilyName) {
+    must.push({
+      multi_match: {
+        query: params.motherFamilyName,
+        fields: 'motherFamilyName',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (!params.motherDoBStart && !params.motherDoBEnd && params.motherDoB) {
+    must.push({
+      match: {
+        motherDoB: params.motherDoB
+      }
+    })
+  }
+
+  if (params.motherDoBStart || params.motherDoBEnd) {
+    if (!params.motherDoBStart) {
+      throw new Error('motherDoBStart must be provided along with motherDoBEnd')
+    }
+    if (!params.motherDoBEnd) {
+      throw new Error('motherDoBEnd must be provided along with motherDoBStart')
+    }
+
+    must.push({
+      range: {
+        motherDoB: {
+          gte: params.motherDoBStart,
+          lte: params.motherDoBEnd
+        }
+      }
+    })
+  }
+
+  if (params.motherIdentifier) {
+    must.push({
+      match: {
+        motherIdentifier: params.motherIdentifier
+      }
+    })
+  }
+
+  if (params.fatherFirstNames) {
+    must.push({
+      multi_match: {
+        query: params.fatherFirstNames,
+        fields: 'fatherFirstNames',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.fatherFamilyName) {
+    must.push({
+      multi_match: {
+        query: params.fatherFamilyName,
+        fields: 'fatherFamilyName',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (!params.fatherDoBStart && params.fatherDoBEnd && params.fatherDoB) {
+    must.push({
+      match: {
+        fatherDoB: params.fatherDoB
+      }
+    })
+  }
+
+  if (params.fatherDoBStart || params.fatherDoBEnd) {
+    if (!params.fatherDoBStart) {
+      throw new Error('fatherDoBStart must be provided along with fatherDoBEnd')
+    }
+    if (!params.fatherDoBEnd) {
+      throw new Error('fatherDoBEnd must be provided along with fatherDoBStart')
+    }
+
+    must.push({
+      range: {
+        fatherDoB: {
+          gte: params.fatherDoBStart,
+          lte: params.fatherDoBEnd
+        }
+      }
+    })
+  }
+
+  if (params.fatherIdentifier) {
+    must.push({
+      match: {
+        fatherIdentifier: params.fatherIdentifier
+      }
+    })
+  }
+
+  if (params.informantFirstNames) {
+    must.push({
+      multi_match: {
+        query: params.informantFirstNames,
+        fields: 'informantFirstNames',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.informantFamilyName) {
+    must.push({
+      multi_match: {
+        query: params.informantFamilyName,
+        fields: 'informantFamilyName',
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (
+    !params.informantDoBStart &&
+    !params.informantDoBEnd &&
+    params.informantDoB
+  ) {
+    must.push({
+      match: {
+        informantDoB: params.informantDoB
+      }
+    })
+  }
+
+  if (params.informantDoBStart || params.informantDoBEnd) {
+    if (!params.informantDoBStart) {
+      throw new Error(
+        'informantDoBStart must be provided along with informantDoBEnd'
+      )
+    }
+    if (!params.informantDoBEnd) {
+      throw new Error(
+        'informantDoBEnd must be provided along with informantDoBStart'
+      )
+    }
+
+    must.push({
+      range: {
+        childDoB: {
+          gte: params.informantDoBStart,
+          lte: params.informantDoBEnd
+        }
+      }
+    })
+  }
+
+  if (params.informantIdentifier) {
+    must.push({
+      match: {
+        informantIdentifier: params.informantIdentifier
+      }
+    })
+  }
+
+  if (params.contactNumber) {
+    must.push({
+      match: {
+        contactNumber: params.contactNumber
+      }
+    })
+  }
+
+  if (params.registrationNumber) {
+    must.push({
+      match: {
+        registrationNumber: params.registrationNumber
+      }
+    })
+  }
+
+  if (params.trackingId) {
+    must.push({
+      match: {
+        trackingId: params.trackingId
+      }
+    })
+  }
+
+  if (params.nationalId) {
+    should.push(
+      {
+        match: {
+          motherIdentifier: params.nationalId
+        }
+      },
+      {
+        match: {
+          fatherIdentifier: params.nationalId
+        }
+      },
+      {
+        match: {
+          informantIdentifier: params.nationalId
+        }
+      },
+      {
+        match: {
+          deceasedIdentifier: params.nationalId
+        }
+      }
+    )
+  }
+
+  if (createdBy) {
+    must.push({
+      term: {
+        'createdBy.keyword': {
+          value: createdBy
+        }
+      }
+    })
+  }
+
+  if (params.compositionType) {
+    must.push({
+      terms: {
+        'compositionType.keyword': params.compositionType
+      }
+    })
+  }
+
   return {
     bool: {
-      must
+      must,
+      should
     }
-  }
-}
-
-function selectNameFields(fields: string): string[] {
-  switch (fields) {
-    case 'CHILD_FIRST':
-      return childFirstNameFields
-    case 'CHILD_FAMILY':
-      return childFamilyNameFields
-    case 'FATHER_FIRST':
-      return fatherFirstNameFields
-    case 'FATHER_FAMILY':
-      return fatherFamilyNameFields
-    case 'MOTHER_FIRST':
-      return motherFirstNameFields
-    case 'MOTHER_FAMILY':
-      return motherFamilyNameFields
-    default:
-      return allNameFields
   }
 }
 

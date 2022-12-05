@@ -75,6 +75,7 @@ type User {
   creationDate: String
   avatar: Avatar
   device: String
+  searches: [BookmarkedSeachItem]
 }
 
 type SearchUserResult {

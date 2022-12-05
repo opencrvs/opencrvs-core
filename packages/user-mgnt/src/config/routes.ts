@@ -80,6 +80,12 @@ import changePhoneHandler, {
 import * as Joi from 'joi'
 import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
 import getUserAvatar from '@user-mgnt/features/getAvatar/handler'
+import {
+  createSearchHandler,
+  removeSearchHandler,
+  createSearchrequestSchema,
+  removeSearchrequestSchema
+} from '@user-mgnt/features/userSearchRecord/handler'
 import resetPasswordSMSHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resstPassword/handler'
@@ -429,6 +435,48 @@ export const getRoutes = () => {
         },
         validate: {
           payload: userAuditSchema
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/searches',
+      handler: createSearchHandler,
+      config: {
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: createSearchrequestSchema
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/searches',
+      handler: removeSearchHandler,
+      config: {
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: removeSearchrequestSchema
         },
         tags: ['api']
       }
