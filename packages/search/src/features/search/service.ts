@@ -58,7 +58,7 @@ export function formatSearchParams(params: ISearchQuery) {
     from = 0,
     size = DEFAULT_SIZE,
     sort = SortOrder.ASC,
-    sortColumn = 'dateOfDeclaration'
+    sortColumn
   } = params
 
   if (nameCombinations.length === 0 && name !== EMPTY_STRING) {
@@ -66,6 +66,16 @@ export function formatSearchParams(params: ISearchQuery) {
       name,
       fields: 'ALL'
     })
+  }
+
+  let sorting:
+    | Array<{
+        [x: string]: SortOrder
+      }>
+    | undefined = undefined
+
+  if (sortColumn) {
+    sorting = [{ [sortColumn]: sort }]
   }
 
   return {
@@ -87,7 +97,7 @@ export function formatSearchParams(params: ISearchQuery) {
         createdBy,
         { event, status, type }
       ),
-      sort: [{ [sortColumn]: sort }]
+      sort: sorting
     }
   }
 }

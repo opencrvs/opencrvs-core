@@ -70,6 +70,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     inProgressTab: searchEvents(
       locationIds: $locationIds
       status: ["IN_PROGRESS"]
+      sortColumn: "dateOfDeclaration"
       type: ["birth-declaration", "death-declaration"]
       count: $pageSize
       skip: $inProgressSkip
@@ -82,6 +83,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     notificationTab: searchEvents(
       locationIds: $locationIds
       status: ["IN_PROGRESS"]
+      sortColumn: "dateOfDeclaration"
       type: ["birth-notification", "death-notification"]
       count: $pageSize
       skip: $healthSystemSkip
@@ -94,6 +96,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     reviewTab: searchEvents(
       locationIds: $locationIds
       status: $reviewStatuses
+      sortColumn: "dateOfDeclaration"
       count: $pageSize
       skip: $reviewSkip
     ) {
@@ -117,6 +120,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     }
     approvalTab: searchEvents(
       locationIds: $locationIds
+      sortColumn: "dateOfDeclaration"
       status: ["VALIDATED"]
       count: $pageSize
       skip: $approvalSkip
@@ -131,6 +135,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       status: ["WAITING_VALIDATION"]
       count: $pageSize
       skip: $externalValidationSkip
+      sortColumn: "dateOfDeclaration"
     ) {
       totalItems
       results {
@@ -139,6 +144,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     }
     printTab: searchEvents(
       locationIds: $locationIds
+      sortColumn: "dateOfDeclaration"
       status: ["REGISTERED"]
       count: $pageSize
       skip: $printSkip
