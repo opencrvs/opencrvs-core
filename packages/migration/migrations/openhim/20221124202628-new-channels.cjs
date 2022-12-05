@@ -12,7 +12,8 @@ graphic logo are (registered/a) trademark(s) of Plan International.
 const {
   addRouteToChannel,
   removeRouteFromChannel,
-  upsertChannel
+  upsertChannel,
+  removeChannel
 } = require('../../utils/openhim-helpers.cjs')
 
 const eventDownloadedChannel = {
@@ -132,6 +133,65 @@ const eventViewedChannel = {
   maxBodyAgeDays: 30
 }
 
+const declarationUpdatedChannel = {
+  methods: [
+    'GET',
+    'POST',
+    'DELETE',
+    'PUT',
+    'OPTIONS',
+    'HEAD',
+    'TRACE',
+    'CONNECT',
+    'PATCH'
+  ],
+  type: 'http',
+  allow: [],
+  whitelist: [],
+  authType: 'public',
+  matchContentTypes: [],
+  properties: [],
+  txViewAcl: [],
+  txViewFullAcl: [],
+  txRerunAcl: [],
+  status: 'enabled',
+  rewriteUrls: false,
+  addAutoRewriteRules: true,
+  autoRetryEnabled: false,
+  autoRetryPeriodMinutes: 60,
+  routes: [
+    {
+      type: 'http',
+      status: 'enabled',
+      forwardAuthHeader: true,
+      name: 'Metrics -> Declaration Updated',
+      secured: false,
+      host: 'metrics',
+      port: 1050,
+      path: '',
+      pathTransform: '',
+      primary: true,
+      username: '',
+      password: ''
+    }
+  ],
+  requestBody: true,
+  responseBody: true,
+  rewriteUrlsConfig: [],
+  name: 'Declaration Updated',
+  urlPattern: '^/events/declaration-updated$',
+  matchContentRegex: null,
+  matchContentXpath: null,
+  matchContentValue: null,
+  matchContentJson: null,
+  pollingSchedule: null,
+  tcpHost: null,
+  tcpPort: null,
+  alerts: [],
+  priority: 1,
+  maxBodyAgeDays: 30
+}
+
 exports.up = async (db, client) => {
   const session = client.startSession()
   try {
@@ -195,6 +255,7 @@ exports.up = async (db, client) => {
 
       await upsertChannel(db, eventDownloadedChannel)
       await upsertChannel(db, eventViewedChannel)
+      await upsertChannel(db, declarationUpdatedChannel)
     })
   } finally {
     await session.endSession()
@@ -225,8 +286,9 @@ exports.down = async (db, client) => {
         'Death Reinstate',
         'Metrics -> Death Reinstate'
       )
-      await upsertChannel(db, eventDownloadedChannel)
-      await upsertChannel(db, eventViewedChannel)
+      await removeChannel(db, eventDownloadedChannel)
+      await removeChannel(db, eventViewedChannel)
+      await removeChannel(db, declarationUpdatedChannel)
     })
   } finally {
     await session.endSession()
