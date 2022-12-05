@@ -11,11 +11,12 @@
  */
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import User from '@user-mgnt/model/user'
+import User, { IUserModel } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import { sendUserName } from './service'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import { logger } from '@user-mgnt/logger'
+import { getUserId } from '@user-mgnt/utils/userUtils'
 
 interface IResendUsernameSMSPayload {
   userId: string
@@ -45,11 +46,15 @@ export default async function usernameSMSReminderHandler(
   const subjectPractitionerId = user.practitionerId
 
   try {
+    const systemAdminUser: IUserModel | null = await User.findById(
+      getUserId({ Authorization: request.headers.authorization })
+    )
     await postUserActionToMetrics(
       'SEND_USERNAME_REMINDER',
       request.headers.authorization,
       remoteAddress,
       userAgent,
+      systemAdminUser?.practitionerId,
       subjectPractitionerId
     )
   } catch (err) {

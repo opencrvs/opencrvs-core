@@ -55,6 +55,11 @@ export default async function changePhoneHandler(
 
   try {
     await User.update({ _id: user._id }, user)
+  } catch (err) {
+    // return 400 if there is a validation error when updating to mongo
+    return h.response(err.message).code(400)
+  }
+  try {
     await postUserActionToMetrics(
       'PHONE_NUMBER_CHANGED',
       request.headers.authorization,
@@ -62,8 +67,7 @@ export default async function changePhoneHandler(
       userAgent
     )
   } catch (err) {
-    // return 400 if there is a validation error when updating to mongo
-    return h.response(err.message).code(400)
+    logger.error(err)
   }
   return h.response().code(200)
 }

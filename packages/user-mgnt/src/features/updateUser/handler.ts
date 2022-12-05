@@ -25,7 +25,7 @@ import User, {
   IUser,
   IUserModel
 } from '@user-mgnt/model/user'
-import { roleScopeMapping } from '@user-mgnt/utils/userUtils'
+import { getUserId, roleScopeMapping } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
@@ -159,11 +159,16 @@ export default async function updateUser(
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   try {
+    const systemAdminUser: IUserModel | null = await User.findById(
+      getUserId({ Authorization: request.headers.authorization })
+    )
     await postUserActionToMetrics(
       'EDIT_USER',
       request.headers.authorization,
       remoteAddress,
-      userAgent
+      userAgent,
+      systemAdminUser?.practitionerId,
+      practitionerId
     )
   } catch (err) {
     logger.error(err.message)
