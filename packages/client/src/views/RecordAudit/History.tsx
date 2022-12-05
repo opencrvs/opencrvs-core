@@ -252,7 +252,7 @@ export const GetHistory = ({
       item.dhis2Notification && !item.user?.role
         ? intl.formatMessage(userMessages.healthSystem)
         : item.user?.title
-        ? item.user?.title
+        ? intl.formatMessage(userMessages[item.user?.title])
         : intl.formatMessage(userMessages[item?.user?.role as string]),
     location:
       item.dhis2Notification && !item.user?.role ? (
