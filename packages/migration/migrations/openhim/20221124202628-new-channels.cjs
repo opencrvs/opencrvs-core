@@ -11,7 +11,8 @@ graphic logo are (registered/a) trademark(s) of Plan International.
 */
 const {
   addRouteToChannel,
-  removeRouteFromChannel, upsertChannel
+  removeRouteFromChannel,
+  upsertChannel
 } = require('../../utils/openhim-helpers.cjs')
 
 const eventDownloadedChannel = {
@@ -55,7 +56,7 @@ const eventDownloadedChannel = {
       username: '',
       password: ''
     }
-    ],
+  ],
   requestBody: true,
   responseBody: true,
   rewriteUrlsConfig: [],
@@ -69,7 +70,8 @@ const eventDownloadedChannel = {
   tcpHost: null,
   tcpPort: null,
   alerts: [],
-  priority: 1
+  priority: 1,
+  maxBodyAgeDays: 30
 }
 const eventViewedChannel = {
   methods: [
@@ -112,7 +114,7 @@ const eventViewedChannel = {
       username: '',
       password: ''
     }
-    ],
+  ],
   requestBody: true,
   responseBody: true,
   rewriteUrlsConfig: [],
@@ -126,9 +128,9 @@ const eventViewedChannel = {
   tcpHost: null,
   tcpPort: null,
   alerts: [],
-  priority: 1
+  priority: 1,
+  maxBodyAgeDays: 30
 }
-
 
 exports.up = async (db, client) => {
   const session = client.startSession()
@@ -193,13 +195,11 @@ exports.up = async (db, client) => {
 
       await upsertChannel(db, eventDownloadedChannel)
       await upsertChannel(db, eventViewedChannel)
-
     })
   } finally {
     await session.endSession()
   }
 }
-
 
 exports.down = async (db, client) => {
   const session = client.startSession()
@@ -232,4 +232,3 @@ exports.down = async (db, client) => {
     await session.endSession()
   }
 }
-
