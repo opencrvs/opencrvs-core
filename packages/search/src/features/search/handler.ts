@@ -18,10 +18,17 @@ import {
 } from '@search/features/search/service'
 import { ISearchQuery } from '@search/features/search/types'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
-import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
+import {
+  ICompositionBody,
+  EVENT,
+  IBirthCompositionBody
+} from '@search/elasticsearch/utils'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
-import { updateComposition } from '@search/elasticsearch/dbhelper'
+import {
+  searchForDuplicates,
+  updateComposition
+} from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
@@ -34,6 +41,20 @@ export async function searchDeclaration(
     return h.response(result).code(200)
   } catch (error) {
     logger.error(`Search/searchDeclarationHandler: error: ${error}`)
+    return internal(error)
+  }
+}
+export async function searchDuplicates(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const result = await searchForDuplicates(
+      request.payload as IBirthCompositionBody
+    )
+    return h.response(result.body?.hits?.hits || []).code(200)
+  } catch (error) {
+    logger.error(`Search/searchForDuplicates: error: ${error}`)
     return internal(error)
   }
 }

@@ -14,19 +14,21 @@ import {
   EVENT_TYPE,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  ASSIGNED_EXTENSION_URL
+  ASSIGNED_EXTENSION_URL,
+  OPENCRVS_SPECIFICATION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
   getDeclarationIdsFromResponse,
   getIDFromResponse,
-  getRegistrationIdsFromResponse,
+  // getRegistrationIdsFromResponse,
   removeDuplicatesFromComposition,
   getRegistrationIds,
   getDeclarationIds,
   getStatusFromTask,
   findExtension,
-  setCertificateCollector
+  setCertificateCollector,
+  getRegistrationIdsFromResponse
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -663,27 +665,39 @@ async function createEventRegistration(
   const draftId =
     details && details.registration && details.registration.draftId
 
-  const duplicateCompostion =
-    draftId && (await lookForDuplicate(draftId, authHeader))
+  const existingComposition =
+    draftId && (await lookForComposition(draftId, authHeader))
 
-  if (duplicateCompostion) {
+  if (existingComposition) {
+    console.log('THIS COMPOSITION EXISTS')
     if (hasScope(authHeader, 'register')) {
       return await getRegistrationIds(
-        duplicateCompostion,
+        existingComposition,
         event,
         false,
         authHeader
       )
     } else {
       // return tracking-id
-      return await getDeclarationIds(duplicateCompostion, authHeader)
+      return await getDeclarationIds(existingComposition, authHeader)
     }
   }
-
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  if (hasScope(authHeader, 'register')) {
-    // return the registrationNumber
+  /*
+   * Some custom logic added here. If you are a registar and
+   * we flagged the declaration as a duplicate, we push the declaration into
+   * "Ready for review" queue and not ready to print.
+   */
 
+  const isADuplicate = doc.entry
+    .find((entry) => entry.resource.resourceType === 'Composition')
+    ?.resource?.extension?.find(
+      (ext) =>
+        ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` && ext.valueBoolean
+    )
+
+  if (hasScope(authHeader, 'register') && !isADuplicate) {
+    // return the registrationNumber
     return await getRegistrationIdsFromResponse(res, event, authHeader)
   } else {
     // return tracking-id
@@ -691,7 +705,7 @@ async function createEventRegistration(
   }
 }
 
-export async function lookForDuplicate(
+export async function lookForComposition(
   identifier: string,
   authHeader: IAuthHeader
 ) {

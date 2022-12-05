@@ -11,7 +11,10 @@
  */
 import { OPENHIM_URL } from '@workflow/constants'
 import { isUserAuthorized } from '@workflow/features/events/auth'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import {
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL
+} from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
   hasDeathRegistrationNumber,
@@ -92,11 +95,19 @@ function detectEvent(request: Hapi.Request): Events {
       fhirBundle.entry[0] &&
       fhirBundle.entry[0].resource
     ) {
-      const firstEntry = fhirBundle.entry[0].resource
-      if (firstEntry.resourceType === 'Composition') {
+      const bundleFirstEntry = fhirBundle.entry[0].resource
+      if (bundleFirstEntry.resourceType === 'Composition') {
+        const composition = bundleFirstEntry as fhir.Composition
+        const isADuplicate = composition?.extension?.find(
+          (ext) =>
+            ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
+            ext.valueBoolean
+        )
+
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
-          if (firstEntry.id) {
+          const wasJustCreated = bundleFirstEntry.id
+          if (wasJustCreated) {
             if (!hasBirthRegistrationNumber(fhirBundle)) {
               if (hasValidateScope(request)) {
                 return Events.BIRTH_MARK_VALID
@@ -107,7 +118,9 @@ function detectEvent(request: Hapi.Request): Events {
             } else {
               if (
                 hasRegisterScope(request) &&
-                hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+                hasCorrectionEncounterSection(
+                  bundleFirstEntry as fhir.Composition
+                )
               ) {
                 return Events.BIRTH_REQUEST_CORRECTION
               } else {
@@ -116,6 +129,10 @@ function detectEvent(request: Hapi.Request): Events {
             }
           } else {
             if (hasRegisterScope(request)) {
+              if (isADuplicate) {
+                return Events.BIRTH_NEW_DEC
+              }
+
               return Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
             }
 
@@ -128,7 +145,7 @@ function detectEvent(request: Hapi.Request): Events {
               : Events.BIRTH_NEW_DEC
           }
         } else if (eventType === EVENT_TYPE.DEATH) {
-          if (firstEntry.id) {
+          if (bundleFirstEntry.id) {
             if (!hasDeathRegistrationNumber(fhirBundle)) {
               if (hasValidateScope(request)) {
                 return Events.DEATH_MARK_VALID
@@ -139,7 +156,9 @@ function detectEvent(request: Hapi.Request): Events {
             } else {
               if (
                 hasRegisterScope(request) &&
-                hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+                hasCorrectionEncounterSection(
+                  bundleFirstEntry as fhir.Composition
+                )
               ) {
                 return Events.DEATH_REQUEST_CORRECTION
               } else {
@@ -161,7 +180,7 @@ function detectEvent(request: Hapi.Request): Events {
           }
         }
       }
-      if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+      if (bundleFirstEntry.resourceType === 'Task' && bundleFirstEntry.id) {
         const taskResource = getTaskResource(fhirBundle)
         if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
           if (hasAssignedExtension(taskResource) && !hasDeclareScope(request)) {
