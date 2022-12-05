@@ -25,6 +25,7 @@ import {
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
+  ADVANCED_SEARCH,
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
@@ -50,8 +51,10 @@ import {
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
-  VS_EXPORTS,
-  VIEW_RECORD
+  VIEW_RECORD,
+  ADVANCED_SEARCH_RESULT,
+  PERFORMANCE_REGISTRATIONS_LIST,
+  VS_EXPORTS
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -75,7 +78,6 @@ import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { IntlShape } from 'react-intl'
 export interface IDynamicValues {
   [key: string]: any
 }
@@ -173,6 +175,10 @@ export function goToVSExport() {
   return push(VS_EXPORTS)
 }
 
+export function goToAdvancedSearch() {
+  return push(ADVANCED_SEARCH)
+}
+
 export function goToFormConfigHome() {
   return push(FORM_CONFIG_HOME)
 }
@@ -255,6 +261,10 @@ export function goToSearchResult(
           searchType
         })
       )
+}
+
+export function goToAdvancedSearchResult(mobile?: boolean) {
+  return push(formatUrl(ADVANCED_SEARCH_RESULT, {}))
 }
 
 export function goToSearch() {
@@ -433,6 +443,27 @@ export function goToFieldAgentList(
       locationId,
       timeStart,
       timeEnd
+    })
+  })
+}
+
+export function goToRegistrationsList(
+  timeStart: string,
+  timeEnd: string,
+  locationId?: string,
+  event?: string,
+  filterBy?: string,
+  currentPageNumber?: number
+) {
+  return push({
+    pathname: PERFORMANCE_REGISTRATIONS_LIST,
+    search: stringify({
+      locationId,
+      timeStart,
+      timeEnd,
+      event,
+      filterBy,
+      currentPageNumber
     })
   })
 }

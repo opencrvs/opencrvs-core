@@ -22,16 +22,18 @@ enum IconSize {
 
 type IconColor = keyof typeof colors | 'currentColor'
 
-type IconProps = {
+export type IconProps = {
   name: keyof typeof icons
   size?: keyof typeof IconSize
   color?: IconColor
+  fill?: IconColor | 'none'
 }
 
 export function Icon({
   name,
   size = 'medium',
   color = 'currentColor',
+  fill = 'none',
   ...rest
 }: IconProps) {
   const IconComponent = icons[name]
@@ -40,6 +42,7 @@ export function Icon({
     <IconComponent
       size={IconSize[size]}
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
+      fill={fill === 'none' ? 'none' : colors[fill]}
       {...rest}
     />
   )

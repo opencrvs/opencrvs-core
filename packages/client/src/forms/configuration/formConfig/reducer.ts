@@ -11,7 +11,6 @@
  */
 import { IFormConfig } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { FieldPosition } from '@client/forms/configuration'
 import * as actions from '@client/forms/configuration/formConfig/actions'
 import {
   getEventDraft,
@@ -21,10 +20,7 @@ import {
 import * as offlineActions from '@client/offline/actions'
 import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
 import {
-  shiftCurrentFieldUp,
-  shiftCurrentFieldDown,
   generateConfigFields,
-  IConfigFieldMap,
   ISectionFieldMap,
   prepareNewCustomFieldConfig
 } from './utils'
@@ -57,26 +53,6 @@ export const initialState: IFormConfigState = {
 }
 
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
-
-function getPreviousField(fieldMap: IConfigFieldMap, fieldId: string) {
-  const currentField = fieldMap[fieldId]
-
-  const { precedingFieldId } = currentField
-
-  return precedingFieldId !== FieldPosition.TOP
-    ? fieldMap[precedingFieldId]
-    : undefined
-}
-
-function getNextField(fieldMap: IConfigFieldMap, fieldId: string) {
-  const currentField = fieldMap[fieldId]
-
-  const { foregoingFieldId } = currentField
-
-  return foregoingFieldId !== FieldPosition.BOTTOM
-    ? fieldMap[foregoingFieldId]
-    : undefined
-}
 
 function getReadyState(formConfig: IFormConfig) {
   const { formDrafts, questionConfig } = formConfig
@@ -136,24 +112,13 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
 
     case actions.ADD_CUSTOM_FIELD: {
       const { event, section, fieldType } = action.payload
-      let fields = state[event].configFields[section]
+      const fields = state[event].configFields[section]
       const customField = prepareNewCustomFieldConfig(
         fields,
         event,
         section,
         fieldType
       )
-      fields = {
-        ...fields,
-        [customField.fieldId]: customField
-      }
-
-      if (customField.precedingFieldId !== FieldPosition.TOP) {
-        fields[customField.precedingFieldId] = {
-          ...fields[customField.precedingFieldId],
-          foregoingFieldId: customField.fieldId
-        }
-      }
 
       return {
         ...state,
@@ -161,7 +126,7 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
           ...state[event],
           configFields: {
             ...state[event].configFields,
-            [section]: fields
+            [section]: [...fields, customField]
           }
         }
       }
@@ -170,45 +135,11 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
     case actions.MODIFY_CONFIG_FIELD: {
       const { fieldId, modifiedProps } = action.payload
       const { event, sectionId } = getIdentifiersFromFieldId(fieldId)
-      const { [fieldId]: originalField, ...fields } =
-        state[event].configFields[sectionId]
-
-      /* Adjusting precedingFieldId & foregoingFieldId */
-      if (modifiedProps.fieldId && fieldId !== modifiedProps.fieldId) {
-        if (originalField.precedingFieldId !== FieldPosition.TOP) {
-          fields[originalField.precedingFieldId] = {
-            ...fields[originalField.precedingFieldId],
-            foregoingFieldId: modifiedProps.fieldId
-          }
-        }
-
-        if (originalField.foregoingFieldId !== FieldPosition.BOTTOM)
-          fields[originalField.foregoingFieldId] = {
-            ...fields[originalField.foregoingFieldId],
-            precedingFieldId: modifiedProps.fieldId
-          }
-
-        fields[modifiedProps.fieldId] = {
-          ...originalField,
-          ...modifiedProps
-        }
-
-        return {
-          ...state,
-          [event]: {
-            ...state[event],
-            configFields: {
-              ...state[event].configFields,
-              [sectionId]: fields
-            }
-          }
-        }
-      }
-
-      fields[fieldId] = {
-        ...originalField,
-        ...modifiedProps
-      }
+      const fields = state[event].configFields[sectionId]
+      const fieldIndex = fields.findIndex(
+        (configField) => configField.fieldId === fieldId
+      )
+      if (fieldIndex < 0) return state
 
       return {
         ...state,
@@ -216,7 +147,15 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
           ...state[event],
           configFields: {
             ...state[event].configFields,
-            [sectionId]: fields
+            [sectionId]: fields.map((configField, index) => {
+              if (index === fieldIndex) {
+                return {
+                  ...configField,
+                  ...modifiedProps
+                }
+              }
+              return configField
+            })
           }
         }
       }
@@ -226,21 +165,11 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
       const { fieldId } = action.payload
       const { event, sectionId } = getIdentifiersFromFieldId(fieldId)
 
-      const { [fieldId]: fieldToRemove, ...fields } =
-        state[event].configFields[sectionId]
-
-      if (fieldToRemove.precedingFieldId !== FieldPosition.TOP) {
-        fields[fieldToRemove.precedingFieldId] = {
-          ...fields[fieldToRemove.precedingFieldId],
-          foregoingFieldId: fieldToRemove.foregoingFieldId
-        }
-      }
-      if (fieldToRemove.foregoingFieldId !== FieldPosition.BOTTOM) {
-        fields[fieldToRemove.foregoingFieldId] = {
-          ...fields[fieldToRemove.foregoingFieldId],
-          precedingFieldId: fieldToRemove.precedingFieldId
-        }
-      }
+      const fields = state[event].configFields[sectionId]
+      const fieldIndex = fields.findIndex(
+        (configField) => configField.fieldId === fieldId
+      )
+      if (fieldIndex < 0) return state
 
       return {
         ...state,
@@ -248,7 +177,9 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
           ...state[event],
           configFields: {
             ...state[event].configFields,
-            [sectionId]: fields
+            [sectionId]: fields.filter(
+              (configField) => configField.fieldId !== fieldId
+            )
           }
         }
       }
@@ -259,9 +190,12 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
       const { event, sectionId } = getIdentifiersFromFieldId(fieldId)
       const fields = state[event].configFields[sectionId]
 
-      const currentField = fields[fieldId]
-      const previousField = getPreviousField(fields, fieldId)
-      const nextField = getNextField(fields, fieldId)
+      const fieldIndex = fields.findIndex(
+        (configField) => configField.fieldId === fieldId
+      )
+
+      /* Field not found or already at the top */
+      if (fieldIndex <= 0) return state
 
       return {
         ...state,
@@ -269,12 +203,12 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
           ...state[event],
           configFields: {
             ...state[event].configFields,
-            [sectionId]: shiftCurrentFieldUp(
-              fields,
-              currentField,
-              previousField,
-              nextField
-            )
+            [sectionId]: [
+              ...fields.slice(0, fieldIndex - 1),
+              fields[fieldIndex],
+              fields[fieldIndex - 1],
+              ...fields.slice(fieldIndex + 1)
+            ]
           }
         }
       }
@@ -285,9 +219,12 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
       const { event, sectionId } = getIdentifiersFromFieldId(fieldId)
       const fields = state[event].configFields[sectionId]
 
-      const currentField = fields[fieldId]
-      const previousField = getPreviousField(fields, fieldId)
-      const nextField = getNextField(fields, fieldId)
+      const fieldIndex = fields.findIndex(
+        (configField) => configField.fieldId === fieldId
+      )
+
+      /* Field not found or already at the bottom */
+      if (fieldIndex < 0 || fieldIndex === fields.length - 1) return state
 
       return {
         ...state,
@@ -295,12 +232,12 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
           ...state[event],
           configFields: {
             ...state[event].configFields,
-            [sectionId]: shiftCurrentFieldDown(
-              fields,
-              currentField,
-              previousField,
-              nextField
-            )
+            [sectionId]: [
+              ...fields.slice(0, fieldIndex),
+              fields[fieldIndex + 1],
+              fields[fieldIndex],
+              ...fields.slice(fieldIndex + 2)
+            ]
           }
         }
       }

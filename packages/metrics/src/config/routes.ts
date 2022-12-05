@@ -55,7 +55,12 @@ import {
   postAdvancedSearchByClient,
   responseSchema
 } from '@metrics/features/searchMetrics/handler'
-import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
+import {
+  totalMetricsByLocation,
+  totalMetricsByRegistrar,
+  totalMetricsByTime,
+  totalMetricsHandler
+} from '@metrics/features/totalMetrics/handler'
 import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
@@ -402,6 +407,62 @@ export const getRoutes = () => {
             timeEnd: Joi.string().required(),
             locationId: Joi.string(),
             event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    {
+      method: 'GET',
+      path: '/totalMetricsByRegistrar',
+      handler: totalMetricsByRegistrar,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string(),
+            event: Joi.string().required(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    {
+      method: 'GET',
+      path: '/totalMetricsByLocation',
+      handler: totalMetricsByLocation,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            event: Joi.string().required(),
+            locationId: Joi.string(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/totalMetricsByTime',
+      handler: totalMetricsByTime,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            event: Joi.string().required(),
+            locationId: Joi.string(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
           })
         },
         tags: ['api']

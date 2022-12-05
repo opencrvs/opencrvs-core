@@ -59,7 +59,8 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',
-      testTimeout: 30000,
+      testTimeout: 60000,
+      hookTimeout: 60000,
       globals: true,
       coverage: {
         reporter: ['text', 'json', 'html']

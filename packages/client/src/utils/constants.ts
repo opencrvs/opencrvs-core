@@ -50,7 +50,9 @@ export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
 export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 
 export const TRACKING_ID_TEXT = 'tracking-id'
+export const NATIONAL_ID_TEXT = 'national-id'
 export const BRN_DRN_TEXT = 'brn-drn'
+export const ADVANCED_SEARCH_TEXT = 'advanced-search'
 export const PHONE_TEXT = 'phone'
 export const NAME_TEXT = 'name'
 export const SEARCH_RESULT_SORT = 'DESC'
@@ -107,6 +109,6 @@ export const INFORMANT_MINIMUM_AGE = 16
 export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
 
 /** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
-export const APPLICATION_VERSION = 'v1.1.1'
+export const APPLICATION_VERSION = 'v1.2.0-beta'
 export const ENABLE_REVIEW_ATTACHMENTS_SCROLLING =
   import.meta.env.MODE === 'test' ? true : false

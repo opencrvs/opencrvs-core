@@ -25,10 +25,39 @@ export interface IMetricsParam {
   skip?: number
 }
 
+export enum FILTER_BY {
+  REGISTERER = 'by_registrar',
+  LOCATION = 'by_location',
+  TIME = 'by_time'
+}
+
 export const resolvers: GQLResolver = {
   Query: {
     async getTotalMetrics(_, variables, authHeader) {
       return getMetrics('/totalMetrics', variables, authHeader)
+    },
+    async getRegistrationsListByFilter(
+      _,
+      { filterBy, ...variables },
+      authHeader
+    ) {
+      let result
+      if (filterBy === FILTER_BY.REGISTERER) {
+        result = await getMetrics(
+          '/totalMetricsByRegistrar',
+          variables,
+          authHeader
+        )
+      } else if (filterBy === FILTER_BY.LOCATION) {
+        result = await getMetrics(
+          '/totalMetricsByLocation',
+          variables,
+          authHeader
+        )
+      } else if (filterBy === FILTER_BY.TIME) {
+        result = await getMetrics('/totalMetricsByTime', variables, authHeader)
+      }
+      return result
     },
     async getVSExports(_, variables, authHeader) {
       let results

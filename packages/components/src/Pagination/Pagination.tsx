@@ -166,6 +166,7 @@ export class Pagination extends React.Component<IPaginationProps> {
         <StyledPagination>
           {pages.map((page, id) => (
             <PageNumberButton
+              key={id}
               size={size}
               id={`page-number-${id}`}
               onClick={() => this.changePage(page)}

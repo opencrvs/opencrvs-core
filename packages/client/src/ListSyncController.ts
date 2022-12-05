@@ -35,7 +35,7 @@ export async function syncRegistrarWorkqueue(
         query: FIELD_AGENT_HOME_QUERY,
         variables: {
           userId: userId,
-          locationIds: [locationId],
+          declarationLocationId: locationId,
           pageSize,
           reviewSkip: reviewSkip,
           rejectSkip: rejectSkip
@@ -51,7 +51,7 @@ export async function syncRegistrarWorkqueue(
       const queryResult = await client.query({
         query: REGISTRATION_HOME_QUERY,
         variables: {
-          locationIds: [locationId],
+          declarationLocationId: locationId,
           pageSize,
           reviewStatuses: reviewStatuses,
           inProgressSkip: inProgressSkip,
