@@ -33,6 +33,10 @@ export function selectCountryLogo(store: IStoreState) {
   return getKey(store, 'config').COUNTRY_LOGO?.file
 }
 
+export function selectCountryBackground(store: IStoreState) {
+  return getKey(store, 'config').COUNTRY_BACKGROUND?.backgroundImage
+}
+
 export function selectApplicationName(store: IStoreState) {
   return getKey(store, 'config').APPLICATION_NAME
 }

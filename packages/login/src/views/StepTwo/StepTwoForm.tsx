@@ -143,7 +143,6 @@ export function StepTwoForm({
                     optionalLabel={intl.formatMessage(messages.optionalLabel)}
                     ignoreMediaQuery
                     hideAsterisk
-                    mode={THEME_MODE.DARK}
                   >
                     <TextInput
                       {...field}
