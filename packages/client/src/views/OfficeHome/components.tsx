@@ -31,6 +31,8 @@ const Flex = styled.div`
 `
 
 export const NameContainer = styled(LinkButton)`
+  white-space: pre-wrap;
+  text-align: left;
   height: auto;
   margin-left: 0;
   div {
