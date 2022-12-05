@@ -36,7 +36,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
-  webhookPermissions: [WebhookPermission!]
+  settings: [WebhookPermission!]
 }
 
 type SystemSecret {
@@ -79,4 +79,5 @@ type Mutation {
   registerSystem(system: SystemInput): SystemSecret
   refreshSystemSecret(clientId: String!): SystemSecret
   updatePermissions(setting: UpdatePermissionsInput!): System
+  deleteSystem(clientId: ID!): System
 }

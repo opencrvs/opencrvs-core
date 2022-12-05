@@ -22,6 +22,7 @@ import {
   WebhookPermission
 } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
+import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
 import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import {
   Alert,
@@ -52,15 +53,13 @@ import React, { useCallback, useState } from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
+import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 
 interface ToggleModal {
   modalVisible: boolean
   selectedClient: System | null
 }
 
-const TopText = styled(Text)`
-  margin-top: 20px;
-`
 const ButtonLink = styled(Link)`
   text-align: left;
 `
@@ -104,6 +103,13 @@ export function SystemList() {
   }
 
   const {
+    closePermissionModal,
+    systemToDeleteData,
+    deleteSystem,
+    systemToDelete,
+    setSystemToDelete,
+    systemToDeleteLoading,
+    systemToDeleteError,
     updatePermissionsData,
     updatePermissionsLoading,
     updatePermissionsError,
@@ -183,10 +189,10 @@ export function SystemList() {
         handler: () => {
           setSystemToShowPermission(system)
           setBirthPermissions(
-            populatePermissions(system.webhookPermissions!, Event.Birth)
+            populatePermissions(system.settings!, Event.Birth)
           )
           setDeathPermissions(
-            populatePermissions(system.webhookPermissions!, Event.Death)
+            populatePermissions(system.settings!, Event.Death)
           )
         },
         label: intl.formatMessage(buttonMessages.edit)
@@ -201,7 +207,9 @@ export function SystemList() {
     })
 
     menuItems.push({
-      handler: () => {},
+      handler: () => {
+        setSystemToDelete(system)
+      },
       label: intl.formatMessage(integrationMessages.delete)
     })
 
@@ -332,6 +340,7 @@ export function SystemList() {
             </Link>
           ]}
           autoHeight={true}
+          width={512}
           titleHeightAuto={true}
           show={toggleKeyModal.modalVisible}
           handleClose={() => {
@@ -340,45 +349,71 @@ export function SystemList() {
           }}
           title={toggleKeyModal.selectedClient?.name ?? ''}
         >
-          {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+          <Text variant="reg16" element="p">
+            {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+          </Text>
 
-          <Stack direction="column" alignItems="flex-start">
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.clientId)}
-            </TopText>
-            <Text variant="reg16" element="span">
-              {toggleKeyModal.selectedClient?.clientId}
-            </Text>
-          </Stack>
-
-          <Stack direction="column" alignItems="flex-start">
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.clientSecret)}
-            </TopText>
-            {refreshTokenLoading ? (
-              <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
-            ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
-              <Text variant="reg16" element="span">
-                {refreshTokenData.refreshSystemSecret?.clientSecret}
+          <Stack alignItems="stretch" direction="column" gap={16}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.clientId)}
               </Text>
-            ) : (
-              <ButtonLink
-                onClick={() => {
-                  clientRefreshToken(toggleKeyModal.selectedClient?.clientId)
-                }}
-              >
-                {intl.formatMessage(buttonMessages.refresh)}
-              </ButtonLink>
-            )}
-          </Stack>
-
-          <Stack direction="column" alignItems="flex-start">
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.shaSecret)}
-            </TopText>
-            <Text variant="reg16" element="span">
-              {toggleKeyModal.selectedClient?.shaSecret}
-            </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {toggleKeyModal.selectedClient?.clientId}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={toggleKeyModal.selectedClient?.clientId as string}
+                />
+              </Stack>
+            </Stack>
+            <Stack direction="column" alignItems="stretch" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.clientSecret)}
+              </Text>
+              {refreshTokenLoading ? (
+                <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
+              ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
+                <Stack justifyContent="space-between" alignItems="center">
+                  <Text variant="reg16" element="span">
+                    {refreshTokenData.refreshSystemSecret?.clientSecret}
+                  </Text>
+                  <CopyButton
+                    copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                    copyLabel={intl.formatMessage(buttonMessages.copy)}
+                    data={
+                      refreshTokenData.refreshSystemSecret
+                        ?.clientSecret as string
+                    }
+                  />
+                </Stack>
+              ) : (
+                <ButtonLink
+                  onClick={() => {
+                    clientRefreshToken(toggleKeyModal.selectedClient?.clientId)
+                  }}
+                >
+                  {intl.formatMessage(buttonMessages.refresh)}
+                </ButtonLink>
+              )}
+            </Stack>
+            <Stack direction="column" alignItems="stretch" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.shaSecret)}
+              </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {toggleKeyModal.selectedClient?.shaSecret}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={toggleKeyModal.selectedClient?.shaSecret as string}
+                />
+              </Stack>
+            </Stack>
           </Stack>
         </ResponsiveModal>
       </Content>
@@ -411,6 +446,7 @@ export function SystemList() {
                 </Button>
               ]
         }
+        width={512}
         autoHeight={true}
         titleHeightAuto={true}
         show={showModal}
@@ -651,30 +687,57 @@ export function SystemList() {
         )}
 
         {registerSystemData?.registerSystem && (
-          <Stack alignItems="flex-start" direction="column" gap={16}>
-            <Stack alignItems="flex-start" direction="column" gap={8}>
+          <Stack alignItems="stretch" direction="column" gap={16}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientId)}
               </Text>
-              <Text variant="reg16" element="span">
-                {registerSystemData.registerSystem.system.clientId}
-              </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {registerSystemData.registerSystem.system.clientId}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={
+                    registerSystemData.registerSystem.system.clientId as string
+                  }
+                />
+              </Stack>
             </Stack>
-            <Stack alignItems="flex-start" direction="column" gap={8}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientSecret)}
               </Text>
-              <Text variant="reg16" element="span">
-                {registerSystemData.registerSystem.clientSecret}
-              </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {registerSystemData.registerSystem.clientSecret}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={
+                    registerSystemData.registerSystem.clientSecret as string
+                  }
+                />
+              </Stack>
             </Stack>
-            <Stack alignItems="flex-start" direction="column" gap={8}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.shaSecret)}
               </Text>
-              <Text variant="reg16" element="span">
-                {registerSystemData.registerSystem.system.shaSecret}
-              </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {registerSystemData.registerSystem.system.shaSecret}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={
+                    registerSystemData.registerSystem.system.shaSecret as string
+                  }
+                />
+              </Stack>
             </Stack>
           </Stack>
         )}
@@ -689,7 +752,16 @@ export function SystemList() {
           deathPermissions={deathPermissions}
           setBirthPermissions={setBirthPermissions}
           setDeathPermissions={setDeathPermissions}
-          closeModal={() => setSystemToShowPermission(undefined)}
+          closeModal={closePermissionModal}
+        />
+      )}
+
+      {systemToDelete && (
+        <DeleteSystemModal
+          system={systemToDelete}
+          loading={systemToDeleteLoading}
+          closeModal={() => setSystemToDelete(undefined)}
+          deleteSystem={deleteSystem}
         />
       )}
 
@@ -720,11 +792,23 @@ export function SystemList() {
           {intl.formatMessage(integrationMessages.updatePermissionsMsg)}
         </Toast>
       )}
+
+      {systemToDeleteData && (
+        <Toast
+          type="success"
+          id="systemToDeleteSuccess"
+          onClose={() => resetData()}
+        >
+          {intl.formatMessage(integrationMessages.deleteSystemMsg)}
+        </Toast>
+      )}
+
       {(activateSystemError ||
         deactivateSystemError ||
         registerSystemError ||
         refreshTokenError ||
-        updatePermissionsError) && (
+        updatePermissionsError ||
+        systemToDeleteError) && (
         <Toast
           type="error"
           id="toggleClientStatusToast"

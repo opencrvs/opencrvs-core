@@ -10,27 +10,27 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import { QA_ENV } from '@user-mgnt/constants'
+import {
+  createFhirPractitioner,
+  createFhirPractitionerRole,
+  postFhir
+} from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import System, {
   ISystemModel,
   WebhookPermissions
 } from '@user-mgnt/model/system'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
-import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
-import { QA_ENV } from '@user-mgnt/constants'
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
+import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
-import { unauthorized } from '@hapi/boom'
-import * as uuid from 'uuid/v4'
-import {
-  createFhirPractitioner,
-  createFhirPractitionerRole,
-  postFhir
-} from '@user-mgnt/features/createUser/service'
+import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
+import * as Joi from 'joi'
 import { pick } from 'lodash'
 import { Types } from 'mongoose'
+import * as uuid from 'uuid/v4'
 
 export enum EventType {
   Birth = 'birth',
@@ -58,7 +58,7 @@ const pickSystem = (system: ISystemModel & { _id: Types.ObjectId }) => ({
   _id: system._id.toString(),
   shaSecret: system.sha_secret,
   clientId: system.client_id,
-  webhookPermissions: system.settings.webhook.map((ite) => ({
+  settings: system.settings.webhook.map((ite) => ({
     event: ite.event,
     permissions: ite.permissions
   }))
@@ -404,7 +404,7 @@ export const SystemSchema = Joi.object({
   type: Joi.string(),
   shaSecret: Joi.string(),
   clientId: Joi.string(),
-  webhookPermissions: webHookSchema.optional()
+  settings: webHookSchema.optional()
 })
 
 export const resSystemSchema = Joi.object({
@@ -505,3 +505,26 @@ export async function refreshSystemSecretHandler(
 export const systemSecretRequestSchema = Joi.object({
   clientId: Joi.string()
 })
+
+export async function deleteSystem(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const { clientId } = request.payload as SystemClientIdPayload
+
+    const system = await System.findOneAndDelete({
+      client_id: clientId
+    })
+
+    if (system) {
+      logger.info(`System has been deleted by clientId ${clientId}`)
+      return h.response(pickSystem(system)).code(200)
+    }
+
+    return h.response(`No system found by clientId: ${clientId}`).code(404)
+  } catch (e) {
+    logger.info(e.message)
+    return h.response(e.message).code(400)
+  }
+}

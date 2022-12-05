@@ -85,7 +85,7 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      return await res.json()
+      return res.json()
     },
     async refreshSystemSecret(_, { clientId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -103,7 +103,7 @@ export const resolvers: GQLResolver = {
         throw new Error(`No user details found by given clientId`)
       }
 
-      return await res.json()
+      return res.json()
     },
     async updatePermissions(_, { setting }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -121,7 +121,25 @@ export const resolvers: GQLResolver = {
         throw new Error(`Something went wrong`)
       }
 
-      return await res.json()
+      return res.json()
+    },
+    async deleteSystem(_, { clientId }, authHeader) {
+      if (!hasScope(authHeader, 'sysadmin')) {
+        throw new Error('Only system user can delete the system')
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}deleteSystem`, {
+        method: 'POST',
+        body: JSON.stringify({ clientId: clientId }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      if (res.status !== 200) {
+        throw new Error(`No System found by given clientId`)
+      }
+
+      return res.json()
     }
   },
 

@@ -94,6 +94,7 @@ export interface GQLMutation {
   registerSystem?: GQLSystemSecret
   refreshSystemSecret?: GQLSystemSecret
   updatePermissions?: GQLSystem
+  deleteSystem?: GQLSystem
 }
 
 export interface GQLDummy {
@@ -387,7 +388,7 @@ export interface GQLSystem {
   status: GQLSystemStatus
   name: string
   type: GQLSystemType
-  webhookPermissions?: Array<GQLWebhookPermission>
+  settings?: Array<GQLWebhookPermission>
 }
 
 export interface GQLNotificationInput {
@@ -2290,6 +2291,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   registerSystem?: MutationToRegisterSystemResolver<TParent>
   refreshSystemSecret?: MutationToRefreshSystemSecretResolver<TParent>
   updatePermissions?: MutationToUpdatePermissionsResolver<TParent>
+  deleteSystem?: MutationToDeleteSystemResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2899,6 +2901,18 @@ export interface MutationToUpdatePermissionsResolver<
   (
     parent: TParent,
     args: MutationToUpdatePermissionsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToDeleteSystemArgs {
+  clientId: string
+}
+export interface MutationToDeleteSystemResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToDeleteSystemArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4128,7 +4142,7 @@ export interface GQLSystemTypeResolver<TParent = any> {
   status?: SystemToStatusResolver<TParent>
   name?: SystemToNameResolver<TParent>
   type?: SystemToTypeResolver<TParent>
-  webhookPermissions?: SystemToWebhookPermissionsResolver<TParent>
+  settings?: SystemToSettingsResolver<TParent>
 }
 
 export interface SystemTo_idResolver<TParent = any, TResult = any> {
@@ -4155,10 +4169,7 @@ export interface SystemToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SystemToWebhookPermissionsResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface SystemToSettingsResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -300,8 +300,18 @@ const messagesToDefine = {
   },
   updatePermissionsMsg: {
     id: 'integrations.updatePermissionsMsg',
-    defaultMessage: 'Permissions update successfully',
+    defaultMessage: 'Permissions updated successfully',
     description: 'Label for update permissions message'
+  },
+  deleteSystemText: {
+    id: 'integrations.deleteSystemText',
+    defaultMessage: 'This will delete the system',
+    description: 'Label for system delete description'
+  },
+  deleteSystemMsg: {
+    id: 'integrations.deleteSystemMsg',
+    defaultMessage: 'System has been deleted successfully',
+    description: 'Label for system deletion success message'
   }
 }
 
