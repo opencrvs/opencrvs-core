@@ -20,6 +20,8 @@ interface IConfigMessages
   applicationNameChangeMessage: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
+  backgroundImageChangeNotification: MessageDescriptor
+  backgroundImageFileLimitError: MessageDescriptor
   govtLogoChangeError: MessageDescriptor
   govtLogoFileLimitError: MessageDescriptor
   applicationConfigChangeError: MessageDescriptor
@@ -37,6 +39,9 @@ interface IConfigMessages
   listDetailsQsn: MessageDescriptor
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
+  loginBackgroundLabel: MessageDescriptor
+  loginImageText: MessageDescriptor
+  backgroundImageError: MessageDescriptor
   currencyLabel: MessageDescriptor
   applicationCurrencyChangeNotification: MessageDescriptor
   applicationBirthRegTargetChangeNotification: MessageDescriptor
@@ -74,6 +79,9 @@ interface IConfigMessages
   generalTabTitle: MessageDescriptor
   birthTabTitle: MessageDescriptor
   deathTabTitle: MessageDescriptor
+  imageTabTitle: MessageDescriptor
+  colourTabTitle: MessageDescriptor
+  colourTabText: MessageDescriptor
   registrationTimePeriodsGroupTitle: MessageDescriptor
   registrationFeesGroupTitle: MessageDescriptor
   eventTargetInputLabel: MessageDescriptor
@@ -133,10 +141,25 @@ const messagesToDefine: IConfigMessages = {
       'Upload the Government logo to be used on the login and form declaration. Note certificate logo is uploaded as part of the certificate template.',
     description: 'Message for government logo change modal'
   },
+  backgroundImageError: {
+    id: 'config.application.backgroundImageError',
+    defaultMessage: 'Unable to change image. Please try again.',
+    description: 'Error message for background image change'
+  },
   govtLogoChangeNotification: {
     id: 'config.application.govtLogoChangeNotification',
     defaultMessage: 'Government logo updated',
     description: 'Message for government logo change notification'
+  },
+  backgroundImageChangeNotification: {
+    id: 'config.application.backgroundImageChangeNotification',
+    defaultMessage: 'Background image updated',
+    description: 'Message for background image change notification'
+  },
+  backgroundImageFileLimitError: {
+    id: 'config.application.backgroundImageFileLimitError',
+    defaultMessage: 'Background image file must be less than 2mb',
+    description: 'Error message for large Background file'
   },
   govtLogoFileLimitError: {
     id: 'config.application.govtLogoFileLimitError',
@@ -255,6 +278,17 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.govermentLogoLabel',
     defaultMessage: 'Government logo',
     description: 'Government logo config label'
+  },
+  loginBackgroundLabel: {
+    id: 'config.application.loginBackgroundLabel',
+    defaultMessage: 'Login Background',
+    description: 'Login Background config label'
+  },
+  loginImageText: {
+    id: 'config.application.loginImageText',
+    defaultMessage:
+      'Upload an image and set how you would like it to display in the background',
+    description: 'Login Image config label'
   },
   currencyLabel: {
     id: 'config.application.currencyLabel',
@@ -424,6 +458,21 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.deathTabTitle',
     defaultMessage: 'Death',
     description: 'The title for death tab'
+  },
+  imageTabTitle: {
+    id: 'config.application.imageTabTitle',
+    defaultMessage: 'Image',
+    description: 'The title for image tab'
+  },
+  colourTabTitle: {
+    id: 'config.application.colourTabTitle',
+    defaultMessage: 'Colour',
+    description: 'The title for colour tab'
+  },
+  colourTabText: {
+    id: 'config.application.colourTabText',
+    defaultMessage: 'Hex code',
+    description: 'The title for colour tab text'
   },
   deathTabTitleExport: {
     id: 'config.application.deathTabTitleExport',

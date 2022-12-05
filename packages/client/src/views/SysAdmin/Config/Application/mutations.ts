@@ -23,6 +23,11 @@ const applicationConfigMutation = gql`
       PHONE_NUMBER_PATTERN
       HIDE_EVENT_REGISTER_INFORMATION
       ADDRESSES
+      LOGIN_BACKGROUND {
+        backgroundColor
+        backgroundImage
+        imageFit
+      }
       COUNTRY_LOGO {
         fileName
         file

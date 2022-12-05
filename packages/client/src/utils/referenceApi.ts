@@ -32,6 +32,11 @@ export interface ICountryLogo {
   fileName: string
   file: string
 }
+export interface ILoginBackground {
+  backgroundColor?: string
+  backgroundImage?: string
+  imageFit?: string
+}
 export interface ICertificateTemplateData {
   event: Event
   status: string
@@ -79,6 +84,7 @@ export interface IApplicationConfig {
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
   INTEGRATIONS?: [IIntegration]
+  LOGIN_BACKGROUND: ILoginBackground
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig

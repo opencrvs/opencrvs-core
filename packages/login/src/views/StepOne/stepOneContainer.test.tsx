@@ -43,6 +43,11 @@ describe('Login app step one', () => {
               fileName: 'dummy-file-name',
               file: 'dummy-logo'
             },
+            LOGIN_BACKGROUND: {
+              backgroundColor: 'FFF',
+              backgroundImage: '',
+              imageFit: 'FILL'
+            },
             SENTRY: '',
             LOGROCKET: ''
           }
