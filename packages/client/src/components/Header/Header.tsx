@@ -107,6 +107,11 @@ interface IProps extends RouteComponentProps {
   enableMenuSelection?: boolean
   changeTeamLocation?: () => void
   mapPerformanceClickHandler?: () => void
+  /** Sets default mobile right actions */
+  mobileRight?: {
+    icon: () => React.ReactNode
+    handler: () => void
+  }[]
 }
 
 type IFullProps = IntlShapeProps &
@@ -561,13 +566,18 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       theme
     )
 
+    const mobileHeaderActionPropsWithDefaults = {
+      mobileRight: this.props.mobileRight,
+      ...mobileHeaderActionProps
+    }
+
     return (
       <AppHeader
         id="register_app_header"
         desktopRightMenu={rightMenu}
         className={className}
         title={title}
-        {...mobileHeaderActionProps}
+        {...mobileHeaderActionPropsWithDefaults}
       />
     )
   }

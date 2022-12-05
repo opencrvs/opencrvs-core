@@ -109,7 +109,6 @@ function initWebHook(event: string) {
   }
 }
 
-/** Lists systems, allows creation of new ones and enabling or disabling existing ones. */
 export function useSystems() {
   const [systemToToggleActivation, setSystemToToggleActivation] =
     useState<System>()

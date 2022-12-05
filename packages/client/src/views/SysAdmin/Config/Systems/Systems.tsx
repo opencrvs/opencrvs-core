@@ -97,9 +97,9 @@ export function SystemList() {
       : setDeathPermissions({ event, permissions })
   }
 
-  const toggleModal = () => {
+  const toggleModal = useCallback(() => {
     setShowModal((prev) => !prev)
-  }
+  }, [])
 
   const {
     closePermissionModal,
@@ -224,7 +224,16 @@ export function SystemList() {
 
   return (
     <Frame
-      header={<Header />}
+      header={
+        <Header
+          mobileRight={[
+            {
+              icon: () => <Icon name="Plus" />,
+              handler: toggleModal
+            }
+          ]}
+        />
+      }
       navigation={<Navigation loadWorkqueueStatuses={false} />}
       skipToContentText={intl.formatMessage(
         constantsMessages.skipToMainContent
