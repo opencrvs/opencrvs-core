@@ -260,17 +260,17 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.audit.list.noDataFound'
   },
   inProgressAuditAction: {
-    defaultMessage: 'Sent declaration for review - incomplete',
+    defaultMessage: 'Sent incomplete',
     description: 'Description for incomplete declaration',
     id: 'user.profile.audit.description.inProgress'
   },
   declaredAuditAction: {
-    defaultMessage: 'Sent declaration for review - complete',
+    defaultMessage: 'Declaration started',
     description: 'Description for complete declaration',
     id: 'user.profile.audit.description.declared'
   },
   validatedAuditAction: {
-    defaultMessage: 'Sent declaration for approval',
+    defaultMessage: 'Sent for approval',
     description: 'Description for validated declaration',
     id: 'user.profile.audit.description.validated'
   },
@@ -285,12 +285,12 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.audit.description.registered'
   },
   rejectedAuditAction: {
-    defaultMessage: 'Sent declaration for updates',
+    defaultMessage: 'Rejected',
     description: 'Description for rejected declaration',
     id: 'user.profile.audit.description.rejected'
   },
   certifiedAuditAction: {
-    defaultMessage: 'Printed certificate',
+    defaultMessage: 'Certified',
     description: 'Description for certified declaration',
     id: 'user.profile.audit.description.certified'
   },
@@ -370,12 +370,12 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.auditList.usernameRequested'
   },
   passwordResetByAdmin: {
-    defaultMessage: 'Sent Password',
+    defaultMessage: 'Sent password',
     description: 'Description for sending temporal password action',
     id: 'user.profile.auditList.passwordResetByAdmin'
   },
   usernameReminderByAdmin: {
-    defaultMessage: 'Sent Username Reminder',
+    defaultMessage: 'Sent username reminder',
     description: 'Description for send username reminder audit action',
     id: 'user.profile.auditList.usernameReminderByAdmin'
   },
@@ -390,25 +390,25 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'user.profile.auditList.viewed'
   },
   reInstatedInProgressAuditAction: {
-    defaultMessage: 'Reinstated to In Progress',
+    defaultMessage: 'Reinstated to in progress',
     description:
       'Description for sending registration from Reinstated to In progress audit action',
     id: 'user.profile.auditList.reInstatedToInProgress'
   },
   reInstatedInReviewAuditAction: {
-    defaultMessage: 'Reinstated to In Review',
+    defaultMessage: 'Reinstated to ready for review',
     description:
       'Description for sending registration from Reinstated to In review audit action',
     id: 'user.profile.auditList.reInstatedToInReview'
   },
   reInStatedRejectedAuditAction: {
-    defaultMessage: 'Reinstated to Require Updates',
+    defaultMessage: 'Reinstated to requires updates',
     description:
       'Description for sending registration from Reinstated to require updates audit action',
     id: 'user.profile.auditList.reInstatedToUpdate'
   },
   sentForApprovalAuditAction: {
-    defaultMessage: 'Sent For Approval',
+    defaultMessage: 'Sent for approval',
     description:
       'Description for sending registration for approval audit action',
     id: 'user.profile.auditList.sentForApproval'
