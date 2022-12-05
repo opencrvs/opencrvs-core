@@ -140,6 +140,7 @@ input RelatedPersonInput {
   affidavit: [AttachmentInput!]
   individual: PersonInput
   exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 type RelatedPerson { # -> Related Person
@@ -150,6 +151,7 @@ type RelatedPerson { # -> Related Person
   affidavit: [Attachment] # -> .extension
   individual: Person # -> .patient.reference
   exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 input DeceasedInput {

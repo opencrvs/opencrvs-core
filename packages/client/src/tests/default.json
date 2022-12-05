@@ -1781,7 +1781,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.exactDateOfBirthUnknown"
+                      "expression": "!values.exactDateOfBirthUnknown || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)"
                     }
                   ],
                   "postfix": "years",
@@ -2325,7 +2325,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.exactDateOfBirthUnknown"
+                      "expression": "!values.exactDateOfBirthUnknown || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)"
                     }
                   ],
                   "postfix": "years",

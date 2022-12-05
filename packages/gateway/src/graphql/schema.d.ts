@@ -564,6 +564,7 @@ export interface GQLRelatedPerson {
   affidavit?: Array<GQLAttachment | null>
   individual?: GQLPerson
   exactDateOfBirthUnknown?: boolean
+  ageOfIndividualInYears?: number
 }
 
 export const enum GQLBirthType {
@@ -925,6 +926,7 @@ export interface GQLRelatedPersonInput {
   affidavit?: Array<GQLAttachmentInput>
   individual?: GQLPersonInput
   exactDateOfBirthUnknown?: boolean
+  ageOfIndividualInYears?: number
 }
 
 export interface GQLQuestionnaireQuestionInput {
@@ -4328,6 +4330,7 @@ export interface GQLRelatedPersonTypeResolver<TParent = any> {
   affidavit?: RelatedPersonToAffidavitResolver<TParent>
   individual?: RelatedPersonToIndividualResolver<TParent>
   exactDateOfBirthUnknown?: RelatedPersonToExactDateOfBirthUnknownResolver<TParent>
+  ageOfIndividualInYears?: RelatedPersonToAgeOfIndividualInYearsResolver<TParent>
 }
 
 export interface RelatedPersonToIdResolver<TParent = any, TResult = any> {
@@ -4367,6 +4370,13 @@ export interface RelatedPersonToIndividualResolver<
 }
 
 export interface RelatedPersonToExactDateOfBirthUnknownResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RelatedPersonToAgeOfIndividualInYearsResolver<
   TParent = any,
   TResult = any
 > {

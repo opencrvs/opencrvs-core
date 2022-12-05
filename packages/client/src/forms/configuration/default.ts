@@ -1426,7 +1426,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.exactDateOfBirthUnknown'
+                    expression:
+                      '!values.exactDateOfBirthUnknown || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)'
                   }
                 ],
                 postfix: 'years',
@@ -1963,7 +1964,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.exactDateOfBirthUnknown'
+                    expression:
+                      '!values.exactDateOfBirthUnknown || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)'
                   }
                 ],
                 postfix: 'years',

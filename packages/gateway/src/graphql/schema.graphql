@@ -715,6 +715,7 @@ type RelatedPerson {
   affidavit: [Attachment]
   individual: Person
   exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 enum BirthType {
@@ -1054,6 +1055,7 @@ input RelatedPersonInput {
   affidavit: [AttachmentInput!]
   individual: PersonInput
   exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 input QuestionnaireQuestionInput {
