@@ -283,7 +283,7 @@ type DeathRegistration implements EventRegistration {
   eventLocation: Location
   questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath
-  deathDescription: Stringation
+  deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeathEstablished: String
   causeOfDeath: String

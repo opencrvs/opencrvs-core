@@ -173,8 +173,6 @@ function FormConfigSettingsComponent() {
   }
 
   const handleDateOfBirthUnknown = () => {
-    // console.log(dateOfBirthUnknown, 'dateOfBirthUnknown')
-
     setDateOfBirthUnknown(!dateOfBirthUnknown)
   }
   const handleInformantSignature = () => {
