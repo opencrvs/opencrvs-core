@@ -44,7 +44,7 @@ export function useCopyToClipboard(): [copiedValue, copyFn] {
   return [copiedText, copy]
 }
 
-interface CopyProps extends React.HTMLAttributes<HTMLButtonElement> {
+export interface ICopyProps extends React.HTMLAttributes<HTMLButtonElement> {
   data: string
   copyLabel: string
   copiedLabel: string
@@ -57,7 +57,7 @@ export function CopyButton({
   copiedLabel,
   timeout = 3000,
   ...props
-}: CopyProps) {
+}: ICopyProps) {
   const [clipToCopy, setClipToCopy] = useCopyToClipboard()
   return (
     <Button
