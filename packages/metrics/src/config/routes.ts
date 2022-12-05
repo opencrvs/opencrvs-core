@@ -48,7 +48,8 @@ import {
   birthDeclarationArchivedHandler,
   deathDeclarationArchivedHandler,
   birthDeclarationReinstatedHandler,
-  deathDeclarationReinstatedHandler
+  deathDeclarationReinstatedHandler,
+  declarationUpdatedHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -356,6 +357,14 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/unassigned',
       handler: declarationUnassignedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/declaration-updated',
+      handler: declarationUpdatedHandler,
       config: {
         tags: ['api']
       }

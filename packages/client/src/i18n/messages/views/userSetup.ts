@@ -51,7 +51,7 @@ interface IUserSetupMessages
   inProgressAuditAction: MessageDescriptor
   declaredAuditAction: MessageDescriptor
   validatedAuditAction: MessageDescriptor
-  waitingForValidationAuditAction: MessageDescriptor
+  updatedAuditAction: MessageDescriptor
   registeredAuditAction: MessageDescriptor
   rejectedAuditAction: MessageDescriptor
   certifiedAuditAction: MessageDescriptor
@@ -274,10 +274,10 @@ const messagesToDefine: IUserSetupMessages = {
     description: 'Description for validated declaration',
     id: 'user.profile.audit.description.validated'
   },
-  waitingForValidationAuditAction: {
-    defaultMessage: 'Sent declaration for external system validation',
-    description: 'Description for waiting for external validation declaration',
-    id: 'user.profile.audit.description.waiting_validation'
+  updatedAuditAction: {
+    defaultMessage: 'Updated',
+    description: 'Description for updated declaration',
+    id: 'user.profile.audit.description.updated'
   },
   registeredAuditAction: {
     defaultMessage: 'Registered',

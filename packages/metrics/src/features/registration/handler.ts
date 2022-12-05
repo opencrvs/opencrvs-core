@@ -557,3 +557,10 @@ export async function deathDeclarationReinstatedHandler(
   }
   return h.response().code(200)
 }
+export async function declarationUpdatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('UPDATED', request)
+  return h.response().code(200)
+}

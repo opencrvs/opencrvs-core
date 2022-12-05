@@ -76,6 +76,7 @@ export enum Events {
   DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
   DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
+  DECLARATION_UPDATED = '/events/declaration-updated', // Registration agent or registrar updating declaration before validating/registering
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   DOWNLOADED = '/events/downloaded',
   ASSIGNED_EVENT = '/events/assigned',

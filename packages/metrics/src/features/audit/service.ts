@@ -29,6 +29,7 @@ type UserAuditAction =
   | 'REJECTED'
   | 'CORRECTED'
   | 'VALIDATED'
+  | 'UPDATED'
   | 'ASSIGNED'
   | 'UNASSIGNED'
   | 'RETRIEVED'
@@ -67,6 +68,7 @@ type UserAuditDataPoint =
   | UserAuditDataPointWithComposition<'REJECTED'>
   | UserAuditDataPointWithComposition<'CORRECTED'>
   | UserAuditDataPointWithComposition<'VALIDATED'>
+  | UserAuditDataPointWithComposition<'UPDATED'>
   | UserAuditDataPointWithComposition<'ASSIGNED'>
   | UserAuditDataPointWithComposition<'UNASSIGNED'>
   | UserAuditDataPointWithComposition<'RETRIEVED'>
