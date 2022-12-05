@@ -128,7 +128,8 @@ enum ACTIVE_MENU_ITEM {
   USERS,
   CERTIFICATE,
   APPLICATION,
-  FORM
+  FORM,
+  INTEGRATION
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
@@ -501,6 +502,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ? constantsMessages.applicationTitle
           : activeMenuItem === ACTIVE_MENU_ITEM.FORM
           ? constantsMessages.formDeclarationTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
+          ? constantsMessages.integrationTitle
           : constantsMessages.declarationTitle
       )
 
@@ -584,6 +587,8 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.APPLICATION
       : window.location.href.includes('config/form')
       ? ACTIVE_MENU_ITEM.FORM
+      : window.location.href.includes('config/integration')
+      ? ACTIVE_MENU_ITEM.INTEGRATION
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)
