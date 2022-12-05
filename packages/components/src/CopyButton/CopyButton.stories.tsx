@@ -24,12 +24,12 @@ const Template: Story<ICopyProps> = (args) => {
 }
 
 export default {
-  title: 'Data/Copy Button',
+  title: 'Controls/Copy button',
   component: CopyButton,
   parameters: {
     docs: {
       description: {
-        component: 'Copy Button is used for copying data to the clipboard.'
+        component: 'Copy button is used for copying data to the clipboard.'
       }
     }
   }

@@ -68,14 +68,14 @@ export function CopyButton({
       {clipToCopy ? (
         <>
           <Icon color="green" name="CheckSquare" />
-          <Text variant="reg16" color="green" element="span">
+          <Text variant="bold14" color="green" element="span">
             {copiedLabel}
           </Text>
         </>
       ) : (
         <>
           <Icon name="Copy" />
-          <Text variant="reg16" color="blue" element="span">
+          <Text variant="bold14" color="blue" element="span">
             {copyLabel}
           </Text>
         </>
