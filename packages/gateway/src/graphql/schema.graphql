@@ -255,6 +255,8 @@ type Mutation {
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
   refreshSystemSecret(clientId: String!): SystemSecret
+  updatePermissions(setting: UpdatePermissionsInput!): System
+  deleteSystem(clientId: ID!): System
 }
 
 type Dummy {
@@ -537,6 +539,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
+  settings: [WebhookPermission!]
 }
 
 input NotificationInput {
@@ -696,6 +699,11 @@ input SystemInput {
   name: String!
   type: SystemType!
   settings: SystemSettings
+}
+
+input UpdatePermissionsInput {
+  clientId: String!
+  webhook: [WebhookInput!]!
 }
 
 scalar Map
@@ -1008,6 +1016,12 @@ enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
+  WEBHOOK
+}
+
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
 }
 
 input PersonInput {
@@ -1181,6 +1195,12 @@ input QuestionInput {
 
 input SystemSettings {
   dailyQuota: Int
+  webhook: [WebhookInput]
+}
+
+input WebhookInput {
+  event: String!
+  permissions: [String]!
 }
 
 enum InformantType {

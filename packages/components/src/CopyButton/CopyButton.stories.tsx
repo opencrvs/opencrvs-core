@@ -1,0 +1,44 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+
+import { Meta, Story } from '@storybook/react'
+import { CopyButton, ICopyProps } from './CopyButton'
+import { Stack } from '../Stack'
+import React from 'react'
+
+const Template: Story<ICopyProps> = (args) => {
+  return (
+    <Stack>
+      <CopyButton {...args} />
+    </Stack>
+  )
+}
+
+export default {
+  title: 'Data/Copy Button',
+  component: CopyButton,
+  parameters: {
+    docs: {
+      description: {
+        component: 'Copy Button is used for copying data to the clipboard.'
+      }
+    }
+  }
+} as Meta
+
+export const Default = Template.bind({})
+Default.args = {
+  copiedLabel: 'Copied',
+  copyLabel: 'Copy',
+  data: 'Data to be copied',
+  timeout: 3000
+}

@@ -52,7 +52,6 @@ import verifySecurityAnswer, {
 import {
   registerSystem,
   reqRegisterSystemSchema,
-  resSystemSchema,
   deactivateSystem,
   reactivateSystem,
   clientIdSchema,
@@ -63,9 +62,13 @@ import {
   getSystemResponseSchema,
   getSystemHandler,
   getAllSystemsHandler,
-  SystemSchema,
+  updatePermissions,
+  reqUpdateSystemSchema,
   refreshSystemSecretHandler,
-  systemSecretRequestSchema
+  systemSecretRequestSchema,
+  resSystemSchema,
+  SystemSchema,
+  deleteSystem
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -502,6 +505,21 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/updatePermissions',
+      handler: updatePermissions,
+      config: {
+        tags: ['api'],
+        description: 'Update system permissions',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: reqUpdateSystemSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/deactivateSystem',
       handler: deactivateSystem,
       config: {
@@ -619,6 +637,25 @@ export const getRoutes = () => {
         },
         response: {
           schema: resSystemSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/deleteSystem',
+      handler: deleteSystem,
+      config: {
+        tags: ['api'],
+        description: 'Delete system ',
+        notes: 'This is responsible for system deletion',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: clientIdSchema
+        },
+        response: {
+          schema: SystemSchema
         }
       }
     }

@@ -23,9 +23,16 @@ import {
   RegisterSystemMutation,
   RegisterSystemMutationVariables,
   System,
-  SystemType
+  SystemType,
+  UpdatePermissionsMutation,
+  UpdatePermissionsMutationVariables,
+  WebhookPermission,
+  Event,
+  DeleteSystemMutation,
+  DeleteSystemMutationVariables
 } from '@client/utils/gateway'
-import { useState } from 'react'
+
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as mutations from './mutations'
 
@@ -64,7 +71,7 @@ export function useSystemsGlobalState() {
   )
   const dispatch = useDispatch()
 
-  const dispatchStatusChange = (updatedSystem: System) => {
+  const dispatchSystemUpdate = (updatedSystem: System) => {
     const systems = existingSystems.map((system) => {
       if (system.clientId === updatedSystem.clientId) {
         return updatedSystem
@@ -79,11 +86,26 @@ export function useSystemsGlobalState() {
     dispatch(updateOfflineSystems({ systems: [...existingSystems, newSystem] }))
   }
 
+  const dispatchSystemRemove = (system: System) => {
+    const systems = existingSystems.filter(
+      (ite) => ite.clientId !== system.clientId
+    )
+    dispatch(updateOfflineSystems({ systems }))
+  }
+
   return {
-    dispatchStatusChange,
+    dispatchSystemUpdate,
     dispatchNewSystem,
     existingSystems,
+    dispatchSystemRemove,
     doesNationalIdAlreadyExist
+  }
+}
+
+function initWebHook(event: string) {
+  return {
+    event: event,
+    permissions: []
   }
 }
 
@@ -101,10 +123,23 @@ export function useSystems() {
   } = useNewSystemDraft()
   const {
     dispatchNewSystem,
-    dispatchStatusChange,
+    dispatchSystemUpdate,
     existingSystems,
-    doesNationalIdAlreadyExist
+    doesNationalIdAlreadyExist,
+    dispatchSystemRemove
   } = useSystemsGlobalState()
+
+  const [birthPermissions, setBirthPermissions] = useState<WebhookPermission>(
+    initWebHook(Event.Birth)
+  )
+
+  const [deathPermissions, setDeathPermissions] = useState<WebhookPermission>(
+    initWebHook(Event.Death)
+  )
+
+  const [systemToShowPermission, setSystemToShowPermission] = useState<System>()
+
+  const [systemToDelete, setSystemToDelete] = useState<System>()
 
   const [
     activateSystemMutate,
@@ -118,7 +153,7 @@ export function useSystems() {
     mutations.activateSystem,
     {
       onCompleted: ({ reactivateSystem }) => {
-        if (reactivateSystem) dispatchStatusChange(reactivateSystem)
+        if (reactivateSystem) dispatchSystemUpdate(reactivateSystem)
         setSystemToToggleActivation(undefined)
       }
     }
@@ -135,7 +170,7 @@ export function useSystems() {
     mutations.deactivateSystem,
     {
       onCompleted: ({ deactivateSystem }) => {
-        if (deactivateSystem) dispatchStatusChange(deactivateSystem)
+        if (deactivateSystem) dispatchSystemUpdate(deactivateSystem)
         setSystemToToggleActivation(undefined)
       }
     }
@@ -179,6 +214,62 @@ export function useSystems() {
     })
   }
 
+  const [
+    updateWebhookPermissions,
+    {
+      data: updatePermissionsData,
+      loading: updatePermissionsLoading,
+      error: updatePermissionsError,
+      reset: updatePermissionsReset
+    }
+  ] = useMutation<
+    UpdatePermissionsMutation,
+    UpdatePermissionsMutationVariables
+  >(mutations.updateSystemPermissions, {
+    onCompleted: ({ updatePermissions }) => {
+      if (updatePermissions) {
+        dispatchSystemUpdate(updatePermissions)
+        setSystemToShowPermission(undefined)
+      }
+    },
+    onError: () => {
+      setSystemToShowPermission(undefined)
+    }
+  })
+
+  const [
+    deleteSystemMutate,
+    {
+      data: systemToDeleteData,
+      loading: systemToDeleteLoading,
+      error: systemToDeleteError,
+      reset: systemToDeleteReset
+    }
+  ] = useMutation<DeleteSystemMutation, DeleteSystemMutationVariables>(
+    mutations.deleteSystem,
+    {
+      onCompleted: ({ deleteSystem }) => {
+        if (deleteSystem) {
+          dispatchSystemRemove(deleteSystem)
+          setSystemToDelete(undefined)
+        }
+      }
+    }
+  )
+
+  const updatePermissions = () => {
+    if (!systemToShowPermission) return
+
+    updateWebhookPermissions({
+      variables: {
+        setting: {
+          clientId: systemToShowPermission.clientId,
+          webhook: [birthPermissions, deathPermissions]
+        }
+      }
+    })
+  }
+
   const deactivateSystem = () => {
     if (!systemToToggleActivation) return
 
@@ -205,25 +296,67 @@ export function useSystems() {
         system: {
           type: newSystemType,
           name: newClientName,
-          settings: {}
+          ...(newSystemType === 'WEBHOOK' && {
+            settings: {
+              dailyQuota: 0,
+              webhook: [birthPermissions, deathPermissions]
+            }
+          })
         }
       }
     })
   }
 
+  const deleteSystem = () => {
+    if (!systemToDelete) return
+
+    deleteSystemMutate({
+      variables: {
+        clientId: systemToDelete.clientId
+      }
+    })
+  }
   const resetData = () => {
     resetActivateSystemData()
     resetDeactivateSystemData()
     resetRegisterSystemData()
+    setDeathPermissions(initWebHook(Event.Death))
+    setBirthPermissions(initWebHook(Event.Birth))
     resetRefreshTokenData()
+    updatePermissionsReset()
+    systemToDeleteReset()
+  }
+
+  const closePermissionModal = () => {
+    setSystemToShowPermission(undefined)
+    setDeathPermissions(initWebHook(Event.Death))
+    setBirthPermissions(initWebHook(Event.Birth))
   }
 
   const shouldWarnAboutNationalId =
     newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
 
   return {
+    closePermissionModal,
+    systemToDeleteData,
+    deleteSystem,
+    systemToDelete,
+    setSystemToDelete,
+    systemToDeleteLoading,
+    systemToDeleteError,
+    updatePermissionsData,
+    updatePermissionsLoading,
+    updatePermissionsError,
+    updatePermissions,
+    systemToShowPermission,
+    setSystemToShowPermission,
+    birthPermissions,
+    setBirthPermissions,
+    deathPermissions,
+    setDeathPermissions,
     existingSystems,
     deactivateSystem,
+    dispatchSystemUpdate,
     activateSystem,
     registerSystem,
     registerSystemData,

@@ -70,6 +70,8 @@ interface IButtonsMessages
   makeCorrection: MessageDescriptor
   publish: MessageDescriptor
   add: MessageDescriptor
+  copy: MessageDescriptor
+  copied: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -370,6 +372,16 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.add',
     defaultMessage: 'Add',
     description: 'Add button text on form config'
+  },
+  copy: {
+    id: 'buttons.copy',
+    defaultMessage: 'Copy',
+    description: 'Copy button text'
+  },
+  copied: {
+    id: 'buttons.copied',
+    defaultMessage: 'Copied',
+    description: 'Copied button text'
   }
 }
 

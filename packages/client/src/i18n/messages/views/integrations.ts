@@ -153,6 +153,12 @@ const messagesToDefine = {
     description: 'Label for informant details'
   },
 
+  diseaseDetails: {
+    id: 'integrations.diseaseDetails',
+    defaultMessage: 'Disease Details',
+    description: 'Label for Disease details'
+  },
+
   registrationDetailsNoPII: {
     id: 'integrations.registrationDetailsnNoPII',
     defaultMessage: 'Registration Details (No PII)',
@@ -291,6 +297,21 @@ const messagesToDefine = {
   onlyOneNationalIdError: {
     id: 'integrations.onlyOneNationalId',
     defaultMessage: 'Only one MOSIP integration is allowed.'
+  },
+  updatePermissionsMsg: {
+    id: 'integrations.updatePermissionsMsg',
+    defaultMessage: 'Permissions updated successfully',
+    description: 'Label for update permissions message'
+  },
+  deleteSystemText: {
+    id: 'integrations.deleteSystemText',
+    defaultMessage: 'This will delete the system',
+    description: 'Label for system delete description'
+  },
+  deleteSystemMsg: {
+    id: 'integrations.deleteSystemMsg',
+    defaultMessage: 'System has been deleted successfully',
+    description: 'Label for system deletion success message'
   }
 }
 

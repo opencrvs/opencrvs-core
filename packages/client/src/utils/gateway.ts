@@ -945,6 +945,7 @@ export type Mutation = {
   createOrUpdateUser: User
   deactivateSystem?: Maybe<System>
   deleteFormDraft?: Maybe<Scalars['String']>
+  deleteSystem?: Maybe<System>
   markBirthAsCertified: Scalars['ID']
   markBirthAsRegistered: BirthRegistration
   markBirthAsValidated?: Maybe<Scalars['ID']>
@@ -969,6 +970,7 @@ export type Mutation = {
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
+  updatePermissions?: Maybe<System>
   usernameSMSReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
@@ -1034,6 +1036,10 @@ export type MutationDeactivateSystemArgs = {
 
 export type MutationDeleteFormDraftArgs = {
   formDraft: DeleteFormDraftInput
+}
+
+export type MutationDeleteSystemArgs = {
+  clientId: Scalars['ID']
 }
 
 export type MutationMarkBirthAsCertifiedArgs = {
@@ -1146,6 +1152,10 @@ export type MutationUpdateBirthRegistrationArgs = {
 export type MutationUpdateDeathRegistrationArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
+}
+
+export type MutationUpdatePermissionsArgs = {
+  setting: UpdatePermissionsInput
 }
 
 export type MutationUsernameSmsReminderArgs = {
@@ -1807,6 +1817,7 @@ export type System = {
   _id: Scalars['ID']
   clientId: Scalars['ID']
   name: Scalars['String']
+  settings?: Maybe<Array<WebhookPermission>>
   shaSecret: Scalars['ID']
   status: SystemStatus
   type: SystemType
@@ -1826,6 +1837,7 @@ export type SystemSecret = {
 
 export type SystemSettings = {
   dailyQuota?: InputMaybe<Scalars['Int']>
+  webhook?: InputMaybe<Array<InputMaybe<WebhookInput>>>
 }
 
 export enum SystemStatus {
@@ -1836,7 +1848,8 @@ export enum SystemStatus {
 export enum SystemType {
   Health = 'HEALTH',
   NationalId = 'NATIONAL_ID',
-  RecordSearch = 'RECORD_SEARCH'
+  RecordSearch = 'RECORD_SEARCH',
+  Webhook = 'WEBHOOK'
 }
 
 export type TotalMetricsResult = {
@@ -1848,6 +1861,11 @@ export type TotalMetricsResult = {
 export type TotalVsExport = {
   __typename?: 'TotalVSExport'
   results?: Maybe<Array<VsExport>>
+}
+
+export type UpdatePermissionsInput = {
+  clientId: Scalars['String']
+  webhook: Array<WebhookInput>
 }
 
 export type User = {
@@ -1939,6 +1957,17 @@ export type VerifyPasswordResult = {
   scrope?: Maybe<Array<Maybe<Scalars['String']>>>
   status?: Maybe<Scalars['String']>
   username?: Maybe<Scalars['String']>
+}
+
+export type WebhookInput = {
+  event: Scalars['String']
+  permissions: Array<InputMaybe<Scalars['String']>>
+}
+
+export type WebhookPermission = {
+  __typename?: 'WebhookPermission'
+  event: Scalars['String']
+  permissions: Array<Scalars['String']>
 }
 
 export type CreateOrUpdateCertificateSvgMutationVariables = Exact<{
@@ -5666,6 +5695,11 @@ export type RegisterSystemMutation = {
       shaSecret: string
       status: SystemStatus
       type: SystemType
+      settings?: Array<{
+        __typename?: 'WebhookPermission'
+        event: string
+        permissions: Array<string>
+      }> | null
     }
   } | null
 }
@@ -5684,6 +5718,11 @@ export type DeactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
+    settings?: Array<{
+      __typename?: 'WebhookPermission'
+      event: string
+      permissions: Array<string>
+    }> | null
   } | null
 }
 
@@ -5701,6 +5740,11 @@ export type ReactivateSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
+    settings?: Array<{
+      __typename?: 'WebhookPermission'
+      event: string
+      permissions: Array<string>
+    }> | null
   } | null
 }
 
@@ -5722,6 +5766,45 @@ export type RefreshSystemSecretMutation = {
       status: SystemStatus
       type: SystemType
     }
+  } | null
+}
+
+export type UpdatePermissionsMutationVariables = Exact<{
+  setting: UpdatePermissionsInput
+}>
+
+export type UpdatePermissionsMutation = {
+  __typename?: 'Mutation'
+  updatePermissions?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
+    settings?: Array<{
+      __typename?: 'WebhookPermission'
+      event: string
+      permissions: Array<string>
+    }> | null
+  } | null
+}
+
+export type DeleteSystemMutationVariables = Exact<{
+  clientId: Scalars['ID']
+}>
+
+export type DeleteSystemMutation = {
+  __typename?: 'Mutation'
+  deleteSystem?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
   } | null
 }
 

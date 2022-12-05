@@ -340,3 +340,64 @@ describe('refresh secret system user', () => {
     expect(res.statusCode).toBe(400)
   })
 })
+
+describe('delete system ', () => {
+  let server: any
+
+  beforeEach(async () => {
+    mockingoose.resetAll()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  it('delete system using mongoose', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(System).toReturn(mockSystem, 'findOne')
+    mockingoose(System).toReturn(mockSystem, 'findOneAndDelete')
+    mockingoose(System).toReturn({}, 'deleteOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/deleteSystem',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('return error if system is not found', async () => {
+    mockingoose(User).toReturn(null, 'findOneAndDelete')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/deleteSystem',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(404)
+  })
+
+  it('return an error if a token scope check fails', async () => {
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/deleteSystem',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${badToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(403)
+  })
+})

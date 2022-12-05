@@ -9,48 +9,57 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useCallback, useState } from 'react'
-import { Content } from '@opencrvs/components/lib/Content'
-import { useIntl } from 'react-intl'
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/ListViewSimplified'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { Navigation } from '@client/components/interface/Navigation'
 import { Header } from '@client/components/Header/Header'
-import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
+import { Navigation } from '@client/components/interface/Navigation'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { integrationMessages } from '@client/i18n/messages/views/integrations'
+import { EMPTY_STRING } from '@client/utils/constants'
+import {
+  Event,
+  System,
+  SystemStatus,
+  SystemType,
+  WebhookPermission
+} from '@client/utils/gateway'
+import { Label } from '@client/views/Settings/items/components'
+import { DeleteSystemModal } from '@client/views/SysAdmin/Config/Systems/DeleteSystemModal'
+import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal'
 import {
   Alert,
+  CheckboxGroup,
+  Divider,
   InputField,
   Link,
+  ListViewItemSimplified,
+  ListViewSimplified,
   Pill,
   Select,
   Spinner,
+  Stack,
   TextInput,
-  ToggleMenu,
   Toast,
-  Stack
-} from '@opencrvs/components/lib'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+  ToggleMenu
+} from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
-import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import styled from 'styled-components'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Content } from '@opencrvs/components/lib/Content'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
+import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { System, SystemStatus, SystemType } from '@client/utils/gateway'
+import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Text } from '@opencrvs/components/lib/Text'
+
+import React, { useCallback, useState } from 'react'
+import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 import { useSystems } from './useSystems'
+import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
 
 interface ToggleModal {
   modalVisible: boolean
   selectedClient: System | null
 }
 
-const TopText = styled(Text)`
-  margin-top: 20px;
-`
 const ButtonLink = styled(Link)`
   text-align: left;
 `
@@ -65,6 +74,13 @@ const StyledSpinner = styled(Spinner)`
 const Field = styled.div`
   margin-top: 16px;
 `
+const populatePermissions = (
+  webhooks: WebhookPermission[] = [],
+  type: string
+) => {
+  const { __typename, ...rest } = webhooks.find((ite) => ite.event === type)!
+  return rest
+}
 
 export function SystemList() {
   const intl = useIntl()
@@ -74,11 +90,12 @@ export function SystemList() {
     selectedClient: null
   })
 
-  const sysType = {
-    HEALTH: intl.formatMessage(integrationMessages.healthSystem),
-    NATIONAL_ID: intl.formatMessage(integrationMessages.mosip),
-    RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
-    WEBHOOK: intl.formatMessage(integrationMessages.webhook)
+  const [selectedTab, setSelectedTab] = React.useState(Event.Birth)
+
+  const checkboxHandler = (permissions: string[], event: Event) => {
+    event === Event.Birth
+      ? setBirthPermissions({ event, permissions })
+      : setDeathPermissions({ event, permissions })
   }
 
   const toggleModal = () => {
@@ -86,6 +103,23 @@ export function SystemList() {
   }
 
   const {
+    closePermissionModal,
+    systemToDeleteData,
+    deleteSystem,
+    systemToDelete,
+    setSystemToDelete,
+    systemToDeleteLoading,
+    systemToDeleteError,
+    updatePermissionsData,
+    updatePermissionsLoading,
+    updatePermissionsError,
+    updatePermissions,
+    systemToShowPermission,
+    setSystemToShowPermission,
+    birthPermissions,
+    setBirthPermissions,
+    deathPermissions,
+    setDeathPermissions,
     existingSystems,
     deactivateSystem,
     systemToToggleActivation,
@@ -140,6 +174,55 @@ export function SystemList() {
     [toggleKeyModal]
   )
 
+  const getMenuItems = (system: System) => {
+    const menuItems: { handler: () => void; label: string }[] = [
+      {
+        handler: () => {
+          toggleRevealKeyModal(system)
+        },
+        label: intl.formatMessage(integrationMessages.revealKeys)
+      }
+    ]
+
+    if (system.type === SystemType.Webhook) {
+      menuItems.push({
+        handler: () => {
+          setSystemToShowPermission(system)
+          setBirthPermissions(
+            populatePermissions(system.settings!, Event.Birth)
+          )
+          setDeathPermissions(
+            populatePermissions(system.settings!, Event.Death)
+          )
+        },
+        label: intl.formatMessage(buttonMessages.edit)
+      })
+    }
+
+    menuItems.push({
+      handler: () => {
+        setSystemToToggleActivation(system)
+      },
+      label: changeActiveStatusIntl(system.status)
+    })
+
+    menuItems.push({
+      handler: () => {
+        setSystemToDelete(system)
+      },
+      label: intl.formatMessage(integrationMessages.delete)
+    })
+
+    return menuItems
+  }
+
+  const sysType = {
+    HEALTH: intl.formatMessage(integrationMessages.healthSystem),
+    NATIONAL_ID: intl.formatMessage(integrationMessages.mosip),
+    RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
+    WEBHOOK: intl.formatMessage(integrationMessages.webhook)
+  }
+
   return (
     <Frame
       header={<Header />}
@@ -179,26 +262,7 @@ export function SystemList() {
 
                   <ToggleMenu
                     id="toggleMenu"
-                    menuItems={[
-                      {
-                        handler: () => {
-                          toggleRevealKeyModal(system)
-                        },
-                        label: intl.formatMessage(
-                          integrationMessages.revealKeys
-                        )
-                      },
-                      {
-                        handler: () => {
-                          setSystemToToggleActivation(system)
-                        },
-                        label: changeActiveStatusIntl(system.status)
-                      },
-                      {
-                        handler: () => {},
-                        label: intl.formatMessage(integrationMessages.delete)
-                      }
-                    ]}
+                    menuItems={getMenuItems(system)}
                     toggleButton={<VerticalThreeDots />}
                   />
                 </>
@@ -207,6 +271,7 @@ export function SystemList() {
               value={sysType[system.type]}
             />
           ))}
+
           {systemToToggleActivation && (
             <ResponsiveModal
               title={
@@ -221,7 +286,9 @@ export function SystemList() {
                   type="tertiary"
                   id="cancel"
                   key="cancel"
-                  onClick={() => setSystemToToggleActivation(undefined)}
+                  onClick={() => {
+                    setSystemToToggleActivation(undefined)
+                  }}
                 >
                   {intl.formatMessage(buttonMessages.cancel)}
                 </Button>,
@@ -261,7 +328,6 @@ export function SystemList() {
             </ResponsiveModal>
           )}
         </ListViewSimplified>
-
         <ResponsiveModal
           actions={[
             <Link
@@ -274,6 +340,7 @@ export function SystemList() {
             </Link>
           ]}
           autoHeight={true}
+          width={512}
           titleHeightAuto={true}
           show={toggleKeyModal.modalVisible}
           handleClose={() => {
@@ -282,45 +349,71 @@ export function SystemList() {
           }}
           title={toggleKeyModal.selectedClient?.name ?? ''}
         >
-          {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+          <Text variant="reg16" element="p">
+            {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
+          </Text>
 
-          <Stack direction="column" alignItems="flex-start">
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.clientId)}
-            </TopText>
-            <Text variant="reg16" element="span">
-              {toggleKeyModal.selectedClient?.clientId}
-            </Text>
-          </Stack>
-
-          <Stack direction="column" alignItems="flex-start">
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.clientSecret)}
-            </TopText>
-            {refreshTokenLoading ? (
-              <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
-            ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
-              <Text variant="reg16" element="span">
-                {refreshTokenData.refreshSystemSecret?.clientSecret}
+          <Stack alignItems="stretch" direction="column" gap={16}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.clientId)}
               </Text>
-            ) : (
-              <ButtonLink
-                onClick={() => {
-                  clientRefreshToken(toggleKeyModal.selectedClient?.clientId)
-                }}
-              >
-                {intl.formatMessage(buttonMessages.refresh)}
-              </ButtonLink>
-            )}
-          </Stack>
-
-          <Stack direction="column" alignItems="flex-start">
-            <TopText variant="bold16" element="span">
-              {intl.formatMessage(integrationMessages.shaSecret)}
-            </TopText>
-            <Text variant="reg16" element="span">
-              {toggleKeyModal.selectedClient?.shaSecret}
-            </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {toggleKeyModal.selectedClient?.clientId}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={toggleKeyModal.selectedClient?.clientId as string}
+                />
+              </Stack>
+            </Stack>
+            <Stack direction="column" alignItems="stretch" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.clientSecret)}
+              </Text>
+              {refreshTokenLoading ? (
+                <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
+              ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
+                <Stack justifyContent="space-between" alignItems="center">
+                  <Text variant="reg16" element="span">
+                    {refreshTokenData.refreshSystemSecret?.clientSecret}
+                  </Text>
+                  <CopyButton
+                    copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                    copyLabel={intl.formatMessage(buttonMessages.copy)}
+                    data={
+                      refreshTokenData.refreshSystemSecret
+                        ?.clientSecret as string
+                    }
+                  />
+                </Stack>
+              ) : (
+                <ButtonLink
+                  onClick={() => {
+                    clientRefreshToken(toggleKeyModal.selectedClient?.clientId)
+                  }}
+                >
+                  {intl.formatMessage(buttonMessages.refresh)}
+                </ButtonLink>
+              )}
+            </Stack>
+            <Stack direction="column" alignItems="stretch" gap={8}>
+              <Text variant="bold16" element="span">
+                {intl.formatMessage(integrationMessages.shaSecret)}
+              </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {toggleKeyModal.selectedClient?.shaSecret}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={toggleKeyModal.selectedClient?.shaSecret as string}
+                />
+              </Stack>
+            </Stack>
           </Stack>
         </ResponsiveModal>
       </Content>
@@ -353,6 +446,7 @@ export function SystemList() {
                 </Button>
               ]
         }
+        width={512}
         autoHeight={true}
         titleHeightAuto={true}
         show={showModal}
@@ -420,13 +514,13 @@ export function SystemList() {
                         integrationMessages.recordSearch
                       ),
                       value: SystemType.RecordSearch
-                    }
-                    /* TODO: Note, this will be amended in OCRVS-4160
+                    },
                     {
                       label: intl.formatMessage(integrationMessages.webhook),
                       value: SystemType.Webhook
-                    } */
+                    }
                   ]}
+                  id={'permissions-selectors'}
                 />
               </InputField>
             </Field>
@@ -469,8 +563,7 @@ export function SystemList() {
               </PaddedAlert>
             )}
 
-            {/* TODO: Note, webhooks will be amended in OCRVS-4160
-            clientType === 'webhook' && (
+            {newSystemType === SystemType.Webhook && (
               <>
                 <InputField
                   id="select-input"
@@ -484,29 +577,23 @@ export function SystemList() {
                 <FormTabs
                   sections={[
                     {
-                      id: WebhookOption.birth,
+                      id: Event.Birth,
                       title: intl.formatMessage(integrationMessages.birth)
                     },
                     {
-                      id: WebhookOption.death,
+                      id: Event.Death,
                       title: intl.formatMessage(integrationMessages.death)
                     }
                   ]}
                   activeTabId={selectedTab}
-                  onTabClick={(tabId) => setSelectedTab(tabId)}
+                  onTabClick={(tabId: Event) => setSelectedTab(tabId)}
                 />
                 <Divider />
-                {selectedTab === WebhookOption.birth ? (
+                {selectedTab === Event.Birth ? (
                   <>
                     <CheckboxGroup
                       id="test-checkbox-group1"
                       options={[
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.registrationDetails
-                          ),
-                          value: 'registration-details'
-                        },
                         {
                           label: intl.formatMessage(
                             integrationMessages.childDetails
@@ -533,74 +620,52 @@ export function SystemList() {
                         }
                       ]}
                       name="test-checkbox-group1"
-                      value={selectedItems}
+                      value={birthPermissions.permissions ?? []}
                       onChange={(newValue) => {
-                        setSelectedItems(newValue)
+                        checkboxHandler(newValue, Event.Birth)
                       }}
                     />
-                    <Divider />
-
-                    {NoPII && (
-                      <CheckboxGroup
-                        id="test-checkbox-group1"
-                        options={[
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.registrationDetailsNoPII
-                            ),
-                            value: 'registration-details-noPII'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.childDetailsNoPII
-                            ),
-                            value: 'child-details-noPII'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.motherDetailsNoPII
-                            ),
-                            value: 'mothers-details-noPII'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.fatherDetailsNoPII
-                            ),
-                            value: 'fathers-details-noPII'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.informantDetailsNoPII
-                            ),
-                            value: 'informant-details-noPII'
-                          }
-                        ]}
-                        name="test-checkbox-group1"
-                        value={selectedItemsNoPII}
-                        onChange={(newValue) => setSelectedItemsNoPII(newValue)}
-                      />
-                    )}
-
-                    <Stack
-                      alignItems="center"
-                      direction="row"
-                      gap={8}
-                      justifyContent="flex-start"
-                    >
-                      <Toggle
-                        defaultChecked={!NoPII}
-                        onChange={toggleOnChange}
-                      />
-                      <div>
-                        {intl.formatMessage(integrationMessages.PIIDataLabel)}
-                      </div>
-                    </Stack>
                   </>
                 ) : (
-                  <></>
+                  <>
+                    <CheckboxGroup
+                      id="test-checkbox-group2"
+                      options={[
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.motherDetails
+                          ),
+                          value: 'mothers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.fatherDetails
+                          ),
+                          value: 'fathers-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.informantDetails
+                          ),
+                          value: 'informant-details'
+                        },
+                        {
+                          label: intl.formatMessage(
+                            integrationMessages.diseaseDetails
+                          ),
+                          value: 'disease-details'
+                        }
+                      ]}
+                      name="test-checkbox-group1"
+                      value={deathPermissions.permissions ?? []}
+                      onChange={(newValue) => {
+                        checkboxHandler(newValue, Event.Death)
+                      }}
+                    />
+                  </>
                 )}
               </>
-                )*/}
+            )}
           </>
         )}
 
@@ -622,39 +687,88 @@ export function SystemList() {
         )}
 
         {registerSystemData?.registerSystem && (
-          <Stack alignItems="flex-start" direction="column" gap={16}>
-            <Stack alignItems="flex-start" direction="column" gap={8}>
+          <Stack alignItems="stretch" direction="column" gap={16}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientId)}
               </Text>
-              <Text variant="reg16" element="span">
-                {registerSystemData.registerSystem.system.clientId}
-              </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {registerSystemData.registerSystem.system.clientId}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={
+                    registerSystemData.registerSystem.system.clientId as string
+                  }
+                />
+              </Stack>
             </Stack>
-            <Stack alignItems="flex-start" direction="column" gap={8}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientSecret)}
               </Text>
-              <Text variant="reg16" element="span">
-                {registerSystemData.registerSystem.clientSecret}
-              </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {registerSystemData.registerSystem.clientSecret}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={
+                    registerSystemData.registerSystem.clientSecret as string
+                  }
+                />
+              </Stack>
             </Stack>
-            <Stack alignItems="flex-start" direction="column" gap={8}>
+            <Stack alignItems="stretch" direction="column" gap={8}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.shaSecret)}
               </Text>
-              <Text variant="reg16" element="span">
-                {registerSystemData.registerSystem.system.shaSecret}
-              </Text>
+              <Stack justifyContent="space-between" alignItems="center">
+                <Text variant="reg16" element="span">
+                  {registerSystemData.registerSystem.system.shaSecret}
+                </Text>
+                <CopyButton
+                  copiedLabel={intl.formatMessage(buttonMessages.copied)}
+                  copyLabel={intl.formatMessage(buttonMessages.copy)}
+                  data={
+                    registerSystemData.registerSystem.system.shaSecret as string
+                  }
+                />
+              </Stack>
             </Stack>
           </Stack>
         )}
       </ResponsiveModal>
 
+      {systemToShowPermission && (
+        <WebhookModal
+          system={systemToShowPermission}
+          loading={updatePermissionsLoading}
+          updatePermissions={updatePermissions}
+          birthPermissions={birthPermissions}
+          deathPermissions={deathPermissions}
+          setBirthPermissions={setBirthPermissions}
+          setDeathPermissions={setDeathPermissions}
+          closeModal={closePermissionModal}
+        />
+      )}
+
+      {systemToDelete && (
+        <DeleteSystemModal
+          system={systemToDelete}
+          loading={systemToDeleteLoading}
+          closeModal={() => setSystemToDelete(undefined)}
+          deleteSystem={deleteSystem}
+        />
+      )}
+
       {activateSystemData && (
         <Toast
           type="success"
-          id="toggleClientStatusToast"
+          id="toggleClientActiveStatusToast"
           onClose={() => resetData()}
         >
           {intl.formatMessage(integrationMessages.activateClientStatus)}
@@ -663,16 +777,38 @@ export function SystemList() {
       {deactivateSystemData && (
         <Toast
           type="success"
-          id="toggleClientStatusToast"
+          id="toggleClientDeActiveStatusToast"
           onClose={() => resetData()}
         >
           {intl.formatMessage(integrationMessages.deactivateClientStatus)}
         </Toast>
       )}
+      {updatePermissionsData && (
+        <Toast
+          type="success"
+          id="updaPermissionsSuccess"
+          onClose={() => resetData()}
+        >
+          {intl.formatMessage(integrationMessages.updatePermissionsMsg)}
+        </Toast>
+      )}
+
+      {systemToDeleteData && (
+        <Toast
+          type="success"
+          id="systemToDeleteSuccess"
+          onClose={() => resetData()}
+        >
+          {intl.formatMessage(integrationMessages.deleteSystemMsg)}
+        </Toast>
+      )}
+
       {(activateSystemError ||
         deactivateSystemError ||
         registerSystemError ||
-        refreshTokenError) && (
+        refreshTokenError ||
+        updatePermissionsError ||
+        systemToDeleteError) && (
         <Toast
           type="error"
           id="toggleClientStatusToast"

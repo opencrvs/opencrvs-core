@@ -26,6 +26,7 @@ enum SystemType {
   NATIONAL_ID
   HEALTH
   RECORD_SEARCH
+  WEBHOOK
 }
 
 type System {
@@ -35,6 +36,7 @@ type System {
   status: SystemStatus!
   name: String!
   type: SystemType!
+  settings: [WebhookPermission!]
 }
 
 type SystemSecret {
@@ -42,8 +44,19 @@ type SystemSecret {
   clientSecret: ID!
 }
 
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
+}
+
+input WebhookInput {
+  event: String!
+  permissions: [String]!
+}
+
 input SystemSettings {
   dailyQuota: Int
+  webhook: [WebhookInput]
 }
 input SystemInput {
   name: String!
@@ -51,11 +64,9 @@ input SystemInput {
   settings: SystemSettings
 }
 
-type RefreshSystemClientSecret {
-  name: String!
+input UpdatePermissionsInput {
   clientId: String!
-  shaSecret: String!
-  clientSecret: String!
+  webhook: [WebhookInput!]!
 }
 
 type Query {
@@ -67,4 +78,6 @@ type Mutation {
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
   refreshSystemSecret(clientId: String!): SystemSecret
+  updatePermissions(setting: UpdatePermissionsInput!): System
+  deleteSystem(clientId: ID!): System
 }

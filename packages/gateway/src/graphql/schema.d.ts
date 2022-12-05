@@ -93,6 +93,8 @@ export interface GQLMutation {
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
   refreshSystemSecret?: GQLSystemSecret
+  updatePermissions?: GQLSystem
+  deleteSystem?: GQLSystem
 }
 
 export interface GQLDummy {
@@ -386,6 +388,7 @@ export interface GQLSystem {
   status: GQLSystemStatus
   name: string
   type: GQLSystemType
+  settings?: Array<GQLWebhookPermission>
 }
 
 export interface GQLNotificationInput {
@@ -545,6 +548,11 @@ export interface GQLSystemInput {
   name: string
   type: GQLSystemType
   settings?: GQLSystemSettings
+}
+
+export interface GQLUpdatePermissionsInput {
+  clientId: string
+  webhook: Array<GQLWebhookInput>
 }
 
 export type GQLMap = any
@@ -878,7 +886,13 @@ export const enum GQLSystemStatus {
 export const enum GQLSystemType {
   NATIONAL_ID = 'NATIONAL_ID',
   HEALTH = 'HEALTH',
-  RECORD_SEARCH = 'RECORD_SEARCH'
+  RECORD_SEARCH = 'RECORD_SEARCH',
+  WEBHOOK = 'WEBHOOK'
+}
+
+export interface GQLWebhookPermission {
+  event: string
+  permissions: Array<string>
 }
 
 export interface GQLPersonInput {
@@ -1052,6 +1066,12 @@ export interface GQLQuestionInput {
 
 export interface GQLSystemSettings {
   dailyQuota?: number
+  webhook?: Array<GQLWebhookInput | null>
+}
+
+export interface GQLWebhookInput {
+  event: string
+  permissions: Array<string | null>
 }
 
 export const enum GQLInformantType {
@@ -1536,6 +1556,7 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
+  WebhookPermission?: GQLWebhookPermissionTypeResolver
   Birth?: GQLBirthTypeResolver
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
@@ -2269,6 +2290,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>
   refreshSystemSecret?: MutationToRefreshSystemSecretResolver<TParent>
+  updatePermissions?: MutationToUpdatePermissionsResolver<TParent>
+  deleteSystem?: MutationToDeleteSystemResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2863,6 +2886,33 @@ export interface MutationToRefreshSystemSecretResolver<
   (
     parent: TParent,
     args: MutationToRefreshSystemSecretArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpdatePermissionsArgs {
+  setting: GQLUpdatePermissionsInput
+}
+export interface MutationToUpdatePermissionsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToUpdatePermissionsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToDeleteSystemArgs {
+  clientId: string
+}
+export interface MutationToDeleteSystemResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToDeleteSystemArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4092,6 +4142,7 @@ export interface GQLSystemTypeResolver<TParent = any> {
   status?: SystemToStatusResolver<TParent>
   name?: SystemToNameResolver<TParent>
   type?: SystemToTypeResolver<TParent>
+  settings?: SystemToSettingsResolver<TParent>
 }
 
 export interface SystemTo_idResolver<TParent = any, TResult = any> {
@@ -4115,6 +4166,10 @@ export interface SystemToNameResolver<TParent = any, TResult = any> {
 }
 
 export interface SystemToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SystemToSettingsResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5184,6 +5239,25 @@ export interface DraftHistoryToCommentResolver<TParent = any, TResult = any> {
 }
 
 export interface DraftHistoryToUpdatedAtResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLWebhookPermissionTypeResolver<TParent = any> {
+  event?: WebhookPermissionToEventResolver<TParent>
+  permissions?: WebhookPermissionToPermissionsResolver<TParent>
+}
+
+export interface WebhookPermissionToEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface WebhookPermissionToPermissionsResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

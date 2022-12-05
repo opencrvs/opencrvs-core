@@ -10,33 +10,45 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { logger } from '@user-mgnt/logger'
-import System, { ISystemModel } from '@user-mgnt/model/system'
-import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
-import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
-import { QA_ENV } from '@user-mgnt/constants'
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
-import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { unauthorized } from '@hapi/boom'
-import * as uuid from 'uuid/v4'
+import * as Hapi from '@hapi/hapi'
+import { QA_ENV } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
+import { logger } from '@user-mgnt/logger'
+import System, {
+  ISystemModel,
+  WebhookPermissions
+} from '@user-mgnt/model/system'
+import User, { IUserModel } from '@user-mgnt/model/user'
+import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
+import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
+import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
+import * as Joi from 'joi'
 import { pick } from 'lodash'
 import { Types } from 'mongoose'
+import * as uuid from 'uuid/v4'
 
-type SystemType = 'HEALTH' | 'RECORD_SEARCH' | 'NATIONAL_ID'
+export enum EventType {
+  Birth = 'birth',
+  Death = 'death'
+}
+
+interface WebHookPayload {
+  event: EventType
+  permissions: WebhookPermissions[]
+}
 
 interface IRegisterSystemPayload {
   name: string
-  type: SystemType
-  settings?: {
-    dailyQuota?: number
+  settings: {
+    dailyQuota: number
+    webhook: WebHookPayload[]
   }
+  type: string
 }
 
 /** Returns a curated System with only the params we want to expose */
@@ -45,7 +57,11 @@ const pickSystem = (system: ISystemModel & { _id: Types.ObjectId }) => ({
   // TODO: client_id and sha_secret should be camelCased in the Mongoose-model
   _id: system._id.toString(),
   shaSecret: system.sha_secret,
-  clientId: system.client_id
+  clientId: system.client_id,
+  settings: system.settings.webhook.map((ite) => ({
+    event: ite.event,
+    permissions: ite.permissions
+  }))
 })
 
 export async function registerSystem(
@@ -54,6 +70,10 @@ export async function registerSystem(
 ) {
   const { name, settings, type } = request.payload as IRegisterSystemPayload
   try {
+    if (type === types.WEBHOOK && !settings) {
+      logger.error('Webhook payloads are required !')
+      return h.response('Webhook payloads are required !').code(400)
+    }
     const token: ITokenPayload = getTokenPayload(
       request.headers.authorization.split(' ')[1]
     )
@@ -112,6 +132,33 @@ export async function registerSystem(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
+
+    if (type === types.WEBHOOK) {
+      const systemDetails = {
+        client_id,
+        name: name || systemAdminUser.username,
+        createdBy: userId,
+        username: systemAdminUser.username,
+        status: statuses.ACTIVE,
+        scope: systemScopes,
+        practitionerId,
+        secretHash: hash,
+        salt,
+        sha_secret,
+        settings,
+        type
+      }
+      const newSystem = await System.create(systemDetails)
+
+      return h
+        .response({
+          // NOTE! Client secret is visible for only this response and then forever gone
+          clientSecret,
+          system: pickSystem(newSystem)
+        })
+        .code(201)
+    }
+
     const systemDetails = {
       client_id,
       name: name || systemAdminUser.username,
@@ -123,7 +170,6 @@ export async function registerSystem(
       secretHash: hash,
       salt,
       sha_secret,
-      settings,
       type
     }
     const newSystem = await System.create(systemDetails)
@@ -141,14 +187,6 @@ export async function registerSystem(
     return h.response().code(400)
   }
 }
-
-export const reqRegisterSystemSchema = Joi.object({
-  type: Joi.string().required(),
-  name: Joi.string(),
-  settings: Joi.object({
-    dailyQuota: Joi.number()
-  })
-})
 
 interface SystemClientIdPayload {
   clientId: string
@@ -352,18 +390,76 @@ export const clientIdSchema = Joi.object({
   clientId: Joi.string()
 })
 
+const webHookSchema = Joi.array().items(
+  Joi.object({
+    event: Joi.string().required(),
+    permissions: Joi.array()
+  })
+)
+
 export const SystemSchema = Joi.object({
   _id: Joi.string(),
   name: Joi.string(),
   status: Joi.string(),
   type: Joi.string(),
   shaSecret: Joi.string(),
-  clientId: Joi.string()
+  clientId: Joi.string(),
+  settings: webHookSchema.optional()
 })
 
 export const resSystemSchema = Joi.object({
   clientSecret: Joi.string().uuid(),
   system: SystemSchema
+})
+
+interface IUpdateSystemPayload {
+  clientId: string
+  webhook: WebHookPayload[]
+}
+
+export async function updatePermissions(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const { clientId, webhook } = request.payload as IUpdateSystemPayload
+
+    const existingSystem: ISystemModel | null = await System.findOne({
+      client_id: clientId
+    })
+
+    if (!existingSystem) {
+      logger.error('No system client is found !')
+      return h.response('No system client is found').code(404)
+    }
+    existingSystem.settings.webhook = webhook
+    const newSystem = await System.findOneAndUpdate(
+      { client_id: clientId },
+      existingSystem,
+      {
+        new: true
+      }
+    )
+
+    return h.response(pickSystem(newSystem!)).code(200)
+  } catch (err) {
+    logger.error(err)
+    return h.response(err.message).code(400)
+  }
+}
+
+export const reqUpdateSystemSchema = Joi.object({
+  clientId: Joi.string().required(),
+  webhook: webHookSchema.required()
+})
+
+export const reqRegisterSystemSchema = Joi.object({
+  type: Joi.string().required(),
+  name: Joi.string().required(),
+  settings: Joi.object({
+    dailyQuota: Joi.number(),
+    webhook: webHookSchema
+  }).optional()
 })
 
 export async function refreshSystemSecretHandler(
@@ -409,3 +505,26 @@ export async function refreshSystemSecretHandler(
 export const systemSecretRequestSchema = Joi.object({
   clientId: Joi.string()
 })
+
+export async function deleteSystem(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const { clientId } = request.payload as SystemClientIdPayload
+
+    const system = await System.findOneAndDelete({
+      client_id: clientId
+    })
+
+    if (system) {
+      logger.info(`System has been deleted by clientId ${clientId}`)
+      return h.response(pickSystem(system)).code(200)
+    }
+
+    return h.response(`No system found by clientId: ${clientId}`).code(404)
+  } catch (e) {
+    logger.info(e.message)
+    return h.response(e.message).code(400)
+  }
+}
