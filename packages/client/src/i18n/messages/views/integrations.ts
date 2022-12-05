@@ -226,12 +226,12 @@ const messagesToDefine = {
 
   clientSecret: {
     id: 'integrations.clientSecret',
-    defaultMessage: 'Client Secret',
+    defaultMessage: 'Client secret',
     description: 'Label for client secret'
   },
   shaSecret: {
     id: 'integrations.shaSecret',
-    defaultMessage: 'SHA Secret',
+    defaultMessage: 'SHA secret',
     description: 'Label for SHA secret'
   },
   active: {
@@ -305,7 +305,8 @@ const messagesToDefine = {
   },
   deleteSystemText: {
     id: 'integrations.deleteSystemText',
-    defaultMessage: 'This will delete the system',
+    defaultMessage:
+      'Are you sure you want to <b>permanently</b> delete the integration?',
     description: 'Label for system delete description'
   },
   deleteSystemMsg: {

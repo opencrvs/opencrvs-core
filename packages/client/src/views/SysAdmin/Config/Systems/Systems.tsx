@@ -27,7 +27,6 @@ import { WebhookModal } from '@client/views/SysAdmin/Config/Systems/WebhookModal
 import {
   Alert,
   CheckboxGroup,
-  Divider,
   InputField,
   Link,
   ListViewItemSimplified,
@@ -564,107 +563,106 @@ export function SystemList() {
             )}
 
             {newSystemType === SystemType.Webhook && (
-              <>
+              <Field>
                 <InputField
                   id="select-input"
                   touched={false}
                   label={intl.formatMessage(integrationMessages.label)}
                 >
-                  <Label>
-                    {intl.formatMessage(integrationMessages.webhookDescription)}
-                  </Label>
+                  <div>
+                    <Label>
+                      {intl.formatMessage(
+                        integrationMessages.webhookDescription
+                      )}
+                    </Label>
+                    <FormTabs
+                      sections={[
+                        {
+                          id: Event.Birth,
+                          title: intl.formatMessage(integrationMessages.birth)
+                        },
+                        {
+                          id: Event.Death,
+                          title: intl.formatMessage(integrationMessages.death)
+                        }
+                      ]}
+                      activeTabId={selectedTab}
+                      onTabClick={(tabId: Event) => setSelectedTab(tabId)}
+                    />
+                    {selectedTab === Event.Birth ? (
+                      <CheckboxGroup
+                        id="test-checkbox-group1"
+                        options={[
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.childDetails
+                            ),
+                            value: 'child-details'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.motherDetails
+                            ),
+                            value: 'mothers-details'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.fatherDetails
+                            ),
+                            value: 'fathers-details'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.informantDetails
+                            ),
+                            value: 'informant-details'
+                          }
+                        ]}
+                        name="test-checkbox-group1"
+                        value={birthPermissions.permissions ?? []}
+                        onChange={(newValue) => {
+                          checkboxHandler(newValue, Event.Birth)
+                        }}
+                      />
+                    ) : (
+                      <CheckboxGroup
+                        id="test-checkbox-group2"
+                        options={[
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.motherDetails
+                            ),
+                            value: 'mothers-details'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.fatherDetails
+                            ),
+                            value: 'fathers-details'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.informantDetails
+                            ),
+                            value: 'informant-details'
+                          },
+                          {
+                            label: intl.formatMessage(
+                              integrationMessages.diseaseDetails
+                            ),
+                            value: 'disease-details'
+                          }
+                        ]}
+                        name="test-checkbox-group1"
+                        value={deathPermissions.permissions ?? []}
+                        onChange={(newValue) => {
+                          checkboxHandler(newValue, Event.Death)
+                        }}
+                      />
+                    )}
+                  </div>
                 </InputField>
-                <FormTabs
-                  sections={[
-                    {
-                      id: Event.Birth,
-                      title: intl.formatMessage(integrationMessages.birth)
-                    },
-                    {
-                      id: Event.Death,
-                      title: intl.formatMessage(integrationMessages.death)
-                    }
-                  ]}
-                  activeTabId={selectedTab}
-                  onTabClick={(tabId: Event) => setSelectedTab(tabId)}
-                />
-                <Divider />
-                {selectedTab === Event.Birth ? (
-                  <>
-                    <CheckboxGroup
-                      id="test-checkbox-group1"
-                      options={[
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.childDetails
-                          ),
-                          value: 'child-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.motherDetails
-                          ),
-                          value: 'mothers-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.fatherDetails
-                          ),
-                          value: 'fathers-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.informantDetails
-                          ),
-                          value: 'informant-details'
-                        }
-                      ]}
-                      name="test-checkbox-group1"
-                      value={birthPermissions.permissions ?? []}
-                      onChange={(newValue) => {
-                        checkboxHandler(newValue, Event.Birth)
-                      }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <CheckboxGroup
-                      id="test-checkbox-group2"
-                      options={[
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.motherDetails
-                          ),
-                          value: 'mothers-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.fatherDetails
-                          ),
-                          value: 'fathers-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.informantDetails
-                          ),
-                          value: 'informant-details'
-                        },
-                        {
-                          label: intl.formatMessage(
-                            integrationMessages.diseaseDetails
-                          ),
-                          value: 'disease-details'
-                        }
-                      ]}
-                      name="test-checkbox-group1"
-                      value={deathPermissions.permissions ?? []}
-                      onChange={(newValue) => {
-                        checkboxHandler(newValue, Event.Death)
-                      }}
-                    />
-                  </>
-                )}
-              </>
+              </Field>
             )}
           </>
         )}
@@ -688,7 +686,7 @@ export function SystemList() {
 
         {registerSystemData?.registerSystem && (
           <Stack alignItems="stretch" direction="column" gap={16}>
-            <Stack alignItems="stretch" direction="column" gap={8}>
+            <Stack alignItems="stretch" direction="column" gap={4}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientId)}
               </Text>
@@ -705,7 +703,7 @@ export function SystemList() {
                 />
               </Stack>
             </Stack>
-            <Stack alignItems="stretch" direction="column" gap={8}>
+            <Stack alignItems="stretch" direction="column" gap={4}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.clientSecret)}
               </Text>
@@ -722,7 +720,7 @@ export function SystemList() {
                 />
               </Stack>
             </Stack>
-            <Stack alignItems="stretch" direction="column" gap={8}>
+            <Stack alignItems="stretch" direction="column" gap={4}>
               <Text variant="bold16" element="span">
                 {intl.formatMessage(integrationMessages.shaSecret)}
               </Text>

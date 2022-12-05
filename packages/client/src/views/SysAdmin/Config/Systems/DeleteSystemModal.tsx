@@ -13,20 +13,11 @@ import { useIntl } from 'react-intl'
 
 import { buttonMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import {
-  System,
-  WebhookPermission,
-  Event,
-  SystemStatus
-} from '@client/utils/gateway'
-import {
-  CheckboxGroup,
-  Divider,
-  FormTabs,
-  ResponsiveModal
-} from '@opencrvs/components'
+import { System } from '@client/utils/gateway'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Button } from '@opencrvs/components/lib/Button'
-import React, { useState } from 'react'
+import { Text } from '@opencrvs/components/lib/Text'
+import React from 'react'
 
 interface ISystemProps {
   system: System
@@ -47,7 +38,7 @@ export function DeleteSystemModal({
     <>
       <ResponsiveModal
         title={system.name}
-        contentHeight={50}
+        contentHeight={70}
         responsive={false}
         actions={[
           <Button
@@ -61,21 +52,25 @@ export function DeleteSystemModal({
             {intl.formatMessage(buttonMessages.cancel)}
           </Button>,
           <Button
-            type="primary"
-            key="confirm"
-            id="confirm"
+            type="negative"
+            key="delete"
+            id="delete"
             loading={loading}
             onClick={() => {
               deleteSystem()
             }}
           >
-            {intl.formatMessage(buttonMessages.confirm)}
+            {intl.formatMessage(buttonMessages.delete)}
           </Button>
         ]}
         show={true}
         handleClose={() => closeModal()}
       >
-        {intl.formatMessage(integrationMessages.deleteSystemText)}
+        <Text variant="reg16" element="span">
+          {intl.formatMessage(integrationMessages.deleteSystemText, {
+            b: (chunks) => <strong>{chunks}</strong>
+          })}
+        </Text>
       </ResponsiveModal>
     </>
   )

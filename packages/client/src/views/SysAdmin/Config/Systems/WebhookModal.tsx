@@ -14,12 +14,7 @@ import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { System, WebhookPermission, Event } from '@client/utils/gateway'
-import {
-  CheckboxGroup,
-  Divider,
-  FormTabs,
-  ResponsiveModal
-} from '@opencrvs/components'
+import { CheckboxGroup, FormTabs, ResponsiveModal } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import React, { useState } from 'react'
 
@@ -85,7 +80,6 @@ export function WebhookModal({
             activeTabId={selectedTab}
             onTabClick={(tabId: Event) => setSelectedTab(tabId)}
           />
-          <Divider />
           {selectedTab === Event.Birth ? (
             <>
               <CheckboxGroup
