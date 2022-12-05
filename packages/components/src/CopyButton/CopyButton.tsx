@@ -11,9 +11,9 @@
  */
 
 import React, { useState } from 'react'
-import { Text } from '@opencrvs/components/lib/Text'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
+import { Text } from '../Text'
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 
 type copiedValue = string | null
 type copyFn = (text: string, time: number | null) => Promise<boolean>
