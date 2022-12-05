@@ -282,16 +282,16 @@ export const registerForms: IDefaultRegisterForms = {
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
+                    value: 'MATERNITY_HOME',
+                    label: formMessageDescriptors.maternityHome
+                  },
+                  {
                     value: 'HEALTH_FACILITY',
-                    label: formMessageDescriptors.healthInstitution
+                    label: formMessageDescriptors.hospital
                   },
                   {
                     value: 'PRIVATE_HOME',
                     label: formMessageDescriptors.privateHome
-                  },
-                  {
-                    value: 'TRADITIONAL_DOCTORS',
-                    label: formMessageDescriptors.placeOfBirthTraditionalDoctors
                   },
                   {
                     value: 'CAR_TAXI',
@@ -321,6 +321,19 @@ export const registerForms: IDefaultRegisterForms = {
                     value: 'TRADITIONAL_MATERNITY_HOMES',
                     label:
                       formMessageDescriptors.placeOfBirthTraditionalMaternityHomes
+                  },
+                  {
+                    value: 'TRADITIONAL_DOCTORS',
+                    label: formMessageDescriptors.placeOfBirthTraditionalDoctors
+                  },
+                  {
+                    value: 'TRADITIONAL_HERBALIST',
+                    label:
+                      formMessageDescriptors.placeOfBirthTraditionalHerbalist
+                  },
+                  {
+                    value: 'SPIRITUAL_HOMES',
+                    label: formMessageDescriptors.placeOfBirthSpiritualHomes
                   },
                   {
                     value: 'OTHER',

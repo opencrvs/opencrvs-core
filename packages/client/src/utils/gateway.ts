@@ -841,6 +841,9 @@ export type LocationStatisticsResponse = {
 }
 
 export enum LocationType {
+  TraditionalHerbalist = 'TRADITIONAL_HERBALIST',
+  SpiritualHomes = 'SPIRITUAL_HOMES',
+  MaternityHome = 'MATERNITY_HOME',
   AdminStructure = 'ADMIN_STRUCTURE',
   Aeroplane = 'AEROPLANE',
   Bus = 'BUS',

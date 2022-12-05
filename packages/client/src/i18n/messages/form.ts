@@ -3077,6 +3077,11 @@ export const formMessageDescriptors = {
     description: 'Label for given name text input',
     id: 'form.field.label.print.otherPersonGivenNames'
   },
+  maternityHome: {
+    defaultMessage: 'Maternity Home',
+    description: 'Select item for Maternity Home',
+    id: 'form.field.label.maternityHome'
+  },
   healthInstitution: {
     defaultMessage: 'Health Institution',
     description: 'Select item for Health Institution',
@@ -3410,10 +3415,21 @@ export const formMessageDescriptors = {
     id: 'form.field.label.placeOfBirth'
   },
   placeOfBirthTraditionalDoctors: {
-    defaultMessage: 'Traditional Doctors',
+    defaultMessage: 'Traditional Birth Attendant',
     description:
-      'Label for place of delivery other option "Traditional Doctors"',
+      'Label for place of delivery other option "Traditional Birth Attendant"',
     id: 'form.field.label.placeOfBirth.traditionalDoctors'
+  },
+  placeOfBirthTraditionalHerbalist: {
+    defaultMessage: 'Traditional Herbalist',
+    description:
+      'Label for place of delivery other option "Traditional Herbalist"',
+    id: 'form.field.label.placeOfBirth.TraditionalHerbalist'
+  },
+  placeOfBirthSpiritualHomes: {
+    defaultMessage: 'Spiritual Homes',
+    description: 'Label for place of delivery other option "Spiritual Homes"',
+    id: 'form.field.label.placeOfBirth.SpiritualHomes'
   },
   placeOfBirthCarTaxi: {
     defaultMessage: 'Car/Taxi',
