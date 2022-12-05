@@ -348,11 +348,39 @@ export function RegistrationsReport({
               {
                 <TotalDisplayWithPercentage
                   total={calculateTotal(
+                    data.results.filter((x) =>
+                      ['HEALTH_FACILITY', 'HOSPITAL'].includes(
+                        x.eventLocationType
+                      )
+                    )
+                  )}
+                  ofNumber={calculateTotal(data.results)}
+                />
+              }
+            </PerformanceValue>
+          </div>
+        }
+      />
+      <ListViewItemSimplified
+        label={
+          <PerformanceTitle>
+            {intl.formatMessage(messages.performanceOtherBirth)}
+          </PerformanceTitle>
+        }
+        value={
+          <div>
+            <PerformanceValue>
+              {
+                <TotalDisplayWithPercentage
+                  total={calculateTotal(
                     data.results.filter(
                       (x) =>
-                        !['DECEASED_USUAL_RESIDENCE', 'PRIVATE_HOME'].includes(
-                          x.eventLocationType
-                        )
+                        ![
+                          'DECEASED_USUAL_RESIDENCE',
+                          'PRIVATE_HOME',
+                          'HEALTH_FACILITY',
+                          'HOSPITAL'
+                        ].includes(x.eventLocationType)
                     )
                   )}
                   ofNumber={calculateTotal(data.results)}

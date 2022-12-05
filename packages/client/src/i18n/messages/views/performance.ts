@@ -79,6 +79,11 @@ const messagesToDefine = {
     defaultMessage: 'Health facility birth',
     description: 'Label text for display showing health facility births'
   },
+  performanceOtherBirth: {
+    id: 'performance.values.labels.birth.Other',
+    defaultMessage: 'Other',
+    description: 'Label text for display showing others'
+  },
   performanceHealthFacilityDeath: {
     id: 'performance.values.labels.death.healthFacility',
     defaultMessage: 'Health facility death',
