@@ -151,7 +151,7 @@ const AuditDescriptionMapping: {
   IN_PROGRESS: messages.inProgressAuditAction,
   DECLARED: messages.declaredAuditAction,
   VALIDATED: messages.validatedAuditAction,
-  UPDATED: messages.updatedAuditAction,
+  DECLARATION_UPDATED: messages.updatedAuditAction,
   REGISTERED: messages.registeredAuditAction,
   REJECTED: messages.rejectedAuditAction,
   CERTIFIED: messages.certifiedAuditAction,
