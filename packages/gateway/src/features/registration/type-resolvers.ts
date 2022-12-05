@@ -555,7 +555,6 @@ export const typeResolvers: GQLResolver = {
         `/Practitioner/${practitionerId}`,
         authHeader
       )
-      console.log('WTF: ', JSON.stringify(practitioner))
       /*  if (
         !practitioner &&
         !practitioner.identifier &&
