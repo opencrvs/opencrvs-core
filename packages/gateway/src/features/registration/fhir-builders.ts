@@ -680,14 +680,14 @@ function createAgeOfIndividualInYearsBulder(
     resource.extension = []
   }
 
-  const hasReasonAgeOfIndividualInYears = resource.extension.find(
+  const hasAgeOfIndividualInYears = resource.extension.find(
     (extention) =>
       extention.url ===
       `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`
   )
 
-  if (hasReasonAgeOfIndividualInYears) {
-    hasReasonAgeOfIndividualInYears.valueString = fieldValue
+  if (hasAgeOfIndividualInYears) {
+    hasAgeOfIndividualInYears.valueString = fieldValue
   } else {
     resource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}/extension/age-of-individual-in-years`,
@@ -1357,7 +1357,14 @@ export const builders: IFieldBuilders = {
       )
       return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
     },
-
+    exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
+      return createExactDateOfBirthUnknownBulder(person, fieldValue as string)
+    },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const father = selectOrCreatePersonResource(
         FATHER_CODE,
@@ -1560,6 +1567,14 @@ export const builders: IFieldBuilders = {
         fhirBundle
       )
       return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
+    },
+    exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createExactDateOfBirthUnknownBulder(person, fieldValue as string)
     },
     maritalStatus: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
