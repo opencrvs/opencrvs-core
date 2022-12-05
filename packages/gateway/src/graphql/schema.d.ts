@@ -128,7 +128,6 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   createdAt?: GQLDate
   updatedAt?: GQLDate
   history?: Array<GQLHistory | null>
-  ageOfIndividualInYears?: string
 }
 
 export interface GQLDeathRegistration extends GQLEventRegistration {
@@ -175,6 +174,8 @@ export interface GQLPerson {
   deceased?: GQLDeceased
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
+  ageOfIndividualInYears?: number
+  exactDateOfBirthUnknown?: boolean
 }
 
 export interface GQLBirthRegResultSet {
@@ -410,7 +411,6 @@ export interface GQLBirthRegistrationInput {
   lastPreviousLiveBirth?: GQLDate
   createdAt?: GQLDate
   updatedAt?: GQLDate
-  ageOfIndividualInYears?: string
 }
 
 export interface GQLReinstated {
@@ -563,6 +563,7 @@ export interface GQLRelatedPerson {
   otherRelationship?: string
   affidavit?: Array<GQLAttachment | null>
   individual?: GQLPerson
+  exactDateOfBirthUnknown?: boolean
 }
 
 export const enum GQLBirthType {
@@ -872,6 +873,8 @@ export interface GQLPersonInput {
   deceased?: GQLDeceasedInput
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
+  ageOfIndividualInYears?: number
+  exactDateOfBirthUnknown?: boolean
 }
 
 export interface GQLLocationInput {
@@ -921,6 +924,7 @@ export interface GQLRelatedPersonInput {
   otherRelationship?: string
   affidavit?: Array<GQLAttachmentInput>
   individual?: GQLPersonInput
+  exactDateOfBirthUnknown?: boolean
 }
 
 export interface GQLQuestionnaireQuestionInput {
@@ -2840,7 +2844,6 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   createdAt?: BirthRegistrationToCreatedAtResolver<TParent>
   updatedAt?: BirthRegistrationToUpdatedAtResolver<TParent>
   history?: BirthRegistrationToHistoryResolver<TParent>
-  ageOfIndividualInYears?: BirthRegistrationToAgeOfIndividualInYearsResolver<TParent>
 }
 
 export interface BirthRegistrationToIdResolver<TParent = any, TResult = any> {
@@ -2974,13 +2977,6 @@ export interface BirthRegistrationToUpdatedAtResolver<
 }
 
 export interface BirthRegistrationToHistoryResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthRegistrationToAgeOfIndividualInYearsResolver<
   TParent = any,
   TResult = any
 > {
@@ -3175,6 +3171,8 @@ export interface GQLPersonTypeResolver<TParent = any> {
   deceased?: PersonToDeceasedResolver<TParent>
   nationality?: PersonToNationalityResolver<TParent>
   educationalAttainment?: PersonToEducationalAttainmentResolver<TParent>
+  ageOfIndividualInYears?: PersonToAgeOfIndividualInYearsResolver<TParent>
+  exactDateOfBirthUnknown?: PersonToExactDateOfBirthUnknownResolver<TParent>
 }
 
 export interface PersonToIdResolver<TParent = any, TResult = any> {
@@ -3253,6 +3251,20 @@ export interface PersonToNationalityResolver<TParent = any, TResult = any> {
 }
 
 export interface PersonToEducationalAttainmentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToAgeOfIndividualInYearsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToExactDateOfBirthUnknownResolver<
   TParent = any,
   TResult = any
 > {
@@ -4315,6 +4327,7 @@ export interface GQLRelatedPersonTypeResolver<TParent = any> {
   otherRelationship?: RelatedPersonToOtherRelationshipResolver<TParent>
   affidavit?: RelatedPersonToAffidavitResolver<TParent>
   individual?: RelatedPersonToIndividualResolver<TParent>
+  exactDateOfBirthUnknown?: RelatedPersonToExactDateOfBirthUnknownResolver<TParent>
 }
 
 export interface RelatedPersonToIdResolver<TParent = any, TResult = any> {
@@ -4347,6 +4360,13 @@ export interface RelatedPersonToAffidavitResolver<
 }
 
 export interface RelatedPersonToIndividualResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RelatedPersonToExactDateOfBirthUnknownResolver<
   TParent = any,
   TResult = any
 > {

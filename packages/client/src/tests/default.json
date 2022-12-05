@@ -1436,16 +1436,6 @@
                     }
                   ],
                   "postfix": "years",
-                  "mapping": {
-                    "mutation": {
-                      "operation": "ageOfIndividualInYearsTransformer",
-                      "parameters": ["birthDate", "child.childBirthDate"]
-                    },
-                    "query": {
-                      "operation": "ageOfIndividualInYearsTransformer",
-                      "parameters": ["birthDate"]
-                    }
-                  },
                   "inputFieldWidth": "78px"
                 },
                 {
@@ -1795,16 +1785,6 @@
                     }
                   ],
                   "postfix": "years",
-                  "mapping": {
-                    "mutation": {
-                      "operation": "ageOfIndividualInYearsTransformer",
-                      "parameters": ["birthDate", "child.childBirthDate"]
-                    },
-                    "query": {
-                      "operation": "ageOfIndividualInYearsTransformer",
-                      "parameters": ["birthDate"]
-                    }
-                  },
                   "inputFieldWidth": "78px"
                 },
                 {
@@ -2349,16 +2329,6 @@
                     }
                   ],
                   "postfix": "years",
-                  "mapping": {
-                    "mutation": {
-                      "operation": "ageOfIndividualInYearsTransformer",
-                      "parameters": ["birthDate", "child.childBirthDate"]
-                    },
-                    "query": {
-                      "operation": "ageOfIndividualInYearsTransformer",
-                      "parameters": ["birthDate"]
-                    }
-                  },
                   "inputFieldWidth": "78px"
                 },
                 {
@@ -3904,16 +3874,6 @@
                     }
                   ],
                   "postfix": "years",
-                  "mapping": {
-                    "mutation": {
-                      "operation": "ageOfIndividualInYearsTransformer",
-                      "parameters": ["birthDate", "child.childBirthDate"]
-                    },
-                    "query": {
-                      "operation": "ageOfIndividualInYearsTransformer",
-                      "parameters": ["birthDate"]
-                    }
-                  },
                   "inputFieldWidth": "78px"
                 },
                 {

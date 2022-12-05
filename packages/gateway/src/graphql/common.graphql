@@ -139,6 +139,7 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput!]
   individual: PersonInput
+  exactDateOfBirthUnknown: Boolean
 }
 
 type RelatedPerson { # -> Related Person
@@ -148,6 +149,7 @@ type RelatedPerson { # -> Related Person
   otherRelationship: String # -> .relationship.coding
   affidavit: [Attachment] # -> .extension
   individual: Person # -> .patient.reference
+  exactDateOfBirthUnknown: Boolean
 }
 
 input DeceasedInput {
@@ -180,6 +182,8 @@ input PersonInput {
   deceased: DeceasedInput
   nationality: [String] # In BDRIS2 for father and mother only
   educationalAttainment: EducationType # Not in BDRIS2
+  ageOfIndividualInYears: Int
+  exactDateOfBirthUnknown: Boolean
 }
 
 type Person { # -> Patient
@@ -203,6 +207,8 @@ type Person { # -> Patient
   deceased: Deceased # -> .deceased
   nationality: [String] # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
   educationalAttainment: EducationType # -> .extension(url='http://opencrvs.org/specs/extension/educational-attainment').valueString
+  ageOfIndividualInYears: Int
+  exactDateOfBirthUnknown: Boolean
 }
 
 input ContactPointInput {

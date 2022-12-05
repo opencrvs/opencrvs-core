@@ -290,7 +290,6 @@ type BirthRegistration implements EventRegistration {
   createdAt: Date
   updatedAt: Date
   history: [History]
-  ageOfIndividualInYears: String
 }
 
 type DeathRegistration implements EventRegistration {
@@ -337,6 +336,8 @@ type Person {
   deceased: Deceased
   nationality: [String]
   educationalAttainment: EducationType
+  ageOfIndividualInYears: Int
+  exactDateOfBirthUnknown: Boolean
 }
 
 type BirthRegResultSet {
@@ -561,7 +562,6 @@ input BirthRegistrationInput {
   lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
-  ageOfIndividualInYears: String
 }
 
 type Reinstated {
@@ -714,6 +714,7 @@ type RelatedPerson {
   otherRelationship: String
   affidavit: [Attachment]
   individual: Person
+  exactDateOfBirthUnknown: Boolean
 }
 
 enum BirthType {
@@ -1001,6 +1002,8 @@ input PersonInput {
   deceased: DeceasedInput
   nationality: [String]
   educationalAttainment: EducationType
+  ageOfIndividualInYears: Int
+  exactDateOfBirthUnknown: Boolean
 }
 
 input LocationInput {
@@ -1050,6 +1053,7 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput!]
   individual: PersonInput
+  exactDateOfBirthUnknown: Boolean
 }
 
 input QuestionnaireQuestionInput {

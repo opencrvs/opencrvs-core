@@ -672,6 +672,54 @@ function createReasonNotApplyingBulder(
   }
 }
 
+function createAgeOfIndividualInYearsBulder(
+  resource: fhir.Patient,
+  fieldValue: string
+) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+
+  const hasReasonAgeOfIndividualInYears = resource.extension.find(
+    (extention) =>
+      extention.url ===
+      `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`
+  )
+
+  if (hasReasonAgeOfIndividualInYears) {
+    hasReasonAgeOfIndividualInYears.valueString = fieldValue
+  } else {
+    resource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}/extension/age-of-individual-in-years`,
+      valueString: fieldValue
+    })
+  }
+}
+
+function createExactDateOfBirthUnknownBulder(
+  resource: fhir.Patient,
+  fieldValue: string
+) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+
+  const hasExactDateOfBirthUnknown = resource.extension.find(
+    (extention) =>
+      extention.url ===
+      `${OPENCRVS_SPECIFICATION_URL}extension/exact-date-of-birth-unknown`
+  )
+
+  if (hasExactDateOfBirthUnknown) {
+    hasExactDateOfBirthUnknown.valueString = fieldValue
+  } else {
+    resource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/exact-date-of-birth-unknown`,
+      valueString: fieldValue
+    })
+  }
+}
+
 function createEducationalAttainmentBuilder(
   resource: fhir.Patient,
   fieldValue: string
@@ -1170,6 +1218,22 @@ export const builders: IFieldBuilders = {
       )
       return createReasonNotApplyingBulder(person, fieldValue as string)
     },
+    ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
+      return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
+    },
+    exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
+      return createExactDateOfBirthUnknownBulder(person, fieldValue as string)
+    },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const mother = selectOrCreatePersonResource(
         MOTHER_CODE,
@@ -1285,6 +1349,15 @@ export const builders: IFieldBuilders = {
       )
       return createReasonNotApplyingBulder(person, fieldValue as string)
     },
+    ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
+      return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
+    },
+
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const father = selectOrCreatePersonResource(
         FATHER_CODE,
@@ -1480,6 +1553,14 @@ export const builders: IFieldBuilders = {
       )
       return createAgeBuilder(person, fieldValue as string)
     },
+    ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
+    },
     maritalStatus: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
@@ -1582,6 +1663,14 @@ export const builders: IFieldBuilders = {
       gender: (fhirBundle, fieldValue, context) => {
         const person = selectOrCreateInformantResource(fhirBundle)
         person.gender = fieldValue as string
+      },
+      ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+        const person = selectOrCreatePersonResource(
+          INFORMANT_CODE,
+          INFORMANT_TITLE,
+          fhirBundle
+        )
+        return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
       },
       identifier: {
         id: (

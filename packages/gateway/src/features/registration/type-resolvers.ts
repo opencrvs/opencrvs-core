@@ -157,6 +157,28 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
+    ageOfIndividualInYears: (person) => {
+      const ageOfIndividualInYearsExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+        person.extension
+      )
+      return (
+        (ageOfIndividualInYearsExtension &&
+          ageOfIndividualInYearsExtension.valueString) ||
+        null
+      )
+    },
+    exactDateOfBirthUnknown: (person) => {
+      const exactDateOfBirthUnknownExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/exact-date-of-birth-unknown`,
+        person.extension
+      )
+      return (
+        (exactDateOfBirthUnknownExtension &&
+          exactDateOfBirthUnknownExtension.valueString) ||
+        null
+      )
+    },
     detailsExist: (person) => {
       return person.active
     },

@@ -41,7 +41,6 @@ import { countries } from '@client/forms/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
-import differenceInYears from 'date-fns/differenceInYears'
 
 interface IName {
   [key: string]: any
@@ -91,29 +90,6 @@ export const fieldValueTransformer =
         queryData[sectionId][transformedFieldName]
     }
     return transformedData
-  }
-
-export const ageOfIndividualInYearsTransformer =
-  (transformedFieldName: string) =>
-  (
-    transformedData: IFormData,
-    queryData: any,
-    sectionId: string,
-    field: IFormField
-  ) => {
-    if (!queryData?.child?.birthDate) {
-      return transformedData
-    }
-
-    const mothersBirthDate = queryData[sectionId]?.[transformedFieldName]
-    if (!mothersBirthDate) {
-      return transformedData
-    }
-
-    transformedData[sectionId]['ageOfIndividualInYears'] = differenceInYears(
-      new Date(queryData.child.birthDate),
-      new Date(mothersBirthDate)
-    )
   }
 
 export const bundleFieldToSectionFieldTransformer =

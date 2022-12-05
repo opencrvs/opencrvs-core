@@ -18,8 +18,7 @@ import {
   IFormSectionData,
   IFormFieldMutationMapFunction
 } from '@client/forms'
-import subYears from 'date-fns/subYears'
-import { get, set } from 'lodash'
+import { set } from 'lodash'
 
 interface IPersonName {
   [key: string]: string
@@ -202,34 +201,6 @@ export const sectionFieldToBundleFieldTransformer =
       transformedData[transformedFieldName] = draftData[sectionId][field.name]
     } else {
       transformedData[field.name] = draftData[sectionId][field.name]
-    }
-
-    return transformedData
-  }
-
-export const ageOfIndividualInYearsTransformer =
-  (transformedFieldName: string, pathToChildsBirthdate: string) =>
-  (
-    transformedData: TransformedData,
-    draftData: IFormData,
-    sectionId: string,
-    field: IFormField
-  ) => {
-    const fieldName = transformedFieldName || field.name
-    const sectionData = draftData[sectionId][field.name] as string
-
-    const childsBirthDate = get(draftData, pathToChildsBirthdate)
-
-    if (!childsBirthDate) {
-      return transformedData
-    }
-
-    if (sectionData) {
-      const childsDoB = new Date(childsBirthDate as unknown as string)
-
-      transformedData[sectionId][fieldName] = formatDate(
-        subYears(childsDoB, Number.parseInt(sectionData)).toISOString()
-      )
     }
 
     return transformedData

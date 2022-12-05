@@ -283,7 +283,7 @@ type DeathRegistration implements EventRegistration {
   eventLocation: Location
   questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath
-  deathDescription: String
+  deathDescription: Stringation
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeathEstablished: String
   causeOfDeath: String
@@ -308,6 +308,7 @@ type Person {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  ageOfIndividualInYears: Int
   dateOfMarriage: Date
   multipleBirth: Int
   address: [Address]
@@ -949,6 +950,7 @@ input PersonInput {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  ageOfIndividualInYears: Int
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]

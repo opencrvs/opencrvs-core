@@ -1429,16 +1429,6 @@ export const registerForms: IDefaultRegisterForms = {
                     expression: '!values.exactDateOfBirthUnknown'
                   }
                 ],
-                mapping: {
-                  mutation: {
-                    operation: 'sectionFieldToBundleFieldTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'bundleFieldToSectionFieldTransformer',
-                    parameters: []
-                  }
-                },
                 postfix: 'years',
                 inputFieldWidth: '78px'
               },
@@ -1977,16 +1967,6 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 postfix: 'years',
-                mapping: {
-                  mutation: {
-                    operation: 'ageOfIndividualInYearsTransformer',
-                    parameters: ['birthDate', 'child.childBirthDate']
-                  },
-                  query: {
-                    operation: 'ageOfIndividualInYearsTransformer',
-                    parameters: ['birthDate']
-                  }
-                },
                 inputFieldWidth: '78px'
               },
               {
@@ -3232,16 +3212,6 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 postfix: 'years',
-                mapping: {
-                  mutation: {
-                    operation: 'ageOfIndividualInYearsTransformer',
-                    parameters: ['birthDate', 'child.childBirthDate']
-                  },
-                  query: {
-                    operation: 'ageOfIndividualInYearsTransformer',
-                    parameters: ['birthDate']
-                  }
-                },
                 inputFieldWidth: '78px'
               },
               {
@@ -3869,16 +3839,6 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 postfix: 'years',
-                mapping: {
-                  mutation: {
-                    operation: 'ageOfIndividualInYearsTransformer',
-                    parameters: ['birthDate', 'child.childBirthDate']
-                  },
-                  query: {
-                    operation: 'ageOfIndividualInYearsTransformer',
-                    parameters: ['birthDate']
-                  }
-                },
                 inputFieldWidth: '78px'
               },
               {
