@@ -1,11 +1,12 @@
 import { Document, model, Schema } from 'mongoose'
-import { ISelectOption, message } from './question'
+import { ISelectOption, message } from '@config/models/question'
 
 export interface IDataset {
   fileName: string
   options: ISelectOption[]
   createdAt: string
   createdBy: string
+  resource?: string
 }
 
 export interface IDataSetModel extends IDataset, Document {}
@@ -25,6 +26,7 @@ const FormDatasetSchema = new Schema({
       required: true
     }
   ],
+  resource: { type: String },
   fileName: { type: String, required: true },
   createdBy: { type: String, required: true },
   createdAt: { type: Date, default: Date.now, required: true }

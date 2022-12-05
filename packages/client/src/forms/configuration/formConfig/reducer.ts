@@ -80,7 +80,8 @@ function getReadyState(formConfig: IFormConfig) {
       configFields: generateConfigFields(
         Event.Birth,
         defaultBirthForm,
-        questionConfig
+        questionConfig,
+        formDataset
       )
     },
     death: {
@@ -90,7 +91,8 @@ function getReadyState(formConfig: IFormConfig) {
       configFields: generateConfigFields(
         Event.Death,
         defaultDeathForm,
-        questionConfig
+        questionConfig,
+        formDataset
       )
     },
     formDataset
@@ -271,7 +273,8 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
         Cmd.action(
           offlineActions.updateOfflineFormConfig(
             [birthFormDraft, deathFormDraft],
-            questionConfig
+            questionConfig,
+            newState.formDataset
           )
         )
       )

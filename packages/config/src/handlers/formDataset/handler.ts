@@ -12,15 +12,21 @@
 import * as Hapi from '@hapi/hapi'
 import { internal } from '@hapi/boom'
 import { csvToJSON, PlainObject } from '@config/utils/csvHelper'
-import { COUNTRY_CONFIG_URL } from '@config/config/constants'
+import {
+  COUNTRY_CONFIG_URL,
+  DISTRICT,
+  HEALTH_FACILITY,
+  STATE
+} from '@config/config/constants'
 import fetch from 'node-fetch'
 import FormDataset, {
   IDataset,
-  IDataSetModel,
-  IOption
+  IDataSetModel
 } from '@config/models/formDataset'
 import { isEmpty, camelCase } from 'lodash'
 import { getTokenPayload } from '@config/utils/verifyToken'
+import { ISelectOption } from '@config/models/question'
+import { healthFacilityService } from '@config/services/locationService'
 
 interface IFormDataset {
   fileName: string
@@ -50,7 +56,21 @@ export async function getFormDatasetHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  return await FormDataset.find()
+  const formDatasets = await FormDataset.find()
+  const formDatasetPromises = formDatasets.map(async (formDataset) => {
+    let options: ISelectOption[] = formDataset.options
+    if (formDataset.resource === HEALTH_FACILITY) {
+      options = await healthFacilityService({ type: HEALTH_FACILITY })
+    } else if (formDataset.resource === STATE) {
+      options = await healthFacilityService({ identifier: STATE })
+    } else if (formDataset.resource === DISTRICT) {
+      options = await healthFacilityService({ identifier: DISTRICT })
+    }
+
+    return { ...formDataset.toObject(), options }
+  })
+
+  return Promise.all(formDatasetPromises)
 }
 
 export async function createFormDatasetHandler(
@@ -81,7 +101,7 @@ export async function createFormDatasetHandler(
       createdBy
     }
     csvJSON.forEach((optionRow) => {
-      const option: IOption = {
+      const option: ISelectOption = {
         value: optionRow.option,
         label: []
       }

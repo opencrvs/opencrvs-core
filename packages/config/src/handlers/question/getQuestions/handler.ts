@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { DISTRICT, HEALTH_FACILITY, STATE } from '@config/config/constants'
 import { IDataSetModel } from '@config/models/formDataset'
 import Question from '@config/models/question'
+import { healthFacilityService } from '@config/services/locationService'
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 
@@ -23,16 +25,28 @@ export default async function getQuestions(
       .populate<{ datasetId: IDataSetModel }>('datasetId')
       .exec()
 
-    return populatedQuestions.map((populatedQuestion) => {
+    const questions = populatedQuestions.map(async (populatedQuestion) => {
       if (populatedQuestion.datasetId) {
+        let options = populatedQuestion.datasetId.options
+
+        if (populatedQuestion.datasetId.resource === HEALTH_FACILITY) {
+          options = await healthFacilityService({ type: HEALTH_FACILITY })
+        } else if (populatedQuestion.datasetId.resource === STATE) {
+          options = await healthFacilityService({ identifier: STATE })
+        } else if (populatedQuestion.datasetId.resource === DISTRICT) {
+          options = await healthFacilityService({ identifier: DISTRICT })
+        }
+
         return {
           ...populatedQuestion.toObject(),
-          options: populatedQuestion.datasetId.options,
+          options,
           datasetId: populatedQuestion.datasetId._id
         }
       }
       return populatedQuestion
     })
+
+    return Promise.all(questions)
   } catch (error) {
     throw internal(error.message)
   }

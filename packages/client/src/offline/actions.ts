@@ -22,7 +22,7 @@ import {
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { IFormConfig } from '@client/forms'
+import { IFormConfig, IFormDataSet } from '@client/forms'
 import { IQuestionConfig } from '@client/forms/questionConfig'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
@@ -228,6 +228,7 @@ export type UpdateOfflineFormConfigAction = {
   payload: {
     formDrafts: IFormDraft[]
     questionConfig?: IQuestionConfig[]
+    formDataset?: IFormDataSet[]
   }
 }
 
@@ -241,12 +242,14 @@ export type UpdateOfflineCertificateAction = {
 
 export const updateOfflineFormConfig = (
   formDrafts: IFormDraft[],
-  questionConfig?: IQuestionConfig[]
+  questionConfig?: IQuestionConfig[],
+  formDataset?: IFormDataSet[]
 ): UpdateOfflineFormConfigAction => ({
   type: UPDATE_OFFLINE_FORM_CONFIG,
   payload: {
     formDrafts,
-    questionConfig
+    questionConfig,
+    formDataset
   }
 })
 

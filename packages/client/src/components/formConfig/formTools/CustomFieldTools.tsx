@@ -1074,7 +1074,7 @@ class CustomFieldToolsComp extends React.Component<
   }
 
   dataSourceSelected(selectedDataSource: string) {
-    const { selectedField, modifyConfigField } = this.props
+    const { selectedField, modifyConfigField, setSelectedField } = this.props
     this.setState({ selectedDataSource })
 
     const options = this.state.dataSourceSelectOptions.find(
@@ -1088,6 +1088,7 @@ class CustomFieldToolsComp extends React.Component<
     modifiedField.datasetId = selectedDataSource
 
     modifyConfigField(selectedField.fieldId, modifiedField)
+    setSelectedField(modifiedField.fieldId)
   }
 
   async onFileChangeHandler(file: File) {

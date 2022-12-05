@@ -23,16 +23,18 @@ import {
   IRadioGroupWithNestedFieldsFormField,
   ISelectFormFieldWithOptions,
   IDocumentUploaderWithOptionsFormField,
-  SerializedFormField
+  SerializedFormField,
+  IFormDataSet
 } from '@client/forms'
 import {
   IQuestionConfig,
   isDefaultQuestionConfig,
   getConfiguredQuestions,
   getIdentifiersFromFieldId,
-  ICustomSelectOption
+  ICustomSelectOption,
+  ICustomQuestionConfig
 } from '@client/forms/questionConfig'
-import { Event, QuestionInput } from '@client/utils/gateway'
+import { CustomFieldType, Event, QuestionInput } from '@client/utils/gateway'
 import { FieldPosition } from '@client/forms/configuration'
 import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import { createCustomField } from '@client/forms/configuration/customUtils'
@@ -134,10 +136,27 @@ export function getCertificateHandlebar(formField: IFormField) {
   return formField.mapping?.template?.[0]
 }
 
+function resolveOptionsFormDatasetId(
+  question: ICustomQuestionConfig,
+  formDataset: IFormDataSet[]
+) {
+  if (question.fieldType === CustomFieldType.Select) {
+    const options =
+      formDataset.find((dataset) => dataset._id === question.datasetId)
+        ?.options || []
+    return {
+      ...question,
+      options
+    }
+  }
+  return question
+}
+
 export function generateConfigFields(
   event: Event,
   defaultForm: ISerializedForm,
-  questions: IQuestionConfig[]
+  questions: IQuestionConfig[],
+  formDataset: IFormDataSet[]
 ) {
   questions = questions.filter((question) => question.fieldId.startsWith(event))
 
@@ -149,7 +168,7 @@ export function generateConfigFields(
             ...configFields,
             isDefaultQuestionConfig(question)
               ? defaultQuestionToConfigField(question, defaultForm)
-              : question
+              : resolveOptionsFormDatasetId(question, formDataset)
           ],
           []
         )

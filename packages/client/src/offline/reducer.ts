@@ -372,12 +372,16 @@ function reducer(
 
       if (!formConfig) return state
 
-      const { formDrafts, questionConfig = formConfig.questionConfig } =
-        action.payload
+      const {
+        formDrafts,
+        questionConfig = formConfig.questionConfig,
+        formDataset
+      } = action.payload
 
       const newFormConfig = {
         formDrafts,
-        questionConfig
+        questionConfig,
+        formDataset
       }
 
       return loop(
