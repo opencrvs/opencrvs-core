@@ -320,17 +320,17 @@ export function questionnaireToCustomFieldTransformer(
 
 export const registrationDateTransformer = (
   transformedData: IFormData,
-  _: any,
+  registrationDetails: any,
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
   __?: IOfflineData
 ) => {
-  if (!_.history) {
+  if (!registrationDetails.history) {
     return
   }
 
-  const history = _.history.find(
+  const history = registrationDetails.history.find(
     (historyItem: History) => historyItem?.action === RegStatus.Registered
   )
 
@@ -352,9 +352,16 @@ export const registrarNameUserTransformer = (
     return
   }
 
-  const history = _.history.find(
-    (historyItem: History) => historyItem?.action === RegStatus.Registered
-  )
+  const history = _.history
+    .sort(
+      (a: { date: string }, b: { date: string }) =>
+        new Date(a.date).valueOf() - new Date(b.date).valueOf()
+    )
+    .find((historyItem: History) =>
+      [RegStatus.Registered, RegStatus.Validated].includes(
+        historyItem?.action as RegStatus
+      )
+    )
   transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
     history?.user ? getUserName(history.user) : ''
 }
