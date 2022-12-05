@@ -43,9 +43,16 @@ describe('Login app step one', () => {
               fileName: 'dummy-file-name',
               file: 'dummy-logo'
             },
+
             COUNTRY_BACKGROUND: {
               backgroundColor: '#36304E', // hex value
               backgroundImage: 'image/png;base64,iVBORw0KGgoAAAAN', //base64 string
+              imageFit: 'FILL'
+            },
+
+            LOGIN_BACKGROUND: {
+              backgroundColor: 'FFF',
+              backgroundImage: '',
               imageFit: 'FILL'
             },
             SENTRY: '',

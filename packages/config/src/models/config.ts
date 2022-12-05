@@ -35,6 +35,12 @@ interface ICountryLogo {
   fileName: string
   file: string
 }
+
+interface ILoginBackground {
+  backgroundColor: string
+  backgroundImage: string
+  imageFit: string
+}
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
   BIRTH: IBirth
@@ -49,6 +55,7 @@ export interface IApplicationConfigurationModel extends Document {
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
   INTEGRATIONS: [IIntegration]
+  LOGIN_BACKGROUND: ILoginBackground
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -72,6 +79,12 @@ const deathSchema = new Schema<IDeath>({
 const countryLogoSchema = new Schema<ICountryLogo>({
   fileName: String,
   file: String
+})
+
+const backgroundImageSchema = new Schema<ILoginBackground>({
+  backgroundColor: String,
+  backgroundImage: String,
+  imageFit: String
 })
 
 const currencySchema = new Schema<ICurrency>({
@@ -139,7 +152,8 @@ const systemSchema = new Schema({
     enum: [1, 2],
     default: 1
   },
-  INTEGRATIONS: [integrationsSchema]
+  INTEGRATIONS: [integrationsSchema],
+  LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false }
 })
 
 export default model<IApplicationConfigurationModel>('Config', systemSchema)

@@ -27,12 +27,19 @@ type ICountryBackground = {
   backgroundImage: string //base64 string
   imageFit: 'FILL' | 'TILE'
 }
+
+export interface ILoginBackground {
+  backgroundColor: string
+  backgroundImage: string
+  imageFit: string
+}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
   SENTRY: string
   LOGROCKET: string
+  LOGIN_BACKGROUND: ILoginBackground
   COUNTRY_BACKGROUND: ICountryBackground
 }
 
