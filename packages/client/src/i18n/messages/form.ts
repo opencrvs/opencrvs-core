@@ -379,6 +379,8 @@ interface IFormMessages
   informantSecondaryAddress: MessageDescriptor
   emptyStringForSubSection: MessageDescriptor
   assignedResponsibilityProof: MessageDescriptor
+  openCamera: MessageDescriptor
+  takePhoto: MessageDescriptor
 }
 
 export const formMessageDescriptors: IFormMessages = {
@@ -2283,6 +2285,16 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: ' ',
     description: 'empty string',
     id: 'form.field.label.empty'
+  },
+  openCamera: {
+    defaultMessage: 'Open Camera',
+    description: 'The text displayed on the Open Camera button',
+    id: 'form.field.label.openCamera'
+  },
+  takePhoto: {
+    defaultMessage: 'Take Photo',
+    description: 'The text displayed on the Take Photo button',
+    id: 'form.field.label.takePhoto'
   }
 }
 
