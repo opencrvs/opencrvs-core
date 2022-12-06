@@ -398,7 +398,6 @@ export interface GQLFormDraft {
 export interface GQLFormDataset {
   options?: Array<GQLFormDatasetOption>
   fileName: string
-  createdBy: GQLUser
   createdAt: string
   _id?: string
 }
@@ -4156,7 +4155,6 @@ export interface FormDraftToCreatedAtResolver<TParent = any, TResult = any> {
 export interface GQLFormDatasetTypeResolver<TParent = any> {
   options?: FormDatasetToOptionsResolver<TParent>
   fileName?: FormDatasetToFileNameResolver<TParent>
-  createdBy?: FormDatasetToCreatedByResolver<TParent>
   createdAt?: FormDatasetToCreatedAtResolver<TParent>
   _id?: FormDatasetTo_idResolver<TParent>
 }
@@ -4166,10 +4164,6 @@ export interface FormDatasetToOptionsResolver<TParent = any, TResult = any> {
 }
 
 export interface FormDatasetToFileNameResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface FormDatasetToCreatedByResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

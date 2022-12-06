@@ -117,6 +117,13 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
       return getReadyState(action.payload.formConfig)
     }
 
+    case offlineActions.OFFLINE_FORM_CONFIG_ADD_FORM_DATASET: {
+      return {
+        ...state,
+        formDataset: [...state.formDataset, action.payload.formDatasetItem]
+      }
+    }
+
     case actions.ADD_CUSTOM_FIELD: {
       const { event, section, fieldType } = action.payload
       const fields = state[event].configFields[section]

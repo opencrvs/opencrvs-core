@@ -90,6 +90,7 @@ import { Alert } from '@opencrvs/components/lib/Alert'
 import { Query } from '@client/components/Query'
 import { FETCH_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/Wizard/query'
 import { createCustomFieldHandlebarName } from '@client/forms/configuration/customUtils'
+import { offlineFormConfigAddFormDataset } from '@client/offline/actions'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -319,22 +320,12 @@ class CustomFieldToolsComp extends React.Component<
   constructor(props: IFullProps) {
     super(props)
     this.state = this.getInitialState()
-    // this.fetchDataSources()
   }
 
   prepareDataSourceOptions(
     formDataset: IFormDataSet[]
   ): IDataSourceSelectOption[] {
-    const { selectedLanguage, facilities } = this.props
-    const healthFacilityOptions = facilities
-      ? Object.keys(facilities).map((id) => ({
-          label: {
-            id: `facility.${id}`,
-            defaultMessage: facilities[id].name
-          },
-          value: facilities[id].id
-        }))
-      : []
+    const { selectedLanguage } = this.props
 
     return (
       formDataset.map((dataset) => {
@@ -356,67 +347,10 @@ class CustomFieldToolsComp extends React.Component<
         return {
           value: dataset._id,
           label: dataset.fileName,
-          options:
-            dataset.fileName === HEALTH_FACILITY
-              ? healthFacilityOptions
-              : optionsFromCSV
+          options: optionsFromCSV
         }
       }) || []
     )
-  }
-
-  //  TODO: This method should be deleted
-  async fetchDataSources() {
-    const { selectedLanguage, facilities } = this.props
-    const data: { data: GetFormDatasetQuery } = await client.query({
-      query: FETCH_FORM_DATA_SET,
-      fetchPolicy: 'no-cache'
-    })
-
-    const healthFacilityOptions = facilities
-      ? Object.keys(facilities).map((id) => ({
-          label: {
-            id: `facility.${id}`,
-            defaultMessage: facilities[id].name
-          },
-          value: facilities[id].id
-        }))
-      : []
-
-    const options: IDataSourceSelectOption[] =
-      data.data?.getFormDataset?.map((dataset) => {
-        const optionsFromCSV = dataset?.options
-          ?.map((option) => {
-            const label = option?.label
-              ? option.label.find((i) => i?.lang === selectedLanguage)
-              : null
-
-            if (label) {
-              delete label.descriptor.__typename
-              return {
-                value: option.value,
-                label: label.descriptor
-              } as ISelectOption
-            }
-          })
-          .filter((i) => i) as ISelectOption[]
-
-        return {
-          value: dataset._id as string,
-          label: dataset.fileName as string,
-          options:
-            dataset.fileName === HEALTH_FACILITY
-              ? healthFacilityOptions
-              : optionsFromCSV
-        }
-      }) || []
-
-    this.setState({
-      dataSourceSelectOptions: [
-        ...this.state.dataSourceSelectOptions,
-        ...options
-      ]
-    })
   }
 
   componentDidUpdate({ selectedField: { fieldId } }: IFullProps) {
@@ -1074,25 +1008,26 @@ class CustomFieldToolsComp extends React.Component<
   }
 
   dataSourceSelected(selectedDataSource: string) {
-    const { selectedField, modifyConfigField, setSelectedField } = this.props
-    this.setState({ selectedDataSource })
+    const { selectedField, modifyConfigField, formDataset } = this.props
 
-    const options = this.state.dataSourceSelectOptions.find(
+    const dataSourceSelectOptions = this.prepareDataSourceOptions(
+      formDataset || []
+    )
+    this.setState({ selectedDataSource, dataSourceSelectOptions })
+
+    const options = dataSourceSelectOptions.find(
       (option) => option.value === selectedDataSource
     )
 
-    const modifiedField = this.prepareModifiedFormField()
-    modifiedField.options = options
-      ? (options.options as ICustomSelectOption[])
-      : []
-    modifiedField.datasetId = selectedDataSource
-
+    const modifiedField = {
+      options: options ? (options.options as ICustomSelectOption[]) : [],
+      datasetId: selectedDataSource
+    }
     modifyConfigField(selectedField.fieldId, modifiedField)
-    setSelectedField(modifiedField.fieldId)
   }
 
   async onFileChangeHandler(file: File) {
-    const { intl } = this.props
+    const { intl, offlineFormConfigAddFormDataset } = this.props
     try {
       const encodedFile = await getBase64String(file)
       const base64Data = (encodedFile as string).split(',')[1]
@@ -1113,9 +1048,15 @@ class CustomFieldToolsComp extends React.Component<
         mutation: CREATE_FORM_DATA_SET,
         variables: { formDataset: { fileName, base64Data } }
       })
-      await this.fetchDataSources()
 
       if (res?.data?.createFormDataset?.data?._id) {
+        const { _id, fileName, options } = res.data.createFormDataset.data
+        const newDataSource: IFormDataSet = {
+          _id,
+          fileName,
+          options: options as ICustomSelectOption[]
+        }
+        offlineFormConfigAddFormDataset(newDataSource)
         this.dataSourceSelected(res.data.createFormDataset.data._id)
       }
       this.setState({
@@ -1302,7 +1243,8 @@ const mapStateToProps = (store: IStoreState, props: IProps) => {
 }
 
 const mapDispatchToProps = {
-  modifyConfigField
+  modifyConfigField,
+  offlineFormConfigAddFormDataset
 }
 
 export const CustomFieldTools = connect(

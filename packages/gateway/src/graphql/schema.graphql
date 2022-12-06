@@ -544,7 +544,6 @@ type FormDraft {
 type FormDataset {
   options: [FormDatasetOption!]
   fileName: String!
-  createdBy: User!
   createdAt: String!
   _id: String
 }

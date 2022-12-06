@@ -6,13 +6,6 @@ export const FETCH_FORM_DATA_SET = gql`
       _id
       fileName
       createdAt
-      createdBy {
-        id
-        name {
-          firstNames
-          familyName
-        }
-      }
       options {
         value
         label {

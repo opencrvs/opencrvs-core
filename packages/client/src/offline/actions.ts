@@ -269,13 +269,29 @@ export type OfflineFormConfigUpdatedAction = {
     formConfig: IFormConfig
   }
 }
-
 export const offlineFormConfigUpdated = (
   formConfig: IFormConfig
 ): OfflineFormConfigUpdatedAction => ({
   type: OFFLINE_FORM_CONFIG_UPDATED,
   payload: {
     formConfig
+  }
+})
+
+export const OFFLINE_FORM_CONFIG_ADD_FORM_DATASET =
+  'OFFLINE/FORM_CONFIG_ADD_FORM_DATASET'
+export type OfflineFormConfigAddFormDatasetAction = {
+  type: typeof OFFLINE_FORM_CONFIG_ADD_FORM_DATASET
+  payload: {
+    formDatasetItem: IFormDataSet
+  }
+}
+export const offlineFormConfigAddFormDataset = (
+  formDatasetItem: IFormDataSet
+): OfflineFormConfigAddFormDatasetAction => ({
+  type: OFFLINE_FORM_CONFIG_ADD_FORM_DATASET,
+  payload: {
+    formDatasetItem
   }
 })
 
@@ -298,6 +314,7 @@ export type Action =
   | UpdateOfflineFormConfigAction
   | UpdateOfflineCertificateAction
   | OfflineFormConfigUpdatedAction
+  | OfflineFormConfigAddFormDatasetAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
