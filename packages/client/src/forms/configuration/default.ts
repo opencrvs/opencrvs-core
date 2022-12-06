@@ -1709,21 +1709,6 @@ export const registerForms: IDefaultRegisterForms = {
           {
             id: 'father-view-group',
             fields: [
-              {
-                name: 'reasonNotApplying',
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression: 'values.detailsExist'
-                  }
-                ],
-                type: 'TEXT',
-                label: formMessageDescriptors.reasonFNA,
-                validate: [],
-                initialValue: '',
-                customisable: true,
-                required: false
-              },
               // Last name
               {
                 name: 'familyNameEng',
