@@ -36,7 +36,7 @@ import {
 } from '@client/utils/userUtils'
 import { goToUserProfile } from '@client/navigation'
 import { AvatarSmall } from '@client/components/Avatar'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { FIELD_AGENT_ROLES, ROLE_FIELD_AGENT } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
@@ -195,7 +195,8 @@ export const GetHistory = ({
         id: userDetails.userMgntUserID,
         name: userDetails.name,
         avatar: userDetails.avatar,
-        role: userDetails.role
+        role: userDetails.role,
+        type: userDetails.type
       },
       office: userDetails.primaryOffice,
       comments: [],
@@ -251,6 +252,8 @@ export const GetHistory = ({
     type:
       item.dhis2Notification && !item.user?.role
         ? intl.formatMessage(userMessages.healthSystem)
+        : item.user?.role === ROLE_FIELD_AGENT && !!item.user?.type
+        ? intl.formatMessage(userMessages[item.user?.type as string])
         : item.user?.title
         ? intl.formatMessage(userMessages[item.user?.title])
         : intl.formatMessage(userMessages[item?.user?.role as string]),
