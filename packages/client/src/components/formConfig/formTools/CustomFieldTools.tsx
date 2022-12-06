@@ -610,7 +610,7 @@ class CustomFieldToolsComp extends React.Component<
                 this.setState({
                   conditionalField: {
                     fieldId: this.state.conditionalField.fieldId,
-                    regex: event.target.value
+                    regex: event.target.value.replaceAll('"', '')
                   }
                 })
               }
