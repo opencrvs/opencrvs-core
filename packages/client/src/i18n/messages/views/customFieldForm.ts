@@ -198,10 +198,6 @@ const messagesToDefine: ICustomFieldFormMessages = {
   statusTranslationMissing: {
     id: 'custom.select.text.statusTranslationMissing',
     defaultMessage: 'Translation is missing'
-  },
-  optionHealthFacility: {
-    id: 'custom.select.option.text.healthFacility',
-    defaultMessage: 'Health Facility'
   }
 }
 
