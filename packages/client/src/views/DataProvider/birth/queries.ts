@@ -46,6 +46,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           occupation
           nationality
           birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
           address {
             type
             line
@@ -70,6 +72,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         occupation
         detailsExist
         reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         dateOfMarriage
         educationalAttainment
         nationality
@@ -104,6 +108,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         occupation
         detailsExist
         reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         dateOfMarriage
         educationalAttainment
         nationality
@@ -299,6 +305,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         occupation
         detailsExist
         reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         identifier {
           id
           type
@@ -333,6 +341,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         occupation
         detailsExist
         reasonNotApplying
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         identifier {
           id
           type
@@ -371,6 +381,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           nationality
           occupation
           birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
           address {
             type
             line

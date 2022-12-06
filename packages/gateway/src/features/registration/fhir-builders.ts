@@ -690,7 +690,7 @@ function createAgeOfIndividualInYearsBulder(
     hasAgeOfIndividualInYears.valueString = fieldValue
   } else {
     resource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}/extension/age-of-individual-in-years`,
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
       valueString: fieldValue
     })
   }
