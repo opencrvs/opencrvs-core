@@ -545,10 +545,21 @@ class CustomFieldToolsComp extends React.Component<
 
   conditionalParameters(fieldIds: string[]) {
     const { intl } = this.props
-    const fieldIdOptions = fieldIds.map((fieldId) => ({
+    const filteredFieldIds = fieldIds.filter((fieldId) => {
+      if (
+        !fieldId.includes('seperator') &&
+        !fieldId.includes('informantType') &&
+        !fieldId.includes('contactPoint')
+      ) {
+        return true
+      }
+      return false
+    })
+    const fieldIdOptions = filteredFieldIds.map((fieldId) => ({
       value: fieldId,
       label: fieldId
     }))
+
     return (
       <FieldContainer>
         <ConditionalWrapper>
