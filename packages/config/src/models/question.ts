@@ -60,7 +60,7 @@ export interface IQuestion {
   custom?: boolean
   conditionals?: ICondition[]
   datasetId?: string
-  options: ISelectOption[]
+  options?: ISelectOption[]
 }
 
 export interface IQuestionModel extends IQuestion, Document {}
