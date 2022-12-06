@@ -48,9 +48,15 @@ export function transformStatusData(
 ) {
   const registrationStatus =
     statusData &&
-    statusData.find((status) => {
-      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
-    })
+    statusData
+      .sort(
+        (a, b) =>
+          new Date(a.timestamp).valueOf() - new Date(b.timestamp).valueOf()
+      )
+      .find((status) => {
+        return ['REGISTERED', 'VALIDATED'].includes(status.type!)
+      })
+
   transformedData[sectionId] = {
     ...transformedData[sectionId],
     commentsOrNotes:
@@ -465,11 +471,18 @@ export const registrationLocationUserTransformer =
   ) => {
     const statusData = queryData[REGISTRATION_SECTION]
       .status as GQLRegWorkflow[]
+
     const registrationStatus =
       statusData &&
-      statusData.find((status) => {
-        return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
-      })
+      statusData
+        .sort(
+          (a, b) =>
+            new Date(a.timestamp).valueOf() - new Date(b.timestamp).valueOf()
+        )
+        .find((status) => {
+          return ['REGISTERED', 'VALIDATED'].includes(status.type!)
+        })
+
     const officeName = registrationStatus?.office?.name || ''
     const officeAddressLevel3 =
       registrationStatus?.office?.address?.district || ''

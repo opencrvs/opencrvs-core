@@ -572,7 +572,7 @@ export const typeResolvers: GQLResolver = {
       return await res.json()
     },
     reason: (task: fhir.Task) => (task.reason && task.reason.text) || null,
-    timestamp: (task) => task.lastModified,
+    timestamp: (task) => task.meta?.lastUpdated || task.lastModified,
     comments: (task) => task.note,
     location: async (task, _, authHeader) => {
       const taskLocation = findExtension(
