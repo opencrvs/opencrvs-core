@@ -39,7 +39,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: Role
+    role: RoleType
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -380,7 +380,7 @@ type User {
   name: [HumanName]!
   username: String!
   mobile: String!
-  role: Role!
+  role: RoleType!
   type: String!
   email: String!
   status: String!
@@ -398,14 +398,6 @@ type User {
 type SearchUserResult {
   results: [User]
   totalItems: Int
-}
-
-type Role {
-  id: ID!
-  title: String
-  value: String
-  types: [String]
-  active: Boolean
 }
 
 type SearchFieldAgentResult {
@@ -492,6 +484,24 @@ type EventProgressResultSet {
   totalItems: Int
 }
 
+enum RoleType {
+  FIELD_AGENT
+  REGISTRATION_AGENT
+  LOCAL_REGISTRAR
+  LOCAL_SYSTEM_ADMIN
+  NATIONAL_SYSTEM_ADMIN
+  PERFORMANCE_MANAGEMENT
+  NATIONAL_REGISTRAR
+}
+
+type Role {
+  id: ID!
+  title: String
+  value: String
+  types: [String]
+  active: Boolean
+}
+
 input ComparisonInput {
   eq: String
   gt: String
@@ -558,8 +568,8 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 type Reinstated {
@@ -595,7 +605,7 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String
-  role: Role
+  role: RoleType
   type: String
   email: String
   primaryOffice: String
@@ -886,7 +896,7 @@ enum LocationType {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: Role!
+  role: RoleType!
   signature: Signature
 }
 

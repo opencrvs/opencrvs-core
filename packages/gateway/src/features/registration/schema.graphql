@@ -272,8 +272,8 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 type BirthRegistration implements EventRegistration { # -> Composition

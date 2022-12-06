@@ -229,7 +229,7 @@ export interface GQLUser {
   name: Array<GQLHumanName | null>
   username: string
   mobile: string
-  role: string
+  role: GQLRole
   type: string
   email: string
   status: string
@@ -333,6 +333,16 @@ export interface GQLEventProgressResultSet {
   totalItems?: number
 }
 
+export const enum GQLRoleType {
+  FIELD_AGENT = 'FIELD_AGENT',
+  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
+  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
+  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
+  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
+  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
+  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
+}
+
 export interface GQLRole {
   id: string
   title?: string
@@ -407,8 +417,8 @@ export interface GQLBirthRegistrationInput {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
-  createdAt?: GQLDate
-  updatedAt?: GQLDate
+  createdAt: GQLDate
+  updatedAt: GQLDate
 }
 
 export interface GQLReinstated {
@@ -735,7 +745,7 @@ export const enum GQLLocationType {
 
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
-  role: string
+  role: GQLRole
   signature?: GQLSignature
 }
 
