@@ -613,6 +613,9 @@ export const englishOnlyNameFormat: Validation = (value: IFormFieldValue) => {
 export const maxNames =
   (max: number): Validation =>
   (value: IFormFieldValue) => {
+    if (!value) {
+      return undefined
+    }
     const cast = value.toString()
     return cast.split(' ').length <= max
       ? undefined
