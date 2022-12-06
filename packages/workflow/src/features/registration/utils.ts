@@ -297,8 +297,8 @@ interface IMosipAuthData {
 }
 
 interface IMosipRequest {
-  deliverytype: 'sync'
-  output: string | ''
+  deliverytype?: 'sync'
+  output?: string | ''
   lang: 'eng'
   authdata: IMosipAuthData
 }
@@ -348,10 +348,8 @@ export async function getMosipUINToken(
     id: '',
     version: '',
     metadata: '',
-    requesttime: '',
+    requesttime: new Date().toISOString(),
     request: {
-      deliverytype: 'sync',
-      output: '',
       lang: 'eng',
       authdata: {
         vid: submittedNationalIDInForm,

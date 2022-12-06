@@ -94,7 +94,7 @@ export function generateFullLocation(
   return location
 }
 
-function generateSearchableLocations(
+export function generateSearchableLocations(
   locations: ILocation[],
   offlineLocations: { [key: string]: ILocation },
   intl: IntlShape

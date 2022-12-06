@@ -72,7 +72,17 @@ const dummyUser = {
     }
   ],
   creationDate: 1559054406433,
-  auditHistory: []
+  auditHistory: [],
+  searches: [
+    {
+      searchId: '121212',
+      name: 'Advanced Search',
+      parameters: {
+        event: 'birth',
+        registrationStatuses: []
+      }
+    }
+  ]
 }
 
 describe('getUser tests', () => {
