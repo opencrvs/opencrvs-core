@@ -197,7 +197,7 @@ export function VerifyDetails() {
   let footer: null | JSX.Element = null
   if (isStandalone) {
     bottomActionButtons = [
-      <PrimaryButton onClick={() => window.close()}>
+      <PrimaryButton onClick={() => (window.location.href = '/')}>
         {intl.formatMessage(buttonMessages.close)}
       </PrimaryButton>
     ]
