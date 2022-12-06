@@ -63,6 +63,7 @@ export interface IOperationHistory {
   operatorFamilyName: string
   operatorFirstNamesLocale: string
   operatorFamilyNameLocale: string
+  operatorOfficeId: string
   operatorOfficeName: string
   operatorOfficeAlias: string[]
   rejectReason?: string
@@ -211,6 +212,7 @@ export const createStatusHistory = async (
     operatorFamilyName,
     operatorFirstNamesLocale,
     operatorFamilyNameLocale,
+    operatorOfficeId: office?.id || '',
     operatorOfficeName: office?.name || '',
     operatorOfficeAlias: office?.alias || []
   } as IOperationHistory

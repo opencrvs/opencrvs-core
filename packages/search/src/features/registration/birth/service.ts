@@ -375,14 +375,25 @@ async function createDeclarationIndex(
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
-  body.declarationLocationId =
-    placeOfDeclarationExtension &&
-    placeOfDeclarationExtension.valueReference &&
-    placeOfDeclarationExtension.valueReference.reference &&
-    placeOfDeclarationExtension.valueReference.reference.split('/')[1]
+
+  if (body.operationHistories && body.operationHistories?.length > 0) {
+    body.declarationLocationId = body.operationHistories[0].operatorOfficeId
+  }
+
+  // This might happen when the task was just created and has no history or
+  // if the declaration was created before this code change and doesn't have "operatorOfficeId" assigned
+  if (!body.declarationLocationId) {
+    body.declarationLocationId =
+      placeOfDeclarationExtension &&
+      placeOfDeclarationExtension.valueReference &&
+      placeOfDeclarationExtension.valueReference.reference &&
+      placeOfDeclarationExtension.valueReference.reference.split('/')[1]
+  }
+
   body.declarationLocationHirarchyIds = await getLocationHirarchyIDs(
     body.declarationLocationId
   )
+
   body.compositionType =
     (compositionTypeCode && compositionTypeCode.code) || 'birth-declaration'
 
