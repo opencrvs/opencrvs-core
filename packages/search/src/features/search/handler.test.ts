@@ -12,15 +12,15 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/server'
-import { searchComposition } from '@search/features/search/service'
+import { advancedSearch } from '@search/features/search/service'
 import {
   mockSearchResult,
   mockAggregationSearchResult
 } from '@search/test/utils'
 import { client } from '@search/elasticsearch/client'
-import * as fetchMock from 'jest-fetch-mock'
+// import * as fetchMock from 'jest-fetch-mock'
 
-const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+// const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('./service.ts')
 
@@ -46,7 +46,7 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/search',
+        url: '/advancedRecordSearch',
         payload: {},
         headers: {
           Authorization: `Bearer ${token}`
@@ -70,7 +70,7 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/search',
+        url: '/advancedRecordSearch',
         payload: {},
         headers: {
           Authorization: `Bearer ${token}`
@@ -78,8 +78,8 @@ describe('Verify handlers', () => {
       })
       expect(res.statusCode).toBe(200)
     })
-    it('should return status code 500', async () => {
-      ;(searchComposition as jest.Mock).mockImplementation(() => {
+    it('should return status code 400', async () => {
+      ;(advancedSearch as jest.Mock).mockImplementation(() => {
         throw new Error('dead')
       })
       const token = jwt.sign(
@@ -96,13 +96,13 @@ describe('Verify handlers', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/search',
+        url: '/advancedRecordSearch',
         payload: {},
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
-      expect(res.statusCode).toBe(500)
+      expect(res.statusCode).toBe(400)
     })
 
     afterAll(async () => {
@@ -113,7 +113,7 @@ describe('Verify handlers', () => {
   describe('When the request is made', () => {
     let token: string
     beforeEach(async () => {
-      ;(searchComposition as jest.Mock).mockReturnValue(mockSearchResult)
+      ;(advancedSearch as jest.Mock).mockReturnValue(mockSearchResult)
       server = await createServer()
       token = jwt.sign(
         {
@@ -131,7 +131,7 @@ describe('Verify handlers', () => {
     it('/search should return a valid response as expected', async () => {
       const res = await server.server.inject({
         method: 'POST',
-        url: '/search',
+        url: '/advancedRecordSearch',
         payload: {},
         headers: {
           Authorization: `Bearer ${token}`
@@ -149,7 +149,7 @@ describe('Verify handlers', () => {
           method: 'POST',
           url: '/statusWiseRegistrationCount',
           payload: {
-            declarationLocationHirarchyId: '123',
+            declarationJurisdictionId: '123',
             status: ['REGISTED']
           },
           headers: {
@@ -166,7 +166,7 @@ describe('Verify handlers', () => {
           method: 'POST',
           url: '/statusWiseRegistrationCount',
           payload: {
-            declarationLocationHirarchyId: '123',
+            declarationJurisdictionId: '123',
             status: ['REGISTED']
           },
           headers: {
@@ -174,74 +174,6 @@ describe('Verify handlers', () => {
           }
         })
 
-        expect(res.statusCode).toBe(500)
-      })
-    })
-    describe('/populateHierarchicalLocationIds', () => {
-      beforeEach(async () => {
-        token = jwt.sign(
-          {
-            scope: ['sysadmin']
-          },
-          readFileSync('../auth/test/cert.key'),
-          {
-            algorithm: 'RS256',
-            issuer: 'opencrvs:auth-service',
-            audience: 'opencrvs:search-user'
-          }
-        )
-      })
-      it('Should return right number of updated registrations for valid payload', async () => {
-        // @ts-ignore
-        jest.spyOn(client, 'search').mockResolvedValueOnce(mockSearchResult)
-        // @ts-ignore
-        jest.spyOn(client, 'search').mockResolvedValueOnce(mockSearchResult)
-
-        fetch.mockResponses(
-          [
-            JSON.stringify({ partOf: { reference: 'Location/123' } }),
-            { status: 200 }
-          ],
-          [
-            JSON.stringify({ partOf: { reference: 'Location/0' } }),
-            { status: 200 }
-          ],
-          [
-            JSON.stringify({ partOf: { reference: 'Location/123' } }),
-            { status: 200 }
-          ],
-          [
-            JSON.stringify({ partOf: { reference: 'Location/0' } }),
-            { status: 200 }
-          ]
-        )
-
-        const res = await server.server.inject({
-          method: 'POST',
-          url: '/populateHierarchicalLocationIds',
-          payload: {},
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        expect(res.statusCode).toBe(200)
-        expect(res.result.birth).toBe(1)
-        expect(res.result.death).toBe(1)
-      })
-      it('Should return 500 when elastic search throws error', async () => {
-        // @ts-ignore
-        jest.spyOn(client, 'search').mockImplementation(() => {
-          throw new Error('error')
-        })
-
-        const res = await server.server.inject({
-          method: 'POST',
-          url: '/populateHierarchicalLocationIds',
-          payload: {},
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
         expect(res.statusCode).toBe(500)
       })
     })

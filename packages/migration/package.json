@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "migrate-mongo": "^9.0.0",
-    "influx": "^5.0.7"
+    "influx": "^5.0.7",
+    "@elastic/elasticsearch": "7.17.0"
   },
   "devDependencies": {
     "prettier": "^2.5.0"

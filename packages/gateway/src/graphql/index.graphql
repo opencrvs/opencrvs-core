@@ -25,6 +25,7 @@
 # import * from '../features/questions/schema.graphql'
 # import Mutation.* from '../features/formDataset/schema.graphql'
 # import Query.* from '../features/formDataset/schema.graphql'
+# import Mutation from '../features/advanceSearch/schema.graphql'
 # import * from 'common.graphql'
 
 # TODO
