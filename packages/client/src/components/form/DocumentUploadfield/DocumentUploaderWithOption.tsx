@@ -305,12 +305,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
           <DocumentUploader
             id={`upload_document${idx}`}
             title={intl.formatMessage(formMessages.addFile)}
-            onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>): void => {
+            onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>) => {
               this.onDocumentTypeChange(opt.value)
-              //return !this.isValid() && e.preventDefault()
-              if (!this.isValid()) {
-                e.preventDefault()
-              }
+              return !this.isValid() && e.preventDefault()
             }}
             handleFileChange={this.handleFileChange}
             disabled={this.state.filesBeingProcessed.length > 0}
@@ -355,6 +352,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
   render() {
     const { label, intl, requiredErrorMessage } = this.props
+
     return (
       <UploaderWrapper>
         <ErrorMessage id="upload-error">
@@ -366,9 +364,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
             </ErrorText>
           )}
         </ErrorMessage>
-        <Label>{label}</Label>
-        <br />
 
+        <Label>{label}</Label>
         <DocumentListPreview
           processingDocuments={this.state.filesBeingProcessed}
           documents={this.props.files}
@@ -379,6 +376,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
         {this.props.hideOnEmptyOption && this.state.dropDownOptions.length === 0
           ? null
           : this.renderDocumentUploaderWithDocumentTypeBlock()}
+
         {this.state.previewImage && (
           <DocumentPreview
             previewImage={this.state.previewImage}
