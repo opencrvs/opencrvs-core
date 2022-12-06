@@ -187,9 +187,6 @@ const RightColumn = styled.div<{
   &:first-child {
     margin-left: 0px;
   }
-  &:last-child {
-    margin-right: -24px;
-  }
 `
 const Content = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -1892,7 +1889,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 {!isCorrection(declaration) ? (
                   <>
                     {!readonly && (
-                      <DuplicateWarning duplicateIds={declaration.duplicates} />
+                      <DuplicateWarning
+                        declarationId={declaration.id}
+                        event={declaration.event}
+                        duplicateIds={declaration.duplicates}
+                      />
                     )}
                     {submitClickEvent && !readonly && (
                       <ReviewAction

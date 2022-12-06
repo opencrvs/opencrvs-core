@@ -163,6 +163,7 @@ interface IUserInfo {
   name: string
   role: string
   title?: string
+  type?: string
   avatar: JSX.Element
 }
 
@@ -322,7 +323,7 @@ export const NavigationView = (props: IFullProps) => {
       applicationVersion={runningVer}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
-      role={userInfo && (userInfo.title || userInfo.role)}
+      role={userInfo && (userInfo.type || userInfo.title || userInfo.role)}
       avatar={() => userInfo && userInfo.avatar}
       warning={isMobileDevice() ? <></> : <UnbuplishedWarning hideIcon />}
     >

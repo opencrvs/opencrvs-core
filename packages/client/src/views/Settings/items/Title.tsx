@@ -28,6 +28,10 @@ import { IStoreState } from '@client/store'
 export function Title() {
   const intl = useIntl()
   const title = useSelector<IStoreState, string>((state) => {
+    const type = state.profile.userDetails?.type
+    if (type) {
+      return userMessages[type] ? intl.formatMessage(userMessages[type]) : ''
+    }
     const role = state.profile.userDetails?.title
     return role && userMessages[role]
       ? intl.formatMessage(userMessages[role])

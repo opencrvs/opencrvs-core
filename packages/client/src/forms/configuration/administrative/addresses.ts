@@ -2875,10 +2875,6 @@ export function getPlaceOfEventAddressFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrban !== "URBAN"'
-        },
-        {
-          action: 'hide',
           expression: '!isDefaultCountry(values.country)'
         }
       ],

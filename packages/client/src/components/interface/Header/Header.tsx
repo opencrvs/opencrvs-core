@@ -241,10 +241,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         ? intl.formatMessage(userMessages[userDetails.role])
         : ''
 
+    const type =
+      userDetails && userDetails.type
+        ? intl.formatMessage(userMessages[userDetails.type])
+        : ''
+
     const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
 
-    const userInfo = { name, role, avatar, title }
-
+    const userInfo = { name, role, avatar, title, type }
     return (
       <>
         <ExpandingMenu
