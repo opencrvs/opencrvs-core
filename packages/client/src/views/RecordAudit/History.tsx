@@ -288,7 +288,7 @@ export const GetHistory = ({
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
     },
     {
-      label: intl.formatMessage(constantsMessages.type),
+      label: intl.formatMessage(constantsMessages.labelRole),
       width: 15,
       key: 'type'
     },
