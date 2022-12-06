@@ -12,7 +12,7 @@
 
 import { IStoreState } from '@client/store'
 import { Event } from '@client/utils/gateway'
-import { ISectionFieldMap, IConfigFieldMap } from './utils'
+import { ISectionFieldMap, IConfigField } from './utils'
 
 export function isFormConfigLoaded(store: IStoreState) {
   return store.formConfig.state !== 'LOADING'
@@ -34,7 +34,7 @@ export function selectConfigFields(
   store: IStoreState,
   event: Event,
   section: string
-): IConfigFieldMap
+): IConfigField[]
 export function selectConfigFields(
   store: IStoreState,
   event: Event,

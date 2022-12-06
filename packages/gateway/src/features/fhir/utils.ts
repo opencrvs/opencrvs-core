@@ -1116,28 +1116,6 @@ export async function postAssignmentSearch(
     })
 }
 
-export const postSearch = (
-  authHeader: IAuthHeader,
-  criteria: ISearchCriteria
-) => {
-  return fetch(`${SEARCH_URL}search`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    },
-    body: JSON.stringify(criteria)
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Search request failed: ${error.message}`)
-      )
-    })
-}
-
 export const postAdvancedSearch = (
   authHeader: IAuthHeader,
   criteria: ISearchCriteria
