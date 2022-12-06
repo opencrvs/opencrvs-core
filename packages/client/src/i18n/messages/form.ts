@@ -346,6 +346,7 @@ interface IFormMessages
   reasonMNAPreview: MessageDescriptor
   reasonFNAPreview: MessageDescriptor
   tooltipNationalID: MessageDescriptor
+  dateRangePickerCheckboxLabel: MessageDescriptor
   deceasedFatherSectionName: MessageDescriptor
   deceasedFatherSectionTitle: MessageDescriptor
   deceasedFathersFamilyName: MessageDescriptor
@@ -379,6 +380,8 @@ interface IFormMessages
   informantSecondaryAddress: MessageDescriptor
   emptyStringForSubSection: MessageDescriptor
   assignedResponsibilityProof: MessageDescriptor
+  showLabel: MessageDescriptor
+  hideLabel: MessageDescriptor
 }
 
 export const formMessageDescriptors: IFormMessages = {
@@ -2154,9 +2157,14 @@ export const formMessageDescriptors: IFormMessages = {
   },
   tooltipNationalID: {
     defaultMessage:
-      'The National ID can only be numeric and must be 9 digits long',
+      'The National ID can only be numeric and must be 10 digits long',
     description: 'Tooltip for form field: iD number',
     id: 'form.field.tooltip.tooltipNationalID'
+  },
+  dateRangePickerCheckboxLabel: {
+    defaultMessage: '{rangeStart} to {rangeEnd}',
+    description: 'Label for daterange picker checkbox',
+    id: 'form.field.dateRangepicker.checkbox.dateLabel'
   },
   deceasedFatherSectionName: {
     defaultMessage: "What is the deceased's father name?",
@@ -2275,7 +2283,7 @@ export const formMessageDescriptors: IFormMessages = {
   },
   helperTextNID: {
     defaultMessage:
-      'The National ID can only be numeric and must be 9 digits long',
+      'The National ID can only be numeric and must be 10 digits long',
     description: 'Helper text for nid input field',
     id: 'form.field.helpertext.nid'
   },
@@ -2283,6 +2291,16 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: ' ',
     description: 'empty string',
     id: 'form.field.label.empty'
+  },
+  showLabel: {
+    defaultMessage: 'Show',
+    description: 'Show label for accordion component',
+    id: 'form.field.showLabel'
+  },
+  hideLabel: {
+    defaultMessage: 'Hide',
+    description: 'Hide label for accordion component',
+    id: 'form.field.hideLabel'
   }
 }
 
