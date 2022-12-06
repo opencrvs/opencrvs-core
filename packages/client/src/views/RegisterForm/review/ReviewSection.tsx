@@ -1872,7 +1872,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 {!isCorrection(declaration) ? (
                   <>
                     {!readonly && (
-                      <DuplicateWarning duplicateIds={declaration.duplicates} />
+                      <DuplicateWarning
+                        declarationId={declaration.id}
+                        event={declaration.event}
+                        duplicateIds={declaration.duplicates}
+                      />
                     )}
                     {submitClickEvent && !readonly && (
                       <ReviewAction
