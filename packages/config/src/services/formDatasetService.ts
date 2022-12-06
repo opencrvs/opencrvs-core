@@ -10,10 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { LOCATION_LEVEL } from '@config/config/constants'
+import { LOCATION_LEVEL, GATEWAY_URL } from '@config/config/constants'
 import { IDataSetModel } from '@config/models/formDataset'
 import { ISelectOption } from '@config/models/question'
-import { GATEWAY_URL } from '@config/config/constants'
 import fetch from 'node-fetch'
 
 export const locationService = async (query: any) => {

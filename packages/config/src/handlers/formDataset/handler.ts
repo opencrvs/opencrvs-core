@@ -64,7 +64,7 @@ export async function createFormDatasetHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  let result = {
+  const result = {
     status: false,
     msg: RESPONSE_MESSAGES.FAILED,
     data: {} as IDataSetModel
