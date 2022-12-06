@@ -191,6 +191,12 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'You are back online',
     id: 'misc.notif.onlineUserStatus',
     description: 'Label for online user status toast notification'
+  },
+  imageCaptureFailed: {
+    defaultMessage: 'Image capture failed',
+    id: 'misc.notif.imageCaptureFailed',
+    description:
+      'Error message for when camera fails during document upload on mobile devices'
   }
 }
 

@@ -318,33 +318,38 @@ class DocumentUploaderWithOptionComp extends React.Component<
         </Flex>
       ))
     ) : (
-      <Flex>
-        <Select
-          id={name}
-          options={this.state.dropDownOptions}
-          value={this.state.fields.documentType}
-          onChange={this.onDocumentTypeChange}
-        />
+      <div>
+        <Flex>
+          <Select
+            id={name}
+            options={this.state.dropDownOptions}
+            value={this.state.fields.documentType}
+            onChange={this.onDocumentTypeChange}
+          />
 
-        {isMobileDevice() ? (
-          <CameraUploadField
-            handleFileChange={this.handleFileChange}
-            isValid={this.isValid}
-          />
-        ) : (
-          <DocumentUploader
-            id="upload_document"
-            title={intl.formatMessage(formMessages.addFile)}
-            onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>): void => {
-              if (!this.isValid()) {
-                e.preventDefault()
-              }
-            }}
-            handleFileChange={this.handleFileChange}
-            disabled={this.state.filesBeingProcessed.length > 0}
-          />
+          {!isMobileDevice() && (
+            <DocumentUploader
+              id="upload_document"
+              title={intl.formatMessage(formMessages.addFile)}
+              onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>): void => {
+                if (!this.isValid()) {
+                  e.preventDefault()
+                }
+              }}
+              handleFileChange={this.handleFileChange}
+              disabled={this.state.filesBeingProcessed.length > 0}
+            />
+          )}
+        </Flex>
+        {isMobileDevice() && (
+          <Flex>
+            <CameraUploadField
+              handleFileChange={this.handleFileChange}
+              isValid={this.isValid}
+            />
+          </Flex>
         )}
-      </Flex>
+      </div>
     )
   }
 
