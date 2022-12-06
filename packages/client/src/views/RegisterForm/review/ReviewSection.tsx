@@ -296,6 +296,7 @@ const Description = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
 `
 const DuplicateWarningGreen = styled(Warning)`
+  /* stylelint-disable-next-line color-no-hex */
   background-color: #f4fff3;
   border-radius: 4px;
   border: 1px solid ${({ theme }) => theme.colors.green};
@@ -510,13 +511,24 @@ interface IErrorsBySection {
 
 type FullProps = IProps & IntlShapeProps
 
-function renderSelectOrRadioLabel(
-  value: IFormFieldValue,
+function getSelectOrRadioOption(
   options: Array<ISelectOption | IRadioOption>,
+  value: IFormFieldValue,
   intl: IntlShape
 ) {
   const option = options.find((option) => option.value === value)
   return option ? intl.formatMessage(option.label) : value
+}
+
+function renderSelectOrRadioLabel(
+  value: IFormFieldValue,
+  options: Array<ISelectOption | IRadioOption>,
+  intl: IntlShape,
+  overrideOptions?: Array<ISelectOption | IRadioOption>
+) {
+  return overrideOptions
+    ? getSelectOrRadioOption(overrideOptions, value, intl)
+    : getSelectOrRadioOption(options, value, intl)
 }
 
 function hasB1Form(draft: IDeclaration) {
@@ -652,7 +664,12 @@ const renderValue = (
   }
 
   if (field.type === RADIO_GROUP) {
-    return renderSelectOrRadioLabel(value, field.options, intl)
+    return renderSelectOrRadioLabel(
+      value,
+      field.options,
+      intl,
+      field.reviewOverrideLabels
+    )
   }
 
   if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {

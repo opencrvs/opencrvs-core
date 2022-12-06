@@ -669,7 +669,6 @@ async function createEventRegistration(
     draftId && (await lookForComposition(draftId, authHeader))
 
   if (existingComposition) {
-    console.log('THIS COMPOSITION EXISTS')
     if (hasScope(authHeader, 'register')) {
       return await getRegistrationIds(
         existingComposition,

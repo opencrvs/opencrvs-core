@@ -499,6 +499,7 @@ export interface IRadioGroupFormField extends IFormFieldBase {
   size?: RadioSize
   notice?: MessageDescriptor
   flexDirection?: FLEX_DIRECTION
+  reviewOverrideLabels?: IRadioOption[]
 }
 
 export interface IRadioGroupWithNestedFieldsFormField
@@ -1041,6 +1042,7 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   size?: RadioSize
   notice?: string
   flexDirection?: string
+  reviewOverrideLabels?: RadioComponentOption[]
 }
 
 export interface Ii18nRadioGroupWithNestedFieldsFormField
