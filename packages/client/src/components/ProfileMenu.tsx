@@ -87,6 +87,9 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   }
 
   getUserRole = (intl: IntlShape, userDetails: IUserDetails | null): string => {
+    if (userDetails && userDetails.type) {
+      return intl.formatMessage(userMessages[userDetails.type])
+    }
     if (userDetails && userDetails.title) {
       return intl.formatMessage(userMessages[userDetails.title])
     }
