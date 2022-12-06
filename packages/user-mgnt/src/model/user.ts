@@ -37,7 +37,8 @@ export interface IUserName {
 
 export enum FIELD_AGENT_TYPES {
   VOLUNTEER = 'VOLUNTEER',
-  HEALTHCARE_WORKER = 'HEALTHCARE_WORKER'
+  HEALTHCARE_WORKER = 'HEALTHCARE_WORKER',
+  LOCAL_LEADER = 'LOCAL_LEADER'
 }
 
 interface IIdentifier {
