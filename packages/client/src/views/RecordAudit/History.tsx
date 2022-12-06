@@ -195,7 +195,8 @@ export const GetHistory = ({
         id: userDetails.userMgntUserID,
         name: userDetails.name,
         avatar: userDetails.avatar,
-        role: userDetails.role
+        role: userDetails.role,
+        type: userDetails.type
       },
       office: userDetails.primaryOffice,
       comments: [],
@@ -251,6 +252,8 @@ export const GetHistory = ({
     type:
       item.dhis2Notification && !item.user?.role
         ? intl.formatMessage(userMessages.healthSystem)
+        : item.user?.type
+        ? intl.formatMessage(userMessages[item.user?.type as string])
         : item.user?.title
         ? intl.formatMessage(userMessages[item.user?.title])
         : intl.formatMessage(userMessages[item?.user?.role as string]),
