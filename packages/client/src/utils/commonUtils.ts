@@ -25,6 +25,7 @@ export function isMobileDevice() {
   ) {
     return IS_MOBILE
   }
+
   if (window.outerWidth < 1033) {
     return IS_MOBILE
   }

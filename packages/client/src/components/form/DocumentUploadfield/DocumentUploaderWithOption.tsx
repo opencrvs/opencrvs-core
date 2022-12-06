@@ -104,13 +104,6 @@ export const getBase64String = (file: File) => {
   })
 }
 
-export const blobToFile = (blob: Blob, fileName: string): File => {
-  return new File([blob], fileName, {
-    lastModified: new Date().getTime(),
-    type: blob.type
-  })
-}
-
 class DocumentUploaderWithOptionComp extends React.Component<
   IFullProps,
   IState
@@ -143,7 +136,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
     return options
   }
 
-  onDocumentTypeChange = (documentType: string) => {
+  onChange = (documentType: string) => {
     const currentState = this.state
     currentState.fields.documentType = documentType
     this.setState(currentState)
@@ -299,14 +292,14 @@ class DocumentUploaderWithOptionComp extends React.Component<
             id={`${name}${idx}`}
             options={[opt]}
             value={opt.value}
-            onChange={this.onDocumentTypeChange}
+            onChange={this.onChange}
           />
 
           <DocumentUploader
             id={`upload_document${idx}`}
             title={intl.formatMessage(formMessages.addFile)}
-            onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-              this.onDocumentTypeChange(opt.value)
+            onClick={(e) => {
+              this.onChange(opt.value)
               return !this.isValid() && e.preventDefault()
             }}
             handleFileChange={this.handleFileChange}
@@ -321,7 +314,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
             id={name}
             options={this.state.dropDownOptions}
             value={this.state.fields.documentType}
-            onChange={this.onDocumentTypeChange}
+            onChange={this.onChange}
           />
 
           {!isMobileDevice() && (
