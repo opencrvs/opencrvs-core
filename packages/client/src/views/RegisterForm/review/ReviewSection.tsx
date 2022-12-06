@@ -187,9 +187,6 @@ const RightColumn = styled.div<{
   &:first-child {
     margin-left: 0px;
   }
-  &:last-child {
-    margin-right: -24px;
-  }
 `
 const Content = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
