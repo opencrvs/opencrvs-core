@@ -10,24 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { GATEWAY_URL } from '@config/config/constants'
+import { LOCATION_LEVEL } from '@config/config/constants'
+import { IDataSetModel } from '@config/models/formDataset'
 import { ISelectOption } from '@config/models/question'
+import { GATEWAY_URL } from '@config/config/constants'
 import fetch from 'node-fetch'
 
-export const locationService = async (queryObj: {
-  [key: string]: string | number
-}) => {
-  const resp = await fetch(
+export const locationService = async (query: any) => {
+  const queryObj = { ...query, _count: 0 }
+
+  const locations = await fetch(
     `${GATEWAY_URL}location?${Object.keys(queryObj)
       .map((key) => key + '=' + queryObj[key])
       .join('&')}`
   )
-  return resp.json()
-}
-
-export const healthFacilityService = async (query: any) => {
-  const queryObj = { ...query, _count: 0 }
-  const facilities = await locationService(queryObj)
+  const facilities = await locations.json()
 
   return facilities.entry.map((i: any) => ({
     value: i.resource.id,
@@ -41,4 +38,22 @@ export const healthFacilityService = async (query: any) => {
       }
     ]
   })) as ISelectOption[]
+}
+
+export async function resolveFormDatasetOptions(formDataset: IDataSetModel) {
+  let options: ISelectOption[] = formDataset.options
+  if (formDataset.resource === LOCATION_LEVEL.HEALTH_FACILITY) {
+    options = await locationService({
+      type: LOCATION_LEVEL.HEALTH_FACILITY
+    })
+  } else if (formDataset.resource === LOCATION_LEVEL.STATE) {
+    options = await locationService({
+      identifier: LOCATION_LEVEL.STATE
+    })
+  } else if (formDataset.resource === LOCATION_LEVEL.DISTRICT) {
+    options = await locationService({
+      identifier: LOCATION_LEVEL.DISTRICT
+    })
+  }
+  return options
 }

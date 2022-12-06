@@ -37,7 +37,11 @@ import {
   ICustomConfigField,
   IDataSourceSelectOption
 } from '@client/forms/configuration/formConfig/utils'
-import { buttonMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  formMessageDescriptors,
+  locationMessages
+} from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
 import {
   ILanguageState,
@@ -63,7 +67,11 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { camelCase, debounce, isEmpty } from 'lodash'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
+import {
+  injectIntl,
+  MessageDescriptor,
+  WrappedComponentProps as IntlShapeProp
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
@@ -311,8 +319,6 @@ interface IOptionalContent {
   [key: string]: IMessage[]
 }
 
-const HEALTH_FACILITY = 'Health Facility'
-
 class CustomFieldToolsComp extends React.Component<
   IFullProps,
   ICustomFieldState
@@ -325,7 +331,7 @@ class CustomFieldToolsComp extends React.Component<
   prepareDataSourceOptions(
     formDataset: IFormDataSet[]
   ): IDataSourceSelectOption[] {
-    const { selectedLanguage } = this.props
+    const { selectedLanguage, intl } = this.props
 
     return (
       formDataset.map((dataset) => {
@@ -344,9 +350,21 @@ class CustomFieldToolsComp extends React.Component<
           })
           .filter((i) => i) as ISelectOption[]
 
+        const datasetResourceLabel: { [key: string]: MessageDescriptor } = {
+          HEALTH_FACILITY: formMessageDescriptors.healthInstitution,
+          STATE: locationMessages.STATE,
+          DISTRICT: locationMessages.DISTRICT,
+          LOCATION_LEVEL_3: locationMessages.LOCATION_LEVEL_3,
+          LOCATION_LEVEL_4: locationMessages.LOCATION_LEVEL_4,
+          LOCATION_LEVEL_5: locationMessages.LOCATION_LEVEL_5
+        }
+        let label = dataset.fileName
+        if (dataset.resource && dataset.resource in datasetResourceLabel) {
+          label = intl.formatMessage(datasetResourceLabel[dataset.resource])
+        }
         return {
           value: dataset._id,
-          label: dataset.fileName,
+          label,
           options: optionsFromCSV
         }
       }) || []

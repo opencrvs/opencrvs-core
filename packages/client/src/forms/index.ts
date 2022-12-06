@@ -96,6 +96,7 @@ export interface IFormDataSet {
   _id: string
   fileName: string
   options: ICustomSelectOption[]
+  resource?: string
 }
 
 export interface IFormConfig {

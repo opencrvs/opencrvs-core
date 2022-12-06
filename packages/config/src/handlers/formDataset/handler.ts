@@ -9,24 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import { internal } from '@hapi/boom'
-import { csvToJSON, PlainObject } from '@config/utils/csvHelper'
-import {
-  COUNTRY_CONFIG_URL,
-  DISTRICT,
-  HEALTH_FACILITY,
-  STATE
-} from '@config/config/constants'
-import fetch from 'node-fetch'
+import { COUNTRY_CONFIG_URL } from '@config/config/constants'
 import FormDataset, {
   IDataset,
   IDataSetModel
 } from '@config/models/formDataset'
-import { isEmpty, camelCase } from 'lodash'
-import { getTokenPayload } from '@config/utils/verifyToken'
 import { ISelectOption } from '@config/models/question'
-import { healthFacilityService } from '@config/services/locationService'
+import { resolveFormDatasetOptions } from '@config/services/formDatasetService'
+import { csvToJSON, PlainObject } from '@config/utils/csvHelper'
+import { getTokenPayload } from '@config/utils/verifyToken'
+import { internal } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import { camelCase, isEmpty } from 'lodash'
+import fetch from 'node-fetch'
 
 interface IFormDataset {
   fileName: string
@@ -58,15 +53,7 @@ export async function getFormDatasetHandler(
 ) {
   const formDatasets = await FormDataset.find()
   const formDatasetPromises = formDatasets.map(async (formDataset) => {
-    let options: ISelectOption[] = formDataset.options
-    if (formDataset.resource === HEALTH_FACILITY) {
-      options = await healthFacilityService({ type: HEALTH_FACILITY })
-    } else if (formDataset.resource === STATE) {
-      options = await healthFacilityService({ identifier: STATE })
-    } else if (formDataset.resource === DISTRICT) {
-      options = await healthFacilityService({ identifier: DISTRICT })
-    }
-
+    const options = await resolveFormDatasetOptions(formDataset)
     return { ...formDataset.toObject(), options }
   })
 

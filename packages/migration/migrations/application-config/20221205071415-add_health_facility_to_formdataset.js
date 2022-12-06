@@ -14,6 +14,7 @@ export const up = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
+      // Adding Health Facility
       await db.collection('formdatasets').updateOne(
         {
           resource: 'HEALTH_FACILITY'
@@ -30,6 +31,7 @@ export const up = async (db, client) => {
         }
       )
 
+      // Adding State
       await db.collection('formdatasets').updateOne(
         {
           resource: 'STATE'
@@ -46,6 +48,7 @@ export const up = async (db, client) => {
         }
       )
 
+      // Adding District
       await db.collection('formdatasets').updateOne(
         {
           resource: 'DISTRICT'
@@ -55,6 +58,57 @@ export const up = async (db, client) => {
             options: [],
             resource: 'DISTRICT',
             fileName: 'District'
+          }
+        },
+        {
+          upsert: true
+        }
+      )
+
+      // Adding LOCATION_LEVEL_3
+      await db.collection('formdatasets').updateOne(
+        {
+          resource: 'LOCATION_LEVEL_3'
+        },
+        {
+          $set: {
+            options: [],
+            resource: 'LOCATION_LEVEL_3',
+            fileName: 'Location Level 3'
+          }
+        },
+        {
+          upsert: true
+        }
+      )
+
+      // Adding LOCATION_LEVEL_4
+      await db.collection('formdatasets').updateOne(
+        {
+          resource: 'LOCATION_LEVEL_4'
+        },
+        {
+          $set: {
+            options: [],
+            resource: 'LOCATION_LEVEL_4',
+            fileName: 'Location Level 4'
+          }
+        },
+        {
+          upsert: true
+        }
+      )
+
+      // Adding LOCATION_LEVEL_5
+      await db.collection('formdatasets').updateOne(
+        {
+          resource: 'LOCATION_LEVEL_5'
+        },
+        {
+          $set: {
+            options: [],
+            resource: 'LOCATION_LEVEL_5',
+            fileName: 'Location Level 4'
           }
         },
         {
