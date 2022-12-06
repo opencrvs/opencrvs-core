@@ -2170,6 +2170,12 @@ export const formMessageDescriptors = {
       "Label for informant's address to be same as deceased's usual place of residence",
     id: 'form.field.label.primaryAddressSameAsDeceasedsPrimary'
   },
+  primaryAddressSameAsDeceasedsPrimaryPreviewLabel: {
+    defaultMessage: "Same as deceased's",
+    description:
+      "Label for informant's address to be same as deceased's usual place of residence on preview page",
+    id: 'form.field.label.primaryAddressSameAsDeceasedsPrimaryPreviewLabel'
+  },
   deathDescription: {
     defaultMessage: 'Description',
     description:
@@ -3392,11 +3398,17 @@ export const formMessageDescriptors = {
       'Title for the radio button to select that the informants current address is the same as their permanent address',
     id: 'form.field.label.appCurrAddSameAsPerm'
   },
-  primaryAddressSameAsOtherPrimary: {
+  primaryAddressSameAsMothersPrimary: {
     defaultMessage: "Same as mother's usual place of residence?",
     description:
       "Title for the radio button to select that the persons primary address is the same as the mother's primary address",
-    id: 'form.field.label.primaryAddressSameAsOtherPrimary'
+    id: 'form.field.label.primaryAddressSameAsMothersPrimary'
+  },
+  primaryAddressSameAsMothersPrimaryPreviewLabel: {
+    defaultMessage: "Same as mother's",
+    description:
+      "Label for father's address to be same as mother's usual place of residence on preview page",
+    id: 'form.field.label.primaryAddressSameAsMothersPrimaryPreviewLabel'
   },
   phoneNumber: {
     defaultMessage: 'Phone number',

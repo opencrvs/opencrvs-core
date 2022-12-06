@@ -72,7 +72,7 @@ export function formatSearchParams(params: ISearchQuery) {
     | Array<{
         [x: string]: SortOrder
       }>
-    | undefined = undefined
+    | undefined
 
   if (sortColumn) {
     sorting = [{ [sortColumn]: sort }]

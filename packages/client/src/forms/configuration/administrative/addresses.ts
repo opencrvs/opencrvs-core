@@ -89,6 +89,7 @@ export type AllowedAddressConfigurations = {
   yComparisonSection?: BirthSection | DeathSection
   conditionalCase?: string
   informant?: boolean
+  positiveComparisonPreviewLabel?: MessageDescriptor
 }
 
 export const defaultAddressConfiguration: IAddressConfiguration[] = [
@@ -160,10 +161,12 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       },
       {
         config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
-        label: formMessageDescriptors.primaryAddressSameAsOtherPrimary,
+        label: formMessageDescriptors.primaryAddressSameAsMothersPrimary,
         xComparisonSection: BirthSection.Father,
         yComparisonSection: BirthSection.Mother,
-        conditionalCase: `(${fathersDetailsDontExist} || ${mothersDetailsDontExistOnOtherPage})`
+        conditionalCase: `(${fathersDetailsDontExist} || ${mothersDetailsDontExistOnOtherPage})`,
+        positiveComparisonPreviewLabel:
+          formMessageDescriptors.primaryAddressSameAsMothersPrimaryPreviewLabel
       },
       {
         config: AddressCases.PRIMARY_ADDRESS,
@@ -209,7 +212,9 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
         config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
         label: formMessageDescriptors.primaryAddressSameAsDeceasedsPrimary,
         xComparisonSection: DeathSection.Informant,
-        yComparisonSection: DeathSection.Deceased
+        yComparisonSection: DeathSection.Deceased,
+        positiveComparisonPreviewLabel:
+          formMessageDescriptors.primaryAddressSameAsDeceasedsPrimaryPreviewLabel
       },
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -278,6 +283,7 @@ export function getAddressFields(
         configuration.xComparisonSection,
         configuration.yComparisonSection,
         configuration.label,
+        configuration.positiveComparisonPreviewLabel as MessageDescriptor,
         configuration.conditionalCase
       )
     case AddressSubsections.PRIMARY_ADDRESS_SUBSECTION:
@@ -386,6 +392,7 @@ export const getXAddressSameAsY = (
   xComparisonSection: BirthSection | DeathSection,
   yComparisonSection: BirthSection | DeathSection,
   label: MessageDescriptor,
+  positivePreviewLabel: MessageDescriptor,
   conditionalCase?: string
 ): SerializedFormField[] => {
   const copyAddressField: SerializedFormField = {
@@ -412,6 +419,12 @@ export const getXAddressSameAsY = (
           description: 'deny label for yes / no radio button',
           id: 'form.field.label.deny'
         }
+      }
+    ],
+    reviewOverrideLabels: [
+      {
+        value: true,
+        label: positivePreviewLabel
       }
     ],
     conditionals: conditionalCase
