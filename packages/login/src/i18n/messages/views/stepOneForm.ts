@@ -22,7 +22,6 @@ interface IStepOneFormMessages
   forbiddenCredentialError: MessageDescriptor
   optionalLabel: MessageDescriptor
   fieldMissing: MessageDescriptor
-  stepOneLoginText: MessageDescriptor
   phoneNumberFormat: MessageDescriptor
 }
 
@@ -41,11 +40,6 @@ const messagesToDefine: IStepOneFormMessages = {
     id: 'login.stepOneInstruction',
     defaultMessage: 'Please enter your mobile number and password.',
     description: 'The instruction that appears in step one of the form'
-  },
-  stepOneLoginText: {
-    id: 'login.stepOneText',
-    defaultMessage: 'Login to Farajaland CRVS',
-    description: 'The instruction that appears in step one of the login form'
   },
   submit: {
     id: 'login.submit',

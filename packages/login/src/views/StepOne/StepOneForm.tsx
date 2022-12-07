@@ -20,7 +20,6 @@ import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
 import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
 import { stepOneFields } from '@login/views/StepOne/stepOneFields'
 import { messages } from '@login/i18n/messages/views/stepOneForm'
-import { Text } from '@opencrvs/components/lib/Text'
 
 import { IAuthenticationData } from '@login/utils/authApi'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
@@ -37,18 +36,14 @@ import {
   selectCountryLogo
 } from '@login/login/selectors'
 import * as actions from '@login/login/actions'
-import {
-  usePersistentCountryLogo,
-  usePersistentCountryBackground
-} from '@login/common/LoginBackground/LoginBackground'
-import { Box } from '@login/../../components/lib/Box'
+import { usePersistentCountryLogo } from '@login/common/LoginBackground/LoginBackground'
 
 export const Container = styled.div`
   position: relative;
   height: auto;
   padding: 0px;
   margin: 0px auto;
-  width: 500px;
+  width: 300px;
 `
 
 export const FormWrapper = styled.form`
@@ -97,7 +92,7 @@ export const StyledPrimaryButton = styled(PrimaryButton)`
 `
 
 export const StyledButton = styled(LinkButton)`
-  color: ${({ theme }) => theme.colors.black};
+  color: ${({ theme }) => theme.colors.white};
   flex-direction: row;
   justify-content: center;
   text-decoration: none;
@@ -115,7 +110,7 @@ export const StyledButton = styled(LinkButton)`
   &:not([data-focus-visible-added]) {
     background: transparent;
     outline: none;
-    color: ${({ theme }) => theme.colors.black};
+    color: ${({ theme }) => theme.colors.white};
   }
   &:active:not([data-focus-visible-added]):enabled {
     outline: none;
@@ -129,9 +124,6 @@ export const StyledButtonWrapper = styled.div`
 `
 export const FieldWrapper = styled.div`
   min-height: 6.5em;
-`
-export const LoginText = styled(Text)`
-  text-align: center;
 `
 
 export interface IProps {
@@ -220,7 +212,6 @@ export function StepOneForm({
   /* This might need to be converted into a state */
   const isOffline: boolean = navigator.onLine ? false : true
   const logo = usePersistentCountryLogo()
-  const countryLogo = usePersistentCountryBackground()
   const appName = useSelector(selectApplicationName)
 
   React.useEffect(() => {
@@ -229,64 +220,59 @@ export function StepOneForm({
 
   return (
     <Container id="login-step-one-box">
-      <Box id="Box" color={'#FFF'}>
-        <LogoContainer>
-          <CountryLogo src={logo} />
-        </LogoContainer>
-        <Title>
-          {submissionError && errorCode ? (
+      <LogoContainer>
+        <CountryLogo src={logo} />
+      </LogoContainer>
+      <Title>
+        {submissionError && errorCode ? (
+          <ErrorMessage>
+            {errorCode === ERROR_CODE_FIELD_MISSING &&
+              intl.formatMessage(messages.fieldMissing)}
+            {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
+              intl.formatMessage(messages.submissionError)}
+            {errorCode === ERROR_CODE_FORBIDDEN_CREDENTIALS &&
+              intl.formatMessage(messages.forbiddenCredentialError)}
+            {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
+              intl.formatMessage(messages.phoneNumberFormat)}
+          </ErrorMessage>
+        ) : (
+          isOffline && (
             <ErrorMessage>
-              {errorCode === ERROR_CODE_FIELD_MISSING &&
-                intl.formatMessage(messages.fieldMissing)}
-              {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
-                intl.formatMessage(messages.submissionError)}
-              {errorCode === ERROR_CODE_FORBIDDEN_CREDENTIALS &&
-                intl.formatMessage(messages.forbiddenCredentialError)}
-              {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
-                intl.formatMessage(messages.phoneNumberFormat)}
+              {intl.formatMessage(messages.networkError)}
             </ErrorMessage>
-          ) : (
-            isOffline && (
-              <ErrorMessage>
-                {intl.formatMessage(messages.networkError)}
-              </ErrorMessage>
-            )
-          )}
-        </Title>
-        <Form
-          onSubmit={(values: IAuthenticationData) =>
-            dispatch(actions.authenticate(values))
-          }
-        >
-          {({ handleSubmit }) => (
-            <FormWrapper id={formId} onSubmit={handleSubmit}>
-              <LoginText variant="h3" element="span">
-                {intl.formatMessage(messages.stepOneLoginText)}
-              </LoginText>
-              <FieldWrapper>
-                <Field name={userNameField.name} component={UserNameInput} />
-              </FieldWrapper>
-              <FieldWrapper>
-                <Field name={passwordField.name} component={Password} />
-              </FieldWrapper>
-              <ActionWrapper>
-                <PrimaryButton id="login-mobile-submit" type="submit">
-                  {intl.formatMessage(messages.submit)}
-                </PrimaryButton>
-                <StyledButtonWrapper>
-                  <StyledButton
-                    id="login-forgot-password"
-                    type="button"
-                    onClick={forgetAction}
-                  >
-                    {intl.formatMessage(messages.forgotPassword)}
-                  </StyledButton>
-                </StyledButtonWrapper>
-              </ActionWrapper>
-            </FormWrapper>
-          )}
-        </Form>
-      </Box>
+          )
+        )}
+      </Title>
+      <Form
+        onSubmit={(values: IAuthenticationData) =>
+          dispatch(actions.authenticate(values))
+        }
+      >
+        {({ handleSubmit }) => (
+          <FormWrapper id={formId} onSubmit={handleSubmit}>
+            <FieldWrapper>
+              <Field name={userNameField.name} component={UserNameInput} />
+            </FieldWrapper>
+            <FieldWrapper>
+              <Field name={passwordField.name} component={Password} />
+            </FieldWrapper>
+            <ActionWrapper>
+              <PrimaryButton id="login-mobile-submit" type="submit">
+                {intl.formatMessage(messages.submit)}
+              </PrimaryButton>
+              <StyledButtonWrapper>
+                <StyledButton
+                  id="login-forgot-password"
+                  type="button"
+                  onClick={forgetAction}
+                >
+                  {intl.formatMessage(messages.forgotPassword)}
+                </StyledButton>
+              </StyledButtonWrapper>
+            </ActionWrapper>
+          </FormWrapper>
+        )}
+      </Form>
     </Container>
   )
 }
