@@ -123,12 +123,6 @@ const messagesToDefine = {
     description: 'Label for mosip'
   },
 
-  registrationDetails: {
-    id: 'integrations.registrationDetails',
-    defaultMessage: 'Registration Details',
-    description: 'Label for registration details'
-  },
-
   childDetails: {
     id: 'integrations.childDetails',
     defaultMessage: 'Childs Details',
