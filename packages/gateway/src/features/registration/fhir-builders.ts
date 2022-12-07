@@ -648,7 +648,7 @@ function createOccupationBulder(resource: fhir.Patient, fieldValue: string) {
   }
 }
 
-function createReasonNotApplyingBulder(
+function createReasonNotApplyingBuilder(
   resource: fhir.Patient,
   fieldValue: string
 ) {
@@ -672,7 +672,7 @@ function createReasonNotApplyingBulder(
   }
 }
 
-function createAgeOfIndividualInYearsBulder(
+function createAgeOfIndividualInYearsBuilder(
   resource: fhir.Patient,
   fieldValue: string
 ) {
@@ -696,7 +696,7 @@ function createAgeOfIndividualInYearsBulder(
   }
 }
 
-function createExactDateOfBirthUnknownBulder(
+function createExactDateOfBirthUnknownBuilder(
   resource: fhir.Patient,
   fieldValue: string
 ) {
@@ -1216,7 +1216,7 @@ export const builders: IFieldBuilders = {
         MOTHER_TITLE,
         fhirBundle
       )
-      return createReasonNotApplyingBulder(person, fieldValue as string)
+      return createReasonNotApplyingBuilder(person, fieldValue as string)
     },
     ageOfIndividualInYears: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
@@ -1224,7 +1224,7 @@ export const builders: IFieldBuilders = {
         MOTHER_TITLE,
         fhirBundle
       )
-      return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
     },
     exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
@@ -1232,7 +1232,7 @@ export const builders: IFieldBuilders = {
         MOTHER_TITLE,
         fhirBundle
       )
-      return createExactDateOfBirthUnknownBulder(person, fieldValue as string)
+      return createExactDateOfBirthUnknownBuilder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const mother = selectOrCreatePersonResource(
@@ -1347,7 +1347,7 @@ export const builders: IFieldBuilders = {
         FATHER_TITLE,
         fhirBundle
       )
-      return createReasonNotApplyingBulder(person, fieldValue as string)
+      return createReasonNotApplyingBuilder(person, fieldValue as string)
     },
     ageOfIndividualInYears: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
@@ -1355,7 +1355,7 @@ export const builders: IFieldBuilders = {
         FATHER_TITLE,
         fhirBundle
       )
-      return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
     },
     exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
@@ -1363,7 +1363,7 @@ export const builders: IFieldBuilders = {
         FATHER_TITLE,
         fhirBundle
       )
-      return createExactDateOfBirthUnknownBulder(person, fieldValue as string)
+      return createExactDateOfBirthUnknownBuilder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const father = selectOrCreatePersonResource(
@@ -1566,7 +1566,7 @@ export const builders: IFieldBuilders = {
         DECEASED_TITLE,
         fhirBundle
       )
-      return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
     },
     exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
@@ -1574,7 +1574,7 @@ export const builders: IFieldBuilders = {
         DECEASED_TITLE,
         fhirBundle
       )
-      return createExactDateOfBirthUnknownBulder(person, fieldValue as string)
+      return createExactDateOfBirthUnknownBuilder(person, fieldValue as string)
     },
     maritalStatus: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
@@ -1680,12 +1680,15 @@ export const builders: IFieldBuilders = {
         person.gender = fieldValue as string
       },
       ageOfIndividualInYears: (fhirBundle, fieldValue) => {
-        const person = selectOrCreatePersonResource(
-          INFORMANT_CODE,
-          INFORMANT_TITLE,
-          fhirBundle
+        const person = selectOrCreateInformantResource(fhirBundle)
+        return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
+      },
+      exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        return createExactDateOfBirthUnknownBuilder(
+          person,
+          fieldValue as string
         )
-        return createAgeOfIndividualInYearsBulder(person, fieldValue as string)
       },
       identifier: {
         id: (

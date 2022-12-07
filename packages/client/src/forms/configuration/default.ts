@@ -1076,6 +1076,12 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: []
                   }
                 ],
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: 'values.exactDateOfBirthUnknown'
+                  }
+                ],
                 mapping: {
                   mutation: {
                     operation: 'fieldValueNestingTransformer',
@@ -1097,6 +1103,76 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['birthDate']
                       }
                     ]
+                  }
+                }
+              },
+              {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                required: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: ['individual']
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'booleanTransformer'
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfInformant,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.exactDateOfBirthUnknown'
+                  }
+                ],
+                postfix: 'years',
+                inputFieldWidth: '78px',
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: ['individual']
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: ['individual']
                   }
                 }
               },
@@ -3146,7 +3222,7 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'disable',
-                    expression: "!!'values.exactDateOfBirthUnknown'"
+                    expression: 'values.exactDateOfBirthUnknown'
                   }
                 ],
                 validate: [
@@ -3756,7 +3832,7 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'disable',
-                    expression: "!!'values.exactDateOfBirthUnknown'"
+                    expression: 'values.exactDateOfBirthUnknown'
                   }
                 ],
                 validate: [
@@ -3812,8 +3888,18 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: ['individual']
+                  },
                   query: {
-                    operation: 'booleanTransformer'
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'booleanTransformer'
+                      }
+                    ]
                   }
                 }
               },
@@ -3841,7 +3927,17 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 postfix: 'years',
-                inputFieldWidth: '78px'
+                inputFieldWidth: '78px',
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: ['individual']
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: ['individual']
+                  }
+                }
               },
               {
                 name: 'firstNamesEng',
