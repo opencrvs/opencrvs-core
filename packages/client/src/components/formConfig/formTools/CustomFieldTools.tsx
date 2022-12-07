@@ -754,7 +754,7 @@ class CustomFieldToolsComp extends React.Component<
           >
             <CTextInput
               value={this.state.conditionalField.regex}
-              onChange={(event) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 this.setState({
                   conditionalField: {
                     fieldId: this.state.conditionalField.fieldId,
@@ -904,7 +904,7 @@ class CustomFieldToolsComp extends React.Component<
             <CTextInput
               type="number"
               defaultValue={this.state.maxLength}
-              onChange={(event) =>
+              onChange={(event: { target: { value: string | number } }) =>
                 this.setState({
                   maxLength: +event.target.value
                 })
@@ -1094,11 +1094,11 @@ class CustomFieldToolsComp extends React.Component<
           }
         ]
       })
-    } catch (ex) {
+    } catch (ex: any) {
       this.setState({
         CSVUploadStatuses: [
           {
-            message: this.showErrorMessage(ex.message),
+            message: this.showErrorMessage(ex.message as string),
             statusType: STATUS_TYPES.ERROR
           }
         ],

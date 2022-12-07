@@ -76,6 +76,7 @@ export function createCustomField({
     validate: [],
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
+    options: [],
     mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
