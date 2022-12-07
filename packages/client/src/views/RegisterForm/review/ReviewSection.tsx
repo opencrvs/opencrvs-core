@@ -1199,16 +1199,23 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             (previewGroup) => previewGroup.id === baseTag
           ) as IPreviewGroup[])) ||
         []
+
       const values = taggedFields
         .map((field) =>
           this.getValueOrError(section, draft.data, field, errorsOnFields)
         )
         .filter((value) => value)
 
+      const hasErrors = taggedFields.reduce(
+        (accum, field) =>
+          accum || this.fieldHasErrors(section, field, errorsOnFields),
+        false
+      )
+
       let completeValue: typeof values[number]
       const previewTransformer =
         section.previewGroupTransformers?.[field.previewGroup]
-      if (previewTransformer) {
+      if (!hasErrors && previewTransformer) {
         completeValue = previewTransformer(values)
       } else {
         completeValue = values[0]
@@ -1229,12 +1236,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             ))
         )
       }
-
-      const hasErrors = taggedFields.reduce(
-        (accum, field) =>
-          accum || this.fieldHasErrors(section, field, errorsOnFields),
-        false
-      )
 
       const hasAnyFieldChanged = taggedFields.reduce(
         (accum, field) =>
