@@ -299,11 +299,6 @@ function UserListComponent(props: IProps) {
     isOnline,
     location: { search }
   } = props
-  const isNatlSysAdmin = userDetails?.role
-    ? NATL_ADMIN_ROLES.includes(userDetails.role)
-      ? true
-      : false
-    : false
 
   const { locationId } = parse(search) as unknown as ISearchParams
   const [toggleActivation, setToggleActivation] =
@@ -429,29 +424,17 @@ function UserListComponent(props: IProps) {
     [goToReviewUserDetails, intl, resendSMS, toggleUserActivationModal]
   )
 
-  function getViewOnly(
-    locationId: string,
-    userDetails: IUserDetails | null,
-    onlyNational: boolean
-  ) {
+  function getViewOnly(userDetails: IUserDetails | null) {
+    const allowedRoles = NATL_ADMIN_ROLES.concat(SYS_ADMIN_ROLES)
+
     if (
       userDetails &&
       userDetails.role &&
-      userDetails.primaryOffice &&
-      SYS_ADMIN_ROLES.includes(userDetails.role) &&
-      locationId === userDetails.primaryOffice.id &&
-      !onlyNational
+      allowedRoles.includes(userDetails.role)
     ) {
       return false
-    } else if (
-      userDetails &&
-      userDetails.role &&
-      NATL_ADMIN_ROLES.includes(userDetails.role)
-    ) {
-      return false
-    } else {
-      return true
     }
+    return true
   }
 
   const StatusMenu = useCallback(
@@ -574,11 +557,10 @@ function UserListComponent(props: IProps) {
 
   const LocationButton = (
     locationId: string,
-    userDetails: IUserDetails | null,
-    onlyNational: boolean
+    userDetails: IUserDetails | null
   ) => {
     const buttons: React.ReactElement[] = []
-    if (!getViewOnly(locationId, userDetails, onlyNational)) {
+    if (!getViewOnly(userDetails)) {
       buttons.push(
         <LocationPicker
           locationId={locationId}
@@ -724,8 +706,7 @@ function UserListComponent(props: IProps) {
   return (
     <SysAdminContentWrapper
       changeTeamLocation={
-        (!getViewOnly(locationId, userDetails, true) && onChangeLocation) ||
-        undefined
+        (!getViewOnly(userDetails) && onChangeLocation) || undefined
       }
       isCertificatesConfigPage={true}
       hideBackground={true}
@@ -749,11 +730,7 @@ function UserListComponent(props: IProps) {
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
                 size={ContentSize.LARGE}
-                topActionButtons={LocationButton(
-                  locationId,
-                  userDetails,
-                  isNatlSysAdmin
-                )}
+                topActionButtons={LocationButton(locationId, userDetails)}
               >
                 {error ? (
                   <ErrorText id="user_loading_error">
