@@ -198,6 +198,7 @@ class ReadyForReviewComponent extends React.Component<
           new Date(reg.dateOfEvent)) ||
         ''
       const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
+
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
