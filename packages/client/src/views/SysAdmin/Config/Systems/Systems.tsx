@@ -242,7 +242,11 @@ export function SystemList() {
       <Content
         title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
-          <Button type="secondary" onClick={() => setShowModal(true)}>
+          <Button
+            type="secondary"
+            id="createClientButton"
+            onClick={() => setShowModal(true)}
+          >
             <Icon name="Plus" />
             {intl.formatMessage(integrationMessages.createClient)}
           </Button>
@@ -357,7 +361,7 @@ export function SystemList() {
           }}
           title={toggleKeyModal.selectedClient?.name ?? ''}
         >
-          <Text variant="reg16" element="p">
+          <Text variant="reg16" element="p" id="revealKeyId">
             {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
           </Text>
 
@@ -440,6 +444,7 @@ export function SystemList() {
                   {intl.formatMessage(buttonMessages.cancel)}
                 </Link>,
                 <Button
+                  id="submitClientForm"
                   disabled={
                     !newSystemType ||
                     newClientName === EMPTY_STRING ||
@@ -468,7 +473,7 @@ export function SystemList() {
           intl.formatMessage(integrationMessages.createClient)
         }
       >
-        <Text variant="reg16" element="p">
+        <Text variant="reg16" element="p" id="uniqueKeyId">
           {!registerSystemData && !registerSystemLoading
             ? intl.formatMessage(integrationMessages.newIntegrationDescription)
             : intl.formatMessage(integrationMessages.uniqueKeysDescription)}
