@@ -144,6 +144,7 @@ import {
   CancelButton
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { getBase64String } from '@client/utils/imageUtils'
+import { formatName } from '@client/utils/name'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -629,6 +630,7 @@ const renderValue = (
   language: string
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
@@ -1170,7 +1172,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
-
       const baseTag = field.previewGroup
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
@@ -1204,22 +1205,30 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         )
         .filter((value) => value)
 
-      let completeValue = values[0]
-      values.shift()
-      values.forEach(
-        (value) =>
-          (completeValue = (
-            <>
-              {completeValue}
-              {tagDef[0].delimiter ? (
-                <span>{tagDef[0].delimiter}</span>
-              ) : (
-                <br />
-              )}
-              {value}
-            </>
-          ))
-      )
+      let completeValue: typeof values[number]
+      const previewTransformer =
+        section.previewGroupTransformers?.[field.previewGroup]
+      if (previewTransformer) {
+        completeValue = previewTransformer(values)
+      } else {
+        completeValue = values[0]
+
+        values.shift()
+        values.forEach(
+          (value) =>
+            (completeValue = (
+              <>
+                {completeValue}
+                {tagDef[0].delimiter ? (
+                  <span>{tagDef[0].delimiter}</span>
+                ) : (
+                  <br />
+                )}
+                {value}
+              </>
+            ))
+        )
+      }
 
       const hasErrors = taggedFields.reduce(
         (accum, field) =>
@@ -1246,22 +1255,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             )
           )
           .filter((value) => value)
-        let previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
-        previousValues.shift()
-        previousValues.forEach(
-          (previousValue) =>
-            (previousCompleteValue = (
-              <>
-                {previousCompleteValue}
-                {tagDef[0].delimiter ? (
-                  <span>{tagDef[0].delimiter}</span>
-                ) : (
-                  <br />
-                )}
-                <Deleted>{previousValue}</Deleted>
-              </>
-            ))
-        )
+
+        let previousCompleteValue: JSX.Element
+
+        if (previewTransformer) {
+          previousCompleteValue = (
+            <Deleted>{previewTransformer(previousValues)}</Deleted>
+          )
+        } else {
+          previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
+          previousValues.shift()
+          previousValues.forEach(
+            (previousValue) =>
+              (previousCompleteValue = (
+                <>
+                  {previousCompleteValue}
+                  {tagDef[0].delimiter ? (
+                    <span>{tagDef[0].delimiter}</span>
+                  ) : (
+                    <br />
+                  )}
+                  <Deleted>{previousValue}</Deleted>
+                </>
+              ))
+          )
+        }
 
         completeValue = (
           <>
@@ -1766,6 +1784,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       formSections,
       errorsOnFields
     )
+
     const description = intl.formatMessage(messages.reviewDescription, {
       event
     })
@@ -1792,7 +1811,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   informantName
                     ? intl.formatMessage(messages.headerSubjectWithName, {
                         eventType: event,
-                        name: informantName
+                        name: formatName(informantName)
                       })
                     : intl.formatMessage(messages.headerSubjectWithoutName, {
                         eventType: event
@@ -1945,7 +1964,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     informantName2
                       ? intl.formatMessage(messages.headerSubjectWithName, {
                           eventType: event,
-                          name: informantName2
+                          name: formatName(informantName2)
                         })
                       : intl.formatMessage(messages.headerSubjectWithoutName, {
                           eventType: event

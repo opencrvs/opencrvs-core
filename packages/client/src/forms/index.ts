@@ -958,6 +958,9 @@ export interface IFormSection {
   notice?: MessageDescriptor
   mapping?: IFormSectionMapping
   hasDocumentSection?: boolean
+  previewGroupTransformers?: {
+    [key: string]: (data: any) => string
+  }
 }
 
 export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {

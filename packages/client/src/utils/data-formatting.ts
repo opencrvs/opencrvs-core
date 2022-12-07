@@ -18,14 +18,14 @@ interface INamesMap {
 export const createNamesMap = (names: GQLHumanName[]): INamesMap =>
   names.filter(Boolean).reduce((prevNamesMap: INamesMap, name) => {
     if (!name.use) {
-      prevNamesMap['default'] = `${name.firstNames || ''} ${
-        name.familyName || ''
+      prevNamesMap['default'] = `${name.familyName || ''}, ${
+        name.firstNames || ''
       }`.trim()
       return prevNamesMap
     }
 
-    prevNamesMap[name.use] = `${name.firstNames || ''} ${
-      name.familyName || ''
+    prevNamesMap[name.use] = `${name.familyName || ''}, ${
+      name.firstNames || ''
     }`.trim()
     return prevNamesMap
   }, {})

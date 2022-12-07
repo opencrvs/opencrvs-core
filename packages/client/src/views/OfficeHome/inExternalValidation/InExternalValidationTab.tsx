@@ -9,36 +9,36 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import {
-  GridTable,
-  COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/interface'
-import { ITheme, withTheme } from '@client/styledComponents'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import { transformData } from '@client/search/transformer'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import {
-  dynamicConstantsMessages,
   constantsMessages,
+  dynamicConstantsMessages,
   wqMessages
 } from '@client/i18n/messages'
-import { connect } from 'react-redux'
-import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
+import { transformData } from '@client/search/transformer'
+import { ITheme, withTheme } from '@client/styledComponents'
 import { formattedDuration } from '@client/utils/date-formatting'
-import {
-  getSortedItems,
-  changeSortedColumn
-} from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer,
-  NameContainer
+  NameContainer,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
+import {
+  changeSortedColumn,
+  getSortedItems
+} from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import {
+  COLUMNS,
+  GridTable,
+  SORT_ORDER
+} from '@opencrvs/components/lib/interface'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 
 const { useState, useEffect } = React
 

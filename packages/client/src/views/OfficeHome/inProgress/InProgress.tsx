@@ -9,78 +9,70 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
-  ColumnContentAlignment,
-  GridTable,
-  COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/interface/GridTable'
-import {
-  GQLHumanName,
-  GQLEventSearchResultSet,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
-import {
-  IDeclaration,
   DOWNLOAD_STATUS,
+  IDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
-import {
-  goToPage as goToPageAction,
-  goToHomeTab,
-  goToDeclarationRecordAudit
-} from '@client/navigation'
-import {
-  DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE,
-  REVIEW_EVENT_PARENT_FORM_PAGE
-} from '@client/navigation/routes'
-import { ITheme, withTheme } from '@client/styledComponents'
-import { LANG_EN } from '@client/utils/constants'
-import { createNamesMap } from '@client/utils/data-formatting'
-import * as React from 'react'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape
-} from 'react-intl'
-import { connect } from 'react-redux'
+import { DownloadAction } from '@client/forms'
 import {
   buttonMessages,
   constantsMessages,
   dynamicConstantsMessages,
   wqMessages
 } from '@client/i18n/messages'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { messages } from '@client/i18n/messages/views/registrarHome'
+import {
+  goToDeclarationRecordAudit,
+  goToHomeTab,
+  goToPage as goToPageAction
+} from '@client/navigation'
+import {
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { DownloadAction } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { getDraftInformantFullName } from '@client/utils/draftUtils'
+import { ITheme, withTheme } from '@client/styledComponents'
+import { LANG_EN } from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { FormTabs } from '@opencrvs/components/lib/forms'
-import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
+import { getDraftInformantFullName } from '@client/utils/draftUtils'
+import { Event } from '@client/utils/gateway'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer,
-  NameContainer
+  NameContainer,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { startCase } from 'lodash'
+import { FormTabs } from '@opencrvs/components/lib/forms'
+import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
+import {
+  ColumnContentAlignment,
+  COLUMNS,
+  GridTable,
+  SORT_ORDER
+} from '@opencrvs/components/lib/interface/GridTable'
+import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet,
+  GQLEventSearchResultSet,
+  GQLHumanName
+} from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -255,7 +247,7 @@ export class InProgressComponent extends React.Component<
             )
           }
         >
-          {startCase(name)}
+          {name}
         </NameContainer>
       ) : (
         <NoNameContainer

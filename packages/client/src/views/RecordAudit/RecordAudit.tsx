@@ -124,6 +124,7 @@ import {
 } from './mutations'
 import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
+import { formatName } from '@client/utils/name'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -524,7 +525,8 @@ function RecordAuditBody({
   const mobileProps: IPageHeaderProps = {
     id: 'mobileHeader',
     mobileTitle:
-      declaration.name || intl.formatMessage(recordAuditMessages.noName),
+      (declaration.name && formatName(declaration.name)) ||
+      intl.formatMessage(recordAuditMessages.noName),
     mobileLeft: [
       <BackButtonDiv>
         <BackButton onClick={() => goBack()}>
@@ -562,7 +564,7 @@ function RecordAuditBody({
       )}
       <Content
         title={
-          (declaration.name && startCase(declaration.name)) ||
+          (declaration.name && formatName(declaration.name)) ||
           intl.formatMessage(recordAuditMessages.noName)
         }
         titleColor={declaration.name ? 'copy' : 'grey600'}

@@ -9,17 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  DOWNLOAD_STATUS,
-  IDeclaration,
-  SUBMISSION_STATUS,
-  getProcessingDeclarationIds
-} from '@client/declarations'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { Header } from '@client/components/interface/Header/Header'
+import { Navigation } from '@client/components/interface/Navigation'
 import { Query } from '@client/components/Query'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
+import {
+  DOWNLOAD_STATUS,
+  getProcessingDeclarationIds,
+  IDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { DownloadAction } from '@client/forms'
+import { convertToMSISDN } from '@client/forms/utils'
 import {
   buttonMessages,
   constantsMessages,
@@ -49,32 +51,28 @@ import {
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
+import { formattedDuration } from '@client/utils/date-formatting'
+import { SearchEventsQuery } from '@client/utils/gateway'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-
+import {
+  IconWithName,
+  IconWithNameEvent,
+  NameContainer,
+  NoNameContainer
+} from '@client/views/OfficeHome/components'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import {
   ColumnContentAlignment,
+  COLUMNS,
   GridTable,
-  IAction,
-  COLUMNS
+  IAction
 } from '@opencrvs/components/lib/interface'
-
-import { SearchEventsQuery } from '@client/utils/gateway'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
-import { convertToMSISDN } from '@client/forms/utils'
-import { formattedDuration } from '@client/utils/date-formatting'
-import { Navigation } from '@client/components/interface/Navigation'
-import {
-  IconWithName,
-  IconWithNameEvent,
-  NoNameContainer,
-  NameContainer
-} from '@client/views/OfficeHome/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};

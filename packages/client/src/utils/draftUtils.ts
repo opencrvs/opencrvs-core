@@ -31,13 +31,13 @@ import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const getInformantEngName = (sectionData: IFormSectionData): string => {
-  if (sectionData.firstNamesEng) {
-    return ([] as IFormFieldValue[])
-      .concat(sectionData.firstNamesEng)
-      .concat(sectionData.middleNamesEng)
-      .concat(sectionData.familyNameEng)
+  if (sectionData.firstNamesEng && sectionData.familyNameEng) {
+    return `${sectionData.familyNameEng}, ${[
+      sectionData.firstNamesEng,
+      sectionData.middleNamesEng
+    ]
       .filter(Boolean)
-      .join(' ')
+      .join(' ')}`
   } else {
     return sectionData.familyNameEng as string
   }
@@ -45,8 +45,8 @@ const getInformantEngName = (sectionData: IFormSectionData): string => {
 
 const getInformantOthreName = (sectionData: IFormSectionData): string => {
   if (sectionData.firstNames) {
-    return `${sectionData.firstNames as string} ${
-      sectionData.familyName as string
+    return `${sectionData.familyName as string}, ${
+      sectionData.firstNames as string
     }`
   } else {
     return sectionData.familyName as string
@@ -65,12 +65,12 @@ const getInformantFullName = (
     fullName = getInformantEngName(sectionData)
   } else {
     if (sectionData.firstNames && sectionData.familyName) {
-      fullName = ([] as IFormFieldValue[])
-        .concat(sectionData.firstNames)
-        .concat(sectionData.middleNames)
-        .concat(sectionData.familyName)
+      fullName = `${sectionData.familyName}, ${[
+        sectionData.firstNames,
+        sectionData.middleNames
+      ]
         .filter(Boolean)
-        .join(' ')
+        .join(' ')}`
     } else {
       fullName =
         getInformantOthreName(sectionData) || getInformantEngName(sectionData)

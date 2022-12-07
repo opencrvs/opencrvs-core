@@ -26,8 +26,17 @@ import {
   deathDocumentForWhomFhirMapping,
   deathDocumentTypeFhirMapping
 } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+import { formatName } from '@client/utils/name'
 
 // THIS FILE CONTAINS THE DEFAULT, FACTORY RESET FORM CONFIGURATIONS
+
+function nameTransformer([surname, ...firstNames]: string[]) {
+  const isEmptyField = surname === '-'
+  if (isEmptyField) {
+    return '-'
+  }
+  return formatName(`${surname}, ${firstNames.join(' ')}`)
+}
 
 interface IDefaultRegisterForms {
   birth: ISerializedForm
@@ -43,6 +52,9 @@ export const registerForms: IDefaultRegisterForms = {
         name: formMessageDescriptors.childTab,
         title: formMessageDescriptors.childTitle,
         hasDocumentSection: true,
+        previewGroupTransformers: {
+          childNameInEnglish: nameTransformer
+        },
         mapping: {
           template: [
             {
@@ -447,6 +459,9 @@ export const registerForms: IDefaultRegisterForms = {
         name: formMessageDescriptors.motherName,
         title: formMessageDescriptors.motherTitle,
         hasDocumentSection: true,
+        previewGroupTransformers: {
+          motherNameInEnglish: nameTransformer
+        },
         groups: [
           {
             id: 'mother-view-group',
@@ -1705,6 +1720,9 @@ export const registerForms: IDefaultRegisterForms = {
           id: 'form.section.father.title'
         },
         hasDocumentSection: true,
+        previewGroupTransformers: {
+          fatherNameInEnglish: nameTransformer
+        },
         groups: [
           {
             id: 'father-view-group',
@@ -3083,6 +3101,9 @@ export const registerForms: IDefaultRegisterForms = {
         },
         title: formMessageDescriptors.informantTitle,
         hasDocumentSection: true,
+        previewGroupTransformers: {
+          informantNameInEnglish: nameTransformer
+        },
         groups: [
           {
             id: 'informant-view-group',
