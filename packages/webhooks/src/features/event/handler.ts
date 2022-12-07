@@ -11,7 +11,7 @@
  */
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { USER_MANAGEMENT_URL } from '@opencrvs/gateway/src/constants'
+import { USER_MANAGEMENT_URL } from '@webhooks/constants'
 import {
   createRequestSignature,
   transformBirthBundle,
