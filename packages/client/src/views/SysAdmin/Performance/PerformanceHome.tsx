@@ -73,6 +73,7 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
+import { ExportReportButton } from './ExportReportButton'
 
 const Layout = styled.div`
   display: flex;
@@ -647,6 +648,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     </ResponsiveModalContent>
                   </ResponsiveModal>
                   <LayoutRight>
+                    <ExportReportButton />
                     {!officeSelected && (
                       <LocationStats>
                         {!isOnline ? null : loading ? (
