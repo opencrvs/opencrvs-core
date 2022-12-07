@@ -28,6 +28,7 @@ interface IButtonsMessages
   edit: MessageDescriptor
   editRegistration: MessageDescriptor
   exitButton: MessageDescriptor
+  exportButton: MessageDescriptor
   finish: MessageDescriptor
   forgotPassword: MessageDescriptor
   forgottenPIN: MessageDescriptor
@@ -151,6 +152,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'EXIT',
     description: 'Label for Exit button on EventTopBar',
     id: 'buttons.exit'
+  },
+  exportButton: {
+    defaultMessage: 'Export',
+    description: 'Label for Export button on export report dialog',
+    id: 'buttons.export'
   },
   finish: {
     defaultMessage: 'Finish',

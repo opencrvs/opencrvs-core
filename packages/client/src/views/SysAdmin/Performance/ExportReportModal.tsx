@@ -11,12 +11,18 @@
  */
 import { EMPTY_STRING } from '@client/utils/constants'
 import * as React from 'react'
-import { ChangeNumberView } from '@client/views/Settings/ChangePhoneModal/ChangeNumberView'
-import { VerifyCodeView } from '@client/views/Settings/ChangePhoneModal/VerifyCodeView'
-import { ResponsiveModal } from '@client/../../components/lib'
+import {
+  Checkbox,
+  CheckboxGroup,
+  ICheckboxOption,
+  ResponsiveModal
+} from '@client/../../components/lib'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Text } from '@opencrvs/components/lib/Text'
+import { Calendar, User, MapPin } from 'react-feather'
+import styled from '@client/styledComponents'
 
 interface IProps {
   show: boolean
@@ -24,9 +30,48 @@ interface IProps {
   onClose: () => void
 }
 
+const LocationIcon = styled(MapPin)`
+  margin-right: 8px;
+`
+
+const UserIcon = styled(User)`
+  margin-right: 8px;
+`
+
+const CalendarIcon = styled(Calendar)`
+  margin-right: 8px;
+`
+
+const FilterRow = styled.div`
+  margin: 4px 0;
+`
+
 export function ExportReportModal({ show, onClose, onSuccess }: IProps) {
   const intl = useIntl()
   const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
+
+  const inputProps = {
+    id: 'id',
+    onChange: () => {},
+    onBlur: () => {},
+    value: {}
+    // disabled: fieldDefinition.disabled,
+    // error: Boolean(error),
+    // touched: Boolean(touched),
+    // placeholder: fieldDefinition.placeholder
+  }
+
+  //var selectedValues : FormFieldValue[]
+
+  const sectionOptions: ICheckboxOption[] = [
+    { value: '', label: 'Completion rates' },
+    { value: '', label: 'Registrations' },
+    { value: '', label: 'Certificates issued' },
+    { value: '', label: 'Sources of applications' },
+    { value: '', label: 'Corrections' },
+    { value: '', label: 'Fees collected' }
+  ]
+
   const onSuccessChangeNumber = (phoneNumber: string) => {
     setPhoneNumber(phoneNumber)
   }
@@ -57,12 +102,44 @@ export function ExportReportModal({ show, onClose, onSuccess }: IProps) {
           }}
           //disabled={!Boolean(phoneNumber.length) || isInvalidPhoneNumber}
         >
-          {intl.formatMessage(buttonMessages.continueButton)}
+          {intl.formatMessage(buttonMessages.exportButton)}
         </PrimaryButton>
       ]}
       handleClose={onClose}
-      contentHeight={150}
+      contentHeight={400}
       contentScrollableY={true}
-    ></ResponsiveModal>
+    >
+      <Text element="p" color="supportingCopy" variant="reg16">
+        A PDF report will be generated with the following sections
+      </Text>
+      <FilterRow>
+        {/* How to set the colour correctly? */}
+        <LocationIcon size={14} color="black" />
+        <Text element="span" color="copy" variant="bold16">
+          Farajaland
+        </Text>
+      </FilterRow>
+      <FilterRow>
+        {/* How to set the colour correctly? */}
+        <UserIcon size={14} color="black" />
+        <Text element="span" color="copy" variant="bold16">
+          Births
+        </Text>
+      </FilterRow>
+      <FilterRow>
+        {/* How to set the colour correctly? */}
+        <CalendarIcon size={14} color="black" />
+        <Text element="span" color="copy" variant="bold16">
+          Last 12 months
+        </Text>
+      </FilterRow>
+      <CheckboxGroup
+        {...inputProps}
+        options={sectionOptions}
+        name={'SectionOptions'}
+        value={['value??']}
+        onChange={(val: string[]) => console.log('onchange: ', val)}
+      />
+    </ResponsiveModal>
   )
 }
