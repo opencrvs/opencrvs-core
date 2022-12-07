@@ -61,7 +61,10 @@ import { ITemplatedComposition } from '@gateway/features/registration/fhir-build
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
-import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
+import {
+  getSignatureExtension,
+  IUserModelData
+} from '@gateway/features/user/type-resolvers'
 import { getUser } from '@gateway/features/user/utils'
 
 export const typeResolvers: GQLResolver = {
@@ -810,6 +813,26 @@ export const typeResolvers: GQLResolver = {
       if (!user || !user.valueReference || !user.valueReference.reference) {
         return null
       }
+      const practitionerId = user.valueReference.reference.split('/')[1]
+      const practitionerRoleBundle = await fetchFHIR(
+        `/PractitionerRole?practitioner=${practitionerId}`,
+        authHeader
+      )
+      const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
+      const practitionerRoleHistoryBundle: fhir.Bundle & {
+        entry: fhir.PractitionerRole[]
+      } = await fetchFHIR(
+        `/PractitionerRole/${practitionerRoleId}/_history`,
+        authHeader
+      )
+      const result = practitionerRoleHistoryBundle.entry.find(
+        (it: fhir.BundleEntry) =>
+          it.resource?.meta?.lastUpdated &&
+          task.lastModified &&
+          it.resource?.meta?.lastUpdated <= task.lastModified!
+      )?.resource as fhir.PractitionerRole | undefined
+
+      const role = result?.code?.[0]?.coding?.[0]?.code
       const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
         method: 'POST',
         body: JSON.stringify({
@@ -820,7 +843,11 @@ export const typeResolvers: GQLResolver = {
           ...authHeader
         }
       })
-      return await res.json()
+      const userResponse: IUserModelData = await res.json()
+      return {
+        ...userResponse,
+        role: role ?? userResponse.role
+      }
     },
     location: async (task: fhir.Task, _: any, authHeader: any) => {
       const taskLocation = findExtension(
