@@ -73,7 +73,8 @@ export async function getLoginConfigHandler(
   const refineConfigResponse = pick(loginConfig, [
     'APPLICATION_NAME',
     'COUNTRY_LOGO',
-    'PHONE_NUMBER_PATTERN'
+    'PHONE_NUMBER_PATTERN',
+    'LOGIN_BACKGROUND'
   ])
   return { config: refineConfigResponse }
 }

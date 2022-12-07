@@ -22,12 +22,6 @@ export interface ICountryLogo {
   file: string
 }
 
-type ICountryBackground = {
-  backgroundColor: string // hex value
-  backgroundImage: string //base64 string
-  imageFit: 'FILL' | 'TILE'
-}
-
 export interface ILoginBackground {
   backgroundColor: string
   backgroundImage: string
@@ -40,7 +34,6 @@ export interface IApplicationConfig {
   SENTRY: string
   LOGROCKET: string
   LOGIN_BACKGROUND: ILoginBackground
-  COUNTRY_BACKGROUND: ICountryBackground
 }
 
 export interface IApplicationConfigResponse {
