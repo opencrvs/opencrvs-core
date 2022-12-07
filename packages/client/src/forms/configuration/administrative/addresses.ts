@@ -3001,60 +3001,6 @@ export function getPlaceOfEventAddressFields(
       }
     },
     {
-      name: 'addressLine5',
-      customisable: false,
-      type: 'TEXT',
-      label: {
-        defaultMessage: 'Village',
-        description: 'Title for the address line 1',
-        id: 'form.field.label.addressLine5'
-      },
-      previewGroup: configCase,
-      required: true,
-      initialValue: '',
-      validate: [],
-      dependency: 'district',
-      conditionals: [
-        {
-          action: 'hide',
-          expression: '!values.country'
-        },
-        {
-          action: 'hide',
-          expression: '!values.state'
-        },
-        {
-          action: 'hide',
-          expression: '!values.district'
-        },
-        {
-          action: 'hide',
-          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
-        },
-        {
-          action: 'hide',
-          expression: 'values.ruralOrUrban !== "RURAL"'
-        },
-        {
-          action: 'hide',
-          expression: '!isDefaultCountry(values.country)'
-        }
-      ],
-      mapping: {
-        mutation: {
-          operation:
-            configCase === EventLocationAddressCases.PLACE_OF_BIRTH
-              ? 'birthEventLocationMutationTransformer'
-              : 'deathEventLocationMutationTransformer',
-          parameters: [5]
-        },
-        query: {
-          operation: 'eventLocationQueryTransformer',
-          parameters: [5]
-        }
-      }
-    },
-    {
       name: 'ruralOption2',
       customisable: false,
       type: 'TEXT',
