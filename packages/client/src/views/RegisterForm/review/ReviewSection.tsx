@@ -458,7 +458,12 @@ const renderValue = (
 
   if (value && field.type === LOCATION_SEARCH_INPUT) {
     const searchableListOfLocations = generateLocations(
-      getListOfLocations(offlineCountryConfiguration, field.searchableResource),
+      field.searchableResource.reduce((locations, resource) => {
+        return {
+          ...locations,
+          ...getListOfLocations(offlineCountryConfiguration, resource)
+        }
+      }, {}),
       intl
     )
     const selectedLocation = searchableListOfLocations.find(
@@ -467,14 +472,18 @@ const renderValue = (
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
 
-  if (typeof value === 'string') {
-    return value
-  }
   if (typeof value === 'boolean') {
     return value
       ? intl.formatMessage(buttonMessages.yes)
       : intl.formatMessage(buttonMessages.no)
   }
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    return field.postfix
+      ? String(value).concat(` ${field.postfix.toLowerCase()}`)
+      : value
+  }
+
   return value
 }
 

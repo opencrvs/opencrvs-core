@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/migration",
-  "version": "1.0.2",
+  "version": "1.2.0-beta",
   "description": "OpenCRVS migration microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "type": "module",
@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "migrate-mongo": "^9.0.0",
-    "influx": "^5.0.7"
+    "influx": "^5.0.7",
+    "@elastic/elasticsearch": "7.17.0"
   },
   "devDependencies": {
     "prettier": "^2.5.0"

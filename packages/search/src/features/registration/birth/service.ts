@@ -40,7 +40,7 @@ import {
   getCompositionById,
   updateInHearth,
   findEntryResourceByUrl,
-  findEventLocation,
+  addEventLocation,
   getLocationHirarchyIDs
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
@@ -194,10 +194,7 @@ async function createChildIndex(
     bundleEntries
   ) as fhir.Patient
 
-  const birthLocation = (await findEventLocation(
-    BIRTH_ENCOUNTER_CODE,
-    composition
-  )) as fhir.Location
+  await addEventLocation(body, BIRTH_ENCOUNTER_CODE, composition)
 
   const childName = child && findName(NAME_EN, child.name)
   const childNameLocal = child && findNameLocale(child.name)
@@ -211,7 +208,7 @@ async function createChildIndex(
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
   body.childDoB = child && child.birthDate
   body.gender = child && child.gender
-  body.eventLocationId = birthLocation && birthLocation.id
+  body.gender = child && child.gender
 }
 
 function createMotherIndex(
@@ -242,7 +239,9 @@ function createMotherIndex(
     motherNameLocal && motherNameLocal.family && motherNameLocal.family[0]
   body.motherDoB = mother.birthDate
   body.motherIdentifier =
-    mother.identifier && mother.identifier[0] && mother.identifier[0].value
+    mother.identifier &&
+    mother.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
 }
 
 function createFatherIndex(
@@ -273,7 +272,9 @@ function createFatherIndex(
     fatherNameLocal && fatherNameLocal.family && fatherNameLocal.family[0]
   body.fatherDoB = father.birthDate
   body.fatherIdentifier =
-    father.identifier && father.identifier[0] && father.identifier[0].value
+    father.identifier &&
+    father.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
 }
 
 function createInformantIndex(
@@ -315,6 +316,11 @@ function createInformantIndex(
     informantNameLocal &&
     informantNameLocal.family &&
     informantNameLocal.family[0]
+  body.informantDoB = informant.birthDate
+  body.informantIdentifier =
+    informant.identifier &&
+    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
 }
 
 async function createDeclarationIndex(
@@ -386,7 +392,7 @@ async function createDeclarationIndex(
     placeOfDeclarationExtension.valueReference &&
     placeOfDeclarationExtension.valueReference.reference &&
     placeOfDeclarationExtension.valueReference.reference.split('/')[1]
-  body.declarationLocationHirarchyIds = await getLocationHirarchyIDs(
+  body.declarationJurisdictionIds = await getLocationHirarchyIDs(
     body.declarationLocationId
   )
   body.compositionType =

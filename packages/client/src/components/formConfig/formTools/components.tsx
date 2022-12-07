@@ -21,7 +21,7 @@ import {
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import ReactTooltip from 'react-tooltip'
 import { Event } from '@client/utils/gateway'
-import { BirthSection, DeathSection, ISerializedForm } from '@client/forms'
+import { BirthSection, DeathSection } from '@client/forms'
 import { useDefaultForm } from '@client/views/SysAdmin/Config/Forms/hooks'
 import { formSectionToFieldIdentifiers } from '@client/forms/questionConfig/transformers'
 import { useParams } from 'react-router'

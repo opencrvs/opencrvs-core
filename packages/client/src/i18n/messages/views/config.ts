@@ -14,6 +14,8 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationSettings: MessageDescriptor
+  advancedSearch: MessageDescriptor
+  advancedSearchInstruction: MessageDescriptor
   vsexport: MessageDescriptor
   vitalStatisticsExport: MessageDescriptor
   export: MessageDescriptor
@@ -100,6 +102,17 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.settings',
     defaultMessage: 'Application',
     description: 'Link Text for Config Application Settings'
+  },
+  advancedSearch: {
+    id: 'config.advanced.search',
+    defaultMessage: 'Advanced Search',
+    description: 'This is used for the advanced search'
+  },
+  advancedSearchInstruction: {
+    id: 'config.advanced.search.instruction',
+    defaultMessage:
+      'Select the options to build an advanced search. A minimum of two search parameters is required.',
+    description: 'This is used for the advanced search'
   },
   vsexport: {
     id: 'config.application.vsexport',

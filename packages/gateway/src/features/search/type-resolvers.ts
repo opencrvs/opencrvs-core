@@ -11,7 +11,7 @@
  */
 import { NATIVE_LANGUAGE } from '@gateway/constants'
 import {
-  // GQLDate,
+  GQLAdvancedSearchParametersInput,
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
@@ -30,48 +30,12 @@ interface ISearchDataTemplate {
   [key: string]: any
 }
 export interface ISearchCriteria {
-  declarationLocationId?: string[] | string
-  declarationLocationHirarchyId?: string
-  status?: string[]
-  type?: string[]
-  trackingId?: string
-  contactNumber?: string
-  name?: string
-  registrationNumber?: string
+  parameters: GQLAdvancedSearchParametersInput
   sort?: string
   sortColumn?: string
   size?: number
   from?: number
   createdBy?: string
-}
-
-export interface IAdvancedSearchParam {
-  event?: string
-  eventLocationId?: string
-  childFirstNames?: string
-  childLastName?: string
-  childDoB?: string
-  deceasedFirstNames?: string
-  deceasedFamilyName?: string
-  deathDate?: string
-  dateOfEventStart?: string
-  dateOfEventEnd?: string
-  motherFirstNames?: string
-  motherFamilyName?: string
-  motherDoB?: string
-  motherIdentifier?: string
-  fatherFirstNames?: string
-  fatherFamilyName?: string
-  fatherDoB?: string
-  fatherIdentifier?: string
-  informantFirstNames?: string
-  informantFamilyName?: string
-  contactNumber?: string
-  registrationNumber?: string
-  trackingId?: string
-  dateOfRegistration?: string
-  dateOfRegistrationStart?: string
-  dateOfRegistrationEnd?: string
 }
 
 const getTimeLoggedDataByStatus = (
