@@ -20,18 +20,20 @@ import styled from 'styled-components'
 import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useHistory, useLocation } from 'react-router'
+import { usePersistentCountryBackground } from '@login/common/LoginBackground/LoginBackground'
 
 type IProps = {
   children: React.ReactNode
 }
 
-const SelectContainer = styled.div`
+const SelectContainer = styled.div<{ selected?: boolean }>`
   display: flex;
   justify-content: end;
   padding: 24px 24px 8px;
-  background: ${({ theme }) => theme.colors.backgroundPrimary};
+  background: ${(hex) => (hex.color ? hex.color : '#101010')};
 `
-
+// ${(hex) => (hex.color ? hex.color : '#fff')};
+// ${({ theme }) => theme.colors.backgroundPrimary};
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const applicationLangauges = window.config.LANGUAGES.split(',')
   const history = useHistory()
@@ -58,15 +60,20 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
 export function LanguageSelect({ children }: IProps) {
   const paramLanguage = useSearchQuery('lang')
   const selectedLanguage = useSelector(getLanguage)
+  const countryBackground = usePersistentCountryBackground()
+
   const [languageOptions, onLanguageChange] = useLanguage(
     selectedLanguage,
     paramLanguage
   )
+  React.useEffect(() => {
+    console.log(countryBackground)
+  }, [])
 
   return (
     <>
       {languageOptions.length > 1 && (
-        <SelectContainer>
+        <SelectContainer color={`#${countryBackground}`}>
           <Select2
             value={selectedLanguage}
             options={languageOptions}
