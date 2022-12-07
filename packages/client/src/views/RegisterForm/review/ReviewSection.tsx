@@ -145,6 +145,7 @@ import {
   CancelButton
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { getBase64String } from '@client/utils/imageUtils'
+import { formatName } from '@client/utils/name'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -630,6 +631,7 @@ const renderValue = (
   language: string
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
@@ -696,7 +698,17 @@ const renderValue = (
   if (typeof value === 'string') {
     return value
   }
+
   if (typeof value === 'boolean') {
+    if (field.reviewOverrideLabels) {
+      const replacementLabel = field.reviewOverrideLabels.find(
+        (label) => label.value === value
+      )
+      if (replacementLabel) {
+        return intl.formatMessage(replacementLabel.label)
+      }
+    }
+
     return value
       ? intl.formatMessage(buttonMessages.yes)
       : intl.formatMessage(buttonMessages.no)
@@ -989,7 +1001,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   isVisibleField(field: IFormField, section: IFormSection) {
     const { draft, offlineCountryConfiguration } = this.props
     const conditionalActions = getConditionalActionsForField(
-      field,
+      {
+        ...field,
+        conditionals: (field.conditionals || []).concat(
+          field.reviewConditionals || []
+        )
+      },
       draft.data[section.id] || {},
       offlineCountryConfiguration,
       draft.data
@@ -1029,6 +1046,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getRenderableField(
+    declaration: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
@@ -1036,7 +1054,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction = false
   ) {
-    const { draft: declaration, intl } = this.props
+    const { intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -1169,6 +1187,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getPreviewGroupsField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
@@ -1177,11 +1196,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
-    const { draft } = this.props
-
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
-
       const baseTag = field.previewGroup
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
@@ -1209,34 +1225,43 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             (previewGroup) => previewGroup.id === baseTag
           ) as IPreviewGroup[])) ||
         []
+
       const values = taggedFields
         .map((field) =>
           this.getValueOrError(section, draft.data, field, errorsOnFields)
         )
         .filter((value) => value)
 
-      let completeValue = values[0]
-      values.shift()
-      values.forEach(
-        (value) =>
-          (completeValue = (
-            <>
-              {completeValue}
-              {tagDef[0].delimiter ? (
-                <span>{tagDef[0].delimiter}</span>
-              ) : (
-                <br />
-              )}
-              {value}
-            </>
-          ))
-      )
-
       const hasErrors = taggedFields.reduce(
         (accum, field) =>
           accum || this.fieldHasErrors(section, field, errorsOnFields),
         false
       )
+
+      let completeValue: typeof values[number]
+      const previewTransformer =
+        section.previewGroupTransformers?.[field.previewGroup]
+      if (!hasErrors && previewTransformer) {
+        completeValue = previewTransformer(values)
+      } else {
+        completeValue = values[0]
+
+        values.shift()
+        values.forEach(
+          (value) =>
+            (completeValue = (
+              <>
+                {completeValue}
+                {tagDef[0].delimiter ? (
+                  <span>{tagDef[0].delimiter}</span>
+                ) : (
+                  <br />
+                )}
+                {value}
+              </>
+            ))
+        )
+      }
 
       const hasAnyFieldChanged = taggedFields.reduce(
         (accum, field) =>
@@ -1257,22 +1282,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             )
           )
           .filter((value) => value)
-        let previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
-        previousValues.shift()
-        previousValues.forEach(
-          (previousValue) =>
-            (previousCompleteValue = (
-              <>
-                {previousCompleteValue}
-                {tagDef[0].delimiter ? (
-                  <span>{tagDef[0].delimiter}</span>
-                ) : (
-                  <br />
-                )}
-                <Deleted>{previousValue}</Deleted>
-              </>
-            ))
-        )
+
+        let previousCompleteValue: JSX.Element
+
+        if (previewTransformer) {
+          previousCompleteValue = (
+            <Deleted>{previewTransformer(previousValues)}</Deleted>
+          )
+        } else {
+          previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
+          previousValues.shift()
+          previousValues.forEach(
+            (previousValue) =>
+              (previousCompleteValue = (
+                <>
+                  {previousCompleteValue}
+                  {tagDef[0].delimiter ? (
+                    <span>{tagDef[0].delimiter}</span>
+                  ) : (
+                    <br />
+                  )}
+                  <Deleted>{previousValue}</Deleted>
+                </>
+              ))
+          )
+        }
 
         completeValue = (
           <>
@@ -1284,6 +1318,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       }
 
       return this.getRenderableField(
+        draft,
         section,
         group,
         (tagDef[0] && tagDef[0].label) || field.label,
@@ -1361,16 +1396,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getSinglePreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean
   ) {
-    const {
-      draft: { data, originalData }
-    } = this.props
-
+    const { data, originalData } = draft
     let value = this.getValueOrError(
       section,
       data,
@@ -1403,6 +1436,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     return this.getRenderableField(
+      draft,
       section,
       group,
       field.label,
@@ -1413,17 +1447,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getNestedPreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     sectionErrors: IErrorsBySection
   ) {
-    const { draft } = this.props
     const visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
-      this.getSinglePreviewField(section, group, field, sectionErrors, true)
+      this.getSinglePreviewField(
+        draft,
+        section,
+        group,
+        field,
+        sectionErrors,
+        true
+      )
     )
     ;(
       (field.nestedFields &&
@@ -1439,6 +1480,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (nestedField.previewGroup) {
         nestedItems.push(
           this.getPreviewGroupsField(
+            draft,
             section,
             group,
             nestedField,
@@ -1454,6 +1496,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       } else {
         nestedItems.push(
           this.getRenderableField(
+            draft,
             section,
             group,
             nestedField.label,
@@ -1473,6 +1516,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverriddenFieldsListForPreview(
+    draft: IDeclaration,
     formSections: IFormSection[]
   ): IFormField[] {
     const overriddenFields = formSections
@@ -1481,7 +1525,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           .map((group) => {
             return group.fields
               .map((field) => {
-                const { draft, offlineCountryConfiguration } = this.props
+                const { offlineCountryConfiguration } = this.props
                 const tempField = clone(field)
                 const residingSection =
                   get(field.reviewOverrides, 'residingSection') || ''
@@ -1510,6 +1554,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   getOverRiddenPreviewField(
+    draft: IDeclaration,
     section: IFormSection,
     group: IFormSectionGroup,
     overriddenField: IFormField,
@@ -1529,6 +1574,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ) as IFormSection
 
     const result = this.getSinglePreviewField(
+      draft,
       residingSection,
       group,
       overriddenField,
@@ -1620,11 +1666,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   transformSectionData = (
     formSections: IFormSection[],
-    errorsOnFields: IErrorsBySection
+    errorsOnFields: IErrorsBySection,
+    draft: IDeclaration
   ) => {
-    const { intl, draft } = this.props
-    const overriddenFields =
-      this.getOverriddenFieldsListForPreview(formSections)
+    const { intl } = this.props
+    const overriddenFields = this.getOverriddenFieldsListForPreview(
+      draft,
+      formSections
+    )
     let tempItem: any
 
     return formSections.map((section) => {
@@ -1646,6 +1695,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           .forEach((field) => {
             tempItem = field.previewGroup
               ? this.getPreviewGroupsField(
+                  draft,
                   section,
                   group,
                   field,
@@ -1657,12 +1707,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
               ? this.getNestedPreviewField(
+                  draft,
                   section,
                   group,
                   field,
                   errorsOnFields
                 )
               : this.getSinglePreviewField(
+                  draft,
                   section,
                   group,
                   field,
@@ -1671,6 +1723,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
             overriddenFields.forEach((overriddenField) => {
               items = this.getOverRiddenPreviewField(
+                draft,
                 section,
                 group,
                 overriddenField as IFormField,
@@ -1775,8 +1828,32 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
-      errorsOnFields
+      errorsOnFields,
+      declaration
     )
+    let transformedSectionDataForDeclaration2: {
+      id: Section
+      title: string
+      items: any[]
+      action:
+        | {
+            label: string
+            handler: () => void
+          }
+        | undefined
+    }[] = []
+    if (declaration2) {
+      const errorsOnFieldsInDeclaration2 = getErrorsOnFieldsBySection(
+        formSections,
+        offlineCountryConfiguration,
+        declaration2
+      )
+      transformedSectionDataForDeclaration2 = this.transformSectionData(
+        formSections,
+        errorsOnFieldsInDeclaration2,
+        declaration2
+      )
+    }
     const description = intl.formatMessage(messages.reviewDescription, {
       event
     })
@@ -1803,7 +1880,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   informantName
                     ? intl.formatMessage(messages.headerSubjectWithName, {
                         eventType: event,
-                        name: informantName
+                        name: formatName(informantName)
                       })
                     : intl.formatMessage(messages.headerSubjectWithoutName, {
                         eventType: event
@@ -1956,7 +2033,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     informantName2
                       ? intl.formatMessage(messages.headerSubjectWithName, {
                           eventType: event,
-                          name: informantName2
+                          name: formatName(informantName2)
                         })
                       : intl.formatMessage(messages.headerSubjectWithoutName, {
                           eventType: event
@@ -1967,7 +2044,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <Description>{description}</Description>
                 )}
                 <FormData>
-                  {transformedSectionData.map((sec, index) => {
+                  {transformedSectionDataForDeclaration2.map((sec, index) => {
                     const { uploadedDocuments, selectOptions } =
                       this.prepSectionDocuments(declaration2, sec.id)
 

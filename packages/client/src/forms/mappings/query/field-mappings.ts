@@ -28,7 +28,7 @@ import {
   ISelectFormFieldWithOptions
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { cloneDeep, capitalize, get, upperCase } from 'lodash'
+import { cloneDeep, capitalize, get } from 'lodash'
 import format from '@client/utils/date-formatting'
 import {
   IOfflineData,
@@ -106,7 +106,7 @@ export const upperCaseNameToFieldTransformer =
     if (!transformedData[sectionId]) {
       transformedData[sectionId] = {}
     }
-    const name = upperCase(selectedName[nameKey])
+    const name = (selectedName[nameKey] || '').toUpperCase()
 
     transformedData[sectionId][field.name] = name
     return transformedData

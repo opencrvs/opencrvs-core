@@ -442,6 +442,8 @@ export interface IFormFieldBase {
   initialValueKey?: string
   extraValue?: IFormFieldValue
   conditionals?: IConditional[]
+  reviewConditionals?: IConditional[]
+  reviewOverrideLabels?: IRadioOption[]
   description?: MessageDescriptor
   placeholder?: MessageDescriptor
   mapping?: IFormFieldMapping
@@ -508,7 +510,6 @@ export interface IRadioGroupFormField extends IFormFieldBase {
   size?: RadioSize
   notice?: MessageDescriptor
   flexDirection?: FLEX_DIRECTION
-  reviewOverrideLabels?: IRadioOption[]
 }
 
 export interface IRadioGroupWithNestedFieldsFormField
@@ -967,6 +968,9 @@ export interface IFormSection {
   notice?: MessageDescriptor
   mapping?: IFormSectionMapping
   hasDocumentSection?: boolean
+  previewGroupTransformers?: {
+    [key: string]: (data: any) => string
+  }
 }
 
 export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
@@ -1034,6 +1038,7 @@ export interface Ii18nFormFieldBase {
   nestedFields?: { [key: string]: Ii18nFormField[] }
   ignoreBottomMargin?: boolean
   ignoreMediaQuery?: boolean
+  reviewOverrideLabels?: RadioComponentOption[]
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
@@ -1051,7 +1056,6 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   size?: RadioSize
   notice?: string
   flexDirection?: string
-  reviewOverrideLabels?: RadioComponentOption[]
 }
 
 export interface Ii18nRadioGroupWithNestedFieldsFormField
@@ -1115,6 +1119,7 @@ export interface Ii18nCheckboxFormField extends Ii18nFormFieldBase {
   type: typeof CHECKBOX
   checkedValue?: 'true' | 'false' | boolean
   uncheckedValue?: 'true' | 'false' | boolean
+  reviewOverrideLabels?: RadioComponentOption[]
 }
 
 export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {

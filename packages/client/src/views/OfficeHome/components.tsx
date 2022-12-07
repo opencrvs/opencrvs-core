@@ -20,6 +20,7 @@ import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { WaitingToSent } from '@opencrvs/components/lib/icons/WaitingToSent'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { formatName } from '@client/utils/name'
 
 const Flex = styled.div`
   display: flex;
@@ -30,7 +31,7 @@ const Flex = styled.div`
   }
 `
 
-export const NameContainer = styled(LinkButton)`
+const NameContainerWrapper = styled(LinkButton)`
   white-space: pre-wrap;
   text-align: left;
   height: auto;
@@ -39,6 +40,18 @@ export const NameContainer = styled(LinkButton)`
     padding: 0;
   }
 `
+
+export function NameContainer(
+  props: NonNullable<typeof NameContainerWrapper.defaultProps> & {
+    children: string
+  }
+) {
+  return (
+    <NameContainerWrapper {...props}>
+      {formatName(props.children)}
+    </NameContainerWrapper>
+  )
+}
 
 export const NoNameContainer = styled.span`
   color: ${({ theme }) => theme.colors.negative};

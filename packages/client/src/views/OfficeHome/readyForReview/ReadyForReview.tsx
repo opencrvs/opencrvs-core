@@ -9,55 +9,53 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import {
+  DOWNLOAD_STATUS,
+  IDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
+import { DownloadAction } from '@client/forms'
+import {
+  constantsMessages,
+  dynamicConstantsMessages,
+  wqMessages
+} from '@client/i18n/messages'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { messages } from '@client/i18n/messages/views/registrarHome'
 import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
-import { Scope, hasRegisterScope } from '@client/utils/authUtils'
-import {
-  ColumnContentAlignment,
-  GridTable,
-  IAction,
-  COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/interface'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
-import ReactTooltip from 'react-tooltip'
-import {
-  constantsMessages,
-  dynamicConstantsMessages,
-  wqMessages
-} from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/registrarHome'
-import {
-  IDeclaration,
-  DOWNLOAD_STATUS,
-  SUBMISSION_STATUS
-} from '@client/declarations'
-import { DownloadAction } from '@client/forms'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { withTheme } from 'styled-components'
+import { hasRegisterScope, Scope } from '@client/utils/authUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer,
-  NameContainer
+  NameContainer,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import {
+  ColumnContentAlignment,
+  COLUMNS,
+  GridTable,
+  IAction,
+  SORT_ORDER
+} from '@opencrvs/components/lib/interface'
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
-import { startCase } from 'lodash'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import ReactTooltip from 'react-tooltip'
+import { withTheme } from 'styled-components'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -200,6 +198,7 @@ class ReadyForReviewComponent extends React.Component<
           new Date(reg.dateOfEvent)) ||
         ''
       const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
+
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
@@ -208,7 +207,7 @@ class ReadyForReviewComponent extends React.Component<
             this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
           }
         >
-          {startCase(reg.name)}
+          {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer

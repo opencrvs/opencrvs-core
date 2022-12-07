@@ -35,9 +35,9 @@ export function getInformantSectionTransformer(
   sectionId: string
 ) {
   if (
-    queryData[sectionId].id &&
-    queryData[sectionId].individual &&
-    queryData[sectionId].individual.id
+    queryData[sectionId]?.id &&
+    queryData[sectionId]?.individual &&
+    queryData[sectionId]?.individual.id
   ) {
     transformedData[sectionId]._fhirIDMap = {
       // @ts-ignore
@@ -46,7 +46,7 @@ export function getInformantSectionTransformer(
     }
   }
   // Getting Informant's relationship data
-  if (queryData[sectionId].relationship) {
+  if (queryData[sectionId]?.relationship) {
     transformedData[sectionId].relationship = queryData[sectionId].relationship
   }
   return transformedData

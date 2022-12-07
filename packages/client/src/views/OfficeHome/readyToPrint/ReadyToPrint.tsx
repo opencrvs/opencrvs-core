@@ -9,49 +9,47 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
-import {
-  goToDeclarationRecordAudit,
-  goToPrintCertificate
-} from '@client/navigation'
-import { transformData } from '@client/search/transformer'
-import { ITheme } from '@client/styledComponents'
-import {
-  ColumnContentAlignment,
-  GridTable,
-  IAction,
-  SORT_ORDER,
-  COLUMNS
-} from '@opencrvs/components/lib/interface'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { withTheme } from 'styled-components'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { DOWNLOAD_STATUS, IDeclaration } from '@client/declarations'
+import { DownloadAction } from '@client/forms'
 import {
   buttonMessages,
   constantsMessages,
   dynamicConstantsMessages,
   wqMessages
 } from '@client/i18n/messages'
-import { IStoreState } from '@client/store'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
-import { DownloadAction } from '@client/forms'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import {
+  goToDeclarationRecordAudit,
+  goToPrintCertificate
+} from '@client/navigation'
+import { transformData } from '@client/search/transformer'
+import { IStoreState } from '@client/store'
+import { ITheme } from '@client/styledComponents'
+import { formattedDuration } from '@client/utils/date-formatting'
+import {
+  IconWithName,
+  IconWithNameEvent,
+  NameContainer,
+  NoNameContainer
+} from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
-import {
-  IconWithName,
-  IconWithNameEvent,
-  NoNameContainer,
-  NameContainer
-} from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { startCase } from 'lodash'
+import {
+  ColumnContentAlignment,
+  COLUMNS,
+  GridTable,
+  IAction,
+  SORT_ORDER
+} from '@opencrvs/components/lib/interface'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { withTheme } from 'styled-components'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -241,7 +239,7 @@ class ReadyToPrintComponent extends React.Component<
             this.props.goToDeclarationRecordAudit('printTab', reg.id)
           }
         >
-          {startCase(reg.name)}
+          {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer
