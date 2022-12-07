@@ -3001,6 +3001,11 @@ export const formMessageDescriptors = {
     description: "Question to ask the user if they have the father's details",
     id: 'form.field.label.fathersDetailsExist'
   },
+  fathersDetailsUnavailable: {
+    defaultMessage: 'Unavailable',
+    description: "Value Unavailable if father's details do not exist",
+    id: 'form.field.label.fathersDetailsUnavailable'
+  },
   fatherTitle: {
     defaultMessage: "Father's details",
     description: 'Form section title for Father',

@@ -2925,6 +2925,18 @@ export const registerForms: IDefaultRegisterForms = {
                 hideHeader: true,
                 initialValue: true,
                 validate: [],
+                reviewOverrideLabels: [
+                  {
+                    value: false,
+                    label: formMessageDescriptors.fathersDetailsUnavailable
+                  }
+                ],
+                reviewConditionals: [
+                  {
+                    action: 'hide',
+                    expression: 'values.detailsExist'
+                  }
+                ],
                 conditionals: [
                   {
                     action: 'hide',

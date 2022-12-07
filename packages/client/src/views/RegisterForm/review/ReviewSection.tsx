@@ -697,7 +697,17 @@ const renderValue = (
   if (typeof value === 'string') {
     return value
   }
+
   if (typeof value === 'boolean') {
+    if (field.reviewOverrideLabels) {
+      const replacementLabel = field.reviewOverrideLabels.find(
+        (label) => label.value === value
+      )
+      if (replacementLabel) {
+        return intl.formatMessage(replacementLabel.label)
+      }
+    }
+
     return value
       ? intl.formatMessage(buttonMessages.yes)
       : intl.formatMessage(buttonMessages.no)
@@ -980,7 +990,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   isVisibleField(field: IFormField, section: IFormSection) {
     const { draft, offlineCountryConfiguration } = this.props
     const conditionalActions = getConditionalActionsForField(
-      field,
+      {
+        ...field,
+        conditionals: (field.conditionals || []).concat(
+          field.reviewConditionals || []
+        )
+      },
       draft.data[section.id] || {},
       offlineCountryConfiguration,
       draft.data
