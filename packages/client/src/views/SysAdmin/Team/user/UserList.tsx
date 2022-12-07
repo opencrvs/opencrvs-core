@@ -455,8 +455,7 @@ function UserListComponent(props: IProps) {
     }) {
       const canEditUserDetails =
         userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
-        (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
-          userDetails?.primaryOffice?.id === locationId)
+        userDetails?.role === 'LOCAL_SYSTEM_ADMIN'
           ? true
           : false
       return (
