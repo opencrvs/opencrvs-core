@@ -1364,6 +1364,12 @@
                       "parameters": []
                     }
                   ],
+                  "conditionals": [
+                    {
+                      "action": "disable",
+                      "expression": "values.exactDateOfBirthUnknown"
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldValueNestingTransformer",
@@ -1407,8 +1413,18 @@
                     }
                   ],
                   "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": ["individual"]
+                    },
                     "query": {
-                      "operation": "booleanTransformer"
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "booleanTransformer"
+                        }
+                      ]
                     }
                   }
                 },
@@ -1436,7 +1452,17 @@
                     }
                   ],
                   "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "inputFieldWidth": "78px",
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": ["individual"]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": ["individual"]
+                    }
+                  }
                 },
                 {
                   "name": "firstNamesEng",
@@ -4634,8 +4660,18 @@
                     }
                   ],
                   "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": ["individual"]
+                    },
                     "query": {
-                      "operation": "booleanTransformer"
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "booleanTransformer"
+                        }
+                      ]
                     }
                   }
                 },
@@ -4663,7 +4699,17 @@
                     }
                   ],
                   "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "inputFieldWidth": "78px",
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": ["individual"]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": ["individual"]
+                    }
+                  }
                 },
                 {
                   "name": "firstNamesEng",
