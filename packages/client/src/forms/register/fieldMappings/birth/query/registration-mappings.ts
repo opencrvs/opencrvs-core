@@ -54,7 +54,9 @@ export function transformStatusData(
           new Date(a.timestamp).valueOf() - new Date(b.timestamp).valueOf()
       )
       .find((status) => {
-        return ['REGISTERED', 'VALIDATED'].includes(status.type!)
+        return ['REGISTERED', 'VALIDATED', 'IN_PROGRESS', 'DECLARED'].includes(
+          status.type!
+        )
       })
 
   transformedData[sectionId] = {

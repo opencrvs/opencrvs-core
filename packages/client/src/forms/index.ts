@@ -215,6 +215,15 @@ export interface IFieldInput {
   type?: string
 }
 
+export interface IRegStatus {
+  type: string
+  statusDate: any
+  officeName: string
+  officeAlias: string
+  officeAddressLevel3: string
+  officeAddressLevel4: string
+}
+
 export type IFormFieldValue =
   | string
   | string[]

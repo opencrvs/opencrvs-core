@@ -69,7 +69,8 @@ import {
   IDocumentUploaderWithOptionsFormField,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  SubmissionAction
+  SubmissionAction,
+  IRegStatus
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -942,8 +943,18 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   ) => {
     const { draft, pageRoute, writeDeclaration, goToPageGroup } = this.props
     const declaration = draft
-    if (declaration.data.registration) {
-      declaration.data.registration.informantsSignature = ''
+    if (
+      declaration.data.registration &&
+      declaration.data.registration.informantsSignature
+    ) {
+      if (!declaration.data.registration.regStatus) {
+        declaration.data.registration.informantsSignature = ''
+      } else {
+        const regStatus = declaration.data.registration.regStatus as IRegStatus
+        if (regStatus.type === 'IN_PROGRESS') {
+          declaration.data.registration.informantsSignature = ''
+        }
+      }
     }
     declaration.review = true
     writeDeclaration(declaration)
