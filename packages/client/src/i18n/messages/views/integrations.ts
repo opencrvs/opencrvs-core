@@ -137,25 +137,25 @@ const messagesToDefine = {
 
   motherDetails: {
     id: 'integrations.motherDetails',
-    defaultMessage: 'Mothers Details',
+    defaultMessage: `Mother's Details`,
     description: 'Label for mothers details'
   },
 
   fatherDetails: {
     id: 'integrations.fatherDetails',
-    defaultMessage: 'Fathers Details',
+    defaultMessage: `Father's Details`,
     description: 'Label for fathers details'
   },
 
   informantDetails: {
     id: 'integrations.informantDetails',
-    defaultMessage: 'Informant Details',
+    defaultMessage: `Informant's Details`,
     description: 'Label for informant details'
   },
 
-  diseaseDetails: {
-    id: 'integrations.diseaseDetails',
-    defaultMessage: 'Disease Details',
+  deceasedDetails: {
+    id: 'integrations.deceasedDetails',
+    defaultMessage: `Deceased's Details`,
     description: 'Label for Disease details'
   },
 

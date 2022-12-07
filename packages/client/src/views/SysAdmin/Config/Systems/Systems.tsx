@@ -612,13 +612,13 @@ export function SystemList() {
                             label: intl.formatMessage(
                               integrationMessages.motherDetails
                             ),
-                            value: 'mothers-details'
+                            value: 'mother-details'
                           },
                           {
                             label: intl.formatMessage(
                               integrationMessages.fatherDetails
                             ),
-                            value: 'fathers-details'
+                            value: 'father-details'
                           },
                           {
                             label: intl.formatMessage(
@@ -641,13 +641,13 @@ export function SystemList() {
                             label: intl.formatMessage(
                               integrationMessages.motherDetails
                             ),
-                            value: 'mothers-details'
+                            value: 'mother-details'
                           },
                           {
                             label: intl.formatMessage(
                               integrationMessages.fatherDetails
                             ),
-                            value: 'fathers-details'
+                            value: 'father-details'
                           },
                           {
                             label: intl.formatMessage(
@@ -657,9 +657,9 @@ export function SystemList() {
                           },
                           {
                             label: intl.formatMessage(
-                              integrationMessages.diseaseDetails
+                              integrationMessages.deceasedDetails
                             ),
-                            value: 'disease-details'
+                            value: 'deceased-details'
                           }
                         ]}
                         name="test-checkbox-group1"
