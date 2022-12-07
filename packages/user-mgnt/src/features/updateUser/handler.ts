@@ -113,11 +113,9 @@ export default async function updateUser(
       throw new Error('Location can be changed only by National System Admin')
     }
   }
-  const practitioner = createFhirPractitioner(user, false)
-  if (!changingRole) {
-    // Update details in practitioner if not changing role, else create new practitioner for a new role
-    practitioner.id = existingPractitioner.id
-  }
+  const practitioner = createFhirPractitioner(existingUser, false)
+  practitioner.id = existingPractitioner.id
+
   const practitionerId = await postFhir(token, practitioner)
   if (!practitionerId) {
     throw new Error(
@@ -125,14 +123,12 @@ export default async function updateUser(
     )
   }
   const practitionerRole = createFhirPractitionerRole(
-    user,
+    existingUser,
     existingUser.practitionerId,
     false
   )
-  if (!changingRole) {
-    // Update details in practitionerRole if not changing role, else create new practitionerRole for a new role
-    practitionerRole.id = existingPractitionerRole.id
-  }
+
+  practitionerRole.id = existingPractitionerRole.id
   const practitionerRoleId = await postFhir(token, practitionerRole)
   if (!practitionerRoleId) {
     throw new Error(
