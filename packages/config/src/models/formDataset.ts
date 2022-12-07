@@ -16,7 +16,7 @@ export interface IDataset {
   fileName: string
   options: ISelectOption[]
   createdAt: string
-  createdBy: string
+  createdBy?: string
   resource?: string
 }
 
