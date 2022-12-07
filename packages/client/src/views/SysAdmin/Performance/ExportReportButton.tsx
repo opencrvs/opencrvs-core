@@ -77,11 +77,11 @@ export function ExportReportButton() {
           Export report
         </Link>
       </Box>
-      {/* <ExportReportModal
+      <ExportReportModal
         show={showModal}
         onClose={toggleReportExportModal}
         onSuccess={handleSuccess}
-      /> */}
+      />
       {/* DO WE NEED A SUCCESS TOAST? */}
       {showSuccessNotification && (
         <Toast type="success" onClose={toggleSuccessNotification}>

@@ -13,10 +13,9 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import * as React from 'react'
 import { ChangeNumberView } from '@client/views/Settings/ChangePhoneModal/ChangeNumberView'
 import { VerifyCodeView } from '@client/views/Settings/ChangePhoneModal/VerifyCodeView'
-import { ResponsiveModal, TextInput } from '@client/../../components/lib'
+import { ResponsiveModal } from '@client/../../components/lib'
 import { useIntl } from 'react-intl'
-import { buttonMessages } from '@client/i18n/messages/buttons'
-import { messages } from '@client/i18n/messages/views/notifications'
+import { buttonMessages } from '@client/i18n/messages'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 
 interface IProps {
@@ -44,7 +43,7 @@ export function ExportReportModal({ show, onClose, onSuccess }: IProps) {
     <ResponsiveModal
       id="ExportReportModal"
       show={show}
-      title={intl.formatMessage(messages.changePhoneLabel)}
+      title="Export report"
       actions={[
         <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
@@ -64,15 +63,6 @@ export function ExportReportModal({ show, onClose, onSuccess }: IProps) {
       handleClose={onClose}
       contentHeight={150}
       contentScrollableY={true}
-    >
-      <TextInput
-        id="PhoneNumber"
-        type="number"
-        touched={true}
-        //error={isInvalidPhoneNumber}
-        value={1232}
-        // onChange={onChangePhoneNumber}
-      />
-    </ResponsiveModal>
+    ></ResponsiveModal>
   )
 }
