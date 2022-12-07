@@ -813,13 +813,11 @@ export const typeResolvers: GQLResolver = {
       if (!user || !user.valueReference || !user.valueReference.reference) {
         return null
       }
-
       const practitionerId = user.valueReference.reference.split('/')[1]
       const practitionerRoleBundle = await fetchFHIR(
         `/PractitionerRole?practitioner=${practitionerId}`,
         authHeader
       )
-
       const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
       const practitionerRoleHistoryBundle: fhir.Bundle & {
         entry: fhir.PractitionerRole[]
@@ -827,7 +825,6 @@ export const typeResolvers: GQLResolver = {
         `/PractitionerRole/${practitionerRoleId}/_history`,
         authHeader
       )
-
       const result = practitionerRoleHistoryBundle.entry.find(
         (it: fhir.BundleEntry) =>
           it.resource?.meta?.lastUpdated &&
@@ -846,7 +843,6 @@ export const typeResolvers: GQLResolver = {
           ...authHeader
         }
       })
-
       const userResponse: IUserModelData = await res.json()
       return {
         ...userResponse,
