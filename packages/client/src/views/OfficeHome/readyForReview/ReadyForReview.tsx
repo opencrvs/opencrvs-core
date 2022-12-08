@@ -111,7 +111,7 @@ class ReadyForReviewComponent extends React.Component<
   }
 
   popStateListener() {
-    window.history.pushState(null, document.title, window.location.href)
+    window.history.pushState(null, '', window.location.href)
   }
 
   componentWillUnmount() {
