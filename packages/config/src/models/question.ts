@@ -121,7 +121,10 @@ const questionSchema = new Schema({
   required: { type: Boolean },
   enabled: { type: String },
   custom: { type: Boolean, default: false },
-  conditionals: [{ type: conditionals, required: false }]
+  conditionals: {
+    type: [conditionals],
+    default: undefined
+  }
 })
 
 export default model<IQuestionModel>('Question', questionSchema)
