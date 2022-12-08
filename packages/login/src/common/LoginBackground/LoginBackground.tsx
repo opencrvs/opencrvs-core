@@ -80,9 +80,13 @@ export class LoginBackground extends React.Component<
 > {
   render() {
     const { children, submitting } = this.props
+    const { countryBackground } = usePersistentCountryBackground()
     return (
       <div>
-        <StyledPage {...this.props}>
+        <StyledPage
+          {...this.props}
+          style={{ backgroundImage: `url(${countryBackground})` }}
+        >
           {submitting ? (
             <Spinner
               id="login-submitting-spinner"
