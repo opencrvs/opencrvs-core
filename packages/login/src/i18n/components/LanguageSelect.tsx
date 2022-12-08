@@ -68,9 +68,9 @@ export function LanguageSelect({ children }: IProps) {
     selectedLanguage,
     paramLanguage
   )
-  // React.useEffect(() => {
-  //   console.log(countryBackground)
-  // }, [])
+  React.useEffect(() => {
+    console.log(countryBackground)
+  }, [])
 
   return (
     <>

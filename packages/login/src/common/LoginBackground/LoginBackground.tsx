@@ -25,6 +25,10 @@ const StyledPage = styled.div<IPage>`
   background: ${({ background, theme }) =>
     background ? `#${background}` : theme.colors.backgroundPrimary};
 
+  background-image: ${({ background, theme }) =>
+    background ? `url(${background})` : theme.colors.backgroundPrimary};
+  background-size: cover;
+
   min-height: 100vh;
   display: flex;
   flex-direction: column;
