@@ -97,7 +97,7 @@ export const StyledPrimaryButton = styled(PrimaryButton)`
 `
 
 export const StyledButton = styled(LinkButton)`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.black};
   flex-direction: row;
   justify-content: center;
   text-decoration: none;
@@ -115,7 +115,7 @@ export const StyledButton = styled(LinkButton)`
   &:not([data-focus-visible-added]) {
     background: transparent;
     outline: none;
-    color: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.black};
   }
   &:active:not([data-focus-visible-added]):enabled {
     outline: none;
@@ -131,7 +131,16 @@ export const FieldWrapper = styled.div`
   min-height: 6.5em;
 `
 export const LoginText = styled(Text)`
-  min-height: 6.5em;
+  font-weight: 400;
+  text-align: center;
+`
+
+const StyledH2 = styled.h2`
+  ${({ theme }) => theme.fonts.h2};
+  /* stylelint-disable-next-line opencrvs/no-font-styles */
+  font-weight: 400;
+  text-align: center;
+  color: ${({ theme }) => theme.colors.grey600};
 `
 
 export interface IProps {
@@ -229,7 +238,7 @@ export function StepOneForm({
 
   return (
     <Container id="login-step-one-box">
-      <Box id="Box" color={'#FFF'}>
+      <Box id="Box">
         <LogoContainer>
           <CountryLogo src={logo} />
         </LogoContainer>
@@ -260,9 +269,10 @@ export function StepOneForm({
         >
           {({ handleSubmit }) => (
             <FormWrapper id={formId} onSubmit={handleSubmit}>
-              <LoginText variant="h3" element="span">
-                Login To Farajaland CRVS
-              </LoginText>
+              <StyledH2>
+                {intl.formatMessage(messages.stepOneLoginText)}
+              </StyledH2>
+
               <FieldWrapper>
                 <Field name={userNameField.name} component={UserNameInput} />
               </FieldWrapper>

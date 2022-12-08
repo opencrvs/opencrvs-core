@@ -22,7 +22,9 @@ import {
 import { useSelector } from 'react-redux'
 
 const StyledPage = styled.div<IPage>`
-  background: ${({ theme }) => theme.colors.backgroundPrimary};
+  background: ${({ background, theme }) =>
+    background ? `#${background}` : theme.colors.backgroundPrimary};
+
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -51,7 +53,9 @@ export function usePersistentCountryBackground() {
   if (background && background !== offlineBackground) {
     setOfflineBackground(background)
     localStorage.setItem('country-background', background)
+    console.log(background)
   }
+
   return offlineBackground
 }
 

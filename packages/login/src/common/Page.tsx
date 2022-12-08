@@ -15,6 +15,7 @@ import { RouteComponentProps } from 'react-router'
 
 export interface IPage {
   submitting: boolean
+  background?: string
 }
 
 const StyledPage = styled.div<IPage>`

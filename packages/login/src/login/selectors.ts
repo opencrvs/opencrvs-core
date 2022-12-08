@@ -40,7 +40,6 @@ export function selectCountryBackground(store: IStoreState) {
     return getKey(store, 'config').LOGIN_BACKGROUND?.backgroundColor
   }
 }
-
 export function selectApplicationName(store: IStoreState) {
   return getKey(store, 'config').APPLICATION_NAME
 }

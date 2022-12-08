@@ -26,14 +26,20 @@ type IProps = {
   children: React.ReactNode
 }
 
-const SelectContainer = styled.div<{ selected?: boolean }>`
+const SelectContainer = styled.div<{
+  color?: string
+  backgroundImage?: string
+}>`
   display: flex;
   justify-content: end;
   padding: 24px 24px 8px;
-  background: ${(hex) => (hex.color ? hex.color : '#000')};
+  background: ${({ color, theme }) =>
+    color ? color : theme.colors.backgroundPrimary};
+
+  background-image: ${({ backgroundImage, theme }) =>
+    backgroundImage ? backgroundImage : theme.colors.backgroundPrimary};
 `
-// ${(hex) => (hex.color ? hex.color : '#fff')};
-// ${({ theme }) => theme.colors.backgroundPrimary};
+
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const applicationLangauges = window.config.LANGUAGES.split(',')
   const history = useHistory()
@@ -66,9 +72,9 @@ export function LanguageSelect({ children }: IProps) {
     selectedLanguage,
     paramLanguage
   )
-  React.useEffect(() => {
-    console.log(countryBackground)
-  }, [])
+  // React.useEffect(() => {
+  //   console.log(countryBackground)
+  // }, [])
 
   return (
     <>

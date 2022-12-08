@@ -18,6 +18,8 @@ import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
 import { Mobile2FA } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
+import { Text } from '@opencrvs/components/lib/Text'
+
 import {
   Title,
   FormWrapper,
@@ -34,6 +36,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 import { ceil } from 'lodash'
 import { messages } from '@login/i18n/messages/views/stepTwoForm'
 import { useDispatch } from 'react-redux'
+import { Box } from '@login/../../components/lib/Box'
 
 const StyledMobile2FA = styled(Mobile2FA)`
   transform: scale(0.8);
@@ -42,6 +45,7 @@ const StyledH2 = styled.h2`
   ${({ theme }) => theme.fonts.h2};
   /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-weight: 400;
+  color: ${({ theme }) => theme.colors.grey600};
 `
 export interface IProps {
   formId: string
@@ -93,91 +97,94 @@ export function StepTwoForm({
   const field = stepTwoFields.code
   return (
     <Container id="login-step-two-box">
-      <Title>
-        <LogoContainer>
-          <StyledMobile2FA />
-        </LogoContainer>
-        {resentSMS ? (
-          <React.Fragment>
-            <StyledH2>
-              {intl.formatMessage(messages.stepTwoResendTitle)}
-            </StyledH2>
-            <p>
-              {intl.formatMessage(messages.resentSMS, {
-                number: mobileNumber
-              })}
-            </p>
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
-            <StyledH2>{intl.formatMessage(messages.stepTwoTitle)}</StyledH2>
-            <p>
-              {intl.formatMessage(messages.stepTwoInstruction, {
-                number: mobileNumber
-              })}
-            </p>
-          </React.Fragment>
-        )}
+      <Box id="Box">
+        <Title>
+          <LogoContainer>
+            <StyledMobile2FA />
+          </LogoContainer>
+          {resentSMS ? (
+            <React.Fragment>
+              <StyledH2>
+                {intl.formatMessage(messages.stepTwoResendTitle)}
+              </StyledH2>
+              <p>
+                {intl.formatMessage(messages.resentSMS, {
+                  number: mobileNumber
+                })}
+              </p>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <StyledH2>{intl.formatMessage(messages.stepTwoTitle)}</StyledH2>
 
-        {submissionError && (
-          <ErrorMessage>
-            {intl.formatMessage(messages.codeSubmissionError)}
-          </ErrorMessage>
-        )}
-      </Title>
-      <Form
-        onSubmit={(values: IVerifyCodeNumbers) =>
-          dispatch(actions.verifyCode(values))
-        }
-      >
-        {({ handleSubmit }) => (
-          <FormWrapper id={formId} onSubmit={handleSubmit}>
-            <FieldWrapper>
-              <Field name={field.name} field={field}>
-                {({ meta, input, ...otherProps }) => (
-                  <InputField
-                    {...field}
-                    {...otherProps}
-                    touched={Boolean(meta.touched)}
-                    label={intl.formatMessage(messages.verficationCodeLabel)}
-                    optionalLabel={intl.formatMessage(messages.optionalLabel)}
-                    ignoreMediaQuery
-                    hideAsterisk
-                  >
-                    <TextInput
+              <Text variant="reg16" element="p">
+                {intl.formatMessage(messages.stepTwoInstruction, {
+                  number: mobileNumber
+                })}
+              </Text>
+            </React.Fragment>
+          )}
+
+          {submissionError && (
+            <ErrorMessage>
+              {intl.formatMessage(messages.codeSubmissionError)}
+            </ErrorMessage>
+          )}
+        </Title>
+        <Form
+          onSubmit={(values: IVerifyCodeNumbers) =>
+            dispatch(actions.verifyCode(values))
+          }
+        >
+          {({ handleSubmit }) => (
+            <FormWrapper id={formId} onSubmit={handleSubmit}>
+              <FieldWrapper>
+                <Field name={field.name} field={field}>
+                  {({ meta, input, ...otherProps }) => (
+                    <InputField
                       {...field}
-                      {...input}
+                      {...otherProps}
                       touched={Boolean(meta.touched)}
-                      error={Boolean(meta.error)}
+                      label={intl.formatMessage(messages.verficationCodeLabel)}
+                      optionalLabel={intl.formatMessage(messages.optionalLabel)}
                       ignoreMediaQuery
-                    />
-                  </InputField>
-                )}
-              </Field>
-            </FieldWrapper>
+                      hideAsterisk
+                    >
+                      <TextInput
+                        {...field}
+                        {...input}
+                        touched={Boolean(meta.touched)}
+                        error={Boolean(meta.error)}
+                        ignoreMediaQuery
+                      />
+                    </InputField>
+                  )}
+                </Field>
+              </FieldWrapper>
 
-            <ActionWrapper>
-              <PrimaryButton
-                id="login-mobile-submit"
-                disabled={submitting}
-                type="submit"
-              >
-                {intl.formatMessage(messages.verify)}
-              </PrimaryButton>{' '}
-              <br />
-              <StyledButtonWrapper>
-                <StyledButton
-                  onClick={onResendSMS}
-                  id="login-mobile-resend"
-                  type="button"
+              <ActionWrapper>
+                <PrimaryButton
+                  id="login-mobile-submit"
+                  disabled={submitting}
+                  type="submit"
                 >
-                  {intl.formatMessage(messages.resend)}
-                </StyledButton>
-              </StyledButtonWrapper>
-            </ActionWrapper>
-          </FormWrapper>
-        )}
-      </Form>
+                  {intl.formatMessage(messages.verify)}
+                </PrimaryButton>{' '}
+                <br />
+                <StyledButtonWrapper>
+                  <StyledButton
+                    onClick={onResendSMS}
+                    id="login-mobile-resend"
+                    type="button"
+                  >
+                    {intl.formatMessage(messages.resend)}
+                  </StyledButton>
+                </StyledButtonWrapper>
+              </ActionWrapper>
+            </FormWrapper>
+          )}
+        </Form>
+      </Box>
     </Container>
   )
 }
