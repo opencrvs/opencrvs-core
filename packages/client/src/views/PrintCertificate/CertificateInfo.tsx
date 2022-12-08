@@ -64,7 +64,7 @@ export const CertificateInfo = ({ data }: { data: Record<string, string> }) => {
     LGA: data.registrationLGA,
     State: data.registrationState,
     BRN: data.registrationNumber,
-    'Full Name': `${data.childFamilyName}, ${data.childFirstName}`,
+    'Full Name': `${data.childFamilyName}, ${data.childFirstName} ${data.childMiddleNames}`,
     Sex: data.informantGender,
     'Date of Birth': data.eventDate,
     'Place of Birth': `${data.placeOfBirthLocality}, ${data.placeOfBirthLGA}, ${data.placeOfBirthState}`
@@ -73,13 +73,13 @@ export const CertificateInfo = ({ data }: { data: Record<string, string> }) => {
   if (data.motherFamilyName || data.motherFirstName) {
     renderedData[
       'Full Name of Mother'
-    ] = `${data.motherFamilyName}, ${data.motherFirstName}`
+    ] = `${data.motherFamilyName}, ${data.motherFirstName} ${data.motherMiddleNames}`
   }
 
   if (data.fatherFamilyName || data.fatherFirstName) {
     renderedData[
       'Full Name of Father'
-    ] = `${data.fatherFamilyName}, ${data.fatherFirstName}`
+    ] = `${data.fatherFamilyName}, ${data.fatherFirstName} ${data.fatherMiddleNames}`
   }
 
   renderedData['Name of Registrar'] = data.registrarName

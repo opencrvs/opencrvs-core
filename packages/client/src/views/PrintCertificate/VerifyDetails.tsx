@@ -40,6 +40,7 @@ import { Event } from '@client/utils/gateway'
 import { startCase } from 'lodash'
 import { formatAllNonStringValues } from './PDFUtils'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { formatName } from '@client/utils/name'
 
 const FullPageCenter = styled.div`
   height: 100vh;
@@ -101,6 +102,7 @@ const VERIFY_QUERY = gql`
           name {
             use
             firstNames
+            middleNames
             familyName
           }
         }
@@ -114,6 +116,7 @@ const VERIFY_QUERY = gql`
         registrationNumber
         status {
           type
+          timestamp
           office {
             name
             alias
@@ -130,6 +133,7 @@ const VERIFY_QUERY = gql`
           name {
             use
             firstNames
+            middleNames
             familyName
           }
           birthDate
@@ -139,6 +143,7 @@ const VERIFY_QUERY = gql`
           name {
             use
             firstNames
+            middleNames
             familyName
           }
         }
@@ -146,6 +151,7 @@ const VERIFY_QUERY = gql`
           name {
             use
             firstNames
+            middleNames
             familyName
           }
         }
@@ -156,6 +162,7 @@ const VERIFY_QUERY = gql`
             name {
               use
               firstNames
+              middleNames
               familyName
             }
           }
@@ -180,6 +187,7 @@ const VERIFY_QUERY = gql`
           name {
             use
             firstNames
+            middleNames
             familyName
           }
         }
@@ -253,7 +261,7 @@ export function VerifyDetails() {
                 </span>
               </StyledBox>
               <Heading>
-                {startCase(
+                {formatName(
                   getName(data.fetchRegistration.child.name, intl.locale)
                 )}
               </Heading>
