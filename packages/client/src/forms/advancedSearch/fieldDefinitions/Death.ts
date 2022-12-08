@@ -189,7 +189,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
 }
 
 export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
-  id: 'BirthEventDetails',
+  id: 'DeathEventDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [
     {
