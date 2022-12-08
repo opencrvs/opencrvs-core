@@ -32,8 +32,7 @@ const SelectContainer = styled.div<{ selected?: boolean }>`
   padding: 24px 24px 8px;
   background: ${(hex) => (hex.color ? hex.color : '#101010')};
 `
-// ${(hex) => (hex.color ? hex.color : '#fff')};
-// ${({ theme }) => theme.colors.backgroundPrimary};
+
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const applicationLangauges = window.config.LANGUAGES.split(',')
   const history = useHistory()
@@ -66,9 +65,7 @@ export function LanguageSelect({ children }: IProps) {
     selectedLanguage,
     paramLanguage
   )
-  React.useEffect(() => {
-    console.log('countryBackground')
-  }, [])
+  React.useEffect(() => {}, [])
 
   return (
     <>
