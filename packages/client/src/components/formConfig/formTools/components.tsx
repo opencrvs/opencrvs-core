@@ -129,5 +129,16 @@ export const RegisterFormFieldIds = ({
     .flatMap((section) => formSectionToFieldIdentifiers(defaultForm, section))
     .map((identifier) => getFieldId(event, identifier, defaultForm))
 
-  return children(fieldIds)
+  const filteredFieldIds = fieldIds.filter((fieldId) => {
+    if (
+      !fieldId.includes('seperator') &&
+      !fieldId.includes('informantType') &&
+      !fieldId.includes('contactPoint')
+    ) {
+      return true
+    }
+    return false
+  })
+
+  return children(filteredFieldIds)
 }
