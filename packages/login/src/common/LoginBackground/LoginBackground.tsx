@@ -19,15 +19,13 @@ import {
   selectCountryBackground,
   selectCountryLogo
 } from '@login/login/selectors'
-import { useSelector } from 'react-redux'
+import { useSelector, connect } from 'react-redux'
+import { injectIntl } from 'react-intl'
+import { IStoreState } from '@login/store'
 
 const StyledPage = styled.div<IPage>`
   background: ${({ background, theme }) =>
     background ? `#${background}` : theme.colors.backgroundPrimary};
-
-  background-image: ${({ background, theme }) =>
-    background ? `url(${background})` : theme.colors.backgroundPrimary};
-  background-size: cover;
 
   min-height: 100vh;
   display: flex;
@@ -57,7 +55,6 @@ export function usePersistentCountryBackground() {
   if (background && background !== offlineBackground) {
     setOfflineBackground(background)
     localStorage.setItem('country-background', background)
-    console.log(background)
   }
 
   return offlineBackground
@@ -75,17 +72,21 @@ export function usePersistentCountryLogo() {
   return offlineLogo
 }
 
-export class LoginBackground extends React.Component<
-  IPage & RouteComponentProps<{}>
-> {
+type IProps = IPage &
+  RouteComponentProps<{}> & {
+    backgroundImage: string | undefined
+    backgroundColor: string | undefined
+  }
+
+export class LoginBackgroundComponent extends React.Component<IProps> {
   render() {
-    const { children, submitting } = this.props
-    const { countryBackground } = usePersistentCountryBackground()
+    const { children, submitting, backgroundImage, backgroundColor } =
+      this.props
     return (
       <div>
         <StyledPage
           {...this.props}
-          style={{ backgroundImage: `url(${countryBackground})` }}
+          style={{ backgroundImage: `url(${backgroundImage})` }}
         >
           {submitting ? (
             <Spinner
@@ -100,3 +101,14 @@ export class LoginBackground extends React.Component<
     )
   }
 }
+
+const mapStateToProps = (store: IStoreState) => {
+  return {
+    backgroundImage: store.login.config.LOGIN_BACKGROUND?.backgroundImage,
+    backgroundColor: store.login.config.LOGIN_BACKGROUND?.backgroundColor
+  }
+}
+
+export const LoginBackground = connect(mapStateToProps)(
+  LoginBackgroundComponent
+)
