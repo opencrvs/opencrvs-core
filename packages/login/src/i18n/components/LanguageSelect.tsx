@@ -75,7 +75,9 @@ export function LanguageSelect({ children }: IProps) {
   return (
     <>
       {languageOptions.length > 1 && (
-        <SelectContainer color={`#${countryBackground}`}>
+        <SelectContainer
+          style={{ backgroundImage: `url(${countryBackground})` }}
+        >
           <Select2
             value={selectedLanguage}
             options={languageOptions}
