@@ -26,11 +26,12 @@ type IProps = {
   children: React.ReactNode
 }
 
-const SelectContainer = styled.div<{ selected?: boolean }>`
+const SelectContainer = styled.div`
+  ${({ theme }) => theme.colors.primary};
   display: flex;
   justify-content: end;
   padding: 24px 24px 8px;
-  background: ${(hex) => (hex.color ? hex.color : '#101010')};
+  background: ${(hex) => (hex.color ? hex.color : '#36304E')};
 `
 
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
@@ -65,7 +66,6 @@ export function LanguageSelect({ children }: IProps) {
     selectedLanguage,
     paramLanguage
   )
-  React.useEffect(() => {}, [])
 
   return (
     <>
