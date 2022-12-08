@@ -14,8 +14,8 @@ import {
   ICustomQuestionConfig,
   getIdentifiersFromFieldId
 } from '@client/forms/questionConfig'
-import { IConnection, IConfigField, IConfigFieldMap } from '.'
-import { camelCase, keys } from 'lodash'
+import { IConfigField } from '.'
+import { camelCase } from 'lodash'
 import { FieldPosition } from '@client/forms/configuration'
 import { CustomFieldType, Event } from '@client/utils/gateway'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -26,7 +26,7 @@ import {
 
 const CUSTOM_FIELD_LABEL = 'Custom Field'
 
-export type ICustomConfigField = ICustomQuestionConfig & IConnection
+export type ICustomConfigField = ICustomQuestionConfig
 
 export function isCustomConfigField(
   configField: IConfigField
@@ -35,13 +35,14 @@ export function isCustomConfigField(
 }
 
 function determineNextFieldIdNumber(
-  fieldsMap: IConfigFieldMap,
+  configFields: IConfigField[],
   event: Event,
   section: string,
   groupId: string
 ): number {
   const partialHandleBar = camelCase(CUSTOM_FIELD_LABEL)
-  const customFieldNumber = keys(fieldsMap)
+  const customFieldNumber = configFields
+    .map(({ fieldId }) => fieldId)
     .filter((item) => item.includes(partialHandleBar))
     .map((item) => {
       const elemNumber = item.replace(
@@ -53,16 +54,15 @@ function determineNextFieldIdNumber(
   return customFieldNumber.length ? Math.max(...customFieldNumber) + 1 : 1
 }
 
-function getLastConfigField(fieldsMap: IConfigFieldMap) {
-  return Object.values(fieldsMap).find(
-    ({ foregoingFieldId }) => foregoingFieldId === FieldPosition.BOTTOM
-  )
+function getLastConfigField(configFields: IConfigField[]) {
+  if (!configFields.length) {
+    return undefined
+  }
+  return configFields[configFields.length - 1]
 }
 
-function getGroupId(fieldsMap: IConfigFieldMap) {
-  const lastConfigField = Object.values(fieldsMap).find(
-    ({ foregoingFieldId }) => foregoingFieldId === FieldPosition.BOTTOM
-  )
+function getGroupId(configFields: IConfigField[]) {
+  const lastConfigField = getLastConfigField(configFields)
   if (!lastConfigField) {
     throw new Error(`No field found in section`)
   }
@@ -74,14 +74,14 @@ function getGroupId(fieldsMap: IConfigFieldMap) {
 }
 
 export function prepareNewCustomFieldConfig(
-  fieldsMap: IConfigFieldMap,
+  configFields: IConfigField[],
   event: Event,
   section: string,
   fieldType: CustomFieldType
 ): ICustomConfigField {
-  const groupId = getGroupId(fieldsMap)
+  const groupId = getGroupId(configFields)
   const customFieldNumber = determineNextFieldIdNumber(
-    fieldsMap,
+    configFields,
     event,
     section,
     groupId
@@ -90,7 +90,7 @@ export function prepareNewCustomFieldConfig(
   const customFieldIndex = `${event}.${section}.${groupId}.${camelCase(
     defaultMessage
   )}`
-  const lastField = getLastConfigField(fieldsMap)
+  const lastField = getLastConfigField(configFields)
 
   const { fieldId } = !lastField ? { fieldId: FieldPosition.TOP } : lastField
 
@@ -99,7 +99,6 @@ export function prepareNewCustomFieldConfig(
     fieldName: camelCase(defaultMessage),
     fieldType,
     precedingFieldId: fieldId,
-    foregoingFieldId: FieldPosition.BOTTOM,
     required: false,
     custom: true,
     label: [

@@ -65,7 +65,8 @@ import {
   IAttachmentValue,
   SubmissionAction,
   ICheckboxFormField,
-  CHECKBOX
+  CHECKBOX,
+  INestedInputFields
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -106,7 +107,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice } from '@client/utils/commonUtils'
+import { isMobileDevice, isBase64FileString } from '@client/utils/commonUtils'
 import {
   ACCUMULATED_FILE_SIZE,
   ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
@@ -457,7 +458,12 @@ const renderValue = (
 
   if (value && field.type === LOCATION_SEARCH_INPUT) {
     const searchableListOfLocations = generateLocations(
-      getListOfLocations(offlineCountryConfiguration, field.searchableResource),
+      field.searchableResource.reduce((locations, resource) => {
+        return {
+          ...locations,
+          ...getListOfLocations(offlineCountryConfiguration, resource)
+        }
+      }, {}),
       intl
     )
     const selectedLocation = searchableListOfLocations.find(
@@ -466,14 +472,18 @@ const renderValue = (
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
 
-  if (typeof value === 'string') {
-    return value
-  }
   if (typeof value === 'boolean') {
     return value
       ? intl.formatMessage(buttonMessages.yes)
       : intl.formatMessage(buttonMessages.no)
   }
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    return field.postfix
+      ? String(value).concat(` ${field.postfix.toLowerCase()}`)
+      : value
+  }
+
   return value
 }
 
@@ -743,8 +753,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           return true
         }
 
+        const documentData = !isBase64FileString(document.data)
+          ? `${window.config.MINIO_URL}${document.data}`
+          : document.data
+
         documentOptions.push({
-          value: document.data,
+          value: documentData,
           label
         })
         selectOptions.push({
@@ -1562,28 +1576,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onContinue,
       viewRecord
     } = this.props
-    const formSections = this.getViewableSection(registerForm[event])
-    if (viewRecord) {
-      formSections.map((section) => {
-        return section.groups.map((group) => {
-          return group.fields.map((field) => {
-            field.readonly = true
-            if (field.nestedFields) {
-              Object.keys(field.nestedFields).forEach(function (key) {
-                if (field.nestedFields) {
-                  if (isArray(field.nestedFields)) {
-                    return field.nestedFields[key].map((nestedField) => {
-                      return (nestedField.readonly = true)
-                    })
-                  }
-                }
-              })
-            }
-            return field
-          })
+    const formSections = viewRecord
+      ? this.getViewableSection(registerForm[event]).map((section) => {
+          return {
+            ...section,
+            groups: section.groups.map((group) => {
+              return {
+                ...group,
+                fields: group.fields.map(fieldToReadOnlyFields)
+              }
+            })
+          }
         })
-      })
-    }
+      : this.getViewableSection(registerForm[event])
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
@@ -1839,6 +1844,27 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       </FullBodyContent>
     )
   }
+}
+
+function fieldToReadOnlyFields(field: IFormField): IFormField {
+  const readyOnlyField = {
+    ...field,
+    readonly: true
+  }
+  if (field.nestedFields) {
+    readyOnlyField.nestedFields = Object.entries(
+      field.nestedFields
+    ).reduce<INestedInputFields>((nestedInputFields, [key, nestedFields]) => {
+      return {
+        ...nestedInputFields,
+        [key]: nestedFields.map((nestedField) => ({
+          ...nestedField,
+          readonly: true
+        }))
+      }
+    }, {})
+  }
+  return readyOnlyField
 }
 
 function motherDoesNotExistAndStateIsMother(

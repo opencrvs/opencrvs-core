@@ -65,6 +65,16 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
+  getRegistrationsListByFilter(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+    filterBy: String!
+    skip: Int!
+    size: Int!
+  ): MixedTotalMetricsResult
+  getVSExports: TotalVSExport
   getTotalPayments(
     timeStart: String!
     timeEnd: String!
@@ -112,53 +122,19 @@ type Query {
   ): UserAuditLogResultSet
   searchEvents(
     userId: String
-    locationIds: [String!]
-    status: [String]
-    type: [String]
-    trackingId: String
-    registrationNumber: String
-    contactNumber: String
-    name: String
+    advancedSearchParameters: AdvancedSearchParametersInput!
     count: Int
     skip: Int
     sort: String
     sortColumn: String
   ): EventSearchResultSet
   getEventsWithProgress(
-    locationId: String
+    declarationJurisdictionId: String
+    registrationStatuses: [String]
+    compositionType: [String]
     count: Int
     skip: Int
     sort: String
-    status: [String]
-    type: [String]
-  ): EventProgressResultSet
-  searchRecord(
-    event: String
-    eventLocationId: String
-    childFirstName: String
-    childLastName: String
-    childDoB: String
-    deceasedFirstNames: String
-    deceasedFamilyName: String
-    deathDate: String
-    deathDateStart: String
-    deathDateEnd: String
-    motherFirstNames: String
-    motherFamilyName: String
-    motherDoB: String
-    motherIdentifier: String
-    fatherFirstNames: String
-    fatherFamilyName: String
-    fatherDoB: String
-    fatherIdentifier: String
-    informantFirstNames: String
-    informantFamilyName: String
-    contactNumber: String
-    registrationNumber: String
-    trackingId: String
-    dateOfRegistration: String
-    dateOfRegistrationStart: String
-    dateOfRegistrationEnd: String
   ): EventProgressResultSet
   getRoles(
     title: String
@@ -249,6 +225,12 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
+  bookmarkAdvancedSearch(
+    bookmarkSearchInput: BookmarkSearchInput!
+  ): BookMarkedSearches
+  removeBookmarkedAdvancedSearch(
+    removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
+  ): BookMarkedSearches
 }
 
 type Dummy {
@@ -392,6 +374,7 @@ type User {
   creationDate: String
   avatar: Avatar
   device: String
+  searches: [BookmarkedSeachItem]
 }
 
 type SearchUserResult {
@@ -415,6 +398,15 @@ type VerifyPasswordResult {
 type TotalMetricsResult {
   estimated: Estimation!
   results: [EventMetrics!]!
+}
+
+union MixedTotalMetricsResult =
+    TotalMetricsByRegistrar
+  | TotalMetricsByLocation
+  | TotalMetricsByTime
+
+type TotalVSExport {
+  results: [VSExport!]
 }
 
 type PaymentMetric {
@@ -472,6 +464,63 @@ type UserAuditLogResultSet {
 type EventSearchResultSet {
   results: [EventSearchSet]
   totalItems: Int
+}
+
+input AdvancedSearchParametersInput {
+  event: Event
+  name: String
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  contactNumber: String
+  nationalId: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventCountry: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  deceasedIdentifier: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  motherIdentifier: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  fatherIdentifier: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
+  informantIdentifier: String
+  compositionType: [String]
 }
 
 type EventProgressResultSet {
@@ -668,6 +717,21 @@ input FormDraftStatusModifyInput {
 
 input DeleteFormDraftInput {
   event: Event!
+}
+
+type BookMarkedSearches {
+  searchList: [BookmarkedSeachItem!]
+}
+
+input BookmarkSearchInput {
+  userId: String!
+  name: String!
+  parameters: AdvancedSearchParametersInput!
+}
+
+input RemoveBookmarkedSeachInput {
+  userId: String!
+  searchId: String!
 }
 
 scalar Map
@@ -890,6 +954,12 @@ type Signature {
   type: String
 }
 
+type BookmarkedSeachItem {
+  searchId: String!
+  name: String!
+  parameters: AdvancedSeachParameters!
+}
+
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
@@ -921,6 +991,29 @@ type EventMetrics {
   practitionerRole: String!
 }
 
+type TotalMetricsByRegistrar {
+  results: [EventMetricsByRegistrar!]!
+  total: Int
+}
+
+type TotalMetricsByLocation {
+  results: [EventMetricsByLocation!]!
+  total: Int
+}
+
+type TotalMetricsByTime {
+  results: [EventMetricsByTime!]!
+  total: Int
+}
+
+type VSExport {
+  event: String!
+  year: Int!
+  fileSize: String!
+  url: String!
+  createdOn: String!
+}
+
 union UserAuditLogResultItem =
     UserAuditLogItemWithComposition
   | UserAuditLogItem
@@ -930,6 +1023,11 @@ interface EventSearchSet {
   type: String
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+}
+
+enum Event {
+  birth
+  death
 }
 
 type EventProgressSet {
@@ -942,11 +1040,6 @@ type EventProgressSet {
   startedByFacility: String
   startedAt: Date
   progressReport: EventProgressData
-}
-
-enum Event {
-  birth
-  death
 }
 
 enum DraftStatus {
@@ -1278,6 +1371,89 @@ enum AttachmentSubject {
   DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
+}
+
+type AdvancedSeachParameters {
+  event: Event
+  name: String
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  contactNumber: String
+  nationalId: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventCountry: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  deceasedIdentifier: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  motherIdentifier: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  fatherIdentifier: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
+  informantIdentifier: String
+  compositionType: [String]
+}
+
+type EventMetricsByRegistrar {
+  registrarPractitioner: User
+  total: Int!
+  late: Int!
+  delayed: Int!
+}
+
+type EventMetricsByLocation {
+  location: Location!
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+}
+
+type EventMetricsByTime {
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+  month: String!
+  time: String!
 }
 
 type UserAuditLogItemWithComposition implements AuditLogItemBase {

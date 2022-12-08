@@ -31,12 +31,14 @@ import {
   goToPerformanceView,
   goToTeamView,
   goToFormConfigHome,
-  goToApplicationConfig
+  goToApplicationConfig,
+  goToAdvancedSearchResult,
+  goToVSExport
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { Activity, PaperPlane, Users } from '@opencrvs/components/lib/icons'
+import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
@@ -56,6 +58,12 @@ import {
 } from '@client/SubmissionController'
 import styled from '@client/styledComponents'
 import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import { omit } from 'lodash'
+import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -73,6 +81,7 @@ export const WORKQUEUE_TABS = {
   outbox: 'outbox',
   externalValidation: 'waitingValidation',
   performance: 'performance',
+  vsexports: 'vsexports',
   team: 'team',
   config: 'config',
   application: 'application',
@@ -139,6 +148,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -153,6 +163,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
+    WORKQUEUE_TABS.vsexports,
     GROUP_ID.menuGroup
   ],
   PERFORMANCE_MANAGEMENT: [WORKQUEUE_TABS.performance, GROUP_ID.menuGroup]
@@ -188,19 +199,23 @@ interface IProps {
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
+  goToVSExportsAction: typeof goToVSExport
   goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
+  goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
+  setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
 interface IStateProps {
   draftDeclarations: IDeclaration[]
   declarationsReadyToSend: IDeclaration[]
   userDetails: IUserDetails | null
+  advancedSearchParams: IAdvancedSearchParamState
   activeMenuItem: string
   workqueue: IWorkqueue
   offlineCountryConfiguration: IOfflineData
@@ -251,13 +266,16 @@ export const NavigationView = (props: IFullProps) => {
     intl,
     match,
     userDetails,
+    advancedSearchParams,
     deselectAllTabs,
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
     goToCertificateConfigAction,
+    goToVSExportsAction,
     goToFormConfigAction,
     goToApplicationConfigAction,
+    goToAdvancedSearchResultAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
@@ -266,6 +284,7 @@ export const NavigationView = (props: IFullProps) => {
     userInfo,
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
+    setAdvancedSearchParam,
     className
   } = props
   const tabId = deselectAllTabs
@@ -550,12 +569,29 @@ export const NavigationView = (props: IFullProps) => {
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.performance]
                       )}
-                      onClick={() =>
+                      onClick={() => {
                         props.goToPerformanceViewAction(userDetails)
-                      }
+                      }}
                       isSelected={
                         enableMenuSelection &&
                         activeMenuItem === WORKQUEUE_TABS.performance
+                      }
+                    />
+                  )}
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.vsexports
+                  ) && (
+                    <NavigationItem
+                      icon={() => <Icon name="Share" size="small" />}
+                      id={`navigation_${WORKQUEUE_TABS.vsexports}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.vsexports]
+                      )}
+                      onClick={goToVSExportsAction}
+                      isSelected={
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TABS.vsexports
                       }
                     />
                   )}
@@ -576,6 +612,7 @@ export const NavigationView = (props: IFullProps) => {
                       }
                     />
                   )}
+
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
                     WORKQUEUE_TABS.config
@@ -648,6 +685,41 @@ export const NavigationView = (props: IFullProps) => {
             )}
         </>
       )}
+
+      {userDetails?.searches && userDetails?.searches.length > 0 ? (
+        userDetails?.searches.map((bookmarkResult, index) => {
+          return (
+            <NavigationItem
+              icon={() => (
+                <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
+              )}
+              id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
+              label={bookmarkResult.name}
+              disabled={
+                advancedSearchParams.searchId === bookmarkResult.searchId &&
+                props.location.pathname === ADVANCED_SEARCH_RESULT
+              }
+              onClick={() => {
+                const filteredParam = omit(
+                  bookmarkResult.parameters,
+                  '__typename'
+                ) as IAdvancedSearchParamState
+                setAdvancedSearchParam({
+                  ...filteredParam,
+                  searchId: bookmarkResult.searchId
+                })
+                goToAdvancedSearchResultAction()
+              }}
+              isSelected={
+                advancedSearchParams.searchId === bookmarkResult.searchId &&
+                props.location.pathname === ADVANCED_SEARCH_RESULT
+              }
+            />
+          )
+        })
+      ) : (
+        <></>
+      )}
     </LeftNavigation>
   )
 }
@@ -674,10 +746,13 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     workqueue: state.workqueueState.workqueue,
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
+    advancedSearchParams: getAdvancedSearchParamsState(state),
     activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
       : window.location.href.includes(WORKQUEUE_TABS.team)
       ? WORKQUEUE_TABS.team
+      : window.location.href.includes(WORKQUEUE_TABS.vsexports)
+      ? WORKQUEUE_TABS.vsexports
       : window.location.href.includes(WORKQUEUE_TABS.application)
       ? WORKQUEUE_TABS.application
       : window.location.href.includes(WORKQUEUE_TABS.settings)
@@ -700,11 +775,14 @@ export const Navigation = connect<
   goToCertificateConfigAction: goToCertificateConfig,
   goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
+  goToAdvancedSearchResultAction: goToAdvancedSearchResult,
+  goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
   goToSettings,
-  updateRegistrarWorkqueue
+  updateRegistrarWorkqueue,
+  setAdvancedSearchParam
 })(injectIntl(withRouter(NavigationView)))
 
 /** @deprecated since the introduction of `<Frame>` */

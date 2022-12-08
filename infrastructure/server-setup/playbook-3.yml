@@ -256,6 +256,34 @@
         mode: g+rwx
       when: not influxdb_data_backup.stat.exists
 
+    - name: Check minio data directory
+      stat:
+        path: /data/minio
+      register: minio_data
+
+    - name: 'Create minio data directory'
+      file:
+        path: /data/minio
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: ugo+rwx
+      when: not minio_data.stat.exists
+
+    - name: Check minio data backup directory
+      stat:
+        path: /data/backups/minio
+      register: minio_data_backup
+
+    - name: 'Create minio backup directory'
+      file:
+        path: /data/backups/minio
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: ugo+rwx
+      when: not minio_data_backup.stat.exists
+
     - name: 'Install UFW'
       apt:
         name: ufw
@@ -332,19 +360,6 @@
         name: vm.max_map_count
         value: 262144
         state: present
-
-    - name: 'Create influxdb data directory'
-      file:
-        path: /data/influxdb
-        state: directory
-
-    - name: 'Create influxdb backup directory'
-      file:
-        path: /data/backups/influxdb
-        state: directory
-        group: 1000
-        owner: 1000
-        mode: g+rwx
 
     - name: 'Create acme file for traefik'
       file:

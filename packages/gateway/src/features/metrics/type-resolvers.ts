@@ -10,6 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
+import { fetchFHIR } from '@gateway/features/fhir/utils'
+import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import fetch from 'node-fetch'
 
 export const typeResolvers: GQLResolver = {
   UserAuditLogResultItem: {
@@ -19,6 +23,37 @@ export const typeResolvers: GQLResolver = {
       } else {
         return 'UserAuditLogItem'
       }
+    }
+  },
+  MixedTotalMetricsResult: {
+    __resolveType(obj, context, info) {
+      if (info.variableValues.filterBy === FILTER_BY.REGISTERER)
+        return 'TotalMetricsByRegistrar'
+      else if (info.variableValues.filterBy === FILTER_BY.LOCATION)
+        return 'TotalMetricsByLocation'
+      else if (info.variableValues.filterBy === FILTER_BY.TIME)
+        return 'TotalMetricsByTime'
+      else throw new Error('Invalid type')
+    }
+  },
+  EventMetricsByLocation: {
+    async location({ location }, _, authHeader) {
+      return await fetchFHIR(`/${location}`, authHeader)
+    }
+  },
+  EventMetricsByRegistrar: {
+    async registrarPractitioner({ registrarPractitioner }, _, authHeader) {
+      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+        method: 'POST',
+        body: JSON.stringify({
+          practitionerId: registrarPractitioner
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      return await res.json()
     }
   }
 }

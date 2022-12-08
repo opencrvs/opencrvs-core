@@ -13,6 +13,7 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   goBack,
   goForward,
@@ -24,7 +25,8 @@ import {
   goToTeamSearch,
   goToTeamUserList,
   goToCreateNewUserWithLocationId,
-  goToCreateNewUser
+  goToCreateNewUser,
+  goToAdvancedSearch
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -33,10 +35,12 @@ import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import {
   BRN_DRN_TEXT,
+  NATIONAL_ID_TEXT,
   FIELD_AGENT_ROLES,
   NAME_TEXT,
   NATL_ADMIN_ROLES,
   PHONE_TEXT,
+  ADVANCED_SEARCH_TEXT,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
@@ -48,18 +52,18 @@ import {
   ArrowBack,
   BackArrowDeepBlue,
   ForwardArrowDeepBlue,
-  BRN,
-  Phone,
   Plus,
   SearchDark,
-  TrackingID,
-  User,
   Activity,
   SearchBlue,
   AddUser
 } from '@opencrvs/components/lib/icons'
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
-import { SearchTool, ISearchType } from '@opencrvs/components/lib/SearchTool'
+import {
+  SearchTool,
+  ISearchType,
+  INavigationType
+} from '@opencrvs/components/lib/SearchTool'
 import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
@@ -76,6 +80,8 @@ import {
   REGISTRAR_HOME,
   TEAM_USER_LIST
 } from '@client/navigation/routes'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 
 type IStateProps = {
   userDetails: IUserDetails | null
@@ -95,6 +101,8 @@ type IDispatchProps = {
   goToCreateNewUser: typeof goToCreateNewUser
   goToTeamSearchAction: typeof goToTeamSearch
   goToTeamUserListAction: typeof goToTeamUserList
+  goToAdvancedSearch: typeof goToAdvancedSearch
+  setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
 interface IProps extends RouteComponentProps {
@@ -361,13 +369,13 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     const role = this.props.userDetails && this.props.userDetails.role
     const location = this.props.history.location.pathname
     if (
-      (FIELD_AGENT_ROLES.includes(role as string) && location.includes(HOME)) ||
+      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
       (NATL_ADMIN_ROLES.includes(role as string) &&
-        location.includes(PERFORMANCE_HOME)) ||
+        PERFORMANCE_HOME.includes(location)) ||
       (SYS_ADMIN_ROLES.includes(role as string) &&
-        location.includes(PERFORMANCE_HOME)) ||
+        PERFORMANCE_HOME.includes(location)) ||
       (REGISTRAR_ROLES.includes(role as string) &&
-        location.includes(REGISTRAR_HOME))
+        REGISTRAR_HOME.includes(location))
     ) {
       return true
     } else {
@@ -386,31 +394,48 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
-        icon: <TrackingID />,
-        invertIcon: <TrackingID />,
+        icon: <Icon name="Target" size="small" />,
+        invertIcon: <Icon name="Target" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
       {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
-        icon: <BRN />,
-        invertIcon: <BRN />,
+        icon: <Icon name="Award" size="small" />,
+        invertIcon: <Icon name="Award" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
+      },
+      {
+        label: intl.formatMessage(messages.nationalId),
+        value: NATIONAL_ID_TEXT,
+        icon: <Icon name="CreditCard" size="small" />,
+        invertIcon: <Icon name="CreditCard" />,
+        placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
-        icon: <Phone />,
-        invertIcon: <Phone />,
+        icon: <Icon name="Phone" size="small" />,
+        invertIcon: <Icon name="Phone" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       },
       {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
-        icon: <User />,
-        invertIcon: <User />,
+        icon: <Icon name="User" size="small" />,
+        invertIcon: <Icon name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
+      }
+    ]
+    const navigationList: INavigationType[] = [
+      {
+        label: intl.formatMessage(messages.advancedSearch),
+        id: ADVANCED_SEARCH_TEXT,
+        onClick: () => {
+          this.props.setAdvancedSearchParam(advancedSearchInitialState)
+          this.props.goToAdvancedSearch()
+        }
       }
     ]
 
@@ -421,6 +446,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
+        navigationList={navigationList}
         searchHandler={(text, type) =>
           props.goToSearchResult(text, type, isMobile)
         }
@@ -600,7 +626,9 @@ export const Header = connect(
     goToCreateNewUserWithLocationId,
     goToCreateNewUser,
     goToTeamSearchAction: goToTeamSearch,
-    goToTeamUserListAction: goToTeamUserList
+    goToTeamUserListAction: goToTeamUserList,
+    goToAdvancedSearch: goToAdvancedSearch,
+    setAdvancedSearchParam: setAdvancedSearchParam
   }
 )(injectIntl(withTheme(withRouter(HeaderComp))))
 

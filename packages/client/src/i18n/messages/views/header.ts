@@ -15,14 +15,17 @@ interface IHeaderMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   typeBrnDrn: MessageDescriptor
   typePhone: MessageDescriptor
+  nationalId: MessageDescriptor
   placeHolderTrackingId: MessageDescriptor
   placeHolderBrnDrn: MessageDescriptor
   placeHolderPhone: MessageDescriptor
+  placeHolderNationalId: MessageDescriptor
   systemTitle: MessageDescriptor
   settingsTitle: MessageDescriptor
   helpTitle: MessageDescriptor
   teamTitle: MessageDescriptor
   typeName: MessageDescriptor
+  advancedSearch: MessageDescriptor
   placeholderName: MessageDescriptor
 }
 
@@ -36,6 +39,11 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.typePhone',
     defaultMessage: 'Phone No.',
     description: 'Search menu phone no type'
+  },
+  nationalId: {
+    id: 'home.header.nationalId',
+    defaultMessage: 'National ID',
+    description: 'Search menu national ID type'
   },
   placeHolderTrackingId: {
     id: 'home.header.placeHolderTrackingId',
@@ -51,6 +59,11 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.placeHolderPhone',
     defaultMessage: 'Search for a phone No.',
     description: 'Search menu phone no place holder'
+  },
+  placeHolderNationalId: {
+    id: 'home.header.placeHolderNationalId',
+    defaultMessage: 'Search for a national ID.',
+    description: 'Search menu national ID place holder'
   },
   systemTitle: {
     id: 'home.header.systemTitle',
@@ -76,6 +89,11 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.typeName',
     defaultMessage: 'Name',
     description: 'Search menu name type'
+  },
+  advancedSearch: {
+    id: 'home.header.advancedSearch',
+    defaultMessage: 'Advanced Search',
+    description: 'Search menu advanced search type'
   },
   placeholderName: {
     id: 'home.header.placeholderName',
