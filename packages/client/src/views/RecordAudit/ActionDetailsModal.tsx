@@ -103,7 +103,11 @@ function prepareComments(
   actionDetailsData: History,
   draft: IDeclaration | null
 ) {
-  if (!draft || actionDetailsData.action === RegAction.Downloaded) {
+  if (
+    !draft ||
+    (actionDetailsData.action &&
+      actionDetailsData.action !== RegAction.RequestedCorrection)
+  ) {
     return []
   }
 
@@ -400,6 +404,7 @@ export const ActionDetailsModalListTable = ({
     <>
       {/* For Reject Reason */}
       {actionDetailsData.reason &&
+        !actionDetailsData.action &&
         actionDetailsData.regStatus === RegStatus.Rejected && (
           <Table
             noResultText=" "

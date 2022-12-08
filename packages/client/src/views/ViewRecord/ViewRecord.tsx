@@ -146,11 +146,10 @@ export const ViewRecord = () => {
 
   if (error) return <GenericErrorToast />
 
-  const eventType =
-    data?.fetchRegistrationForViewing?.__typename === 'BirthRegistration'
-      ? Event.Birth
-      : Event.Death
   const eventData = data?.fetchRegistrationForViewing
+  const eventType =
+    data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as Event
+
   const transData: IFormData = gqlToDraftTransformer(
     form[eventType],
     data?.fetchRegistrationForViewing,

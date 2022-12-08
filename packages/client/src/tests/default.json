@@ -1186,8 +1186,8 @@
                   "previewGroup": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
-                  "searchableResource": "facilities",
-                  "searchableType": "HEALTH_FACILITY",
+                  "searchableResource": ["facilities"],
+                  "searchableType": ["HEALTH_FACILITY"],
                   "dynamicOptions": {
                     "resource": "facilities"
                   },
@@ -1206,10 +1206,7 @@
                     "template": {
                       "fieldName": "placeOfBirth",
                       "operation": "eventLocationNameQueryOfflineTransformer",
-                      "parameters": [
-                        "facilities",
-                        "placeOfBirth"
-                      ]
+                      "parameters": ["facilities", "placeOfBirth"]
                     },
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
@@ -4214,8 +4211,8 @@
                   "previewGroup": "placeOfDeath",
                   "required": true,
                   "initialValue": "",
-                  "searchableResource": "facilities",
-                  "searchableType": "HEALTH_FACILITY",
+                  "searchableResource": ["facilities"],
+                  "searchableType": ["HEALTH_FACILITY"],
                   "dynamicOptions": {
                     "resource": "facilities"
                   },
@@ -4234,10 +4231,7 @@
                     "template": {
                       "fieldName": "placeOfDeath",
                       "operation": "eventLocationNameQueryOfflineTransformer",
-                      "parameters": [
-                        "facilities",
-                        "placeOfDeath"
-                      ]
+                      "parameters": ["facilities", "placeOfDeath"]
                     },
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
@@ -4429,9 +4423,7 @@
                         "individual",
                         {
                           "operation": "longDateTransformer",
-                          "parameters": [
-                            "birthDate"
-                          ]
+                          "parameters": ["birthDate"]
                         },
                         "birthDate"
                       ]
@@ -4442,9 +4434,7 @@
                         "individual",
                         {
                           "operation": "fieldValueTransformer",
-                          "parameters": [
-                            "birthDate"
-                          ]
+                          "parameters": ["birthDate"]
                         }
                       ]
                     }
@@ -4878,8 +4868,8 @@
                 },
                 "required": true,
                 "initialValue": "",
-                "searchableResource": "offices",
-                "searchableType": "CRVS_OFFICE",
+                "searchableResource": ["offices"],
+                "searchableType": ["CRVS_OFFICE"],
                 "validate": [
                   {
                     "operation": "officeMustBeSelected"
@@ -5235,8 +5225,8 @@
                 },
                 "required": true,
                 "initialValue": "",
-                "searchableResource": "offices",
-                "searchableType": "CRVS_OFFICE",
+                "searchableResource": ["offices"],
+                "searchableType": ["CRVS_OFFICE"],
                 "validate": [
                   {
                     "operation": "officeMustBeSelected"
