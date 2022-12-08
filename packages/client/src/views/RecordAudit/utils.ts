@@ -391,7 +391,9 @@ export function getStatusLabel(
   loggedInUser: IUserDetails | null
 ) {
   if (action) {
-    return intl.formatMessage(regActionMessages[action])
+    return intl.formatMessage(regActionMessages[action], {
+      regStatus: regStatus?.toLowerCase()
+    })
   }
   if (
     regStatus === RegStatus.Declared &&
