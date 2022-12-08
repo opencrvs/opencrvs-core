@@ -28,16 +28,12 @@ type IProps = {
 
 const SelectContainer = styled.div<{
   color?: string
-  backgroundImage?: string
 }>`
   display: flex;
   justify-content: end;
   padding: 24px 24px 8px;
   background: ${({ color, theme }) =>
     color ? color : theme.colors.backgroundPrimary};
-
-  background-image: ${({ backgroundImage, theme }) =>
-    backgroundImage ? backgroundImage : theme.colors.backgroundPrimary};
 `
 
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
