@@ -179,11 +179,11 @@ services:
     environment:
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
+      - ES_HOST=elasticsearch:9200
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
-      - WAIT_HOSTS=mongo1:27017,influxdb:8086,minio:9000
-
+      - WAIT_HOSTS=mongo1:27017,influxdb:8086,minio:9000,elasticsearch:9200
   documents:
     image: opencrvs/ocrvs-documents:${VERSION:-latest}
     build:

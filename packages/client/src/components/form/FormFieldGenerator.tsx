@@ -79,7 +79,9 @@ import {
   Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
   Ii18nTextareaFormField,
-  TEXT
+  TEXT,
+  DATE_RANGE_PICKER,
+  IDateRangePickerValue
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -120,6 +122,8 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
+import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
+import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -131,10 +135,7 @@ const FormItem = styled.div<{
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '40px'};
-`
-const LinkFormField = styled(Link)`
-  ${({ theme }) => theme.fonts.reg16};
+    ignoreBottomMargin ? '0px' : '28px'};
 `
 
 const FieldGroupTitle = styled.div`
@@ -404,6 +405,21 @@ function GeneratedInputField({
       </InputField>
     )
   }
+  if (fieldDefinition.type === DATE_RANGE_PICKER) {
+    return (
+      <InputField {...inputFieldProps}>
+        <DateRangePickerForFormField
+          inputProps={{ ...inputProps }}
+          notice={fieldDefinition.notice}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+          onChange={(val: IDateRangePickerValue) =>
+            onSetFieldValue(fieldDefinition.name, val)
+          }
+          value={value as IDateRangePickerValue}
+        />
+      </InputField>
+    )
+  }
   if (fieldDefinition.type === TEXTAREA) {
     return (
       <InputField {...inputFieldProps}>
@@ -499,11 +515,12 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === LINK) {
     return (
-      <LinkFormField
+      <Link
+        type="reg16"
         onClick={() => onSetFieldValue(fieldDefinition.name, true)}
       >
         {fieldDefinition.label}
-      </LinkFormField>
+      </Link>
     )
   }
 
@@ -641,6 +658,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
+  initialValues?: IBaseAdvancedSearchState
 }
 
 interface IStateProps {
@@ -931,16 +949,19 @@ class FormSectionComponent extends React.Component<Props> {
               ? {
                   ...field,
                   locationList: generateLocations(
-                    getListOfLocations(
-                      offlineCountryConfig,
-                      field.searchableResource
-                    ),
+                    field.searchableResource.reduce((locations, resource) => {
+                      return {
+                        ...locations,
+                        ...getListOfLocations(offlineCountryConfig, resource)
+                      }
+                    }, {}),
                     intl,
                     undefined,
-                    [field.searchableType as LocationType]
+                    field.searchableType as LocationType[]
                   )
                 }
               : field
+
           if (
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
@@ -1112,7 +1133,9 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionData
 >({
   mapPropsToValues: (props) =>
-    mapFieldsToValues(props.fields, props.userDetails),
+    props.initialValues
+      ? props.initialValues
+      : mapFieldsToValues(props.fields, props.userDetails),
   handleSubmit: (values) => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(
