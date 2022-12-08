@@ -648,7 +648,14 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     </ResponsiveModalContent>
                   </ResponsiveModal>
                   <LayoutRight>
-                    <ExportReportButton />
+                    {console.log('Passing in state ', this.state)}
+                    <ExportReportButton
+                      selectedLocation={this.state.selectedLocation}
+                      event={this.state.event}
+                      timeStart={this.state.timeStart}
+                      timeEnd={this.state.timeEnd}
+                      officeSelected={this.state.officeSelected}
+                    />
                     {!officeSelected && (
                       <LocationStats>
                         {!isOnline ? null : loading ? (

@@ -12,7 +12,6 @@
 import { EMPTY_STRING } from '@client/utils/constants'
 import * as React from 'react'
 import {
-  Checkbox,
   CheckboxGroup,
   ICheckboxOption,
   ResponsiveModal
@@ -23,11 +22,13 @@ import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Calendar, User, MapPin } from 'react-feather'
 import styled from '@client/styledComponents'
+import { IExportReportFilters } from './ExportReportButton'
 
 interface IProps {
   show: boolean
   onSuccess: () => void
   onClose: () => void
+  state: IExportReportFilters
 }
 
 const LocationIcon = styled(MapPin)`
@@ -46,7 +47,7 @@ const FilterRow = styled.div`
   margin: 4px 0;
 `
 
-export function ExportReportModal({ show, onClose, onSuccess }: IProps) {
+export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
   const intl = useIntl()
   const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
 
@@ -106,7 +107,7 @@ export function ExportReportModal({ show, onClose, onSuccess }: IProps) {
         </PrimaryButton>
       ]}
       handleClose={onClose}
-      contentHeight={400}
+      contentHeight={390}
       contentScrollableY={true}
     >
       <Text element="p" color="supportingCopy" variant="reg16">
@@ -116,21 +117,21 @@ export function ExportReportModal({ show, onClose, onSuccess }: IProps) {
         {/* How to set the colour correctly? */}
         <LocationIcon size={14} color="black" />
         <Text element="span" color="copy" variant="bold16">
-          Farajaland
+          {state.selectedLocation.displayLabel}
         </Text>
       </FilterRow>
       <FilterRow>
         {/* How to set the colour correctly? */}
         <UserIcon size={14} color="black" />
         <Text element="span" color="copy" variant="bold16">
-          Births
+          {state.event}
         </Text>
       </FilterRow>
       <FilterRow>
         {/* How to set the colour correctly? */}
         <CalendarIcon size={14} color="black" />
         <Text element="span" color="copy" variant="bold16">
-          Last 12 months
+          {state.timeStart.toString()} - {state.timeEnd.toString()}
         </Text>
       </FilterRow>
       <CheckboxGroup
