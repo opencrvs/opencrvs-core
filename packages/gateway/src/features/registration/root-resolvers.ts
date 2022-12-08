@@ -221,11 +221,11 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'performance')
       ) {
         const payload: {
-          declarationLocationHirarchyId?: string
+          declarationJurisdictionId?: string
           status: string[]
           event?: string
         } = {
-          declarationLocationHirarchyId: locationId,
+          declarationJurisdictionId: locationId,
           status: status as string[],
           event
         }

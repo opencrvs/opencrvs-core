@@ -24,7 +24,8 @@ import {
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
   getVisibleSectionGroupsBasedOnConditions,
-  getConditionalActionsForField
+  getConditionalActionsForField,
+  getListOfLocations
 } from '@client/forms/utils'
 import {
   buttonMessages as messages,
@@ -38,7 +39,7 @@ import {
   goToTeamUserList,
   goToUserReviewForm
 } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
+import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { draftToGqlTransformer } from '@client/transformer'
@@ -229,8 +230,18 @@ class UserReviewFormComponent extends React.Component<
     const { intl, formData } = this.props
 
     if (field.type === LOCATION_SEARCH_INPUT) {
-      const offlineLocations =
-        this.props.offlineCountryConfiguration[field.searchableResource]
+      const offlineLocations = field.searchableResource.reduce(
+        (locations, resource) => {
+          return {
+            ...locations,
+            ...getListOfLocations(
+              this.props.offlineCountryConfiguration,
+              resource
+            )
+          }
+        },
+        {}
+      ) as { [key: string]: ILocation }
 
       const locationId = formData[field.name] as string
       return offlineLocations[locationId] && offlineLocations[locationId].name
