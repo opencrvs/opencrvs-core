@@ -26,7 +26,7 @@ import { IExportReportFilters } from './ExportReportButton'
 import { endOfYear, subDays, subMonths } from 'date-fns'
 import format from '@client/utils/date-formatting'
 import { constantsMessages as messages } from '@client/i18n/messages/constants'
-
+import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
 interface IProps {
   show: boolean
   onSuccess: () => void
@@ -64,7 +64,8 @@ function getRangeDescription(startDate: Date, endDate: Date): string {
   const last2Year = new Date(currentYear - 2, 0)
   const last3Year = new Date(currentYear - 3, 0)
 
-  if (endDate >= today) {
+  // TODO: Is there a better way to compare dates (without times) than using toDateString?
+  if (endDate >= today || endDate.toDateString() == today.toDateString()) {
     if (startDate.toDateString() == date30DaysBack.toDateString()) {
       return intl.formatMessage(constantsMessages.last30Days)
     }
@@ -108,18 +109,53 @@ export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
     // placeholder: fieldDefinition.placeholder
   }
 
-  const x = getRangeDescription(state.timeStart, state.timeEnd)
-
   //var selectedValues : FormFieldValue[]
 
   const sectionOptions: ICheckboxOption[] = [
-    { value: '', label: 'Completion rates' },
-    { value: '', label: 'Registrations' },
-    { value: '', label: 'Certificates issued' },
-    { value: '', label: 'Sources of applications' },
-    { value: '', label: 'Corrections' },
-    { value: '', label: 'Fees collected' }
+    {
+      value: '2',
+      label: intl.formatMessage(
+        performanceMessages.performanceTotalRegistrationsHeader
+      )
+    },
+    {
+      value: '3',
+      label: intl.formatMessage(
+        performanceMessages.performanceTotalCertificatesHeader
+      )
+    },
+    {
+      value: '4',
+      label: intl.formatMessage(
+        performanceMessages.performanceApplicationSourcesHeader
+      )
+    },
+    {
+      value: '5',
+      label: intl.formatMessage(
+        performanceMessages.performanceTotalCorrectionsHeader
+      )
+    },
+    {
+      value: '6',
+      label: intl.formatMessage(
+        performanceMessages.performanceTotalPaymentsHeader
+      )
+    }
   ]
+
+  if (!state.officeSelected) {
+    sectionOptions.splice(0, 0, {
+      value: '1',
+      label: intl.formatMessage(
+        performanceMessages.performanceCompletenessRatesHeader
+      )
+    })
+  }
+
+  const [selectedItems, setSelectedItems] = React.useState<string[]>(
+    sectionOptions.map((o) => o.value)
+  )
 
   const onSuccessChangeNumber = (phoneNumber: string) => {
     setPhoneNumber(phoneNumber)
@@ -187,8 +223,10 @@ export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
         {...inputProps}
         options={sectionOptions}
         name={'SectionOptions'}
-        value={['value??']}
-        onChange={(val: string[]) => console.log('onchange: ', val)}
+        value={selectedItems}
+        onChange={(val: string[]) => {
+          setSelectedItems(val)
+        }}
       />
     </ResponsiveModal>
   )
