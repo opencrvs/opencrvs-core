@@ -106,6 +106,12 @@ export function WebhookModal({
                       integrationMessages.informantDetails
                     ),
                     value: 'informant-details'
+                  },
+                  {
+                    label: intl.formatMessage(
+                      integrationMessages.documentDetails
+                    ),
+                    value: 'documents'
                   }
                 ]}
                 name="test-checkbox-group1"
@@ -122,15 +128,15 @@ export function WebhookModal({
                 options={[
                   {
                     label: intl.formatMessage(
-                      integrationMessages.motherDetails
+                      integrationMessages.deceasedDetails
                     ),
-                    value: 'mother-details'
+                    value: 'deceased-details'
                   },
                   {
                     label: intl.formatMessage(
-                      integrationMessages.fatherDetails
+                      integrationMessages.deathEventDetails
                     ),
-                    value: 'father-details'
+                    value: 'death-event-details'
                   },
                   {
                     label: intl.formatMessage(
@@ -140,9 +146,9 @@ export function WebhookModal({
                   },
                   {
                     label: intl.formatMessage(
-                      integrationMessages.deceasedDetails
+                      integrationMessages.documentDetails
                     ),
-                    value: 'deceased-details'
+                    value: 'documents'
                   }
                 ]}
                 name="test-checkbox-group1"
