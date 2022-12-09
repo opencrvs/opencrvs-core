@@ -27,6 +27,7 @@ import { formSectionToFieldIdentifiers } from '@client/forms/questionConfig/tran
 import { useParams } from 'react-router'
 import { getFieldId } from '@client/forms/configuration/defaultUtils'
 import { IConditionalConfig } from '@client/forms/questionConfig'
+import { previewSectionFilter } from '@client/components/formConfig/SectionNavigation'
 
 export const Title = styled.h3`
   margin: 0;
@@ -126,15 +127,12 @@ export const RegisterFormFieldIds = ({
   )
 
   const fieldIds = sections
+    .filter(previewSectionFilter)
     .flatMap((section) => formSectionToFieldIdentifiers(defaultForm, section))
     .map((identifier) => getFieldId(event, identifier, defaultForm))
 
   const filteredFieldIds = fieldIds.filter((fieldId) => {
-    if (
-      !fieldId.includes('seperator') &&
-      !fieldId.includes('informantType') &&
-      !fieldId.includes('contactPoint')
-    ) {
+    if (!fieldId.includes('seperator')) {
       return true
     }
     return false
