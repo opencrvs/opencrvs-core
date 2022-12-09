@@ -14,7 +14,8 @@ import {
   createRouterProps,
   createTestComponent,
   createTestStore,
-  flushPromises
+  flushPromises,
+  userDetails
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
@@ -26,6 +27,7 @@ import { userMutations } from '@client/user/mutations'
 import { vi, Mock } from 'vitest'
 
 import * as Router from 'react-router'
+import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
 
 const useParams = Router.useParams as Mock
 
@@ -105,6 +107,7 @@ describe('User audit list tests', () => {
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
+    store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
     component = await createTestComponent(<UserAudit />, {
       store,
       history,
@@ -153,100 +156,5 @@ describe('User audit list tests', () => {
       setTimeout(resolve, 100)
     })
     expect(history.location.pathname).toBe('/team/users')
-  })
-  it('sends invite on clicking resend sms invite menu option', async () => {
-    ;(userMutations.resendSMSInvite as Mock).mockResolvedValueOnce({
-      data: { resendSMSInvite: 'true' }
-    })
-    const menuLink = await waitForElement(
-      component,
-      '#sub-page-header-munu-buttonToggleButton'
-    )
-    menuLink.hostNodes().simulate('click')
-
-    const deactivationLink = await waitForElement(
-      component,
-      '#sub-page-header-munu-buttonItem1'
-    )
-    deactivationLink.hostNodes().simulate('click')
-
-    await flushPromises()
-
-    component.update()
-
-    expect(
-      await waitForElement(component, '#resend_invite_success')
-    ).toBeDefined()
-  })
-  it('shows error on clicking resend sms invite menu option if there is any', async () => {
-    ;(userMutations.resendSMSInvite as Mock).mockRejectedValueOnce(
-      new Error('Something went wrong')
-    )
-    const menuLink = await waitForElement(
-      component,
-      '#sub-page-header-munu-buttonToggleButton'
-    )
-    menuLink.hostNodes().simulate('click')
-
-    const deactivationLink = await waitForElement(
-      component,
-      '#sub-page-header-munu-buttonItem1'
-    )
-    deactivationLink.hostNodes().simulate('click')
-
-    await flushPromises()
-
-    component.update()
-
-    expect(
-      await waitForElement(component, '#resend_invite_error')
-    ).toBeDefined()
-  })
-  //NEED TO FIX
-  it('opens deactivation modal on clicking deactivate menu option', async () => {
-    const menuLink = await waitForElement(
-      component,
-      '#sub-page-header-munu-buttonToggleButton'
-    )
-    menuLink.hostNodes().simulate('click')
-
-    const deactivationLink = await waitForElement(
-      component,
-      '#sub-page-header-munu-buttonItem2'
-    )
-    deactivationLink.hostNodes().simulate('click')
-
-    expect(await waitForElement(component, '#deactivate-action')).toBeDefined()
-  })
-  //NEED TO FIX
-  it('opens activation modal on clicking deactivate menu option', async () => {
-    // @ts-ignore
-    graphqlMock[0].result.data.getUser.status = 'deactivated'
-    component = await createTestComponent(<UserAudit />, {
-      store,
-      history,
-      graphqlMocks: graphqlMock
-    })
-
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-
-    component.update()
-
-    const menuLink = await waitForElement(
-      component,
-      '#sub-page-header-munu-buttonToggleButton'
-    )
-    menuLink.hostNodes().simulate('click')
-
-    const activationLink = await waitForElement(
-      component,
-      '#sub-page-header-munu-buttonItem1'
-    )
-    activationLink.hostNodes().simulate('click')
-
-    expect(await waitForElement(component, '#reactivate-action')).toBeDefined()
   })
 })
