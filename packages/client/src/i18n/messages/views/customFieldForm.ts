@@ -123,7 +123,7 @@ const messagesToDefine: ICustomFieldFormMessages = {
   duplicateField: {
     id: 'custom.field.form.duplicateField',
     defaultMessage:
-      'Sorry that certificate handlebar already exists. Please change the English label.',
+      'Label already exists in this form section. Please create a unique label',
     description: 'Duplicate field error message'
   }
 }

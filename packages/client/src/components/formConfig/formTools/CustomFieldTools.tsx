@@ -437,7 +437,7 @@ class CustomFieldToolsComp extends React.Component<
       return false
     }
 
-    return newGeneratedFieldID in fieldsMap
+    return fieldsMap.some((field) => field.fieldId === newGeneratedFieldID)
   }
 
   getHeadingText(): string {
@@ -638,26 +638,44 @@ class CustomFieldToolsComp extends React.Component<
                     value={this.state.fieldForms[language].label}
                     onChange={(event: any) => {
                       const { value } = event.target
-                      this.setState({
-                        handleBars:
-                          defaultLanguage === this.state.selectedLanguage
-                            ? camelCase(
-                                value || getCertificateHandlebar(formField)
-                              )
-                            : this.state.handleBars,
-                        fieldForms: {
-                          ...this.state.fieldForms,
-                          [this.state.selectedLanguage]: {
-                            ...this.state.fieldForms[
-                              this.state.selectedLanguage
-                            ],
-                            label: value
+                      this.setState(
+                        {
+                          handleBars:
+                            defaultLanguage === this.state.selectedLanguage
+                              ? camelCase(
+                                  value || getCertificateHandlebar(formField)
+                                )
+                              : this.state.handleBars,
+                          fieldForms: {
+                            ...this.state.fieldForms,
+                            [this.state.selectedLanguage]: {
+                              ...this.state.fieldForms[
+                                this.state.selectedLanguage
+                              ],
+                              label: value
+                            }
+                          }
+                        },
+                        () => {
+                          if (this.isFieldNameDuplicate()) {
+                            this.setState({
+                              isFieldDuplicate: true
+                            })
+                          } else {
+                            this.setState({
+                              isFieldDuplicate: false
+                            })
                           }
                         }
-                      })
+                      )
                     }}
                   />
                 </CInputField>
+                {this.state.isFieldDuplicate && (
+                  <Text variant="reg14" element="p" color="red">
+                    {intl.formatMessage(customFieldFormMessages.duplicateField)}
+                  </Text>
+                )}
               </FieldContainer>
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
@@ -767,17 +785,15 @@ class CustomFieldToolsComp extends React.Component<
               <CPrimaryButton
                 id={'custom-tool-save-button'}
                 onClick={() => {
-                  if (this.isFieldNameDuplicate()) {
-                    this.setState({
-                      isFieldDuplicate: true
-                    })
-                    return
-                  }
                   const modifiedField = this.prepareModifiedFormField()
                   modifyConfigField(selectedField.fieldId, modifiedField)
                   debouncedNullifySelectedField()
                 }}
-                disabled={!this.isFormValid() || !this.isConditionalFormValid()}
+                disabled={
+                  !this.isFormValid() ||
+                  !this.isConditionalFormValid() ||
+                  this.state.isFieldDuplicate
+                }
               >
                 {intl.formatMessage(buttonMessages.save)}
               </CPrimaryButton>
@@ -827,11 +843,6 @@ class CustomFieldToolsComp extends React.Component<
         {this.getLanguageDropDown()}
         {this.inputFields()}
         {this.showHandlebar()}
-        {this.state.isFieldDuplicate && (
-          <CErrorText ignoreMediaQuery={true}>
-            {intl.formatMessage(customFieldFormMessages.duplicateField)}
-          </CErrorText>
-        )}
       </>
     )
   }
