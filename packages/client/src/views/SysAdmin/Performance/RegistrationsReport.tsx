@@ -59,7 +59,7 @@ export function RegistrationsReport({
         label={
           <div>
             <PerformanceListHeader>
-              {intl.formatMessage(messages.performanceTotalRegitrationsHeader)}
+              {intl.formatMessage(messages.performanceTotalRegistrationsHeader)}
             </PerformanceListHeader>
           </div>
         }

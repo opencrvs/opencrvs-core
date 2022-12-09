@@ -491,7 +491,7 @@ function RegistrationListComponent(props: IProps) {
       isCertificatesConfigPage={true}
     >
       <Content
-        title={intl.formatMessage(messages.performanceTotalRegitrationsHeader)}
+        title={intl.formatMessage(messages.performanceTotalRegistrationsHeader)}
         size={ContentSize.LARGE}
         filterContent={
           <>

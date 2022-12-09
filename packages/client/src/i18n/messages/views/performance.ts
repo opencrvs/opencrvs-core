@@ -23,7 +23,7 @@ const messagesToDefine = {
       'The no. of registrations, expressed as a % of the total estimated no. of {event, select, BIRTH{birth} DEATH{death} other{birth}}s occurring',
     description: 'Sub header for report completeness rates'
   },
-  performanceTotalRegitrationsHeader: {
+  performanceTotalRegistrationsHeader: {
     id: 'performance.reports.header.totalRegistrations',
     defaultMessage: 'Registrations',
     description: 'Header for report total registrations'
