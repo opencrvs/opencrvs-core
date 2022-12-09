@@ -11,9 +11,7 @@
  */
 import { Box, ISearchLocation, Link } from '@client/../../components/lib'
 import { userMessages } from '@client/i18n/messages'
-import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { FileText } from 'react-feather'
@@ -23,7 +21,6 @@ import {
   useIntl,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
-import { useDispatch, useSelector } from 'react-redux'
 import { ExportReportModal } from './ExportReportModal'
 import { Event } from '@client/utils/gateway'
 
@@ -89,7 +86,7 @@ class ExportReportButtonComp extends React.Component<
           show={this.state.showModal}
           onClose={this.toggleReportExportModal}
           onSuccess={this.handleSuccess}
-          state={this.props}
+          filterState={this.props}
         />
         {/* DO WE NEED A SUCCESS TOAST? */}
         {this.state.showSuccessNotification && (
@@ -105,53 +102,3 @@ class ExportReportButtonComp extends React.Component<
 export const ExportReportButton = injectIntl<'intl', IExportReportFilters>(
   ExportReportButtonComp
 )
-
-// export function ExportReportButton(state: IExportReportFilters): JSX.Element {
-//   console.log(state.selectedLocation)
-//   // WHAT CAN I GET RID OF HERE?
-//   const intl = useIntl()
-//   const isOnline = useOnlineStatus()
-//   const mobile = useSelector<IStoreState, string>(
-//     (state) => state.profile.userDetails?.mobile || ''
-//   )
-//   const dispatch = useDispatch()
-
-//   // WHAT CAN I GET RID OF HERE?
-//   const [showSuccessNotification, setShowSuccessNotification] =
-//     React.useState(false)
-//   const [showModal, setShowModal] = React.useState(false)
-//   const toggleSuccessNotification = () => {
-//     setShowSuccessNotification((prevValue) => !prevValue)
-//   }
-//   const toggleReportExportModal = () => {
-//     setShowModal((prevValue) => !prevValue)
-//   }
-//   const handleSuccess = () => {
-//     toggleReportExportModal()
-//     toggleSuccessNotification()
-//   }
-
-//   return (
-//     <>
-//       <Box>
-//         {/* How do I set this colour and font weight correctly? */}
-//         <ButtonIcon size={18} fontWeight="bold" color="#4972BB" />
-//         <Link font="bold14" onClick={toggleReportExportModal}>
-//           Export report
-//         </Link>
-//       </Box>
-//       <ExportReportModal
-//         show={showModal}
-//         onClose={toggleReportExportModal}
-//         onSuccess={handleSuccess}
-//         state={state}
-//       />
-//       {/* DO WE NEED A SUCCESS TOAST? */}
-//       {showSuccessNotification && (
-//         <Toast type="success" onClose={toggleSuccessNotification}>
-//           <FormattedMessage {...userMessages.phoneNumberUpdated} />
-//         </Toast>
-//       )}
-//     </>
-//   )
-// }

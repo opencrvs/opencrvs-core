@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { EMPTY_STRING } from '@client/utils/constants'
 import * as React from 'react'
 import {
   CheckboxGroup,
@@ -27,11 +26,14 @@ import { endOfYear, subDays, subMonths } from 'date-fns'
 import format from '@client/utils/date-formatting'
 import { constantsMessages as messages } from '@client/i18n/messages/constants'
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
+import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
+import pdfFonts from 'pdfmake/build/vfs_fonts'
+
 interface IProps {
   show: boolean
   onSuccess: () => void
   onClose: () => void
-  state: IExportReportFilters
+  filterState: IExportReportFilters
 }
 
 const LocationIcon = styled(MapPin)`
@@ -94,9 +96,13 @@ function getRangeDescription(startDate: Date, endDate: Date): string {
   return `${format(startDate, 'MMMM yyyy')} - ${format(endDate, 'MMMM yyyy')}`
 }
 
-export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
+export function ExportReportModal({
+  show,
+  onClose,
+  onSuccess,
+  filterState
+}: IProps) {
   const intl = useIntl()
-  const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
 
   const inputProps = {
     id: 'id',
@@ -144,7 +150,7 @@ export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
     }
   ]
 
-  if (!state.officeSelected) {
+  if (!filterState.officeSelected) {
     sectionOptions.splice(0, 0, {
       value: '1',
       label: intl.formatMessage(
@@ -153,15 +159,12 @@ export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
     })
   }
 
-  const [selectedItems, setSelectedItems] = React.useState<string[]>(
+  const [selectedSections, setSelectedSections] = React.useState<string[]>(
     sectionOptions.map((o) => o.value)
   )
 
-  const onSuccessChangeNumber = (phoneNumber: string) => {
-    setPhoneNumber(phoneNumber)
-  }
   const restoreState = () => {
-    setPhoneNumber(EMPTY_STRING)
+    //setSelectedSections([])
   }
   React.useEffect(() => {
     if (!show) {
@@ -183,6 +186,17 @@ export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
           key="continue"
           onClick={() => {
             console.log('Click')
+            const dd = {
+              content: [
+                'Performance Report',
+                'Now just need to get some real data and layout in here'
+              ]
+            }
+
+            pdfMake.vfs = pdfFonts.pdfMake.vfs
+            const layout = pdfMake.createPdf(dd)
+            layout.getDataUrl((a) => console.log(a))
+            layout.print()
             //continueButtonHandler(phoneNumber)
           }}
           //disabled={!Boolean(phoneNumber.length) || isInvalidPhoneNumber}
@@ -194,19 +208,20 @@ export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
       contentHeight={390}
       contentScrollableY={true}
     >
+      {/* TODO: Localise this string */}
       <Text element="p" color="supportingCopy" variant="reg16">
         A PDF report will be generated with the following sections
       </Text>
       <FilterRow>
         <LocationIcon size={14} color="black" />
         <Text element="span" color="copy" variant="bold16">
-          {state.selectedLocation.displayLabel}
+          {filterState.selectedLocation.displayLabel}
         </Text>
       </FilterRow>
       <FilterRow>
         <UserIcon size={14} />
         <Text element="span" color="copy" variant="bold16">
-          {state.event.toString() ==
+          {filterState.event.toString() ==
           messages.birth.defaultMessage?.toString().toLowerCase()
             ? messages.births.defaultMessage
             : messages.deaths.defaultMessage}
@@ -216,16 +231,16 @@ export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
         {/* How to set the colour correctly? */}
         <CalendarIcon size={14} color="black" />
         <Text element="span" color="copy" variant="bold16">
-          {getRangeDescription(state.timeStart, state.timeEnd)}
+          {getRangeDescription(filterState.timeStart, filterState.timeEnd)}
         </Text>
       </FilterRow>
       <CheckboxGroup
         {...inputProps}
         options={sectionOptions}
         name={'SectionOptions'}
-        value={selectedItems}
+        value={selectedSections}
         onChange={(val: string[]) => {
-          setSelectedItems(val)
+          setSelectedSections(val)
         }}
       />
     </ResponsiveModal>

@@ -648,7 +648,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     </ResponsiveModalContent>
                   </ResponsiveModal>
                   <LayoutRight>
-                    {console.log('Passing in state ', this.state)}
                     <ExportReportButton
                       selectedLocation={this.state.selectedLocation}
                       event={this.state.event}
