@@ -51,7 +51,8 @@ import {
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
-  GQLRegistrationSearchSet
+  GQLRegistrationSearchSet,
+  GQLRegWorkflow
 } from '@opencrvs/gateway/src/graphql/schema'
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
@@ -1628,11 +1629,19 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         userDetails
       )
       const downloadedAppStatus: string =
-        (eventData &&
-          eventData.registration &&
-          eventData.registration.status &&
-          eventData.registration.status[0].type) ||
-        ''
+        (eventData?.registration?.status as GQLRegWorkflow[])
+          ?.sort(
+            (a, b) =>
+              new Date(b.timestamp).valueOf() - new Date(a.timestamp).valueOf()
+          )
+          ?.find((status) => {
+            return [
+              'REGISTERED',
+              'VALIDATED',
+              'IN_PROGRESS',
+              'DECLARED'
+            ].includes(status.type!)
+          })?.type || ''
       newDeclarationsAfterDownload[downloadingDeclarationIndex] =
         createReviewDeclaration(
           downloadingDeclaration.id,
