@@ -73,7 +73,7 @@ const systemSchema = new Schema({
   },
   settings: {
     webhook: { type: [WebhookSchema], required: false },
-    dailyQuota: { type: String, default: 0 }
+    dailyQuota: { type: Number, default: 0 }
   },
   creationDate: { type: Number, default: Date.now },
   type: {

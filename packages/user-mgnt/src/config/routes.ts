@@ -103,6 +103,7 @@ const enum RouteScope {
   CERTIFY = 'certify',
   PERFORMANCE = 'performance',
   SYSADMIN = 'sysadmin',
+  NATLSYSADMIN = 'natlsysadmin',
   VALIDATE = 'validate',
   RECORDSEARCH = 'recordsearch'
 }
@@ -541,7 +542,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new system client',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
           payload: reqRegisterSystemSchema
@@ -572,9 +573,9 @@ export const getRoutes = () => {
       handler: deactivateSystem,
       config: {
         tags: ['api'],
-        description: 'Creates a new system client',
+        description: 'Deactivates a new system client',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
           payload: clientIdSchema
@@ -590,9 +591,9 @@ export const getRoutes = () => {
       handler: reactivateSystem,
       config: {
         tags: ['api'],
-        description: 'Creates a new system client',
+        description: 'Reactivates a new system client',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
           payload: clientIdSchema
@@ -678,7 +679,7 @@ export const getRoutes = () => {
         description: 'Refresh client secret ',
         notes: 'Refresh client secret',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
           payload: systemSecretRequestSchema
@@ -697,7 +698,7 @@ export const getRoutes = () => {
         description: 'Delete system ',
         notes: 'This is responsible for system deletion',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
           payload: clientIdSchema

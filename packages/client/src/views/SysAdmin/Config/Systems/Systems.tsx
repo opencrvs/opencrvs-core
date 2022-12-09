@@ -217,7 +217,7 @@ export function SystemList() {
 
   const sysType = {
     HEALTH: intl.formatMessage(integrationMessages.healthSystem),
-    NATIONAL_ID: intl.formatMessage(integrationMessages.mosip),
+    NATIONAL_ID: intl.formatMessage(integrationMessages.nationalID),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook)
   }
@@ -514,7 +514,7 @@ export function SystemList() {
                       value: SystemType.Health
                     },
                     {
-                      label: intl.formatMessage(integrationMessages.mosip),
+                      label: intl.formatMessage(integrationMessages.nationalID),
                       value: SystemType.NationalId
                     },
                     {
@@ -555,10 +555,27 @@ export function SystemList() {
               </PaddedAlert>
             )}
 
-            {(newSystemType === SystemType.NationalId ||
-              newSystemType === SystemType.RecordSearch) && (
+            {newSystemType === SystemType.NationalId && (
               <PaddedAlert type="info">
-                {intl.formatMessage(integrationMessages.otherAlertDescription)}
+                {intl.formatMessage(
+                  integrationMessages.nationalidAlertDescription
+                )}
+                <Link
+                  onClick={() => {
+                    window.open('https://documentation.opencrvs.org/', '_blank')
+                  }}
+                  font="bold16"
+                >
+                  documentation.opencrvs.org
+                </Link>
+              </PaddedAlert>
+            )}
+
+            {newSystemType === SystemType.RecordSearch && (
+              <PaddedAlert type="info">
+                {intl.formatMessage(
+                  integrationMessages.recordSearchDescription
+                )}
                 {'\n'}
                 <Link
                   onClick={() => {
@@ -572,106 +589,129 @@ export function SystemList() {
             )}
 
             {newSystemType === SystemType.Webhook && (
-              <Field>
-                <InputField
-                  id="select-input"
-                  touched={false}
-                  label={intl.formatMessage(integrationMessages.label)}
-                >
-                  <div>
-                    <Label>
-                      {intl.formatMessage(
-                        integrationMessages.webhookDescription
+              <>
+                <PaddedAlert type="info">
+                  {intl.formatMessage(integrationMessages.webhookDescription)}
+                  {'\n'}
+                  <Link
+                    onClick={() => {
+                      window.open(
+                        'https://documentation.opencrvs.org/',
+                        '_blank'
+                      )
+                    }}
+                    font="bold16"
+                  >
+                    documentation.opencrvs.org
+                  </Link>
+                </PaddedAlert>
+                <Field>
+                  <InputField
+                    id="select-input"
+                    touched={false}
+                    label={intl.formatMessage(integrationMessages.label)}
+                  >
+                    <div>
+                      <Label>
+                        {intl.formatMessage(
+                          integrationMessages.webhookPermissionsDescription
+                        )}
+                      </Label>
+                      <FormTabs
+                        sections={[
+                          {
+                            id: Event.Birth,
+                            title: intl.formatMessage(integrationMessages.birth)
+                          },
+                          {
+                            id: Event.Death,
+                            title: intl.formatMessage(integrationMessages.death)
+                          }
+                        ]}
+                        activeTabId={selectedTab}
+                        onTabClick={(tabId: Event) => setSelectedTab(tabId)}
+                      />
+                      {selectedTab === Event.Birth ? (
+                        <CheckboxGroup
+                          id="test-checkbox-group1"
+                          options={[
+                            {
+                              label: intl.formatMessage(
+                                integrationMessages.childDetails
+                              ),
+                              value: 'child-details'
+                            },
+                            {
+                              label: intl.formatMessage(
+                                integrationMessages.motherDetails
+                              ),
+                              value: 'mother-details'
+                            },
+                            {
+                              label: intl.formatMessage(
+                                integrationMessages.fatherDetails
+                              ),
+                              value: 'father-details'
+                            },
+                            {
+                              label: intl.formatMessage(
+                                integrationMessages.informantDetails
+                              ),
+                              value: 'informant-details'
+                            },
+                            {
+                              label: intl.formatMessage(
+                                integrationMessages.documentDetails
+                              ),
+                              value: 'documents'
+                            }
+                          ]}
+                          name="test-checkbox-group1"
+                          value={birthPermissions.permissions ?? []}
+                          onChange={(newValue) => {
+                            checkboxHandler(newValue, Event.Birth)
+                          }}
+                        />
+                      ) : (
+                        <CheckboxGroup
+                          id="test-checkbox-group2"
+                          options={[
+                            {
+                              label: intl.formatMessage(
+                                integrationMessages.deceasedDetails
+                              ),
+                              value: 'deceased-details'
+                            },
+                            {
+                              label: intl.formatMessage(
+                                integrationMessages.deathEventDetails
+                              ),
+                              value: 'death-event-details'
+                            },
+                            {
+                              label: intl.formatMessage(
+                                integrationMessages.informantDetails
+                              ),
+                              value: 'informant-details'
+                            },
+                            {
+                              label: intl.formatMessage(
+                                integrationMessages.documentDetails
+                              ),
+                              value: 'documents'
+                            }
+                          ]}
+                          name="test-checkbox-group1"
+                          value={deathPermissions.permissions ?? []}
+                          onChange={(newValue) => {
+                            checkboxHandler(newValue, Event.Death)
+                          }}
+                        />
                       )}
-                    </Label>
-                    <FormTabs
-                      sections={[
-                        {
-                          id: Event.Birth,
-                          title: intl.formatMessage(integrationMessages.birth)
-                        },
-                        {
-                          id: Event.Death,
-                          title: intl.formatMessage(integrationMessages.death)
-                        }
-                      ]}
-                      activeTabId={selectedTab}
-                      onTabClick={(tabId: Event) => setSelectedTab(tabId)}
-                    />
-                    {selectedTab === Event.Birth ? (
-                      <CheckboxGroup
-                        id="test-checkbox-group1"
-                        options={[
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.childDetails
-                            ),
-                            value: 'child-details'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.motherDetails
-                            ),
-                            value: 'mother-details'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.fatherDetails
-                            ),
-                            value: 'father-details'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.informantDetails
-                            ),
-                            value: 'informant-details'
-                          }
-                        ]}
-                        name="test-checkbox-group1"
-                        value={birthPermissions.permissions ?? []}
-                        onChange={(newValue) => {
-                          checkboxHandler(newValue, Event.Birth)
-                        }}
-                      />
-                    ) : (
-                      <CheckboxGroup
-                        id="test-checkbox-group2"
-                        options={[
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.motherDetails
-                            ),
-                            value: 'mother-details'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.fatherDetails
-                            ),
-                            value: 'father-details'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.informantDetails
-                            ),
-                            value: 'informant-details'
-                          },
-                          {
-                            label: intl.formatMessage(
-                              integrationMessages.deceasedDetails
-                            ),
-                            value: 'deceased-details'
-                          }
-                        ]}
-                        name="test-checkbox-group1"
-                        value={deathPermissions.permissions ?? []}
-                        onChange={(newValue) => {
-                          checkboxHandler(newValue, Event.Death)
-                        }}
-                      />
-                    )}
-                  </div>
-                </InputField>
-              </Field>
+                    </div>
+                  </InputField>
+                </Field>
+              </>
             )}
           </>
         )}

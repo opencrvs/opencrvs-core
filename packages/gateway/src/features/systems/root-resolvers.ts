@@ -17,9 +17,9 @@ import { getSystem, hasScope } from '@gateway/features/user/utils'
 export const resolvers: GQLResolver = {
   Mutation: {
     async reactivateSystem(_, { clientId }, authHeader) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, 'natlsysadmin')) {
         return Promise.reject(
-          new Error('Activate user is only allowed for sysadmin')
+          new Error('Activate user is only allowed for natlsysadmin')
         )
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}reactivateSystem`, {
@@ -39,9 +39,9 @@ export const resolvers: GQLResolver = {
       return res.json()
     },
     async deactivateSystem(_, { clientId }, authHeader) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
-          new Error('Deactivate user is only allowed for sysadmin')
+          new Error('Deactivate user is only allowed for natlsysadmin')
         )
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}deactivateSystem`, {
@@ -63,9 +63,9 @@ export const resolvers: GQLResolver = {
       return res.json()
     },
     async registerSystem(_, { system }, authHeader) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, 'natlsysadmin')) {
         return Promise.reject(
-          new Error('Only sysadmin is allowed to create client')
+          new Error('Only natlsysadmin is allowed to create client')
         )
       }
 
@@ -88,7 +88,7 @@ export const resolvers: GQLResolver = {
       return res.json()
     },
     async refreshSystemSecret(_, { clientId }, authHeader) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, 'natlsysadmin')) {
         throw new Error('Only system user can update refresh client secret')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}refreshSystemSecret`, {
@@ -106,7 +106,7 @@ export const resolvers: GQLResolver = {
       return res.json()
     },
     async updatePermissions(_, { setting }, authHeader) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, 'natlsysadmin')) {
         throw new Error('Only system user can update refresh client secret')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}updatePermissions`, {
@@ -124,7 +124,7 @@ export const resolvers: GQLResolver = {
       return res.json()
     },
     async deleteSystem(_, { clientId }, authHeader) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, 'natlsysadmin')) {
         throw new Error('Only system user can delete the system')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}deleteSystem`, {
@@ -145,9 +145,9 @@ export const resolvers: GQLResolver = {
 
   Query: {
     async fetchSystem(_, { clientId }, authHeader) {
-      if (authHeader && !hasScope(authHeader, 'sysadmin')) {
+      if (authHeader && !hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
-          new Error('Fetch integration is only allowed for sysadmin')
+          new Error('Fetch integration is only allowed for natlsysadmin')
         )
       }
 

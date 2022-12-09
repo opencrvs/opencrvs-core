@@ -86,11 +86,17 @@ const messagesToDefine = {
     defaultMessage: 'Label',
     description: 'Label'
   },
+  webhookPermissionsDescription: {
+    id: 'integrations.webhookPermissionsDescription',
+    defaultMessage:
+      'Select the data you wish to be contained within the webhook payload',
+    description: 'Webhook description above permissions'
+  },
   webhookDescription: {
     id: 'integrations.webhookDescription',
     defaultMessage:
-      ' Select the ... or with no PII (Personal Identifiable Information)',
-    description: 'Label for webhook description'
+      'Select the data you wish to be contained within the webhook payload',
+    description: 'label for webhook client'
   },
 
   PIIDataLabel: {
@@ -117,40 +123,52 @@ const messagesToDefine = {
     description: 'Label for health notification'
   },
 
-  mosip: {
-    id: 'integrations.type.mosip',
-    defaultMessage: 'MOSIP',
-    description: 'Label for mosip'
+  nationalID: {
+    id: 'integrations.type.nationalID',
+    defaultMessage: 'National ID',
+    description: 'Label for national ID system client'
   },
 
   childDetails: {
     id: 'integrations.childDetails',
-    defaultMessage: 'Childs Details',
+    defaultMessage: `Child's details`,
     description: 'Label for child details'
   },
 
   motherDetails: {
     id: 'integrations.motherDetails',
-    defaultMessage: `Mother's Details`,
+    defaultMessage: `Mother's details`,
     description: 'Label for mothers details'
   },
 
   fatherDetails: {
     id: 'integrations.fatherDetails',
-    defaultMessage: `Father's Details`,
+    defaultMessage: `Father's details`,
     description: 'Label for fathers details'
   },
 
   informantDetails: {
     id: 'integrations.informantDetails',
-    defaultMessage: `Informant's Details`,
+    defaultMessage: `Informant's details`,
     description: 'Label for informant details'
+  },
+
+  documentDetails: {
+    id: 'integrations.documentDetails',
+    defaultMessage: `Document details`,
+    description: 'Label for document details'
+  },
+
+  deathEventDetails: {
+    id: 'integrations.deathEventDetails',
+    defaultMessage: `Event details`,
+    description: 'Label for death event details'
   },
 
   deceasedDetails: {
     id: 'integrations.deceasedDetails',
-    defaultMessage: `Deceased's Details`,
-    description: 'Label for Disease details'
+    defaultMessage: `Deceased's details`,
+    description: 'Label for Deceased details'
   },
 
   registrationDetailsNoPII: {
@@ -202,14 +220,22 @@ const messagesToDefine = {
   healthnotificationAlertDescription: {
     id: 'integrations.healthnotificationDescription',
     defaultMessage:
-      'A notification client (eg. health systems) sends notification of birth and death to OpenCRVS for processing. Please visit',
+      'A notification client (eg. hospital) can send a partial notification or a full declaration of a birth or death to OpenCRVS for processing. For more information, visit:',
     description: 'Label for  health notification description'
   },
 
-  otherAlertDescription: {
-    id: 'integrations.otherAlertDescription',
-    defaultMessage: '...Please visit',
-    description: 'Label for  health notification description'
+  nationalidAlertDescription: {
+    id: 'integrations.nationalidAlertDescription',
+    defaultMessage:
+      'A National ID client (eg. MOSIP) can react to birth or death webhooks to create or invalidate NID numbers, and respond to OpenCRVS to provide a temporary ID to children, and link vital events to each other. For more information, visit:',
+    description: 'Label for  national id description'
+  },
+
+  recordSearchDescription: {
+    id: 'integrations.recordSearchDescription',
+    defaultMessage:
+      'A Record Search client can perform an advanced search on OpenCRVS data. For more information, visit:',
+    description: 'Label for  record search description'
   },
 
   clientId: {
@@ -290,7 +316,7 @@ const messagesToDefine = {
   },
   onlyOneNationalIdError: {
     id: 'integrations.onlyOneNationalId',
-    defaultMessage: 'Only one MOSIP integration is allowed.'
+    defaultMessage: 'Only one National ID integration is allowed.'
   },
   updatePermissionsMsg: {
     id: 'integrations.updatePermissionsMsg',

@@ -12,7 +12,7 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { QA_ENV } from '@user-mgnt/constants'
+import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
@@ -68,11 +68,19 @@ export async function registerSystem(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { name, settings, type } = request.payload as IRegisterSystemPayload
+  const { name, type } = request.payload as IRegisterSystemPayload
+  let { settings } = request.payload as IRegisterSystemPayload
   try {
     if (type === types.WEBHOOK && !settings) {
       logger.error('Webhook payloads are required !')
       return h.response('Webhook payloads are required !').code(400)
+    }
+
+    if (type === types.RECORD_SEARCH && !settings) {
+      settings = {
+        dailyQuota: RECORD_SEARCH_QUOTA,
+        webhook: []
+      }
     }
     const token: ITokenPayload = getTokenPayload(
       request.headers.authorization.split(' ')[1]
