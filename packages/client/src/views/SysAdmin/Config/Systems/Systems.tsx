@@ -481,7 +481,11 @@ export function SystemList() {
                 id="name_of_client"
                 touched={false}
                 required={true}
-                label={intl.formatMessage(integrationMessages.name)}
+                label={
+                  newSystemType === SystemType.NationalId
+                    ? intl.formatMessage(integrationMessages.nationalIDName)
+                    : intl.formatMessage(integrationMessages.name)
+                }
               >
                 <TextInput
                   id="client_name"
@@ -663,7 +667,7 @@ export function SystemList() {
                               label: intl.formatMessage(
                                 integrationMessages.documentDetails
                               ),
-                              value: 'documents'
+                              value: 'supporting-documents'
                             }
                           ]}
                           name="test-checkbox-group1"
@@ -686,7 +690,7 @@ export function SystemList() {
                               label: intl.formatMessage(
                                 integrationMessages.deathEventDetails
                               ),
-                              value: 'death-event-details'
+                              value: 'death-encounter'
                             },
                             {
                               label: intl.formatMessage(
@@ -698,7 +702,7 @@ export function SystemList() {
                               label: intl.formatMessage(
                                 integrationMessages.documentDetails
                               ),
-                              value: 'documents'
+                              value: 'supporting-documents'
                             }
                           ]}
                           name="test-checkbox-group1"

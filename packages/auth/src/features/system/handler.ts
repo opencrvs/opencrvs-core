@@ -49,6 +49,9 @@ export async function authenticateSystemClientHandler(
   } catch (err) {
     throw unauthorized()
   }
+  if (result.status !== 'active') {
+    throw unauthorized()
+  }
 
   const isNotificationAPIUser = result.scope.indexOf('notification-api') > -1
   const isValidatorAPIUser = result.scope.indexOf('validator-api') > -1

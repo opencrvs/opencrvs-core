@@ -643,7 +643,7 @@ export async function validateDeceasedDetails(
     const mosipIntegration = configResponse.filter((integration) => {
       return integration.name === 'MOSIP'
     })[0]
-    if (mosipIntegration.status === statuses.ACTIVE) {
+    if (mosipIntegration && mosipIntegration.status === statuses.ACTIVE) {
       logger.info('validateDeceasedDetails: MOSIP ENABLED')
       try {
         const mosipTokenSeederResponse = await getMosipUINToken(patient)

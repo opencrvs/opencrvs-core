@@ -56,6 +56,7 @@ export async function subscribeWebhooksHandler(
     request.headers.authorization.split(' ')[1]
   )
   const systemId = token.sub
+
   try {
     const system: ISystem = await getSystem(
       { systemId },
@@ -112,37 +113,49 @@ export async function subscribeWebhooksHandler(
       trigger: TRIGGERS[TRIGGERS[hub.topic]]
     }
     const challenge = generateChallenge()
-    try {
-      const challengeCheck = await fetch(
-        resolve(
-          hub.callback,
-          `?mode=subscribe&challenge=${encodeURIComponent(challenge)}&topic=${
-            hub.topic
-          }`
-        ),
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
+
+    if (!(system.scope.indexOf('demo') > -1)) {
+      try {
+        const challengeCheck = await fetch(
+          resolve(
+            hub.callback,
+            `?mode=subscribe&challenge=${encodeURIComponent(challenge)}&topic=${
+              hub.topic
+            }`
+          ),
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      )
-        .then((response) => {
-          return response.json()
-        })
-        .catch((error) => {
-          return Promise.reject(new Error(` request failed: ${error.message}`))
-        })
-      if (challenge !== challengeCheck.challenge) {
-        throw new Error(
-          `${challenge} is not equal to ${challengeCheck.challenge}.  Subscription endpoint check failed`
         )
+          .then((response) => {
+            return response.json()
+          })
+          .catch((error) => {
+            return Promise.reject(
+              new Error(` request failed: ${error.message}`)
+            )
+          })
+        if (challenge !== challengeCheck.challenge) {
+          throw new Error(
+            `${challenge} is not equal to ${challengeCheck.challenge}.  Subscription endpoint check failed`
+          )
+        }
+        await Webhook.create(webhook)
+        return h.response().code(202)
+      } catch (err) {
+        logger.error(err)
+        return h.response('Subscription callback check failed').code(400)
       }
-      await Webhook.create(webhook)
-      return h.response().code(202)
-    } catch (err) {
-      logger.error(err)
-      throw internal()
+    } else {
+      try {
+        await Webhook.create(webhook)
+        return h.response().code(202)
+      } catch (err) {
+        throw new Error(`Cannot save webhook in development: ${err}`)
+      }
     }
   } catch (err) {
     logger.error(err)

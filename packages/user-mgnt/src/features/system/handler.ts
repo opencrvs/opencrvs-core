@@ -344,10 +344,15 @@ export async function getSystemHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { systemId, clientId } = request.payload as IGetSystemPayload
+  let criteria = {}
+  if (systemId) {
+    criteria = { ...criteria, _id: systemId }
+  }
+  if (clientId) {
+    criteria = { ...criteria, client_id: clientId }
+  }
 
-  const system: ISystemModel | null = await System.findOne({
-    $or: [{ _id: systemId }, { clientId: clientId }]
-  })
+  const system: ISystemModel | null = await System.findOne(criteria)
 
   if (!system) {
     // Don't return a 404 as this gives away that this user account exists
