@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # Select the crontab file based on the environment
@@ -10,4 +11,5 @@ crontab $CRON_FILE
 
 # Start cron
 echo "Starting cron..."
+
 crond -f
