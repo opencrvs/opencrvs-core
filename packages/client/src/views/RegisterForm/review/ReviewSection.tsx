@@ -96,6 +96,7 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
+import { messages as duplicatesMessages } from '@client/i18n/messages/views/duplicates'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { goToPageGroup } from '@client/navigation'
@@ -2016,9 +2017,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           <RightColumn hasDeclaration2={Boolean(declaration2)}>
             {duplicate && (
               <DuplicateWarningRed
-                label={intl.formatMessage(errorMessages.duplicateWarning, {
-                  trackingId: declaration2?.data?.registration?.trackingId ?? ''
-                })}
+                label={intl.formatMessage(
+                  duplicatesMessages.potentialDuplicateWarning
+                )}
               />
             )}
             {declaration2 ? (

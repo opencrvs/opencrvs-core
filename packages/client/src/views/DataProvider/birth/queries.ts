@@ -401,6 +401,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       registration {
         id
         informantType
+        attachments {
+          type
+          subject
+        }
         otherInformantType
         contact
         contactPhoneNumber
