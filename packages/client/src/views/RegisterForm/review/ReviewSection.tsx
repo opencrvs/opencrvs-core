@@ -1755,6 +1755,23 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     })
   }
 
+  getTextAreaProps = (id: string, declaration: IDeclaration) => ({
+    id,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      ;(this.props.onChangeReviewForm as onChangeReviewForm)(
+        { commentsOrNotes: e.target.value },
+        this.props.registrationSection,
+        declaration
+      )
+    },
+    value:
+      (declaration.data.registration &&
+        declaration.data.registration.commentsOrNotes) ||
+      '',
+    disabled: this.props.readonly,
+    ignoreMediaQuery: true
+  })
+
   render() {
     const {
       intl,
@@ -1789,23 +1806,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
       ).length === 0 && !isSignatureMissing
-
-    const textAreaProps = {
-      id: 'additional_comments',
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-        ;(this.props.onChangeReviewForm as onChangeReviewForm)(
-          { commentsOrNotes: e.target.value },
-          registrationSection,
-          declaration
-        )
-      },
-      value:
-        (declaration.data.registration &&
-          declaration.data.registration.commentsOrNotes) ||
-        '',
-      disabled: readonly,
-      ignoreMediaQuery: true
-    }
 
     const signatureInputProps = {
       id: 'informants_signature',
@@ -1951,7 +1951,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       required={false}
                       label={intl.formatMessage(messages.additionalComments)}
                     >
-                      <TextArea {...textAreaProps} />
+                      <TextArea
+                        {...this.getTextAreaProps(
+                          'additional_comments',
+                          declaration
+                        )}
+                      />
                     </InputField>
                   </InputWrapper>
                 )}
@@ -2104,7 +2109,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         required={false}
                         label={intl.formatMessage(messages.additionalComments)}
                       >
-                        <TextArea {...textAreaProps} />
+                        <TextArea
+                          {...this.getTextAreaProps(
+                            'additional_comments_2',
+                            declaration2
+                          )}
+                        />
                       </InputField>
                     </InputWrapper>
                   )}
