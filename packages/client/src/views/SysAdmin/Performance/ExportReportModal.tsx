@@ -17,12 +17,15 @@ import {
   ResponsiveModal
 } from '@client/../../components/lib'
 import { useIntl } from 'react-intl'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Calendar, User, MapPin } from 'react-feather'
 import styled from '@client/styledComponents'
 import { IExportReportFilters } from './ExportReportButton'
+import { endOfYear, subDays, subMonths } from 'date-fns'
+import format from '@client/utils/date-formatting'
+import { constantsMessages as messages } from '@client/i18n/messages/constants'
 
 interface IProps {
   show: boolean
@@ -33,19 +36,62 @@ interface IProps {
 
 const LocationIcon = styled(MapPin)`
   margin-right: 8px;
+  color: ${({ theme }) => theme.colors.grey600};
 `
 
 const UserIcon = styled(User)`
   margin-right: 8px;
+  color: ${({ theme }) => theme.colors.grey600};
 `
 
 const CalendarIcon = styled(Calendar)`
   margin-right: 8px;
+  color: ${({ theme }) => theme.colors.grey600};
 `
 
 const FilterRow = styled.div`
   margin: 4px 0;
 `
+
+function getRangeDescription(startDate: Date, endDate: Date): string {
+  // TODO: Is this the right way to use intl?
+  const intl = useIntl()
+  const today = new Date(Date.now())
+  const currentYear = today.getFullYear()
+  const date30DaysBack = subDays(today, 30)
+  const date12MonthsBack = subMonths(today, 12)
+  const lastYear = new Date(currentYear - 1, 0)
+  const last2Year = new Date(currentYear - 2, 0)
+  const last3Year = new Date(currentYear - 3, 0)
+
+  if (endDate >= today) {
+    if (startDate.toDateString() == date30DaysBack.toDateString()) {
+      return intl.formatMessage(constantsMessages.last30Days)
+    }
+    if (startDate.toDateString() == date12MonthsBack.toDateString()) {
+      return intl.formatMessage(constantsMessages.last12Months)
+    }
+  }
+  if (
+    startDate.toDateString() == lastYear.toDateString() &&
+    endDate.toDateString() == endOfYear(lastYear).toDateString()
+  ) {
+    return format(lastYear, 'yyyy')
+  }
+  if (
+    startDate.toDateString() == last2Year.toDateString() &&
+    endDate.toDateString() == endOfYear(last2Year).toDateString()
+  ) {
+    return format(last2Year, 'yyyy')
+  }
+  if (
+    startDate.toDateString() == last3Year.toDateString() &&
+    endDate.toDateString() == endOfYear(last3Year).toDateString()
+  ) {
+    return format(last3Year, 'yyyy')
+  }
+  return `${format(startDate, 'MMMM yyyy')} - ${format(endDate, 'MMMM yyyy')}`
+}
 
 export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
   const intl = useIntl()
@@ -61,6 +107,8 @@ export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
     // touched: Boolean(touched),
     // placeholder: fieldDefinition.placeholder
   }
+
+  const x = getRangeDescription(state.timeStart, state.timeEnd)
 
   //var selectedValues : FormFieldValue[]
 
@@ -114,24 +162,25 @@ export function ExportReportModal({ show, onClose, onSuccess, state }: IProps) {
         A PDF report will be generated with the following sections
       </Text>
       <FilterRow>
-        {/* How to set the colour correctly? */}
         <LocationIcon size={14} color="black" />
         <Text element="span" color="copy" variant="bold16">
           {state.selectedLocation.displayLabel}
         </Text>
       </FilterRow>
       <FilterRow>
-        {/* How to set the colour correctly? */}
-        <UserIcon size={14} color="black" />
+        <UserIcon size={14} />
         <Text element="span" color="copy" variant="bold16">
-          {state.event}
+          {state.event.toString() ==
+          messages.birth.defaultMessage?.toString().toLowerCase()
+            ? messages.births.defaultMessage
+            : messages.deaths.defaultMessage}
         </Text>
       </FilterRow>
       <FilterRow>
         {/* How to set the colour correctly? */}
         <CalendarIcon size={14} color="black" />
         <Text element="span" color="copy" variant="bold16">
-          {state.timeStart.toString()} - {state.timeEnd.toString()}
+          {getRangeDescription(state.timeStart, state.timeEnd)}
         </Text>
       </FilterRow>
       <CheckboxGroup

@@ -64,10 +64,6 @@ import {
   advancedSearchParamReducer,
   IAdvancedSearchParamState
 } from '@client/search/advancedSearch/reducer'
-import {
-  IPerformanceFilterState,
-  performanceFilterParamReducer
-} from './views/SysAdmin/Performance/reducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -85,7 +81,6 @@ export interface IStoreState {
   workqueueState: WorkqueueState
   formConfig: IFormConfigState
   advancedSearch: IAdvancedSearchParamState
-  performanceFilterState: IPerformanceFilterState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -113,8 +108,7 @@ export const createStore = <T>(
     userForm: userFormReducer,
     workqueueState: workqueueReducer,
     formConfig: formConfigReducer,
-    advancedSearch: advancedSearchParamReducer,
-    performanceFilterState: performanceFilterParamReducer
+    advancedSearch: advancedSearchParamReducer
   })
   // @ts-ignore
   const enhancer = compose(
