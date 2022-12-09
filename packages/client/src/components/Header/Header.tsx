@@ -121,7 +121,6 @@ type IFullProps = IntlShapeProps &
   IDomProps
 
 interface IState {
-  showMenu: boolean
   showLogoutModal: boolean
 }
 
@@ -184,7 +183,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     super(props)
 
     this.state = {
-      showMenu: false,
       showLogoutModal: false
     }
   }
@@ -334,10 +332,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     } else {
       return false
     }
-  }
-
-  toggleMenu = () => {
-    this.setState((prevState) => ({ showMenu: !prevState.showMenu }))
   }
 
   renderSearchInput(props: IFullProps, isMobile?: boolean) {
