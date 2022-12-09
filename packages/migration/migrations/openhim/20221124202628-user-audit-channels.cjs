@@ -13,35 +13,12 @@ const {
   addRouteToChannel,
   removeRouteFromChannel,
   upsertChannel,
-  removeChannel
+  removeChannel,
+  newChannelTemplate
 } = require('../../utils/openhim-helpers.cjs')
 
 const eventDownloadedChannel = {
-  methods: [
-    'GET',
-    'POST',
-    'DELETE',
-    'PUT',
-    'OPTIONS',
-    'HEAD',
-    'TRACE',
-    'CONNECT',
-    'PATCH'
-  ],
-  type: 'http',
-  allow: [],
-  whitelist: [],
-  authType: 'public',
-  matchContentTypes: [],
-  properties: [],
-  txViewAcl: [],
-  txViewFullAcl: [],
-  txRerunAcl: [],
-  status: 'enabled',
-  rewriteUrls: false,
-  addAutoRewriteRules: true,
-  autoRetryEnabled: false,
-  autoRetryPeriodMinutes: 60,
+  ...newChannelTemplate,
   routes: [
     {
       type: 'http',
@@ -58,48 +35,12 @@ const eventDownloadedChannel = {
       password: ''
     }
   ],
-  requestBody: true,
-  responseBody: true,
-  rewriteUrlsConfig: [],
   name: 'Event Downloaded',
-  urlPattern: '^/events/downloaded$',
-  matchContentRegex: null,
-  matchContentXpath: null,
-  matchContentValue: null,
-  matchContentJson: null,
-  pollingSchedule: null,
-  tcpHost: null,
-  tcpPort: null,
-  alerts: [],
-  priority: 1,
-  maxBodyAgeDays: 30
+  urlPattern: '^/events/downloaded$'
 }
+
 const eventViewedChannel = {
-  methods: [
-    'GET',
-    'POST',
-    'DELETE',
-    'PUT',
-    'OPTIONS',
-    'HEAD',
-    'TRACE',
-    'CONNECT',
-    'PATCH'
-  ],
-  type: 'http',
-  allow: [],
-  whitelist: [],
-  authType: 'public',
-  matchContentTypes: [],
-  properties: [],
-  txViewAcl: [],
-  txViewFullAcl: [],
-  txRerunAcl: [],
-  status: 'enabled',
-  rewriteUrls: false,
-  addAutoRewriteRules: true,
-  autoRetryEnabled: false,
-  autoRetryPeriodMinutes: 60,
+  ...newChannelTemplate,
   routes: [
     {
       type: 'http',
@@ -116,49 +57,12 @@ const eventViewedChannel = {
       password: ''
     }
   ],
-  requestBody: true,
-  responseBody: true,
-  rewriteUrlsConfig: [],
   name: 'Event Viewed',
-  urlPattern: '^/events/viewed$',
-  matchContentRegex: null,
-  matchContentXpath: null,
-  matchContentValue: null,
-  matchContentJson: null,
-  pollingSchedule: null,
-  tcpHost: null,
-  tcpPort: null,
-  alerts: [],
-  priority: 1,
-  maxBodyAgeDays: 30
+  urlPattern: '^/events/viewed$'
 }
 
 const declarationUpdatedChannel = {
-  methods: [
-    'GET',
-    'POST',
-    'DELETE',
-    'PUT',
-    'OPTIONS',
-    'HEAD',
-    'TRACE',
-    'CONNECT',
-    'PATCH'
-  ],
-  type: 'http',
-  allow: [],
-  whitelist: [],
-  authType: 'public',
-  matchContentTypes: [],
-  properties: [],
-  txViewAcl: [],
-  txViewFullAcl: [],
-  txRerunAcl: [],
-  status: 'enabled',
-  rewriteUrls: false,
-  addAutoRewriteRules: true,
-  autoRetryEnabled: false,
-  autoRetryPeriodMinutes: 60,
+  ...newChannelTemplate,
   routes: [
     {
       type: 'http',
@@ -175,27 +79,42 @@ const declarationUpdatedChannel = {
       password: ''
     }
   ],
-  requestBody: true,
-  responseBody: true,
-  rewriteUrlsConfig: [],
   name: 'Declaration Updated',
-  urlPattern: '^/events/declaration-updated$',
-  matchContentRegex: null,
-  matchContentXpath: null,
-  matchContentValue: null,
-  matchContentJson: null,
-  pollingSchedule: null,
-  tcpHost: null,
-  tcpPort: null,
-  alerts: [],
-  priority: 1,
-  maxBodyAgeDays: 30
+  urlPattern: '^/events/declaration-updated$'
 }
 
 exports.up = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
+      await addRouteToChannel(db, 'Event Assignment', {
+        type: 'http',
+        status: 'enabled',
+        forwardAuthHeader: true,
+        name: 'Metrics -> Event Assignment',
+        secured: false,
+        host: 'metrics',
+        port: 1050,
+        path: '',
+        pathTransform: '',
+        primary: false,
+        username: '',
+        password: ''
+      })
+      await addRouteToChannel(db, 'Event Unassignment', {
+        type: 'http',
+        status: 'enabled',
+        forwardAuthHeader: true,
+        name: 'Metrics -> Event Unassignment',
+        secured: false,
+        host: 'metrics',
+        port: 1050,
+        path: '',
+        pathTransform: '',
+        primary: false,
+        username: '',
+        password: ''
+      })
       await addRouteToChannel(db, 'Birth Archive', {
         type: 'http',
         status: 'enabled',
@@ -268,28 +187,38 @@ exports.down = async (db, client) => {
     await session.withTransaction(async () => {
       await removeRouteFromChannel(
         db,
-        'Birth Archive',
-        'Metrics -> Birth Archive'
+        'Event Assignment',
+        'Metrics -> Event Assignment'
       )
       await removeRouteFromChannel(
         db,
-        'Birth Reinstate',
-        'Metrics -> Birth Reinstate'
+        'Event Unassignment',
+        'Metrics -> Event Unassignment'
       )
-      await removeRouteFromChannel(
-        db,
-        'Death Archive',
-        'Metrics -> Death Archive'
-      )
-      await removeRouteFromChannel(
-        db,
-        'Death Reinstate',
-        'Metrics -> Death Reinstate'
-      )
-      await removeChannel(db, eventDownloadedChannel)
-      await removeChannel(db, eventViewedChannel)
-      await removeChannel(db, declarationUpdatedChannel)
     })
+    await removeRouteFromChannel(
+      db,
+      'Birth Archive',
+      'Metrics -> Birth Archive'
+    )
+    await removeRouteFromChannel(
+      db,
+      'Birth Reinstate',
+      'Metrics -> Birth Reinstate'
+    )
+    await removeRouteFromChannel(
+      db,
+      'Death Archive',
+      'Metrics -> Death Archive'
+    )
+    await removeRouteFromChannel(
+      db,
+      'Death Reinstate',
+      'Metrics -> Death Reinstate'
+    )
+    await removeChannel(db, eventDownloadedChannel)
+    await removeChannel(db, eventViewedChannel)
+    await removeChannel(db, declarationUpdatedChannel)
   } finally {
     await session.endSession()
   }
