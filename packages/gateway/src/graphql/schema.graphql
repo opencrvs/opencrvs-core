@@ -377,17 +377,17 @@ type User {
   id: ID!
   userMgntUserID: ID!
   practitionerId: String!
-  name: [HumanName]!
-  username: String!
+  name: [HumanName!]!
+  username: String
   mobile: String!
   role: RoleType!
-  type: String!
-  email: String!
+  type: String
+  email: String
   status: String!
-  underInvestigation: Boolean!
-  primaryOffice: Location!
-  catchmentArea: [Location!]!
-  localRegistrar: LocalRegistrar!
+  underInvestigation: Boolean
+  primaryOffice: Location
+  catchmentArea: [Location]
+  localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
   creationDate: String!
@@ -398,6 +398,16 @@ type User {
 type SearchUserResult {
   results: [User]
   totalItems: Int
+}
+
+enum RoleType {
+  FIELD_AGENT
+  REGISTRATION_AGENT
+  LOCAL_REGISTRAR
+  LOCAL_SYSTEM_ADMIN
+  NATIONAL_SYSTEM_ADMIN
+  PERFORMANCE_MANAGEMENT
+  NATIONAL_REGISTRAR
 }
 
 type SearchFieldAgentResult {
@@ -482,16 +492,6 @@ type EventSearchResultSet {
 type EventProgressResultSet {
   results: [EventProgressSet]
   totalItems: Int
-}
-
-enum RoleType {
-  FIELD_AGENT
-  REGISTRATION_AGENT
-  LOCAL_REGISTRAR
-  LOCAL_SYSTEM_ADMIN
-  NATIONAL_SYSTEM_ADMIN
-  PERFORMANCE_MANAGEMENT
-  NATIONAL_REGISTRAR
 }
 
 type Role {
@@ -601,11 +601,11 @@ input DeathRegistrationInput {
 
 input UserInput {
   id: ID
-  name: [HumanNameInput]
+  name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String
-  role: RoleType
+  mobile: String!
+  role: RoleType!
   type: String
   email: String
   primaryOffice: String

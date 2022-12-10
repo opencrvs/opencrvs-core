@@ -226,17 +226,17 @@ export interface GQLUser {
   id: string
   userMgntUserID: string
   practitionerId: string
-  name: Array<GQLHumanName | null>
-  username: string
+  name: Array<GQLHumanName>
+  username?: string
   mobile: string
-  role: GQLRole
-  type: string
-  email: string
+  role: GQLRoleType
+  type?: string
+  email?: string
   status: string
-  underInvestigation: boolean
-  primaryOffice: GQLLocation
-  catchmentArea: Array<GQLLocation>
-  localRegistrar: GQLLocalRegistrar
+  underInvestigation?: boolean
+  primaryOffice?: GQLLocation
+  catchmentArea?: Array<GQLLocation | null>
+  localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate: string
@@ -247,6 +247,16 @@ export interface GQLUser {
 export interface GQLSearchUserResult {
   results?: Array<GQLUser | null>
   totalItems?: number
+}
+
+export const enum GQLRoleType {
+  FIELD_AGENT = 'FIELD_AGENT',
+  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
+  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
+  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
+  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
+  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
+  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
 }
 
 export interface GQLSearchFieldAgentResult {
@@ -331,16 +341,6 @@ export interface GQLEventSearchResultSet {
 export interface GQLEventProgressResultSet {
   results?: Array<GQLEventProgressSet | null>
   totalItems?: number
-}
-
-export const enum GQLRoleType {
-  FIELD_AGENT = 'FIELD_AGENT',
-  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
-  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
-  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
-  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
-  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
-  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
 }
 
 export interface GQLRole {
@@ -450,11 +450,11 @@ export interface GQLDeathRegistrationInput {
 
 export interface GQLUserInput {
   id?: string
-  name?: Array<GQLHumanNameInput | null>
+  name: Array<GQLHumanNameInput>
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
-  mobile?: string
-  role?: string
+  mobile: string
+  role: GQLRoleType
   type?: string
   email?: string
   primaryOffice?: string
@@ -745,7 +745,7 @@ export const enum GQLLocationType {
 
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
-  role: GQLRole
+  role: GQLRoleType
   signature?: GQLSignature
 }
 
@@ -1863,7 +1863,7 @@ export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
   status?: string
-  role?: string
+  role?: GQLRoleType
   primaryOfficeId?: string
   locationId?: string
   count?: number

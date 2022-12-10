@@ -24,7 +24,7 @@ input SignatureInput {
   type: String
 }
 
-enum Role {
+enum RoleType {
   FIELD_AGENT
   REGISTRATION_AGENT
   LOCAL_REGISTRAR
@@ -34,13 +34,14 @@ enum Role {
   NATIONAL_REGISTRAR
 }
 
+# Create user form does not ask email, username
 input UserInput {
   id: ID
-  name: [HumanNameInput]
+  name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String
-  role: Role
+  mobile: String!
+  role: RoleType!
   type: String
   email: String
   primaryOffice: String
@@ -56,7 +57,7 @@ type Signature {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: Role!
+  role: RoleType!
   signature: Signature
 }
 
@@ -65,21 +66,23 @@ type Avatar {
   data: String!
 }
 
+# Fields type, underInvestigation, primaryOffice, catchmentArea and localRegistrar
+# are optional when a Local System Admin creates new user.
 type User {
   id: ID!
   userMgntUserID: ID!
   practitionerId: String!
-  name: [HumanName]! # -> .name
-  username: String!
+  name: [HumanName!]! # -> .name
+  username: String
   mobile: String!
-  role: Role!
-  type: String!
-  email: String!
+  role: RoleType!
+  type: String
+  email: String
   status: String!
-  underInvestigation: Boolean!
-  primaryOffice: Location!
-  catchmentArea: [Location!]!
-  localRegistrar: LocalRegistrar!
+  underInvestigation: Boolean
+  primaryOffice: Location
+  catchmentArea: [Location]
+  localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
   creationDate: String!
@@ -136,7 +139,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: Role
+    role: RoleType
     primaryOfficeId: String
     locationId: String
     count: Int
