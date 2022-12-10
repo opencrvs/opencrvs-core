@@ -24,6 +24,10 @@ interface IRoleScopeMapping {
   [key: string]: string[]
 }
 
+export interface IAuthHeader {
+  Authorization: string
+}
+
 export const roleScopeMapping: IRoleScopeMapping = {
   FIELD_AGENT: ['declare'],
   REGISTRATION_AGENT: ['validate', 'performance', 'certify'],
@@ -67,4 +71,12 @@ export const getTokenPayload = (token: string): ITokenPayload => {
     )
   }
   return decoded
+}
+
+export const getUserId = (authHeader: IAuthHeader): string => {
+  if (!authHeader || !authHeader.Authorization) {
+    throw new Error(`getUserId: Error occurred during token decode`)
+  }
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  return tokenPayload.sub
 }

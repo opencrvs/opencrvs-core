@@ -12,7 +12,7 @@
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { BirthSection, DeathSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { FieldPosition, FieldEnabled } from '@client/forms/configuration'
+import { FieldEnabled } from '@client/forms/configuration'
 import {
   removeCustomField,
   shiftConfigFieldDown,
@@ -21,7 +21,6 @@ import {
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import {
   IConfigField,
-  IConfigFieldMap,
   isDefaultConfigField,
   isPreviewGroupConfigField,
   isCustomConfigField,
@@ -38,9 +37,9 @@ import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import ConfigPlaceholder from './ConfigPlaceholder'
-import { Condition } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const CanvasBox = styled.div`
   display: flex;
@@ -69,32 +68,11 @@ type ICanvasProps = {
   ref: React.RefObject<HTMLDivElement>
 }
 
-function generateConfigFields(formFieldMap: IConfigFieldMap) {
-  const firstField = Object.values(formFieldMap).find(
-    (formField) => formField.precedingFieldId === FieldPosition.TOP
-  )
-
-  if (!firstField) {
-    throw new Error(`No starting field found in section`)
-  }
-
-  const configFields: IConfigField[] = []
-  let currentField: IConfigField | null = firstField
-  while (currentField) {
-    configFields.push(currentField)
-    currentField = currentField.foregoingFieldId
-      ? formFieldMap[currentField.foregoingFieldId]
-      : null
-  }
-  return configFields
-}
-
 function useConfigFields() {
   const { event, section } = useParams<IRouteProps>()
-  const fieldsMap = useSelector((store: IStoreState) =>
+  return useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  return React.useMemo(() => generateConfigFields(fieldsMap), [fieldsMap])
 }
 
 function FormField({
@@ -129,8 +107,8 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
                 ? configField.enabled !== FieldEnabled.DISABLED
                 : true
             )
-        ).map((configField) => {
-          const { fieldId, precedingFieldId, foregoingFieldId } = configField
+        ).map((configField, index, configFields) => {
+          const { fieldId } = configField
           const isCustom = isCustomConfigField(configField)
           const isSelected = selectedField?.fieldId === fieldId
           const isHidden =
@@ -148,13 +126,12 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
               onClick={() => {
                 setSelectedField(fieldId)
               }}
-              movable={isCustom && isSelected}
               status={
                 isHidden ? intl.formatMessage(messages.hidden) : undefined
               }
               removable={isCustom}
-              isUpDisabled={precedingFieldId === FieldPosition.TOP}
-              isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
+              isUpDisabled={!index}
+              isDownDisabled={index === configFields.length - 1}
               onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}
               onMoveDown={() => dispatch(shiftConfigFieldDown(fieldId))}
               onRemove={() => {
@@ -168,7 +145,7 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
                 <CardContentWrapper>
                   {conditionalField && conditionalField.length > 0 && (
                     <Stack>
-                      <Condition color="grey400" />
+                      <Icon name="GitBranch" size="small" color="grey400" />
                       <Text variant="reg14" element="span" color="grey400">
                         {conditionalField[0].fieldId}
                       </Text>

@@ -27,10 +27,7 @@ import {
 } from '@client/forms'
 import {
   IQuestionConfig,
-  IDefaultQuestionConfig,
-  ICustomQuestionConfig,
   isDefaultQuestionConfig,
-  configFieldToQuestionConfig,
   getConfiguredQuestions,
   getIdentifiersFromFieldId
 } from '@client/forms/questionConfig'
@@ -40,38 +37,27 @@ import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import { createCustomField } from '@client/forms/configuration/customUtils'
 import {
   isPreviewGroupConfigField,
-  getLastFieldOfPreviewGroup,
   IPreviewGroupConfigField
 } from './previewGroup'
-import { ICustomConfigField } from './customConfig'
+import { ICustomConfigField, isCustomConfigField } from './customConfig'
 import {
   IDefaultConfigField,
-  defaultFieldToConfigField,
+  defaultQuestionToConfigField,
   isDefaultConfigField,
-  hasDefaultFieldChanged,
-  isDefaultConfigFieldWithPreviewGroup,
-  IDefaultConfigFieldWithPreviewGroup
+  hasDefaultFieldChanged
 } from './defaultConfig'
 import { getField } from '@client/forms/configuration/defaultUtils'
 
 export * from './previewGroup'
-export * from './motion'
 export * from './customConfig'
 export * from './defaultConfig'
-
-export type IConnection = {
-  precedingFieldId: string
-  foregoingFieldId: string
-}
 
 export type IConfigField =
   | IDefaultConfigField
   | ICustomConfigField
   | IPreviewGroupConfigField
 
-export type IConfigFieldMap = Record<string, IConfigField>
-
-export type ISectionFieldMap = Record<string, IConfigFieldMap>
+export type ISectionFieldMap = Record<string, IConfigField[]>
 
 export function getFieldDefinition(
   configField: IDefaultConfigField | ICustomConfigField,
@@ -142,256 +128,73 @@ export function getCertificateHandlebar(formField: IFormField) {
   return formField.mapping?.template?.[0]
 }
 
-function getPreviewGroupFieldId(fieldId: string, previewGroup: string) {
-  const { event, sectionId, groupId } = getIdentifiersFromFieldId(fieldId)
-  return [event, sectionId, groupId, 'previewGroup', previewGroup].join('.')
-}
-
-type IConfigFieldMaybeWithPreviewGroup =
-  | ICustomConfigField
-  | IDefaultConfigField
-  | IDefaultConfigFieldWithPreviewGroup
-
-function isFromDifferentSections(fieldIdA: string, fieldIdB: string) {
-  const { sectionId: sectionA } = getIdentifiersFromFieldId(fieldIdA)
-  const { sectionId: sectionB } = getIdentifiersFromFieldId(fieldIdB)
-  return sectionA !== sectionB
-}
-
-function removeForegoingFieldIdAcrossSections({
-  foregoingFieldId,
-  fieldId
-}: IConfigField) {
-  return foregoingFieldId === FieldPosition.BOTTOM ||
-    isFromDifferentSections(foregoingFieldId, fieldId)
-    ? FieldPosition.BOTTOM
-    : foregoingFieldId
-}
-
-function getConfigFieldsWithoutPreviewGroups(
-  configFields: IConfigFieldMaybeWithPreviewGroup[]
-) {
-  return configFields
-    .filter(
-      (configField): configField is IDefaultConfigField | ICustomConfigField =>
-        !isDefaultConfigFieldWithPreviewGroup(configField)
-    )
-    .reduce<ISectionFieldMap>((sectionFieldsMap, configField) => {
-      const { sectionId: currentSection } = getIdentifiersFromFieldId(
-        configField.fieldId
-      )
-      const currentSectionFields = sectionFieldsMap[currentSection] ?? {}
-      return {
-        ...sectionFieldsMap,
-        [currentSection]: {
-          ...currentSectionFields,
-          [configField.fieldId]: configField
-        }
-      }
-    }, {})
-}
-
-function getPreviewGroupConfigFields(
-  previewGroupDefaultFields: IDefaultConfigFieldWithPreviewGroup[]
-) {
-  /*
-   * We need to check if the precedingField or foregoingField
-   * is also a field with a previewGroup or not
-   */
-  const getPrecedingFieldId = (precedingFieldId: string) => {
-    if (precedingFieldId === FieldPosition.TOP) {
-      return precedingFieldId
-    }
-    const precedingPreviewGroupDefaultField = previewGroupDefaultFields.find(
-      ({ fieldId }) => fieldId === precedingFieldId
-    )
-    if (!precedingPreviewGroupDefaultField) {
-      return precedingFieldId
-    }
-    const { fieldId, previewGroup } = precedingPreviewGroupDefaultField
-    return getPreviewGroupFieldId(fieldId, previewGroup)
-  }
-
-  const getForegoingFieldId = (foregoingFieldId: string) => {
-    if (foregoingFieldId === FieldPosition.BOTTOM) {
-      return foregoingFieldId
-    }
-    const foregoingPreviewGroupDefaultField = previewGroupDefaultFields.find(
-      ({ fieldId }) => fieldId === foregoingFieldId
-    )
-    if (!foregoingPreviewGroupDefaultField) {
-      return foregoingFieldId
-    }
-    const { fieldId, previewGroup } = foregoingPreviewGroupDefaultField
-    return getPreviewGroupFieldId(fieldId, previewGroup)
-  }
-
-  return previewGroupDefaultFields.reduce<IPreviewGroupConfigField[]>(
-    (previewGroupConfigFields, previewGroupDefaultField) => {
-      const { previewGroup, previewGroupLabel, ...defaultConfigField } =
-        previewGroupDefaultField
-      const previewGroupId = getPreviewGroupFieldId(
-        defaultConfigField.fieldId,
-        previewGroup
-      )
-      let previewGroupConfigField: IPreviewGroupConfigField = {
-        ...(previewGroupConfigFields.find(
-          ({ fieldId }) => fieldId === previewGroupId
-        ) ?? {
-          fieldId: previewGroupId,
-          previewGroup,
-          previewGroupLabel,
-          configFields: [],
-          precedingFieldId: getPrecedingFieldId(
-            defaultConfigField.precedingFieldId
-          ),
-          foregoingFieldId: FieldPosition.BOTTOM
-        })
-      }
-      previewGroupConfigField = {
-        ...previewGroupConfigField,
-        foregoingFieldId: getForegoingFieldId(
-          defaultConfigField.foregoingFieldId
-        ),
-        configFields: [
-          ...previewGroupConfigField.configFields,
-          defaultConfigField
-        ]
-      }
-      return [
-        ...previewGroupConfigFields.filter(
-          ({ fieldId }) => fieldId !== previewGroupId
-        ),
-        previewGroupConfigField
-      ]
-    },
-    []
-  )
-}
-
-function addPreviewGroupConfigField(
-  sectionFieldsMap: ISectionFieldMap,
-  previewGroupConfigField: IPreviewGroupConfigField
-): ISectionFieldMap {
-  const { precedingFieldId, foregoingFieldId, fieldId } =
-    previewGroupConfigField
-  const { sectionId: currentSection } = getIdentifiersFromFieldId(fieldId)
-  let currentSectionConfigFields = sectionFieldsMap[currentSection]
-  if (previewGroupConfigField.precedingFieldId !== FieldPosition.TOP) {
-    currentSectionConfigFields = {
-      ...currentSectionConfigFields,
-      [precedingFieldId]: {
-        ...currentSectionConfigFields[precedingFieldId],
-        foregoingFieldId: fieldId
-      }
-    }
-  }
-  if (foregoingFieldId !== FieldPosition.BOTTOM) {
-    currentSectionConfigFields = {
-      ...currentSectionConfigFields,
-      [foregoingFieldId]: {
-        ...currentSectionConfigFields[foregoingFieldId],
-        precedingFieldId: fieldId
-      }
-    }
-  }
-  return {
-    ...sectionFieldsMap,
-    [currentSection]: {
-      ...currentSectionConfigFields,
-      [fieldId]: previewGroupConfigField
-    }
-  }
-}
-
 export function generateConfigFields(
   event: Event,
   defaultForm: ISerializedForm,
   questions: IQuestionConfig[]
 ) {
   questions = questions.filter((question) => question.fieldId.startsWith(event))
-  /*
-   * We get a list of all the fields, configured & default,
-   * transformed into questionConfigs
-   */
-  const configFieldsWithDefaultPreviewGroupFields = getConfiguredQuestions(
-    event,
-    defaultForm,
-    questions
-  )
-    .map((question, idx, questions): IConfigFieldMaybeWithPreviewGroup => {
-      const foregoingFieldId =
-        idx === questions.length - 1
-          ? FieldPosition.BOTTOM
-          : questions[idx + 1].fieldId
 
-      if (!isDefaultQuestionConfig(question)) {
-        return {
-          ...question,
-          foregoingFieldId
-        }
-      }
-      return defaultFieldToConfigField(question, foregoingFieldId, defaultForm)
-    })
-    .map((configField) => ({
-      ...configField,
-      foregoingFieldId: removeForegoingFieldIdAcrossSections(configField)
-    }))
-
-  const configFieldsWithoutPreviewGroups = getConfigFieldsWithoutPreviewGroups(
-    configFieldsWithDefaultPreviewGroupFields
-  )
-
-  const previewGroupDefaultFields =
-    configFieldsWithDefaultPreviewGroupFields.filter(
-      (configField): configField is IDefaultConfigFieldWithPreviewGroup =>
-        isDefaultConfigFieldWithPreviewGroup(configField)
+  return getConfiguredQuestions(event, defaultForm, questions)
+    .map((sectionQuestionConfigs) =>
+      sectionQuestionConfigs
+        .reduce<IConfigField[]>(
+          (configFields, question) => [
+            ...configFields,
+            isDefaultQuestionConfig(question)
+              ? defaultQuestionToConfigField(question, defaultForm)
+              : question
+          ],
+          []
+        )
+        .reduce<IConfigField[]>((configFields, currentConfigField, index) => {
+          if (!index) return [currentConfigField]
+          const previousConfigField = configFields[configFields.length - 1]
+          if (
+            isPreviewGroupConfigField(previousConfigField) &&
+            isPreviewGroupConfigField(currentConfigField) &&
+            previousConfigField.previewGroup === currentConfigField.previewGroup
+          ) {
+            previousConfigField.configFields = [
+              ...previousConfigField.configFields,
+              ...currentConfigField.configFields
+            ]
+            return configFields
+          }
+          return [...configFields, currentConfigField]
+        }, [])
     )
-
-  const previewGroupConfigFields = getPreviewGroupConfigFields(
-    previewGroupDefaultFields
-  )
-
-  return previewGroupConfigFields.reduce<ISectionFieldMap>(
-    addPreviewGroupConfigField,
-    configFieldsWithoutPreviewGroups
-  )
+    .reduce<ISectionFieldMap>((sectionMap, sectionConfigFields) => {
+      if (sectionConfigFields.length === 0) return sectionMap
+      const { sectionId } = getIdentifiersFromFieldId(
+        sectionConfigFields[0].fieldId
+      )
+      return {
+        ...sectionMap,
+        [sectionId]: sectionConfigFields
+      }
+    }, {})
 }
 
-function configFieldsToQuestionConfigs(configFields: ISectionFieldMap) {
-  const getPrecedingFieldId = ({ precedingFieldId, fieldId }: IConfigField) => {
-    if (precedingFieldId === FieldPosition.TOP) {
-      return precedingFieldId
-    }
-    const { sectionId } = getIdentifiersFromFieldId(fieldId)
-    const previousConfigField = configFields[sectionId][precedingFieldId]
-    if (isPreviewGroupConfigField(previousConfigField)) {
-      return getLastFieldOfPreviewGroup(previousConfigField).fieldId
-    }
-    return previousConfigField.fieldId
-  }
-
-  /*
-   * The precedingFieldId needs to be recalculated for the fields that
-   * have a previewGroup as a preceding field and the first field inside
-   * a previewGroup as it's not updated as the fields are moved around
-   */
-  return Object.values(configFields).reduce<
-    Array<IDefaultQuestionConfig | ICustomQuestionConfig>
-  >(
-    (questionConfigs, sectionConfigFields) =>
-      Object.values(sectionConfigFields)
-        .map((configField) => ({
-          ...configField,
-          precedingFieldId: getPrecedingFieldId(configField)
-        }))
-        .reduce((sectionQuestionConfigs, configField) => {
-          return [
-            ...sectionQuestionConfigs,
-            ...configFieldToQuestionConfig(configField)
-          ]
-        }, questionConfigs),
-    []
+function configFieldsToQuestionConfigs(
+  configFieldsMap: ISectionFieldMap
+): IQuestionConfig[] {
+  return Object.values(configFieldsMap).flatMap((sectionConfigFields) =>
+    sectionConfigFields
+      .flatMap((configField) => {
+        if (
+          isDefaultConfigField(configField) ||
+          isCustomConfigField(configField)
+        )
+          return [configField]
+        return configField.configFields
+      })
+      .map((configField, index, inputConfigFields) => ({
+        ...configField,
+        precedingFieldId: !index
+          ? FieldPosition.TOP
+          : inputConfigFields[index - 1].fieldId
+      }))
   )
 }
 

@@ -52,7 +52,7 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
   }
 `
 
-function previewSectionFilter(
+export function previewSectionFilter(
   section: BirthSection | DeathSection
 ): section is
   | Exclude<BirthSection, 'preview' | 'registration'>

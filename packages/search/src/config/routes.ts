@@ -13,10 +13,8 @@ import * as Joi from 'joi'
 import { birthEventHandler } from '@search/features/registration/birth/handler'
 import { deathEventHandler } from '@search/features/registration/death/handler'
 import {
-  searchDeclaration,
   getAllDocumentsHandler,
   getStatusWiseRegistrationCountHandler,
-  populateHierarchicalLocationIdsHandler,
   advancedRecordSearch,
   searchAssignment
 } from '@search/features/search/handler'
@@ -65,23 +63,6 @@ export const getRoutes = () => {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/search',
-      handler: searchDeclaration,
-      config: {
-        tags: ['api'],
-        auth: {
-          scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.SYSADMIN
-          ]
-        },
-        description: 'Handles searching from declarations'
       }
     },
     {
@@ -179,7 +160,7 @@ export const getRoutes = () => {
         },
         validate: {
           payload: Joi.object({
-            declarationLocationHirarchyId: Joi.string(),
+            declarationJurisdictionId: Joi.string(),
             status: Joi.array().required(),
             event: Joi.string()
           })
@@ -189,25 +170,18 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/populateHierarchicalLocationIds',
-      handler: populateHierarchicalLocationIdsHandler,
-      config: {
-        tags: ['api'],
-        auth: {
-          scope: [RouteScope.SYSADMIN]
-        },
-        description:
-          'Populates hierarchical location ids for the legacy indexes'
-      }
-    },
-    {
-      method: 'POST',
       path: '/advancedRecordSearch',
       handler: advancedRecordSearch,
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.RECORD_SEARCH]
+          scope: [
+            RouteScope.RECORD_SEARCH,
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
         },
         description:
           'Populates hierarchical location ids for the legacy indexes'

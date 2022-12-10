@@ -30,7 +30,7 @@ const heightMap: Record<IPillSize, string> = {
 
 const colorMap: Record<IPillType, string> = {
   active: 'rgba(73, 183, 141, 0.3)',
-  default: 'rgba(206, 206, 206, 0.3)',
+  default: 'rgba(222, 229, 242, 1)',
   inactive: 'rgba(245, 209, 209, 1)',
   pending: 'rgba(252, 236, 217, 1)'
 }

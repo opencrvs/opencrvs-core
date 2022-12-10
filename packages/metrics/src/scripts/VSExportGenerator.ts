@@ -320,20 +320,39 @@ async function setLocationInComposition(
     'Location/',
     ''
   )
-  const location = locations.find(
+  const locationDoc = locations.find(
     ({ id }) => id === locationId
   ) as fhir.Location
 
-  const districtLocation = locations.find(
-    ({ id }) => id === location.address?.district
-  )
-  const stateLocation = locations.find(
-    ({ id }) => id === location.address?.state
-  )
-  fullComposition['healthCenter'] = location.name ?? ''
-  fullComposition['eventDistrict'] = districtLocation?.name ?? ''
-  fullComposition['eventState'] = stateLocation?.name ?? ''
-  fullComposition['eventCity'] = location.address?.city ?? ''
+  const isLocationHealthFacility =
+    locationDoc.type?.coding?.[0].code === 'HEALTH_FACILITY'
+
+  if (isLocationHealthFacility) {
+    const districtLocationId = String(
+      locationDoc.partOf?.reference?.replace('Location/', '')
+    )
+    const districtLocationDoc = locations.find(
+      ({ id }) => id === districtLocationId
+    )
+    const stateLocationId = String(
+      districtLocationDoc?.partOf?.reference?.replace('Location/', '')
+    )
+    const stateLocationDoc = locations.find(({ id }) => id === stateLocationId)
+    fullComposition['healthCenter'] = locationDoc.name ?? ''
+    fullComposition['eventDistrict'] = districtLocationDoc?.name ?? ''
+    fullComposition['eventState'] = stateLocationDoc?.name ?? ''
+  } else {
+    const districtLocation = locations.find(
+      ({ id }) => id === locationDoc.address?.district
+    )
+    const stateLocation = locations.find(
+      ({ id }) => id === locationDoc.address?.state
+    )
+    fullComposition['eventDistrict'] = districtLocation?.name ?? ''
+    fullComposition['eventState'] = stateLocation?.name ?? ''
+  }
+
+  fullComposition['eventCity'] = locationDoc.address?.city ?? ''
 
   const officeLocationId = task.extension
     ?.find((obj) => obj.url === officeLocationExtURL)

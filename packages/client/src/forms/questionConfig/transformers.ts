@@ -10,11 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  IConfigField,
-  isPreviewGroupConfigField,
-  previewGroupToQuestionConfig
-} from '@client/forms/configuration/formConfig/utils'
-import {
   IDefaultQuestionConfig,
   ICustomQuestionConfig,
   IFieldIdentifiers,
@@ -32,17 +27,7 @@ import { Event, QuestionInput } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default'
 
-export function configFieldToQuestionConfig(
-  configField: IConfigField
-): Array<IDefaultQuestionConfig | ICustomQuestionConfig> {
-  if (isPreviewGroupConfigField(configField)) {
-    return previewGroupToQuestionConfig(configField)
-  }
-  const { foregoingFieldId, ...rest } = configField
-  return [rest]
-}
-
-function fieldIdentifiersToQuestionConfig(
+export function fieldIdentifiersToQuestionConfig(
   event: Event,
   defaultForm: ISerializedForm,
   identifiers: IFieldIdentifiers
@@ -84,17 +69,6 @@ export function formSectionToFieldIdentifiers(
       }))
     )
     .flat()
-}
-
-export function defaultFormSectionToQuestionConfigs(
-  event: Event,
-  section: BirthSection | DeathSection,
-  defaultForm: ISerializedForm
-) {
-  return formSectionToFieldIdentifiers(defaultForm, section).map(
-    (identifiers) =>
-      fieldIdentifiersToQuestionConfig(event, defaultForm, identifiers)
-  )
 }
 
 /* TODO: The paylaod needs to be validated */
@@ -152,8 +126,13 @@ export function questionsTransformer(
         fieldId,
         enabled: enabled ?? '',
         precedingFieldId,
-        identifiers: getFieldIdentifiers(fieldId, defaultForms[event]),
-        required: required ?? false
+        identifiers: getFieldIdentifiers(fieldId, defaultForms[event])
+      }
+      /* Setting required = false for default fields results
+       * in "optional" showing up in some of the fields
+       */
+      if (required) {
+        defaultQuestionConfig.required = true
       }
       return defaultQuestionConfig
     }
