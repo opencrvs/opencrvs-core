@@ -1253,6 +1253,10 @@ export interface GQLStatusReason {
   text?: string
 }
 
+export interface GQLSystem {
+  name: string
+}
+
 export interface GQLComment {
   id: string
   user?: GQLUser
@@ -1772,6 +1776,7 @@ export interface GQLResolver {
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
+  System?: GQLSystemTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
   AdvancedSeachParameters?: GQLAdvancedSeachParametersTypeResolver
@@ -5778,6 +5783,14 @@ export interface GQLStatusReasonTypeResolver<TParent = any> {
 }
 
 export interface StatusReasonToTextResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSystemTypeResolver<TParent = any> {
+  name?: SystemToNameResolver<TParent>
+}
+
+export interface SystemToNameResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

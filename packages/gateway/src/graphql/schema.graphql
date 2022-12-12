@@ -1348,6 +1348,10 @@ type StatusReason {
   text: String
 }
 
+type System {
+  name: String!
+}
+
 type Comment {
   id: ID!
   user: User

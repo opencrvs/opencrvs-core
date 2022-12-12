@@ -3252,6 +3252,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -3542,6 +3543,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -3906,6 +3908,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -4178,6 +4181,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
