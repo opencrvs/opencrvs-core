@@ -42,7 +42,13 @@ import {
   ITemplatedComposition
 } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
-import { FHIR_URL, SEARCH_URL, METRICS_URL } from '@gateway/constants'
+import {
+  FHIR_URL,
+  SEARCH_URL,
+  METRICS_URL,
+  HEARTH_URL,
+  DOCUMENTS_URL
+} from '@gateway/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import {
   FHIR_OBSERVATION_CATEGORY_URL,
@@ -1042,6 +1048,52 @@ export const fetchFHIR = <T = any>(
     })
 }
 
+export const fetchFromHearth = <T = any>(
+  suffix: string,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  return fetch(`${HEARTH_URL}${suffix}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    },
+    body
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`FHIR with Hearth request failed: ${error.message}`)
+      )
+    })
+}
+
+export const sendToFhir = (
+  doc: fhir.Location,
+  suffix: string,
+  method: string,
+  token: string
+) => {
+  return fetch(`${FHIR_URL}${suffix}`, {
+    method,
+    body: JSON.stringify(doc),
+    headers: {
+      'Content-Type': 'application/fhir+json',
+      Authorization: `${token}`
+    }
+  })
+    .then((response) => {
+      return response
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`FHIR ${method} failed: ${error.message}`)
+      )
+    })
+}
+
 export async function postAssignmentSearch(
   authHeader: IAuthHeader,
   compositionId: string
@@ -1351,4 +1403,44 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
     task.extension &&
     findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
   return extension
+}
+
+export const fetchDocuments = async <T = any>(
+  suffix: string,
+  authHeader: IAuthHeader,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  const result = await fetch(`${DOCUMENTS_URL}${suffix}`, {
+    method,
+    headers: {
+      ...authHeader,
+      'Content-Type': 'application/json'
+    },
+    body
+  })
+  const res = await result.json()
+  return await res
+}
+
+export async function uploadBase64ToMinio(
+  fileData: string,
+  authHeader: IAuthHeader
+): Promise<string> {
+  const docUploadResponse = await fetchDocuments(
+    '/upload',
+    authHeader,
+    'POST',
+    JSON.stringify({ fileData: fileData })
+  )
+
+  return docUploadResponse.refUrl
+}
+
+export function isBase64FileString(str: string) {
+  if (str === '' || str.trim() === '') {
+    return false
+  }
+  const strSplit = str.split(':')
+  return strSplit.length > 0 && strSplit[0] === 'data'
 }

@@ -212,6 +212,13 @@ export const GetHistory = ({
       <>
         {isSystemInitiated(item) ? (
           <HealthSystemUser name={item.system?.name} />
+        ) : isFieldAgent ? (
+          <GetNameWithAvatar
+            id={item?.user?.id as string}
+            nameObject={item?.user?.name as (GQLHumanName | null)[]}
+            avatar={item.user?.avatar as IAvatar}
+            language={window.config.LANGUAGES}
+          />
         ) : (
           <Link
             id="profile-link"
