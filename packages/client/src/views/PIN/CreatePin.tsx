@@ -19,6 +19,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/pin'
 import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@client/declarations'
+import { IOfflineData } from '@client/offline/reducer'
 
 const Container = styled.div`
   display: flex;
@@ -77,7 +78,10 @@ const ErrorBox = styled.div`
   margin-top: -20px;
 `
 
-type IProps = IntlShapeProps & { onComplete: () => void }
+type IProps = IntlShapeProps & {
+  onComplete: () => void
+  offlineCountryConfiguration: IOfflineData
+}
 
 class CreatePinComponent extends React.Component<IProps> {
   pinKeyRef: any
@@ -147,7 +151,7 @@ class CreatePinComponent extends React.Component<IProps> {
   render() {
     const { pin, pinMatchError, pinHasSameDigits, pinHasSeqDigits, refresher } =
       this.state
-    const { intl } = this.props
+    const { intl, offlineCountryConfiguration } = this.props
 
     return (
       <Container>

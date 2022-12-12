@@ -31,11 +31,14 @@ import { Button } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { AvatarLarge } from '@client/components/Avatar'
+import { getOfflineData } from '@client/offline/selectors'
+import { ILoginBackground } from '@client/utils/referenceApi'
+import { IOfflineData } from '@client/offline/reducer'
 
 export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   ${({ theme }) => theme.colors.primary};
-  background: ${({ theme }) => theme.colors.backgroundPrimary};
+  background: ${(hex) => (hex.color ? hex.color : '#36304E')};
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -59,13 +62,15 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   flex-grow: 1;
+  background: ${({ theme }) => theme.colors.white};
+  margin: 10rem 30rem;
 `
 const Name = styled.p`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.grey600};
 `
 const ForgottenPinLink = styled(Button)`
   ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.grey600};
   text-transform: none;
 `
 interface IState {
@@ -86,6 +91,7 @@ type IFullProps = Props &
   IntlShapeProps & {
     onCorrectPinMatch: () => void
     onForgetPin: () => void
+    offlineCountryConfiguration: IOfflineData
   }
 
 const MAX_LOCK_TIME = 1
@@ -237,9 +243,15 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   }
 
   render() {
-    const { userDetails } = this.props
+    const { userDetails, offlineCountryConfiguration } = this.props
     return (
-      <PageWrapper id="unlockPage">
+      <PageWrapper
+        id="unlockPage"
+        color={`#${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor}`}
+        style={{
+          backgroundImage: `url(${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage})`
+        }}
+      >
         <LogoutHeader onClick={this.logout} id="logout">
           <span>{this.props.intl.formatMessage(buttonMessages.logout)}</span>
           <Logout />
@@ -274,7 +286,8 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
 export const Unlock = connect(
   (store: IStoreState) => ({
-    userDetails: getUserDetails(store)
+    userDetails: getUserDetails(store),
+    offlineCountryConfiguration: getOfflineData(store)
   }),
   {
     redirectToAuthentication

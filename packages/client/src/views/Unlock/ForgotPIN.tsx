@@ -49,6 +49,8 @@ import {
   LogoutHeader as LogoutContainer
 } from '@client/views/Unlock/Unlock'
 import { getLanguage } from '@client/i18n/selectors'
+import { IStoreState } from '@client/store'
+import { getOfflineData } from '@client/offline/selectors'
 
 interface IForgotPINProps {
   goBack: () => void
@@ -57,6 +59,7 @@ interface IForgotPINProps {
 
 const PageWrapper = styled(UnlockPageWrapper)`
   justify-content: flex-start;
+  background: ${(hex) => (hex.color ? hex.color : '#36304E')};
 `
 const BackButton = styled(CircleButton)`
   float: left;
@@ -149,7 +152,9 @@ export function ForgotPIN(props: IForgotPINProps) {
   const [error, setError] = useState<string>('')
   const intl = useIntl()
   const [verifyingPassword, setVerifyingPassword] = useState<boolean>(false)
-
+  const offlineCountryConfiguration = useSelector((store: IStoreState) =>
+    getOfflineData(store)
+  )
   const userDetails = useSelector(getUserDetails)
   const dispatch = useDispatch()
   const logout = useCallback(() => {
@@ -216,7 +221,13 @@ export function ForgotPIN(props: IForgotPINProps) {
   }, [])
 
   return (
-    <PageWrapper id="forgot_pin_page">
+    <PageWrapper
+      id="forgot_pin_page"
+      color={`#${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor}`}
+      style={{
+        backgroundImage: `url(${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage})`
+      }}
+    >
       <BackButton id="action_back" onClick={props.goBack}>
         <BackArrow />
       </BackButton>

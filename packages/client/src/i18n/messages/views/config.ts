@@ -153,7 +153,7 @@ const messagesToDefine: IConfigMessages = {
   },
   backgroundImageChangeNotification: {
     id: 'config.application.backgroundImageChangeNotification',
-    defaultMessage: 'Background image updated',
+    defaultMessage: 'Background updated successfully',
     description: 'Message for background image change notification'
   },
   backgroundImageFileLimitError: {

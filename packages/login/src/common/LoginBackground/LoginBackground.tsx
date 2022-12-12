@@ -15,12 +15,12 @@ import { RouteComponentProps } from 'react-router'
 import { IPage } from '@login/common/Page'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { getTheme } from '@opencrvs/components/lib/theme'
+
 import {
   selectCountryBackground,
   selectCountryLogo
 } from '@login/login/selectors'
 import { useSelector, connect } from 'react-redux'
-import { injectIntl } from 'react-intl'
 import { IStoreState } from '@login/store'
 
 const StyledPage = styled.div<IPage>`
