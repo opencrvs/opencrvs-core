@@ -11,7 +11,7 @@
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { constantsMessages, userMessages } from '@client/i18n/messages'
+import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import {
@@ -46,12 +46,10 @@ import {
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
-import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { IUserDetails } from '@client/utils/userUtils'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowBack,
-  BackArrowDeepBlue,
-  ForwardArrowDeepBlue,
   Plus,
   SearchDark,
   Activity,
@@ -64,15 +62,12 @@ import {
   ISearchType,
   INavigationType
 } from '@opencrvs/components/lib/SearchTool'
-import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { FixedNavigation } from '@client/components/interface/Navigation'
-import { Avatar } from '@client/components/Avatar'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
   HOME,
@@ -82,6 +77,8 @@ import {
 } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { HistoryNavigator } from './HistoryNavigator'
+import { Hamburger } from './Hamburger'
 
 type IStateProps = {
   userDetails: IUserDetails | null
@@ -124,7 +121,6 @@ type IFullProps = IntlShapeProps &
   IDomProps
 
 interface IState {
-  showMenu: boolean
   showLogoutModal: boolean
 }
 
@@ -172,14 +168,6 @@ const HeaderCenter = styled.div`
   align-items: center;
   background: ${({ theme }) => theme.colors.white};
 `
-const HeaderLeft = styled.div`
-  height: 40px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-  background: ${({ theme }) => theme.colors.white};
-`
 const HeaderRight = styled.div`
   height: 40px;
   background: ${({ theme }) => theme.colors.white};
@@ -195,45 +183,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     super(props)
 
     this.state = {
-      showMenu: false,
       showLogoutModal: false
     }
-  }
-
-  hamburger = () => {
-    const { userDetails, language, intl } = this.props
-    let name = ''
-    if (userDetails && userDetails.name) {
-      const nameObj = getIndividualNameObj(userDetails.name, language)
-      name = nameObj
-        ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-        : ''
-    }
-
-    const role =
-      userDetails && userDetails.role
-        ? intl.formatMessage(userMessages[userDetails.role])
-        : ''
-
-    const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
-
-    const userInfo = { name, role, avatar }
-
-    return (
-      <>
-        <ExpandingMenu
-          showMenu={this.state.showMenu}
-          menuCollapse={() => this.toggleMenu()}
-          navigation={() => (
-            <FixedNavigation
-              navigationWidth={320}
-              menuCollapse={() => this.toggleMenu()}
-              userInfo={userInfo}
-            />
-          )}
-        />
-      </>
-    )
   }
 
   getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM, theme: ITheme) {
@@ -244,8 +195,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
+            icon: () => <Hamburger />,
+            handler: () => {}
           }
         ],
         mobileRight: [
@@ -262,8 +213,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ],
           mobileRight: [
@@ -291,8 +242,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ],
           mobileRight: [
@@ -312,8 +263,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ]
         }
@@ -325,8 +276,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
+            icon: () => <Hamburger />,
+            handler: () => {}
           }
         ]
       }
@@ -345,8 +296,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ],
           mobileRight: [
@@ -381,10 +332,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     } else {
       return false
     }
-  }
-
-  toggleMenu = () => {
-    this.setState((prevState) => ({ showMenu: !prevState.showMenu }))
   }
 
   renderSearchInput(props: IFullProps, isMobile?: boolean) {
@@ -483,33 +430,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     }
   }
 
-  arrowNavigator() {
-    return (
-      <HeaderLeft>
-        <CircleButton
-          id="header-go-back-button"
-          disabled={
-            (this.props.history.action === 'POP' ||
-              this.props.history.action === 'REPLACE') &&
-            this.isLandingPage()
-          }
-          onClick={() => this.props.goBack()}
-        >
-          <BackArrowDeepBlue />
-        </CircleButton>
-        <CircleButton
-          disabled={
-            this.props.history.action === 'PUSH' ||
-            this.props.history.action === 'REPLACE'
-          }
-          onClick={() => this.props.goForward()}
-        >
-          <ForwardArrowDeepBlue />
-        </CircleButton>
-      </HeaderLeft>
-    )
-  }
-
   render() {
     const { className, intl, activeMenuItem, theme } = this.props
 
@@ -532,7 +452,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     let rightMenu = [
       {
-        element: this.arrowNavigator()
+        element: <HistoryNavigator />
       },
       {
         element: (
@@ -571,7 +491,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     ) {
       rightMenu = [
         {
-          element: this.arrowNavigator()
+          element: <HistoryNavigator />
         },
         {
           element: <ProfileMenu key="profileMenu" />

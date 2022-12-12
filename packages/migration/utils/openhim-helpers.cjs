@@ -37,3 +37,44 @@ exports.removeRouteFromChannel = async (db, channelName, routeName) => {
       { $pull: { routes: { name: routeName } } }
     )
 }
+
+exports.newChannelTemplate = {
+  methods: [
+    'GET',
+    'POST',
+    'DELETE',
+    'PUT',
+    'OPTIONS',
+    'HEAD',
+    'TRACE',
+    'CONNECT',
+    'PATCH'
+  ],
+  type: 'http',
+  allow: [],
+  whitelist: [],
+  authType: 'public',
+  matchContentTypes: [],
+  properties: [],
+  txViewAcl: [],
+  txViewFullAcl: [],
+  txRerunAcl: [],
+  status: 'enabled',
+  rewriteUrls: false,
+  addAutoRewriteRules: true,
+  autoRetryEnabled: false,
+  autoRetryPeriodMinutes: 60,
+  requestBody: true,
+  responseBody: true,
+  rewriteUrlsConfig: [],
+  matchContentRegex: null,
+  matchContentXpath: null,
+  matchContentValue: null,
+  matchContentJson: null,
+  pollingSchedule: null,
+  tcpHost: null,
+  tcpPort: null,
+  alerts: [],
+  priority: 1,
+  maxBodyAgeDays: 30
+}

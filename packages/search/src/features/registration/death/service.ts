@@ -202,6 +202,7 @@ async function createDeceasedIndex(
     deceased.identifier &&
     deceased.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
       ?.value
+  body.deceasedDoB = deceased && deceased.birthDate
 }
 
 function createMotherIndex(
