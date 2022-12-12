@@ -61,6 +61,8 @@ export const FETCH_USER = gql`
         data
       }
       searches {
+        searchId
+        name
         parameters {
           ...AdvancedSeachParameters
         }
