@@ -138,7 +138,8 @@ export const ViewRecord = () => {
   const { declarationId } = useParams<{ declarationId: string }>()
 
   const { loading, error, data } = useQuery(FETCH_VIEW_RECORD_BY_COMPOSITION, {
-    variables: { id: declarationId }
+    variables: { id: declarationId },
+    fetchPolicy: 'network-only'
   })
 
   if (loading) return <LoadingState />

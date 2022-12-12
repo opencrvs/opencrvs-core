@@ -37,9 +37,9 @@ import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import ConfigPlaceholder from './ConfigPlaceholder'
-import { Condition } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const CanvasBox = styled.div`
   display: flex;
@@ -145,7 +145,7 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
                 <CardContentWrapper>
                   {conditionalField && conditionalField.length > 0 && (
                     <Stack>
-                      <Condition color="grey400" />
+                      <Icon name="GitBranch" size="small" color="grey400" />
                       <Text variant="reg14" element="span" color="grey400">
                         {conditionalField[0].fieldId}
                       </Text>
