@@ -240,6 +240,7 @@ export async function markEventAsValidatedHandler(
         getToken(request)
       )
       await postToHearth(payload)
+      await triggerEvent(Events.DECLARATION_UPDATED, payload, request.headers)
       delete taskResource.input
       delete taskResource.output
     }
@@ -387,6 +388,7 @@ export async function markEventAsWaitingValidationHandler(
         getToken(request)
       )
       await postToHearth(payload)
+      await triggerEvent(Events.DECLARATION_UPDATED, payload, request.headers)
       delete taskResource.input
       delete taskResource.output
     }

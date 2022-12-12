@@ -622,7 +622,7 @@ describe('when in device of small viewport', () => {
                   {
                     name: 'motherBirthDate',
                     type: DATE,
-                    label: formMessages.motherDateOfBirth,
+                    label: formMessages.dateOfBirth,
                     required: true,
                     validate: [],
                     initialValue: ''

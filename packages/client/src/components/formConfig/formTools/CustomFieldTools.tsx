@@ -59,11 +59,11 @@ import {
   RegisterFormFieldIds
 } from './components'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { Condition } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { createCustomFieldHandlebarName } from '@client/forms/configuration/customUtils'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -437,7 +437,7 @@ class CustomFieldToolsComp extends React.Component<
       return false
     }
 
-    return newGeneratedFieldID in fieldsMap
+    return fieldsMap.some((field) => field.fieldId === newGeneratedFieldID)
   }
 
   getHeadingText(): string {
@@ -549,11 +549,12 @@ class CustomFieldToolsComp extends React.Component<
       value: fieldId,
       label: fieldId
     }))
+
     return (
       <FieldContainer>
         <ConditionalWrapper>
           <Stack>
-            <Condition color="grey600" />
+            <Icon name="GitBranch" color="grey600" />
             <Title>
               {intl.formatMessage(
                 customFieldFormMessages.conditionalFieldHeaderLabel
@@ -599,7 +600,7 @@ class CustomFieldToolsComp extends React.Component<
                 this.setState({
                   conditionalField: {
                     fieldId: this.state.conditionalField.fieldId,
-                    regex: event.target.value
+                    regex: event.target.value.replaceAll('"', '')
                   }
                 })
               }

@@ -92,7 +92,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       name: 'deceasedDoB',
       customisable: false,
       type: 'DATE_RANGE_PICKER',
-      label: formMessageDescriptors.deceasedDateOfBirth,
+      label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
       validate: []
@@ -101,7 +101,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       name: 'deceasedFirstNames',
       customisable: false,
       type: 'TEXT',
-      label: formMessageDescriptors.deceasedGivenNames,
+      label: formMessageDescriptors.firstName,
       maxLength: 32,
       required: false,
       initialValue: 'fasfasf',
@@ -111,7 +111,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       name: 'deceasedFamilyName',
       customisable: false,
       type: 'TEXT',
-      label: formMessageDescriptors.deceasedFamilyName,
+      label: formMessageDescriptors.familyName,
       maxLength: 32,
       required: false,
       initialValue: '',
@@ -121,7 +121,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       name: 'deceasedGender',
       customisable: false,
       type: 'SELECT_WITH_OPTIONS',
-      label: formMessageDescriptors.deceasedSex,
+      label: formMessageDescriptors.sex,
       required: false,
       initialValue: '',
       validate: [],
@@ -129,15 +129,15 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       options: [
         {
           value: 'male',
-          label: formMessageDescriptors.deceasedSexMale
+          label: formMessageDescriptors.sexMale
         },
         {
           value: 'female',
-          label: formMessageDescriptors.deceasedSexFemale
+          label: formMessageDescriptors.sexFemale
         },
         {
           value: 'unknown',
-          label: formMessageDescriptors.deceasedSexUnknown
+          label: formMessageDescriptors.sexUnknown
         }
       ]
     },
@@ -347,7 +347,7 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
       name: 'informantDoB',
       customisable: false,
       type: 'DATE_RANGE_PICKER',
-      label: formMessageDescriptors.fatherDateOfBirth,
+      label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
       validate: []
@@ -357,7 +357,7 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
 
       customisable: false,
       type: 'TEXT',
-      label: formMessageDescriptors.motherFirstNamesEng,
+      label: formMessageDescriptors.firstName,
       maxLength: 32,
       required: false,
       initialValue: '',
@@ -368,7 +368,7 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
 
       customisable: false,
       type: 'TEXT',
-      label: formMessageDescriptors.motherFamilyNameEng,
+      label: formMessageDescriptors.familyName,
       maxLength: 32,
       required: false,
       initialValue: '',
