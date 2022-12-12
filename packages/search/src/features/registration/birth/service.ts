@@ -40,8 +40,7 @@ import {
   getCompositionById,
   updateInHearth,
   findEntryResourceByUrl,
-  addEventLocation,
-  getLocationHirarchyIDs
+  addEventLocation
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
@@ -392,9 +391,6 @@ async function createDeclarationIndex(
     placeOfDeclarationExtension.valueReference &&
     placeOfDeclarationExtension.valueReference.reference &&
     placeOfDeclarationExtension.valueReference.reference.split('/')[1]
-  body.declarationJurisdictionIds = await getLocationHirarchyIDs(
-    body.declarationLocationId
-  )
   body.compositionType =
     (compositionTypeCode && compositionTypeCode.code) || 'birth-declaration'
 

@@ -89,21 +89,31 @@ export async function addEventLocation(
   bundleEntries?: fhir.BundleEntry[]
 ) {
   let data
+  let location: fhir.Location | undefined
+
   if (bundleEntries) {
-    data = findEntry(code, composition, bundleEntries)
+    data = findEntry(code, composition, bundleEntries) as
+      | fhir.Encounter
+      | undefined
+    if (data && data.location && data.location[0].location) {
+      location = findEntryResourceByUrl(
+        data.location[0].location.reference,
+        bundleEntries
+      ) as fhir.Location | undefined
+    }
   } else {
     const encounterSection = findCompositionSection(code, composition)
     if (encounterSection && encounterSection.entry) {
       data = await getFromFhir(
         `/Encounter/${encounterSection.entry[0].reference}`
       )
+      if (data && data.location && data.location[0].location) {
+        location = await getFromFhir(`/${data.location[0].location.reference}`)
+      }
     }
   }
-  if (data && data.location && data.location[0].location) {
-    const location: fhir.Location = await getFromFhir(
-      `/${data.location[0].location.reference}`
-    )
 
+  if (location) {
     const isLocationHealthFacility =
       location.type &&
       location.type.coding &&
@@ -280,22 +290,6 @@ export function selectObservationEntry(
         }
       })
     : undefined
-}
-
-export async function getLocationHirarchyIDs(declarationLocationId?: string) {
-  if (!declarationLocationId) {
-    return []
-  }
-  const locationHirarchyIds = [declarationLocationId]
-  let locationId = `Location/${declarationLocationId}`
-  while (locationId) {
-    locationId = await fetchParentLocationByLocationID(locationId)
-    if (locationId === 'Location/0') {
-      break
-    }
-    locationHirarchyIds.push(locationId.split('/')[1])
-  }
-  return locationHirarchyIds
 }
 
 export async function fetchParentLocationByLocationID(locationID: string) {

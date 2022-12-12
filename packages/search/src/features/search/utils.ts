@@ -106,7 +106,7 @@ export function advancedQueryBuilder(
   ) {
     must.push({
       match: {
-        dateOfRegistration: params.dateOfRegistration
+        dateOfDeclaration: params.dateOfRegistration
       }
     })
   }
@@ -181,14 +181,12 @@ export function advancedQueryBuilder(
   ].filter((id) => Boolean(id))
 
   if (eventJurisdictionIds.length > 0) {
-    must.push({
-      bool: {
-        should: eventJurisdictionIds.map((locationId: string) => ({
-          match: {
-            eventJurisdictionIds: locationId
-          }
-        }))
-      }
+    eventJurisdictionIds.forEach((locationId) => {
+      must.push({
+        match: {
+          declarationJurisdictionIds: locationId
+        }
+      })
     })
   }
 
@@ -300,7 +298,7 @@ export function advancedQueryBuilder(
 
     must.push({
       range: {
-        childDoB: {
+        deceasedDoB: {
           gte: params.deceasedDoBStart,
           lte: params.deceasedDoBEnd
         }
@@ -470,7 +468,7 @@ export function advancedQueryBuilder(
 
     must.push({
       range: {
-        childDoB: {
+        informantDoB: {
           gte: params.informantDoBStart,
           lte: params.informantDoBEnd
         }
