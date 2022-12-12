@@ -155,7 +155,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
   ) {
     transformedStoreState.registrationStatuses =
       localState.registrationStatuses === 'IN_REVIEW'
-        ? [RegStatus.WaitingValidation, RegStatus.Validated]
+        ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
         ? Object.values(RegStatus)
         : [localState.registrationStatuses]
@@ -287,7 +287,14 @@ export const transformStoreDataToAdvancedSearchLocalState = (
     localState.registrationStatuses =
       reduxState.registrationStatuses.length === 1
         ? reduxState.registrationStatuses[0]
-        : reduxState.registrationStatuses.length === 2
+        : isEqual(
+            reduxState.registrationStatuses.sort(),
+            [
+              RegStatus.WaitingValidation,
+              RegStatus.Validated,
+              RegStatus.Declared
+            ].sort()
+          )
         ? 'IN_REVIEW'
         : 'ALL'
   } else {
@@ -539,7 +546,11 @@ const getLabelForRegistrationStatus = (
       RegStatus.Validated,
       RegStatus.WaitingValidation
     ],
-    IN_REVIEW: [RegStatus.WaitingValidation, RegStatus.Validated],
+    IN_REVIEW: [
+      RegStatus.WaitingValidation,
+      RegStatus.Validated,
+      RegStatus.Declared
+    ],
     ARCHIVED: [RegStatus.Archived],
     CERTIFIED: [RegStatus.Certified],
     DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
@@ -552,7 +563,7 @@ const getLabelForRegistrationStatus = (
   }
 
   const statusType = Object.keys(statusLabelMapping).find((key, i) => {
-    if (isEqual(statusList, statusLabelMapping[key])) {
+    if (isEqual(statusList.sort(), statusLabelMapping[key].sort())) {
       return true
     }
     return false

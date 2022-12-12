@@ -106,7 +106,7 @@ export function advancedQueryBuilder(
   ) {
     must.push({
       match: {
-        dateOfRegistration: params.dateOfRegistration
+        dateOfDeclaration: params.dateOfRegistration
       }
     })
   }
@@ -148,7 +148,7 @@ export function advancedQueryBuilder(
   if (params.declarationJurisdictionId) {
     must.push({
       match: {
-        declarationJurisdictionId: {
+        declarationJurisdictionIds: {
           query: params.declarationJurisdictionId,
           boost: 2.0
         }
@@ -279,11 +279,6 @@ export function advancedQueryBuilder(
     !params.deceasedDoBEnd &&
     params.deceasedDoB
   ) {
-    console.log({
-      s: params.deceasedDoBStart,
-      e: params.deceasedDoBEnd,
-      main: params.deceasedDoB
-    })
     must.push({
       match: {
         deceasedDoB: params.deceasedDoB
@@ -454,11 +449,6 @@ export function advancedQueryBuilder(
     !params.informantDoBEnd &&
     params.informantDoB
   ) {
-    console.log('i', {
-      s: params.informantDoBStart,
-      e: params.informantDoBEnd,
-      main: params.informantDoB
-    })
     must.push({
       match: {
         informantDoB: params.informantDoB
