@@ -390,7 +390,7 @@ export function advancedQueryBuilder(
     })
   }
 
-  if (!params.fatherDoBStart && params.fatherDoBEnd && params.fatherDoB) {
+  if (!params.fatherDoBStart && !params.fatherDoBEnd && params.fatherDoB) {
     must.push({
       match: {
         fatherDoB: params.fatherDoB

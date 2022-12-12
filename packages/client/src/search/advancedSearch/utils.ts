@@ -30,6 +30,7 @@ import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import format from '@client/utils/date-formatting'
 import { ISearchLocation } from '@opencrvs/components'
+import formatDate from '@client/utils/date-formatting'
 
 export type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
@@ -454,7 +455,12 @@ export const determineDateFromDateRangePickerVal = (
   if (!dateRangePickerValue) {
     return { exact: undefined, rangeStart: undefined, rangeEnd: undefined }
   }
-  const value = { ...dateRangePickerValue }
+  const value = {
+    ...dateRangePickerValue,
+    exact:
+      dateRangePickerValue.exact &&
+      formatDate(new Date(dateRangePickerValue.exact), 'yyyy-MM-dd')
+  }
   if (dateRangePickerValue.isDateRangeActive) {
     value.exact = undefined
   } else {
