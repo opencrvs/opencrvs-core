@@ -20,6 +20,10 @@ import { messages } from '@client/i18n/messages/views/pin'
 import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
+import { Box } from '@client/../../components/lib/Box'
+import { connect } from 'react-redux'
+import { IStoreState } from '@client/store'
+import { getOfflineData } from '@client/offline/selectors'
 
 const Container = styled.div`
   display: flex;
@@ -27,23 +31,30 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   ${({ theme }) => theme.gradients.primary};
-  background: ${({ theme }) => theme.colors.backgroundPrimary};
+  background: ${(hex) => (hex.color ? hex.color : '#36304E')};
   height: 100vh;
   width: 100%;
   position: absolute;
   overflow-y: hidden;
   overflow-x: hidden;
 `
+const BoxWrapper = styled(Box)`
+  width: 32rem;
+  text-align: center;
+`
 
 const StyledPIN = styled(PIN)`
-  margin-top: -80px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: auto;
   @media (max-height: 780px) {
     margin-top: 0px;
   }
 `
 
 const TitleText = styled.span`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.h2};
   text-align: center;
   margin-top: 24px;
@@ -56,7 +67,7 @@ const TitleText = styled.span`
 `
 
 const DescriptionText = styled.span`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.reg18};
   text-align: center;
   max-width: 360px;
@@ -154,78 +165,85 @@ class CreatePinComponent extends React.Component<IProps> {
     const { intl, offlineCountryConfiguration } = this.props
 
     return (
-      <Container>
-        <StyledPIN />
-        {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
-          <>
-            <TitleText id="title-text">
-              {intl.formatMessage(messages.createTitle)}
-            </TitleText>
-            <DescriptionText id="description-text">
-              {intl.formatMessage(messages.createDescription)}
-            </DescriptionText>
-            {pinMatchError && (
+      <Container
+        color={`#${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor}`}
+        style={{
+          backgroundImage: `url(${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage})`
+        }}
+      >
+        <BoxWrapper>
+          <StyledPIN />
+          {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
+            <>
+              <TitleText id="title-text">
+                {intl.formatMessage(messages.createTitle)}
+              </TitleText>
+              <DescriptionText id="description-text">
+                {intl.formatMessage(messages.createDescription)}
+              </DescriptionText>
+              {pinMatchError && (
+                <ErrorBox id="error-text">
+                  {intl.formatMessage(messages.pinMatchError)}
+                </ErrorBox>
+              )}
+              <PINKeypad
+                pin=""
+                ref={(elem: any) => (this.pinKeyRef = elem)}
+                onComplete={this.firstPINEntry}
+              />
+            </>
+          )}
+          {pinHasSeqDigits && (
+            <>
+              <TitleText id="title-text">
+                {intl.formatMessage(messages.createTitle)}
+              </TitleText>
+              <DescriptionText id="description-text">
+                {intl.formatMessage(messages.createDescription)}
+              </DescriptionText>
               <ErrorBox id="error-text">
-                {intl.formatMessage(messages.pinMatchError)}
+                {intl.formatMessage(messages.pinSequentialDigitsError)}
               </ErrorBox>
-            )}
-            <PINKeypad
-              pin=""
-              ref={(elem: any) => (this.pinKeyRef = elem)}
-              onComplete={this.firstPINEntry}
-            />
-          </>
-        )}
-        {pinHasSeqDigits && (
-          <>
-            <TitleText id="title-text">
-              {intl.formatMessage(messages.createTitle)}
-            </TitleText>
-            <DescriptionText id="description-text">
-              {intl.formatMessage(messages.createDescription)}
-            </DescriptionText>
-            <ErrorBox id="error-text">
-              {intl.formatMessage(messages.pinSequentialDigitsError)}
-            </ErrorBox>
-            <PINKeypad
-              onComplete={this.firstPINEntry}
-              key={refresher.toString()}
-            />
-          </>
-        )}
-        {pinHasSameDigits && (
-          <>
-            <TitleText id="title-text">
-              {intl.formatMessage(messages.createTitle)}
-            </TitleText>
-            <DescriptionText id="description-text">
-              {intl.formatMessage(messages.createDescription)}
-            </DescriptionText>
-            <ErrorBox id="error-text">
-              {intl.formatMessage(messages.pinSameDigitsError)}
-            </ErrorBox>
-            <PINKeypad
-              ref={(elem: any) => (this.pinKeyRef = elem)}
-              onComplete={this.firstPINEntry}
-              key={refresher.toString()}
-            />
-          </>
-        )}
-        {pin && (
-          <>
-            <TitleText id="title-text">
-              {intl.formatMessage(messages.reEnterTitle)}
-            </TitleText>
-            <DescriptionText id="description-text">
-              {intl.formatMessage(messages.reEnterDescription)}
-            </DescriptionText>
+              <PINKeypad
+                onComplete={this.firstPINEntry}
+                key={refresher.toString()}
+              />
+            </>
+          )}
+          {pinHasSameDigits && (
+            <>
+              <TitleText id="title-text">
+                {intl.formatMessage(messages.createTitle)}
+              </TitleText>
+              <DescriptionText id="description-text">
+                {intl.formatMessage(messages.createDescription)}
+              </DescriptionText>
+              <ErrorBox id="error-text">
+                {intl.formatMessage(messages.pinSameDigitsError)}
+              </ErrorBox>
+              <PINKeypad
+                ref={(elem: any) => (this.pinKeyRef = elem)}
+                onComplete={this.firstPINEntry}
+                key={refresher.toString()}
+              />
+            </>
+          )}
+          {pin && (
+            <>
+              <TitleText id="title-text">
+                {intl.formatMessage(messages.reEnterTitle)}
+              </TitleText>
+              <DescriptionText id="description-text">
+                {intl.formatMessage(messages.reEnterDescription)}
+              </DescriptionText>
 
-            <PINKeypad
-              ref={(elem: any) => (this.pinKeyRef = elem)}
-              onComplete={this.secondPINEntry}
-            />
-          </>
-        )}
+              <PINKeypad
+                ref={(elem: any) => (this.pinKeyRef = elem)}
+                onComplete={this.secondPINEntry}
+              />
+            </>
+          )}
+        </BoxWrapper>
       </Container>
     )
   }
@@ -254,4 +272,6 @@ class CreatePinComponent extends React.Component<IProps> {
   }
 }
 
-export const CreatePin = injectIntl(CreatePinComponent)
+export const CreatePin = connect((store: IStoreState) => ({
+  offlineCountryConfiguration: getOfflineData(store)
+}))(injectIntl(CreatePinComponent))
