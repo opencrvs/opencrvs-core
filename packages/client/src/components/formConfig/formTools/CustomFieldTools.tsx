@@ -56,6 +56,7 @@ import { Button } from '@opencrvs/components/src/Button'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { Link } from '@opencrvs/components/lib/Link'
 import {
   Select,
   ISelectOption as IDataSourceOption
@@ -242,7 +243,7 @@ const CFileSelectLink = styled(FileSelectLink)`
   height: 40px;
 
   &:hover {
-    text-decoration: none;
+    text-decoration: underline;
     background: ${({ theme }) => theme.colors.grey100};
     border: 2px solid ${({ theme }) => theme.colors.primaryDark};
     color: ${({ theme }) => theme.colors.primaryDark};
@@ -333,7 +334,7 @@ class CustomFieldToolsComp extends React.Component<
   ): IDataSourceSelectOption[] {
     const { selectedLanguage, intl } = this.props
 
-    return (
+    const dataSourceOptions =
       formDataset.map((dataset) => {
         const optionsFromCSV = dataset?.options
           ?.map((option) => {
@@ -368,7 +369,12 @@ class CustomFieldToolsComp extends React.Component<
           options: optionsFromCSV
         }
       }) || []
-    )
+    for (let i = dataSourceOptions.length - 1; i >= 0; --i) {
+      if (dataSourceOptions[i].options.length === 0) {
+        dataSourceOptions.splice(i, 1)
+      }
+    }
+    return dataSourceOptions
   }
 
   componentDidUpdate({ selectedField: { fieldId } }: IFullProps) {
@@ -1001,14 +1007,15 @@ class CustomFieldToolsComp extends React.Component<
         <Text color="grey500" variant="reg14" element="span">
           {intl.formatMessage(customFieldFormMessages.dataSourceDescription)}
           &nbsp;
-          <FileSelectLink
-            id="upload-data-source"
-            accept=".csv"
-            handleFileChange={this.onFileChangeHandler.bind(this)}
-            title={intl.formatMessage(buttonMessages.upload)}
-          />
         </Text>
-
+        <Link
+          onClick={() => {
+            window.open('https://documentation.opencrvs.org/', '_blank')
+          }}
+          font="reg14"
+        >
+          documentation.opencrvs.org
+        </Link>
         {this.CSVUploadModal()}
 
         <CSelect
@@ -1021,6 +1028,15 @@ class CustomFieldToolsComp extends React.Component<
             value: option.value
           }))}
         />
+
+        <FileSelectLink
+          id="upload-data-source"
+          accept=".csv"
+          handleFileChange={this.onFileChangeHandler.bind(this)}
+          title={intl.formatMessage(buttonMessages.upload)}
+        />
+        <br></br>
+        <br></br>
       </>
     )
   }
