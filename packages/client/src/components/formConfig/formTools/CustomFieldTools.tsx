@@ -26,11 +26,7 @@ import {
   ICustomSelectOption,
   IMessage
 } from '@client/forms/questionConfig'
-import {
-  CreateFormDatasetMutation,
-  Event,
-  GetFormDatasetQuery
-} from '@client/utils/gateway'
+import { CreateFormDatasetMutation, Event } from '@client/utils/gateway'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
   getCertificateHandlebar,
@@ -57,10 +53,7 @@ import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Link } from '@opencrvs/components/lib/Link'
-import {
-  Select,
-  ISelectOption as IDataSourceOption
-} from '@opencrvs/components/lib/Select'
+import { Select } from '@opencrvs/components/lib/Select'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import {
   ListViewSimplified,
@@ -85,21 +78,18 @@ import {
   RegisterFormFieldIds
 } from './components'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { Condition } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import { Icon } from '@opencrvs/components/src/Icon/Icon'
 import { FileSelectLink } from '@opencrvs/components/lib/FileSelectLink'
 import { getBase64String } from '@client/utils/imageUtils'
 import { ResponsiveModal } from '@client/../../components/lib'
 import { client } from '@client/utils/apolloClient'
 import { CREATE_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/mutations'
 import { Alert } from '@opencrvs/components/lib/Alert'
-import { Query } from '@client/components/Query'
-import { FETCH_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/Wizard/query'
 import { createCustomFieldHandlebarName } from '@client/forms/configuration/customUtils'
 import { offlineFormConfigAddFormDataset } from '@client/offline/actions'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -598,7 +588,7 @@ class CustomFieldToolsComp extends React.Component<
       return false
     }
 
-    return newGeneratedFieldID in fieldsMap
+    return fieldsMap.some((field) => field.fieldId === newGeneratedFieldID)
   }
 
   getHeadingText(): string {
@@ -714,11 +704,12 @@ class CustomFieldToolsComp extends React.Component<
       value: fieldId,
       label: fieldId
     }))
+
     return (
       <FieldContainer>
         <ConditionalWrapper>
           <Stack>
-            <Condition color="grey600" />
+            <Icon name="GitBranch" color="grey600" />
             <Title>
               {intl.formatMessage(
                 customFieldFormMessages.conditionalFieldHeaderLabel
@@ -764,7 +755,7 @@ class CustomFieldToolsComp extends React.Component<
                 this.setState({
                   conditionalField: {
                     fieldId: this.state.conditionalField.fieldId,
-                    regex: event.target.value
+                    regex: event.target.value.replaceAll('"', '')
                   }
                 })
               }
