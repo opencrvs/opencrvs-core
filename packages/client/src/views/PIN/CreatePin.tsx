@@ -219,7 +219,7 @@ class CreatePinComponent extends React.Component<IProps> {
                 {intl.formatMessage(messages.createDescription)}
               </DescriptionText>
               <ErrorBox id="error-text">
-                {intl.formatMessage(messages.pinMatchError)}
+                {intl.formatMessage(messages.pinSameDigitsError)}
               </ErrorBox>
               <PINKeypad
                 ref={(elem: any) => (this.pinKeyRef = elem)}
