@@ -201,6 +201,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         system {
           name
+          type
         }
         user {
           id
@@ -453,6 +454,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
         system {
           name
+          type
         }
         user {
           id

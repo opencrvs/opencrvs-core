@@ -15,7 +15,12 @@ import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
-import { getFormattedDate, getPageItems, getStatusLabel } from './utils'
+import {
+  getFormattedDate,
+  getPageItems,
+  getStatusLabel,
+  isSystemInitiated
+} from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
@@ -26,8 +31,9 @@ import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, RegStatus } from '@client/utils/gateway'
+import { History, RegStatus, SystemType } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
+import { integrationMessages } from '@client/i18n/messages/views/integrations'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -101,10 +107,11 @@ const GetNameWithAvatar = ({
   )
 }
 
-function isSystemInitiated(history: History) {
-  return Boolean(
-    (history.dhis2Notification && !history.user?.id) || history.system
-  )
+function getSystemType(type: string | undefined) {
+  if (type === SystemType.RecordSearch) {
+    return integrationMessages.recordSearch
+  }
+  return integrationMessages.healthSystem
 }
 
 const getIndexByAction = (histories: any, index: number): number => {
@@ -237,7 +244,7 @@ export const GetHistory = ({
     ),
     type: intl.formatMessage(
       isSystemInitiated(item) || !item.user?.role
-        ? userMessages.healthSystem
+        ? getSystemType(item.system?.type)
         : userMessages[item.user.role]
     ),
     location: isSystemInitiated(item) ? null : isFieldAgent ? (

@@ -369,6 +369,7 @@ export async function getSystemHandler(
     scope: system.scope,
     sha_secret: system.sha_secret,
     practitionerId: system.practitionerId,
+    type: system.type,
     settings: {
       dailyQuota: system.settings.dailyQuota || 0
     }

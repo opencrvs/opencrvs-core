@@ -238,6 +238,8 @@ type History {
   requester: String
   hasShowedVerifiedDocument: Boolean
   otherReason: String
+  #This doesn't resolve to the System model properly rather
+  #uses the getSystem endpoint in user-mgnt
   system: System # -> identitifier(system='http://opencrvs.org/specs/extension/system_identifier')
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference

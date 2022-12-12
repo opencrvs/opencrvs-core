@@ -190,6 +190,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         system {
           name
+          type
         }
         user {
           id
@@ -428,6 +429,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         system {
           name
+          type
         }
         user {
           id
