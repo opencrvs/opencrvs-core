@@ -236,9 +236,9 @@ export const GetHistory = ({
       </>
     ),
     type: intl.formatMessage(
-      (item.dhis2Notification && !item.user?.role) || null === item.user?.role
+      isSystemInitiated(item) || !item.user?.role
         ? userMessages.healthSystem
-        : userMessages[item?.user?.role as string]
+        : userMessages[item.user.role]
     ),
     location: isSystemInitiated(item) ? null : isFieldAgent ? (
       <>{item.office?.name}</>
