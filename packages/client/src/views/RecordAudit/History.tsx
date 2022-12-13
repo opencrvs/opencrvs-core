@@ -19,14 +19,14 @@ import { getFormattedDate, getPageItems, getStatusLabel } from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
+import { getIndividualNameObj } from '@client/utils/userUtils'
+import { Avatar, History, RegStatus } from '@client/utils/gateway'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, RegStatus } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
 
 const TableDiv = styled.div`
@@ -89,7 +89,7 @@ const GetNameWithAvatar = ({
 }: {
   id: string
   nameObject: Array<GQLHumanName | null>
-  avatar: IAvatar
+  avatar: Avatar
   language: string
 }) => {
   const nameObj = getIndividualNameObj(nameObject, language)
@@ -214,7 +214,7 @@ export const GetHistory = ({
           <GetNameWithAvatar
             id={item?.user?.id as string}
             nameObject={item?.user?.name as (GQLHumanName | null)[]}
-            avatar={item.user?.avatar as IAvatar}
+            avatar={item.user?.avatar as Avatar}
             language={window.config.LANGUAGES}
           />
         ) : (
@@ -226,7 +226,7 @@ export const GetHistory = ({
             <GetNameWithAvatar
               id={item?.user?.id as string}
               nameObject={item?.user?.name as (GQLHumanName | null)[]}
-              avatar={item.user?.avatar as IAvatar}
+              avatar={item.user?.avatar as Avatar}
               language={window.config.LANGUAGES}
             />
           </Link>

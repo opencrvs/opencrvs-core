@@ -18,6 +18,7 @@ import {
   GQLBookmarkedSeachItem
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/client/src/storage'
+import { Avatar } from '@client/utils/gateway'
 import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
@@ -37,11 +38,6 @@ export interface IGQLLocation {
   status?: string
 }
 
-export interface IAvatar {
-  type: string
-  data: string
-}
-
 export interface IUserDetails {
   userMgntUserID?: string
   practitionerId?: string
@@ -57,7 +53,7 @@ export interface IUserDetails {
     role?: string
     signature?: GQLSignature
   }
-  avatar?: IAvatar
+  avatar?: Avatar
   searches?: GQLBookmarkedSeachItem[]
 }
 
