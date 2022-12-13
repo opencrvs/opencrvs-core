@@ -13,6 +13,7 @@
 import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
+import { resolvers as integrationResolver } from '@gateway/features/systems/root-resolvers'
 import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
@@ -28,13 +29,15 @@ import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/roo
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as formDatasetResolvers } from '@gateway/features/formDataset/root-resolver'
 import {
+  ISystemModelData,
   IUserModelData,
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
 import {
   getUser,
   getUserId,
-  getTokenPayload
+  getTokenPayload,
+  getSystem
 } from '@gateway/features/user/utils'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 import { loadSchemaSync } from '@graphql-tools/load'
@@ -62,6 +65,7 @@ const resolvers: StringIndexed<IResolvers> = merge(
   userTypeResolvers as IResolvers,
   certificateTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
+  integrationResolver as IResolvers,
   metricsTypeResolvers as IResolvers,
   typeResolvers as IResolvers,
   searchRootResolvers as IResolvers,
@@ -72,6 +76,8 @@ const resolvers: StringIndexed<IResolvers> = merge(
   correctionRootResolvers as IResolvers,
   formDraftResolvers as IResolvers,
   applicationRootResolvers as IResolvers,
+  integrationResolver as IResolvers,
+  formDatasetResolvers as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
   formDatasetResolvers as IResolvers
 )
@@ -101,10 +107,17 @@ export const getApolloConfig = (): Config => {
         const userId = getUserId({
           Authorization: request.headers.authorization
         })
-        const user: IUserModelData = await getUser(
+        let user: IUserModelData | ISystemModelData
+        user = await getUser(
           { userId },
           { Authorization: request.headers.authorization }
         )
+        if (!user) {
+          user = await getSystem(
+            { systemId: userId },
+            { Authorization: request.headers.authorization }
+          )
+        }
         if (!user || !['active', 'pending'].includes(user.status)) {
           throw new AuthenticationError('Authentication failed')
         }

@@ -25,7 +25,7 @@ import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { IFormConfig } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, System } from '@client/utils/gateway'
 import {
   IQuestionConfig,
   isDefaultQuestionConfig
@@ -75,7 +75,7 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-
+  systems: System[]
   config: IApplicationConfig
   formConfig: IFormConfig
 }
@@ -367,6 +367,20 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
+    case actions.UPDATE_OFFLINE_SYSTEMS: {
+      const newOfflineData = {
+        ...state.offlineData,
+        systems: action.payload.systems
+      }
+
+      return loop(
+        {
+          ...state,
+          offlineData: newOfflineData
+        },
+        Cmd.run(saveOfflineData, { args: [newOfflineData] })
+      )
+    }
     case actions.UPDATE_OFFLINE_FORM_CONFIG: {
       const { formConfig } = state.offlineData
 
@@ -399,7 +413,7 @@ function reducer(
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, formConfig } = action.payload
+      const { certificates, config, formConfig, systems } = action.payload
       merge(window.config, config)
       let newOfflineData
       const birthCertificateTemplate = certificates.find(
@@ -429,6 +443,7 @@ function reducer(
           ...state.offlineData,
           config,
           formConfig,
+          systems,
           templates: {
             certificates: certificatesTemplates
           }
@@ -438,6 +453,7 @@ function reducer(
           ...state.offlineData,
           config,
           formConfig,
+          systems,
 
           // Field agents do not get certificate templates from the config service.
           // Our loading logic depends on certificates being present and the app would load infinitely

@@ -58,6 +58,7 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
+import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
@@ -330,6 +331,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.TEAM_USER_LIST}
                                             component={UserList}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.SYSTEM_LIST}
+                                            component={SystemList}
                                           />
                                           <ProtectedRoute
                                             exact

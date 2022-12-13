@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import ApplicationConfig, {
   IApplicationConfigurationModel
-} from '@config/models/config' //   IApplicationConfigurationModel
+} from '@config/models/config'
 import { logger } from '@config/config/logger'
 import { badRequest, internal } from '@hapi/boom'
 import * as Joi from 'joi'
@@ -20,6 +20,7 @@ import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
+import getSystems from '@config/handlers/system/systemHandler'
 import { getFormDatasetHandler } from '@config/handlers/formDataset/handler'
 
 export default async function configHandler(
@@ -27,17 +28,25 @@ export default async function configHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const [certificates, questionConfig, formDrafts, config, formDataset] =
-      await Promise.all([
-        getActiveCertificatesHandler(request, h),
-        getQuestionsHandler(request, h),
-        getFormDrafts(request, h),
-        getApplicationConfig(request, h),
-        getFormDatasetHandler(request, h)
-      ])
+    const [
+      certificates,
+      questionConfig,
+      formDrafts,
+      config,
+      systems,
+      formDataset
+    ] = await Promise.all([
+      getActiveCertificatesHandler(request, h),
+      getQuestionsHandler(request, h),
+      getFormDrafts(request, h),
+      getApplicationConfig(request, h),
+      getSystems(request, h),
+      getFormDatasetHandler(request, h)
+    ])
     return {
       config,
       certificates,
+      systems,
       formConfig: {
         questionConfig,
         formDrafts,
@@ -81,39 +90,25 @@ export async function getLoginConfigHandler(
   return { config: refineConfigResponse }
 }
 
-export async function getIntegrationConfigHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  let integrationConfig: IApplicationConfigurationModel | null
-  try {
-    integrationConfig = await ApplicationConfig.findOne({})
-  } catch (error) {
-    throw internal(error.message)
-  }
-  const refineConfigResponse = pick(integrationConfig, ['INTEGRATIONS'])
-  return { config: refineConfigResponse }
-}
-
 export async function updateApplicationConfigHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
     const applicationConfig = request.payload as IApplicationConfigurationModel
-    const existingApllicationConfig: IApplicationConfigurationModel | null =
+    const existingApplicationConfig: IApplicationConfigurationModel | null =
       await ApplicationConfig.findOne({})
-    if (!existingApllicationConfig) {
+    if (!existingApplicationConfig) {
       throw badRequest('No existing application config found')
     }
     // Update existing application config fields
-    merge(existingApllicationConfig, applicationConfig)
+    merge(existingApplicationConfig, applicationConfig)
 
     await ApplicationConfig.update(
-      { _id: existingApllicationConfig._id },
-      existingApllicationConfig
+      { _id: existingApplicationConfig._id },
+      existingApplicationConfig
     )
-    return h.response(existingApllicationConfig).code(201)
+    return h.response(existingApplicationConfig).code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo
@@ -154,9 +149,5 @@ export const updateApplicationConfig = Joi.object({
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.string(),
-  ADDRESSES: Joi.number().valid(...[1, 2]),
-  INTEGRATIONS: Joi.array().items({
-    name: Joi.string().required(),
-    status: Joi.string().required()
-  })
+  ADDRESSES: Joi.number().valid(...[1, 2])
 })
