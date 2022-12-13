@@ -20,25 +20,28 @@ import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
+import { getFormDatasetHandler } from '@config/handlers/formDataset/handler'
 
 export default async function configHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const [certificates, questionConfig, formDrafts, config] =
+    const [certificates, questionConfig, formDrafts, config, formDataset] =
       await Promise.all([
         getActiveCertificatesHandler(request, h),
         getQuestionsHandler(request, h),
         getFormDrafts(request, h),
-        getApplicationConfig(request, h)
+        getApplicationConfig(request, h),
+        getFormDatasetHandler(request, h)
       ])
     return {
       config,
       certificates,
       formConfig: {
         questionConfig,
-        formDrafts
+        formDrafts,
+        formDataset
       }
     }
   } catch (ex) {

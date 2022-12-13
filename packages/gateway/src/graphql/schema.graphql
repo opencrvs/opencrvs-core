@@ -147,6 +147,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
+  getFormDataset: [FormDataset!]
 }
 
 type Mutation {
@@ -231,6 +232,7 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
+  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
 }
 
 type Dummy {
@@ -569,6 +571,13 @@ type FormDraft {
   createdAt: Date!
 }
 
+type FormDataset {
+  options: [FormDatasetOption!]
+  fileName: String!
+  createdAt: String!
+  _id: String
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -732,6 +741,17 @@ input BookmarkSearchInput {
 input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
+}
+
+type FormDatasetResponse {
+  status: String!
+  msg: String!
+  data: FormDataset
+}
+
+input FormDatasetInput {
+  fileName: String!
+  base64Data: String!
 }
 
 scalar Map
@@ -1056,6 +1076,11 @@ type DraftHistory {
   updatedAt: Date!
 }
 
+type FormDatasetOption {
+  value: String!
+  label: [FormDatasetOptionLabel]
+}
+
 input PersonInput {
   _fhirID: ID
   identifier: [IdentityInput]
@@ -1233,6 +1258,8 @@ input QuestionInput {
   enabled: String
   custom: Boolean
   conditionals: [ConditionalInput!]
+  datasetId: String
+  options: [CustomSelectOption!]
 }
 
 enum InformantType {
@@ -1530,6 +1557,11 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
+type FormDatasetOptionLabel {
+  lang: String!
+  descriptor: MesssageDescriptor!
+}
+
 input IdentityInput {
   id: ID
   type: IdentityIDType
@@ -1639,11 +1671,17 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+  SELECT_WITH_OPTIONS
 }
 
 input ConditionalInput {
   fieldId: String!
   regexp: String!
+}
+
+input CustomSelectOption {
+  value: String!
+  label: MesssageDescriptorInput!
 }
 
 type Payment {
@@ -1666,6 +1704,12 @@ interface AuditLogItemBase {
 type AdditionalIdWithCompositionId {
   compositionId: String!
   trackingId: String!
+}
+
+type MesssageDescriptor {
+  id: String!
+  description: String
+  defaultMessage: String!
 }
 
 input CommentInput {
