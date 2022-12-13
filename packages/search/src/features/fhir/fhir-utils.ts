@@ -122,29 +122,29 @@ export async function addEventLocation(
     if (isLocationHealthFacility) {
       body.eventLocationId = location.id
     } else {
-      body.declarationJurisdictionIds = []
+      body.eventJurisdictionIds = []
       if (location.address?.country) {
         body.eventCountry = location.address.country
       }
       //eventLocationLevel1
       if (location.address?.state) {
-        body.declarationJurisdictionIds.push(location.address.state)
+        body.eventJurisdictionIds.push(location.address.state)
       }
       //eventLocationLevel2
       if (location.address?.district) {
-        body.declarationJurisdictionIds.push(location.address.district)
+        body.eventJurisdictionIds.push(location.address.district)
       }
       //eventLocationLevel3
       if (location.address?.line?.[10]) {
-        body.declarationJurisdictionIds.push(location.address.line[10])
+        body.eventJurisdictionIds.push(location.address.line[10])
       }
       //eventLocationLevel4
       if (location.address?.line?.[11]) {
-        body.declarationJurisdictionIds.push(location.address.line[11])
+        body.eventJurisdictionIds.push(location.address.line[11])
       }
       //eventLocationLevel5
       if (location.address?.line?.[12]) {
-        body.declarationJurisdictionIds.push(location.address.line[12])
+        body.eventJurisdictionIds.push(location.address.line[12])
       }
     }
   }
@@ -295,4 +295,22 @@ export function selectObservationEntry(
 export async function fetchParentLocationByLocationID(locationID: string) {
   const location = await getFromFhir(`/${locationID}`)
   return location && location.partOf && location.partOf.reference
+}
+
+export async function getdeclarationJurisdictionIds(
+  declarationLocationId?: string
+) {
+  if (!declarationLocationId) {
+    return []
+  }
+  const locationHirarchyIds = [declarationLocationId]
+  let locationId = `Location/${declarationLocationId}`
+  while (locationId) {
+    locationId = await fetchParentLocationByLocationID(locationId)
+    if (locationId === 'Location/0') {
+      break
+    }
+    locationHirarchyIds.push(locationId.split('/')[1])
+  }
+  return locationHirarchyIds
 }

@@ -148,7 +148,7 @@ export function advancedQueryBuilder(
   if (params.declarationJurisdictionId) {
     must.push({
       match: {
-        declarationJurisdictionId: {
+        declarationJurisdictionIds: {
           query: params.declarationJurisdictionId,
           boost: 2.0
         }
@@ -184,7 +184,7 @@ export function advancedQueryBuilder(
     eventJurisdictionIds.forEach((locationId) => {
       must.push({
         match: {
-          declarationJurisdictionIds: locationId
+          eventJurisdictionIds: locationId
         }
       })
     })
