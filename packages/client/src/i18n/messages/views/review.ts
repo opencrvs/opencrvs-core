@@ -30,7 +30,6 @@ const messagesToDefine = {
     defaultMessage:
       'This declaration will be sent to the registrar for them to register'
   },
-
   informantsSignature: {
     defaultMessage: 'Signature of informant',
     description: 'Label for informants signature input',

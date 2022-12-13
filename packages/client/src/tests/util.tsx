@@ -1704,6 +1704,7 @@ export const mockDeclarationData = {
       value: 'MOTHER',
       nestedFields: { otherInformantType: '' }
     },
+    informantsSignature: 'data:image/png;base64,abcd',
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',

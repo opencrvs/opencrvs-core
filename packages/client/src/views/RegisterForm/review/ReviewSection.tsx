@@ -399,7 +399,7 @@ function SignatureInput({ id, value, onChange }: SignatureInputProps) {
 
       <ResponsiveModal
         id={`${id}Modal`}
-        title={'Signature of informant'}
+        title={intl.formatMessage(messages.informantsSignature)}
         autoHeight={true}
         titleHeightAuto={true}
         width={600}
