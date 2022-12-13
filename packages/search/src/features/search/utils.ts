@@ -555,7 +555,6 @@ export function advancedQueryBuilder(
     })
   }
 
-  console.log('must', must)
 
   return {
     bool: {
