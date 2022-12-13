@@ -95,7 +95,7 @@ import {
 } from '@user-mgnt/features/userSearchRecord/handler'
 import resetPasswordSMSHandler, {
   requestSchema as resetPasswordRequestSchema
-} from '@user-mgnt/features/resstPassword/handler'
+} from '@user-mgnt/features/resetPassword/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',

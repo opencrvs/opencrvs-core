@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { BirthSection, DeathSection } from '@client/forms'
+import { BirthSection, DeathSection, SELECT_WITH_OPTIONS } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { FieldEnabled } from '@client/forms/configuration'
 import {
@@ -37,9 +37,9 @@ import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import ConfigPlaceholder from './ConfigPlaceholder'
-import { Condition } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Stack } from '@opencrvs/components/lib/Stack'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const CanvasBox = styled.div`
   display: flex;
@@ -118,11 +118,15 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
           const conditionalField = isCustomConfigField(configField)
             ? configField.conditionals
             : undefined
+          const enableInteraction =
+            isCustomConfigField(configField) &&
+            configField.fieldType === SELECT_WITH_OPTIONS
           return (
             <FormConfigElementCard
               id={fieldId}
               key={fieldId}
               selected={isSelected}
+              enableInteraction={enableInteraction}
               onClick={() => {
                 setSelectedField(fieldId)
               }}
@@ -145,7 +149,7 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
                 <CardContentWrapper>
                   {conditionalField && conditionalField.length > 0 && (
                     <Stack>
-                      <Condition color="grey400" />
+                      <Icon name="GitBranch" size="small" color="grey400" />
                       <Text variant="reg14" element="span" color="grey400">
                         {conditionalField[0].fieldId}
                       </Text>

@@ -103,7 +103,9 @@ export const AppBar = (props: IAppBarProps) => {
           )}
         </Left>
 
-        {props.mobileRight && <Actions>{props.mobileRight}</Actions>}
+        {props.mobileRight && (
+          <Actions $flex="none">{props.mobileRight}</Actions>
+        )}
       </AppBarWrapper>
     )
   }

@@ -631,6 +631,8 @@ describe('markEventAsValidatedHandler handler', () => {
     server = await createServer()
     fetch.mockResponses(
       ...getMarkBundleAndPostToHearthMockResponses,
+      // For triggering DECLARATION_UPDATED event
+      [{}, { status: 200 }],
       // This is needed only for the bundle with input output
       ...getMarkBundleAndPostToHearthMockResponses
     )
@@ -1307,6 +1309,9 @@ describe('markEventAsWaitingValidationHandler', () => {
     server = await createServer()
     fetch.mockResponses(
       ...getMarkBundleAndPostToHearthMockResponses,
+      // For triggering DECLARATION_UPDATED event
+      [JSON.stringify({}), { status: 200 }],
+      // This is needed only for the bundle with input output
       ...getMarkBundleAndPostToHearthMockResponses
     )
   })

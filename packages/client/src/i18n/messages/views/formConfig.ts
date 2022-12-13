@@ -87,6 +87,7 @@ interface IFormConfigMessages
   dynamicList: MessageDescriptor
   formConfigMobileModalTitle: MessageDescriptor
   formConfigMobileModalDesc: MessageDescriptor
+  customSelect: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -494,6 +495,10 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage:
       'Please use a laptop or desktop to configure a declaration form',
     description: 'Modal description for mobile form configuration'
+  },
+  customSelect: {
+    id: 'config.form.tools.input.customSelect',
+    defaultMessage: 'Custom Select'
   }
 }
 

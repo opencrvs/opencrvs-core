@@ -26,6 +26,7 @@ import { resolvers as userRootResolvers } from '@gateway/features/user/root-reso
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
 import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
+import { resolvers as formDatasetResolvers } from '@gateway/features/formDataset/root-resolver'
 import { resolvers as advancedSearchResolvers } from '@gateway/features/advanceSearch/root-resolvers'
 import {
   ISystemModelData,
@@ -76,6 +77,7 @@ const resolvers: StringIndexed<IResolvers> = merge(
   formDraftResolvers as IResolvers,
   applicationRootResolvers as IResolvers,
   integrationResolver as IResolvers,
+  formDatasetResolvers as IResolvers,
   advancedSearchResolvers as IResolvers
 )
 

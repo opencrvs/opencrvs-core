@@ -100,7 +100,9 @@ export function questionsTransformer(
       required,
       enabled,
       custom,
-      conditionals
+      conditionals,
+      datasetId,
+      options
     }) => {
       if (custom) {
         return {
@@ -116,7 +118,9 @@ export function questionsTransformer(
           precedingFieldId,
           required: required ?? false,
           custom,
-          conditionals
+          conditionals,
+          datasetId,
+          options
         } as ICustomQuestionConfig
       }
 

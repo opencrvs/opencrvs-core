@@ -111,7 +111,7 @@ export function WebhookModal({
                     label: intl.formatMessage(
                       integrationMessages.documentDetails
                     ),
-                    value: 'documents'
+                    value: 'supporting-documents'
                   }
                 ]}
                 name="test-checkbox-group1"
@@ -136,7 +136,7 @@ export function WebhookModal({
                     label: intl.formatMessage(
                       integrationMessages.deathEventDetails
                     ),
-                    value: 'death-event-details'
+                    value: 'death-encounter'
                   },
                   {
                     label: intl.formatMessage(
@@ -148,7 +148,7 @@ export function WebhookModal({
                     label: intl.formatMessage(
                       integrationMessages.documentDetails
                     ),
-                    value: 'documents'
+                    value: 'supporting-documents'
                   }
                 ]}
                 name="test-checkbox-group1"
