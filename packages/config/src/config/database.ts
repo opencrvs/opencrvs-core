@@ -17,6 +17,7 @@ const db = mongoose.connection
 
 db.on('disconnected', () => {
   logger.info('MongoDB disconnected')
+  process.exit(1)
 })
 
 db.on('connected', () => {
