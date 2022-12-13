@@ -86,15 +86,16 @@ export const tertiary = css`
   color: ${({ theme }) => theme.colors.primary};
 
   &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
+    background: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.grey200};
+    background: ${({ theme }) => theme.colors.grey300};
+    color: ${({ theme }) => theme.colors.primaryDarker};
   }
 `
 
-export const positive = css`
+export const positive = ({ loading }: { loading?: boolean }) => css`
   background: ${({ theme }) => theme.colors.positive};
   color: ${({ theme }) => theme.colors.white};
 
@@ -104,9 +105,14 @@ export const positive = css`
   &:active {
     background-color: ${({ theme }) => theme.colors.positiveDarker};
   }
+
+  ${loading &&
+  css`
+    background: ${({ theme }) => theme.colors.positiveDark};
+  `}
 `
 
-export const negative = css`
+export const negative = ({ loading }: { loading?: boolean }) => css`
   background: ${({ theme }) => theme.colors.negative};
   color: ${({ theme }) => theme.colors.white};
 
@@ -116,6 +122,10 @@ export const negative = css`
   &:active {
     background-color: ${({ theme }) => theme.colors.negativeDarker};
   }
+  ${loading &&
+  css`
+    background: ${({ theme }) => theme.colors.pnegativeDark};
+  `}
 `
 
 export const icon = css`
@@ -124,11 +134,36 @@ export const icon = css`
   aspect-ratio: 1 / 1;
 
   &:hover:not(:focus-visible) {
-    background: ${({ theme }) => theme.colors.grey100};
-  }
-  &:active {
     background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDark};
   }
+  &:hover&:active {
+    background: ${({ theme }) => theme.colors.grey300};
+    color: ${({ theme }) => theme.colors.primaryDarker};
+  }
+
+  svg {
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+`
+
+export const iconSolid = css<{ shadow?: boolean }>`
+  ${({ theme, shadow }) => (shadow ? theme.shadows.light : 'none')};
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
+  border-radius: 100%;
+  aspect-ratio: 1 / 1;
+
+  &:hover:not(:focus-visible) {
+    background: ${({ theme }) => theme.colors.primaryDark};
+    color: ${({ theme }) => theme.colors.white};
+  }
+
+  &:hover&:active {
+    background: ${({ theme }) => theme.colors.primaryDarker};
+  }
+
   svg {
     margin-left: -8px;
     margin-right: -8px;
@@ -142,8 +177,8 @@ export const small = ({ loading }: { loading?: boolean }) => css`
   padding: 8px;
 
   svg {
-    height: 18px;
-    width: 18px;
+    height: 20px;
+    width: 20px;
     margin-right: 6px;
     margin-left: -1px;
   }
@@ -162,8 +197,8 @@ export const medium = css`
   padding: 0 12px;
 
   svg {
-    height: 20px;
-    width: 20px;
+    height: 24px;
+    width: 24px;
   }
 `
 
