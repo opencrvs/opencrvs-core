@@ -12,10 +12,8 @@
 export const up = async (db, client) => {
   await db
     .collection('configs')
-    .update({}, { $unset: { INTEGRATIONS: '' } }, { multi: true })
+    .updateMany({}, { $unset: { INTEGRATIONS: '' } })
 }
 export const down = async (db, client) => {
-  await db
-    .collection('configs')
-    .update({}, { $set: { INTEGRATIONS: [] } }, { multi: true })
+  await db.collection('configs').updateMany({}, { $set: { INTEGRATIONS: [] } })
 }
