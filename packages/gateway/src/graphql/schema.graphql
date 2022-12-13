@@ -226,13 +226,13 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
-  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
   bookmarkAdvancedSearch(
     bookmarkSearchInput: BookmarkSearchInput!
   ): BookMarkedSearches
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
+  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
 }
 
 type Dummy {
@@ -728,17 +728,6 @@ input DeleteFormDraftInput {
   event: Event!
 }
 
-type FormDatasetResponse {
-  status: String!
-  msg: String!
-  data: FormDataset
-}
-
-input FormDatasetInput {
-  fileName: String!
-  base64Data: String!
-}
-
 type BookMarkedSearches {
   searchList: [BookmarkedSeachItem!]
 }
@@ -752,6 +741,17 @@ input BookmarkSearchInput {
 input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
+}
+
+type FormDatasetResponse {
+  status: String!
+  msg: String!
+  data: FormDataset
+}
+
+input FormDatasetInput {
+  fileName: String!
+  base64Data: String!
 }
 
 scalar Map

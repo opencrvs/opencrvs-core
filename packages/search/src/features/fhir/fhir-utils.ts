@@ -89,21 +89,31 @@ export async function addEventLocation(
   bundleEntries?: fhir.BundleEntry[]
 ) {
   let data
+  let location: fhir.Location | undefined
+
   if (bundleEntries) {
-    data = findEntry(code, composition, bundleEntries)
+    data = findEntry(code, composition, bundleEntries) as
+      | fhir.Encounter
+      | undefined
+    if (data && data.location && data.location[0].location) {
+      location = findEntryResourceByUrl(
+        data.location[0].location.reference,
+        bundleEntries
+      ) as fhir.Location | undefined
+    }
   } else {
     const encounterSection = findCompositionSection(code, composition)
     if (encounterSection && encounterSection.entry) {
       data = await getFromFhir(
         `/Encounter/${encounterSection.entry[0].reference}`
       )
+      if (data && data.location && data.location[0].location) {
+        location = await getFromFhir(`/${data.location[0].location.reference}`)
+      }
     }
   }
-  if (data && data.location && data.location[0].location) {
-    const location: fhir.Location = await getFromFhir(
-      `/${data.location[0].location.reference}`
-    )
 
+  if (location) {
     const isLocationHealthFacility =
       location.type &&
       location.type.coding &&
@@ -112,29 +122,29 @@ export async function addEventLocation(
     if (isLocationHealthFacility) {
       body.eventLocationId = location.id
     } else {
-      body.declarationJurisdictionIds = []
+      body.eventJurisdictionIds = []
       if (location.address?.country) {
         body.eventCountry = location.address.country
       }
       //eventLocationLevel1
       if (location.address?.state) {
-        body.declarationJurisdictionIds.push(location.address.state)
+        body.eventJurisdictionIds.push(location.address.state)
       }
       //eventLocationLevel2
       if (location.address?.district) {
-        body.declarationJurisdictionIds.push(location.address.district)
+        body.eventJurisdictionIds.push(location.address.district)
       }
       //eventLocationLevel3
       if (location.address?.line?.[10]) {
-        body.declarationJurisdictionIds.push(location.address.line[10])
+        body.eventJurisdictionIds.push(location.address.line[10])
       }
       //eventLocationLevel4
       if (location.address?.line?.[11]) {
-        body.declarationJurisdictionIds.push(location.address.line[11])
+        body.eventJurisdictionIds.push(location.address.line[11])
       }
       //eventLocationLevel5
       if (location.address?.line?.[12]) {
-        body.declarationJurisdictionIds.push(location.address.line[12])
+        body.eventJurisdictionIds.push(location.address.line[12])
       }
     }
   }
@@ -282,7 +292,14 @@ export function selectObservationEntry(
     : undefined
 }
 
-export async function getLocationHirarchyIDs(declarationLocationId?: string) {
+export async function fetchParentLocationByLocationID(locationID: string) {
+  const location = await getFromFhir(`/${locationID}`)
+  return location && location.partOf && location.partOf.reference
+}
+
+export async function getdeclarationJurisdictionIds(
+  declarationLocationId?: string
+) {
   if (!declarationLocationId) {
     return []
   }
@@ -296,9 +313,4 @@ export async function getLocationHirarchyIDs(declarationLocationId?: string) {
     locationHirarchyIds.push(locationId.split('/')[1])
   }
   return locationHirarchyIds
-}
-
-export async function fetchParentLocationByLocationID(locationID: string) {
-  const location = await getFromFhir(`/${locationID}`)
-  return location && location.partOf && location.partOf.reference
 }
