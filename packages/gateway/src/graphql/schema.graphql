@@ -692,6 +692,7 @@ type Registration {
   assignment: AssignmentData
   contact: String
   contactRelationship: String
+  informantsSignature: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -1023,6 +1024,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantsSignature: String
   informantType: InformantType
   otherInformantType: String
   contact: String
