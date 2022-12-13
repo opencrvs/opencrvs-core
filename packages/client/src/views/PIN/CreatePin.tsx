@@ -31,7 +31,8 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   ${({ theme }) => theme.gradients.primary};
-  background: ${(hex) => (hex.color ? hex.color : '#36304E')};
+  background: ${({ color, theme }) =>
+    color ? color : theme.colors.backgroundPrimary};
   height: 100vh;
   width: 100%;
   position: absolute;

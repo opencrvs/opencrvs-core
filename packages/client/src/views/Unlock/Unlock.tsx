@@ -38,7 +38,8 @@ import { IOfflineData } from '@client/offline/reducer'
 export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   ${({ theme }) => theme.colors.primary};
-  background: ${(hex) => (hex.color ? hex.color : '#36304E')};
+  background: ${({ color, theme }) =>
+    color ? color : theme.colors.backgroundPrimary};
   height: 100vh;
   display: flex;
   flex-direction: column;
