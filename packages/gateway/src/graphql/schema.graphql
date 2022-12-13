@@ -240,6 +240,7 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
+  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
 }
 
 type Dummy {
@@ -783,6 +784,17 @@ input BookmarkSearchInput {
 input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
+}
+
+type FormDatasetResponse {
+  status: String!
+  msg: String!
+  data: FormDataset
+}
+
+input FormDatasetInput {
+  fileName: String!
+  base64Data: String!
 }
 
 scalar Map

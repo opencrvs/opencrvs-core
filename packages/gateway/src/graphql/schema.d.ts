@@ -99,6 +99,7 @@ export interface GQLMutation {
   createFormDataset?: GQLFormDatasetResponse
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
+  createFormDataset?: GQLFormDatasetResponse
 }
 
 export interface GQLDummy {
@@ -666,6 +667,17 @@ export interface GQLBookmarkSearchInput {
 export interface GQLRemoveBookmarkedSeachInput {
   userId: string
   searchId: string
+}
+
+export interface GQLFormDatasetResponse {
+  status: string
+  msg: string
+  data?: GQLFormDataset
+}
+
+export interface GQLFormDatasetInput {
+  fileName: string
+  base64Data: string
 }
 
 export type GQLMap = any
@@ -1774,6 +1786,7 @@ export interface GQLResolver {
   SystemSecret?: GQLSystemSecretTypeResolver
   FormDatasetResponse?: GQLFormDatasetResponseTypeResolver
   BookMarkedSearches?: GQLBookMarkedSearchesTypeResolver
+  FormDatasetResponse?: GQLFormDatasetResponseTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -2537,6 +2550,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createFormDataset?: MutationToCreateFormDatasetResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
+  createFormDataset?: MutationToCreateFormDatasetResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -3166,18 +3180,6 @@ export interface MutationToDeleteSystemResolver<TParent = any, TResult = any> {
 export interface MutationToCreateFormDatasetArgs {
   formDataset: GQLFormDatasetInput
 }
-export interface MutationToCreateFormDatasetResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToCreateFormDatasetArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface MutationToBookmarkAdvancedSearchArgs {
   bookmarkSearchInput: GQLBookmarkSearchInput
 }
@@ -3203,6 +3205,21 @@ export interface MutationToRemoveBookmarkedAdvancedSearchResolver<
   (
     parent: TParent,
     args: MutationToRemoveBookmarkedAdvancedSearchArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateFormDatasetArgs {
+  formDataset: GQLFormDatasetInput
+}
+export interface MutationToCreateFormDatasetResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToCreateFormDatasetArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4665,6 +4682,17 @@ export interface SystemSecretToClientSecretResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLBookMarkedSearchesTypeResolver<TParent = any> {
+  searchList?: BookMarkedSearchesToSearchListResolver<TParent>
+}
+
+export interface BookMarkedSearchesToSearchListResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLFormDatasetResponseTypeResolver<TParent = any> {
   status?: FormDatasetResponseToStatusResolver<TParent>
   msg?: FormDatasetResponseToMsgResolver<TParent>
@@ -4686,17 +4714,6 @@ export interface FormDatasetResponseToMsgResolver<
 }
 
 export interface FormDatasetResponseToDataResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLBookMarkedSearchesTypeResolver<TParent = any> {
-  searchList?: BookMarkedSearchesToSearchListResolver<TParent>
-}
-
-export interface BookMarkedSearchesToSearchListResolver<
   TParent = any,
   TResult = any
 > {

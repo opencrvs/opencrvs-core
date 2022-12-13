@@ -399,7 +399,11 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
-        navigationList={navigationList}
+        navigationList={
+          FIELD_AGENT_ROLES.includes(this.props.userDetails?.role as string)
+            ? undefined
+            : navigationList
+        }
         searchHandler={(text, type) =>
           props.goToSearchResult(text, type, isMobile)
         }
