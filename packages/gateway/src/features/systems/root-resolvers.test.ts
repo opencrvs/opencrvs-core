@@ -21,7 +21,7 @@ let authHeaderRegister: { Authorization: string }
 beforeEach(() => {
   fetch.resetMocks()
   const sysAdminToken = jwt.sign(
-    { scope: ['sysadmin'] },
+    { scope: ['natlsysadmin'] },
     readFileSync('../auth/test/cert.key'),
     {
       subject: 'ba7022f0ff4822',
@@ -115,7 +115,7 @@ describe('Integrations root resolvers', () => {
           },
           authHeaderRegister
         )
-      ).rejects.toThrowError('Deactivate user is only allowed for sysadmin')
+      ).rejects.toThrowError('Deactivate user is only allowed for natlsysadmin')
     })
   })
   it('should throw error for users other than the system admin who try to activate integration client', async () => {
@@ -140,7 +140,7 @@ describe('Integrations root resolvers', () => {
         },
         authHeaderRegister
       )
-    ).rejects.toThrowError('Activate user is only allowed for sysadmin')
+    ).rejects.toThrowError('Activate user is only allowed for natlsysadmin')
   })
 })
 
@@ -150,7 +150,7 @@ describe('generate refresh token', () => {
   beforeEach(() => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
-      { scope: ['sysadmin'] },
+      { scope: ['natlsysadmin'] },
       readFileSync('../auth/test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
@@ -220,7 +220,7 @@ describe('delete system integration', () => {
   beforeEach(() => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
-      { scope: ['sysadmin'] },
+      { scope: ['natlsysadmin'] },
       readFileSync('../auth/test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
