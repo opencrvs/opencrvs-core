@@ -224,13 +224,19 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            roles={[Roles.LOCAL_REGISTRAR]}
+                                            roles={[
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.REGISTRATION_AGENT
+                                            ]}
                                             path={routes.ADVANCED_SEARCH}
                                             component={AdvancedSearchConfig}
                                           />
                                           <ProtectedRoute
                                             exact
-                                            roles={[Roles.LOCAL_REGISTRAR]}
+                                            roles={[
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.REGISTRATION_AGENT
+                                            ]}
                                             path={routes.ADVANCED_SEARCH_RESULT}
                                             component={AdvancedSearchResult}
                                           />
