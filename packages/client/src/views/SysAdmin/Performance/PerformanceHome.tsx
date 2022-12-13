@@ -73,6 +73,7 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
+import { Divider } from '@opencrvs/components/lib/Divider'
 
 const Layout = styled.div`
   display: flex;
@@ -107,6 +108,11 @@ const LayoutLeft = styled.div`
     }
   }
 `
+
+const Stats = styled.div`
+  padding: 16px 24px;
+`
+
 const LayoutRight = styled.div`
   margin: 24px auto;
   width: 335px;
@@ -148,11 +154,6 @@ const RegistrationStatus = styled(Box)`
     border: 0;
     padding: 0;
   }
-`
-
-const Devider = styled.div`
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  margin-bottom: 16px;
 `
 
 const ConnectivityContainer = styled.div`
@@ -418,151 +419,153 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             >
               {isOnline ? (
                 <>
-                  <Query
-                    query={PERFORMANCE_METRICS}
-                    fetchPolicy="no-cache"
-                    variables={
-                      this.state.selectedLocation &&
-                      !isCountry(this.state.selectedLocation)
-                        ? {
-                            ...queryVariablesWithoutLocationId,
-                            locationId: this.state.selectedLocation.id
-                          }
-                        : queryVariablesWithoutLocationId
-                    }
-                  >
-                    {({
-                      loading,
-                      error,
-                      data
-                    }: {
-                      loading: boolean
-                      error?: ApolloError
-                      data?: IMetricsQueryResult
-                    }) => {
-                      if (error) {
-                        return <GenericErrorToast />
+                  <Stats>
+                    <Query
+                      query={PERFORMANCE_METRICS}
+                      fetchPolicy="no-cache"
+                      variables={
+                        this.state.selectedLocation &&
+                        !isCountry(this.state.selectedLocation)
+                          ? {
+                              ...queryVariablesWithoutLocationId,
+                              locationId: this.state.selectedLocation.id
+                            }
+                          : queryVariablesWithoutLocationId
                       }
+                    >
+                      {({
+                        loading,
+                        error,
+                        data
+                      }: {
+                        loading: boolean
+                        error?: ApolloError
+                        data?: IMetricsQueryResult
+                      }) => {
+                        if (error) {
+                          return <GenericErrorToast />
+                        }
 
-                      if (loading) {
+                        if (loading) {
+                          return (
+                            <Spinner id="performance-home-loading" size={24} />
+                          )
+                        }
+
                         return (
-                          <Spinner id="performance-home-loading" size={24} />
-                        )
-                      }
-
-                      return (
-                        <>
-                          {!officeSelected && (
-                            <CompletenessReport
+                          <>
+                            {!officeSelected && (
+                              <CompletenessReport
+                                data={data!.getTotalMetrics}
+                                selectedEvent={
+                                  event.toUpperCase() as 'BIRTH' | 'DEATH'
+                                }
+                                onClickDetails={this.onClickDetails}
+                              />
+                            )}
+                            <RegistrationsReport
                               data={data!.getTotalMetrics}
                               selectedEvent={
                                 event.toUpperCase() as 'BIRTH' | 'DEATH'
                               }
-                              onClickDetails={this.onClickDetails}
+                              timeStart={timeStart.toISOString()}
+                              timeEnd={timeEnd.toISOString()}
+                              locationId={this.state.selectedLocation.id}
                             />
-                          )}
-                          <RegistrationsReport
-                            data={data!.getTotalMetrics}
-                            selectedEvent={
-                              event.toUpperCase() as 'BIRTH' | 'DEATH'
-                            }
-                            timeStart={timeStart.toISOString()}
-                            timeEnd={timeEnd.toISOString()}
-                            locationId={this.state.selectedLocation.id}
-                          />
-                          <CertificationRatesReport
-                            totalRegistrations={calculateTotal(
-                              data?.getTotalMetrics.results || []
-                            )}
-                            {...(this.state.selectedLocation &&
-                            !isCountry(this.state.selectedLocation)
-                              ? {
-                                  ...queryVariablesWithoutLocationId,
-                                  locationId: this.state.selectedLocation.id
-                                }
-                              : queryVariablesWithoutLocationId)}
-                          />
-                          <AppSources
-                            data={data!.getTotalMetrics}
-                            isAccessibleOffice={this.state.isAccessibleOffice}
-                            locationId={
-                              isCountry(this.state.selectedLocation)
-                                ? undefined
-                                : this.state.selectedLocation.id
-                            }
-                            timeStart={timeStart.toISOString()}
-                            timeEnd={timeEnd.toISOString()}
-                          />
-                        </>
-                      )
-                    }}
-                  </Query>
-                  <Query
-                    fetchPolicy="no-cache"
-                    query={CORRECTION_TOTALS}
-                    variables={
-                      this.state.selectedLocation &&
-                      !isCountry(this.state.selectedLocation)
-                        ? {
-                            ...queryVariablesWithoutLocationId,
-                            locationId: this.state.selectedLocation.id
-                          }
-                        : queryVariablesWithoutLocationId
-                    }
-                  >
-                    {({
-                      loading,
-                      error,
-                      data
-                    }: {
-                      loading: boolean
-                      error?: ApolloError
-                      data?: ICorrectionsQueryResult
-                    }) => {
-                      if (error) {
-                        return <GenericErrorToast />
-                      }
-
-                      if (loading) {
-                        return null
-                      }
-                      return (
-                        <CorrectionsReport data={data!.getTotalCorrections} />
-                      )
-                    }}
-                  </Query>
-                  <Query
-                    fetchPolicy="no-cache"
-                    query={GET_TOTAL_PAYMENTS}
-                    variables={
-                      this.state.selectedLocation &&
-                      !isCountry(this.state.selectedLocation)
-                        ? {
-                            ...queryVariablesWithoutLocationId,
-                            locationId: this.state.selectedLocation.id
-                          }
-                        : queryVariablesWithoutLocationId
-                    }
-                  >
-                    {({ loading, data, error }) => {
-                      if (error) {
-                        return <GenericErrorToast />
-                      }
-                      if (loading) {
-                        return null
-                      }
-                      if (data && data.getTotalPayments) {
-                        return (
-                          <PaymentsAmountComponent
-                            currency={this.props.currency}
-                            data={data!.getTotalPayments}
-                          />
+                            <CertificationRatesReport
+                              totalRegistrations={calculateTotal(
+                                data?.getTotalMetrics.results || []
+                              )}
+                              {...(this.state.selectedLocation &&
+                              !isCountry(this.state.selectedLocation)
+                                ? {
+                                    ...queryVariablesWithoutLocationId,
+                                    locationId: this.state.selectedLocation.id
+                                  }
+                                : queryVariablesWithoutLocationId)}
+                            />
+                            <AppSources
+                              data={data!.getTotalMetrics}
+                              isAccessibleOffice={this.state.isAccessibleOffice}
+                              locationId={
+                                isCountry(this.state.selectedLocation)
+                                  ? undefined
+                                  : this.state.selectedLocation.id
+                              }
+                              timeStart={timeStart.toISOString()}
+                              timeEnd={timeEnd.toISOString()}
+                            />
+                          </>
                         )
+                      }}
+                    </Query>
+                    <Query
+                      fetchPolicy="no-cache"
+                      query={CORRECTION_TOTALS}
+                      variables={
+                        this.state.selectedLocation &&
+                        !isCountry(this.state.selectedLocation)
+                          ? {
+                              ...queryVariablesWithoutLocationId,
+                              locationId: this.state.selectedLocation.id
+                            }
+                          : queryVariablesWithoutLocationId
                       }
+                    >
+                      {({
+                        loading,
+                        error,
+                        data
+                      }: {
+                        loading: boolean
+                        error?: ApolloError
+                        data?: ICorrectionsQueryResult
+                      }) => {
+                        if (error) {
+                          return <GenericErrorToast />
+                        }
 
-                      return <></>
-                    }}
-                  </Query>
+                        if (loading) {
+                          return null
+                        }
+                        return (
+                          <CorrectionsReport data={data!.getTotalCorrections} />
+                        )
+                      }}
+                    </Query>
+                    <Query
+                      fetchPolicy="no-cache"
+                      query={GET_TOTAL_PAYMENTS}
+                      variables={
+                        this.state.selectedLocation &&
+                        !isCountry(this.state.selectedLocation)
+                          ? {
+                              ...queryVariablesWithoutLocationId,
+                              locationId: this.state.selectedLocation.id
+                            }
+                          : queryVariablesWithoutLocationId
+                      }
+                    >
+                      {({ loading, data, error }) => {
+                        if (error) {
+                          return <GenericErrorToast />
+                        }
+                        if (loading) {
+                          return null
+                        }
+                        if (data && data.getTotalPayments) {
+                          return (
+                            <PaymentsAmountComponent
+                              currency={this.props.currency}
+                              data={data!.getTotalPayments}
+                            />
+                          )
+                        }
+
+                        return <></>
+                      }}
+                    </Query>
+                  </Stats>
                 </>
               ) : (
                 <ConnectivityContainer>
@@ -626,7 +629,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
                           {!officeSelected && isOnline && (
                             <>
-                              <Devider />
+                              <Divider />
 
                               <LocationStatsView
                                 registrationOffices={

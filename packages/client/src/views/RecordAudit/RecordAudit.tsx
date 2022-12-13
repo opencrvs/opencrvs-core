@@ -333,28 +333,6 @@ function RecordAuditBody({
   const mobileActions: React.ReactElement[] = []
   const desktopActionsView: React.ReactElement[] = []
 
-  if (
-    declaration.status !== SUBMISSION_STATUS.DRAFT &&
-    (userHasRegisterScope || userHasValidateScope)
-  ) {
-    actions.push(
-      <Button
-        type="secondary"
-        onClick={() => {
-          dispatch(goToViewRecordPage(declaration.id as string))
-        }}
-      >
-        {intl.formatMessage(buttonMessages.view)}
-      </Button>
-    )
-    mobileActions.push(actions[actions.length - 1])
-    desktopActionsView.push(
-      <DesktopDiv key={actions.length}>
-        {actions[actions.length - 1]}
-      </DesktopDiv>
-    )
-  }
-
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
@@ -446,6 +424,29 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
+
+  if (
+    declaration.status !== SUBMISSION_STATUS.DRAFT &&
+    (userHasRegisterScope || userHasValidateScope)
+  ) {
+    actions.push(
+      <Button
+        type="secondary"
+        onClick={() => {
+          dispatch(goToViewRecordPage(declaration.id as string))
+        }}
+      >
+        {intl.formatMessage(buttonMessages.view)}
+      </Button>
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
+
   if (
     declaration.status === SUBMISSION_STATUS.DRAFT ||
     ((declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
@@ -578,6 +579,7 @@ function RecordAuditBody({
         }
         titleColor={declaration.name ? 'copy' : 'grey600'}
         size={ContentSize.LARGE}
+        hideHeaderMobile={true}
         topActionButtons={desktopActionsView}
         icon={() =>
           hasDuplicates ? (

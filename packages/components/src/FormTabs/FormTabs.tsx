@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Tab, Tabs } from './components/Tabs'
+import { Tab } from './components/Tab'
+import { Stack } from '../Stack'
 
 export interface IFormTabs<T extends string | number = string> {
   id: T
@@ -29,9 +30,16 @@ function FormTabsComponent<T extends string | number = string>({
   onTabClick
 }: IFormTabProps<T>) {
   return (
-    <Tabs>
+    <Stack
+      alignItems="center"
+      direction="row"
+      gap={16}
+      justifyContent="flex-start"
+    >
       {sections.map(({ title, id, disabled }) => (
         <Tab
+          type="tertiary"
+          size="small"
           id={`tab_${id}`}
           onClick={() => onTabClick(id)}
           key={id}
@@ -41,7 +49,7 @@ function FormTabsComponent<T extends string | number = string>({
           {title}
         </Tab>
       ))}
-    </Tabs>
+    </Stack>
   )
 }
 

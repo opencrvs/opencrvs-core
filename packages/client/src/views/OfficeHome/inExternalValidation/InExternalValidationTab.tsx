@@ -71,12 +71,7 @@ function InExternalValidationComponent(props: IProps) {
   const { data } = queryData
   const totalPages = props.queryData.data.totalItems
     ? Math.ceil(props.queryData.data.totalItems / pageSize)
-    : 0
-  const isShowPagination =
-    props.queryData.data.totalItems &&
-    props.queryData.data.totalItems > pageSize
-      ? true
-      : false
+    : 1
 
   useEffect(() => {
     function recordWindowWidth() {
@@ -182,7 +177,7 @@ function InExternalValidationComponent(props: IProps) {
     viewportWidth > props.theme.grid.breakpoints.lg
       ? [
           {
-            width: 30,
+            width: 40,
             label: props.intl.formatMessage(constantsMessages.name),
             key: COLUMNS.ICON_WITH_NAME,
             isSorted: sortedCol === COLUMNS.NAME,
@@ -190,21 +185,21 @@ function InExternalValidationComponent(props: IProps) {
           },
           {
             label: props.intl.formatMessage(constantsMessages.event),
-            width: 16,
+            width: 15,
             key: COLUMNS.EVENT,
             isSorted: sortedCol === COLUMNS.EVENT,
             sortFunction: onColumnClick
           },
           {
             label: props.intl.formatMessage(constantsMessages.eventDate),
-            width: 18,
+            width: 15,
             key: COLUMNS.DATE_OF_EVENT,
             isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
             sortFunction: onColumnClick
           },
           {
             label: props.intl.formatMessage(constantsMessages.sentForReview),
-            width: 18,
+            width: 15,
             key: COLUMNS.SENT_FOR_VALIDATION,
             isSorted: sortedCol === COLUMNS.SENT_FOR_VALIDATION,
             sortFunction: onColumnClick
@@ -222,9 +217,8 @@ function InExternalValidationComponent(props: IProps) {
     <WQContentWrapper
       title={intl.formatMessage(navigationMessages.waitingValidation)}
       isMobileSize={viewportWidth < props.theme.grid.breakpoints.lg}
-      isShowPagination={isShowPagination}
       paginationId={paginationId}
-      totalPages={totalPages}
+      totalPages={totalPages || 1}
       onPageChange={onPageChange}
       noResultText={intl.formatMessage(wqMessages.noRecordsExternalValidation)}
       loading={props.loading}
@@ -236,7 +230,6 @@ function InExternalValidationComponent(props: IProps) {
         loading={props.loading}
         columns={columns}
         sortOrder={sortOrder}
-        hideLastBorder={!isShowPagination}
       />
     </WQContentWrapper>
   )

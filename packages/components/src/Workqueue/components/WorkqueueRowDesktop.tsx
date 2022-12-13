@@ -34,27 +34,25 @@ export interface IWorkqueueRow {
     alignment?: ColumnContentAlignment | undefined
   ) => JSX.Element
   clickable: boolean | undefined
-  hideLastBorder?: boolean
 }
 
-const StyledBox = styled.div<{ hideLastBorder?: boolean }>`
+const StyledBox = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-  &:last-child {
-    ${({ hideLastBorder }) => hideLastBorder && ` border-bottom: 0;`}
+  min-height: 56px;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.grey100};
   }
-
-  height: 72px;
 `
 
 export const RowWrapper = styled.div<{
   clickable?: boolean
 }>`
   width: 100%;
-  padding: 0 16px;
+  padding: 8px 24px;
   display: flex;
   align-items: center;
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
@@ -64,17 +62,15 @@ export const ContentWrapper = styled.div<{
   width: number
   alignment?: string
   color?: string
-  paddingRight?: number | null
 }>`
   width: ${({ width }) => width}%;
   display: inline-block;
   position: relative;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   ${({ color }) => color && `color: ${color};`}
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 4px 0;
+  white-space: nowrap;
+  ${({ color }) => color && `color: ${color};`};
 `
 
 export const Error = styled.span`
@@ -89,19 +85,9 @@ export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
   return (
     <>
       {props.displayItems.map((item, index) => {
-        const clickable = props.clickable || Boolean(item.rowClickable)
         return (
-          <StyledBox key={index} hideLastBorder={props.hideLastBorder}>
-            <RowWrapper
-              id={'row_' + index}
-              clickable={clickable}
-              onClick={() =>
-                clickable &&
-                props.getRowClickHandler(
-                  item.rowClickHandler as IActionObject[]
-                )()
-              }
-            >
+          <StyledBox key={index}>
+            <RowWrapper id={'row_' + index}>
               {props.columns.map((preference, indx) => {
                 if (preference.isActionColumn) {
                   return props.renderActionBlock(
@@ -109,15 +95,13 @@ export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
                     item[preference.key] as IAction[],
                     preference.width,
                     index,
-                    indx,
-                    preference.alignment
+                    indx
                   )
                 } else if (preference.isIconColumn) {
                   return (
                     <IconWrapper
                       key={indx}
                       width={preference.width}
-                      alignment={preference.alignment}
                       color={preference.color}
                     >
                       {(item.icon as JSX.Element) || (
@@ -130,7 +114,6 @@ export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
                     <ContentWrapper
                       key={indx}
                       width={preference.width}
-                      alignment={preference.alignment}
                       color={preference.color}
                     >
                       {(item[preference.key] as string) || (

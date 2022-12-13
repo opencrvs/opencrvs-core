@@ -26,7 +26,10 @@ export interface IPaginationProps {
 const PaginationWrapper = styled.div`
   display: flex;
   align-items: center;
-`
+    @media only screen and (max-width: 1023px) {
+      width: 100%;
+    }
+  `
 
 const DesktopWrapper = styled.div`
   display: flex;

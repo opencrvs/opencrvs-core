@@ -120,7 +120,7 @@ class RequiresUpdateComponent extends React.Component<
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          width: 30,
+          width: 40,
           label: this.props.intl.formatMessage(constantsMessages.name),
           key: COLUMNS.ICON_WITH_NAME,
           isSorted: this.state.sortedCol === COLUMNS.NAME,
@@ -128,14 +128,14 @@ class RequiresUpdateComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.event),
-          width: 16,
+          width: 15,
           key: COLUMNS.EVENT,
           isSorted: this.state.sortedCol === COLUMNS.EVENT,
           sortFunction: this.onColumnClick
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 18,
+          width: 15,
           key: COLUMNS.DATE_OF_EVENT,
           isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
           sortFunction: this.onColumnClick
@@ -144,13 +144,13 @@ class RequiresUpdateComponent extends React.Component<
           label: this.props.intl.formatMessage(
             constantsMessages.sentForUpdates
           ),
-          width: 18,
+          width: 15,
           key: COLUMNS.SENT_FOR_UPDATES,
           isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_UPDATES,
           sortFunction: this.onColumnClick
         },
         {
-          width: 18,
+          width: 15,
           alignment: ColumnContentAlignment.RIGHT,
           key: COLUMNS.ACTIONS,
           isActionColumn: true
@@ -314,17 +314,11 @@ class RequiresUpdateComponent extends React.Component<
     const { data } = queryData
     const totalPages = this.props.queryData.data.totalItems
       ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
-      : 0
-    const isShowPagination =
-      this.props.queryData.data.totalItems &&
-      this.props.queryData.data.totalItems > pageSize
-        ? true
-        : false
+      : 1
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.requiresUpdate)}
         isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
-        isShowPagination={isShowPagination}
         paginationId={paginationId}
         totalPages={totalPages}
         onPageChange={onPageChange}
@@ -338,7 +332,6 @@ class RequiresUpdateComponent extends React.Component<
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>
     )

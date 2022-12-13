@@ -417,7 +417,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         >
           {this.state.selectedSubMenuItem ===
             this.SUB_MENU_ID.certificatesConfig && (
-            <Content title={CertificateSection.title} titleColor={'copy'}>
+            <Content title={CertificateSection.title}>
               <>
                 {intl.formatMessage(messages.listDetails)}
                 <LinkButton

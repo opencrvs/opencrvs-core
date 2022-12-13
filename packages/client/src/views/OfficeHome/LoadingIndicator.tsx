@@ -27,7 +27,7 @@ const ErrorText = styled.div`
 const ConnectivityContainer = styled.div`
   width: 100%;
   display: flex;
-  justify-content: center;
+  align-items: center;
 `
 const NoConnectivity = styled(ConnectionError)`
   width: 24px;

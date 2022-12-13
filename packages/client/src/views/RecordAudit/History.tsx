@@ -27,15 +27,15 @@ import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
 import { History, RegStatus } from '@client/utils/gateway'
-import { Link } from '@opencrvs/components'
+import { Link } from '@opencrvs/components/lib/Link'
+import { Text } from '@opencrvs/components/lib/Text'
 
 const TableDiv = styled.div`
   overflow: auto;
 `
 
-const Heading = styled.h3`
-  ${({ theme }) => theme.fonts.h3}
-  margin-bottom: 0px !important;
+const HistoryHeading = styled.div`
+  padding: 0 24px;
 `
 
 const LargeGreyedInfo = styled.div`
@@ -147,8 +147,12 @@ export const GetHistory = ({
     return (
       <>
         <Divider />
-        <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
-        <LargeGreyedInfo />
+        <HistoryHeading>
+          <Text element="h2" variant="h3">
+            {intl.formatMessage(constantsMessages.history)}
+          </Text>
+          <LargeGreyedInfo />
+        </HistoryHeading>
       </>
     )
   let allHistoryData = (draft.data.history || []) as unknown as {
@@ -220,7 +224,7 @@ export const GetHistory = ({
         ) : (
           <Link
             id="profile-link"
-            font="bold14"
+            font="reg14"
             onClick={() => goToUserProfile(String(item?.user?.id))}
           >
             <GetNameWithAvatar
@@ -245,7 +249,7 @@ export const GetHistory = ({
         <>{item.office?.name}</>
       ) : (
         <Link
-          font="bold14"
+          font="reg14"
           onClick={() => {
             goToTeamUserList && goToTeamUserList(item?.office?.id as string)
           }}
@@ -264,7 +268,8 @@ export const GetHistory = ({
     {
       label: intl.formatMessage(constantsMessages.date),
       width: 22,
-      key: 'date'
+      key: 'date',
+      isSortable: true
     },
     {
       label: intl.formatMessage(constantsMessages.by),
@@ -287,11 +292,15 @@ export const GetHistory = ({
   return (
     <>
       <Divider />
-      <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
+      <HistoryHeading>
+        <Text element="h2" variant="h3">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
+      </HistoryHeading>
       <TableDiv>
         <Table
           id="task-history"
-          fixedWidth={1088}
+          fixedWidth={1140}
           noResultText=""
           columns={columns}
           content={historyData}

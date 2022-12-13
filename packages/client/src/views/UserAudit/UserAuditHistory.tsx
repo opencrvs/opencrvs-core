@@ -58,7 +58,8 @@ import {
 } from '@client/utils/gateway'
 import { getFormattedDate } from '@client/views/RecordAudit/utils'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Link } from '@opencrvs/components'
+import { Link } from '@opencrvs/components/lib/Link'
+import { Text } from '@opencrvs/components/lib/Text'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -75,13 +76,13 @@ const AuditDescTimeContainer = styled.div`
   }
 `
 const HistoryHeader = styled.div`
+  padding: 0 24px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `
 
 const RecentActionsHolder = styled.div`
-  margin-top: 40px;
-  padding-top: 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: 24px;
     padding-top: 24px;
@@ -92,11 +93,6 @@ const RecentActionsHolder = styled.div`
 const AlignedDateRangePicker = styled(DateRangePicker)`
   position: absolute;
   top: 6px;
-`
-
-const SectionTitle = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-bottom: 10px;
 `
 
 const StatusIcon = styled.div`
@@ -433,9 +429,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   getLoadingView() {
     return (
       <>
-        <SectionTitle>
+        <Text element="h2" variant="h3">
           <LoadingGrey width={5} />
-        </SectionTitle>
+        </Text>
         <LoadingGrey width={10} />
         {this.getLoadingAuditListView()}
       </>
@@ -470,9 +466,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         <>
           <>
             <HistoryHeader>
-              <SectionTitle>
+              <Text element="h2" variant="h3">
                 {intl.formatMessage(messages.auditSectionTitle)}
-              </SectionTitle>
+              </Text>
               <AlignedDateRangePicker
                 startDate={timeStart}
                 endDate={timeEnd}
@@ -519,6 +515,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                           }
                           pageSize={DEFAULT_LIST_SIZE}
                         />
+
                         <Pagination
                           currentPage={this.state.currentPageNumber}
                           totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}

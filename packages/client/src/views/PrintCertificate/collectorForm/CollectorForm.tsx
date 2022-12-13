@@ -11,8 +11,11 @@
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { Content } from '@opencrvs/components/lib/Content'
-
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Content, ContentBody } from '@opencrvs/components/lib/Content'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
@@ -368,17 +371,68 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     }
     return (
       <>
-        <ActionPageLight
-          id="collector_form"
-          hideBackground
-          title={intl.formatMessage(formSection.title)}
-          goBack={goBack}
-          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
+        <Frame
+          header={
+            <AppBar
+              desktopLeft={
+                <Button
+                  aria-label="Go back"
+                  size="medium"
+                  type="icon"
+                  onClick={goBack}
+                >
+                  <Icon color="currentColor" name="ArrowLeft" size="large" />
+                </Button>
+              }
+              desktopRight={
+                <Button
+                  aria-label="Exit"
+                  size="medium"
+                  type="icon"
+                  onClick={() =>
+                    this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+                  }
+                >
+                  <Icon color="currentColor" name="X" size="large" />
+                </Button>
+              }
+              mobileLeft={
+                <Button aria-label="Go back" size="medium" type="icon">
+                  <Icon color="currentColor" name="Globe" size="large" />{' '}
+                </Button>
+              }
+              mobileTitle={intl.formatMessage(formSection.title)}
+              desktopTitle={intl.formatMessage(formSection.title)}
+            />
+          }
+          skipToContentText="Skip to main content"
         >
           <Content
+            // id="collector_form"
             title={
               (formGroup.title && intl.formatMessage(formGroup.title)) || ''
             }
+            bottomActionButtons={[
+              <Button
+                id="confirm_form"
+                type="primary"
+                size="large"
+                onClick={() => {
+                  this.continueButtonHandler(
+                    declarationToBeCertified.id,
+                    formGroup.id,
+                    nextSectionGroup ? nextSectionGroup.groupId : undefined,
+                    event,
+                    formSection.id,
+                    formGroup.fields,
+                    declarationToBeCertified
+                  )
+                }}
+                disabled={this.state.isFileUploading}
+              >
+                {intl.formatMessage(buttonMessages.continueButton)}
+              </Button>
+            ]}
           >
             {showError && (
               <ErrorWrapper>
@@ -388,40 +442,26 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                 </ErrorText>
               </ErrorWrapper>
             )}
-            <FormFieldGenerator
-              id={formGroup.id}
-              onChange={(values) => {
-                if (values && values.affidavitFile) {
-                  this.setState({
-                    showError: false
-                  })
-                }
-                this.modifyDeclaration(values, declarationToBeCertified)
-              }}
-              setAllFieldsDirty={false}
-              fields={formGroup.fields}
-              draftData={declarationToBeCertified.data}
-              onUploadingStateChanged={this.onUploadingStateChanged}
-            />
-            <PrimaryButton
-              id="confirm_form"
-              onClick={() => {
-                this.continueButtonHandler(
-                  declarationToBeCertified.id,
-                  formGroup.id,
-                  nextSectionGroup ? nextSectionGroup.groupId : undefined,
-                  event,
-                  formSection.id,
-                  formGroup.fields,
-                  declarationToBeCertified
-                )
-              }}
-              disabled={this.state.isFileUploading}
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
+            <ContentBody>
+              <FormFieldGenerator
+                id={formGroup.id}
+                onChange={(values) => {
+                  if (values && values.affidavitFile) {
+                    this.setState({
+                      showError: false
+                    })
+                  }
+                  this.modifyDeclaration(values, declarationToBeCertified)
+                }}
+                setAllFieldsDirty={false}
+                fields={formGroup.fields}
+                draftData={declarationToBeCertified.data}
+                onUploadingStateChanged={this.onUploadingStateChanged}
+              />
+            </ContentBody>
           </Content>
-        </ActionPageLight>
+        </Frame>
+
         {showModalForNoSignedAffidavit && (
           <ResponsiveModal
             id="noAffidavitAgreementConfirmationModal"

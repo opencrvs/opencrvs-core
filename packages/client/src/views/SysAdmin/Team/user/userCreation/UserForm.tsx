@@ -164,7 +164,21 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
           goHome={() => goToTeamUserList(String(formData.registrationOffice))}
           hideBackground={true}
         >
-          <Content title={title}>
+          <Content
+            title={title}
+            bottomActionButtons={[
+              <PrimaryButton
+                id="confirm_form"
+                onClick={this.handleFormAction}
+                disabled={
+                  this.state.disableContinueOnLocation ||
+                  this.state.fileUploading
+                }
+              >
+                {intl.formatMessage(buttonMessages.continueButton)}
+              </PrimaryButton>
+            ]}
+          >
             <FormFieldGenerator
               key={activeGroup.id}
               id={section.id}
@@ -177,18 +191,6 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               requiredErrorMessage={messages.requiredForNewUser}
               onUploadingStateChanged={this.onUploadingStateChanged}
             />
-            <Action>
-              <PrimaryButton
-                id="confirm_form"
-                onClick={this.handleFormAction}
-                disabled={
-                  this.state.disableContinueOnLocation ||
-                  this.state.fileUploading
-                }
-              >
-                {intl.formatMessage(buttonMessages.continueButton)}
-              </PrimaryButton>
-            </Action>
           </Content>
         </ActionPageLight>
       </>

@@ -12,139 +12,121 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
-import { ICON_ALIGNMENT, TertiaryButton } from '../buttons'
 import { colors } from '../colors'
-import { BackArrow } from '../icons'
-import { Box } from '../Box'
 
-const Container = styled(Box)<{ size: string }>`
+const Container = styled.div<{ size: string }>`
+  margin: 24px auto 200px auto;
   position: relative;
-  margin: 24px auto;
+  box-sizing: border-box;
   max-width: min(
     ${({ size }) => (size === 'large' ? '1140px' : '778px')},
     100% - 24px - 24px
   );
-  box-sizing: border-box;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-radius: 4px;
+  background: ${({ theme }) => theme.colors.white};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 0;
-    border: 0;
-    border-radius: 0;
-    max-width: 100%;
+    max-width: none;
+    margin: 16px;
   }
 `
-const Header = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  margin: -24px -24px 24px;
-  padding: 0 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    border: 0;
-    padding: 0;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 0 -16px;
-  }
-`
-const TopActionBar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-`
-export const SubHeader = styled.div`
-  padding-bottom: 16px;
-  color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.reg18};
-`
-export const Body = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
-`
-const Footer = styled.div`
-  display: flex;
-  height: 72px;
-  padding-top: 24px;
-`
-const HeaderBottom = styled.div`
-  display: flex;
-  padding: 0 0 24px;
-  width: 100%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding: 24px;
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0 16px 16px;
-  }
-`
-const TopTabBar = styled.div`
-  display: flex;
-  gap: 28px;
-  width: 100%;
-  margin: -24px 0;
-  padding: 0;
-  position: relative;
-  bottom: -1px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: -16px 0;
-  }
-`
-const TopFilterBar = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-`
-const TopBar = styled.div<{ keepShowing?: boolean }>`
+const Header = styled.div<{ hideHeader?: boolean }>`
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 16px 0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    ${({ keepShowing }) => {
-      return !keepShowing ? 'display:none;' : 'padding:16px;'
+    ${({ hideHeader }) => {
+      return !hideHeader ? '' : 'display: none;'
     }}
   }
 `
-const BottomActionBar = styled.div`
+
+const HeaderActions = styled.div`
   display: flex;
-  gap: 16px;
-  margin-right: auto;
+  padding-right: 24px;
+  align-items: center;
+  gap: 12px;
 `
-const BackButtonContainer = styled.div`
-  padding-left: 8px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
-const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
+
+const HeaderTitle = styled.div<{ titleColor?: keyof typeof colors }>`
   display: flex;
   gap: 16px;
   align-items: center;
   width: 0;
+  padding: 0px 24px;
   flex: 1;
   color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
 `
 
-const Title = styled.div<{ truncateOnMobile?: boolean }>`
+const Title = styled.div`
   ${({ theme }) => theme.fonts.h2}
   color: ${({ theme }) => theme.colors.copy};
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    ${({ truncateOnMobile }) => !truncateOnMobile && 'white-space:normal'}
-  }
 `
+
 const Icon = styled.div`
+  display: flex;
+  align-items: center;
   background-color: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
+`
+
+const HeaderFilters = styled.div`
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0 16px 16px;
+  }
+`
+
+const TabFilters = styled.div`
+  height: 40px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  padding: 0px 24px;
+`
+
+const SelectFilters = styled.div`
+  height: 56px;
+  display: flex;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0px 24px;
+  gap: 8px;
+`
+
+export const SupportingCopy = styled.div`
+  padding: 16px 24px;
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.reg16};
+`
+
+export const ContentBody = styled.div`
+  padding: 16px 24px;
+`
+
+const Footer = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 24px 24px;
+`
+
+const FooterActions = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-right: auto;
 `
 
 export enum ContentSize {
@@ -154,12 +136,9 @@ export enum ContentSize {
 
 interface IProps {
   icon?: () => React.ReactNode
-  backButtonLabel?: string
-  backButtonAction?: () => void
   title?: string
   titleColor?: keyof typeof colors
-  showTitleOnMobile?: boolean
-  truncateTitleOnMobile?: boolean
+  hideHeaderMobile?: boolean
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
   filterContent?: React.ReactNode
@@ -174,12 +153,9 @@ export class UnstyledContent extends React.Component<IProps> {
   render() {
     const {
       icon,
-      backButtonLabel,
-      backButtonAction,
       title,
       titleColor,
-      showTitleOnMobile,
-      truncateTitleOnMobile,
+      hideHeaderMobile,
       topActionButtons,
       tabBarContent,
       filterContent,
@@ -192,49 +168,28 @@ export class UnstyledContent extends React.Component<IProps> {
 
     return (
       <Container size={size as string} className={className}>
-        <Header>
-          {backButtonLabel && (
-            <BackButtonContainer>
-              <TertiaryButton
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <BackArrow />}
-                onClick={backButtonAction}
-              >
-                {backButtonLabel}
-              </TertiaryButton>
-            </BackButtonContainer>
-          )}
-          {(icon || title || topActionButtons) && (
-            <TopBar keepShowing={showTitleOnMobile}>
-              <TitleContainer titleColor={titleColor}>
-                {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-                {title && (
-                  <Title
-                    id={`content-name`}
-                    truncateOnMobile={truncateTitleOnMobile}
-                  >
-                    {title}
-                  </Title>
-                )}
-              </TitleContainer>
-              {topActionButtons && (
-                <TopActionBar>{topActionButtons}</TopActionBar>
-              )}
-            </TopBar>
-          )}
-          {(filterContent || tabBarContent) && (
-            <HeaderBottom>
-              {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}
-              {filterContent && <TopFilterBar>{filterContent}</TopFilterBar>}
-            </HeaderBottom>
-          )}
-        </Header>
-        {subtitle && <SubHeader>{subtitle}</SubHeader>}
-        {children && <Body>{children}</Body>}
-
+        {(icon || title || topActionButtons) && (
+          <Header hideHeader={hideHeaderMobile}>
+            <HeaderTitle titleColor={titleColor}>
+              {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
+              {title && <Title id={`content-name`}>{title}</Title>}
+            </HeaderTitle>
+            {topActionButtons && (
+              <HeaderActions>{topActionButtons}</HeaderActions>
+            )}
+          </Header>
+        )}
+        {(filterContent || tabBarContent) && (
+          <HeaderFilters>
+            {tabBarContent && <TabFilters>{tabBarContent}</TabFilters>}
+            {filterContent && <SelectFilters>{filterContent}</SelectFilters>}
+          </HeaderFilters>
+        )}
+        {subtitle && <SupportingCopy>{subtitle}</SupportingCopy>}
+        {children}
         {bottomActionButtons && (
           <Footer>
-            <BottomActionBar>{bottomActionButtons}</BottomActionBar>
+            <FooterActions>{bottomActionButtons}</FooterActions>
           </Footer>
         )}
       </Container>

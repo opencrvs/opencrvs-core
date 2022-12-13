@@ -39,7 +39,6 @@ import {
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -54,8 +53,8 @@ import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import {
-  BodyContent,
   Content,
+  ContentBody,
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -84,18 +83,11 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query as QueryType, User } from '@client/utils/gateway'
-import { Link } from '@opencrvs/components'
+import { Link } from '@opencrvs/components/lib/Link'
+import { Pill } from '@opencrvs/components/lib/Pill'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
-
-const UserTable = styled(BodyContent)`
-  padding: 0px;
-  margin: 8px auto 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0px;
-  }
-`
 
 const ErrorText = styled.div`
   ${({ theme }) => theme.fonts.bold16};
@@ -116,52 +108,8 @@ const Loading = styled.div`
   }
 `
 
-const StatusBox = styled.div`
-  padding: 4px 8px;
-  ${({ theme }) => theme.fonts.bold12};
-  border-radius: 100px;
-  height: 30px;
-  text-align: center;
-  margin-left: 4px;
-`
-const ActiveStatusBox = styled(StatusBox)`
-  background: rgba(73, 183, 141, 0.3);
-`
-const DeactivatedStatusBox = styled(StatusBox)`
-  background: rgba(245, 209, 209, 1);
-`
-const PendingStatusBox = styled(StatusBox)`
-  background: rgba(252, 236, 217, 1);
-`
-const DisabledStatusBox = styled(StatusBox)`
-  background: rgba(206, 206, 206, 0.3);
-`
-
 const AddUserIcon = styled(AddUser)`
   cursor: pointer;
-`
-
-const Header = styled.h1`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2};
-  margin: 8px 0;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
-
-const LocationInfo = styled.div`
-  padding: 8px 0px;
-`
-
-const LocationInfoValue = styled.div`
-  color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.reg18};
-`
-
-const LocationInfoEmptyValue = styled.div`
-  color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.reg16};
 `
 
 const StatusMenuContainer = styled.div`
@@ -171,10 +119,6 @@ const StatusMenuContainer = styled.div`
 
 const Value = styled.span`
   color: ${({ theme }) => theme.colors.grey500};
-  ${({ theme }) => theme.fonts.reg16}
-`
-
-const Name = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
@@ -202,9 +146,6 @@ const NoConnectivity = styled(NoWifi)`
 const Text = styled.div`
   ${({ theme }) => theme.fonts.reg16};
   text-align: center;
-`
-const LinkButtonModified = styled(LinkButton)`
-  height: 24px;
 `
 
 interface ISearchParams {
@@ -248,26 +189,36 @@ export const Status = (statusProps: IStatusProps) => {
   switch (status) {
     case UserStatus[UserStatus.ACTIVE].toLowerCase():
       return (
-        <ActiveStatusBox>{intl.formatMessage(messages.active)}</ActiveStatusBox>
+        <Pill
+          label={intl.formatMessage(messages.active)}
+          size="small"
+          type="active"
+        />
       )
     case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
       return (
-        <DeactivatedStatusBox>
-          {intl.formatMessage(messages.deactivated)}
-        </DeactivatedStatusBox>
+        <Pill
+          label={intl.formatMessage(messages.deactivated)}
+          size="small"
+          type="inactive"
+        />
       )
     case UserStatus[UserStatus.DISABLED].toLowerCase():
       return (
-        <DisabledStatusBox>
-          {intl.formatMessage(messages.disabled)}
-        </DisabledStatusBox>
+        <Pill
+          label={intl.formatMessage(messages.disabled)}
+          size="small"
+          type="default"
+        />
       )
     case UserStatus[UserStatus.PENDING].toLowerCase():
     default:
       return (
-        <PendingStatusBox>
-          {intl.formatMessage(messages.pending)}
-        </PendingStatusBox>
+        <Pill
+          label={intl.formatMessage(messages.pending)}
+          size="small"
+          type="pending"
+        />
       )
   }
 }
@@ -558,7 +509,6 @@ function UserListComponent(props: IProps) {
           ? true
           : false
       return (
-        // TODO use Pill Component from #2780
         <StatusMenuContainer>
           {underInvestigation && <SearchRed />}
           <Status status={status || 'pending'} />
@@ -694,128 +644,121 @@ function UserListComponent(props: IProps) {
 
       return (
         <>
-          <UserTable id="user_list">
-            <ListViewSimplified>
-              {userContent.length <= 0 ? (
-                <NoRecord id="no-record">
-                  {intl.formatMessage(constantsMessages.noResults)}
-                </NoRecord>
-              ) : (
-                userContent.map((content, index) => {
-                  return (
-                    <ListViewItemSimplified
-                      key={index}
-                      image={content.image}
-                      label={content.label}
-                      value={content.value}
-                      actions={content.actions}
-                    />
-                  )
-                })
-              )}
-            </ListViewSimplified>
-            {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-              <Pagination
-                currentPage={currentPageNumber}
-                totalPages={Math.ceil(
-                  totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                )}
-                onPageChange={(currentPage: number) =>
-                  setCurrentPageNumber(currentPage)
-                }
-              />
+          <ListViewSimplified id="user_list">
+            {userContent.length <= 0 ? (
+              <NoRecord id="no-record">
+                {intl.formatMessage(constantsMessages.noResults)}
+              </NoRecord>
+            ) : (
+              userContent.map((content, index) => {
+                return (
+                  <ListViewItemSimplified
+                    key={index}
+                    image={content.image}
+                    label={content.label}
+                    value={content.value}
+                    actions={content.actions}
+                  />
+                )
+              })
             )}
-            <UserAuditActionModal
-              show={toggleActivation.modalVisible}
-              user={toggleActivation.selectedUser}
-              onClose={() => toggleUserActivationModal()}
-              onConfirmRefetchQueries={[
-                {
-                  query: SEARCH_USERS,
-                  variables: {
-                    primaryOfficeId: locationId,
-                    count: recordCount
-                  }
-                }
-              ]}
+          </ListViewSimplified>
+          {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+            <Pagination
+              currentPage={currentPageNumber}
+              totalPages={Math.ceil(totalData / DEFAULT_FIELD_AGENT_LIST_SIZE)}
+              onPageChange={(currentPage: number) =>
+                setCurrentPageNumber(currentPage)
+              }
             />
+          )}
+          <UserAuditActionModal
+            show={toggleActivation.modalVisible}
+            user={toggleActivation.selectedUser}
+            onClose={() => toggleUserActivationModal()}
+            onConfirmRefetchQueries={[
+              {
+                query: SEARCH_USERS,
+                variables: {
+                  primaryOfficeId: locationId,
+                  count: recordCount
+                }
+              }
+            ]}
+          />
 
-            <ResponsiveModal
-              id="username-reminder-modal"
-              show={toggleUsernameReminder.modalVisible}
-              handleClose={() => toggleUsernameReminderModal()}
-              title={intl.formatMessage(
-                messages.sendUsernameReminderSMSModalTitle
-              )}
-              actions={[
-                <Button
-                  type="tertiary"
-                  id="username-reminder-cancel"
-                  key="username-reminusernameSMSReminderder-cancel"
-                  onClick={() => toggleUsernameReminderModal()}
-                >
-                  {intl.formatMessage(buttonMessages.cancel)}
-                </Button>,
-                <Button
-                  type="primary"
-                  id="username-reminder-send"
-                  key="username-reminder-send"
-                  onClick={() => {
-                    if (toggleUsernameReminder.selectedUser?.id) {
-                      usernameSMSReminder(
-                        toggleUsernameReminder.selectedUser.id
-                      )
-                    }
-                    toggleUsernameReminderModal()
-                  }}
-                >
-                  {intl.formatMessage(buttonMessages.send)}
-                </Button>
-              ]}
-              responsive={false}
-              autoHeight={true}
-            >
-              {intl.formatMessage(
-                messages.sendUsernameReminderSMSModalMessage,
-                { phoneNumber: toggleUsernameReminder.selectedUser?.mobile }
-              )}
-            </ResponsiveModal>
-            <ResponsiveModal
-              id="user-reset-password-modal"
-              show={toggleResetPassword.modalVisible}
-              handleClose={() => toggleUserResetPasswordModal()}
-              title={intl.formatMessage(messages.resetUserPasswordModalTitle)}
-              actions={[
-                <Button
-                  type="tertiary"
-                  id="reset-password-cancel"
-                  key="reset-password-cancel"
-                  onClick={() => toggleUserResetPasswordModal()}
-                >
-                  {intl.formatMessage(buttonMessages.cancel)}
-                </Button>,
-                <Button
-                  type="primary"
-                  id="reset-password-send"
-                  key="reset-password-send"
-                  onClick={() => {
-                    if (toggleResetPassword.selectedUser?.id) {
-                      resetPassword(toggleResetPassword.selectedUser.id)
-                    }
-                    toggleUserResetPasswordModal()
-                  }}
-                >
-                  {intl.formatMessage(buttonMessages.send)}
-                </Button>
-              ]}
-              responsive={false}
-              autoHeight={true}
-            >
-              {intl.formatMessage(messages.resetUserPasswordModalMessage, {
-                phoneNumber: toggleResetPassword.selectedUser?.mobile ?? ''
-              })}
-            </ResponsiveModal>
-          </UserTable>
+          <ResponsiveModal
+            id="username-reminder-modal"
+            show={toggleUsernameReminder.modalVisible}
+            handleClose={() => toggleUsernameReminderModal()}
+            title={intl.formatMessage(
+              messages.sendUsernameReminderSMSModalTitle
+            )}
+            actions={[
+              <Button
+                type="tertiary"
+                id="username-reminder-cancel"
+                key="username-reminusernameSMSReminderder-cancel"
+                onClick={() => toggleUsernameReminderModal()}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </Button>,
+              <Button
+                type="primary"
+                id="username-reminder-send"
+                key="username-reminder-send"
+                onClick={() => {
+                  if (toggleUsernameReminder.selectedUser?.id) {
+                    usernameSMSReminder(toggleUsernameReminder.selectedUser.id)
+                  }
+                  toggleUsernameReminderModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.send)}
+              </Button>
+            ]}
+            responsive={false}
+            autoHeight={true}
+          >
+            {intl.formatMessage(messages.sendUsernameReminderSMSModalMessage, {
+              phoneNumber: toggleUsernameReminder.selectedUser?.mobile
+            })}
+          </ResponsiveModal>
+          <ResponsiveModal
+            id="user-reset-password-modal"
+            show={toggleResetPassword.modalVisible}
+            handleClose={() => toggleUserResetPasswordModal()}
+            title={intl.formatMessage(messages.resetUserPasswordModalTitle)}
+            actions={[
+              <Button
+                type="tertiary"
+                id="reset-password-cancel"
+                key="reset-password-cancel"
+                onClick={() => toggleUserResetPasswordModal()}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </Button>,
+              <Button
+                type="primary"
+                id="reset-password-send"
+                key="reset-password-send"
+                onClick={() => {
+                  if (toggleResetPassword.selectedUser?.id) {
+                    resetPassword(toggleResetPassword.selectedUser.id)
+                  }
+                  toggleUserResetPasswordModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.send)}
+              </Button>
+            ]}
+            responsive={false}
+            autoHeight={true}
+          >
+            {intl.formatMessage(messages.resetUserPasswordModalMessage, {
+              phoneNumber: toggleResetPassword.selectedUser?.mobile ?? ''
+            })}
+          </ResponsiveModal>
         </>
       )
     },
@@ -865,49 +808,35 @@ function UserListComponent(props: IProps) {
                     ? searchedLocation?.name || ''
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
-                size={ContentSize.LARGE}
+                size={ContentSize.NORMAL}
                 topActionButtons={LocationButton(
                   locationId,
                   userDetails,
                   isNatlSysAdmin
                 )}
               >
-                {error ? (
-                  <ErrorText id="user_loading_error">
-                    <>{intl.formatMessage(errorMessages.userQueryError)}</>
-                    <LinkButtonModified
-                      onClick={() => window.location.reload()}
-                    >
-                      {intl.formatMessage(constantsMessages.refresh)}
-                    </LinkButtonModified>
-                  </ErrorText>
-                ) : loading ? (
-                  <Loading>
-                    <LoadingIndicator loading={true} />
-                  </Loading>
-                ) : (
-                  <>
-                    <Header id="header">
-                      {(searchedLocation && searchedLocation.name) || ''}
-                    </Header>
-                    <LocationInfo>
-                      {searchedLocation && searchedLocation.address ? (
-                        <LocationInfoValue>
-                          {searchedLocation.address}
-                        </LocationInfoValue>
-                      ) : (
-                        <LocationInfoEmptyValue>
-                          {intl.formatMessage(constantsMessages.notAvailable)}
-                        </LocationInfoEmptyValue>
-                      )}
-                    </LocationInfo>
-                    <RenderUserList
-                      data={data}
-                      locationId={locationId}
-                      userDetails={userDetails}
-                    />
-                  </>
-                )}
+                <ContentBody>
+                  {error ? (
+                    <ErrorText id="user_loading_error">
+                      <>{intl.formatMessage(errorMessages.userQueryError)}</>
+                      <Link onClick={() => window.location.reload()}>
+                        {intl.formatMessage(constantsMessages.refresh)}
+                      </Link>
+                    </ErrorText>
+                  ) : loading ? (
+                    <Loading>
+                      <LoadingIndicator loading={true} />
+                    </Loading>
+                  ) : (
+                    <>
+                      <RenderUserList
+                        data={data}
+                        locationId={locationId}
+                        userDetails={userDetails}
+                      />
+                    </>
+                  )}
+                </ContentBody>
               </Content>
             )
           }}
@@ -915,14 +844,16 @@ function UserListComponent(props: IProps) {
       ) : (
         <Content
           title={intl.formatMessage(headerMessages.teamTitle)}
-          size={ContentSize.LARGE}
+          size={ContentSize.NORMAL}
         >
-          <ConnectivityContainer>
-            <NoConnectivity />
-            <Text id="no-connection-text">
-              {intl.formatMessage(constantsMessages.noConnection)}
-            </Text>
-          </ConnectivityContainer>
+          <ContentBody>
+            <ConnectivityContainer>
+              <NoConnectivity />
+              <Text id="no-connection-text">
+                {intl.formatMessage(constantsMessages.noConnection)}
+              </Text>
+            </ConnectivityContainer>
+          </ContentBody>
         </Content>
       )}
 

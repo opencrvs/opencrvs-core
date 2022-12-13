@@ -132,8 +132,8 @@ enum ACTIVE_MENU_ITEM {
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 100%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
@@ -606,7 +606,7 @@ export const Header = connect(
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`
-  margin-left: 249px;
+  margin-left: 282px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 0;
