@@ -51,6 +51,25 @@ export const up = async (db, client) => {
         }
       }
     ])
+
+    // Update createdBy to be userId instead of UserNameSchema
+    // Update name to be string instead of UserNameSchema
+    const natlSysAdmin = await db
+      .collection('users')
+      .findOne({ role: 'NATIONAL_SYSTEM_ADMIN' })
+    const adminFirstNames = natlSysAdmin.name[0].given.join(' ')
+
+    await db.collection('systems').updateMany({}, [
+      {
+        $set: {
+          createdBy: natlSysAdmin._id,
+          name:
+            adminFirstNames.length > 0
+              ? adminFirstNames + ' ' + natlSysAdmin.name[0].family
+              : natlSysAdmin.name[0].family
+        }
+      }
+    ])
   } finally {
     await session.endSession()
   }
@@ -59,6 +78,19 @@ export const down = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
+      const natlSysAdmin = await db
+        .collection('users')
+        .findOne({ role: 'NATIONAL_SYSTEM_ADMIN' })
+
+      await db.collection('systems').updateMany({}, [
+        {
+          $set: {
+            createdBy: natlSysAdmin.name,
+            name: natlSysAdmin.name
+          }
+        }
+      ])
+
       await db.collection('systems').updateMany({}, { $unset: { type: '' } })
       await db
         .collection('systems')
