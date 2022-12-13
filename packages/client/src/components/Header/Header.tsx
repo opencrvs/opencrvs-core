@@ -13,7 +13,6 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   goBack,
   goForward,
@@ -47,15 +46,6 @@ import {
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  ArrowBack,
-  Plus,
-  SearchDark,
-  Activity,
-  SearchBlue,
-  AddUser
-} from '@opencrvs/components/lib/icons'
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
 import {
   SearchTool,
@@ -79,6 +69,8 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { Hamburger } from './Hamburger'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 type IStateProps = {
   userDetails: IUserDetails | null
@@ -141,24 +133,6 @@ enum ACTIVE_MENU_ITEM {
   INTEGRATION
 }
 
-const StyledPrimaryButton = styled(PrimaryButton)`
-  width: 40px;
-  height: 40px;
-  border-radius: 100%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-  &:hover {
-    background: ${({ theme }) => theme.colors.primaryDark};
-  }
-  &:focus {
-    background: ${({ theme }) => theme.colors.yellow};
-  }
-  &:active {
-    background: ${({ theme }) => theme.colors.primaryDark};
-  }
-`
-
 const Search = styled(SearchTool)`
   position: static;
   left: calc(50% - 624px / 2 + 24px);
@@ -201,13 +175,15 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Hamburger />,
+            icon: () => <Icon color="currentColor" name="Menu" size="medium" />,
             handler: () => {}
           }
         ],
         mobileRight: [
           {
-            icon: () => <Activity stroke={theme.colors.primary} />,
+            icon: () => (
+              <Icon color="currentColor" name="Activity" size="medium" />
+            ),
             handler: () =>
               this.props.mapPerformanceClickHandler &&
               this.props.mapPerformanceClickHandler()
@@ -219,18 +195,24 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Hamburger />,
+              icon: () => (
+                <Icon color="currentColor" name="Menu" size="medium" />
+              ),
               handler: () => {}
             }
           ],
           mobileRight: [
             {
-              icon: () => <SearchBlue />,
+              icon: () => (
+                <Icon color="currentColor" name="Search" size="medium" />
+              ),
               handler: () =>
                 this.props.changeTeamLocation && this.props.changeTeamLocation()
             },
             {
-              icon: () => <AddUser />,
+              icon: () => (
+                <Icon color="currentColor" name="UserPlus" size="medium" />
+              ),
               handler: () => {
                 if (locationId) {
                   this.props.goToCreateNewUserWithLocationId(locationId)
@@ -248,13 +230,17 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Hamburger />,
+              icon: () => (
+                <Icon color="currentColor" name="Menu" size="medium" />
+              ),
               handler: () => {}
             }
           ],
           mobileRight: [
             {
-              icon: () => <AddUser />,
+              icon: () => (
+                <Icon color="currentColor" name="UserPlus" size="medium" />
+              ),
               handler: () => {
                 if (locationId) {
                   this.props.goToCreateNewUserWithLocationId(locationId)
@@ -269,7 +255,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Hamburger />,
+              icon: () => (
+                <Icon color="currentColor" name="Menu" size="medium" />
+              ),
               handler: () => {}
             }
           ]
@@ -282,7 +270,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Hamburger />,
+            icon: () => <Icon color="currentColor" name="Menu" size="medium" />,
             handler: () => {}
           }
         ]
@@ -292,7 +280,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <ArrowBack />,
+              icon: () => (
+                <Icon color="currentColor" name="ArrowLeft" size="medium" />
+              ),
               handler: () => window.history.back()
             }
           ],
@@ -302,13 +292,17 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <Hamburger />,
+              icon: () => (
+                <Icon color="currentColor" name="Menu" size="medium" />
+              ),
               handler: () => {}
             }
           ],
           mobileRight: [
             {
-              icon: () => <SearchDark />,
+              icon: () => (
+                <Icon color="currentColor" name="Search" size="medium" />
+              ),
               handler: () => this.props.goToSearch()
             }
           ]
@@ -347,23 +341,25 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
-        icon: <Icon name="Target" size="small" />,
-        invertIcon: <Icon name="Target" size="small" />,
+        icon: <Icon color="currentColor" name="Target" size="small" />,
+        invertIcon: <Icon color="currentColor" name="Target" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
       {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
-        icon: <Icon name="Award" size="small" />,
-        invertIcon: <Icon name="Award" size="small" />,
+        icon: <Icon color="currentColor" name="Award" size="small" />,
+        invertIcon: <Icon color="currentColor" name="Award" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         label: intl.formatMessage(messages.nationalId),
         value: NATIONAL_ID_TEXT,
-        icon: <Icon name="CreditCard" size="small" />,
-        invertIcon: <Icon name="CreditCard" />,
+        icon: <Icon color="currentColor" name="CreditCard" size="small" />,
+        invertIcon: (
+          <Icon color="currentColor" name="CreditCard" size="small" />
+        ),
         placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       },
       {
@@ -376,8 +372,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
-        icon: <Icon name="User" size="small" />,
-        invertIcon: <Icon name="User" size="small" />,
+        icon: <Icon color="currentColor" name="User" size="small" />,
+        invertIcon: <Icon color="currentColor" name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
@@ -474,13 +470,16 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
             ) && (
               <HeaderCenter>
-                <StyledPrimaryButton
+                <Button
                   key="newEvent"
                   id="header_new_event"
+                  type="iconSolid"
+                  size="medium"
+                  aria-label="Create new declaration"
                   onClick={this.props.goToEvents}
-                  icon={() => <Plus />}
-                />
-
+                >
+                  <Icon color="currentColor" name="Plus" size="medium" />
+                </Button>
                 {this.renderSearchInput(this.props)}
               </HeaderCenter>
             )}

@@ -58,23 +58,25 @@ export function HistoryNavigator({
       <Button
         id="header-go-back-button"
         type="icon"
-        size="large"
+        size="medium"
+        aria-label="Go back"
         disabled={
           (history.action === 'POP' || history.action === 'REPLACE') &&
           isLandingPage()
         }
         onClick={() => dispatch(goBack())}
       >
-        <Icon name="ArrowLeft" />
+        <Icon color="currentColor" name="ArrowLeft" size="medium" />
       </Button>
       {!hideForward && (
         <Button
           type="icon"
-          size="large"
+          size="medium"
+          aria-label="Go forward"
           disabled={history.action === 'PUSH' || history.action === 'REPLACE'}
           onClick={() => dispatch(goForward())}
         >
-          <Icon name="ArrowRight" />
+          <Icon color="currentColor" name="ArrowRight" size="medium" />
         </Button>
       )}
     </div>

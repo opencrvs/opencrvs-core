@@ -32,8 +32,8 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
-import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
   FIELD_AGENT_ROLES,
@@ -452,11 +452,16 @@ class OfficeHomeView extends React.Component<
         )}
 
         <FABContainer>
-          <FloatingActionButton
+          <Button
             id="new_event_declaration"
+            type="iconSolid"
+            size="large"
+            aria-label="New declaration"
             onClick={this.props.goToEvents}
-            icon={() => <PlusTransparentWhite />}
-          />
+            shadow={true}
+          >
+            <Icon color="currentColor" name="Plus" size="large" />
+          </Button>
         </FABContainer>
 
         {this.state.showCertificateToast && (
