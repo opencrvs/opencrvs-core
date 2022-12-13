@@ -14,10 +14,13 @@ export const HOST = process.env.HOST || 'localhost'
 export const HOSTNAME = process.env.DOMAIN || '*'
 export const PORT = process.env.PORT || 2021
 // Services
+export const GATEWAY_URL = process.env.GATEWAY_URL || 'http://localhost:7070/'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
+export const COUNTRY_CONFIG_URL =
+  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const MONGO_URL =
   process.env.MONGO_URL || 'mongodb://localhost/application-config'
 export const USER_MANAGEMENT_URL =
@@ -31,3 +34,12 @@ export const CERT_PUBLIC_KEY_PATH =
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export const DEFAULT_TIMEOUT = 600000
+
+export const enum LOCATION_LEVEL {
+  HEALTH_FACILITY = 'HEALTH_FACILITY',
+  STATE = 'STATE',
+  DISTRICT = 'DISTRICT',
+  LOCATION_LEVEL_3 = 'LOCATION_LEVEL_3',
+  LOCATION_LEVEL_4 = 'LOCATION_LEVEL_4',
+  LOCATION_LEVEL_5 = 'LOCATION_LEVEL_5'
+}

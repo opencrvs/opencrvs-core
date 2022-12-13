@@ -21,7 +21,7 @@ import {
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { IFormConfig } from '@client/forms'
+import { IFormConfig, IFormDataSet } from '@client/forms'
 import { IQuestionConfig } from '@client/forms/questionConfig'
 import { System } from '@client/utils/gateway'
 
@@ -239,6 +239,7 @@ export type UpdateOfflineFormConfigAction = {
   payload: {
     formDrafts: IFormDraft[]
     questionConfig?: IQuestionConfig[]
+    formDataset?: IFormDataSet[]
   }
 }
 
@@ -252,12 +253,14 @@ export type UpdateOfflineCertificateAction = {
 
 export const updateOfflineFormConfig = (
   formDrafts: IFormDraft[],
-  questionConfig?: IQuestionConfig[]
+  questionConfig?: IQuestionConfig[],
+  formDataset?: IFormDataSet[]
 ): UpdateOfflineFormConfigAction => ({
   type: UPDATE_OFFLINE_FORM_CONFIG,
   payload: {
     formDrafts,
-    questionConfig
+    questionConfig,
+    formDataset
   }
 })
 
@@ -277,13 +280,29 @@ export type OfflineFormConfigUpdatedAction = {
     formConfig: IFormConfig
   }
 }
-
 export const offlineFormConfigUpdated = (
   formConfig: IFormConfig
 ): OfflineFormConfigUpdatedAction => ({
   type: OFFLINE_FORM_CONFIG_UPDATED,
   payload: {
     formConfig
+  }
+})
+
+export const OFFLINE_FORM_CONFIG_ADD_FORM_DATASET =
+  'OFFLINE/FORM_CONFIG_ADD_FORM_DATASET'
+export type OfflineFormConfigAddFormDatasetAction = {
+  type: typeof OFFLINE_FORM_CONFIG_ADD_FORM_DATASET
+  payload: {
+    formDatasetItem: IFormDataSet
+  }
+}
+export const offlineFormConfigAddFormDataset = (
+  formDatasetItem: IFormDataSet
+): OfflineFormConfigAddFormDatasetAction => ({
+  type: OFFLINE_FORM_CONFIG_ADD_FORM_DATASET,
+  payload: {
+    formDatasetItem
   }
 })
 
@@ -307,6 +326,7 @@ export type Action =
   | UpdateOfflineFormConfigAction
   | UpdateOfflineCertificateAction
   | OfflineFormConfigUpdatedAction
+  | OfflineFormConfigAddFormDatasetAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

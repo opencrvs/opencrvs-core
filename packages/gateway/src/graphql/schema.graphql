@@ -148,6 +148,7 @@ type Query {
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
   fetchSystem(clientId: ID!): System
+  getFormDataset: [FormDataset!]
 }
 
 type Mutation {
@@ -232,6 +233,7 @@ type Mutation {
   refreshSystemSecret(clientId: String!): SystemSecret
   updatePermissions(setting: UpdatePermissionsInput!): System
   deleteSystem(clientId: ID!): System
+  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
   bookmarkAdvancedSearch(
     bookmarkSearchInput: BookmarkSearchInput!
   ): BookMarkedSearches
@@ -585,6 +587,12 @@ type System {
   type: SystemType!
   settings: [WebhookPermission!]
 }
+type FormDataset {
+  options: [FormDatasetOption!]
+  fileName: String!
+  createdAt: String!
+  _id: String
+}
 
 input NotificationInput {
   child: PersonInput
@@ -748,6 +756,16 @@ input SystemInput {
 input UpdatePermissionsInput {
   clientId: String!
   webhook: [WebhookInput!]!
+}
+type FormDatasetResponse {
+  status: String!
+  msg: String!
+  data: FormDataset
+}
+
+input FormDatasetInput {
+  fileName: String!
+  base64Data: String!
 }
 
 type BookMarkedSearches {
@@ -1103,6 +1121,10 @@ type WebhookPermission {
   event: String!
   permissions: [String!]!
 }
+type FormDatasetOption {
+  value: String!
+  label: [FormDatasetOptionLabel]
+}
 
 input PersonInput {
   _fhirID: ID
@@ -1271,6 +1293,8 @@ input QuestionInput {
   enabled: String
   custom: Boolean
   conditionals: [ConditionalInput!]
+  datasetId: String
+  options: [CustomSelectOption!]
 }
 
 input SystemSettings {
@@ -1578,6 +1602,11 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
+type FormDatasetOptionLabel {
+  lang: String!
+  descriptor: MesssageDescriptor!
+}
+
 input IdentityInput {
   id: ID
   type: IdentityIDType
@@ -1687,11 +1716,17 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+  SELECT_WITH_OPTIONS
 }
 
 input ConditionalInput {
   fieldId: String!
   regexp: String!
+}
+
+input CustomSelectOption {
+  value: String!
+  label: MesssageDescriptorInput!
 }
 
 type Payment {
@@ -1714,6 +1749,12 @@ interface AuditLogItemBase {
 type AdditionalIdWithCompositionId {
   compositionId: String!
   trackingId: String!
+}
+
+type MesssageDescriptor {
+  id: String!
+  description: String
+  defaultMessage: String!
 }
 
 input CommentInput {
