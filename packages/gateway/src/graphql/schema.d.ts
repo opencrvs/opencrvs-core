@@ -96,7 +96,6 @@ export interface GQLMutation {
   refreshSystemSecret?: GQLSystemSecret
   updatePermissions?: GQLSystem
   deleteSystem?: GQLSystem
-  createFormDataset?: GQLFormDatasetResponse
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
   createFormDataset?: GQLFormDatasetResponse
@@ -641,17 +640,6 @@ export interface GQLSystemInput {
 export interface GQLUpdatePermissionsInput {
   clientId: string
   webhook: Array<GQLWebhookInput>
-}
-
-export interface GQLFormDatasetResponse {
-  status: string
-  msg: string
-  data?: GQLFormDataset
-}
-
-export interface GQLFormDatasetInput {
-  fileName: string
-  base64Data: string
 }
 
 export interface GQLBookMarkedSearches {
@@ -1785,7 +1773,6 @@ export interface GQLResolver {
   Avatar?: GQLAvatarTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
   SystemSecret?: GQLSystemSecretTypeResolver
-  FormDatasetResponse?: GQLFormDatasetResponseTypeResolver
   BookMarkedSearches?: GQLBookMarkedSearchesTypeResolver
   FormDatasetResponse?: GQLFormDatasetResponseTypeResolver
   Map?: GraphQLScalarType
@@ -2548,7 +2535,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   refreshSystemSecret?: MutationToRefreshSystemSecretResolver<TParent>
   updatePermissions?: MutationToUpdatePermissionsResolver<TParent>
   deleteSystem?: MutationToDeleteSystemResolver<TParent>
-  createFormDataset?: MutationToCreateFormDatasetResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
   createFormDataset?: MutationToCreateFormDatasetResolver<TParent>
@@ -3178,9 +3164,6 @@ export interface MutationToDeleteSystemResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface MutationToCreateFormDatasetArgs {
-  formDataset: GQLFormDatasetInput
-}
 export interface MutationToBookmarkAdvancedSearchArgs {
   bookmarkSearchInput: GQLBookmarkSearchInput
 }

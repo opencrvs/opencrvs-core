@@ -233,7 +233,6 @@ type Mutation {
   refreshSystemSecret(clientId: String!): SystemSecret
   updatePermissions(setting: UpdatePermissionsInput!): System
   deleteSystem(clientId: ID!): System
-  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
   bookmarkAdvancedSearch(
     bookmarkSearchInput: BookmarkSearchInput!
   ): BookMarkedSearches
@@ -758,17 +757,6 @@ input SystemInput {
 input UpdatePermissionsInput {
   clientId: String!
   webhook: [WebhookInput!]!
-}
-
-type FormDatasetResponse {
-  status: String!
-  msg: String!
-  data: FormDataset
-}
-
-input FormDatasetInput {
-  fileName: String!
-  base64Data: String!
 }
 
 type BookMarkedSearches {
