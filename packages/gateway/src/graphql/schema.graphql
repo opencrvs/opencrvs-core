@@ -587,6 +587,7 @@ type System {
   type: SystemType!
   settings: [WebhookPermission!]
 }
+
 type FormDataset {
   options: [FormDatasetOption!]
   fileName: String!
@@ -757,6 +758,7 @@ input UpdatePermissionsInput {
   clientId: String!
   webhook: [WebhookInput!]!
 }
+
 type FormDatasetResponse {
   status: String!
   msg: String!
@@ -1121,6 +1123,7 @@ type WebhookPermission {
   event: String!
   permissions: [String!]!
 }
+
 type FormDatasetOption {
   value: String!
   label: [FormDatasetOptionLabel]

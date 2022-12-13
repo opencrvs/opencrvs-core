@@ -470,6 +470,7 @@ export interface GQLSystem {
   type: GQLSystemType
   settings?: Array<GQLWebhookPermission>
 }
+
 export interface GQLFormDataset {
   options?: Array<GQLFormDatasetOption>
   fileName: string
@@ -640,6 +641,7 @@ export interface GQLUpdatePermissionsInput {
   clientId: string
   webhook: Array<GQLWebhookInput>
 }
+
 export interface GQLFormDatasetResponse {
   status: string
   msg: string
@@ -1026,6 +1028,7 @@ export interface GQLWebhookPermission {
   event: string
   permissions: Array<string>
 }
+
 export interface GQLFormDatasetOption {
   value: string
   label?: Array<GQLFormDatasetOptionLabel | null>
@@ -2484,6 +2487,7 @@ export interface QueryToFetchSystemResolver<TParent = any, TResult = any> {
     info: GraphQLResolveInfo
   ): TResult
 }
+
 export interface QueryToGetFormDatasetResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
@@ -3086,20 +3090,6 @@ export interface MutationToReactivateSystemResolver<
     info: GraphQLResolveInfo
   ): TResult
 }
-export interface MutationToCreateFormDatasetArgs {
-  formDataset: GQLFormDatasetInput
-}
-export interface MutationToCreateFormDatasetResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToReactivateSystemArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
 
 export interface MutationToDeactivateSystemArgs {
   clientId: string
@@ -3168,6 +3158,20 @@ export interface MutationToDeleteSystemResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: MutationToDeleteSystemArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateFormDatasetArgs {
+  formDataset: GQLFormDatasetInput
+}
+export interface MutationToCreateFormDatasetResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
     args: MutationToCreateFormDatasetArgs,
     context: any,
     info: GraphQLResolveInfo
@@ -4474,6 +4478,7 @@ export interface SystemToTypeResolver<TParent = any, TResult = any> {
 export interface SystemToSettingsResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
+
 export interface GQLFormDatasetTypeResolver<TParent = any> {
   options?: FormDatasetToOptionsResolver<TParent>
   fileName?: FormDatasetToFileNameResolver<TParent>
@@ -5699,6 +5704,14 @@ export interface WebhookPermissionToEventResolver<
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
+
+export interface WebhookPermissionToPermissionsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLFormDatasetOptionTypeResolver<TParent = any> {
   value?: FormDatasetOptionToValueResolver<TParent>
   label?: FormDatasetOptionToLabelResolver<TParent>
@@ -5711,12 +5724,6 @@ export interface FormDatasetOptionToValueResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface WebhookPermissionToPermissionsResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
 export interface FormDatasetOptionToLabelResolver<
   TParent = any,
   TResult = any
