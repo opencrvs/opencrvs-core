@@ -163,12 +163,15 @@ services:
     restart: unless-stopped
     environment:
       - AUTH_URL=http://auth:4040
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config
       - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+      - GATEWAY_URL=http://gateway:7070
       - CHECK_INVALID_TOKEN=true
   migration:
     image: opencrvs/ocrvs-migration:${VERSION:-latest}

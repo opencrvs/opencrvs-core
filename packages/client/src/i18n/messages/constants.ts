@@ -270,6 +270,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Declaration title',
     id: 'constants.declarations'
   },
+  integrationTitle: {
+    defaultMessage: 'Integrations',
+    description: 'Integration title',
+    id: 'constants.integrations'
+  },
   declarationUpdatedOn: {
     defaultMessage: 'Updated on',
     description:

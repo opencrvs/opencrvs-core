@@ -25,13 +25,12 @@ const Container = styled.div<{
   --color: ${({ $type, theme }) => `
     ${$type === 'success' ? theme.colors.positiveDark : ''}
     ${$type === 'loading' ? theme.colors.primaryDark : ''}
-    ${$type === 'info' ? theme.colors.primaryDark : ''}
+    ${$type === 'info' ? theme.colors.tealDark : ''}
     ${$type === 'error' ? theme.colors.negativeDark : ''}
     ${$type === 'warning' ? theme.colors.orangeDark : ''}
     ${$type === undefined ? theme.colors.positiveDark : ''}
   `};
 
-  min-height: 52px;
   display: flex;
   border-radius: 4px;
   border: 2px solid var(--color);

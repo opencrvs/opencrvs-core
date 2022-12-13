@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { CustomFieldType, Event } from '@client/utils/gateway'
-import { Message } from 'typescript-react-intl'
 import { ISerializedForm } from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
-import { fieldIdentifiersToQuestionConfig } from './transformers'
 import { getSection } from '@client/forms/configuration/defaultUtils'
+import { fieldIdentifiersToQuestionConfig } from '@client/forms/questionConfig/transformers'
+import { CustomFieldType, Event } from '@client/utils/gateway'
+import { Message } from 'typescript-react-intl'
 
 export * from './transformers'
 
@@ -25,6 +25,11 @@ export interface IMessage {
 export interface IConditionalConfig {
   fieldId: string
   regexp: string
+}
+
+export interface ICustomSelectOption {
+  label: IMessage[]
+  value: string
 }
 
 interface IBaseQuestionConfig {
@@ -56,6 +61,8 @@ export interface ICustomQuestionConfig extends IBaseQuestionConfig {
   fieldName: string
   fieldType: CustomFieldType
   conditionals?: IConditionalConfig[]
+  options?: ICustomSelectOption[]
+  datasetId?: string
 }
 
 export type IQuestionConfig = IDefaultQuestionConfig | ICustomQuestionConfig

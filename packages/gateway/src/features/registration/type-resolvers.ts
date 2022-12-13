@@ -65,7 +65,7 @@ import {
   getSignatureExtension,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
-import { getUser } from '@gateway/features/user/utils'
+import { getSystem, getUser } from '@gateway/features/user/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -848,6 +848,16 @@ export const typeResolvers: GQLResolver = {
         ...userResponse,
         role: role ?? userResponse.role
       }
+    },
+    system: async (task: fhir.Task, _: any, authHeader) => {
+      const systemIdentifier = task.identifier?.find(
+        ({ system }) =>
+          system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+      )
+      if (!systemIdentifier || !systemIdentifier.value) {
+        return null
+      }
+      return await getSystem({ systemId: systemIdentifier.value }, authHeader)
     },
     location: async (task: fhir.Task, _: any, authHeader: any) => {
       const taskLocation = findExtension(
