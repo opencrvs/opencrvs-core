@@ -17,7 +17,7 @@ export interface INavigationGroup
   extends React.HTMLAttributes<HTMLDivElement> {}
 
 const NavigationGroupContainer = styled.div`
-  padding: 8px 0px;
+  padding: 8px 8px 8px 12px;
   box-shadow: 0px 16px 1px -16px ${({ theme }) => theme.colors.grey400};
   &:last-child {
     box-shadow: none;

@@ -407,7 +407,9 @@ export const NavigationView = (props: IFullProps) => {
               }}
             />
             <NavigationItem
-              icon={() => <PaperPlane />}
+              icon={() => (
+                <Icon color="currentColor" name="Send" size="small" />
+              )}
               id={`navigation_${WORKQUEUE_TABS.outbox}`}
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.outbox]
@@ -541,7 +543,9 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.outbox
                   ) && (
                     <NavigationItem
-                      icon={() => <PaperPlane />}
+                      icon={() => (
+                        <Icon color="currentColor" name="Send" size="small" />
+                      )}
                       id={`navigation_${WORKQUEUE_TABS.outbox}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.outbox]
@@ -564,7 +568,13 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.performance
                   ) && (
                     <NavigationItem
-                      icon={() => <Activity />}
+                      icon={() => (
+                        <Icon
+                          color="currentColor"
+                          name="Activity"
+                          size="small"
+                        />
+                      )}
                       id={`navigation_${WORKQUEUE_TABS.performance}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.performance]
@@ -583,7 +593,9 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.vsexports
                   ) && (
                     <NavigationItem
-                      icon={() => <Icon name="Share" size="small" />}
+                      icon={() => (
+                        <Icon color="currentColor" name="Share" size="small" />
+                      )}
                       id={`navigation_${WORKQUEUE_TABS.vsexports}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.vsexports]
@@ -600,7 +612,9 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.team
                   ) && (
                     <NavigationItem
-                      icon={() => <Users />}
+                      icon={() => (
+                        <Icon color="currentColor" name="Users" size="small" />
+                      )}
                       id={`navigation_${WORKQUEUE_TABS.team}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.team]
@@ -619,7 +633,13 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <>
                       <NavigationItem
-                        icon={() => <Configuration />}
+                        icon={() => (
+                          <Icon
+                            color="currentColor"
+                            name="Settings"
+                            size="small"
+                          />
+                        )}
                         id={`navigation_${WORKQUEUE_TABS.config}_main`}
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.config]
