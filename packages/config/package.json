@@ -22,6 +22,7 @@
     "@opencrvs/commons": "^1.2.0-beta",
     "@types/hapi-pino": "^8.0.5",
     "@types/pino": "^6.3.12",
+    "fast-csv": "^4.3.6",
     "fp-ts": "^2.12.3",
     "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^8.5.0",
