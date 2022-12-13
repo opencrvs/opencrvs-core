@@ -49,8 +49,13 @@ export function Hamburger() {
 
   return (
     <>
-      <Button type="icon" onClick={toggleMenu}>
-        <Icon name="Menu"></Icon>
+      <Button
+        type="icon"
+        size="medium"
+        aria-label="Open menu"
+        onClick={toggleMenu}
+      >
+        <Icon color="currentColor" name="Menu" size="large"></Icon>
       </Button>
       <ExpandingMenu
         showMenu={showMenu}

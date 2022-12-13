@@ -175,7 +175,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Icon color="currentColor" name="Menu" size="large" />,
+            icon: () => <Hamburger />,
             handler: () => {}
           }
         ],
@@ -195,9 +195,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => (
-                <Icon color="currentColor" name="Menu" size="large" />
-              ),
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ],
@@ -230,9 +228,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => (
-                <Icon color="currentColor" name="Menu" size="large" />
-              ),
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ],
@@ -255,9 +251,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => (
-                <Icon color="currentColor" name="Menu" size="large" />
-              ),
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ]
@@ -270,7 +264,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Icon color="currentColor" name="Menu" size="large" />,
+            icon: () => <Hamburger />,
             handler: () => {}
           }
         ]
@@ -292,9 +286,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => (
-                <Icon color="currentColor" name="Menu" size="large" />
-              ),
+              icon: () => <Hamburger />,
               handler: () => {}
             }
           ],
