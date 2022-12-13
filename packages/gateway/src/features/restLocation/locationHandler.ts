@@ -178,7 +178,7 @@ export async function createLocationHandler(
   }
 
   const response = await sendToFhir(
-    newLocation,
+    JSON.stringify(newLocation),
     '/Location',
     'POST',
     request.headers.authorization
@@ -220,7 +220,7 @@ export async function updateLocationHandler(
   }
 
   const response = await sendToFhir(
-    newLocation,
+    JSON.stringify(newLocation),
     `/Location/${locationId}`,
     'PUT',
     request.headers.authorization

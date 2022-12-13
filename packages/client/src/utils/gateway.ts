@@ -919,6 +919,7 @@ export type History = {
   requester?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
+  system?: Maybe<System>
   user?: Maybe<User>
 }
 
@@ -3300,6 +3301,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -3590,6 +3592,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -3954,6 +3957,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -4226,6 +4230,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -6180,6 +6185,23 @@ export type GetTotalCertificationsQuery = {
     total: number
     eventType: string
   }> | null
+}
+
+export type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetVsExportsQuery = {
+  __typename?: 'Query'
+  getVSExports?: {
+    __typename?: 'TotalVSExport'
+    results?: Array<{
+      __typename?: 'VSExport'
+      event: string
+      year: number
+      url: string
+      createdOn: string
+      fileSize: string
+    }> | null
+  } | null
 }
 
 export type SubmitActivateUserMutationVariables = Exact<{

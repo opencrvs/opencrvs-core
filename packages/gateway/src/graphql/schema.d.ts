@@ -746,6 +746,7 @@ export interface GQLHistory {
   requester?: string
   hasShowedVerifiedDocument?: boolean
   otherReason?: string
+  system?: GQLSystem
   location?: GQLLocation
   office?: GQLLocation
   dhis2Notification?: boolean
@@ -4921,6 +4922,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   requester?: HistoryToRequesterResolver<TParent>
   hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
   otherReason?: HistoryToOtherReasonResolver<TParent>
+  system?: HistoryToSystemResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
   dhis2Notification?: HistoryToDhis2NotificationResolver<TParent>
@@ -4967,6 +4969,10 @@ export interface HistoryToHasShowedVerifiedDocumentResolver<
 }
 
 export interface HistoryToOtherReasonResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToSystemResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

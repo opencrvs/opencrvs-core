@@ -863,6 +863,7 @@ type History {
   requester: String
   hasShowedVerifiedDocument: Boolean
   otherReason: String
+  system: System
   location: Location
   office: Location
   dhis2Notification: Boolean
