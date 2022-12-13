@@ -342,9 +342,14 @@ export const getDraftDeclarationName = (declaration: IDeclaration) => {
   }
 
   if (declarationName) {
-    name = [declarationName.firstNamesEng, declarationName.familyNameEng]
-      .filter((part) => Boolean(part))
-      .join(' ')
+    name = [
+      declarationName.familyNameEng,
+      [declarationName.firstNamesEng, declarationName.middleNamesEng]
+        .filter(Boolean)
+        .join(' ')
+    ]
+      .filter(Boolean)
+      .join(', ')
   }
   return name
 }

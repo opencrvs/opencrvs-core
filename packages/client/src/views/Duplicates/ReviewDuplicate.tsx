@@ -27,11 +27,16 @@ import {
   ErrorToastNotification
 } from '@opencrvs/components/lib/interface'
 import { useIntl } from 'react-intl'
-import { messages as registerMessages } from '@client/i18n/messages/views/register'
+import { messages } from '@client/i18n/messages/views/duplicates'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { goBack } from '@client/navigation'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import styled from '@client/styledComponents'
 
+const StyledPrimaryButton = styled(PrimaryButton)`
+  margin: 8px 0 24px 24px;
+`
 function findDeclarationById(id: string, declarations: IDeclaration[]) {
   return declarations.find((declaration) => declaration.id === id)
 }
@@ -70,16 +75,18 @@ export function ReviewDuplicate() {
   const form = useSelector(getRegisterForm)
   const [loading, setLoading] = React.useState(2)
   const [error, setError] = React.useState(false)
-  const [left, setLeft] = React.useState(findDeclarationById(id, declarations))
-  const [right, setRight] = React.useState(
+  const [left, setLeft] = React.useState(
     findDeclarationById(existingId, declarations)
+  )
+  const [right, setRight] = React.useState(
+    findDeclarationById(id, declarations)
   )
   const history = useHistory()
 
   React.useEffect(() => {
     async function fetchLeft() {
       try {
-        const declaration = await fetchDeclaration(id, event, form)
+        const declaration = await fetchDeclaration(existingId, event, form)
         setLeft(declaration)
       } catch (e) {
         setError(true)
@@ -91,12 +98,12 @@ export function ReviewDuplicate() {
     } else {
       setLoading((l) => l - 1)
     }
-  }, [id, event, form, left])
+  }, [existingId, event, form, left])
 
   React.useEffect(() => {
     async function fetchRight() {
       try {
-        const declaration = await fetchDeclaration(existingId, event, form)
+        const declaration = await fetchDeclaration(id, event, form)
         setRight(declaration)
       } catch (e) {
         setError(true)
@@ -108,14 +115,12 @@ export function ReviewDuplicate() {
     } else {
       setLoading((l) => l - 1)
     }
-  }, [existingId, event, form, right])
+  }, [id, event, form, right])
 
   return (
     <>
       <EventTopBar
-        title={intl.formatMessage(registerMessages.newVitalEventRegistration, {
-          event
-        })}
+        title={intl.formatMessage(messages.headerTitle)}
         pageIcon={<Duplicate />}
         goHome={() => dispatch(goBack())}
       />
@@ -129,13 +134,18 @@ export function ReviewDuplicate() {
       ) : loading > 0 ? (
         <Loader id="review-duplicate-loader" marginPercent={23} />
       ) : left && right ? (
-        <ReviewSection
-          pageRoute=""
-          readonly
-          duplicate
-          draft={left}
-          draft2={right}
-        />
+        <>
+          <ReviewSection
+            pageRoute=""
+            readonly
+            duplicate
+            draft={left}
+            draft2={right}
+          />
+          <StyledPrimaryButton onClick={() => dispatch(goBack())}>
+            {intl.formatMessage(buttonMessages.close)}
+          </StyledPrimaryButton>
+        </>
       ) : null}
     </>
   )
