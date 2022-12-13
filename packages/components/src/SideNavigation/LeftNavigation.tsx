@@ -31,7 +31,7 @@ const LeftNavigationContainer = styled.div<{
   position: relative;
   top: 0px;
   width: ${({ navigationWidth }) =>
-    navigationWidth ? navigationWidth : 249}px;
+    navigationWidth ? navigationWidth : 282}px;
   height: 100vh;
   overflow-y: auto;
   background-color: ${({ theme }) => theme.colors.white};

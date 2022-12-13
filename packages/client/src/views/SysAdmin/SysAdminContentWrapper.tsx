@@ -148,7 +148,7 @@ const HeaderText = styled.span`
 const BodyContainer = styled.div`
   margin-left: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 249px;
+    margin-left: 282px;
   }
 `
 
