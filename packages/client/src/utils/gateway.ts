@@ -6186,24 +6186,6 @@ export type GetTotalCertificationsQuery = {
     eventType: string
   }> | null
 }
-
-export type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
-
-export type GetVsExportsQuery = {
-  __typename?: 'Query'
-  getVSExports?: {
-    __typename?: 'TotalVSExport'
-    results?: Array<{
-      __typename?: 'VSExport'
-      event: string
-      year: number
-      url: string
-      createdOn: string
-      fileSize: string
-    }> | null
-  } | null
-}
-
 export type SubmitActivateUserMutationVariables = Exact<{
   userId: Scalars['String']
   password: Scalars['String']
