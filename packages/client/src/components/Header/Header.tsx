@@ -175,14 +175,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Icon color="currentColor" name="Menu" size="medium" />,
+            icon: () => <Icon color="currentColor" name="Menu" size="large" />,
             handler: () => {}
           }
         ],
         mobileRight: [
           {
             icon: () => (
-              <Icon color="currentColor" name="Activity" size="medium" />
+              <Icon color="currentColor" name="Activity" size="large" />
             ),
             handler: () =>
               this.props.mapPerformanceClickHandler &&
@@ -196,7 +196,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           mobileLeft: [
             {
               icon: () => (
-                <Icon color="currentColor" name="Menu" size="medium" />
+                <Icon color="currentColor" name="Menu" size="large" />
               ),
               handler: () => {}
             }
@@ -204,14 +204,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           mobileRight: [
             {
               icon: () => (
-                <Icon color="currentColor" name="Search" size="medium" />
+                <Icon color="currentColor" name="Search" size="large" />
               ),
               handler: () =>
                 this.props.changeTeamLocation && this.props.changeTeamLocation()
             },
             {
               icon: () => (
-                <Icon color="currentColor" name="UserPlus" size="medium" />
+                <Icon color="currentColor" name="UserPlus" size="large" />
               ),
               handler: () => {
                 if (locationId) {
@@ -231,7 +231,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           mobileLeft: [
             {
               icon: () => (
-                <Icon color="currentColor" name="Menu" size="medium" />
+                <Icon color="currentColor" name="Menu" size="large" />
               ),
               handler: () => {}
             }
@@ -239,7 +239,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           mobileRight: [
             {
               icon: () => (
-                <Icon color="currentColor" name="UserPlus" size="medium" />
+                <Icon color="currentColor" name="UserPlus" size="large" />
               ),
               handler: () => {
                 if (locationId) {
@@ -256,7 +256,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           mobileLeft: [
             {
               icon: () => (
-                <Icon color="currentColor" name="Menu" size="medium" />
+                <Icon color="currentColor" name="Menu" size="large" />
               ),
               handler: () => {}
             }
@@ -270,7 +270,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => <Icon color="currentColor" name="Menu" size="medium" />,
+            icon: () => <Icon color="currentColor" name="Menu" size="large" />,
             handler: () => {}
           }
         ]
@@ -281,7 +281,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           mobileLeft: [
             {
               icon: () => (
-                <Icon color="currentColor" name="ArrowLeft" size="medium" />
+                <Icon color="currentColor" name="ArrowLeft" size="large" />
               ),
               handler: () => window.history.back()
             }
@@ -293,7 +293,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           mobileLeft: [
             {
               icon: () => (
-                <Icon color="currentColor" name="Menu" size="medium" />
+                <Icon color="currentColor" name="Menu" size="large" />
               ),
               handler: () => {}
             }
@@ -301,7 +301,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           mobileRight: [
             {
               icon: () => (
-                <Icon color="currentColor" name="Search" size="medium" />
+                <Icon color="currentColor" name="Search" size="large" />
               ),
               handler: () => this.props.goToSearch()
             }
