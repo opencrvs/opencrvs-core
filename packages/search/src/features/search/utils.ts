@@ -509,28 +509,32 @@ export function advancedQueryBuilder(
   }
 
   if (params.nationalId) {
-    should.push(
-      {
-        match: {
-          motherIdentifier: params.nationalId
-        }
-      },
-      {
-        match: {
-          fatherIdentifier: params.nationalId
-        }
-      },
-      {
-        match: {
-          informantIdentifier: params.nationalId
-        }
-      },
-      {
-        match: {
-          deceasedIdentifier: params.nationalId
-        }
+    must.push({
+      bool: {
+        should: [
+          {
+            match: {
+              motherIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              fatherIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              informantIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              deceasedIdentifier: params.nationalId
+            }
+          }
+        ]
       }
-    )
+    })
   }
 
   if (createdBy) {
@@ -550,6 +554,8 @@ export function advancedQueryBuilder(
       }
     })
   }
+
+  console.log('must', must)
 
   return {
     bool: {
