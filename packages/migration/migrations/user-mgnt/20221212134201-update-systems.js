@@ -16,6 +16,10 @@ export const up = async (db, client) => {
       .collection('systems')
       .updateMany({}, { $set: { 'settings.webhook': [] } })
 
+    // If "notification-api" in `scope` array, type = "HEALTH"
+    // If "nationalId" in `scope` array, type = "NATIONAL_ID"
+    // If "recordsearch" in `scope` array, type = "RECORD_SEARCH"
+    // If "webhook" in `scope` array, type = "WEBHOOK"
     await db.collection('systems').updateMany({}, [
       {
         $set: {
