@@ -358,7 +358,6 @@ export async function getSystemHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-
   const systemName = system.name
   return {
     name: systemName || system.createdBy,
@@ -370,9 +369,7 @@ export async function getSystemHandler(
     sha_secret: system.sha_secret,
     practitionerId: system.practitionerId,
     type: system.type,
-    settings: {
-      dailyQuota: system.settings.dailyQuota || 0
-    }
+    settings: system.settings
   }
 }
 
@@ -386,6 +383,13 @@ export const getSystemRequestSchema = Joi.object({
   clientId: Joi.string()
 })
 
+const webHookSchema = Joi.array().items(
+  Joi.object({
+    event: Joi.string().required(),
+    permissions: Joi.array().items(Joi.string())
+  })
+)
+
 export const getSystemResponseSchema = Joi.object({
   name: Joi.string(),
   createdBy: Joi.string(),
@@ -395,21 +399,16 @@ export const getSystemResponseSchema = Joi.object({
   scope: Joi.array().items(Joi.string()),
   sha_secret: Joi.string(),
   practitionerId: Joi.string(),
+  type: Joi.string(),
   settings: Joi.object({
-    dailyQuota: Joi.number()
+    dailyQuota: Joi.number(),
+    webhook: Joi.any().optional()
   })
 })
 
 export const clientIdSchema = Joi.object({
   clientId: Joi.string()
 })
-
-const webHookSchema = Joi.array().items(
-  Joi.object({
-    event: Joi.string().required(),
-    permissions: Joi.array()
-  })
-)
 
 export const SystemSchema = Joi.object({
   _id: Joi.string(),

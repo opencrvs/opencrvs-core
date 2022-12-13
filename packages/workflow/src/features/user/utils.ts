@@ -30,7 +30,7 @@ export async function getUser(
 
   if (!res.ok) {
     throw new Error(
-      `Unable to retrieve user mobile number. Error: ${res.status} status received`
+      `Unable to retrieve user in workflow. Error: ${res.status} status received`
     )
   }
 
@@ -54,7 +54,7 @@ export async function getSystem(
 
   if (!res.ok) {
     throw new Error(
-      `Unable to retrieve system mobile number. Error: ${res.status} status received`
+      `Unable to retrieve system in workflow. Error: ${res.status} status received`
     )
   }
 
