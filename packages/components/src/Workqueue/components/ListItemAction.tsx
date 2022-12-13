@@ -11,57 +11,28 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ExpansionButton } from '../../buttons/ExpansionButton'
-import { ArrowExpansionButton } from '../../buttons/ArrowExpansionButton'
 import { Button } from '../../Button'
-import { ColumnContentAlignment, IAction } from '../../common-types'
+import { IAction } from '../../common-types'
 import { IActionComponent } from '..'
+
 const Container = styled.div`
-  background: ${({ theme }) => theme.colors.white};
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-left: 1px;
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 0px;
     padding-left: 0px;
   }
 `
 
-const ListItemActionsContainer = styled.div<{
-  alignment?: ColumnContentAlignment
-}>`
+const ListItemActionsContainer = styled.div`
   display: flex;
   flex: 1;
   align-items: center;
   gap: 8px;
-  justify-content: ${({ alignment }) => {
-    if (alignment === ColumnContentAlignment.LEFT) {
-      return 'flex-start'
-    } else if (alignment === ColumnContentAlignment.CENTER) {
-      return alignment
-    } else {
-      return 'flex-end'
-    }
-  }};
+  justify-content: flex-end;
 `
-const ListItemSingleAction = styled(Button)<{
-  isFullHeight?: boolean
-}>`
-  ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
-  text-transform: capitalize;
-`
-const ExpansionSecion = styled(ExpansionButton)<{
-  isFullHeight?: boolean
-}>`
-  ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
-`
-const ArrowExpansionSecion = styled(ArrowExpansionButton)<{
-  isFullHeight?: boolean
-}>`
-  ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
-`
+
 const ActionButtonContainer = styled.div`
   width: 40px;
   display: flex;
@@ -76,11 +47,6 @@ const ActionButton = styled.div`
 interface IListItemActionProps {
   actions: IAction[]
   id?: string
-  expanded?: boolean
-  arrowExpansion?: boolean
-  isFullHeight?: boolean
-  onExpand?: () => void
-  alignment?: ColumnContentAlignment
 }
 
 function isActionComponent(action: IAction): action is IActionComponent {
@@ -88,18 +54,10 @@ function isActionComponent(action: IAction): action is IActionComponent {
 }
 
 export function ListItemAction(props: IListItemActionProps) {
-  const {
-    actions,
-    expanded,
-    arrowExpansion,
-    onExpand,
-    id,
-    isFullHeight,
-    alignment
-  } = props
+  const { actions, id } = props
   return (
     <Container id={id}>
-      <ListItemActionsContainer alignment={alignment} id="2ndContainer">
+      <ListItemActionsContainer id="2ndContainer">
         {actions &&
           actions.map((action: IAction) =>
             isActionComponent(action) ? (
@@ -109,9 +67,8 @@ export function ListItemAction(props: IListItemActionProps) {
                 </ActionButton>
               </ActionButtonContainer>
             ) : (
-              <ListItemSingleAction
+              <Button
                 type="primary"
-                isFullHeight={isFullHeight}
                 key={action.label as string}
                 id={`${id}-${action.label as string}`}
                 size={'medium'}
@@ -119,24 +76,10 @@ export function ListItemAction(props: IListItemActionProps) {
                 disabled={action.disabled}
               >
                 {action.icon} {action.label}
-              </ListItemSingleAction>
+              </Button>
             )
           )}
       </ListItemActionsContainer>
-      {onExpand &&
-        ((arrowExpansion && (
-          <ArrowExpansionSecion
-            isFullHeight={isFullHeight}
-            expanded={expanded}
-            onClick={onExpand}
-          />
-        )) || (
-          <ExpansionSecion
-            isFullHeight={isFullHeight}
-            expanded={expanded}
-            onClick={onExpand}
-          />
-        ))}
     </Container>
   )
 }

@@ -14,6 +14,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import styled from 'styled-components'
 import { NoResultText } from '@opencrvs/components/lib/Workqueue'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import {
   LoadingIndicator,
   withOnlineStatus,
@@ -25,7 +26,6 @@ interface IContentWrapper {
   title: string
   children: React.ReactNode | React.ReactNode[]
   tabBarContent?: React.ReactNode
-  isShowPagination?: boolean
   paginationId?: number
   totalPages?: number
   onPageChange?: (newPageNumber: number) => void
@@ -38,8 +38,10 @@ interface IContentWrapper {
 type IProps = IContentWrapper & IOnlineStatusProps
 
 const TabBarContainer = styled.div`
+  overflow: scroll;
+  height: 40px;
   background-color: ${({ theme }) => theme.colors.white};
-  padding-left: 20px;
+  padding-left: 16px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 
@@ -47,13 +49,8 @@ const MobileChildrenContainer = styled.div`
   margin: 20px 16px 0;
 `
 
-const PaginationLoaderContainer = styled.div<{ isShowPagination?: boolean }>`
-  height: auto;
-`
-
 const Body = (props: IProps) => {
   const {
-    isShowPagination,
     paginationId,
     totalPages,
     onPageChange,
@@ -65,27 +62,23 @@ const Body = (props: IProps) => {
   return (
     <>
       {props.children}
-      <PaginationLoaderContainer isShowPagination={isShowPagination}>
-        {noContent && !loading && (
-          <NoResultText id="no-record">{props.noResultText}</NoResultText>
+      {noContent && (
+        <NoResultText id="no-record">{props.noResultText}</NoResultText>
+      )}
+      <Stack>
+        {paginationId && totalPages && onPageChange && isOnline && (
+          <Pagination
+            currentPage={paginationId}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
         )}
-        {isShowPagination &&
-          paginationId &&
-          totalPages &&
-          onPageChange &&
-          isOnline && (
-            <Pagination
-              currentPage={paginationId}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
-          )}
         <LoadingIndicator
           loading={loading ? true : false}
           hasError={error ? true : false}
           noDeclaration={noContent}
         />
-      </PaginationLoaderContainer>
+      </Stack>
     </>
   )
 }

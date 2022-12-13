@@ -12,6 +12,8 @@
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Content } from '@opencrvs/components/lib/Content'
+import { Summary } from '@opencrvs/components/lib/Summary'
+import { Button } from '@opencrvs/components/lib/Button'
 import { Currency } from '@opencrvs/components/lib/Currency'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
@@ -43,34 +45,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
-const Action = styled.div`
-  margin-top: 32px;
-`
-
-const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bold18};
-  margin-right: 2px;
-`
-const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.reg18};
-`
-
-function LabelValue({
-  id,
-  label,
-  value
-}: {
-  id: string
-  label: string
-  value: React.ReactNode | string
-}) {
-  return (
-    <div id={id}>
-      <StyledLabel>{label}</StyledLabel>
-      <StyledValue>{value}</StyledValue>
-    </div>
-  )
-}
 interface IProps {
   event: Event
   registrationId: string
@@ -164,33 +138,40 @@ class PaymentComponent extends React.Component<IFullProps> {
           hideBackground
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
-          <Content title={intl.formatMessage(messages.payment)}>
-            <LabelValue
-              id="service"
-              label={intl.formatMessage(messages.receiptService)}
-              value={serviceMessage}
-            />
-            <LabelValue
-              id="amountDue"
-              label={intl.formatMessage(messages.amountDue)}
-              value={
-                <Currency
-                  value={paymentAmount}
-                  currency={offlineCountryConfig.config.CURRENCY.isoCode}
-                  languagesAndCountry={
-                    offlineCountryConfig.config.CURRENCY.languagesAndCountry[0]
-                  }
-                />
-              }
-            />
-            <Action>
-              <PrimaryButton
+          <Content
+            title={intl.formatMessage(messages.payment)}
+            bottomActionButtons={[
+              <Button
                 id="Continue"
+                type="primary"
+                size="large"
                 onClick={() => this.continue(paymentAmount.toString())}
               >
                 {intl.formatMessage(buttonMessages.continueButton)}
-              </PrimaryButton>
-            </Action>
+              </Button>
+            ]}
+          >
+            <Summary>
+              <Summary.Row
+                id="service"
+                label={intl.formatMessage(messages.receiptService)}
+                value={serviceMessage}
+              />
+              <Summary.Row
+                id="amountDue"
+                label={intl.formatMessage(messages.amountDue)}
+                value={
+                  <Currency
+                    value={paymentAmount}
+                    currency={offlineCountryConfig.config.CURRENCY.isoCode}
+                    languagesAndCountry={
+                      offlineCountryConfig.config.CURRENCY
+                        .languagesAndCountry[0]
+                    }
+                  />
+                }
+              />
+            </Summary>
           </Content>
         </ActionPageLight>
       </>

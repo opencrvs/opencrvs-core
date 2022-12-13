@@ -275,34 +275,34 @@ class ReadyForReviewComponent extends React.Component<
       return [
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 30,
+          width: 40,
           key: COLUMNS.ICON_WITH_NAME,
           sortFunction: this.onColumnClick,
           isSorted: this.state.sortedCol === COLUMNS.NAME
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.event),
-          width: 16,
+          width: 15,
           key: COLUMNS.EVENT,
           sortFunction: this.onColumnClick,
           isSorted: this.state.sortedCol === COLUMNS.EVENT
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 18,
+          width: 15,
           key: COLUMNS.DATE_OF_EVENT,
           sortFunction: this.onColumnClick,
           isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.sentForReview),
-          width: 18,
+          width: 15,
           key: COLUMNS.SENT_FOR_REVIEW,
           sortFunction: this.onColumnClick,
           isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_REVIEW
         },
         {
-          width: 18,
+          width: 15,
           key: COLUMNS.ACTIONS,
           isActionColumn: true,
           alignment: ColumnContentAlignment.RIGHT
@@ -330,21 +330,16 @@ class ReadyForReviewComponent extends React.Component<
     const { data } = queryData
     const totalPages = this.props.queryData.data.totalItems
       ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
-      : 0
-    const isShowPagination =
-      this.props.queryData.data.totalItems &&
-      this.props.queryData.data.totalItems > pageSize
-        ? true
-        : false
+      : 1
+
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.readyForReview)}
         isMobileSize={
           this.state.width < this.props.theme.grid.breakpoints.lg ? true : false
         }
-        isShowPagination={isShowPagination}
         paginationId={paginationId}
-        totalPages={totalPages}
+        totalPages={totalPages || 1}
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
@@ -363,7 +358,6 @@ class ReadyForReviewComponent extends React.Component<
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>
     )

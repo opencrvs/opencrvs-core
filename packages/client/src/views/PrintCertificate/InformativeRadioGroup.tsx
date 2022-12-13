@@ -23,6 +23,7 @@ import { ParentDetails } from '@client/views/PrintCertificate/ParentDetails'
 import styled from '@client/styledComponents'
 
 const RadioGroupWrapper = styled.div`
+  padding: 0px 24px;
   > div > span {
     display: block !important;
   }

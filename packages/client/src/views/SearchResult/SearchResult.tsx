@@ -162,7 +162,6 @@ export class SearchResultView extends React.Component<
   ISearchResultState
 > {
   pageSize = 10
-  showPaginated = false
   constructor(props: ISearchResultProps) {
     super(props)
     this.state = {

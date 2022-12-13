@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { FormTabs, IFormTabs } from './FormTabs'
 
 export default {
-  title: 'Controls/Tabs',
+  title: 'Controls/ ',
   component: FormTabs,
   parameters: {
     docs: {

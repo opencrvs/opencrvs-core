@@ -98,6 +98,14 @@ const bold12 = `
   line-height: 140%;
 `
 
+const bold12Cap = `
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 140%;
+  text-transform: uppercase;
+  `
+
 export const fonts = {
   hero,
   h1,
@@ -108,6 +116,7 @@ export const fonts = {
   bold16,
   bold14,
   bold12,
+  bold12Cap,
   reg18,
   reg16,
   reg14,

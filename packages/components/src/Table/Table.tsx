@@ -24,37 +24,29 @@ const Wrapper = styled.div<{
 }>`
   ${({ fixedWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
-
   @media (max-width: ${({ fixedWidth }) => fixedWidth}px) {
     width: 100%;
   }
   background: ${({ theme }) => theme.colors.white};
 `
+
 const TableHeader = styled.div<{
   totalWidth?: number
   fixedWidth?: number
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
-  background: ${({ theme }) => theme.colors.grey100};
-  padding: 10px 0px;
+  height: 40px;
+  padding: 0 24px;
   display: flex;
-  align-items: top;
+  align-items: center;
+  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  border-radius: 2px 2px 0 0;
-
-  & span:first-child {
-    padding-left: 8px;
-  }
-
-  & span:last-child {
-    padding-right: 8px;
-  }
 `
 
 const TableHeaderText = styled.div`
-  ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.grey600};
+  color: ${({ theme }) => theme.colors.grey400};
+  ${({ theme }) => theme.fonts.bold12Cap};
 `
 
 const TableBody = styled.div<{
@@ -70,32 +62,21 @@ const TableBody = styled.div<{
   & div:last-of-type {
     ${({ footerColumns }) => (footerColumns ? 'border-bottom: none;' : '')};
   }
-  & span:first-child {
-    padding-left: 8px;
-  }
-
-  & span:last-child {
-    padding-right: 8px;
-  }
 `
 const RowWrapper = styled.div<{
   totalWidth: number
-  highlight?: boolean
   height?: IBreakpoint
   horizontalPadding?: IBreakpoint
-  hideTableBottomBorder?: boolean
   columns: IColumn[]
 }>`
   display: flex;
   width: 100%;
   min-height: 48px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  align-items: center;
+  padding: 0 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-
-  &:last-child {
-    ${({ hideTableBottomBorder }) =>
-      hideTableBottomBorder && `border-bottom: 0`};
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.grey100};
   }
 
   ${({ height }) => height && `min-height: ${height.lg}px;`};
@@ -119,12 +100,6 @@ const TableFooter = styled(RowWrapper)<{
     color: ${({ theme }) => theme.colors.copy};
     ${({ theme }) => theme.fonts.bold14};
   }
-  & span:first-child {
-    padding-left: 8px;
-  }
-  & span:last-child {
-    padding-right: 8px;
-  }
 `
 
 const ContentWrapper = styled.span<{
@@ -139,7 +114,6 @@ const ContentWrapper = styled.span<{
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
   color: ${({ theme }) => theme.colors.tertiary};
-  padding: 0 4px;
 `
 const ValueWrapper = styled.span<{
   width: number
@@ -149,11 +123,9 @@ const ValueWrapper = styled.span<{
 }>`
   width: ${({ width, totalWidth }) =>
     totalWidth > 100 ? (width * 100) / totalWidth : width}%;
-
   justify-content: ${({ alignment }) =>
     alignment === ColumnContentAlignment.RIGHT ? 'flex-end' : 'flex-start'};
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
-  padding: 0 4px;
   align-self: center;
   ${({ color }) => color && `color: ${color};`}
 `
@@ -161,9 +133,12 @@ const Error = styled.span`
   color: ${({ theme }) => theme.colors.negative};
 `
 const ErrorText = styled.div<{ isFullPage?: boolean }>`
-  ${({ theme }) => theme.fonts.h3};
-  text-align: left;
-  margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  ${({ theme }) => theme.fonts.bold16};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   color: ${({ theme }) => theme.colors.copy};
 `
 export const LoadingTableGrey = styled.span<{
@@ -179,7 +154,6 @@ const TableScrollerHorizontal = styled.div<{
 }>`
   ${({ disableScrollOnOverflow }) =>
     !disableScrollOnOverflow && `overflow: auto`};
-  padding-bottom: 8px;
   &::-webkit-scrollbar {
     border-radius: 8px;
     width: 8px;
@@ -189,7 +163,7 @@ const TableScrollerHorizontal = styled.div<{
 
   &::-webkit-scrollbar-thumb {
     border-radius: 8px;
-    background: ${({ theme }) => theme.colors.grey400};
+    background: ${({ theme }) => theme.colors.grey300};
   }
 `
 const TableScroller = styled.div<{
@@ -200,12 +174,6 @@ const TableScroller = styled.div<{
   fixedWidth: number | undefined
 }>`
   display: block;
-  max-height: ${({ height, isFullPage, offsetTop }) =>
-    isFullPage
-      ? `calc(100vh - ${offsetTop}px - 180px)`
-      : height
-      ? `${height}px`
-      : 'auto'};
 
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth
@@ -365,40 +333,38 @@ export class Table extends React.Component<ITableProps, ITableState> {
             <TableScrollerHorizontal
               disableScrollOnOverflow={this.props.disableScrollOnOverflow}
             >
-              {!hideTableHeader && content.length > 0 && (
-                <TableHeaderWrapper>
-                  <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
-                    {columns.map((preference, index) => (
-                      <ContentWrapper
-                        key={index}
-                        id={`${preference.key}-label`}
-                        width={preference.width}
-                        totalWidth={totalWidth}
-                        alignment={preference.alignment}
-                        sortable={preference.isSortable}
-                        onClick={() =>
-                          preference.isSortable &&
-                          preference.sortFunction &&
-                          this.invertSortIcon(preference.key) &&
-                          preference.sortFunction(preference.key)
-                        }
-                      >
-                        <TableHeaderText>
-                          {preference.label}
-                          <ToggleSortIcon
-                            toggle={
-                              this.state.sortIconInverted &&
-                              this.state.sortKey === preference.key
-                            }
-                          >
-                            {preference.icon}
-                          </ToggleSortIcon>
-                        </TableHeaderText>
-                      </ContentWrapper>
-                    ))}
-                  </TableHeader>
-                </TableHeaderWrapper>
-              )}
+              <TableHeaderWrapper>
+                <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
+                  {columns.map((preference, index) => (
+                    <ContentWrapper
+                      key={index}
+                      id={`${preference.key}-label`}
+                      width={preference.width}
+                      totalWidth={totalWidth}
+                      alignment={preference.alignment}
+                      sortable={preference.isSortable}
+                      onClick={() =>
+                        preference.isSortable &&
+                        preference.sortFunction &&
+                        this.invertSortIcon(preference.key) &&
+                        preference.sortFunction(preference.key)
+                      }
+                    >
+                      <TableHeaderText>
+                        {preference.label}
+                        <ToggleSortIcon
+                          toggle={
+                            this.state.sortIconInverted &&
+                            this.state.sortKey === preference.key
+                          }
+                        >
+                          {preference.icon}
+                        </ToggleSortIcon>
+                      </TableHeaderText>
+                    </ContentWrapper>
+                  ))}
+                </TableHeader>
+              </TableHeaderWrapper>
               <TableScroller
                 height={tableHeight}
                 isFullPage={isFullPage}
@@ -419,10 +385,8 @@ export class Table extends React.Component<ITableProps, ITableState> {
                           id={'row_' + index}
                           key={index}
                           totalWidth={totalWidth}
-                          highlight={highlightRowOnMouseOver}
                           height={rowStyle?.height}
                           horizontalPadding={rowStyle?.horizontalPadding}
-                          hideTableBottomBorder={hideTableBottomBorder}
                           columns={columns}
                         >
                           {columns.map((preference, indx) => {
@@ -496,10 +460,10 @@ export class Table extends React.Component<ITableProps, ITableState> {
             </TableHeader>
           </LoadingContainer>
         )}
-        {totalItems > pageSize && !noPagination && (
+        {!noPagination && (
           <Pagination
             currentPage={currentPage}
-            totalPages={Math.ceil(totalItems / pageSize)}
+            totalPages={Math.ceil(totalItems / pageSize) || 1}
             onPageChange={this.onPageChange}
           />
         )}

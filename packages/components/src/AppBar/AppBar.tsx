@@ -44,6 +44,7 @@ const Actions = styled.div<{ $flex?: '1' | 'none' }>`
   flex-direction: row;
   align-items: center;
   justify-content: right;
+  gap: 12px;
   flex: ${({ $flex }) => $flex ?? '1'};
 `
 const Title = styled(Text)`

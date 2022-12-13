@@ -13,7 +13,10 @@ import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { grid } from '../grid'
 import { IDynamicValues, IColumn, IActionObject } from './types'
-import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
+import {
+  WorkqueueRowDesktop,
+  ContentWrapper
+} from './components/WorkqueueRowDesktop'
 import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
 import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
@@ -24,48 +27,32 @@ const Wrapper = styled.div`
   width: 100%;
 `
 const TableHeader = styled.div`
-  color: ${({ theme }) => theme.colors.grey600};
-  background-color: ${({ theme }) => theme.colors.grey100};
-  ${({ theme }) => theme.fonts.bold14};
-  height: 36px;
+  height: 40px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 24px;
+  color: ${({ theme }) => theme.colors.grey400};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  ${({ theme }) => theme.fonts.bold12Cap};
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 
 export const NoResultText = styled.div`
+  height: 56px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bold16}
-  text-align: left;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 50%;
-    text-align: center;
+    justify-content: center;
+    border-bottom: none;
   }
 `
-
-const ContentWrapper = styled.span<{
-  width: number
-  alignment?: string
-  color?: string
-  paddingRight?: number | null
-}>`
-  width: ${({ width }) => width}%;
-  display: inline-block;
-  text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
-  padding-right: ${({ paddingRight }) => (paddingRight ? paddingRight : 10)}px;
-  ${({ color }) => color && `color: ${color};`}
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
-
 const ColumnContainer = styled.div<{
   width: number
   clickable: boolean
@@ -73,18 +60,6 @@ const ColumnContainer = styled.div<{
   width: ${({ width }) => width}%;
   display: flex;
   ${({ clickable }) => clickable && `cursor: pointer;`}
-`
-
-const ColumnTitleWrapper = styled.div<{ alignment?: string }>`
-  align-self: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
-  width: 100%;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-`
-
-const ActionWrapper = styled(ContentWrapper)`
-  padding-right: 0px;
 `
 
 export enum ColumnContentAlignment {
@@ -114,6 +89,15 @@ export enum SORT_ORDER {
   DESCENDING = 'desc'
 }
 
+const ColumnTitle = styled.div<{ alignment?: string }>`
+  justify-content: ${({ alignment }) =>
+    alignment ? alignment.toString() : 'flex-start'};
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`
+
 interface IComponentWithTheme {
   theme: ITheme
 }
@@ -133,8 +117,6 @@ interface IWorkqueueProps extends IComponentWithTheme {
   clickable?: boolean
   /** Sets the direction of the sort icon */
   sortOrder?: SORT_ORDER
-  /** Adds `border-bottom: 0` on desktop */
-  hideLastBorder?: boolean
 }
 
 interface IWorkqueueState {
@@ -172,9 +154,9 @@ export class WorkqueueComp extends React.Component<
     alignment?: ColumnContentAlignment
   ) => {
     return (
-      <ActionWrapper key={idKey} width={width} alignment={alignment}>
+      <ContentWrapper key={idKey} width={width}>
         <ListItemAction id={`ListItemAction-${key}`} actions={actions} />
-      </ActionWrapper>
+      </ContentWrapper>
     )
   }
 
@@ -189,7 +171,7 @@ export class WorkqueueComp extends React.Component<
     const isMobileView = this.state.width < this.props.theme.grid.breakpoints.lg
     return (
       <Wrapper>
-        {content.length > 0 && width > grid.breakpoints.lg && !hideTableHeader && (
+        {width > grid.breakpoints.lg && !hideTableHeader && (
           <TableHeader>
             {columns.map((preference, index) => (
               <ColumnContainer
@@ -202,7 +184,7 @@ export class WorkqueueComp extends React.Component<
                 }
                 clickable={Boolean(preference.sortFunction)}
               >
-                <ColumnTitleWrapper>
+                <ColumnTitle>
                   {preference.label && preference.label}
                   {preference.sortFunction && (
                     <SortIcon
@@ -210,7 +192,7 @@ export class WorkqueueComp extends React.Component<
                       isDescending={sortOrder === SORT_ORDER.DESCENDING}
                     />
                   )}
-                </ColumnTitleWrapper>
+                </ColumnTitle>
               </ColumnContainer>
             ))}
           </TableHeader>
@@ -222,7 +204,6 @@ export class WorkqueueComp extends React.Component<
             clickable={this.props.clickable}
             getRowClickHandler={this.getRowClickHandler}
             renderActionBlock={this.renderActionBlock}
-            hideLastBorder={this.props.hideLastBorder}
           />
         ) : (
           <WorkqueueRowMobile

@@ -18,7 +18,7 @@ import {
   userMessages as messages
 } from '@client/i18n/messages'
 import { Navigation } from '@client/components/interface/Navigation'
-import { Content } from '@opencrvs/components/lib/Content'
+import { Content, ContentBody } from '@opencrvs/components/lib/Content'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   Name,
@@ -42,17 +42,19 @@ export function SettingsPage() {
     >
       <Content
         title={intl.formatMessage(messages.settingsTitle)}
-        showTitleOnMobile={true}
+        hideHeaderMobile={true}
       >
-        <ListViewSimplified>
-          <Name />
-          <PhoneNumber />
-          <Role />
-          <Language />
-          <Password />
-          <PIN />
-          <ProfileImage />
-        </ListViewSimplified>
+        <ContentBody>
+          <ListViewSimplified>
+            <Name />
+            <PhoneNumber />
+            <Role />
+            <Language />
+            <Password />
+            <PIN />
+            <ProfileImage />
+          </ListViewSimplified>
+        </ContentBody>
       </Content>
     </Frame>
   )

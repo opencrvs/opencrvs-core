@@ -43,14 +43,10 @@ import {
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
 import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
-import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowBack,
-  BackArrowDeepBlue,
-  ForwardArrowDeepBlue,
   BRN,
   Phone,
-  Plus,
   SearchDark,
   TrackingID,
   User,
@@ -76,6 +72,8 @@ import {
   REGISTRAR_HOME,
   TEAM_USER_LIST
 } from '@client/navigation/routes'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 type IStateProps = {
   userDetails: IUserDetails | null
@@ -130,24 +128,6 @@ enum ACTIVE_MENU_ITEM {
   APPLICATION,
   FORM
 }
-
-const StyledPrimaryButton = styled(PrimaryButton)`
-  width: 40px;
-  height: 40px;
-  border-radius: 100%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-  &:hover {
-    background: ${({ theme }) => theme.colors.primaryDark};
-  }
-  &:focus {
-    background: ${({ theme }) => theme.colors.yellow};
-  }
-  &:active {
-    background: ${({ theme }) => theme.colors.primaryDark};
-  }
-`
 
 const Search = styled(SearchTool)`
   position: static;
@@ -460,26 +440,33 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   arrowNavigator() {
     return (
       <HeaderLeft>
-        <CircleButton
+        <Button
           id="header-go-back-button"
           disabled={
             (this.props.history.action === 'POP' ||
               this.props.history.action === 'REPLACE') &&
             this.isLandingPage()
           }
+          type="icon"
+          size="medium"
+          aria-label="Go back"
           onClick={() => this.props.goBack()}
         >
-          <BackArrowDeepBlue />
-        </CircleButton>
-        <CircleButton
+          <Icon color="currentColor" name="ArrowLeft" size="medium" />
+        </Button>
+        <Button
+          id="header-go-back-button"
           disabled={
             this.props.history.action === 'PUSH' ||
             this.props.history.action === 'REPLACE'
           }
+          type="icon"
+          size="medium"
+          aria-label="Go forward"
           onClick={() => this.props.goForward()}
         >
-          <ForwardArrowDeepBlue />
-        </CircleButton>
+          <Icon color="currentColor" name="ArrowRight" size="medium" />
+        </Button>
       </HeaderLeft>
     )
   }
@@ -516,13 +503,16 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
             ) && (
               <HeaderCenter>
-                <StyledPrimaryButton
+                <Button
                   key="newEvent"
                   id="header_new_event"
+                  type="iconSolid"
+                  size="medium"
+                  aria-label="Create new declaration"
                   onClick={this.props.goToEvents}
-                  icon={() => <Plus />}
-                />
-
+                >
+                  <Icon color="currentColor" name="Plus" size="medium" />
+                </Button>
                 {this.renderSearchInput(this.props)}
               </HeaderCenter>
             )}
@@ -606,8 +596,7 @@ export const Header = connect(
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`
-  margin-left: 249px;
-
+  margin-left: 282px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 0;
   }

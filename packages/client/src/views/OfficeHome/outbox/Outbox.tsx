@@ -271,7 +271,7 @@ export function Outbox() {
         ]
       : [
           {
-            width: 25,
+            width: 40,
             label: intl.formatMessage(constantsMessages.record),
             key: COLUMNS.ICON_WITH_NAME,
             isSorted: sortedColumn === COLUMNS.NAME,
@@ -279,28 +279,26 @@ export function Outbox() {
           },
           {
             label: intl.formatMessage(constantsMessages.event),
-            width: 25,
+            width: 20,
             key: COLUMNS.EVENT,
             isSorted: sortedColumn === COLUMNS.EVENT,
             sortFunction: onColumnClick
           },
           {
             label: intl.formatMessage(constantsMessages.eventDate),
-            width: 25,
+            width: 20,
             key: COLUMNS.DATE_OF_EVENT,
             isSorted: sortedColumn === COLUMNS.DATE_OF_EVENT,
             sortFunction: onColumnClick
           },
           {
-            label: '',
-            width: 21,
+            label: intl.formatMessage(constantsMessages.status),
+            width: 15,
             key: 'submissionStatus',
-            alignment: ColumnContentAlignment.RIGHT,
             color: theme.colors.supportingCopy
           },
           {
-            label: '',
-            width: 4,
+            width: 5,
             key: 'statusIndicator',
             isActionColumn: true
           }
@@ -316,7 +314,6 @@ export function Outbox() {
         content={transformDeclarationsReadyToSend()}
         columns={getColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResultsOutbox)}
-        hideLastBorder={true}
         sortOrder={sortOrder}
       />
     </WQContentWrapper>

@@ -23,6 +23,8 @@ type ButtonType =
   | 'positive'
   | 'negative'
   | 'icon'
+  | 'iconSolid'
+
 type ButtonModifier = 'disabled' | 'loading'
 
 interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
@@ -32,6 +34,8 @@ interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
   element?: 'a' | 'button'
   /** Button type */
   type: ButtonType
+  /** Shadow backdrop */
+  shadow?: boolean
 }
 
 export type ButtonProps = ButtonCustomization & {
@@ -59,6 +63,8 @@ const StyledButton = styled.button.withConfig({
   ${(props) => props.variant === 'positive' && styles.positive}
   ${(props) => props.variant === 'negative' && styles.negative}
   ${(props) => props.variant === 'icon' && styles.icon}
+  ${(props) => props.variant === 'iconSolid' && styles.iconSolid}
+
 
   ${(props) => props.loading && styles.loading}
   ${(props) => props.disabled && styles.disabled}
@@ -69,6 +75,7 @@ export const Button = ({
   element = 'button',
   type,
   loading,
+  shadow,
   children,
   ...props
 }: ButtonProps) => {
@@ -77,6 +84,7 @@ export const Button = ({
       size={size}
       variant={type}
       loading={loading}
+      shadow={shadow}
       as={element}
       {...props}
     >

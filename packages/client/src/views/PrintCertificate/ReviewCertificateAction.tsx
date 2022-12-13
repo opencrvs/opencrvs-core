@@ -9,15 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  PrimaryButton,
-  SuccessButton,
-  DangerButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Check } from '@opencrvs/components/lib/icons'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Content } from '@opencrvs/components/lib/Content'
-
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { compact } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
@@ -71,16 +67,6 @@ const CustomTertiaryButton = styled(TertiaryButton)`
   &:disabled {
     background: ${({ theme }) => theme.colors.white};
     color: ${({ theme }) => theme.colors.grey300};
-  }
-`
-const ButtonWrapper = styled.div`
-  display: flex;
-
-  button {
-    margin-right: 10px;
-  }
-  button:last-child {
-    margin-right: 0px;
   }
 `
 const PdfWrapper = styled.div`
@@ -264,21 +250,28 @@ class ReviewCertificateActionComponent extends React.Component<
         goBack={this.goBack}
         goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
+        {this.state.certificatePdf && (
+          <PdfWrapper id="pdfwrapper">
+            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
+          </PdfWrapper>
+        )}
         <Content
           title={this.getTitle()}
           subtitle={intl.formatMessage(certificateMessages.reviewDescription)}
-        >
-          <ButtonWrapper>
-            <SuccessButton
-              align={0}
+          bottomActionButtons={compact([
+            <Button
               id="confirm-print"
+              type="positive"
+              size="large"
               onClick={this.toggleModal}
-              icon={() => <Check />}
             >
+              <Icon color="currentColor" name="Check" size="large" />
               {intl.formatMessage(certificateMessages.confirmAndPrint)}
-            </SuccessButton>
-            {hasRegisterScope(scope) && (
-              <DangerButton
+            </Button>,
+            hasRegisterScope(scope) && (
+              <Button
+                type="negative"
+                size="large"
                 onClick={() =>
                   this.props.goToCertificateCorrection(
                     this.props.registrationId,
@@ -286,16 +279,12 @@ class ReviewCertificateActionComponent extends React.Component<
                   )
                 }
               >
+                <Icon color="currentColor" name="X" size="large" />
                 {intl.formatMessage(buttonMessages.editRecord)}
-              </DangerButton>
-            )}
-          </ButtonWrapper>
-        </Content>
-        {this.state.certificatePdf && (
-          <PdfWrapper id="pdfwrapper">
-            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
-          </PdfWrapper>
-        )}
+              </Button>
+            )
+          ])}
+        ></Content>
 
         <ResponsiveModal
           id="confirm-print-modal"

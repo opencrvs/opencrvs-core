@@ -12,19 +12,16 @@
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import { Content } from '@opencrvs/components/lib/Content'
-import {
-  SuccessButton,
-  DangerButton,
-  ICON_ALIGNMENT,
-  TertiaryButton,
-  PrimaryButton
-} from '@opencrvs/components/lib/buttons'
-import { Check, Cross } from '@opencrvs/components/lib/icons'
+import { Summary } from '@opencrvs/components/lib/Summary'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Icon } from '@opencrvs/components/lib/Icon'
+
+import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages, countryMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { identityNameMapper } from '@client/forms/identity'
-import { LabelValuePair } from '@opencrvs/components/lib/ViewData'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { formatLongDate } from '@client/utils/date-formatting'
 
@@ -48,35 +45,12 @@ export interface ICollectorInfo {
   nationality: string
 }
 
-const Container = styled.div`
-  z-index: 1;
-  position: relative;
-  white-space: pre-wrap;
-  color: ${({ theme }) => theme.colors.copy};
-  @media (max-width: 768px) {
-    padding: 0px;
-  }
-`
-
 interface IIDVerifierProps {
   id?: string
   title: string
   collectorInformation: ICollectorInfo
   actionProps: IVerifierActionProps
 }
-
-const ActionContainer = styled.div`
-  flex-flow: row wrap;
-  margin-top: 24px;
-
-  & > button {
-    margin: 0 8px 8px 0;
-  }
-
-  & > button:last-child {
-    margin-right: 0;
-  }
-`
 
 interface IIDVerifierState {
   showPrompt: boolean
@@ -98,7 +72,7 @@ class IDVerifierComponent extends React.Component<
     return (
       <>
         {collectorInformation.iD && (
-          <LabelValuePair
+          <Summary.Row
             label={intl.formatMessage(constantsMessages.id)}
             value={
               intl.formatMessage(
@@ -110,19 +84,19 @@ class IDVerifierComponent extends React.Component<
           />
         )}
         {collectorInformation.firstNames && (
-          <LabelValuePair
+          <Summary.Row
             label={intl.formatMessage(certificateMessages.firstName)}
             value={String(collectorInformation.firstNames)}
           />
         )}
 
-        <LabelValuePair
+        <Summary.Row
           label={intl.formatMessage(certificateMessages.familyName)}
           value={String(collectorInformation.familyName)}
         />
 
         {collectorInformation.birthDate && (
-          <LabelValuePair
+          <Summary.Row
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
             value={formatLongDate(
               collectorInformation.birthDate as string,
@@ -132,7 +106,7 @@ class IDVerifierComponent extends React.Component<
         )}
 
         {collectorInformation.nationality && (
-          <LabelValuePair
+          <Summary.Row
             label={intl.formatMessage(certificateMessages.nationality)}
             value={intl.formatMessage(
               countryMessages[collectorInformation.nationality as string]
@@ -150,26 +124,30 @@ class IDVerifierComponent extends React.Component<
 
     return (
       <div id={id}>
-        <Content title={this.props.title}>
-          <Container>{this.renderLabelValue()}</Container>
-          <ActionContainer>
-            <SuccessButton
+        <Content
+          title={this.props.title}
+          bottomActionButtons={[
+            <Button
               id="verifyPositive"
+              type="positive"
+              size="large"
               onClick={positiveAction.handler}
-              icon={() => <Check />}
-              align={ICON_ALIGNMENT.LEFT}
             >
+              <Icon color="currentColor" name="Check" size="large" />
               {positiveAction.label}
-            </SuccessButton>
-            <DangerButton
+            </Button>,
+            <Button
               id="verifyNegative"
+              type="negative"
+              size="large"
               onClick={this.togglePrompt}
-              icon={() => <Cross color="currentColor" />}
-              align={ICON_ALIGNMENT.LEFT}
             >
+              <Icon color="currentColor" name="X" size="large" />
               {negativeAction.label}
-            </DangerButton>
-          </ActionContainer>
+            </Button>
+          ]}
+        >
+          <Summary>{this.renderLabelValue()}</Summary>
         </Content>
 
         <ResponsiveModal

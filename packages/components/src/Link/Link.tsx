@@ -35,25 +35,22 @@ const StyledLink = styled.button<{ $font: IFont; $color: IColor }>`
   background: transparent;
   text-decoration: none;
   display: inline;
-  text-overflow: ellipsis;
-  overflow: hidden;
+  text-align: left;
+  white-space: normal;
   max-width: 100%;
 
   &:hover,
   &:active {
     text-decoration: underline;
     text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
   }
 
   &:focus-visible {
     background: ${({ theme }) => theme.colors.yellow};
-    box-shadow: 0 -2px ${({ theme }) => theme.colors.yellow},
-      0px 2px ${({ theme }) => theme.colors.yellow},
-      0 4px ${({ theme }) => theme.colors.copy};
     color: ${({ theme }) => theme.colors.grey600};
     outline: none;
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
   }
 
   &:disabled {

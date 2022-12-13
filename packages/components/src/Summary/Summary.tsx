@@ -16,6 +16,7 @@ import styled from 'styled-components'
 
 const SummaryTable = styled.table`
   width: 100%;
+  padding: 0 24px;
   border-spacing: 0 16px;
 `
 
