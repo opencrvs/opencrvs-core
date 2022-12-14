@@ -1419,7 +1419,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    this.setState({ previewImage: previewImage as IFileValue })
+    const previewImageTransformed = { ...previewImage }
+    previewImageTransformed.data = isBase64FileString(
+      previewImageTransformed.data
+    )
+      ? previewImageTransformed.data
+      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
+
+    this.setState({ previewImage: previewImageTransformed as IFileValue })
   }
 
   closePreviewSection = (callBack?: () => void) => {
