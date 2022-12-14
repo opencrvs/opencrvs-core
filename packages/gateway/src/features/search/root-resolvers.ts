@@ -111,7 +111,6 @@ export const resolvers: GQLResolver = {
           {},
           authHeader
         )
-
         if (getTotalRequest.total >= system.settings.dailyQuota) {
           return await Promise.reject(new Error('Daily search quota exceeded'))
         }
