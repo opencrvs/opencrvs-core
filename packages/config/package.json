@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/config",
-  "version": "1.0.0-alpha.3.1",
+  "version": "1.2.0-beta",
   "description": "OpenCRVS public configuration microservice",
   "license": "MPL-2.0",
   "scripts": {
@@ -19,9 +19,10 @@
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.2.1",
-    "@opencrvs/commons": "^1.0.0-alpha.3.1",
+    "@opencrvs/commons": "^1.2.0-beta",
     "@types/hapi-pino": "^8.0.5",
     "@types/pino": "^6.3.12",
+    "fast-csv": "^4.3.6",
     "fp-ts": "^2.12.3",
     "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^8.5.0",
@@ -30,12 +31,14 @@
     "is-svg": "^4.3.2",
     "joi": "^17.5.0",
     "jsonwebtoken": "^8.3.0",
+    "jwt-decode": "^2.2.0",
     "mongoose": "^6.6.1",
     "pino": "^6.0.0",
     "tsconfig-paths": "^3.13.0"
   },
   "devDependencies": {
     "@types/boom": "^7.3.1",
+    "@types/jwt-decode": "^2.2.1",
     "mockingoose": "^2.15.2",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.0",

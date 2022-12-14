@@ -631,7 +631,7 @@ describe('OfficeHome sent for review tab related tests', () => {
           request: {
             query: REGISTRATION_HOME_QUERY,
             variables: {
-              locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               count: 10,
               reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
               inProgressSkip: 0,

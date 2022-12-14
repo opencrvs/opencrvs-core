@@ -12,38 +12,15 @@
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@search/logger'
 import { badRequest, internal } from '@hapi/boom'
-import {
-  searchComposition,
-  DEFAULT_SIZE,
-  advancedSearch
-} from '@search/features/search/service'
-import {
-  IAdvancedSearchParam,
-  ISearchQuery
-} from '@search/features/search/types'
-import { client, ISearchResponse } from '@search/elasticsearch/client'
+import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
+import { ISearchCriteria } from '@search/features/search/types'
+import { client } from '@search/elasticsearch/client'
 import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
-import { ApiResponse } from '@elastic/elasticsearch'
-import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
-import {
-  searchByCompositionId,
-  updateComposition
-} from '@search/elasticsearch/dbhelper'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-
-export async function searchDeclaration(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    const result = await searchComposition(request.payload as ISearchQuery)
-    return h.response(result).code(200)
-  } catch (error) {
-    logger.error(`Search/searchDeclarationHandler: error: ${error}`)
-    return internal(error)
-  }
-}
+import { getTokenPayload } from '@search/utils/authUtils'
+import { RouteScope } from '@search/config/routes'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -113,7 +90,7 @@ export async function getAllDocumentsHandler(
 }
 
 interface ICountQueryParam {
-  declarationLocationHirarchyId: string
+  declarationJurisdictionId: string
   status: string[]
   event?: string
 }
@@ -136,10 +113,10 @@ export async function getStatusWiseRegistrationCountHandler(
         }
       }
     ]
-    if (payload.declarationLocationHirarchyId) {
+    if (payload.declarationJurisdictionId) {
       matchRules.push({
         match: {
-          declarationLocationHirarchyIds: payload.declarationLocationHirarchyId
+          declarationJurisdictionIds: payload.declarationJurisdictionId
         }
       })
     }
@@ -193,103 +170,23 @@ export async function getStatusWiseRegistrationCountHandler(
   }
 }
 
-export async function populateHierarchicalLocationIdsHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    const updatedCompositionCounts = {
-      birth: 0,
-      death: 0
-    }
-    // Before retrieving all documents, we need to check the total count to make sure that the query will no tbe too large
-    // By performing the search, requesting only the first 10 in DEFAULT_SIZE we can get the total count
-    const resultCountCheck = await client.search(
-      {
-        index: OPENCRVS_INDEX_NAME,
-        body: {
-          query: {
-            bool: {
-              must_not: {
-                exists: {
-                  field: 'declarationLocationHirarchyIds'
-                }
-              }
-            }
-          },
-          size: DEFAULT_SIZE
-        }
-      },
-      {
-        ignore: [404]
-      }
-    )
-    const count: number = resultCountCheck.body.hits.total.value
-    if (count > 5000) {
-      return internal(
-        'Elastic contains over 5000 results.  It is risky to return all without pagination.'
-      )
-    }
-    // If total count is less than 5000, then proceed.
-    const allDocumentsWithoutHierarchicalLocations: ApiResponse<
-      ISearchResponse<ICompositionBody>
-    > = await client.search(
-      {
-        index: OPENCRVS_INDEX_NAME,
-        body: {
-          query: {
-            bool: {
-              must_not: {
-                exists: {
-                  field: 'declarationLocationHirarchyIds'
-                }
-              }
-            }
-          },
-          size: count
-        }
-      },
-      {
-        ignore: [404]
-      }
-    )
-    const compositions =
-      allDocumentsWithoutHierarchicalLocations?.body?.hits?.hits
-
-    for (const composition of compositions) {
-      const body: ICompositionBody = composition._source
-      if (body && body.declarationLocationId) {
-        body.declarationLocationHirarchyIds = await getLocationHirarchyIDs(
-          body.declarationLocationId
-        )
-        await updateComposition(composition._id, body)
-        if (
-          body.event &&
-          body.event.toLowerCase() === EVENT.DEATH.toLowerCase()
-        ) {
-          updatedCompositionCounts.death += 1
-        } else {
-          updatedCompositionCounts.birth += 1
-        }
-      }
-    }
-
-    return h.response(updatedCompositionCounts).code(200)
-  } catch (err) {
-    return internal(err)
-  }
-}
-
 export async function advancedRecordSearch(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const response = await advancedSearch(
-      request.payload as IAdvancedSearchParam
+    let isExternalSearch = false
+    const tokenPayload = getTokenPayload(request.headers.authorization)
+    if (tokenPayload.scope.includes(RouteScope.RECORD_SEARCH)) {
+      isExternalSearch = true
+    }
+    const result = await advancedSearch(
+      isExternalSearch,
+      request.payload as ISearchCriteria
     )
-    return h.response(response).code(200)
+    return h.response(result).code(200)
   } catch (err) {
+    logger.error(`Search/searchDeclarationHandler: error: ${err}`)
     return badRequest(err.message)
   }
 }

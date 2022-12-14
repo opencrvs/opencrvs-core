@@ -11,21 +11,18 @@
  */
 
 import React, { useState } from 'react'
-import { Header } from '@client/components/Header/Header'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { useIntl } from 'react-intl'
-import { Query } from '@client/components/Query'
+import { IntlShape, useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 import { GET_USER } from '@client/user/queries'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
@@ -45,10 +42,18 @@ import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { GetUserQuery, HumanName } from '@client/utils/gateway'
+import {
+  GetUserQuery,
+  GetUserQueryVariables,
+  HumanName
+} from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { getOfflineData } from '@client/offline/selectors'
+import { useQuery } from '@apollo/client'
+import { AppBar, Link } from '@opencrvs/components/lib'
+import { ProfileMenu } from '@client/components/ProfileMenu'
+import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -61,11 +66,46 @@ export const InformationTitle = styled.div`
   width: 320px;
 `
 
-const LinkButtonWithoutSpacing = styled(LinkButton)`
-  height: auto !important;
-`
 interface IRouteProps {
   userId: string
+}
+
+const transformUserQueryResult = (
+  userData: NonNullable<GetUserQuery['getUser']>,
+  intl: IntlShape
+) => {
+  const locale = intl.locale
+  return {
+    id: userData.id,
+    primaryOffice: {
+      id: (userData.primaryOffice && userData.primaryOffice.id) || '',
+      searchableText: '',
+      displayLabel:
+        (userData.primaryOffice &&
+          (locale === LANG_EN
+            ? userData.primaryOffice.name
+            : (userData.primaryOffice.alias &&
+                userData.primaryOffice.alias.join(' ')) ||
+              '')) ||
+        ''
+    },
+    name: createNamesMap(userData.name as HumanName[])[locale],
+    role: userData.role,
+    type: userData.type,
+    number: userData.mobile,
+    status: userData.status,
+    underInvestigation: userData.underInvestigation,
+    username: userData.username,
+    nid:
+      userData.identifier?.system === 'NATIONAL_ID'
+        ? userData.identifier.value
+        : EMPTY_STRING,
+    practitionerId: userData.practitionerId,
+    locationId:
+      getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) || '0',
+    avatar: userData.avatar || undefined,
+    device: userData.device
+  }
 }
 
 export const UserAudit = () => {
@@ -89,6 +129,13 @@ export const UserAudit = () => {
   const [toggleUsernameReminder, setToggleUsernameReminder] = useState(false)
   const [toggleResetPassword, setToggleResetPassword] = useState(false)
   const offLineData = useSelector(getOfflineData)
+  const { data, loading, error } = useQuery<
+    GetUserQuery,
+    GetUserQueryVariables
+  >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
+  const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
+  const userRole = user && getUserRole(user, intl)
+  const userType = user && getUserType(user, intl)
 
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
@@ -206,87 +253,18 @@ export const UserAudit = () => {
     return menuItems
   }
 
-  const transformUserQueryResult = (
-    userData: NonNullable<GetUserQuery['getUser']>
-  ) => {
-    const locale = intl.locale
-    return {
-      id: userData.id,
-      primaryOffice: {
-        id: (userData.primaryOffice && userData.primaryOffice.id) || '',
-        searchableText: '',
-        displayLabel:
-          (userData.primaryOffice &&
-            (locale === LANG_EN
-              ? userData.primaryOffice.name
-              : (userData.primaryOffice.alias &&
-                  userData.primaryOffice.alias.join(' ')) ||
-                '')) ||
-          ''
-      },
-      name: createNamesMap(userData.name as HumanName[])[locale],
-      role: userData.role,
-      type: userData.type,
-      number: userData.mobile,
-      status: userData.status,
-      underInvestigation: userData.underInvestigation,
-      username: userData.username,
-      nid:
-        userData.identifier?.system === 'NATIONAL_ID'
-          ? userData.identifier.value
-          : EMPTY_STRING,
-      practitionerId: userData.practitionerId,
-      locationId:
-        getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) ||
-        '0',
-      avatar: userData.avatar || undefined,
-      device: userData.device
-    }
-  }
-
   return (
     <Frame
       header={
-        <Header
-          title={intl.formatMessage(userSetupMessages.auditSectionTitle)}
-        />
-      }
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-      navigation={<Navigation />}
-    >
-      <Query<GetUserQuery>
-        query={GET_USER}
-        variables={{
-          userId
-        }}
-        fetchPolicy={'cache-and-network'}
-      >
-        {({ data: userQueryData, loading, error }) => {
-          if (loading) {
-            return <Loader id="user_loader" marginPercent={35} />
-          }
-
-          if (error) {
-            return <GenericErrorToast />
-          }
-
-          if (!userQueryData?.getUser) {
-            return <GenericErrorToast />
-          }
-
-          const user = transformUserQueryResult(userQueryData.getUser)
-          const userRole = getUserRole(user, intl)
-          const userType = getUserType(user, intl)
-          return (
-            <Content
-              title={user.name}
-              showTitleOnMobile={true}
-              icon={() => <UserAvatar name={user.name} avatar={user.avatar} />}
-              topActionButtons={[
-                <Status status={user.status || 'pending'} />,
-
+        <AppBar
+          mobileTitle={user?.name}
+          desktopLeft={<HistoryNavigator />}
+          desktopRight={<ProfileMenu key="profileMenu" />}
+          mobileLeft={<HistoryNavigator hideForward />}
+          mobileRight={
+            user && (
+              <>
+                <Status status={user.status || 'pending'} />
                 <ToggleMenu
                   id={`sub-page-header-munu-button`}
                   toggleButton={<VerticalThreeDots />}
@@ -296,205 +274,222 @@ export const UserAudit = () => {
                   )}
                   hide={(scope && !scope.includes('sysadmin')) || false}
                 />
-              ]}
-              size={ContentSize.LARGE}
-            >
-              <>
-                <Summary>
-                  <Summary.Row
-                    data-testid="office-link"
-                    label={intl.formatMessage(userSetupMessages.assignedOffice)}
-                    value={
-                      <LinkButtonWithoutSpacing
-                        id="office-link"
-                        onClick={() =>
-                          dispatch(goToTeamUserList(user.primaryOffice!.id))
-                        }
-                      >
-                        {user.primaryOffice && user.primaryOffice.displayLabel}
-                      </LinkButtonWithoutSpacing>
-                    }
-                  />
-                  <Summary.Row
-                    label={
-                      (userType &&
-                        intl.formatMessage(userSetupMessages.roleType)) ||
-                      intl.formatMessage(userFormMessages.labelRole)
-                    }
-                    value={
-                      (userType && `${userRole} / ${userType}`) || userRole
-                    }
-                  />
-                  <Summary.Row
-                    label={intl.formatMessage(userFormMessages.userDevice)}
-                    value={user.device === null ? 'N/A' : user.device}
-                  />
-                </Summary>
-
-                {user.practitionerId && (
-                  <UserAuditHistory
-                    practitionerId={user.practitionerId}
-                    practitionerName={user.name}
-                    loggedInUserRole={userDetails!.role}
-                  />
-                )}
               </>
-              <UserAuditActionModal
-                show={modalVisible}
-                user={userQueryData.getUser}
-                onClose={() => toggleUserActivationModal()}
-                onConfirmRefetchQueries={[
-                  {
-                    query: GET_USER,
-                    variables: {
-                      userId: userId
+            )
+          }
+        />
+      }
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+      navigation={<Navigation />}
+    >
+      {loading ? (
+        <Loader id="user_loader" marginPercent={35} />
+      ) : error || !user ? (
+        <GenericErrorToast />
+      ) : (
+        <Content
+          title={user.name}
+          icon={() => <UserAvatar name={user.name} avatar={user.avatar} />}
+          topActionButtons={[
+            <Status status={user.status || 'pending'} />,
+            <ToggleMenu
+              id={`sub-page-header-munu-button`}
+              toggleButton={<VerticalThreeDots />}
+              menuItems={getMenuItems(user.id as string, user.status as string)}
+              hide={(scope && !scope.includes('sysadmin')) || false}
+            />
+          ]}
+          size={ContentSize.LARGE}
+        >
+          <>
+            <Summary>
+              <Summary.Row
+                data-testid="office-link"
+                label={intl.formatMessage(userSetupMessages.assignedOffice)}
+                value={
+                  <Link
+                    id="office-link"
+                    onClick={() =>
+                      dispatch(goToTeamUserList(user.primaryOffice!.id))
                     }
-                  }
-                ]}
+                  >
+                    {user.primaryOffice && user.primaryOffice.displayLabel}
+                  </Link>
+                }
               />
-              <ResponsiveModal
-                id="username-reminder-modal"
-                show={toggleUsernameReminder}
-                handleClose={() => toggleUsernameReminderModal()}
-                title={intl.formatMessage(
-                  sysMessages.sendUsernameReminderSMSModalTitle
-                )}
-                actions={[
-                  <Button
-                    type="tertiary"
-                    id="username-reminder-cancel"
-                    key="username-reminusernameSMSReminderder-cancel"
-                    onClick={() => toggleUsernameReminderModal()}
-                  >
-                    {intl.formatMessage(buttonMessages.cancel)}
-                  </Button>,
-                  <Button
-                    type="primary"
-                    id="username-reminder-send"
-                    key="username-reminder-send"
-                    onClick={() => {
-                      if (toggleUsernameReminder) {
-                        usernameSMSReminder(userId)
-                      }
-                      toggleUsernameReminderModal()
-                    }}
-                  >
-                    {intl.formatMessage(buttonMessages.send)}
-                  </Button>
-                ]}
-                responsive={false}
-                autoHeight={true}
-              >
-                {intl.formatMessage(
-                  sysMessages.sendUsernameReminderSMSModalMessage,
-                  { phoneNumber: user.number }
-                )}
-              </ResponsiveModal>
-              <ResponsiveModal
-                id="user-reset-password-modal"
-                show={toggleResetPassword}
-                handleClose={() => toggleUserResetPasswordModal()}
-                title={intl.formatMessage(
-                  sysMessages.resetUserPasswordModalTitle
-                )}
-                actions={[
-                  <Button
-                    type="tertiary"
-                    id="reset-password-cancel"
-                    key="reset-password-cancel"
-                    onClick={() => toggleUserResetPasswordModal()}
-                  >
-                    {intl.formatMessage(buttonMessages.cancel)}
-                  </Button>,
-                  <Button
-                    type="primary"
-                    id="reset-password-send"
-                    key="reset-password-send"
-                    onClick={() => {
-                      if (toggleResetPassword) {
-                        resetPassword(userId)
-                      }
-                      toggleUserResetPasswordModal()
-                    }}
-                  >
-                    {intl.formatMessage(buttonMessages.send)}
-                  </Button>
-                ]}
-                responsive={false}
-                autoHeight={true}
-              >
-                {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
-                  phoneNumber: user.number ?? ''
-                })}
-              </ResponsiveModal>
-              {showResendSMSSuccess && (
-                <Toast
-                  id="resend_invite_success"
-                  type="success"
-                  onClose={() => setShowResendSMSSuccess(false)}
-                >
-                  {intl.formatMessage(sysMessages.resendSMSSuccess)}
-                </Toast>
-              )}
-              {showResendSMSError && (
-                <Toast
-                  id="resend_invite_error"
-                  type="error"
-                  onClose={() => setShowResendSMSError(false)}
-                >
-                  {intl.formatMessage(sysMessages.resendSMSError)}
-                </Toast>
-              )}
-              {showUsernameSMSReminderSuccess && (
-                <Toast
-                  id="username_reminder_success"
-                  type="success"
-                  onClose={() => setShowUsernameSMSReminderSuccess(false)}
-                >
-                  {intl.formatMessage(
-                    sysMessages.sendUsernameReminderSMSSuccess,
-                    {
-                      name: user.name
-                    }
-                  )}
-                </Toast>
-              )}
-              {showUsernameSMSReminderError && (
-                <Toast
-                  id="username_reminder_error"
-                  type="warning"
-                  onClose={() => setShowUsernameSMSReminderError(false)}
-                >
-                  {intl.formatMessage(sysMessages.sendUsernameReminderSMSError)}
-                </Toast>
-              )}
+              <Summary.Row
+                label={
+                  (userType &&
+                    intl.formatMessage(userSetupMessages.roleType)) ||
+                  intl.formatMessage(userFormMessages.labelRole)
+                }
+                value={(userType && `${userRole} / ${userType}`) || userRole}
+              />
+              <Summary.Row
+                label={intl.formatMessage(userFormMessages.userDevice)}
+                value={user.device === null ? 'N/A' : user.device}
+              />
+            </Summary>
 
-              {showResetPasswordSMSSuccess && (
-                <Toast
-                  id="reset_password_success"
-                  type="success"
-                  onClose={() => {
-                    setShowResetPasswordSMSSuccess(false)
-                  }}
-                >
-                  {intl.formatMessage(sysMessages.resetPasswordSMSSuccess, {
-                    username: user.name
-                  })}
-                </Toast>
-              )}
-              {showResetPasswordSMSError && (
-                <Toast
-                  id="reset_password_error"
-                  type="warning"
-                  onClose={() => setShowResetPasswordSMSError(false)}
-                >
-                  {intl.formatMessage(sysMessages.resetPasswordSMSError)}
-                </Toast>
-              )}
-            </Content>
-          )
-        }}
-      </Query>
+            {user.practitionerId && (
+              <UserAuditHistory
+                practitionerId={user.practitionerId}
+                practitionerName={user.name}
+                loggedInUserRole={userDetails!.role}
+              />
+            )}
+          </>
+          <UserAuditActionModal
+            show={modalVisible}
+            user={data.getUser!}
+            onClose={() => toggleUserActivationModal()}
+            onConfirmRefetchQueries={[
+              {
+                query: GET_USER,
+                variables: {
+                  userId: userId
+                }
+              }
+            ]}
+          />
+          <ResponsiveModal
+            id="username-reminder-modal"
+            show={toggleUsernameReminder}
+            handleClose={() => toggleUsernameReminderModal()}
+            title={intl.formatMessage(
+              sysMessages.sendUsernameReminderSMSModalTitle
+            )}
+            actions={[
+              <Button
+                type="tertiary"
+                id="username-reminder-cancel"
+                key="username-reminusernameSMSReminderder-cancel"
+                onClick={() => toggleUsernameReminderModal()}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </Button>,
+              <Button
+                type="primary"
+                id="username-reminder-send"
+                key="username-reminder-send"
+                onClick={() => {
+                  if (toggleUsernameReminder) {
+                    usernameSMSReminder(userId)
+                  }
+                  toggleUsernameReminderModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.send)}
+              </Button>
+            ]}
+            responsive={false}
+            autoHeight={true}
+          >
+            {intl.formatMessage(
+              sysMessages.sendUsernameReminderSMSModalMessage,
+              { phoneNumber: user.number }
+            )}
+          </ResponsiveModal>
+          <ResponsiveModal
+            id="user-reset-password-modal"
+            show={toggleResetPassword}
+            handleClose={() => toggleUserResetPasswordModal()}
+            title={intl.formatMessage(sysMessages.resetUserPasswordModalTitle)}
+            actions={[
+              <Button
+                type="tertiary"
+                id="reset-password-cancel"
+                key="reset-password-cancel"
+                onClick={() => toggleUserResetPasswordModal()}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </Button>,
+              <Button
+                type="primary"
+                id="reset-password-send"
+                key="reset-password-send"
+                onClick={() => {
+                  if (toggleResetPassword) {
+                    resetPassword(userId)
+                  }
+                  toggleUserResetPasswordModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.send)}
+              </Button>
+            ]}
+            responsive={false}
+            autoHeight={true}
+          >
+            {intl.formatMessage(sysMessages.resetUserPasswordModalMessage, {
+              phoneNumber: user.number ?? ''
+            })}
+          </ResponsiveModal>
+          {showResendSMSSuccess && (
+            <Toast
+              id="resend_invite_success"
+              type="success"
+              onClose={() => setShowResendSMSSuccess(false)}
+            >
+              {intl.formatMessage(sysMessages.resendSMSSuccess)}
+            </Toast>
+          )}
+          {showResendSMSError && (
+            <Toast
+              id="resend_invite_error"
+              type="error"
+              onClose={() => setShowResendSMSError(false)}
+            >
+              {intl.formatMessage(sysMessages.resendSMSError)}
+            </Toast>
+          )}
+          {showUsernameSMSReminderSuccess && (
+            <Toast
+              id="username_reminder_success"
+              type="success"
+              onClose={() => setShowUsernameSMSReminderSuccess(false)}
+            >
+              {intl.formatMessage(sysMessages.sendUsernameReminderSMSSuccess, {
+                name: user.name
+              })}
+            </Toast>
+          )}
+          {showUsernameSMSReminderError && (
+            <Toast
+              id="username_reminder_error"
+              type="warning"
+              onClose={() => setShowUsernameSMSReminderError(false)}
+            >
+              {intl.formatMessage(sysMessages.sendUsernameReminderSMSError)}
+            </Toast>
+          )}
+
+          {showResetPasswordSMSSuccess && (
+            <Toast
+              id="reset_password_success"
+              type="success"
+              onClose={() => {
+                setShowResetPasswordSMSSuccess(false)
+              }}
+            >
+              {intl.formatMessage(sysMessages.resetPasswordSMSSuccess, {
+                username: user.name
+              })}
+            </Toast>
+          )}
+          {showResetPasswordSMSError && (
+            <Toast
+              id="reset_password_error"
+              type="warning"
+              onClose={() => setShowResetPasswordSMSError(false)}
+            >
+              {intl.formatMessage(sysMessages.resetPasswordSMSError)}
+            </Toast>
+          )}
+        </Content>
+      )}
     </Frame>
   )
 }

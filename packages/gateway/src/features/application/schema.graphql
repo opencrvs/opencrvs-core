@@ -109,7 +109,6 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
-  INTEGRATIONS: [IntegrationInput]
 }
 
 type ApplicationConfiguration {
@@ -124,7 +123,6 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
-  INTEGRATIONS: [Integration]
 }
 
 type Mutation {

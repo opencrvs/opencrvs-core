@@ -48,9 +48,9 @@ describe('Workflow status tests', () => {
           variables: {
             count: 10,
             skip: 0,
-            locationId: locationId,
-            status: ['REGISTERED'],
-            type: ['birth-declaration', 'birth-notification']
+            declarationJurisdictionId: locationId,
+            registrationStatuses: ['REGISTERED'],
+            compositionType: ['birth-declaration', 'birth-notification']
           }
         },
         result: {
@@ -305,9 +305,9 @@ describe('Workflow status tests', () => {
           variables: {
             count: 25,
             skip: 0,
-            parentLocationId: locationId,
-            status: ['REGISTERED'],
-            type: ['birth-declaration', 'birth-notification']
+            declarationJurisdictionId: locationId,
+            registrationStatuses: ['REGISTERED'],
+            compositionType: ['birth-declaration', 'birth-notification']
           }
         },
         result: {
