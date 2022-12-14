@@ -229,6 +229,7 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'Declaration Forms',
     description: 'Title for Form Configuration Page'
   },
+
   previewDescription: {
     id: 'config.form.preview.description',
     defaultMessage:

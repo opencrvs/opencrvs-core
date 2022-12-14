@@ -25,14 +25,33 @@ export interface ITokenPayload {
   scope: string[]
 }
 
+export enum EventType {
+  Birth = 'birth',
+  Death = 'death'
+}
+
+export interface WebHook {
+  event: EventType
+  permissions: string[]
+}
+
 export interface ISystem {
   name: string
+  createdBy: string
   username: string
   client_id: string
-  status: string
-  scope: string[]
+  secretHash: string
+  salt: string
   sha_secret: string
   practitionerId: string
+  scope: string[]
+  status: string
+  settings: {
+    dailyQuota: number
+    webhook: WebHook[]
+  }
+  creationDate?: number
+  type: string
 }
 
 export function hasScope(authHeader: IAuthHeader, scope: string) {
@@ -54,6 +73,7 @@ export const getTokenPayload = (token: string): ITokenPayload => {
   }
   return decoded
 }
+
 export async function getSystem(
   body: { [key: string]: string | undefined },
   authHeader: string

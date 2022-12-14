@@ -30,6 +30,7 @@ import {
   goToSettings,
   goToPerformanceView,
   goToTeamView,
+  goToSystemList,
   goToFormConfigHome,
   goToApplicationConfig,
   goToAdvancedSearchResult,
@@ -86,6 +87,7 @@ export const WORKQUEUE_TABS = {
   config: 'config',
   application: 'application',
   certificate: 'certificate',
+  systems: 'integration',
   settings: 'settings',
   logout: 'logout',
   declarationForms: 'form'
@@ -206,6 +208,7 @@ interface IDispatchProps {
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
+  goToSystemViewAction: typeof goToSystemList
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
@@ -274,6 +277,7 @@ export const NavigationView = (props: IFullProps) => {
     goToCertificateConfigAction,
     goToVSExportsAction,
     goToFormConfigAction,
+    goToSystemViewAction,
     goToApplicationConfigAction,
     goToAdvancedSearchResultAction,
     navigationWidth,
@@ -297,7 +301,8 @@ export const NavigationView = (props: IFullProps) => {
   const configTab: string[] = [
     WORKQUEUE_TABS.application,
     WORKQUEUE_TABS.certificate,
-    WORKQUEUE_TABS.declarationForms
+    WORKQUEUE_TABS.declarationForms,
+    WORKQUEUE_TABS.systems
   ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { data, initialSyncDone } = workqueue
@@ -696,6 +701,18 @@ export const NavigationView = (props: IFullProps) => {
                               activeMenuItem === WORKQUEUE_TABS.declarationForms
                             }
                           />
+
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.systems}`}
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.systems]
+                            )}
+                            onClick={goToSystemViewAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.systems
+                            }
+                          />
                         </>
                       )}
                     </>
@@ -781,6 +798,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.certificate
       : window.location.href.includes(WORKQUEUE_TABS.declarationForms)
       ? WORKQUEUE_TABS.declarationForms
+      : window.location.href.includes(WORKQUEUE_TABS.systems)
+      ? WORKQUEUE_TABS.systems
       : ''
   }
 }
@@ -799,6 +818,7 @@ export const Navigation = connect<
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
+  goToSystemViewAction: goToSystemList,
   redirectToAuthentication,
   goToSettings,
   updateRegistrarWorkqueue,

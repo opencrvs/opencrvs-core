@@ -64,13 +64,7 @@ jest.mock('@metrics/configApi', () => {
           isoCode: 'ZMW',
           languagesAndCountry: ['en-ZM']
         },
-        ADDRESSES: 1,
-        INTEGRATIONS: [
-          {
-            name: 'MOSIP',
-            status: statuses.ACTIVE
-          }
-        ]
+        ADDRESSES: 1
       })
   }
 })
