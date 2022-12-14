@@ -48,6 +48,7 @@ import {
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
+import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
@@ -244,6 +245,10 @@ export async function fhirWorkflowEventHandler(
     !isUserAuthorized(request.auth.credentials.scope, event)
   ) {
     return h.response().code(401)
+  }
+
+  if (event != Events.UNKNOWN) {
+    setupSystemIdentifier(request)
   }
 
   let response

@@ -28,6 +28,7 @@ interface INavigationMessages
   certificate: MessageDescriptor
   completenessRates: MessageDescriptor
   form: MessageDescriptor
+  integration: MessageDescriptor
 }
 
 const messagesToDefine: INavigationMessages = {
@@ -105,6 +106,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Declaration forms',
     description: 'Declaration forms label in navigation',
     id: 'navigation.declarationForms'
+  },
+  integration: {
+    defaultMessage: 'Integrations',
+    description: 'Integration forms label in navigation',
+    id: 'navigation.integration'
   },
   outbox: {
     defaultMessage: 'Outbox',

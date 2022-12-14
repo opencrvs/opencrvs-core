@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { BirthSection, DeathSection } from '@client/forms'
+import { BirthSection, DeathSection, SELECT_WITH_OPTIONS } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { FieldEnabled } from '@client/forms/configuration'
 import {
@@ -118,11 +118,15 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
           const conditionalField = isCustomConfigField(configField)
             ? configField.conditionals
             : undefined
+          const enableInteraction =
+            isCustomConfigField(configField) &&
+            configField.fieldType === SELECT_WITH_OPTIONS
           return (
             <FormConfigElementCard
               id={fieldId}
               key={fieldId}
               selected={isSelected}
+              enableInteraction={enableInteraction}
               onClick={() => {
                 setSelectedField(fieldId)
               }}
