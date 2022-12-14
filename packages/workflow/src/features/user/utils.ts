@@ -159,9 +159,10 @@ export async function getLoggedInPractitionerResource(
   const tokenPayload = getTokenPayload(token)
   const isNotificationAPIUser =
     tokenPayload.scope.indexOf('notification-api') > -1
+  const isRecordSearchAPIUser = tokenPayload.scope.indexOf('recordsearch') > -1
 
   let userResponse
-  if (isNotificationAPIUser) {
+  if (isNotificationAPIUser || isRecordSearchAPIUser) {
     userResponse = await getSystem(tokenPayload.sub, {
       Authorization: `Bearer ${token}`
     })

@@ -141,7 +141,7 @@ export async function registerSystem(
       )
     }
 
-    if (type === types.WEBHOOK) {
+    if (type === types.WEBHOOK || type === types.RECORD_SEARCH) {
       const systemDetails = {
         client_id,
         name: name || systemAdminUser.username,

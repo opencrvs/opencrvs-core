@@ -35,7 +35,6 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   getUser,
-  getUserId,
   getTokenPayload,
   getSystem
 } from '@gateway/features/user/utils'
@@ -104,26 +103,28 @@ export const getApolloConfig = (): Config => {
     introspection: true,
     context: async ({ request, h }) => {
       try {
-        const userId = getUserId({
-          Authorization: request.headers.authorization
-        })
-        let user: IUserModelData | ISystemModelData
-        user = await getUser(
-          { userId },
-          { Authorization: request.headers.authorization }
+        const tokenPayload = getTokenPayload(
+          request.headers.authorization.split(' ')[1]
         )
-        if (!user) {
+        const userId = tokenPayload.sub
+        let user: IUserModelData | ISystemModelData
+        const isSystemUser = tokenPayload.scope.indexOf('recordsearch') > -1
+        if (isSystemUser) {
           user = await getSystem(
             { systemId: userId },
             { Authorization: request.headers.authorization }
           )
+        } else {
+          user = await getUser(
+            { userId },
+            { Authorization: request.headers.authorization }
+          )
         }
+
         if (!user || !['active', 'pending'].includes(user.status)) {
           throw new AuthenticationError('Authentication failed')
         }
-        const tokenPayload = getTokenPayload(
-          request.headers.authorization.split(' ')[1]
-        )
+
         if (tokenPayload && !isEqual(tokenPayload.scope, user.scope)) {
           throw new AuthenticationError('Authentication failed')
         }
