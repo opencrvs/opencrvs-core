@@ -1825,6 +1825,7 @@ export const mockBirthRegistrationSectionData = {
     value: 'MOTHER',
     nestedFields: { otherInformantType: '' }
   },
+  informantsSignature: 'data:image/png;base64,abcd',
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
   registrationNumber: '201908122365BDSS0SE1',
