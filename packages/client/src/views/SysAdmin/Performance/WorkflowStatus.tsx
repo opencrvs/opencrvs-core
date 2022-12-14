@@ -771,11 +771,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         <Query
           query={FETCH_EVENTS_WITH_PROGRESS}
           variables={{
-            locationId: locationId,
+            declarationJurisdictionId: locationId,
             skip: pageSize * (currentPageNumber - 1),
             count: pageSize,
-            status: (status && [status]) || undefined,
-            type:
+            registrationStatuses: (status && [status]) || undefined,
+            compositionType:
               (event && [
                 `${event.toLowerCase()}-declaration`,
                 `${event.toLowerCase()}-notification`

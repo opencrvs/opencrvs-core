@@ -39,6 +39,7 @@ import {
 import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { Event } from '@client/utils/gateway'
 
 interface INameField {
   firstNamesField: string
@@ -233,13 +234,9 @@ const mapStateToProps = (
     (draft) => draft.id === declarationId
   )
 
-  if (!declaration) {
-    throw new Error(`Draft "${declarationId}" missing!`)
-  }
-
   return {
-    declaration,
-    form: getVerifyCorrectorDefinition(declaration.event)
+    declaration: declaration as IDeclaration,
+    form: getVerifyCorrectorDefinition(declaration?.event ?? Event.Birth)
   }
 }
 

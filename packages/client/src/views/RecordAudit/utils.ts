@@ -41,7 +41,14 @@ import {
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
 import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { Event, Maybe, RegAction, RegStatus, User } from '@client/utils/gateway'
+import {
+  Event,
+  Maybe,
+  RegAction,
+  RegStatus,
+  User,
+  History
+} from '@client/utils/gateway'
 import { IUserDetails } from '@client/utils/userUtils'
 
 export interface IDeclarationData {
@@ -391,7 +398,9 @@ export function getStatusLabel(
   loggedInUser: IUserDetails | null
 ) {
   if (action) {
-    return intl.formatMessage(regActionMessages[action])
+    return intl.formatMessage(regActionMessages[action], {
+      regStatus: regStatus?.toLowerCase()
+    })
   }
   if (
     regStatus === RegStatus.Declared &&
@@ -407,4 +416,10 @@ export function getStatusLabel(
     return intl.formatMessage(recordAuditMessages.started)
   }
   return regStatus ? intl.formatMessage(regStatusMessages[regStatus]) : ''
+}
+
+export function isSystemInitiated(history: History) {
+  return Boolean(
+    (history.dhis2Notification && !history.user?.id) || history.system
+  )
 }

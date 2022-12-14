@@ -13,14 +13,10 @@ import { ApiResponse } from '@elastic/elasticsearch'
 import {
   getMetrics,
   postAdvancedSearch,
-  postMetrics,
-  postSearch
+  postMetrics
 } from '@gateway/features/fhir/utils'
 import { markRecordAsDownloadedOrAssigned } from '@gateway/features/registration/root-resolvers'
-import {
-  IAdvancedSearchParam,
-  ISearchCriteria
-} from '@gateway/features/search/type-resolvers'
+import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import {
   getSystem,
   getTokenPayload,
@@ -76,13 +72,7 @@ export const resolvers: GQLResolver = {
       _,
       {
         userId,
-        locationIds,
-        status,
-        type,
-        trackingId,
-        registrationNumber,
-        contactNumber,
-        name,
+        advancedSearchParameters,
         count,
         skip,
         sortColumn,
@@ -91,74 +81,130 @@ export const resolvers: GQLResolver = {
       authHeader
     ) {
       const searchCriteria: ISearchCriteria = {
-        sort
+        sort,
+        parameters: advancedSearchParameters
       }
-      if (locationIds) {
-        if (locationIds.length <= 0 || locationIds.includes('')) {
-          return await Promise.reject(new Error('Invalid location id'))
-        }
-        if (locationIds.length === 1) {
-          // Currently used if the user is a registration agent
-          searchCriteria.declarationLocationId = locationIds[0]
-        } else {
-          // Not used currently, but this could be used if you were searching a group of offices
-          searchCriteria.declarationLocationId = locationIds
-        }
-      } else if (authHeader && !hasScope(authHeader, 'register')) {
-        // Only register scope user can search without locationIds
-        return await Promise.reject(new Error('User does not have permission'))
-      }
-      if (trackingId) {
-        searchCriteria.trackingId = trackingId
-      }
-      if (registrationNumber) {
-        searchCriteria.registrationNumber = registrationNumber
-      }
-      if (contactNumber) {
-        searchCriteria.contactNumber = contactNumber
-      }
-      if (name) {
-        searchCriteria.name = name
-      }
-      if (count) {
-        searchCriteria.size = count
-      }
-      if (skip) {
-        searchCriteria.from = skip
-      }
-      if (status) {
-        searchCriteria.status = status as string[]
-      }
-      if (type) {
-        searchCriteria.type = type as string[]
-      }
-      if (userId) {
-        searchCriteria.createdBy = userId
-      }
-      if (sortColumn) {
-        searchCriteria.sortColumn = sortColumn
+      // Only registrar, registration agent & field agent should be able to search user
+      if (
+        !inScope(authHeader, [
+          'register',
+          'validate',
+          'certify',
+          'declare',
+          'recordsearch'
+        ])
+      ) {
+        return await Promise.reject(
+          new Error(
+            'Advanced search is only allowed for registrar, registration agent & field agent'
+          )
+        )
       }
 
-      const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(
-        authHeader,
-        searchCriteria
-      )
-      return {
-        totalItems:
-          (searchResult &&
-            searchResult.body.hits &&
-            searchResult.body.hits.total.value) ||
-          0,
-        results:
-          (searchResult &&
-            searchResult.body.hits &&
-            searchResult.body.hits.hits) ||
-          []
+      const isExternalAPI = hasScope(authHeader, 'recordsearch')
+      if (isExternalAPI) {
+        const payload = getTokenPayload(authHeader.Authorization)
+        const system = await getSystem({ systemId: payload.sub }, authHeader)
+
+        const getTotalRequest = await getMetrics(
+          '/advancedSearch',
+          {},
+          authHeader
+        )
+
+        if (getTotalRequest.total >= system.settings.dailyQuota) {
+          return await Promise.reject(new Error('Daily search quota exceeded'))
+        }
+
+        const searchResult: ApiResponse<ISearchResponse<any>> =
+          await postAdvancedSearch(authHeader, searchCriteria)
+
+        if (
+          searchResult &&
+          searchResult.statusCode &&
+          searchResult.statusCode >= 400
+        ) {
+          const errMsg = searchResult as Options<string>
+          return await Promise.reject(new Error(errMsg.message))
+        }
+
+        ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
+          await markRecordAsDownloadedOrAssigned(hit._id, authHeader)
+        })
+
+        if (searchResult.body.hits.total.value) {
+          await postMetrics('/advancedSearch', {}, authHeader)
+        }
+
+        return {
+          totalItems:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.total.value) ||
+            0,
+          results:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.hits) ||
+            []
+        }
+      } else {
+        const hasAtLeastOneParam = Object.values(advancedSearchParameters).some(
+          (param) => Boolean(param)
+        )
+
+        if (!hasAtLeastOneParam) {
+          return await Promise.reject(new Error('There is no param to search '))
+        }
+
+        if (count) {
+          searchCriteria.size = count
+        }
+        if (skip) {
+          searchCriteria.from = skip
+        }
+        if (userId) {
+          searchCriteria.createdBy = userId
+        }
+        if (sortColumn) {
+          searchCriteria.sortColumn = sortColumn
+        }
+
+        //register scope can search records of other locations
+        if (hasScope(authHeader, 'register')) {
+          const { declarationLocationId, ...restParam } =
+            advancedSearchParameters
+          searchCriteria.parameters = { ...restParam }
+        } else {
+          searchCriteria.parameters = { ...advancedSearchParameters }
+        }
+
+        const searchResult: ApiResponse<ISearchResponse<any>> =
+          await postAdvancedSearch(authHeader, searchCriteria)
+        return {
+          totalItems:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.total.value) ||
+            0,
+          results:
+            (searchResult &&
+              searchResult.body.hits &&
+              searchResult.body.hits.hits) ||
+            []
+        }
       }
     },
     async getEventsWithProgress(
       _,
-      { locationId, count, skip, sort = 'desc', status, type },
+      {
+        declarationJurisdictionId,
+        registrationStatuses,
+        compositionType,
+        count,
+        skip,
+        sort = 'desc'
+      },
       authHeader
     ) {
       if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
@@ -170,8 +216,12 @@ export const resolvers: GQLResolver = {
       }
 
       const searchCriteria: ISearchCriteria = {
-        declarationLocationHirarchyId: locationId,
-        sort
+        sort,
+        parameters: {
+          declarationJurisdictionId: declarationJurisdictionId,
+          registrationStatuses: registrationStatuses,
+          compositionType: compositionType
+        }
       }
 
       if (count) {
@@ -181,79 +231,18 @@ export const resolvers: GQLResolver = {
         searchCriteria.from = skip
       }
 
-      if (type) {
-        searchCriteria.type = type as string[]
-      }
-
-      if (status) {
-        searchCriteria.status = status as string[]
-      }
-
-      const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(
-        authHeader,
-        searchCriteria
-      )
-      return {
-        totalItems:
-          (searchResult &&
-            searchResult.body &&
-            searchResult.body.hits &&
-            searchResult.body.hits.total.value) ||
-          0,
-        results:
-          (searchResult &&
-            searchResult.body &&
-            searchResult.body.hits &&
-            searchResult.body.hits.hits) ||
-          []
-      }
-    },
-    async searchRecord(_, searchCriteria: IAdvancedSearchParam, authHeader) {
-      if (authHeader && !hasScope(authHeader, 'recordsearch')) {
-        return await Promise.reject(new Error('User does not have permission'))
-      }
-
-      const payload = getTokenPayload(authHeader.Authorization)
-      const system = await getSystem({ systemId: payload.sub }, authHeader)
-
-      const getTotalRequest = await getMetrics(
-        '/advancedSearch',
-        {},
-        authHeader
-      )
-
-      if (getTotalRequest.total >= system.settings.dailyQuota) {
-        return await Promise.reject(new Error('Daily search quota exceeded'))
-      }
-
       const searchResult: ApiResponse<ISearchResponse<any>> =
         await postAdvancedSearch(authHeader, searchCriteria)
-
-      if (
-        searchResult &&
-        searchResult.statusCode &&
-        searchResult.statusCode >= 400
-      ) {
-        const errMsg = searchResult as Options<string>
-        return await Promise.reject(new Error(errMsg.message))
-      }
-
-      ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-        await markRecordAsDownloadedOrAssigned(hit._id, authHeader)
-      })
-
-      if (searchResult.body.hits.total.value) {
-        await postMetrics('/advancedSearch', {}, authHeader)
-      }
-
       return {
         totalItems:
           (searchResult &&
+            searchResult.body &&
             searchResult.body.hits &&
             searchResult.body.hits.total.value) ||
           0,
         results:
           (searchResult &&
+            searchResult.body &&
             searchResult.body.hits &&
             searchResult.body.hits.hits) ||
           []

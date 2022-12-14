@@ -9,11 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { getBirthEncounterCompositionCursor } from './../../utils/hearth-helper.js'
+
 export const up = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      const compositionCursor = await getCompositionCursor(db)
+      const compositionCursor = await getBirthEncounterCompositionCursor(db)
       while (await compositionCursor.hasNext()) {
         const composition = await compositionCursor.next()
         const compositionHistory = await db
@@ -30,11 +32,9 @@ export const up = async (db, client) => {
           )
         })
         const immediatePrevComp = compositionHistory[correctionIndex - 1]
-        const hasDocumentSection =
-          immediatePrevComp &&
-          immediatePrevComp.section.find(
-            (section) => section.code.coding[0].code === 'supporting-documents'
-          )
+        const hasDocumentSection = immediatePrevComp?.section.find(
+          (section) => section.code.coding[0].code === 'supporting-documents'
+        )
         if (hasDocumentSection) {
           await db
             .collection('Composition')
@@ -48,12 +48,6 @@ export const up = async (db, client) => {
   } finally {
     await session.endSession()
   }
-}
-
-async function getCompositionCursor(db) {
-  return db.collection('Composition').find({
-    'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
-  })
 }
 
 export const down = async (db, client) => {}

@@ -25,6 +25,7 @@ import {
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
+  ADVANCED_SEARCH,
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
@@ -50,9 +51,11 @@ import {
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
-  PERFORMANCE_REGISTRATIONS_LIST,
+  SYSTEM_LIST,
   VS_EXPORTS,
-  VIEW_RECORD
+  VIEW_RECORD,
+  ADVANCED_SEARCH_RESULT,
+  PERFORMANCE_REGISTRATIONS_LIST
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -173,6 +176,10 @@ export function goToVSExport() {
   return push(VS_EXPORTS)
 }
 
+export function goToAdvancedSearch() {
+  return push(ADVANCED_SEARCH)
+}
+
 export function goToFormConfigHome() {
   return push(FORM_CONFIG_HOME)
 }
@@ -237,6 +244,10 @@ export function goToTeamUserList(id: string) {
   })
 }
 
+export function goToSystemList() {
+  return push(SYSTEM_LIST)
+}
+
 export function goToSearchResult(
   searchText: string,
   searchType: string,
@@ -255,6 +266,10 @@ export function goToSearchResult(
           searchType
         })
       )
+}
+
+export function goToAdvancedSearchResult(mobile?: boolean) {
+  return push(formatUrl(ADVANCED_SEARCH_RESULT, {}))
 }
 
 export function goToSearch() {

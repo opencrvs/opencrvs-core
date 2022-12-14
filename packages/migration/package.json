@@ -16,7 +16,10 @@
   },
   "dependencies": {
     "migrate-mongo": "^9.0.0",
-    "influx": "^5.0.7"
+    "influx": "^5.0.7",
+    "minio": "^7.0.30",
+    "file-type": "^16.5.3",
+    "@elastic/elasticsearch": "7.17.0"
   },
   "devDependencies": {
     "prettier": "^2.5.0"

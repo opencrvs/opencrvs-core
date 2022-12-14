@@ -32,7 +32,12 @@ import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { isEmpty, find, flatten, values } from 'lodash'
-import { getFieldValue, getFormattedDate, getStatusLabel } from './utils'
+import {
+  getFieldValue,
+  getFormattedDate,
+  getStatusLabel,
+  isSystemInitiated
+} from './utils'
 import {
   CollectorRelationLabelArray,
   CorrectorRelationLabelArray,
@@ -103,7 +108,11 @@ function prepareComments(
   actionDetailsData: History,
   draft: IDeclaration | null
 ) {
-  if (!draft || actionDetailsData.action === RegAction.Downloaded) {
+  if (
+    !draft ||
+    (actionDetailsData.action &&
+      actionDetailsData.action !== RegAction.RequestedCorrection)
+  ) {
     return []
   }
 
@@ -547,7 +556,7 @@ export const ActionDetailsModal = ({
 
   let userName = ''
 
-  if (!actionDetailsData.dhis2Notification) {
+  if (!isSystemInitiated(actionDetailsData)) {
     const nameObj = actionDetailsData?.user?.name
       ? getIndividualNameObj(
           actionDetailsData.user.name as GQLHumanName[],
@@ -558,7 +567,9 @@ export const ActionDetailsModal = ({
       ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
       : ''
   } else {
-    userName = intl.formatMessage(userMessages.healthSystem)
+    userName =
+      actionDetailsData.system?.name ??
+      intl.formatMessage(userMessages.healthSystem)
   }
 
   return (
