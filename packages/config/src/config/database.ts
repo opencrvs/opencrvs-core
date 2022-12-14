@@ -17,7 +17,11 @@ const db = mongoose.connection
 
 db.on('disconnected', () => {
   logger.info('MongoDB disconnected')
-  process.exit(1)
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1)
+  } else {
+    process.kill(process.pid, 'SIGUSR2')
+  }
 })
 
 db.on('connected', () => {
