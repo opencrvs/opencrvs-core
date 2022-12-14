@@ -1068,15 +1068,15 @@ export const fetchFromHearth = <T = any>(
     })
 }
 
-export const sendToFhir = (
-  doc: fhir.Location,
+export const sendToFhir = async (
+  body: string,
   suffix: string,
   method: string,
   token: string
 ) => {
   return fetch(`${FHIR_URL}${suffix}`, {
     method,
-    body: JSON.stringify(doc),
+    body,
     headers: {
       'Content-Type': 'application/fhir+json',
       Authorization: `${token}`

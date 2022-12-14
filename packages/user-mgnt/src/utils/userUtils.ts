@@ -20,6 +20,13 @@ export const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
+export const types = {
+  NATIONAL_ID: 'NATIONAL_ID',
+  HEALTH: 'HEALTH',
+  RECORD_SEARCH: 'RECORD_SEARCH',
+  WEBHOOK: 'WEBHOOK'
+}
+
 interface IRoleScopeMapping {
   [key: string]: string[]
 }
@@ -33,7 +40,7 @@ export const roleScopeMapping: IRoleScopeMapping = {
   REGISTRATION_AGENT: ['validate', 'performance', 'certify'],
   LOCAL_REGISTRAR: ['register', 'performance', 'certify'],
   LOCAL_SYSTEM_ADMIN: ['sysadmin'],
-  NATIONAL_SYSTEM_ADMIN: ['sysadmin'],
+  NATIONAL_SYSTEM_ADMIN: ['sysadmin', 'natlsysadmin'],
   PERFORMANCE_MANAGEMENT: ['performance'],
   NATIONAL_REGISTRAR: ['register', 'performance', 'certify', 'config', 'teams']
 }
@@ -43,7 +50,8 @@ export const systemScopeMapping: IRoleScopeMapping = {
   NATIONAL_ID: ['nationalId'],
   EXTERNAL_VALIDATION: ['validator-api'],
   AGE_CHECK: ['declare', 'age-verification-api'],
-  RECORD_SEARCH: ['recordsearch']
+  RECORD_SEARCH: ['recordsearch'],
+  WEBHOOK: ['webhook']
 }
 
 export const hasScope = (request: Hapi.Request, scope: string): boolean => {

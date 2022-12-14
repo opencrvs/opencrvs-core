@@ -83,6 +83,8 @@ export const PERFORMANCE_REGISTRATIONS_LIST = '/performance/registrations'
 export const TEAM_SEARCH = '/team/search'
 export const TEAM_USER_LIST = '/team/users'
 
+export const SYSTEM_LIST = '/config/integration'
+
 export const CREATE_USER = '/createUser'
 export const CREATE_USER_ON_LOCATION = '/createUserInLocation/:locationId'
 export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'

@@ -1932,6 +1932,6 @@ export const mosipSuccessMock = JSON.stringify({
     authToken: '257803821990055124230310596669133515'
   }
 })
-export const mosipConfigMock = JSON.stringify({
-  config: { INTEGRATIONS: [{ status: 'active', name: 'MOSIP' }] }
-})
+export const mosipConfigMock = JSON.stringify([
+  { status: 'active', name: 'MOSIP' }
+])

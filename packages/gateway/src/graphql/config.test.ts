@@ -84,7 +84,10 @@ describe('Test apollo server config', () => {
     })
   })
   it('throws authentication error when the token holder does not exist', async () => {
-    fetch.mockResponseOnce(JSON.stringify(null), { status: 200 })
+    fetch.mockResponses(
+      [JSON.stringify(null), { status: 200 }],
+      [JSON.stringify(null), { status: 200 }]
+    )
     const config = getApolloConfig()
 
     await expect(

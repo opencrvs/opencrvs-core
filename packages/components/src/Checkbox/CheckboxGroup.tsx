@@ -40,7 +40,6 @@ export interface ICheckboxGroup {
 export class CheckboxGroup extends React.Component<ICheckboxGroup> {
   change = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
-
     this.props.onChange(
       this.props.value.indexOf(value) > -1
         ? this.props.value.filter((val) => val !== value)
