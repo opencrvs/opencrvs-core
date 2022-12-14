@@ -343,32 +343,6 @@ describe('when user is previewing the form data', () => {
       await waitForElement(app, '#readyDeclaration')
     })
 
-    it('successfully submits the review form', async () => {
-      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
-      app.find('#signature-file-upload').hostNodes().simulate('click')
-      app
-        .find('#image_file_uploader_field')
-        .hostNodes()
-        .simulate('change', {
-          target: {
-            files: [
-              getFileFromBase64String(
-                validImageB64String,
-                'signature.png',
-                'image/png'
-              )
-            ]
-          }
-        })
-      await new Promise((resolve) => {
-        setTimeout(resolve, 50)
-      })
-      app.update()
-      app.find('#registerDeclarationBtn').hostNodes().simulate('click')
-      app.update()
-      app.update().find('#submit_confirm').hostNodes().simulate('click')
-    })
-
     it('rejecting declaration redirects to reject confirmation screen', async () => {
       vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
 
@@ -416,25 +390,6 @@ describe('when user is previewing the form data', () => {
           .replace(':event', 'birth')
           .replace(':pageId', 'review')
       )
-      app.update()
-      app.find('#signature-file-upload').hostNodes().simulate('click')
-      app
-        .find('#image_file_uploader_field')
-        .hostNodes()
-        .simulate('change', {
-          target: {
-            files: [
-              getFileFromBase64String(
-                validImageB64String,
-                'signature.png',
-                'image/png'
-              )
-            ]
-          }
-        })
-      await new Promise((resolve) => {
-        setTimeout(resolve, 50)
-      })
       app.update()
     })
 
