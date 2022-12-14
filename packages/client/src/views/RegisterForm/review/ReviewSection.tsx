@@ -66,7 +66,8 @@ import {
   SubmissionAction,
   ICheckboxFormField,
   CHECKBOX,
-  INestedInputFields
+  INestedInputFields,
+  DeathSection
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -1487,6 +1488,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
   }
 
+  isLastNameFirst = () => {
+    const { registerForm, draft: declaration } = this.props
+    const fields = registerForm[declaration.event].sections.find((section) =>
+      declaration.event === Event.Birth
+        ? section.id === BirthSection.Child
+        : section.id === DeathSection.Deceased
+    )?.groups[0].fields
+    if (!fields) return false
+    return (
+      fields.findIndex((field) => field.name === 'familyNameEng') <
+      fields.findIndex((field) => field.name === 'firstNamesEng')
+    )
+  }
+
   transformSectionData = (
     formSections: IFormSection[],
     errorsOnFields: IErrorsBySection
@@ -1624,7 +1639,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const informantName = getDraftInformantFullName(declaration, intl.locale)
+    const informantName = getDraftInformantFullName(
+      declaration,
+      intl.locale,
+      this.isLastNameFirst()
+    )
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
