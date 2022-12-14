@@ -15,7 +15,12 @@ import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
-import { getFormattedDate, getPageItems, getStatusLabel } from './utils'
+import {
+  getFormattedDate,
+  getPageItems,
+  getStatusLabel,
+  isSystemInitiated
+} from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
@@ -26,8 +31,9 @@ import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, RegStatus } from '@client/utils/gateway'
+import { History, RegStatus, SystemType } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
+import { integrationMessages } from '@client/i18n/messages/views/integrations'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -65,18 +71,14 @@ const HealthSystemLogo = styled.div`
   background-color: ${({ theme }) => theme.colors.grey200};
 `
 
-const HealthSystemLocation = styled.p`
-  ${({ theme }) => theme.fonts.reg16}
-`
-
-function HealthSystemUser() {
+function HealthSystemUser({ name }: { name?: string }) {
   const intl = useIntl()
   return (
     <NameAvatar>
       <HealthSystemLogo>
         <Box />
       </HealthSystemLogo>
-      <span>{intl.formatMessage(userMessages.healthSystem)}</span>
+      <span>{name ?? intl.formatMessage(userMessages.healthSystem)}</span>
     </NameAvatar>
   )
 }
@@ -103,6 +105,13 @@ const GetNameWithAvatar = ({
       <span>{userName}</span>
     </NameAvatar>
   )
+}
+
+function getSystemType(type: string | undefined) {
+  if (type === SystemType.RecordSearch) {
+    return integrationMessages.recordSearch
+  }
+  return integrationMessages.healthSystem
 }
 
 const getIndexByAction = (histories: any, index: number): number => {
@@ -208,8 +217,8 @@ export const GetHistory = ({
     ),
     user: (
       <>
-        {item.dhis2Notification && !item.user?.id ? (
-          <HealthSystemUser />
+        {isSystemInitiated(item) ? (
+          <HealthSystemUser name={item.system?.name} />
         ) : isFieldAgent ? (
           <GetNameWithAvatar
             id={item?.user?.id as string}
@@ -234,25 +243,22 @@ export const GetHistory = ({
       </>
     ),
     type: intl.formatMessage(
-      (item.dhis2Notification && !item.user?.role) || null === item.user?.role
-        ? userMessages.healthSystem
-        : userMessages[item?.user?.role as string]
+      isSystemInitiated(item) || !item.user?.role
+        ? getSystemType(item.system?.type)
+        : userMessages[item.user.role]
     ),
-    location:
-      item.dhis2Notification && !item.user?.role ? (
-        <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
-      ) : isFieldAgent ? (
-        <>{item.office?.name}</>
-      ) : (
-        <Link
-          font="bold14"
-          onClick={() => {
-            goToTeamUserList && goToTeamUserList(item?.office?.id as string)
-          }}
-        >
-          {item.office?.name as string}
-        </Link>
-      )
+    location: isSystemInitiated(item) ? null : isFieldAgent ? (
+      <>{item.office?.name}</>
+    ) : (
+      <Link
+        font="bold14"
+        onClick={() => {
+          goToTeamUserList && goToTeamUserList(item?.office?.id as string)
+        }}
+      >
+        {item.office?.name as string}
+      </Link>
+    )
   }))
 
   const columns = [

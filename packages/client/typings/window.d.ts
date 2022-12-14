@@ -56,7 +56,6 @@ interface Window {
     LOGROCKET: string
     SENTRY: string
     ADDRESSES: number
-    INTEGRATIONS: any[]
   }
   __localeId__: string
 }

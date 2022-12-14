@@ -151,7 +151,7 @@ const AuditDescriptionMapping: {
   IN_PROGRESS: messages.inProgressAuditAction,
   DECLARED: messages.declaredAuditAction,
   VALIDATED: messages.validatedAuditAction,
-  WAITING_VALIDATION: messages.waitingForValidationAuditAction,
+  DECLARATION_UPDATED: messages.updatedAuditAction,
   REGISTERED: messages.registeredAuditAction,
   REJECTED: messages.rejectedAuditAction,
   CERTIFIED: messages.certifiedAuditAction,
@@ -168,7 +168,15 @@ const AuditDescriptionMapping: {
   EDIT_USER: messages.editUserAuditAction,
   CREATE_USER: messages.createUserAuditAction,
   PASSWORD_RESET: messages.passwordResetAuditAction,
-  USERNAME_REMINDER: messages.userNameReminderAuditAction
+  USERNAME_REMINDER: messages.userNameReminderAuditAction,
+  USERNAME_REMINDER_BY_ADMIN: messages.usernameReminderByAdmin,
+  PASSWORD_RESET_BY_ADMIN: messages.passwordResetByAdmin,
+  RETRIEVED: messages.retrievedAuditAction,
+  VIEWED: messages.viewedAuditAction,
+  REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
+  REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
+  REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
+  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction
 }
 
 export function getUserAuditDescription(
