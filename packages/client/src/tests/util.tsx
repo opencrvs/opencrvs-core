@@ -1705,6 +1705,7 @@ export const mockDeclarationData = {
       nestedFields: { otherInformantType: '' }
     },
     informantsSignature: 'data:image/png;base64,abcd',
+
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -1714,7 +1715,8 @@ export const mockDeclarationData = {
       officeAddressLevel4: 'Dhaka'
     },
     certificates: [{}]
-  }
+  },
+  documents: {}
 }
 
 export const mockDeathDeclarationData = {
