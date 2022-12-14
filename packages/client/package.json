@@ -4,6 +4,38 @@
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
+  "scripts": {
+    "postinstall": "patch-package",
+    "precommit": "lint-staged",
+    "start": "vite --port=3000",
+    "preview": "vite preview",
+    "build": "VITE_APP_VERSION=$VERSION NODE_OPTIONS=--max_old_space_size=8000 vite build && yarn gen:sw",
+    "gen:sw": "workbox injectManifest --config workbox-config.js",
+    "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-client",
+    "docker:run": "docker run -it --rm -p 5000:80 --name ocrvs-client ocrvs-client",
+    "test": "NODE_OPTIONS=--max_old_space_size=8000 vitest run --coverage --silent --dangerouslyIgnoreUnhandledErrors && yarn test:compilation",
+    "test:watch": "vitest",
+    "open:cov": "yarn test && opener coverage/index.html",
+    "generate:test:forms": "bash generate-form.sh",
+    "lint": "yarn lint:css && yarn lint:ts",
+    "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
+    "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
+    "start:prod": "yarn serve -s -l 3000 build",
+    "test:compilation": "tsc --noEmit",
+    "extract:translations": "bash extract-translations.sh",
+    "generate-gateway-types": "graphql-codegen --config codegen.yml && prettier --write src/utils/gateway.ts",
+    "build:clean": "rm -rf build",
+    "serve": "node serve-static.js"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "prettier --write",
+      "yarn lint:ts",
+      "stylelint",
+      "yarn extract:translations",
+      "git add"
+    ]
+  },
   "dependencies": {
     "@apollo/client": "^3.7.0",
     "@craco/craco": "^6.4.3",
@@ -70,38 +102,6 @@
     "vite-tsconfig-paths": "^3.5.0",
     "webfontloader": "^1.6.28",
     "xregexp": "^4.2.0"
-  },
-  "scripts": {
-    "postinstall": "patch-package",
-    "precommit": "lint-staged",
-    "start": "vite --port=3000",
-    "preview": "vite preview",
-    "build": "VITE_APP_VERSION=$VERSION NODE_OPTIONS=--max_old_space_size=8000 vite build && yarn gen:sw",
-    "gen:sw": "workbox injectManifest --config workbox-config.js",
-    "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-client",
-    "docker:run": "docker run -it --rm -p 5000:80 --name ocrvs-client ocrvs-client",
-    "test": "NODE_OPTIONS=--max_old_space_size=8000 vitest run --coverage --silent --dangerouslyIgnoreUnhandledErrors && yarn test:compilation",
-    "test:watch": "vitest",
-    "open:cov": "yarn test && opener coverage/index.html",
-    "generate:test:forms": "bash generate-form.sh",
-    "lint": "yarn lint:css && yarn lint:ts",
-    "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
-    "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
-    "start:prod": "yarn serve -s -l 3000 build",
-    "test:compilation": "tsc --noEmit",
-    "extract:translations": "bash extract-translations.sh",
-    "generate-gateway-types": "graphql-codegen --config codegen.yml && prettier --write src/utils/gateway.ts",
-    "build:clean": "rm -rf build",
-    "serve": "node serve-static.js"
-  },
-  "lint-staged": {
-    "src/**/*.{ts,tsx}": [
-      "prettier --write",
-      "yarn lint:ts",
-      "stylelint",
-      "yarn extract:translations",
-      "git add"
-    ]
   },
   "devDependencies": {
     "@graphql-codegen/add": "3.1.1",

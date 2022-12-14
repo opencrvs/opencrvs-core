@@ -59,12 +59,9 @@ describe('updateInformantSMSNotification handler', () => {
   it('update informantSMSNotification using mongoose', async () => {
     mockingoose(InformantSMSNotification).toReturn(
       informantSMSNotificationMock,
-      'findOne'
+      'find'
     )
-    mockingoose(InformantSMSNotification).toReturn(
-      informantSMSNotificationMock,
-      'updateOne'
-    )
+    mockingoose(InformantSMSNotification).toReturn({}, 'updateOne')
     mockingoose(InformantSMSNotification).toReturn(
       informantSMSNotificationMock,
       'find'
@@ -73,10 +70,18 @@ describe('updateInformantSMSNotification handler', () => {
     const res = await server.server.inject({
       method: 'PUT',
       url: '/informantSMSNotification',
-      payload: {
-        id: '6399adbfd9f62e3dbe63f93e',
-        enabled: true
-      },
+      payload: [
+        {
+          id: '6399adb1d9f62e3dbe63f93b',
+          name: 'Health Notification',
+          enabled: true
+        },
+        {
+          id: '6399adbfd9f62e3dbe63f93e',
+          name: 'SMS Notification',
+          enabled: false
+        }
+      ],
       headers: {
         Authorization: `${token}`
       }
@@ -87,7 +92,7 @@ describe('updateInformantSMSNotification handler', () => {
   it('return error when tries to update invalid data', async () => {
     mockingoose(InformantSMSNotification).toReturn(
       informantSMSNotificationMock,
-      'findOne'
+      'find'
     )
     mockingoose(InformantSMSNotification).toReturn(
       informantSMSNotificationMock,

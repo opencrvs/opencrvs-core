@@ -22,9 +22,9 @@ export default async function createInformantSMSNotification(
   h: Hapi.ResponseToolkit
 ) {
   const informantSMSNotificationPayload =
-    request.payload as IInformantSMSNotificationsModel
+    request.payload as IInformantSMSNotificationsModel[]
   try {
-    await InformantSMSNotification.create(informantSMSNotificationPayload)
+    await InformantSMSNotification.insertMany(informantSMSNotificationPayload)
   } catch (e) {
     throw internal(e.message)
   }
@@ -36,7 +36,7 @@ export default async function createInformantSMSNotification(
   return h.response(informantSMSNotifications).code(201)
 }
 
-export const requestSchema = Joi.object({
+export const requestSchema = Joi.array().items({
   name: Joi.string().required(),
   enabled: Joi.boolean()
 })

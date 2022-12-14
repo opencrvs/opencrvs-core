@@ -16,7 +16,6 @@ import * as Joi from 'joi'
 import InformantSMSNotification from '@config/models/informantSMSNotifications'
 import { badRequest } from '@hapi/boom'
 import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
-
 export interface IInformantSMSNotificationPayload {
   id: string
   name: string
@@ -28,29 +27,43 @@ export default async function updateInformantSMSNotification(
   h: Hapi.ResponseToolkit
 ) {
   const informantSMSNotificationPayload =
-    request.payload as IInformantSMSNotificationPayload
+    request.payload as IInformantSMSNotificationPayload[]
 
   try {
-    const existingInformantSMSNotification =
-      await InformantSMSNotification.findOne({
-        _id: informantSMSNotificationPayload.id
+    const existingInformantSMSNotifications =
+      await InformantSMSNotification.find().exec()
+    if (!existingInformantSMSNotifications) {
+      throw badRequest(`No informantSMSNotification record found!`)
+    }
+
+    const modifiedInformantSMSNotification =
+      informantSMSNotificationPayload.filter((informantSMSNotification) => {
+        const hasModified = existingInformantSMSNotifications.find(
+          (inftNoti) =>
+            String(inftNoti._id) === String(informantSMSNotification.id) &&
+            (inftNoti.name !== informantSMSNotification.name ||
+              inftNoti.enabled !== informantSMSNotification.enabled)
+        )
+
+        return hasModified
       })
 
-    if (!existingInformantSMSNotification) {
-      throw badRequest(
-        `No informantSMSNotification found by given id: ${informantSMSNotificationPayload.id}`
+    // find and Update existing fields
+    try {
+      await Promise.all(
+        modifiedInformantSMSNotification.map(
+          async (informantSMSNotification) => {
+            await InformantSMSNotification.updateOne(
+              { _id: informantSMSNotification?.id },
+              { ...informantSMSNotification, updatedAt: Date.now() }
+            )
+          }
+        )
       )
+    } catch (err) {
+      return h.response(`Failed to update existing question. ${err}`).code(400)
     }
-    // Update existing fields
-    existingInformantSMSNotification.name = informantSMSNotificationPayload.name
-    existingInformantSMSNotification.enabled =
-      informantSMSNotificationPayload.enabled
-    existingInformantSMSNotification.updatedAt = Date.now()
 
-    await InformantSMSNotification.updateOne(
-      { _id: existingInformantSMSNotification._id },
-      existingInformantSMSNotification
-    )
     const informantSMSNotifications = await getInformantSMSNotificationsHandler(
       request,
       h
@@ -62,8 +75,9 @@ export default async function updateInformantSMSNotification(
   }
 }
 
-export const requestSchema = Joi.object({
+export const requestSchema = Joi.array().items({
   id: Joi.string().required(),
-  name: Joi.string(),
+  name: Joi.string().required(),
   enabled: Joi.boolean()
 })
+ 

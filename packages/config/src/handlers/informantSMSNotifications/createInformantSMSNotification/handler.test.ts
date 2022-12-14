@@ -58,7 +58,7 @@ describe('createInformantSMSNotification test', () => {
   it('should create informantSMSNotification using mongoose', async () => {
     mockingoose(InformantSMSNotification).toReturn(
       informantSMSNotificationMock[0],
-      'create'
+      'insertMany'
     )
     mockingoose(InformantSMSNotification).toReturn(
       informantSMSNotificationMock,
@@ -68,10 +68,12 @@ describe('createInformantSMSNotification test', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/informantSMSNotification',
-      payload: {
-        name: 'Health Notification',
-        enabled: true
-      },
+      payload: [
+        {
+          name: 'Health Notification',
+          enabled: true
+        }
+      ],
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -82,7 +84,7 @@ describe('createInformantSMSNotification test', () => {
   it('should return error if payload is invalid while create informantSMSNotification', async () => {
     mockingoose(InformantSMSNotification).toReturn(
       informantSMSNotificationMock[0],
-      'create'
+      'insertMany'
     )
     mockingoose(InformantSMSNotification).toReturn(
       informantSMSNotificationMock,
@@ -92,10 +94,12 @@ describe('createInformantSMSNotification test', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/informantSMSNotification',
-      payload: {
-        name: 'Health Notification',
-        enabled: 'active'
-      },
+      payload: [
+        {
+          name: 'Health Notification',
+          enabled: 'active'
+        }
+      ],
       headers: {
         Authorization: `Bearer ${token}`
       }

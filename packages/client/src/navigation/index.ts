@@ -51,10 +51,11 @@ import {
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME,
   REGISTRAR_HOME_TAB_PAGE,
+  SYSTEM_LIST,
+  VS_EXPORTS,
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST,
-  VS_EXPORTS
+  PERFORMANCE_REGISTRATIONS_LIST
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -241,6 +242,10 @@ export function goToTeamUserList(id: string) {
       locationId: id
     })
   })
+}
+
+export function goToSystemList() {
+  return push(SYSTEM_LIST)
 }
 
 export function goToSearchResult(
