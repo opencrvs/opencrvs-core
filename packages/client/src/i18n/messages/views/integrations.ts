@@ -122,10 +122,10 @@ const messagesToDefine = {
     description: 'Label for death'
   },
 
-  healthNotification: {
-    id: 'integrations.type.healthNotification',
-    defaultMessage: 'Health notification',
-    description: 'Label for health notification'
+  eventNotification: {
+    id: 'integrations.type.eventNotification',
+    defaultMessage: 'Event notification',
+    description: 'Label for event notification'
   },
 
   nationalID: {
@@ -208,7 +208,7 @@ const messagesToDefine = {
 
   recordSearch: {
     id: 'integrations.type.recordSearch',
-    defaultMessage: 'Record Search',
+    defaultMessage: 'Record search',
     description: 'Label for record search'
   },
 
@@ -223,7 +223,7 @@ const messagesToDefine = {
     description: 'Label for health system type'
   },
   healthnotificationAlertDescription: {
-    id: 'integrations.healthnotificationDescription',
+    id: 'integrations.eventNotificationDescription',
     defaultMessage:
       'A notification client (eg. hospital) can send a partial notification or a full declaration of a birth or death to OpenCRVS for processing. For more information, visit:',
     description: 'Label for  health notification description'
@@ -239,7 +239,7 @@ const messagesToDefine = {
   recordSearchDescription: {
     id: 'integrations.recordSearchDescription',
     defaultMessage:
-      'A Record Search client can perform an advanced search on OpenCRVS data. For more information, visit:',
+      'A Record search client can perform an advanced search on OpenCRVS data. For more information, visit:',
     description: 'Label for  record search description'
   },
 

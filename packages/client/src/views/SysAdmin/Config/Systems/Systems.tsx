@@ -216,7 +216,7 @@ export function SystemList() {
   }
 
   const sysType = {
-    HEALTH: intl.formatMessage(integrationMessages.healthSystem),
+    HEALTH: intl.formatMessage(integrationMessages.eventNotification),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalID),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook)
@@ -518,7 +518,7 @@ export function SystemList() {
                   options={[
                     {
                       label: intl.formatMessage(
-                        integrationMessages.healthNotification
+                        integrationMessages.eventNotification
                       ),
                       value: SystemType.Health
                     },
