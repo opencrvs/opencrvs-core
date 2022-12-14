@@ -55,6 +55,11 @@ export default async function changePhoneHandler(
 
   try {
     await User.update({ _id: user._id }, user)
+  } catch (err) {
+    // return 400 if there is a validation error when updating to mongo
+    return h.response(err.message).code(400)
+  }
+  try {
     await postUserActionToMetrics(
       'PHONE_NUMBER_CHANGED',
       request.headers.authorization,
@@ -62,8 +67,7 @@ export default async function changePhoneHandler(
       userAgent
     )
   } catch (err) {
-    // return 400 if there is a validation error when updating to mongo
-    return h.response(err.message).code(400)
+    logger.error(err)
   }
   return h.response().code(200)
 }
@@ -73,10 +77,15 @@ export async function postUserActionToMetrics(
   token: string,
   remoteAddress: string,
   userAgent: string,
-  practitionerId?: string
+  practitionerId?: string,
+  subjectPractitionerId?: string
 ) {
   const url = resolve(METRICS_URL, '/audit/events')
-  const body = { action: action, practitionerId: practitionerId }
+  const body = {
+    action,
+    practitionerId,
+    ...(subjectPractitionerId && { additionalData: { subjectPractitionerId } })
+  }
   const authentication = 'Bearer ' + token
   await fetch(url, {
     method: 'POST',
@@ -89,7 +98,6 @@ export async function postUserActionToMetrics(
     }
   })
 }
-
 export const changePhoneRequestSchema = Joi.object({
   userId: Joi.string().required(),
   phoneNumber: Joi.string().required()

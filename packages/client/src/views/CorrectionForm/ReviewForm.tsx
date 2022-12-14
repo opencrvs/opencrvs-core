@@ -17,20 +17,25 @@ import {
 import { IForm } from '@client/forms'
 import { IDeclaration } from '@client/declarations'
 import { IStoreState } from '@client/store'
-import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
+import { CERTIFICATE_CORRECTION_REVIEW, HOME } from '@client/navigation/routes'
 import { connect } from 'react-redux'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
+import { Event } from '@client/utils/gateway'
+import { Redirect } from 'react-router'
 
 type IStateProps = {
-  declaration: IDeclaration
+  declaration: IDeclaration | undefined
   registerForm: IForm
   pageRoute: string
 }
 
 type IProps = IStateProps & RouteProps
 
-function CorrectionReviewFormComponent(props: IProps) {
-  return <RegisterForm {...props} />
+function CorrectionReviewFormComponent({ declaration, ...props }: IProps) {
+  if (!declaration) {
+    return <Redirect to={HOME} />
+  }
+  return <RegisterForm declaration={declaration} {...props} />
 }
 
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
@@ -42,11 +47,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     (app) => app.id === declarationId
   )
 
-  if (!declaration) {
-    throw new Error(`Declaration "${match.params.declarationId}" missing!`)
-  }
-
-  const event = declaration.event
+  const event = declaration?.event || Event.Birth
 
   const reviewForm = getEventReviewForm(state, event)
 

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig } from '@client/forms'
+import { IFormConfig, IFormDataSet } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import * as actions from '@client/forms/configuration/formConfig/actions'
 import {
@@ -27,12 +27,14 @@ import {
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default'
 import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
+import { IDataSourceSelectOption } from '@client/forms/configuration/formConfig/utils'
 
 export type IFormConfigState =
   | {
       state: 'LOADING'
       birth: null
       death: null
+      formDataset: null
     }
   | {
       state: 'READY'
@@ -44,18 +46,20 @@ export type IFormConfigState =
         formDraft: IFormDraft
         configFields: ISectionFieldMap
       }
+      formDataset: IFormDataSet[]
     }
 
 export const initialState: IFormConfigState = {
   state: 'LOADING',
   birth: null,
-  death: null
+  death: null,
+  formDataset: null
 }
 
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
 
 function getReadyState(formConfig: IFormConfig) {
-  const { formDrafts, questionConfig } = formConfig
+  const { formDrafts, questionConfig, formDataset = [] } = formConfig
 
   const defaultBirthForm = populateRegisterFormsWithAddresses(
     registerForms[Event.Birth],
@@ -76,7 +80,8 @@ function getReadyState(formConfig: IFormConfig) {
       configFields: generateConfigFields(
         Event.Birth,
         defaultBirthForm,
-        questionConfig
+        questionConfig,
+        formDataset
       )
     },
     death: {
@@ -86,9 +91,11 @@ function getReadyState(formConfig: IFormConfig) {
       configFields: generateConfigFields(
         Event.Death,
         defaultDeathForm,
-        questionConfig
+        questionConfig,
+        formDataset
       )
-    }
+    },
+    formDataset
   }
 }
 
@@ -108,6 +115,13 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
     case offlineActions.APPLICATION_CONFIG_LOADED:
     case offlineActions.OFFLINE_FORM_CONFIG_UPDATED: {
       return getReadyState(action.payload.formConfig)
+    }
+
+    case offlineActions.OFFLINE_FORM_CONFIG_ADD_FORM_DATASET: {
+      return {
+        ...state,
+        formDataset: [...state.formDataset, action.payload.formDatasetItem]
+      }
     }
 
     case actions.ADD_CUSTOM_FIELD: {
@@ -266,7 +280,8 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
         Cmd.action(
           offlineActions.updateOfflineFormConfig(
             [birthFormDraft, deathFormDraft],
-            questionConfig
+            questionConfig,
+            newState.formDataset
           )
         )
       )
