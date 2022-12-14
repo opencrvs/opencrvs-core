@@ -31,6 +31,8 @@ interface IAdvancedSearchMessages
   recordStatusRegistered: MessageDescriptor
   recordStatusCertified: MessageDescriptor
   recordStatusAchived: MessageDescriptor
+  show: MessageDescriptor
+  hide: MessageDescriptor
 }
 
 const messagesToDefine: IAdvancedSearchMessages = {
