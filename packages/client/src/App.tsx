@@ -226,6 +226,14 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
+                                            path={routes.INFORMANT_NOTIFICATION}
+                                            component={CertificatesConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
                                               Roles.LOCAL_REGISTRAR,
                                               Roles.REGISTRATION_AGENT
                                             ]}
