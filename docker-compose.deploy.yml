@@ -609,7 +609,6 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
-      -
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
