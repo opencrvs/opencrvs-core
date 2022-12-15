@@ -66,7 +66,13 @@ export default async function changePasswordHandler(
 
   try {
     await User.update({ _id: user._id }, user)
-    if (request.headers.authorization === undefined) {
+  } catch (err) {
+    logger.error(err.message)
+    // return 400 if there is a validation error when updating to mongo
+    return h.response().code(400)
+  }
+  try {
+    if (!request.headers.authorization) {
       await postUserActionToMetrics(
         'PASSWORD_RESET',
         request.headers.authorization,
@@ -83,9 +89,7 @@ export default async function changePasswordHandler(
       )
     }
   } catch (err) {
-    logger.error(err.message)
-    // return 400 if there is a validation error when updating to mongo
-    return h.response().code(400)
+    logger.error(err)
   }
   return h.response().code(200)
 }

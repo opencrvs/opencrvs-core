@@ -214,7 +214,6 @@ export type ApplicationConfiguration = {
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
-  INTEGRATIONS?: Maybe<Array<Maybe<Integration>>>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -229,7 +228,6 @@ export type ApplicationConfigurationInput = {
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
-  INTEGRATIONS?: InputMaybe<Array<InputMaybe<IntegrationInput>>>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -609,7 +607,8 @@ export enum CustomFieldType {
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
   Text = 'TEXT',
-  Textarea = 'TEXTAREA'
+  Textarea = 'TEXTAREA',
+  Select = 'SELECT_WITH_OPTIONS'
 }
 
 export type Death = {
@@ -846,6 +845,39 @@ export type EventSearchSet = {
   type?: Maybe<Scalars['String']>
 }
 
+export type FormDataset = {
+  __typename?: 'FormDataset'
+  _id?: Maybe<Scalars['String']>
+  createdAt: Scalars['String']
+  createdBy: User
+  fileName: Scalars['String']
+  options?: Maybe<Array<FormDatasetOption>>
+}
+
+export type FormDatasetInput = {
+  base64Data: Scalars['String']
+  fileName: Scalars['String']
+}
+
+export type FormDatasetOption = {
+  __typename?: 'FormDatasetOption'
+  label?: Maybe<Array<Maybe<FormDatasetOptionLabel>>>
+  value: Scalars['String']
+}
+
+export type FormDatasetOptionLabel = {
+  __typename?: 'FormDatasetOptionLabel'
+  descriptor: MesssageDescriptor
+  lang: Scalars['String']
+}
+
+export type FormDatasetResponse = {
+  __typename?: 'FormDatasetResponse'
+  data?: Maybe<FormDataset>
+  msg: Scalars['String']
+  status: Scalars['String']
+}
+
 export type FormDraft = {
   __typename?: 'FormDraft'
   _id: Scalars['ID']
@@ -887,6 +919,7 @@ export type History = {
   requester?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
+  system?: Maybe<System>
   user?: Maybe<User>
 }
 
@@ -963,17 +996,6 @@ export type InputOutput = {
   valueCode?: Maybe<Scalars['String']>
   valueId?: Maybe<Scalars['String']>
   valueString?: Maybe<Scalars['String']>
-}
-
-export type Integration = {
-  __typename?: 'Integration'
-  name?: Maybe<Scalars['String']>
-  status?: Maybe<Scalars['String']>
-}
-
-export type IntegrationInput = {
-  name?: InputMaybe<Scalars['String']>
-  status?: InputMaybe<Scalars['String']>
 }
 
 export type LocalRegistrar = {
@@ -1083,6 +1105,13 @@ export type MedicalPractitionerInput = {
   qualification?: InputMaybe<Scalars['String']>
 }
 
+export type MesssageDescriptor = {
+  __typename?: 'MesssageDescriptor'
+  defaultMessage: Scalars['String']
+  description?: Maybe<Scalars['String']>
+  id: Scalars['String']
+}
+
 export type MesssageDescriptorInput = {
   defaultMessage: Scalars['String']
   description?: InputMaybe<Scalars['String']>
@@ -1120,11 +1149,14 @@ export type Mutation = {
   changePhone?: Maybe<Scalars['String']>
   createBirthRegistration: CreatedIds
   createDeathRegistration: CreatedIds
+  createFormDataset?: Maybe<FormDatasetResponse>
   createFormDraft?: Maybe<FormDraft>
   createNotification: Notification
   createOrUpdateCertificateSVG?: Maybe<CertificateSvg>
   createOrUpdateUser: User
+  deactivateSystem?: Maybe<System>
   deleteFormDraft?: Maybe<Scalars['String']>
+  deleteSystem?: Maybe<System>
   markBirthAsCertified: Scalars['ID']
   markBirthAsRegistered: BirthRegistration
   markBirthAsValidated?: Maybe<Scalars['ID']>
@@ -1139,6 +1171,9 @@ export type Mutation = {
   markEventAsVoided: Scalars['ID']
   modifyDraftStatus?: Maybe<FormDraft>
   notADuplicate: Scalars['ID']
+  reactivateSystem?: Maybe<System>
+  refreshSystemSecret?: Maybe<SystemSecret>
+  registerSystem?: Maybe<SystemSecret>
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
   requestBirthRegistrationCorrection: Scalars['ID']
   requestDeathRegistrationCorrection: Scalars['ID']
@@ -1147,6 +1182,7 @@ export type Mutation = {
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
+  updatePermissions?: Maybe<System>
   usernameSMSReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
@@ -1194,6 +1230,10 @@ export type MutationCreateDeathRegistrationArgs = {
   details: DeathRegistrationInput
 }
 
+export type MutationCreateFormDatasetArgs = {
+  formDataset: FormDatasetInput
+}
+
 export type MutationCreateFormDraftArgs = {
   formDraft: FormDraftInput
 }
@@ -1210,8 +1250,16 @@ export type MutationCreateOrUpdateUserArgs = {
   user: UserInput
 }
 
+export type MutationDeactivateSystemArgs = {
+  clientId: Scalars['ID']
+}
+
 export type MutationDeleteFormDraftArgs = {
   formDraft: DeleteFormDraftInput
+}
+
+export type MutationDeleteSystemArgs = {
+  clientId: Scalars['ID']
 }
 
 export type MutationMarkBirthAsCertifiedArgs = {
@@ -1281,6 +1329,18 @@ export type MutationNotADuplicateArgs = {
   id: Scalars['String']
 }
 
+export type MutationReactivateSystemArgs = {
+  clientId: Scalars['ID']
+}
+
+export type MutationRefreshSystemSecretArgs = {
+  clientId: Scalars['String']
+}
+
+export type MutationRegisterSystemArgs = {
+  system?: InputMaybe<SystemInput>
+}
+
 export type MutationRemoveBookmarkedAdvancedSearchArgs = {
   removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
 }
@@ -1316,6 +1376,10 @@ export type MutationUpdateBirthRegistrationArgs = {
 export type MutationUpdateDeathRegistrationArgs = {
   details: DeathRegistrationInput
   id: Scalars['ID']
+}
+
+export type MutationUpdatePermissionsArgs = {
+  setting: UpdatePermissionsInput
 }
 
 export type MutationUsernameSmsReminderArgs = {
@@ -1452,10 +1516,12 @@ export type Query = {
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
+  fetchSystem?: Maybe<System>
   getActiveCertificatesSVG?: Maybe<Array<Maybe<CertificateSvg>>>
   getCertificateSVG?: Maybe<CertificateSvg>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
   getEventsWithProgress?: Maybe<EventProgressResultSet>
+  getFormDataset?: Maybe<Array<FormDataset>>
   getFormDraft?: Maybe<Array<FormDraft>>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
@@ -1522,6 +1588,10 @@ export type QueryFetchRegistrationCountByStatusArgs = {
 
 export type QueryFetchRegistrationForViewingArgs = {
   id: Scalars['ID']
+}
+
+export type QueryFetchSystemArgs = {
+  clientId: Scalars['ID']
 }
 
 export type QueryGetCertificateSvgArgs = {
@@ -1720,6 +1790,8 @@ export type QuestionInput = {
   precedingFieldId: Scalars['String']
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
+  options?: InputMaybe<Array<MesssageInput>>
+  datasetId?: InputMaybe<Scalars['String']>
 }
 
 export type QuestionnaireQuestion = {
@@ -1947,6 +2019,46 @@ export type StatusWiseRegistrationCount = {
   status: Scalars['String']
 }
 
+export type System = {
+  __typename?: 'System'
+  _id: Scalars['ID']
+  clientId: Scalars['ID']
+  name: Scalars['String']
+  settings?: Maybe<Array<WebhookPermission>>
+  shaSecret: Scalars['ID']
+  status: SystemStatus
+  type: SystemType
+}
+
+export type SystemInput = {
+  name: Scalars['String']
+  settings?: InputMaybe<SystemSettings>
+  type: SystemType
+}
+
+export type SystemSecret = {
+  __typename?: 'SystemSecret'
+  clientSecret: Scalars['ID']
+  system: System
+}
+
+export type SystemSettings = {
+  dailyQuota?: InputMaybe<Scalars['Int']>
+  webhook?: InputMaybe<Array<InputMaybe<WebhookInput>>>
+}
+
+export enum SystemStatus {
+  Active = 'active',
+  Deactivated = 'deactivated'
+}
+
+export enum SystemType {
+  Health = 'HEALTH',
+  NationalId = 'NATIONAL_ID',
+  RecordSearch = 'RECORD_SEARCH',
+  Webhook = 'WEBHOOK'
+}
+
 export type TotalMetricsByLocation = {
   __typename?: 'TotalMetricsByLocation'
   results: Array<EventMetricsByLocation>
@@ -1974,6 +2086,11 @@ export type TotalMetricsResult = {
 export type TotalVsExport = {
   __typename?: 'TotalVSExport'
   results?: Maybe<Array<VsExport>>
+}
+
+export type UpdatePermissionsInput = {
+  clientId: Scalars['String']
+  webhook: Array<WebhookInput>
 }
 
 export type User = {
@@ -2066,6 +2183,17 @@ export type VerifyPasswordResult = {
   scrope?: Maybe<Array<Maybe<Scalars['String']>>>
   status?: Maybe<Scalars['String']>
   username?: Maybe<Scalars['String']>
+}
+
+export type WebhookInput = {
+  event: Scalars['String']
+  permissions: Array<InputMaybe<Scalars['String']>>
+}
+
+export type WebhookPermission = {
+  __typename?: 'WebhookPermission'
+  event: Scalars['String']
+  permissions: Array<Scalars['String']>
 }
 
 export type CreateOrUpdateCertificateSvgMutationVariables = Exact<{
@@ -3173,6 +3301,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -3463,6 +3592,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -3827,6 +3957,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -4099,6 +4230,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         id: string
         name?: string | null
       } | null
+      system?: { __typename?: 'System'; name: string } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -5451,6 +5583,40 @@ export type UpdateApplicationConfigMutation = {
   } | null
 }
 
+export type GetFormDatasetQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetFormDatasetQuery = {
+  __typename?: 'Query'
+  getFormDataset?: Array<{
+    __typename?: 'FormDataset'
+    _id?: string | null
+    fileName: string
+    createdAt: string
+    createdBy: {
+      __typename?: 'User'
+      id?: string | null
+      name?: Array<{
+        __typename?: 'HumanName'
+        firstNames?: string | null
+        familyName?: string | null
+      } | null> | null
+    }
+    options?: Array<{
+      __typename?: 'FormDatasetOption'
+      value: string
+      label?: Array<{
+        __typename?: 'FormDatasetOptionLabel'
+        lang: string
+        descriptor: {
+          __typename?: 'MesssageDescriptor'
+          id: string
+          defaultMessage: string
+        }
+      } | null> | null
+    }> | null
+  }> | null
+}
+
 export type ChangeFormDraftStatusMutationVariables = Exact<{
   event: Event
   status: DraftStatus
@@ -5508,6 +5674,168 @@ export type CreateFormDraftMutation = {
       comment: string
       updatedAt: any
     }>
+  } | null
+}
+
+export type RegisterSystemMutationVariables = Exact<{
+  system?: InputMaybe<SystemInput>
+}>
+
+export type RegisterSystemMutation = {
+  __typename?: 'Mutation'
+  registerSystem?: {
+    __typename?: 'SystemSecret'
+    clientSecret: string
+    system: {
+      __typename?: 'System'
+      _id: string
+      clientId: string
+      name: string
+      shaSecret: string
+      status: SystemStatus
+      type: SystemType
+      settings?: Array<{
+        __typename?: 'WebhookPermission'
+        event: string
+        permissions: Array<string>
+      }> | null
+    }
+  } | null
+}
+
+export type DeactivateSystemMutationVariables = Exact<{
+  clientId: Scalars['ID']
+}>
+
+export type DeactivateSystemMutation = {
+  __typename?: 'Mutation'
+  deactivateSystem?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
+    settings?: Array<{
+      __typename?: 'WebhookPermission'
+      event: string
+      permissions: Array<string>
+    }> | null
+  } | null
+}
+
+export type ReactivateSystemMutationVariables = Exact<{
+  clientId: Scalars['ID']
+}>
+
+export type ReactivateSystemMutation = {
+  __typename?: 'Mutation'
+  reactivateSystem?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
+    settings?: Array<{
+      __typename?: 'WebhookPermission'
+      event: string
+      permissions: Array<string>
+    }> | null
+  } | null
+}
+
+export type RefreshSystemSecretMutationVariables = Exact<{
+  clientId: Scalars['String']
+}>
+
+export type RefreshSystemSecretMutation = {
+  __typename?: 'Mutation'
+  refreshSystemSecret?: {
+    __typename?: 'SystemSecret'
+    clientSecret: string
+    system: {
+      __typename?: 'System'
+      _id: string
+      clientId: string
+      name: string
+      shaSecret: string
+      status: SystemStatus
+      type: SystemType
+    }
+  } | null
+}
+
+export type UpdatePermissionsMutationVariables = Exact<{
+  setting: UpdatePermissionsInput
+}>
+
+export type UpdatePermissionsMutation = {
+  __typename?: 'Mutation'
+  updatePermissions?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
+    settings?: Array<{
+      __typename?: 'WebhookPermission'
+      event: string
+      permissions: Array<string>
+    }> | null
+  } | null
+}
+
+export type DeleteSystemMutationVariables = Exact<{
+  clientId: Scalars['ID']
+}>
+
+export type DeleteSystemMutation = {
+  __typename?: 'Mutation'
+  deleteSystem?: {
+    __typename?: 'System'
+    _id: string
+    clientId: string
+    name: string
+    shaSecret: string
+    status: SystemStatus
+    type: SystemType
+  } | null
+}
+
+export type CreateFormDatasetMutationVariables = Exact<{
+  formDataset: FormDatasetInput
+}>
+
+export type CreateFormDatasetMutation = {
+  __typename?: 'Mutation'
+  createFormDataset?: {
+    __typename?: 'FormDatasetResponse'
+    status: string
+    msg: string
+    data?: {
+      __typename?: 'FormDataset'
+      fileName: string
+      createdAt: string
+      _id?: string | null
+      options?: Array<{
+        __typename?: 'FormDatasetOption'
+        value: string
+        label?: Array<{
+          __typename?: 'FormDatasetOptionLabel'
+          lang: string
+          descriptor: {
+            __typename?: 'MesssageDescriptor'
+            id: string
+            defaultMessage: string
+          }
+        } | null> | null
+      }> | null
+    } | null
   } | null
 }
 
@@ -5858,7 +6186,6 @@ export type GetTotalCertificationsQuery = {
     eventType: string
   }> | null
 }
-
 export type SubmitActivateUserMutationVariables = Exact<{
   userId: Scalars['String']
   password: Scalars['String']

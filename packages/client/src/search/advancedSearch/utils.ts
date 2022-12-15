@@ -30,6 +30,7 @@ import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import format from '@client/utils/date-formatting'
 import { ISearchLocation } from '@opencrvs/components'
+import formatDate from '@client/utils/date-formatting'
 
 export type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
@@ -155,7 +156,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
   ) {
     transformedStoreState.registrationStatuses =
       localState.registrationStatuses === 'IN_REVIEW'
-        ? [RegStatus.WaitingValidation, RegStatus.Validated]
+        ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
         ? Object.values(RegStatus)
         : [localState.registrationStatuses]
@@ -287,7 +288,14 @@ export const transformStoreDataToAdvancedSearchLocalState = (
     localState.registrationStatuses =
       reduxState.registrationStatuses.length === 1
         ? reduxState.registrationStatuses[0]
-        : reduxState.registrationStatuses.length === 2
+        : isEqual(
+            reduxState.registrationStatuses.sort(),
+            [
+              RegStatus.WaitingValidation,
+              RegStatus.Validated,
+              RegStatus.Declared
+            ].sort()
+          )
         ? 'IN_REVIEW'
         : 'ALL'
   } else {
@@ -447,7 +455,12 @@ export const determineDateFromDateRangePickerVal = (
   if (!dateRangePickerValue) {
     return { exact: undefined, rangeStart: undefined, rangeEnd: undefined }
   }
-  const value = { ...dateRangePickerValue }
+  const value = {
+    ...dateRangePickerValue,
+    exact:
+      dateRangePickerValue.exact &&
+      formatDate(new Date(dateRangePickerValue.exact), 'yyyy-MM-dd')
+  }
   if (dateRangePickerValue.isDateRangeActive) {
     value.exact = undefined
   } else {
@@ -539,7 +552,11 @@ const getLabelForRegistrationStatus = (
       RegStatus.Validated,
       RegStatus.WaitingValidation
     ],
-    IN_REVIEW: [RegStatus.WaitingValidation, RegStatus.Validated],
+    IN_REVIEW: [
+      RegStatus.WaitingValidation,
+      RegStatus.Validated,
+      RegStatus.Declared
+    ],
     ARCHIVED: [RegStatus.Archived],
     CERTIFIED: [RegStatus.Certified],
     DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
@@ -552,7 +569,7 @@ const getLabelForRegistrationStatus = (
   }
 
   const statusType = Object.keys(statusLabelMapping).find((key, i) => {
-    if (isEqual(statusList, statusLabelMapping[key])) {
+    if (isEqual(statusList.sort(), statusLabelMapping[key].sort())) {
       return true
     }
     return false

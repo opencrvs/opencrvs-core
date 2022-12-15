@@ -17,7 +17,8 @@ export enum FieldType {
   NUMBER = 'NUMBER',
   TEXTAREA = 'TEXTAREA',
   SUBSECTION = 'SUBSECTION',
-  PARAGRAPH = 'PARAGRAPH'
+  PARAGRAPH = 'PARAGRAPH',
+  SELECT_WITH_OPTIONS = 'SELECT_WITH_OPTIONS'
 }
 
 export const validFieldType = Object.values(FieldType)
@@ -33,6 +34,10 @@ export interface IMessage {
 export interface ICondition {
   fieldId: string
   regexp: string
+}
+export interface ISelectOption {
+  value: string
+  label: IMessage[]
 }
 export interface IQuestion {
   // fieldId is in the format:
@@ -54,6 +59,8 @@ export interface IQuestion {
   enabled?: string
   custom?: boolean
   conditionals?: ICondition[]
+  datasetId?: string
+  options?: ISelectOption[]
 }
 
 export interface IQuestionModel extends IQuestion, Document {}
@@ -124,7 +131,8 @@ const questionSchema = new Schema({
   conditionals: {
     type: [conditionals],
     default: undefined
-  }
+  },
+  datasetId: { type: Schema.Types.ObjectId, ref: 'FormDataset' }
 })
 
 export default model<IQuestionModel>('Question', questionSchema)

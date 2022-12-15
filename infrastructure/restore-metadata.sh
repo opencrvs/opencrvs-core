@@ -75,3 +75,6 @@ restore_metadata "/default_backups/openhim-dev.gz"
 restore_metadata "/default_backups/user-mgnt.gz";
 
 restore_metadata "/default_backups/application-config.gz"
+
+# run migration by restarting migration service
+docker service update --force --update-parallelism 1 --update-delay 30s opencrvs_migration
