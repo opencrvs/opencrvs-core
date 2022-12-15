@@ -29,8 +29,17 @@ type UserAuditAction =
   | 'REJECTED'
   | 'CORRECTED'
   | 'VALIDATED'
+  | 'DECLARATION_UPDATED'
   | 'ASSIGNED'
   | 'UNASSIGNED'
+  | 'RETRIEVED'
+  | 'VIEWED'
+  | 'ARCHIVED'
+  | 'REINSTATED_IN_PROGRESS'
+  | 'REINSTATED_DECLARED'
+  | 'REINSTATED_REJECTED'
+  | 'SENT_FOR_APPROVAL'
+  | 'CERTIFIED'
 
 type RawUserAuditDataPoint = {
   practitionerId: number
@@ -59,8 +68,17 @@ type UserAuditDataPoint =
   | UserAuditDataPointWithComposition<'REJECTED'>
   | UserAuditDataPointWithComposition<'CORRECTED'>
   | UserAuditDataPointWithComposition<'VALIDATED'>
+  | UserAuditDataPointWithComposition<'DECLARATION_UPDATED'>
   | UserAuditDataPointWithComposition<'ASSIGNED'>
   | UserAuditDataPointWithComposition<'UNASSIGNED'>
+  | UserAuditDataPointWithComposition<'RETRIEVED'>
+  | UserAuditDataPointWithComposition<'VIEWED'>
+  | UserAuditDataPointWithComposition<'ARCHIVED'>
+  | UserAuditDataPointWithComposition<'REINSTATED_IN_PROGRESS'>
+  | UserAuditDataPointWithComposition<'REINSTATED_DECLARED'>
+  | UserAuditDataPointWithComposition<'REINSTATED_REJECTED'>
+  | UserAuditDataPointWithComposition<'SENT_FOR_APPROVAL'>
+  | UserAuditDataPointWithComposition<'CERTIFIED'>
 
 export async function createUserAuditPointFromFHIR(
   action: UserAuditAction,
@@ -71,7 +89,6 @@ export async function createUserAuditPointFromFHIR(
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   const bundle = request.payload as fhir.Bundle
-
   return writePoints([
     generateAuditPoint(
       getPractitionerIdFromBundle(bundle)!,

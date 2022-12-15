@@ -1,7 +1,7 @@
 {
   "description": "OpenCRVS core workspace",
   "license": "MPL-2.0",
-  "version": "1.1.1",
+  "version": "1.2.0-beta",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -55,10 +55,12 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
+    "@types/react-signature-canvas": "^1.0.2",
     "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
     "patch-package": "^6.1.2",
-    "postinstall-postinstall": "^2.0.0"
+    "postinstall-postinstall": "^2.0.0",
+    "react-signature-canvas": "^1.0.6"
   },
   "resolutions": {
     "underscore": ">1.12.1",

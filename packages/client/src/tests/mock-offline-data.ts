@@ -100,9 +100,17 @@ export const formConfig: IFormConfig = {
       required: false,
       enabled: '',
       custom: true
+    },
+    {
+      fieldId: 'birth.child.child-view-group.birthType',
+      enabled: '',
+      identifiers: { sectionIndex: 1, groupIndex: 0, fieldIndex: 6 },
+      precedingFieldId: 'birth.child.child-view-group.vaccination'
     }
   ]
 }
+
+export const systems = []
 
 export const mockConditionals = {
   presentAtBirthRegistration: {
@@ -684,7 +692,8 @@ export const mockOfflineData = {
     DATE_OF_BIRTH_UNKNOWN: true,
     INFORMANT_SIGNATURE: false
   },
-  formConfig
+  formConfig,
+  systems
 }
 
 export const mockOfflineLocationsWithHierarchy: Record<

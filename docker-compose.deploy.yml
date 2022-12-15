@@ -16,8 +16,12 @@ services:
   traefik:
     image: 'traefik:v2.8'
     ports:
-      - '80:80'
-      - '443:443'
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /data/traefik/acme.json:/acme.json
@@ -586,6 +590,7 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
+      - RECORD_SEARCH_QUOTA=2000
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://user-mgnt:${USER_MGNT_MONGODB_PASSWORD}@mongo1/user-mgnt?replicaSet=rs0
     deploy:
@@ -769,6 +774,12 @@ services:
     environment:
       - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
       - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
+      - ES_HOST=search-user:${ROTATING_SEARCH_ELASTIC_PASSWORD}@elasticsearch:9200
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - MINIO_BUCKET=ocrvs
     deploy:
       labels:
         - 'traefik.enable=false'
@@ -824,12 +835,20 @@ services:
         - 'traefik.http.routers.openhimapi.tls.certresolver=certResolver'
         - 'traefik.http.services.openhimapi.loadbalancer.server.scheme=https'
 
-        - 'traefik.http.routers.api.rule=Host(`api.{{hostname}}`)'
-        - 'traefik.http.routers.api.tls=true'
-        - 'traefik.http.routers.api.service=api'
-        - 'traefik.http.routers.api.tls.certresolver=certResolver'
-        - 'traefik.http.routers.api.entrypoints=web,websecure'
-        - 'traefik.http.services.api.loadbalancer.server.port=5001'
+        # To expose OpenHIM to external systems as an interoperability layer
+        # Given OpenCRVS has it's own integrations UI and control.  This functionality is currently disabled
+        # If you wish to reopen OpenHIM interoperability, you can enable these lines
+        # Any subdomain labelled "api" is regularly spammed and can lead to DDOS attack
+        # Care must be taken to whitelist any access to this endpoint
+
+        # - 'traefik.http.routers.api.rule=Host(`api.{{hostname}}`)'
+        # - 'traefik.http.routers.api.tls=true'
+        # - 'traefik.http.routers.api.service=api'
+        # - 'traefik.http.routers.api.tls.certresolver=certResolver'
+        # - 'traefik.http.routers.api.entrypoints=web,websecure'
+        # - 'traefik.http.services.api.loadbalancer.server.port=5001'
+        # - 'traefik.http.middlewares.openhimapi-whitelist.ipwhitelist.sourcerange=<Comma separated IP list>'
+        # - "traefik.http.routers.openhimapi.middlewares=openhimapi-whitelist@docker"
 
         - 'traefik.docker.network=opencrvs_overlay_net'
 
@@ -879,11 +898,11 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.webhook.rule=Host(`webhook.{{hostname}}`)'
-        - 'traefik.http.services.webhook.loadbalancer.server.port=2525'
-        - 'traefik.http.routers.webhook.tls=true'
-        - 'traefik.http.routers.webhook.tls.certresolver=certResolver'
-        - 'traefik.http.routers.webhook.entrypoints=web,websecure'
+        - 'traefik.http.routers.webhooks.rule=Host(`webhooks.{{hostname}}`)'
+        - 'traefik.http.services.webhooks.loadbalancer.server.port=2525'
+        - 'traefik.http.routers.webhooks.tls=true'
+        - 'traefik.http.routers.webhooks.tls.certresolver=certResolver'
+        - 'traefik.http.routers.webhooks.entrypoints=web,websecure'
         - 'traefik.docker.network=opencrvs_overlay_net'
         - 'traefik.http.middlewares.webhooks.headers.customresponseheaders.Pragma=no-cache'
         - 'traefik.http.middlewares.webhooks.headers.customresponseheaders.Cache-control=no-store'

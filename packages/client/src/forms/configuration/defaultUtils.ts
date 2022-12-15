@@ -49,45 +49,6 @@ export function getFieldId(
   return [event, section.id, group.id, field.name].join('.')
 }
 
-export function getPrecedingDefaultFieldIdAcrossSections(
-  event: Event,
-  identifiers: IFieldIdentifiers,
-  defaultForm: ISerializedForm
-) {
-  const { sectionIndex } = identifiers
-  const precedingDefaultFieldId = getPrecedingDefaultFieldIdAcrossGroups(
-    event,
-    identifiers,
-    defaultForm
-  )
-  const isFirstSection = !sectionIndex
-  if (precedingDefaultFieldId === FieldPosition.TOP && !isFirstSection) {
-    const previousSectionIdentifiers = {
-      sectionIndex: sectionIndex - 1,
-      groupIndex: -1,
-      fieldIndex: -1
-    }
-    const previousSection = getSection(previousSectionIdentifiers, defaultForm)
-    const lastGroup = getGroup(
-      {
-        ...previousSectionIdentifiers,
-        groupIndex: previousSection.groups.length - 1
-      },
-      defaultForm
-    )
-    return getFieldId(
-      event,
-      {
-        ...previousSectionIdentifiers,
-        groupIndex: previousSection.groups.length - 1,
-        fieldIndex: lastGroup.fields.length - 1
-      },
-      defaultForm
-    )
-  }
-  return precedingDefaultFieldId
-}
-
 export function getPrecedingDefaultFieldIdAcrossGroups(
   event: Event,
   identifiers: IFieldIdentifiers,
@@ -119,7 +80,7 @@ export function getPrecedingDefaultFieldIdAcrossGroups(
   return precedingDefaultFieldId
 }
 
-export function getPrecedingDefaultFieldId(
+function getPrecedingDefaultFieldId(
   event: Event,
   identifiers: IFieldIdentifiers,
   defaultForm: ISerializedForm

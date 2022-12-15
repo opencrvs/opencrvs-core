@@ -11,10 +11,9 @@
  */
 import {
   IDefaultQuestionConfig,
-  ICustomQuestionConfig,
   getIdentifiersFromFieldId
 } from '@client/forms/questionConfig'
-import { IConnection, IConfigField } from '.'
+import { IConfigField } from '.'
 import { isCustomConfigField } from './customConfig'
 import {
   getField,
@@ -24,20 +23,15 @@ import {
 import {
   isPreviewGroupConfigField,
   getPreviewGroupLabel,
-  isPlaceHolderPreviewGroup
+  isPlaceHolderPreviewGroup,
+  IPreviewGroupConfigField,
+  getPreviewGroupFieldId
 } from './previewGroup'
 import { ISerializedForm } from '@client/forms'
 import { FieldEnabled } from '@client/forms/configuration'
-import { Event } from '@client/utils/gateway'
-import { MessageDescriptor } from 'react-intl'
 
 export type IDefaultConfigField = IDefaultQuestionConfig & {
   required: boolean
-} & IConnection
-
-export type IDefaultConfigFieldWithPreviewGroup = IDefaultConfigField & {
-  previewGroup: string
-  previewGroupLabel: MessageDescriptor
 }
 
 export function isDefaultConfigField(
@@ -48,50 +42,29 @@ export function isDefaultConfigField(
   )
 }
 
-export function isDefaultConfigFieldWithPreviewGroup(
-  configField:
-    | ICustomQuestionConfig
-    | IDefaultConfigField
-    | IDefaultConfigFieldWithPreviewGroup
-): configField is IDefaultConfigFieldWithPreviewGroup {
-  return 'previewGroup' in configField
-}
-
-export function defaultFieldToConfigField(
+export function defaultQuestionToConfigField(
   question: IDefaultQuestionConfig,
-  foregoingFieldId: string,
   defaultForm: ISerializedForm
-): IDefaultConfigField | IDefaultConfigFieldWithPreviewGroup {
+): IDefaultConfigField | IPreviewGroupConfigField {
   const { previewGroup, required } = getField(question.identifiers, defaultForm)
   const configField = {
     required: required ?? false,
-    ...question,
-    foregoingFieldId
+    ...question
   }
-  if (previewGroup && isPlaceHolderPreviewGroup(previewGroup)) {
-    return {
-      ...configField,
-      previewGroup,
-      previewGroupLabel: getPreviewGroupLabel(
-        getGroup(question.identifiers, defaultForm),
-        previewGroup
-      )
-    }
+  if (!previewGroup || !isPlaceHolderPreviewGroup(previewGroup)) {
+    return configField
   }
-  return configField
-}
-
-export function getDefaultConfigFieldIdentifiers(
-  defaultConfigField: IDefaultConfigField
-) {
-  const { sectionIndex, groupIndex, fieldIndex } =
-    defaultConfigField.identifiers
-  return {
-    event: defaultConfigField.fieldId.split('.')[0] as Event,
-    sectionIndex,
-    groupIndex,
-    fieldIndex
+  const previewGroupConfigField: IPreviewGroupConfigField = {
+    fieldId: getPreviewGroupFieldId(question.fieldId, previewGroup),
+    previewGroup,
+    precedingFieldId: question.precedingFieldId,
+    previewGroupLabel: getPreviewGroupLabel(
+      getGroup(question.identifiers, defaultForm),
+      previewGroup
+    ),
+    configFields: [configField]
   }
+  return previewGroupConfigField
 }
 
 export function hasDefaultFieldChanged(

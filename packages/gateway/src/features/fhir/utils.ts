@@ -74,7 +74,6 @@ import {
   GQLRegStatus
 } from '@gateway/graphql/schema'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
-
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
@@ -83,7 +82,6 @@ export interface IEventDurationResponse {
   status: string
   durationInSeconds: number
 }
-
 export function findCompositionSectionInBundle(
   code: string,
   fhirBundle: ITemplatedBundle
@@ -1070,15 +1068,15 @@ export const fetchFromHearth = <T = any>(
     })
 }
 
-export const sendToFhir = (
-  doc: fhir.Location,
+export const sendToFhir = async (
+  body: string,
   suffix: string,
   method: string,
   token: string
 ) => {
   return fetch(`${FHIR_URL}${suffix}`, {
     method,
-    body: JSON.stringify(doc),
+    body,
     headers: {
       'Content-Type': 'application/fhir+json',
       Authorization: `${token}`
@@ -1112,28 +1110,6 @@ export async function postAssignmentSearch(
     .catch((error) => {
       return Promise.reject(
         new Error(`Search assignment failed: ${error.message}`)
-      )
-    })
-}
-
-export const postSearch = (
-  authHeader: IAuthHeader,
-  criteria: ISearchCriteria
-) => {
-  return fetch(`${SEARCH_URL}search`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    },
-    body: JSON.stringify(criteria)
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Search request failed: ${error.message}`)
       )
     })
 }
@@ -1404,7 +1380,6 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
     findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
   return extension
 }
-
 export const fetchDocuments = async <T = any>(
   suffix: string,
   authHeader: IAuthHeader,

@@ -184,7 +184,7 @@ describe('validate', () => {
       const response = {
         message: {
           defaultMessage:
-            'The National ID can only be numeric and must be 9 digits long',
+            'The National ID can only be numeric and must be 10 digits long',
           description:
             'The error message that appears when an invalid value is used as nid',
           id: 'validations.validNationalId'
@@ -198,7 +198,7 @@ describe('validate', () => {
       const response = {
         message: {
           defaultMessage:
-            'The National ID can only be numeric and must be 9 digits long',
+            'The National ID can only be numeric and must be 10 digits long',
           description:
             'The error message that appears when an invalid value is used as nid',
           id: 'validations.validNationalId'

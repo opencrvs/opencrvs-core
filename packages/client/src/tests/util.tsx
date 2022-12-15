@@ -1706,6 +1706,8 @@ export const mockDeclarationData = {
       value: 'MOTHER',
       nestedFields: { otherInformantType: '' }
     },
+    informantsSignature: 'data:image/png;base64,abcd',
+
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -1715,7 +1717,8 @@ export const mockDeclarationData = {
       officeAddressLevel4: 'Dhaka'
     },
     certificates: [{}]
-  }
+  },
+  documents: {}
 }
 
 export const mockDeathDeclarationData = {
@@ -1825,6 +1828,7 @@ export const mockBirthRegistrationSectionData = {
     value: 'MOTHER',
     nestedFields: { otherInformantType: '' }
   },
+  informantsSignature: 'data:image/png;base64,abcd',
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
   registrationNumber: '201908122365BDSS0SE1',
@@ -1916,7 +1920,8 @@ export const mockFetchCertificatesTemplatesDefinition = [
 export const mockConfigResponse = {
   config: mockOfflineData.config,
   certificates: mockFetchCertificatesTemplatesDefinition,
-  formConfig: mockOfflineData.formConfig
+  formConfig: mockOfflineData.formConfig,
+  systems: mockOfflineData.systems
 }
 
 export const mockOfflineDataDispatch = {
@@ -1928,7 +1933,8 @@ export const mockOfflineDataDispatch = {
   offices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
-  formConfig: mockOfflineData.formConfig
+  formConfig: mockOfflineData.formConfig,
+  systems: mockOfflineData.systems
 }
 
 export async function createTestStore() {
@@ -2390,8 +2396,8 @@ export const mockUserGraphqlOperation = {
                     },
                     required: true,
                     initialValue: '',
-                    searchableResource: 'facilities',
-                    searchableType: 'CRVS_OFFICE',
+                    searchableResource: ['facilities'],
+                    searchableType: ['CRVS_OFFICE'],
                     locationList: [],
                     validate: [
                       {

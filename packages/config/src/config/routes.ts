@@ -21,11 +21,11 @@ import {
 } from '@config/handlers/certificate/certificateHandler'
 import configHandler, {
   getLoginConfigHandler,
-  getIntegrationConfigHandler,
   updateApplicationConfig,
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
 import createQuestionHandler, {
+  formDatasetSchema,
   requestSchema as createQuestionReqSchema
 } from '@config/handlers/question/createQuestion/handler'
 import updateQuestionHandler, {
@@ -46,6 +46,11 @@ import {
   deleteFormDraftHandler,
   requestSchema as deleteFormDraftReqSchema
 } from '@config/handlers/formDraft/deleteFormDraft/handler'
+import getSystems from '@config/handlers/system/systemHandler'
+import {
+  createFormDatasetHandler,
+  getFormDatasetHandler
+} from '@config/handlers/formDataset/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -108,10 +113,10 @@ export default function getRoutes() {
     {
       method: 'GET',
       path: '/integrationConfig',
-      handler: getIntegrationConfigHandler,
+      handler: getSystems,
       config: {
         tags: ['api'],
-        description: 'Retrieve Application integration configuration'
+        description: 'Retrieve Application integrations'
       }
     },
     {
@@ -315,6 +320,33 @@ export default function getRoutes() {
         description: 'Get question',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/getFormDataset',
+      handler: getFormDatasetHandler,
+      config: {
+        tags: ['api'],
+        description: 'fetch form dataset',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/createFormDataset',
+      handler: createFormDatasetHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create form dataset',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: formDatasetSchema
         }
       }
     }

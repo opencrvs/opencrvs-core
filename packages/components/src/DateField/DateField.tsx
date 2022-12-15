@@ -39,7 +39,7 @@ interface IState {
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
 const DateSegment = styled(TextInput)`
-  width: 54px;
+  width: 54px !important;
   margin: 0 4px;
 
   &:first-of-type {
@@ -47,7 +47,7 @@ const DateSegment = styled(TextInput)`
   }
   &:last-of-type {
     margin-right: 0;
-    width: 80px;
+    width: 80px !important;
   }
 `
 
@@ -146,7 +146,6 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   render() {
     const { id, meta, focusInput, notice, ignorePlaceHolder, ...props } =
       this.props
-
     return (
       <>
         <DateWrapper id={id}>
