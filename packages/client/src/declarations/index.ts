@@ -55,7 +55,7 @@ import {
   GQLRegWorkflow
 } from '@opencrvs/gateway/src/graphql/schema'
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
-import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
+import { Cmd, loop, Loop, LoopReducer, RunCmd } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
@@ -524,6 +524,13 @@ const initialState: IDeclarationsState = {
   declarations: [],
   initialDeclarationsLoaded: false,
   isWritingDraft: false
+}
+
+function delay(cmd: RunCmd<any>, time: number) {
+  return Cmd.list(
+    [Cmd.run(() => new Promise((resolve) => setTimeout(resolve, time))), cmd],
+    { sequence: true }
+  )
 }
 
 export function createDeclaration(event: Event, initialData?: IFormData) {
@@ -1115,26 +1122,9 @@ async function getWorkqueueData(
   )
 }
 
-async function writeRegistrarWorkqueueByUserWithTimeout(
-  getState: () => IStoreState,
-  workqueuePaginationParams: IWorkqueuePaginationParams,
-  timeout?: number
-) {
-  if (timeout) {
-    await new Promise((resolve) => setTimeout(() => resolve(), timeout))
-  }
-
-  if (!navigator.onLine) {
-    return
-  }
-
-  return writeRegistrarWorkqueueByUser(getState, workqueuePaginationParams)
-}
-
 export async function writeRegistrarWorkqueueByUser(
   getState: () => IStoreState,
-  workqueuePaginationParams: IWorkqueuePaginationParams,
-  timeout?: number
+  workqueuePaginationParams: IWorkqueuePaginationParams
 ): Promise<string> {
   const state = getState()
   const userDetails = getUserDetails(state) as IUserDetails
@@ -2020,12 +2010,15 @@ export const registrarWorkqueueReducer: LoopReducer<WorkqueueState, Action> = (
           // Reload workqueue if there was an error
           return loop(
             { ...state },
-            Cmd.run(writeRegistrarWorkqueueByUserWithTimeout, {
-              successActionCreator:
-                updateRegistrarWorkqueueSuccessActionCreator,
-              failActionCreator: updateRegistrarWorkqueueFailActionCreator,
-              args: [Cmd.getState, action.payload, 2500]
-            })
+            delay(
+              Cmd.run(writeRegistrarWorkqueueByUser, {
+                successActionCreator:
+                  updateRegistrarWorkqueueSuccessActionCreator,
+                failActionCreator: updateRegistrarWorkqueueFailActionCreator,
+                args: [Cmd.getState, action.payload]
+              }),
+              2500
+            )
           )
         }
 
