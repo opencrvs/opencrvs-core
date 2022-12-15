@@ -60,7 +60,7 @@ const Title = styled.h4`
   margin-bottom: 24px;
 `
 
-const AVAILABLE_EVENTS = [Event.Birth]
+const AVAILABLE_EVENTS = [Event.Birth, Event.Death]
 
 function EventInfoComponet(props: IFullProps) {
   const {
