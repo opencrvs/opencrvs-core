@@ -392,9 +392,7 @@ class CustomFieldToolsComp extends React.Component<
     })
 
     return {
-      handleBars:
-        getCertificateHandlebar(formField) ||
-        camelCase(fieldForms[defaultLanguage].label),
+      handleBars: camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
       conditionalField: {
         fieldId: conditionalfield?.fieldId ?? EMPTY_STRING,
