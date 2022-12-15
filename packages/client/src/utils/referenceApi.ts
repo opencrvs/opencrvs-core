@@ -47,6 +47,11 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
+interface IIntegration {
+  name: string
+  status: string
+}
+
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {

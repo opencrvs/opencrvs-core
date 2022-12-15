@@ -1182,6 +1182,11 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
+export interface GQLIntegration {
+  name?: string
+  status?: string
+}
+
 export interface GQLBirthInput {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
@@ -1201,6 +1206,11 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
+}
+
+export interface GQLIntegrationInput {
+  name?: string
+  status?: string
 }
 
 export interface GQLQuestionInput {
@@ -1831,6 +1841,7 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
+  Integration?: GQLIntegrationTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -4685,6 +4696,27 @@ export interface ApplicationConfigurationToADDRESSESResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface ApplicationConfigurationToINTEGRATIONSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLSystemSecretTypeResolver<TParent = any> {
   system?: SystemSecretToSystemResolver<TParent>
   clientSecret?: SystemSecretToClientSecretResolver<TParent>
@@ -4733,20 +4765,6 @@ export interface FormDatasetResponseToMsgResolver<
 }
 
 export interface FormDatasetResponseToDataResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<
   TParent = any,
   TResult = any
 > {
@@ -5876,6 +5894,19 @@ export interface DeathToREGISTRATION_TARGETResolver<
 }
 
 export interface DeathToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLIntegrationTypeResolver<TParent = any> {
+  name?: IntegrationToNameResolver<TParent>
+  status?: IntegrationToStatusResolver<TParent>
+}
+
+export interface IntegrationToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface IntegrationToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
