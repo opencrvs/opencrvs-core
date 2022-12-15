@@ -1115,9 +1115,26 @@ async function getWorkqueueData(
   )
 }
 
+async function writeRegistrarWorkqueueByUserWithTimeout(
+  getState: () => IStoreState,
+  workqueuePaginationParams: IWorkqueuePaginationParams,
+  timeout?: number
+) {
+  if (timeout) {
+    await new Promise((resolve) => setTimeout(() => resolve(), timeout))
+  }
+
+  if (!navigator.onLine) {
+    return
+  }
+
+  return writeRegistrarWorkqueueByUser(getState, workqueuePaginationParams)
+}
+
 export async function writeRegistrarWorkqueueByUser(
   getState: () => IStoreState,
-  workqueuePaginationParams: IWorkqueuePaginationParams
+  workqueuePaginationParams: IWorkqueuePaginationParams,
+  timeout?: number
 ): Promise<string> {
   const state = getState()
   const userDetails = getUserDetails(state) as IUserDetails
@@ -1998,6 +2015,19 @@ export const registrarWorkqueueReducer: LoopReducer<WorkqueueState, Action> = (
     case UPDATE_REGISTRAR_WORKQUEUE_SUCCESS:
       if (action.payload) {
         const workqueue = JSON.parse(action.payload) as IWorkqueue
+
+        if (workqueue.error) {
+          // Reload workqueue if there was an error
+          return loop(
+            { ...state },
+            Cmd.run(writeRegistrarWorkqueueByUserWithTimeout, {
+              successActionCreator:
+                updateRegistrarWorkqueueSuccessActionCreator,
+              failActionCreator: updateRegistrarWorkqueueFailActionCreator,
+              args: [Cmd.getState, action.payload, 2500]
+            })
+          )
+        }
 
         return {
           workqueue
