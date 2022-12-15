@@ -19,7 +19,7 @@ export interface IInformantSMSNotificationsModel extends Document {
 }
 
 const informantSMSNotificationsSchema = new Schema({
-  name: { type: String, required: true },
+  name: { type: String, unique: true, required: true },
   enabled: {
     type: Boolean,
     required: true,
