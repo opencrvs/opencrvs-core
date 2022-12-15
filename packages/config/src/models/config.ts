@@ -35,6 +35,12 @@ interface ICountryLogo {
   fileName: string
   file: string
 }
+
+interface IIntegration {
+  name: string
+  status: string
+}
+
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
   BIRTH: IBirth
