@@ -21,7 +21,7 @@ import { statuses } from '@user-mgnt/utils/userUtils'
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['sysadmin', 'demo'] },
+  { scope: ['natlsysadmin', 'demo'] },
   readFileSync('../auth/test/cert.key'),
   {
     subject: '123',
@@ -81,23 +81,20 @@ const mockUser = {
 } as unknown as IUser & { password: string }
 
 const mockSystem = {
-  name: [
-    {
-      use: 'en',
-      given: ['John', 'William'],
-      family: 'Doe'
-    }
-  ],
+  name: 'MOSIP',
+  createdBy: '123',
   username: 'j.doe1',
   client_id: '123',
-  status: statuses.ACTIVE,
-  practitionerId: '123',
+  secretHash: 'secretsecret',
   salt: '123',
+  practitionerId: '123',
   sha_secret: '123',
-  scope: ['nationalId']
+  scope: ['nationalId'],
+  status: statuses.ACTIVE,
+  type: 'NATIONAL_ID'
 } as unknown as ISystem & { secretHash: string }
 
-describe('registerSystemClient handler', () => {
+describe('registerSystem handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -116,10 +113,10 @@ describe('registerSystemClient handler', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/registerSystemClient',
+      url: '/registerSystem',
       payload: {
-        scope: 'NATIONAL_ID',
-        name: [{ use: 'en', family: 'Health complex' }],
+        type: 'RECORD_SEARCH',
+        name: 'Fortune Green',
         settings: {
           dailyQuota: 50
         }
@@ -131,14 +128,14 @@ describe('registerSystemClient handler', () => {
     expect(res.statusCode).toBe(201)
   })
 
-  it('return unauthoried error if sysadmin not returned', async () => {
+  it('return unauthorized error if sysadmin not returned', async () => {
     mockingoose(User).toReturn(null, 'findOne')
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/registerSystemClient',
+      url: '/registerSystem',
       payload: {
-        scope: 'NATIONAL_ID'
+        type: 'NATIONAL_ID'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -151,9 +148,9 @@ describe('registerSystemClient handler', () => {
   it('return an error if a token scope check fails', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/registerSystemClient',
+      url: '/registerSystem',
       payload: {
-        scope: 'NATIONAL_ID'
+        type: 'NATIONAL_ID'
       },
       headers: {
         Authorization: `Bearer ${badToken}`
@@ -166,9 +163,9 @@ describe('registerSystemClient handler', () => {
   it('return an error if system scope is not supported', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/registerSystemClient',
+      url: '/registerSystem',
       payload: {
-        scope: '123'
+        type: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -179,7 +176,7 @@ describe('registerSystemClient handler', () => {
   })
 })
 
-describe('deactivateSystemClient handler', () => {
+describe('deactivateSystem handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -191,13 +188,13 @@ describe('deactivateSystemClient handler', () => {
   it('deactivates system client using mongoose', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     mockingoose(System).toReturn(mockSystem, 'findOne')
-    mockingoose(System).toReturn({}, 'update')
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/deactivateSystemClient',
+      url: '/deactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -206,14 +203,14 @@ describe('deactivateSystemClient handler', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('return unauthoried error if sysadmin not returned', async () => {
+  it('return unauthorized error if sysadmin not returned', async () => {
     mockingoose(User).toReturn(null, 'findOne')
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/deactivateSystemClient',
+      url: '/deactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -226,9 +223,9 @@ describe('deactivateSystemClient handler', () => {
   it('return an error if a token scope check fails', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/deactivateSystemClient',
+      url: '/deactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${badToken}`
@@ -239,7 +236,7 @@ describe('deactivateSystemClient handler', () => {
   })
 })
 
-describe('reactivateSystemClient handler', () => {
+describe('reactivateSystem handler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -251,13 +248,13 @@ describe('reactivateSystemClient handler', () => {
   it('reactivates system client using mongoose', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     mockingoose(System).toReturn(mockSystem, 'findOne')
-    mockingoose(System).toReturn({}, 'update')
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/reactivateSystemClient',
+      url: '/reactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -266,14 +263,14 @@ describe('reactivateSystemClient handler', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('return unauthoried error if sysadmin not returned', async () => {
+  it('return unauthorized error if sysadmin not returned', async () => {
     mockingoose(User).toReturn(null, 'findOne')
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/reactivateSystemClient',
+      url: '/reactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -286,9 +283,115 @@ describe('reactivateSystemClient handler', () => {
   it('return an error if a token scope check fails', async () => {
     const res = await server.server.inject({
       method: 'POST',
-      url: '/reactivateSystemClient',
+      url: '/reactivateSystem',
       payload: {
-        client_id: '123'
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${badToken}`
+      }
+    })
+
+    expect(res.statusCode).toBe(403)
+  })
+})
+
+describe('refresh secret system user', () => {
+  let server: any
+
+  beforeEach(async () => {
+    mockingoose.resetAll()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  it('generate refresh secret key', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(System).toReturn(mockSystem, 'findOne')
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/refreshSystemSecret',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('return unauthorized error if no system user is found', async () => {
+    mockingoose(System).toReturn({}, 'findOneAndUpdate')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/refreshSystemSecret',
+      payload: {
+        clientId: '12367'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
+  })
+})
+
+describe('delete system ', () => {
+  let server: any
+
+  beforeEach(async () => {
+    mockingoose.resetAll()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  it('delete system using mongoose', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(System).toReturn(mockSystem, 'findOne')
+    mockingoose(System).toReturn(mockSystem, 'findOneAndDelete')
+    mockingoose(System).toReturn({}, 'deleteOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/deleteSystem',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('return error if system is not found', async () => {
+    mockingoose(User).toReturn(null, 'findOneAndDelete')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/deleteSystem',
+      payload: {
+        clientId: '123'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(404)
+  })
+
+  it('return an error if a token scope check fails', async () => {
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/deleteSystem',
+      payload: {
+        clientId: '123'
       },
       headers: {
         Authorization: `Bearer ${badToken}`

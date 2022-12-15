@@ -42,13 +42,17 @@ type VSExportProps = {
   items: VsExport[]
 }
 
-function downloadURI(uri: string, name: string) {
-  const link = document.createElement('a')
-  link.href = uri
-  link.download = name
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+async function downloadURI(uri: string, name: string) {
+  await fetch(uri)
+    .then((res) => {
+      return res.blob()
+    })
+    .then((data) => {
+      const a = document.createElement('a')
+      a.href = window.URL.createObjectURL(data)
+      a.download = name
+      a.click()
+    })
 }
 
 function TabContent(props: VSExportProps) {
@@ -62,29 +66,28 @@ function TabContent(props: VSExportProps) {
           event: item.event,
           fileSize: ''
         })
-        const sizeValue = intl.formatMessage(messages.vitalStatisticsExport, {
+        const label = intl.formatMessage(messages.vitalStatisticsExport, {
           year: item.year,
           event: item.event,
           fileSize: item.fileSize
         })
+        const downloadFilePath = `${window.config.MINIO_URL}${item.url}`
 
         return (
           <ListViewSimplified key={`${item.createdOn}_${item.event}`}>
             <ListViewItemSimplified
+              compactLabel
               label={<Label id={`${item.year}_label`}>{item.year}</Label>}
-              value={<Value id={`${item.createdOn}_value`}>{sizeValue}</Value>}
+              value={<Value id={`${item.createdOn}_value`}>{label}</Value>}
               actions={
                 <DynamicHeightLinkButton
-                  id={item.url}
+                  id={`${item.year}_export_button`}
                   disabled={false}
-                  onClick={() =>
-                    downloadURI(
-                      `${window.config.MINIO_URL}${item.url}`,
-                      fileName
-                    )
+                  onClick={async () =>
+                    await downloadURI(downloadFilePath, fileName)
                   }
                 >
-                  {messages.export.defaultMessage}
+                  {intl.formatMessage(messages.export)}
                 </DynamicHeightLinkButton>
               }
             />

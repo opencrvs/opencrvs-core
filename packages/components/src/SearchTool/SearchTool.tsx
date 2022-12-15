@@ -10,28 +10,31 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { SearchBlue, ClearText } from '../icons'
-import { Button } from '../buttons'
+import { ClearText } from '../icons'
+import { Button } from '../Button'
+import { Icon } from '../Icon'
 import styled from 'styled-components'
+import { Text } from '../Text'
 
 const SearchBox = styled.div`
-  background: ${({ theme }) => theme.colors.grey200};
+  background: ${({ theme }) => theme.colors.grey100};
   box-sizing: border-box;
-  border-radius: 40px;
   width: 664px;
   height: 40px;
+  border-radius: 40px;
 
   &:hover {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    outline: 1px solid ${({ theme }) => theme.colors.grey400};
+    background: ${({ theme }) => theme.colors.grey100};
   }
 
   &:focus-within {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    outline: 2px solid ${({ theme }) => theme.colors.grey600};
     background: ${({ theme }) => theme.colors.white};
   }
 
   &:active {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    outline: 2px solid ${({ theme }) => theme.colors.grey600};
   }
 
   &:focus-within input {
@@ -52,17 +55,16 @@ const Wrapper = styled.form`
   align-items: center;
   border-radius: 2px;
   display: flex;
-  ${({ theme }) => theme.fonts.reg16};
-  padding: 0px 10px;
-  padding-right: 0;
-  margin-bottom: 1px;
+  ${({ theme }) => theme.fonts.bold14};
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 0px 8px 0px 4px;
   position: relative;
 `
 const SearchTextInput = styled.input`
   border: none;
   margin: 0px 4px;
   ${({ theme }) => theme.fonts.reg16};
-  background-color: ${({ theme }) => theme.colors.grey200};
+  background-color: transparent;
   flex-grow: 1;
   &:focus {
     outline: none;
@@ -97,11 +99,17 @@ const DropDownWrapper = styled.ul`
   margin: 4px 0px;
   cursor: pointer;
 `
-const DropDownItem = styled.li`
+
+const DropDownItem = styled.li<{ borderTop: boolean }>`
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 8px 8px 8px 16px;
+  ${({ borderTop, theme }) =>
+    borderTop
+      ? `border-top: 1px solid ${theme.colors.grey200}; padding:2px 2px 2px 10px; margin-top: 2px`
+      : ''}
   &:nth-last-child {
     border-bottom: none;
   }
@@ -114,7 +122,8 @@ const DropDownItem = styled.li`
 `
 const IconWrapper = styled.span`
   display: flex;
-  padding: 8px 12px 8px 16px;
+  padding-right: 12px;
+  padding-left: 0;
 `
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg16};
@@ -150,7 +159,7 @@ const DropDown = styled.div`
   }
 `
 const ClearTextIcon = styled((props) => <ClearText {...props} />)`
-  margin: 0 5px;
+  margin: 0 12px;
 `
 export interface ISearchType {
   label: string
@@ -160,6 +169,12 @@ export interface ISearchType {
   isDefault?: boolean
   placeHolderText: string
 }
+export interface INavigationType {
+  label: string
+  id: string
+  icon?: React.ReactNode
+  onClick: () => void
+}
 interface IState {
   dropDownIsVisible: boolean
   searchParam: string
@@ -168,6 +183,7 @@ interface IState {
 }
 interface IProps {
   searchTypeList: ISearchType[]
+  navigationList?: INavigationType[]
   searchText?: string
   selectedSearchType?: string
   language: string
@@ -234,6 +250,7 @@ export class SearchTool extends React.Component<IProps, IState> {
           {this.props.searchTypeList.map((item) => {
             return (
               <DropDownItem
+                borderTop={false}
                 id={item.value}
                 key={item.value}
                 onClick={() => this.dropDownItemSelect(item)}
@@ -243,10 +260,26 @@ export class SearchTool extends React.Component<IProps, IState> {
               </DropDownItem>
             )
           })}
+          {this.props.navigationList?.map((item) => {
+            return (
+              <DropDownItem
+                borderTop={true}
+                id={item.id}
+                key={item.id}
+                onClick={() => item.onClick()}
+              >
+                <IconWrapper>{item.icon}</IconWrapper>
+                <Text variant={'bold14'} element={'p'} color={'primary'}>
+                  {item.label}
+                </Text>
+              </DropDownItem>
+            )
+          })}
         </DropDownWrapper>
       )
     )
   }
+
   dropDownItemSelect = (item: ISearchType) => {
     this.setState((_) => ({
       selectedSearchType: item,
@@ -284,7 +317,15 @@ export class SearchTool extends React.Component<IProps, IState> {
     return (
       <SearchBox className={this.props.className}>
         <Wrapper onSubmit={this.search}>
-          <SearchBlue id="searchIconButton" onClick={this.search} />
+          <Button
+            type="icon"
+            size="medium"
+            aria-label="Search"
+            id="searchIconButton"
+            onClick={this.search}
+          >
+            <Icon color="currentColor" name="Search" size="large" />
+          </Button>
           <SearchTextInput
             id="searchText"
             type="text"

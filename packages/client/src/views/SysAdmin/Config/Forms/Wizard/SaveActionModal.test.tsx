@@ -100,6 +100,12 @@ const graphqlMocks: MockedResponse[] = [
             required: false,
             enabled: '',
             custom: true
+          },
+          {
+            fieldId: 'birth.child.child-view-group.birthType',
+            required: false,
+            enabled: '',
+            precedingFieldId: 'birth.child.child-view-group.vaccination'
           }
         ]
       }

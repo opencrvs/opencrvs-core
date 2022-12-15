@@ -13,7 +13,7 @@ import { MessageDescriptor } from 'react-intl'
 
 export function getMotherDateOfBirthLabel(): MessageDescriptor {
   return {
-    id: 'form.field.label.motherDateOfBirth',
+    id: 'form.field.label.dateOfBirth',
     defaultMessage: 'Date of birth',
     description: 'Label for form field: Date of birth'
   }
@@ -21,7 +21,7 @@ export function getMotherDateOfBirthLabel(): MessageDescriptor {
 
 export function getFatherDateOfBirthLabel(): MessageDescriptor {
   return {
-    id: 'form.field.label.motherDateOfBirth',
+    id: 'form.field.label.dateOfBirth',
     defaultMessage: 'Date of birth',
     description: 'Label for form field: Date of birth'
   }

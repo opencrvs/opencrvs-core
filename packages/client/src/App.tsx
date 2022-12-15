@@ -58,9 +58,13 @@ import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 import { Roles } from '@client/utils/authUtils'
-import VSExport from './views/SysAdmin/Performance/Vsexports/VSExport'
+import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
+import VSExport from './views/SysAdmin/Vsexports/VSExport'
+import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
+import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
+import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -222,6 +226,26 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.ADVANCED_SEARCH}
+                                            component={AdvancedSearchConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.ADVANCED_SEARCH_RESULT}
+                                            component={AdvancedSearchResult}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
                                               Roles.NATIONAL_SYSTEM_ADMIN
                                             ]}
                                             path={routes.APPLICATION_CONFIG}
@@ -312,6 +336,11 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            path={routes.SYSTEM_LIST}
+                                            component={SystemList}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={routes.CREATE_USER}
                                             component={CreateNewUser}
                                           />
@@ -383,11 +412,17 @@ export class App extends React.Component<IAppProps> {
                                             path={routes.USER_PROFILE}
                                             component={UserAudit}
                                           />
-
                                           <ProtectedRoute
                                             exact
                                             path={routes.VIEW_RECORD}
                                             component={ViewRecord}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.PERFORMANCE_REGISTRATIONS_LIST
+                                            }
+                                            component={RegistrationList}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

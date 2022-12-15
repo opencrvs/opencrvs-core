@@ -100,9 +100,17 @@ export const formConfig: IFormConfig = {
       required: false,
       enabled: '',
       custom: true
+    },
+    {
+      fieldId: 'birth.child.child-view-group.birthType',
+      enabled: '',
+      identifiers: { sectionIndex: 1, groupIndex: 0, fieldIndex: 6 },
+      precedingFieldId: 'birth.child.child-view-group.vaccination'
     }
   ]
 }
+
+export const systems = []
 
 export const mockConditionals = {
   presentAtBirthRegistration: {
@@ -682,7 +690,8 @@ export const mockOfflineData = {
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
     ADDRESSES: 1
   },
-  formConfig
+  formConfig,
+  systems
 }
 
 export const mockOfflineLocationsWithHierarchy: Record<

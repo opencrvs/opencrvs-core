@@ -276,7 +276,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(formMessages.informantName),
         key: 'informant',
-        width: 12,
+        width: 14,
         isSortable: true,
         sortFunction: () => toggleSort('informant'),
         icon: columnToBeSort === 'informant' ? <ArrowDownBlue /> : <></>,
@@ -771,11 +771,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         <Query
           query={FETCH_EVENTS_WITH_PROGRESS}
           variables={{
-            locationId: locationId,
+            declarationJurisdictionId: locationId,
             skip: pageSize * (currentPageNumber - 1),
             count: pageSize,
-            status: (status && [status]) || undefined,
-            type:
+            registrationStatuses: (status && [status]) || undefined,
+            compositionType:
               (event && [
                 `${event.toLowerCase()}-declaration`,
                 `${event.toLowerCase()}-notification`
@@ -805,7 +805,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   columns={getColumns()}
                   isLoading={loading || Boolean(error)}
                   noResultText={intl.formatMessage(constantsMessages.noResults)}
-                  fixedWidth={2050}
                   tableHeight={150}
                   highlightRowOnMouseOver
                   noPagination
