@@ -168,8 +168,8 @@ describe('when field definition has location search input', () => {
             validate: [],
             label: formMessages.placeOfBirth,
             initialValue: '',
-            searchableResource: 'facilities',
-            searchableType: LocationType.HEALTH_FACILITY,
+            searchableResource: ['facilities'],
+            searchableType: [LocationType.HEALTH_FACILITY],
             locationList: []
           }
         ]}
@@ -449,7 +449,7 @@ describe('when field definition has date field', () => {
               type: DATE,
               required: true,
               validate: [dateNotInFuture()],
-              label: formMessages.childDateOfBirth,
+              label: formMessages.dateOfBirth,
               initialValue: ''
             }
           ]}

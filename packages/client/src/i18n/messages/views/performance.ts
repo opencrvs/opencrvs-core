@@ -350,6 +350,31 @@ const messagesToDefine = {
     id: 'performance.completenessTable.completenessRate',
     defaultMessage: 'Completeness {lineBreak}rate',
     description: 'Title for Completeness rate column in the table'
+  },
+  byRegistrar: {
+    id: 'performance.regRates.select.item.byRegistrar',
+    defaultMessage: 'By Registrars',
+    description: 'Label for select option By Registrar'
+  },
+  month: {
+    id: 'performance.registrationsListTable.monthColumn',
+    defaultMessage: 'Month',
+    description: 'Title for month column in the table'
+  },
+  location: {
+    id: 'performance.registrationsListTable.locationColumn',
+    defaultMessage: 'Location',
+    description: 'Title for location column in the table'
+  },
+  registrar: {
+    id: 'performance.registrationsListTable.registrarColumn',
+    defaultMessage: 'Registrar',
+    description: 'Title for registrar column in the table'
+  },
+  totalRegistrations: {
+    id: 'performance.registrationsListTable.totalRegistrationsColumn',
+    defaultMessage: 'Total Registrations',
+    description: 'Title for total registrations column in the table'
   }
 }
 

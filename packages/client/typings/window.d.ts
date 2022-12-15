@@ -57,7 +57,6 @@ interface Window {
     SENTRY: string
     ADDRESSES: number
     ADMIN_LEVELS: number
-    INTEGRATIONS: any[]
   }
   __localeId__: string
 }

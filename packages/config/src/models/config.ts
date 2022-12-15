@@ -49,7 +49,6 @@ export interface IApplicationConfigurationModel extends Document {
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
   ADMIN_LEVELS: number
-  INTEGRATIONS: [IIntegration]
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -80,7 +79,7 @@ const currencySchema = new Schema<ICurrency>({
   languagesAndCountry: { type: [String] }
 })
 
-interface IIntegration {
+export interface Integration {
   name: string
   status: string
 }
@@ -91,20 +90,6 @@ export const statuses = {
   DISABLED: 'disabled',
   DEACTIVATED: 'deactivated'
 }
-
-const integrationsSchema = new Schema<IIntegration>({
-  name: String,
-  status: {
-    type: String,
-    enum: [
-      statuses.PENDING,
-      statuses.ACTIVE,
-      statuses.DISABLED,
-      statuses.DEACTIVATED
-    ],
-    default: statuses.PENDING
-  }
-})
 
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
@@ -145,8 +130,7 @@ const systemSchema = new Schema({
     required: true,
     enum: [1, 2, 3, 4, 5],
     default: 2
-  },
-  INTEGRATIONS: [integrationsSchema]
+  }
 })
 
 export default model<IApplicationConfigurationModel>('Config', systemSchema)

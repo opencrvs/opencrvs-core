@@ -29,6 +29,7 @@ const Segment = styled(Button)<{ isSelected?: boolean }>`
   border: 2px solid ${({ theme }) => theme.colors.primary};
   &:first-child {
     border-radius: 4px 0 0 4px;
+    border-right-width: 0px;
   }
   &:last-child {
     border-radius: 0 4px 4px 0;

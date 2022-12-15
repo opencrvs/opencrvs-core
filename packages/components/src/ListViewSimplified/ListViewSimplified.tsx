@@ -39,9 +39,10 @@ const LabelValueContainer = styled.div`
   }
 `
 
-const ValueContainer = styled.div`
+const ValueContainer = styled.div<{ compactLabel?: boolean }>`
   display: flex;
-  flex: 0 1 50%;
+  ${({ compactLabel }) => (!compactLabel ? 'flex: 0 1 50%;' : '')}
+  ${({ compactLabel }) => (compactLabel ? 'margin:0 auto;' : '')}
   align-items: center;
   color: ${({ theme }) => theme.colors.grey600};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -59,9 +60,9 @@ const MobileValueContainer = styled(ValueContainer)`
   }
 `
 
-const LabelContainer = styled.div`
+const LabelContainer = styled.div<{ compactLabel?: boolean }>`
   display: flex;
-  flex: 1 0 50%;
+  ${({ compactLabel }) => (!compactLabel ? 'flex: 1 0 50%;' : '')}
   align-items: center;
   button > div {
     padding: 0;
@@ -129,6 +130,7 @@ export interface IListViewItemSimplifiedProps {
   value?: React.ReactNode
   actions?: React.ReactNode
   className?: string
+  compactLabel?: boolean
 }
 
 /**
@@ -139,7 +141,8 @@ export function ListViewItemSimplified({
   label,
   value,
   className,
-  actions
+  actions,
+  compactLabel
 }: IListViewItemSimplifiedProps) {
   return (
     <>
@@ -150,10 +153,18 @@ export function ListViewItemSimplified({
       )}
 
       <LabelValueContainer className={className}>
-        <LabelContainer data-test-id="list-view-label">{label}</LabelContainer>
+        <LabelContainer
+          data-test-id="list-view-label"
+          compactLabel={compactLabel}
+        >
+          {label}
+        </LabelContainer>
 
         {value && (
-          <ValueContainer data-test-id="list-view-value">
+          <ValueContainer
+            data-test-id="list-view-value"
+            compactLabel={compactLabel}
+          >
             {value}
           </ValueContainer>
         )}

@@ -70,7 +70,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
-
+import _ from 'lodash'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',

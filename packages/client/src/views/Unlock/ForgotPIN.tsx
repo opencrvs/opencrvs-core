@@ -58,6 +58,7 @@ interface IForgotPINProps {
 const PageWrapper = styled(UnlockPageWrapper)`
   justify-content: flex-start;
 `
+
 const BackButton = styled(CircleButton)`
   float: left;
   color: ${({ theme }) => theme.colors.white};
@@ -65,6 +66,7 @@ const BackButton = styled(CircleButton)`
   position: absolute;
   top: 30px;
   left: 20px;
+
   svg {
     path {
       stroke: ${({ theme }) => theme.colors.white};

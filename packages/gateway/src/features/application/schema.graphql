@@ -110,7 +110,6 @@ input ApplicationConfigurationInput {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   ADMIN_LEVELS: Int
-  INTEGRATIONS: [IntegrationInput]
 }
 
 type ApplicationConfiguration {
@@ -126,7 +125,6 @@ type ApplicationConfiguration {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   ADMIN_LEVELS: Int
-  INTEGRATIONS: [Integration]
 }
 
 type Mutation {

@@ -622,7 +622,13 @@ export const mockFetchConfig = {
       svgDateCreated: 1640696804785
     }
   ],
-  formConfig: { questionConfig: [] }
+  formConfig: { questionConfig: [] },
+  systems: [
+    {
+      name: 'MOSIP',
+      status: statuses.ACTIVE
+    }
+  ]
 }
 
 const certificates = [
