@@ -4678,6 +4678,7 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'death-event-details',
+            includeHiddenValues: true,
             fields: [
               {
                 name: 'deathDate',

@@ -45,7 +45,7 @@ const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox=
   <tspan x="59.3275" y="320.392">Full name:</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
-  <tspan x="162.619" y="319.992">{{ childFamilyName }}, {{ childFirstName }}</tspan>
+  <tspan x="162.619" y="319.992">{{ childFamilyName }}, {{ childFirstName }} {{ childMiddleNames }}</tspan>
 </text>
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" letter-spacing="0px">
   <tspan x="59.3275" y="340.392">Sex:</tspan>
@@ -71,7 +71,7 @@ const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox=
 </text>
 {{#if motherFirstName}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
-  <tspan x="162.619" y="412.992">{{ motherFamilyName }}, {{ motherFirstName }}</tspan>
+  <tspan x="162.619" y="412.992">{{ motherFamilyName }}, {{ motherFirstName }} {{ motherMiddleNames }}</tspan>
 </text>
 {{else}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
@@ -83,7 +83,7 @@ const birthCertificateTemplateTextOnly = `<svg width="420" height="595" viewBox=
 </text>
 {{#if fatherFirstName}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
-  <tspan x="162.619" y="431.621">{{ fatherFamilyName }}, {{ fatherFirstName }}</tspan>
+  <tspan x="162.619" y="431.621">{{ fatherFamilyName }}, {{ fatherFirstName }} {{ fatherMiddleNames }}</tspan>
 </text>
 {{else}}
 <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="9" font-weight="700" letter-spacing="0px">
