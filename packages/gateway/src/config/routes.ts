@@ -22,6 +22,11 @@ import {
   updateSchema,
   fetchLocationHandler
 } from '@gateway/features/restLocation/locationHandler'
+import {
+  eventNotificationHandler,
+  fhirBundleSchema,
+  validationFailedAction
+} from '@gateway/features/eventNotification/eventNotificationHandler'
 
 export const getRoutes = () => {
   const routes = [
@@ -100,6 +105,23 @@ export const getRoutes = () => {
         description: 'Update a location or facility',
         validate: {
           payload: updateSchema
+        }
+      }
+    },
+    // create event notification
+    {
+      method: 'POST',
+      path: '/notification',
+      handler: eventNotificationHandler,
+      config: {
+        tags: ['api'],
+        description: 'Create a health notification',
+        auth: {
+          scope: ['declare', 'notification-api']
+        },
+        validate: {
+          payload: fhirBundleSchema,
+          failAction: validationFailedAction
         }
       }
     }

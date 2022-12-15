@@ -148,15 +148,12 @@ export const getCatchmentAreaIdsByPrimaryOfficeId = async (
 
 export const postFhir = async (token: string, resource: fhir.Resource) => {
   const shouldUpdateExisting = Boolean(resource.id)
-  console.log('PAYLOAD: ', JSON.stringify(resource))
   const request = shouldUpdateExisting
     ? {
         url: `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
         method: 'PUT'
       }
     : { url: `${FHIR_URL}/${resource.resourceType}`, method: 'POST' }
-  console.log('request.url: ', request.url)
-  console.log('request.method: ', request.method)
   const res = await fetch(request.url, {
     method: request.method,
     headers: {
@@ -165,7 +162,6 @@ export const postFhir = async (token: string, resource: fhir.Resource) => {
     },
     body: JSON.stringify(resource)
   })
-  console.log(res)
   if (res.status !== 200 && res.status !== 201) {
     throw new Error('Unexpected response received')
   }
