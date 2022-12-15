@@ -31,7 +31,8 @@ import { modifyConfigField } from '@client/forms/configuration/formConfig/action
 import {
   getCertificateHandlebar,
   ICustomConfigField,
-  IDataSourceSelectOption
+  IDataSourceSelectOption,
+  isPreviewGroupConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import {
   buttonMessages,
@@ -293,7 +294,6 @@ interface CSVUploadStatus {
 }
 
 interface ICustomFieldState {
-  isFieldDuplicate: boolean
   selectedLanguage: string
   conditionalField: IConditionalFieldForms
   handleBars: string
@@ -392,7 +392,6 @@ class CustomFieldToolsComp extends React.Component<
     })
 
     return {
-      isFieldDuplicate: false,
       handleBars: camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
       conditionalField: {
@@ -586,7 +585,14 @@ class CustomFieldToolsComp extends React.Component<
       return false
     }
 
-    return fieldsMap.some((field) => field.fieldId === newGeneratedFieldID)
+    return fieldsMap.some((field) => {
+      if (isPreviewGroupConfigField(field)) {
+        return field.configFields.some(
+          ({ fieldId }) => fieldId === newGeneratedFieldID
+        )
+      }
+      return field.fieldId === newGeneratedFieldID
+    })
   }
 
   getHeadingText(): string {
@@ -804,6 +810,11 @@ class CustomFieldToolsComp extends React.Component<
                     }}
                   />
                 </CInputField>
+                {this.isFieldNameDuplicate() && (
+                  <Text variant="reg14" element="p" color="red">
+                    {intl.formatMessage(customFieldFormMessages.duplicateField)}
+                  </Text>
+                )}
               </FieldContainer>
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
@@ -1136,17 +1147,15 @@ class CustomFieldToolsComp extends React.Component<
             <CPrimaryButton
               id={'custom-tool-save-button'}
               onClick={() => {
-                if (this.isFieldNameDuplicate()) {
-                  this.setState({
-                    isFieldDuplicate: true
-                  })
-                  return
-                }
                 const modifiedField = this.prepareModifiedFormField()
                 modifyConfigField(selectedField.fieldId, modifiedField)
                 debouncedNullifySelectedField()
               }}
-              disabled={!this.isFormValid() || !this.isConditionalFormValid()}
+              disabled={
+                !this.isFormValid() ||
+                !this.isConditionalFormValid() ||
+                this.isFieldNameDuplicate()
+              }
             >
               {intl.formatMessage(buttonMessages.save)}
             </CPrimaryButton>
@@ -1236,11 +1245,6 @@ class CustomFieldToolsComp extends React.Component<
         {selectedField.fieldType === SELECT_WITH_OPTIONS && this.selectField()}
         {this.saveButton()}
         {this.showHandlebar()}
-        {this.state.isFieldDuplicate && (
-          <CErrorText ignoreMediaQuery={true}>
-            {intl.formatMessage(customFieldFormMessages.duplicateField)}
-          </CErrorText>
-        )}
       </>
     )
   }
