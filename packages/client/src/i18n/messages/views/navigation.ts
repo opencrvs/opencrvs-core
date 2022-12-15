@@ -75,6 +75,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Performance label in navigation',
     id: 'navigation.performance'
   },
+  dashboard: {
+    defaultMessage: 'Dashboard',
+    description: 'Dashboard label in navigation',
+    id: 'navigation.dashboard'
+  },
   team: {
     defaultMessage: 'Team',
     description: 'Team label in navigation',

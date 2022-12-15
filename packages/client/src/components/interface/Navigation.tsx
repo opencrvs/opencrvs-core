@@ -33,12 +33,13 @@ import {
   goToPerformanceView,
   goToTeamView,
   goToFormConfigHome,
-  goToApplicationConfig
+  goToApplicationConfig,
+  goToDashboard
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { Activity, Users } from '@opencrvs/components/lib/icons'
+import { Activity, Users, PieChart } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
@@ -67,6 +68,7 @@ export const WORKQUEUE_TABS = {
   sentForApproval: 'approvals',
   readyToPrint: 'print',
   externalValidation: 'waitingValidation',
+  dashboard: 'dashboard',
   performance: 'performance',
   team: 'team',
   config: 'config',
@@ -99,6 +101,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.sentForApproval,
     WORKQUEUE_TABS.readyToPrint,
+    WORKQUEUE_TABS.dashboard,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     GROUP_ID.declarationGroup,
@@ -109,6 +112,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
+    WORKQUEUE_TABS.dashboard,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     GROUP_ID.declarationGroup,
@@ -119,6 +123,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
+    WORKQUEUE_TABS.dashboard,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     GROUP_ID.declarationGroup,
@@ -129,17 +134,20 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
+    WORKQUEUE_TABS.dashboard,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
   LOCAL_SYSTEM_ADMIN: [
+    WORKQUEUE_TABS.dashboard,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
+    WORKQUEUE_TABS.dashboard,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
@@ -185,6 +193,7 @@ interface IDispatchProps {
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
+  goToDashboard: typeof goToDashboard
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
 }
@@ -493,6 +502,23 @@ export const NavigationView = (props: IFullProps) => {
               <NavigationGroup>
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.dashboard
+                  ) && (
+                    <NavigationItem
+                      icon={() => <PieChart />}
+                      id={`navigation_${WORKQUEUE_TABS.dashboard}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.dashboard]
+                      )}
+                      onClick={() => props.goToDashboard()}
+                      isSelected={
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TABS.dashboard
+                      }
+                    />
+                  )}
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
                     WORKQUEUE_TABS.performance
                   ) && (
                     <NavigationItem
@@ -653,6 +679,7 @@ export const Navigation = connect<
   goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
+  goToDashboard: goToDashboard,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
   goToSettings,
