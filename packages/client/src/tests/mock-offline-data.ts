@@ -110,7 +110,36 @@ export const formConfig: IFormConfig = {
   ]
 }
 
-export const systems = []
+export const systems = [
+  {
+    name: 'WebHook 1',
+    status: 'active',
+    type: 'WEBHOOK',
+    _id: '63998b6efbd0f8bad7708033',
+    shaSecret: 'c37d4f5d-4c12-4016-9c7e-d810d2f871df',
+    clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
+    settings: [
+      {
+        event: 'birth',
+        permissions: ['informant-details', 'supporting-documents']
+      },
+      {
+        event: 'death',
+        permissions: ['deceased-details', 'death-encounter']
+      }
+    ]
+  },
+  {
+    _id: '63a01ffe607915acacc2f553',
+    clientId: '5923118f-c633-40c6-ba97-c3e3cbb412aa',
+    name: 'Health Deactivation',
+    shaSecret: '2569a6d4-1f38-4f53-8724-1bfcba8262f6',
+    status: 'deactivated',
+    type: 'HEALTH',
+    settings: [],
+    __typename: 'System'
+  }
+]
 
 export const mockConditionals = {
   presentAtBirthRegistration: {
