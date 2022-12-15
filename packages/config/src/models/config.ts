@@ -81,7 +81,7 @@ const currencySchema = new Schema<ICurrency>({
   languagesAndCountry: { type: [String] }
 })
 
-interface IIntegration {
+export interface Integration {
   name: string
   status: string
 }

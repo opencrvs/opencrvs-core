@@ -30,8 +30,9 @@ const Card = styled.div<{ selected: boolean }>`
   }
 `
 
-const ChildrenContainer = styled.div`
-  pointer-events: none;
+const ChildrenContainer = styled.div<{ enableInteraction: boolean }>`
+  pointer-events: ${({ enableInteraction }) =>
+    enableInteraction ? 'auto' : 'none'};
   flex-grow: 1;
 `
 
@@ -61,11 +62,11 @@ export interface IFormConfigElementCardProps {
   id: string
   children: React.ReactNode
   selected?: boolean
-  movable?: boolean
   removable?: boolean
   status?: string
   isUpDisabled?: boolean
   isDownDisabled?: boolean
+  enableInteraction?: boolean
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   onRemove?: () => void
   onMoveUp?: () => void
@@ -76,10 +77,10 @@ export function FormConfigElementCard({
   id,
   children,
   selected = false,
-  movable = false,
   removable = false,
   isUpDisabled = false,
   isDownDisabled = false,
+  enableInteraction = false,
   status,
   onClick,
   onRemove,
@@ -95,9 +96,11 @@ export function FormConfigElementCard({
       selected={selected}
       onClick={(event) => (!selected ? onClick && onClick(event) : undefined)}
     >
-      <ChildrenContainer>{children}</ChildrenContainer>
+      <ChildrenContainer enableInteraction={enableInteraction}>
+        {children}
+      </ChildrenContainer>
       <Controls>
-        {movable && selected && (
+        {selected && (
           <MovementControls>
             <CircleButton
               id={`${id}_up`}

@@ -631,6 +631,8 @@ describe('markEventAsValidatedHandler handler', () => {
     server = await createServer()
     fetch.mockResponses(
       ...getMarkBundleAndPostToHearthMockResponses,
+      // For triggering DECLARATION_UPDATED event
+      [{}, { status: 200 }],
       // This is needed only for the bundle with input output
       ...getMarkBundleAndPostToHearthMockResponses
     )
@@ -1117,7 +1119,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
-      [JSON.stringify({ config: { INTEGRATIONS: [] } }), { status: 200 }],
+      [JSON.stringify([]), { status: 200 }],
       [patientMock, { status: 200 }],
       [motherMock, { status: 200 }],
       [motherMock, { status: 200 }]
@@ -1307,6 +1309,9 @@ describe('markEventAsWaitingValidationHandler', () => {
     server = await createServer()
     fetch.mockResponses(
       ...getMarkBundleAndPostToHearthMockResponses,
+      // For triggering DECLARATION_UPDATED event
+      [JSON.stringify({}), { status: 200 }],
+      // This is needed only for the bundle with input output
       ...getMarkBundleAndPostToHearthMockResponses
     )
   })

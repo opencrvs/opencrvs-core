@@ -14,7 +14,6 @@ import {
   GQLCurrencyInput,
   GQLDeathInput,
   GQLCountryLogoInput,
-  GQLIntegrationInput,
   GQLResolver
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'

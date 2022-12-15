@@ -14,8 +14,7 @@ import {
   GQLCurrencyInput,
   GQLBirthInput,
   GQLDeathInput,
-  GQLCountryLogoInput,
-  GQLIntegrationInput
+  GQLCountryLogoInput
 } from '@gateway/graphql/schema'
 
 export interface IApplicationConfigPayload {

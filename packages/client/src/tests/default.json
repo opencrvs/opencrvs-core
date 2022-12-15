@@ -862,7 +862,7 @@
                   "label": {
                     "defaultMessage": "Sex",
                     "description": "Label for form field: Sex name",
-                    "id": "form.field.label.childSex"
+                    "id": "form.field.label.sex"
                   },
                   "required": true,
                   "initialValue": "",
@@ -884,7 +884,7 @@
                       "label": {
                         "defaultMessage": "Male",
                         "description": "Option for form field: Sex name",
-                        "id": "form.field.label.childSexMale"
+                        "id": "form.field.label.sexMale"
                       }
                     },
                     {
@@ -892,7 +892,7 @@
                       "label": {
                         "defaultMessage": "Female",
                         "description": "Option for form field: Sex name",
-                        "id": "form.field.label.childSexFemale"
+                        "id": "form.field.label.sexFemale"
                       }
                     },
                     {
@@ -900,7 +900,7 @@
                       "label": {
                         "defaultMessage": "Unknown",
                         "description": "Option for form field: Sex name",
-                        "id": "form.field.label.childSexUnknown"
+                        "id": "form.field.label.sexUnknown"
                       }
                     }
                   ]
@@ -1186,8 +1186,8 @@
                   "previewGroup": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
-                  "searchableResource": "facilities",
-                  "searchableType": "HEALTH_FACILITY",
+                  "searchableResource": ["facilities"],
+                  "searchableType": ["HEALTH_FACILITY"],
                   "dynamicOptions": {
                     "resource": "facilities"
                   },
@@ -1264,7 +1264,7 @@
                   "label": {
                     "defaultMessage": "Nationality",
                     "description": "Label for form field: Nationality",
-                    "id": "form.field.label.deceased.nationality"
+                    "id": "form.field.label.nationality"
                   },
                   "required": true,
                   "initialValue": "FAR",
@@ -1349,7 +1349,7 @@
                   "label": {
                     "defaultMessage": "Date of birth",
                     "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.motherDateOfBirth"
+                    "id": "form.field.label.dateOfBirth"
                   },
                   "required": true,
                   "customisable": true,
@@ -1625,7 +1625,7 @@
                   "label": {
                     "defaultMessage": "Reason for mother",
                     "description": "Label for form field: reasonMotherNotApplying",
-                    "id": "form.field.label.reasonMotherNotApplying"
+                    "id": "form.field.label.reasonNotApplying"
                   },
                   "validate": [],
                   "initialValue": "",
@@ -1638,7 +1638,7 @@
                   "label": {
                     "defaultMessage": "Nationality",
                     "description": "Label for form field: Nationality",
-                    "id": "form.field.label.deceased.nationality"
+                    "id": "form.field.label.nationality"
                   },
                   "required": true,
                   "initialValue": "FAR",
@@ -1719,7 +1719,7 @@
                   "label": {
                     "defaultMessage": "Date of birth",
                     "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.motherDateOfBirth"
+                    "id": "form.field.label.dateOfBirth"
                   },
                   "conditionals": [
                     {
@@ -1820,7 +1820,7 @@
                   "label": {
                     "defaultMessage": "First name(s)",
                     "description": "Label for form field: First names in english",
-                    "id": "form.field.label.motherFirstNamesEng"
+                    "id": "form.field.label.firstNames"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -1859,7 +1859,7 @@
                   "label": {
                     "defaultMessage": "Last Name",
                     "description": "Label for form field: Family name in english",
-                    "id": "form.field.label.motherFamilyNameEng"
+                    "id": "form.field.label.familyName"
                   },
                   "conditionals": [
                     {
@@ -2041,7 +2041,7 @@
                   "label": {
                     "defaultMessage": "level of education",
                     "description": "Label for form field: Mother education",
-                    "id": "form.field.label.motherEducationAttainment"
+                    "id": "form.field.label.educationAttainment"
                   },
                   "required": false,
                   "customisable": true,
@@ -2182,7 +2182,7 @@
                   "label": {
                     "defaultMessage": "Nationality",
                     "description": "Label for form field: Nationality",
-                    "id": "form.field.label.deceased.nationality"
+                    "id": "form.field.label.nationality"
                   },
                   "required": true,
                   "initialValue": "FAR",
@@ -2263,7 +2263,7 @@
                   "label": {
                     "defaultMessage": "Date of birth",
                     "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.motherDateOfBirth"
+                    "id": "form.field.label.dateOfBirth"
                   },
                   "required": true,
                   "initialValue": "",
@@ -2364,7 +2364,7 @@
                   "label": {
                     "defaultMessage": "First Name",
                     "description": "Label for form field: First names in english",
-                    "id": "form.field.label.fatherFirstNamesEng"
+                    "id": "form.field.label.firstNames"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -2558,7 +2558,7 @@
                   "label": {
                     "defaultMessage": "level of education",
                     "description": "Label for form field: Mother education",
-                    "id": "form.field.label.motherEducationAttainment"
+                    "id": "form.field.label.educationAttainment"
                   },
                   "customisable": true,
                   "required": false,
@@ -3755,7 +3755,7 @@
                   "label": {
                     "defaultMessage": "Nationality",
                     "description": "Label for form field: Nationality",
-                    "id": "form.field.label.deceased.nationality"
+                    "id": "form.field.label.nationality"
                   },
                   "required": true,
                   "initialValue": "FAR",
@@ -3825,7 +3825,7 @@
                   "label": {
                     "defaultMessage": "Date of Birth",
                     "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.deceasedDateOfBirth"
+                    "id": "form.field.label.dateOfBirth"
                   },
                   "required": true,
                   "initialValue": "",
@@ -3909,7 +3909,7 @@
                   "label": {
                     "defaultMessage": "First Name(s) in English",
                     "description": "Label for form field: Given names in english",
-                    "id": "form.field.label.deceasedGivenNamesEng"
+                    "id": "form.field.label.firstNames"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -3942,7 +3942,7 @@
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
                     "description": "Label for form field: Family name in english",
-                    "id": "form.field.label.deceasedFamilyNameEng"
+                    "id": "form.field.label.familyName"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -3974,7 +3974,7 @@
                   "label": {
                     "defaultMessage": "Sex",
                     "description": "Label for form field: Sex name",
-                    "id": "form.field.label.deceasedSex"
+                    "id": "form.field.label.sex"
                   },
                   "required": true,
                   "initialValue": "",
@@ -3996,7 +3996,7 @@
                       "label": {
                         "defaultMessage": "Male",
                         "description": "Option for form field: Sex name",
-                        "id": "form.field.label.deceasedSexMale"
+                        "id": "form.field.label.sexMale"
                       }
                     },
                     {
@@ -4004,7 +4004,7 @@
                       "label": {
                         "defaultMessage": "Female",
                         "description": "Option for form field: Sex name",
-                        "id": "form.field.label.deceasedSexFemale"
+                        "id": "form.field.label.sexFemale"
                       }
                     },
                     {
@@ -4012,7 +4012,7 @@
                       "label": {
                         "defaultMessage": "Unknown",
                         "description": "Option for form field: Sex name",
-                        "id": "form.field.label.deceasedSexUnknown"
+                        "id": "form.field.label.sexUnknown"
                       }
                     }
                   ]
@@ -4451,8 +4451,8 @@
                   "previewGroup": "placeOfDeath",
                   "required": true,
                   "initialValue": "",
-                  "searchableResource": "facilities",
-                  "searchableType": "HEALTH_FACILITY",
+                  "searchableResource": ["facilities"],
+                  "searchableType": ["HEALTH_FACILITY"],
                   "dynamicOptions": {
                     "resource": "facilities"
                   },
@@ -4511,7 +4511,7 @@
                   "label": {
                     "defaultMessage": "Nationality",
                     "description": "Label for form field: Nationality",
-                    "id": "form.field.label.deceased.nationality"
+                    "id": "form.field.label.nationality"
                   },
                   "required": true,
                   "initialValue": "FAR",
@@ -4596,7 +4596,7 @@
                   "label": {
                     "defaultMessage": "Date of birth",
                     "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.motherDateOfBirth"
+                    "id": "form.field.label.dateOfBirth"
                   },
                   "required": true,
                   "customisable": true,
@@ -5139,8 +5139,8 @@
                 },
                 "required": true,
                 "initialValue": "",
-                "searchableResource": "offices",
-                "searchableType": "CRVS_OFFICE",
+                "searchableResource": ["offices"],
+                "searchableType": ["CRVS_OFFICE"],
                 "validate": [
                   {
                     "operation": "officeMustBeSelected"
@@ -5496,8 +5496,8 @@
                 },
                 "required": true,
                 "initialValue": "",
-                "searchableResource": "offices",
-                "searchableType": "CRVS_OFFICE",
+                "searchableResource": ["offices"],
+                "searchableType": ["CRVS_OFFICE"],
                 "validate": [
                   {
                     "operation": "officeMustBeSelected"

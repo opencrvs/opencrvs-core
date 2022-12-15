@@ -466,7 +466,8 @@ describe('when in device of large viewport', () => {
               informantPhoneMother: '011123456789'
             }
           }
-        }
+        },
+        documents: {}
       }
 
       const simpleDraft = createReviewDeclaration(
@@ -536,8 +537,8 @@ describe('when in device of large viewport', () => {
                     {
                       name: 'birthLocation',
                       type: LOCATION_SEARCH_INPUT,
-                      searchableResource: 'facilities',
-                      searchableType: LocationType.HEALTH_FACILITY,
+                      searchableResource: ['facilities'],
+                      searchableType: [LocationType.HEALTH_FACILITY],
                       locationList: [],
                       required: true,
                       validate: [],
@@ -565,7 +566,8 @@ describe('when in device of large viewport', () => {
       const data = {
         child: {
           birthLocation: '0d8474da-0361-4d32-979e-af91f012340a'
-        }
+        },
+        documents: {}
       }
 
       const simpleDraft = createReviewDeclaration(
@@ -622,7 +624,7 @@ describe('when in device of small viewport', () => {
                   {
                     name: 'motherBirthDate',
                     type: DATE,
-                    label: formMessages.motherDateOfBirth,
+                    label: formMessages.dateOfBirth,
                     required: true,
                     validate: [],
                     initialValue: ''
@@ -679,6 +681,13 @@ describe('when in device of small viewport', () => {
         uploadDocForMother: [
           {
             optionValues: ['MOTHER', 'Birth Registration'],
+            type: 'image/png',
+            data: 'data:image/png;base64,abcd'
+          }
+        ],
+        uploadDocForChildDOB: [
+          {
+            optionValues: ['CHILD', 'Birth Registration'],
             type: 'image/png',
             data: 'data:image/png;base64,abcd'
           }
