@@ -1494,7 +1494,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration.event === Event.Birth
         ? section.id === BirthSection.Child
         : section.id === DeathSection.Deceased
-    )?.groups[0].fields
+    )?.groups[0]?.fields
     if (!fields) return false
     return (
       fields.findIndex((field) => field.name === 'familyNameEng') <
