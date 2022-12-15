@@ -343,6 +343,15 @@ describe('when user is previewing the form data', () => {
       await waitForElement(app, '#readyDeclaration')
     })
 
+    /* This needs to be fixed in #4191
+    it('successfully submits the review form', async () => {
+      vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
+      app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
+      app.update()
+      app.update().find('#submit_confirm').hostNodes().simulate('click')
+    })
+    */
+
     it('rejecting declaration redirects to reject confirmation screen', async () => {
       vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
 

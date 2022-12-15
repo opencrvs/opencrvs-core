@@ -974,7 +974,6 @@ describe('when user is in the register form preview section', () => {
 
       confirmBtn.simulate('click')
       component.update()
-      console.log(history.location.pathname)
       expect(history.location.pathname).toBe(HOME)
     })
   })
