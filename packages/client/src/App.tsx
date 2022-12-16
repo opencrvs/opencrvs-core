@@ -64,6 +64,7 @@ import { Registrations } from '@client/views/SysAdmin/Performance/Registrations'
 import { VerifyDetails } from '@client/views/PrintCertificate/VerifyDetails'
 import { ReviewSection } from './views/RegisterForm/review/ReviewSection'
 import { ReviewDuplicate } from './views/Duplicates/ReviewDuplicate'
+import { Dashboard } from './views/Dashboard/Dashboard'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -347,6 +348,19 @@ export class App extends React.Component<IAppProps> {
                                             ]}
                                             path={routes.PERFORMANCE_HOME}
                                             component={PerformanceHome}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.DASHBOARD}
+                                            component={Dashboard}
                                           />
                                           <ProtectedRoute
                                             exact
