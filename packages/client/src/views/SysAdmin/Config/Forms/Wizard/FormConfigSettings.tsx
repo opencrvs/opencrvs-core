@@ -255,7 +255,7 @@ function FormConfigSettingsComponent() {
             label={intl.formatMessage(messages.informantSignatureSettings)}
             value={
               <span id="informantSignature">
-                {informantSignature
+                {!informantSignature
                   ? intl.formatMessage(messages.disable)
                   : intl.formatMessage(messages.enable)}
               </span>
@@ -383,7 +383,7 @@ function FormConfigSettingsComponent() {
               actions={
                 <CenteredToggle
                   id="informantSignature"
-                  defaultChecked={!informantSignature}
+                  defaultChecked={informantSignature}
                   onChange={handleInformantSignature}
                 />
               }

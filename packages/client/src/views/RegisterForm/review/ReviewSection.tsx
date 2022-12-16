@@ -1931,18 +1931,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
 
-              {!isCorrection(declaration) && !hasB1Form(declaration) && (
-                <InputWrapper>
-                  <InputField
-                    id="informant_signature"
-                    touched={false}
-                    required={true}
-                    label={intl.formatMessage(messages.informantsSignature)}
-                  >
-                    <SignatureInput {...signatureInputProps} />
-                  </InputField>
-                </InputWrapper>
-              )}
+              {window.config.INFORMANT_SIGNATURE &&
+                !isCorrection(declaration) &&
+                !hasB1Form(declaration) && (
+                  <InputWrapper>
+                    <InputField
+                      id="informant_signature"
+                      touched={false}
+                      required={true}
+                      label={intl.formatMessage(messages.informantsSignature)}
+                    >
+                      <SignatureInput {...signatureInputProps} />
+                    </InputField>
+                  </InputWrapper>
+                )}
               {totalFileSizeExceeded && (
                 <Alert type="warning">
                   {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
