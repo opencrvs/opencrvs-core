@@ -65,7 +65,7 @@ export function getConditionals(location: string, useCase: string) {
         },
         {
           action: 'hide',
-          expression: '!values.statePrimary'
+          expression: `!values.state${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -82,11 +82,11 @@ export function getConditionals(location: string, useCase: string) {
         },
         {
           action: 'hide',
-          expression: '!values.statePrimary'
+          expression: `!values.state${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
-          expression: '!values.districtPrimary'
+          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -103,15 +103,15 @@ export function getConditionals(location: string, useCase: string) {
         },
         {
           action: 'hide',
-          expression: '!values.statePrimary'
+          expression: `!values.state${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
-          expression: '!values.districtPrimary'
+          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
-          expression: '!values.locationLevel3'
+          expression: `!values.locationLevel3${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -128,19 +128,19 @@ export function getConditionals(location: string, useCase: string) {
         },
         {
           action: 'hide',
-          expression: '!values.statePrimary'
+          expression: `!values.state${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
-          expression: '!values.districtPrimary'
+          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
-          expression: '!values.locationLevel3'
+          expression: `!values.locationLevel3${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
-          expression: '!values.locationLevel4'
+          expression: `!values.locationLevel4${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -158,11 +158,12 @@ export function getLocationSelect(
   locationIndex: number,
   informant: boolean
 ): SerializedFormField {
+  console.log('location: ', location)
   return {
     name: `${location}${sentenceCase(useCase)}`,
     type: 'SELECT_WITH_DYNAMIC_OPTIONS',
     label: {
-      defaultMessage: sentenceCase(location),
+      defaultMessage: '',
       description: `Title for the ${location} select`,
       id: `form.field.label.${location}`
     },
@@ -405,7 +406,7 @@ export function getPlaceOfEventLocationSelect(
           configCase === EventLocationAddressCases.PLACE_OF_BIRTH
             ? 'birthEventLocationMutationTransformer'
             : 'deathEventLocationMutationTransformer',
-        parameters: []
+        parameters: [locationIndex]
       },
       query: {
         operation: 'eventLocationQueryTransformer',
