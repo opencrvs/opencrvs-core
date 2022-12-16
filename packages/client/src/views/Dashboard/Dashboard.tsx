@@ -40,9 +40,7 @@ export function Dashboard() {
         )}
         {window.config.DASHBOARD_EMBED_URL && (
           <StyledIFrame
-            src={
-              'https://metabase.nigeria-demo.opencrvs.org/public/dashboard/32913338-faa5-4705-b65b-3eb6fd5b9178'
-            }
+            src={window.config.DASHBOARD_EMBED_URL}
             allowFullScreen
           />
         )}
