@@ -24,7 +24,8 @@ import { cloneDeep } from 'lodash'
 import { getFieldIdentifiers } from '@client/forms/questionConfig'
 import {
   getLocationSelect,
-  getPlaceOfEventLocationSelect
+  getPlaceOfEventLocationSelect,
+  getRuralOrUrbanConditionals
 } from '@client/forms/configuration/administrative/utils'
 import { sentenceCase } from '@client/utils/data-formatting'
 
@@ -695,18 +696,10 @@ function getAddressCaseFields(
       hideValueInPreview: true,
       required: false,
       validate: [],
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals(useCase, [
         {
           action: 'hide',
           expression: `!values.country${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.state${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -714,7 +707,7 @@ function getAddressCaseFields(
             useCase
           )})`
         }
-      ],
+      ]),
       mapping: {
         mutation: informant
           ? {
@@ -763,18 +756,10 @@ function getAddressCaseFields(
       initialValue: '',
       validate: [],
       dependency: `district${sentenceCase(useCase)}`,
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals(useCase, [
         {
           action: 'hide',
           expression: `!values.country${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.state${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -786,7 +771,7 @@ function getAddressCaseFields(
             useCase
           )})`
         }
-      ],
+      ]),
       mapping: {
         mutation: informant
           ? {
@@ -835,18 +820,10 @@ function getAddressCaseFields(
       initialValue: '',
       validate: [],
       dependency: `district${sentenceCase(useCase)}`,
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals(useCase, [
         {
           action: 'hide',
           expression: `!values.country${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.state${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -858,7 +835,7 @@ function getAddressCaseFields(
             useCase
           )})`
         }
-      ],
+      ]),
       mapping: {
         mutation: informant
           ? {
@@ -907,18 +884,10 @@ function getAddressCaseFields(
       initialValue: '',
       validate: [],
       dependency: `district${sentenceCase(useCase)}`,
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals(useCase, [
         {
           action: 'hide',
           expression: `!values.country${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.state${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -930,7 +899,7 @@ function getAddressCaseFields(
             useCase
           )})`
         }
-      ],
+      ]),
       mapping: {
         mutation: informant
           ? {
@@ -979,18 +948,10 @@ function getAddressCaseFields(
       initialValue: '',
       validate: [],
       dependency: `district${sentenceCase(useCase)}`,
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals(useCase, [
         {
           action: 'hide',
           expression: `!values.country${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.state${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -1002,7 +963,7 @@ function getAddressCaseFields(
             useCase
           )})`
         }
-      ],
+      ]),
       mapping: {
         mutation: informant
           ? {
@@ -1051,18 +1012,10 @@ function getAddressCaseFields(
       initialValue: '',
       validate: [],
       dependency: `district${sentenceCase(useCase)}`,
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals(useCase, [
         {
           action: 'hide',
           expression: `!values.country${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.state${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -1074,7 +1027,7 @@ function getAddressCaseFields(
             useCase
           )})`
         }
-      ],
+      ]),
       mapping: {
         mutation: informant
           ? {
@@ -1123,18 +1076,10 @@ function getAddressCaseFields(
       initialValue: '',
       validate: [],
       dependency: `district${sentenceCase(useCase)}`,
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals(useCase, [
         {
           action: 'hide',
           expression: `!values.country${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.state${sentenceCase(useCase)}`
-        },
-        {
-          action: 'hide',
-          expression: `!values.district${sentenceCase(useCase)}`
         },
         {
           action: 'hide',
@@ -1146,7 +1091,8 @@ function getAddressCaseFields(
             useCase
           )})`
         }
-      ],
+      ]),
+
       mapping: {
         mutation: informant
           ? {
@@ -1646,18 +1592,10 @@ export function getPlaceOfEventAddressFields(
       hideValueInPreview: true,
       previewGroup: configCase,
       validate: [],
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals('', [
         {
           action: 'hide',
           expression: '!values.country'
-        },
-        {
-          action: 'hide',
-          expression: '!values.state'
-        },
-        {
-          action: 'hide',
-          expression: '!values.district'
         },
         {
           action: 'hide',
@@ -1667,7 +1605,7 @@ export function getPlaceOfEventAddressFields(
           action: 'hide',
           expression: '!isDefaultCountry(values.country)'
         }
-      ],
+      ]),
       mapping: {
         mutation: {
           operation:
@@ -1696,18 +1634,10 @@ export function getPlaceOfEventAddressFields(
       initialValue: '',
       validate: [],
       dependency: 'district',
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals('', [
         {
           action: 'hide',
           expression: '!values.country'
-        },
-        {
-          action: 'hide',
-          expression: '!values.state'
-        },
-        {
-          action: 'hide',
-          expression: '!values.district'
         },
         {
           action: 'hide',
@@ -1721,7 +1651,7 @@ export function getPlaceOfEventAddressFields(
           action: 'hide',
           expression: '!isDefaultCountry(values.country)'
         }
-      ],
+      ]),
       mapping: {
         mutation: {
           operation:
@@ -1750,18 +1680,10 @@ export function getPlaceOfEventAddressFields(
       initialValue: '',
       validate: [],
       dependency: 'district',
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals('', [
         {
           action: 'hide',
           expression: '!values.country'
-        },
-        {
-          action: 'hide',
-          expression: '!values.state'
-        },
-        {
-          action: 'hide',
-          expression: '!values.district'
         },
         {
           action: 'hide',
@@ -1775,7 +1697,7 @@ export function getPlaceOfEventAddressFields(
           action: 'hide',
           expression: '!isDefaultCountry(values.country)'
         }
-      ],
+      ]),
       mapping: {
         mutation: {
           operation:
@@ -1804,18 +1726,10 @@ export function getPlaceOfEventAddressFields(
       initialValue: '',
       validate: [],
       dependency: 'district',
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals('', [
         {
           action: 'hide',
           expression: '!values.country'
-        },
-        {
-          action: 'hide',
-          expression: '!values.state'
-        },
-        {
-          action: 'hide',
-          expression: '!values.district'
         },
         {
           action: 'hide',
@@ -1829,7 +1743,7 @@ export function getPlaceOfEventAddressFields(
           action: 'hide',
           expression: '!isDefaultCountry(values.country)'
         }
-      ],
+      ]),
       mapping: {
         mutation: {
           operation:
@@ -1858,18 +1772,10 @@ export function getPlaceOfEventAddressFields(
       initialValue: '',
       validate: [],
       dependency: 'district',
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals('', [
         {
           action: 'hide',
           expression: '!values.country'
-        },
-        {
-          action: 'hide',
-          expression: '!values.state'
-        },
-        {
-          action: 'hide',
-          expression: '!values.district'
         },
         {
           action: 'hide',
@@ -1883,7 +1789,7 @@ export function getPlaceOfEventAddressFields(
           action: 'hide',
           expression: '!isDefaultCountry(values.country)'
         }
-      ],
+      ]),
       mapping: {
         mutation: {
           operation:
@@ -1912,18 +1818,10 @@ export function getPlaceOfEventAddressFields(
       initialValue: '',
       validate: [],
       dependency: 'district',
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals('', [
         {
           action: 'hide',
           expression: '!values.country'
-        },
-        {
-          action: 'hide',
-          expression: '!values.state'
-        },
-        {
-          action: 'hide',
-          expression: '!values.district'
         },
         {
           action: 'hide',
@@ -1937,7 +1835,7 @@ export function getPlaceOfEventAddressFields(
           action: 'hide',
           expression: '!isDefaultCountry(values.country)'
         }
-      ],
+      ]),
       mapping: {
         mutation: {
           operation:
@@ -1966,18 +1864,10 @@ export function getPlaceOfEventAddressFields(
       initialValue: '',
       validate: [],
       dependency: 'district',
-      conditionals: [
+      conditionals: getRuralOrUrbanConditionals('', [
         {
           action: 'hide',
           expression: '!values.country'
-        },
-        {
-          action: 'hide',
-          expression: '!values.state'
-        },
-        {
-          action: 'hide',
-          expression: '!values.district'
         },
         {
           action: 'hide',
@@ -1991,7 +1881,7 @@ export function getPlaceOfEventAddressFields(
           action: 'hide',
           expression: '!isDefaultCountry(values.country)'
         }
-      ],
+      ]),
       mapping: {
         mutation: {
           operation:

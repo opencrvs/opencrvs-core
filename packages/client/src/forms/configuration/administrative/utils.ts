@@ -15,7 +15,7 @@ import {
   AddressCases,
   EventLocationAddressCases
 } from '@client/forms/configuration/administrative/addresses'
-import { SerializedFormField } from '@client/forms/index'
+import { IConditional, SerializedFormField } from '@client/forms/index'
 
 export function getDependency(location: string, useCase: string) {
   switch (location) {
@@ -40,6 +40,72 @@ export function getDependency(location: string, useCase: string) {
         ? 'locationLevel4'
         : `locationLevel4${sentenceCase(useCase)}`
   }
+}
+
+export function getRuralOrUrbanConditionals(
+  useCase: string,
+  defaultConditionals: IConditional[]
+) {
+  let customConditionals: IConditional[] = []
+  switch (window.config.ADMIN_LEVELS) {
+    case 1:
+      customConditionals = [
+        {
+          action: 'hide',
+          expression: `!values.state${sentenceCase(useCase)}`
+        }
+      ]
+      break
+    case 2:
+      customConditionals = [
+        {
+          action: 'hide',
+          expression: `!values.state${sentenceCase(useCase)}`
+        },
+        {
+          action: 'hide',
+          expression: `!values.district${sentenceCase(useCase)}`
+        }
+      ]
+      break
+    case 3:
+      customConditionals = [
+        {
+          action: 'hide',
+          expression: `!values.state${sentenceCase(useCase)}`
+        },
+        {
+          action: 'hide',
+          expression: `!values.district${sentenceCase(useCase)}`
+        },
+        {
+          action: 'hide',
+          expression: `!values.locationLevel3${sentenceCase(useCase)}`
+        }
+      ]
+      break
+    case 4:
+      customConditionals = [
+        {
+          action: 'hide',
+          expression: `!values.state${sentenceCase(useCase)}`
+        },
+        {
+          action: 'hide',
+          expression: `!values.district${sentenceCase(useCase)}`
+        },
+        {
+          action: 'hide',
+          expression: `!values.locationLevel3${sentenceCase(useCase)}`
+        },
+        {
+          action: 'hide',
+          expression: `!values.locationLevel4${sentenceCase(useCase)}`
+        }
+      ]
+      break
+  }
+  return defaultConditionals.concat(customConditionals)
 }
 
 export function getConditionals(location: string, useCase: string) {
