@@ -1029,6 +1029,21 @@ const dynamicMessagesToDefine: Record<
     defaultMessage: 'Death',
     description: 'A label from the death event'
   },
+  marriage: {
+    id: 'constants.marriage',
+    defaultMessage: 'Marriage',
+    description: 'A label from the marriage event'
+  },
+  divorce: {
+    id: 'constants.death',
+    defaultMessage: 'Death',
+    description: 'A label for the divorce event'
+  },
+  adoption: {
+    id: 'constants.adoption',
+    defaultMessage: 'Adoption',
+    description: 'A label for the adoption event'
+  },
   father: {
     id: 'form.field.label.informantRelation.father',
     defaultMessage: 'Father',

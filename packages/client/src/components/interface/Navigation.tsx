@@ -47,7 +47,7 @@ import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigatio
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { getOfflineData } from '@client/offline/selectors'
@@ -349,19 +349,19 @@ export const NavigationView = (props: IFullProps) => {
       {isCreateActionsVisible && (
         <NavigationActionButtonGroup>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Birth)}>
-            Birth <Plus />
+            {intl.formatMessage(constantsMessages.birth)} <Plus />
           </PrimaryButton>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Death)}>
-            Death <Plus />
+            {intl.formatMessage(constantsMessages.death)} <Plus />
           </PrimaryButton>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Marriage)}>
-            Marriage <Plus />
+            {intl.formatMessage(constantsMessages.marriage)} <Plus />
           </PrimaryButton>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Divorce)}>
-            Divorce <Plus />
+            {intl.formatMessage(constantsMessages.divorce)} <Plus />
           </PrimaryButton>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Adoption)}>
-            Adoption <Plus />
+            {intl.formatMessage(constantsMessages.adoption)} <Plus />
           </PrimaryButton>
         </NavigationActionButtonGroup>
       )}
