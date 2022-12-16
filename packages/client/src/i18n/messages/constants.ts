@@ -1035,8 +1035,8 @@ const dynamicMessagesToDefine: Record<
     description: 'A label from the marriage event'
   },
   divorce: {
-    id: 'constants.death',
-    defaultMessage: 'Death',
+    id: 'constants.divorce',
+    defaultMessage: 'Divorce',
     description: 'A label for the divorce event'
   },
   adoption: {

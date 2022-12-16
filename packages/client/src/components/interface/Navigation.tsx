@@ -47,7 +47,7 @@ import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigatio
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages, dynamicConstantsMessages } from '@client/i18n/messages'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { getOfflineData } from '@client/offline/selectors'
@@ -349,19 +349,19 @@ export const NavigationView = (props: IFullProps) => {
       {isCreateActionsVisible && (
         <NavigationActionButtonGroup>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Birth)}>
-            {intl.formatMessage(constantsMessages.birth)} <Plus />
+            {intl.formatMessage(dynamicConstantsMessages.birth)} <Plus />
           </PrimaryButton>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Death)}>
-            {intl.formatMessage(constantsMessages.death)} <Plus />
+            {intl.formatMessage(dynamicConstantsMessages.death)} <Plus />
           </PrimaryButton>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Marriage)}>
-            {intl.formatMessage(constantsMessages.marriage)} <Plus />
+            {intl.formatMessage(dynamicConstantsMessages.marriage)} <Plus />
           </PrimaryButton>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Divorce)}>
-            {intl.formatMessage(constantsMessages.divorce)} <Plus />
+            {intl.formatMessage(dynamicConstantsMessages.divorce)} <Plus />
           </PrimaryButton>
           <PrimaryButton onClick={() => props.goToEventInfo(Event.Adoption)}>
-            {intl.formatMessage(constantsMessages.adoption)} <Plus />
+            {intl.formatMessage(dynamicConstantsMessages.adoption)} <Plus />
           </PrimaryButton>
         </NavigationActionButtonGroup>
       )}
