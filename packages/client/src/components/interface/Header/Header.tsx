@@ -207,7 +207,7 @@ const HeaderRight = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `
 
-const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
+export const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
   NATL_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES
 )
@@ -555,16 +555,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               this.props.userDetails?.role &&
               USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
             ) && (
-              <HeaderCenter>
-                <StyledPrimaryButton
-                  key="newEvent"
-                  id="header_new_event"
-                  onClick={this.props.goToEvents}
-                  icon={() => <Plus />}
-                />
-
-                {this.renderSearchInput(this.props)}
-              </HeaderCenter>
+              <HeaderCenter>{this.renderSearchInput(this.props)}</HeaderCenter>
             )}
           </>
         )

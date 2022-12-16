@@ -212,6 +212,12 @@ export function getEventDate(data: IFormData, event: Event) {
       return data.child.childBirthDate as string
     case Event.Death:
       return data.deathEvent.deathDate as string
+    case Event.Adoption:
+      return data.child.childBirthDate as string // TODO: Amend
+    case Event.Marriage:
+      return data.child.childBirthDate as string // TODO: Amend
+    case Event.Divorce:
+      return data.child.childBirthDate as string // TODO: Amend
   }
 }
 

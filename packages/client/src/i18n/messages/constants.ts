@@ -527,6 +527,21 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'New death declaration',
     description: 'The title that appears for new death registrations'
   },
+  newMarriageRegistration: {
+    id: 'register.selectInformant.newMarriageRegistration',
+    defaultMessage: 'New marriage declaration',
+    description: 'The title that appears for new marriage registrations'
+  },
+  newDivorceRegistration: {
+    id: 'register.selectInformant.newDivorceRegistration',
+    defaultMessage: 'New divorce declaration',
+    description: 'The title that appears for new divorce registrations'
+  },
+  newAdoptionRegistration: {
+    id: 'register.selectInformant.newAdoptionRegistration',
+    defaultMessage: 'New adoption declaration',
+    description: 'The title that appears for new adoption registrations'
+  },
   noNameProvided: {
     defaultMessage: 'No name provided',
     description: 'Label for empty title',

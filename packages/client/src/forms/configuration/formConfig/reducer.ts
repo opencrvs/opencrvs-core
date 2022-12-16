@@ -37,6 +37,9 @@ export type IFormConfigState =
       state: 'LOADING'
       birth: null
       death: null
+      marriage: null
+      adoption: null
+      divorce: null
     }
   | {
       state: 'READY'
@@ -48,12 +51,27 @@ export type IFormConfigState =
         formDraft: IFormDraft
         configFields: ISectionFieldMap
       }
+      marriage: {
+        formDraft: IFormDraft
+        configFields: ISectionFieldMap
+      }
+      adoption: {
+        formDraft: IFormDraft
+        configFields: ISectionFieldMap
+      }
+      divorce: {
+        formDraft: IFormDraft
+        configFields: ISectionFieldMap
+      }
     }
 
 export const initialState: IFormConfigState = {
   state: 'LOADING',
   birth: null,
-  death: null
+  death: null,
+  adoption: null,
+  divorce: null,
+  marriage: null
 }
 
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
@@ -91,6 +109,21 @@ function getReadyState(formConfig: IFormConfig) {
     Event.Death
   )
 
+  const defaultMarriageForm = populateRegisterFormsWithAddresses(
+    registerForms[Event.Marriage],
+    Event.Marriage
+  )
+
+  const defaultDivorceForm = populateRegisterFormsWithAddresses(
+    registerForms[Event.Divorce],
+    Event.Divorce
+  )
+
+  const defaultAdoptionForm = populateRegisterFormsWithAddresses(
+    registerForms[Event.Adoption],
+    Event.Adoption
+  )
+
   return {
     state: 'READY' as const,
     birth: {
@@ -110,6 +143,36 @@ function getReadyState(formConfig: IFormConfig) {
       configFields: generateConfigFields(
         Event.Death,
         defaultDeathForm,
+        questionConfig
+      )
+    },
+    marriage: {
+      formDraft:
+        getEventDraft(formDrafts, Event.Marriage) ||
+        DEFAULT_FORM_DRAFT[Event.Marriage],
+      configFields: generateConfigFields(
+        Event.Marriage,
+        defaultMarriageForm,
+        questionConfig
+      )
+    },
+    divorce: {
+      formDraft:
+        getEventDraft(formDrafts, Event.Divorce) ||
+        DEFAULT_FORM_DRAFT[Event.Divorce],
+      configFields: generateConfigFields(
+        Event.Divorce,
+        defaultDivorceForm,
+        questionConfig
+      )
+    },
+    adoption: {
+      formDraft:
+        getEventDraft(formDrafts, Event.Adoption) ||
+        DEFAULT_FORM_DRAFT[Event.Adoption],
+      configFields: generateConfigFields(
+        Event.Adoption,
+        defaultAdoptionForm,
         questionConfig
       )
     }

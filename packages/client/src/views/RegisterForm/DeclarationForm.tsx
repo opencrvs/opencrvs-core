@@ -36,7 +36,10 @@ interface IFormProps {
 
 const pageRoute: { [key in Event]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
-  death: DRAFT_DEATH_FORM_PAGE_GROUP
+  death: DRAFT_DEATH_FORM_PAGE_GROUP,
+  divorce: '', // TODO: Amend
+  marriage: '', // TODO: Amend
+  adoption: '' // TODO: Amend
 }
 
 export class DeclarationFormView extends React.Component<

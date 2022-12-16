@@ -103,6 +103,24 @@ function EventInfoComponet(props: IFullProps) {
         intl.formatMessage(message.index)
       )
       break
+    case Event.Marriage:
+      topBarTitle = constantsMessages.newMarriageRegistration
+      listItems = messages.marriageBulletListItems.map((message) =>
+        intl.formatMessage(message.index)
+      )
+      break
+    case Event.Divorce:
+      topBarTitle = constantsMessages.newDivorceRegistration
+      listItems = messages.divorceBulletListItems.map((message) =>
+        intl.formatMessage(message.index)
+      )
+      break
+    case Event.Adoption:
+      topBarTitle = constantsMessages.newAdoptionRegistration
+      listItems = messages.adoptionBulletListItems.map((message) =>
+        intl.formatMessage(message.index)
+      )
+      break
     default:
       topBarTitle = constantsMessages.newBirthRegistration
       listItems = messages.birthBulletListItems.map((message) =>
