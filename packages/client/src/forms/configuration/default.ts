@@ -3878,13 +3878,7 @@ export const registerForms: IDefaultRegisterForms = {
                   deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF,
                 hideAsterisk: true,
                 validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      'draftData?.deathEvent?.causeOfDeathEstablished !== "true"'
-                  }
-                ],
+                conditionals: [],
                 options: [
                   {
                     value:
