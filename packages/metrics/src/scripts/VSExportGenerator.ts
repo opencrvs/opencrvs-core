@@ -153,6 +153,13 @@ const OBSERVATION_CODE = {
   PRESENT_AT_BIRTH_REG: 'present-at-birth-reg'
 }
 
+const EDUCATION_LEVEL_MAP = {
+  PRIMARY_ISCED_1: 'Primary',
+  POST_SECONDARY_ISCED_4: 'Secondary',
+  FIRST_STAGE_TERTIARY_ISCED_5: 'Tertiary',
+  NO_SCHOOLING: 'No schooling'
+}
+
 const connect = async () => {
   try {
     await client.connect()
@@ -777,7 +784,11 @@ async function makeCompositionAndExportCSVReport(
               fullComposition.mother?.maritalStatus ?? ''
             birthRow.motherOccupation = fullComposition.mother?.occupation ?? ''
             birthRow.motherEducationalAttainment =
-              fullComposition.mother?.educational_attainment ?? ''
+              (fullComposition.mother?.educational_attainment &&
+                EDUCATION_LEVEL_MAP[
+                  fullComposition.mother?.educational_attainment
+                ]) ??
+              ''
             birthRow.motherCity = fullComposition.mother?.city ?? ''
             birthRow.motherDistrict = fullComposition.mother?.district ?? ''
             birthRow.motherState = fullComposition.mother?.state ?? ''
@@ -788,7 +799,11 @@ async function makeCompositionAndExportCSVReport(
               fullComposition.father?.maritalStatus ?? ''
             birthRow.fatherOccupation = fullComposition.father?.occupation ?? ''
             birthRow.fatherEducationalAttainment =
-              fullComposition.father?.educational_attainment ?? ''
+              (fullComposition.father?.educational_attainment &&
+                EDUCATION_LEVEL_MAP[
+                  fullComposition.father?.educational_attainment
+                ]) ??
+              ''
             birthRow.fatherCity = fullComposition.father?.city ?? ''
             birthRow.fatherDistrict = fullComposition.father?.district ?? ''
             birthRow.fatherState = fullComposition.father?.state ?? ''
@@ -800,7 +815,11 @@ async function makeCompositionAndExportCSVReport(
             birthRow.informantOccupation =
               fullComposition.informant?.occupation ?? ''
             birthRow.informantEducationalAttainment =
-              fullComposition.informant?.educational_attainment ?? ''
+              (fullComposition.informant?.educational_attainment &&
+                EDUCATION_LEVEL_MAP[
+                  fullComposition.informant?.educational_attainment
+                ]) ??
+              ''
             birthRow.informantCity = fullComposition.informant?.city ?? ''
             birthRow.informantDistrict =
               fullComposition.informant?.district ?? ''
