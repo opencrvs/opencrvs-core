@@ -2187,6 +2187,11 @@ export const formMessageDescriptors = {
     description: 'Source of cause of death',
     id: 'form.field.label.causeOfDeathMethod'
   },
+  causeOfDeath: {
+    defaultMessage: 'Cause of death',
+    description: 'Cause of death label',
+    id: 'form.field.label.causeOfDeath'
+  },
   assignedResponsibilityProof: {
     defaultMessage: 'Proof of assigned responsibility',
     description: 'Label for docuemnt option Proof of assigned responsibility',
@@ -2646,6 +2651,11 @@ export const formMessageDescriptors = {
     defaultMessage: 'Place of Occurrence of Death',
     description: 'Title for place of occurrence of death',
     id: 'form.field.label.deathPlace'
+  },
+  placeOfDeathPreview: {
+    defaultMessage: 'Place of occurrence',
+    description: 'Title for place of death sub section',
+    id: 'form.field.label.placeOfDeathPreview'
   },
   placeOfDeath: {
     defaultMessage: 'Where did the death occur?',

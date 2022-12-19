@@ -28,6 +28,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         age
         gender
         maritalStatus
+        literacy
+        educationalAttainment
+        stateOfOrigin
+        ethnicOrigin
         nationality
         identifier {
           id
@@ -266,6 +270,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         age
         gender
         maritalStatus
+        literacy
+        educationalAttainment
+        stateOfOrigin
+        ethnicOrigin
         nationality
         identifier {
           id

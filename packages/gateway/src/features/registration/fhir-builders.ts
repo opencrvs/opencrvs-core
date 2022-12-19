@@ -1631,6 +1631,22 @@ export const builders: IFieldBuilders = {
       )
       return createMaritalStatusBuilder(person, fieldValue as string)
     },
+    stateOfOrigin: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createStateOfOriginBuilder(person, fieldValue as string)
+    },
+    ethnicOrigin: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createEthnicOriginBuilder(person, fieldValue as string)
+    },
     occupation: (fhirBundle, fieldValue) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
@@ -1690,6 +1706,18 @@ export const builders: IFieldBuilders = {
         fhirBundle
       )
       return createDateOfMarriageBuilder(person, fieldValue)
+    },
+    literacy: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createLiteracyBuilder(person, fieldValue)
     },
     educationalAttainment: (
       fhirBundle: ITemplatedBundle,
