@@ -9,20 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { AudioRecorder } from './AudioRecorder'
+import { useEffect, useRef } from 'react'
 
-export default {
-  title: 'Components/forms/AudioRecorder',
-  component: AudioRecorder
-} as Meta
+export function useInterval<T extends () => void>(
+  callback: T,
+  delay: number | null
+) {
+  const savedCallback = useRef<T>()
 
-const Template: Story<any> = (args) => {
-  return (
-    <AudioRecorder onRecordEnd={(recording) => console.info(recording)}>
-      Record
-    </AudioRecorder>
-  )
+  useEffect(() => {
+    savedCallback.current = callback
+  }, [callback])
+
+  useEffect(() => {
+    function tick() {
+      savedCallback.current?.()
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay)
+      return () => clearInterval(id)
+    }
+    return
+  }, [delay])
 }
-export const AudioRecorderView = Template.bind({})

@@ -149,7 +149,7 @@ import {
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { getBase64String } from '@client/utils/imageUtils'
 import { formatName } from '@client/utils/name'
-import { Recorder } from '@opencrvs/components/lib/forms/AudioRecorder/types'
+import { Base64String } from '@opencrvs/components/lib/forms/AudioRecorder/useRecorder'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -415,8 +415,8 @@ function SignatureInput({
     onChange(signatureValue)
   }
 
-  const onRecordEnd = (state: Recorder) => {
-    onRecordingChange(state.audio)
+  const onRecordEnd = (state: Base64String) => {
+    onRecordingChange(state)
     onChange('')
   }
 

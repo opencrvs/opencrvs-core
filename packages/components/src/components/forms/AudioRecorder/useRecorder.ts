@@ -9,123 +9,133 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { useState, useEffect } from 'react'
-import { startRecording, saveRecording } from './recorder-controls'
-import { Recorder, Interval, AudioTrack, MediaRecorderEvent } from './types'
+import { useReducer } from 'react'
+import { useInterval } from './useInterval'
 
-const initialState: Recorder = {
-  recordingMinutes: 0,
-  recordingSeconds: 0,
-  initRecording: false,
-  mediaStream: null,
-  mediaRecorder: null,
-  audio: null
+type State = {
+  isRecording: boolean
+  recorder: MediaRecorder | null
+  data: Blob | null
+  error: Error | null
+  secondsPassed: number | null
 }
 
-export function useRecorder({
-  onRecordEnd
-}: {
-  onRecordEnd: (state: Recorder) => void
-}) {
-  const [recorderState, setRecorderState] = useState<Recorder>(initialState)
+type Actions =
+  | { type: 'START' }
+  | { type: 'START_RECORDING'; payload: { recorder: MediaRecorder } }
+  | { type: 'CANCEL' }
+  | { type: 'STOP' }
+  | { type: 'UPDATE_SECONDS'; payload: { secondsPassed: number | null } }
+  | { type: 'HAS_ERROR'; payload: { error: Error | null } }
 
-  useEffect(() => {
-    const MAX_RECORDER_TIME = 5
-    let recordingInterval: Interval = null
+const initState: State = {
+  isRecording: false,
+  recorder: null,
+  data: null,
+  error: null,
+  secondsPassed: null
+}
 
-    if (recorderState.initRecording)
-      recordingInterval = setInterval(() => {
-        setRecorderState((prevState: Recorder) => {
-          if (
-            prevState.recordingMinutes === MAX_RECORDER_TIME &&
-            prevState.recordingSeconds === 0
-          ) {
-            typeof recordingInterval === 'number' &&
-              clearInterval(recordingInterval)
-            return prevState
-          }
-
-          if (
-            prevState.recordingSeconds >= 0 &&
-            prevState.recordingSeconds < 59
-          )
-            return {
-              ...prevState,
-              recordingSeconds: prevState.recordingSeconds + 1
-            }
-          else if (prevState.recordingSeconds === 59)
-            return {
-              ...prevState,
-              recordingMinutes: prevState.recordingMinutes + 1,
-              recordingSeconds: 0
-            }
-          else return prevState
-        })
-      }, 1000)
-    else
-      typeof recordingInterval === 'number' && clearInterval(recordingInterval)
-
-    return () => {
-      typeof recordingInterval === 'number' && clearInterval(recordingInterval)
-    }
+function blobToBase64(blob: Blob) {
+  return new Promise<string>((resolve) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result?.toString())
+    reader.readAsDataURL(blob)
   })
+}
 
-  useEffect(() => {
-    setRecorderState((prevState) => {
-      if (prevState.mediaStream)
-        return {
-          ...prevState,
-          mediaRecorder: new MediaRecorder(prevState.mediaStream)
-        }
-      else return prevState
+const reducer = (state: State, action: Actions): State => {
+  switch (action.type) {
+    case 'START':
+      return { ...state, isRecording: true }
+    case 'STOP':
+      return { ...state, isRecording: false }
+    case 'CANCEL':
+      return initState
+    case 'START_RECORDING':
+      return {
+        ...state,
+        isRecording: true,
+        secondsPassed: 0,
+        recorder: action.payload.recorder
+      }
+    case 'UPDATE_SECONDS':
+      return { ...state, secondsPassed: action.payload.secondsPassed }
+    case 'HAS_ERROR':
+      return { ...state, isRecording: false, error: action.payload.error }
+    default:
+      return state
+  }
+}
+
+export type Base64String = string
+
+export const useRecorder = (
+  cb: (result: Base64String) => void,
+  MAX_SECONDS_PASSED = 10
+) => {
+  const [state, dispatch] = useReducer(reducer, initState)
+
+  const finishRecording = async ({ data }: { data: Blob }) => {
+    const base64String = await blobToBase64(data)
+    cb(base64String)
+  }
+
+  const updateSeconds = () => {
+    if (!state.isRecording) return
+
+    if ((state.secondsPassed ?? 0) >= MAX_SECONDS_PASSED - 1) {
+      stop()
+    }
+
+    dispatch({
+      type: 'UPDATE_SECONDS',
+      payload: { secondsPassed: (state.secondsPassed ?? 0) + 1 }
     })
-  }, [recorderState.mediaStream])
+  }
 
-  useEffect(() => {
-    const recorder = recorderState.mediaRecorder
-    let chunks: Blob[] = []
+  useInterval(updateSeconds, state.isRecording ? 1000 : null)
 
-    if (recorder && recorder.state === 'inactive') {
+  const start = async () => {
+    try {
+      if (state.isRecording) return
+      dispatch({ type: 'START' })
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      dispatch({ type: 'START_RECORDING', payload: { recorder } })
       recorder.start()
+      recorder.addEventListener('dataavailable', finishRecording)
+      if (state.error) dispatch({ type: 'HAS_ERROR', payload: { error: null } })
+    } catch (err) {
+      dispatch({ type: 'HAS_ERROR', payload: { error: err } })
+    }
+  }
 
-      recorder.ondataavailable = (e: MediaRecorderEvent) => {
-        chunks.push(e.data)
-      }
-
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
-        const file = new window.FileReader()
-        file.readAsDataURL(blob)
-        file.onloadend = () => {
-          const newState = {
-            ...initialState,
-            audio: file.result?.toString() ?? null
-          }
-
-          onRecordEnd(newState)
-
-          setRecorderState((prevState: Recorder) => {
-            if (prevState.mediaRecorder) return newState
-            else return initialState
-          })
-          chunks = []
+  const stop = () => {
+    try {
+      const recorder = state.recorder
+      dispatch({ type: 'STOP' })
+      if (recorder) {
+        if (recorder.state !== 'inactive') {
+          recorder.stop()
+          recorder.stream.getTracks().forEach((track) => track.stop())
         }
+        recorder.removeEventListener('dataavailable', finishRecording)
       }
+    } catch (err) {
+      dispatch({ type: 'HAS_ERROR', payload: { error: err } })
     }
+  }
 
-    return () => {
-      if (recorder)
-        recorder.stream
-          .getAudioTracks()
-          .forEach((track: AudioTrack) => track.stop())
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recorderState.mediaRecorder])
+  const cancel = () => dispatch({ type: 'CANCEL' })
 
   return {
-    recorderState,
-    startRecording: () => startRecording(setRecorderState),
-    cancelRecording: () => setRecorderState(initialState),
-    saveRecording: () => saveRecording(recorderState.mediaRecorder)
+    start,
+    stop,
+    cancel,
+    recorder: state.recorder,
+    isRecording: state.isRecording,
+    error: state.error,
+    secondsPassed: state.secondsPassed
   }
 }
