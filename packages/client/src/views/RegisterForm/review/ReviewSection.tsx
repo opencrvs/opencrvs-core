@@ -21,7 +21,8 @@ import {
   ImageUploader,
   InputField,
   ISelectOption as SelectComponentOptions,
-  TextArea
+  TextArea,
+  FormTabs
 } from '@opencrvs/components/lib/forms'
 import {
   DocumentViewer,
@@ -386,7 +387,7 @@ type SignatureInputProps = {
 }
 
 const SignatureDescription = styled.p`
-  margin-top: 0;
+  margin-top: 16px;
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.grey500};
 `
@@ -399,6 +400,7 @@ function SignatureInput({
 }: SignatureInputProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = React.useState(false)
   const [signatureValue, setSignatureValue] = React.useState('')
+  const [tab, setTab] = React.useState<'sign-canvas' | 'audio'>('sign-canvas')
 
   const intl = useIntl()
 
@@ -408,63 +410,88 @@ function SignatureInput({
   }
 
   return (
-    <div>
-      <SignatureDescription>
-        {intl.formatMessage(messages.signatureDescription)}
-      </SignatureDescription>
-      {!value && !readonly && (
-        <>
-          <SecondaryButton onClick={() => setSignatureDialogOpen(true)}>
-            {intl.formatMessage(messages.signatureOpenSignatureInput)}
-          </SecondaryButton>
-          <CustomImageUpload
-            id="signature-file-upload"
-            title="Upload"
-            handleFileChange={async (file) => {
-              onChange((await getBase64String(file)).toString())
-            }}
-          />
-        </>
-      )}
-      {value && <SignaturePreview alt="Informant's signature" src={value} />}
-      {value && !readonly && (
-        <TertiaryButton onClick={() => onChange('')}>
-          {intl.formatMessage(messages.signatureDelete)}
-        </TertiaryButton>
-      )}
-
-      <ResponsiveModal
-        id={`${id}Modal`}
-        title={'Signature of informant'}
-        autoHeight={true}
-        titleHeightAuto={true}
-        width={600}
-        show={signatureDialogOpen}
-        actions={[
-          <CancelButton
-            key="cancel"
-            id="modal_cancel"
-            onClick={() => setSignatureDialogOpen(false)}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
-            key="apply"
-            id="apply_change"
-            disabled={false}
-            onClick={apply}
-          >
-            {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
-        ]}
-        handleClose={() => setSignatureDialogOpen(false)}
+    <InputWrapper>
+      <InputField
+        id="informant_signature"
+        touched={false}
+        required={true}
+        label={intl.formatMessage(messages.informantsSignature)}
       >
-        <SignatureDescription>
-          {intl.formatMessage(messages.signatureInputDescription)}
-        </SignatureDescription>
-        <SignCanvas value={value} onChange={setSignatureValue} />
-      </ResponsiveModal>
-    </div>
+        <div>
+          <FormTabs
+            sections={[
+              { id: 'sign-canvas', title: 'Sign on canvas' },
+              { id: 'audio', title: 'Record audio' }
+            ]}
+            activeTabId={tab}
+            onTabClick={(tab) => setTab(() => tab)}
+          />
+
+          {tab === 'sign-canvas' && (
+            <>
+              <SignatureDescription>
+                {intl.formatMessage(messages.signatureDescription)}
+              </SignatureDescription>
+              {!value && !readonly && (
+                <>
+                  <SecondaryButton onClick={() => setSignatureDialogOpen(true)}>
+                    {intl.formatMessage(messages.signatureOpenSignatureInput)}
+                  </SecondaryButton>
+                  <CustomImageUpload
+                    id="signature-file-upload"
+                    title="Upload"
+                    handleFileChange={async (file) => {
+                      onChange((await getBase64String(file)).toString())
+                    }}
+                  />
+                </>
+              )}
+              {value && (
+                <SignaturePreview alt="Informant's signature" src={value} />
+              )}
+              {value && !readonly && (
+                <TertiaryButton onClick={() => onChange('')}>
+                  {intl.formatMessage(messages.signatureDelete)}
+                </TertiaryButton>
+              )}
+              <ResponsiveModal
+                id={`${id}Modal`}
+                title={'Signature of informant'}
+                autoHeight={true}
+                titleHeightAuto={true}
+                width={600}
+                show={signatureDialogOpen}
+                actions={[
+                  <CancelButton
+                    key="cancel"
+                    id="modal_cancel"
+                    onClick={() => setSignatureDialogOpen(false)}
+                  >
+                    {intl.formatMessage(buttonMessages.cancel)}
+                  </CancelButton>,
+                  <ApplyButton
+                    key="apply"
+                    id="apply_change"
+                    disabled={false}
+                    onClick={apply}
+                  >
+                    {intl.formatMessage(buttonMessages.apply)}
+                  </ApplyButton>
+                ]}
+                handleClose={() => setSignatureDialogOpen(false)}
+              >
+                <SignatureDescription>
+                  {intl.formatMessage(messages.signatureInputDescription)}
+                </SignatureDescription>
+                <SignCanvas value={value} onChange={setSignatureValue} />
+              </ResponsiveModal>
+            </>
+          )}
+
+          {tab === 'audio' && <b>testi</b>}
+        </div>
+      </InputField>
+    </InputWrapper>
   )
 }
 
@@ -1964,16 +1991,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputWrapper>
                 )}
                 {!isCorrection(declaration) && !hasB1Form(declaration) && (
-                  <InputWrapper>
-                    <InputField
-                      id="informant_signature"
-                      touched={false}
-                      required={true}
-                      label={intl.formatMessage(messages.informantsSignature)}
-                    >
-                      <SignatureInput {...signatureInputProps} />
-                    </InputField>
-                  </InputWrapper>
+                  <SignatureInput {...signatureInputProps} />
                 )}
                 {totalFileSizeExceeded && (
                   <Warning
