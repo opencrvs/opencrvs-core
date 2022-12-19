@@ -21,8 +21,11 @@ import {
   goToFieldAgentList,
   goToPerformanceHome,
   goToRegistrationsList,
-  IDynamicValues
+  IDynamicValues,
+  goToUserProfile,
+  goToTeamUserList
 } from '@client/navigation'
+import { AvatarSmall } from '@client/components/Avatar'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -56,6 +59,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import { Link } from '@opencrvs/components/lib/Link'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -75,6 +79,10 @@ interface SortMap {
   healthFacility_num: SORT_ORDER
   home_num: SORT_ORDER
   time: SORT_ORDER
+}
+export interface IAvatar {
+  type: string
+  data: string
 }
 const INITIAL_SORT_MAP = {
   month: SORT_ORDER.ASCENDING,
@@ -109,6 +117,8 @@ interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToFieldAgentList: typeof goToFieldAgentList
   goToRegistrationsList: typeof goToRegistrationsList
+  goToTeamUserList: typeof goToTeamUserList
+  goToUserProfile: typeof goToUserProfile
 }
 type IProps = RouteComponentProps &
   WrappedComponentProps &
@@ -192,7 +202,7 @@ function RegistrationListComponent(props: IProps) {
       {
         key: 'total',
         label: intl.formatMessage(messages.totalRegistrations),
-        width: 20,
+        width: 30,
         isSortable: true,
         sortFunction: () => toggleSort('total'),
         icon:
@@ -208,7 +218,7 @@ function RegistrationListComponent(props: IProps) {
         label: intl.formatMessage(
           messages.performanceDelayedRegistrationsLabel
         ),
-        width: 20,
+        width: 30,
         isSortable: true,
         sortFunction: () => toggleSort('delayed_num'),
         icon:
@@ -225,7 +235,7 @@ function RegistrationListComponent(props: IProps) {
       commonColumns.push({
         key: 'late',
         label: intl.formatMessage(messages.performanceLateRegistrationsLabel),
-        width: 20,
+        width: 30,
         isSortable: true,
         sortFunction: () => toggleSort('late_num'),
         icon:
@@ -243,7 +253,7 @@ function RegistrationListComponent(props: IProps) {
         {
           key: 'month',
           label: intl.formatMessage(messages.month),
-          width: 20,
+          width: 25,
           isSortable: true,
           sortFunction: () => toggleSort('time'),
           icon:
@@ -257,8 +267,11 @@ function RegistrationListComponent(props: IProps) {
         ...commonColumns,
         {
           key: 'home',
-          label: intl.formatMessage(messages.performanceHomeBirth),
-          width: 20,
+          label:
+            event === EVENT_OPTIONS.DEATH
+              ? intl.formatMessage(messages.performanceHomeDeath)
+              : intl.formatMessage(messages.performanceHomeBirth),
+          width: 25,
           isSortable: true,
           sortFunction: () => toggleSort('home_num'),
           icon:
@@ -271,8 +284,11 @@ function RegistrationListComponent(props: IProps) {
         },
         {
           key: 'healthFacility',
-          label: intl.formatMessage(messages.performanceHealthFacilityBirth),
-          width: 20,
+          label:
+            event === EVENT_OPTIONS.DEATH
+              ? intl.formatMessage(messages.performanceHealthFacilityDeath)
+              : intl.formatMessage(messages.performanceHealthFacilityBirth),
+          width: 25,
           isSortable: true,
           sortFunction: () => toggleSort('healthFacility_num'),
           icon:
@@ -289,7 +305,7 @@ function RegistrationListComponent(props: IProps) {
         {
           key: 'location',
           label: intl.formatMessage(messages.location),
-          width: 20,
+          width: 25,
           isSortable: true,
           sortFunction: () => toggleSort('location'),
           icon:
@@ -304,7 +320,7 @@ function RegistrationListComponent(props: IProps) {
         {
           key: 'home',
           label: intl.formatMessage(messages.performanceHomeBirth),
-          width: 20,
+          width: 25,
           isSortable: true,
           sortFunction: () => toggleSort('home_num'),
           icon:
@@ -318,7 +334,7 @@ function RegistrationListComponent(props: IProps) {
         {
           key: 'healthFacility',
           label: intl.formatMessage(messages.performanceHealthFacilityBirth),
-          width: 20,
+          width: 25,
           isSortable: true,
           sortFunction: () => toggleSort('healthFacility_num'),
           icon:
@@ -333,19 +349,24 @@ function RegistrationListComponent(props: IProps) {
     if (filterBy === FILTER_BY_OPTIONS.BY_REGISTRAR)
       return [
         {
+          key: 'icon',
+          label: '',
+          width: 10
+        },
+        {
           key: 'name',
           label: intl.formatMessage(messages.registrar),
-          width: 20
+          width: 25
         },
         {
           key: 'role',
           label: intl.formatMessage(messages.typeColumnHeader),
-          width: 20
+          width: 25
         },
         {
           key: 'location',
           label: intl.formatMessage(messages.officeColumnHeader),
-          width: 20
+          width: 25
         },
         ...commonColumns
       ]
@@ -382,10 +403,39 @@ function RegistrationListComponent(props: IProps) {
       finalContent = content.results.map(
         (result: IDynamicValues, index: number) => ({
           ...result,
-          name: result.registrarPractitioner.name
-            ? getName(result.registrarPractitioner.name, 'en')
-            : '',
-          location: result.registrarPractitioner.primaryOffice.name,
+          icon: (
+            <AvatarSmall
+              name={
+                result.registrarPractitioner.name
+                  ? getName(result.registrarPractitioner.name, 'en')
+                  : ''
+              }
+            />
+          ),
+          name: (
+            <Link
+              font="bold14"
+              onClick={() => {
+                props.goToUserProfile(String(result.registrarPractitioner.id))
+              }}
+            >
+              {result.registrarPractitioner.name
+                ? getName(result.registrarPractitioner.name, 'en')
+                : ''}
+            </Link>
+          ),
+          location: (
+            <Link
+              font="bold14"
+              onClick={() => {
+                props.goToTeamUserList(
+                  result.registrarPractitioner.primaryOffice?.id as string
+                )
+              }}
+            >
+              {result.registrarPractitioner.primaryOffice.name}
+            </Link>
+          ),
           role: getFieldAgentTypeLabel(result.registrarPractitioner.role),
           total: String(result.total),
           delayed: showWithTooltip(
@@ -617,25 +667,26 @@ function RegistrationListComponent(props: IProps) {
             } else {
               const totalData = get(data, 'getRegistrationsListByFilter.total')
               return (
-                <TableDiv>
-                  <Table
-                    id={'registrations-list-result'}
-                    noResultText={intl.formatMessage(
-                      constantsMessages.noResults
-                    )}
-                    isLoading={loading}
-                    disableScrollOnOverflow={true}
-                    columns={getColumns()}
-                    content={getContent(
-                      data && data.getRegistrationsListByFilter
-                    )}
-                    totalItems={totalData}
-                    currentPage={currentPage}
-                    pageSize={recordCount}
-                    isFullPage={true}
-                    highlightRowOnMouseOver
-                    noPagination={true}
-                  />
+                <>
+                  <TableDiv>
+                    <Table
+                      id={'registrations-list-result'}
+                      noResultText={intl.formatMessage(
+                        constantsMessages.noResults
+                      )}
+                      isLoading={loading}
+                      disableScrollOnOverflow={true}
+                      columns={getColumns()}
+                      content={getContent(
+                        data && data.getRegistrationsListByFilter
+                      )}
+                      totalItems={totalData}
+                      currentPage={currentPage}
+                      pageSize={recordCount}
+                      highlightRowOnMouseOver
+                      noPagination={true}
+                    />
+                  </TableDiv>
                   {totalData > DEFAULT_PAGE_SIZE && (
                     <Pagination
                       currentPage={currentPage}
@@ -652,7 +703,7 @@ function RegistrationListComponent(props: IProps) {
                       }}
                     />
                   )}
-                </TableDiv>
+                </>
               )
             }
           }}
@@ -671,5 +722,11 @@ export const RegistrationList = connect(
       offlineLocations
     }
   },
-  { goToPerformanceHome, goToFieldAgentList, goToRegistrationsList }
+  {
+    goToPerformanceHome,
+    goToFieldAgentList,
+    goToRegistrationsList,
+    goToUserProfile,
+    goToTeamUserList
+  }
 )(injectIntl(RegistrationListComponent))
