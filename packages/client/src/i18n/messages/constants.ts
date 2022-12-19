@@ -527,6 +527,21 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'New death declaration',
     description: 'The title that appears for new death registrations'
   },
+  newMarriageRegistration: {
+    id: 'register.selectInformant.newMarriageRegistration',
+    defaultMessage: 'New marriage declaration',
+    description: 'The title that appears for new marriage registrations'
+  },
+  newDivorceRegistration: {
+    id: 'register.selectInformant.newDivorceRegistration',
+    defaultMessage: 'New divorce declaration',
+    description: 'The title that appears for new divorce registrations'
+  },
+  newAdoptionRegistration: {
+    id: 'register.selectInformant.newAdoptionRegistration',
+    defaultMessage: 'New adoption declaration',
+    description: 'The title that appears for new adoption registrations'
+  },
   noNameProvided: {
     defaultMessage: 'No name provided',
     description: 'Label for empty title',
@@ -1013,6 +1028,21 @@ const dynamicMessagesToDefine: Record<
     id: 'constants.death',
     defaultMessage: 'Death',
     description: 'A label from the death event'
+  },
+  marriage: {
+    id: 'constants.marriage',
+    defaultMessage: 'Marriage',
+    description: 'A label from the marriage event'
+  },
+  divorce: {
+    id: 'constants.divorce',
+    defaultMessage: 'Divorce',
+    description: 'A label for the divorce event'
+  },
+  adoption: {
+    id: 'constants.adoption',
+    defaultMessage: 'Adoption',
+    description: 'A label for the adoption event'
   },
   father: {
     id: 'form.field.label.informantRelation.father',

@@ -557,6 +557,42 @@
             "deprecationReason": null
           },
           {
+            "name": "SMS_EVENT_NOTIFICATIONS_ENABLED",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SMS_USERNAME_REMINDER_ENABLED",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "TWO_FACTOR_AUTHENTICATION_ENABLED",
             "description": null,
             "args": [],
@@ -706,6 +742,42 @@
             "type": {
               "kind": "SCALAR",
               "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SMS_EVENT_NOTIFICATIONS_ENABLED",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SMS_USERNAME_REMINDER_ENABLED",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SMS_USER_MANAGEMENT_NOTIFICATIONS_ENABLED",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Boolean",
               "ofType": null
             },
             "defaultValue": null,
@@ -4848,6 +4920,12 @@
         "interfaces": null,
         "enumValues": [
           {
+            "name": "adoption",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "birth",
             "description": null,
             "isDeprecated": false,
@@ -4855,6 +4933,18 @@
           },
           {
             "name": "death",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "divorce",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "marriage",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -5873,6 +5963,18 @@
             "deprecationReason": null
           },
           {
+            "name": "middleNames",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "use",
             "description": null,
             "args": [],
@@ -5910,6 +6012,18 @@
           },
           {
             "name": "firstNames",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "middleNames",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -6951,6 +7065,12 @@
             "deprecationReason": null
           },
           {
+            "name": "MATERNITY_HOME",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "MILITARY_BASE_OR_CANTONMENT",
             "description": null,
             "isDeprecated": false,
@@ -6999,7 +7119,19 @@
             "deprecationReason": null
           },
           {
+            "name": "SPIRITUAL_HOMES",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "TRADITIONAL_DOCTORS",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TRADITIONAL_HERBALIST",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -11893,9 +12025,13 @@
                   "kind": "LIST",
                   "name": null,
                   "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
                   }
                 },
                 "defaultValue": null,

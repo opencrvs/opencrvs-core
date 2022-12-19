@@ -10,7 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, BirthSection, DeathSection } from '@client/forms'
+import {
+  IForm,
+  BirthSection,
+  DeathSection,
+  MarriageSection,
+  DivorceSection,
+  AdoptionSection
+} from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import * as offlineActions from '@client/offline/actions'
 import { messages } from '@client/i18n/messages/views/review'
@@ -26,6 +33,9 @@ export type IRegisterFormState =
       registerForm: {
         birth: IForm
         death: IForm
+        marriage: IForm
+        divorce: IForm
+        adoption: IForm
       }
     }
 
@@ -51,6 +61,9 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
 
       const birth = getConfiguredOrDefaultForm(formConfig, Event.Birth)
       const death = getConfiguredOrDefaultForm(formConfig, Event.Death)
+      const marriage = getConfiguredOrDefaultForm(formConfig, Event.Marriage)
+      const divorce = getConfiguredOrDefaultForm(formConfig, Event.Divorce)
+      const adoption = getConfiguredOrDefaultForm(formConfig, Event.Adoption)
 
       const preview = {
         viewType: 'preview' as const,
@@ -80,6 +93,27 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
             sections: [
               ...death.sections,
               { ...preview, id: DeathSection.Preview }
+            ]
+          },
+          marriage: {
+            ...marriage,
+            sections: [
+              ...marriage.sections,
+              { ...preview, id: MarriageSection.Preview }
+            ]
+          },
+          divorce: {
+            ...divorce,
+            sections: [
+              ...divorce.sections,
+              { ...preview, id: DivorceSection.Preview }
+            ]
+          },
+          adoption: {
+            ...adoption,
+            sections: [
+              ...adoption.sections,
+              { ...preview, id: AdoptionSection.Preview }
             ]
           }
         }

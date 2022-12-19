@@ -28,7 +28,10 @@ type IProps = IQueryProviderProps & IntlShapeProps
 /* Need to add mappings for events here */
 const QueryMapper = {
   [Event.Birth]: getBirthQueryMappings,
-  [Event.Death]: getDeathQueryMappings
+  [Event.Death]: getDeathQueryMappings,
+  [Event.Marriage]: getDeathQueryMappings, // TODO: Amend these
+  [Event.Divorce]: getDeathQueryMappings, // TODO: Amend these
+  [Event.Adoption]: getDeathQueryMappings // TODO: Amend these
 }
 export const getQueryMapping = (event: Event, action: Action) => {
   return QueryMapper[event] && QueryMapper[event](action)

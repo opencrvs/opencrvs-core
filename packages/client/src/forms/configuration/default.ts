@@ -41,9 +41,15 @@ function nameTransformer([surname, ...firstNames]: string[]) {
 interface IDefaultRegisterForms {
   birth: ISerializedForm
   death: ISerializedForm
+  marriage: ISerializedForm
+  divorce: ISerializedForm
+  adoption: ISerializedForm
 }
 
 export const registerForms: IDefaultRegisterForms = {
+  marriage: { sections: [] },
+  divorce: { sections: [] },
+  adoption: { sections: [] },
   birth: {
     sections: [
       {

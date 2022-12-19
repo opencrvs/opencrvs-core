@@ -31,6 +31,9 @@ type HumanName { # -> HumanName
 enum Event {
   birth
   death
+  marriage
+  divorce
+  adoption
 }
 
 enum Relationship {

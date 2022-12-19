@@ -956,6 +956,9 @@ type EventProgressSet {
 enum Event {
   birth
   death
+  marriage
+  divorce
+  adoption
 }
 
 enum DraftStatus {

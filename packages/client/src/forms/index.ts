@@ -914,6 +914,18 @@ export enum DeathSection {
   Preview = 'preview'
 }
 
+export enum AdoptionSection {
+  Preview = 'preview'
+}
+
+export enum DivorceSection {
+  Preview = 'preview'
+}
+
+export enum MarriageSection {
+  Preview = 'preview'
+}
+
 export type WizardSection = BirthSection | DeathSection | 'settings'
 
 export enum UserSection {
@@ -952,6 +964,9 @@ export type Section =
   | PaymentSection
   | BirthSection
   | DeathSection
+  | AdoptionSection
+  | DivorceSection
+  | MarriageSection
   | UserSection
   | CertificateSection
   | CorrectionSection

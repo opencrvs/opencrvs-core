@@ -109,6 +109,18 @@ export function questionsTransformer(
     death: populateRegisterFormsWithAddresses(
       registerForms[Event.Death],
       Event.Death
+    ),
+    marriage: populateRegisterFormsWithAddresses(
+      registerForms[Event.Marriage],
+      Event.Marriage
+    ),
+    divorce: populateRegisterFormsWithAddresses(
+      registerForms[Event.Divorce],
+      Event.Divorce
+    ),
+    adoption: populateRegisterFormsWithAddresses(
+      registerForms[Event.Adoption],
+      Event.Adoption
     )
   }
   return questionsPayload.map(

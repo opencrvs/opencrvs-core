@@ -25,6 +25,7 @@ import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/Le
 import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
 import { NavigationSubItem } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
+import { NavigationActionButtonGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationActionButtonGroup'
 import { connect } from 'react-redux'
 import {
   goToHomeTab,
@@ -34,18 +35,19 @@ import {
   goToTeamView,
   goToFormConfigHome,
   goToApplicationConfig,
+  goToEventInfo,
   goToDashboard
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { Activity, Users, PieChart } from '@opencrvs/components/lib/icons'
+import { Activity, Plus, Users, PieChart } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, dynamicConstantsMessages } from '@client/i18n/messages'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { getOfflineData } from '@client/offline/selectors'
@@ -53,6 +55,9 @@ import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { UnbuplishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import { USERS_WITHOUT_SEARCH } from './Header/Header'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Event } from '@client/utils/gateway'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -195,6 +200,7 @@ interface IDispatchProps {
   goToTeamViewAction: typeof goToTeamView
   goToDashboard: typeof goToDashboard
   goToSettings: typeof goToSettings
+  goToEventInfo: typeof goToEventInfo
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
 }
 
@@ -326,6 +332,10 @@ export const NavigationView = (props: IFullProps) => {
     readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0
   }
 
+  const isCreateActionsVisible = !(
+    userInfo?.role && USERS_WITHOUT_SEARCH.includes(userInfo.role)
+  )
+
   return (
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
@@ -336,6 +346,25 @@ export const NavigationView = (props: IFullProps) => {
       avatar={() => userInfo && userInfo.avatar}
       warning={isMobileDevice() ? <></> : <UnbuplishedWarning hideIcon />}
     >
+      {isCreateActionsVisible && (
+        <NavigationActionButtonGroup>
+          <PrimaryButton onClick={() => props.goToEventInfo(Event.Birth)}>
+            {intl.formatMessage(dynamicConstantsMessages.birth)} <Plus />
+          </PrimaryButton>
+          <PrimaryButton onClick={() => props.goToEventInfo(Event.Death)}>
+            {intl.formatMessage(dynamicConstantsMessages.death)} <Plus />
+          </PrimaryButton>
+          <PrimaryButton onClick={() => props.goToEventInfo(Event.Marriage)}>
+            {intl.formatMessage(dynamicConstantsMessages.marriage)} <Plus />
+          </PrimaryButton>
+          <PrimaryButton onClick={() => props.goToEventInfo(Event.Divorce)}>
+            {intl.formatMessage(dynamicConstantsMessages.divorce)} <Plus />
+          </PrimaryButton>
+          <PrimaryButton onClick={() => props.goToEventInfo(Event.Adoption)}>
+            {intl.formatMessage(dynamicConstantsMessages.adoption)} <Plus />
+          </PrimaryButton>
+        </NavigationActionButtonGroup>
+      )}
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>
           <NavigationGroup>
@@ -683,5 +712,6 @@ export const Navigation = connect<
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
   goToSettings,
+  goToEventInfo,
   updateRegistrarWorkqueue
 })(injectIntl(withRouter(NavigationView)))

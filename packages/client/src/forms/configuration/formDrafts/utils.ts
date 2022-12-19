@@ -28,6 +28,30 @@ export const DEFAULT_FORM_DRAFT = {
     history: [],
     createdAt: Date.now(),
     updatedAt: Date.now()
+  },
+  marriage: {
+    version: 0,
+    status: DraftStatus.Draft,
+    event: Event.Marriage,
+    history: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  },
+  divorce: {
+    version: 0,
+    status: DraftStatus.Draft,
+    event: Event.Divorce,
+    history: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  },
+  adoption: {
+    version: 0,
+    status: DraftStatus.Draft,
+    event: Event.Adoption,
+    history: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now()
   }
 }
 

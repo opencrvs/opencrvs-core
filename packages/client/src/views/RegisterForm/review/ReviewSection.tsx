@@ -765,7 +765,10 @@ const getErrorsOnFieldsBySection = (
 
 const SECTION_MAPPING = {
   [Event.Birth]: birthSectionMapping,
-  [Event.Death]: deathSectionMapping
+  [Event.Death]: deathSectionMapping,
+  [Event.Marriage]: birthSectionMapping, // TODO: Amend
+  [Event.Divorce]: birthSectionMapping, // TODO: Amend
+  [Event.Adoption]: birthSectionMapping // TODO: Amend
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {

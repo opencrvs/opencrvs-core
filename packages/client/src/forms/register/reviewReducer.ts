@@ -26,6 +26,9 @@ export type IReviewFormState =
       reviewForm: {
         birth: IForm
         death: IForm
+        marriage: IForm
+        divorce: IForm
+        adoption: IForm
       }
     }
 
@@ -51,6 +54,9 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
 
       const birth = getConfiguredOrDefaultForm(formConfig, Event.Birth)
       const death = getConfiguredOrDefaultForm(formConfig, Event.Death)
+      const marriage = getConfiguredOrDefaultForm(formConfig, Event.Marriage)
+      const divorce = getConfiguredOrDefaultForm(formConfig, Event.Divorce)
+      const adoption = getConfiguredOrDefaultForm(formConfig, Event.Adoption)
 
       const review = {
         id: ReviewSection.Review,
@@ -76,6 +82,18 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
           death: {
             ...death,
             sections: [...death.sections, review]
+          },
+          marriage: {
+            ...marriage,
+            sections: [...marriage.sections, review]
+          },
+          divorce: {
+            ...divorce,
+            sections: [...divorce.sections, review]
+          },
+          adoption: {
+            ...adoption,
+            sections: [...adoption.sections, review]
           }
         }
       }

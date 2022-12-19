@@ -837,7 +837,10 @@ export interface GQLEventProgressSet {
 
 export const enum GQLEvent {
   birth = 'birth',
-  death = 'death'
+  death = 'death',
+  marriage = 'marriage',
+  divorce = 'divorce',
+  adoption = 'adoption'
 }
 
 export const enum GQLDraftStatus {

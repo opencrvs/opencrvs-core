@@ -92,7 +92,7 @@ function getEvent(event: string): Event {
   }
 }
 const VERIFY_QUERY = gql`
-  query fetchRegistration($id: ID!) {
+  query verifyRegistration($id: ID!) {
     fetchRegistration(id: $id) {
       id
       history {
@@ -197,7 +197,7 @@ const VERIFY_QUERY = gql`
 `
 export function VerifyDetails() {
   const intl = useIntl()
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
   const offlineData = useSelector(getOfflineData)
   const registerForm = useSelector(getRegisterForm)
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches

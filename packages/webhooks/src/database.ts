@@ -29,8 +29,8 @@ db.on('connected', () => {
   logger.info('Connected to MongoDB')
 })
 
-// tslint:disable-next-line
 const wait = (time: number) =>
+  // tslint:disable-next-line
   new Promise((resolve) => setTimeout(resolve, time))
 
 let redisConnection: IORedis.Redis
