@@ -2335,10 +2335,12 @@ export const registerForms: IDefaultRegisterForms = {
         ],
         mapping: {
           mutation: {
-            operation: 'setInformantRegistrationComposedTransformer'
+            operation: 'setInformantRegistrationComposedTransformer',
+            parameters: ['birth']
           },
           query: {
-            operation: 'getInformantRegistrationComposedTransformer'
+            operation: 'getInformantRegistrationComposedTransformer',
+            parameters: ['birth']
           }
         }
       },
@@ -3559,10 +3561,12 @@ export const registerForms: IDefaultRegisterForms = {
         ],
         mapping: {
           mutation: {
-            operation: 'setInformantSectionTransformer'
+            operation: 'setInformantRegistrationComposedTransformer',
+            parameters: ['death']
           },
           query: {
-            operation: 'getInformantSectionTransformer'
+            operation: 'getInformantRegistrationComposedTransformer',
+            parameters: ['death']
           }
         }
       },
