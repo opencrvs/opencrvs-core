@@ -3786,620 +3786,6 @@ export const registerForms: IDefaultRegisterForms = {
   death: {
     sections: [
       {
-        id: DeathSection.Registration,
-        viewType: 'form',
-        name: formMessageDescriptors.registrationName,
-        title: formMessageDescriptors.registrationTitle,
-        groups: [
-          {
-            id: 'who-is-applying-view-group',
-            title: informantMessageDescriptors.deathInformantTitle,
-            conditionals: [],
-            preventContinueIfError: true,
-            showExitButtonOnly: true,
-            fields: [
-              {
-                name: 'informantType',
-                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: informantMessageDescriptors.deathInformantTitle,
-                hideHeader: true,
-                required: true,
-                hideInPreview: false,
-                initialValue: '',
-                validate: [],
-                size: RadioSize.LARGE,
-                options: [
-                  {
-                    value: 'SPOUSE',
-                    label: informantMessageDescriptors.spouse
-                  },
-                  {
-                    value: 'SON',
-                    label: informantMessageDescriptors.son
-                  },
-                  {
-                    value: 'DAUGHTER',
-                    label: informantMessageDescriptors.daughter
-                  },
-                  {
-                    value: 'SON_IN_LAW',
-                    label: informantMessageDescriptors.sonInLaw
-                  },
-                  {
-                    value: 'DAUGHTER_IN_LAW',
-                    label: informantMessageDescriptors.daughterInLaw
-                  },
-                  {
-                    value: 'MOTHER',
-                    label: informantMessageDescriptors.mother
-                  },
-                  {
-                    value: 'FATHER',
-                    label: informantMessageDescriptors.father
-                  },
-                  {
-                    value: 'GRANDSON',
-                    label: informantMessageDescriptors.grandson
-                  },
-                  {
-                    value: 'GRANDDAUGHTER',
-                    label: informantMessageDescriptors.granddaughter
-                  },
-                  {
-                    value: 'OTHER',
-                    label: formMessageDescriptors.someoneElse
-                  }
-                ],
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                nestedFields: {
-                  SPOUSE: [],
-                  SON: [],
-                  DAUGHTER: [],
-                  SON_IN_LAW: [],
-                  DAUGHTER_IN_LAW: [],
-                  MOTHER: [],
-                  FATHER: [],
-                  GRANDSON: [],
-                  GRANDDAUGHTER: [],
-                  OTHER: [
-                    {
-                      name: 'otherInformantType',
-                      type: 'TEXT',
-                      label:
-                        formMessageDescriptors.informantsRelationWithDeceased,
-                      placeholder:
-                        formMessageDescriptors.relationshipPlaceHolder,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'englishOnlyNameFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: ['registration.otherInformantType']
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: ['registration.otherInformantType']
-                        }
-                      }
-                    }
-                  ]
-                },
-                mapping: {
-                  mutation: {
-                    operation: 'nestedRadioFieldToBundleFieldTransformer',
-                    parameters: ['registration.informantType']
-                  },
-                  query: {
-                    operation: 'bundleFieldToNestedRadioFieldTransformer',
-                    parameters: ['registration.informantType']
-                  }
-                }
-              }
-            ]
-          },
-          {
-            id: 'contact-view-group',
-            title: informantMessageDescriptors.selectContactPoint,
-            conditionals: [],
-            preventContinueIfError: true,
-            showExitButtonOnly: true,
-            previewGroups: [
-              {
-                id: 'contactPointGroup',
-                label: formMessageDescriptors.reviewLabelMainContact,
-                required: false,
-                initialValue: '',
-                fieldToRedirect: 'contactPoint'
-              }
-            ],
-            fields: [
-              {
-                name: 'contactPoint',
-                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: formMessageDescriptors.selectContactPoint,
-                conditionals: [],
-                previewGroup: 'contactPointGroup',
-                required: true,
-                hideHeader: true,
-                initialValue: '',
-                validate: [],
-                size: RadioSize.LARGE,
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                options: [
-                  {
-                    value: 'SPOUSE',
-                    label: informantMessageDescriptors.spouse
-                  },
-                  {
-                    value: 'SON',
-                    label: informantMessageDescriptors.son
-                  },
-                  {
-                    value: 'DAUGHTER',
-                    label: informantMessageDescriptors.daughter
-                  },
-                  {
-                    value: 'SON_IN_LAW',
-                    label: informantMessageDescriptors.sonInLaw
-                  },
-                  {
-                    value: 'DAUGHTER_IN_LAW',
-                    label: informantMessageDescriptors.daughterInLaw
-                  },
-                  {
-                    value: 'MOTHER',
-                    label: informantMessageDescriptors.mother
-                  },
-                  {
-                    value: 'FATHER',
-                    label: informantMessageDescriptors.father
-                  },
-                  {
-                    value: 'GRANDSON',
-                    label: informantMessageDescriptors.grandson
-                  },
-                  {
-                    value: 'GRANDDAUGHTER',
-                    label: informantMessageDescriptors.granddaughter
-                  },
-                  {
-                    value: 'OTHER',
-                    label: formMessageDescriptors.someoneElse
-                  }
-                ],
-                nestedFields: {
-                  SPOUSE: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  SON: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  DAUGHTER: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  SON_IN_LAW: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  DAUGHTER_IN_LAW: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  MOTHER: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  FATHER: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  GRANDSON: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  GRANDDAUGHTER: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  OTHER: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: formMessageDescriptors.phoneNumber,
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ]
-                },
-                mapping: {
-                  mutation: {
-                    operation: 'nestedRadioFieldToBundleFieldTransformer',
-                    parameters: ['registration.contact']
-                  },
-                  query: {
-                    operation: 'bundleFieldToNestedRadioFieldTransformer',
-                    parameters: ['registration.contact']
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        mapping: {
-          template: [
-            {
-              fieldName: 'registrationNumber',
-              operation: 'registrationNumberTransformer'
-            },
-            {
-              fieldName: 'certificateDate',
-              operation: 'certificateDateTransformer',
-              parameters: ['en', 'dd MMMM yyyy']
-            },
-            {
-              fieldName: 'registrarName',
-              operation: 'registrarNameUserTransformer'
-            },
-            {
-              fieldName: 'role',
-              operation: 'roleUserTransformer'
-            },
-            {
-              fieldName: 'registrarSignature',
-              operation: 'registrarSignatureUserTransformer'
-            },
-            {
-              fieldName: 'qrCode',
-              operation: 'QRCodeTransformerTransformer'
-            },
-            {
-              fieldName: 'registrationCentre',
-              operation: 'registrationLocationUserTransformer',
-              parameters: [':office']
-            },
-            {
-              fieldName: 'registrationLGA',
-              operation: 'registrationLocationUserTransformer',
-              parameters: [':district']
-            },
-            {
-              fieldName: 'registrationState',
-              operation: 'registrationLocationUserTransformer',
-              parameters: [':state']
-            }
-          ],
-          mutation: {
-            operation: 'setDeathRegistrationSectionTransformer'
-          },
-          query: {
-            operation: 'getDeathRegistrationSectionTransformer'
-          }
-        }
-      },
-      {
         id: DeathSection.Deceased,
         viewType: 'form',
         name: formMessageDescriptors.deceasedName,
@@ -4957,27 +4343,121 @@ export const registerForms: IDefaultRegisterForms = {
             id: 'informant-view-group',
             fields: [
               {
-                name: 'nationality',
+                name: 'informantType',
                 type: 'SELECT_WITH_OPTIONS',
-                label: formMessageDescriptors.nationality,
+                label: formMessageDescriptors.informantsRelationWithDeceased,
                 required: true,
-                initialValue:
-                  typeof window !== 'undefined'
-                    ? (window as any).config.COUNTRY.toUpperCase()
-                    : 'FAR',
+                hideInPreview: false,
+                initialValue: '',
                 validate: [],
+                options: [
+                  {
+                    value: 'SPOUSE',
+                    label: informantMessageDescriptors.spouse
+                  },
+                  {
+                    value: 'SON',
+                    label: informantMessageDescriptors.son
+                  },
+                  {
+                    value: 'DAUGHTER',
+                    label: informantMessageDescriptors.daughter
+                  },
+                  {
+                    value: 'SON_IN_LAW',
+                    label: informantMessageDescriptors.sonInLaw
+                  },
+                  {
+                    value: 'DAUGHTER_IN_LAW',
+                    label: informantMessageDescriptors.daughterInLaw
+                  },
+                  {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
+                    value: 'GRANDSON',
+                    label: informantMessageDescriptors.grandson
+                  },
+                  {
+                    value: 'GRANDDAUGHTER',
+                    label: informantMessageDescriptors.granddaughter
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.someoneElse
+                  }
+                ],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
-                options: {
-                  resource: 'countries'
-                },
+                mapping: {
+                  mutation: {
+                    operation: 'changeHirerchyMutationTransformer',
+                    parameters: ['registration.informantType']
+                  },
+                  query: {
+                    operation: 'changeHirerchyQueryTransformer',
+                    parameters: ['registration.informantType']
+                  }
+                }
+              },
+              {
+                name: 'otherInformantType',
+                type: 'TEXT',
+                label:
+                  formMessageDescriptors.informantsOtherRelationWithDeceased,
+                placeholder: formMessageDescriptors.relationshipPlaceHolder,
+                required: true,
+                initialValue: '',
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.informantType || values.informantType !== "OTHER"'
+                  }
+                ],
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'changeHirerchyMutationTransformer',
+                    parameters: ['registration.otherInformantType']
+                  },
+                  query: {
+                    operation: 'changeHirerchyQueryTransformer',
+                    parameters: ['registration.otherInformantType']
+                  }
+                }
+              },
+              {
+                name: 'familyNameEng',
+                previewGroup: 'informantNameInEnglish',
+                type: 'TEXT',
+                label: formMessageDescriptors.childFamilyName,
+                maxLength: 32,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
                 mapping: {
                   mutation: {
                     operation: 'fieldValueNestingTransformer',
                     parameters: [
                       'individual',
                       {
-                        operation: 'fieldToArrayTransformer'
-                      }
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'familyName']
+                      },
+                      'name'
                     ]
                   },
                   query: {
@@ -4985,7 +4465,131 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: [
                       'individual',
                       {
-                        operation: 'arrayToFieldTransformer'
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'familyName']
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'firstNamesEng',
+                previewGroup: 'informantNameInEnglish',
+                type: 'TEXT',
+                label: formMessageDescriptors.childFirstNames,
+                maxLength: 32,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'firstNames']
+                      },
+                      'name'
+                    ]
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'firstNames']
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'middleNamesEng',
+                previewGroup: 'informantNameInEnglish',
+                type: 'TEXT',
+                label: formMessageDescriptors.middleNames,
+                maxLength: 32,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldToNameTransformer',
+                        parameters: ['en', 'middleNames']
+                      },
+                      'name'
+                    ]
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'middleNames']
+                      }
+                    ]
+                  }
+                }
+              },
+              // PRIMARY ADDRESS SUBSECTION
+              // PRIMARY ADDRESS
+              {
+                name: 'seperator',
+                type: 'SUBSECTION',
+                label: {
+                  defaultMessage: ' ',
+                  description: 'empty string',
+                  id: 'form.field.label.empty'
+                },
+                initialValue: '',
+                ignoreBottomMargin: true,
+                validate: [],
+                conditionals: []
+              },
+              {
+                name: 'registrationPhone',
+                type: 'TEL',
+                label: formMessageDescriptors.phoneNumber,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'phoneNumberFormat'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'changeHirerchyMutationTransformer',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      {
+                        operation: 'msisdnTransformer',
+                        parameters: ['registration.contactPhoneNumber']
+                      }
+                    ]
+                  },
+                  query: {
+                    operation: 'changeHirerchyQueryTransformer',
+                    parameters: [
+                      'registration.contactPhoneNumber',
+                      {
+                        operation: 'localPhoneTransformer',
+                        parameters: ['registration.contactPhoneNumber']
                       }
                     ]
                   }
@@ -5031,127 +4635,7 @@ export const registerForms: IDefaultRegisterForms = {
                     ]
                   }
                 }
-              },
-              {
-                name: 'informantBirthDate',
-                type: 'DATE',
-                label: formMessageDescriptors.motherDateOfBirth,
-                required: true,
-                customisable: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'dateFormatIsCorrect',
-                    parameters: []
-                  },
-                  {
-                    operation: 'dateInPast',
-                    parameters: []
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'longDateTransformer',
-                        parameters: ['birthDate']
-                      },
-                      'birthDate'
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldValueTransformer',
-                        parameters: ['birthDate']
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'firstNamesEng',
-                previewGroup: 'informantNameInEnglish',
-                type: 'TEXT',
-                label: formMessageDescriptors.childFirstNames,
-                maxLength: 32,
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'firstNames']
-                      },
-                      'name'
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['en', 'firstNames']
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'familyNameEng',
-                previewGroup: 'informantNameInEnglish',
-                type: 'TEXT',
-                label: formMessageDescriptors.childFamilyName,
-                maxLength: 32,
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'familyName']
-                      },
-                      'name'
-                    ]
-                  },
-                  query: {
-                    operation: 'nestedValueToFieldTransformer',
-                    parameters: [
-                      'individual',
-                      {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['en', 'familyName']
-                      }
-                    ]
-                  }
-                }
               }
-              // PRIMARY ADDRESS SUBSECTION
-              // PRIMARY ADDRESS
-              // SECONDARY ADDRESS SAME AS PRIMARY
-              // SECONDARY ADDRESS SUBSECTION
-              // SECONDARY ADDRESS
             ],
             previewGroups: [
               {
@@ -5173,6 +4657,175 @@ export const registerForms: IDefaultRegisterForms = {
           },
           query: {
             operation: 'getInformantSectionTransformer'
+          }
+        }
+      },
+      {
+        id: DeathSection.Registration,
+        viewType: 'form',
+        name: formMessageDescriptors.registrationName,
+        title: formMessageDescriptors.registrationTitle,
+        groups: [
+          {
+            id: 'who-is-applying-view-group',
+            title: informantMessageDescriptors.deathInformantTitle,
+            conditionals: [{ action: 'hide', expression: 'true' }],
+            preventContinueIfError: true,
+            showExitButtonOnly: true,
+            fields: [
+              {
+                name: 'informantType',
+                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
+                label: informantMessageDescriptors.deathInformantTitle,
+                hideHeader: true,
+                required: true,
+                hideInPreview: false,
+                initialValue: '',
+                validate: [],
+                size: RadioSize.LARGE,
+                options: [
+                  {
+                    value: 'SPOUSE',
+                    label: informantMessageDescriptors.spouse
+                  },
+                  {
+                    value: 'SON',
+                    label: informantMessageDescriptors.son
+                  },
+                  {
+                    value: 'DAUGHTER',
+                    label: informantMessageDescriptors.daughter
+                  },
+                  {
+                    value: 'SON_IN_LAW',
+                    label: informantMessageDescriptors.sonInLaw
+                  },
+                  {
+                    value: 'DAUGHTER_IN_LAW',
+                    label: informantMessageDescriptors.daughterInLaw
+                  },
+                  {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
+                    value: 'GRANDSON',
+                    label: informantMessageDescriptors.grandson
+                  },
+                  {
+                    value: 'GRANDDAUGHTER',
+                    label: informantMessageDescriptors.granddaughter
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.someoneElse
+                  }
+                ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                nestedFields: {
+                  SPOUSE: [],
+                  SON: [],
+                  DAUGHTER: [],
+                  SON_IN_LAW: [],
+                  DAUGHTER_IN_LAW: [],
+                  MOTHER: [],
+                  FATHER: [],
+                  GRANDSON: [],
+                  GRANDDAUGHTER: [],
+                  OTHER: [
+                    {
+                      name: 'otherInformantType',
+                      type: 'TEXT',
+                      label:
+                        formMessageDescriptors.informantsRelationWithDeceased,
+                      placeholder:
+                        formMessageDescriptors.relationshipPlaceHolder,
+                      required: true,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'englishOnlyNameFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: ['registration.otherInformantType']
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: ['registration.otherInformantType']
+                        }
+                      }
+                    }
+                  ]
+                },
+                mapping: {
+                  mutation: {
+                    operation: 'nestedRadioFieldToBundleFieldTransformer',
+                    parameters: ['registration.informantType']
+                  },
+                  query: {
+                    operation: 'bundleFieldToNestedRadioFieldTransformer',
+                    parameters: ['registration.informantType']
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        mapping: {
+          template: [
+            {
+              fieldName: 'registrationNumber',
+              operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'certificateDate',
+              operation: 'certificateDateTransformer',
+              parameters: ['en', 'dd MMMM yyyy']
+            },
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
+            },
+            {
+              fieldName: 'registrationCentre',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':office']
+            },
+            {
+              fieldName: 'registrationLGA',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':district']
+            },
+            {
+              fieldName: 'registrationState',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':state']
+            }
+          ],
+          mutation: {
+            operation: 'setDeathRegistrationSectionTransformer'
+          },
+          query: {
+            operation: 'getDeathRegistrationSectionTransformer'
           }
         }
       },
