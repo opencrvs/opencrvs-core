@@ -21,41 +21,10 @@ export default {
 } as Meta
 
 const Template: Story<any> = (args) => {
-  const [isAudioRecorderModalOpen, setIsAudioRecorderModalOpen] =
-    useState(false)
-
   return (
-    <>
-      <AudioRecorder.Button onClick={() => setIsAudioRecorderModalOpen(true)}>
-        Record
-      </AudioRecorder.Button>
-
-      <ResponsiveModal
-        title="Audio signature of informant"
-        autoHeight={true}
-        titleHeightAuto={true}
-        width={600}
-        show={isAudioRecorderModalOpen}
-        actions={[
-          <TertiaryButton
-            key="cancel"
-            onClick={() => setIsAudioRecorderModalOpen(false)}
-          >
-            Cancel
-          </TertiaryButton>,
-          <PrimaryButton
-            key="apply"
-            disabled={false}
-            onClick={() => alert('applied')}
-          >
-            Apply
-          </PrimaryButton>
-        ]}
-        handleClose={() => setIsAudioRecorderModalOpen(false)}
-      >
-        <AudioRecorder />
-      </ResponsiveModal>
-    </>
+    <AudioRecorder onRecordEnd={(recording) => console.info(recording)}>
+      Record
+    </AudioRecorder>
   )
 }
 export const AudioRecorderView = Template.bind({})

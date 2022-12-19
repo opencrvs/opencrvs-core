@@ -22,7 +22,8 @@ import {
   InputField,
   ISelectOption as SelectComponentOptions,
   TextArea,
-  FormTabs
+  FormTabs,
+  AudioRecorder
 } from '@opencrvs/components/lib/forms'
 import {
   DocumentViewer,
@@ -148,6 +149,7 @@ import {
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { getBase64String } from '@client/utils/imageUtils'
 import { formatName } from '@client/utils/name'
+import { Recorder } from '@opencrvs/components/lib/forms/AudioRecorder/types'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -384,6 +386,8 @@ type SignatureInputProps = {
   value?: string
   onChange: (value: string) => void
   readonly?: boolean
+  onRecordingChange: (value: any) => void
+  recording?: any
 }
 
 const SignatureDescription = styled.p`
@@ -396,7 +400,9 @@ function SignatureInput({
   id,
   value,
   onChange,
-  readonly
+  readonly,
+  recording,
+  onRecordingChange
 }: SignatureInputProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = React.useState(false)
   const [signatureValue, setSignatureValue] = React.useState('')
@@ -407,6 +413,11 @@ function SignatureInput({
   function apply() {
     setSignatureDialogOpen(false)
     onChange(signatureValue)
+  }
+
+  const onRecordEnd = (state: Recorder) => {
+    onRecordingChange(state.audio)
+    onChange('')
   }
 
   return (
@@ -488,7 +499,23 @@ function SignatureInput({
             </>
           )}
 
-          {tab === 'audio' && <b>testi</b>}
+          {tab === 'audio' && (
+            <>
+              <SignatureDescription>
+                {intl.formatMessage(messages.signatureDescription)}
+              </SignatureDescription>
+              {!recording && !readonly && (
+                <AudioRecorder onRecordEnd={onRecordEnd}>
+                  {intl.formatMessage(messages.signatureOpenSignatureInput)}
+                </AudioRecorder>
+              )}
+              {recording && (
+                <audio controls autoPlay={false}>
+                  <source src={recording} />
+                </audio>
+              )}
+            </>
+          )}
         </div>
       </InputField>
     </InputWrapper>
@@ -984,6 +1011,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         const regStatus = declaration.data.registration.regStatus as IRegStatus
         if (regStatus.type === 'IN_PROGRESS') {
           declaration.data.registration.informantsSignature = ''
+        }
+      }
+    }
+    if (
+      declaration.data.registration &&
+      declaration.data.registration.informantsSignatureRecording
+    ) {
+      if (!declaration.data.registration.regStatus) {
+        declaration.data.registration.informantsSignatureRecording = ''
+      } else {
+        const regStatus = declaration.data.registration.regStatus as IRegStatus
+        if (regStatus.type === 'IN_PROGRESS') {
+          declaration.data.registration.informantsSignatureRecording = ''
         }
       }
     }
@@ -1829,7 +1869,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ? false
       : !(
           hasB1Form(declaration) ||
-          declaration.data.registration?.informantsSignature
+          declaration.data.registration?.informantsSignature ||
+          declaration.data.registration?.informantsSignatureRecording
         )
 
     const isComplete =
@@ -1848,6 +1889,18 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           )
       },
       value: declaration.data.registration?.informantsSignature as string,
+      onRecordingChange: (value: string) => {
+        this.props.onChangeReviewForm &&
+          this.props.onChangeReviewForm(
+            {
+              informantsSignatureRecording: value
+            },
+            registrationSection,
+            declaration
+          )
+      },
+      recording: declaration.data.registration
+        ?.informantsSignatureRecording as string,
       readonly
     }
 
@@ -2140,22 +2193,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </InputWrapper>
                   )}
                   {!isCorrection(declaration2) && !hasB1Form(declaration2) && (
-                    <InputWrapper>
-                      <InputField
-                        id="informant_signature"
-                        touched={false}
-                        required={true}
-                        label={intl.formatMessage(messages.informantsSignature)}
-                      >
-                        <SignatureInput
-                          {...signatureInputProps}
-                          value={
-                            declaration2.data.registration
-                              ?.informantsSignature as string
-                          }
-                        />
-                      </InputField>
-                    </InputWrapper>
+                    <SignatureInput
+                      {...signatureInputProps}
+                      value={
+                        declaration2.data.registration
+                          ?.informantsSignature as string
+                      }
+                      recording={
+                        declaration2.data.registration
+                          ?.informantsSignatureRecording as string
+                      }
+                    />
                   )}
                   {totalFileSizeExceeded && (
                     <Warning

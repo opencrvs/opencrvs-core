@@ -22,7 +22,11 @@ const initialState: Recorder = {
   audio: null
 }
 
-export function useRecorder() {
+export function useRecorder({
+  onRecordEnd
+}: {
+  onRecordEnd: (state: Recorder) => void
+}) {
   const [recorderState, setRecorderState] = useState<Recorder>(initialState)
 
   useEffect(() => {
@@ -90,16 +94,22 @@ export function useRecorder() {
 
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
-        chunks = []
+        const file = new window.FileReader()
+        file.readAsDataURL(blob)
+        file.onloadend = () => {
+          const newState = {
+            ...initialState,
+            audio: file.result?.toString() ?? null
+          }
 
-        setRecorderState((prevState: Recorder) => {
-          if (prevState.mediaRecorder)
-            return {
-              ...initialState,
-              audio: window.URL.createObjectURL(blob)
-            }
-          else return initialState
-        })
+          onRecordEnd(newState)
+
+          setRecorderState((prevState: Recorder) => {
+            if (prevState.mediaRecorder) return newState
+            else return initialState
+          })
+          chunks = []
+        }
       }
     }
 
@@ -109,6 +119,7 @@ export function useRecorder() {
           .getAudioTracks()
           .forEach((track: AudioTrack) => track.stop())
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recorderState.mediaRecorder])
 
   return {
