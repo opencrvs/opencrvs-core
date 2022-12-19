@@ -9,14 +9,32 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
+if [ "$1" != "" ]; then
+  sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-hearth.js
+  sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-openhim.js
+  sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-application-config.js
+  sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-user-mgnt.js
+fi
+
 # hearth migrations
-yarn migrate-mongo up --file migrate-mongo-config-hearth.js
-yarn migrate-mongo status --file migrate-mongo-config-hearth.js
+yarn migrate-mongo up --file $1migrate-mongo-config-hearth.js
+yarn migrate-mongo status --file $1migrate-mongo-config-hearth.js
 
 #openhim migrations
-yarn migrate-mongo up --file migrate-mongo-config-openhim.js
-yarn migrate-mongo status --file migrate-mongo-config-openhim.js
+yarn migrate-mongo up --file $1migrate-mongo-config-openhim.js
+yarn migrate-mongo status --file $1migrate-mongo-config-openhim.js
 
 # Application Config migration
-yarn migrate-mongo up --file migrate-mongo-config-application-config.js
-yarn migrate-mongo status --file migrate-mongo-config-application-config.js
+yarn migrate-mongo up --file $1migrate-mongo-config-application-config.js
+yarn migrate-mongo status --file $1migrate-mongo-config-application-config.js
+
+# User mgnt migration
+yarn migrate-mongo up --file $1migrate-mongo-config-user-mgnt.js
+yarn migrate-mongo status --file $1migrate-mongo-config-user-mgnt.js
+
+if [ "$1" != "" ]; then
+  sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-hearth.js
+  sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-openhim.js
+  sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-application-config.js
+  sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-user-mgnt.js
+fi
