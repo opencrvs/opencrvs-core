@@ -690,7 +690,8 @@ export const mockOfflineData = {
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
     ADDRESSES: 1,
     DATE_OF_BIRTH_UNKNOWN: true,
-    INFORMANT_SIGNATURE: false
+    INFORMANT_SIGNATURE: false,
+    INFORMANT_SIGNATURE_REQUIRED: false
   },
   formConfig,
   systems

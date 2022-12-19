@@ -155,5 +155,6 @@ export const updateApplicationConfig = Joi.object({
     status: Joi.string().required()
   }),
   INFORMANT_SIGNATURE: Joi.boolean(),
-  DATE_OF_BIRTH_UNKNOWN: Joi.boolean()
+  DATE_OF_BIRTH_UNKNOWN: Joi.boolean(),
+  INFORMANT_SIGNATURE_REQUIRED: Joi.boolean()
 })

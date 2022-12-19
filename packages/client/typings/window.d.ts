@@ -59,6 +59,7 @@ interface Window {
     INTEGRATIONS: any[]
     DATE_OF_BIRTH_UNKNOWN: boolean
     INFORMANT_SIGNATURE: boolean
+    INFORMANT_SIGNATURE_REQUIRED: boolean
   }
   __localeId__: string
 }
