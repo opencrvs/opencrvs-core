@@ -3238,26 +3238,6 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [],
                 options: [
                   {
-                    value: 'SPOUSE',
-                    label: informantMessageDescriptors.spouse
-                  },
-                  {
-                    value: 'SON',
-                    label: informantMessageDescriptors.son
-                  },
-                  {
-                    value: 'DAUGHTER',
-                    label: informantMessageDescriptors.daughter
-                  },
-                  {
-                    value: 'SON_IN_LAW',
-                    label: informantMessageDescriptors.sonInLaw
-                  },
-                  {
-                    value: 'DAUGHTER_IN_LAW',
-                    label: informantMessageDescriptors.daughterInLaw
-                  },
-                  {
                     value: 'MOTHER',
                     label: informantMessageDescriptors.mother
                   },
@@ -3266,12 +3246,52 @@ export const registerForms: IDefaultRegisterForms = {
                     label: informantMessageDescriptors.father
                   },
                   {
-                    value: 'GRANDSON',
-                    label: informantMessageDescriptors.grandson
+                    value: 'PATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.paternalGrandfather
                   },
                   {
-                    value: 'GRANDDAUGHTER',
-                    label: informantMessageDescriptors.granddaughter
+                    value: 'PATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.paternalGrandmother
+                  },
+                  {
+                    value: 'MATERNAL_GRANDFATHER',
+                    label: informantMessageDescriptors.maternalGrandfather
+                  },
+                  {
+                    value: 'MATERNAL_GRANDMOTHER',
+                    label: informantMessageDescriptors.maternalGrandmother
+                  },
+                  {
+                    value: 'BROTHER',
+                    label: informantMessageDescriptors.brother
+                  },
+                  {
+                    value: 'SISTER',
+                    label: informantMessageDescriptors.sister
+                  },
+                  {
+                    value: 'MOTHERS_BROTHER',
+                    label: informantMessageDescriptors.mothersBrother
+                  },
+                  {
+                    value: 'MOTHERS_SISTER',
+                    label: informantMessageDescriptors.mothersSister
+                  },
+                  {
+                    value: 'FATHERS_BROTHER',
+                    label: informantMessageDescriptors.fathersBrother
+                  },
+                  {
+                    value: 'FATHERS_SISTER',
+                    label: informantMessageDescriptors.fathersSister
+                  },
+                  {
+                    value: 'OTHER_FAMILY_MEMBER',
+                    label: informantMessageDescriptors.otherFamilyMember
+                  },
+                  {
+                    value: 'LEGAL_GUARDIAN',
+                    label: informantMessageDescriptors.legalGuardian
                   },
                   {
                     value: 'OTHER',
