@@ -80,10 +80,6 @@ interface SortMap {
   home_num: SORT_ORDER
   time: SORT_ORDER
 }
-export interface IAvatar {
-  type: string
-  data: string
-}
 const INITIAL_SORT_MAP = {
   month: SORT_ORDER.ASCENDING,
   location: SORT_ORDER.ASCENDING,
