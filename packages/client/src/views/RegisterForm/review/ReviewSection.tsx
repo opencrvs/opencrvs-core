@@ -1842,6 +1842,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       errorsOnFields
     )
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
+    console.log(window.config.INFORMANT_SIGNATURE_REQUIRED, 'required')
+    console.log(window.config.INFORMANT_SIGNATURE)
 
     return (
       <FullBodyContent>
@@ -1938,7 +1940,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     <InputField
                       id="informant_signature"
                       touched={false}
-                      required={true}
+                      required={window.config.INFORMANT_SIGNATURE_REQUIRED}
                       label={intl.formatMessage(messages.informantsSignature)}
                     >
                       <SignatureInput {...signatureInputProps} />

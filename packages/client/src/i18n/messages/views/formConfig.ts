@@ -56,6 +56,7 @@ interface IFormConfigMessages
   informantSignatureSettings: MessageDescriptor
   enable: MessageDescriptor
   disable: MessageDescriptor
+  enableAndRequired: MessageDescriptor
   globalSettingsDescription: MessageDescriptor
   introductionPageSettingsDialogTitle: MessageDescriptor
   introductionPageSettingsDialogDesc: MessageDescriptor
@@ -315,6 +316,12 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.settings.disable',
     defaultMessage: 'Disabled',
     description: 'Label for disable intorduction page settings'
+  },
+  enableAndRequired: {
+    id: 'config.form.settings.enableAndRequired',
+    defaultMessage: 'Enabled (Required for registration) ',
+    description:
+      'Label for enabled and registration required in informant signature page settings'
   },
   introductionPageSettingsDialogTitle: {
     id: 'config.form.settings.introductionPage.dialogTitle',

@@ -51,7 +51,9 @@ export const resolvers: GQLResolver = {
         INTEGRATIONS: applicationConfig.INTEGRATIONS as GQLIntegrationInput[],
         DATE_OF_BIRTH_UNKNOWN:
           applicationConfig.DATE_OF_BIRTH_UNKNOWN as boolean,
-        INFORMANT_SIGNATURE: applicationConfig.INFORMANT_SIGNATURE as boolean
+        INFORMANT_SIGNATURE: applicationConfig.INFORMANT_SIGNATURE as boolean,
+        INFORMANT_SIGNATURE_REQUIRED:
+          applicationConfig.INFORMANT_SIGNATURE as boolean
       }
 
       const res = await fetch(

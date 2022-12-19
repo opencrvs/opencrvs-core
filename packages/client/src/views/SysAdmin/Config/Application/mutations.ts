@@ -24,6 +24,7 @@ const applicationConfigMutation = gql`
       HIDE_EVENT_REGISTER_INFORMATION
       DATE_OF_BIRTH_UNKNOWN
       INFORMANT_SIGNATURE
+      INFORMANT_SIGNATURE_REQUIRED
       ADDRESSES
       COUNTRY_LOGO {
         fileName

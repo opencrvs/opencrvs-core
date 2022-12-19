@@ -716,6 +716,7 @@ type ApplicationConfiguration {
   ADDRESSES: Int
   INTEGRATIONS: [Integration]
   INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
   DATE_OF_BIRTH_UNKNOWN: Boolean
 }
 
@@ -733,6 +734,7 @@ input ApplicationConfigurationInput {
   ADDRESSES: Int
   INTEGRATIONS: [IntegrationInput]
   INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
   DATE_OF_BIRTH_UNKNOWN: Boolean
 }
 
