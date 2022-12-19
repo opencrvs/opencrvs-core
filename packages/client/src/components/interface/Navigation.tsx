@@ -333,7 +333,7 @@ export const NavigationView = (props: IFullProps) => {
   }
 
   const isCreateActionsVisible = !(
-    userInfo?.role && USERS_WITHOUT_SEARCH.includes(userInfo.role)
+    userDetails?.role && USERS_WITHOUT_SEARCH.includes(userDetails.role)
   )
 
   return (
