@@ -64,7 +64,8 @@ jest.mock('@metrics/configApi', () => {
           isoCode: 'ZMW',
           languagesAndCountry: ['en-ZM']
         },
-        ADDRESSES: 1
+        ADDRESSES: 1,
+        ADMIN_LEVELS: 2
       })
   }
 })
