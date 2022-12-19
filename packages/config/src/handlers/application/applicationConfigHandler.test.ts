@@ -70,7 +70,8 @@ const mockConfig = {
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
   DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION,MUNICIPALITY',
   EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
-  ADDRESSES: 1
+  ADDRESSES: 1,
+  ADMIN_LEVELS: 2
 } as unknown as IApplicationConfigurationModel
 
 describe('applicationHandler', () => {

@@ -148,20 +148,6 @@ export const locationsFailed = (error: Error): LocationsFailedAction => ({
   payload: error
 })
 
-export const pilotLocationsLoaded = (
-  payload: ILocationDataResponse
-): PilotLocationsLoadedAction => ({
-  type: PILOT_LOCATIONS_LOADED,
-  payload: payload
-})
-
-export const pilotLocationsFailed = (
-  error: Error
-): PilotLocationsFailedAction => ({
-  type: PILOT_LOCATIONS_FAILED,
-  payload: error
-})
-
 /*
  * Only called from tests atm
  */

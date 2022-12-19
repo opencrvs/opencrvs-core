@@ -341,7 +341,7 @@ export const getFieldOptions = (
     }
     return generateOptions(
       Object.values(locations).filter((location: ILocation) => {
-        return location.partOf === partOf
+        return location.partOf === partOf && location.status === 'active'
       }),
       'location'
     )
