@@ -9,14 +9,40 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
+sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-hearth.js
+sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-openhim.js
+sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-application-config.js
+sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-user-mgnt.js
+
 # Revert hearth migrations
-yarn migrate-mongo down --file migrate-mongo-config-hearth.js
-yarn migrate-mongo status --file migrate-mongo-config-hearth.js
+HEARTH_FILES=$(ls $1migrations/hearth | wc -l)
+for ((n=0;n<$HEARTH_FILES;n++)); do
+  yarn migrate-mongo down --file $1migrate-mongo-config-hearth.js
+done
+yarn migrate-mongo status --file $1migrate-mongo-config-hearth.js
 
-# Revert openhim migrations
-yarn migrate-mongo down --file migrate-mongo-config-openhim.js
-yarn migrate-mongo status --file migrate-mongo-config-openhim.js
+## Revert openhim migrations
+OPENHIM_FILES=$(ls $1migrations/openhim | wc -l)
+for ((n=0;n<$OPENHIM_FILES;n++)); do
+  yarn migrate-mongo down --file $1migrate-mongo-config-openhim.js
+done
+yarn migrate-mongo status --file $1migrate-mongo-config-openhim.js
 
-# Revert application Config migration
-yarn migrate-mongo down --file migrate-mongo-config-application-config.js
-yarn migrate-mongo status --file migrate-mongo-config-application-config.js
+## Revert application Config migration
+APP_CONFIG_FILES=$(ls $1migrations/application-config | wc -l)
+for ((n=0;n<$APP_CONFIG_FILES;n++)); do
+  yarn migrate-mongo down --file $1migrate-mongo-config-application-config.js
+done
+yarn migrate-mongo status --file $1migrate-mongo-config-application-config.js
+
+## Revert user-mgnt migration
+USER_MGNT_FILES=$(ls $1migrations/user-mgnt | wc -l)
+for ((n=0;n<$USER_MGNT_FILES;n++)); do
+  yarn migrate-mongo down --file $1migrate-mongo-config-user-mgnt.js
+done
+yarn migrate-mongo status --file $1migrate-mongo-config-user-mgnt.js
+
+sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-hearth.js
+sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-openhim.js
+sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-application-config.js
+sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-user-mgnt.js

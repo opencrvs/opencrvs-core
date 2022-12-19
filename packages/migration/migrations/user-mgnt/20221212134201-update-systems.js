@@ -57,19 +57,22 @@ export const up = async (db, client) => {
     const natlSysAdmin = await db
       .collection('users')
       .findOne({ role: 'NATIONAL_SYSTEM_ADMIN' })
-    const adminFirstNames = natlSysAdmin.name[0].given.join(' ')
 
-    await db.collection('systems').updateMany({}, [
-      {
-        $set: {
-          createdBy: natlSysAdmin._id,
-          name:
-            adminFirstNames.length > 0
-              ? adminFirstNames + ' ' + natlSysAdmin.name[0].family
-              : natlSysAdmin.name[0].family
+    if (natlSysAdmin) {
+      const adminFirstNames = natlSysAdmin.name[0].given.join(' ')
+
+      await db.collection('systems').updateMany({}, [
+        {
+          $set: {
+            createdBy: natlSysAdmin._id,
+            name:
+              adminFirstNames.length > 0
+                ? adminFirstNames + ' ' + natlSysAdmin.name[0].family
+                : natlSysAdmin.name[0].family
+          }
         }
-      }
-    ])
+      ])
+    }
   } finally {
     await session.endSession()
   }
