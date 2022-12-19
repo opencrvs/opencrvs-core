@@ -387,7 +387,7 @@ export const getDraftDeclarationData = (
     dateOfBirth:
       declaration.data?.child?.childBirthDate?.toString() || EMPTY_STRING,
     dateOfDeath:
-      declaration.data?.deathEvent?.deathDate?.toString() || EMPTY_STRING,
+      declaration.data?.deceased?.deathDate?.toString() || EMPTY_STRING,
     placeOfBirth: getLocation(declaration, resources, intl) || EMPTY_STRING,
     placeOfDeath: getLocation(declaration, resources, intl) || EMPTY_STRING,
     informant:

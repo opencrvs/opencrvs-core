@@ -3218,7 +3218,51 @@ export const registerForms: IDefaultRegisterForms = {
               }
             ]
           }
-        ]
+        ],
+        mapping: {
+          template: [
+            {
+              fieldName: 'registrationNumber',
+              operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'certificateDate',
+              operation: 'certificateDateTransformer',
+              parameters: ['en', 'dd MMMM yyyy']
+            },
+            {
+              fieldName: 'registrarName',
+              operation: 'registrarNameUserTransformer'
+            },
+            {
+              fieldName: 'role',
+              operation: 'roleUserTransformer'
+            },
+            {
+              fieldName: 'registrarSignature',
+              operation: 'registrarSignatureUserTransformer'
+            },
+            {
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
+            },
+            {
+              fieldName: 'registrationCentre',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':office']
+            },
+            {
+              fieldName: 'registrationLGA',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':district']
+            },
+            {
+              fieldName: 'registrationState',
+              operation: 'registrationLocationUserTransformer',
+              parameters: [':state']
+            }
+          ]
+        }
       },
       {
         id: DeathSection.Informant,
@@ -3689,48 +3733,6 @@ export const registerForms: IDefaultRegisterForms = {
           }
         ],
         mapping: {
-          template: [
-            {
-              fieldName: 'registrationNumber',
-              operation: 'registrationNumberTransformer'
-            },
-            {
-              fieldName: 'certificateDate',
-              operation: 'certificateDateTransformer',
-              parameters: ['en', 'dd MMMM yyyy']
-            },
-            {
-              fieldName: 'registrarName',
-              operation: 'registrarNameUserTransformer'
-            },
-            {
-              fieldName: 'role',
-              operation: 'roleUserTransformer'
-            },
-            {
-              fieldName: 'registrarSignature',
-              operation: 'registrarSignatureUserTransformer'
-            },
-            {
-              fieldName: 'qrCode',
-              operation: 'QRCodeTransformerTransformer'
-            },
-            {
-              fieldName: 'registrationCentre',
-              operation: 'registrationLocationUserTransformer',
-              parameters: [':office']
-            },
-            {
-              fieldName: 'registrationLGA',
-              operation: 'registrationLocationUserTransformer',
-              parameters: [':district']
-            },
-            {
-              fieldName: 'registrationState',
-              operation: 'registrationLocationUserTransformer',
-              parameters: [':state']
-            }
-          ],
           mutation: {
             operation: 'setDeathRegistrationSectionTransformer'
           },
