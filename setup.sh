@@ -102,7 +102,7 @@ echo
 echo "Installing Docker and Node for example, is outside the scope of this script."
 sleep_if_non_ci 10
 echo
-echo "As part of this script, we checkout another GIT repo: The fictional Farajaland country configuration module into the folder next to this one called: 'opencrvs-farajaland'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should delete this folder and fork the config repo somewhere else."
+echo "As part of this script, we checkout another GIT repo: The fictional Farajaland country configuration module into the folder next to this one called: 'opencrvs-farajaland'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should follow our forking instructions at https://documentation.opencrvs.org."
 [ -d "../opencrvs-farajaland" ] && echo "Enter your password to delete the existing Farajaland country configuration to reset OpenCRVS to factory settings." && sudo rm -r ../opencrvs-farajaland
 
 sleep_if_non_ci 10
@@ -273,7 +273,6 @@ if [[ $(docker ps -aq) ]] ; then
   docker stop $(docker ps -aq)
   sleep_if_non_ci 5
 fi
-pkill node
 
 echo
 openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
