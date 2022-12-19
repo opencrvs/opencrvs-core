@@ -3471,7 +3471,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'registrationPhone',
                 type: 'TEL',
                 label: formMessageDescriptors.phoneNumber,
-                required: true,
+                required: false,
                 initialValue: '',
                 validate: [
                   {
