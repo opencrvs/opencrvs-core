@@ -33,4 +33,5 @@ export interface IApplicationConfigPayload {
   INTEGRATIONS: GQLIntegrationInput[]
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
+  INFORMANT_SIGNATURE_REQUIRED: boolean
 }

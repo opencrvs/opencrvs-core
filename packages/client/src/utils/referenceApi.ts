@@ -82,6 +82,7 @@ export interface IApplicationConfig {
   INTEGRATIONS?: [IIntegration]
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
+  INFORMANT_SIGNATURE_REQUIRED: boolean
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig

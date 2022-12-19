@@ -57,6 +57,7 @@ export interface IApplicationConfigurationModel extends Document {
   INTEGRATIONS: [IIntegration]
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
+  INFORMANT_SIGNATURE_REQUIRED: boolean
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -149,7 +150,8 @@ const configSchema = new Schema({
   },
   INTEGRATIONS: [integrationsSchema],
   DATE_OF_BIRTH_UNKNOWN: { type: Boolean, required: true, default: false },
-  INFORMANT_SIGNATURE: { type: Boolean, required: true, default: true }
+  INFORMANT_SIGNATURE: { type: Boolean, required: true, default: true },
+  INFORMANT_SIGNATURE_REQUIRED: { type: Boolean, required: true, default: true }
 })
 
 export default model<IApplicationConfigurationModel>('Config', configSchema)

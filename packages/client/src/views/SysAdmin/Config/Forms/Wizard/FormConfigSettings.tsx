@@ -75,7 +75,8 @@ export enum ConfigActionType {
   HIDE_EVENT_REGISTER_INFORMATION = 'HIDE_EVENT_REGISTER_INFORMATION',
   ADDRESSES = 'ADDRESSES',
   DATE_OF_BIRTH_UNKNOWN = 'DATE_OF_BIRTH_UNKNOWN',
-  INFORMANT_SIGNATURE = 'INFORMANT_SIGNATURE'
+  INFORMANT_SIGNATURE = 'INFORMANT_SIGNATURE',
+  INFORMANT_SIGNATURE_REQUIRED = 'INFORMANT_SIGNATURE_REQUIRED'
 }
 
 function FormConfigSettingsComponent() {
@@ -100,7 +101,7 @@ function FormConfigSettingsComponent() {
     offlineCountryConfiguration.config.INFORMANT_SIGNATURE
   )
   const [requiredForRegistration, setRequiredForRegistration] = React.useState(
-    offlineCountryConfiguration.config.INFORMANT_SIGNATURE
+    offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED
   )
   const [showModal, setShowModal] = React.useState(false)
   const [errorOccured, setErrorOccured] = React.useState(false)
@@ -115,7 +116,7 @@ function FormConfigSettingsComponent() {
       modalName === ConfigActionType.ADDRESSES ||
       modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION ||
       modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN ||
-      modalName == ConfigActionType.INFORMANT_SIGNATURE
+      modalName === ConfigActionType.INFORMANT_SIGNATURE
     ) {
       try {
         await callApplicationConfigMutation(
@@ -134,6 +135,8 @@ function FormConfigSettingsComponent() {
             : modalName == ConfigActionType.INFORMANT_SIGNATURE
             ? {
                 ...offlineCountryConfiguration.config,
+                [ConfigActionType.INFORMANT_SIGNATURE_REQUIRED]:
+                  requiredForRegistration,
                 [ConfigActionType.INFORMANT_SIGNATURE]: informantSignature
               }
             : {
@@ -257,6 +260,8 @@ function FormConfigSettingsComponent() {
               <span id="informantSignature">
                 {!informantSignature
                   ? intl.formatMessage(messages.disable)
+                  : requiredForRegistration
+                  ? intl.formatMessage(messages.enableAndRequired)
                   : intl.formatMessage(messages.enable)}
               </span>
             }
@@ -397,7 +402,7 @@ function FormConfigSettingsComponent() {
               actions={
                 <CenteredToggle
                   id="requiredForRegistration"
-                  defaultChecked={!requiredForRegistration}
+                  defaultChecked={requiredForRegistration}
                   onChange={handleRequiredForRegistration}
                 />
               }
