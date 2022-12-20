@@ -123,6 +123,11 @@ export function getBirthRegistrationSectionTransformer(
       queryData[sectionId].informantsSignature
   }
 
+  if (queryData[sectionId].informantsSignatureRecording) {
+    transformedData[sectionId].informantsSignatureRecording =
+      queryData[sectionId].informantsSignatureRecording
+  }
+
   if (queryData[sectionId].status) {
     transformStatusData(
       transformedData,

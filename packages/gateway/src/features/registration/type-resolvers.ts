@@ -416,6 +416,13 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
+    informantsSignatureRecording: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature-recording`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
     contactRelationship: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
