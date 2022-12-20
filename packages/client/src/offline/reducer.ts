@@ -49,6 +49,7 @@ export enum LocationType {
 export interface ILocation {
   id: string
   name: string
+  status: string
   alias: string
   address?: string
   physicalType: string
@@ -61,7 +62,6 @@ export interface IOfflineData {
   locations: { [key: string]: ILocation }
   facilities: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
-  pilotLocations: { [key: string]: ILocation }
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
@@ -223,11 +223,6 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
-const PILOT_LOCATIONS_CMD = Cmd.run(() => referenceApi.loadPilotLocations(), {
-  successActionCreator: actions.pilotLocationsLoaded,
-  failActionCreator: actions.pilotLocationsFailed
-})
-
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   successActionCreator: actions.configLoaded,
   failActionCreator: actions.configFailed
@@ -251,7 +246,6 @@ function getDataLoadingCommands() {
   return Cmd.list<actions.Action>([
     FACILITIES_CMD,
     LOCATIONS_CMD,
-    PILOT_LOCATIONS_CMD,
     CONFIG_CMD,
     CONTENT_CMD
   ])
@@ -575,29 +569,6 @@ function reducer(
           loadingError: errorIfDataNotLoaded(state)
         },
         delay(FACILITIES_CMD, RETRY_TIMEOUT)
-      )
-    }
-
-    /*
-     * Pilot Locations
-     */
-
-    case actions.PILOT_LOCATIONS_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          pilotLocations: action.payload
-        }
-      }
-    }
-    case actions.PILOT_LOCATIONS_FAILED: {
-      return loop(
-        {
-          ...state,
-          loadingError: errorIfDataNotLoaded(state)
-        },
-        delay(PILOT_LOCATIONS_CMD, RETRY_TIMEOUT)
       )
     }
 

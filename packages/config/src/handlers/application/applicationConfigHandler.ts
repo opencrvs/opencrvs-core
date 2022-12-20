@@ -149,5 +149,6 @@ export const updateApplicationConfig = Joi.object({
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.string(),
-  ADDRESSES: Joi.number().valid(...[1, 2])
+  ADDRESSES: Joi.number().valid(...[1, 2]),
+  ADMIN_LEVELS: Joi.number().valid(...[1, 2, 3, 4, 5])
 })
