@@ -9,10 +9,35 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-hearth.js
-sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-openhim.js
-sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-application-config.js
-sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-user-mgnt.js
+function updateFile {
+  local action=$1
+  local path=$2
+  local file=$3
+  local sedPrefix=$4
+  if [[ $action == *"RUN"* ]]; then
+    eval $sedPrefix -e "s%migrations/%$path/migrations/%" "$file"
+  else
+    eval $sedPrefix -e "s%$path/migrations/%migrations/%" $file
+  fi
+}
+
+if [  -n "$(uname -a | grep Ubuntu)" ]; then
+  echo -e "\033[32m:::::::::::::::: You are running Ubuntu.  Checking version ::::::::::::::::\033[0m"
+  echo
+  SED_PREFIX="sed -i "
+elif [ "$(uname)" == "Darwin" ]; then
+  echo -e "\033[32m::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::\033[0m"
+  echo
+  SED_PREFIX="sed -i ''"
+fi
+
+
+if [ "$1" != "" ]; then
+  updateFile "RUN" $1 "$1/migrate-mongo-config-hearth.js" "$SED_PREFIX"
+  updateFile "RUN" $1 "$1/migrate-mongo-config-openhim.js" "$SED_PREFIX"
+  updateFile "RUN" $1 "$1/migrate-mongo-config-application-config.js" "$SED_PREFIX"
+  updateFile "RUN" $1 "$1/migrate-mongo-config-user-mgnt.js" "$SED_PREFIX"
+fi
 
 # Revert hearth migrations
 HEARTH_FILES=$(ls $1migrations/hearth | wc -l)
@@ -42,7 +67,9 @@ for ((n=0;n<$USER_MGNT_FILES;n++)); do
 done
 yarn migrate-mongo status --file $1migrate-mongo-config-user-mgnt.js
 
-sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-hearth.js
-sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-openhim.js
-sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-application-config.js
-sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-user-mgnt.js
+if [ "$1" != "" ]; then
+  updateFile "REVERT" $1 "$1/migrate-mongo-config-hearth.js" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$1/migrate-mongo-config-openhim.js" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$1/migrate-mongo-config-application-config.js" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$1/migrate-mongo-config-user-mgnt.js" "$SED_PREFIX"
+fi
