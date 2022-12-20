@@ -27,33 +27,37 @@ elif [ "$(uname)" == "Darwin" ]; then
   SED_PREFIX="sed -i ''"
 fi
 
+HEARTH_CONFIG=$1/migrate-mongo-config-hearth.js
+OPENHIM_CONFIG=$1/migrate-mongo-config-openhim.js
+APP_CONFIG=$1/migrate-mongo-config-application-config.js
+USER_MGNT_CONFIG=$1/migrate-mongo-config-user-mgnt.js
 
 if [ "$1" != "" ]; then
-  updateFile "RUN" $1 "$1/migrate-mongo-config-hearth.js" "$SED_PREFIX"
-  updateFile "RUN" $1 "$1/migrate-mongo-config-openhim.js" "$SED_PREFIX"
-  updateFile "RUN" $1 "$1/migrate-mongo-config-application-config.js" "$SED_PREFIX"
-  updateFile "RUN" $1 "$1/migrate-mongo-config-user-mgnt.js" "$SED_PREFIX"
+  updateFile "RUN" $1 "$HEARTH_CONFIG" "$SED_PREFIX"
+  updateFile "RUN" $1 "$OPENHIM_CONFIG" "$SED_PREFIX"
+  updateFile "RUN" $1 "$APP_CONFIG" "$SED_PREFIX"
+  updateFile "RUN" $1 "$USER_MGNT_CONFIG" "$SED_PREFIX"
 fi
 
 # hearth migrations
-yarn migrate-mongo up --file $1migrate-mongo-config-hearth.js
-yarn migrate-mongo status --file $1migrate-mongo-config-hearth.js
+yarn migrate-mongo up --file $HEARTH_CONFIG
+yarn migrate-mongo status --file $HEARTH_CONFIG
 
 #openhim migrations
-yarn migrate-mongo up --file $1migrate-mongo-config-openhim.js
-yarn migrate-mongo status --file $1migrate-mongo-config-openhim.js
+yarn migrate-mongo up --file $OPENHIM_CONFIG
+yarn migrate-mongo status --file $OPENHIM_CONFIG
 
 # Application Config migration
-yarn migrate-mongo up --file $1migrate-mongo-config-application-config.js
-yarn migrate-mongo status --file $1migrate-mongo-config-application-config.js
+yarn migrate-mongo up --file $APP_CONFIG
+yarn migrate-mongo status --file $APP_CONFIG
 
 # User mgnt migration
-yarn migrate-mongo up --file $1migrate-mongo-config-user-mgnt.js
-yarn migrate-mongo status --file $1migrate-mongo-config-user-mgnt.js
+yarn migrate-mongo up --file $USER_MGNT_CONFIG
+yarn migrate-mongo status --file $USER_MGNT_CONFIG
 
 if [ "$1" != "" ]; then
-  updateFile "REVERT" $1 "$1/migrate-mongo-config-hearth.js" "$SED_PREFIX"
-  updateFile "REVERT" $1 "$1/migrate-mongo-config-openhim.js" "$SED_PREFIX"
-  updateFile "REVERT" $1 "$1/migrate-mongo-config-application-config.js" "$SED_PREFIX"
-  updateFile "REVERT" $1 "$1/migrate-mongo-config-user-mgnt.js" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$HEARTH_CONFIG" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$OPENHIM_CONFIG" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$APP_CONFIG" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$USER_MGNT_CONFIG" "$SED_PREFIX"
 fi

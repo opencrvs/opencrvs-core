@@ -27,45 +27,50 @@ elif [ "$(uname)" == "Darwin" ]; then
   SED_PREFIX="sed -i ''"
 fi
 
+HEARTH_CONFIG=$1/migrate-mongo-config-hearth.js
+OPENHIM_CONFIG=$1/migrate-mongo-config-openhim.js
+APP_CONFIG=$1/migrate-mongo-config-application-config.js
+USER_MGNT_CONFIG=$1/migrate-mongo-config-user-mgnt.js
+
 
 if [ "$1" != "" ]; then
-  updateFile "RUN" $1 "$1/migrate-mongo-config-hearth.js" "$SED_PREFIX"
-  updateFile "RUN" $1 "$1/migrate-mongo-config-openhim.js" "$SED_PREFIX"
-  updateFile "RUN" $1 "$1/migrate-mongo-config-application-config.js" "$SED_PREFIX"
-  updateFile "RUN" $1 "$1/migrate-mongo-config-user-mgnt.js" "$SED_PREFIX"
+  updateFile "RUN" $1 "$HEARTH_CONFIG" "$SED_PREFIX"
+  updateFile "RUN" $1 "$OPENHIM_CONFIG" "$SED_PREFIX"
+  updateFile "RUN" $1 "$APP_CONFIG" "$SED_PREFIX"
+  updateFile "RUN" $1 "$USER_MGNT_CONFIG" "$SED_PREFIX"
 fi
 
 # Revert hearth migrations
-HEARTH_FILES=$(ls $1migrations/hearth | wc -l)
+HEARTH_FILES=$(ls $1/migrations/hearth | wc -l)
 for ((n=0;n<$HEARTH_FILES;n++)); do
-  yarn migrate-mongo down --file $1migrate-mongo-config-hearth.js
+  yarn migrate-mongo down --file $HEARTH_CONFIG
 done
-yarn migrate-mongo status --file $1migrate-mongo-config-hearth.js
+yarn migrate-mongo status --file $HEARTH_CONFIG
 
 ## Revert openhim migrations
-OPENHIM_FILES=$(ls $1migrations/openhim | wc -l)
+OPENHIM_FILES=$(ls $1/migrations/openhim | wc -l)
 for ((n=0;n<$OPENHIM_FILES;n++)); do
-  yarn migrate-mongo down --file $1migrate-mongo-config-openhim.js
+  yarn migrate-mongo down --file $OPENHIM_CONFIG
 done
-yarn migrate-mongo status --file $1migrate-mongo-config-openhim.js
+yarn migrate-mongo status --file $OPENHIM_CONFIG
 
 ## Revert application Config migration
-APP_CONFIG_FILES=$(ls $1migrations/application-config | wc -l)
+APP_CONFIG_FILES=$(ls $1/migrations/application-config | wc -l)
 for ((n=0;n<$APP_CONFIG_FILES;n++)); do
-  yarn migrate-mongo down --file $1migrate-mongo-config-application-config.js
+  yarn migrate-mongo down --file $APP_CONFIG
 done
-yarn migrate-mongo status --file $1migrate-mongo-config-application-config.js
+yarn migrate-mongo status --file $APP_CONFIG
 
 ## Revert user-mgnt migration
-USER_MGNT_FILES=$(ls $1migrations/user-mgnt | wc -l)
+USER_MGNT_FILES=$(ls $1/migrations/user-mgnt | wc -l)
 for ((n=0;n<$USER_MGNT_FILES;n++)); do
-  yarn migrate-mongo down --file $1migrate-mongo-config-user-mgnt.js
+  yarn migrate-mongo down --file $USER_MGNT_CONFIG
 done
-yarn migrate-mongo status --file $1migrate-mongo-config-user-mgnt.js
+yarn migrate-mongo status --file $USER_MGNT_CONFIG
 
 if [ "$1" != "" ]; then
-  updateFile "REVERT" $1 "$1/migrate-mongo-config-hearth.js" "$SED_PREFIX"
-  updateFile "REVERT" $1 "$1/migrate-mongo-config-openhim.js" "$SED_PREFIX"
-  updateFile "REVERT" $1 "$1/migrate-mongo-config-application-config.js" "$SED_PREFIX"
-  updateFile "REVERT" $1 "$1/migrate-mongo-config-user-mgnt.js" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$HEARTH_CONFIG" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$OPENHIM_CONFIG" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$APP_CONFIG" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$USER_MGNT_CONFIG" "$SED_PREFIX"
 fi
