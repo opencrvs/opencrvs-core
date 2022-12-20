@@ -224,7 +224,6 @@ export function getLocationSelect(
   locationIndex: number,
   informant: boolean
 ): SerializedFormField {
-  console.log('location: ', location)
   return {
     name: `${location}${sentenceCase(useCase)}`,
     type: 'SELECT_WITH_DYNAMIC_OPTIONS',
