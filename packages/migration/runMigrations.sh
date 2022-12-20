@@ -9,11 +9,30 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
+function updateFile {
+  local action=$1
+  local path=$2
+  local file=$3
+  local sedPrefix=$4
+  if [[ $action == *"RUN"* ]]; then
+    eval $sedPrefix -e "s%migrations/%$path/migrations/%" "$file"
+  else
+    eval $sedPrefix -e "s%$path/migrations/%migrations/%" $file
+  fi
+}
+
+if [  -n "$(uname -a | grep Ubuntu)" ]; then
+  SED_PREFIX="sed -i "
+elif [ "$(uname)" == "Darwin" ]; then
+  SED_PREFIX="sed -i ''"
+fi
+
+
 if [ "$1" != "" ]; then
-  sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-hearth.js
-  sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-openhim.js
-  sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-application-config.js
-  sed -i '' -e "s%migrationsDir: '%migrationsDir: '$1%" $1migrate-mongo-config-user-mgnt.js
+  updateFile "RUN" $1 "$1/migrate-mongo-config-hearth.js" "$SED_PREFIX"
+  updateFile "RUN" $1 "$1/migrate-mongo-config-openhim.js" "$SED_PREFIX"
+  updateFile "RUN" $1 "$1/migrate-mongo-config-application-config.js" "$SED_PREFIX"
+  updateFile "RUN" $1 "$1/migrate-mongo-config-user-mgnt.js" "$SED_PREFIX"
 fi
 
 # hearth migrations
@@ -33,8 +52,8 @@ yarn migrate-mongo up --file $1migrate-mongo-config-user-mgnt.js
 yarn migrate-mongo status --file $1migrate-mongo-config-user-mgnt.js
 
 if [ "$1" != "" ]; then
-  sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-hearth.js
-  sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-openhim.js
-  sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-application-config.js
-  sed -i '' -e "s%migrationsDir: '$1%migrationsDir: '%" $1migrate-mongo-config-user-mgnt.js
+  updateFile "REVERT" $1 "$1/migrate-mongo-config-hearth.js" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$1/migrate-mongo-config-openhim.js" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$1/migrate-mongo-config-application-config.js" "$SED_PREFIX"
+  updateFile "REVERT" $1 "$1/migrate-mongo-config-user-mgnt.js" "$SED_PREFIX"
 fi
