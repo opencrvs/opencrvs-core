@@ -13,36 +13,41 @@ import React from 'react'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import {
-  BodyContent,
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/Content'
+import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import {
   ListViewItemSimplified,
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
-import { Query } from '@client/components/Query'
 import { GET_INFORMANT_SMS_NOTIFICATIONS } from './queries'
 import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  LoadingIndicator,
+  useOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
 import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import {
   Event,
   GetInformantSmsNotificationsQuery,
-  SmsNotification
+  SmsNotification,
+  SmsNotificationInput,
+  ToggleInformantSmsNotificationMutation,
+  ToggleInformantSmsNotificationMutationVariables
 } from '@client/utils/gateway'
-import { lowerFirst } from 'lodash'
+import { find, lowerFirst } from 'lodash'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
+import { useMutation, useQuery } from '@apollo/client'
+import { TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION } from './mutations'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { Toast } from '@opencrvs/components/lib/Toast'
 
 const ToggleWrapper = styled.div`
   margin-left: 24px;
@@ -66,17 +71,93 @@ enum INotificationName {
   deathRejectionSMS = 'deathRejectionSMS'
 }
 
+type IState = { [key in INotificationName]: boolean }
+
 const InformantNotification = () => {
   const intl = useIntl()
-  const [birthInProgressSMS, setBirthInProgressSMS] = React.useState(true)
-  const [birthDeclarationSMS, setBirthDeclarationSMS] = React.useState(true)
-  const [birthRegistrationSMS, setBirthRegistrationSMS] = React.useState(true)
-  const [birthRejectionSMS, setBirthRejectionSMS] = React.useState(true)
-  const [deathInProgressSMS, setDeathInProgressSMS] = React.useState(true)
-  const [deathDeclarationSMS, setDeathDeclarationSMS] = React.useState(true)
-  const [deathRegistrationSMS, setDeathRegistrationSMS] = React.useState(true)
-  const [deathRejectionSMS, setDeathRejectionSMS] = React.useState(true)
+  const isOnline = useOnlineStatus()
+  const { loading, error, data, refetch } =
+    useQuery<GetInformantSmsNotificationsQuery>(
+      GET_INFORMANT_SMS_NOTIFICATIONS,
+      {
+        fetchPolicy: 'no-cache'
+      }
+    )
+
+  const informantNotifitionsData = React.useMemo(() => {
+    return data?.informantSMSNotifications ?? []
+  }, [data])
+
+  const [informantSMSNotificationState, setInformantSMSNotificationState] =
+    React.useState<IState>({
+      birthInProgressSMS: true,
+      birthDeclarationSMS: true,
+      birthRegistrationSMS: true,
+      birthRejectionSMS: true,
+      deathInProgressSMS: true,
+      deathDeclarationSMS: true,
+      deathRegistrationSMS: true,
+      deathRejectionSMS: true
+    })
+
+  React.useEffect(() => {
+    const updateState = () => {
+      if (data && data.informantSMSNotifications) {
+        setInformantSMSNotificationState((state) => {
+          const modifiedState: IState = { ...state }
+          informantNotifitionsData.forEach((notification) => {
+            modifiedState[notification.name as INotificationName] =
+              notification.enabled
+          })
+          return {
+            ...state,
+            ...modifiedState
+          }
+        })
+      }
+    }
+    updateState()
+  }, [data, setInformantSMSNotificationState, informantNotifitionsData])
+
   const [activeTabId, setActiveTabId] = React.useState(Event.Birth)
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
+
+  const notificationsState = [
+    {
+      name: 'birthInProgressSMS',
+      enabled: informantSMSNotificationState.birthInProgressSMS
+    },
+    {
+      name: 'birthDeclarationSMS',
+      enabled: informantSMSNotificationState.birthDeclarationSMS
+    },
+    {
+      name: 'birthRegistrationSMS',
+      enabled: informantSMSNotificationState.birthRegistrationSMS
+    },
+    {
+      name: 'birthRejectionSMS',
+      enabled: informantSMSNotificationState.birthRejectionSMS
+    },
+    {
+      name: 'deathInProgressSMS',
+      enabled: informantSMSNotificationState.deathInProgressSMS
+    },
+    {
+      name: 'deathDeclarationSMS',
+      enabled: informantSMSNotificationState.deathDeclarationSMS
+    },
+    {
+      name: 'deathRegistrationSMS',
+      enabled: informantSMSNotificationState.deathRegistrationSMS
+    },
+    {
+      name: 'deathRejectionSMS',
+      enabled: informantSMSNotificationState.deathRejectionSMS
+    }
+  ]
+
   const tabSections = [
     {
       id: Event.Birth,
@@ -88,44 +169,56 @@ const InformantNotification = () => {
     }
   ]
 
-  const toggleOnChange = (notificationName: string) => {
-    if (notificationName === INotificationName.birthInProgressSMS) {
-      setBirthInProgressSMS((prev) => !prev)
-    } else if (notificationName === INotificationName.birthDeclarationSMS) {
-      setBirthDeclarationSMS((prev) => !prev)
-    } else if (notificationName === INotificationName.birthRegistrationSMS) {
-      setBirthRegistrationSMS((prev) => !prev)
-    } else if (notificationName === INotificationName.birthRejectionSMS) {
-      setBirthRejectionSMS((prev) => !prev)
-    } else if (notificationName === INotificationName.deathInProgressSMS) {
-      setDeathInProgressSMS((prev) => !prev)
-    } else if (notificationName === INotificationName.deathDeclarationSMS) {
-      setDeathDeclarationSMS((prev) => !prev)
-    } else if (notificationName === INotificationName.deathRegistrationSMS) {
-      setDeathRegistrationSMS((prev) => !prev)
-    } else if (notificationName === INotificationName.deathRejectionSMS) {
-      setDeathRejectionSMS((prev) => !prev)
-    }
+  const toggleOnChange = (notificationName: INotificationName) => {
+    setInformantSMSNotificationState({
+      ...informantSMSNotificationState,
+      [notificationName]: !informantSMSNotificationState[notificationName]
+    })
   }
 
-  const getDefaultValue = (notificationName: string) => {
-    if (notificationName === INotificationName.birthInProgressSMS) {
-      return birthInProgressSMS
-    } else if (notificationName === INotificationName.birthDeclarationSMS) {
-      return birthDeclarationSMS
-    } else if (notificationName === INotificationName.birthRegistrationSMS) {
-      return birthRegistrationSMS
-    } else if (notificationName === INotificationName.birthRejectionSMS) {
-      return birthRejectionSMS
-    } else if (notificationName === INotificationName.deathInProgressSMS) {
-      return deathInProgressSMS
-    } else if (notificationName === INotificationName.deathDeclarationSMS) {
-      return deathDeclarationSMS
-    } else if (notificationName === INotificationName.deathRegistrationSMS) {
-      return deathRegistrationSMS
-    } else if (notificationName === INotificationName.deathRejectionSMS) {
-      return deathRejectionSMS
+  const isNotificationsChanges = (notificationData: SmsNotification[]) => {
+    return !notificationData.every((notification) => {
+      const diff = find(notificationsState, {
+        name: notification.name,
+        enabled: notification.enabled
+      })
+      return Boolean(diff)
+    })
+  }
+
+  const [informantSMSNotificationshResult] = useMutation<
+    ToggleInformantSmsNotificationMutation,
+    ToggleInformantSmsNotificationMutationVariables
+  >(TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION, {
+    onError() {
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
+    },
+    async onCompleted() {
+      await refetch()
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     }
+  })
+
+  const informantNotificationMutationHandler = async (
+    notificationData: SmsNotification[]
+  ) => {
+    const updatedInformantNotifications = notificationData.map(
+      (notification) => {
+        return {
+          id: notification.id,
+          name: notification.name,
+          enabled: notificationsState.find(
+            (notifState) => notifState.name === notification.name
+          )?.enabled
+        }
+      }
+    )
+    await informantSMSNotificationshResult({
+      variables: {
+        smsNotifications:
+          updatedInformantNotifications as SmsNotificationInput[]
+      }
+    })
   }
 
   const TabContent = (props: SmsNotificationProps) => {
@@ -149,9 +242,13 @@ const InformantNotification = () => {
                   <ToggleWrapper>
                     <Toggle
                       id={`${item.name}`}
-                      defaultChecked={getDefaultValue(item.name)}
+                      defaultChecked={Boolean(
+                        informantSMSNotificationState[
+                          item.name as INotificationName
+                        ]
+                      )}
                       onChange={() => {
-                        toggleOnChange(item.name)
+                        toggleOnChange(item.name as INotificationName)
                       }}
                     />
                   </ToggleWrapper>
@@ -187,42 +284,62 @@ const InformantNotification = () => {
             />
           }
         >
-          <Query<GetInformantSmsNotificationsQuery>
-            query={GET_INFORMANT_SMS_NOTIFICATIONS}
-            fetchPolicy={'no-cache'}
-          >
-            {({ data, loading, error }) => {
-              if (error) {
-                return <GenericErrorToast />
-              } else if (loading) {
-                return (
-                  <>
-                    <LoadingIndicator loading />
-                  </>
-                )
-              } else {
-                const notificatrions = data?.informantSMSNotifications ?? []
-                return (
-                  <TabContent
-                    items={notificatrions.filter(({ name }) =>
-                      name.includes(activeTabId)
-                    )}
-                  />
-                )
+          {error && <GenericErrorToast />}
+          {loading && <LoadingIndicator loading />}
+          {!error && !loading && (
+            <>
+              <TabContent
+                items={informantNotifitionsData.filter(({ name }) =>
+                  name.includes(activeTabId)
+                )}
+              />
+              <Action>
+                <Button
+                  id="confirm_form"
+                  type="primary"
+                  onClick={async () => {
+                    setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
+                    await informantNotificationMutationHandler(
+                      informantNotifitionsData
+                    )
+                  }}
+                  disabled={
+                    !isOnline ||
+                    !isNotificationsChanges(informantNotifitionsData) ||
+                    notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+                  }
+                  loading={
+                    notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+                  }
+                >
+                  {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+                    ? intl.formatMessage(buttonMessages.saving)
+                    : intl.formatMessage(buttonMessages.save)}
+                </Button>
+              </Action>
+            </>
+          )}
+
+          {(notificationStatus === NOTIFICATION_STATUS.SUCCESS ||
+            notificationStatus === NOTIFICATION_STATUS.ERROR) && (
+            <Toast
+              id={`informant_notification`}
+              type={
+                notificationStatus === NOTIFICATION_STATUS.SUCCESS
+                  ? 'success'
+                  : 'error'
               }
-            }}
-          </Query>
-          <Action>
-            <PrimaryButton
-              id="confirm_form"
-              onClick={() => {
-                alert('saved!')
+              onClose={() => {
+                setNotificationStatus(NOTIFICATION_STATUS.IDLE)
               }}
-              disabled={false}
             >
-              {intl.formatMessage(buttonMessages.save)}
-            </PrimaryButton>
-          </Action>
+              {notificationStatus === NOTIFICATION_STATUS.ERROR
+                ? intl.formatMessage(messages.applicationConfigChangeError)
+                : intl.formatMessage(
+                    messages.informantNotificationUpdatingMessage
+                  )}
+            </Toast>
+          )}
         </Content>
       </Frame>
     </>

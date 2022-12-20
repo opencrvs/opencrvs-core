@@ -100,6 +100,7 @@ interface IConfigMessages
   declarationSMS: MessageDescriptor
   registrationSMS: MessageDescriptor
   rejectionSMS: MessageDescriptor
+  informantNotificationUpdatingMessage: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -556,6 +557,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.informantNotification.rejectionSMS',
     defaultMessage: 'Declaration rejected',
     description: 'Title for informant rejectionSMS notification'
+  },
+  informantNotificationUpdatingMessage: {
+    id: 'config.informantNotification.success',
+    defaultMessage: 'Informant notifications updated',
+    description: 'Notification for informant update success'
   }
 }
 
