@@ -118,9 +118,6 @@ function FormConfigSettingsComponent() {
       modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN ||
       modalName === ConfigActionType.INFORMANT_SIGNATURE
     ) {
-      console.log({ modalName })
-      console.log({ requiredForRegistration })
-
       try {
         await callApplicationConfigMutation(
           modalName,
@@ -396,20 +393,22 @@ function FormConfigSettingsComponent() {
                 />
               }
             />
-            <ListViewItemSimplified
-              label={
-                <Label>
-                  {intl.formatMessage(messages.showRequiredForRegistration)}
-                </Label>
-              }
-              actions={
-                <CenteredToggle
-                  id="requiredForRegistration"
-                  defaultChecked={requiredForRegistration}
-                  onChange={handleRequiredForRegistration}
-                />
-              }
-            />
+            {informantSignature && (
+              <ListViewItemSimplified
+                label={
+                  <Label>
+                    {intl.formatMessage(messages.showRequiredForRegistration)}
+                  </Label>
+                }
+                actions={
+                  <CenteredToggle
+                    id="requiredForRegistration"
+                    defaultChecked={requiredForRegistration}
+                    onChange={handleRequiredForRegistration}
+                  />
+                }
+              />
+            )}
           </ListViewSimplified>
         ) : (
           <></>

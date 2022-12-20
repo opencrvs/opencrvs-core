@@ -1842,8 +1842,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       errorsOnFields
     )
     const totalFileSizeExceeded = isFileSizeExceeded(declaration)
-    console.log(window.config.INFORMANT_SIGNATURE_REQUIRED, 'required')
-    console.log(window.config.INFORMANT_SIGNATURE)
 
     return (
       <FullBodyContent>
