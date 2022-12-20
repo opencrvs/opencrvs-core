@@ -68,6 +68,7 @@ export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const PERFORMANCE_HOME = '/performance'
 export const DASHBOARD = '/dashboard'
+export const STATISTICS = '/statistics'
 export const EVENT_COMPLETENESS_RATES =
   '/performance/operations/completenessRates/:eventType'
 export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'

@@ -51,7 +51,8 @@ import {
   FORM_CONFIG_HOME,
   EVENT_REGISTRATIONS,
   REVIEW_DUPLICATE,
-  DASHBOARD
+  DASHBOARD,
+  STATISTICS
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -375,6 +376,9 @@ export function goToCreateNewUser() {
 }
 export function goToDashboard() {
   return push(DASHBOARD)
+}
+export function goToStatistics() {
+  return push(STATISTICS)
 }
 
 export function goToCreateNewUserWithLocationId(locationId: string) {

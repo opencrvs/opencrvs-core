@@ -13,7 +13,7 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/dashboard'
+import { messages } from '@client/i18n/messages/views/statistics'
 import { goToHome } from '@client/navigation'
 import IframeResizer from 'iframe-resizer-react'
 import styled from '@client/styledComponents'
@@ -25,7 +25,7 @@ const StyledIFrame = styled(IframeResizer)`
   height: 100%;
   border: none;
 `
-export function Dashboard() {
+export function Statistics() {
   const intl = useIntl()
   const dispatch = useDispatch()
   const handle = useFullScreenHandle()
@@ -46,12 +46,12 @@ export function Dashboard() {
       />
       <FullScreen handle={handle}>
         <FullBodyContent>
-          {!window.config.DASHBOARD_EMBED_URL && (
-            <h1>Dashboard URL configuration missing</h1>
+          {!window.config.STATISTICS_EMBED_URL && (
+            <h1>Statistics dashboard URL configuration missing</h1>
           )}
-          {window.config.DASHBOARD_EMBED_URL && (
+          {window.config.STATISTICS_EMBED_URL && (
             <StyledIFrame
-              src={window.config.DASHBOARD_EMBED_URL}
+              src={window.config.STATISTICS_EMBED_URL}
               allowFullScreen
             />
           )}

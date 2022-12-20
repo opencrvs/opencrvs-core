@@ -56,6 +56,7 @@
     "react-apollo": "^2.1.4",
     "react-dom": "^16.10.1",
     "react-easy-crop": "^4.0.1",
+    "react-full-screen": "^1.1.1",
     "react-idle-timer": "^4.2.11",
     "react-intl": "5.19.0",
     "react-page-visibility": "^3.2.1",

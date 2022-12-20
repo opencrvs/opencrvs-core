@@ -65,6 +65,7 @@ import { VerifyDetails } from '@client/views/PrintCertificate/VerifyDetails'
 import { ReviewSection } from './views/RegisterForm/review/ReviewSection'
 import { ReviewDuplicate } from './views/Duplicates/ReviewDuplicate'
 import { Dashboard } from './views/Dashboard/Dashboard'
+import { Statistics } from './views/Statistics/Statistics'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -361,6 +362,19 @@ export class App extends React.Component<IAppProps> {
                                             ]}
                                             path={routes.DASHBOARD}
                                             component={Dashboard}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.STATISTICS}
+                                            component={Statistics}
                                           />
                                           <ProtectedRoute
                                             exact
