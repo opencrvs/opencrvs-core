@@ -406,18 +406,15 @@ function SignatureInput({
 }: SignatureInputProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = React.useState(false)
   const [signatureValue, setSignatureValue] = React.useState('')
-  const [tab, setTab] = React.useState<'sign-canvas' | 'audio'>('sign-canvas')
+  const [tab, setTab] = React.useState<'sign-canvas' | 'audio'>(
+    recording ? 'audio' : 'sign-canvas'
+  )
 
   const intl = useIntl()
 
   function apply() {
     setSignatureDialogOpen(false)
     onChange(signatureValue)
-  }
-
-  const onRecordEnd = (state: Base64String) => {
-    onRecordingChange(state)
-    onChange('')
   }
 
   return (
@@ -467,7 +464,7 @@ function SignatureInput({
               )}
               <ResponsiveModal
                 id={`${id}Modal`}
-                title={'Signature of informant'}
+                title={"Informant's declaration"}
                 autoHeight={true}
                 titleHeightAuto={true}
                 width={600}
@@ -505,14 +502,21 @@ function SignatureInput({
                 {intl.formatMessage(messages.signatureDescription)}
               </SignatureDescription>
               {!recording && !readonly && (
-                <AudioRecorder onRecordEnd={onRecordEnd}>
+                <AudioRecorder onRecordEnd={onRecordingChange}>
                   {intl.formatMessage(messages.signatureOpenSignatureInput)}
                 </AudioRecorder>
               )}
               {recording && (
-                <audio controls autoPlay={false}>
-                  <source src={recording} />
-                </audio>
+                <div>
+                  <audio controls autoPlay={false}>
+                    <source src={recording} />
+                  </audio>
+                </div>
+              )}
+              {recording && !readonly && (
+                <TertiaryButton onClick={() => onRecordingChange('')}>
+                  {intl.formatMessage(messages.signatureDelete)}
+                </TertiaryButton>
               )}
             </>
           )}
@@ -1883,7 +1887,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onChange: (value: string) => {
         this.props.onChangeReviewForm &&
           this.props.onChangeReviewForm(
-            { informantsSignature: value },
+            { informantsSignature: value, informantsSignatureRecording: '' },
             registrationSection,
             declaration
           )
@@ -1893,7 +1897,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         this.props.onChangeReviewForm &&
           this.props.onChangeReviewForm(
             {
-              informantsSignatureRecording: value
+              informantsSignatureRecording: value,
+              informantsSignature: ''
             },
             registrationSection,
             declaration
