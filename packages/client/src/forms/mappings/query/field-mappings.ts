@@ -172,27 +172,30 @@ export const ageAtEventQueryTransformer =
     if (!earlierEventDateString || !laterEventDateString) return transformedData
 
     transformedData[sectionId][targetFieldName] = differenceInYears(
-      new Date(earlierEventDateString),
-      new Date(laterEventDateString)
+      new Date(laterEventDateString),
+      new Date(earlierEventDateString)
     )
   }
 
 export const ageUnderOneYearQueryTransformer =
   (
-    earlierEventFieldName: string,
-    laterEventFieldName: string,
+    earlierEventFieldPath: string,
+    laterEventFieldPath: string,
     targetFieldName: string
   ) =>
   (transformedData: IFormData, queryData: any, sectionId: string) => {
-    const earlierEventDateString = queryData[sectionId]?.[earlierEventFieldName]
-    const laterEventDateString = queryData[sectionId]?.[laterEventFieldName]
+    const earlierEventDateString = get(
+      queryData[sectionId],
+      earlierEventFieldPath
+    )
+    const laterEventDateString = get(queryData[sectionId], laterEventFieldPath)
 
     if (!earlierEventDateString || !laterEventDateString) return transformedData
 
     transformedData[sectionId][targetFieldName] =
       differenceInYears(
-        new Date(earlierEventDateString),
-        new Date(laterEventDateString)
+        new Date(laterEventDateString),
+        new Date(earlierEventDateString)
       ) < 1
   }
 
@@ -210,13 +213,16 @@ function formatMonths(months: number | undefined) {
 
 export const ageInMonthsQueryTransformer =
   (
-    earlierEventFieldName: string,
-    laterEventFieldName: string,
+    earlierEventFieldPath: string,
+    laterEventFieldPath: string,
     targetFieldName: string
   ) =>
   (transformedData: IFormData, queryData: any, sectionId: string) => {
-    const earlierEventDateString = queryData[sectionId]?.[earlierEventFieldName]
-    const laterEventDateString = queryData[sectionId]?.[laterEventFieldName]
+    const earlierEventDateString = get(
+      queryData[sectionId],
+      earlierEventFieldPath
+    )
+    const laterEventDateString = get(queryData[sectionId], laterEventFieldPath)
 
     if (!earlierEventDateString || !laterEventDateString) return transformedData
 

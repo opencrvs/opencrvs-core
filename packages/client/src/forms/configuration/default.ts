@@ -2920,7 +2920,7 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'ageAtEventQueryTransformer',
                     parameters: [
                       'deceased.birthDate',
-                      'deceased.deathDate',
+                      'deceased.deceased.deathDate',
                       'ageAtDeathInYears'
                     ]
                   }
@@ -2945,7 +2945,14 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   query: {
                     operation: 'ageUnderOneYearQueryTransformer',
-                    parameters: ['birthDate', 'deathDate', 'ageUnderOneYear']
+                    parameters: [
+                      'birthDate',
+                      'deceased.deathDate',
+                      'ageUnderOneYear'
+                    ]
+                  },
+                  mutation: {
+                    operation: 'ignoreFieldTransformer'
                   }
                 }
               },
@@ -2957,9 +2964,10 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: ageAtDeathInMonths',
                   id: 'form.field.label.ageAtDeathInMonths'
                 },
-                required: false,
+                required: true,
                 hideYear: true,
                 initialValue: '',
+                previewGroup: 'deceasedAge',
                 validate: [],
                 conditionals: [
                   {
@@ -2974,7 +2982,11 @@ export const registerForms: IDefaultRegisterForms = {
                   },
                   query: {
                     operation: 'ageInMonthsQueryTransformer',
-                    parameters: ['birthDate', 'deathDate', 'ageAtDeathInMonths']
+                    parameters: [
+                      'birthDate',
+                      'deceased.deathDate',
+                      'ageAtDeathInMonths'
+                    ]
                   }
                 }
               },
@@ -3287,6 +3299,14 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.nameInEnglishPreviewGroup,
                 fieldToRedirect: 'familyNameEng',
                 delimiter: ' '
+              },
+              {
+                id: 'deceasedAge',
+                label: {
+                  defaultMessage: 'Age at death',
+                  description: 'Label for form field: ageAtDeathInYears',
+                  id: 'form.field.label.ageAtDeathInYears'
+                }
               }
             ]
           }

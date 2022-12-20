@@ -365,18 +365,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
     payload?: IPayload,
     downloadStatus?: DOWNLOAD_STATUS
   ) => {
-    console.log(getGqlDetails(this.props.registerForm, declaration))
-    // const updatedDeclaration = {
-    //   ...declaration,
-    //   submissionStatus,
-    //   action,
-    //   payload,
-    //   downloadStatus,
-    //   timeLoggedMS:
-    //     (declaration.timeLoggedMS || 0) + Date.now() - this.state.startTime
-    // }
-    // this.props.writeDeclaration(updatedDeclaration)
-    // this.props.history.push(HOME)
+    const updatedDeclaration = {
+      ...declaration,
+      submissionStatus,
+      action,
+      payload,
+      downloadStatus,
+      timeLoggedMS:
+        (declaration.timeLoggedMS || 0) + Date.now() - this.state.startTime
+    }
+    this.props.writeDeclaration(updatedDeclaration)
+    this.props.history.push(HOME)
   }
 
   generateSectionListForReview = (
