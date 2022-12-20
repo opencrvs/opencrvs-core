@@ -27,7 +27,8 @@ const StyledIFrame = styled(IframeResizer)`
 `
 const Container = styled.div`
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 56px);
+  overflow: auto;
   border: none;
   background: #fff;
   top: 0;
