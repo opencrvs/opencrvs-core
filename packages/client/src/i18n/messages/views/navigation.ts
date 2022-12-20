@@ -80,6 +80,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Dashboard label in navigation',
     id: 'navigation.dashboard'
   },
+  statistics: {
+    defaultMessage: 'Statistics',
+    description: 'Statistics label in navigation',
+    id: 'navigation.statistics'
+  },
   team: {
     defaultMessage: 'Team',
     description: 'Team label in navigation',

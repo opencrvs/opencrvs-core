@@ -793,6 +793,19 @@ function createInformantsSignature(resource: fhir.Task, fieldValue: string) {
   })
 }
 
+function createInformantsSignatureRecording(
+  resource: fhir.Task,
+  fieldValue: string
+) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature-recording`,
+    valueString: fieldValue
+  })
+}
+
 function createInformantShareContactNumber(
   resource: fhir.Task,
   fieldValue: string
@@ -2198,6 +2211,14 @@ export const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantsSignature(taskResource, fieldValue)
+    },
+    informantsSignatureRecording: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantsSignatureRecording(taskResource, fieldValue)
     },
     contactRelationship: (
       fhirBundle: ITemplatedBundle,

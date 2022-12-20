@@ -14,6 +14,7 @@ interface Window {
     APPLICATION_NAME: string
     API_GATEWAY_URL: string
     DASHBOARD_EMBED_URL: string
+    STATISTICS_EMBED_URL: string
     BIRTH: {
       REGISTRATION_TARGET: number
       LATE_REGISTRATION_TARGET: number

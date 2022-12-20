@@ -679,6 +679,7 @@ type Registration {
   contact: String
   contactRelationship: String
   informantsSignature: String
+  informantsSignatureRecording: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -1025,6 +1026,7 @@ input RegistrationInput {
   page: String
   book: String
   informantsSignature: String
+  informantsSignatureRecording: String
   informantType: InformantType
   otherInformantType: String
   contact: String

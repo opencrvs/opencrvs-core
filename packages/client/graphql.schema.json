@@ -13174,6 +13174,18 @@
             "deprecationReason": null
           },
           {
+            "name": "informantsSignatureRecording",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "otherInformantType",
             "description": null,
             "args": [],
@@ -13466,6 +13478,18 @@
           },
           {
             "name": "informantsSignature",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "informantsSignatureRecording",
             "description": null,
             "type": {
               "kind": "SCALAR",
