@@ -21,6 +21,7 @@ import {
 import { convertToMSISDN } from '@client/forms/utils'
 import subYears from 'date-fns/subYears'
 import { get, set } from 'lodash'
+import sub from 'date-fns/sub'
 
 interface IPersonName {
   [key: string]: string
@@ -587,8 +588,8 @@ function formatDate(dateString: string) {
   } else return null
 }
 
-export const ageAtBirthOfChildTransformer =
-  (transformedFieldName: string, pathToChildsBirthdate: string) =>
+export const ageAtEventTransformer =
+  (transformedFieldName: string, pathToEventdate: string) =>
   (
     transformedData: TransformedData,
     draftData: IFormData,
@@ -598,20 +599,47 @@ export const ageAtBirthOfChildTransformer =
     const fieldName = transformedFieldName || field.name
     const sectionData = draftData[sectionId][field.name] as string
 
-    const childsBirthDate = get(draftData, pathToChildsBirthdate)
+    const eventDateString = get(draftData, pathToEventdate)
 
-    if (!childsBirthDate) {
+    if (!eventDateString) {
       return transformedData
     }
 
     if (sectionData) {
-      const childsDoB = new Date(childsBirthDate as unknown as string)
+      const eventDate = new Date(eventDateString as unknown as string)
 
       transformedData[sectionId][fieldName] = formatDate(
-        subYears(childsDoB, Number.parseInt(sectionData)).toISOString()
+        subYears(eventDate, Number.parseInt(sectionData)).toISOString()
       )
     }
     return transformedData
+  }
+
+export const ageInMonthsBeforeEventTransformer =
+  (transformedFieldName: string, eventFieldPath: string) =>
+  (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    // -mm-dd
+    const sectionData = draftData[sectionId][field.name] as string
+    console.log(sectionData)
+    const [months, days] = sectionData
+      .split('-')
+      .slice(1)
+      .map((val) => parseInt(val))
+    const eventDateString = get(draftData, eventFieldPath) as unknown as
+      | string
+      | undefined
+    if (!eventDateString) return transformedData
+    transformedData[sectionId][transformedFieldName] = formatDate(
+      sub(new Date(eventDateString), {
+        months,
+        days
+      }).toISOString()
+    )
   }
 
 export const longDateTransformer =

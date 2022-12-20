@@ -13,8 +13,7 @@ import { RadioSize } from '@opencrvs/components/lib/forms'
 import {
   BirthSection,
   ISerializedForm,
-  DeathSection,
-  ISelectOption
+  DeathSection
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
@@ -692,12 +691,16 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   mutation: {
-                    operation: 'ageAtBirthOfChildTransformer',
+                    operation: 'ageAtEventTransformer',
                     parameters: ['birthDate', 'child.childBirthDate']
                   },
                   query: {
-                    operation: 'ageAtBirthOfChildQueryTransformer',
-                    parameters: ['birthDate']
+                    operation: 'ageAtEventQueryTransformer',
+                    parameters: [
+                      'mother.birthDate',
+                      'child.birthDate',
+                      'ageAtBirthOfChild'
+                    ]
                   }
                 }
               },
@@ -1323,12 +1326,16 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   mutation: {
-                    operation: 'ageAtBirthOfChildTransformer',
+                    operation: 'ageAtEventTransformer',
                     parameters: ['birthDate', 'child.childBirthDate']
                   },
                   query: {
-                    operation: 'ageAtBirthOfChildQueryTransformer',
-                    parameters: ['birthDate']
+                    operation: 'ageAtEventQueryTransformer',
+                    parameters: [
+                      'father.birthDate',
+                      'child.birthDate',
+                      'ageAtBirthOfChild'
+                    ]
                   }
                 }
               },
@@ -2884,25 +2891,90 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: []
               },
               {
-                name: 'birthDate',
-                type: 'DATE',
-                label: formMessageDescriptors.deceasedDateOfBirth,
+                name: 'ageAtDeathInYears',
+                type: 'FORCED_NUMBER_MAX_LENGTH',
+                maxLength: 2,
+                label: {
+                  defaultMessage: 'Age at death',
+                  description: 'Label for form field: ageAtDeathInYears',
+                  id: 'form.field.label.ageAtDeathInYears'
+                },
+                inputFieldWidth: '60px',
+                customisable: true,
+                postfix: 'years',
                 required: true,
                 initialValue: '',
-                validate: [
+                conditionals: [
                   {
-                    operation: 'isValidBirthDate'
+                    action: 'disable',
+                    expression: 'values.ageUnderOneYear === true'
+                  }
+                ],
+                validate: [],
+                mapping: {
+                  mutation: {
+                    operation: 'ageAtEventTransformer',
+                    parameters: ['birthDate', 'deceased.deathDate']
+                  },
+                  query: {
+                    operation: 'ageAtEventQueryTransformer',
+                    parameters: [
+                      'deceased.birthDate',
+                      'deceased.deathDate',
+                      'ageAtDeathInYears'
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'ageUnderOneYear',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Under 1 year',
+                  description: 'Label for form field: ageUnderOneYear',
+                  id: 'form.field.label.ageUnderOneYear'
+                },
+                required: false,
+                customisable: true,
+                checkedValue: true,
+                uncheckedValue: false,
+                hideHeader: true,
+                hideInPreview: true,
+                initialValue: false,
+                validate: [],
+                mapping: {
+                  query: {
+                    operation: 'ageUnderOneYearQueryTransformer',
+                    parameters: ['birthDate', 'deathDate', 'ageUnderOneYear']
+                  }
+                }
+              },
+              {
+                name: 'ageAtDeathInMonths',
+                type: 'DATE',
+                label: {
+                  defaultMessage: 'Months, days',
+                  description: 'Label for form field: ageAtDeathInMonths',
+                  id: 'form.field.label.ageAtDeathInMonths'
+                },
+                required: false,
+                hideYear: true,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: 'values.ageUnderOneYear !== true'
                   }
                 ],
                 mapping: {
-                  template: {
-                    operation: 'dateFormatTransformer',
-                    fieldName: 'deceasedBirthDate',
-                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
-                  },
                   mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: []
+                    operation: 'ageInMonthsBeforeEventTransformer',
+                    parameters: ['birthDate', 'deceased.deathDate']
+                  },
+                  query: {
+                    operation: 'ageInMonthsQueryTransformer',
+                    parameters: ['birthDate', 'deathDate', 'ageAtDeathInMonths']
                   }
                 }
               },
