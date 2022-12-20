@@ -37,7 +37,7 @@ const StyledInput = styled.input<ITextInputProps>`
   box-sizing: border-box;
   outline: none;
   ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme, isDisabled }) => isDisabled ? theme.colors.grey300 : theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
 
   ${({ hideBorder, error, touched, isDisabled, theme }) =>
@@ -60,7 +60,7 @@ const StyledInput = styled.input<ITextInputProps>`
         error && touched
           ? theme.colors.negative
           : isDisabled
-          ? theme.colors.greyGrey
+          ? theme.colors.grey300
           : theme.colors.copy
       };
       &:focus {
@@ -159,6 +159,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
           }
           maxLength={maxLength}
           disabled={isDisabled}
+          isDisabled={isDisabled}
           inputFieldWidth={inputFieldWidth}
           onChange={onChange}
         />
@@ -174,6 +175,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
           }
           maxLength={maxLength}
           disabled={isDisabled}
+          isDisabled={isDisabled}
           inputFieldWidth={inputFieldWidth}
         />
       )

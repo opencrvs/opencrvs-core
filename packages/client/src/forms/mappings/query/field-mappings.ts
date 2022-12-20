@@ -42,6 +42,7 @@ import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
 import { getFullLocationNameOfFacility } from '@client/utils/locationUtils'
 import differenceInYears from 'date-fns/differenceInYears'
+import intervalToDuration from 'date-fns/intervalToDuration'
 
 interface IName {
   [key: string]: any
@@ -152,29 +153,90 @@ export const fieldValueTransformer =
     }
     return transformedData
   }
-export const ageAtBirthOfChildQueryTransformer =
-  (transformedFieldName: string) =>
+
+export const ageAtEventQueryTransformer =
+  (
+    earlierEventFieldPath: string,
+    laterEventFieldPath: string,
+    targetFieldName: string
+  ) =>
   (
     transformedData: IFormData,
     queryData: any,
     sectionId: string,
     field: IFormField
   ) => {
-    if (!queryData.child.birthDate) {
-      return transformedData
-    }
+    const earlierEventDateString = get(queryData, earlierEventFieldPath)
+    const laterEventDateString = get(queryData, laterEventFieldPath)
 
-    const mothersBirthDate = queryData[sectionId]?.[transformedFieldName]
-    if (!mothersBirthDate) {
-      return transformedData
-    }
+    if (!earlierEventDateString || !laterEventDateString) return transformedData
 
-    transformedData[sectionId]['ageAtBirthOfChild'] = differenceInYears(
-      new Date(queryData.child.birthDate),
-      new Date(mothersBirthDate)
+    transformedData[sectionId][targetFieldName] = differenceInYears(
+      new Date(laterEventDateString),
+      new Date(earlierEventDateString)
     )
   }
 
+export const ageUnderOneYearQueryTransformer =
+  (
+    earlierEventFieldPath: string,
+    laterEventFieldPath: string,
+    targetFieldName: string
+  ) =>
+  (transformedData: IFormData, queryData: any, sectionId: string) => {
+    const earlierEventDateString = get(
+      queryData[sectionId],
+      earlierEventFieldPath
+    )
+    const laterEventDateString = get(queryData[sectionId], laterEventFieldPath)
+
+    if (!earlierEventDateString || !laterEventDateString) return transformedData
+
+    transformedData[sectionId][targetFieldName] =
+      differenceInYears(
+        new Date(laterEventDateString),
+        new Date(earlierEventDateString)
+      ) < 1
+  }
+
+function formatDays(days: number | undefined) {
+  if (!days) return '00'
+  if (days < 10) return `0${days}`
+  return String(days)
+}
+
+function formatMonths(months: number | undefined) {
+  if (!months) return '00'
+  if (months < 10) return `0${months}`
+  return String(months)
+}
+
+export const ageInMonthsQueryTransformer =
+  (
+    earlierEventFieldPath: string,
+    laterEventFieldPath: string,
+    targetFieldName: string
+  ) =>
+  (transformedData: IFormData, queryData: any, sectionId: string) => {
+    const earlierEventDateString = get(
+      queryData[sectionId],
+      earlierEventFieldPath
+    )
+    const laterEventDateString = get(queryData[sectionId], laterEventFieldPath)
+
+    if (!earlierEventDateString || !laterEventDateString) return transformedData
+
+    const duration = intervalToDuration({
+      start: new Date(earlierEventDateString),
+      end: new Date(laterEventDateString)
+    })
+    // Less than 1 year
+    if (!duration.years) {
+      transformedData[sectionId][targetFieldName] = `-${formatMonths(
+        duration.months
+      )}-${formatDays(duration.days)}`
+    }
+  }
 export const bundleFieldToSectionFieldTransformer =
   (transformedFieldName?: string) =>
   (

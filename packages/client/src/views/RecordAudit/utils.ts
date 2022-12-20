@@ -190,22 +190,20 @@ export const getLocation = (
 
   if (declaration.event === Event.Death) {
     locationType =
-      declaration.data?.deathEvent?.placeOfDeath?.toString() || EMPTY_STRING
+      declaration.data?.deceased?.placeOfDeath?.toString() || EMPTY_STRING
     locationId =
-      declaration.data?.deathEvent?.deathLocation?.toString() || EMPTY_STRING
+      declaration.data?.deceased?.deathLocation?.toString() || EMPTY_STRING
 
-    district =
-      declaration.data?.deathEvent?.district?.toString() || EMPTY_STRING
-    state = declaration.data?.deathEvent?.state?.toString() || EMPTY_STRING
-    country = declaration.data?.deathEvent?.country?.toString() || EMPTY_STRING
-    city = declaration.data?.deathEvent?.city?.toString() || EMPTY_STRING
+    district = declaration.data?.deceased?.district?.toString() || EMPTY_STRING
+    state = declaration.data?.deceased?.state?.toString() || EMPTY_STRING
+    country = declaration.data?.deceased?.country?.toString() || EMPTY_STRING
+    city = declaration.data?.deceased?.city?.toString() || EMPTY_STRING
     // when address is outside of default country
     internationalDistrict =
-      declaration.data?.deathEvent?.internationalDistrict?.toString() ||
+      declaration.data?.deceased?.internationalDistrict?.toString() ||
       EMPTY_STRING
     internationalState =
-      declaration.data?.deathEvent?.internationalState?.toString() ||
-      EMPTY_STRING
+      declaration.data?.deceased?.internationalState?.toString() || EMPTY_STRING
   } else {
     locationType =
       declaration.data?.child?.placeOfBirth?.toString() || EMPTY_STRING
@@ -387,7 +385,7 @@ export const getDraftDeclarationData = (
     dateOfBirth:
       declaration.data?.child?.childBirthDate?.toString() || EMPTY_STRING,
     dateOfDeath:
-      declaration.data?.deathEvent?.deathDate?.toString() || EMPTY_STRING,
+      declaration.data?.deceased?.deathDate?.toString() || EMPTY_STRING,
     placeOfBirth: getLocation(declaration, resources, intl) || EMPTY_STRING,
     placeOfDeath: getLocation(declaration, resources, intl) || EMPTY_STRING,
     informant:

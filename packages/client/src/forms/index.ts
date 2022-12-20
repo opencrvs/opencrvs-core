@@ -566,6 +566,7 @@ export interface ICheckboxFormField extends IFormFieldBase {
 }
 export interface IDateFormField extends IFormFieldBase {
   type: typeof DATE
+  hideYear?: boolean
   notice?: MessageDescriptor
   ignorePlaceHolder?: boolean
 }
@@ -1143,6 +1144,7 @@ export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE
+  hideYear?: boolean
   notice?: string
   ignorePlaceHolder?: boolean
 }

@@ -109,6 +109,10 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
       color: ${({ theme }) => theme.colors.white};
     }
   }
+
+  .react-select__menu {
+    z-index: 2;
+  }
 `
 
 function getSelectedOption(

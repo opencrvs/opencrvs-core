@@ -20,7 +20,10 @@ import {
   first,
   findIndex
 } from 'lodash'
-import { setBirthRegistrationSectionTransformer } from '@client/forms/mappings/mutation'
+import {
+  setBirthRegistrationSectionTransformer,
+  setDeathRegistrationSectionTransformer
+} from '@client/forms/mappings/mutation'
 
 export enum OBJECT_TYPE {
   NAME = 'name',
@@ -138,20 +141,32 @@ export function setInformantSectionTransformer(
 }
 
 export function setInformantRegistrationComposedTransformer(
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string
+  event: 'birth' | 'death'
 ) {
-  if (!transformedData.registration) {
-    transformedData.registration = {}
+  return function (
+    transformedData: TransformedData,
+    draftData: IFormData,
+    sectionId: string
+  ) {
+    if (!transformedData.registration) {
+      transformedData.registration = {}
+    }
+    if (draftData.registration?._fhirID) {
+      transformedData.registration._fhirID = draftData.registration._fhirID
+    }
+    setInformantSectionTransformer(transformedData, draftData, sectionId)
+    if (event === 'birth') {
+      setBirthRegistrationSectionTransformer(
+        transformedData,
+        draftData,
+        'registration'
+      )
+    } else if (event === 'death') {
+      setDeathRegistrationSectionTransformer(
+        transformedData,
+        draftData,
+        'registration'
+      )
+    }
   }
-  if (draftData.registration?._fhirID) {
-    transformedData.registration._fhirID = draftData.registration._fhirID
-  }
-  setInformantSectionTransformer(transformedData, draftData, sectionId)
-  setBirthRegistrationSectionTransformer(
-    transformedData,
-    draftData,
-    'registration'
-  )
 }

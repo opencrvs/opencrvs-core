@@ -413,6 +413,7 @@ function GeneratedInputField({
         <DateField
           {...inputProps}
           notice={fieldDefinition.notice}
+          hideYear={fieldDefinition.hideYear}
           ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
@@ -502,6 +503,7 @@ function GeneratedInputField({
           pattern="[0-9]*"
           maxLength={fieldDefinition.maxLength}
           {...inputProps}
+          isDisabled={disabled}
           onKeyPress={(e) => {
             if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
               e.preventDefault()
