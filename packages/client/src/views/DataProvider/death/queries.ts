@@ -23,6 +23,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           use
           firstNames
           familyName
+          middleNames
         }
         birthDate
         age
@@ -67,6 +68,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             use
             firstNames
             familyName
+            middleNames
           }
           nationality
           occupation
@@ -265,6 +267,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           use
           firstNames
           familyName
+          middleNames
         }
         birthDate
         age
@@ -309,6 +312,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             use
             firstNames
             familyName
+            middleNames
           }
           nationality
           occupation
