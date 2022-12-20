@@ -90,11 +90,7 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import {
-  buttonMessages,
-  constantsMessages,
-  errorMessages
-} from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { messages as duplicatesMessages } from '@client/i18n/messages/views/duplicates'
 import { getLanguage } from '@client/i18n/selectors'
@@ -706,6 +702,11 @@ const renderValue = (
 
   if (typeof value === 'string') {
     if (field.postfix) return `${value} ${field.postfix}`
+    if (value === 'true') {
+      return intl.formatMessage(buttonMessages.yes)
+    } else if (value === 'false') {
+      return intl.formatMessage(buttonMessages.no)
+    }
     return value
   }
 
