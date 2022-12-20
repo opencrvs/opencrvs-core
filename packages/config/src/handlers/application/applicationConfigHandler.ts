@@ -103,6 +103,8 @@ export async function updateApplicationConfigHandler(
     }
     // Update existing application config fields
     merge(existingApplicationConfig, applicationConfig)
+    console.log(applicationConfig)
+    console.log(existingApplicationConfig)
 
     await ApplicationConfig.update(
       { _id: existingApplicationConfig._id },
