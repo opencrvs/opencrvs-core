@@ -2894,11 +2894,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'ageAtDeathInYears',
                 type: 'FORCED_NUMBER_MAX_LENGTH',
                 maxLength: 2,
-                label: {
-                  defaultMessage: 'Age at death',
-                  description: 'Label for form field: ageAtDeathInYears',
-                  id: 'form.field.label.ageAtDeathInYears'
-                },
+                label: formMessageDescriptors.ageAtDeath,
                 inputFieldWidth: '60px',
                 customisable: true,
                 postfix: 'years',
@@ -2929,11 +2925,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'ageUnderOneYear',
                 type: 'CHECKBOX',
-                label: {
-                  defaultMessage: 'Under 1 year',
-                  description: 'Label for form field: ageUnderOneYear',
-                  id: 'form.field.label.ageUnderOneYear'
-                },
+                label: formMessageDescriptors.ageUnderOneYear,
                 required: false,
                 customisable: true,
                 checkedValue: true,
@@ -2959,11 +2951,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'ageAtDeathInMonths',
                 type: 'DATE',
-                label: {
-                  defaultMessage: 'Months, days',
-                  description: 'Label for form field: ageAtDeathInMonths',
-                  id: 'form.field.label.ageAtDeathInMonths'
-                },
+                label: formMessageDescriptors.ageAtDeathInMonths,
                 required: true,
                 hideYear: true,
                 initialValue: '',
@@ -3302,11 +3290,7 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 id: 'deceasedAge',
-                label: {
-                  defaultMessage: 'Age at death',
-                  description: 'Label for form field: ageAtDeathInYears',
-                  id: 'form.field.label.ageAtDeathInYears'
-                }
+                label: formMessageDescriptors.ageAtDeath
               }
             ]
           }

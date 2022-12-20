@@ -2337,6 +2337,21 @@ export const formMessageDescriptors = {
     description: 'Assigned Registration Office section',
     id: 'form.section.assignedRegistrationOfficeGroupTitle'
   },
+  ageAtDeath: {
+    defaultMessage: 'Age at death',
+    description: 'Label for form field: ageAtDeathInYears',
+    id: 'form.field.label.ageAtDeathInYears'
+  },
+  ageAtDeathInMonths: {
+    defaultMessage: 'Months, days',
+    description: 'Label for form field: ageAtDeathInMonths',
+    id: 'form.field.label.ageAtDeathInMonths'
+  },
+  ageUnderOneYear: {
+    defaultMessage: 'Under 1 year',
+    description: 'Label for form field: ageUnderOneYear',
+    id: 'form.field.label.ageUnderOneYear'
+  },
   attendantAtBirth: {
     defaultMessage: 'Attendant at birth',
     description: 'Label for form field: Attendant at birth',
