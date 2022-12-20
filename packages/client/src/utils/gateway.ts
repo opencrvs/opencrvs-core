@@ -1590,6 +1590,7 @@ export type Registration = {
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
   informantsSignature?: Maybe<Scalars['String']>
+  informantsSignatureRecording?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
   paperFormID?: Maybe<Scalars['String']>
@@ -1618,6 +1619,7 @@ export type RegistrationInput = {
   inCompleteFields?: InputMaybe<Scalars['String']>
   informantType?: InputMaybe<InformantType>
   informantsSignature?: InputMaybe<Scalars['String']>
+  informantsSignatureRecording?: InputMaybe<Scalars['String']>
   location?: InputMaybe<LocationInput>
   otherInformantType?: InputMaybe<Scalars['String']>
   page?: InputMaybe<Scalars['String']>
@@ -2612,6 +2614,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       contactPhoneNumber?: string | null
       duplicates?: Array<string | null> | null
       informantsSignature?: string | null
+      informantsSignatureRecording?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -2912,6 +2915,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       contact?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
+      informantsSignatureRecording?: string | null
       trackingId?: string | null
       registrationNumber?: string | null
       attachments?: Array<{

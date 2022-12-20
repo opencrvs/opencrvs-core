@@ -21,7 +21,9 @@ import {
   ImageUploader,
   InputField,
   ISelectOption as SelectComponentOptions,
-  TextArea
+  TextArea,
+  FormTabs,
+  AudioRecorder
 } from '@opencrvs/components/lib/forms'
 import {
   DocumentViewer,
@@ -147,6 +149,7 @@ import {
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { getBase64String } from '@client/utils/imageUtils'
 import { formatName } from '@client/utils/name'
+import { Base64String } from '@opencrvs/components/lib/forms/AudioRecorder/useRecorder'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -383,10 +386,12 @@ type SignatureInputProps = {
   value?: string
   onChange: (value: string) => void
   readonly?: boolean
+  onRecordingChange: (value: any) => void
+  recording?: any
 }
 
 const SignatureDescription = styled.p`
-  margin-top: 0;
+  margin-top: 16px;
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.grey500};
 `
@@ -395,10 +400,15 @@ function SignatureInput({
   id,
   value,
   onChange,
-  readonly
+  readonly,
+  recording,
+  onRecordingChange
 }: SignatureInputProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = React.useState(false)
   const [signatureValue, setSignatureValue] = React.useState('')
+  const [tab, setTab] = React.useState<'sign-canvas' | 'audio'>(
+    recording ? 'audio' : 'sign-canvas'
+  )
 
   const intl = useIntl()
 
@@ -408,63 +418,112 @@ function SignatureInput({
   }
 
   return (
-    <div>
-      <SignatureDescription>
-        {intl.formatMessage(messages.signatureDescription)}
-      </SignatureDescription>
-      {!value && !readonly && (
-        <>
-          <SecondaryButton onClick={() => setSignatureDialogOpen(true)}>
-            {intl.formatMessage(messages.signatureOpenSignatureInput)}
-          </SecondaryButton>
-          <CustomImageUpload
-            id="signature-file-upload"
-            title="Upload"
-            handleFileChange={async (file) => {
-              onChange((await getBase64String(file)).toString())
-            }}
-          />
-        </>
-      )}
-      {value && <SignaturePreview alt="Informant's signature" src={value} />}
-      {value && !readonly && (
-        <TertiaryButton onClick={() => onChange('')}>
-          {intl.formatMessage(messages.signatureDelete)}
-        </TertiaryButton>
-      )}
-
-      <ResponsiveModal
-        id={`${id}Modal`}
-        title={'Signature of informant'}
-        autoHeight={true}
-        titleHeightAuto={true}
-        width={600}
-        show={signatureDialogOpen}
-        actions={[
-          <CancelButton
-            key="cancel"
-            id="modal_cancel"
-            onClick={() => setSignatureDialogOpen(false)}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
-            key="apply"
-            id="apply_change"
-            disabled={false}
-            onClick={apply}
-          >
-            {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
-        ]}
-        handleClose={() => setSignatureDialogOpen(false)}
+    <InputWrapper>
+      <InputField
+        id="informant_signature"
+        touched={false}
+        required={true}
+        label={intl.formatMessage(messages.informantsSignature)}
       >
-        <SignatureDescription>
-          {intl.formatMessage(messages.signatureInputDescription)}
-        </SignatureDescription>
-        <SignCanvas value={value} onChange={setSignatureValue} />
-      </ResponsiveModal>
-    </div>
+        <div>
+          <FormTabs
+            sections={[
+              { id: 'sign-canvas', title: 'Signature' },
+              { id: 'audio', title: 'Voice (if illiterate)' }
+            ]}
+            activeTabId={tab}
+            onTabClick={(tab) => setTab(() => tab)}
+          />
+
+          {tab === 'sign-canvas' && (
+            <>
+              <SignatureDescription>
+                {intl.formatMessage(messages.signatureDescription)}
+              </SignatureDescription>
+              {!value && !readonly && (
+                <>
+                  <SecondaryButton onClick={() => setSignatureDialogOpen(true)}>
+                    {intl.formatMessage(messages.signatureOpenSignatureInput)}
+                  </SecondaryButton>
+                  <CustomImageUpload
+                    id="signature-file-upload"
+                    title="Upload"
+                    handleFileChange={async (file) => {
+                      onChange((await getBase64String(file)).toString())
+                    }}
+                  />
+                </>
+              )}
+              {value && (
+                <SignaturePreview alt="Informant's signature" src={value} />
+              )}
+              {value && !readonly && (
+                <TertiaryButton onClick={() => onChange('')}>
+                  {intl.formatMessage(messages.signatureDelete)}
+                </TertiaryButton>
+              )}
+              <ResponsiveModal
+                id={`${id}Modal`}
+                title={'Signature of informant'}
+                autoHeight={true}
+                titleHeightAuto={true}
+                width={600}
+                show={signatureDialogOpen}
+                actions={[
+                  <CancelButton
+                    key="cancel"
+                    id="modal_cancel"
+                    onClick={() => setSignatureDialogOpen(false)}
+                  >
+                    {intl.formatMessage(buttonMessages.cancel)}
+                  </CancelButton>,
+                  <ApplyButton
+                    key="apply"
+                    id="apply_change"
+                    disabled={false}
+                    onClick={apply}
+                  >
+                    {intl.formatMessage(buttonMessages.apply)}
+                  </ApplyButton>
+                ]}
+                handleClose={() => setSignatureDialogOpen(false)}
+              >
+                <SignatureDescription>
+                  {intl.formatMessage(messages.signatureInputDescription)}
+                </SignatureDescription>
+                <SignCanvas value={value} onChange={setSignatureValue} />
+              </ResponsiveModal>
+            </>
+          )}
+
+          {tab === 'audio' && (
+            <>
+              <SignatureDescription>
+                I, &lt;name&gt;, hereby declare that the particulars in this
+                form are true and correct to the best of my knowledge.
+              </SignatureDescription>
+              {!recording && !readonly && (
+                <AudioRecorder onRecordEnd={onRecordingChange}>
+                  Record
+                </AudioRecorder>
+              )}
+              {recording && (
+                <div>
+                  <audio controls autoPlay={false}>
+                    <source src={recording} />
+                  </audio>
+                </div>
+              )}
+              {recording && !readonly && (
+                <TertiaryButton onClick={() => onRecordingChange('')}>
+                  {intl.formatMessage(messages.signatureDelete)}
+                </TertiaryButton>
+              )}
+            </>
+          )}
+        </div>
+      </InputField>
+    </InputWrapper>
   )
 }
 
@@ -957,6 +1016,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         const regStatus = declaration.data.registration.regStatus as IRegStatus
         if (regStatus.type === 'IN_PROGRESS') {
           declaration.data.registration.informantsSignature = ''
+        }
+      }
+    }
+    if (
+      declaration.data.registration &&
+      declaration.data.registration.informantsSignatureRecording
+    ) {
+      if (!declaration.data.registration.regStatus) {
+        declaration.data.registration.informantsSignatureRecording = ''
+      } else {
+        const regStatus = declaration.data.registration.regStatus as IRegStatus
+        if (regStatus.type === 'IN_PROGRESS') {
+          declaration.data.registration.informantsSignatureRecording = ''
         }
       }
     }
@@ -1802,7 +1874,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       ? false
       : !(
           hasB1Form(declaration) ||
-          declaration.data.registration?.informantsSignature
+          declaration.data.registration?.informantsSignature ||
+          declaration.data.registration?.informantsSignatureRecording
         )
 
     const isComplete =
@@ -1815,12 +1888,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onChange: (value: string) => {
         this.props.onChangeReviewForm &&
           this.props.onChangeReviewForm(
-            { informantsSignature: value },
+            { informantsSignature: value, informantsSignatureRecording: '' },
             registrationSection,
             declaration
           )
       },
       value: declaration.data.registration?.informantsSignature as string,
+      onRecordingChange: (value: string) => {
+        this.props.onChangeReviewForm &&
+          this.props.onChangeReviewForm(
+            {
+              informantsSignatureRecording: value,
+              informantsSignature: ''
+            },
+            registrationSection,
+            declaration
+          )
+      },
+      recording: declaration.data.registration
+        ?.informantsSignatureRecording as string,
       readonly
     }
 
@@ -1964,16 +2050,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputWrapper>
                 )}
                 {!isCorrection(declaration) && !hasB1Form(declaration) && (
-                  <InputWrapper>
-                    <InputField
-                      id="informant_signature"
-                      touched={false}
-                      required={true}
-                      label={intl.formatMessage(messages.informantsSignature)}
-                    >
-                      <SignatureInput {...signatureInputProps} />
-                    </InputField>
-                  </InputWrapper>
+                  <SignatureInput {...signatureInputProps} />
                 )}
                 {totalFileSizeExceeded && (
                   <Warning
@@ -2122,22 +2199,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </InputWrapper>
                   )}
                   {!isCorrection(declaration2) && !hasB1Form(declaration2) && (
-                    <InputWrapper>
-                      <InputField
-                        id="informant_signature"
-                        touched={false}
-                        required={true}
-                        label={intl.formatMessage(messages.informantsSignature)}
-                      >
-                        <SignatureInput
-                          {...signatureInputProps}
-                          value={
-                            declaration2.data.registration
-                              ?.informantsSignature as string
-                          }
-                        />
-                      </InputField>
-                    </InputWrapper>
+                    <SignatureInput
+                      {...signatureInputProps}
+                      value={
+                        declaration2.data.registration
+                          ?.informantsSignature as string
+                      }
+                      recording={
+                        declaration2.data.registration
+                          ?.informantsSignatureRecording as string
+                      }
+                    />
                   )}
                   {totalFileSizeExceeded && (
                     <Warning
