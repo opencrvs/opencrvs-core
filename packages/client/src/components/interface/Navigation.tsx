@@ -115,6 +115,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.sentForApproval,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.dashboard,
+    WORKQUEUE_TABS.statistics,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     GROUP_ID.declarationGroup,
