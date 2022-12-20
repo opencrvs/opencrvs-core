@@ -214,7 +214,7 @@ function GeneratedInputField({
     tooltip: fieldDefinition.tooltip,
     description: fieldDefinition.description,
     required: fieldDefinition.required,
-    disabled: fieldDefinition.disabled ?? disabled,
+    disabled: fieldDefinition.disabled,
     prefix: fieldDefinition.prefix,
     postfix: fieldDefinition.postfix,
     hideAsterisk: fieldDefinition.hideAsterisk,

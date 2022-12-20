@@ -158,6 +158,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
             process.env.NODE_ENV === 'production' ? 'off' : undefined
           }
           maxLength={maxLength}
+          disabled={isDisabled}
           isDisabled={isDisabled}
           inputFieldWidth={inputFieldWidth}
           onChange={onChange}
@@ -173,6 +174,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
             process.env.NODE_ENV === 'production' ? 'off' : undefined
           }
           maxLength={maxLength}
+          disabled={isDisabled}
           isDisabled={isDisabled}
           inputFieldWidth={inputFieldWidth}
         />
