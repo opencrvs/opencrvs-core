@@ -595,6 +595,7 @@ export interface GQLApplicationConfiguration {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
+  ADMIN_LEVELS?: number
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -609,6 +610,7 @@ export interface GQLApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
+  ADMIN_LEVELS?: number
 }
 
 export interface GQLFormDraftInput {
@@ -4571,6 +4573,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
+  ADMIN_LEVELS?: ApplicationConfigurationToADMIN_LEVELSResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -4644,6 +4647,13 @@ export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
 }
 
 export interface ApplicationConfigurationToADDRESSESResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToADMIN_LEVELSResolver<
   TParent = any,
   TResult = any
 > {
