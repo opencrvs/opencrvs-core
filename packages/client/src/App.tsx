@@ -352,32 +352,6 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            roles={[
-                                              Roles.REGISTRATION_AGENT,
-                                              Roles.LOCAL_REGISTRAR,
-                                              Roles.LOCAL_SYSTEM_ADMIN,
-                                              Roles.NATIONAL_SYSTEM_ADMIN,
-                                              Roles.PERFORMANCE_MANAGEMENT,
-                                              Roles.NATIONAL_REGISTRAR
-                                            ]}
-                                            path={routes.DASHBOARD}
-                                            component={Dashboard}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            roles={[
-                                              Roles.REGISTRATION_AGENT,
-                                              Roles.LOCAL_REGISTRAR,
-                                              Roles.LOCAL_SYSTEM_ADMIN,
-                                              Roles.NATIONAL_SYSTEM_ADMIN,
-                                              Roles.PERFORMANCE_MANAGEMENT,
-                                              Roles.NATIONAL_REGISTRAR
-                                            ]}
-                                            path={routes.STATISTICS}
-                                            component={Statistics}
-                                          />
-                                          <ProtectedRoute
-                                            exact
                                             path={
                                               routes.EVENT_COMPLETENESS_RATES
                                             }
@@ -417,6 +391,16 @@ export class App extends React.Component<IAppProps> {
                                           />
                                         </Switch>
                                       </TransitionWrapper>
+                                      <Dashboard
+                                        visible={
+                                          location.pathname === '/dashboard'
+                                        }
+                                      />
+                                      <Statistics
+                                        visible={
+                                          location.pathname === '/statistics'
+                                        }
+                                      />
                                     </>
                                   )
                                 }}

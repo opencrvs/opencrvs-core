@@ -25,13 +25,25 @@ const StyledIFrame = styled(IframeResizer)`
   height: 100%;
   border: none;
 `
-export function Dashboard() {
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+  top: 0;
+  left: 0;
+  position: fixed;
+  visibility: ${({ visible }: { visible: boolean }) =>
+    visible ? 'visible' : 'hidden'};
+  z-index: ${({ visible }: { visible: boolean }) => (visible ? 3 : -1)};
+`
+export function Dashboard({ visible }: { visible: boolean }) {
   const intl = useIntl()
   const dispatch = useDispatch()
   const handle = useFullScreenHandle()
 
   return (
-    <>
+    <Container visible={visible}>
       <EventTopBar
         menuItems={[
           {
@@ -57,6 +69,6 @@ export function Dashboard() {
           )}
         </FullBodyContent>
       </FullScreen>
-    </>
+    </Container>
   )
 }
