@@ -108,7 +108,6 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { IUserDetails } from '@client/utils/userUtils'
-import { getGqlDetails } from '@client/declarations/submissionMiddleware'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
