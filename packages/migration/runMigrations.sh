@@ -22,12 +22,8 @@ function updateFile {
 }
 
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
-  echo -e "\033[32m:::::::::::::::: You are running Ubuntu.  Checking version ::::::::::::::::\033[0m"
-  echo
   SED_PREFIX="sed -i "
 elif [ "$(uname)" == "Darwin" ]; then
-  echo -e "\033[32m::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::\033[0m"
-  echo
   SED_PREFIX="sed -i ''"
 fi
 
