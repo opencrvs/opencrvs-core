@@ -625,7 +625,6 @@ export const ageInMonthsBeforeEventTransformer =
   ) => {
     // -mm-dd
     const sectionData = draftData[sectionId][field.name] as string
-    console.log(sectionData)
     const [months, days] = sectionData
       .split('-')
       .slice(1)

@@ -52,7 +52,7 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING
 } as const
 
-function getGqlDetails(form: IForm, draft: IDeclaration) {
+export function getGqlDetails(form: IForm, draft: IDeclaration) {
   const gqlDetails = draftToGqlTransformer(
     form,
     draft.data,

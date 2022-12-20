@@ -15,8 +15,12 @@ import { ITextInputProps, IRef, TextInput } from './TextInput'
 import { InputLabel } from './InputField/InputLabel'
 import { Omit } from '../omit'
 
-const DateWrapper = styled.div`
-  width: 100%;
+const DateWrapper = styled.div<{ hideYear?: boolean }>`
+  ${({ hideYear }) => hideYear ? `
+    display: flex;
+    gap: 4px;
+    flex-direction: row-reverse;
+  ` : 'width: 100%'}
 `
 export const NoticeWrapper = styled.div`
   padding-bottom: 16px;
@@ -25,6 +29,7 @@ export interface IProps {
   id: string
   disabled?: boolean
   meta?: { touched: boolean; error: string }
+  hideYear?: boolean
   focusInput?: boolean
   notice?: string
   ignorePlaceHolder?: boolean
@@ -39,16 +44,19 @@ export interface IState {
 
 export type IDateFieldProps = IProps & Omit<ITextInputProps, 'onChange'>
 
-const DateSegment = styled(TextInput)`
+const DateSegment = styled(TextInput)<{ hideYear?: boolean }>`
   width: 54px;
   margin: 0 4px;
 
   &:first-of-type {
     margin-left: 0;
   }
-  &:last-of-type {
-    margin-right: 0;
-    width: 80px;
+  ${({ hideYear }) => hideYear ? '' : `
+    &:last-of-type {
+      margin-right: 0;
+      width: 80px;
+    }
+  `
   }
 `
 
@@ -91,6 +99,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   }
 
   change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { hideYear } = this.props
     const segmentType = String(event.target.id.split('-').pop())
     const val = event.target.value
 
@@ -105,10 +114,10 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           }
           break
         case 'mm':
-          if (val.length > 2 || Number(val) > 12) {
+          if (val.length > 2 || Number(val) > (hideYear ? 11 : 12)) {
             return
           }
-          if (val.length > 1 && this.yyyy.current) {
+          if (val.length > 1 && this.yyyy.current && !hideYear) {
             this.yyyy.current.focusField()
           }
           break
@@ -145,12 +154,12 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   }
 
   render() {
-    const { id, meta, focusInput, notice, ignorePlaceHolder, ...props } =
+    const { id, meta, focusInput, notice, hideYear, ignorePlaceHolder, ...props } =
       this.props
 
     return (
       <>
-        <DateWrapper id={id}>
+        <DateWrapper id={id} hideYear={hideYear}>
           {notice && (
             <NoticeWrapper>
               <InputLabel id={`${id}_notice`}>{notice}</InputLabel>
@@ -183,6 +192,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             type="number"
             placeholder={ignorePlaceHolder ? '' : 'mm'}
             maxLength={2}
+            hideYear={hideYear}
             min={1}
             max={12}
             value={this.state.mm}
@@ -191,7 +201,8 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
               event.currentTarget.blur()
             }}
           />
-          <DateSegment
+          {
+          !hideYear && (<DateSegment
             {...props}
             id={`${id}-yyyy`}
             ref={this.yyyy}
@@ -207,7 +218,8 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
               event.currentTarget.blur()
             }}
-          />
+            />)
+        }
         </DateWrapper>
       </>
     )

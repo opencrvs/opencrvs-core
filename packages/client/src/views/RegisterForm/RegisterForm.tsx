@@ -108,6 +108,7 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { IUserDetails } from '@client/utils/userUtils'
+import { getGqlDetails } from '@client/declarations/submissionMiddleware'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -364,17 +365,18 @@ class RegisterFormView extends React.Component<FullProps, State> {
     payload?: IPayload,
     downloadStatus?: DOWNLOAD_STATUS
   ) => {
-    const updatedDeclaration = {
-      ...declaration,
-      submissionStatus,
-      action,
-      payload,
-      downloadStatus,
-      timeLoggedMS:
-        (declaration.timeLoggedMS || 0) + Date.now() - this.state.startTime
-    }
-    this.props.writeDeclaration(updatedDeclaration)
-    this.props.history.push(HOME)
+    console.log(getGqlDetails(this.props.registerForm, declaration))
+    // const updatedDeclaration = {
+    //   ...declaration,
+    //   submissionStatus,
+    //   action,
+    //   payload,
+    //   downloadStatus,
+    //   timeLoggedMS:
+    //     (declaration.timeLoggedMS || 0) + Date.now() - this.state.startTime
+    // }
+    // this.props.writeDeclaration(updatedDeclaration)
+    // this.props.history.push(HOME)
   }
 
   generateSectionListForReview = (

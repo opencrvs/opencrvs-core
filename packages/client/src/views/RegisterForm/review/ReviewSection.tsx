@@ -111,7 +111,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-
+import formatDuration from 'date-fns/formatDuration'
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
@@ -648,6 +648,14 @@ const renderValue = (
     )
   }
 
+  if (field.type === DATE && field.hideYear) {
+    const [months, days] = (value as string)
+      .split('-')
+      .slice(1)
+      .map((val) => parseInt(val))
+    return formatDuration({ months, days })
+  }
+
   if (
     (field.type === DATE ||
       (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
@@ -697,6 +705,7 @@ const renderValue = (
   }
 
   if (typeof value === 'string') {
+    if (field.postfix) return `${value} ${field.postfix}`
     return value
   }
 
