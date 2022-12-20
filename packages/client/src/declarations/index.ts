@@ -875,8 +875,8 @@ async function updateWorkqueueData(
     []
   const transformedDeathDate =
     (declaration.data &&
-      declaration.data.deathEvent &&
-      declaration.data.deathEvent.deathDate) ||
+      declaration.data.deceased &&
+      declaration.data.deceased.deathDate) ||
     []
   const transformedBirthDate =
     (declaration.data &&

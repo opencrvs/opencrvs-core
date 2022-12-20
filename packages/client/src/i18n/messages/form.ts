@@ -2187,6 +2187,11 @@ export const formMessageDescriptors = {
     description: 'Source of cause of death',
     id: 'form.field.label.causeOfDeathMethod'
   },
+  causeOfDeath: {
+    defaultMessage: 'Cause of death',
+    description: 'Cause of death label',
+    id: 'form.field.label.causeOfDeath'
+  },
   assignedResponsibilityProof: {
     defaultMessage: 'Proof of assigned responsibility',
     description: 'Label for docuemnt option Proof of assigned responsibility',
@@ -2312,6 +2317,11 @@ export const formMessageDescriptors = {
     description: 'Label for Relationship to Deceased select',
     id: 'form.field.label.informantsRelationWithDeceased'
   },
+  informantsOtherRelationWithDeceased: {
+    defaultMessage: 'Other relationship to deceased',
+    description: 'Label for Other Relationship to deceased',
+    id: 'form.field.label.informantsOtherRelationWithDeceased'
+  },
   informantTitle: {
     defaultMessage: "What are the informant's details?",
     description: 'Form section title for informants',
@@ -2326,6 +2336,21 @@ export const formMessageDescriptors = {
     defaultMessage: 'Assigned registration office',
     description: 'Assigned Registration Office section',
     id: 'form.section.assignedRegistrationOfficeGroupTitle'
+  },
+  ageAtDeath: {
+    defaultMessage: 'Age at death',
+    description: 'Label for form field: ageAtDeathInYears',
+    id: 'form.field.label.ageAtDeathInYears'
+  },
+  ageAtDeathInMonths: {
+    defaultMessage: 'Months, days',
+    description: 'Label for form field: ageAtDeathInMonths',
+    id: 'form.field.label.ageAtDeathInMonths'
+  },
+  ageUnderOneYear: {
+    defaultMessage: 'Under 1 year',
+    description: 'Label for form field: ageUnderOneYear',
+    id: 'form.field.label.ageUnderOneYear'
   },
   attendantAtBirth: {
     defaultMessage: 'Attendant at birth',
@@ -2646,6 +2671,11 @@ export const formMessageDescriptors = {
     defaultMessage: 'Place of Occurrence of Death',
     description: 'Title for place of occurrence of death',
     id: 'form.field.label.deathPlace'
+  },
+  placeOfDeathPreview: {
+    defaultMessage: 'Place of occurrence',
+    description: 'Title for place of death sub section',
+    id: 'form.field.label.placeOfDeathPreview'
   },
   placeOfDeath: {
     defaultMessage: 'Where did the death occur?',

@@ -12,6 +12,7 @@
 import { IFormField, IFormData } from '@client/forms'
 import { GQLContactPoint } from '@opencrvs/gateway/src/graphql/schema'
 import { getBirthRegistrationSectionTransformer } from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
+import { getDeathRegistrationSectionTransformer } from '@client/forms/mappings/query'
 
 export const phoneNumberToFieldTransformer = (
   transformedData: IFormData,
@@ -53,20 +54,32 @@ export function getInformantSectionTransformer(
 }
 
 export function getInformantRegistrationComposedTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string
+  event: 'birth' | 'death'
 ) {
-  if (!transformedData.registration) {
-    transformedData.registration = {}
+  return function (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string
+  ) {
+    if (!transformedData.registration) {
+      transformedData.registration = {}
+    }
+    if (queryData.registration?.id) {
+      transformedData.registration._fhirID = queryData.registration.id
+    }
+    getInformantSectionTransformer(transformedData, queryData, sectionId)
+    if (event === 'birth') {
+      getBirthRegistrationSectionTransformer(
+        transformedData,
+        queryData,
+        'registration'
+      )
+    } else if (event === 'death') {
+      getDeathRegistrationSectionTransformer(
+        transformedData,
+        queryData,
+        'registration'
+      )
+    }
   }
-  if (queryData.registration?.id) {
-    transformedData.registration._fhirID = queryData.registration.id
-  }
-  getInformantSectionTransformer(transformedData, queryData, sectionId)
-  getBirthRegistrationSectionTransformer(
-    transformedData,
-    queryData,
-    'registration'
-  )
 }

@@ -92,11 +92,7 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import {
-  buttonMessages,
-  constantsMessages,
-  errorMessages
-} from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { messages as duplicatesMessages } from '@client/i18n/messages/views/duplicates'
 import { getLanguage } from '@client/i18n/selectors'
@@ -113,7 +109,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-
+import formatDuration from 'date-fns/formatDuration'
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
@@ -707,6 +703,14 @@ const renderValue = (
     )
   }
 
+  if (field.type === DATE && field.hideYear) {
+    const [months, days] = (value as string)
+      .split('-')
+      .slice(1)
+      .map((val) => parseInt(val))
+    return formatDuration({ months, days })
+  }
+
   if (
     (field.type === DATE ||
       (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
@@ -756,6 +760,12 @@ const renderValue = (
   }
 
   if (typeof value === 'string') {
+    if (field.postfix) return `${value} ${field.postfix}`
+    if (value === 'true') {
+      return intl.formatMessage(buttonMessages.yes)
+    } else if (value === 'false') {
+      return intl.formatMessage(buttonMessages.no)
+    }
     return value
   }
 
