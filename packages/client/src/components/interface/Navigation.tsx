@@ -172,7 +172,12 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.config,
     GROUP_ID.menuGroup
   ],
-  PERFORMANCE_MANAGEMENT: [WORKQUEUE_TABS.performance, GROUP_ID.menuGroup]
+  PERFORMANCE_MANAGEMENT: [
+    WORKQUEUE_TABS.dashboard,
+    WORKQUEUE_TABS.statistics,
+    WORKQUEUE_TABS.performance,
+    GROUP_ID.menuGroup
+  ]
 }
 
 interface ICount {
