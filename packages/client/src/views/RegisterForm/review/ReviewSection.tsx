@@ -428,8 +428,8 @@ function SignatureInput({
         <div>
           <FormTabs
             sections={[
-              { id: 'sign-canvas', title: 'Sign on canvas' },
-              { id: 'audio', title: 'Record audio' }
+              { id: 'sign-canvas', title: 'Signature' },
+              { id: 'audio', title: 'Voice (if illiterate)' }
             ]}
             activeTabId={tab}
             onTabClick={(tab) => setTab(() => tab)}
@@ -464,7 +464,7 @@ function SignatureInput({
               )}
               <ResponsiveModal
                 id={`${id}Modal`}
-                title={"Informant's declaration"}
+                title={'Signature of informant'}
                 autoHeight={true}
                 titleHeightAuto={true}
                 width={600}
@@ -499,11 +499,12 @@ function SignatureInput({
           {tab === 'audio' && (
             <>
               <SignatureDescription>
-                {intl.formatMessage(messages.signatureDescription)}
+                I, &lt;name&gt;, hereby declare that the particulars in this
+                form are true and correct to the best of my knowledge.
               </SignatureDescription>
               {!recording && !readonly && (
                 <AudioRecorder onRecordEnd={onRecordingChange}>
-                  {intl.formatMessage(messages.signatureOpenSignatureInput)}
+                  Record
                 </AudioRecorder>
               )}
               {recording && (
