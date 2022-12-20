@@ -35,7 +35,7 @@ export function Dashboard() {
       <EventTopBar
         menuItems={[
           {
-            label: 'Fullscreen',
+            label: 'Full screen',
             icon: <FullScreenIcon />,
             handler: () => handle.enter()
           }
