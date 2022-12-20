@@ -408,43 +408,41 @@ const renderValue = (
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
 
-  // If Country is changed from Farajaland to any other
+  // Showing State & District Name instead of their ID
   if (
-    ['statePrimary', 'districtPrimary'].includes(field.name) &&
-    isOriginalData
-  ) {
-    return value
-  }
-
-  // If Country is changed from farajaland to any other
-  if (
-    ['internationalStatePrimary', 'internationalDistrictPrimary'].includes(
-      field.name
-    ) &&
+    [
+      'statePrimary',
+      'districtPrimary',
+      'internationalStatePrimary',
+      'internationalDistrictPrimary'
+    ].includes(field.name) &&
     isOriginalData
   ) {
     const sectionData = draftData[sectionId]
-    const dynamicOption: IDynamicOptions =
-      field.name === 'internationalStatePrimary'
-        ? {
-            resource: 'locations',
-            dependency: 'countryPrimary',
-            initialValue: 'agentDefault'
-          }
-        : {
-            resource: 'locations',
-            dependency: 'statePrimary',
-            initialValue: 'agentDefault'
-          }
 
-    return renderSelectDynamicLabel(
-      value,
-      dynamicOption,
-      sectionData,
-      intl,
-      offlineCountryConfiguration,
-      language
-    )
+    if (sectionData.countryPrimary === window.config.COUNTRY) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
+      }
+      dynamicOption.dependency = [
+        'internationalStatePrimary',
+        'statePrimary'
+      ].includes(field.name)
+        ? 'countryPrimary'
+        : 'statePrimary'
+
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineCountryConfiguration,
+        language
+      )
+    }
+
+    return value
   }
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
