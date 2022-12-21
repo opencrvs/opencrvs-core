@@ -425,7 +425,7 @@ function SignatureInput({
           <FormTabs
             sections={[
               { id: 'sign-canvas', title: 'Signature' },
-              { id: 'audio', title: 'Voice (if illiterate)' }
+              { id: 'audio', title: 'Voice' }
             ]}
             activeTabId={tab}
             onTabClick={(tab) => setTab(() => tab)}
