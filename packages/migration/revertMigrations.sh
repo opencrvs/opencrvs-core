@@ -27,10 +27,17 @@ elif [ "$(uname)" == "Darwin" ]; then
   SED_PREFIX="sed -i ''"
 fi
 
-HEARTH_CONFIG=$1/migrate-mongo-config-hearth.js
-OPENHIM_CONFIG=$1/migrate-mongo-config-openhim.js
-APP_CONFIG=$1/migrate-mongo-config-application-config.js
-USER_MGNT_CONFIG=$1/migrate-mongo-config-user-mgnt.js
+if [ "$1" != "" ]; then
+  HEARTH_CONFIG=$1/migrate-mongo-config-hearth.js
+  OPENHIM_CONFIG=$1/migrate-mongo-config-openhim.js
+  APP_CONFIG=$1/migrate-mongo-config-application-config.js
+  USER_MGNT_CONFIG=$1/migrate-mongo-config-user-mgnt.js
+else
+  HEARTH_CONFIG=migrate-mongo-config-hearth.js
+  OPENHIM_CONFIG=migrate-mongo-config-openhim.js
+  APP_CONFIG=migrate-mongo-config-application-config.js
+  USER_MGNT_CONFIG=migrate-mongo-config-user-mgnt.js
+fi
 
 
 if [ "$1" != "" ]; then
