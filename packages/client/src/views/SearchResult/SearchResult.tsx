@@ -350,7 +350,8 @@ export class SearchResultView extends React.Component<
                           userDetails &&
                           ![
                             Roles.LOCAL_REGISTRAR,
-                            Roles.NATIONAL_REGISTRAR
+                            Roles.NATIONAL_REGISTRAR,
+                            Roles.REGISTRATION_AGENT
                           ].includes(userDetails.role as Roles)
                             ? getUserLocation(userDetails).id
                             : ''
@@ -457,9 +458,11 @@ export class SearchResultView extends React.Component<
               advancedSearchParameters: {
                 declarationLocationId:
                   userDetails &&
-                  ![Roles.LOCAL_REGISTRAR, Roles.NATIONAL_REGISTRAR].includes(
-                    userDetails.role as Roles
-                  )
+                  ![
+                    Roles.LOCAL_REGISTRAR,
+                    Roles.NATIONAL_REGISTRAR,
+                    Roles.REGISTRATION_AGENT
+                  ].includes(userDetails.role as Roles)
                     ? getUserLocation(userDetails).id
                     : '',
                 trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
