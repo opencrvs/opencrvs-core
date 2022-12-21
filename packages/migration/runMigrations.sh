@@ -9,7 +9,7 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-function updateFile {
+updateFile() {
   local action=$1
   local path=$2
   local file=$3
