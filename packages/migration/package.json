@@ -6,9 +6,9 @@
   "type": "module",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "./runMigrations.sh",
-    "revert": "./revertMigrations.sh",
-    "start:prod": "./runMigrations.sh",
+    "start": "bash runMigrations.sh",
+    "revert": "bash revertMigrations.sh",
+    "start:prod": "bash runMigrations.sh",
     "create:hearth": "migrate-mongo create -f migrate-mongo-config-hearth.js",
     "create:openhim": "migrate-mongo create -f migrate-mongo-config-openhim.js",
     "create:user-mgnt": "migrate-mongo create -f migrate-mongo-config-user-mgnt.js",
