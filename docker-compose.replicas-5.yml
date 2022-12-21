@@ -37,6 +37,7 @@ services:
 
   migration:
     environment:
+      - APPLICATION_CONFIG_MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/application-config?replicaSet=rs0
       - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/hearth-dev?replicaSet=rs0
       - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/openhim-dev?replicaSet=rs0
       - WAIT_HOSTS=mongo1:27017,mongo2:27017,mongo3:27017,mongo4:27017,mongo5:27017,influxdb:8086,minio:9000,elasticsearch:9200
