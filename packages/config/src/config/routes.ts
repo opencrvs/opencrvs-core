@@ -379,7 +379,13 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Get informantSMSNotifications',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.VALIDATE
+          ]
         }
       }
     },

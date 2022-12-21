@@ -28,9 +28,10 @@ export default async function updateTaskHandler(
   event: Events
 ) {
   try {
+    const token = getToken(request)
     const payload = await modifyTaskBundle(
       request.payload as fhir.Bundle,
-      getToken(request)
+      token
     )
     const taskId = getEntryId(payload)
     const taskResource = payload.entry?.[0].resource as fhir.Task | undefined
@@ -55,7 +56,7 @@ export default async function updateTaskHandler(
     /* sending notification to the contact */
     if (msisdn) {
       logger.info(`updateTaskHandler(${event}) sending event notification`)
-      sendEventNotification(payload, event, msisdn, {
+      sendEventNotification(payload, event, msisdn, token, {
         Authorization: request.headers.authorization
       })
     } else {
