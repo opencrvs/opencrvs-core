@@ -180,6 +180,7 @@ services:
       dockerfile: ./packages/migration/Dockerfile
     restart: unless-stopped
     environment:
+      - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
       - APPLICATION_CONFIG_MONGO_URL=mongodb://mongo1/application-config
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
