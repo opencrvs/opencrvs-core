@@ -379,7 +379,7 @@ class ReviewActionComponent extends React.Component<
                 id="submit_form"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={totalFileSizeExceeded}
+                disabled={!completeDeclaration || totalFileSizeExceeded}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(
