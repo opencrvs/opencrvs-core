@@ -27,11 +27,11 @@ export const Tab = styled(Button)<IProps>`
   margin-right: 24px;
   margin-top: 8px;
   padding: 0;
-  color: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme, disabled }) => (disabled ? theme.colors.grey300 : 'none')};
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.grey300 : theme.colors.primary};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   border-bottom: ${({ theme, active }) =>
-    active ? `2px solid ${theme.colors.primary}` : 'none'};
+    active ? `2px solid ${theme.colors.primary}` : '2px solid transparent'};
   & div {
     ${({ theme }) => theme.fonts.bold14};
     -webkit-justify-content: normal !important;

@@ -617,6 +617,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  ADMIN_LEVELS: Int
 }
 
 input ApplicationConfigurationInput {
@@ -631,6 +632,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  ADMIN_LEVELS: Int
 }
 
 input FormDraftInput {

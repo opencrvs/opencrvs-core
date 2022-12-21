@@ -93,7 +93,9 @@ class MobileHeader extends React.Component<IMobileHeaderProps & IDomProps> {
       <HeaderContainer id={id} className={this.props.className}>
         {mobileLeft &&
           mobileLeft.map(({ icon }, index) => (
-            <EndComponentContainer key={index}>{icon()}</EndComponentContainer>
+            <EndComponentContainer key={`mobile-left-${index}`}>
+              {icon()}
+            </EndComponentContainer>
           ))}
 
         {mobileBody ? (
@@ -104,7 +106,7 @@ class MobileHeader extends React.Component<IMobileHeaderProps & IDomProps> {
 
         {mobileRight &&
           mobileRight.map(({ handler, icon }, index) => (
-            <EndComponentContainer key={index}>
+            <EndComponentContainer key={`mobile-right-${index}`}>
               <CircleButton
                 id="mobile_header_right"
                 onClick={handler}

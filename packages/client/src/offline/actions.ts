@@ -15,7 +15,6 @@ import {
   ILocationDataResponse,
   IFacilitiesDataResponse,
   IContentResponse,
-  IAssetResponse,
   IApplicationConfigResponse,
   IApplicationConfig,
   ICertificateTemplateData
@@ -24,6 +23,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IFormConfig, IFormDataSet } from '@client/forms'
 import { IQuestionConfig } from '@client/forms/questionConfig'
+import { System } from '@client/utils/gateway'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -90,6 +90,11 @@ export type ApplicationConfigUpdatedAction = {
   type: typeof UPDATE_OFFLINE_CONFIG
   payload: { config: IApplicationConfig }
 }
+export const UPDATE_OFFLINE_SYSTEMS = 'OFFLINE/UPDATE_OFFLINE_SYSTEMS' as const
+export type UpdateOfflineSystemsAction = {
+  type: typeof UPDATE_OFFLINE_SYSTEMS
+  payload: { systems: System[] }
+}
 
 export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
 export type ApplicationConfigFailedAction = {
@@ -140,20 +145,6 @@ export const facilitiesLoaded = (
 
 export const locationsFailed = (error: Error): LocationsFailedAction => ({
   type: LOCATIONS_FAILED,
-  payload: error
-})
-
-export const pilotLocationsLoaded = (
-  payload: ILocationDataResponse
-): PilotLocationsLoadedAction => ({
-  type: PILOT_LOCATIONS_LOADED,
-  payload: payload
-})
-
-export const pilotLocationsFailed = (
-  error: Error
-): PilotLocationsFailedAction => ({
-  type: PILOT_LOCATIONS_FAILED,
   payload: error
 })
 
@@ -214,6 +205,12 @@ export const updateOfflineConfigData = (payload: {
   config: IApplicationConfig
 }): ApplicationConfigUpdatedAction => ({
   type: UPDATE_OFFLINE_CONFIG,
+  payload: payload
+})
+export const updateOfflineSystems = (payload: {
+  systems: System[]
+}): UpdateOfflineSystemsAction => ({
+  type: UPDATE_OFFLINE_SYSTEMS,
   payload: payload
 })
 
@@ -311,6 +308,7 @@ export type Action =
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
+  | UpdateOfflineSystemsAction
   | UpdateOfflineFormConfigAction
   | UpdateOfflineCertificateAction
   | OfflineFormConfigUpdatedAction

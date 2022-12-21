@@ -719,9 +719,11 @@ export const dateFormatTransformer =
     let queryValue =
       (queryData[sectionId]?.[transformedFieldName] as string) || ''
     if (nestedField && queryData[sectionId][nestedField]) {
-      queryValue = (queryData[sectionId][nestedField] as IFormSectionData)[
-        transformedFieldName
-      ].toString()
+      queryValue = String(
+        (queryData[sectionId][nestedField] as IFormSectionData)[
+          transformedFieldName
+        ]
+      )
     }
     const date = new Date(queryValue)
     if (!Number.isNaN(date.getTime())) {
