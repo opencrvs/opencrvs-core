@@ -13,7 +13,14 @@ import { IFormConfig } from '@client/forms'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { CustomFieldType, DraftStatus, Event } from '@client/utils/gateway'
+import {
+  CustomFieldType,
+  DraftStatus,
+  Event,
+  System,
+  SystemStatus,
+  SystemType
+} from '@client/utils/gateway'
 import { ILocation } from '@client/offline/reducer'
 
 export const validImageB64String =
@@ -110,11 +117,11 @@ export const formConfig: IFormConfig = {
   ]
 }
 
-export const systems = [
+export const systems: System[] = [
   {
     name: 'WebHook 1',
-    status: 'active',
-    type: 'WEBHOOK',
+    status: SystemStatus.Active,
+    type: SystemType.Webhook,
     _id: '63998b6efbd0f8bad7708033',
     shaSecret: 'c37d4f5d-4c12-4016-9c7e-d810d2f871df',
     clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
@@ -134,8 +141,8 @@ export const systems = [
     clientId: '5923118f-c633-40c6-ba97-c3e3cbb412aa',
     name: 'Health Deactivation',
     shaSecret: '2569a6d4-1f38-4f53-8724-1bfcba8262f6',
-    status: 'deactivated',
-    type: 'HEALTH',
+    status: SystemStatus.Deactivated,
+    type: SystemType.Health,
     settings: [],
     __typename: 'System'
   }
