@@ -46,7 +46,7 @@ const MESSAGE_MAP: Record<CustomFieldType, MessageDescriptor> = {
   /* TODO */
   [CustomFieldType.Subsection]: messages.supportingCopy,
   [CustomFieldType.Paragraph]: messages.heading,
-  [CustomFieldType.Select]: messages.customSelect
+  [CustomFieldType.SelectWithOptions]: messages.customSelect
 }
 
 type IRouteProps = {

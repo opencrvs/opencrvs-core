@@ -236,7 +236,8 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             roles={[
                                               Roles.LOCAL_REGISTRAR,
-                                              Roles.REGISTRATION_AGENT
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.NATIONAL_REGISTRAR
                                             ]}
                                             path={routes.ADVANCED_SEARCH}
                                             component={AdvancedSearchConfig}
@@ -245,7 +246,8 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             roles={[
                                               Roles.LOCAL_REGISTRAR,
-                                              Roles.REGISTRATION_AGENT
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.NATIONAL_REGISTRAR
                                             ]}
                                             path={routes.ADVANCED_SEARCH_RESULT}
                                             component={AdvancedSearchResult}

@@ -38,7 +38,6 @@ import {
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { messages as configMessages } from '@client/i18n/messages/views/config'
-import { IApplicationConfig } from '@client/utils/referenceApi'
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg16};

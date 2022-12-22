@@ -126,7 +126,12 @@ function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
           ></Checkbox>
         )}
 
-        <Link onClick={handleLinkOnClick}>{linkLabel}</Link>
+        <Link
+          id={props.inputProps.id + '-date_range_button'}
+          onClick={handleLinkOnClick}
+        >
+          {linkLabel}
+        </Link>
         {modalVisible && (
           <DateRangePicker
             startDate={

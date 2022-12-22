@@ -129,7 +129,7 @@ export function createCustomField({
   if (baseField.type === 'TEXT' || baseField.type === 'TEXTAREA') {
     baseField.maxLength = maxLength
   }
-  if (baseField.type === CustomFieldType.Select) {
+  if (baseField.type === CustomFieldType.SelectWithOptions) {
     baseField.options =
       options?.map((option) => {
         return {

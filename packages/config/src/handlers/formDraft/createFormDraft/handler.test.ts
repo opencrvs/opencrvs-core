@@ -161,8 +161,8 @@ describe('createFormDraftHandler test', () => {
   it('should update question using mongoose', async () => {
     mockingoose(FormDraft).toReturn(birthMockFormDraft, 'findOne')
     mockingoose(Question).toReturn(mockQuestion, 'find')
-    mockingoose(Question).toReturn(mockQuestion, 'updateOne')
-    mockingoose(FormDraft).toReturn(birthMockFormDraft, 'updateOne')
+    mockingoose(Question).toReturn(mockQuestion, 'replaceOne')
+    mockingoose(FormDraft).toReturn(birthMockFormDraft, 'replaceOne')
     const res = await server.server.inject({
       method: 'POST',
       url: '/formDraft',

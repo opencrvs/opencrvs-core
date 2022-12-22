@@ -40,7 +40,6 @@ else
 fi
 
 
-
 if [ "$1" != "" ]; then
   updateFile "RUN" $1 "$HEARTH_CONFIG" "$SED_PREFIX"
   updateFile "RUN" $1 "$OPENHIM_CONFIG" "$SED_PREFIX"
@@ -48,20 +47,32 @@ if [ "$1" != "" ]; then
   updateFile "RUN" $1 "$USER_MGNT_CONFIG" "$SED_PREFIX"
 fi
 
-# hearth migrations
-yarn migrate-mongo up --file $HEARTH_CONFIG
+# Revert hearth migrations
+HEARTH_FILES=$(ls $1/migrations/hearth | wc -l)
+for ((n=0;n<$HEARTH_FILES;n++)); do
+  yarn migrate-mongo down --file $HEARTH_CONFIG
+done
 yarn migrate-mongo status --file $HEARTH_CONFIG
 
-#openhim migrations
-yarn migrate-mongo up --file $OPENHIM_CONFIG
+## Revert openhim migrations
+OPENHIM_FILES=$(ls $1/migrations/openhim | wc -l)
+for ((n=0;n<$OPENHIM_FILES;n++)); do
+  yarn migrate-mongo down --file $OPENHIM_CONFIG
+done
 yarn migrate-mongo status --file $OPENHIM_CONFIG
 
-# Application Config migration
-yarn migrate-mongo up --file $APP_CONFIG
+## Revert application Config migration
+APP_CONFIG_FILES=$(ls $1/migrations/application-config | wc -l)
+for ((n=0;n<$APP_CONFIG_FILES;n++)); do
+  yarn migrate-mongo down --file $APP_CONFIG
+done
 yarn migrate-mongo status --file $APP_CONFIG
 
-# User mgnt migration
-yarn migrate-mongo up --file $USER_MGNT_CONFIG
+## Revert user-mgnt migration
+USER_MGNT_FILES=$(ls $1/migrations/user-mgnt | wc -l)
+for ((n=0;n<$USER_MGNT_FILES;n++)); do
+  yarn migrate-mongo down --file $USER_MGNT_CONFIG
+done
 yarn migrate-mongo status --file $USER_MGNT_CONFIG
 
 if [ "$1" != "" ]; then

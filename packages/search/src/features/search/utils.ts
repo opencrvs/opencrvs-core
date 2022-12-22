@@ -204,7 +204,7 @@ export function advancedQueryBuilder(
     must.push({
       multi_match: {
         query: params.childLastName,
-        fields: 'childLastName',
+        fields: 'childFamilyName',
         fuzziness: 'AUTO'
       }
     })
@@ -388,7 +388,7 @@ export function advancedQueryBuilder(
     })
   }
 
-  if (!params.fatherDoBStart && params.fatherDoBEnd && params.fatherDoB) {
+  if (!params.fatherDoBStart && !params.fatherDoBEnd && params.fatherDoB) {
     must.push({
       match: {
         fatherDoB: params.fatherDoB
