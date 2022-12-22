@@ -42,14 +42,26 @@ import {
   requestForRegistrarValidationHandler,
   declarationAssignedHandler,
   declarationUnassignedHandler,
-  waitingExternalValidationHandler
+  waitingExternalValidationHandler,
+  declarationViewedHandler,
+  declarationDownloadedHandler,
+  birthDeclarationArchivedHandler,
+  deathDeclarationArchivedHandler,
+  birthDeclarationReinstatedHandler,
+  deathDeclarationReinstatedHandler,
+  declarationUpdatedHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
   postAdvancedSearchByClient,
   responseSchema
 } from '@metrics/features/searchMetrics/handler'
-import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
+import {
+  totalMetricsByLocation,
+  totalMetricsByRegistrar,
+  totalMetricsByTime,
+  totalMetricsHandler
+} from '@metrics/features/totalMetrics/handler'
 import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
@@ -59,6 +71,10 @@ import {
   newAuditHandler
 } from '@metrics/features/audit/handler'
 import * as Joi from 'joi'
+import {
+  getAllVSExport,
+  vsExportHandler
+} from '@metrics/features/vsExport/handler'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -291,8 +307,64 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/events/downloaded',
+      handler: declarationDownloadedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/viewed',
+      handler: declarationViewedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-archived',
+      handler: birthDeclarationArchivedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-archived',
+      handler: deathDeclarationArchivedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-reinstated',
+      handler: birthDeclarationReinstatedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-reinstated',
+      handler: deathDeclarationReinstatedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/unassigned',
       handler: declarationUnassignedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/declaration-updated',
+      handler: declarationUpdatedHandler,
       config: {
         tags: ['api']
       }
@@ -344,6 +416,62 @@ export const getRoutes = () => {
             timeEnd: Joi.string().required(),
             locationId: Joi.string(),
             event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    {
+      method: 'GET',
+      path: '/totalMetricsByRegistrar',
+      handler: totalMetricsByRegistrar,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string(),
+            event: Joi.string().required(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    {
+      method: 'GET',
+      path: '/totalMetricsByLocation',
+      handler: totalMetricsByLocation,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            event: Joi.string().required(),
+            locationId: Joi.string(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/totalMetricsByTime',
+      handler: totalMetricsByTime,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            event: Joi.string().required(),
+            locationId: Joi.string(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
           })
         },
         tags: ['api']
@@ -534,6 +662,23 @@ export const getRoutes = () => {
             event: Joi.string().required()
           })
         },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/vsExport',
+      handler: vsExportHandler,
+      config: {
+        tags: ['api'],
+        auth: false
+      }
+    },
+    {
+      method: 'GET',
+      path: '/fetchVSExport',
+      handler: getAllVSExport,
+      config: {
         tags: ['api']
       }
     },

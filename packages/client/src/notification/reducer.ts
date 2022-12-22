@@ -42,6 +42,7 @@ export type NotificationState = {
   downloadDeclarationFailedToast: boolean
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: userCreateDuplicateMobileFailedToastState
+  userReconnectedToast: boolean
 }
 
 export const initialState: NotificationState = {
@@ -59,7 +60,8 @@ export const initialState: NotificationState = {
   userCreateDuplicateMobileFailedToast: {
     visible: false,
     mobile: null
-  }
+  },
+  userReconnectedToast: false
 }
 
 export const notificationReducer: LoopReducer<
@@ -70,16 +72,6 @@ export const notificationReducer: LoopReducer<
   action: actions.Action
 ): NotificationState | Loop<NotificationState, actions.Action> => {
   switch (action.type) {
-    case actions.SHOW_BACKGROUND_SYNC_TRIGGERED:
-      return {
-        ...state,
-        backgroundSyncMessageVisible: true
-      }
-    case actions.HIDE_BACKGROUND_SYNC_TRIGGERED:
-      return {
-        ...state,
-        backgroundSyncMessageVisible: false
-      }
     case actions.SESSION_EXPIRED:
       return {
         ...state,
@@ -179,7 +171,6 @@ export const notificationReducer: LoopReducer<
         showPINUpdateSuccess: false
       }
     case actions.SHOW_UNASSIGNED:
-      console.log(action.payload)
       return {
         ...state,
         unassignedModal: action.payload
@@ -188,6 +179,16 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         unassignedModal: null
+      }
+    case actions.SHOW_USER_RECONNECTED_TOAST:
+      return {
+        ...state,
+        userReconnectedToast: true
+      }
+    case actions.HIDE_USER_RECONNECTED_TOAST:
+      return {
+        ...state,
+        userReconnectedToast: false
       }
     default:
       return state

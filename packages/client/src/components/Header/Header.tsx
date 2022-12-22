@@ -11,8 +11,9 @@
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { constantsMessages, userMessages } from '@client/i18n/messages'
+import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import {
   goBack,
   goForward,
@@ -24,7 +25,8 @@ import {
   goToTeamSearch,
   goToTeamUserList,
   goToCreateNewUserWithLocationId,
-  goToCreateNewUser
+  goToCreateNewUser,
+  goToAdvancedSearch
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -33,42 +35,39 @@ import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import {
   BRN_DRN_TEXT,
+  NATIONAL_ID_TEXT,
   FIELD_AGENT_ROLES,
   NAME_TEXT,
   NATL_ADMIN_ROLES,
   PHONE_TEXT,
+  ADVANCED_SEARCH_TEXT,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
-import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { IUserDetails } from '@client/utils/userUtils'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowBack,
-  BackArrowDeepBlue,
-  ForwardArrowDeepBlue,
-  BRN,
-  Phone,
   Plus,
   SearchDark,
-  TrackingID,
-  User,
   Activity,
   SearchBlue,
   AddUser
 } from '@opencrvs/components/lib/icons'
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
-import { SearchTool, ISearchType } from '@opencrvs/components/lib/SearchTool'
-import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
+import {
+  SearchTool,
+  ISearchType,
+  INavigationType
+} from '@opencrvs/components/lib/SearchTool'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { FixedNavigation } from '@client/components/interface/Navigation'
-import { Avatar } from '@client/components/Avatar'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
   HOME,
@@ -76,6 +75,10 @@ import {
   REGISTRAR_HOME,
   TEAM_USER_LIST
 } from '@client/navigation/routes'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { HistoryNavigator } from './HistoryNavigator'
+import { Hamburger } from './Hamburger'
 
 type IStateProps = {
   userDetails: IUserDetails | null
@@ -95,6 +98,8 @@ type IDispatchProps = {
   goToCreateNewUser: typeof goToCreateNewUser
   goToTeamSearchAction: typeof goToTeamSearch
   goToTeamUserListAction: typeof goToTeamUserList
+  goToAdvancedSearch: typeof goToAdvancedSearch
+  setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
 interface IProps extends RouteComponentProps {
@@ -107,6 +112,11 @@ interface IProps extends RouteComponentProps {
   enableMenuSelection?: boolean
   changeTeamLocation?: () => void
   mapPerformanceClickHandler?: () => void
+  /** Sets default mobile right actions */
+  mobileRight?: {
+    icon: () => React.ReactNode
+    handler: () => void
+  }[]
 }
 
 type IFullProps = IntlShapeProps &
@@ -116,7 +126,6 @@ type IFullProps = IntlShapeProps &
   IDomProps
 
 interface IState {
-  showMenu: boolean
   showLogoutModal: boolean
 }
 
@@ -128,7 +137,8 @@ enum ACTIVE_MENU_ITEM {
   USERS,
   CERTIFICATE,
   APPLICATION,
-  FORM
+  FORM,
+  INTEGRATION
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
@@ -164,14 +174,6 @@ const HeaderCenter = styled.div`
   align-items: center;
   background: ${({ theme }) => theme.colors.white};
 `
-const HeaderLeft = styled.div`
-  height: 40px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-  background: ${({ theme }) => theme.colors.white};
-`
 const HeaderRight = styled.div`
   height: 40px;
   background: ${({ theme }) => theme.colors.white};
@@ -187,45 +189,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     super(props)
 
     this.state = {
-      showMenu: false,
       showLogoutModal: false
     }
-  }
-
-  hamburger = () => {
-    const { userDetails, language, intl } = this.props
-    let name = ''
-    if (userDetails && userDetails.name) {
-      const nameObj = getIndividualNameObj(userDetails.name, language)
-      name = nameObj
-        ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-        : ''
-    }
-
-    const role =
-      userDetails && userDetails.role
-        ? intl.formatMessage(userMessages[userDetails.role])
-        : ''
-
-    const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
-
-    const userInfo = { name, role, avatar }
-
-    return (
-      <>
-        <ExpandingMenu
-          showMenu={this.state.showMenu}
-          menuCollapse={() => this.toggleMenu()}
-          navigation={() => (
-            <FixedNavigation
-              navigationWidth={320}
-              menuCollapse={() => this.toggleMenu()}
-              userInfo={userInfo}
-            />
-          )}
-        />
-      </>
-    )
   }
 
   getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM, theme: ITheme) {
@@ -236,8 +201,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
+            icon: () => <Hamburger />,
+            handler: () => {}
           }
         ],
         mobileRight: [
@@ -254,8 +219,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ],
           mobileRight: [
@@ -283,8 +248,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ],
           mobileRight: [
@@ -304,8 +269,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ]
         }
@@ -317,8 +282,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
+            icon: () => <Hamburger />,
+            handler: () => {}
           }
         ]
       }
@@ -337,8 +302,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ],
           mobileRight: [
@@ -361,22 +326,18 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     const role = this.props.userDetails && this.props.userDetails.role
     const location = this.props.history.location.pathname
     if (
-      (FIELD_AGENT_ROLES.includes(role as string) && location.includes(HOME)) ||
+      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
       (NATL_ADMIN_ROLES.includes(role as string) &&
-        location.includes(PERFORMANCE_HOME)) ||
+        PERFORMANCE_HOME.includes(location)) ||
       (SYS_ADMIN_ROLES.includes(role as string) &&
-        location.includes(PERFORMANCE_HOME)) ||
+        PERFORMANCE_HOME.includes(location)) ||
       (REGISTRAR_ROLES.includes(role as string) &&
-        location.includes(REGISTRAR_HOME))
+        REGISTRAR_HOME.includes(location))
     ) {
       return true
     } else {
       return false
     }
-  }
-
-  toggleMenu = () => {
-    this.setState((prevState) => ({ showMenu: !prevState.showMenu }))
   }
 
   renderSearchInput(props: IFullProps, isMobile?: boolean) {
@@ -386,31 +347,48 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
-        icon: <TrackingID />,
-        invertIcon: <TrackingID />,
+        icon: <Icon name="Target" size="small" />,
+        invertIcon: <Icon name="Target" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
       {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
-        icon: <BRN />,
-        invertIcon: <BRN />,
+        icon: <Icon name="Award" size="small" />,
+        invertIcon: <Icon name="Award" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
+      },
+      {
+        label: intl.formatMessage(messages.nationalId),
+        value: NATIONAL_ID_TEXT,
+        icon: <Icon name="CreditCard" size="small" />,
+        invertIcon: <Icon name="CreditCard" />,
+        placeHolderText: intl.formatMessage(messages.placeHolderNationalId)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
-        icon: <Phone />,
-        invertIcon: <Phone />,
+        icon: <Icon name="Phone" size="small" />,
+        invertIcon: <Icon name="Phone" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       },
       {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
-        icon: <User />,
-        invertIcon: <User />,
+        icon: <Icon name="User" size="small" />,
+        invertIcon: <Icon name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
+      }
+    ]
+    const navigationList: INavigationType[] = [
+      {
+        label: intl.formatMessage(messages.advancedSearch),
+        id: ADVANCED_SEARCH_TEXT,
+        onClick: () => {
+          this.props.setAdvancedSearchParam(advancedSearchInitialState)
+          this.props.goToAdvancedSearch()
+        }
       }
     ]
 
@@ -421,6 +399,11 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
+        navigationList={
+          FIELD_AGENT_ROLES.includes(this.props.userDetails?.role as string)
+            ? undefined
+            : navigationList
+        }
         searchHandler={(text, type) =>
           props.goToSearchResult(text, type, isMobile)
         }
@@ -457,33 +440,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     }
   }
 
-  arrowNavigator() {
-    return (
-      <HeaderLeft>
-        <CircleButton
-          id="header-go-back-button"
-          disabled={
-            (this.props.history.action === 'POP' ||
-              this.props.history.action === 'REPLACE') &&
-            this.isLandingPage()
-          }
-          onClick={() => this.props.goBack()}
-        >
-          <BackArrowDeepBlue />
-        </CircleButton>
-        <CircleButton
-          disabled={
-            this.props.history.action === 'PUSH' ||
-            this.props.history.action === 'REPLACE'
-          }
-          onClick={() => this.props.goForward()}
-        >
-          <ForwardArrowDeepBlue />
-        </CircleButton>
-      </HeaderLeft>
-    )
-  }
-
   render() {
     const { className, intl, activeMenuItem, theme } = this.props
 
@@ -501,12 +457,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ? constantsMessages.applicationTitle
           : activeMenuItem === ACTIVE_MENU_ITEM.FORM
           ? constantsMessages.formDeclarationTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
+          ? constantsMessages.integrationTitle
           : constantsMessages.declarationTitle
       )
 
     let rightMenu = [
       {
-        element: this.arrowNavigator()
+        element: <HistoryNavigator />
       },
       {
         element: (
@@ -545,7 +503,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     ) {
       rightMenu = [
         {
-          element: this.arrowNavigator()
+          element: <HistoryNavigator />
         },
         {
           element: <ProfileMenu key="profileMenu" />
@@ -558,13 +516,18 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       theme
     )
 
+    const mobileHeaderActionPropsWithDefaults = {
+      mobileRight: this.props.mobileRight,
+      ...mobileHeaderActionProps
+    }
+
     return (
       <AppHeader
         id="register_app_header"
         desktopRightMenu={rightMenu}
         className={className}
         title={title}
-        {...mobileHeaderActionProps}
+        {...mobileHeaderActionPropsWithDefaults}
       />
     )
   }
@@ -584,6 +547,8 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.APPLICATION
       : window.location.href.includes('config/form')
       ? ACTIVE_MENU_ITEM.FORM
+      : window.location.href.includes('config/integration')
+      ? ACTIVE_MENU_ITEM.INTEGRATION
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)
@@ -600,7 +565,9 @@ export const Header = connect(
     goToCreateNewUserWithLocationId,
     goToCreateNewUser,
     goToTeamSearchAction: goToTeamSearch,
-    goToTeamUserListAction: goToTeamUserList
+    goToTeamUserListAction: goToTeamUserList,
+    goToAdvancedSearch: goToAdvancedSearch,
+    setAdvancedSearchParam: setAdvancedSearchParam
   }
 )(injectIntl(withTheme(withRouter(HeaderComp))))
 

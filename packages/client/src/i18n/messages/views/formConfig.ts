@@ -83,9 +83,11 @@ interface IFormConfigMessages
   checkboxGroup: MessageDescriptor
   checkbox: MessageDescriptor
   date: MessageDescriptor
+  dateRangePickerForFormField: MessageDescriptor
   dynamicList: MessageDescriptor
   formConfigMobileModalTitle: MessageDescriptor
   formConfigMobileModalDesc: MessageDescriptor
+  customSelect: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -227,6 +229,7 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'Declaration Forms',
     description: 'Title for Form Configuration Page'
   },
+
   previewDescription: {
     id: 'config.form.preview.description',
     defaultMessage:
@@ -436,6 +439,11 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'Date input',
     description: 'Success notification label for number of addresses settings'
   },
+  dateRangePickerForFormField: {
+    id: 'config.form.settings.dateRangePickerForFormField',
+    defaultMessage: 'Date Rangee Picker input',
+    description: 'Date range picker input label'
+  },
   dynamicList: {
     id: 'config.form.settings.dynamicList',
     defaultMessage: 'Dynamic List',
@@ -487,6 +495,10 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage:
       'Please use a laptop or desktop to configure a declaration form',
     description: 'Modal description for mobile form configuration'
+  },
+  customSelect: {
+    id: 'config.form.tools.input.customSelect',
+    defaultMessage: 'Custom Select'
   }
 }
 

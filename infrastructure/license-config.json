@@ -2,7 +2,7 @@
   "ignore": [
     "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub|cjs)",
     ".git",
-    ".idea/opencrvs-core.iml",
+    ".idea",
     "**/patches",
     ".secrets",
     "deploy_key.enc",
@@ -32,7 +32,11 @@
     "packages/components/**/*.mdx",
     "packages/components/.storybook/preview.jsx",
     "grafana",
-    ".nvmrc"
+    "packages/scheduler/start.sh",
+    "packages/scheduler/cronTabFiles/*",
+    "packages/scheduler/jobs/*",
+    ".nvmrc",
+    ".idea"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {

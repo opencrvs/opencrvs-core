@@ -23,6 +23,7 @@ import {
   FATHER_DETAILS_DONT_EXIST,
   MOTHER_DETAILS_DONT_EXIST
 } from './administrative/addresses'
+import { CustomFieldType } from '@client/utils/gateway'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
 
@@ -61,7 +62,8 @@ export function createCustomField({
   placeholder,
   required,
   maxLength,
-  conditionals
+  conditionals,
+  options
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -74,14 +76,18 @@ export function createCustomField({
     validate: [],
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
+    options: [],
     mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
       },
       query: {
         operation: 'questionnaireToCustomFieldTransformer'
+      },
+      template: {
+        fieldName: createCustomFieldHandlebarName(fieldId),
+        operation: 'questionnaireToCustomFieldTransformer'
       }
-      /* TODO: Add template mapping so that handlebars work */
     }
   }
   const { sectionId } = getIdentifiersFromFieldId(fieldId)
@@ -123,7 +129,32 @@ export function createCustomField({
   if (baseField.type === 'TEXT' || baseField.type === 'TEXTAREA') {
     baseField.maxLength = maxLength
   }
+  if (baseField.type === CustomFieldType.Select) {
+    baseField.options =
+      options?.map((option) => {
+        return {
+          ...option,
+          label: Array.isArray(option.label)
+            ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+            : option.label
+        }
+      }) || []
+  }
   return baseField
+}
+
+export function createCustomFieldHandlebarName(fieldId: string) {
+  const fieldIdNameArray = fieldId.split('.').map((field, index) => {
+    if (index !== 0) {
+      return field.charAt(0).toUpperCase() + field.slice(1)
+    } else {
+      return field
+    }
+  })
+
+  return `${fieldIdNameArray[0]}${fieldIdNameArray[1]}${
+    fieldIdNameArray[fieldIdNameArray.length - 1]
+  }`
 }
 
 function escapeRegExp(value: string) {

@@ -13,233 +13,15 @@ import {
   CERTIFIED_STATUS,
   REGISTERED_STATUS
 } from '@search/elasticsearch/utils'
-import {
-  IAdvancedSearchParam,
-  IFilter,
-  INameCombination
-} from '@search/features/search/types'
-const SEARCHABLE_FIELDS = [
-  'childFirstNames',
-  'childFamilyName',
-  'childFirstNamesLocal',
-  'childFamilyNameLocal',
-  'deceasedFirstNames',
-  'deceasedFamilyName',
-  'deceasedFirstNamesLocal',
-  'deceasedFamilyNameLocal',
-  'trackingId',
-  'registrationNumber',
-  'contactNumber'
-]
+import { IAdvancedSearchParam } from '@search/features/search/types'
 
-const allNameFields = [
-  'childFirstNames',
-  'childFamilyName',
-  'childFirstNamesLocal',
-  'childFamilyNameLocal',
-  'motherFirstNames',
-  'motherFamilyName',
-  'motherFirstNamesLocal',
-  'motherFamilyNameLocal',
-  'fatherFirstNames',
-  'fatherFamilyName',
-  'fatherFirstNamesLocal',
-  'fatherFamilyNameLocal',
-  'informantFirstNames',
-  'informantFamilyName',
-  'informantFirstNamesLocal',
-  'informantFamilyNameLocal',
-  'deceasedFirstNames',
-  'deceasedFamilyName',
-  'deceasedFirstNamesLocal',
-  'deceasedFamilyNameLocal',
-  'spouseFirstNames',
-  'spouseFamilyName',
-  'spouseFirstNamesLocal',
-  'spouseFamilyNameLocal'
-]
-
-const childFirstNameFields = ['childFirstNames', 'childFirstNamesLocal']
-
-const motherFirstNameFields = ['motherFirstNames', 'motherFirstNamesLocal']
-
-const fatherFirstNameFields = ['fatherFirstNames', 'fatherFirstNamesLocal']
-
-const childFamilyNameFields = ['childFamilyName', 'childFamilyNameLocal']
-
-const motherFamilyNameFields = ['motherFamilyName', 'motherFamilyNameLocal']
-
-const fatherFamilyNameFields = ['fatherFamilyName', 'fatherFamilyNameLocal']
-
-export const EMPTY_STRING = ''
-
-export function queryBuilder(
-  query: string,
-  trackingId: string,
-  contactNumber: string,
-  registrationNumber: string,
-  eventLocationId: string,
-  gender: string,
-  nameCombinations: INameCombination[],
-  declarationLocationId: string | string[],
-  declarationLocationHirarchyId: string,
+export function advancedQueryBuilder(
+  params: IAdvancedSearchParam,
   createdBy: string,
-  filters: IFilter
+  isExternalSearch: boolean
 ) {
   const must: any[] = []
   const should: any[] = []
-
-  if (query !== EMPTY_STRING) {
-    must.push({
-      multi_match: {
-        query: `${query}`,
-        fields: SEARCHABLE_FIELDS,
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (nameCombinations.length > 0) {
-    nameCombinations.forEach((nameCombination: INameCombination) => {
-      must.push({
-        multi_match: {
-          query: nameCombination.name,
-          fields: selectNameFields(nameCombination.fields),
-          fuzziness: 'AUTO'
-        }
-      })
-    })
-  }
-
-  if (trackingId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'trackingId.keyword': trackingId
-      }
-    })
-  }
-
-  if (contactNumber !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'contactNumber.keyword': contactNumber
-      }
-    })
-  }
-
-  if (registrationNumber !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'registrationNumber.keyword': registrationNumber
-      }
-    })
-  }
-
-  if (gender !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'gender.keyword': gender
-      }
-    })
-  }
-
-  if (eventLocationId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'eventLocationId.keyword': {
-          value: eventLocationId,
-          boost: 2.0
-        }
-      }
-    })
-  }
-  if (Array.isArray(declarationLocationId)) {
-    // If you are searching multiple locations at once
-    declarationLocationId.forEach((id) => {
-      must.push({
-        bool: {
-          should: declarationLocationId.map((locationId: string) => ({
-            term: {
-              'declarationLocationId.keyword': locationId
-            }
-          }))
-        }
-      })
-    })
-  } else if (declarationLocationId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'declarationLocationId.keyword': {
-          value: declarationLocationId,
-          boost: 2
-        }
-      }
-    })
-  }
-
-  if (declarationLocationHirarchyId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'declarationLocationHirarchyIds.keyword': {
-          value: declarationLocationHirarchyId,
-
-          boost: 2.0
-        }
-      }
-    })
-  }
-
-  if (createdBy !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'createdBy.keyword': {
-          value: createdBy
-        }
-      }
-    })
-  }
-
-  if (filters.event !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'event.keyword': filters.event
-      }
-    })
-  }
-
-  if (filters.status) {
-    must.push({
-      terms: {
-        'type.keyword': filters.status
-      }
-    })
-  }
-
-  if (filters.type) {
-    must.push({
-      terms: {
-        'compositionType.keyword': filters.type
-      }
-    })
-  }
-
-  return {
-    bool: {
-      must,
-      should
-    }
-  }
-}
-
-export function advancedQueryBuilder(params: IAdvancedSearchParam) {
-  const must: any[] = [
-    {
-      query_string: {
-        default_field: 'type',
-        query: `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS})`
-      }
-    }
-  ]
 
   if (params.event) {
     must.push({
@@ -249,11 +31,162 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     })
   }
 
+  if (params.name) {
+    must.push({
+      multi_match: {
+        query: params.name,
+        fields: [
+          'childFirstNames',
+          'childFamilyName',
+          'motherFirstNames',
+          'motherFamilyName',
+          'fatherFirstNames',
+          'fatherFamilyName',
+          'informantFirstNames',
+          'informantFamilyName',
+          'deceasedFirstNames',
+          'deceasedFamilyName',
+          'spouseFirstNames',
+          'spouseFamilyName'
+        ],
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (params.registrationStatuses) {
+    must.push({
+      query_string: {
+        default_field: 'type',
+        query: isExternalSearch
+          ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS})`
+          : `(${params.registrationStatuses.join(') OR (')})`
+      }
+    })
+  }
+
+  if (
+    !params.dateOfEventStart &&
+    !params.dateOfEventEnd &&
+    params.dateOfEvent
+  ) {
+    must.push({
+      match: {
+        deathDate: params.dateOfEvent
+      }
+    })
+  }
+
+  if (params.dateOfEventStart || params.dateOfEventEnd) {
+    if (!params.dateOfEventStart) {
+      throw new Error(
+        'dateOfEventStart must be provided along with dateOfEventEnd'
+      )
+    }
+    if (!params.dateOfEventEnd) {
+      throw new Error(
+        'dateOfEventEnd must be provided along with dateOfEventStart'
+      )
+    }
+
+    must.push({
+      range: {
+        deathDate: {
+          gte: params.dateOfEventStart,
+          lte: params.dateOfEventEnd
+        }
+      }
+    })
+  }
+
+  if (
+    !params.dateOfRegistrationStart &&
+    !params.dateOfRegistrationEnd &&
+    params.dateOfRegistration
+  ) {
+    must.push({
+      match: {
+        dateOfDeclaration: params.dateOfRegistration
+      }
+    })
+  }
+
+  if (params.dateOfRegistrationStart || params.dateOfRegistrationEnd) {
+    if (!params.dateOfRegistrationStart) {
+      throw new Error(
+        'dateOfRegistrationStart  must be provided along with dateOfRegistrationEnd'
+      )
+    }
+
+    if (!params.dateOfRegistrationEnd) {
+      throw new Error(
+        'dateOfRegistrationEnd  must be provided along with dateOfRegistrationStart'
+      )
+    }
+
+    must.push({
+      range: {
+        dateOfDeclaration: {
+          gte: params.dateOfRegistrationStart,
+          lte: params.dateOfRegistrationEnd
+        }
+      }
+    })
+  }
+
+  if (params.declarationLocationId) {
+    must.push({
+      match: {
+        declarationLocationId: {
+          query: params.declarationLocationId,
+          boost: 2.0
+        }
+      }
+    })
+  }
+
+  if (params.declarationJurisdictionId) {
+    must.push({
+      match: {
+        declarationJurisdictionIds: {
+          query: params.declarationJurisdictionId,
+          boost: 2.0
+        }
+      }
+    })
+  }
+
   if (params.eventLocationId) {
     must.push({
       match: {
         eventLocationId: params.eventLocationId
       }
+    })
+  }
+
+  if (params.eventCountry) {
+    must.push({
+      match: {
+        eventCountry: params.eventCountry
+      }
+    })
+  }
+
+  const eventJurisdictionIds = [
+    params.eventLocationLevel1,
+    params.eventLocationLevel2,
+    params.eventLocationLevel3,
+    params.eventLocationLevel4,
+    params.eventLocationLevel5
+  ].filter((id) => Boolean(id))
+
+  if (eventJurisdictionIds.length > 0) {
+    eventJurisdictionIds.forEach((locationId) => {
+      must.push({
+        match: {
+          eventJurisdictionIds: locationId
+        }
+      })
     })
   }
 
@@ -271,16 +204,42 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     must.push({
       multi_match: {
         query: params.childLastName,
-        fields: 'childLastName',
+        fields: 'childFamilyName',
         fuzziness: 'AUTO'
       }
     })
   }
 
-  if (!params.dateOfEventStart && !params.dateOfEventEnd && params.childDoB) {
+  if (!params.childDoBStart && !params.childDoBEnd && params.childDoB) {
     must.push({
       match: {
         childDoB: params.childDoB
+      }
+    })
+  }
+
+  if (params.childDoBStart || params.childDoBEnd) {
+    if (!params.childDoBStart) {
+      throw new Error('childDoBStart must be provided along with childDoBEnd')
+    }
+    if (!params.childDoBEnd) {
+      throw new Error('childDoBEnd must be provided along with childDoBStart')
+    }
+
+    must.push({
+      range: {
+        childDoB: {
+          gte: params.childDoBStart,
+          lte: params.childDoBEnd
+        }
+      }
+    })
+  }
+
+  if (params.childGender) {
+    must.push({
+      match: {
+        gender: params.childGender
       }
     })
   }
@@ -305,46 +264,52 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     })
   }
 
-  if (!params.dateOfEventStart && !params.dateOfEventEnd && params.deathDate) {
+  if (params.deceasedGender) {
     must.push({
       match: {
-        deathDate: params.deathDate
+        gender: params.deceasedGender
       }
     })
   }
 
-  if (params.dateOfEventStart || params.dateOfEventEnd) {
-    if (!params.event) {
-      throw new Error('Event is required for date range search')
-    }
-    if (!params.dateOfEventStart) {
-      throw new Error(
-        'dateOfEventStart must be provided along with dateOfEventEnd'
-      )
-    }
-    if (!params.dateOfEventEnd) {
-      throw new Error(
-        'dateOfEventEnd must be provided along with dateOfEventStart'
-      )
-    }
+  if (
+    !params.deceasedDoBStart &&
+    !params.deceasedDoBEnd &&
+    params.deceasedDoB
+  ) {
+    must.push({
+      match: {
+        deceasedDoB: params.deceasedDoB
+      }
+    })
+  }
 
-    let fieldName
-    const eventWiseFieldName = {
-      Birth: 'childDoB',
-      Death: 'deathDate'
+  if (params.deceasedDoBStart || params.deceasedDoBEnd) {
+    if (!params.deceasedDoBStart) {
+      throw new Error(
+        'deceasedDoBStart must be provided along with deceasedDoBEnd'
+      )
     }
-    if (params.event in eventWiseFieldName) {
-      fieldName = eventWiseFieldName[params.event]
-    } else {
-      throw Error('Invalid Event. Valid events are: Birth, Death, etc.')
+    if (!params.deceasedDoBEnd) {
+      throw new Error(
+        'deceasedDoBEnd must be provided along with deceasedDoBStart'
+      )
     }
 
     must.push({
       range: {
-        [fieldName]: {
-          gte: params.dateOfEventStart,
-          lte: params.dateOfEventEnd
+        deceasedDoB: {
+          gte: params.deceasedDoBStart,
+          lte: params.deceasedDoBEnd
         }
+      }
+    })
+  }
+
+  if (params.deceasedIdentifier) {
+    must.push({
+      match: {
+        deceasedIdentifier: params.deceasedIdentifier
       }
     })
   }
@@ -369,10 +334,28 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     })
   }
 
-  if (params.motherDoB) {
+  if (!params.motherDoBStart && !params.motherDoBEnd && params.motherDoB) {
     must.push({
       match: {
         motherDoB: params.motherDoB
+      }
+    })
+  }
+
+  if (params.motherDoBStart || params.motherDoBEnd) {
+    if (!params.motherDoBStart) {
+      throw new Error('motherDoBStart must be provided along with motherDoBEnd')
+    }
+    if (!params.motherDoBEnd) {
+      throw new Error('motherDoBEnd must be provided along with motherDoBStart')
+    }
+
+    must.push({
+      range: {
+        motherDoB: {
+          gte: params.motherDoBStart,
+          lte: params.motherDoBEnd
+        }
       }
     })
   }
@@ -405,10 +388,28 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     })
   }
 
-  if (params.fatherDoB) {
+  if (!params.fatherDoBStart && !params.fatherDoBEnd && params.fatherDoB) {
     must.push({
       match: {
         fatherDoB: params.fatherDoB
+      }
+    })
+  }
+
+  if (params.fatherDoBStart || params.fatherDoBEnd) {
+    if (!params.fatherDoBStart) {
+      throw new Error('fatherDoBStart must be provided along with fatherDoBEnd')
+    }
+    if (!params.fatherDoBEnd) {
+      throw new Error('fatherDoBEnd must be provided along with fatherDoBStart')
+    }
+
+    must.push({
+      range: {
+        fatherDoB: {
+          gte: params.fatherDoBStart,
+          lte: params.fatherDoBEnd
+        }
       }
     })
   }
@@ -441,6 +442,48 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     })
   }
 
+  if (
+    !params.informantDoBStart &&
+    !params.informantDoBEnd &&
+    params.informantDoB
+  ) {
+    must.push({
+      match: {
+        informantDoB: params.informantDoB
+      }
+    })
+  }
+
+  if (params.informantDoBStart || params.informantDoBEnd) {
+    if (!params.informantDoBStart) {
+      throw new Error(
+        'informantDoBStart must be provided along with informantDoBEnd'
+      )
+    }
+    if (!params.informantDoBEnd) {
+      throw new Error(
+        'informantDoBEnd must be provided along with informantDoBStart'
+      )
+    }
+
+    must.push({
+      range: {
+        informantDoB: {
+          gte: params.informantDoBStart,
+          lte: params.informantDoBEnd
+        }
+      }
+    })
+  }
+
+  if (params.informantIdentifier) {
+    must.push({
+      match: {
+        informantIdentifier: params.informantIdentifier
+      }
+    })
+  }
+
   if (params.contactNumber) {
     must.push({
       match: {
@@ -465,64 +508,58 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     })
   }
 
-  if (
-    !params.dateOfRegistrationStart &&
-    !params.dateOfRegistrationEnd &&
-    params.dateOfRegistration
-  ) {
+  if (params.nationalId) {
     must.push({
-      match: {
-        dateOfRegistration: params.dateOfRegistration
+      bool: {
+        should: [
+          {
+            match: {
+              motherIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              fatherIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              informantIdentifier: params.nationalId
+            }
+          },
+          {
+            match: {
+              deceasedIdentifier: params.nationalId
+            }
+          }
+        ]
       }
     })
   }
 
-  if (params.dateOfRegistrationStart || params.dateOfRegistrationEnd) {
-    if (!params.dateOfRegistrationStart) {
-      throw new Error(
-        'dateOfRegistrationStart  must be provided along with dateOfRegistrationEnd'
-      )
-    }
-
-    if (!params.dateOfRegistrationEnd) {
-      throw new Error(
-        'dateOfRegistrationEnd  must be provided along with dateOfRegistrationStart'
-      )
-    }
-
+  if (createdBy) {
     must.push({
-      range: {
-        dateOfDeclaration: {
-          gte: params.dateOfRegistrationStart,
-          lte: params.dateOfRegistrationEnd
+      term: {
+        'createdBy.keyword': {
+          value: createdBy
         }
+      }
+    })
+  }
+
+  if (params.compositionType) {
+    must.push({
+      terms: {
+        'compositionType.keyword': params.compositionType
       }
     })
   }
 
   return {
     bool: {
-      must
+      must,
+      should
     }
-  }
-}
-
-function selectNameFields(fields: string): string[] {
-  switch (fields) {
-    case 'CHILD_FIRST':
-      return childFirstNameFields
-    case 'CHILD_FAMILY':
-      return childFamilyNameFields
-    case 'FATHER_FIRST':
-      return fatherFirstNameFields
-    case 'FATHER_FAMILY':
-      return fatherFamilyNameFields
-    case 'MOTHER_FIRST':
-      return motherFirstNameFields
-    case 'MOTHER_FAMILY':
-      return motherFamilyNameFields
-    default:
-      return allNameFields
   }
 }
 

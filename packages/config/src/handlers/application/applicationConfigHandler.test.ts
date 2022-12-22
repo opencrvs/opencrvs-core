@@ -62,6 +62,7 @@ const mockConfig = {
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
+  MINIO_URL: 'http://localhost:3535',
   API_GATEWAY_URL: 'http://localhost:7070/',
   PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040',
@@ -69,7 +70,8 @@ const mockConfig = {
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
   DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION,MUNICIPALITY',
   EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
-  ADDRESSES: 1
+  ADDRESSES: 1,
+  ADMIN_LEVELS: 2
 } as unknown as IApplicationConfigurationModel
 
 describe('applicationHandler', () => {

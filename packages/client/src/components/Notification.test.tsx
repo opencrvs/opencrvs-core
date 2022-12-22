@@ -13,7 +13,6 @@ import { createTestApp } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
 import * as actions from '@client/notification/actions'
-import * as i18nActions from '@client/i18n/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -28,46 +27,30 @@ describe('when app notifies the user', () => {
     store = testApp.store
   })
 
-  describe('When background Sync is triggered', () => {
+  describe('When user is reconnected', () => {
     beforeEach(() => {
-      const action = actions.showBackgroundSyncedNotification()
+      const action = actions.showUserReconnectedToast()
       store.dispatch(action)
       app.update()
     })
 
-    it('Should display the background synced notification', () => {
-      expect(
-        app.find('#backgroundSyncShowNotification').hostNodes()
-      ).toHaveLength(1)
+    it('Should display notification', () => {
+      expect(store.getState().notification.userReconnectedToast).toEqual(true)
     })
 
-    it('Should internationalizes background sync notification texts', async () => {
-      const action = i18nActions.changeLanguage({ language: 'bn' })
-      store.dispatch(action)
-
-      const label = app
-        .update()
-        .find('#backgroundSyncShowNotification')
-        .hostNodes()
-        .text()
-      expect(label).toBe(
-        'ইন্টারনেট সংযোগ ফিরে আসায় আমরা এখন আপনার দরখাস্তগুলো সিঙ্ক করতে পারবো'
-      )
-    })
-
-    describe('When user clicks the background sync notification', () => {
+    describe('When user clicks the close button', () => {
       beforeEach(() => {
         app
-          .find('#backgroundSyncShowNotificationCancel')
+          .find('#userOnlineReconnectedToastCancel')
           .hostNodes()
           .simulate('click')
         app.update()
       })
 
       it('Should hide the notification', () => {
-        expect(
-          store.getState().notification.backgroundSyncMessageVisible
-        ).toEqual(false)
+        expect(store.getState().notification.userReconnectedToast).toEqual(
+          false
+        )
       })
     })
   })

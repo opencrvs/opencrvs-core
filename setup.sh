@@ -96,13 +96,13 @@ echo
 echo "We will check your dependencies, build docker images, load and configure OpenCRVS. It takes a long time so please be patient and do not quit this process."
 echo
 sleep_if_non_ci 5
-echo "If we recognise that you have not installed a dependency correctly, we will display links to instructions you can follow on 3rd party websites. The links worked at the time of writing but may change. Please let us know on Gitter if you encounter any broken links."
+echo "If we recognise that you have not installed a dependency correctly, we will display links to instructions you can follow on 3rd party websites. The links worked at the time of writing but may change. Please let us know on GitHub discussions if you encounter any broken links."
 sleep_if_non_ci 5
 echo
 echo "Installing Docker and Node for example, is outside the scope of this script."
 sleep_if_non_ci 10
 echo
-echo "As part of this script, we checkout another GIT repo: The fictional Farajaland country configuration module into the folder next to this one called: 'opencrvs-farajaland'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should delete this folder and fork the config repo somewhere else."
+echo "As part of this script, we checkout another GIT repo: The fictional Farajaland country configuration module into the folder next to this one called: 'opencrvs-farajaland'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should follow our forking instructions at https://documentation.opencrvs.org."
 [ -d "../opencrvs-farajaland" ] && echo "Enter your password to delete the existing Farajaland country configuration to reset OpenCRVS to factory settings." && sudo rm -r ../opencrvs-farajaland
 
 sleep_if_non_ci 10
@@ -120,9 +120,9 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
 
   OS="UBUNTU"
   ubuntuVersion="$(grep -oP 'VERSION_ID="\K[\d.]+' /etc/os-release)"
-  ubuntuVersionTest=$(do_version_check $ubuntuVersion 18.04)
+  ubuntuVersionTest=$(do_version_check $ubuntuVersion 20.04)
   if [ "$ubuntuVersionTest" == "LOWER" ] ; then
-    echo "Sorry your Ubuntu version is not supported.  You must upgrade Ubuntu to 18.04 or 20.04"
+    echo "Sorry your Ubuntu version is not supported.  You must upgrade Ubuntu to 20.04"
     echo "Follow the instructions here: https://ubuntu.com/tutorials/upgrading-ubuntu-desktop#1-before-you-start"
     exit 1
   else
@@ -224,7 +224,16 @@ do
             echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:\033[0m"
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
             echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
+            echo
             echo "nvm install 14.18.0"
+            echo
+            echo "When the version is installed, us it:"
+            echo
+            echo "nvm use 14.18.1"
+            echo
+            echo "Finally set the version to be the default:"
+            echo
+            echo "nvm alias default 14.18.1"
         fi
         if [ $i == "yarn" ] ; then
            echo "You need to install the Yarn Package Manager for Node."
@@ -265,9 +274,8 @@ if [[ $(docker ps -aq) ]] ; then
   sleep_if_non_ci 5
 fi
 
-
 echo
-openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021)
+openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
 for x in "${openCRVSPorts[@]}"
 do
    :
@@ -287,13 +295,13 @@ echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED
 echo
 
 myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
-versionTest=$(do_version_check $myNodeVersion 14.17.0)
+versionTest=$(do_version_check $myNodeVersion 14.18.0)
 if [ "$versionTest" == "LOWER" ] ; then
   echo "Sorry your Node version is not supported.  You must upgrade Node to use a supported version."
-  echo "We recommend you install Node v.14.17.0, v.14.17.6, v14.18.0 or v14.18.1 as this release has been tested on those versions."
+  echo "We recommend you install Node v14.18.1 as this release has been tested on that version."
   echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
   echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
-  echo "nvm install 14.18.0"
+  echo "nvm install 14.18.1"
   exit 1
   else
     echo -e "Your Node version: $myNodeVersion is \033[32msupported!\033[0m :)"
@@ -339,6 +347,8 @@ mkdir -p data/mongo
 chmod 775 data/mongo
 mkdir -p data/influxdb
 chmod 775 data/influxdb
+mkdir -p data/minio
+chmod 775 data/minio
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
@@ -363,6 +373,7 @@ echo "wait-on tcp:9200" && wait-on -l tcp:9200
 echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
 echo "wait-on tcp:8086" && wait-on -l tcp:8086
+echo "wait-on tcp:3535" && wait-on -l tcp:3535
 
 
 set -- $(stty size) #$1=rows, $2=columns

@@ -1913,7 +1913,8 @@ export const mockFetchCertificatesTemplatesDefinition = [
 export const mockConfigResponse = {
   config: mockOfflineData.config,
   certificates: mockFetchCertificatesTemplatesDefinition,
-  formConfig: mockOfflineData.formConfig
+  formConfig: mockOfflineData.formConfig,
+  systems: mockOfflineData.systems
 }
 
 export const mockOfflineDataDispatch = {
@@ -1921,11 +1922,11 @@ export const mockOfflineDataDispatch = {
   templates: mockOfflineData.templates,
   locations: mockOfflineData.locations,
   facilities: mockOfflineData.facilities,
-  pilotLocations: mockOfflineData.pilotLocations,
   offices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
-  formConfig: mockOfflineData.formConfig
+  formConfig: mockOfflineData.formConfig,
+  systems: mockOfflineData.systems
 }
 
 export async function createTestStore() {
@@ -2387,8 +2388,8 @@ export const mockUserGraphqlOperation = {
                     },
                     required: true,
                     initialValue: '',
-                    searchableResource: 'facilities',
-                    searchableType: 'CRVS_OFFICE',
+                    searchableResource: ['facilities'],
+                    searchableType: ['CRVS_OFFICE'],
                     locationList: [],
                     validate: [
                       {

@@ -11,7 +11,7 @@ set -e
 DIR=$(cd "$(dirname "$0")"; pwd)
 
 echo
-echo -e "This command starts the OpenCRVS Core development environment, which consists of multiple NodeJS microservices running in parallel.  OpenCRVS requires a companion country configuration server to also be running. \n\nIf you ran our setup command, the fictional Farajaland country configuration server exists in the directory opencrvs-farajaland alongside this directory, otherwise you may have cloned or forked it somewhere else.\n\nSo, before we start...\n\n1. Copy this command: \033[32myarn dev \033[0m\n\n2. Create another terminal window.\n\n3. cd into your country config directory and prepare to paste the command, \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m, in order to start the country config server and be able to use OpenCRVS.\n\nYou know OpenCRVS Core is ready for you to start the country configuration server, when you see this message: \"\033[32m@opencrvs/client: Compiled with warnings.\033[0m\" followed by any NPM dependency warnings."
+echo -e "This command starts the OpenCRVS Core development environment, which consists of multiple NodeJS microservices running in parallel.  OpenCRVS requires a companion country configuration server to also be running. \n\nIf you ran our setup command, the fictional Farajaland country configuration server exists in the directory opencrvs-farajaland alongside this directory, otherwise you may have cloned or forked it somewhere else.\n\nSo, before we start...\n\n1. Copy this command: \033[32myarn dev \033[0m\n\n2. Create another terminal window.\n\n3. cd into your country config directory and prepare to run this command in that terminal window  \033[32myarn dev \033[0m\n\n2, \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m, in order to start the country config server and be able to use OpenCRVS.\n\nYou know OpenCRVS Core is ready for you to start the country configuration server, when you see this message: \"\033[32m@opencrvs/client: Compiled with warnings.\033[0m\" followed by any NPM dependency warnings."
 echo
 sleep 3
 
@@ -24,6 +24,7 @@ function ask_yes_or_no() {
         *)     echo "no" ;;
     esac
 }
+
 if [[ "no" == $(ask_yes_or_no "If you are ready to continue, type: yes.  If you dont know, type: no to exit.") ]]
 then
     echo -e "\n\nExiting OpenCRVS."
@@ -33,7 +34,28 @@ fi
 echo
 echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
 echo
-if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
+if [[ $(docker ps -aq) ]] ; then
+  docker stop $(docker ps -aq)
+  sleep 5
+fi
+
+
+echo
+openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
+for x in "${openCRVSPorts[@]}"
+do
+   :
+    if lsof -i:$x; then
+      echo -e "OpenCRVS thinks that port: $x is in use by another application.\r"
+      echo "You need to find out which application is using this port and quit the application."
+      echo "You can find out the application by running:"
+      echo "lsof -i:$x"
+      exit 1
+    else
+        echo -e "$x \033[32m port is available!\033[0m :)"
+    fi
+done
+
 
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
   OS="UBUNTU"

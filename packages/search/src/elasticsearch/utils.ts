@@ -83,8 +83,10 @@ export interface ICompositionBody {
   trackingId?: string
   registrationNumber?: string
   eventLocationId?: string
+  eventJurisdictionIds?: string[]
+  eventCountry?: string
   declarationLocationId?: string
-  declarationLocationHirarchyIds?: string[]
+  declarationJurisdictionIds?: string[]
   rejectReason?: string
   rejectComment?: string
   relatesTo?: string[]
@@ -122,6 +124,8 @@ export interface IBirthCompositionBody extends ICompositionBody {
   informantFamilyName?: string
   informantFirstNamesLocal?: string
   informantFamilyNameLocal?: string
+  informantDoB?: string
+  informantIdentifier?: string
 }
 
 export interface IDeathCompositionBody extends ICompositionBody {
@@ -129,6 +133,9 @@ export interface IDeathCompositionBody extends ICompositionBody {
   deceasedFamilyName?: string
   deceasedFirstNamesLocal?: string
   deceasedFamilyNameLocal?: string
+  deceasedDoB?: string
+  gender?: string
+  deceasedIdentifier?: string
   deathDate?: string
   motherFirstNames?: string
   motherFamilyName?: string
@@ -146,6 +153,8 @@ export interface IDeathCompositionBody extends ICompositionBody {
   informantFamilyName?: string
   informantFirstNamesLocal?: string
   informantFamilyNameLocal?: string
+  informantDoB?: string
+  informantIdentifier?: string
 }
 export interface IUserModelData {
   _id: string

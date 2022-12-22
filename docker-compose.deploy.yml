@@ -16,8 +16,12 @@ services:
   traefik:
     image: 'traefik:v2.8'
     ports:
-      - '80:80'
-      - '443:443'
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /data/traefik/acme.json:/acme.json
@@ -42,18 +46,13 @@ services:
     deploy:
       replicas: 1
       labels:
-        - 'traefik.http.routers.traefik.tls.certresolver=certResolver'
+        - 'traefik.http.services.traefik.loadbalancer.server.port=80'
         - 'traefik.http.middlewares.test-compress.compress=true'
       placement:
         constraints:
           - node.role == manager
     networks:
       - overlay_net
-    logging:
-      driver: gelf
-      options:
-        gelf-address: 'udp://127.0.0.1:12201'
-        tag: 'traefik'
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:7.17.0
 
@@ -77,6 +76,8 @@ services:
     restart: always
     deploy:
       mode: global
+      labels:
+        - 'traefik.enable=false'
     networks:
       - overlay_net
     configs:
@@ -112,6 +113,8 @@ services:
     networks:
       - overlay_net
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 1
       placement:
         constraints:
@@ -174,16 +177,16 @@ services:
       - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
       - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
       - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
+      - METRICS_MONGODB_PASSWORD=${METRICS_MONGODB_PASSWORD}
       - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
       - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     deploy:
       replicas: 1
+      labels:
+        - 'traefik.enable=false'
       placement:
         constraints:
           - node.labels.data1 == true
-    configs:
-      - source: mongo-init.{{ts}}
-        target: /docker-entrypoint-initdb.d/create-mongo-users.sh
     networks:
       - overlay_net
     logging:
@@ -198,6 +201,8 @@ services:
       - source: mongo-on-deploy.{{ts}}
         target: /on-deploy.sh
     deploy:
+      labels:
+        - traefik.enable=false
       replicas: 1
       restart_policy:
         condition: none
@@ -210,6 +215,7 @@ services:
       - USER_MGNT_MONGODB_PASSWORD=${USER_MGNT_MONGODB_PASSWORD}
       - HEARTH_MONGODB_PASSWORD=${HEARTH_MONGODB_PASSWORD}
       - CONFIG_MONGODB_PASSWORD=${CONFIG_MONGODB_PASSWORD}
+      - METRICS_MONGODB_PASSWORD=${METRICS_MONGODB_PASSWORD}
       - OPENHIM_MONGODB_PASSWORD=${OPENHIM_MONGODB_PASSWORD}
       - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     networks:
@@ -223,6 +229,9 @@ services:
   redis:
     networks:
       - overlay_net
+    deploy:
+      labels:
+        - traefik.enable=false
     logging:
       driver: gelf
       options:
@@ -235,6 +244,8 @@ services:
       - '/data/backups/elasticsearch:/data/backups/elasticsearch'
     deploy:
       replicas: 1
+      labels:
+        - 'traefik.enable=false'
       placement:
         constraints:
           - node.labels.data1 == true
@@ -257,6 +268,39 @@ services:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'elasticsearch'
 
+  # Configure elasticsearch
+  minio:
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_DOMAIN=minio.{{hostname}}
+      - MINIO_SERVER_URL=https://minio.{{hostname}}
+      - MINIO_BROWSER_REDIRECT_URL=https://minio-console.{{hostname}}
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - '/data/minio:/data'
+    command: server --console-address ":9001" /data
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        # Console
+        - 'traefik.http.routers.minio-console.rule=Host(`minio-console.{{hostname}}`)'
+        - 'traefik.http.routers.minio-console.entrypoints=websecure'
+        - 'traefik.http.routers.minio-console.tls.certresolver=certResolver'
+        - 'traefik.http.routers.minio-console.service=minio-console'
+        - 'traefik.http.services.minio-console.loadbalancer.server.port=9001'
+        # APi
+        - 'traefik.http.routers.minio.rule=Host(`minio.{{hostname}}`)'
+        - 'traefik.http.routers.minio.entrypoints=websecure'
+        - 'traefik.http.routers.minio.tls.certresolver=certResolver'
+        - 'traefik.http.routers.minio.service=minio'
+        - 'traefik.http.services.minio.loadbalancer.server.port=9000'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+    networks:
+      - overlay_net
+
   setup-elasticsearch-users:
     image: ubuntu:bionic
     entrypoint: ['bash', '/usr/app/setup.sh']
@@ -277,6 +321,8 @@ services:
     networks:
       - overlay_net
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 1
       placement:
         constraints:
@@ -295,6 +341,8 @@ services:
     networks:
       - overlay_net
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 1
       placement:
         constraints:
@@ -327,6 +375,8 @@ services:
       - overlay_net
     restart: always
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 2
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.15.2
@@ -341,6 +391,8 @@ services:
     networks:
       - overlay_net
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 2
     command:
       [
@@ -372,6 +424,8 @@ services:
       - '/data/backups/influxdb:/data/backups/influxdb'
     deploy:
       replicas: 1
+      labels:
+        - 'traefik.enable=false'
       placement:
         constraints:
           - node.labels.data1 == true
@@ -387,11 +441,13 @@ services:
     environment:
       - COUNTRY_CONFIG_URL=https://countryconfig.{{hostname}}
       - HOST={{hostname}}
+      - MINIO_URL=https://minio.{{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
         - 'traefik.http.routers.client.rule=Host(`register.{{hostname}}`,`{{hostname}}`)'
         - 'traefik.http.routers.client.middlewares=test-replacepathregex'
+        - 'traefik.http.routers.client.service=client'
         - 'traefik.http.services.client.loadbalancer.server.port=80'
         - 'traefik.http.routers.client.tls=true'
         - 'traefik.http.routers.client.tls.certresolver=certResolver'
@@ -534,9 +590,12 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
+      - RECORD_SEARCH_QUOTA=2000
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://user-mgnt:${USER_MGNT_MONGODB_PASSWORD}@mongo1/user-mgnt?replicaSet=rs0
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 2
     networks:
       - overlay_net
@@ -553,6 +612,8 @@ services:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       replicas: 2
+      labels:
+        - 'traefik.enable=false'
     networks:
       - overlay_net
     logging:
@@ -597,6 +658,8 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 2
     networks:
       - overlay_net
@@ -613,6 +676,8 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 2
     networks:
       - overlay_net
@@ -627,7 +692,11 @@ services:
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - MONGO_URL=mongodb://metrics:${METRICS_MONGODB_PASSWORD}@mongo1/metrics?replicaSet=rs0
+      - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 2
     networks:
       - overlay_net
@@ -636,6 +705,40 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'metrics'
+  scheduler:
+    deploy:
+      replicas: 1
+      labels:
+        - 'traefik.enable=false'
+    networks:
+      - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'scheduler'
+  documents:
+    deploy:
+      replicas: 1
+      labels:
+        - 'traefik.enable=false'
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - APN_SERVICE_URL=http://apm-server:8200
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - MINIO_BUCKET=ocrvs
+    networks:
+      - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'documents'
   config:
     secrets:
       - jwt-public-key.{{ts}}
@@ -669,9 +772,19 @@ services:
         tag: 'config'
   migration:
     environment:
+      - USER_MGNT_MONGO_URL=mongodb://user-mgnt:${USER_MGNT_MONGODB_PASSWORD}@mongo1/user-mgnt?replicaSet=rs0
+      - APPLICATION_CONFIG_MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1/application-config?replicaSet=rs0
       - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
       - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
+      - ES_HOST=search-user:${ROTATING_SEARCH_ELASTIC_PASSWORD}@elasticsearch:9200
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - MINIO_BUCKET=ocrvs
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -690,6 +803,8 @@ services:
     depends_on:
       - mongo1
     deploy:
+      labels:
+        - 'traefik.enable=false'
       replicas: 2
     secrets:
       - jwt-public-key.{{ts}}
@@ -722,12 +837,20 @@ services:
         - 'traefik.http.routers.openhimapi.tls.certresolver=certResolver'
         - 'traefik.http.services.openhimapi.loadbalancer.server.scheme=https'
 
-        - 'traefik.http.routers.api.rule=Host(`api.{{hostname}}`)'
-        - 'traefik.http.routers.api.tls=true'
-        - 'traefik.http.routers.api.service=api'
-        - 'traefik.http.routers.api.tls.certresolver=certResolver'
-        - 'traefik.http.routers.api.entrypoints=web,websecure'
-        - 'traefik.http.services.api.loadbalancer.server.port=5001'
+        # To expose OpenHIM to external systems as an interoperability layer
+        # Given OpenCRVS has it's own integrations UI and control.  This functionality is currently disabled
+        # If you wish to reopen OpenHIM interoperability, you can enable these lines
+        # Any subdomain labelled "api" is regularly spammed and can lead to DDOS attack
+        # Care must be taken to whitelist any access to this endpoint
+
+        # - 'traefik.http.routers.api.rule=Host(`api.{{hostname}}`)'
+        # - 'traefik.http.routers.api.tls=true'
+        # - 'traefik.http.routers.api.service=api'
+        # - 'traefik.http.routers.api.tls.certresolver=certResolver'
+        # - 'traefik.http.routers.api.entrypoints=web,websecure'
+        # - 'traefik.http.services.api.loadbalancer.server.port=5001'
+        # - 'traefik.http.middlewares.openhimapi-whitelist.ipwhitelist.sourcerange=<Comma separated IP list>'
+        # - "traefik.http.routers.openhimapi.middlewares=openhimapi-whitelist@docker"
 
         - 'traefik.docker.network=opencrvs_overlay_net'
 
@@ -777,11 +900,11 @@ services:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.webhook.rule=Host(`webhook.{{hostname}}`)'
-        - 'traefik.http.services.webhook.loadbalancer.server.port=2525'
-        - 'traefik.http.routers.webhook.tls=true'
-        - 'traefik.http.routers.webhook.tls.certresolver=certResolver'
-        - 'traefik.http.routers.webhook.entrypoints=web,websecure'
+        - 'traefik.http.routers.webhooks.rule=Host(`webhooks.{{hostname}}`)'
+        - 'traefik.http.services.webhooks.loadbalancer.server.port=2525'
+        - 'traefik.http.routers.webhooks.tls=true'
+        - 'traefik.http.routers.webhooks.tls.certresolver=certResolver'
+        - 'traefik.http.routers.webhooks.entrypoints=web,websecure'
         - 'traefik.docker.network=opencrvs_overlay_net'
         - 'traefik.http.middlewares.webhooks.headers.customresponseheaders.Pragma=no-cache'
         - 'traefik.http.middlewares.webhooks.headers.customresponseheaders.Cache-control=no-store'
@@ -811,8 +934,6 @@ configs:
     file: ./infrastructure/hearth-queryparam-extensions.json
   metricbeat-conf.{{ts}}:
     file: ./infrastructure/monitoring/beats/metricbeat.yml
-  mongo-init.{{ts}}:
-    file: ./infrastructure/mongodb/docker-entrypoint-initdb.d/create-mongo-users.sh
   mongo-on-deploy.{{ts}}:
     file: ./infrastructure/mongodb/on-deploy.sh
   metricbeat-rollover-policy.{{ts}}:

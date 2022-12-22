@@ -59,7 +59,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { GQLHumanName, GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
 import {
@@ -84,6 +84,7 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query as QueryType, User } from '@client/utils/gateway'
+import { Link } from '@opencrvs/components'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -113,9 +114,6 @@ const Loading = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     height: calc(100vh - 104px);
   }
-`
-const LinkButtonWithoutSpacing = styled(LinkButton)`
-  height: auto !important;
 `
 
 const StatusBox = styled.div`
@@ -237,11 +235,6 @@ type IProps = BaseProps &
 
 interface IStatusProps {
   status: string
-}
-
-interface ToggleModal {
-  modalVisible: boolean
-  selectedUser: User | null
 }
 
 interface ToggleModal {
@@ -613,12 +606,12 @@ function UserListComponent(props: IProps) {
             return {
               image: <AvatarSmall name={name} avatar={avatar || undefined} />,
               label: (
-                <LinkButtonWithoutSpacing
+                <Link
                   id="profile-link"
                   onClick={() => goToUserProfile(String(user.id))}
                 >
                   {name}
-                </LinkButtonWithoutSpacing>
+                </Link>
               ),
               value: <Value>{role}</Value>,
               actions: (

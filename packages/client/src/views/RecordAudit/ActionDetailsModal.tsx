@@ -32,7 +32,12 @@ import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { isEmpty, find, flatten, values } from 'lodash'
-import { getFieldValue, getFormattedDate, getStatusLabel } from './utils'
+import {
+  getFieldValue,
+  getFormattedDate,
+  getStatusLabel,
+  isSystemInitiated
+} from './utils'
 import {
   CollectorRelationLabelArray,
   CorrectorRelationLabelArray,
@@ -103,7 +108,11 @@ function prepareComments(
   actionDetailsData: History,
   draft: IDeclaration | null
 ) {
-  if (!draft || actionDetailsData.action === RegAction.Downloaded) {
+  if (
+    !draft ||
+    (actionDetailsData.action &&
+      actionDetailsData.action !== RegAction.RequestedCorrection)
+  ) {
     return []
   }
 
@@ -400,6 +409,7 @@ export const ActionDetailsModalListTable = ({
     <>
       {/* For Reject Reason */}
       {actionDetailsData.reason &&
+        !actionDetailsData.action &&
         actionDetailsData.regStatus === RegStatus.Rejected && (
           <Table
             noResultText=" "
@@ -415,16 +425,18 @@ export const ActionDetailsModalListTable = ({
         )}
 
       {/* Correction Requester */}
-      {actionDetailsData.requester && (
-        <Table
-          noResultText=" "
-          columns={requesterColumn}
-          content={[{ requester: requesterLabel }]}
-        />
-      )}
+      {actionDetailsData.requester &&
+        actionDetailsData.action === RegAction.RequestedCorrection && (
+          <Table
+            noResultText=" "
+            columns={requesterColumn}
+            content={[{ requester: requesterLabel }]}
+          />
+        )}
 
       {/* Correction Requester Id Verified */}
-      {actionDetailsData.requester !== CorrectorRelationship.ANOTHER_AGENT &&
+      {actionDetailsData.action === RegAction.RequestedCorrection &&
+        actionDetailsData.requester !== CorrectorRelationship.ANOTHER_AGENT &&
         actionDetailsData.requester !== CorrectorRelationship.REGISTRAR && (
           <Table
             noResultText=" "
@@ -470,17 +482,19 @@ export const ActionDetailsModalListTable = ({
       )}
 
       {/* For Data Updated */}
-      {declarationUpdates.length > 0 && (
-        <Table
-          noResultText=" "
-          columns={declarationUpdatedColumns}
-          content={declarationUpdates}
-          pageSize={10}
-          totalItems={declarationUpdates.length}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
+      {declarationUpdates.length > 0 &&
+        (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.regStatus === RegStatus.DeclarationUpdated) && (
+          <Table
+            noResultText=" "
+            columns={declarationUpdatedColumns}
+            content={declarationUpdates}
+            pageSize={10}
+            totalItems={declarationUpdates.length}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
 
       {/* For Certificate */}
       {!isEmpty(collectorData) && (
@@ -544,7 +558,7 @@ export const ActionDetailsModal = ({
 
   let userName = ''
 
-  if (!actionDetailsData.dhis2Notification) {
+  if (!isSystemInitiated(actionDetailsData)) {
     const nameObj = actionDetailsData?.user?.name
       ? getIndividualNameObj(
           actionDetailsData.user.name as GQLHumanName[],
@@ -555,7 +569,9 @@ export const ActionDetailsModal = ({
       ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
       : ''
   } else {
-    userName = intl.formatMessage(userMessages.healthSystem)
+    userName =
+      actionDetailsData.system?.name ??
+      intl.formatMessage(userMessages.healthSystem)
   }
 
   return (

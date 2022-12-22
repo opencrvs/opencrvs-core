@@ -35,6 +35,7 @@ const config = {
   CONFIG_API_URL: 'http://localhost:2021',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
+  MINIO_URL: 'http://localhost:3535',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
   BIRTH: {
@@ -64,7 +65,8 @@ const config = {
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   NID_NUMBER_PATTERN: /^[0-9]{9}$/,
   PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
-  ADDRESSES: 1
+  ADDRESSES: 1,
+  ADMIN_LEVELS: 2
 }
 
 vi.stubGlobal('config', config)
@@ -158,7 +160,6 @@ vi.doMock(
     referenceApi: {
       loadLocations: () => Promise.resolve(mockOfflineData.locations),
       loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
-      loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
       loadContent: () =>
         Promise.resolve({
           languages: mockOfflineData.languages

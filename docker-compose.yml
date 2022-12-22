@@ -41,6 +41,7 @@ services:
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
       - FHIR_URL=http://openhim-core:5001/fhir
+      - HEARTH_URL=http://hearth:3447/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
@@ -50,6 +51,8 @@ services:
       - WORKFLOW_URL=http://workflow:5050/
       - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
+      - MINIO_BUCKET=ocrvs
+      - DOCUMENTS_URL=http://documents:9050
   # User facing services
   workflow:
     image: opencrvs/ocrvs-workflow:${VERSION:-latest}
@@ -90,9 +93,19 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - CONFIG_API_URL=http://config:2021
       - FHIR_URL=http://openhim-core:5001/fhir
+      - MONGO_URL=mongodb://mongo1/metrics
+      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
+      - DOCUMENTS_URL=http://documents:9050
   # END User facing services
+  scheduler:
+    image: opencrvs/ocrvs-scheduler:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/scheduler/Dockerfile
+    environment:
+      - METRICS_URL=http://metrics:1050
   auth:
     image: opencrvs/ocrvs-auth:${VERSION:-latest}
     build:
@@ -150,12 +163,15 @@ services:
     restart: unless-stopped
     environment:
       - AUTH_URL=http://auth:4040
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config
       - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+      - GATEWAY_URL=http://gateway:7070
       - CHECK_INVALID_TOKEN=true
   migration:
     image: opencrvs/ocrvs-migration:${VERSION:-latest}
@@ -164,9 +180,20 @@ services:
       dockerfile: ./packages/migration/Dockerfile
     restart: unless-stopped
     environment:
+      - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
+      - APPLICATION_CONFIG_MONGO_URL=mongodb://mongo1/application-config
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
+      - ES_HOST=elasticsearch:9200
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
-      - WAIT_HOSTS=mongo1:27017,influxdb:8086
+      - WAIT_HOSTS=mongo1:27017,influxdb:8086,minio:9000,elasticsearch:9200
+  documents:
+    image: opencrvs/ocrvs-documents:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/documents/Dockerfile
+    restart: unless-stopped
+    environment:
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040

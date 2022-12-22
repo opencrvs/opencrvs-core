@@ -45,8 +45,10 @@ import {
   ASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL
+  REINSTATED_EXTENSION_URL,
+  VIEWED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
+import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
@@ -75,11 +77,13 @@ export enum Events {
   DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
   DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
+  DECLARATION_UPDATED = '/events/declaration-updated', // Registration agent or registrar updating declaration before validating/registering
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   DOWNLOADED = '/events/downloaded',
   ASSIGNED_EVENT = '/events/assigned',
   UNASSIGNED_EVENT = '/events/unassigned',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
+  VIEWED = '/events/viewed'
 }
 
 function detectEvent(request: Hapi.Request): Events {
@@ -194,6 +198,9 @@ function detectEvent(request: Hapi.Request): Events {
     if (hasExtension(taskResource, DOWNLOADED_EXTENSION_URL)) {
       return Events.DOWNLOADED
     }
+    if (hasExtension(taskResource, VIEWED_EXTENSION_URL)) {
+      return Events.VIEWED
+    }
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
       if (isRejectedTask(taskResource)) {
@@ -231,7 +238,6 @@ export async function fhirWorkflowEventHandler(
 ) {
   const event = detectEvent(request)
   logger.info(`Event detected: ${event}`)
-
   // Unknown event are allowed through to Hearth by default.
   // We can restrict what resources can be used in Hearth directly if necessary
   if (
@@ -239,6 +245,10 @@ export async function fhirWorkflowEventHandler(
     !isUserAuthorized(request.auth.credentials.scope, event)
   ) {
     return h.response().code(401)
+  }
+
+  if (event != Events.UNKNOWN) {
+    setupSystemIdentifier(request)
   }
 
   let response
@@ -415,7 +425,9 @@ export async function fhirWorkflowEventHandler(
       )
       break
     case Events.DOWNLOADED:
+    case Events.VIEWED:
       response = await actionEventHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.ASSIGNED_EVENT:
     case Events.UNASSIGNED_EVENT:

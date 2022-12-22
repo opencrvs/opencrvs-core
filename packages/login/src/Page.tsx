@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { applicationConfigLoadAction } from './login/actions'
 import { changeLanguage, loadLanguages } from './i18n/actions'
 import {
@@ -18,9 +18,19 @@ import {
   retrieveLanguage,
   useSearchQuery
 } from './i18n/utils'
+import { selectApplicationName } from './login/selectors'
 
 type IProps = {
   children: React.ReactNode
+}
+
+function useDocumentTitle() {
+  const applicationName = useSelector(selectApplicationName)
+  React.useEffect(() => {
+    if (applicationName) {
+      document.title = applicationName
+    }
+  }, [applicationName])
 }
 
 function useLoadConfigurations() {
@@ -48,6 +58,7 @@ function useSyncLanguage() {
 export function Page({ children }: IProps) {
   useLoadConfigurations()
   useSyncLanguage()
+  useDocumentTitle()
 
   return <>{children}</>
 }

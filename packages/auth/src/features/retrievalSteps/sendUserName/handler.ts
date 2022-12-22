@@ -62,13 +62,19 @@ export default async function sendUserNameHandler(
       retrievalStepInformation.username
     )
   }
-  await postUserActionToMetrics(
-    'USERNAME_REMINDER',
-    request.headers.authorization,
-    remoteAddress,
-    userAgent,
-    retrievalStepInformation.practitionerId
-  )
+
+  try {
+    await postUserActionToMetrics(
+      'USERNAME_REMINDER',
+      request.headers.authorization,
+      remoteAddress,
+      userAgent,
+      retrievalStepInformation.practitionerId
+    )
+  } catch (err) {
+    logger.error(err.message)
+  }
+
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)
 }

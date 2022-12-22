@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { MINIO_BUCKET } from '@gateway/constants'
 import {
   GQLAttachmentInput,
   GQLBirthRegistrationInput,
@@ -20,6 +21,12 @@ export async function validateAttachments(
   attachments: Array<{ data: string }>
 ) {
   for (const file of attachments) {
+    const isMinioUrl =
+      file.data.split('/').length > 1 &&
+      file.data.split('/')[1] === MINIO_BUCKET
+    if (isMinioUrl) {
+      continue
+    }
     const data = file.data.split('base64,')?.[1] || ''
     const mime = file.data.split(';')[0].replace('data:', '')
 

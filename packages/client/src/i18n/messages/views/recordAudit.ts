@@ -208,13 +208,19 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
   },
   [RegAction.Reinstated]: {
     id: 'recordAudit.regAction.reinstated',
-    defaultMessage: 'Reinstated to {regStatus}',
+    defaultMessage:
+      'Reinstated to {regStatus, select, validated{ready for review} in_progress{in progress} declared{ready for review} rejected{requires updates} other{}}',
     description: 'Reinstated action'
   },
   [RegAction.RequestedCorrection]: {
     id: 'recordAudit.regAction.requestedCorrection',
     defaultMessage: 'Requested Correction',
     description: 'Requested Correction action'
+  },
+  [RegAction.Viewed]: {
+    id: 'recordAudit.regAction.viewed',
+    defaultMessage: 'Viewed',
+    description: 'Viewed Record action'
   }
 }
 

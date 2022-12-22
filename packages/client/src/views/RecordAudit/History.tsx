@@ -9,17 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import React from 'react'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
-import { getFormattedDate, getPageItems, getStatusLabel } from './utils'
+import {
+  getFormattedDate,
+  getPageItems,
+  getStatusLabel,
+  isSystemInitiated
+} from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
 import { AvatarSmall } from '@client/components/Avatar'
@@ -28,7 +31,9 @@ import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, RegStatus } from '@client/utils/gateway'
+import { History, RegStatus, SystemType } from '@client/utils/gateway'
+import { Link } from '@opencrvs/components'
+import { integrationMessages } from '@client/i18n/messages/views/integrations'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -55,23 +60,6 @@ const NameAvatar = styled.div`
   }
 `
 
-export const GetLink = ({
-  status,
-  onClick
-}: {
-  status: string
-  disabled?: boolean
-  onClick: () => void
-}) => {
-  return (
-    <>
-      <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
-        {status}
-      </LinkButton>
-    </>
-  )
-}
-
 const HealthSystemLogo = styled.div`
   border-radius: 100%;
   width: 40px;
@@ -83,18 +71,14 @@ const HealthSystemLogo = styled.div`
   background-color: ${({ theme }) => theme.colors.grey200};
 `
 
-const HealthSystemLocation = styled.p`
-  ${({ theme }) => theme.fonts.reg16}
-`
-
-function HealthSystemUser() {
+function HealthSystemUser({ name }: { name?: string }) {
   const intl = useIntl()
   return (
     <NameAvatar>
       <HealthSystemLogo>
         <Box />
       </HealthSystemLogo>
-      <span>{intl.formatMessage(userMessages.healthSystem)}</span>
+      <span>{name ?? intl.formatMessage(userMessages.healthSystem)}</span>
     </NameAvatar>
   )
 }
@@ -123,6 +107,13 @@ const GetNameWithAvatar = ({
   )
 }
 
+function getSystemType(type: string | undefined) {
+  if (type === SystemType.RecordSearch) {
+    return integrationMessages.recordSearch
+  }
+  return integrationMessages.healthSystem
+}
+
 const getIndexByAction = (histories: any, index: number): number => {
   const newHistories = [...histories]
   newHistories.map((item) => {
@@ -148,6 +139,7 @@ export const GetHistory = ({
   userDetails
 }: CMethodParams & {
   toggleActionDetails: (actionItem: History, index?: number) => void
+  goToUserProfile: (user: string) => void
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
@@ -204,53 +196,69 @@ export const GetHistory = ({
     DEFAULT_HISTORY_RECORD_PAGE_SIZE,
     sortedHistory
   )
-
   const historyData = (historiesForDisplay as History[]).map((item, index) => ({
     date: getFormattedDate(item?.date),
     action: (
-      <GetLink
-        status={getStatusLabel(
+      <Link
+        font="bold14"
+        onClick={() => {
+          const actionIndex = getIndexByAction(historiesForDisplay, index)
+          toggleActionDetails(item, actionIndex)
+        }}
+      >
+        {getStatusLabel(
           item.action,
           item.regStatus,
           intl,
           item.user,
           userDetails
         )}
-        onClick={() => {
-          const actionIndex = getIndexByAction(historiesForDisplay, index)
-          toggleActionDetails(item, actionIndex)
-        }}
-      />
+      </Link>
     ),
-    user:
-      item.dhis2Notification && !item.user?.id ? (
-        <HealthSystemUser />
-      ) : (
-        <GetNameWithAvatar
-          id={item?.user?.id as string}
-          nameObject={item?.user?.name as (GQLHumanName | null)[]}
-          avatar={item.user?.avatar as IAvatar}
-          language={window.config.LANGUAGES}
-        />
-      ),
+    user: (
+      <>
+        {isSystemInitiated(item) ? (
+          <HealthSystemUser name={item.system?.name} />
+        ) : isFieldAgent ? (
+          <GetNameWithAvatar
+            id={item?.user?.id as string}
+            nameObject={item?.user?.name as (GQLHumanName | null)[]}
+            avatar={item.user?.avatar as IAvatar}
+            language={window.config.LANGUAGES}
+          />
+        ) : (
+          <Link
+            id="profile-link"
+            font="bold14"
+            onClick={() => goToUserProfile(String(item?.user?.id))}
+          >
+            <GetNameWithAvatar
+              id={item?.user?.id as string}
+              nameObject={item?.user?.name as (GQLHumanName | null)[]}
+              avatar={item.user?.avatar as IAvatar}
+              language={window.config.LANGUAGES}
+            />
+          </Link>
+        )}
+      </>
+    ),
     type: intl.formatMessage(
-      (item.dhis2Notification && !item.user?.role) || null === item.user?.role
-        ? userMessages.healthSystem
-        : userMessages[item?.user?.role as string]
+      isSystemInitiated(item) || !item.user?.role
+        ? getSystemType(item.system?.type)
+        : userMessages[item.user.role]
     ),
-    location:
-      item.dhis2Notification && !item.user?.role ? (
-        <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
-      ) : isFieldAgent ? (
-        <>{item.office?.name}</>
-      ) : (
-        <GetLink
-          status={item.office?.name as string}
-          onClick={() => {
-            goToTeamUserList && goToTeamUserList(item?.office?.id as string)
-          }}
-        />
-      )
+    location: isSystemInitiated(item) ? null : isFieldAgent ? (
+      <>{item.office?.name}</>
+    ) : (
+      <Link
+        font="bold14"
+        onClick={() => {
+          goToTeamUserList && goToTeamUserList(item?.office?.id as string)
+        }}
+      >
+        {item.office?.name as string}
+      </Link>
+    )
   }))
 
   const columns = [
