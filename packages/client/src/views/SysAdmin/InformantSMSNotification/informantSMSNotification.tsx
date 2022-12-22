@@ -123,49 +123,21 @@ const InformantNotification = () => {
   const [notificationStatus, setNotificationStatus] =
     React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 
-  const notificationsState = [
-    {
-      name: 'birthInProgressSMS',
-      enabled: informantSMSNotificationState.birthInProgressSMS
-    },
-    {
-      name: 'birthDeclarationSMS',
-      enabled: informantSMSNotificationState.birthDeclarationSMS
-    },
-    {
-      name: 'birthRegistrationSMS',
-      enabled: informantSMSNotificationState.birthRegistrationSMS
-    },
-    {
-      name: 'birthRejectionSMS',
-      enabled: informantSMSNotificationState.birthRejectionSMS
-    },
-    {
-      name: 'deathInProgressSMS',
-      enabled: informantSMSNotificationState.deathInProgressSMS
-    },
-    {
-      name: 'deathDeclarationSMS',
-      enabled: informantSMSNotificationState.deathDeclarationSMS
-    },
-    {
-      name: 'deathRegistrationSMS',
-      enabled: informantSMSNotificationState.deathRegistrationSMS
-    },
-    {
-      name: 'deathRejectionSMS',
-      enabled: informantSMSNotificationState.deathRejectionSMS
-    }
-  ]
+  const notificationsState = Object.entries(informantSMSNotificationState).map(
+    ([name, enabled]) => ({
+      name,
+      enabled
+    })
+  )
 
   const tabSections = [
     {
       id: Event.Birth,
-      title: intl.formatMessage(messages.birthTabTitleExport)
+      title: intl.formatMessage(constantsMessages.births)
     },
     {
       id: Event.Death,
-      title: intl.formatMessage(messages.deathTabTitleExport)
+      title: intl.formatMessage(constantsMessages.deaths)
     }
   ]
 
@@ -194,6 +166,8 @@ const InformantNotification = () => {
       setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     },
     async onCompleted() {
+      console.log('here')
+
       await refetch()
       setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     }
@@ -213,6 +187,7 @@ const InformantNotification = () => {
         }
       }
     )
+
     await informantSMSNotificationshResult({
       variables: {
         smsNotifications:
@@ -295,7 +270,7 @@ const InformantNotification = () => {
               />
               <Action>
                 <Button
-                  id="confirm_form"
+                  id="save"
                   type="primary"
                   onClick={async () => {
                     setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
