@@ -26,7 +26,7 @@ import {
   goToEventInfo
 } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, dynamicConstantsMessages } from '@client/i18n/messages'
 import {
   PAGE_TRANSITIONS_CLASSNAME,
   PAGE_TRANSITIONS_ENTER_TIME,
@@ -139,30 +139,25 @@ class SelectVitalEventView extends React.Component<
               </ErrorText>
             )}
             <Actions id="select_vital_event_view">
-              <RadioButton
-                size="large"
-                key="birthevent"
-                name="birthevent"
-                label={intl.formatMessage(constantsMessages.birth)}
-                value="birth"
-                id="select_birth_event"
-                selected={this.state.goTo === 'birth' ? 'birth' : ''}
-                onChange={() =>
-                  this.setState({ goTo: 'birth', noEventSelectedError: false })
-                }
-              />
-              <RadioButton
-                size="large"
-                key="deathevent"
-                name="deathevent"
-                label={intl.formatMessage(constantsMessages.death)}
-                value="death"
-                id="select_death_event"
-                selected={this.state.goTo === 'death' ? 'death' : ''}
-                onChange={() =>
-                  this.setState({ goTo: 'death', noEventSelectedError: false })
-                }
-              />
+              {['birth', 'death', 'marriage', 'divorce', 'adoption'].map(
+                (event) => (
+                  <RadioButton
+                    size="large"
+                    key={event}
+                    name={`${event}event`}
+                    label={intl.formatMessage(dynamicConstantsMessages[event])}
+                    value={event}
+                    id={`select_${event}_event`}
+                    selected={this.state.goTo === event ? event : ''}
+                    onChange={() =>
+                      this.setState({
+                        goTo: event,
+                        noEventSelectedError: false
+                      })
+                    }
+                  />
+                )
+              )}
             </Actions>
             <PrimaryButton id="continue" onClick={this.handleContinue}>
               {intl.formatMessage(buttonMessages.continueButton)}
