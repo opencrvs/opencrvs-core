@@ -1,0 +1,187 @@
+import styled from 'styled-components'
+import { Meta, Source, Canvas, Story } from '@storybook/addon-docs'
+import { SecondaryButton } from '../buttons'
+import { useState } from 'react'
+import { Toast } from './Toast'
+
+export const ToastToggler = ({ type, dismissable, actionable, children }) => {
+  const [isVisible, setVisible] = useState(false)
+  return (
+    <>
+      <SecondaryButton onClick={() => setVisible(!isVisible)}>
+        {isVisible ? 'Close' : 'Open'}
+      </SecondaryButton>
+      {isVisible && (
+        <Toast
+          type={type}
+          onClose={() => setVisible(false)}
+          onActionClick={actionable ? () => alert('Retried') : undefined}
+          actionText="Retry"
+        >
+          {children}
+        </Toast>
+      )}
+    </>
+  )
+}
+
+<Meta title="Data/Toast" component={Toast} />
+
+# Toast
+
+Toast is a message that pop ups from the bottom of the interface on a desktop, and from the top of the interface on mobile. It provides feedback on the outcome of an action.
+Toast can be used inside any view, it doesn't have to be on the application root level element.
+
+Toast automatically closes after 8 seconds, unless `timeout` -prop is set to `null`.
+
+## Success
+
+<br />
+
+<Story name="Success" storyName="Success">
+  <ToastToggler type="success">Hello! I'm a success toast</ToastToggler>
+</Story>
+
+<Source
+  dark
+  code={`
+{isVisible && (
+  <Toast type="success" onClose={() => setVisible(false)}>
+    Hello! I'm a success toast
+  </Toast>
+)}`}
+/>
+
+## Warning
+
+<br />
+
+<Story name="Warning" storyName="Warning">
+  <ToastToggler type="warning">Hello! I'm a warning toast</ToastToggler>
+</Story>
+
+<Source
+  dark
+  code={`
+{isVisible && (
+  <Toast type="warning" onClose={() => setVisible(false)}>
+  Hello! I'm a warning toast
+  </Toast>
+)}`}
+/>
+
+## Error
+
+<br />
+
+<Story name="Error" storyName="Error">
+  <ToastToggler type="error">Hello! I'm a error toast</ToastToggler>
+</Story>
+
+<Source
+  dark
+  code={`
+{isVisible && (
+  <Toast type="error" onClose={() => setVisible(false)}>
+    Hello! I'm an error toast
+  </Toast>
+)}`}
+/>
+
+## Loading
+
+Loading toasts cannot be dismissed.
+
+<Story name="Loading" storyName="Loading">
+  <ToastToggler type="loading">Hello! I'm a loading toast</ToastToggler>
+</Story>
+
+<Source
+  dark
+  code={`
+<Toast type="loading">
+  Hello! I'm a loading toast
+</Toast>
+`}
+/>
+
+## With action
+
+<br />
+
+<Story name="With Action" storyName="With Action">
+  <ToastToggler type="error" actionable>
+    Hello! I'm a toast with action button
+  </ToastToggler>
+</Story>
+
+<Source
+  dark
+  code={`
+{isVisible && (
+  <Toast
+    type="success"
+    onActionClick={() => alert('Retried')}
+    actionText="Retry"
+  >
+    Hello! I'm a toast with an action button
+  </Toast>
+)}
+    `}
+/>
+
+## With action and dismiss
+
+<br />
+
+<Story name="With Action And Dismiss" storyName="With Action And Dismiss">
+  <ToastToggler type="error" actionable dismissable>
+    Hello! I'm a toast with an action and dismiss button
+  </ToastToggler>
+</Story>
+
+<Source
+  dark
+  code={`
+{isVisible && (
+  <Toast
+    type="success"
+    onActionClick={() => alert('Retried')}
+    actionText="Retry"
+    onClose={() => setVisible(false)}
+  >
+    Hello! I'm a toast with an action and dismiss button
+  </Toast>
+)}
+    `}
+/>
+
+## Multiple lines
+
+<br />
+
+<Story name="Multiple Lines" storyName="Multiple Lines">
+  <ToastToggler type="error" actionable dismissable>
+    Hello! I'm a toast with an action and dismiss button. I also have a very
+    long text within the toast. This illustrates how the toast stretches when
+    the content is lengthy.
+  </ToastToggler>
+</Story>
+
+<Source
+  dark
+  code={`
+{isVisible && (
+  <Toast
+    type="success"
+    onActionClick={() => alert('Retried')}
+    actionText="Retry"
+    onClose={() => setVisible(false)}
+  >
+    Hello! I'm a toast with an action and dismiss button. I also have a very
+    long text within the toast. This illustrates how the toast stretches when
+    the content is lengthy.
+  </Toast>
+)}
+    `}
+/>

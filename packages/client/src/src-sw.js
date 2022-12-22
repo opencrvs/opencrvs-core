@@ -46,14 +46,26 @@ self.addEventListener('fetch', (event) => {
   }
 })
 
-self.addEventListener('message', (event) => {
+self.addEventListener('message', async (event) => {
   if (!event.data) {
+    return
+  }
+
+  if (
+    typeof event.data === 'object' &&
+    event.data.hasOwnProperty('minioUrls')
+  ) {
+    await removeCache(event.data.minioUrls)
     return
   }
 
   switch (event.data) {
     case 'skipWaiting':
-      self.skipWaiting()
+      // About caches variable: https://developer.mozilla.org/en-US/docs/Web/API/CacheStorage/delete
+      caches
+        .keys()
+        .then((cs) => cs.forEach((c) => caches.delete(c)))
+        .then(() => self.skipWaiting())
       break
     default:
       break
@@ -81,9 +93,29 @@ workbox.routing.registerRoute(
   new workbox.strategies.NetworkFirst()
 )
 
+// This caches the minio urls
+workbox.routing.registerRoute(
+  /https(.+)minio\.(.+)\/ocrvs\/+/,
+  new workbox.strategies.NetworkFirst()
+)
+
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
 workbox.routing.registerNavigationRoute('/index.html', {
   blacklist: [/^\/__.*$/]
 })
+
+const removeCache = async (minioUrls) => {
+  const runTimeCacheKey = (await caches.keys()).find((e) =>
+    e.includes('workbox-runtime')
+  )
+  if (!runTimeCacheKey) {
+    return
+  }
+  const runtimecache = await caches.open(runTimeCacheKey)
+  for (let minioUrl of minioUrls) {
+    const cacheDeletionSuccess = await runtimecache.delete(minioUrl)
+    console.log(`Deleted cache for ${minioUrl} : ${cacheDeletionSuccess}`)
+  }
+}

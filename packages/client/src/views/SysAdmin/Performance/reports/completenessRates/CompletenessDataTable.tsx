@@ -17,10 +17,7 @@ import {
   COMPLETENESS_RATE_REPORT_BASE
 } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { SortArrow } from '@opencrvs/components/lib/icons'
-import {
-  ListTable,
-  ColumnContentAlignment
-} from '@opencrvs/components/lib/interface'
+import { ListTable } from '@opencrvs/components/lib/ListTable'
 import { orderBy } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -30,6 +27,9 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import styled from '@client/styledComponents'
+import { Table } from '@opencrvs/components/lib/Table/Table'
 
 interface ITableProps extends WrappedComponentProps {
   loading: boolean
@@ -59,6 +59,10 @@ const INITIAL_SORT_MAP = {
   completenessRate: SORT_ORDER.ASCENDING,
   registeredWithinTargetd: SORT_ORDER.ASCENDING
 }
+
+const TableDiv = styled.div`
+  overflow: auto;
+`
 
 function CompletenessDataTableComponent(props: ITableProps) {
   const { intl, loading, eventType, base } = props
@@ -141,75 +145,88 @@ function CompletenessDataTableComponent(props: ITableProps) {
         }
 
   return (
-    <ListTable
-      noResultText={intl.formatMessage(constantsMessages.noResults)}
-      isLoading={loading}
-      columns={[
-        {
-          key: firstColProp.dataKey,
-          label: firstColProp.label,
-          width: 30,
-          isSortable: true,
-          sortFunction: () => toggleSort(firstColProp.sortKey),
-          icon: (
-            <SortArrow active={sortOrder[0].key === firstColProp.sortKey} />
-          ),
-          isSorted: true
-        },
-        {
-          key: 'registeredWithinTargetd',
-          isSortable: true,
-          sortFunction: () => toggleSort('registeredWithinTargetd'),
-          icon: (
-            <SortArrow
-              active={sortOrder[0].key === 'registeredWithinTargetd'}
-            />
-          ),
-          isSorted: true,
-          label:
-            props.completenessRateTime === CompletenessRateTime.Within5Years
-              ? intl.formatMessage(messages.performanceWithin5YearsLabel)
-              : props.completenessRateTime === CompletenessRateTime.Within1Year
-              ? intl.formatMessage(messages.performanceWithin1YearLabel)
-              : intl.formatMessage(messages.performanceWithinTargetDaysLabel, {
-                  target:
-                    eventType === Event.Birth
-                      ? window.config.BIRTH.REGISTRATION_TARGET
-                      : window.config.DEATH.REGISTRATION_TARGET,
-                  withPrefix: false
-                }),
-          width: 25
-        },
-        {
-          key: 'estimated',
-          isSortable: true,
-          sortFunction: () => toggleSort('estimated'),
-          icon: <SortArrow active={sortOrder[0].key === 'estimated'} />,
-          isSorted: true,
-          label: intl.formatMessage(constantsMessages.estimatedNumberOfEvents, {
-            eventType,
-            lineBreak: <br />
-          }),
-          width: 20
-        },
-        {
-          key: 'completenessRate',
-          isSortable: true,
-          sortFunction: () => toggleSort('completenessRate'),
-          icon: <SortArrow active={sortOrder[0].key === 'completenessRate'} />,
-          isSorted: true,
-          label: intl.formatMessage(messages.completenessRate, {
-            lineBreak: <br />
-          }),
-          alignment: ColumnContentAlignment.LEFT,
-          width: 25
-        }
-      ]}
-      pageSize={sortedContent.length}
-      content={sortedContent}
-      hideBoxShadow={true}
-      highlightRowOnMouseOver
-    />
+    <>
+      <TableDiv>
+        <Table
+          noResultText={intl.formatMessage(constantsMessages.noResults)}
+          fixedWidth={1088}
+          isLoading={loading}
+          columns={[
+            {
+              key: firstColProp.dataKey,
+              label: firstColProp.label,
+              width: 30,
+              isSortable: true,
+              sortFunction: () => toggleSort(firstColProp.sortKey),
+              icon: (
+                <SortArrow active={sortOrder[0].key === firstColProp.sortKey} />
+              ),
+              isSorted: true
+            },
+            {
+              key: 'registeredWithinTargetd',
+              isSortable: true,
+              sortFunction: () => toggleSort('registeredWithinTargetd'),
+              icon: (
+                <SortArrow
+                  active={sortOrder[0].key === 'registeredWithinTargetd'}
+                />
+              ),
+              isSorted: true,
+              label:
+                props.completenessRateTime === CompletenessRateTime.Within5Years
+                  ? intl.formatMessage(messages.performanceWithin5YearsLabel)
+                  : props.completenessRateTime ===
+                    CompletenessRateTime.Within1Year
+                  ? intl.formatMessage(messages.performanceWithin1YearLabel)
+                  : intl.formatMessage(
+                      messages.performanceWithinTargetDaysLabel,
+                      {
+                        target:
+                          eventType === Event.Birth
+                            ? window.config.BIRTH.REGISTRATION_TARGET
+                            : window.config.DEATH.REGISTRATION_TARGET,
+                        withPrefix: false
+                      }
+                    ),
+              width: 25
+            },
+            {
+              key: 'estimated',
+              isSortable: true,
+              sortFunction: () => toggleSort('estimated'),
+              icon: <SortArrow active={sortOrder[0].key === 'estimated'} />,
+              isSorted: true,
+              label: intl.formatMessage(
+                constantsMessages.estimatedNumberOfEvents,
+                {
+                  eventType,
+                  lineBreak: <br />
+                }
+              ),
+              width: 20
+            },
+            {
+              key: 'completenessRate',
+              isSortable: true,
+              sortFunction: () => toggleSort('completenessRate'),
+              icon: (
+                <SortArrow active={sortOrder[0].key === 'completenessRate'} />
+              ),
+              isSorted: true,
+              label: intl.formatMessage(messages.completenessRate, {
+                lineBreak: <br />
+              }),
+              alignment: ColumnContentAlignment.LEFT,
+              width: 25
+            }
+          ]}
+          pageSize={sortedContent.length}
+          content={sortedContent}
+          highlightRowOnMouseOver
+        />
+      </TableDiv>
+    </>
   )
 }
 

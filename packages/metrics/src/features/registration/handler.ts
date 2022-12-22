@@ -28,6 +28,12 @@ import { populateBundleFromPayload } from '@metrics/features/registration/utils'
 import { Events } from '@metrics/features/metrics/constants'
 import { IPoints } from '@metrics/features/registration'
 
+import { createUserAuditPointFromFHIR } from '@metrics/features/audit/service'
+import {
+  getActionFromTask,
+  getTask
+} from '@metrics/features/registration/fhirUtils'
+
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -50,6 +56,7 @@ export async function waitingExternalValidationHandler(
         }
       )
     )
+
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -63,6 +70,7 @@ export async function requestForRegistrarValidationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
+  await createUserAuditPointFromFHIR('SENT_FOR_APPROVAL', request)
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -80,6 +88,7 @@ export async function requestForRegistrarValidationHandler(
         Events.REQUEST_FOR_REGISTRAR_VALIDATION
       )
     )
+
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -123,6 +132,9 @@ export async function newDeclarationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
+
+  await createUserAuditPointFromFHIR('DECLARED', request)
+
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
@@ -140,6 +152,7 @@ export async function newDeclarationHandler(
         Events.NEW_DEC
       )
     )
+
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -176,6 +189,7 @@ export async function inProgressHandler(
         Events.IN_PROGRESS_DEC
       )
     )
+
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -188,6 +202,7 @@ export async function markRejectedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('REJECTED', request)
   try {
     const points: IPoints[] = []
     points.push(
@@ -206,6 +221,7 @@ export async function markRejectedHandler(
         true
       )
     )
+
     points.push(
       await generateEventDurationPoint(
         request.payload as fhir.Bundle,
@@ -229,6 +245,7 @@ export async function newBirthRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('REGISTERED', request)
   const points = []
   try {
     points.push(
@@ -245,6 +262,7 @@ export async function newBirthRegistrationHandler(
         'x-correlation-id': request.headers['x-correlation-id']
       })
     )
+
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -257,6 +275,7 @@ export async function markBirthRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('REGISTERED', request)
   try {
     const bundle = await populateBundleFromPayload(
       request.payload as fhir.Bundle | fhir.Task,
@@ -293,6 +312,8 @@ export async function newDeathRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('REGISTERED', request)
+
   const points = []
   try {
     points.push(
@@ -320,6 +341,8 @@ export async function markDeathRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('REGISTERED', request)
+
   try {
     const bundle = await populateBundleFromPayload(
       request.payload as fhir.Bundle | fhir.Task,
@@ -357,6 +380,7 @@ export async function markCertifiedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('CERTIFIED', request)
   try {
     const points = await Promise.all([
       generateCertificationPoint(request.payload as fhir.Bundle, {
@@ -393,6 +417,7 @@ export async function markValidatedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('VALIDATED', request)
   try {
     const points = await Promise.all([
       generateEventDurationPoint(
@@ -421,6 +446,7 @@ export async function requestCorrectionHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  await createUserAuditPointFromFHIR('CORRECTED', request)
   try {
     const points = await Promise.all([
       generatePaymentPoint(
@@ -449,6 +475,92 @@ export async function requestCorrectionHandler(
   } catch (err) {
     return internal(err)
   }
+  return h.response().code(200)
+}
 
+export async function declarationAssignedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ASSIGNED', request)
+  return h.response().code(200)
+}
+export async function declarationUnassignedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('UNASSIGNED', request)
+  return h.response().code(200)
+}
+export async function declarationDownloadedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('RETRIEVED', request)
+  return h.response().code(200)
+}
+export async function declarationViewedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('VIEWED', request)
+  return h.response().code(200)
+}
+export async function birthDeclarationArchivedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ARCHIVED', request)
+  return h.response().code(200)
+}
+export async function deathDeclarationArchivedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('ARCHIVED', request)
+  return h.response().code(200)
+}
+export async function birthDeclarationReinstatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const bundle = request.payload as fhir.Bundle
+  const task = getTask(bundle)
+  const previousAction = getActionFromTask(task!)
+  if (previousAction === 'IN_PROGRESS') {
+    await createUserAuditPointFromFHIR('REINSTATED_IN_PROGRESS', request)
+  }
+  if (previousAction === 'DECLARED') {
+    await createUserAuditPointFromFHIR('REINSTATED_DECLARED', request)
+  }
+  if (previousAction === 'REJECTED') {
+    await createUserAuditPointFromFHIR('REINSTATED_REJECTED', request)
+  }
+
+  return h.response().code(200)
+}
+export async function deathDeclarationReinstatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const bundle = request.payload as fhir.Bundle
+  const task = getTask(bundle)
+  const previousAction = getActionFromTask(task!)
+  if (previousAction === 'IN_PROGRESS') {
+    await createUserAuditPointFromFHIR('REINSTATED_IN_PROGRESS', request)
+  }
+  if (previousAction === 'DECLARED') {
+    await createUserAuditPointFromFHIR('REINSTATED_DECLARED', request)
+  }
+  if (previousAction === 'REJECTED') {
+    await createUserAuditPointFromFHIR('REINSTATED_REJECTED', request)
+  }
+  return h.response().code(200)
+}
+export async function declarationUpdatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('DECLARATION_UPDATED', request)
   return h.response().code(200)
 }

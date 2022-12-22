@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
 import { IApplicationConfig } from '@client/utils/referenceApi'
 
@@ -23,6 +23,7 @@ const applicationConfigMutation = gql`
       PHONE_NUMBER_PATTERN
       HIDE_EVENT_REGISTER_INFORMATION
       ADDRESSES
+      ADMIN_LEVELS
       COUNTRY_LOGO {
         fileName
         file

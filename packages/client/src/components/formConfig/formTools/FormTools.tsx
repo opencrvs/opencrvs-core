@@ -18,7 +18,7 @@ import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   ListViewItemSimplified,
   ListViewSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import React from 'react'
 import { useIntl, MessageDescriptor } from 'react-intl'
 import { useDispatch } from 'react-redux'
@@ -45,7 +45,8 @@ const MESSAGE_MAP: Record<CustomFieldType, MessageDescriptor> = {
   [CustomFieldType.Textarea]: messages.textAreaInput,
   /* TODO */
   [CustomFieldType.Subsection]: messages.supportingCopy,
-  [CustomFieldType.Paragraph]: messages.heading
+  [CustomFieldType.Paragraph]: messages.heading,
+  [CustomFieldType.Select]: messages.customSelect
 }
 
 type IRouteProps = {

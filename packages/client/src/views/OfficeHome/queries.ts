@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 
 const EVENT_SEARCH_RESULT_FIELDS = gql`
   fragment EventSearchFields on EventSearchSet {
@@ -33,6 +33,22 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
         officeName
       }
     }
+    operationHistories {
+      operationType
+      operatedOn
+      operatorRole
+      operatorName {
+        firstNames
+        familyName
+        use
+      }
+      operatorOfficeName
+      operatorOfficeAlias
+      notificationFacilityName
+      notificationFacilityAlias
+      rejectReason
+      rejectComment
+    }
     ... on BirthEventSearchSet {
       dateOfBirth
       childName {
@@ -55,7 +71,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
 export const REGISTRATION_HOME_QUERY = gql`
   ${EVENT_SEARCH_RESULT_FIELDS}
   query registrationHome(
-    $locationIds: [String!]
+    $declarationLocationId: String!
     $pageSize: Int
     $inProgressSkip: Int
     $healthSystemSkip: Int
@@ -67,9 +83,11 @@ export const REGISTRATION_HOME_QUERY = gql`
     $printSkip: Int
   ) {
     inProgressTab: searchEvents(
-      locationIds: $locationIds
-      status: ["IN_PROGRESS"]
-      type: ["birth-declaration", "death-declaration"]
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["IN_PROGRESS"]
+        compositionType: ["birth-declaration", "death-declaration"]
+      }
       count: $pageSize
       skip: $inProgressSkip
     ) {
@@ -79,9 +97,11 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     notificationTab: searchEvents(
-      locationIds: $locationIds
-      status: ["IN_PROGRESS"]
-      type: ["birth-notification", "death-notification"]
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["IN_PROGRESS"]
+        compositionType: ["birth-notification", "death-notification"]
+      }
       count: $pageSize
       skip: $healthSystemSkip
     ) {
@@ -91,8 +111,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     reviewTab: searchEvents(
-      locationIds: $locationIds
-      status: $reviewStatuses
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: $reviewStatuses
+      }
       count: $pageSize
       skip: $reviewSkip
     ) {
@@ -102,8 +124,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     rejectTab: searchEvents(
-      locationIds: $locationIds
-      status: ["REJECTED"]
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["REJECTED"]
+      }
       count: $pageSize
       skip: $rejectSkip
       sortColumn: "createdAt.keyword"
@@ -115,8 +139,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     approvalTab: searchEvents(
-      locationIds: $locationIds
-      status: ["VALIDATED"]
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["VALIDATED"]
+      }
       count: $pageSize
       skip: $approvalSkip
     ) {
@@ -126,8 +152,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     externalValidationTab: searchEvents(
-      locationIds: $locationIds
-      status: ["WAITING_VALIDATION"]
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["WAITING_VALIDATION"]
+      }
       count: $pageSize
       skip: $externalValidationSkip
     ) {
@@ -137,8 +165,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     printTab: searchEvents(
-      locationIds: $locationIds
-      status: ["REGISTERED"]
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["REGISTERED"]
+      }
       count: $pageSize
       skip: $printSkip
     ) {
@@ -154,21 +184,23 @@ export const FIELD_AGENT_HOME_QUERY = gql`
   ${EVENT_SEARCH_RESULT_FIELDS}
   query fieldAgentHome(
     $userId: String
-    $locationIds: [String!]
+    $declarationLocationId: String!
     $pageSize: Int
     $reviewSkip: Int
     $rejectSkip: Int
   ) {
     reviewTab: searchEvents(
       userId: $userId
-      locationIds: $locationIds
-      status: [
-        "DECLARED"
-        "IN_PROGRESS"
-        "VALIDATED"
-        "WAITING_VALIDATION"
-        "REGISTERED"
-      ]
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: [
+          "DECLARED"
+          "IN_PROGRESS"
+          "VALIDATED"
+          "WAITING_VALIDATION"
+          "REGISTERED"
+        ]
+      }
       count: $pageSize
       skip: $reviewSkip
     ) {
@@ -179,8 +211,10 @@ export const FIELD_AGENT_HOME_QUERY = gql`
     }
     rejectTab: searchEvents(
       userId: $userId
-      locationIds: $locationIds
-      status: ["REJECTED"]
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["REJECTED"]
+      }
       count: $pageSize
       skip: $rejectSkip
       sortColumn: "createdAt.keyword"
@@ -189,113 +223,6 @@ export const FIELD_AGENT_HOME_QUERY = gql`
       totalItems
       results {
         ...EventSearchFields
-      }
-    }
-  }
-`
-
-export const SEARCH_EVENTS = gql`
-  ${EVENT_SEARCH_RESULT_FIELDS}
-  query searchEventsForWorkqueue(
-    $sort: String
-    $trackingId: String
-    $contactNumber: String
-    $registrationNumber: String
-    $status: [String]
-    $locationIds: [String!]
-    $count: Int
-    $skip: Int
-  ) {
-    searchEvents(
-      sort: $sort
-      trackingId: $trackingId
-      registrationNumber: $registrationNumber
-      contactNumber: $contactNumber
-      locationIds: $locationIds
-      status: $status
-      count: $count
-      skip: $skip
-    ) {
-      totalItems
-      results {
-        ...EventSearchFields
-      }
-    }
-  }
-`
-
-export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
-  query fetchRegistrationByComposition($id: ID!) {
-    fetchRegistration(id: $id) {
-      id
-      registration {
-        id
-        type
-        status {
-          id
-          user {
-            id
-            name {
-              use
-              firstNames
-              familyName
-            }
-            role
-          }
-          location {
-            id
-            name
-            alias
-          }
-          office {
-            name
-            alias
-            address {
-              district
-              state
-            }
-          }
-          type
-          timestamp
-          comments {
-            comment
-          }
-        }
-        contact
-        contactPhoneNumber
-      }
-      ... on BirthRegistration {
-        child {
-          id
-          multipleBirth
-          name {
-            use
-            firstNames
-            familyName
-          }
-          birthDate
-        }
-      }
-      ... on DeathRegistration {
-        deceased {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          deceased {
-            deathDate
-          }
-        }
-        informant {
-          individual {
-            telecom {
-              use
-              system
-              value
-            }
-          }
-        }
       }
     }
   }

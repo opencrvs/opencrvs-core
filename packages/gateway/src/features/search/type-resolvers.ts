@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { NATIVE_LANGUAGE } from '@gateway/constants'
-import { GQLDate, GQLResolver } from '@gateway/graphql/schema'
+import {
+  GQLAdvancedSearchParametersInput,
+  GQLOperationHistorySearchSet,
+  GQLResolver
+} from '@gateway/graphql/schema'
 import {
   getEventDurationsFromMetrics,
   IEventDurationResponse
@@ -26,24 +30,12 @@ interface ISearchDataTemplate {
   [key: string]: any
 }
 export interface ISearchCriteria {
-  declarationLocationId?: string[] | string
-  declarationLocationHirarchyId?: string
-  status?: string[]
-  type?: string[]
-  trackingId?: string
-  contactNumber?: string
-  name?: string
-  registrationNumber?: string
+  parameters: GQLAdvancedSearchParametersInput
   sort?: string
   sortColumn?: string
   size?: number
   from?: number
   createdBy?: string
-}
-
-interface IGQLOperationHistorySearchSet {
-  operatedOn?: GQLDate
-  notificationFacilityName?: string
 }
 
 const getTimeLoggedDataByStatus = (
@@ -115,7 +107,6 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
 
 export const searchTypeResolvers: GQLResolver = {
   EventSearchSet: {
-    // tslint:disable-next-line
     __resolveType(obj: ISearchEventDataTemplate) {
       if (obj._type === 'compositions' && obj._source.event === 'Birth') {
         return 'BirthEventSearchSet'
@@ -134,6 +125,9 @@ export const searchTypeResolvers: GQLResolver = {
     registration(resultSet: ISearchEventDataTemplate) {
       return resultSet._source
     },
+    operationHistories(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source.operationHistories
+    },
     childName(resultSet: ISearchEventDataTemplate) {
       return getChildName(resultSet._source)
     },
@@ -150,6 +144,9 @@ export const searchTypeResolvers: GQLResolver = {
     },
     registration(resultSet: ISearchEventDataTemplate) {
       return resultSet._source
+    },
+    operationHistories(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source.operationHistories
     },
     deceasedName(resultSet: ISearchEventDataTemplate) {
       return getDeceasedName(resultSet._source)
@@ -170,6 +167,43 @@ export const searchTypeResolvers: GQLResolver = {
     },
     duplicates(searchData: ISearchDataTemplate) {
       return searchData.relatesTo
+    }
+  },
+  OperationHistorySearchSet: {
+    operatorName(searchData: ISearchDataTemplate) {
+      const names = [
+        {
+          use: 'en',
+          given:
+            (searchData.operatorFirstNames && [
+              searchData.operatorFirstNames
+            ]) ||
+            null,
+          family:
+            (searchData.operatorFamilyName && [
+              searchData.operatorFamilyName
+            ]) ||
+            null
+        }
+      ]
+
+      if (NATIVE_LANGUAGE) {
+        names.push({
+          use: NATIVE_LANGUAGE,
+          given:
+            (searchData.operatorFirstNamesLocale && [
+              searchData.operatorFirstNamesLocale
+            ]) ||
+            null,
+          family:
+            (searchData.operatorFamilyNameLocale && [
+              searchData.operatorFamilyNameLocale
+            ]) ||
+            null
+        })
+      }
+
+      return names
     }
   },
   EventProgressSet: {
@@ -203,7 +237,7 @@ export const searchTypeResolvers: GQLResolver = {
       if (searchData._source.operationHistories) {
         startedAt = (
           searchData._source
-            .operationHistories as IGQLOperationHistorySearchSet[]
+            .operationHistories as GQLOperationHistorySearchSet[]
         )[0].operatedOn
       }
       return startedAt
@@ -219,7 +253,7 @@ export const searchTypeResolvers: GQLResolver = {
       if (searchData._source.operationHistories) {
         facilityName = (
           searchData._source
-            .operationHistories as IGQLOperationHistorySearchSet[]
+            .operationHistories as GQLOperationHistorySearchSet[]
         )[0].notificationFacilityName
       }
       return facilityName

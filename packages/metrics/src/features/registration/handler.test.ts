@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { createServer } from '@metrics/server'
 import * as api from '@metrics/api'
 import { readFileSync } from 'fs'
@@ -1169,7 +1170,7 @@ describe('When an existing declaration is marked registered', () => {
       payload
     })
     const declarationEventPoint =
-      influxClient.writePoints.mock.calls[0][0].find(
+      influxClient.writePoints.mock.calls[1][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'declaration_event_duration'
       )
@@ -1188,7 +1189,7 @@ describe('When an existing declaration is marked registered', () => {
       payload
     })
     const declarationEventPoint =
-      influxClient.writePoints.mock.calls[0][0].find(
+      influxClient.writePoints.mock.calls[1][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'declaration_event_duration'
       )
@@ -1233,7 +1234,7 @@ describe('When an existing declaration is marked registered', () => {
       payload
     })
     const declarationEventPoint =
-      influxClient.writePoints.mock.calls[0][0].find(
+      influxClient.writePoints.mock.calls[1][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'declaration_event_duration'
       )
@@ -1254,7 +1255,7 @@ describe('When an existing declaration is marked registered', () => {
         payload
       })
       const declarationEventPoint =
-        influxClient.writePoints.mock.calls[0][0].find(
+        influxClient.writePoints.mock.calls[1][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'declaration_event_duration'
         )
@@ -1283,7 +1284,7 @@ describe('When an existing declaration is marked certified', () => {
       payload
     })
     const declarationEventPoint =
-      influxClient.writePoints.mock.calls[0][0].find(
+      influxClient.writePoints.mock.calls[1][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'declaration_event_duration'
       )
@@ -1305,7 +1306,7 @@ describe('When an existing declaration is marked certified', () => {
       })
       expect(res.statusCode).toBe(200)
       const declarationEventPoint =
-        influxClient.writePoints.mock.calls[0][0].find(
+        influxClient.writePoints.mock.calls[1][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'declaration_event_duration'
         )
@@ -1327,7 +1328,7 @@ describe('When an existing declaration is marked certified', () => {
       })
       expect(res.statusCode).toBe(200)
       const declarationEventPoint =
-        influxClient.writePoints.mock.calls[0][0].find(
+        influxClient.writePoints.mock.calls[1][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'payment'
         )
@@ -1389,7 +1390,7 @@ describe('When an in-progress declaration is received', () => {
       },
       payload
     })
-    const rejectedPoints = influxClient.writePoints.mock.calls[0][0].find(
+    const rejectedPoints = influxClient.writePoints.mock.calls[1][0].find(
       ({ measurement }: { measurement: string }) =>
         measurement === 'declarations_rejected'
     )
@@ -1431,7 +1432,7 @@ describe('When an existing declaration requested correction', () => {
       payload
     })
     const declarationEventPoint =
-      influxClient.writePoints.mock.calls[0][0].find(
+      influxClient.writePoints.mock.calls[1][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'declaration_event_duration'
       )
@@ -1453,7 +1454,7 @@ describe('When an existing declaration requested correction', () => {
       })
       expect(res.statusCode).toBe(200)
       const declarationEventPoint =
-        influxClient.writePoints.mock.calls[0][0].find(
+        influxClient.writePoints.mock.calls[1][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'declaration_event_duration'
         )
@@ -1475,7 +1476,7 @@ describe('When an existing declaration requested correction', () => {
       })
       expect(res.statusCode).toBe(200)
       const declarationEventPoint =
-        influxClient.writePoints.mock.calls[0][0].find(
+        influxClient.writePoints.mock.calls[1][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'payment'
         )

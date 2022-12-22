@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/commons",
-  "version": "1.1.2",
+  "version": "1.2.0-beta",
   "description": "OpenCRVS common modules and utils",
   "license": "MPL-2.0",
   "main": "./build/dist/index.js",
@@ -27,7 +27,7 @@
     "lint-staged": "^7.1.0",
     "node-fetch": "^2.6.7",
     "pkg-up": "^3.1.0",
-    "typescript": "^3.7.2"
+    "typescript": "^4.8.3"
   },
   "devDependencies": {
     "jest-fetch-mock": "^2.1.2",

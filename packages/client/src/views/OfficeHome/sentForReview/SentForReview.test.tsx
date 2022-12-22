@@ -17,7 +17,7 @@ import {
   resizeWindow
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { merge } from 'lodash'
@@ -29,6 +29,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { History } from 'history'
+import { vi, Mock } from 'vitest'
 
 const validateScopeToken = jwt.sign(
   { scope: ['validate'] },
@@ -134,7 +135,7 @@ for (let i = 0; i < 14; i++) {
 }
 merge(mockUserResponse, nameObj)
 
-const getItem = window.localStorage.getItem as jest.Mock
+const getItem = window.localStorage.getItem as Mock
 
 describe('RegistrationHome sent for approval tab related tests', () => {
   let store: AppStore
@@ -147,8 +148,9 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
   it('renders all items returned from graphql query in sent for approval', async () => {
     const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
+    Date.now = vi.fn(() => 1554055200000)
 
+    const sentForApprovalDate = '2019-10-20T11:03:20.660Z'
     const testComponent = await createTestComponent(
       <SentForReview
         queryData={{
@@ -169,6 +171,27 @@ describe('RegistrationHome sent for approval tab related tests', () => {
                   createdAt: TIME_STAMP,
                   modifiedAt: TIME_STAMP
                 },
+                operationHistories: [
+                  {
+                    operationType: 'VALIDATED',
+                    operatedOn: sentForApprovalDate,
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    operatorName: [
+                      {
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                  }
+                ],
                 dateOfBirth: '2010-10-10',
                 childName: [
                   {
@@ -224,8 +247,11 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     )
 
     testComponent.update()
-    const data = testComponent.find(GridTable).prop('content')
-    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(Number(TIME_STAMP))
+    const data = testComponent.find(Workqueue).prop('content')
+    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
+      new Date(sentForApprovalDate)
+    )
+
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
@@ -237,7 +263,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
-    Date.now = jest.fn(() => 1554055200000)
+    Date.now = vi.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
       <SentForReview
@@ -256,14 +282,14 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       { store, history }
     )
 
-    const data = (await waitForElement(testComponent, GridTable)).prop(
+    const data = (await waitForElement(testComponent, Workqueue)).prop(
       'content'
     )
     expect(data.length).toBe(0)
   })
 
   it('should show pagination if items more than 10 in Approval Tab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
+    Date.now = vi.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
       <SentForReview
@@ -294,7 +320,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   })
 
   it('should show pagination and page number as per need ', async () => {
-    Date.now = jest.fn(() => 1554055200000)
+    Date.now = vi.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
       <SentForReview
@@ -320,7 +346,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   })
 
   it('redirect to recordAudit page if item is clicked on desktop view ', async () => {
-    Date.now = jest.fn(() => 1554055200000)
+    Date.now = vi.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
       <SentForReview
@@ -446,9 +472,9 @@ describe('Tablet tests', () => {
   })
 
   it('redirects to recordAudit page if item is clicked', async () => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
+    Date.now = vi.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
       <SentForReview

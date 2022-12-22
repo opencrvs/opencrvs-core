@@ -10,37 +10,55 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { RouteComponentProps, withRouter } from 'react-router'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { applicationConfigLoadAction } from './login/actions'
-import { IStoreState } from './store'
-import { loadLanguages } from './i18n/actions'
+import { changeLanguage, loadLanguages } from './i18n/actions'
+import {
+  getDefaultLanguage,
+  retrieveLanguage,
+  useSearchQuery
+} from './i18n/utils'
+import { selectApplicationName } from './login/selectors'
 
-interface IDispatchProps {
-  getApplicationConfig: () => void
-  loadLanguages: () => void
+type IProps = {
+  children: React.ReactNode
 }
 
-class Component extends React.Component<
-  RouteComponentProps<{}> & IDispatchProps
-> {
-  componentDidMount() {
-    this.props.getApplicationConfig()
-    this.props.loadLanguages()
-  }
-  render() {
-    const { children } = this.props
-    return <>{children}</>
-  }
+function useDocumentTitle() {
+  const applicationName = useSelector(selectApplicationName)
+  React.useEffect(() => {
+    if (applicationName) {
+      document.title = applicationName
+    }
+  }, [applicationName])
 }
 
-const mapDispatchToProps = {
-  getApplicationConfig: applicationConfigLoadAction,
-  loadLanguages
+function useLoadConfigurations() {
+  const dispatch = useDispatch()
+  React.useEffect(() => {
+    dispatch(loadLanguages())
+    dispatch(applicationConfigLoadAction())
+  }, [dispatch])
 }
-export const Page = withRouter(
-  connect<{}, IDispatchProps, {}, IStoreState>(
-    null,
-    mapDispatchToProps
-  )(Component)
-)
+
+function useSyncLanguage() {
+  const dispatch = useDispatch()
+  const paramLanguage = useSearchQuery('lang')
+  React.useEffect(() => {
+    async function syncLanguage() {
+      const languageToUse =
+        paramLanguage ?? (await retrieveLanguage()) ?? getDefaultLanguage()
+
+      if (languageToUse) dispatch(changeLanguage({ language: languageToUse }))
+    }
+    syncLanguage()
+  }, [dispatch, paramLanguage])
+}
+
+export function Page({ children }: IProps) {
+  useLoadConfigurations()
+  useSyncLanguage()
+  useDocumentTitle()
+
+  return <>{children}</>
+}

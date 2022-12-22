@@ -18,7 +18,7 @@ import {
 } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
 import { get, has } from 'lodash'
-import { IntlShape, MessageDescriptor } from 'react-intl'
+import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import {
   generateLocationName,
@@ -35,12 +35,21 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { IDynamicValues } from '@client/navigation'
 import { countryMessages } from '@client/i18n/messages/constants'
-import { IUserDetails } from '@client/utils/userUtils'
+import {
+  recordAuditMessages,
+  regActionMessages,
+  regStatusMessages
+} from '@client/i18n/messages/views/recordAudit'
 import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { Event } from '@client/utils/gateway'
-interface IStatus {
-  [key: string]: MessageDescriptor
-}
+import {
+  Event,
+  Maybe,
+  RegAction,
+  RegStatus,
+  User,
+  History
+} from '@client/utils/gateway'
+import { IUserDetails } from '@client/utils/userUtils'
 
 export interface IDeclarationData {
   id: string
@@ -55,6 +64,7 @@ export interface IDeclarationData {
   informant?: string
   informantContact?: string
   brnDrn?: string
+  nid?: string
   assignment?: GQLAssignmentData
 }
 
@@ -70,81 +80,8 @@ export interface IGQLDeclaration {
   }
 }
 
-export const DECLARATION_STATUS_LABEL: IStatus = {
-  STARTED: {
-    defaultMessage: 'Started',
-    description: 'Label for declaration started',
-    id: 'recordAudit.history.started'
-  },
-  REINSTATED: {
-    defaultMessage: 'Reinstated to {status}',
-    description: 'The prefix for reinstated declaration',
-    id: 'recordAudit.history.reinstated'
-  },
-  ARCHIVED: {
-    defaultMessage: 'Archived',
-    description: 'Label for registration status archived',
-    id: 'recordAudit.history.archived'
-  },
-  IN_PROGRESS: {
-    defaultMessage: 'Sent incomplete',
-    description: 'Declaration submitted without completing the required fields',
-    id: 'constants.sent_incomplete'
-  },
-  DECLARED: {
-    defaultMessage: 'Declaration started',
-    description: 'Label for registration status declared',
-    id: 'recordAudit.history.declared'
-  },
-  DECLARED_FIELD_AGENT: {
-    defaultMessage: 'Sent notification for review',
-    description: 'Label for registration status declared',
-    id: 'recordAudit.history.declaredFieldAgent'
-  },
-  WAITING_VALIDATION: {
-    defaultMessage: 'Waiting for validation',
-    description: 'Label for registration status waitingValidation',
-    id: 'recordAudit.history.waitingValidation'
-  },
-  VALIDATED: {
-    defaultMessage: 'Sent for approval',
-    description: 'The title of sent for approvals tab',
-    id: 'regHome.sentForApprovals'
-  },
-  REGISTERED: {
-    defaultMessage: 'Registered',
-    description: 'Label for registration status registered',
-    id: 'recordAudit.history.registered'
-  },
-  CERTIFIED: {
-    defaultMessage: 'Certified',
-    description: 'Label for registration status certified',
-    id: 'recordAudit.history.certified'
-  },
-  REJECTED: {
-    defaultMessage: 'Rejected',
-    description: 'A label for registration status rejected',
-    id: 'recordAudit.history.rejected'
-  },
-  DOWNLOADED: {
-    defaultMessage: 'Downloaded',
-    description: 'Label for declaration download status Downloaded',
-    id: 'recordAudit.history.downloaded'
-  },
-  REQUESTED_CORRECTION: {
-    defaultMessage: 'Corrected record',
-    description: 'Status for declaration being requested for correction',
-    id: 'recordAudit.history.requestedCorrection'
-  },
-  DECLARATION_UPDATED: {
-    defaultMessage: 'Updated',
-    description: 'Declaration has been updated',
-    id: 'recordAudit.history.updatedDeclaration'
-  }
-}
-
 export const getFieldValue = (
-  value: string,
+  value: Maybe<string> | undefined,
   fieldObj: IFormField,
   offlineData: Partial<IOfflineData>,
   intl: IntlShape
@@ -153,7 +90,8 @@ export const getFieldValue = (
   if (has(fieldObj, 'dynamicOptions')) {
     const offlineIndex = get(fieldObj, 'dynamicOptions.resource')
     const offlineResourceValues = get(offlineData, offlineIndex)
-    const offlineResourceValue = get(offlineResourceValues, original)
+    const offlineResourceValue =
+      original && get(offlineResourceValues, original)
     original = offlineResourceValue?.name || EMPTY_STRING
   }
   if (fieldObj.type === 'SELECT_WITH_OPTIONS') {
@@ -452,31 +390,36 @@ export const getPageItems = (
   return pageItems
 }
 
-export const getStatusLabel = (
-  status: string,
-  reinstated: boolean,
+export function getStatusLabel(
+  action: Maybe<RegAction> | undefined,
+  regStatus: Maybe<RegStatus> | undefined,
   intl: IntlShape,
-  userDetails: IUserDetails
-) => {
-  if (status in DECLARATION_STATUS_LABEL)
-    return reinstated
-      ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'], {
-          status: intl.formatMessage(DECLARATION_STATUS_LABEL[status])
-        })
-      : status === 'DECLARED'
-      ? findMessage(
-          status,
-          userDetails.role ? userDetails.role : EMPTY_STRING,
-          intl
-        )
-      : intl.formatMessage(DECLARATION_STATUS_LABEL[status])
-  return EMPTY_STRING
+  performedBy: Maybe<User> | undefined,
+  loggedInUser: IUserDetails | null
+) {
+  if (action) {
+    return intl.formatMessage(regActionMessages[action], {
+      regStatus: regStatus?.toLowerCase()
+    })
+  }
+  if (
+    regStatus === RegStatus.Declared &&
+    performedBy?.id === loggedInUser?.userMgntUserID &&
+    loggedInUser?.role &&
+    FIELD_AGENT_ROLES.includes(loggedInUser.role)
+  ) {
+    return intl.formatMessage(recordAuditMessages.sentNotification)
+  }
+  /* We should find a better way of handling started event*/
+  //@ts-ignore
+  if (regStatus === 'STARTED') {
+    return intl.formatMessage(recordAuditMessages.started)
+  }
+  return regStatus ? intl.formatMessage(regStatusMessages[regStatus]) : ''
 }
 
-const findMessage = (status: string, userRole: string, intl: IntlShape) => {
-  if (userRole && FIELD_AGENT_ROLES.includes(userRole)) {
-    return intl.formatMessage(DECLARATION_STATUS_LABEL['DECLARED_FIELD_AGENT'])
-  } else {
-    return intl.formatMessage(DECLARATION_STATUS_LABEL[status])
-  }
+export function isSystemInitiated(history: History) {
+  return Boolean(
+    (history.dhis2Notification && !history.user?.id) || history.system
+  )
 }

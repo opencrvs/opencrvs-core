@@ -24,15 +24,16 @@ import {
   Mutation as GQLMutation,
   CreateFormDraftMutationVariables
 } from '@client/utils/gateway'
-import { Mutation } from 'react-apollo'
+import { Mutation } from '@apollo/client/react/components'
 import {
   SecondaryButton,
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { InputField, TextArea } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { useParams } from 'react-router'
 import { goToFormConfigHome } from '@client/navigation'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'

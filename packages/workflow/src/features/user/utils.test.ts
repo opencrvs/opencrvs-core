@@ -118,7 +118,7 @@ describe('Verify getUser', () => {
     await expect(
       getUser('XXX', { Authorization: 'bearer acd ' })
     ).rejects.toThrowError(
-      'Unable to retrieve user mobile number. Error: 401 status received'
+      'Unable to retrieve user in workflow. Error: 401 status received'
     )
   })
 })

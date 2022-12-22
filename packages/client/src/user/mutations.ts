@@ -9,18 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
-import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import { InternalRefetchQueriesInclude, gql } from '@apollo/client'
 
 const RESEND_SMS_INVITE = gql`
   mutation resendSMSInvite($userId: String!) {
     resendSMSInvite(userId: $userId)
   }
 `
+const USERNAME_SMS_REMINDER = gql`
+  mutation usernameSMSReminder($userId: String!) {
+    usernameSMSReminder(userId: $userId)
+  }
+`
+
 async function resendSMSInvite(
   userId: string,
-  refetchQueries: RefetchQueryDescription
+  refetchQueries: InternalRefetchQueriesInclude
 ) {
   return (
     client &&
@@ -31,7 +36,42 @@ async function resendSMSInvite(
     })
   )
 }
+const RESET_PASSWORD_SMS = gql`
+  mutation resetPasswordSMS($userId: String!, $applicationName: String!) {
+    resetPasswordSMS(userId: $userId, applicationName: $applicationName)
+  }
+`
+async function sendResetPasswordSMS(
+  userId: string,
+  applicationName: string,
+  refetchQueries: InternalRefetchQueriesInclude
+) {
+  return (
+    client &&
+    client.mutate({
+      mutation: RESET_PASSWORD_SMS,
+      variables: { userId, applicationName },
+      refetchQueries
+    })
+  )
+}
+
+async function usernameSMSReminderSend(
+  userId: string,
+  refetchQueries: InternalRefetchQueriesInclude
+) {
+  return (
+    client &&
+    client.mutate({
+      mutation: USERNAME_SMS_REMINDER,
+      variables: { userId },
+      refetchQueries
+    })
+  )
+}
 
 export const userMutations = {
-  resendSMSInvite
+  resendSMSInvite,
+  usernameSMSReminderSend,
+  sendResetPasswordSMS
 }

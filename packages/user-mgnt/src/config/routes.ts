@@ -50,18 +50,25 @@ import verifySecurityAnswer, {
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
 import {
-  registerSystemClient,
+  registerSystem,
   reqRegisterSystemSchema,
-  resRegisterSystemSchema,
-  deactivateSystemClient,
-  reactivateSystemClient,
-  auditSystemSchema,
+  deactivateSystem,
+  reactivateSystem,
+  clientIdSchema,
   verifySystemHandler,
   verifySystemReqSchema,
   verifySystemResSchema,
   getSystemRequestSchema,
   getSystemResponseSchema,
-  getSystemHandler
+  getSystemHandler,
+  getAllSystemsHandler,
+  updatePermissions,
+  reqUpdateSystemSchema,
+  refreshSystemSecretHandler,
+  systemSecretRequestSchema,
+  resSystemSchema,
+  SystemSchema,
+  deleteSystem
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -71,12 +78,24 @@ import * as Hapi from '@hapi/hapi'
 import resendSMSInviteHandler, {
   requestSchema as resendSMSRequestSchema
 } from '@user-mgnt/features/resendSMSInvite/handler'
+import usernameSMSReminderHandler, {
+  requestSchema as usernameSMSReminderRequestSchema
+} from '@user-mgnt/features/usernameSMSReminderInvite/handler'
 import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
 import * as Joi from 'joi'
 import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
 import getUserAvatar from '@user-mgnt/features/getAvatar/handler'
+import {
+  createSearchHandler,
+  removeSearchHandler,
+  createSearchrequestSchema,
+  removeSearchrequestSchema
+} from '@user-mgnt/features/userSearchRecord/handler'
+import resetPasswordSMSHandler, {
+  requestSchema as resetPasswordRequestSchema
+} from '@user-mgnt/features/resetPassword/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -84,7 +103,9 @@ const enum RouteScope {
   CERTIFY = 'certify',
   PERFORMANCE = 'performance',
   SYSADMIN = 'sysadmin',
-  VALIDATE = 'validate'
+  NATLSYSADMIN = 'natlsysadmin',
+  VALIDATE = 'validate',
+  RECORDSEARCH = 'recordsearch'
 }
 
 export const getRoutes = () => {
@@ -324,7 +345,8 @@ export const getRoutes = () => {
             RouteScope.CERTIFY,
             RouteScope.PERFORMANCE,
             RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            RouteScope.VALIDATE,
+            RouteScope.RECORDSEARCH
           ]
         },
         validate: {
@@ -427,6 +449,48 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/searches',
+      handler: createSearchHandler,
+      config: {
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: createSearchrequestSchema
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/searches',
+      handler: removeSearchHandler,
+      config: {
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: removeSearchrequestSchema
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
       path: '/resendSMSInvite',
       handler: resendSMSInviteHandler,
       config: {
@@ -442,49 +506,100 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/registerSystemClient',
-      handler: registerSystemClient,
+      path: '/usernameSMSReminder',
+      handler: usernameSMSReminderHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: usernameSMSReminderRequestSchema
+        },
+        description:
+          'Resend sms for given username and make the corresponding user pending'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/resetPasswordSMS',
+      handler: resetPasswordSMSHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: resetPasswordRequestSchema
+        },
+        description:
+          'Reset password via sms for given userid and make the corresponding user pending'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/registerSystem',
+      handler: registerSystem,
       config: {
         tags: ['api'],
         description: 'Creates a new system client',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
           payload: reqRegisterSystemSchema
         },
         response: {
-          schema: resRegisterSystemSchema
+          schema: resSystemSchema
         }
       }
     },
     {
       method: 'POST',
-      path: '/deactivateSystemClient',
-      handler: deactivateSystemClient,
+      path: '/updatePermissions',
+      handler: updatePermissions,
       config: {
         tags: ['api'],
-        description: 'Creates a new system client',
+        description: 'Update system permissions',
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
         validate: {
-          payload: auditSystemSchema
+          payload: reqUpdateSystemSchema
         }
       }
     },
     {
       method: 'POST',
-      path: '/reactivateSystemClient',
-      handler: reactivateSystemClient,
+      path: '/deactivateSystem',
+      handler: deactivateSystem,
       config: {
         tags: ['api'],
-        description: 'Creates a new system client',
+        description: 'Deactivates a new system client',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          payload: auditSystemSchema
+          payload: clientIdSchema
+        },
+        response: {
+          schema: SystemSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/reactivateSystem',
+      handler: reactivateSystem,
+      config: {
+        tags: ['api'],
+        description: 'Reactivates a new system client',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: clientIdSchema
+        },
+        response: {
+          schema: SystemSchema
         }
       }
     },
@@ -505,6 +620,7 @@ export const getRoutes = () => {
         }
       }
     },
+
     {
       method: 'POST',
       path: '/getSystem',
@@ -521,6 +637,16 @@ export const getRoutes = () => {
         }
       }
     },
+    {
+      method: 'GET',
+      path: '/getAllSystems',
+      handler: getAllSystemsHandler,
+      config: {
+        tags: ['api'],
+        description: 'Returns all systems'
+      }
+    },
+
     {
       method: 'GET',
       path: '/countUsersByLocation',
@@ -541,6 +667,44 @@ export const getRoutes = () => {
           query: Joi.object({
             role: Joi.string().required()
           })
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/refreshSystemSecret',
+      handler: refreshSystemSecretHandler,
+      config: {
+        tags: ['api'],
+        description: 'Refresh client secret ',
+        notes: 'Refresh client secret',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: systemSecretRequestSchema
+        },
+        response: {
+          schema: resSystemSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/deleteSystem',
+      handler: deleteSystem,
+      config: {
+        tags: ['api'],
+        description: 'Delete system ',
+        notes: 'This is responsible for system deletion',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: clientIdSchema
+        },
+        response: {
+          schema: SystemSchema
         }
       }
     }

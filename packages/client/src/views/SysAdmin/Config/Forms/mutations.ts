@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import { FORM_DRAFT_FIELDS } from '@client/forms/configuration/formDrafts/queries'
 
 export const CHANGE_FORM_DRAFT_STATUS = gql`
@@ -38,6 +38,30 @@ export const CREATE_FORM_DRAFT = gql`
       formDraft: { event: $event, comment: $comment, questions: $questions }
     ) {
       ...FormDraftFields
+    }
+  }
+`
+
+export const CREATE_FORM_DATA_SET = gql`
+  mutation createFormDataset($formDataset: FormDatasetInput!) {
+    createFormDataset(formDataset: $formDataset) {
+      status
+      msg
+      data {
+        options {
+          value
+          label {
+            lang
+            descriptor {
+              id
+              defaultMessage
+            }
+          }
+        }
+        fileName
+        createdAt
+        _id
+      }
     }
   }
 `

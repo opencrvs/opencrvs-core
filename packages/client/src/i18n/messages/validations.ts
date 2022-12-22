@@ -211,6 +211,12 @@ const messagesToDefine: IValidationMessages = {
       'The error message that appears on required fields on new user form',
     id: 'validations.userform.required'
   },
+  requiredReasonForCorrection: {
+    defaultMessage: 'Please provide a reason for this correction',
+    description:
+      'The error message that appears on reason field on correction form',
+    id: 'validations.correctionReason'
+  },
   requiredSymbol: {
     defaultMessage: '',
     description:
@@ -233,7 +239,7 @@ const messagesToDefine: IValidationMessages = {
   },
   validNationalId: {
     defaultMessage:
-      'The National ID can only be numeric and must be 9 digits long',
+      'The National ID can only be numeric and must be 10 digits long',
     description:
       'The error message that appears when an invalid value is used as nid',
     id: 'validations.validNationalId'

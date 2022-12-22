@@ -9,11 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { mockOfflineData } from '@client/tests/util'
+import {
+  mockOfflineData,
+  mockOfflineLocationsWithHierarchy
+} from '@client/tests/util'
 import {
   filterLocations,
   generateLocationName,
-  getJurisidictionType
+  getJurisidictionType,
+  getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
 import { LocationType } from '@client/offline/reducer'
 import { createIntl } from 'react-intl'
@@ -29,6 +33,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
           },
@@ -37,6 +42,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/321'
           },
@@ -45,6 +51,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            status: 'active',
             type: 'ADMIN_STRUCTURE',
             partOf: 'Location/123'
           }
@@ -69,6 +76,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
           },
@@ -77,6 +85,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/321'
           },
@@ -85,6 +94,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
+            status: 'active',
             type: 'CRVS_OFFICE',
             partOf: 'Location/123'
           }
@@ -145,5 +155,19 @@ describe('locationUtil tests', () => {
       messages: language.messages
     })
     expect(generateLocationName(undefined, intl)).toEqual('')
+  })
+  describe('getLocationNameMapOfFacility()', () => {
+    it('returns a mapping object of jurisdictionType vs name of a given facility', () => {
+      const { facilities, locations } = mockOfflineLocationsWithHierarchy
+      const facilityLocation = facilities[Object.keys(facilities)[0]]
+
+      const map = getLocationNameMapOfFacility(facilityLocation, locations)
+      expect(map).toEqual({
+        DISTRICT: 'Abwe',
+        STATE: 'Central',
+        country: undefined,
+        facility: 'ARK Private Clinic'
+      })
+    })
   })
 })

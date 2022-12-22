@@ -9,24 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 
 export const SEARCH_EVENTS = gql`
   query searchEvents(
+    $advancedSearchParameters: AdvancedSearchParametersInput!
     $sort: String
-    $trackingId: String
-    $contactNumber: String
-    $registrationNumber: String
-    $name: String
-    $locationIds: [String!]
+    $count: Int
+    $skip: Int
   ) {
     searchEvents(
+      advancedSearchParameters: $advancedSearchParameters
       sort: $sort
-      trackingId: $trackingId
-      registrationNumber: $registrationNumber
-      name: $name
-      contactNumber: $contactNumber
-      locationIds: $locationIds
+      count: $count
+      skip: $skip
     ) {
       totalItems
       results {
@@ -48,6 +44,22 @@ export const SEARCH_EVENTS = gql`
           createdAt
           modifiedAt
         }
+        operationHistories {
+          operationType
+          operatedOn
+          operatorRole
+          operatorName {
+            firstNames
+            familyName
+            use
+          }
+          operatorOfficeName
+          operatorOfficeAlias
+          notificationFacilityName
+          notificationFacilityAlias
+          rejectReason
+          rejectComment
+        }
         ... on BirthEventSearchSet {
           dateOfBirth
           childName {
@@ -65,67 +77,6 @@ export const SEARCH_EVENTS = gql`
           }
         }
       }
-    }
-  }
-`
-export const SEARCH_DECLARATIONS_USER_WISE = gql`
-  query searchDeclarationsUserWise(
-    $status: [String]
-    $userId: String
-    $locationIds: [String!]
-    $sort: String
-    $count: Int
-    $skip: Int
-  ) {
-    searchEvents(
-      status: $status
-      userId: $userId
-      locationIds: $locationIds
-      sort: $sort
-      count: $count
-      skip: $skip
-    ) {
-      totalItems
-      results {
-        id
-        type
-        registration {
-          contactNumber
-          trackingId
-          dateOfDeclaration
-          modifiedAt
-          createdAt
-          status
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            use
-            firstNames
-            familyName
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            use
-            firstNames
-            familyName
-          }
-        }
-      }
-    }
-  }
-`
-
-export const COUNT_USER_WISE_DECLARATIONS = gql`
-  query countUserWiseDeclarations(
-    $status: [String]
-    $userId: String
-    $locationIds: [String!]
-  ) {
-    searchEvents(status: $status, userId: $userId, locationIds: $locationIds) {
-      totalItems
     }
   }
 `

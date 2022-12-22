@@ -18,6 +18,7 @@ import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
 import { History } from 'history'
+import { vi, Mock } from 'vitest'
 
 const users = [
   {
@@ -140,12 +141,12 @@ describe('user audit action modal tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
-  let onCloseMock: jest.Mock
+  let onCloseMock: Mock
 
   beforeEach(async () => {
     ;({ history, store } = await createStore())
 
-    onCloseMock = jest.fn()
+    onCloseMock = vi.fn()
   })
 
   afterEach(() => {
@@ -237,11 +238,7 @@ describe('user audit action modal tests', () => {
       })
 
       it('clicking confirm action dispatches error notification action', async () => {
-        const confirmButton = await waitForElement(
-          component,
-          '#deactivate-action'
-        )
-        confirmButton.hostNodes().simulate('click')
+        component.find('#deactivate-action').hostNodes().simulate('click')
         await flushPromises()
         expect(store.getState().notification.submitFormErrorToast).toBe(
           'userFormFail'
@@ -328,9 +325,10 @@ describe('user audit action modal tests', () => {
         )
         confirmButton.hostNodes().simulate('click')
 
-        await flushPromises()
-        expect(store.getState().notification.submitFormErrorToast).toBe(
-          'userFormFail'
+        waitFor(
+          () =>
+            store.getState().notification.submitFormErrorToast ===
+            'userFormFail'
         )
       })
     })

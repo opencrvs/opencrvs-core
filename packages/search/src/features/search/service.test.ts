@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  searchComposition,
+  advancedSearch,
   formatSearchParams
 } from '@search/features/search/service'
 import { client } from '@search/elasticsearch/client'
@@ -19,67 +19,71 @@ import { SortOrder } from '@search/features/search/types'
 describe('elasticsearch db helper', () => {
   it('should index a composition with proper configuration', async () => {
     const searchSpy = jest.spyOn(client, 'search')
-    const searchQuery = {
-      query: 'some query',
-      trackingId: 'dummy',
-      contactNumber: 'dummy',
-      registrationNumber: 'dummy',
-      event: 'EMPTY_STRING',
-      status: ['DECLARED'],
-      type: ['birth-declaration', 'death-declaration'],
-      declarationLocationId: 'EMPTY_STRING',
+    advancedSearch(false, {
+      parameters: {
+        trackingId: 'dummy',
+        contactNumber: 'dummy',
+        registrationNumber: 'dummy',
+        event: 'birth',
+        registrationStatuses: ['DECLARED'],
+        compositionType: ['birth-declaration', 'death-declaration'],
+        declarationLocationId: ''
+      },
       from: 0,
       size: 10
-    }
-    searchComposition(searchQuery)
+    })
     expect(searchSpy).toBeCalled()
   })
 
   it('should index a composition with minimum configuration', async () => {
     const searchSpy = jest.spyOn(client, 'search')
-    searchComposition({})
+    advancedSearch(false, {
+      parameters: {
+        event: 'birth'
+      }
+    })
     expect(searchSpy).toBeCalled()
   })
 
   it('should index a composition and call combination search configuration', async () => {
     const searchSpy = jest.spyOn(client, 'search')
-    const searchQuery = {
-      query: 'some query',
-      trackingId: 'dummy',
-      contactNumber: 'dummy',
-      registrationNumber: 'dummy',
-      event: 'EMPTY_STRING',
-      status: ['DECLARED'],
-      type: ['birth-declaration', 'death-declaration'],
-      declarationLocationId: 'EMPTY_STRING',
+    advancedSearch(false, {
+      parameters: {
+        trackingId: 'dummy',
+        contactNumber: 'dummy',
+        registrationNumber: 'dummy',
+        event: 'birth',
+        registrationStatuses: ['DECLARED'],
+        compositionType: ['birth-declaration', 'death-declaration']
+      },
       from: 0,
       size: 10
-    }
-    searchComposition(searchQuery)
+    })
     expect(searchSpy).toBeCalled()
   })
 })
 
 describe('elasticsearch params formatter', () => {
   it('should prepare search params to search birth declarations using a single name against all fields', () => {
-    const params = formatSearchParams({
-      query: 'some query',
-      trackingId: 'myTrackingId',
-      contactNumber: '07989898989',
-      registrationNumber: 'BHGUGKJH',
-      event: 'EMPTY_STRING',
-      status: ['DECLARED'],
-      type: ['birth-declaration'],
-      declarationLocationId: '123',
-      eventLocationId: '456',
-      gender: 'male',
-      name: 'Anik',
-      nameCombinations: [],
-      createdBy: 'EMPTY_STRING',
-      from: 0,
-      size: 10,
-      sort: SortOrder.ASC
-    })
+    const params = formatSearchParams(
+      {
+        parameters: {
+          trackingId: 'myTrackingId',
+          contactNumber: '07989898989',
+          registrationNumber: 'BHGUGKJH',
+          event: 'birth',
+          registrationStatuses: ['DECLARED'],
+          compositionType: ['birth-declaration'],
+          declarationLocationId: '123',
+          eventLocationId: '456'
+        },
+        createdBy: 'EMPTY_STRING',
+        from: 0,
+        size: 10,
+        sort: SortOrder.ASC
+      },
+      false
+    )
 
     expect(params).toEqual({
       type: 'compositions',
@@ -91,92 +95,42 @@ describe('elasticsearch params formatter', () => {
           bool: {
             must: [
               {
-                multi_match: {
-                  query: 'some query',
-                  fields: [
-                    'childFirstNames',
-                    'childFamilyName',
-                    'childFirstNamesLocal',
-                    'childFamilyNameLocal',
-                    'deceasedFirstNames',
-                    'deceasedFamilyName',
-                    'deceasedFirstNamesLocal',
-                    'deceasedFamilyNameLocal',
-                    'trackingId',
-                    'registrationNumber',
-                    'contactNumber'
-                  ],
-                  fuzziness: 'AUTO'
+                match: {
+                  event: 'birth'
                 }
               },
               {
-                multi_match: {
-                  query: 'Anik',
-                  fields: [
-                    'childFirstNames',
-                    'childFamilyName',
-                    'childFirstNamesLocal',
-                    'childFamilyNameLocal',
-                    'motherFirstNames',
-                    'motherFamilyName',
-                    'motherFirstNamesLocal',
-                    'motherFamilyNameLocal',
-                    'fatherFirstNames',
-                    'fatherFamilyName',
-                    'fatherFirstNamesLocal',
-                    'fatherFamilyNameLocal',
-                    'informantFirstNames',
-                    'informantFamilyName',
-                    'informantFirstNamesLocal',
-                    'informantFamilyNameLocal',
-                    'deceasedFirstNames',
-                    'deceasedFamilyName',
-                    'deceasedFirstNamesLocal',
-                    'deceasedFamilyNameLocal',
-                    'spouseFirstNames',
-                    'spouseFamilyName',
-                    'spouseFirstNamesLocal',
-                    'spouseFamilyNameLocal'
-                  ],
-                  fuzziness: 'AUTO'
+                query_string: {
+                  default_field: 'type',
+                  query: '(DECLARED)'
                 }
               },
               {
-                term: {
-                  'trackingId.keyword': 'myTrackingId'
-                }
-              },
-              {
-                term: {
-                  'contactNumber.keyword': '07989898989'
-                }
-              },
-              {
-                term: {
-                  'registrationNumber.keyword': 'BHGUGKJH'
-                }
-              },
-              {
-                term: {
-                  'gender.keyword': 'male'
-                }
-              },
-              {
-                term: {
-                  'eventLocationId.keyword': {
-                    value: '456',
-                    // tslint:disable-next-line
-                    boost: 2.0
+                match: {
+                  declarationLocationId: {
+                    boost: 2,
+                    query: '123'
                   }
                 }
               },
               {
-                term: {
-                  'declarationLocationId.keyword': {
-                    value: '123',
-                    // tslint:disable-next-line
-                    boost: 2.0
-                  }
+                match: {
+                  eventLocationId: '456'
+                }
+              },
+              {
+                match: {
+                  contactNumber: '07989898989'
+                }
+              },
+              {
+                match: {
+                  registrationNumber: 'BHGUGKJH'
+                }
+              },
+              {
+                match: {
+                  trackingId: 'myTrackingId'
                 }
               },
               {
@@ -184,16 +138,6 @@ describe('elasticsearch params formatter', () => {
                   'createdBy.keyword': {
                     value: 'EMPTY_STRING'
                   }
-                }
-              },
-              {
-                term: {
-                  'event.keyword': 'EMPTY_STRING'
-                }
-              },
-              {
-                terms: {
-                  'type.keyword': ['DECLARED']
                 }
               },
               {
@@ -209,35 +153,20 @@ describe('elasticsearch params formatter', () => {
       }
     })
   })
-  it('should prepare search params to search birth declarations using specific names against specific fields', () => {
-    const params = formatSearchParams({
-      query: '',
-      trackingId: 'myTrackingId',
-      contactNumber: '07989898989',
-      registrationNumber: 'BHGUGKJH',
-      event: 'EMPTY_STRING',
-      status: ['DECLARED'],
-      type: ['birth-declaration'],
-      declarationLocationId: '123',
-      eventLocationId: '456',
-      gender: 'male',
-      name: 'EMPTY_STRING',
-      nameCombinations: [
-        {
-          name: 'child name',
-          fields: 'CHILD_FAMILY'
+
+  it('should prepare search params to search birth declarations using names against all name fields', () => {
+    const params = formatSearchParams(
+      {
+        parameters: {
+          name: 'sadman anik'
         },
-        {
-          name: 'mother name',
-          fields: 'MOTHER_FAMILY'
-        }
-      ],
-      createdBy: 'EMPTY_STRING',
-      from: 0,
-      size: 10,
-      sort: SortOrder.ASC,
-      sortColumn: 'modifiedAt.keyword'
-    })
+        createdBy: '',
+        from: 0,
+        size: 10,
+        sort: SortOrder.ASC
+      },
+      false
+    )
 
     expect(params).toEqual({
       type: 'compositions',
@@ -250,83 +179,29 @@ describe('elasticsearch params formatter', () => {
             must: [
               {
                 multi_match: {
-                  query: 'child name',
-                  fields: ['childFamilyName', 'childFamilyNameLocal'],
+                  query: 'sadman anik',
+                  fields: [
+                    'childFirstNames',
+                    'childFamilyName',
+                    'motherFirstNames',
+                    'motherFamilyName',
+                    'fatherFirstNames',
+                    'fatherFamilyName',
+                    'informantFirstNames',
+                    'informantFamilyName',
+                    'deceasedFirstNames',
+                    'deceasedFamilyName',
+                    'spouseFirstNames',
+                    'spouseFamilyName'
+                  ],
                   fuzziness: 'AUTO'
-                }
-              },
-              {
-                multi_match: {
-                  query: 'mother name',
-                  fields: ['motherFamilyName', 'motherFamilyNameLocal'],
-                  fuzziness: 'AUTO'
-                }
-              },
-              {
-                term: {
-                  'trackingId.keyword': 'myTrackingId'
-                }
-              },
-              {
-                term: {
-                  'contactNumber.keyword': '07989898989'
-                }
-              },
-              {
-                term: {
-                  'registrationNumber.keyword': 'BHGUGKJH'
-                }
-              },
-              {
-                term: {
-                  'gender.keyword': 'male'
-                }
-              },
-              {
-                term: {
-                  'eventLocationId.keyword': {
-                    value: '456',
-                    // tslint:disable-next-line
-                    boost: 2.0
-                  }
-                }
-              },
-              {
-                term: {
-                  'declarationLocationId.keyword': {
-                    value: '123',
-                    // tslint:disable-next-line
-                    boost: 2.0
-                  }
-                }
-              },
-              {
-                term: {
-                  'createdBy.keyword': {
-                    value: 'EMPTY_STRING'
-                  }
-                }
-              },
-              {
-                term: {
-                  'event.keyword': 'EMPTY_STRING'
-                }
-              },
-              {
-                terms: {
-                  'type.keyword': ['DECLARED']
-                }
-              },
-              {
-                terms: {
-                  'compositionType.keyword': ['birth-declaration']
                 }
               }
             ],
             should: []
           }
         },
-        sort: [{ 'modifiedAt.keyword': 'asc' }]
+        sort: [{ dateOfDeclaration: 'asc' }]
       }
     })
   })

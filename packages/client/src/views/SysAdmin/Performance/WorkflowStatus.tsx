@@ -9,14 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
 import { Event } from '@client/utils/gateway'
+import { getStatusWiseWQTab } from '@client/views/OfficeHome/utils'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -24,7 +22,12 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToPerformanceHome, goToWorkflowStatus } from '@client/navigation'
+import {
+  goToPerformanceHome,
+  goToWorkflowStatus,
+  goToSearchResult,
+  goToDeclarationRecordAudit
+} from '@client/navigation'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
@@ -33,8 +36,10 @@ import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completen
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/interface'
-import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  IColumn,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/Workqueue'
 import {
   GQLEventProgressSet,
   GQLHumanName,
@@ -56,16 +61,19 @@ import subYears from 'date-fns/subYears'
 import differenceInSeconds from 'date-fns/differenceInSeconds'
 import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import { colors } from '@opencrvs/components/lib/colors'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
-import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
-import { TableView } from '@opencrvs/components/lib/interface/TableView'
-import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
-import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { Table } from '@opencrvs/components/lib/Table'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
+import register from '@client/registerServiceWorker'
+
+type IDispatchProps = {
+  goToSearchResult: typeof goToSearchResult
+}
+
+interface IBasePrintTabProps {
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+}
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -139,10 +147,7 @@ export const StatusMapping: IStatusMapping = {
     labelDescriptor: statusMessages.certified,
     color: colors.blue
   },
-  REQUESTED_CORRECTION: {
-    labelDescriptor: statusMessages.requestedCorrection,
-    color: colors.blue
-  },
+
   ARCHIVED: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
@@ -184,6 +189,8 @@ function isPrimaryContact(contact: string): contact is PrimaryContact {
 interface DispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToWorkflowStatus: typeof goToWorkflowStatus
+  goToSearchResult: typeof goToSearchResult
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 interface ISearchParams {
   locationId: string
@@ -269,7 +276,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(formMessages.informantName),
         key: 'informant',
-        width: 12,
+        width: 14,
         isSortable: true,
         sortFunction: () => toggleSort('informant'),
         icon: columnToBeSort === 'informant' ? <ArrowDownBlue /> : <></>,
@@ -578,6 +585,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               eventProgress.registration &&
               eventProgress.registration.trackingId,
             status,
+            compositionId: eventProgress.id,
             eventType: event,
             dateOfEvent: eventProgress.dateOfEvent,
             nameIntl,
@@ -627,7 +635,18 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     ).map((row, idx) => {
       return {
         ...row,
-        id: <LinkButton>{row.id}</LinkButton>,
+        id: (
+          <LinkButton
+            onClick={() =>
+              props.goToDeclarationRecordAudit(
+                'printTab',
+                row.compositionId as string
+              )
+            }
+          >
+            {row.id}
+          </LinkButton>
+        ),
         declarationStartedBy: (
           <DoubleLineValueWrapper>
             {row.declarationStartedBy}
@@ -752,11 +771,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         <Query
           query={FETCH_EVENTS_WITH_PROGRESS}
           variables={{
-            locationId: locationId,
+            declarationJurisdictionId: locationId,
             skip: pageSize * (currentPageNumber - 1),
             count: pageSize,
-            status: (status && [status]) || undefined,
-            type:
+            registrationStatuses: (status && [status]) || undefined,
+            compositionType:
               (event && [
                 `${event.toLowerCase()}-declaration`,
                 `${event.toLowerCase()}-notification`
@@ -780,39 +799,24 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 
             return (
               <>
-                <TableView
+                <Table
                   id="declaration-status-list"
                   content={getContent(data)}
                   columns={getColumns()}
                   isLoading={loading || Boolean(error)}
                   noResultText={intl.formatMessage(constantsMessages.noResults)}
-                  hideBoxShadow
-                  fixedWidth={2050}
                   tableHeight={150}
                   highlightRowOnMouseOver
                   noPagination
                   isFullPage
                 />
-                {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+                {error && <GenericErrorToast />}
                 {total > pageSize && (
-                  <PaginationWrapper id="pagination_container">
-                    <DesktopWrapper>
-                      <PaginationModified
-                        size="small"
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(total / pageSize)}
-                        onPageChange={onPageChange}
-                      />
-                    </DesktopWrapper>
-                    <MobileWrapper>
-                      <PaginationModified
-                        size="large"
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(total / pageSize)}
-                        onPageChange={onPageChange}
-                      />
-                    </MobileWrapper>
-                  </PaginationWrapper>
+                  <Pagination
+                    currentPage={currentPageNumber}
+                    totalPages={Math.ceil(total / pageSize)}
+                    onPageChange={onPageChange}
+                  />
                 )}
               </>
             )
@@ -825,5 +829,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 
 export const WorkflowStatus = connect(null, {
   goToPerformanceHome,
+  goToSearchResult,
+  goToDeclarationRecordAudit,
   goToWorkflowStatus
 })(injectIntl(WorkflowStatusComponent))

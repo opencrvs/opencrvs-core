@@ -145,7 +145,7 @@ export const fieldToAddressTransformer =
     if (!address) {
       address = {
         type: addressType,
-        line: ['', '', '', '', '', '']
+        line: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''] // lines must be available as empty strings for GraphQL to parse all options
       }
       sectionData.address.push(address)
     }
@@ -394,9 +394,6 @@ export function fieldToAttachmentTransformer(
   subjectMapper?: any,
   typeMapper?: any
 ) {
-  if (draftData[sectionId][field.name] === []) {
-    return transformedData
-  }
   const attachments = (draftData[sectionId][field.name] as IAttachment[]).map(
     (attachment) => {
       return {
@@ -409,7 +406,7 @@ export function fieldToAttachmentTransformer(
       }
     }
   )
-  if (attachments) {
+  if (attachments.length > 0) {
     const selectedSectionId = alternateSectionId
       ? alternateSectionId
       : sectionId

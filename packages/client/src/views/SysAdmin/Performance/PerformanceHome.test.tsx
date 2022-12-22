@@ -15,7 +15,7 @@ import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { Event } from '@client/utils/gateway'
-import { MockedProvider } from 'react-apollo/test-utils'
+import { MockedProvider } from '@apollo/client/testing'
 import {
   mockRegistrationCountRequest,
   mockPerformanceMetricsRequest,

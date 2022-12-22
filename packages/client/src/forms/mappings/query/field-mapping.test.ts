@@ -9,8 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { identityToFieldTransformer } from '@client/forms/mappings/query/field-mappings'
+import {
+  eventLocationNameQueryOfflineTransformer,
+  identityToFieldTransformer
+} from '@client/forms/mappings/query/field-mappings'
 import { IFormField } from '@client/forms'
+import { mockOfflineDataWithLocationHierarchy } from '@client/tests/mock-offline-data'
 
 describe('Query FieldMapping', () => {
   it('Should return valid data', () => {
@@ -57,6 +61,55 @@ describe('Query FieldMapping', () => {
       field as IFormField
     )
 
+    expect(result).toEqual(expectedResult)
+  })
+
+  it('should transform one input to multiple output field', () => {
+    const factory = eventLocationNameQueryOfflineTransformer(
+      'facilities',
+      'placeOfBirth'
+    )
+    const expectedResult = {
+      template: {
+        placeOfBirth: ['ARK Private Clinic', 'Abwe', 'Central', undefined],
+        placeOfBirthCountry: undefined,
+        placeOfBirthDistrict: 'Abwe',
+        placeOfBirthFacility: 'ARK Private Clinic',
+        placeOfBirthState: 'Central'
+      }
+    }
+    const queryData = {
+      eventLocation: {
+        id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
+        type: 'HEALTH_FACILITY',
+        address: {
+          line: [],
+          district: null,
+          state: null,
+          city: null,
+          postalCode: null,
+          country: null,
+          __typename: 'Address'
+        },
+        __typename: 'Location'
+      },
+      _fhirIDMap: {
+        eventLocation: '5c6abc88-26b8-4834-a1a6-2992807e3a72'
+      }
+    }
+    const sectionId = 'template'
+    const field = { name: 'placeOfBirth' } as IFormField
+    const transformedData = {
+      template: {}
+    }
+    const result = factory(
+      transformedData,
+      queryData,
+      sectionId,
+      field,
+      undefined,
+      mockOfflineDataWithLocationHierarchy
+    )
     expect(result).toEqual(expectedResult)
   })
 })

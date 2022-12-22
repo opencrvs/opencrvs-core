@@ -82,7 +82,13 @@ const mockQuestion: IQuestion = {
   fieldType: FieldType.TEXT,
   precedingFieldId: 'myPreviousFieldId',
   required: true,
-  custom: true
+  custom: true,
+  conditionals: [
+    {
+      fieldId: 'currentFieldId',
+      regexp: 'FARAJALAND'
+    }
+  ]
 }
 
 describe('createQuestion handler', () => {

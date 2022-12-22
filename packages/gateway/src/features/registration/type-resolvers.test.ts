@@ -31,7 +31,7 @@ import {
   mockErrorComposition,
   mockTaskDownloaded
 } from '@gateway/utils/testUtils'
-import { GQLRegStatus } from '@gateway/graphql/schema'
+import { GQLRegAction } from '@gateway/graphql/schema'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
@@ -266,7 +266,7 @@ describe('Registration type resolvers', () => {
   describe('History type resolver', () => {
     it('Should return action DOWNLOADED', async () => {
       const action = await typeResolvers.History.action(mockTaskDownloaded)
-      expect(action).toEqual(GQLRegStatus.DOWNLOADED)
+      expect(action).toEqual(GQLRegAction.DOWNLOADED)
     })
 
     it('Should return reject reason', async () => {
@@ -276,18 +276,158 @@ describe('Registration type resolvers', () => {
       expect(statusReason.text).toEqual('Rejected reason')
     })
 
-    it('Should return true if reinstated', () => {
-      const reinstated = typeResolvers.History.reinstated(mockTaskDownloaded)
-      expect(reinstated).toBe(true)
-    })
-
     it('Should return date', () => {
       const date = typeResolvers.History.date(mockTaskDownloaded)
       expect(date).toBe('2016-10-31T09:45:05+10:00')
     })
 
     it('Should return user', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockUser))
+      const roleBundle = {
+        resourceType: 'Bundle',
+        id: '1dc23622-8151-4e4a-86fb-336dd79a9e42',
+        meta: { lastUpdated: '2022-12-07T15:15:54.885+00:00' },
+        type: 'searchset',
+        total: 1,
+        link: [
+          {
+            relation: 'self',
+            url: 'http://localhost:3447/fhir/PractitionerRole?practitioner=ea3cf326-fe93-4795-88c6-6bc6a3118c96'
+          }
+        ],
+        entry: [
+          {
+            fullUrl:
+              'http://localhost:3447/fhir/PractitionerRole/6368ed99-60b8-4787-8dbc-74ba4912f785/_history/543c88a0-c0b4-45d0-8fe7-6931de5dfd11',
+            resource: {
+              resourceType: 'PractitionerRole',
+              practitioner: {
+                reference: 'Practitioner/ea3cf326-fe93-4795-88c6-6bc6a3118c96'
+              },
+              code: [
+                {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/roles',
+                      code: 'FIELD_AGENT'
+                    }
+                  ]
+                },
+                {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/types',
+                      code: 'HEALTHCARE_WORKER'
+                    }
+                  ]
+                }
+              ],
+              location: [
+                { reference: 'Location/c24c0b72-11b5-4c1a-bbb7-61112fa6f481' },
+                { reference: 'Location/da30f792-d28c-4a92-bb2f-43d6a8ef9254' }
+              ],
+              id: '6368ed99-60b8-4787-8dbc-74ba4912f785',
+              meta: {
+                lastUpdated: '2022-12-07T14:39:24.233+00:00',
+                versionId: '543c88a0-c0b4-45d0-8fe7-6931de5dfd11'
+              }
+            },
+            request: {
+              method: 'PUT',
+              url: 'PractitionerRole/6368ed99-60b8-4787-8dbc-74ba4912f785'
+            }
+          }
+        ]
+      }
+      const roleHistoryBundle = {
+        resourceType: 'Bundle',
+        id: '23c2aa70-bf3c-41ae-9251-384044bdba09',
+        meta: { lastUpdated: '2022-12-07T15:15:55.164+00:00' },
+        type: 'history',
+        total: 2,
+        link: [
+          { relation: 'self', url: 'http://localhost:3447/fhir/_history' }
+        ],
+        entry: [
+          {
+            fullUrl:
+              'http://localhost:3447/fhir/PractitionerRole/6368ed99-60b8-4787-8dbc-74ba4912f785/_history/543c88a0-c0b4-45d0-8fe7-6931de5dfd11',
+            resource: {
+              resourceType: 'PractitionerRole',
+              practitioner: {
+                reference: 'Practitioner/ea3cf326-fe93-4795-88c6-6bc6a3118c96'
+              },
+              code: [
+                {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/roles',
+                      code: 'FIELD_AGENT'
+                    }
+                  ]
+                },
+                {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/types',
+                      code: 'HEALTHCARE_WORKER'
+                    }
+                  ]
+                }
+              ],
+              location: [
+                { reference: 'Location/c24c0b72-11b5-4c1a-bbb7-61112fa6f481' },
+                { reference: 'Location/da30f792-d28c-4a92-bb2f-43d6a8ef9254' }
+              ],
+              id: '6368ed99-60b8-4787-8dbc-74ba4912f785',
+              meta: {
+                lastUpdated: '2022-12-07T14:39:24.233+00:00',
+                versionId: '543c88a0-c0b4-45d0-8fe7-6931de5dfd11'
+              }
+            },
+            request: {
+              method: 'PUT',
+              url: 'PractitionerRole/6368ed99-60b8-4787-8dbc-74ba4912f785'
+            }
+          },
+          {
+            fullUrl:
+              'http://localhost:3447/fhir/PractitionerRole/6368ed99-60b8-4787-8dbc-74ba4912f785/_history/a10e2a08-633d-4ba0-b2c1-1a124fa366cb',
+            resource: {
+              resourceType: 'PractitionerRole',
+              practitioner: {
+                reference: 'Practitioner/ea3cf326-fe93-4795-88c6-6bc6a3118c96'
+              },
+              code: [
+                {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/roles',
+                      code: 'LOCAL_REGISTRAR'
+                    }
+                  ]
+                }
+              ],
+              location: [
+                { reference: 'Location/0be1dc9b-5c8b-4d20-a88c-08cafc71c99a' },
+                { reference: 'Location/c24c0b72-11b5-4c1a-bbb7-61112fa6f481' },
+                { reference: 'Location/da30f792-d28c-4a92-bb2f-43d6a8ef9254' }
+              ],
+              meta: {
+                lastUpdated: '2022-11-28T17:46:57.168+00:00',
+                versionId: 'a10e2a08-633d-4ba0-b2c1-1a124fa366cb'
+              },
+              id: '6368ed99-60b8-4787-8dbc-74ba4912f785'
+            },
+            request: { method: 'POST', url: 'PractitionerRole' }
+          }
+        ]
+      }
+
+      fetch.mockResponses(
+        [JSON.stringify(roleBundle), { status: 200 }],
+        [JSON.stringify(roleHistoryBundle), { status: 200 }],
+        [JSON.stringify(mockUser), { status: 200 }]
+      )
       const user = await typeResolvers.History.user(
         mockTaskDownloaded,
         null,

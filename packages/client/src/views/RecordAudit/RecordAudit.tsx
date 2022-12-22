@@ -10,11 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Header } from '@client/components/interface/Header/Header'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Header } from '@client/components/Header/Header'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import {
   Navigation,
   WORKQUEUE_TABS
@@ -36,7 +33,8 @@ import {
   goToCertificateCorrection,
   goToPrintCertificate,
   goToUserProfile,
-  goToTeamUserList
+  goToTeamUserList,
+  goToViewRecordPage
 } from '@client/navigation'
 import {
   injectIntl,
@@ -46,7 +44,7 @@ import {
 } from 'react-intl'
 import {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   IDeclaration,
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
@@ -56,13 +54,9 @@ import { IStoreState } from '@client/store'
 import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import {
-  ResponsiveModal,
-  Loader,
-  PageHeader,
-  IPageHeaderProps,
-  ErrorToastNotification
-} from '@opencrvs/components/lib/interface'
+import { Toast } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
@@ -80,17 +74,16 @@ import {
   FIELD_AGENT_ROLES,
   IN_PROGRESS
 } from '@client/utils/constants'
-import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
+import { IQueryData } from '@client/workqueue'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { CorrectionSection, IForm } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
@@ -107,16 +100,17 @@ import {
   ShowUpdateButton,
   ShowPrintButton
 } from './ActionButtons'
-import { IActionDetailsData, GetHistory } from './History'
+import { GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
-import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
-import { Mutation } from 'react-apollo'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { Mutation } from '@apollo/client/react/components'
 import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
-  Event
+  Event,
+  History
 } from '@client/utils/gateway'
 import {
   REINSTATE_BIRTH_DECLARATION,
@@ -124,6 +118,10 @@ import {
 } from './mutations'
 import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { Button } from '@opencrvs/components/lib/Button'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -131,17 +129,9 @@ const DesktopHeader = styled(Header)`
   }
 `
 
-const MobileHeader = styled(PageHeader)`
+const MobileHeader = styled(AppBar)`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
-  }
-`
-
-const BodyContainer = styled.div`
-  margin-left: 0px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 250px;
-    padding: 0px 24px;
   }
 `
 
@@ -189,7 +179,7 @@ interface IStateProps {
 
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
-  clearCorrectionChange: typeof clearCorrectionChange
+  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
@@ -293,7 +283,7 @@ function ReinstateButton({
 
 function RecordAuditBody({
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   declaration,
   draft,
   duplicates,
@@ -324,13 +314,12 @@ function RecordAuditBody({
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
+  const isOnline = useOnlineStatus()
+  const dispatch = useDispatch()
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
-  const toggleActionDetails = (
-    actionItem: IActionDetailsData | null,
-    itemIndex = -1
-  ) => {
+  const toggleActionDetails = (actionItem: History | null, itemIndex = -1) => {
     actionItem && setActionDetailsData(actionItem)
     setActionDetailsIndex(itemIndex)
     setActionDetails((prevValue) => !prevValue)
@@ -343,6 +332,28 @@ function RecordAuditBody({
   const actions: React.ReactElement[] = []
   const mobileActions: React.ReactElement[] = []
   const desktopActionsView: React.ReactElement[] = []
+
+  if (
+    declaration.status !== SUBMISSION_STATUS.DRAFT &&
+    (userHasRegisterScope || userHasValidateScope)
+  ) {
+    actions.push(
+      <Button
+        type="secondary"
+        onClick={() => {
+          dispatch(goToViewRecordPage(declaration.id as string))
+        }}
+      >
+        {intl.formatMessage(buttonMessages.view)}
+      </Button>
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
 
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
@@ -360,7 +371,7 @@ function RecordAuditBody({
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
         onClick={() => {
-          clearCorrectionChange(declaration.id)
+          clearCorrectionAndPrintChanges(declaration.id)
           goToCertificateCorrection(declaration.id, CorrectionSection.Corrector)
         }}
       >
@@ -402,6 +413,7 @@ function RecordAuditBody({
         align={ICON_ALIGNMENT.LEFT}
         id="reinstate_button"
         key="reinstate_button"
+        disabled={!isOnline}
         icon={() => <RotateLeft />}
         onClick={toggleDisplayDialog}
       >
@@ -469,7 +481,8 @@ function RecordAuditBody({
         userDetails,
         draft,
         goToPrintCertificate,
-        goToTeamUserList
+        goToTeamUserList,
+        clearCorrectionAndPrintChanges
       })
     )
     mobileActions.push(actions[actions.length - 1])
@@ -490,7 +503,7 @@ function RecordAuditBody({
     desktopActionsView.push(actions[actions.length - 1])
   } else {
     if (draft?.submissionStatus === SUBMISSION_STATUS.DRAFT) {
-      actions.push(<Uploaded />)
+      actions.push(<Downloaded />)
     } else {
       actions.push(
         ShowDownloadButton({
@@ -515,13 +528,14 @@ function RecordAuditBody({
     actionDetailsIndex,
     toggleActionDetails,
     intl,
+    userDetails,
     goToUser: goToUserProfile,
     registerForm: regForm,
     offlineData,
     draft
   }
 
-  const mobileProps: IPageHeaderProps = {
+  const mobileProps: IAppBarProps = {
     id: 'mobileHeader',
     mobileTitle:
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
@@ -646,7 +660,7 @@ function RecordAuditBody({
   )
 }
 
-function getBodyContent({
+const BodyContent = ({
   declarationId,
   draft,
   intl,
@@ -658,7 +672,9 @@ function getBodyContent({
   workqueueDeclaration,
   goBack,
   ...actionProps
-}: IFullProps) {
+}: IFullProps) => {
+  const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
+
   if (
     tab === 'search' ||
     (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
@@ -678,12 +694,20 @@ function getBodyContent({
               return <Loader id="search_loader" marginPercent={35} />
             } else if (error) {
               return (
-                <ErrorToastNotification
-                  retryButtonText={intl.formatMessage(buttonMessages.retry)}
-                  retryButtonHandler={() => refetch()}
-                >
-                  {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-                </ErrorToastNotification>
+                (!isErrorDismissed && (
+                  <Toast
+                    type="warning"
+                    actionText={intl.formatMessage(buttonMessages.retry)}
+                    onActionClick={() => {
+                      refetch()
+                      setIsErrorDismissed(false)
+                    }}
+                    onClose={() => setIsErrorDismissed(true)}
+                  >
+                    {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+                  </Toast>
+                )) ||
+                null
               )
             }
 
@@ -700,7 +724,8 @@ function getBodyContent({
               )
               declaration = {
                 ...declaration,
-                status: data.fetchRegistration?.registration?.status[0].type
+                status: data.fetchRegistration?.registration?.status[0].type,
+                assignment: data.fetchRegistration?.registration?.assignment
               }
             } else {
               declaration = getGQLDeclaration(data.fetchRegistration, language)
@@ -772,12 +797,17 @@ function getBodyContent({
 
 const RecordAuditComp = (props: IFullProps) => {
   return (
-    <>
-      <DesktopHeader />
-      <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
-      <BodyContainer>{getBodyContent(props)}</BodyContainer>
-      <NotificationToast />
-    </>
+    <Frame
+      header={<DesktopHeader />}
+      navigation={
+        <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
+      }
+      skipToContentText={props.intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+    >
+      <BodyContent {...props} />
+    </Frame>
   )
 }
 
@@ -812,7 +842,7 @@ export const RecordAudit = connect<
   IStoreState
 >(mapStateToProps, {
   archiveDeclaration,
-  clearCorrectionChange,
+  clearCorrectionAndPrintChanges,
   goToCertificateCorrection,
   goToPage,
   goToPrintCertificate,

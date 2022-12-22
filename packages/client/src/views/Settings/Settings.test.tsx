@@ -20,19 +20,22 @@ import {
 import { createStore } from '@client/store'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
-import { DataSection } from '@opencrvs/components/lib/interface'
+import { DataSection } from '@opencrvs/components/lib/ViewData'
 import { ReactWrapper } from 'enzyme'
-import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
+import { SEARCH_EVENTS } from '@client/search/queries'
 import { changeAvatarMutation, AvatarChangeModal } from './AvatarChangeModal'
 import * as imageUtils from '@client/utils/imageUtils'
+import { vi } from 'vitest'
 
 const graphqlMocks = [
   {
     request: {
-      query: COUNT_USER_WISE_DECLARATIONS,
+      query: SEARCH_EVENTS,
       variables: {
-        status: ['REJECTED'],
-        locationIds: ['6327dbd9-e118-4dbe-9246-cb0f7649a666']
+        advancedSearchParameters: {
+          registrationStatuses: ['REJECTED'],
+          declarationLocationId: ['6327dbd9-e118-4dbe-9246-cb0f7649a666']
+        }
       }
     },
     result: {
@@ -185,14 +188,12 @@ describe('Settings page tests', () => {
     })
 
     it('should change profile image', async () => {
-      jest
-        .spyOn(imageUtils, 'getCroppedImage')
-        .mockImplementation((img, crop) =>
-          Promise.resolve({
-            type: 'image/jpeg',
-            data: validImageB64String
-          })
-        )
+      vi.spyOn(imageUtils, 'getCroppedImage').mockImplementation((img, crop) =>
+        Promise.resolve({
+          type: 'image/jpeg',
+          data: validImageB64String
+        })
+      )
       component
         .find('#image_file_uploader_field')
         .hostNodes()

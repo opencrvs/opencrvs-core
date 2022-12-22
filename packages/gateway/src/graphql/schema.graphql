@@ -23,6 +23,7 @@ type Query {
   fetchDeathRegistration(id: ID!): DeathRegistration
   fetchEventRegistration(id: ID!): EventRegistration
   fetchRegistration(id: ID!): EventRegistration
+  fetchRegistrationForViewing(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
     status: [String]!
@@ -64,6 +65,16 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
+  getRegistrationsListByFilter(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+    filterBy: String!
+    skip: Int!
+    size: Int!
+  ): MixedTotalMetricsResult
+  getVSExports: TotalVSExport
   getTotalPayments(
     timeStart: String!
     timeEnd: String!
@@ -102,34 +113,28 @@ type Query {
     locationId: String
     event: String!
   ): [LocationWiseEstimationMetric!]
-  fetchTimeLoggedMetricsByPractitioner(
-    timeStart: String!
-    timeEnd: String!
+  getUserAuditLog(
     practitionerId: String!
-    locationId: String!
+    skip: Int
     count: Int!
-  ): TimeLoggedMetricsResultSet
+    timeStart: String
+    timeEnd: String
+  ): UserAuditLogResultSet
   searchEvents(
     userId: String
-    locationIds: [String!]
-    status: [String]
-    type: [String]
-    trackingId: String
-    registrationNumber: String
-    contactNumber: String
-    name: String
+    advancedSearchParameters: AdvancedSearchParametersInput!
     count: Int
     skip: Int
     sort: String
     sortColumn: String
   ): EventSearchResultSet
   getEventsWithProgress(
-    locationId: String
+    declarationJurisdictionId: String
+    registrationStatuses: [String]
+    compositionType: [String]
     count: Int
     skip: Int
     sort: String
-    status: [String]
-    type: [String]
   ): EventProgressResultSet
   getRoles(
     title: String
@@ -142,6 +147,8 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
+  fetchSystem(clientId: ID!): System
+  getFormDataset: [FormDataset!]
 }
 
 type Mutation {
@@ -209,6 +216,8 @@ type Mutation {
     comment: String
   ): String
   resendSMSInvite(userId: String!): String
+  usernameSMSReminder(userId: String!): String
+  resetPasswordSMS(userId: String!, applicationName: String!): String
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -218,6 +227,19 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
+  reactivateSystem(clientId: ID!): System
+  deactivateSystem(clientId: ID!): System
+  registerSystem(system: SystemInput): SystemSecret
+  refreshSystemSecret(clientId: String!): SystemSecret
+  updatePermissions(setting: UpdatePermissionsInput!): System
+  deleteSystem(clientId: ID!): System
+  bookmarkAdvancedSearch(
+    bookmarkSearchInput: BookmarkSearchInput!
+  ): BookMarkedSearches
+  removeBookmarkedAdvancedSearch(
+    removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
+  ): BookMarkedSearches
+  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
 }
 
 type Dummy {
@@ -361,6 +383,7 @@ type User {
   creationDate: String
   avatar: Avatar
   device: String
+  searches: [BookmarkedSeachItem]
 }
 
 type SearchUserResult {
@@ -384,6 +407,15 @@ type VerifyPasswordResult {
 type TotalMetricsResult {
   estimated: Estimation!
   results: [EventMetrics!]!
+}
+
+union MixedTotalMetricsResult =
+    TotalMetricsByRegistrar
+  | TotalMetricsByLocation
+  | TotalMetricsByTime
+
+type TotalVSExport {
+  results: [VSExport!]
 }
 
 type PaymentMetric {
@@ -433,14 +465,71 @@ type LocationWiseEstimationMetric {
   locationName: String!
 }
 
-type TimeLoggedMetricsResultSet {
-  results: [TimeLoggedMetrics]
-  totalItems: Int
+type UserAuditLogResultSet {
+  total: Int!
+  results: [UserAuditLogResultItem!]!
 }
 
 type EventSearchResultSet {
   results: [EventSearchSet]
   totalItems: Int
+}
+
+input AdvancedSearchParametersInput {
+  event: Event
+  name: String
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  contactNumber: String
+  nationalId: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventCountry: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  deceasedIdentifier: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  motherIdentifier: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  fatherIdentifier: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
+  informantIdentifier: String
+  compositionType: [String]
 }
 
 type EventProgressResultSet {
@@ -487,6 +576,23 @@ type FormDraft {
   history: [DraftHistory!]!
   updatedAt: Date!
   createdAt: Date!
+}
+
+type System {
+  _id: ID!
+  clientId: ID!
+  shaSecret: ID!
+  status: SystemStatus!
+  name: String!
+  type: SystemType!
+  settings: [WebhookPermission!]
+}
+
+type FormDataset {
+  options: [FormDatasetOption!]
+  fileName: String!
+  createdAt: String!
+  _id: String
 }
 
 input NotificationInput {
@@ -606,6 +712,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  ADMIN_LEVELS: Int
 }
 
 input ApplicationConfigurationInput {
@@ -620,6 +727,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  ADMIN_LEVELS: Int
 }
 
 input FormDraftInput {
@@ -637,6 +745,48 @@ input DeleteFormDraftInput {
   event: Event!
 }
 
+type SystemSecret {
+  system: System!
+  clientSecret: ID!
+}
+
+input SystemInput {
+  name: String!
+  type: SystemType!
+  settings: SystemSettings
+}
+
+input UpdatePermissionsInput {
+  clientId: String!
+  webhook: [WebhookInput!]!
+}
+
+type BookMarkedSearches {
+  searchList: [BookmarkedSeachItem!]
+}
+
+input BookmarkSearchInput {
+  userId: String!
+  name: String!
+  parameters: AdvancedSearchParametersInput!
+}
+
+input RemoveBookmarkedSeachInput {
+  userId: String!
+  searchId: String!
+}
+
+type FormDatasetResponse {
+  status: String!
+  msg: String!
+  data: FormDataset
+}
+
+input FormDatasetInput {
+  fileName: String!
+  base64Data: String!
+}
+
 scalar Map
 
 type Registration {
@@ -644,6 +794,7 @@ type Registration {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -707,10 +858,14 @@ enum BirthRegType {
 type History {
   user: User
   date: Date
-  action: RegStatus
+  regStatus: RegStatus
+  action: RegAction
   statusReason: StatusReason
   reason: String
-  reinstated: Boolean
+  requester: String
+  hasShowedVerifiedDocument: Boolean
+  otherReason: String
+  system: System
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -853,6 +1008,12 @@ type Signature {
   type: String
 }
 
+type BookmarkedSeachItem {
+  searchId: String!
+  name: String!
+  parameters: AdvancedSeachParameters!
+}
+
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
@@ -884,17 +1045,43 @@ type EventMetrics {
   practitionerRole: String!
 }
 
-type TimeLoggedMetrics {
-  status: String!
-  trackingId: String
-  eventType: String!
-  time: String!
+type TotalMetricsByRegistrar {
+  results: [EventMetricsByRegistrar!]!
+  total: Int
 }
+
+type TotalMetricsByLocation {
+  results: [EventMetricsByLocation!]!
+  total: Int
+}
+
+type TotalMetricsByTime {
+  results: [EventMetricsByTime!]!
+  total: Int
+}
+
+type VSExport {
+  event: String!
+  year: Int!
+  fileSize: String!
+  url: String!
+  createdOn: String!
+}
+
+union UserAuditLogResultItem =
+    UserAuditLogItemWithComposition
+  | UserAuditLogItem
 
 interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
+}
+
+enum Event {
+  birth
+  death
 }
 
 type EventProgressSet {
@@ -909,11 +1096,6 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
-enum Event {
-  birth
-  death
-}
-
 enum DraftStatus {
   DRAFT
   IN_PREVIEW
@@ -926,6 +1108,28 @@ type DraftHistory {
   status: DraftStatus!
   comment: String!
   updatedAt: Date!
+}
+
+enum SystemStatus {
+  active
+  deactivated
+}
+
+enum SystemType {
+  NATIONAL_ID
+  HEALTH
+  RECORD_SEARCH
+  WEBHOOK
+}
+
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
+}
+
+type FormDatasetOption {
+  value: String!
+  label: [FormDatasetOptionLabel]
 }
 
 input PersonInput {
@@ -970,6 +1174,7 @@ input RegistrationInput {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -1012,8 +1217,6 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
-  REQUESTED_CORRECTION
-  DOWNLOADED
 }
 
 input MedicalPractitionerInput {
@@ -1095,6 +1298,19 @@ input QuestionInput {
   required: Boolean
   enabled: String
   custom: Boolean
+  conditionals: [ConditionalInput!]
+  datasetId: String
+  options: [CustomSelectOption!]
+}
+
+input SystemSettings {
+  dailyQuota: Int
+  webhook: [WebhookInput]
+}
+
+input WebhookInput {
+  event: String!
+  permissions: [String]!
 }
 
 enum InformantType {
@@ -1148,6 +1364,15 @@ type Certificate {
   data: String
 }
 
+enum RegAction {
+  ASSIGNED
+  UNASSIGNED
+  REINSTATED
+  REQUESTED_CORRECTION
+  DOWNLOADED
+  VIEWED
+}
+
 type StatusReason {
   text: String
 }
@@ -1168,6 +1393,9 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
+  MOSIP_UINTOKEN
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
@@ -1223,6 +1451,106 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
 }
 
+type AdvancedSeachParameters {
+  event: Event
+  name: String
+  registrationStatuses: [String]
+  dateOfEvent: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  contactNumber: String
+  nationalId: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+  declarationLocationId: String
+  declarationJurisdictionId: String
+  eventLocationId: String
+  eventCountry: String
+  eventLocationLevel1: String
+  eventLocationLevel2: String
+  eventLocationLevel3: String
+  eventLocationLevel4: String
+  eventLocationLevel5: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  childDoBStart: String
+  childDoBEnd: String
+  childGender: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deceasedGender: String
+  deceasedDoB: String
+  deceasedDoBStart: String
+  deceasedDoBEnd: String
+  deceasedIdentifier: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherDoBStart: String
+  motherDoBEnd: String
+  motherIdentifier: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherDoBStart: String
+  fatherDoBEnd: String
+  fatherIdentifier: String
+  informantFirstNames: String
+  informantFamilyName: String
+  informantDoB: String
+  informantDoBStart: String
+  informantDoBEnd: String
+  informantIdentifier: String
+  compositionType: [String]
+}
+
+type EventMetricsByRegistrar {
+  registrarPractitioner: User
+  total: Int!
+  late: Int!
+  delayed: Int!
+}
+
+type EventMetricsByLocation {
+  location: Location!
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+}
+
+type EventMetricsByTime {
+  total: Int!
+  late: Int!
+  delayed: Int!
+  home: Int!
+  healthFacility: Int!
+  month: String!
+  time: String!
+}
+
+type UserAuditLogItemWithComposition implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+  data: AdditionalIdWithCompositionId!
+}
+
+type UserAuditLogItem implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
 type RegistrationSearchSet {
   status: String
   contactNumber: String
@@ -1240,12 +1568,26 @@ type RegistrationSearchSet {
   assignment: AssignmentData
 }
 
+type OperationHistorySearchSet {
+  operationType: String
+  operatedOn: Date
+  operatorRole: String
+  operatorName: [HumanName]
+  operatorOfficeName: String
+  operatorOfficeAlias: [String]
+  notificationFacilityName: String
+  notificationFacilityAlias: [String]
+  rejectReason: String
+  rejectComment: String
+}
+
 type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -1254,6 +1596,7 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressData {
@@ -1263,6 +1606,11 @@ type EventProgressData {
   timeInWaitingForApproval: Int
   timeInWaitingForBRIS: Int
   timeInReadyToPrint: Int
+}
+
+type FormDatasetOptionLabel {
+  lang: String!
+  descriptor: MesssageDescriptor!
 }
 
 input IdentityInput {
@@ -1336,6 +1684,7 @@ input CorrectionInput {
   location: LocationInput
   data: String
   reason: String
+  otherReason: String
   note: String
 }
 
@@ -1373,6 +1722,17 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+  SELECT_WITH_OPTIONS
+}
+
+input ConditionalInput {
+  fieldId: String!
+  regexp: String!
+}
+
+input CustomSelectOption {
+  value: String!
+  label: MesssageDescriptorInput!
 }
 
 type Payment {
@@ -1382,6 +1742,25 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+interface AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
+type AdditionalIdWithCompositionId {
+  compositionId: String!
+  trackingId: String!
+}
+
+type MesssageDescriptor {
+  id: String!
+  description: String
+  defaultMessage: String!
 }
 
 input CommentInput {

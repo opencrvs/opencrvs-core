@@ -15,7 +15,7 @@ import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -169,7 +169,7 @@ describe('createUser handler', () => {
       ]
     }
 
-    expect(fetch.mock.calls.length).toBe(7)
+    expect(fetch.mock.calls.length).toBe(8)
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual(
       expectedPractitioner
     )

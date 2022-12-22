@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import { Action, DownloadAction } from '@client/forms'
 
 export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
@@ -169,9 +169,12 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
+        otherReason
+        requester
+        hasShowedVerifiedDocument
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text
@@ -184,6 +187,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         office {
           id
           name
+        }
+        system {
+          name
+          type
         }
         user {
           id
@@ -403,9 +410,11 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
+        otherReason
+        requester
         date
         action
-        reinstated
+        regStatus
         dhis2Notification
         statusReason {
           text
@@ -417,6 +426,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         office {
           id
           name
+        }
+        system {
+          name
+          type
         }
         user {
           id

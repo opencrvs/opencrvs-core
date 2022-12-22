@@ -114,16 +114,14 @@ type Query {
     locationId: String
     event: String!
   ): [LocationWiseEstimationMetric!]
-  fetchTimeLoggedMetricsByPractitioner(
-    timeStart: String!
-    timeEnd: String!
+  getUserAuditLog(
     practitionerId: String!
-    locationId: String!
+    skip: Int
     count: Int!
-  ): TimeLoggedMetricsResultSet
+  ): UserAuditLogResultSet
   searchEvents(
     userId: String
-    locationIds: [String]
+    locationIds: [String!]
     status: [String]
     type: [String]
     trackingId: String
@@ -145,7 +143,7 @@ type Query {
   ): EventProgressResultSet
   getRoles(
     title: String
-    value: String
+    value: ComparisonInput
     type: String
     active: Boolean
     sortBy: String
@@ -153,7 +151,6 @@ type Query {
   ): [Role]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
-  getQuestions: [Question]
   getFormDraft: [FormDraft!]
 }
 
@@ -192,11 +189,11 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
-  markEventAsUnassigned(id: String!): ID!
   requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!
   ): ID!
+  markEventAsUnassigned(id: String!): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -222,15 +219,16 @@ type Mutation {
     comment: String
   ): String
   resendSMSInvite(userId: String!): String
+  usernameSMSReminder(userId: String!): String
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
   updateApplicationConfig(
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
-  createOrUpdateQuestion(question: QuestionInput!): Question
   createFormDraft(formDraft: FormDraftInput!): FormDraft
-  modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
+  modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
+  deleteFormDraft(formDraft: DeleteFormDraftInput!): String
 }
 
 type Dummy {
@@ -368,7 +366,7 @@ type User {
   underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
-  localRegistrar: LocalRegistrar!
+  localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
   creationDate: String
@@ -446,9 +444,9 @@ type LocationWiseEstimationMetric {
   locationName: String!
 }
 
-type TimeLoggedMetricsResultSet {
-  results: [TimeLoggedMetrics]
-  totalItems: Int
+type UserAuditLogResultSet {
+  total: Int!
+  results: [UserAuditLogResultItem!]!
 }
 
 type EventSearchResultSet {
@@ -461,13 +459,6 @@ type EventProgressResultSet {
   totalItems: Int
 }
 
-type AssignmentData {
-  userId: String
-  firstName: String
-  lastName: String
-  officeName: String
-}
-
 type Role {
   id: ID!
   title: String
@@ -476,42 +467,35 @@ type Role {
   active: Boolean
 }
 
-type CertificateSVG {
-  _id: ID
-  svgCode: String
-  svgFilename: String
-  svgDateUpdated: String
-  svgDateCreated: String
-  user: String
-  event: String
-  status: String
+input ComparisonInput {
+  eq: String
+  gt: String
+  lt: String
+  gte: String
+  lte: String
+  in: [String!]
+  ne: String
+  nin: [String!]
 }
 
-type Question {
-  _id: ID!
-  fieldId: String!
-  label: [Messsage!]
-  placeholder: [Messsage!]
-  description: [Messsage!]
-  tooltip: [Messsage!]
-  errorMessage: [Messsage!]
-  maxLength: Int
-  fieldName: String
-  fieldType: String
-  precedingFieldId: String
-  required: Boolean
-  enabled: String
-  custom: Boolean
-  initialValue: String
+type CertificateSVG {
+  id: ID!
+  svgCode: String!
+  svgFilename: String!
+  svgDateUpdated: String!
+  svgDateCreated: String!
+  user: String!
+  event: String!
+  status: String!
 }
 
 type FormDraft {
-  _id: ID
-  event: String!
-  status: String!
-  comment: String
+  _id: ID!
+  event: Event!
+  status: DraftStatus!
+  comment: String!
   version: Int!
-  history: [DraftHistory!]
+  history: [DraftHistory!]!
   updatedAt: Date!
   createdAt: Date!
 }
@@ -630,11 +614,10 @@ type ApplicationConfiguration {
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
-  SENTRY: String
-  LOGROCKET: String
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  ADMIN_LEVELS: Int
 }
 
 input ApplicationConfigurationInput {
@@ -646,40 +629,25 @@ input ApplicationConfigurationInput {
   FIELD_AGENT_AUDIT_LOCATIONS: String
   HIDE_EVENT_REGISTER_INFORMATION: Boolean
   EXTERNAL_VALIDATION_WORKQUEUE: Boolean
-  SENTRY: String
-  LOGROCKET: String
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
-}
-
-input QuestionInput {
-  id: ID
-  fieldId: String!
-  label: [MesssageInput!]
-  placeholder: [MesssageInput!]
-  description: [MesssageInput!]
-  tooltip: [MesssageInput!]
-  errorMessage: [MesssageInput!]
-  maxLength: Int
-  fieldName: String
-  fieldType: String
-  precedingFieldId: String
-  required: Boolean
-  enabled: String
-  custom: Boolean
-  initialValue: String
+  ADMIN_LEVELS: Int
 }
 
 input FormDraftInput {
   questions: [QuestionInput!]!
-  event: String!
+  event: Event!
   comment: String!
 }
 
-input FormDraftStatusModify {
-  event: String!
-  status: String!
+input FormDraftStatusModifyInput {
+  event: Event!
+  status: DraftStatus!
+}
+
+input DeleteFormDraftInput {
+  event: Event!
 }
 
 scalar Map
@@ -695,6 +663,7 @@ type Registration {
   book: String
   informantType: InformantType
   otherInformantType: String
+  assignment: AssignmentData
   contact: String
   contactRelationship: String
   contactPhoneNumber: String
@@ -753,13 +722,16 @@ type History {
   date: Date
   action: RegStatus
   statusReason: StatusReason
+  reason: String
   reinstated: Boolean
   location: Location
   office: Location
+  dhis2Notification: Boolean
   comments: [Comment]
   input: [InputOutput]
   output: [InputOutput]
   certificates: [Certificate]
+  signature: Signature
 }
 
 enum MannerOfDeath {
@@ -925,17 +897,15 @@ type EventMetrics {
   practitionerRole: String!
 }
 
-type TimeLoggedMetrics {
-  status: String!
-  trackingId: String
-  eventType: String!
-  time: String!
-}
+union UserAuditLogResultItem =
+    UserAuditLogItemWithComposition
+  | UserAuditLogItem
 
 interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressSet {
@@ -950,17 +920,23 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
-type Messsage {
-  lang: String!
-  descriptor: MesssageDescriptor!
+enum Event {
+  birth
+  death
+}
+
+enum DraftStatus {
+  DRAFT
+  IN_PREVIEW
+  PUBLISHED
 }
 
 type DraftHistory {
-  _id: ID
-  version: Int
-  status: String
-  comment: String
-  updatedAt: Date
+  _id: ID!
+  version: Int!
+  status: DraftStatus!
+  comment: String!
+  updatedAt: Date!
 }
 
 input PersonInput {
@@ -978,7 +954,7 @@ input PersonInput {
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]
-  photo: [AttachmentInput]
+  photo: [AttachmentInput!]
   deceased: DeceasedInput
   nationality: [String]
   educationalAttainment: EducationType
@@ -1017,7 +993,7 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
-  attachments: [AttachmentInput]
+  attachments: [AttachmentInput!]
   certificates: [CertificateInput]
   location: LocationInput
   correction: CorrectionInput
@@ -1028,7 +1004,7 @@ input RelatedPersonInput {
   _fhirID: ID
   relationship: String
   otherRelationship: String
-  affidavit: [AttachmentInput]
+  affidavit: [AttachmentInput!]
   individual: PersonInput
 }
 
@@ -1070,7 +1046,7 @@ input UserIdentifierInput {
 }
 
 input SignatureInput {
-  data: String
+  data: String!
   type: String
 }
 
@@ -1116,9 +1092,20 @@ input DeathInput {
   FEE: DeathFeeInput
 }
 
-input MesssageInput {
-  lang: String!
-  descriptor: MesssageDescriptorInput!
+input QuestionInput {
+  fieldId: String!
+  label: [MesssageInput!]
+  placeholder: [MesssageInput!]
+  description: [MesssageInput!]
+  tooltip: [MesssageInput!]
+  errorMessage: [MesssageInput!]
+  maxLength: Int
+  fieldName: String
+  fieldType: CustomFieldType
+  precedingFieldId: String!
+  required: Boolean
+  enabled: String
+  custom: Boolean
 }
 
 enum InformantType {
@@ -1139,6 +1126,13 @@ enum InformantType {
   GRANDSON
   GRANDDAUGHTER
   OTHER
+}
+
+type AssignmentData {
+  userId: String
+  firstName: String
+  lastName: String
+  officeName: String
 }
 
 type RegWorkflow {
@@ -1185,6 +1179,9 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
+  MOSIP_UINTOKEN
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
@@ -1234,16 +1231,27 @@ enum AttachmentSubject {
   PARENT
   CHILD_AGE
   DECEASED_ID_PROOF
-  DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
-  DECEASED_BIRTH_PROOF
+  DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
-  INFORMANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
-  ASSIGNED_RESPONSIBILITY_PROOF
-  WARD_COUNCILLOR_PROOF
-  CAUSE_OF_DEATH
-  CORONERS_REPORT
+}
+
+type UserAuditLogItemWithComposition implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+  data: AdditionalIdWithCompositionId!
+}
+
+type UserAuditLogItem implements AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
 }
 
 type RegistrationSearchSet {
@@ -1263,12 +1271,26 @@ type RegistrationSearchSet {
   assignment: AssignmentData
 }
 
+type OperationHistorySearchSet {
+  operationType: String
+  operatedOn: Date
+  operatorRole: String
+  operatorName: [HumanName]
+  operatorOfficeName: String
+  operatorOfficeAlias: [String]
+  notificationFacilityName: String
+  notificationFacilityAlias: [String]
+  rejectReason: String
+  rejectComment: String
+}
+
 type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -1277,6 +1299,7 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type EventProgressData {
@@ -1286,12 +1309,6 @@ type EventProgressData {
   timeInWaitingForApproval: Int
   timeInWaitingForBRIS: Int
   timeInReadyToPrint: Int
-}
-
-type MesssageDescriptor {
-  id: String!
-  description: String!
-  defaultMessage: String!
 }
 
 input IdentityInput {
@@ -1323,7 +1340,7 @@ input AddressInput {
 input AttachmentInput {
   _fhirID: ID
   contentType: String
-  data: String
+  data: String!
   status: String
   originalFileName: String
   systemFileName: String
@@ -1390,10 +1407,18 @@ input DeathFeeInput {
   DELAYED: Float
 }
 
-input MesssageDescriptorInput {
-  id: String!
-  description: String
-  defaultMessage: String!
+input MesssageInput {
+  lang: String!
+  descriptor: MesssageDescriptorInput!
+}
+
+enum CustomFieldType {
+  TEXT
+  TEL
+  TEXTAREA
+  NUMBER
+  SUBSECTION
+  PARAGRAPH
 }
 
 type Payment {
@@ -1403,6 +1428,19 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+interface AuditLogItemBase {
+  time: String!
+  ipAddress: String!
+  userAgent: String!
+  action: String!
+  practitionerId: String!
+}
+
+type AdditionalIdWithCompositionId {
+  compositionId: String!
+  trackingId: String!
 }
 
 input CommentInput {
@@ -1426,6 +1464,12 @@ input CorrectionValueInput {
   fieldName: String
   oldValue: String
   newValue: String
+}
+
+input MesssageDescriptorInput {
+  id: String!
+  description: String
+  defaultMessage: String!
 }
 
 enum PaymentType {

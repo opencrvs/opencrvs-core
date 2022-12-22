@@ -67,18 +67,27 @@ describe('Test apollo server config', () => {
     const context = await config.context({
       request: {
         headers: {
-          authorization: `Bearer ${token}`
+          authorization: `Bearer ${token}`,
+          'user-agent': 'OpenCRVS'
+        },
+        info: {
+          remoteAddress: '1.1.1.1'
         }
       },
       h: {}
     })
     expect(context).toStrictEqual({
       Authorization: `Bearer ${token}`,
-      'x-correlation-id': '1'
+      'x-correlation-id': '1',
+      'x-real-ip': '1.1.1.1',
+      'x-real-user-agent': 'OpenCRVS'
     })
   })
   it('throws authentication error when the token holder does not exist', async () => {
-    fetch.mockResponseOnce(JSON.stringify(null), { status: 200 })
+    fetch.mockResponses(
+      [JSON.stringify(null), { status: 200 }],
+      [JSON.stringify(null), { status: 200 }]
+    )
     const config = getApolloConfig()
 
     await expect(

@@ -50,7 +50,9 @@ export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
 export const ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE = ['image/svg+xml']
 
 export const TRACKING_ID_TEXT = 'tracking-id'
+export const NATIONAL_ID_TEXT = 'national-id'
 export const BRN_DRN_TEXT = 'brn-drn'
+export const ADVANCED_SEARCH_TEXT = 'advanced-search'
 export const PHONE_TEXT = 'phone'
 export const NAME_TEXT = 'name'
 export const SEARCH_RESULT_SORT = 'DESC'
@@ -92,11 +94,12 @@ export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
 export const MONTHS_IN_YEAR = 12
 
+/* change to import.meta.env.mode when migrating to vitest */
 export const LOADER_MIN_DISPLAY_TIME =
-  process.env.NODE_ENV !== 'test' ? 3 * 1000 : 0 // 3 seconds except test environment
+  import.meta.env.MODE !== 'test' ? 3 * 1000 : 0 // 3 seconds except test environment
 
 export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
-  process.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
+  import.meta.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
 export const ACCUMULATED_FILE_SIZE = 20480000
@@ -105,4 +108,7 @@ export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
 export const INFORMANT_MINIMUM_AGE = 16
 export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'
 
-export const APPLICATION_VERSION = '1.1.0'
+/** Current application version used in the left navigation. It's saved to localStorage to determine if a user logged into a newer version of the app for the first time */
+export const APPLICATION_VERSION = 'v1.2.0-beta'
+export const ENABLE_REVIEW_ATTACHMENTS_SCROLLING =
+  import.meta.env.MODE === 'test' ? true : false

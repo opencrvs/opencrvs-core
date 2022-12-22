@@ -14,6 +14,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { CustomFieldType, DraftStatus, Event } from '@client/utils/gateway'
+import { ILocation } from '@client/offline/reducer'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -99,9 +100,17 @@ export const formConfig: IFormConfig = {
       required: false,
       enabled: '',
       custom: true
+    },
+    {
+      fieldId: 'birth.child.child-view-group.birthType',
+      enabled: '',
+      identifiers: { sectionIndex: 1, groupIndex: 0, fieldIndex: 6 },
+      precedingFieldId: 'birth.child.child-view-group.vaccination'
     }
   ]
 }
+
+export const systems = []
 
 export const mockConditionals = {
   presentAtBirthRegistration: {
@@ -343,6 +352,7 @@ export const mockOfflineData = {
       name: 'Shaheed Taj Uddin Ahmad Medical College',
       alias: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
       physicalType: 'Building',
+      status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
     },
@@ -351,6 +361,7 @@ export const mockOfflineData = {
       name: 'Kaliganj Union Sub Center',
       alias: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
       physicalType: 'Building',
+      status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
     },
@@ -359,6 +370,7 @@ export const mockOfflineData = {
       name: 'Kaliganj Upazila Health Complex',
       alias: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
       physicalType: 'Building',
+      status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
     },
@@ -367,6 +379,7 @@ export const mockOfflineData = {
       name: 'Dholashadhukhan Cc',
       alias: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
       physicalType: 'Building',
+      status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
     }
@@ -377,6 +390,7 @@ export const mockOfflineData = {
       name: 'Moktarpur Union Parishad',
       alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
       physicalType: 'Building',
+      status: 'active',
       type: 'CRVS_OFFICE',
       partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
     }
@@ -387,6 +401,7 @@ export const mockOfflineData = {
       name: 'Barisal',
       alias: 'বরিশাল',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
@@ -396,6 +411,7 @@ export const mockOfflineData = {
       name: 'Chittagong',
       alias: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
@@ -405,6 +421,7 @@ export const mockOfflineData = {
       name: 'Dhaka',
       alias: 'ঢাকা',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
@@ -414,6 +431,7 @@ export const mockOfflineData = {
       name: 'Khulna',
       alias: 'খুলনা',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
@@ -423,6 +441,7 @@ export const mockOfflineData = {
       name: 'Rajshahi',
       alias: 'রাজশাহী',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
@@ -432,6 +451,7 @@ export const mockOfflineData = {
       name: 'Rangpur',
       alias: 'রংপুর',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
@@ -441,6 +461,7 @@ export const mockOfflineData = {
       name: 'Sylhet',
       alias: 'সিলেট',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
@@ -450,6 +471,7 @@ export const mockOfflineData = {
       name: 'Mymensingh',
       alias: 'ময়মনসিংহ',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
@@ -459,6 +481,7 @@ export const mockOfflineData = {
       name: 'BARGUNA',
       alias: 'বরগুনা',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
@@ -468,6 +491,7 @@ export const mockOfflineData = {
       name: 'BARISAL',
       alias: 'বরিশাল',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
@@ -477,6 +501,7 @@ export const mockOfflineData = {
       name: 'BHOLA',
       alias: 'ভোলা',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
@@ -486,6 +511,7 @@ export const mockOfflineData = {
       name: 'JHALOKATI',
       alias: 'ঝালকাঠি',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
@@ -495,6 +521,7 @@ export const mockOfflineData = {
       name: 'PATUAKHALI',
       alias: 'পটুয়াখালী ',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
@@ -504,6 +531,7 @@ export const mockOfflineData = {
       name: 'PIROJPUR',
       alias: 'পিরোজপুর ',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
@@ -513,6 +541,7 @@ export const mockOfflineData = {
       name: 'BANDARBAN',
       alias: 'বান্দরবান',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
@@ -522,6 +551,7 @@ export const mockOfflineData = {
       name: 'BRAHMANBARIA',
       alias: 'ব্রাহ্মণবাড়িয়া',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
@@ -531,6 +561,7 @@ export const mockOfflineData = {
       name: 'CHANDPUR',
       alias: 'চাঁদপুর',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
@@ -540,6 +571,7 @@ export const mockOfflineData = {
       name: 'CHITTAGONG',
       alias: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
@@ -549,6 +581,7 @@ export const mockOfflineData = {
       name: 'COMILLA',
       alias: 'কুমিল্লা',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
@@ -558,6 +591,7 @@ export const mockOfflineData = {
       name: "COX'S BAZAR",
       alias: 'কক্সবাজার ',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
@@ -567,6 +601,7 @@ export const mockOfflineData = {
       name: 'FENI',
       alias: 'ফেনী',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
@@ -574,6 +609,7 @@ export const mockOfflineData = {
     'bfe8306c-0910-48fe-8bf5-0db906cf3155': {
       alias: 'বানিয়াজান',
       id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
+      status: 'active',
       jurisdictionType: 'UNION',
       name: 'Baniajan',
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
@@ -583,6 +619,7 @@ export const mockOfflineData = {
     'd3cef1d4-6187-4f0e-a024-61abd3fce9d4': {
       alias: 'দুওজ',
       id: 'd3cef1d4-6187-4f0e-a024-61abd3fce9d4',
+      status: 'active',
       jurisdictionType: 'UNION',
       name: 'Duaz',
       partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
@@ -592,6 +629,7 @@ export const mockOfflineData = {
     '473ed705-13e8-4ec1-9836-69bc269f7fad': {
       alias: '',
       id: '473ed705-13e8-4ec1-9836-69bc269f7fad',
+      status: 'active',
       jurisdictionType: 'STATE',
       name: 'Lusaka',
       partOf: 'Location/0',
@@ -601,29 +639,10 @@ export const mockOfflineData = {
     '81317429-1d89-42ac-8abc-7a92f268273c': {
       alias: '',
       id: '81317429-1d89-42ac-8abc-7a92f268273c',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       name: 'Lusaka',
       partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    }
-  },
-  pilotLocations: {
-    'bfe8306c-0910-48fe-8bf5-0db906cf3155': {
-      alias: 'বানিয়াজান',
-      id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
-      jurisdictionType: 'UNION',
-      name: 'Baniajan',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    'd3cef1d4-6187-4f0e-a024-61abd3fce9d4': {
-      alias: 'দুওজ',
-      id: 'd3cef1d4-6187-4f0e-a024-61abd3fce9d4',
-      jurisdictionType: 'UNION',
-      name: 'Duaz',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
       physicalType: 'Jurisdiction',
       type: 'ADMIN_STRUCTURE'
     }
@@ -679,7 +698,75 @@ export const mockOfflineData = {
     NID_NUMBER_PATTERN: /^[0-9]{9}$/,
     SENTRY: 'https://sentry.com',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
-    ADDRESSES: 1
+    ADDRESSES: 1,
+    ADMIN_LEVELS: 2
   },
-  formConfig
+  formConfig,
+  systems
+}
+
+export const mockOfflineLocationsWithHierarchy: Record<
+  string,
+  Record<string, ILocation>
+> = {
+  facilities: {
+    '5c6abc88-26b8-4834-a1a6-2992807e3a72': {
+      id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
+      name: 'ARK Private Clinic',
+      alias: 'ARK Private Clinic',
+      address: '',
+      physicalType: 'Building',
+      status: 'active',
+      type: 'HEALTH_FACILITY',
+      partOf: 'Location/f244b79e-16e7-40b2-834f-c1c57bd7eae8'
+    }
+  },
+  offices: {
+    'c9c4d6e9-981c-4646-98fe-4014fddebd5e': {
+      id: 'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
+      name: 'Ibombo District Office',
+      alias: 'Ibombo District Office',
+      address: 'Ibombo District, Central Province',
+      physicalType: 'Building',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/ecc5a78b-e7d9-4640-ac65-e591a6a9590f'
+    }
+  },
+  locations: {
+    'f244b79e-16e7-40b2-834f-c1c57bd7eae8': {
+      id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
+      name: 'Abwe',
+      alias: 'Abwe',
+      physicalType: 'Jurisdiction',
+      status: 'active',
+      jurisdictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
+    },
+    'ecc5a78b-e7d9-4640-ac65-e591a6a9590f': {
+      id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
+      name: 'Ibombo',
+      alias: 'Ibombo',
+      physicalType: 'Jurisdiction',
+      status: 'active',
+      jurisdictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
+    },
+    'df669feb-61a3-4984-ab24-4b28511b472a': {
+      id: 'df669feb-61a3-4984-ab24-4b28511b472a',
+      name: 'Central',
+      alias: 'Central',
+      physicalType: 'Jurisdiction',
+      status: 'active',
+      jurisdictionType: 'STATE',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/0'
+    }
+  }
+}
+export const mockOfflineDataWithLocationHierarchy = {
+  ...mockOfflineData,
+  ...mockOfflineLocationsWithHierarchy
 }

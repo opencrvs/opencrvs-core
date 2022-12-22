@@ -10,12 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { model, Schema, Document } from 'mongoose'
-// tslint:disable-next-line
-import { statuses } from '../utils/userUtils'
-import { IUserName, UserNameSchema } from '@user-mgnt/model/user'
+import { statuses, types } from '@user-mgnt/utils/userUtils'
 
 export interface ISystem {
-  name: IUserName[]
+  name: string
+  createdBy: string
   username: string
   client_id: string
   secretHash: string
@@ -24,13 +23,42 @@ export interface ISystem {
   practitionerId: string
   scope: string[]
   status: string
+  settings: {
+    dailyQuota: number
+    webhook: WebHook[]
+  }
   creationDate?: number
+  type: string
 }
+
+export enum EventType {
+  Birth = 'birth',
+  Death = 'death'
+}
+
+export interface WebHook {
+  event: EventType
+  permissions: WebhookPermissions[]
+}
+
+export enum WebhookPermissions {
+  CHILDS_DETAILS = 'childs-details',
+  MOTHERS_DETAILS = 'mothers-details',
+  FATHERS_DETAILS = 'fathers-details',
+  INFORMANT_DETAILS = 'informant-details',
+  DISEASE_DETAILS = 'disease-details'
+}
+
+const WebhookSchema = new Schema({
+  event: { type: String },
+  permissions: { type: [String] }
+})
 
 export interface ISystemModel extends ISystem, Document {}
 
 const systemSchema = new Schema({
-  name: { type: [UserNameSchema], required: true },
+  name: { type: String, required: true },
+  createdBy: { type: String, required: true },
   username: { type: String, required: true },
   client_id: { type: String, required: true },
   secretHash: { type: String, required: true },
@@ -43,7 +71,15 @@ const systemSchema = new Schema({
     enum: [statuses.PENDING, statuses.ACTIVE, statuses.DISABLED],
     default: statuses.PENDING
   },
-  creationDate: { type: Number, default: Date.now }
+  settings: {
+    webhook: { type: [WebhookSchema], required: false },
+    dailyQuota: { type: Number, default: 0 }
+  },
+  creationDate: { type: Number, default: Date.now },
+  type: {
+    type: String,
+    enum: [types.HEALTH, types.NATIONAL_ID, types.RECORD_SEARCH, types.WEBHOOK]
+  }
 })
 
 export default model<ISystemModel>('System', systemSchema)

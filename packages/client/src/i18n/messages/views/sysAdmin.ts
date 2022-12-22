@@ -33,12 +33,22 @@ interface ISysAdminMessages
   editUserCommonTitle: MessageDescriptor
   reactivate: MessageDescriptor
   reactivateUserTitle: MessageDescriptor
+  resetUserPasswordTitle: MessageDescriptor
+  resetUserPasswordModalTitle: MessageDescriptor
+  resetUserPasswordModalMessage: MessageDescriptor
   reactivateUserSubtitle: MessageDescriptor
   reactivateReasonReturnedToRole: MessageDescriptor
   reactivateReasonNoLongerInvestigated: MessageDescriptor
   resendSMS: MessageDescriptor
   resendSMSSuccess: MessageDescriptor
   resendSMSError: MessageDescriptor
+  sendUsernameReminderSMS: MessageDescriptor
+  sendUsernameReminderSMSSuccess: MessageDescriptor
+  sendUsernameReminderSMSError: MessageDescriptor
+  sendUsernameReminderSMSModalMessage: MessageDescriptor
+  sendUsernameReminderSMSModalTitle: MessageDescriptor
+  resetPasswordSMSSuccess: MessageDescriptor
+  resetPasswordSMSError: MessageDescriptor
   newUser: MessageDescriptor
   active: MessageDescriptor
   pending: MessageDescriptor
@@ -140,6 +150,22 @@ const messagesToDefine: ISysAdminMessages = {
     description: 'Common title of form view groups when edit user',
     id: 'sysAdHome.user.edit.commonGroupTitle'
   },
+  resetUserPasswordTitle: {
+    defaultMessage: 'Reset Password',
+    description: 'Title for reset user password',
+    id: 'sysAdHome.user.resetpassword.title'
+  },
+  resetUserPasswordModalTitle: {
+    defaultMessage: 'Reset password?',
+    description: 'Title for reset user password modal',
+    id: 'sysAdHome.user.resetPasswordModal.title'
+  },
+  resetUserPasswordModalMessage: {
+    id: 'sysAdHome.user.resetPasswordModal.message',
+    defaultMessage:
+      'The user will receive a temporary password via SMS sent to {phoneNumber}. They will then be prompted to create a new password on successful login',
+    description: 'Message for reset password modal'
+  },
   reactivateUserTitle: {
     id: 'sysAdHome.user.audit.reactivation.title',
     defaultMessage: 'Reactivate {name}?',
@@ -180,6 +206,44 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Invite could not be sent',
     description: 'The label for error notification of resend sms invite',
     id: 'sysAdHome.resendSMSError'
+  },
+  sendUsernameReminderSMS: {
+    defaultMessage: 'Send username reminder',
+    description: 'The label for menu option to send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMS'
+  },
+  sendUsernameReminderSMSSuccess: {
+    defaultMessage: 'Username reminder sent to {name}',
+    description: 'The label for success notification of send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSSuccess'
+  },
+  sendUsernameReminderSMSError: {
+    defaultMessage: 'Username reminder could not be sent',
+    description: 'The label for error notification of send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSError'
+  },
+  sendUsernameReminderSMSModalTitle: {
+    defaultMessage: 'Send username reminder?',
+    description: 'Title for send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSModalTitle'
+  },
+  sendUsernameReminderSMSModalMessage: {
+    defaultMessage:
+      'The user will receive a username reminder via an SMS sent to {phoneNumber}',
+    description: 'Message for send username reminder',
+    id: 'sysAdHome.sendUsernameReminderSMSModalMessage'
+  },
+  resetPasswordSMSSuccess: {
+    defaultMessage: 'Temporary password sent to {username}',
+    description:
+      'The label for success notification of reset password sms invite',
+    id: 'sysAdHome.resentPasswordSMSSuccess'
+  },
+  resetPasswordSMSError: {
+    defaultMessage: 'Temporary password could not be sent',
+    description:
+      'The label for error notification of reset password sms invite',
+    id: 'sysAdHome.resentPasswordSMSError'
   },
   newUser: {
     defaultMessage: 'New User',

@@ -23,6 +23,7 @@ import { History } from 'history'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
+import { vi } from 'vitest'
 
 describe('Team search test', () => {
   let store: AppStore
@@ -73,7 +74,7 @@ describe('Team search test', () => {
     })
 
     it('redirect to user list on search button click', () => {
-      Date.now = jest.fn(() => 1455454308000)
+      Date.now = vi.fn(() => 1455454308000)
       app.find('#location-search-btn').hostNodes().simulate('click')
       app.update()
       flushPromises()

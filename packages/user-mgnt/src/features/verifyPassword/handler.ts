@@ -26,6 +26,7 @@ interface IVerifyResponse {
   scope: string[]
   status: string
   id: string
+  practitionerId: string
 }
 
 export default async function verifyPassHandler(
@@ -34,7 +35,6 @@ export default async function verifyPassHandler(
 ) {
   const { username, password } = request.payload as IVerifyPayload
 
-  // tslint:disable-next-line
   const user: IUserModel | null = await User.findOne({ username })
 
   if (!user) {
@@ -45,12 +45,12 @@ export default async function verifyPassHandler(
   if (generateHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
-
   const response: IVerifyResponse = {
     mobile: user.mobile,
     scope: user.scope,
     status: user.status,
-    id: user.id
+    id: user.id,
+    practitionerId: user.practitionerId
   }
 
   return response
@@ -65,5 +65,6 @@ export const responseSchema = Joi.object({
   mobile: Joi.string(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
-  id: Joi.string()
+  id: Joi.string(),
+  practitionerId: Joi.string()
 })

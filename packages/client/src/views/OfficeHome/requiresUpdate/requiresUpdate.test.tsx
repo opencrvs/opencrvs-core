@@ -28,9 +28,8 @@ import {
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/OfficeHome/queries'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -42,13 +41,14 @@ import {
 import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { birthDeclarationForReview } from '@client/tests/mock-graphql-responses'
+import { vi, Mock } from 'vitest'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-const getItem = window.localStorage.getItem as jest.Mock
+const getItem = window.localStorage.getItem as Mock
 
-const mockFetchUserDetails = jest.fn()
-const mockListSyncController = jest.fn()
+const mockFetchUserDetails = vi.fn()
+const mockListSyncController = vi.fn()
 
 const nameObj = {
   data: {
@@ -148,8 +148,8 @@ merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
 
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
+storage.getItem = vi.fn()
+storage.setItem = vi.fn()
 
 describe('OfficeHome sent for update tab related tests', () => {
   const { store, history } = createStore()
@@ -162,6 +162,8 @@ describe('OfficeHome sent for update tab related tests', () => {
 
   it('renders all items returned from graphql query in sent for update tab', async () => {
     const TIME_STAMP = '1544188309380'
+
+    const birthEventRejectedDate = '2019-10-20T11:03:20.660Z'
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -184,6 +186,27 @@ describe('OfficeHome sent for update tab related tests', () => {
                   createdAt: TIME_STAMP,
                   modifiedAt: TIME_STAMP + 1
                 },
+                operationHistories: [
+                  {
+                    operationType: 'REJECTED',
+                    operatedOn: '2021-10-20T11:03:20.660Z',
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    operatorName: [
+                      {
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                  }
+                ],
                 dateOfBirth: '2010-10-10',
                 childName: [
                   {
@@ -212,6 +235,27 @@ describe('OfficeHome sent for update tab related tests', () => {
                   createdAt: TIME_STAMP,
                   modifiedAt: TIME_STAMP
                 },
+                operationHistories: [
+                  {
+                    operationType: 'REJECTED',
+                    operatedOn: birthEventRejectedDate,
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    operatorName: [
+                      {
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                  }
+                ],
                 dateOfDeath: '2007-01-01',
                 deceasedName: [
                   {
@@ -233,9 +277,11 @@ describe('OfficeHome sent for update tab related tests', () => {
       { store, history }
     )
 
-    const table = await waitForElement(testComponent, GridTable)
+    const table = await waitForElement(testComponent, Workqueue)
     const data = table.prop('content')
-    const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
+    const EXPECTED_DATE_OF_REJECTION = formattedDuration(
+      new Date(birthEventRejectedDate)
+    )
 
     expect(data.length).toBe(2)
     expect(data[1].id).toBe('bc09200d-0160-43b4-9e2b-5b9e90424e95')
@@ -246,7 +292,7 @@ describe('OfficeHome sent for update tab related tests', () => {
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
-    Date.now = jest.fn(() => 1554055200000)
+    Date.now = vi.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -261,198 +307,10 @@ describe('OfficeHome sent for update tab related tests', () => {
       { store, history }
     )
 
-    const table = await waitForElement(testComponent, GridTable)
+    const table = await waitForElement(testComponent, Workqueue)
 
     const data = table.prop('content')
     expect(data.length).toBe(0)
-  })
-
-  it('redirects to recordAudit page if item is clicked on desktop size', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: FETCH_REGISTRATION_BY_COMPOSITION,
-          variables: {
-            id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-          }
-        },
-        result: {
-          data: {
-            fetchRegistration: {
-              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-              registration: {
-                id: '345678',
-                type: 'BIRTH',
-                certificates: null,
-                status: [
-                  {
-                    id: '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
-                    timestamp: '2019-04-03T07:08:24.936Z',
-                    user: {
-                      id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                      name: [
-                        {
-                          use: 'en',
-                          firstNames: 'Mohammad',
-                          familyName: 'Ashraful'
-                        },
-                        {
-                          use: 'bn',
-                          firstNames: '',
-                          familyName: ''
-                        }
-                      ],
-                      role: 'LOCAL_REGISTRAR'
-                    },
-                    location: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: ['']
-                    },
-                    office: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: [''],
-                      address: {
-                        district: '7876',
-                        state: 'iuyiuy'
-                      }
-                    },
-                    type: 'REJECTED',
-                    comments: [
-                      {
-                        comment: 'reason=duplicate&comment=dup'
-                      }
-                    ]
-                  }
-                ],
-                contact: 'MOTHER',
-                contactPhoneNumber: '01622688231'
-              },
-              child: {
-                id: 'FAKE_ID',
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: 'Mushraful',
-                    familyName: 'Hoque'
-                  }
-                ],
-                birthDate: '01-01-1984'
-              },
-              deceased: null,
-              informant: null
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RequiresUpdate
-        queryData={{
-          data: {
-            totalItems: 2,
-            results: [
-              {
-                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: 'Birth',
-                registration: {
-                  status: 'REJECTED',
-                  contactNumber: '01622688231',
-                  trackingId: 'BW0UTHR',
-                  registrationNumber: undefined,
-                  eventLocationId: undefined,
-                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-                  duplicates: [null],
-                  createdAt: '2018-05-23T14:44:58+02:00',
-                  modifiedAt: '2018-05-23T14:44:58+02:00'
-                },
-                operationHistories: [
-                  {
-                    operationType: 'REJECTED',
-                    operatedOn: '2019-12-12T15:24:53.586Z',
-                    operatorRole: 'LOCAL_REGISTRAR',
-                    operatorName: [
-                      {
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful',
-                        use: 'en'
-                      },
-                      {
-                        firstNames: '',
-                        familyName: null,
-                        use: 'bn'
-                      }
-                    ],
-                    operatorOfficeName: 'Alokbali Union Parishad',
-                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
-                    rejectReason: 'missing_supporting_doc',
-                    rejectComment: 'No supporting documents provided.'
-                  }
-                ],
-                dateOfBirth: '2010-10-10',
-                childName: [
-                  {
-                    firstNames: 'Iliyas',
-                    familyName: 'Khan',
-                    use: 'en'
-                  },
-                  {
-                    firstNames: 'ইলিয়াস',
-                    familyName: 'খান',
-                    use: 'bn'
-                  }
-                ]
-              } as GQLBirthEventSearchSet,
-              {
-                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: 'Death',
-                registration: {
-                  status: 'REJECTED',
-                  trackingId: 'DW0UTHR',
-                  registrationNumber: undefined,
-                  eventLocationId: undefined,
-                  contactNumber: '01622688231',
-                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
-                  createdAt: '2007-01-01',
-                  modifiedAt: '2007-01-01'
-                },
-                dateOfDeath: '2007-01-01',
-                deceasedName: [
-                  {
-                    firstNames: 'Iliyas',
-                    familyName: 'Khan',
-                    use: 'en'
-                  },
-                  {
-                    firstNames: 'ইলিয়াস',
-                    familyName: 'খান',
-                    use: 'bn'
-                  }
-                ]
-              } as GQLDeathEventSearchSet
-            ]
-          }
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock }
-    )
-
-    const element = await waitForElement(testComponent, '#name_0')
-    element.hostNodes().simulate('click')
-
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.update()
-
-    expect(window.location.href).toContain(
-      '/record-audit/rejectTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-    )
   })
 
   describe('handles download status', () => {
@@ -460,7 +318,7 @@ describe('OfficeHome sent for update tab related tests', () => {
     let createdTestComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       const TIME_STAMP = '1544188309380'
-      Date.now = jest.fn(() => 1554055200000)
+      Date.now = vi.fn(() => 1554055200000)
 
       mockListSyncController
         .mockReturnValueOnce({
@@ -611,15 +469,10 @@ describe('OfficeHome sent for update tab related tests', () => {
       )
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
       store.dispatch(storeDeclaration(downloadedDeclaration))
-
       testComponent.update()
-
-      const errorIcon = await waitForElement(
-        testComponent,
-        '#ListItemAction-1-icon-failed'
-      )
-
-      expect(errorIcon.hostNodes()).toHaveLength(1)
+      expect(
+        testComponent.find('#ListItemAction-1-icon-failed').hostNodes()
+      ).toHaveLength(1)
     })
   })
 })
@@ -639,7 +492,7 @@ describe('Tablet tests', () => {
 
   it('redirects to recordAudit page if item is clicked', async () => {
     const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
+    Date.now = vi.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
       // @ts-ignore

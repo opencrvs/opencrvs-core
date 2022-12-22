@@ -13,10 +13,10 @@ import * as Joi from 'joi'
 import { birthEventHandler } from '@search/features/registration/birth/handler'
 import { deathEventHandler } from '@search/features/registration/death/handler'
 import {
-  searchDeclaration,
   getAllDocumentsHandler,
   getStatusWiseRegistrationCountHandler,
-  populateHierarchicalLocationIdsHandler
+  advancedRecordSearch,
+  searchAssignment
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import {
@@ -25,14 +25,15 @@ import {
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 
-const enum RouteScope {
+export const enum RouteScope {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
   SYSADMIN = 'sysadmin',
   CERTIFY = 'certify',
   NATLSYSADMIN = 'natlsysadmin',
-  PERFORMANCE = 'performance'
+  PERFORMANCE = 'performance',
+  RECORD_SEARCH = 'recordsearch'
 }
 
 export const getRoutes = () => {
@@ -66,19 +67,14 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/search',
-      handler: searchDeclaration,
+      path: '/search/assignment',
+      handler: searchAssignment,
       config: {
         tags: ['api'],
         auth: {
-          scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.SYSADMIN
-          ]
+          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
         },
-        description: 'Handles searching from declarations'
+        description: 'Handles searching declaration assignment'
       }
     },
     {
@@ -164,7 +160,7 @@ export const getRoutes = () => {
         },
         validate: {
           payload: Joi.object({
-            declarationLocationHirarchyId: Joi.string(),
+            declarationJurisdictionId: Joi.string(),
             status: Joi.array().required(),
             event: Joi.string()
           })
@@ -174,12 +170,18 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/populateHierarchicalLocationIds',
-      handler: populateHierarchicalLocationIdsHandler,
+      path: '/advancedRecordSearch',
+      handler: advancedRecordSearch,
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [
+            RouteScope.RECORD_SEARCH,
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
         },
         description:
           'Populates hierarchical location ids for the legacy indexes'

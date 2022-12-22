@@ -13,13 +13,21 @@ import React from 'react'
 import styled from '@client/styledComponents'
 import { useDispatch } from 'react-redux'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
-import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
+import { Toggle } from '@opencrvs/components/lib/Toggle'
 import {
   IDefaultConfigField,
   ICustomConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import ReactTooltip from 'react-tooltip'
+import { Event } from '@client/utils/gateway'
+import { BirthSection, DeathSection } from '@client/forms'
+import { useDefaultForm } from '@client/views/SysAdmin/Config/Forms/hooks'
+import { formSectionToFieldIdentifiers } from '@client/forms/questionConfig/transformers'
+import { useParams } from 'react-router'
+import { getFieldId } from '@client/forms/configuration/defaultUtils'
+import { IConditionalConfig } from '@client/forms/questionConfig'
+import { previewSectionFilter } from '@client/components/formConfig/SectionNavigation'
 
 export const Title = styled.h3`
   margin: 0;
@@ -62,11 +70,33 @@ export function RequiredToggleAction({
 
   return (
     <CenteredToggle
+      id={'required-toggle-button'}
       defaultChecked={!!required}
       onChange={() =>
         dispatch(
           modifyConfigField(fieldId, {
             required: !required
+          })
+        )
+      }
+    />
+  )
+}
+
+export function ConditionalToggleAction({
+  fieldId,
+  conditionals,
+  initConditionals
+}: ICustomConfigField & { initConditionals: IConditionalConfig[] }) {
+  const dispatch = useDispatch()
+  return (
+    <CenteredToggle
+      id={'conditional-toggle-button'}
+      defaultChecked={!!conditionals}
+      onChange={() =>
+        dispatch(
+          modifyConfigField(fieldId, {
+            conditionals: conditionals ? undefined : initConditionals
           })
         )
       }
@@ -83,4 +113,30 @@ export const ToolTip = ({ label, id }: { label: string; id: string }) => {
       </ReactTooltip>
     </TooltipContainer>
   )
+}
+
+export const RegisterFormFieldIds = ({
+  children
+}: {
+  children: (fieldIds: string[]) => JSX.Element
+}) => {
+  const defaultForm = useDefaultForm()
+  const { event } = useParams<{ event: Event }>()
+  const sections = Object.values<BirthSection | DeathSection>(
+    event === Event.Birth ? BirthSection : DeathSection
+  )
+
+  const fieldIds = sections
+    .filter(previewSectionFilter)
+    .flatMap((section) => formSectionToFieldIdentifiers(defaultForm, section))
+    .map((identifier) => getFieldId(event, identifier, defaultForm))
+
+  const filteredFieldIds = fieldIds.filter((fieldId) => {
+    if (!fieldId.includes('seperator')) {
+      return true
+    }
+    return false
+  })
+
+  return children(filteredFieldIds)
 }

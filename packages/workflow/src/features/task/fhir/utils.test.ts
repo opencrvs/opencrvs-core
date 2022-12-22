@@ -15,13 +15,15 @@ import {
   isArchiveTask,
   isRejectedTask,
   getTaskEventType,
-  hasReinstatedExtension
+  hasExtension
 } from '@workflow/features/task/fhir/utils'
 import { testFhirTaskBundle } from '@workflow/test/utils'
-import { RegStatus } from '@workflow/features/registration/fhir/constants'
+import {
+  RegStatus,
+  EVENT_TYPE
+} from '@workflow/features/registration/fhir/constants'
 import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import { cloneDeep } from 'lodash'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 
 const task = testFhirTaskBundle.entry[0].resource
 
@@ -55,9 +57,9 @@ describe('isRejectedTask()', () => {
   })
 })
 
-describe('hasReinstatedExtension()', () => {
+describe('hasExtension()', () => {
   it('should return false if task has no reinstated extension', () => {
-    expect(hasReinstatedExtension(task)).toBeFalsy()
+    expect(hasExtension(task, REINSTATED_EXTENSION_URL)).toBeFalsy()
   })
 
   it('should return true if task has reinstated extension', () => {
@@ -70,7 +72,9 @@ describe('hasReinstatedExtension()', () => {
         }
       ]
     }
-    expect(hasReinstatedExtension(taskWithReinstatedExtension)).toBeTruthy()
+    expect(
+      hasExtension(taskWithReinstatedExtension, REINSTATED_EXTENSION_URL)
+    ).toBeTruthy()
   })
 })
 

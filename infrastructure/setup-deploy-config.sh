@@ -11,9 +11,6 @@ set -e
 echo
 echo "Setting up deployment config for $1 - `date --iso-8601=ns`"
 
-# Set hostname in traefik config
-sed -i "s/{{hostname}}/$1/g" /opt/opencrvs/infrastructure/traefik.toml
-
 # Set hostname in openhim-console config
 sed -i "s/{{hostname}}/$1/g" /opt/opencrvs/infrastructure/openhim-console-config.deploy.json
 

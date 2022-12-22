@@ -64,13 +64,13 @@ import {
   isAValidDateFormat,
   isDateNotInFuture
 } from '@client/utils/validate'
-import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
+import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
 import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
-
+import _ from 'lodash'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -341,7 +341,7 @@ export const getFieldOptions = (
     }
     return generateOptions(
       Object.values(locations).filter((location: ILocation) => {
-        return location.partOf === partOf
+        return location.partOf === partOf && location.status === 'active'
       }),
       'location'
     )
@@ -555,9 +555,11 @@ export const getConditionalActionsForField = (
 
 export const getVisibleSectionGroupsBasedOnConditions = (
   section: IFormSection,
-  values: IFormSectionData,
+  sectionData: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
+  // eslint-disable-next-line no-unused-vars
+  const values = sectionData
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)

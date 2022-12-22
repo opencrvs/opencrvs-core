@@ -16,6 +16,7 @@ import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import { statuses } from '@user-mgnt/utils/userUtils'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 interface IChangePasswordPayload {
   userId: string
@@ -58,6 +59,10 @@ export default async function changePasswordHandler(
     }
   }
   user.passwordHash = generateHash(userUpdateData.password, user.salt)
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   try {
     await User.update({ _id: user._id }, user)
@@ -65,6 +70,26 @@ export default async function changePasswordHandler(
     logger.error(err.message)
     // return 400 if there is a validation error when updating to mongo
     return h.response().code(400)
+  }
+  try {
+    if (!request.headers.authorization) {
+      await postUserActionToMetrics(
+        'PASSWORD_RESET',
+        request.headers.authorization,
+        remoteAddress,
+        userAgent,
+        user.practitionerId
+      )
+    } else {
+      await postUserActionToMetrics(
+        'PASSWORD_CHANGED',
+        request.headers.authorization,
+        remoteAddress,
+        userAgent
+      )
+    }
+  } catch (err) {
+    logger.error(err)
   }
   return h.response().code(200)
 }
