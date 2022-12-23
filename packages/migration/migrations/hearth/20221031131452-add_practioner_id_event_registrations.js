@@ -53,7 +53,13 @@ async function migrateRegistrations(measurement, db) {
     const deleteQuery = `DELETE FROM ${measurement} WHERE registrarPractitionerId = '' AND time >= ${startTime} AND time <= ${endTime}`
     await query(deleteQuery)
 
-    processed += LIMIT
+    processed += registrations.length
+    console.log(
+      `Migration - InfluxDB :: Processing done: ${(
+        (processed / totalCount) *
+        100
+      ).toFixed(2)}%`
+    )
   }
 }
 
