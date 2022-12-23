@@ -362,7 +362,7 @@ export class InProgressComponent extends React.Component<
       const eventTime =
         draft.event === Event.Birth
           ? draft.data.child?.childBirthDate || ''
-          : draft.data.deathEvent?.deathDate || ''
+          : draft.data.deceased?.deathDate || ''
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
       const NameComponent = name ? (
         <NameContainer
