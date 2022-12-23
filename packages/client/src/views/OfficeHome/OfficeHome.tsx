@@ -18,12 +18,7 @@ import {
 } from '@client/declarations'
 import { Header } from '@client/components/interface/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  getDefaultPerformanceLocationId
-} from '@client/navigation'
+import { goToEvents, goToPage, goToPrintCertificate } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -65,6 +60,7 @@ import {
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { getDefaultPerformanceLocationId } from '@client/utils/locationUtils'
 
 export interface IProps extends IButtonProps {
   active?: boolean

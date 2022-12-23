@@ -81,6 +81,7 @@ import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { useLocation } from 'react-router'
 import * as React from 'react'
+import { getDefaultPerformanceLocationId } from '@client/utils/locationUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -596,28 +597,6 @@ export function goToPage(
       historyState
     }
   }
-}
-
-export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
-  const role = userDetails?.role
-  const primaryOfficeId = userDetails.primaryOffice?.id
-  if (role) {
-    if (userDetails.supervisoryArea) {
-      return userDetails.supervisoryArea
-    }
-    if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
-      return primaryOfficeId
-    } else if (
-      NATL_ADMIN_ROLES.includes(role) ||
-      NATIONAL_REGISTRAR_ROLES.includes(role) ||
-      PERFORMANCE_MANAGEMENT_ROLES.includes(role)
-    ) {
-      return // country wide
-    }
-  }
-  throw new Error(
-    `Performance view no default location selected for role: ${role}`
-  )
 }
 
 export function goToPerformanceView(userDetails: IUserDetails) {

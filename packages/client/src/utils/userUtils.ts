@@ -189,6 +189,12 @@ export function getUserName(userDetails: IUserDetails | null) {
   )
 }
 
+export function useUserDetails() {
+  return useSelector<IStoreState, IUserDetails | null>((state) => {
+    const { userDetails } = state.profile
+    return userDetails
+  })
+}
 export function useUserName() {
   return useSelector<IStoreState, string>((state) => {
     const { userDetails } = state.profile

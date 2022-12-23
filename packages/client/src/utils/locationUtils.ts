@@ -16,6 +16,15 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/forms/countries'
 import { startCase } from 'lodash'
+import { useSelector } from 'react-redux'
+import { IStoreState } from '@client/store'
+import {
+  NATIONAL_REGISTRAR_ROLES,
+  NATL_ADMIN_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES,
+  REGISTRAR_ROLES,
+  SYS_ADMIN_ROLES
+} from './constants'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -253,4 +262,47 @@ export function getFullLocationNameOfFacility(
     }
   }
   return names
+}
+
+export function useLocations() {
+  return useSelector<
+    IStoreState,
+    {
+      [key: string]: ILocation
+    }
+  >((state) => {
+    return state.offline?.offlineData?.locations || {}
+  })
+}
+export function useOffices() {
+  return useSelector<
+    IStoreState,
+    {
+      [key: string]: ILocation
+    }
+  >((state) => {
+    return state.offline?.offlineData?.offices || {}
+  })
+}
+
+export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
+  const role = userDetails?.role
+  const primaryOfficeId = userDetails.primaryOffice?.id
+  if (role) {
+    if (userDetails.supervisoryArea) {
+      return userDetails.supervisoryArea
+    }
+    if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
+      return primaryOfficeId
+    } else if (
+      NATL_ADMIN_ROLES.includes(role) ||
+      NATIONAL_REGISTRAR_ROLES.includes(role) ||
+      PERFORMANCE_MANAGEMENT_ROLES.includes(role)
+    ) {
+      return // country wide
+    }
+  }
+  throw new Error(
+    `Performance view no default location selected for role: ${role}`
+  )
 }

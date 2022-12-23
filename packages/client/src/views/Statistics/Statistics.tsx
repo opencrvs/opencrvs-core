@@ -20,6 +20,13 @@ import styled from '@client/styledComponents'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import { FullScreen, useFullScreenHandle } from 'react-full-screen'
 import { FullScreen as FullScreenIcon } from '@opencrvs/components/lib/icons'
+import { useUserDetails } from '@client/utils/userUtils'
+import {
+  getDefaultPerformanceLocationId,
+  useLocations,
+  useOffices
+} from '@client/utils/locationUtils'
+import { ILocation } from '@client/offline/reducer'
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
   height: 100%;
@@ -39,10 +46,80 @@ const Container = styled.div`
     visible ? 'visible' : 'hidden'};
   z-index: ${({ visible }: { visible: boolean }) => (visible ? 3 : -1)};
 `
+function formatStatisticsEmbedUrl(params: Record<string, string>) {
+  if (!window.config.STATISTICS_EMBED_URL) {
+    return ''
+  }
+
+  const configuredUrl = new URL(window.config.STATISTICS_EMBED_URL)
+  const searchParams = new URLSearchParams(configuredUrl.search)
+
+  for (const [key, value] of Object.entries(params)) {
+    searchParams.set(key, value)
+  }
+
+  configuredUrl.search = searchParams.toString()
+
+  return configuredUrl.toString()
+}
+
+function getParentLocation(
+  location: ILocation,
+  allLocations: {
+    [key: string]: ILocation
+  }
+) {
+  const parentId = location.partOf.replace('Location/', '')
+  return allLocations[parentId]
+}
+
+function getAllLocationLevels(
+  location: ILocation,
+  allLocations: {
+    [key: string]: ILocation
+  }
+) {
+  if (location.type === 'STATE') {
+    return { state: location.name, lga: '', office: '' }
+  }
+
+  if (location.type === 'DISTRICT') {
+    return {
+      state: getParentLocation(location, allLocations).name,
+      lga: location.name,
+      office: ''
+    }
+  }
+
+  if (location.type === 'CRVS_OFFICE') {
+    const lga = getParentLocation(location, allLocations)
+    const state = getParentLocation(lga, allLocations)
+    return { state: state.name, lga: lga.name, office: location.name }
+  }
+
+  return { state: '', lga: '', office: '' }
+}
+
 export function Statistics({ visible }: { visible: boolean }) {
   const intl = useIntl()
   const dispatch = useDispatch()
   const handle = useFullScreenHandle()
+  const userDetails = useUserDetails()
+  const locations = useLocations()
+  const offices = useOffices()
+
+  const defaultView = getDefaultPerformanceLocationId(userDetails!)
+
+  let embedUrl = window.config.STATISTICS_EMBED_URL
+
+  if (defaultView && defaultView !== '0') {
+    const allLocations = { ...locations, ...offices }
+    const defaultLocation = allLocations[defaultView]
+
+    embedUrl = formatStatisticsEmbedUrl(
+      getAllLocationLevels(defaultLocation, allLocations)
+    )
+  }
 
   return (
     <Container visible={visible}>
@@ -64,10 +141,7 @@ export function Statistics({ visible }: { visible: boolean }) {
             <h1>Statistics dashboard URL configuration missing</h1>
           )}
           {window.config.STATISTICS_EMBED_URL && (
-            <StyledIFrame
-              src={window.config.STATISTICS_EMBED_URL}
-              allowFullScreen
-            />
+            <StyledIFrame src={embedUrl} allowFullScreen />
           )}
         </FullBodyContent>
       </FullScreen>
