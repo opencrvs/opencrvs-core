@@ -43,77 +43,79 @@ async function migrateRegistrations(measurement, db) {
         processed + registrations.length
       }`
     )
-    // We want to process them serially
-    for (let i = 0; i < registrations.length; i++) {
-      console.log(
-        `Migration - InfluxDB :: Processing ${measurement}, ${
-          processed + i + 1
-        }/${totalCount}`
-      )
-      await updateInflux(registrations[i], measurement, db)
-    }
+    const updatedPoints = await getUpdatedPoints(registrations, measurement, db)
+
+    await writePoints(updatedPoints)
+
+    const startTime = registrations[0].time.getNanoTime()
+    const endTime = registrations[registrations.length - 1].time.getNanoTime()
+
+    const deleteQuery = `DELETE FROM ${measurement} WHERE registrarPractitionerId = '' AND time >= ${startTime} AND time <= ${endTime}`
+    await query(deleteQuery)
 
     processed += LIMIT
   }
 }
 
-const updateInflux = async (registration, measurement, db) => {
-  const {
-    compositionId,
-    time,
-    ageInDays,
-    ageInYears,
-    currentStatus,
-    deathDays,
-    ...tags
-  } = registration
-  let task = await db.collection('Task').findOne({
-    focus: {
-      reference: `Composition/${compositionId}`
-    },
-    'businessStatus.coding.code': 'REGISTERED'
-  })
+const getUpdatedPoints = async (registrations, measurement, db) => {
+  return Promise.all(
+    registrations.map(
+      async ({
+        compositionId,
+        time,
+        ageInDays,
+        ageInYears,
+        currentStatus,
+        deathDays,
+        ...tags
+      }) => {
+        let task = await db.collection('Task').findOne({
+          focus: {
+            reference: `Composition/${compositionId}`
+          },
+          'businessStatus.coding.code': 'REGISTERED'
+        })
 
-  if (!task) {
-    task = await db.collection('Task_history').findOne({
-      focus: {
-        reference: `Composition/${compositionId}`
-      },
-      'businessStatus.coding.code': 'REGISTERED'
-    })
-  }
+        if (!task) {
+          task = await db.collection('Task_history').findOne({
+            focus: {
+              reference: `Composition/${compositionId}`
+            },
+            'businessStatus.coding.code': 'REGISTERED'
+          })
+        }
 
-  const practitionerExtension = task.extension.find(
-    (extension) =>
-      extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
+        const practitionerExtension = task.extension.find(
+          (extension) =>
+            extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
+        )
+        const id = practitionerExtension.valueReference.reference.replace(
+          'Practitioner/',
+          ''
+        )
+        const fields = { compositionId, currentStatus }
+        if (measurement === 'birth_registration') {
+          fields.ageInDays = ageInDays
+        }
+        if (measurement === 'death_registration') {
+          fields.deathDays = deathDays
+          fields.ageInYears = ageInYears
+        }
+
+        const practitioner = await db.collection('Practitioner').findOne({ id })
+
+        return {
+          measurement,
+          tags: {
+            ...tags,
+            registrarPractitionerId: practitioner.id
+          },
+          fields,
+          timestamp: time.getNanoTime()
+        }
+      }
+    )
   )
-  const id = practitionerExtension.valueReference.reference.replace(
-    'Practitioner/',
-    ''
-  )
-  const fields = { compositionId, currentStatus }
-  if (measurement === 'birth_registration') {
-    fields.ageInDays = ageInDays
-  }
-  if (measurement === 'death_registration') {
-    fields.deathDays = deathDays
-    fields.ageInYears = ageInYears
-  }
-
-  const practitioner = await db.collection('Practitioner').findOne({ id })
-
-  const point = {
-    measurement,
-    tags: {
-      ...tags,
-      registrarPractitionerId: practitioner.id
-    },
-    fields,
-    timestamp: time.getNanoTime()
-  }
-  const deleteQuery = `DELETE FROM ${measurement} WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
-  await writePoints([point])
-  await query(deleteQuery)
 }
 
 export const down = async (db, client) => {
