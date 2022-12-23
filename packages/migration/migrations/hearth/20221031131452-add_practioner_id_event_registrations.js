@@ -32,23 +32,28 @@ async function migrateRegistrations(measurement, db) {
     `Migration - InfluxDB :: Total points found for measurement ${measurement}: ${totalCount}`
   )
 
-  let skip = 0
+  let processed = 0
 
-  while (skip < totalCount) {
+  while (processed < totalCount) {
     const registrations = await query(
-      `SELECT * FROM ${measurement} WHERE registrarPractitionerId = '' LIMIT ${LIMIT} OFFSET ${skip}`
+      `SELECT * FROM ${measurement} WHERE registrarPractitionerId = '' LIMIT ${LIMIT}`
+    )
+    console.log(
+      `Migration - InfluxDB :: Processing ${measurement}, ${processed + 1}-${
+        processed + registrations.length
+      }`
     )
     // We want to process them serially
-    for (let i = 1; i <= registrations.length; i++) {
+    for (let i = 0; i < registrations.length; i++) {
       console.log(
         `Migration - InfluxDB :: Processing ${measurement}, ${
-          skip + i
+          processed + i + 1
         }/${totalCount}`
       )
-      await updateInflux(registrations[i - 1], measurement, db)
+      await updateInflux(registrations[i], measurement, db)
     }
 
-    skip += LIMIT
+    processed += LIMIT
   }
 }
 
