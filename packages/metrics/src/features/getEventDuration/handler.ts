@@ -21,7 +21,12 @@ export async function getEventDurationHandler(
   const eventDurationData = await query(
     `SELECT previousStatus as status, durationInSeconds
           FROM declaration_event_duration
-        WHERE compositionId = '${compositionId}'`
+        WHERE compositionId = $compositionId`,
+    {
+      placeholders: {
+        compositionId
+      }
+    }
   )
   return eventDurationData && eventDurationData.length > 0
     ? eventDurationData

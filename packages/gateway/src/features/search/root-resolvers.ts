@@ -84,7 +84,7 @@ export const resolvers: GQLResolver = {
         sort,
         parameters: advancedSearchParameters
       }
-      // Only registrar or registration agent should be able to search user
+      // Only registrar, registration agent & field agent should be able to search user
       if (
         !inScope(authHeader, [
           'register',
@@ -96,7 +96,7 @@ export const resolvers: GQLResolver = {
       ) {
         return await Promise.reject(
           new Error(
-            'Advanced search is only allowed for registrar or registration agent'
+            'Advanced search is only allowed for registrar, registration agent & field agent'
           )
         )
       }
@@ -111,7 +111,6 @@ export const resolvers: GQLResolver = {
           {},
           authHeader
         )
-
         if (getTotalRequest.total >= system.settings.dailyQuota) {
           return await Promise.reject(new Error('Daily search quota exceeded'))
         }

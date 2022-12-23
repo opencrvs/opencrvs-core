@@ -66,6 +66,11 @@ type Avatar {
   data: String!
 }
 
+# This should be replaced in #2277
+type System {
+  name: String!
+}
+
 # Fields type, underInvestigation, primaryOffice, catchmentArea and localRegistrar
 # are optional when a Local System Admin creates new user.
 type User {
