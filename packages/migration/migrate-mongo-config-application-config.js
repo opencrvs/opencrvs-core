@@ -12,7 +12,8 @@
 const config = {
   mongodb: {
     url:
-      process.env.HEARTH_MONGO_URL || 'mongodb://localhost/application-config',
+      process.env.APPLICATION_CONFIG_MONGO_URL ||
+      'mongodb://localhost/application-config',
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
       useUnifiedTopology: true // removes a deprecating warning when connecting

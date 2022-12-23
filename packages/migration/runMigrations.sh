@@ -9,7 +9,7 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-function updateFile {
+updateFile() {
   local action=$1
   local path=$2
   local file=$3
@@ -27,10 +27,19 @@ elif [ "$(uname)" == "Darwin" ]; then
   SED_PREFIX="sed -i ''"
 fi
 
-HEARTH_CONFIG=$1/migrate-mongo-config-hearth.js
-OPENHIM_CONFIG=$1/migrate-mongo-config-openhim.js
-APP_CONFIG=$1/migrate-mongo-config-application-config.js
-USER_MGNT_CONFIG=$1/migrate-mongo-config-user-mgnt.js
+if [ "$1" != "" ]; then
+  HEARTH_CONFIG=$1/migrate-mongo-config-hearth.js
+  OPENHIM_CONFIG=$1/migrate-mongo-config-openhim.js
+  APP_CONFIG=$1/migrate-mongo-config-application-config.js
+  USER_MGNT_CONFIG=$1/migrate-mongo-config-user-mgnt.js
+else
+  HEARTH_CONFIG=migrate-mongo-config-hearth.js
+  OPENHIM_CONFIG=migrate-mongo-config-openhim.js
+  APP_CONFIG=migrate-mongo-config-application-config.js
+  USER_MGNT_CONFIG=migrate-mongo-config-user-mgnt.js
+fi
+
+
 
 if [ "$1" != "" ]; then
   updateFile "RUN" $1 "$HEARTH_CONFIG" "$SED_PREFIX"
