@@ -186,7 +186,8 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    precedingFieldId: 'death.deceased.deceased-view-group.cityUrbanOption',
+    precedingFieldId:
+      'death.deceased.deceased-view-group.internationalPostcode',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
