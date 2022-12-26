@@ -11,19 +11,6 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IEventInfoMessages
-  extends Record<
-    string,
-    MessageDescriptor | { [key: string]: MessageDescriptor }[]
-  > {
-  title: MessageDescriptor
-  birthBulletListItems: { [key: string]: MessageDescriptor }[]
-  deathBulletListItems: { [key: string]: MessageDescriptor }[]
-  adoptionBulletListItems: { [key: string]: MessageDescriptor }[]
-  marriageBulletListItems: { [key: string]: MessageDescriptor }[]
-  divorceBulletListItems: { [key: string]: MessageDescriptor }[]
-}
-
 const birthBulletListItemsToDefine: MessageDescriptor[] = [
   {
     id: 'register.eventInfo.birth.listItem0',
@@ -70,19 +57,18 @@ const marriageBulletListItemsToDefine: MessageDescriptor[] = [
   {
     id: 'register.eventInfo.marriage.listItem0',
     defaultMessage:
-      'I am here to complete the marriage registration declaration for you. ',
+      'The Compulsory Birth and Death Registration Act mandates all registrars to ensure that the divorce register is regularly updated.',
     description: 'Event info bullet list item for marriage'
   },
   {
     id: 'register.eventInfo.marriage.listItem1',
     defaultMessage:
-      'Once I complete the declaration, it will be sent to the registration office for review.',
+      'Completing this digital register with the information provided by the Registrar of the Court enables the Commission to have accurate and complete statistical data on civil registration in Nigeria.',
     description: 'Event info bullet list item for marriage'
   },
   {
     id: 'register.eventInfo.marriage.listItem2',
-    defaultMessage:
-      'Wait for an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.',
+    defaultMessage: 'Form will be available soon',
     description: 'Event info bullet list item for marriage'
   }
 ]
@@ -91,19 +77,18 @@ const divorceBulletListItemsToDefine: MessageDescriptor[] = [
   {
     id: 'register.eventInfo.divorce.listItem0',
     defaultMessage:
-      'I am here to complete the divorce registration declaration for you. ',
+      'The Compulsory Birth and Death Registration Act mandates all registrars to ensure that the divorce register is regularly updated.',
     description: 'Event info bullet list item for divorce'
   },
   {
     id: 'register.eventInfo.divorce.listItem1',
     defaultMessage:
-      'Once I complete the declaration, it will be sent to the registration office for review.',
+      'Completing this digital register with the information provided by the Registrar of the Court enables the Commission to have accurate and complete statistical data on civil registration in Nigeria.',
     description: 'Event info bullet list item for divorce'
   },
   {
     id: 'register.eventInfo.divorce.listItem2',
-    defaultMessage:
-      'Wait for an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.',
+    defaultMessage: 'Form will be available soon',
     description: 'Event info bullet list item for divorce'
   }
 ]
@@ -112,32 +97,46 @@ const adoptionBulletListItemsToDefine: MessageDescriptor[] = [
   {
     id: 'register.eventInfo.adoption.listItem0',
     defaultMessage:
-      'I am here to complete the adoption registration declaration for you. ',
+      'The Compulsory Birth & Death Registration Act mandates all registrars to ensure that the adoption registry is regularly updated.',
     description: 'Event info bullet list item for adoption'
   },
   {
     id: 'register.eventInfo.adoption.listItem1',
     defaultMessage:
-      'Once I complete the declaration, it will be sent to the registration office for review.',
+      'Completing this digital register with the information provided by the Registrar of the Court enables the Commission to have accurate and complete statistical data on civil registration in Nigeria.',
     description: 'Event info bullet list item for adoption'
   },
   {
     id: 'register.eventInfo.adoption.listItem2',
-    defaultMessage:
-      'Wait for an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.',
+    defaultMessage: 'Form will be available soon',
     description: 'Event info bullet list item for adoption'
   }
 ]
 
 const messagesToDefine = {
-  title: {
-    id: 'register.eventInfo.event.title',
-    defaultMessage:
-      'Introduce the {eventType, select, birth{birth} death{death} marriage{marriage} divorce{divorce} adoption{adoption} other{birth}} registration process to the informant'
+  birthTitle: {
+    id: 'register.eventInfo.event.title.birth',
+    defaultMessage: 'Introduce the birth registration process to the informant'
+  },
+  deathTitle: {
+    id: 'register.eventInfo.event.title.death',
+    defaultMessage: 'Introduce the death registration process to the informant'
+  },
+  adoptionTitle: {
+    id: 'register.eventInfo.event.title.adoption',
+    defaultMessage: 'Keeping the adoption register updated'
+  },
+  divorceTitle: {
+    id: 'register.eventInfo.event.title.divorce',
+    defaultMessage: 'Keeping the divorce register updated'
+  },
+  marriageTitle: {
+    id: 'register.eventInfo.event.title.marriage',
+    defaultMessage: 'Keeping the marriage register updated'
   }
 }
 
-export const messages: IEventInfoMessages = {
+export const messages = {
   ...defineMessages(messagesToDefine),
   birthBulletListItems: birthBulletListItemsToDefine.map(
     (birthMessage, index) => {

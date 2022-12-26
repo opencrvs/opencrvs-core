@@ -62,6 +62,14 @@ const Title = styled.h4`
 
 const AVAILABLE_EVENTS = [Event.Birth, Event.Death]
 
+const titles = {
+  [Event.Birth]: messages.birthTitle,
+  [Event.Death]: messages.deathTitle,
+  [Event.Adoption]: messages.adoptionTitle,
+  [Event.Divorce]: messages.divorceTitle,
+  [Event.Marriage]: messages.marriageTitle
+}
+
 function EventInfoComponet(props: IFullProps) {
   const {
     match: {
@@ -142,7 +150,7 @@ function EventInfoComponet(props: IFullProps) {
         >
           {intl.formatMessage(buttonMessages.back)}
         </TertiaryButton>
-        <Title>{intl.formatMessage(messages.title, { eventType })}</Title>
+        <Title>{intl.formatMessage(titles[eventType])}</Title>
         <BulletList id={`${eventType}-info-bullet-list`} items={listItems} />
         <PrimaryButton
           id="continue"
