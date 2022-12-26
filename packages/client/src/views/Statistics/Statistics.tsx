@@ -79,11 +79,11 @@ function getAllLocationLevels(
     [key: string]: ILocation
   }
 ) {
-  if (location.type === 'STATE') {
+  if (location.jurisdictionType === 'STATE') {
     return { state: location.name, lga: '', office: '' }
   }
 
-  if (location.type === 'DISTRICT') {
+  if (location.jurisdictionType === 'DISTRICT') {
     return {
       state: getParentLocation(location, allLocations).name,
       lga: location.name,
