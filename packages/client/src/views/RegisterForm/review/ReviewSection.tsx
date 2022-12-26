@@ -384,6 +384,7 @@ type SignatureInputProps = {
   readonly?: boolean
   onRecordingChange: (value: any) => void
   recording?: any
+  disabled?: boolean
 }
 
 const SignatureDescription = styled.p`
@@ -398,6 +399,7 @@ function SignatureInput({
   onChange,
   readonly,
   recording,
+  disabled,
   onRecordingChange
 }: SignatureInputProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = React.useState(false)
@@ -438,10 +440,14 @@ function SignatureInput({
               </SignatureDescription>
               {!value && !readonly && (
                 <>
-                  <SecondaryButton onClick={() => setSignatureDialogOpen(true)}>
+                  <SecondaryButton
+                    disabled={disabled}
+                    onClick={() => setSignatureDialogOpen(true)}
+                  >
                     {intl.formatMessage(messages.signatureOpenSignatureInput)}
                   </SecondaryButton>
                   <CustomImageUpload
+                    disabled={disabled}
                     id="signature-file-upload"
                     title="Upload"
                     handleFileChange={async (file) => {
@@ -499,7 +505,10 @@ function SignatureInput({
                 form are true and correct to the best of my knowledge.
               </SignatureDescription>
               {!recording && !readonly && (
-                <AudioRecorder onRecordEnd={onRecordingChange}>
+                <AudioRecorder
+                  disabled={disabled}
+                  onRecordEnd={onRecordingChange}
+                >
                   Record
                 </AudioRecorder>
               )}
@@ -1888,10 +1897,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           declaration.data.registration?.informantsSignatureRecording
         )
 
-    const isComplete =
+    const isFormComplete =
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
-      ).length === 0 && !isSignatureMissing
+      ).length === 0
+
+    const isComplete = isFormComplete && !isSignatureMissing
 
     const signatureInputProps = {
       id: 'informants_signature',
@@ -2060,7 +2071,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputWrapper>
                 )}
                 {!isCorrection(declaration) && !hasB1Form(declaration) && (
-                  <SignatureInput {...signatureInputProps} />
+                  <SignatureInput
+                    {...signatureInputProps}
+                    disabled={!isFormComplete}
+                  />
                 )}
                 {totalFileSizeExceeded && (
                   <Warning

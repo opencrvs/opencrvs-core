@@ -51,11 +51,13 @@ const SecondsPassed = styled.span`
 
 interface AudioRecorderProps {
   children: string
+  disabled?: boolean
   onRecordEnd: (state: Base64String) => void
 }
 
 export const AudioRecorder = ({
   children,
+  disabled,
   onRecordEnd
 }: AudioRecorderProps) => {
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -78,7 +80,7 @@ export const AudioRecorder = ({
 
   return (
     <>
-      <SecondaryButton onClick={onStartRecording}>
+      <SecondaryButton disabled={disabled} onClick={onStartRecording}>
         <Mic />
         &nbsp;&nbsp;{children}
       </SecondaryButton>
@@ -101,7 +103,6 @@ export const AudioRecorder = ({
           <PrimaryButton
             key="apply"
             id="apply_change"
-            disabled={false}
             onClick={onSaveRecording}
           >
             Apply
