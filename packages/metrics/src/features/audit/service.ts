@@ -26,6 +26,7 @@ import {
 type UserAuditAction =
   | 'DECLARED'
   | 'REGISTERED'
+  | 'IN_PROGRESS'
   | 'REJECTED'
   | 'CORRECTED'
   | 'VALIDATED'
@@ -65,6 +66,7 @@ type UserAuditDataPointWithComposition<Action> = ParsedUserAuditDataPoint & {
 type UserAuditDataPoint =
   | UserAuditDataPointWithComposition<'DECLARED'>
   | UserAuditDataPointWithComposition<'REGISTERED'>
+  | UserAuditDataPointWithComposition<'IN_PROGRESS'>
   | UserAuditDataPointWithComposition<'REJECTED'>
   | UserAuditDataPointWithComposition<'CORRECTED'>
   | UserAuditDataPointWithComposition<'VALIDATED'>
