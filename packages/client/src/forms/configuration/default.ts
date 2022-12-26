@@ -2774,10 +2774,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     value: 'female',
                     label: formMessageDescriptors.deceasedSexFemale
-                  },
-                  {
-                    value: 'unknown',
-                    label: formMessageDescriptors.deceasedSexUnknown
                   }
                 ]
               },
@@ -3038,6 +3034,19 @@ export const registerForms: IDefaultRegisterForms = {
                 ]
               },
               {
+                name: 'deceased-marital-status-separator',
+                type: 'SUBSECTION',
+                label: {
+                  defaultMessage: ' ',
+                  description: 'empty string',
+                  id: 'form.field.label.empty'
+                },
+                initialValue: '',
+                ignoreBottomMargin: true,
+                validate: [],
+                conditionals: []
+              },
+              {
                 name: 'maritalStatus',
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.maritalStatus,
@@ -3269,6 +3278,12 @@ export const registerForms: IDefaultRegisterForms = {
                 customisable: true,
                 initialValue: '',
                 validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: 'values.causeOfDeathEstablished!=="true"'
+                  }
+                ],
                 mapping: {
                   mutation: {
                     operation: 'sectionFieldToBundleFieldTransformer',
