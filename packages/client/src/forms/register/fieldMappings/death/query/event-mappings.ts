@@ -10,11 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IFormField, IFormData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, DeathRegistration } from '@client/utils/gateway'
 import { REGISTRATION_SECTION } from '@client/forms/register/fieldMappings/death/query/documents-mappings'
 import { GQLRegWorkflow } from '@opencrvs/gateway/src/graphql/schema'
 import { transformStatusData } from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
 import format from '@client/utils/date-formatting'
+import { capitalize } from 'lodash'
+import { IOfflineData } from '@client/offline/reducer'
 
 export const deceasedDateToFieldTransformation =
   (alternativeSectionId?: string) =>
@@ -115,4 +117,68 @@ export function getDeathRegistrationSectionTransformer(
       REGISTRATION_SECTION
     )
   }
+}
+
+export const placeOfDeathLocalityTransformer = (
+  transformedData: IFormData,
+  registration: DeathRegistration,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) => {
+  const city = registration.eventLocation?.address?.city
+
+  if (!city) {
+    return
+  }
+
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'placeOfDeathLocality'
+  ] = capitalize(city)
+}
+
+export const placeOfDeathStateTransformer = (
+  transformedData: IFormData,
+  registration: DeathRegistration,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  offlineData?: IOfflineData
+) => {
+  const stateId = registration.eventLocation?.address?.state
+  if (!stateId) {
+    return
+  }
+
+  const state = offlineData?.locations[stateId]
+
+  if (!state) {
+    return
+  }
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'placeOfDeathState'
+  ] = state.name
+}
+export const placeOfDeathLGATransformer = (
+  transformedData: IFormData,
+  registration: DeathRegistration,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  offlineData?: IOfflineData
+) => {
+  const lgaId = registration.eventLocation?.address?.district
+
+  if (!lgaId) {
+    return
+  }
+  const lga = offlineData?.locations[lgaId]
+
+  if (!lga) {
+    return
+  }
+
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'placeOfDeathLGAState'
+  ] = lga.name
 }
