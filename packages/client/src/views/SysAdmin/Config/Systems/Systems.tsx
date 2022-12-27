@@ -472,6 +472,7 @@ export function SystemList() {
           registerSystemData?.registerSystem?.system.name ??
           intl.formatMessage(integrationMessages.createClient)
         }
+        id="createClientModal"
       >
         <Text variant="reg16" element="p" id="uniqueKeyId">
           {!registerSystemData && !registerSystemLoading
@@ -642,7 +643,7 @@ export function SystemList() {
                       />
                       {selectedTab === Event.Birth ? (
                         <CheckboxGroup
-                          id="test-checkbox-group1"
+                          id="birthCheckboxGroup"
                           options={[
                             {
                               label: intl.formatMessage(
@@ -683,7 +684,7 @@ export function SystemList() {
                         />
                       ) : (
                         <CheckboxGroup
-                          id="test-checkbox-group2"
+                          id="deathCheckboxGroup"
                           options={[
                             {
                               label: intl.formatMessage(
