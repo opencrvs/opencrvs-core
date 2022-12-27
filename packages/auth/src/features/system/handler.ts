@@ -114,5 +114,6 @@ export async function registerSystemClient(
   return res
 }
 export const registerRquestSchema = Joi.object({
-  scope: Joi.string()
+  type: Joi.string(),
+  name: Joi.string()
 })
