@@ -3317,6 +3317,10 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrationNumberTransformer'
             },
             {
+              fieldName: 'registrationDate',
+              operation: 'registrationDateTransformer'
+            },
+            {
               fieldName: 'certificateDate',
               operation: 'certificateDateTransformer',
               parameters: ['en', 'dd MMMM yyyy']
@@ -3351,6 +3355,18 @@ export const registerForms: IDefaultRegisterForms = {
               fieldName: 'registrationState',
               operation: 'registrationLocationUserTransformer',
               parameters: [':state']
+            },
+            {
+              fieldName: 'placeOfDeathLocality',
+              operation: 'placeOfDeathLocalityTransformer'
+            },
+            {
+              fieldName: 'placeOfDeathLGA',
+              operation: 'placeOfDeathLGATransformer'
+            },
+            {
+              fieldName: 'placeOfDeathState',
+              operation: 'placeOfDeathStateTransformer'
             }
           ]
         }

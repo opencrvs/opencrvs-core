@@ -622,6 +622,12 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         }
       ],
       mapping: {
+        template: informant
+          ? undefined
+          : {
+              operation: 'deceasedAddressStateTransformer',
+              fieldName: 'addressState'
+            },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -692,6 +698,12 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         }
       ],
       mapping: {
+        template: informant
+          ? undefined
+          : {
+              operation: 'deceasedAddressLGATransformer',
+              fieldName: 'addressLGA'
+            },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -847,6 +859,12 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         }
       ],
       mapping: {
+        template: informant
+          ? undefined
+          : {
+              operation: 'deceasedAddressLocalityTransformer',
+              fieldName: 'addressLocality'
+            },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',

@@ -1094,7 +1094,7 @@ const dummyDeathRegistrationResponse = {
       line: ['', '', '', '', '', '', 'URBAN'],
       district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
       state: 'df669feb-61a3-4984-ab24-4b28511b472a',
-      city: null,
+      city: 'Some Locality',
       postalCode: null,
       country: 'FAR',
       __typename: 'Address'
