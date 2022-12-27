@@ -196,6 +196,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           id
           type
           role
+          title
           name {
             firstNames
             familyName
@@ -436,6 +437,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           id
           type
           role
+          title
           name {
             firstNames
             familyName
