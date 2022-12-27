@@ -11,6 +11,8 @@
  */
 import { LoginState } from '@login/login/reducer'
 import { IStoreState } from '@login/store'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 const getPartialState = (store: IStoreState): LoginState => store.login
 
 function getKey<K extends keyof LoginState>(store: IStoreState, key: K) {
@@ -42,4 +44,53 @@ export function selectCountryBackground(store: IStoreState) {
 }
 export function selectApplicationName(store: IStoreState) {
   return getKey(store, 'config').APPLICATION_NAME
+}
+
+export const getStepOneDetails = (
+  store: IStoreState
+): LoginState['authenticationDetails'] => getKey(store, 'authenticationDetails')
+
+export function selectImageToObjectFit(store: IStoreState) {
+  if (getKey(store, 'config').LOGIN_BACKGROUND?.imageFit) {
+    return getKey(store, 'config').LOGIN_BACKGROUND?.imageFit
+  } else {
+    return getKey(store, 'config').LOGIN_BACKGROUND?.imageFit
+  }
+}
+
+export function usePersistentCountryBackground() {
+  const [offlineBackground, setOfflineBackground] = React.useState(
+    localStorage.getItem('country-background') ?? ''
+  )
+  const background = useSelector(selectCountryBackground)
+  if (background && background !== offlineBackground) {
+    setOfflineBackground(background)
+    localStorage.setItem('country-background', background)
+  }
+
+  return offlineBackground
+}
+export function useImageToObjectFit() {
+  const [offlineBackground, setOfflineBackground] = React.useState(
+    localStorage.getItem('country-image-fit') ?? ''
+  )
+  const background = useSelector(selectImageToObjectFit)
+  if (background && background !== offlineBackground) {
+    setOfflineBackground(background)
+    localStorage.setItem('country-image-fit', background)
+  }
+
+  return offlineBackground
+}
+
+export function usePersistentCountryLogo() {
+  const [offlineLogo, setOfflineLogo] = React.useState(
+    localStorage.getItem('country-logo') ?? ''
+  )
+  const logo = useSelector(selectCountryLogo)
+  if (logo && logo !== offlineLogo) {
+    setOfflineLogo(logo)
+    localStorage.setItem('country-logo', logo)
+  }
+  return offlineLogo
 }

@@ -23,7 +23,7 @@ import { useHistory, useLocation } from 'react-router'
 import { usePersistentCountryBackground } from '@login/common/LoginBackground/LoginBackground'
 
 type IProps = {
-  children: React.ReactNode
+  background: string
 }
 
 const SelectContainer = styled.div`
@@ -31,8 +31,6 @@ const SelectContainer = styled.div`
   display: flex;
   justify-content: end;
   padding: 24px 24px 8px;
-  background: ${({ color, theme }) =>
-    color ? color : theme.colors.backgroundPrimary};
 `
 
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
@@ -58,10 +56,9 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   return [languageOptions, onChange] as const
 }
 
-export function LanguageSelect({ children }: IProps) {
+export function LanguageSelect() {
   const paramLanguage = useSearchQuery('lang')
   const selectedLanguage = useSelector(getLanguage)
-  const countryBackground = usePersistentCountryBackground()
 
   const [languageOptions, onLanguageChange] = useLanguage(
     selectedLanguage,
@@ -71,10 +68,7 @@ export function LanguageSelect({ children }: IProps) {
   return (
     <>
       {languageOptions.length > 1 && (
-        <SelectContainer
-          color={`#${countryBackground}`}
-          style={{ backgroundImage: `url(${countryBackground})` }}
-        >
+        <SelectContainer>
           <Select2
             value={selectedLanguage}
             options={languageOptions}
@@ -82,7 +76,6 @@ export function LanguageSelect({ children }: IProps) {
           />
         </SelectContainer>
       )}
-      {children}
     </>
   )
 }

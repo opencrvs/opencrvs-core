@@ -15,12 +15,7 @@ import { RouteComponentProps } from 'react-router'
 import { IPage } from '@login/common/Page'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { getTheme } from '@opencrvs/components/lib/theme'
-
-import {
-  selectCountryBackground,
-  selectCountryLogo
-} from '@login/login/selectors'
-import { useSelector, connect } from 'react-redux'
+import { connect } from 'react-redux'
 import { IStoreState } from '@login/store'
 
 const StyledPage = styled.div<IPage>`
@@ -34,7 +29,6 @@ const StyledPage = styled.div<IPage>`
 
   ${({ submitting }) =>
     submitting && `justify-content: center; align-items: center;`}
-
   * {
     box-sizing: border-box;
     -webkit-font-smoothing: subpixel-antialiased;
@@ -46,31 +40,6 @@ const StyledPage = styled.div<IPage>`
     box-sizing: border-box;
   }
 `
-
-export function usePersistentCountryBackground() {
-  const [offlineBackground, setOfflineBackground] = React.useState(
-    localStorage.getItem('country-background') ?? ''
-  )
-  const background = useSelector(selectCountryBackground)
-  if (background && background !== offlineBackground) {
-    setOfflineBackground(background)
-    localStorage.setItem('country-background', background)
-  }
-
-  return offlineBackground
-}
-
-export function usePersistentCountryLogo() {
-  const [offlineLogo, setOfflineLogo] = React.useState(
-    localStorage.getItem('country-logo') ?? ''
-  )
-  const logo = useSelector(selectCountryLogo)
-  if (logo && logo !== offlineLogo) {
-    setOfflineLogo(logo)
-    localStorage.setItem('country-logo', logo)
-  }
-  return offlineLogo
-}
 
 type IProps = IPage &
   RouteComponentProps<{}> & {

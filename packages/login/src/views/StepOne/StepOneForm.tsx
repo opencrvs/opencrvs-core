@@ -34,13 +34,12 @@ import { goToForgottenItemForm } from '@login/login/actions'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   selectApplicationName,
-  selectCountryLogo
+  selectCountryLogo,
+  usePersistentCountryBackground,
+  usePersistentCountryLogo
 } from '@login/login/selectors'
 import * as actions from '@login/login/actions'
-import {
-  usePersistentCountryLogo,
-  usePersistentCountryBackground
-} from '@login/common/LoginBackground/LoginBackground'
+
 import { Box } from '@login/../../components/lib/Box'
 
 export const Container = styled.div`

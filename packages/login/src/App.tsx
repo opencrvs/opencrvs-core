@@ -34,6 +34,9 @@ import { SecurityQuestion } from './views/resetCredentialsForm/securityQuestionF
 import { UpdatePassword } from './views/resetCredentialsForm/updatePasswordForm'
 import { Page } from './Page'
 import { LanguageSelect } from './i18n/components/LanguageSelect'
+import { StepOneContainer1 } from '@login/views/StepOne/StepOneContainer1'
+import { LoginBackgroundWrapper } from '@login/common/LoginBackground/LoginBackgroundWrapper'
+import { StepTwoContainer2 } from '@login/views/StepTwo/StepTwoContainer2'
 
 export const { store, history } = createStore()
 
@@ -63,16 +66,14 @@ export class App extends React.Component<IAppProps> {
                 <Page>
                   <Switch>
                     <Route exact path={routes.STEP_ONE}>
-                      <LanguageSelect>
-                        <LoginBackgroundContainer>
-                          <StepOneContainer />
-                        </LoginBackgroundContainer>
-                      </LanguageSelect>
+                      <LoginBackgroundWrapper>
+                        <StepOneContainer1 />
+                      </LoginBackgroundWrapper>
                     </Route>
                     <Route exact path={routes.STEP_TWO}>
-                      <LoginBackgroundContainer>
-                        <StepTwoContainer />
-                      </LoginBackgroundContainer>
+                      <LoginBackgroundWrapper>
+                        <StepTwoContainer2 />
+                      </LoginBackgroundWrapper>
                     </Route>
                     <Route exact path={routes.FORGOTTEN_ITEM}>
                       <PageContainer>
