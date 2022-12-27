@@ -11,7 +11,7 @@
  */
 
 import { UserSection, CorrectionSection, WizardSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, User } from '@client/utils/gateway'
 import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
@@ -64,7 +64,6 @@ import {
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
@@ -614,7 +613,7 @@ export function goToPage(
   }
 }
 
-export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
+export function getDefaultPerformanceLocationId(userDetails: User) {
   const role = userDetails?.role
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
@@ -633,7 +632,7 @@ export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
   )
 }
 
-export function goToPerformanceView(userDetails: IUserDetails) {
+export function goToPerformanceView(userDetails: User) {
   return goToPerformanceHome(
     undefined,
     undefined,
@@ -641,7 +640,7 @@ export function goToPerformanceView(userDetails: IUserDetails) {
   )
 }
 
-export function goToTeamView(userDetails: IUserDetails) {
+export function goToTeamView(userDetails: User) {
   if (userDetails && userDetails.role) {
     return goToTeamUserList(
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''

@@ -20,7 +20,7 @@ import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import styled from '@client/styledComponents'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { gql } from '@apollo/client'
 import { get } from 'lodash'
 import * as React from 'react'
@@ -133,7 +133,7 @@ interface IProps {
   showPasswordChange: boolean
   togglePasswordChangeModal: () => void
   passwordChanged: () => void
-  userDetails: IUserDetails | null
+  userDetails: User | null
 }
 type IFullProps = IProps & IntlShapeProps
 

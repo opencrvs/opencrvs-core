@@ -19,7 +19,7 @@ import {
 } from '@client/pdfRenderer/transformer/types'
 import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { IOfflineData } from '@client/offline/reducer'
 import { isMobileDevice } from '@client/utils/commonUtils'
 
@@ -29,7 +29,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 export function createPDF(
   template: IPDFTemplate,
   declaration: IDeclaration,
-  userDetails: IUserDetails,
+  userDetails: User,
   offlineResource: IOfflineData,
   intl: IntlShape,
   optionalData?: OptionalData
@@ -75,7 +75,7 @@ export function createPDF(
 export function createSVG(
   template: ISVGTemplate,
   declaration: IDeclaration,
-  userDetails: IUserDetails,
+  userDetails: User,
   offlineResource: IOfflineData,
   intl: IntlShape,
   optionalData?: OptionalData
@@ -114,7 +114,7 @@ export function createSVG(
 export function printPDF(
   template: IPDFTemplate,
   declaration: IDeclaration,
-  userDetails: IUserDetails,
+  userDetails: User,
   offlineResource: IOfflineData,
   intl: IntlShape,
   optionalData?: OptionalData

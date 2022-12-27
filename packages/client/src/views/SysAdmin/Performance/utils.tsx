@@ -15,7 +15,7 @@ import {
   GQLIdentifier,
   GQLPaymentMetric
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User, Event } from '@client/utils/gateway'
 import { ILocation } from '@client/offline/reducer'
 import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
@@ -33,7 +33,6 @@ import {
   PERFORMANCE_STATS,
   CORRECTION_TOTALS
 } from '@client/views/SysAdmin/Performance/metricsQuery'
-import { Event } from '@client/utils/gateway'
 import {
   GET_TOTAL_CERTIFICATIONS,
   GET_TOTAL_PAYMENTS
@@ -215,9 +214,7 @@ export function getPrimaryLocationIdOfOffice(
   return location.id
 }
 
-export function getJurisdictionLocationIdFromUserDetails(
-  userDetails: IUserDetails
-) {
+export function getJurisdictionLocationIdFromUserDetails(userDetails: User) {
   const location =
     userDetails.catchmentArea &&
     userDetails.catchmentArea.find((location) => {

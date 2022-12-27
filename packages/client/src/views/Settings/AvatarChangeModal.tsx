@@ -23,7 +23,7 @@ import Cropper from 'react-easy-crop'
 import { Point, Area, Size } from 'react-easy-crop/types'
 import { Mutation } from '@apollo/client/react/components'
 import styled from '@client/styledComponents'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
@@ -112,7 +112,7 @@ type IProps = IntlShapeProps &
     onErrorChanged: (error: string) => void
     onConfirmAvatarChange: () => void
     onAvatarChanged: (img: IImage) => void
-    userDetails: IUserDetails | null
+    userDetails: User | null
   }
 
 const DEFAULT_SIZE: Size = {

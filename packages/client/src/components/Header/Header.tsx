@@ -46,7 +46,7 @@ import {
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowBack,
@@ -81,7 +81,7 @@ import { HistoryNavigator } from './HistoryNavigator'
 import { Hamburger } from './Hamburger'
 
 type IStateProps = {
-  userDetails: IUserDetails | null
+  userDetails: User | null
   language: string
 }
 

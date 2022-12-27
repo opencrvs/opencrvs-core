@@ -41,7 +41,6 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
-import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   AddUser,
@@ -218,7 +217,7 @@ type IOnlineStatusProps = {
 type BaseProps = {
   theme: ITheme
   offlineOffices: ILocation[]
-  userDetails: IUserDetails | null
+  userDetails: User | null
   offlineCountryConfig: IOfflineData
   goToCreateNewUser: typeof goToCreateNewUser
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
@@ -502,7 +501,7 @@ function UserListComponent(props: IProps) {
 
   function getViewOnly(
     locationId: string,
-    userDetails: IUserDetails | null,
+    userDetails: User | null,
     onlyNational: boolean
   ) {
     if (
@@ -544,7 +543,7 @@ function UserListComponent(props: IProps) {
       status,
       underInvestigation
     }: {
-      userDetails: IUserDetails | null
+      userDetails: User | null
       locationId: string
       user: User
       index: number
@@ -579,7 +578,7 @@ function UserListComponent(props: IProps) {
     function generateUserContents(
       data: QueryType,
       locationId: string,
-      userDetails: IUserDetails | null
+      userDetails: User | null
     ) {
       if (!data || !data.searchUsers || !data.searchUsers.results) {
         return []
@@ -659,7 +658,7 @@ function UserListComponent(props: IProps) {
 
   const LocationButton = (
     locationId: string,
-    userDetails: IUserDetails | null,
+    userDetails: User | null,
     onlyNational: boolean
   ) => {
     const buttons: React.ReactElement[] = []
@@ -686,7 +685,7 @@ function UserListComponent(props: IProps) {
     }: {
       data: any
       locationId: string
-      userDetails: IUserDetails | null
+      userDetails: User | null
     }) {
       const totalData =
         (data && data.searchUsers && data.searchUsers.totalItems) || 0

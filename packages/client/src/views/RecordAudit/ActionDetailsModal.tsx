@@ -28,7 +28,8 @@ import {
   dynamicConstantsMessages,
   userMessages
 } from '@client/i18n/messages'
-import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
+import { getIndividualNameObj } from '@client/utils/userUtils'
+import { User, History, RegAction, RegStatus } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { isEmpty, find, flatten, values } from 'lodash'
@@ -47,7 +48,6 @@ import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/Searc
 import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
-import { History, RegAction, RegStatus } from '@client/utils/gateway'
 import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
 
 interface IActionDetailsModalListTable {
@@ -538,7 +538,7 @@ export const ActionDetailsModal = ({
   actionDetailsIndex: number
   toggleActionDetails: (param: History | null) => void
   intl: IntlShape
-  userDetails: IUserDetails | null
+  userDetails: User | null
   goToUser: typeof goToUserProfile
   registerForm: IForm
   offlineData: Partial<IOfflineData>

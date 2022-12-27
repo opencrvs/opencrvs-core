@@ -48,7 +48,8 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation } from '@client/utils/userUtils'
+import { User, RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Redirect, RouteComponentProps } from 'react-router'
@@ -62,7 +63,6 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
-import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { Query } from '@client/components/Query'
 import { SEARCH_EVENTS } from '@client/search/queries'
@@ -108,7 +108,7 @@ interface IBaseSearchResultProps {
   language: string
   scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: IUserDetails | null
+  userDetails: User | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction

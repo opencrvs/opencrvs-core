@@ -18,7 +18,7 @@ import {
   GQLBookmarkedSeachItem
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/client/src/storage'
-import { Avatar } from '@client/utils/gateway'
+import { Avatar, Location, HumanName, User } from '@client/utils/gateway'
 import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
@@ -26,38 +26,7 @@ import { IStoreState } from '@client/store'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
-export interface IIdentifier {
-  system: string
-  value: string
-}
-export interface IGQLLocation {
-  id: string
-  identifier?: IIdentifier[]
-  name?: string
-  alias?: (string | null)[]
-  status?: string
-}
-
-export interface IUserDetails {
-  userMgntUserID?: string
-  practitionerId?: string
-  mobile?: string
-  role?: string
-  type?: string
-  status?: string
-  name?: Array<GQLHumanName | null>
-  catchmentArea?: IGQLLocation[]
-  primaryOffice?: IGQLLocation
-  localRegistrar?: {
-    name: Array<GQLHumanName | null>
-    role?: string
-    signature?: GQLSignature
-  }
-  avatar?: Avatar
-  searches?: GQLBookmarkedSeachItem[]
-}
-
-export function getUserDetails(user: GQLUser): IUserDetails {
+export function getUserDetails(user: GQLUser): User {
   const {
     catchmentArea,
     primaryOffice,
@@ -72,7 +41,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     avatar,
     searches
   } = user
-  const userDetails: IUserDetails = {}
+  const userDetails: User = {}
   if (localRegistrar) {
     userDetails.localRegistrar = localRegistrar
   }
@@ -128,7 +97,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
         }
         return {}
       }
-    ) as IGQLLocation[]
+    ) as Location[]
     if (potentialCatchmentAreas !== undefined) {
       userDetails.catchmentArea = potentialCatchmentAreas
     }
@@ -145,7 +114,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
   return userDetails
 }
 
-export function getUserLocation(userDetails: IUserDetails) {
+export function getUserLocation(userDetails: User) {
   if (!userDetails.primaryOffice) {
     throw Error('The user has no primary office')
   }
@@ -153,7 +122,7 @@ export function getUserLocation(userDetails: IUserDetails) {
   return userDetails.primaryOffice
 }
 
-export async function storeUserDetails(userDetails: IUserDetails) {
+export async function storeUserDetails(userDetails: User) {
   storage.setItem(USER_DETAILS, JSON.stringify(userDetails))
 }
 export async function removeUserDetails() {
@@ -161,17 +130,17 @@ export async function removeUserDetails() {
 }
 
 export function getIndividualNameObj(
-  individualNameArr: Array<GQLHumanName | null>,
+  individualNameArr: Array<HumanName | null>,
   language: string
 ) {
   return (
-    individualNameArr.find((name: GQLHumanName | null) => {
+    individualNameArr.find((name: HumanName | null) => {
       return name && name.use === language ? true : false
     }) || individualNameArr[0]
   )
 }
 
-export function getUserName(userDetails: IUserDetails | null) {
+export function getUserName(userDetails: User | null) {
   return (
     (userDetails &&
       userDetails.name &&

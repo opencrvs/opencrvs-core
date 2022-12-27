@@ -60,7 +60,7 @@ import {
 } from '@client/forms/utils'
 import { buttonMessages, formMessageDescriptors } from '@client/i18n/messages'
 import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
-import { IGQLLocation } from '@client/utils/userUtils'
+import { Location } from '@client/utils/gateway'
 import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
 
 export function groupHasError(
@@ -128,7 +128,7 @@ export function isFileSizeExceeded(declaration: IDeclaration) {
 
 export function updateDeclarationRegistrationWithCorrection(
   declaration: IDeclaration,
-  meta?: { userPrimaryOffice?: IGQLLocation }
+  meta?: { userPrimaryOffice?: Location }
 ): void {
   let correctionValues: Record<string, any> = {}
   const { data } = declaration

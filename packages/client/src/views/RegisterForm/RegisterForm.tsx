@@ -60,7 +60,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SubmissionAction
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, User } from '@client/utils/gateway'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -107,7 +107,6 @@ import {
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { IUserDetails } from '@client/utils/userUtils'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 
 const FormSectionTitle = styled.h4`
@@ -957,7 +956,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 function getInitialValue(
   field: IFormField,
   data: IFormData,
-  userDetails?: IUserDetails | null
+  userDetails?: User | null
 ) {
   let fieldInitialValue = field.initialValue
   if (field.initialValueKey) {
@@ -980,7 +979,7 @@ export function replaceInitialValues(
   fields: IFormField[],
   sectionValues: any,
   data?: IFormData,
-  userDetails?: IUserDetails | null
+  userDetails?: User | null
 ) {
   return fields.map((field) => ({
     ...field,

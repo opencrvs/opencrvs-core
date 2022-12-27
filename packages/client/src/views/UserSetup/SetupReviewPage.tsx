@@ -26,7 +26,12 @@ import {
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { createNamesMap } from '@client/utils/data-formatting'
-import { getUserName, IUserDetails } from '@client/utils/userUtils'
+import { getUserName } from '@client/utils/userUtils'
+import {
+  User,
+  SubmitActivateUserMutation,
+  SubmitActivateUserMutationVariables
+} from '@client/utils/gateway'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { Mutation } from '@apollo/client/react/components'
 import {
@@ -39,10 +44,6 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { Content } from '@opencrvs/components/lib/Content'
-import {
-  SubmitActivateUserMutation,
-  SubmitActivateUserMutationVariables
-} from '@client/utils/gateway'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -78,9 +79,7 @@ interface IProps {
 export function UserSetupReview({ setupData, goToStep }: IProps) {
   const intl = useIntl()
   const [submitError, setSubmitError] = React.useState(false)
-  const userDetails = useSelector<IStoreState, IUserDetails | null>(
-    getUserDetails
-  )
+  const userDetails = useSelector<IStoreState, User | null>(getUserDetails)
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
 

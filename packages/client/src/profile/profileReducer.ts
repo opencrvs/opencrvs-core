@@ -14,11 +14,11 @@ import * as actions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import {
   USER_DETAILS,
-  IUserDetails,
   getUserDetails,
   storeUserDetails,
   removeUserDetails
 } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import {
   getTokenPayload,
   ITokenPayload,
@@ -40,7 +40,7 @@ export type ProfileState = {
   authenticated: boolean
   tokenPayload: ITokenPayload | null
   userDetailsFetched: boolean
-  userDetails: IUserDetails | null
+  userDetails: User | null
   nonce: string
 }
 
@@ -148,7 +148,7 @@ export const profileReducer: LoopReducer<
         }
       }
     case actions.MODIFY_USER_DETAILS:
-      const details: IUserDetails = action.payload
+      const details: User = action.payload
       if (details) {
         return loop(
           {
@@ -181,7 +181,7 @@ export const profileReducer: LoopReducer<
       )
     case actions.GET_USER_DETAILS_SUCCESS:
       const userDetailsString = action.payload
-      const userDetailsCollection: IUserDetails | null = JSON.parse(
+      const userDetailsCollection: User | null = JSON.parse(
         userDetailsString ? userDetailsString : 'null'
       )
       // if the user detail cannot be found or they don't match the user specified in the token

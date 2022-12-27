@@ -68,7 +68,7 @@ import { RouteComponentProps } from 'react-router'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import {
   ListViewSimplified,
   ListViewItemSimplified,
@@ -93,7 +93,7 @@ interface IDispatchProps {
   goBack: typeof goBack
   goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
-  userDetails: IUserDetails | null
+  userDetails: User | null
 }
 
 interface ISectionData {

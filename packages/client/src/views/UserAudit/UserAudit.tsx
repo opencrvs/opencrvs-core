@@ -28,7 +28,12 @@ import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { IUserDetails } from '@client/utils/userUtils'
+import {
+  User,
+  GetUserQuery,
+  GetUserQueryVariables,
+  HumanName
+} from '@client/utils/gateway'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useDispatch, useSelector } from 'react-redux'
@@ -42,11 +47,6 @@ import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import {
-  GetUserQuery,
-  GetUserQueryVariables,
-  HumanName
-} from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { getOfflineData } from '@client/offline/selectors'
@@ -102,7 +102,7 @@ const transformUserQueryResult = (
         : EMPTY_STRING,
     practitionerId: userData.practitionerId,
     locationId:
-      getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) || '0',
+      getJurisdictionLocationIdFromUserDetails(userData as User) || '0',
     avatar: userData.avatar || undefined,
     device: userData.device
   }

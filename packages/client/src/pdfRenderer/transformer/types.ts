@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IDeclaration } from '@client/declarations'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { TDocumentDefinitions, TFontFamilyTypes } from 'pdfmake/interfaces'
 import { IOfflineData } from '@client/offline/reducer'
@@ -59,7 +59,7 @@ export interface IFieldTransformer {
 
 export type TemplateTransformerData = {
   declaration: IDeclaration
-  userDetails: IUserDetails
+  userDetails: User
   resource: IOfflineData
 }
 

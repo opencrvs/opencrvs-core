@@ -18,10 +18,9 @@ import {
   filterProcessingDeclarations,
   filterProcessingDeclarationsFromQuery
 } from '.'
-import { Event } from '@client/utils/gateway'
+import { Event, User } from '@client/utils/gateway'
 import { AppStore, createStore } from '@client/store'
 import { mockDeclarationData, flushPromises } from '@client/tests/util'
-import { IUserDetails } from '@client/utils/userUtils'
 import { storage } from '@client/storage'
 import { vi } from 'vitest'
 
@@ -283,7 +282,7 @@ describe('archiveDeclaration tests', () => {
       declarations: [declaration]
     }
 
-    const currentUserDetails: IUserDetails = {
+    const currentUserDetails: User = {
       userMgntUserID: '123',
       localRegistrar: { name: [] }
     }

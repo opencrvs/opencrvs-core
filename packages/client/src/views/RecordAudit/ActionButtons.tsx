@@ -34,7 +34,7 @@ import {
 } from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
@@ -44,7 +44,7 @@ import { Roles } from '@client/utils/authUtils'
 export type CMethodParams = {
   declaration: IDeclarationData
   intl: IntlShape
-  userDetails: IUserDetails | null
+  userDetails: User | null
   draft: IDeclaration | null
   clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
   goToPage?: typeof goToPage
@@ -60,7 +60,7 @@ export const ShowDownloadButton = ({
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
-  userDetails: IUserDetails | null
+  userDetails: User | null
 }) => {
   const { id, type } = declaration || {}
 

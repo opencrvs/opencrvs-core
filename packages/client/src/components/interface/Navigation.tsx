@@ -38,7 +38,7 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -217,7 +217,7 @@ interface IDispatchProps {
 interface IStateProps {
   draftDeclarations: IDeclaration[]
   declarationsReadyToSend: IDeclaration[]
-  userDetails: IUserDetails | null
+  userDetails: User | null
   advancedSearchParams: IAdvancedSearchParamState
   activeMenuItem: string
   workqueue: IWorkqueue
@@ -704,7 +704,7 @@ export const NavigationView = (props: IFullProps) => {
       )}
 
       {userDetails?.searches && userDetails?.searches.length > 0 ? (
-        userDetails?.searches.map((bookmarkResult, index) => {
+        userDetails?.searches.map((bookmarkResult) => {
           return (
             <NavigationItem
               icon={() => (

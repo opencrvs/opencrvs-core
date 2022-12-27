@@ -15,7 +15,7 @@ import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 
 export enum Roles {
   FIELD_AGENT = 'FIELD_AGENT',
@@ -146,7 +146,7 @@ export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
 
 export const hasAccessToRoute = (
   roles: Roles[],
-  userDetails: IUserDetails
+  userDetails: User
 ): boolean => {
   const userRole = userDetails.role as Roles
   if (roles.includes(userRole)) {

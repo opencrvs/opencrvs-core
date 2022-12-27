@@ -28,9 +28,8 @@ import {
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { vi } from 'vitest'
 
-import { Event } from '@client/utils/gateway'
+import { Event, User } from '@client/utils/gateway'
 import { storage } from '@client/storage'
-import { IUserDetails } from '@client/utils/userUtils'
 describe('when user logs in', () => {
   // Some mock data
   const draft1 = createDeclaration(Event.Birth)
@@ -47,7 +46,7 @@ describe('when user logs in', () => {
     declarations: [draft3]
   }
 
-  const currentUserDetails: IUserDetails = {
+  const currentUserDetails: User = {
     userMgntUserID: 'shakib75',
     localRegistrar: { name: [] }
   }

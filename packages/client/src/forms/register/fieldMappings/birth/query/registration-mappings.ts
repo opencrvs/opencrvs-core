@@ -20,8 +20,7 @@ import { userMessages } from '@client/i18n/messages'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
-import { Event, History, RegStatus } from '@client/utils/gateway'
-import { IUserDetails } from '@client/utils/userUtils'
+import { Event, History, RegStatus, User } from '@client/utils/gateway'
 import {
   GQLRegStatus,
   GQLRegWorkflow
@@ -245,7 +244,7 @@ export const registrarNameUserTransformer = (
   targetSectionId?: string,
   targetFieldName?: string,
   __?: IOfflineData,
-  userDetails?: IUserDetails
+  userDetails?: User
 ) => {
   if (!_.history) {
     return
@@ -266,7 +265,7 @@ export const roleUserTransformer = (
   targetSectionId?: string,
   targetFieldName?: string,
   __?: IOfflineData,
-  userDetails?: IUserDetails
+  userDetails?: User
 ) => {
   if (!_.history) {
     return
@@ -313,7 +312,7 @@ export const registrarSignatureUserTransformer = (
   targetSectionId?: string,
   targetFieldName?: string,
   __?: IOfflineData,
-  userDetails?: IUserDetails
+  userDetails?: User
 ) => {
   if (!_.history) {
     return

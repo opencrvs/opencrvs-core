@@ -21,7 +21,7 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Event, Query } from '@client/utils/gateway'
+import { Event, Query, User } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -40,7 +40,6 @@ import {
   draftToGqlTransformer
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import { IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
 import {
   GQLEventSearchResultSet,
@@ -377,7 +376,7 @@ interface IDownloadDeclarationSuccess {
     }
     client: ApolloClient<{}>
     offlineData?: IOfflineData
-    userDetails?: IUserDetails
+    userDetails?: User
   }
 }
 
@@ -597,7 +596,7 @@ async function getCurrentUserRole(): Promise<string> {
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as IUserDetails).role || ''
+  return (JSON.parse(userDetails) as User).role || ''
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -606,7 +605,7 @@ export async function getCurrentUserID(): Promise<string> {
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as IUserDetails).userMgntUserID || ''
+  return (JSON.parse(userDetails) as User).userMgntUserID || ''
 }
 
 export async function getUserData(userId: string) {
@@ -974,7 +973,7 @@ function downloadDeclarationSuccess({
       form,
       client,
       offlineData: getOfflineData(store),
-      userDetails: getUserDetails(store) as IUserDetails
+      userDetails: getUserDetails(store) as User
     }
   }
 }

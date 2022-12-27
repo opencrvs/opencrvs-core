@@ -119,7 +119,7 @@ import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
@@ -582,7 +582,7 @@ function GeneratedInputField({
 
 export function getInitialValueForSelectDynamicValue(
   field: IFormField,
-  userDetails: IUserDetails | null
+  userDetails: User | null
 ) {
   let fieldInitialValue = field.initialValue as IFormFieldValue
   const catchmentAreas = userDetails?.catchmentArea
@@ -610,10 +610,7 @@ export function getInitialValueForSelectDynamicValue(
   return fieldInitialValue
 }
 
-const mapFieldsToValues = (
-  fields: IFormField[],
-  userDetails: IUserDetails | null
-) =>
+const mapFieldsToValues = (fields: IFormField[], userDetails: User | null) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
@@ -663,7 +660,7 @@ interface IFormSectionProps {
 
 interface IStateProps {
   offlineCountryConfig: IOfflineData
-  userDetails: IUserDetails | null
+  userDetails: User | null
 }
 
 interface IDispatchProps {

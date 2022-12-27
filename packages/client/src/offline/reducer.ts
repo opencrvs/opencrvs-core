@@ -25,13 +25,12 @@ import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { IFormConfig } from '@client/forms'
-import { Event, System } from '@client/utils/gateway'
+import { Event, System, User } from '@client/utils/gateway'
 import {
   IQuestionConfig,
   isDefaultQuestionConfig
 } from '@client/forms/questionConfig'
 import { isOfflineDataLoaded } from './selectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import {
   IPDFTemplate,
   ISVGTemplate
@@ -84,7 +83,7 @@ export type IOfflineDataState = {
   offlineData: Partial<IOfflineData>
   offlineDataLoaded: boolean
   loadingError: boolean
-  userDetails?: IUserDetails
+  userDetails?: User
 }
 
 export const initialState: IOfflineDataState = {

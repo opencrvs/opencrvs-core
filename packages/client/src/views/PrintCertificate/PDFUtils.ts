@@ -12,7 +12,7 @@
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
-import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
+import { User } from '@opencrvs/client/src/utils/gateway'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   OptionalData,
@@ -73,7 +73,7 @@ export function executeHandlebarsTemplate(
 export async function previewCertificate(
   intl: IntlShape,
   declaration: IDeclaration,
-  userDetails: IUserDetails | null,
+  userDetails: User | null,
   offlineResource: IOfflineData,
   callBack: (pdf: string) => void,
   optionalData?: OptionalData,
@@ -98,7 +98,7 @@ export async function previewCertificate(
 export function printCertificate(
   intl: IntlShape,
   declaration: IDeclaration,
-  userDetails: IUserDetails | null,
+  userDetails: User | null,
   offlineResource: IOfflineData,
   optionalData?: OptionalData,
   pageSize: PageSize = 'A4'

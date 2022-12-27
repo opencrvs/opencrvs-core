@@ -24,7 +24,8 @@ import {
 import { SettingsBlack, LogoutBlack } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
-import { IUserDetails, getIndividualNameObj } from '@client/utils/userUtils'
+import { getIndividualNameObj } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { getLanguage } from '@client/i18n/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -45,7 +46,7 @@ const UserRole = styled.div`
 
 interface IProps {
   language: string
-  userDetails: IUserDetails | null
+  userDetails: User | null
   redirectToAuthentication: typeof redirectToAuthentication
   goToSettings: typeof goToSettings
 }
@@ -72,10 +73,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     return items
   }
 
-  getUserName = (
-    language: string,
-    userDetails: IUserDetails | null
-  ): string => {
+  getUserName = (language: string, userDetails: User | null): string => {
     let userName = ''
 
     if (userDetails && userDetails.name) {
@@ -89,7 +87,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     return userName
   }
 
-  getUserRole = (intl: IntlShape, userDetails: IUserDetails | null): string => {
+  getUserRole = (intl: IntlShape, userDetails: User | null): string => {
     let userRole = ''
 
     if (userDetails && userDetails.role) {
@@ -102,7 +100,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   getMenuHeader = (
     intl: IntlShape,
     language: string,
-    userDetails: IUserDetails | null
+    userDetails: User | null
   ): JSX.Element => {
     const userName = this.getUserName(language, userDetails)
     const userRole = this.getUserRole(intl, userDetails)

@@ -50,7 +50,8 @@ import {
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation } from '@client/utils/userUtils'
+import { User, SearchEventsQuery } from '@client/utils/gateway'
 
 import {
   ColumnContentAlignment,
@@ -60,7 +61,6 @@ import {
 } from '@opencrvs/components/lib/Workqueue'
 import { Frame } from '@opencrvs/components/lib/Frame'
 
-import { SearchEventsQuery } from '@client/utils/gateway'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -134,7 +134,7 @@ interface IBaseSearchResultProps {
   language: string
   scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: IUserDetails | null
+  userDetails: User | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction

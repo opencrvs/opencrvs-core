@@ -14,7 +14,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Currency } from '@opencrvs/components/lib/Currency'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import { Event, User } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
@@ -26,7 +26,6 @@ import {
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@client/styledComponents'
-import { IUserDetails } from '@client/utils/userUtils'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -81,7 +80,7 @@ interface IProps {
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
   goToHomeTab: typeof goToHomeTab
-  userDetails: IUserDetails | null
+  userDetails: User | null
   offlineCountryConfig: IOfflineData
 }
 

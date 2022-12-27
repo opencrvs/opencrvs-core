@@ -604,11 +604,16 @@ export type CurrencyInput = {
 export enum CustomFieldType {
   Number = 'NUMBER',
   Paragraph = 'PARAGRAPH',
+  SelectWithOptions = 'SELECT_WITH_OPTIONS',
   Subsection = 'SUBSECTION',
   Tel = 'TEL',
   Text = 'TEXT',
-  Textarea = 'TEXTAREA',
-  Select = 'SELECT_WITH_OPTIONS'
+  Textarea = 'TEXTAREA'
+}
+
+export type CustomSelectOption = {
+  label: MesssageDescriptorInput
+  value: Scalars['String']
 }
 
 export type Death = {
@@ -849,7 +854,6 @@ export type FormDataset = {
   __typename?: 'FormDataset'
   _id?: Maybe<Scalars['String']>
   createdAt: Scalars['String']
-  createdBy: User
   fileName: Scalars['String']
   options?: Maybe<Array<FormDatasetOption>>
 }
@@ -1778,6 +1782,7 @@ export type QueryVerifyPasswordByIdArgs = {
 export type QuestionInput = {
   conditionals?: InputMaybe<Array<ConditionalInput>>
   custom?: InputMaybe<Scalars['Boolean']>
+  datasetId?: InputMaybe<Scalars['String']>
   description?: InputMaybe<Array<MesssageInput>>
   enabled?: InputMaybe<Scalars['String']>
   errorMessage?: InputMaybe<Array<MesssageInput>>
@@ -1786,12 +1791,11 @@ export type QuestionInput = {
   fieldType?: InputMaybe<CustomFieldType>
   label?: InputMaybe<Array<MesssageInput>>
   maxLength?: InputMaybe<Scalars['Int']>
+  options?: InputMaybe<Array<CustomSelectOption>>
   placeholder?: InputMaybe<Array<MesssageInput>>
   precedingFieldId: Scalars['String']
   required?: InputMaybe<Scalars['Boolean']>
   tooltip?: InputMaybe<Array<MesssageInput>>
-  options?: InputMaybe<Array<MesssageInput>>
-  datasetId?: InputMaybe<Scalars['String']>
 }
 
 export type QuestionnaireQuestion = {
@@ -2609,6 +2613,8 @@ export type FetchUserQuery = {
     avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     searches?: Array<{
       __typename?: 'BookmarkedSeachItem'
+      searchId: string
+      name: string
       parameters: {
         __typename?: 'AdvancedSeachParameters'
         event?: Event | null
@@ -3301,7 +3307,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string } | null
+      system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -3592,7 +3598,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string } | null
+      system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -3957,7 +3963,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string } | null
+      system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -4230,7 +4236,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         id: string
         name?: string | null
       } | null
-      system?: { __typename?: 'System'; name: string } | null
+      system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
         id?: string | null
@@ -5592,15 +5598,6 @@ export type GetFormDatasetQuery = {
     _id?: string | null
     fileName: string
     createdAt: string
-    createdBy: {
-      __typename?: 'User'
-      id?: string | null
-      name?: Array<{
-        __typename?: 'HumanName'
-        firstNames?: string | null
-        familyName?: string | null
-      } | null> | null
-    }
     options?: Array<{
       __typename?: 'FormDatasetOption'
       value: string
@@ -5674,6 +5671,38 @@ export type CreateFormDraftMutation = {
       comment: string
       updatedAt: any
     }>
+  } | null
+}
+
+export type CreateFormDatasetMutationVariables = Exact<{
+  formDataset: FormDatasetInput
+}>
+
+export type CreateFormDatasetMutation = {
+  __typename?: 'Mutation'
+  createFormDataset?: {
+    __typename?: 'FormDatasetResponse'
+    status: string
+    msg: string
+    data?: {
+      __typename?: 'FormDataset'
+      fileName: string
+      createdAt: string
+      _id?: string | null
+      options?: Array<{
+        __typename?: 'FormDatasetOption'
+        value: string
+        label?: Array<{
+          __typename?: 'FormDatasetOptionLabel'
+          lang: string
+          descriptor: {
+            __typename?: 'MesssageDescriptor'
+            id: string
+            defaultMessage: string
+          }
+        } | null> | null
+      }> | null
+    } | null
   } | null
 }
 
@@ -5804,55 +5833,6 @@ export type DeleteSystemMutation = {
     shaSecret: string
     status: SystemStatus
     type: SystemType
-  } | null
-}
-
-export type CreateFormDatasetMutationVariables = Exact<{
-  formDataset: FormDatasetInput
-}>
-
-export type CreateFormDatasetMutation = {
-  __typename?: 'Mutation'
-  createFormDataset?: {
-    __typename?: 'FormDatasetResponse'
-    status: string
-    msg: string
-    data?: {
-      __typename?: 'FormDataset'
-      fileName: string
-      createdAt: string
-      _id?: string | null
-      options?: Array<{
-        __typename?: 'FormDatasetOption'
-        value: string
-        label?: Array<{
-          __typename?: 'FormDatasetOptionLabel'
-          lang: string
-          descriptor: {
-            __typename?: 'MesssageDescriptor'
-            id: string
-            defaultMessage: string
-          }
-        } | null> | null
-      }> | null
-    } | null
-  } | null
-}
-
-export type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
-
-export type GetVsExportsQuery = {
-  __typename?: 'Query'
-  getVSExports?: {
-    __typename?: 'TotalVSExport'
-    results?: Array<{
-      __typename?: 'VSExport'
-      event: string
-      year: number
-      url: string
-      createdOn: string
-      fileSize: string
-    }> | null
   } | null
 }
 
@@ -6186,6 +6166,24 @@ export type GetTotalCertificationsQuery = {
     eventType: string
   }> | null
 }
+
+export type GetVsExportsQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetVsExportsQuery = {
+  __typename?: 'Query'
+  getVSExports?: {
+    __typename?: 'TotalVSExport'
+    results?: Array<{
+      __typename?: 'VSExport'
+      event: string
+      year: number
+      url: string
+      createdOn: string
+      fileSize: string
+    }> | null
+  } | null
+}
+
 export type SubmitActivateUserMutationVariables = Exact<{
   userId: Scalars['String']
   password: Scalars['String']

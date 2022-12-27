@@ -32,8 +32,7 @@ import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
 import { sectionTransformer } from '@client/forms/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
-import { IUserDetails } from '@client/utils/userUtils'
-import { EventRegistration, EventSearchSet } from '@client/utils/gateway'
+import { User, EventRegistration, EventSearchSet } from '@client/utils/gateway'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -299,7 +298,7 @@ export const gqlToDraftTransformer = (
   formDefinition: IForm,
   queryData: any,
   offlineData?: IOfflineData,
-  userDetails?: IUserDetails
+  userDetails?: User
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')

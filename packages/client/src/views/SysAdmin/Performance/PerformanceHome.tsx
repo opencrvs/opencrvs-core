@@ -30,10 +30,9 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subYears from 'date-fns/subYears'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { Event } from '@client/utils/gateway'
+import { Event, User } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
 import {
   CORRECTION_TOTALS,
@@ -215,7 +214,7 @@ interface IDispatchProps {
 type Props = WrappedComponentProps &
   IDispatchProps &
   IOnlineStatusProps &
-  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
+  RouteComponentProps & { userDetails: User | null } & IConnectProps & {
     theme: ITheme
   }
 
