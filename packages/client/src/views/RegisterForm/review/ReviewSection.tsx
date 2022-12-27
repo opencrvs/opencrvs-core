@@ -1412,12 +1412,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         )
       }
 
+      let erroredFieldToRedirect
+      if (hasErrors) {
+        erroredFieldToRedirect = taggedFields.find((field) =>
+          this.fieldHasErrors(section, field, errorsOnFields)
+        )?.name
+      }
       return this.getRenderableField(
         draft,
         section,
         group,
         (tagDef[0] && tagDef[0].label) || field.label,
-        (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
+        erroredFieldToRedirect ||
+          (tagDef[0] && tagDef[0].fieldToRedirect) ||
+          field.name,
         completeValue,
         field.readonly || this.props.readonly
       )
