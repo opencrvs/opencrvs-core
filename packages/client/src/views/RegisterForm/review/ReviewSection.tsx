@@ -280,7 +280,7 @@ const SignatureInputContainer = styled.div`
   align-items: flex-end;
 `
 const SignaturePreview = styled.img`
-  max-width: 100%;
+  max-width: 50%;
   display: block;
 `
 
@@ -1931,7 +1931,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
 
-              {window.config.INFORMANT_SIGNATURE &&
+              {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
                 !isCorrection(declaration) &&
                 !hasB1Form(declaration) && (
                   <InputWrapper>

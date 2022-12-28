@@ -103,8 +103,6 @@ export async function updateApplicationConfigHandler(
     }
     // Update existing application config fields
     merge(existingApplicationConfig, applicationConfig)
-    console.log(applicationConfig)
-    console.log(existingApplicationConfig)
 
     await ApplicationConfig.update(
       { _id: existingApplicationConfig._id },
@@ -152,10 +150,6 @@ export const updateApplicationConfig = Joi.object({
   DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.string(),
   ADDRESSES: Joi.number().valid(...[1, 2]),
-  INTEGRATIONS: Joi.array().items({
-    name: Joi.string().required(),
-    status: Joi.string().required()
-  }),
   INFORMANT_SIGNATURE: Joi.boolean(),
   DATE_OF_BIRTH_UNKNOWN: Joi.boolean(),
   INFORMANT_SIGNATURE_REQUIRED: Joi.boolean()

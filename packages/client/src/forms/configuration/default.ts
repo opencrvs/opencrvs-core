@@ -1145,6 +1145,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Checkbox for exact date of birth unknown',
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
+                hideInPreview: true,
                 required: true,
                 hideHeader: true,
                 initialValue: false,
@@ -1157,8 +1158,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: ['individual']
+                    operation: 'ignoreFieldTransformer'
                   },
                   query: {
                     operation: 'nestedValueToFieldTransformer',
@@ -1501,6 +1501,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
                 required: true,
+                hideInPreview: true,
                 hideHeader: true,
                 initialValue: false,
                 validate: [],
@@ -1514,6 +1515,9 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   query: {
                     operation: 'booleanTransformer'
+                  },
+                  mutation: {
+                    operation: 'ignoreFieldTransformer'
                   }
                 }
               },
@@ -2047,6 +2051,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
                 required: true,
+                hideInPreview: true,
                 hideHeader: true,
                 initialValue: false,
                 validate: [],
@@ -2060,6 +2065,9 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   query: {
                     operation: 'booleanTransformer'
+                  },
+                  mutation: {
+                    operation: 'ignoreFieldTransformer'
                   }
                 }
               },
@@ -3293,6 +3301,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Checkbox for exact date of birth unknown',
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
+                hideInPreview: true,
                 required: true,
                 hideHeader: true,
                 initialValue: false,
@@ -3306,6 +3315,9 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   query: {
                     operation: 'booleanTransformer'
+                  },
+                  mutation: {
+                    operation: 'ignoreFieldTransformer'
                   }
                 }
               },
@@ -3955,6 +3967,7 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Checkbox for exact date of birth unknown',
                   id: 'form.field.label.exactDateOfBirthUnknown'
                 },
+                hideInPreview: true,
                 required: true,
                 hideHeader: true,
                 initialValue: false,
@@ -3967,8 +3980,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   mutation: {
-                    operation: 'fieldValueNestingTransformer',
-                    parameters: ['individual']
+                    operation: 'ignoreFieldTransformer'
                   },
                   query: {
                     operation: 'nestedValueToFieldTransformer',

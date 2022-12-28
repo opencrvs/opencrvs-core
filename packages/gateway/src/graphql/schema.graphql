@@ -1163,7 +1163,6 @@ input PersonInput {
   nationality: [String]
   educationalAttainment: EducationType
   ageOfIndividualInYears: Int
-  exactDateOfBirthUnknown: Boolean
 }
 
 input LocationInput {

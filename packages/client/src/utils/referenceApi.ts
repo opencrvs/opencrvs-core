@@ -47,11 +47,6 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
-interface IIntegration {
-  name: string
-  status: string
-}
-
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {
@@ -79,7 +74,6 @@ export interface IApplicationConfig {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
-  INTEGRATIONS?: [IIntegration]
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean

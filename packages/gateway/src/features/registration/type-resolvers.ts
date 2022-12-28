@@ -173,7 +173,7 @@ export const typeResolvers: GQLResolver = {
     },
     exactDateOfBirthUnknown: (person) => {
       const exactDateOfBirthUnknownExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/exact-date-of-birth-unknown`,
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
         person.extension
       )
       return (

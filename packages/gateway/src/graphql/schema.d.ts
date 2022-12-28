@@ -1068,7 +1068,6 @@ export interface GQLPersonInput {
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
   ageOfIndividualInYears?: number
-  exactDateOfBirthUnknown?: boolean
 }
 
 export interface GQLLocationInput {

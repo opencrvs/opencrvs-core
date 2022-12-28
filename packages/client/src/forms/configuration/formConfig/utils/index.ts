@@ -140,7 +140,7 @@ function resolveOptionsFormDatasetId(
   question: ICustomQuestionConfig,
   formDataset: IFormDataSet[]
 ) {
-  if (question.fieldType === CustomFieldType.Select) {
+  if (question.fieldType === CustomFieldType.SelectWithOptions) {
     const options =
       formDataset.find((dataset) => dataset._id === question.datasetId)
         ?.options || []

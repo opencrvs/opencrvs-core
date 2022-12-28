@@ -36,11 +36,6 @@ interface ICountryLogo {
   file: string
 }
 
-interface IIntegration {
-  name: string
-  status: string
-}
-
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
   BIRTH: IBirth
@@ -54,7 +49,6 @@ export interface IApplicationConfigurationModel extends Document {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
-  INTEGRATIONS: [IIntegration]
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
@@ -100,20 +94,6 @@ export const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
-const integrationsSchema = new Schema<IIntegration>({
-  name: String,
-  status: {
-    type: String,
-    enum: [
-      statuses.PENDING,
-      statuses.ACTIVE,
-      statuses.DISABLED,
-      statuses.DEACTIVATED
-    ],
-    default: statuses.PENDING
-  }
-})
-
 const configSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   BIRTH: { type: birthSchema, required: false },
@@ -148,7 +128,6 @@ const configSchema = new Schema({
     enum: [1, 2],
     default: 1
   },
-  INTEGRATIONS: [integrationsSchema],
   DATE_OF_BIRTH_UNKNOWN: { type: Boolean, required: true, default: false },
   INFORMANT_SIGNATURE: { type: Boolean, required: true, default: true },
   INFORMANT_SIGNATURE_REQUIRED: { type: Boolean, required: true, default: true }

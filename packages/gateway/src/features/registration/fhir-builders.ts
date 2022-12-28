@@ -696,30 +696,6 @@ function createAgeOfIndividualInYearsBuilder(
   }
 }
 
-function createExactDateOfBirthUnknownBuilder(
-  resource: fhir.Patient,
-  fieldValue: string
-) {
-  if (!resource.extension) {
-    resource.extension = []
-  }
-
-  const hasExactDateOfBirthUnknown = resource.extension.find(
-    (extention) =>
-      extention.url ===
-      `${OPENCRVS_SPECIFICATION_URL}extension/exact-date-of-birth-unknown`
-  )
-
-  if (hasExactDateOfBirthUnknown) {
-    hasExactDateOfBirthUnknown.valueString = fieldValue
-  } else {
-    resource.extension.push({
-      url: `${OPENCRVS_SPECIFICATION_URL}extension/exact-date-of-birth-unknown`,
-      valueString: fieldValue
-    })
-  }
-}
-
 function createEducationalAttainmentBuilder(
   resource: fhir.Patient,
   fieldValue: string
@@ -1236,14 +1212,6 @@ export const builders: IFieldBuilders = {
       )
       return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
     },
-    exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
-      const person = selectOrCreatePersonResource(
-        MOTHER_CODE,
-        MOTHER_TITLE,
-        fhirBundle
-      )
-      return createExactDateOfBirthUnknownBuilder(person, fieldValue as string)
-    },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const mother = selectOrCreatePersonResource(
         MOTHER_CODE,
@@ -1366,14 +1334,6 @@ export const builders: IFieldBuilders = {
         fhirBundle
       )
       return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
-    },
-    exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
-      const person = selectOrCreatePersonResource(
-        FATHER_CODE,
-        FATHER_TITLE,
-        fhirBundle
-      )
-      return createExactDateOfBirthUnknownBuilder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const father = selectOrCreatePersonResource(
@@ -1578,14 +1538,6 @@ export const builders: IFieldBuilders = {
       )
       return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
     },
-    exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
-      const person = selectOrCreatePersonResource(
-        DECEASED_CODE,
-        DECEASED_TITLE,
-        fhirBundle
-      )
-      return createExactDateOfBirthUnknownBuilder(person, fieldValue as string)
-    },
     maritalStatus: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
@@ -1692,13 +1644,6 @@ export const builders: IFieldBuilders = {
       ageOfIndividualInYears: (fhirBundle, fieldValue) => {
         const person = selectOrCreateInformantResource(fhirBundle)
         return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
-      },
-      exactDateOfBirthUnknown: (fhirBundle, fieldValue) => {
-        const person = selectOrCreateInformantResource(fhirBundle)
-        return createExactDateOfBirthUnknownBuilder(
-          person,
-          fieldValue as string
-        )
       },
       identifier: {
         id: (
