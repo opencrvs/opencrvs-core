@@ -42,7 +42,13 @@ export function Icon({
     <IconComponent
       size={IconSize[size]}
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
-      fill={fill === 'none' ? 'none' : colors[fill]}
+      fill={
+        fill === 'none'
+          ? 'none'
+          : fill === 'currentColor'
+          ? 'currentColor'
+          : colors[fill]
+      }
       {...rest}
     />
   )

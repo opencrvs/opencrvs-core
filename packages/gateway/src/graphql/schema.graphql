@@ -147,6 +147,8 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
+  fetchSystem(clientId: ID!): System
+  getFormDataset: [FormDataset!]
 }
 
 type Mutation {
@@ -225,12 +227,19 @@ type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
   deleteFormDraft(formDraft: DeleteFormDraftInput!): String
+  reactivateSystem(clientId: ID!): System
+  deactivateSystem(clientId: ID!): System
+  registerSystem(system: SystemInput): SystemSecret
+  refreshSystemSecret(clientId: String!): SystemSecret
+  updatePermissions(setting: UpdatePermissionsInput!): System
+  deleteSystem(clientId: ID!): System
   bookmarkAdvancedSearch(
     bookmarkSearchInput: BookmarkSearchInput!
   ): BookMarkedSearches
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
+  createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
 }
 
 type Dummy {
@@ -569,6 +578,23 @@ type FormDraft {
   createdAt: Date!
 }
 
+type System {
+  _id: ID!
+  clientId: ID!
+  shaSecret: ID!
+  status: SystemStatus!
+  name: String!
+  type: SystemType!
+  settings: [WebhookPermission!]
+}
+
+type FormDataset {
+  options: [FormDatasetOption!]
+  fileName: String!
+  createdAt: String!
+  _id: String
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -686,7 +712,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
-  INTEGRATIONS: [Integration]
+  ADMIN_LEVELS: Int
 }
 
 input ApplicationConfigurationInput {
@@ -701,7 +727,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
-  INTEGRATIONS: [IntegrationInput]
+  ADMIN_LEVELS: Int
 }
 
 input FormDraftInput {
@@ -719,6 +745,22 @@ input DeleteFormDraftInput {
   event: Event!
 }
 
+type SystemSecret {
+  system: System!
+  clientSecret: ID!
+}
+
+input SystemInput {
+  name: String!
+  type: SystemType!
+  settings: SystemSettings
+}
+
+input UpdatePermissionsInput {
+  clientId: String!
+  webhook: [WebhookInput!]!
+}
+
 type BookMarkedSearches {
   searchList: [BookmarkedSeachItem!]
 }
@@ -732,6 +774,17 @@ input BookmarkSearchInput {
 input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
+}
+
+type FormDatasetResponse {
+  status: String!
+  msg: String!
+  data: FormDataset
+}
+
+input FormDatasetInput {
+  fileName: String!
+  base64Data: String!
 }
 
 scalar Map
@@ -812,6 +865,7 @@ type History {
   requester: String
   hasShowedVerifiedDocument: Boolean
   otherReason: String
+  system: System
   location: Location
   office: Location
   dhis2Notification: Boolean
@@ -1073,6 +1127,28 @@ type DraftHistory {
   updatedAt: Date!
 }
 
+enum SystemStatus {
+  active
+  deactivated
+}
+
+enum SystemType {
+  NATIONAL_ID
+  HEALTH
+  RECORD_SEARCH
+  WEBHOOK
+}
+
+type WebhookPermission {
+  event: String!
+  permissions: [String!]!
+}
+
+type FormDatasetOption {
+  value: String!
+  label: [FormDatasetOptionLabel]
+}
+
 input PersonInput {
   _fhirID: ID
   identifier: [IdentityInput]
@@ -1204,11 +1280,6 @@ type Death {
   FEE: DeathFee
 }
 
-type Integration {
-  name: String
-  status: String
-}
-
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1230,11 +1301,6 @@ input DeathInput {
   FEE: DeathFeeInput
 }
 
-input IntegrationInput {
-  name: String
-  status: String
-}
-
 input QuestionInput {
   fieldId: String!
   label: [MesssageInput!]
@@ -1250,6 +1316,18 @@ input QuestionInput {
   enabled: String
   custom: Boolean
   conditionals: [ConditionalInput!]
+  datasetId: String
+  options: [CustomSelectOption!]
+}
+
+input SystemSettings {
+  dailyQuota: Int
+  webhook: [WebhookInput]
+}
+
+input WebhookInput {
+  event: String!
+  permissions: [String]!
 }
 
 enum InformantType {
@@ -1547,6 +1625,11 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
+type FormDatasetOptionLabel {
+  lang: String!
+  descriptor: MesssageDescriptor!
+}
+
 input IdentityInput {
   id: ID
   type: IdentityIDType
@@ -1656,11 +1739,17 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+  SELECT_WITH_OPTIONS
 }
 
 input ConditionalInput {
   fieldId: String!
   regexp: String!
+}
+
+input CustomSelectOption {
+  value: String!
+  label: MesssageDescriptorInput!
 }
 
 type Payment {
@@ -1683,6 +1772,12 @@ interface AuditLogItemBase {
 type AdditionalIdWithCompositionId {
   compositionId: String!
   trackingId: String!
+}
+
+type MesssageDescriptor {
+  id: String!
+  description: String
+  defaultMessage: String!
 }
 
 input CommentInput {

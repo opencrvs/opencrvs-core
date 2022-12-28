@@ -66,7 +66,8 @@ import {
   SubmissionAction,
   ICheckboxFormField,
   CHECKBOX,
-  INestedInputFields
+  INestedInputFields,
+  DeathSection
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -1419,7 +1420,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    this.setState({ previewImage: previewImage as IFileValue })
+    const previewImageTransformed = { ...previewImage }
+    previewImageTransformed.data = isBase64FileString(
+      previewImageTransformed.data
+    )
+      ? previewImageTransformed.data
+      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
+
+    this.setState({ previewImage: previewImageTransformed as IFileValue })
   }
 
   closePreviewSection = (callBack?: () => void) => {
@@ -1477,6 +1485,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       event === Event.Birth &&
       ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
         (section.id === BirthSection.Father && !!data.father?.detailsExist))
+    )
+  }
+
+  isLastNameFirst = () => {
+    const { registerForm, draft: declaration } = this.props
+    const fields = registerForm[declaration.event].sections.find((section) =>
+      declaration.event === Event.Birth
+        ? section.id === BirthSection.Child
+        : section.id === DeathSection.Deceased
+    )?.groups[0]?.fields
+    if (!fields) return false
+    return (
+      fields.findIndex((field) => field.name === 'familyNameEng') <
+      fields.findIndex((field) => field.name === 'firstNamesEng')
     )
   }
 
@@ -1617,7 +1639,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const informantName = getDraftInformantFullName(declaration, intl.locale)
+    const informantName = getDraftInformantFullName(
+      declaration,
+      intl.locale,
+      this.isLastNameFirst()
+    )
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,

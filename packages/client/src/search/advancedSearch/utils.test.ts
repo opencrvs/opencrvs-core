@@ -30,13 +30,13 @@ describe('Transforms advancedSearch local state to advancedSearch store state pr
       mockOfflineData.offices['0d8474da-0361-4d32-979e-af91f012340a'].id,
     eventLocationType: LocationType.HealthFacility,
     dateOfRegistration: {
-      exact: '19-09-1995',
+      exact: '1995-09-19',
       isDateRangeActive: false,
       rangeStart: '2021-11-30T07:42:19.092Z',
       rangeEnd: '2022-11-30T17:59:59.999Z'
     },
     childDoB: {
-      exact: '20-08-1994',
+      exact: '1994-08-20',
       isDateRangeActive: true,
       rangeStart: '2021-11-30T07:42:19.092Z',
       rangeEnd: '2022-11-30T17:59:59.999Z'
@@ -59,12 +59,13 @@ describe('Transforms advancedSearch local state to advancedSearch store state pr
   it('Converts registrationStatus to a transformed list of registration statuses ', () => {
     expect(transformedStoreState.registrationStatuses).toStrictEqual([
       'WAITING_VALIDATION',
-      'VALIDATED'
+      'VALIDATED',
+      'DECLARED'
     ])
   })
 
   it('Selects exact date if dateRange is not active', () => {
-    expect(transformedStoreState.dateOfRegistration).toBe('19-09-1995')
+    expect(transformedStoreState.dateOfRegistration).toBe('1995-09-19')
   })
 
   it('Selects and converts date ranges if dateRange is active', () => {
@@ -100,13 +101,13 @@ describe('Transforms advancedSearch local state to advancedSearch store state pr
 describe('Transforms advancedSearch store state to advancedSearch local state  properly', () => {
   const mockStoreState: IAdvancedSearchParamState = {
     event: 'birth',
-    registrationStatuses: ['WAITING_VALIDATION', 'VALIDATED'],
+    registrationStatuses: ['WAITING_VALIDATION', 'VALIDATED', 'DECLARED'],
     declarationLocationId:
       mockOfflineData.offices['0d8474da-0361-4d32-979e-af91f012340a'].id,
     eventLocationId: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
     eventLocationLevel1: '',
     eventLocationLevel2: '',
-    dateOfRegistration: '19-09-1995',
+    dateOfRegistration: '1995-09-19',
     childDoBStart: '2021-11-30T07:42:19.092Z',
     childDoBEnd: '2022-11-30T17:59:59.999Z'
   }

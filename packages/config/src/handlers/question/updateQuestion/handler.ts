@@ -44,7 +44,10 @@ export default async function updateQuestion(
   existingQuestion.required = question.required
   existingQuestion.enabled = question.enabled
   existingQuestion.custom = question.custom
-  existingQuestion.conditionals = question.conditionals
+  existingQuestion.conditionals =
+    question.conditionals && question.conditionals.length > 0
+      ? question.conditionals
+      : undefined
 
   try {
     await Question.update({ _id: existingQuestion._id }, existingQuestion)
