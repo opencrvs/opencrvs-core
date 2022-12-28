@@ -456,7 +456,6 @@ export const up = async (db, client) => {
         },
         {
           $match: {
-            lastModified: { $gte: '2022-12-26T16:45:38.000Z' },
             'extension.url':
               'http://opencrvs.org/specs/extension/requestCorrection'
           }
