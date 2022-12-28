@@ -27,6 +27,7 @@ import { internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
 import { Events } from '@metrics/features/metrics/constants'
 import { IPoints } from '@metrics/features/registration'
+import { refresh } from '../analytics/viewRefresher'
 
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,
@@ -283,6 +284,7 @@ export async function markBirthRegisteredHandler(
     ])
 
     await writePoints(points)
+    await refresh()
   } catch (err) {
     return internal(err)
   }
@@ -346,6 +348,7 @@ export async function markDeathRegisteredHandler(
     ])
 
     await writePoints(points)
+    await refresh()
   } catch (err) {
     return internal(err)
   }
@@ -382,6 +385,7 @@ export async function markCertifiedHandler(
     ])
 
     await writePoints(points)
+    await refresh()
   } catch (err) {
     return internal(err)
   }
@@ -446,6 +450,7 @@ export async function requestCorrectionHandler(
     ])
 
     await writePoints(points)
+    await refresh()
   } catch (err) {
     return internal(err)
   }

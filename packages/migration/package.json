@@ -10,9 +10,11 @@
     "start:prod": "./runMigrations.sh",
     "create:hearth": "migrate-mongo create -f migrate-mongo-config-hearth.js",
     "create:openhim": "migrate-mongo create -f migrate-mongo-config-openhim.js",
+    "create:analytics": "migrate-mongo create -f migrate-mongo-config-analytics.js",
     "create:application-config": "migrate-mongo create application-config -f migrate-mongo-config-application-config.js",
     "status:hearth": "migrate-mongo status -f migrate-mongo-config-hearth.js",
     "status:openhim": "migrate-mongo status -f migrate-mongo-config-openhim.js",
+    "status:analytics": "migrate-mongo status -f migrate-mongo-config-analytics.js",
     "status:application-config": "migrate-mongo status migrate-mongo status -f migrate-mongo-config-application-config.js",
     "precommit": "lint-staged"
   },

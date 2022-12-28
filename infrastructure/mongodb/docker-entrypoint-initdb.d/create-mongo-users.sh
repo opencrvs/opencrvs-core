@@ -16,7 +16,7 @@ mongo <<EOF
   db.createUser({
     user: 'hearth',
     pwd: '$HEARTH_MONGODB_PASSWORD',
-    roles: [{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'hearth-dev' }]
+    roles: [{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'analytics' }, { role: 'readWrite', db: 'hearth-dev' }]
   })
 EOF
 

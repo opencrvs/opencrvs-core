@@ -92,6 +92,7 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
+      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
   # END User facing services
   auth:
     image: opencrvs/ocrvs-auth:${VERSION:-latest}
@@ -165,6 +166,7 @@ services:
       dockerfile: ./packages/migration/Dockerfile
     restart: unless-stopped
     environment:
+      - ANALYTICS_MONGO_URL=mongodb://mongo1/analytics
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
       - APPLICATION_CONFIG_MONGO_URL=mongodb://mongo1/application-config
