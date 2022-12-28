@@ -234,7 +234,7 @@ export interface GQLUser {
   role: GQLRoleType
   type?: string
   email?: string
-  status: string
+  status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
@@ -250,16 +250,6 @@ export interface GQLUser {
 export interface GQLSearchUserResult {
   results?: Array<GQLUser | null>
   totalItems?: number
-}
-
-export const enum GQLRoleType {
-  FIELD_AGENT = 'FIELD_AGENT',
-  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
-  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
-  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
-  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
-  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
-  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
 }
 
 export interface GQLSearchFieldAgentResult {
@@ -836,6 +826,23 @@ export const enum GQLLocationType {
   OTHER = 'OTHER'
 }
 
+export const enum GQLRoleType {
+  FIELD_AGENT = 'FIELD_AGENT',
+  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
+  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
+  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
+  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
+  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
+  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
+}
+
+export const enum GQLStatus {
+  active = 'active',
+  deactivated = 'deactivated',
+  pending = 'pending',
+  disabled = 'disabled'
+}
+
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
   role: GQLRoleType
@@ -857,7 +864,7 @@ export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
   type?: string
-  status?: string
+  status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string
   creationDate?: string
@@ -2073,7 +2080,7 @@ export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
   status?: string
-  role?: GQLRoleType
+  role?: string
   primaryOfficeId?: string
   locationId?: string
   count?: number

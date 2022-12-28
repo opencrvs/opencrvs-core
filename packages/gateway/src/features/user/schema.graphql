@@ -34,6 +34,13 @@ enum RoleType {
   NATIONAL_REGISTRAR
 }
 
+enum Status {
+  active
+  deactivated
+  pending
+  disabled
+}
+
 # Create user form does not ask email, username
 input UserInput {
   id: ID
@@ -78,7 +85,7 @@ type User {
   role: RoleType!
   type: String
   email: String
-  status: String!
+  status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
@@ -110,7 +117,7 @@ type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
   type: String
-  status: String
+  status: Status
   avatar: Avatar
   primaryOfficeId: String
   creationDate: String
@@ -140,7 +147,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: RoleType
+    role: String
     primaryOfficeId: String
     locationId: String
     count: Int

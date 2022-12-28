@@ -39,7 +39,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: RoleType
+    role: String
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -364,7 +364,7 @@ type User {
   role: RoleType!
   type: String
   email: String
-  status: String!
+  status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
@@ -380,16 +380,6 @@ type User {
 type SearchUserResult {
   results: [User]
   totalItems: Int
-}
-
-enum RoleType {
-  FIELD_AGENT
-  REGISTRATION_AGENT
-  LOCAL_REGISTRAR
-  LOCAL_SYSTEM_ADMIN
-  NATIONAL_SYSTEM_ADMIN
-  PERFORMANCE_MANAGEMENT
-  NATIONAL_REGISTRAR
 }
 
 type SearchFieldAgentResult {
@@ -953,6 +943,23 @@ enum LocationType {
   OTHER
 }
 
+enum RoleType {
+  FIELD_AGENT
+  REGISTRATION_AGENT
+  LOCAL_REGISTRAR
+  LOCAL_SYSTEM_ADMIN
+  NATIONAL_SYSTEM_ADMIN
+  PERFORMANCE_MANAGEMENT
+  NATIONAL_REGISTRAR
+}
+
+enum Status {
+  active
+  deactivated
+  pending
+  disabled
+}
+
 type LocalRegistrar {
   name: [HumanName]!
   role: RoleType!
@@ -974,7 +981,7 @@ type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
   type: String
-  status: String
+  status: Status
   avatar: Avatar
   primaryOfficeId: String
   creationDate: String
