@@ -11,15 +11,13 @@
  */
 const config = {
   mongodb: {
-    url:
-      process.env.APPLICATION_CONFIG_MONGO_URL ||
-      'mongodb://localhost/application-config',
+    url: process.env.USER_MGNT_MONGO_URL || 'mongodb://localhost/user-mgnt',
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
       useUnifiedTopology: true // removes a deprecating warning when connecting
     }
   },
-  migrationsDir: 'migrations/application-config',
+  migrationsDir: 'migrations/user-mgnt',
   changelogCollectionName: 'changelog',
   migrationFileExtension: '.js',
   useFileHash: false,

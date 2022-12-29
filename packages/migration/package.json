@@ -7,11 +7,16 @@
   "license": "MPL-2.0",
   "scripts": {
     "start": "./runMigrations.sh",
+    "revert": "./revertMigrations.sh",
     "start:prod": "./runMigrations.sh",
     "create:hearth": "migrate-mongo create -f migrate-mongo-config-hearth.js",
     "create:openhim": "migrate-mongo create -f migrate-mongo-config-openhim.js",
+    "create:user-mgnt": "migrate-mongo create -f migrate-mongo-config-user-mgnt.js",
+    "create:application-config": "migrate-mongo create -f migrate-mongo-config-application-config.js",
     "status:hearth": "migrate-mongo status -f migrate-mongo-config-hearth.js",
     "status:openhim": "migrate-mongo status -f migrate-mongo-config-openhim.js",
+    "status:user-mgnt": "migrate-mongo status -f migrate-mongo-config-user-mgnt.js",
+    "status:application-config": "migrate-mongo status -f migrate-mongo-config-application-config.js",
     "precommit": "lint-staged"
   },
   "dependencies": {

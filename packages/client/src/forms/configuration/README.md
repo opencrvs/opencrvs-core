@@ -218,6 +218,18 @@ This object holds sections for birth declaration forms. All sections are contain
 
     District of the place of birth.
 
+  - #### `locationLevel3`
+
+    LocationLevel3 of the place of birth. Array index: 10
+
+  - #### `locationLevel4`
+
+    LocationLevel3 of the place of birth. Array index: 11
+
+  - #### `locationLevel5`
+
+    LocationLevel3 of the place of birth. Array index: 12
+
   - #### `ruralOrUrban`
 
     This is a conditional field that only appears if the rest of the address is either an urban or rural address.

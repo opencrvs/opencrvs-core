@@ -24,7 +24,8 @@ export const fetchUserManagement = async <T = any>(
   authHeader: AuthHeader,
   method = 'GET'
 ): Promise<T> => {
-  const response = await fetch(`${USER_MANAGEMENT_URL}${suffix}`, {
+  const systemURL = new URL(suffix, USER_MANAGEMENT_URL).toString()
+  const response = await fetch(systemURL, {
     method,
     headers: {
       'Content-Type': 'application/fhir+json',
