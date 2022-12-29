@@ -40,10 +40,7 @@ import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  IColumn,
-  ColumnContentAlignment
-} from '@opencrvs/components/lib/Workqueue'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
@@ -62,18 +59,10 @@ import { Link } from '@opencrvs/components'
 
 const DEFAULT_LIST_SIZE = 10
 
-const InformationCaption = styled.div`
-  ${({ theme }) => theme.fonts.reg12};
-  padding-bottom: 5px;
+const TableDiv = styled.div`
+  overflow: auto;
 `
 
-const AuditDescTimeContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  & > :first-child {
-    padding-top: 5px;
-  }
-`
 const HistoryHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -107,10 +96,6 @@ const AdjustedStatusIcon = styled.div`
   margin-left: 3px;
 `
 
-const InformationTitle = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  width: 320px;
-`
 const AuditContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
 `
@@ -213,62 +198,44 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   }
 
   getAuditColumns() {
-    const { theme, intl } = this.props
-    let columns: IColumn[] = []
-    if (this.state.viewportWidth <= theme.grid.breakpoints.md) {
-      columns = [
-        {
-          label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 80,
-          key: 'actionDescriptionWithAuditTime'
-        },
-        {
-          label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
-          width: 20,
-          key: 'trackingId',
-          alignment: ColumnContentAlignment.RIGHT
-        }
-      ]
-    } else {
-      columns = [
-        {
-          label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 25,
-          isSortable: true,
-          icon: <ArrowDownBlue />,
-          key: 'actionDescription',
-          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.ACTION)
-        },
-        {
-          label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
-          width: 25,
-          isSortable: true,
-          icon: <ArrowDownBlue />,
-          key: 'trackingId',
-          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.RECORD)
-        },
-        {
-          label: intl.formatMessage(messages.auditDeviceIpAddressColumnTitle),
-          width: 25,
-          isSortable: true,
-          icon: <ArrowDownBlue />,
-          key: 'deviceIpAddress',
-          alignment: ColumnContentAlignment.LEFT,
-          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DEVICE)
-        },
-        {
-          label: intl.formatMessage(messages.auditDateColumnTitle),
-          width: 25,
-          key: 'auditTime',
-          isSortable: true,
-          isSorted: true,
-          icon: <ArrowDownBlue />,
-          alignment: ColumnContentAlignment.RIGHT,
-          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DATE)
-        }
-      ]
-    }
-    return columns
+    const { intl } = this.props
+    return [
+      {
+        label: intl.formatMessage(messages.auditActionColumnTitle),
+        width: 25,
+        isSortable: true,
+        icon: <ArrowDownBlue />,
+        key: 'actionDescription',
+        sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.ACTION)
+      },
+      {
+        label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
+        width: 25,
+        isSortable: true,
+        icon: <ArrowDownBlue />,
+        key: 'trackingId',
+        sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.RECORD)
+      },
+      {
+        label: intl.formatMessage(messages.auditDeviceIpAddressColumnTitle),
+        width: 25,
+        isSortable: true,
+        icon: <ArrowDownBlue />,
+        key: 'deviceIpAddress',
+        alignment: ColumnContentAlignment.LEFT,
+        sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DEVICE)
+      },
+      {
+        label: intl.formatMessage(messages.auditDateColumnTitle),
+        width: 25,
+        key: 'auditTime',
+        isSortable: true,
+        isSorted: true,
+        icon: <ArrowDownBlue />,
+        alignment: ColumnContentAlignment.RIGHT,
+        sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DATE)
+      }
+    ]
   }
 
   getWorkflowStatusIcon = (status: string) => {
@@ -518,13 +485,14 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                     )
 
                     return (
-                      <>
+                      <TableDiv>
                         <Table
                           columns={this.getAuditColumns()}
                           content={this.getAuditData(data.getUserAuditLog)}
                           noResultText={intl.formatMessage(
                             messages.noAuditFound
                           )}
+                          fixedWidth={1088}
                           isLoading={loading}
                           hideTableHeader={
                             this.state.viewportWidth <=
@@ -565,7 +533,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                             </>
                           </ResponsiveModal>
                         )}
-                      </>
+                      </TableDiv>
                     )
                   }
                 }}
