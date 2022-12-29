@@ -75,7 +75,8 @@ export async function sendVerificationCode(
         'auth',
         ['service'],
         ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
-        JWT_ISSUER
+        JWT_ISSUER,
+        true
       )}`
     }
   })
