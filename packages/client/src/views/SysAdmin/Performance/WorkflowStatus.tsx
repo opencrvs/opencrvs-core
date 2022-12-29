@@ -66,6 +66,8 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import register from '@client/registerServiceWorker'
+import { useEffect } from 'react'
+import { isMobileDevice } from '@client/utils/commonUtils'
 
 type IDispatchProps = {
   goToSearchResult: typeof goToSearchResult
@@ -215,6 +217,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(
     'declarationStartedOn'
   )
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const pageSize = 10
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
@@ -225,6 +228,13 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     timeStart = historyState.timeStart
     timeEnd = historyState.timeEnd
   }
+  useEffect(() => {
+    const recordWindowWidth = () => {
+      setWindowWidth(window.innerWidth)
+    }
+    window.addEventListener('resize', recordWindowWidth)
+    return () => window.removeEventListener('resize', recordWindowWidth)
+  }, [])
 
   function toggleSort(key: keyof SortMap) {
     const invertedOrder =
@@ -236,11 +246,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   }
 
   function getColumns(): IColumn[] {
+    const mobileDevice = isMobileDevice()
     const keys = [
       {
         label: intl.formatMessage(constantsMessages.trackingId),
         key: 'id',
-        width: 12,
+        width: mobileDevice ? 30 : 12,
         isSortable: true,
         sortFunction: () => toggleSort('id'),
         icon: columnToBeSort === 'id' ? <ArrowDownBlue /> : <></>,
@@ -249,7 +260,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.status),
         key: 'status',
-        width: 12,
+        width: mobileDevice ? 35 : 12,
         isSortable: true,
         sortFunction: () => toggleSort('status'),
         icon: columnToBeSort === 'status' ? <ArrowDownBlue /> : <></>,
@@ -258,7 +269,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.eventType),
         key: 'eventType',
-        width: 8,
+        width: mobileDevice ? 20 : 8,
         isSortable: true,
         sortFunction: () => toggleSort('eventType'),
         icon: columnToBeSort === 'eventType' ? <ArrowDownBlue /> : <></>,
@@ -267,7 +278,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.name),
         key: 'nameIntl',
-        width: 12,
+        width: mobileDevice ? 35 : 12,
         isSortable: true,
         sortFunction: () => toggleSort('nameIntl'),
         icon: columnToBeSort === 'nameIntl' ? <ArrowDownBlue /> : <></>,
@@ -276,7 +287,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(formMessages.informantName),
         key: 'informant',
-        width: 14,
+        width: mobileDevice ? 40 : 14,
         isSortable: true,
         sortFunction: () => toggleSort('informant'),
         icon: columnToBeSort === 'informant' ? <ArrowDownBlue /> : <></>,
@@ -285,7 +296,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.declarationStarted),
         key: 'declarationStartedOn',
-        width: 10,
+        width: mobileDevice ? 35 : 10,
         isSortable: true,
         sortFunction: () => toggleSort('declarationStartedOn'),
         icon:
@@ -295,7 +306,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.declarationStartedBy),
         key: 'declarationStartedBy',
-        width: 10,
+        width: mobileDevice ? 35 : 10,
         isSortable: true,
         sortFunction: () => toggleSort('declarationStartedBy'),
         icon:
@@ -305,7 +316,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.eventDate),
         key: 'dateOfEvent',
-        width: 12,
+        width: mobileDevice ? 35 : 12,
         isSortable: true,
         sortFunction: () => toggleSort('dateOfEvent'),
         icon: columnToBeSort === 'dateOfEvent' ? <ArrowDownBlue /> : <></>,
@@ -314,7 +325,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeInProgress),
         key: 'timeLoggedInProgress',
-        width: 12,
+        width: mobileDevice ? 35 : 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedInProgress'),
         icon:
@@ -324,7 +335,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeReadyForReview),
         key: 'timeLoggedDeclared',
-        width: 12,
+        width: mobileDevice ? 35 : 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedDeclared'),
         icon:
@@ -334,7 +345,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeRequireUpdates),
         key: 'timeLoggedRejected',
-        width: 12,
+        width: mobileDevice ? 35 : 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRejected'),
         icon:
@@ -344,7 +355,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeWatingApproval),
         key: 'timeLoggedValidated',
-        width: 12,
+        width: mobileDevice ? 35 : 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedValidated'),
         icon:
@@ -356,7 +367,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           constantsMessages.timeWaitingExternalValidation
         ),
         key: 'timeLoggedWaitingValidation',
-        width: 12,
+        width: mobileDevice ? 35 : 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedWaitingValidation'),
         icon:
@@ -371,7 +382,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeReadyToPrint),
         key: 'timeLoggedRegistered',
-        width: 12,
+        width: mobileDevice ? 35 : 12,
         alignment: ColumnContentAlignment.LEFT,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRegistered'),
