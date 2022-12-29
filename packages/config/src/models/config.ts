@@ -54,8 +54,9 @@ export interface IApplicationConfigurationModel extends Document {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
-  INTEGRATIONS: [IIntegration]
+  INTEGRATIONS: [Integration]
   LOGIN_BACKGROUND: ILoginBackground
+  ADMIN_LEVELS: number
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -92,7 +93,7 @@ const currencySchema = new Schema<ICurrency>({
   languagesAndCountry: { type: [String] }
 })
 
-interface IIntegration {
+export interface Integration {
   name: string
   status: string
 }
@@ -103,20 +104,6 @@ export const statuses = {
   DISABLED: 'disabled',
   DEACTIVATED: 'deactivated'
 }
-
-const integrationsSchema = new Schema<IIntegration>({
-  name: String,
-  status: {
-    type: String,
-    enum: [
-      statuses.PENDING,
-      statuses.ACTIVE,
-      statuses.DISABLED,
-      statuses.DEACTIVATED
-    ],
-    default: statuses.PENDING
-  }
-})
 
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
@@ -153,7 +140,13 @@ const systemSchema = new Schema({
     default: 1
   },
   INTEGRATIONS: [integrationsSchema],
-  LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false }
+  LOGIN_BACKGROUND: { type: backgroundImageSchema, required: false },
+  ADMIN_LEVELS: {
+    type: Number,
+    required: true,
+    enum: [1, 2, 3, 4, 5],
+    default: 2
+  }
 })
 
 export default model<IApplicationConfigurationModel>('Config', systemSchema)

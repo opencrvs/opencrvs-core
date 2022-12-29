@@ -62,6 +62,7 @@ const PageWrapper = styled(UnlockPageWrapper)`
   background: ${({ color, theme }) =>
     color ? color : theme.colors.backgroundPrimary};
 `
+
 const BackButton = styled(CircleButton)`
   float: left;
   color: ${({ theme }) => theme.colors.white};
@@ -69,6 +70,7 @@ const BackButton = styled(CircleButton)`
   position: absolute;
   top: 30px;
   left: 20px;
+
   svg {
     path {
       stroke: ${({ theme }) => theme.colors.white};

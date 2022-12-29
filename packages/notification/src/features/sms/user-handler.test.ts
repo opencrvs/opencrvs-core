@@ -399,8 +399,6 @@ describe('Verify user handlers', () => {
         }
       })
 
-      console.log(res.data)
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with no application name', async () => {

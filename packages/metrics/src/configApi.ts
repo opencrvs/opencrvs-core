@@ -55,6 +55,7 @@ export interface IApplicationConfig {
   PHONE_NUMBER_PATTERN: string
   ADDRESSES: number
   LOGIN_BACKGROUND: ILoginBackground
+  ADMIN_LEVELS: number
 }
 
 export async function getApplicationConfig(

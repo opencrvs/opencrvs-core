@@ -9,34 +9,38 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ApolloQueryResult } from '@apollo/client'
 import { ValidationInitializer } from '@client/utils/validate'
-import { MessageDescriptor } from 'react-intl'
+import { IDynamicValues } from '@opencrvs/client/src/navigation'
+import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
 import { THEME_MODE } from '@opencrvs/components/lib/InputField'
 import {
   IRadioOption as RadioComponentOption,
   RadioSize
 } from '@opencrvs/components/lib/Radio'
-import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
 import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
-import { ApolloQueryResult } from '@apollo/client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import { IDynamicValues } from '@opencrvs/client/src/navigation'
+import { MessageDescriptor } from 'react-intl'
 
-import * as mutations from './mappings/mutation'
-import * as queries from './mappings/query'
-import * as graphQLQueries from './mappings/queries'
-import * as labels from './mappings/label'
-import * as types from './mappings/type'
-import * as responseTransformers from './mappings/response-transformers'
-import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
-import { IOfflineData } from '@client/offline/reducer'
-import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
-import { IUserDetails } from '@client/utils/userUtils'
-import { messages } from '@client/i18n/messages/views/formConfig'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { IQuestionConfig } from './questionConfig'
+import {
+  ICustomSelectOption,
+  IQuestionConfig
+} from '@client/forms/questionConfig'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import { IOfflineData } from '@client/offline/reducer'
+import { IUserDetails } from '@client/utils/userUtils'
+import * as validators from '@opencrvs/client/src/utils/validate'
 import { IFont } from '@opencrvs/components/lib/fonts'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import * as labels from './mappings/label'
+import * as mutations from './mappings/mutation'
+import * as graphQLQueries from './mappings/queries'
+import * as queries from './mappings/query'
+import * as responseTransformers from './mappings/response-transformers'
+import * as types from './mappings/type'
+import { LocationType } from '@client/utils/gateway'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -48,6 +52,7 @@ export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const CHECKBOX = 'CHECKBOX'
 export const DATE = 'DATE'
+export const DATE_RANGE_PICKER = 'DATE_RANGE_PICKER'
 export const TEXTAREA = 'TEXTAREA'
 export const SUBSECTION = 'SUBSECTION'
 export const FIELD_GROUP_TITLE = 'FIELD_GROUP_TITLE'
@@ -89,9 +94,17 @@ export enum DownloadAction {
 
 export type Action = SubmissionAction | DownloadAction
 
+export interface IFormDataSet {
+  _id: string
+  fileName: string
+  options: ICustomSelectOption[]
+  resource?: string
+}
+
 export interface IFormConfig {
   questionConfig: IQuestionConfig[]
   formDrafts: IFormDraft[]
+  formDataset?: IFormDataSet[]
 }
 
 export interface ISelectOption {
@@ -227,6 +240,7 @@ export type IFormFieldValue =
   | FieldValueMap
   | IContactPoint
   | IInformant
+  | IDateRangePickerValue
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
 export interface FieldValueMap {
@@ -263,6 +277,13 @@ export interface IInformant {
 export interface IContactPoint {
   value: string
   nestedFields: IContactPointPhone
+}
+
+export interface IDateRangePickerValue {
+  exact: string | undefined
+  rangeStart: string | undefined
+  rangeEnd: string | undefined
+  isDateRangeActive: boolean | undefined
 }
 
 export interface IAttachmentValue {
@@ -543,6 +564,12 @@ export interface IDateFormField extends IFormFieldBase {
   notice?: MessageDescriptor
   ignorePlaceHolder?: boolean
 }
+export interface IDateRangePickerFormField extends IFormFieldBase {
+  type: typeof DATE_RANGE_PICKER
+  notice?: MessageDescriptor
+  ignorePlaceHolder?: boolean
+}
+
 export interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
@@ -586,12 +613,11 @@ export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
 
 export interface ILocationSearchInputFormField extends IFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
+  searchableResource: Array<
+    Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>
   >
   locationList?: ISearchLocation[]
-  searchableType: string
+  searchableType: string[]
   dispatchOptions?: IDispatchOptions
   dynamicOptions?: IDynamicOptions
 }
@@ -662,6 +688,7 @@ export type IFormField =
   | ILoaderButton
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
+  | IDateRangePickerFormField
 
 export interface IPreviewGroup {
   id: string
@@ -893,6 +920,11 @@ export enum UserSection {
   Preview = 'preview'
 }
 
+export enum AdvancedSearchSection {
+  Birth = 'birth',
+  Death = 'death'
+}
+
 export enum CertificateSection {
   Collector = 'collector',
   CollectCertificate = 'collectCertificate',
@@ -1088,6 +1120,11 @@ export interface Ii18nDateFormField extends Ii18nFormFieldBase {
   notice?: string
   ignorePlaceHolder?: boolean
 }
+export interface Ii18nDateRangePickerFormField extends Ii18nFormFieldBase {
+  type: typeof DATE_RANGE_PICKER
+  notice?: string
+  ignorePlaceHolder?: boolean
+}
 export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
@@ -1128,11 +1165,10 @@ export interface Ii18nSimpleDocumentUploaderFormField
 
 export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
+  searchableResource: Array<
+    Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>
   >
-  searchableType: string
+  searchableType: string[]
   locationList?: ISearchLocation[]
   dispatchOptions?: IDispatchOptions
 
@@ -1185,6 +1221,7 @@ export type Ii18nFormField =
   | Ii18nLoaderButtonField
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
+  | Ii18nDateRangePickerFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
@@ -1244,6 +1281,7 @@ export function fieldTypeLabel(type: IFormField['type']) {
     CHECKBOX_GROUP: messages.checkboxGroup,
     CHECKBOX: messages.checkbox,
     DATE: messages.date,
+    DATE_RANGE_PICKER: messages.dateRangePickerForFormField,
     DYNAMIC_LIST: messages.dynamicList
   }
 

@@ -66,7 +66,8 @@ import {
   SubmissionAction,
   ICheckboxFormField,
   CHECKBOX,
-  INestedInputFields
+  INestedInputFields,
+  DeathSection
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -402,9 +403,47 @@ const renderValue = (
   field: IFormField,
   intl: IntlShape,
   offlineCountryConfiguration: IOfflineData,
-  language: string
+  language: string,
+  isOriginalData = false
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+
+  // Showing State & District Name instead of their ID
+  if (
+    [
+      'statePrimary',
+      'districtPrimary',
+      'internationalStatePrimary',
+      'internationalDistrictPrimary'
+    ].includes(field.name) &&
+    isOriginalData
+  ) {
+    const sectionData = draftData[sectionId]
+
+    if (sectionData.countryPrimary === window.config.COUNTRY) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
+      }
+      dynamicOption.dependency = [
+        'internationalStatePrimary',
+        'statePrimary'
+      ].includes(field.name)
+        ? 'countryPrimary'
+        : 'statePrimary'
+
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineCountryConfiguration,
+        language
+      )
+    }
+
+    return value
+  }
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
@@ -458,7 +497,12 @@ const renderValue = (
 
   if (value && field.type === LOCATION_SEARCH_INPUT) {
     const searchableListOfLocations = generateLocations(
-      getListOfLocations(offlineCountryConfiguration, field.searchableResource),
+      field.searchableResource.reduce((locations, resource) => {
+        return {
+          ...locations,
+          ...getListOfLocations(offlineCountryConfiguration, resource)
+        }
+      }, {}),
       intl
     )
     const selectedLocation = searchableListOfLocations.find(
@@ -467,14 +511,18 @@ const renderValue = (
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
 
-  if (typeof value === 'string') {
-    return value
-  }
   if (typeof value === 'boolean') {
     return value
       ? intl.formatMessage(buttonMessages.yes)
       : intl.formatMessage(buttonMessages.no)
   }
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    return field.postfix
+      ? String(value).concat(` ${field.postfix.toLowerCase()}`)
+      : value
+  }
+
   return value
 }
 
@@ -922,7 +970,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean,
-    replaceEmpty?: boolean
+    replaceEmpty?: boolean,
+    isOriginalData?: boolean
   ) => {
     const { intl, offlineCountryConfiguration, language } = this.props
 
@@ -932,7 +981,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field,
       intl,
       offlineCountryConfiguration,
-      language
+      language,
+      isOriginalData
     )
 
     if (replaceEmpty && !value) {
@@ -968,7 +1018,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 nestedField,
                 intl,
                 offlineCountryConfiguration,
-                language
+                language,
+                isOriginalData
               )) ||
             ''
           return (
@@ -1103,7 +1154,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               errorsOnFields,
               undefined,
-              !index
+              !index,
+              true
             )
           )
           .filter((value) => value)
@@ -1410,7 +1462,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    this.setState({ previewImage: previewImage as IFileValue })
+    const previewImageTransformed = { ...previewImage }
+    previewImageTransformed.data = isBase64FileString(
+      previewImageTransformed.data
+    )
+      ? previewImageTransformed.data
+      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
+
+    this.setState({ previewImage: previewImageTransformed as IFileValue })
   }
 
   closePreviewSection = (callBack?: () => void) => {
@@ -1468,6 +1527,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       event === Event.Birth &&
       ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
         (section.id === BirthSection.Father && !!data.father?.detailsExist))
+    )
+  }
+
+  isLastNameFirst = () => {
+    const { registerForm, draft: declaration } = this.props
+    const fields = registerForm[declaration.event].sections.find((section) =>
+      declaration.event === Event.Birth
+        ? section.id === BirthSection.Child
+        : section.id === DeathSection.Deceased
+    )?.groups[0]?.fields
+    if (!fields) return false
+    return (
+      fields.findIndex((field) => field.name === 'familyNameEng') <
+      fields.findIndex((field) => field.name === 'firstNamesEng')
     )
   }
 
@@ -1608,7 +1681,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const informantName = getDraftInformantFullName(declaration, intl.locale)
+    const informantName = getDraftInformantFullName(
+      declaration,
+      intl.locale,
+      this.isLastNameFirst()
+    )
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,

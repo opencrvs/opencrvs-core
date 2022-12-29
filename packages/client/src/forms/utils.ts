@@ -70,7 +70,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
 import { IDeclaration } from '@client/declarations'
 import differenceInDays from 'date-fns/differenceInDays'
-
+import _ from 'lodash'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -341,7 +341,7 @@ export const getFieldOptions = (
     }
     return generateOptions(
       Object.values(locations).filter((location: ILocation) => {
-        return location.partOf === partOf
+        return location.partOf === partOf && location.status === 'active'
       }),
       'location'
     )

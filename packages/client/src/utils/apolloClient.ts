@@ -27,7 +27,7 @@ import { AnyAction, Store } from 'redux'
 import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
 
-export let client: any = { mutate: () => {} }
+export let client: any = { mutate: () => {}, query: () => {} }
 
 export const createClient = (store: Store<IStoreState, AnyAction>) => {
   const httpLink = createHttpLink({

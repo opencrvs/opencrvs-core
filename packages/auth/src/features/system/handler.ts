@@ -22,12 +22,8 @@ import {
   NOTIFICATION_API_USER_AUDIENCE,
   VALIDATOR_API_USER_AUDIENCE,
   AGE_VERIFICATION_USER_AUDIENCE,
-  NATIONAL_ID_USER_AUDIENCE,
-  USER_MANAGEMENT_URL
+  NATIONAL_ID_USER_AUDIENCE
 } from '@auth/constants'
-import fetch from 'node-fetch'
-import { resolve } from 'url'
-
 interface ISystemAuthPayload {
   client_id: string
   client_secret: string
@@ -47,6 +43,9 @@ export async function authenticateSystemClientHandler(
   try {
     result = await authenticateSystem(payload.client_id, payload.client_secret)
   } catch (err) {
+    throw unauthorized()
+  }
+  if (result.status !== 'active') {
     throw unauthorized()
   }
 
@@ -83,33 +82,4 @@ export const requestSchema = Joi.object({
 
 export const responseSchema = Joi.object({
   token: Joi.string().optional()
-})
-
-export async function registerSystemClient(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-): Promise<any> {
-  const authHeader = {
-    Authorization: request.headers.authorization
-  }
-
-  const url = resolve(USER_MANAGEMENT_URL, '/registerSystemClient')
-
-  const res = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(request.payload),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-    .then((response) => response.json())
-    .catch((error: Error) =>
-      Promise.reject(new Error(` request failed: ${error.message}`))
-    )
-
-  return res
-}
-export const registerRquestSchema = Joi.object({
-  scope: Joi.string()
 })

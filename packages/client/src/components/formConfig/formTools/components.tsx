@@ -21,12 +21,13 @@ import {
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import ReactTooltip from 'react-tooltip'
 import { Event } from '@client/utils/gateway'
-import { BirthSection, DeathSection, ISerializedForm } from '@client/forms'
+import { BirthSection, DeathSection } from '@client/forms'
 import { useDefaultForm } from '@client/views/SysAdmin/Config/Forms/hooks'
 import { formSectionToFieldIdentifiers } from '@client/forms/questionConfig/transformers'
 import { useParams } from 'react-router'
 import { getFieldId } from '@client/forms/configuration/defaultUtils'
 import { IConditionalConfig } from '@client/forms/questionConfig'
+import { previewSectionFilter } from '@client/components/formConfig/SectionNavigation'
 
 export const Title = styled.h3`
   margin: 0;
@@ -126,8 +127,16 @@ export const RegisterFormFieldIds = ({
   )
 
   const fieldIds = sections
+    .filter(previewSectionFilter)
     .flatMap((section) => formSectionToFieldIdentifiers(defaultForm, section))
     .map((identifier) => getFieldId(event, identifier, defaultForm))
 
-  return children(fieldIds)
+  const filteredFieldIds = fieldIds.filter((fieldId) => {
+    if (!fieldId.includes('seperator')) {
+      return true
+    }
+    return false
+  })
+
+  return children(filteredFieldIds)
 }
