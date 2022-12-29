@@ -24,16 +24,7 @@ import {
   GQLUserAuditLogResultItem,
   GQLUserAuditLogResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import {
-  ArrowDownBlue,
-  StatusCollected,
-  StatusGray,
-  StatusGreen,
-  StatusOrange,
-  StatusProgress,
-  StatusRejected,
-  StatusWaitingValidation
-} from '@opencrvs/components/lib/icons'
+import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import { Table } from '@opencrvs/components/lib/Table'
@@ -88,14 +79,6 @@ const SectionTitle = styled.div`
   margin-bottom: 10px;
 `
 
-const StatusIcon = styled.div`
-  margin-top: 4px;
-`
-
-const AdjustedStatusIcon = styled.div`
-  margin-left: 3px;
-`
-
 const AuditContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
 `
@@ -128,6 +111,8 @@ export enum SORTED_COLUMN {
   DATE = 'auditTime',
   DEVICE = 'deviceIpAddress'
 }
+
+const ADMIN_ACTIONS = ['DEACTIVATE', 'REACTIVATE', 'EDIT_USER', 'CREATE_USER']
 
 type State = {
   timeStart: Date
@@ -238,55 +223,6 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
     ]
   }
 
-  getWorkflowStatusIcon = (status: string) => {
-    switch (status) {
-      case 'IN_PROGRESS':
-        return <StatusProgress />
-      case 'DECLARED':
-        return (
-          <AdjustedStatusIcon>
-            <StatusOrange />
-          </AdjustedStatusIcon>
-        )
-      case 'VALIDATED':
-        return (
-          <StatusIcon>
-            <StatusGray />
-          </StatusIcon>
-        )
-      case 'WAITING_VALIDATION':
-        return (
-          <StatusIcon>
-            <StatusWaitingValidation />
-          </StatusIcon>
-        )
-      case 'REGISTERED':
-        return (
-          <StatusIcon>
-            <StatusGreen />
-          </StatusIcon>
-        )
-      case 'REJECTED':
-        return (
-          <StatusIcon>
-            <StatusRejected />
-          </StatusIcon>
-        )
-      case 'CERTIFIED':
-        return (
-          <StatusIcon>
-            <StatusCollected />
-          </StatusIcon>
-        )
-      default:
-        return (
-          <StatusIcon>
-            <StatusOrange />
-          </StatusIcon>
-        )
-    }
-  }
-
   toggleActionDetails = (actionItem: UserAuditLogResultItem | null) => {
     this.setState({
       actionDetailsData: actionItem,
@@ -340,7 +276,8 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             >
               {actionMessage}
             </Link>
-          ) : !isSystemAdmin ? (
+          ) : !isSystemAdmin &&
+            !ADMIN_ACTIONS.includes(userAuditItem.action) ? (
             <Link
               font="bold14"
               onClick={() => {
