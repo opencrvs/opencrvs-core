@@ -136,7 +136,7 @@ export interface IUser {
   passwordHash: string
   salt: string
   role: string
-  type: FIELD_AGENT_TYPES
+  type?: FIELD_AGENT_TYPES
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
@@ -147,7 +147,7 @@ export interface IUser {
   device?: string
   securityQuestionAnswers: ISecurityQuestionAnswer[]
   creationDate: number
-  auditHistory: IAuditHistory[]
+  auditHistory?: IAuditHistory[]
   avatar?: IAvatar
   searches?: ISearch[]
 }
