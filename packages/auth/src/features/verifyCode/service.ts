@@ -74,7 +74,7 @@ export async function sendVerificationCode(
       Authorization: `Bearer ${await createToken(
         'auth',
         ['service'],
-        ['opencrvs:notification-user'],
+        ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
         JWT_ISSUER
       )}`
     }
