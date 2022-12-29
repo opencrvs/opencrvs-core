@@ -9,20 +9,37 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import Question, { IQuestion } from '@config/models/question'
+import { IDataSetModel } from '@config/models/formDataset'
+import Question from '@config/models/question'
+import { resolveFormDatasetOptions } from '@config/services/formDatasetService'
 import { internal } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
 
 export default async function getQuestions(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  let questions: IQuestion[]
   try {
-    questions = await Question.find().exec()
+    const populatedQuestions = await Question.find()
+      .populate<{ datasetId: IDataSetModel }>('datasetId')
+      .exec()
+
+    const questions = populatedQuestions.map(async (populatedQuestion) => {
+      if (populatedQuestion.datasetId) {
+        const options = await resolveFormDatasetOptions(
+          populatedQuestion.datasetId
+        )
+        return {
+          ...populatedQuestion.toObject(),
+          options,
+          datasetId: populatedQuestion.datasetId._id
+        }
+      }
+      return populatedQuestion
+    })
+
+    return Promise.all(questions)
   } catch (error) {
     throw internal(error.message)
   }
-
-  return questions
 }

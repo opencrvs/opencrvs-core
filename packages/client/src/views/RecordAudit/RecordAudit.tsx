@@ -724,7 +724,8 @@ const BodyContent = ({
               )
               declaration = {
                 ...declaration,
-                status: data.fetchRegistration?.registration?.status[0].type
+                status: data.fetchRegistration?.registration?.status[0].type,
+                assignment: data.fetchRegistration?.registration?.assignment
               }
             } else {
               declaration = getGQLDeclaration(data.fetchRegistration, language)

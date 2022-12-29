@@ -14,10 +14,14 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationSettings: MessageDescriptor
+  advancedSearch: MessageDescriptor
+  advancedSearchInstruction: MessageDescriptor
   vsexport: MessageDescriptor
   vitalStatisticsExport: MessageDescriptor
   export: MessageDescriptor
+  vsEmptyStateText: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
+  applicationNameChangeNotification: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
   backgroundImageChangeNotification: MessageDescriptor
@@ -36,6 +40,13 @@ interface IConfigMessages
   birthDefaultTempDesc: MessageDescriptor
   eventUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
+  certificateUploading: MessageDescriptor
+  certificateUpdated: MessageDescriptor
+  certificateValidationError: MessageDescriptor
+  uploadCertificateDialogTitle: MessageDescriptor
+  uploadCertificateDialogDescription: MessageDescriptor
+  uploadCertificateDialogConfirm: MessageDescriptor
+  uploadCertificateDialogCancel: MessageDescriptor
   listDetailsQsn: MessageDescriptor
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
@@ -78,10 +89,12 @@ interface IConfigMessages
   withinLegallySpecifiedTimeLabel: MessageDescriptor
   generalTabTitle: MessageDescriptor
   birthTabTitle: MessageDescriptor
+  birthTabTitleExport: MessageDescriptor
   deathTabTitle: MessageDescriptor
   imageTabTitle: MessageDescriptor
   colourTabTitle: MessageDescriptor
   colourTabText: MessageDescriptor
+  deathTabTitleExport: MessageDescriptor
   registrationTimePeriodsGroupTitle: MessageDescriptor
   registrationFeesGroupTitle: MessageDescriptor
   eventTargetInputLabel: MessageDescriptor
@@ -97,6 +110,17 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.settings',
     defaultMessage: 'Application',
     description: 'Link Text for Config Application Settings'
+  },
+  advancedSearch: {
+    id: 'config.advanced.search',
+    defaultMessage: 'Advanced Search',
+    description: 'This is used for the advanced search'
+  },
+  advancedSearchInstruction: {
+    id: 'config.advanced.search.instruction',
+    defaultMessage:
+      'Select the options to build an advanced search. A minimum of two search parameters is required.',
+    description: 'This is used for the advanced search'
   },
   vsexport: {
     id: 'config.application.vsexport',

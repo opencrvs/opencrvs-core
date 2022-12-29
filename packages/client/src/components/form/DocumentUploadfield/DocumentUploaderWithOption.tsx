@@ -35,30 +35,24 @@ const options = {
 }
 
 const UploaderWrapper = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: 28px;
 `
+
 const Label = styled.label`
   position: relative;
-  top: -6px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg18};
 `
 const Flex = styled.div<{ splitView?: boolean }>`
   display: flex;
   flex-wrap: nowrap;
+  gap: 8px;
   margin-bottom: ${({ splitView }) => {
     return splitView ? '10px' : '0px'
   }};
 `
 export const ErrorMessage = styled.div`
   margin-bottom: 16px;
-`
-const DocumentUploader = styled(ImageUploader)`
-  margin-left: 16px;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 8px;
-  }
 `
 
 type IFullProps = {
@@ -291,7 +285,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
             onChange={this.onChange}
           />
 
-          <DocumentUploader
+          <ImageUploader
             id={`upload_document${idx}`}
             title={intl.formatMessage(formMessages.addFile)}
             onClick={(e) => {
@@ -312,7 +306,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
           onChange={this.onChange}
         />
 
-        <DocumentUploader
+        <ImageUploader
           id="upload_document"
           title={intl.formatMessage(formMessages.addFile)}
           onClick={(e) => !this.isValid() && e.preventDefault()}

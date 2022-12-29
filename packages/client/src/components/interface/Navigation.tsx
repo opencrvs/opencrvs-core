@@ -30,8 +30,10 @@ import {
   goToSettings,
   goToPerformanceView,
   goToTeamView,
+  goToSystemList,
   goToFormConfigHome,
   goToApplicationConfig,
+  goToAdvancedSearchResult,
   goToVSExport
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -58,6 +60,11 @@ import {
 import styled from '@client/styledComponents'
 import { updateRegistrarWorkqueue, IWorkqueue } from '@client/workqueue'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+import { omit } from 'lodash'
+import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
+import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -80,6 +87,7 @@ export const WORKQUEUE_TABS = {
   config: 'config',
   application: 'application',
   certificate: 'certificate',
+  systems: 'integration',
   settings: 'settings',
   logout: 'logout',
   declarationForms: 'form'
@@ -196,17 +204,21 @@ interface IDispatchProps {
   goToVSExportsAction: typeof goToVSExport
   goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
+  goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
+  goToSystemViewAction: typeof goToSystemList
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
+  setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
 interface IStateProps {
   draftDeclarations: IDeclaration[]
   declarationsReadyToSend: IDeclaration[]
   userDetails: IUserDetails | null
+  advancedSearchParams: IAdvancedSearchParamState
   activeMenuItem: string
   workqueue: IWorkqueue
   offlineCountryConfiguration: IOfflineData
@@ -257,6 +269,7 @@ export const NavigationView = (props: IFullProps) => {
     intl,
     match,
     userDetails,
+    advancedSearchParams,
     deselectAllTabs,
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
@@ -264,7 +277,9 @@ export const NavigationView = (props: IFullProps) => {
     goToCertificateConfigAction,
     goToVSExportsAction,
     goToFormConfigAction,
+    goToSystemViewAction,
     goToApplicationConfigAction,
+    goToAdvancedSearchResultAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
@@ -273,6 +288,7 @@ export const NavigationView = (props: IFullProps) => {
     userInfo,
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
+    setAdvancedSearchParam,
     className
   } = props
   const tabId = deselectAllTabs
@@ -285,7 +301,8 @@ export const NavigationView = (props: IFullProps) => {
   const configTab: string[] = [
     WORKQUEUE_TABS.application,
     WORKQUEUE_TABS.certificate,
-    WORKQUEUE_TABS.declarationForms
+    WORKQUEUE_TABS.declarationForms,
+    WORKQUEUE_TABS.systems
   ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { data, initialSyncDone } = workqueue
@@ -408,9 +425,6 @@ export const NavigationView = (props: IFullProps) => {
               }}
             />
           </NavigationGroup>
-          {menuCollapse && (
-            <NavigationGroup>{getSettingsAndLogout(props)}</NavigationGroup>
-          )}
         </>
       ) : (
         <>
@@ -664,15 +678,65 @@ export const NavigationView = (props: IFullProps) => {
                               activeMenuItem === WORKQUEUE_TABS.declarationForms
                             }
                           />
+
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.systems}`}
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.systems]
+                            )}
+                            onClick={goToSystemViewAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.systems
+                            }
+                          />
                         </>
                       )}
                     </>
                   )}
-                {menuCollapse && getSettingsAndLogout(props)}
               </NavigationGroup>
             )}
         </>
       )}
+      <NavigationGroup>
+        {userDetails?.searches && userDetails?.searches.length > 0 ? (
+          userDetails?.searches.map((bookmarkResult, index) => {
+            return (
+              <NavigationItem
+                icon={() => (
+                  <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
+                )}
+                id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
+                label={bookmarkResult.name}
+                disabled={
+                  advancedSearchParams.searchId === bookmarkResult.searchId &&
+                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                }
+                onClick={() => {
+                  const filteredParam = omit(
+                    bookmarkResult.parameters,
+                    '__typename'
+                  ) as IAdvancedSearchParamState
+                  setAdvancedSearchParam({
+                    ...filteredParam,
+                    searchId: bookmarkResult.searchId
+                  })
+                  goToAdvancedSearchResultAction()
+                }}
+                isSelected={
+                  advancedSearchParams.searchId === bookmarkResult.searchId &&
+                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                }
+              />
+            )
+          })
+        ) : (
+          <></>
+        )}
+      </NavigationGroup>
+      <NavigationGroup>
+        {menuCollapse && getSettingsAndLogout(props)}
+      </NavigationGroup>
     </LeftNavigation>
   )
 }
@@ -699,6 +763,7 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     workqueue: state.workqueueState.workqueue,
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
+    advancedSearchParams: getAdvancedSearchParamsState(state),
     activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
       : window.location.href.includes(WORKQUEUE_TABS.team)
@@ -713,6 +778,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.certificate
       : window.location.href.includes(WORKQUEUE_TABS.declarationForms)
       ? WORKQUEUE_TABS.declarationForms
+      : window.location.href.includes(WORKQUEUE_TABS.systems)
+      ? WORKQUEUE_TABS.systems
       : ''
   }
 }
@@ -727,12 +794,15 @@ export const Navigation = connect<
   goToCertificateConfigAction: goToCertificateConfig,
   goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
+  goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
+  goToSystemViewAction: goToSystemList,
   redirectToAuthentication,
   goToSettings,
-  updateRegistrarWorkqueue
+  updateRegistrarWorkqueue,
+  setAdvancedSearchParam
 })(injectIntl(withRouter(NavigationView)))
 
 /** @deprecated since the introduction of `<Frame>` */

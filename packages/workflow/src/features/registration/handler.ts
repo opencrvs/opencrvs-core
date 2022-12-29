@@ -104,7 +104,10 @@ function getSectionIndex(
 ): number | undefined {
   let index
   section.filter((obj: fhir.CompositionSection, i: number) => {
-    if (obj.title && obj.title === 'Birth encounter') {
+    if (
+      obj.title &&
+      ['Birth encounter', 'Death encounter'].includes(obj.title)
+    ) {
       index = i
     }
   })
@@ -240,6 +243,7 @@ export async function markEventAsValidatedHandler(
         getToken(request)
       )
       await postToHearth(payload)
+      await triggerEvent(Events.DECLARATION_UPDATED, payload, request.headers)
       delete taskResource.input
       delete taskResource.output
     }
@@ -387,6 +391,7 @@ export async function markEventAsWaitingValidationHandler(
         getToken(request)
       )
       await postToHearth(payload)
+      await triggerEvent(Events.DECLARATION_UPDATED, payload, request.headers)
       delete taskResource.input
       delete taskResource.output
     }

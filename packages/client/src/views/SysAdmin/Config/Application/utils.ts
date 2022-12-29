@@ -73,12 +73,18 @@ export const getCurrencySymbol = (currency: ICurrency) => {
   })[0].symbol
   return currencySymbol
 }
+
 export const getCurrencyObject = (value: string) => {
   const arr = value.split('-')
   return {
     isoCode: arr.pop(),
     languagesAndCountry: [arr.join('-')]
   }
+}
+
+export const getCountryName = (isoCode: string) => {
+  const countryName = lookup.countries({ alpha3: isoCode })[0]
+  return countryName && countryName.name
 }
 
 export function isValidRegEx(pattern: string): boolean {

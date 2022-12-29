@@ -41,11 +41,13 @@ import {
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
+import * as Hapi from '@hapi/hapi'
 import {
   APPLICATION_CONFIG_URL,
   RESOURCE_SERVICE_URL
 } from '@workflow/constants'
 import {
+  getToken,
   getTokenPayload,
   ITokenPayload,
   USER_SCOPE
@@ -473,6 +475,32 @@ export async function setupLastRegLocation(
   return taskResource
 }
 
+const SYSTEM_SCOPES = ['recordsearch', 'notification-api']
+
+function isSystemInitiated(scopes: string[] | undefined) {
+  return Boolean(scopes?.some((scope) => SYSTEM_SCOPES.includes(scope)))
+}
+
+export function setupSystemIdentifier(request: Hapi.Request) {
+  const token = getToken(request)
+  const { sub: systemId } = getTokenPayload(token)
+  const bundle = request.payload as fhir.Bundle
+  const taskResource = getTaskResource(bundle)
+  const systemIdentifierUrl = `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
+  if (!taskResource.identifier) {
+    taskResource.identifier = []
+  }
+  taskResource.identifier = taskResource.identifier.filter(
+    ({ system }) => system != systemIdentifierUrl
+  )
+  if (isSystemInitiated(request.auth.credentials.scope)) {
+    taskResource.identifier.push({
+      system: systemIdentifierUrl,
+      value: systemId
+    })
+  }
+}
+
 export function setupLastRegUser(
   taskResource: fhir.Task,
   practitioner: fhir.Practitioner
@@ -591,16 +619,9 @@ export async function updatePatientIdentifierWithRN(
   return patient
 }
 
-interface IIntegration {
+interface Integration {
   name: string
   status: string
-}
-interface IApplicationConfig {
-  INTEGRATIONS: [IIntegration]
-}
-
-export interface IApplicationConfigResponse {
-  config: IApplicationConfig
 }
 
 const statuses = {
@@ -625,7 +646,7 @@ export async function validateDeceasedDetails(
     Any external identifier must be justifiably verified as authentic by a National ID system such as MOSIP or equivalent
   */
 
-  const configResponse: IApplicationConfigResponse = await fetch(
+  const configResponse: Integration[] | undefined = await fetch(
     `${APPLICATION_CONFIG_URL}integrationConfig`,
     {
       method: 'GET',
@@ -646,17 +667,11 @@ export async function validateDeceasedDetails(
   logger.info(
     `validateDeceasedDetails: configResponse ${JSON.stringify(configResponse)}`
   )
-  if (
-    configResponse &&
-    configResponse.config.INTEGRATIONS &&
-    configResponse.config.INTEGRATIONS.length
-  ) {
-    const mosipIntegration = configResponse.config.INTEGRATIONS.filter(
-      (integration) => {
-        return integration.name === 'MOSIP'
-      }
-    )[0]
-    if (mosipIntegration.status === statuses.ACTIVE) {
+  if (configResponse?.length) {
+    const mosipIntegration = configResponse.filter((integration) => {
+      return integration.name === 'MOSIP'
+    })[0]
+    if (mosipIntegration && mosipIntegration.status === statuses.ACTIVE) {
       logger.info('validateDeceasedDetails: MOSIP ENABLED')
       try {
         const mosipTokenSeederResponse = await getMosipUINToken(patient)

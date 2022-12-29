@@ -33,6 +33,8 @@ interface IContentWrapper {
   noContent?: boolean
   loading?: boolean
   error?: boolean
+  topActionButtons?: React.ReactElement[]
+  showTitleOnMobile?: boolean
 }
 
 type IProps = IContentWrapper & IOnlineStatusProps
@@ -107,6 +109,8 @@ const WQContentWrapperComp = (props: IProps) => {
           title={props.title}
           size={ContentSize.LARGE}
           tabBarContent={props.tabBarContent}
+          topActionButtons={props.topActionButtons}
+          showTitleOnMobile={props.showTitleOnMobile}
         >
           <Body {...props} />
         </Content>

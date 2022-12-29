@@ -36,8 +36,8 @@ import {
   findTaskExtension,
   findTaskIdentifier,
   findEntryResourceByUrl,
-  getLocationHirarchyIDs,
-  findEventLocation
+  getdeclarationJurisdictionIds,
+  addEventLocation
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
 
@@ -181,11 +181,7 @@ async function createDeceasedIndex(
     bundleEntries
   ) as fhir.Patient
 
-  const deathLocation = (await findEventLocation(
-    DEATH_ENCOUNTER_CODE,
-    composition,
-    bundleEntries
-  )) as fhir.Location
+  await addEventLocation(body, DEATH_ENCOUNTER_CODE, composition)
 
   const deceasedName = deceased && findName(NAME_EN, deceased.name)
   const deceasedNameLocal = deceased && findNameLocale(deceased.name)
@@ -201,7 +197,12 @@ async function createDeceasedIndex(
   body.deceasedFamilyNameLocal =
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
   body.deathDate = deceased && deceased.deceasedDateTime
-  body.eventLocationId = deathLocation && deathLocation.id
+  body.gender = deceased && deceased.gender
+  body.deceasedIdentifier =
+    deceased.identifier &&
+    deceased.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
+  body.deceasedDoB = deceased && deceased.birthDate
 }
 
 function createMotherIndex(
@@ -327,6 +328,11 @@ function createInformantIndex(
     informantNameLocal &&
     informantNameLocal.family &&
     informantNameLocal.family[0]
+  body.informantDoB = informant.birthDate
+  body.informantIdentifier =
+    informant.identifier &&
+    informant.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
+      ?.value
 }
 
 async function createDeclarationIndex(
@@ -398,7 +404,7 @@ async function createDeclarationIndex(
     placeOfDeclarationExtension.valueReference &&
     placeOfDeclarationExtension.valueReference.reference &&
     placeOfDeclarationExtension.valueReference.reference.split('/')[1]
-  body.declarationLocationHirarchyIds = await getLocationHirarchyIDs(
+  body.declarationJurisdictionIds = await getdeclarationJurisdictionIds(
     body.declarationLocationId
   )
 

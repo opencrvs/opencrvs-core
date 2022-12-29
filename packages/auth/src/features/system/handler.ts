@@ -49,6 +49,9 @@ export async function authenticateSystemClientHandler(
   } catch (err) {
     throw unauthorized()
   }
+  if (result.status !== 'active') {
+    throw unauthorized()
+  }
 
   const isNotificationAPIUser = result.scope.indexOf('notification-api') > -1
   const isValidatorAPIUser = result.scope.indexOf('validator-api') > -1
@@ -93,7 +96,7 @@ export async function registerSystemClient(
     Authorization: request.headers.authorization
   }
 
-  const url = resolve(USER_MANAGEMENT_URL, '/registerSystemClient')
+  const url = resolve(USER_MANAGEMENT_URL, '/registerSystem')
 
   const res = await fetch(url, {
     method: 'POST',
