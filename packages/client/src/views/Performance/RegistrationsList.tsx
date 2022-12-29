@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ISearchLocation } from '@client/../../components/lib'
+import { ISearchLocation, Stack } from '@client/../../components/lib'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
@@ -53,7 +53,7 @@ import { Table } from '@opencrvs/components/lib/Table'
 import { GQLMixedTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { get, orderBy } from 'lodash'
 import { parse } from 'query-string'
-import * as React from 'react'
+import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
@@ -65,7 +65,7 @@ const ToolTipContainer = styled.span`
   text-align: center;
 `
 const DEFAULT_PAGE_SIZE = 10
-const { useState, useEffect } = React
+
 interface SortMap {
   month: SORT_ORDER
   location: SORT_ORDER
@@ -164,7 +164,8 @@ function RegistrationListComponent(props: IProps) {
   } = parse(search) as unknown as ISearchParams
   const isOfficeSelected = isLocationOffice(locationId)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
-  const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('time')
+  const [columnToBeSort, setColumnToBeSort] =
+    React.useState<keyof SortMap>('time')
 
   const currentPage = parseInt(currentPageNumber)
   const recordCount = DEFAULT_PAGE_SIZE * currentPage
@@ -198,7 +199,7 @@ function RegistrationListComponent(props: IProps) {
       {
         key: 'total',
         label: intl.formatMessage(messages.totalRegistrations),
-        width: 30,
+        width: 20,
         isSortable: true,
         sortFunction: () => toggleSort('total'),
         icon:
@@ -214,7 +215,7 @@ function RegistrationListComponent(props: IProps) {
         label: intl.formatMessage(
           messages.performanceDelayedRegistrationsLabel
         ),
-        width: 30,
+        width: 20,
         isSortable: true,
         sortFunction: () => toggleSort('delayed_num'),
         icon:
@@ -231,7 +232,7 @@ function RegistrationListComponent(props: IProps) {
       commonColumns.push({
         key: 'late',
         label: intl.formatMessage(messages.performanceLateRegistrationsLabel),
-        width: 30,
+        width: 20,
         isSortable: true,
         sortFunction: () => toggleSort('late_num'),
         icon:
@@ -249,7 +250,7 @@ function RegistrationListComponent(props: IProps) {
         {
           key: 'month',
           label: intl.formatMessage(messages.month),
-          width: 25,
+          width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('time'),
           icon:
@@ -267,7 +268,7 @@ function RegistrationListComponent(props: IProps) {
             event === EVENT_OPTIONS.DEATH
               ? intl.formatMessage(messages.performanceHomeDeath)
               : intl.formatMessage(messages.performanceHomeBirth),
-          width: 25,
+          width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('home_num'),
           icon:
@@ -284,7 +285,7 @@ function RegistrationListComponent(props: IProps) {
             event === EVENT_OPTIONS.DEATH
               ? intl.formatMessage(messages.performanceHealthFacilityDeath)
               : intl.formatMessage(messages.performanceHealthFacilityBirth),
-          width: 25,
+          width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('healthFacility_num'),
           icon:
@@ -301,7 +302,7 @@ function RegistrationListComponent(props: IProps) {
         {
           key: 'location',
           label: intl.formatMessage(messages.location),
-          width: 25,
+          width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('location'),
           icon:
@@ -316,7 +317,7 @@ function RegistrationListComponent(props: IProps) {
         {
           key: 'home',
           label: intl.formatMessage(messages.performanceHomeBirth),
-          width: 25,
+          width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('home_num'),
           icon:
@@ -330,7 +331,7 @@ function RegistrationListComponent(props: IProps) {
         {
           key: 'healthFacility',
           label: intl.formatMessage(messages.performanceHealthFacilityBirth),
-          width: 25,
+          width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('healthFacility_num'),
           icon:
@@ -345,24 +346,19 @@ function RegistrationListComponent(props: IProps) {
     if (filterBy === FILTER_BY_OPTIONS.BY_REGISTRAR)
       return [
         {
-          key: 'icon',
-          label: '',
-          width: 10
-        },
-        {
           key: 'name',
           label: intl.formatMessage(messages.registrar),
-          width: 25
+          width: 20
         },
         {
           key: 'role',
           label: intl.formatMessage(messages.typeColumnHeader),
-          width: 25
+          width: 20
         },
         {
           key: 'location',
           label: intl.formatMessage(messages.officeColumnHeader),
-          width: 25
+          width: 20
         },
         ...commonColumns
       ]
@@ -399,26 +395,26 @@ function RegistrationListComponent(props: IProps) {
       finalContent = content.results.map(
         (result: IDynamicValues, index: number) => ({
           ...result,
-          icon: (
-            <AvatarSmall
-              name={
-                result.registrarPractitioner.name
-                  ? getName(result.registrarPractitioner.name, 'en')
-                  : ''
-              }
-            />
-          ),
           name: (
-            <Link
-              font="bold14"
-              onClick={() => {
-                props.goToUserProfile(String(result.registrarPractitioner.id))
-              }}
-            >
-              {result.registrarPractitioner.name
-                ? getName(result.registrarPractitioner.name, 'en')
-                : ''}
-            </Link>
+            <Stack>
+              <AvatarSmall
+                name={
+                  result.registrarPractitioner.name
+                    ? getName(result.registrarPractitioner.name, 'en')
+                    : ''
+                }
+              />
+              <Link
+                font="bold14"
+                onClick={() => {
+                  props.goToUserProfile(String(result.registrarPractitioner.id))
+                }}
+              >
+                {result.registrarPractitioner.name
+                  ? getName(result.registrarPractitioner.name, 'en')
+                  : ''}
+              </Link>
+            </Stack>
           ),
           location: (
             <Link
@@ -670,6 +666,7 @@ function RegistrationListComponent(props: IProps) {
                       noResultText={intl.formatMessage(
                         constantsMessages.noResults
                       )}
+                      fixedWidth={994}
                       isLoading={loading}
                       disableScrollOnOverflow={true}
                       columns={getColumns()}
