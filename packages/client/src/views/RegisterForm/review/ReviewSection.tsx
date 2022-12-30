@@ -559,6 +559,7 @@ interface IProps {
   registrationSection: IFormSection
   documentsSection: IFormSection
   duplicate?: boolean
+  onArchiveDeclaration?: () => void
 }
 type State = {
   displayEditDialog: boolean
@@ -1885,6 +1886,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       registrationSection,
       documentsSection,
       offlineCountryConfiguration,
+      onArchiveDeclaration,
       draft: { event },
       readonly,
       onContinue,
@@ -2092,6 +2094,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     )}
                   />
                 )}
+
                 {!isCorrection(declaration) ? (
                   <>
                     {!readonly && (
@@ -2103,6 +2106,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     )}
                     {submitClickEvent && !readonly && (
                       <ReviewAction
+                        onArchiveDeclaration={onArchiveDeclaration}
                         completeDeclaration={isComplete}
                         totalFileSizeExceeded={totalFileSizeExceeded}
                         declarationToBeValidated={this.userHasValidateScope()}
@@ -2251,6 +2255,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       )}
                     />
                   )}
+
                   {!isCorrection(declaration2) ? (
                     <>
                       {!readonly && (
@@ -2260,6 +2265,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       )}
                       {submitClickEvent && !readonly && (
                         <ReviewAction
+                          onArchiveDeclaration={onArchiveDeclaration}
                           completeDeclaration={isComplete}
                           totalFileSizeExceeded={totalFileSizeExceeded}
                           declarationToBeValidated={this.userHasValidateScope()}
