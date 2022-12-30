@@ -32,7 +32,7 @@ const users = [
       }
     ],
     username: 'r.tagore',
-    role: RoleType.FieldAgent,
+    role: RoleType.RegistrationAgent,
     localRegistrar: {
       name: [
         {
