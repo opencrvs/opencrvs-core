@@ -162,8 +162,7 @@ export const postFhir = async (token: string, resource: fhir.Resource) => {
     },
     body: JSON.stringify(resource)
   })
-
-  if (!res.ok) {
+  if (res.status !== 200 && res.status !== 201) {
     throw new Error('Unexpected response received')
   }
 

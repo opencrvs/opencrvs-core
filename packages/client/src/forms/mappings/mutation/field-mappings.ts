@@ -145,7 +145,7 @@ export const fieldToAddressTransformer =
     if (!address) {
       address = {
         type: addressType,
-        line: ['', '', '', '', '', '']
+        line: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''] // lines must be available as empty strings for GraphQL to parse all options
       }
       sectionData.address.push(address)
     }

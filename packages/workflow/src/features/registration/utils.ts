@@ -297,10 +297,10 @@ interface IMosipAuthData {
 }
 
 interface IMosipRequest {
-  deliverytype: 'sync'
-  output: string | ''
+  deliverytype?: 'sync'
+  output?: string | ''
   lang: 'eng'
-  authdata: IMosipAuthData[]
+  authdata: IMosipAuthData
 }
 
 export interface IMosipSeederPayload {
@@ -334,6 +334,7 @@ export interface IMosipSeederResponse {
 export async function getMosipUINToken(
   patient: fhir.Patient
 ): Promise<IMosipSeederResponse> {
+  logger.info(`getMosipUINToken: ${JSON.stringify(patient)}`)
   let submittedNationalIDInForm = ''
   const identifiers = patient?.identifier?.filter(
     (identifier: fhir.Identifier) => {
@@ -347,21 +348,17 @@ export async function getMosipUINToken(
     id: '',
     version: '',
     metadata: '',
-    requesttime: '',
+    requesttime: new Date().toISOString(),
     request: {
-      deliverytype: 'sync',
-      output: '',
       lang: 'eng',
-      authdata: [
-        {
-          vid: submittedNationalIDInForm,
-          name: concatenateName(patient.name as fhir.HumanName[]),
-          gender: patient.gender,
-          dob: patient.birthDate?.replace(/-/g, '/')
-          // TODO: send informant contact phone number?  We dont ask for deceased's phone number in Civil Reg form currently
-          // TODO: send address in a way MOSIP can understand
-        }
-      ]
+      authdata: {
+        vid: submittedNationalIDInForm,
+        name: concatenateName(patient.name as fhir.HumanName[]),
+        gender: patient.gender,
+        dob: patient.birthDate?.replace(/-/g, '/')
+        // TODO: send informant contact phone number?  We dont ask for deceased's phone number in Civil Reg form currently
+        // TODO: send address in a way MOSIP can understand
+      }
     }
   }
   logger.info(`IMosipSeederPayload: ${JSON.stringify(payload)}`)

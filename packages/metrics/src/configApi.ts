@@ -49,6 +49,7 @@ export interface IApplicationConfig {
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
   PHONE_NUMBER_PATTERN: string
   ADDRESSES: number
+  ADMIN_LEVELS: number
 }
 
 export async function getApplicationConfig(

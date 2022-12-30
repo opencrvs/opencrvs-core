@@ -60,6 +60,10 @@ import {
 } from './forms/configuration/formConfig/reducer'
 import { submissionMiddleware } from './declarations/submissionMiddleware'
 import { workqueueReducer, WorkqueueState } from './workqueue'
+import {
+  advancedSearchParamReducer,
+  IAdvancedSearchParamState
+} from '@client/search/advancedSearch/reducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -76,6 +80,7 @@ export interface IStoreState {
   userForm: IUserFormState
   workqueueState: WorkqueueState
   formConfig: IFormConfigState
+  advancedSearch: IAdvancedSearchParamState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -102,7 +107,8 @@ export const createStore = <T>(
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: workqueueReducer,
-    formConfig: formConfigReducer
+    formConfig: formConfigReducer,
+    advancedSearch: advancedSearchParamReducer
   })
   // @ts-ignore
   const enhancer = compose(

@@ -31,7 +31,6 @@ export async function newAuditHandler(
     const userAgent =
       request.headers['x-real-user-agent'] || request.headers['user-agent']
     const payload = request.payload as IUserAuditBody
-
     let practitionerId
     if (payload.practitionerId) {
       practitionerId = payload.practitionerId!

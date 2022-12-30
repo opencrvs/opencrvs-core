@@ -35,7 +35,8 @@ export const influx = new Influx.InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -51,13 +52,15 @@ export const influx = new Influx.InfluxDB({
         'timeLabel',
         'ageLabel',
         'dateLabel',
+        'registrarPractitionerId',
         'practitionerRole',
         'eventLocationType',
         'officeLocation',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -74,6 +77,7 @@ export const influx = new Influx.InfluxDB({
         'ageLabel',
         'timeLabel',
         'dateLabel',
+        'registrarPractitionerId',
         'practitionerRole',
         'eventLocationType',
         'mannerOfDeath',
@@ -82,7 +86,8 @@ export const influx = new Influx.InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -99,7 +104,8 @@ export const influx = new Influx.InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -117,7 +123,8 @@ export const influx = new Influx.InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -142,7 +149,8 @@ export const influx = new Influx.InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -158,7 +166,8 @@ export const influx = new Influx.InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -175,7 +184,8 @@ export const influx = new Influx.InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -190,7 +200,8 @@ export const influx = new Influx.InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {

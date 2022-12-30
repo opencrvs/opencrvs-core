@@ -165,17 +165,6 @@ const messagesToDefine = {
     defaultMessage: 'Search for an office',
     description: 'Header for system admin team home page'
   },
-  noResultForLocation: {
-    id: 'performance.reports.noResultForLocation',
-    defaultMessage:
-      'No data for {searchedLocation}. We are currently piloting for following areas:',
-    description: 'Message to show if no data is found for a location'
-  },
-  noResultForLocationWithoutPilotAreas: {
-    id: 'performance.reports.noResultInPilot',
-    defaultMessage: 'No data for {searchedLocation}.',
-    description: 'Message to show if no data is found for a location'
-  },
   operational: {
     id: 'performance.reports.select.item.operational',
     defaultMessage: 'Operational',
@@ -337,11 +326,6 @@ const messagesToDefine = {
     defaultMessage: 'Show next {pageSize}',
     description: 'Label for show more link'
   },
-  pilotAreaListHeader: {
-    id: 'performance.pilotArea.header',
-    defaultMessage: 'Pilot Areas',
-    description: 'Label for pilot area list header'
-  },
   stats: {
     id: 'performance.stats.header',
     defaultMessage: 'Stats',
@@ -366,6 +350,31 @@ const messagesToDefine = {
     id: 'performance.completenessTable.completenessRate',
     defaultMessage: 'Completeness {lineBreak}rate',
     description: 'Title for Completeness rate column in the table'
+  },
+  byRegistrar: {
+    id: 'performance.regRates.select.item.byRegistrar',
+    defaultMessage: 'By Registrars',
+    description: 'Label for select option By Registrar'
+  },
+  month: {
+    id: 'performance.registrationsListTable.monthColumn',
+    defaultMessage: 'Month',
+    description: 'Title for month column in the table'
+  },
+  location: {
+    id: 'performance.registrationsListTable.locationColumn',
+    defaultMessage: 'Location',
+    description: 'Title for location column in the table'
+  },
+  registrar: {
+    id: 'performance.registrationsListTable.registrarColumn',
+    defaultMessage: 'Registrar',
+    description: 'Title for registrar column in the table'
+  },
+  totalRegistrations: {
+    id: 'performance.registrationsListTable.totalRegistrationsColumn',
+    defaultMessage: 'Total Registrations',
+    description: 'Title for total registrations column in the table'
   }
 }
 

@@ -41,10 +41,11 @@ import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { Scope } from '@client/utils/authUtils'
+import { Roles, Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,
   NAME_TEXT,
+  NATIONAL_ID_TEXT,
   PHONE_TEXT,
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
@@ -333,21 +334,29 @@ export class SearchResultView extends React.Component<
                   {
                     query: SEARCH_EVENTS,
                     variables: {
-                      locationIds: this.userHasRegisterScope()
-                        ? null
-                        : userDetails
-                        ? [getUserLocation(userDetails).id]
-                        : [],
-                      sort: SEARCH_RESULT_SORT,
-                      trackingId:
-                        searchType === TRACKING_ID_TEXT ? searchText : '',
-                      registrationNumber:
-                        searchType === BRN_DRN_TEXT ? searchText : '',
-                      contactNumber:
-                        searchType === PHONE_TEXT
-                          ? convertToMSISDN(searchText)
-                          : '',
-                      name: searchType === NAME_TEXT ? searchText : ''
+                      advancedSearchParameters: {
+                        trackingId:
+                          searchType === TRACKING_ID_TEXT ? searchText : '',
+                        nationalId:
+                          searchType === NATIONAL_ID_TEXT ? searchText : '',
+                        registrationNumber:
+                          searchType === BRN_DRN_TEXT ? searchText : '',
+                        contactNumber:
+                          searchType === PHONE_TEXT
+                            ? convertToMSISDN(searchText)
+                            : '',
+                        name: searchType === NAME_TEXT ? searchText : '',
+                        declarationLocationId:
+                          userDetails &&
+                          ![
+                            Roles.LOCAL_REGISTRAR,
+                            Roles.NATIONAL_REGISTRAR,
+                            Roles.REGISTRATION_AGENT
+                          ].includes(userDetails.role as Roles)
+                            ? getUserLocation(userDetails).id
+                            : ''
+                      },
+                      sort: SEARCH_RESULT_SORT
                     }
                   }
                 ],
@@ -446,17 +455,25 @@ export class SearchResultView extends React.Component<
           <Query<SearchEventsQuery>
             query={SEARCH_EVENTS}
             variables={{
-              locationIds: this.userHasRegisterScope()
-                ? null
-                : userDetails
-                ? [getUserLocation(userDetails).id]
-                : [],
-              sort: SEARCH_RESULT_SORT,
-              trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
-              registrationNumber: searchType === BRN_DRN_TEXT ? searchText : '',
-              contactNumber:
-                searchType === PHONE_TEXT ? convertToMSISDN(searchText) : '',
-              name: searchType === NAME_TEXT ? searchText : ''
+              advancedSearchParameters: {
+                declarationLocationId:
+                  userDetails &&
+                  ![
+                    Roles.LOCAL_REGISTRAR,
+                    Roles.NATIONAL_REGISTRAR,
+                    Roles.REGISTRATION_AGENT
+                  ].includes(userDetails.role as Roles)
+                    ? getUserLocation(userDetails).id
+                    : '',
+                trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
+                nationalId: searchType === NATIONAL_ID_TEXT ? searchText : '',
+                registrationNumber:
+                  searchType === BRN_DRN_TEXT ? searchText : '',
+                contactNumber:
+                  searchType === PHONE_TEXT ? convertToMSISDN(searchText) : '',
+                name: searchType === NAME_TEXT ? searchText : ''
+              },
+              sort: SEARCH_RESULT_SORT
             }}
             fetchPolicy="cache-and-network"
           >
@@ -464,7 +481,6 @@ export class SearchResultView extends React.Component<
               const total = loading
                 ? -1
                 : data?.searchEvents?.results?.length || 0
-
               return (
                 <WQContentWrapper
                   title={intl.formatMessage(messages.searchResultFor, {

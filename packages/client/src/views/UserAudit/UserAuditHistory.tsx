@@ -56,8 +56,8 @@ import {
   GetUserAuditLogQuery,
   UserAuditLogResultItem
 } from '@client/utils/gateway'
-import { getFormattedDate } from '@client/views/RecordAudit/utils'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import format from '@client/utils/date-formatting'
 import { Link } from '@opencrvs/components'
 
 const DEFAULT_LIST_SIZE = 10
@@ -117,7 +117,7 @@ const AuditContent = styled.div`
 
 const BoldContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bold12};
+  ${({ theme }) => theme.fonts.bold14};
 `
 interface IBaseProp {
   practitionerId: string
@@ -386,14 +386,27 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             <BoldContent>{actionMessage}</BoldContent>
           ),
 
-        actionDescriptionWithAuditTime: (
-          <AuditDescTimeContainer>
-            <InformationTitle>{actionMessage}</InformationTitle>
-            <InformationCaption>
-              {getFormattedDate(new Date(userAuditItem.time))}
-            </InformationCaption>
-          </AuditDescTimeContainer>
-        ),
+        actionDescriptionWithAuditTime:
+          isSystemAdmin &&
+          isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
+            <Link
+              onClick={() => {
+                this.toggleActionDetails(userAuditItem)
+              }}
+            >
+              {actionMessage}
+            </Link>
+          ) : !isSystemAdmin ? (
+            <Link
+              onClick={() => {
+                this.toggleActionDetails(userAuditItem)
+              }}
+            >
+              {actionMessage}
+            </Link>
+          ) : (
+            <BoldContent>{actionMessage}</BoldContent>
+          ),
         trackingId:
           isUserAuditItemWithDeclarationDetials(userAuditItem) &&
           !isSystemAdmin ? (
@@ -416,7 +429,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
           ? userAuditItem.data.trackingId
           : null,
-        auditTime: getFormattedDate(new Date(userAuditItem.time))
+        auditTime: format(new Date(userAuditItem.time), 'MMMM dd, yyyy hh:mm a')
       }
     })
     return (
@@ -542,8 +555,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                             <>
                               <AuditContent>
                                 {this.props.practitionerName} -{' '}
-                                {getFormattedDate(
-                                  new Date(this.state.actionDetailsData.time)
+                                {format(
+                                  new Date(this.state.actionDetailsData.time),
+                                  'MMMM dd, yyyy hh:mm a'
                                 )}{' '}
                                 {' | '}
                                 {this.getIpAdress(this.state.actionDetailsData)}

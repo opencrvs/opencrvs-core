@@ -14,7 +14,8 @@ import {
   GQLUser,
   GQLHumanName,
   GQLIdentifier,
-  GQLSignature
+  GQLSignature,
+  GQLBookmarkedSeachItem
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/client/src/storage'
 import { createNamesMap } from './data-formatting'
@@ -57,6 +58,7 @@ export interface IUserDetails {
     signature?: GQLSignature
   }
   avatar?: IAvatar
+  searches?: GQLBookmarkedSeachItem[]
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
@@ -71,7 +73,8 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     userMgntUserID,
     practitionerId,
     localRegistrar,
-    avatar
+    avatar,
+    searches
   } = user
   const userDetails: IUserDetails = {}
   if (localRegistrar) {
@@ -137,6 +140,10 @@ export function getUserDetails(user: GQLUser): IUserDetails {
 
   if (avatar) {
     userDetails.avatar = avatar
+  }
+
+  if (searches) {
+    userDetails.searches = searches as GQLBookmarkedSeachItem[]
   }
 
   return userDetails
