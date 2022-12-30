@@ -143,6 +143,7 @@ export class Checkbox extends React.Component<ICheckbox> {
           value={value}
           onChange={onChange}
           size={size === 'large' ? 40 : 16}
+          hidden={true}
         />
         <Check size={size}>
           {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
