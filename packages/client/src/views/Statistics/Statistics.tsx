@@ -20,13 +20,18 @@ import styled from '@client/styledComponents'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import { FullScreen, useFullScreenHandle } from 'react-full-screen'
 import { FullScreen as FullScreenIcon } from '@opencrvs/components/lib/icons'
-import { useUserDetails } from '@client/utils/userUtils'
+import { IUserDetails, useUserDetails } from '@client/utils/userUtils'
 import {
   getDefaultPerformanceLocationId,
   useLocations,
   useOffices
 } from '@client/utils/locationUtils'
 import { ILocation } from '@client/offline/reducer'
+import {
+  NATL_ADMIN_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES,
+  SYS_ADMIN_ROLES
+} from '@client/utils/constants'
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
   height: 100%;
@@ -100,6 +105,14 @@ function getAllLocationLevels(
   return { state: '', lga: '', office: '' }
 }
 
+function shouldSeeView(userDetails: IUserDetails) {
+  return (
+    SYS_ADMIN_ROLES.includes(userDetails.role!) ||
+    NATL_ADMIN_ROLES.includes(userDetails.role!) ||
+    PERFORMANCE_MANAGEMENT_ROLES.includes(userDetails.role!)
+  )
+}
+
 export function Statistics({ visible }: { visible: boolean }) {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -107,6 +120,15 @@ export function Statistics({ visible }: { visible: boolean }) {
   const userDetails = useUserDetails()
   const locations = useLocations()
   const offices = useOffices()
+
+  /*
+   * This view is loaded for caching purposes and sufficient logic for doing it based on
+   * user's role isn't part of the code on the router level, thus we only render a DIV if user is not
+   * allowed to see the view
+   */
+  if (!userDetails || !shouldSeeView(userDetails)) {
+    return <div />
+  }
 
   const defaultView = getDefaultPerformanceLocationId(userDetails!)
 
