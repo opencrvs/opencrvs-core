@@ -234,23 +234,23 @@ export interface GQLLocation {
 }
 
 export interface GQLUser {
-  id?: string
-  userMgntUserID?: string
-  practitionerId?: string
-  name?: Array<GQLHumanName | null>
+  id: string
+  userMgntUserID: string
+  practitionerId: string
+  name: Array<GQLHumanName>
   username?: string
-  mobile?: string
-  role?: string
+  mobile: string
+  role: GQLRoleType
   type?: string
   email?: string
-  status?: string
+  status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
-  creationDate?: string
+  creationDate: string
   avatar?: GQLAvatar
   device?: string
   searches?: Array<GQLBookmarkedSeachItem | null>
@@ -511,8 +511,8 @@ export interface GQLBirthRegistrationInput {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
-  createdAt?: GQLDate
-  updatedAt?: GQLDate
+  createdAt: GQLDate
+  updatedAt: GQLDate
 }
 
 export interface GQLReinstated {
@@ -544,11 +544,11 @@ export interface GQLDeathRegistrationInput {
 
 export interface GQLUserInput {
   id?: string
-  name?: Array<GQLHumanNameInput | null>
+  name: Array<GQLHumanNameInput>
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
-  mobile?: string
-  role?: string
+  mobile: string
+  role: GQLRoleType
   type?: string
   email?: string
   primaryOffice?: string
@@ -880,9 +880,26 @@ export const enum GQLLocationType {
   OTHER = 'OTHER'
 }
 
+export const enum GQLRoleType {
+  FIELD_AGENT = 'FIELD_AGENT',
+  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
+  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
+  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
+  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
+  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
+  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
+}
+
+export const enum GQLStatus {
+  active = 'active',
+  deactivated = 'deactivated',
+  pending = 'pending',
+  disabled = 'disabled'
+}
+
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
-  role: string
+  role: GQLRoleType
   signature?: GQLSignature
 }
 
@@ -901,7 +918,7 @@ export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
   type?: string
-  status?: string
+  status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string
   creationDate?: string
