@@ -11,18 +11,27 @@
  */
 import * as React from 'react'
 
-export const Logout = (props: React.HTMLAttributes<SVGElement>) => (
+interface IPropsLogout {
+  stroke?: string
+  height?: number
+  width?: number
+}
+/* fill={props.stroke || 'currentColor'}*/
+
+export const Logout = (
+  props: React.HTMLAttributes<SVGElement> & IPropsLogout
+) => (
   <svg width={24} height={24} fill="none" {...props}>
     <path
       d="M14 22h5a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-5"
-      stroke="#fff"
+      stroke={props.stroke || '#fff'}
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M11 16l4-4-4-4M15 12H3"
-      stroke="#fff"
+      stroke={props.stroke || '#fff'}
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"

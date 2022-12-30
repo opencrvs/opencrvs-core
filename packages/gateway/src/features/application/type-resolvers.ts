@@ -14,7 +14,6 @@ import {
   GQLCurrencyInput,
   GQLBirthInput,
   GQLDeathInput,
-  GQLCountryLogoInput,
   GQLIntegrationInput,
   GQLLoginBackgroundInput,
   GQLCountryLogoInput

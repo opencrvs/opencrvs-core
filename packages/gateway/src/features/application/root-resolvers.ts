@@ -15,8 +15,7 @@ import {
   GQLDeathInput,
   GQLCountryLogoInput,
   GQLIntegrationInput,
-  GQLResolver,
-  GQLLoginBackgroundInput
+  GQLLoginBackgroundInput,
   GQLResolver
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
@@ -51,7 +50,7 @@ export const resolvers: GQLResolver = {
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
         ADDRESSES: applicationConfig.ADDRESSES as number,
-        ADMIN_LEVELS: applicationConfig.ADMIN_LEVELS as number
+        ADMIN_LEVELS: applicationConfig.ADMIN_LEVELS as number,
         INTEGRATIONS: applicationConfig.INTEGRATIONS as GQLIntegrationInput[],
         LOGIN_BACKGROUND:
           applicationConfig.LOGIN_BACKGROUND as GQLLoginBackgroundInput

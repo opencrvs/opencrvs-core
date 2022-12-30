@@ -128,6 +128,8 @@ input ApplicationConfigurationInput {
   ADDRESSES: Int
   INTEGRATIONS: [IntegrationInput]
   LOGIN_BACKGROUND: LoginBackgroundInput
+  ADMIN_LEVELS: Int
+
 }
 
 type ApplicationConfiguration {
@@ -144,6 +146,8 @@ type ApplicationConfiguration {
   ADDRESSES: Int
   INTEGRATIONS: [Integration]
   LOGIN_BACKGROUND: LoginBackground
+  ADMIN_LEVELS: Int
+
 }
 
 type Mutation {

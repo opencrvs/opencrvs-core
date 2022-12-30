@@ -29,11 +29,14 @@ const StyledPage = styled.div<IPageProps>`
   width: 100%;
 
   ${({ imageFitter, background, theme }) =>
-    imageFitter === 'FILL' && background
+    background
       ? css`
           background-image: url(${background});
-          background-repeat: no-repeat;
-          background-size: cover;
+          background-repeat: ${imageFitter === 'FILL' ? 'no-repeat' : 'repeat'};
+          background-size: ${imageFitter === 'FILL' ? `cover` : `auto`};
+          background: ${background
+            ? `#${background}`
+            : theme.colors.backgroundPrimary};
         `
       : css`
           background: ${background

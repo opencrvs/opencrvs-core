@@ -105,6 +105,20 @@ export const statuses = {
   DEACTIVATED: 'deactivated'
 }
 
+const integrationsSchema = new Schema<Integration>({
+  name: String,
+  status: {
+    type: String,
+    enum: [
+      statuses.PENDING,
+      statuses.ACTIVE,
+      statuses.DISABLED,
+      statuses.DEACTIVATED
+    ],
+    default: statuses.PENDING
+  }
+})
+
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   BIRTH: { type: birthSchema, required: false },

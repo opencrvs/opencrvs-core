@@ -17,34 +17,29 @@ import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { IUserDetails, getUserName } from '@client/utils/userUtils'
+import { getUserName, IUserDetails } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
-import { Logout } from '@opencrvs/components/lib/icons'
+import { Activity, Logout } from '@opencrvs/components/lib/icons'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { Button } from '@opencrvs/components/lib/buttons'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, errorMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getOfflineData } from '@client/offline/selectors'
-import { ILoginBackground } from '@client/utils/referenceApi'
 import { IOfflineData } from '@client/offline/reducer'
+import { Button } from '@opencrvs/components/lib/buttons'
+import { Toast } from '@opencrvs/components'
 
 export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   ${({ theme }) => theme.colors.primary};
   background: ${({ color, theme }) =>
     color ? color : theme.colors.backgroundPrimary};
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  width: 100%;
 `
 
 export const LogoutHeader = styled.a`
@@ -52,6 +47,7 @@ export const LogoutHeader = styled.a`
   color: ${({ theme }) => theme.colors.white};
   display: flex;
   justify-content: flex-end;
+
   span {
     margin-right: 10px;
   }
@@ -62,22 +58,26 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-grow: 1;
+  width: min(500px, 90%);
+  border-radius: 4px;
+  padding: 24px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
-  margin: 10rem 30rem;
 `
 const Name = styled.p`
   color: ${({ theme }) => theme.colors.grey600};
 `
 const ForgottenPinLink = styled(Button)`
   ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.grey600};
+  color: ${({ theme }) => theme.colors.blue};
   text-transform: none;
 `
+
 interface IState {
   pin: string
   resetKey: number
 }
+
 type ErrorState = {
   attempt: number
   errorMessage: string
@@ -137,7 +137,9 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   showErrorMessage() {
     return (
       this.state.errorMessage && (
-        <ErrorMessage id="errorMsg">{this.state.errorMessage}</ErrorMessage>
+        <Toast type="error" onClose={() => this.setState({ errorMessage: '' })}>
+          {this.state.errorMessage}
+        </Toast>
       )
     )
   }
@@ -246,41 +248,52 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   render() {
     const { userDetails, offlineCountryConfiguration } = this.props
     return (
-      <PageWrapper
-        id="unlockPage"
-        color={`#${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor}`}
-        style={{
-          backgroundImage: `url(${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage})`
-        }}
-      >
-        <LogoutHeader onClick={this.logout} id="logout">
-          <span>{this.props.intl.formatMessage(buttonMessages.logout)}</span>
-          <Logout />
-        </LogoutHeader>
-        <Container onClick={this.focusKeypad}>
-          <AvatarLarge
-            name={getUserName(userDetails)}
-            avatar={userDetails?.avatar}
-          />
-          {this.showName()}
+      <>
+        {' '}
+        <div
+          className="main"
+          color={`#${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor}`}
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            height: '100vh',
+            background: 'green',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <Container onClick={this.focusKeypad}>
+            <LogoutHeader onClick={this.logout} id="logout">
+              <span>
+                {this.props.intl.formatMessage(buttonMessages.logout)}
+              </span>
+              <Logout stroke={'#4A8AD7'} />
+            </LogoutHeader>
 
-          {this.showErrorMessage()}
-          <PINKeypad
-            forgotPinComponent={
-              <ForgottenPinLink
-                id="forgotten_pin"
-                onClick={this.props.onForgetPin}
-              >
-                {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
-              </ForgottenPinLink>
-            }
-            ref={(elem: any) => (this.pinKeyRef = elem)}
-            onComplete={this.onPinProvided}
-            pin={this.state.pin}
-            key={this.state.resetKey}
-          />
-        </Container>
-      </PageWrapper>
+            <AvatarLarge
+              name={getUserName(userDetails)}
+              avatar={userDetails?.avatar}
+            />
+            <PINKeypad
+              forgotPinComponent={
+                <ForgottenPinLink
+                  id="forgotten_pin"
+                  onClick={this.props.onForgetPin}
+                >
+                  {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
+                </ForgottenPinLink>
+              }
+              ref={(elem: any) => (this.pinKeyRef = elem)}
+              onComplete={this.onPinProvided}
+              pin={this.state.pin}
+              key={this.state.resetKey}
+            />
+
+            {this.showErrorMessage()}
+          </Container>
+        </div>
+      </>
     )
   }
 }
