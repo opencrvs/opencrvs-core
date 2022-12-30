@@ -126,6 +126,13 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
 
   handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
+    if (!this.state.answer) {
+      this.setState({
+        touched: true,
+        error: true
+      })
+      return
+    }
     if (this.state.error) {
       return
     }
