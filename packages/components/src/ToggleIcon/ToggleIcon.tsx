@@ -9,18 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
 import * as React from 'react'
 import { Icon, IconProps } from '../Icon'
 import { Button } from '../Button'
-
-const CheckBoxLabel = styled.label<{ checked: boolean }>`
-  cursor: pointer;
-`
-const CheckBox = styled.input`
-  opacity: 0;
-  display: none;
-`
 
 export function ToggleIcon({
   name,

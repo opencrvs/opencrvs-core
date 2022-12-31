@@ -206,6 +206,7 @@ export type AdvancedSearchParametersInput = {
 export type ApplicationConfiguration = {
   __typename?: 'ApplicationConfiguration'
   ADDRESSES?: Maybe<Scalars['Int']>
+  ADMIN_LEVELS?: Maybe<Scalars['Int']>
   APPLICATION_NAME?: Maybe<Scalars['String']>
   BIRTH?: Maybe<Birth>
   COUNTRY_LOGO?: Maybe<CountryLogo>
@@ -220,6 +221,7 @@ export type ApplicationConfiguration = {
 
 export type ApplicationConfigurationInput = {
   ADDRESSES?: InputMaybe<Scalars['Int']>
+  ADMIN_LEVELS?: InputMaybe<Scalars['Int']>
   APPLICATION_NAME?: InputMaybe<Scalars['String']>
   BIRTH?: InputMaybe<BirthInput>
   COUNTRY_LOGO?: InputMaybe<CountryLogoInput>
@@ -411,7 +413,7 @@ export type BirthRegistrationInput = {
   birthType?: InputMaybe<BirthType>
   child?: InputMaybe<PersonInput>
   childrenBornAliveToMother?: InputMaybe<Scalars['Int']>
-  createdAt?: InputMaybe<Scalars['Date']>
+  createdAt: Scalars['Date']
   eventLocation?: InputMaybe<LocationInput>
   father?: InputMaybe<PersonInput>
   foetalDeathsToMother?: InputMaybe<Scalars['Int']>
@@ -421,7 +423,7 @@ export type BirthRegistrationInput = {
   otherAttendantAtBirth?: InputMaybe<Scalars['String']>
   questionnaire?: InputMaybe<Array<InputMaybe<QuestionnaireQuestionInput>>>
   registration?: InputMaybe<RegistrationInput>
-  updatedAt?: InputMaybe<Scalars['Date']>
+  updatedAt: Scalars['Date']
   weightAtBirth?: InputMaybe<Scalars['Float']>
 }
 
@@ -1005,7 +1007,7 @@ export type InputOutput = {
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
-  role: Scalars['String']
+  role: RoleType
   signature?: Maybe<Signature>
 }
 
@@ -1969,6 +1971,16 @@ export type Role = {
   value?: Maybe<Scalars['String']>
 }
 
+export enum RoleType {
+  FieldAgent = 'FIELD_AGENT',
+  LocalRegistrar = 'LOCAL_REGISTRAR',
+  LocalSystemAdmin = 'LOCAL_SYSTEM_ADMIN',
+  NationalRegistrar = 'NATIONAL_REGISTRAR',
+  NationalSystemAdmin = 'NATIONAL_SYSTEM_ADMIN',
+  PerformanceManagement = 'PERFORMANCE_MANAGEMENT',
+  RegistrationAgent = 'REGISTRATION_AGENT'
+}
+
 export type SearchFieldAgentResponse = {
   __typename?: 'SearchFieldAgentResponse'
   avatar?: Maybe<Avatar>
@@ -1977,7 +1989,7 @@ export type SearchFieldAgentResponse = {
   fullName?: Maybe<Scalars['String']>
   practitionerId?: Maybe<Scalars['String']>
   primaryOfficeId?: Maybe<Scalars['String']>
-  status?: Maybe<Scalars['String']>
+  status?: Maybe<Status>
   totalNumberOfDeclarationStarted?: Maybe<Scalars['Int']>
   totalNumberOfInProgressAppStarted?: Maybe<Scalars['Int']>
   totalNumberOfRejectedDeclarations?: Maybe<Scalars['Int']>
@@ -2010,6 +2022,13 @@ export type Signature = {
 export type SignatureInput = {
   data: Scalars['String']
   type?: InputMaybe<Scalars['String']>
+}
+
+export enum Status {
+  Active = 'active',
+  Deactivated = 'deactivated',
+  Disabled = 'disabled',
+  Pending = 'pending'
 }
 
 export type StatusReason = {
@@ -2101,23 +2120,23 @@ export type User = {
   __typename?: 'User'
   avatar?: Maybe<Avatar>
   catchmentArea?: Maybe<Array<Maybe<Location>>>
-  creationDate?: Maybe<Scalars['String']>
+  creationDate: Scalars['String']
   device?: Maybe<Scalars['String']>
   email?: Maybe<Scalars['String']>
-  id?: Maybe<Scalars['ID']>
+  id: Scalars['ID']
   identifier?: Maybe<Identifier>
   localRegistrar?: Maybe<LocalRegistrar>
-  mobile?: Maybe<Scalars['String']>
-  name?: Maybe<Array<Maybe<HumanName>>>
-  practitionerId?: Maybe<Scalars['String']>
+  mobile: Scalars['String']
+  name: Array<HumanName>
+  practitionerId: Scalars['String']
   primaryOffice?: Maybe<Location>
-  role?: Maybe<Scalars['String']>
+  role: RoleType
   searches?: Maybe<Array<Maybe<BookmarkedSeachItem>>>
   signature?: Maybe<Signature>
-  status?: Maybe<Scalars['String']>
+  status: Status
   type?: Maybe<Scalars['String']>
   underInvestigation?: Maybe<Scalars['Boolean']>
-  userMgntUserID?: Maybe<Scalars['ID']>
+  userMgntUserID: Scalars['ID']
   username?: Maybe<Scalars['String']>
 }
 
@@ -2162,10 +2181,10 @@ export type UserInput = {
   email?: InputMaybe<Scalars['String']>
   id?: InputMaybe<Scalars['ID']>
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
-  mobile?: InputMaybe<Scalars['String']>
-  name?: InputMaybe<Array<InputMaybe<HumanNameInput>>>
+  mobile: Scalars['String']
+  name: Array<HumanNameInput>
   primaryOffice?: InputMaybe<Scalars['String']>
-  role?: InputMaybe<Scalars['String']>
+  role: RoleType
   signature?: InputMaybe<SignatureInput>
   type?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
@@ -2564,18 +2583,18 @@ export type FetchUserQuery = {
   __typename?: 'Query'
   getUser?: {
     __typename?: 'User'
-    userMgntUserID?: string | null
-    practitionerId?: string | null
-    mobile?: string | null
-    role?: string | null
+    userMgntUserID: string
+    practitionerId: string
+    mobile: string
+    role: RoleType
     type?: string | null
-    status?: string | null
-    name?: Array<{
+    status: Status
+    name: Array<{
       __typename?: 'HumanName'
       use?: string | null
       firstNames?: string | null
       familyName?: string | null
-    } | null> | null
+    }>
     catchmentArea?: Array<{
       __typename?: 'Location'
       id: string
@@ -2597,7 +2616,7 @@ export type FetchUserQuery = {
     } | null
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
-      role: string
+      role: RoleType
       name: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -2831,19 +2850,19 @@ export type SearchUsersQuery = {
     totalItems?: number | null
     results?: Array<{
       __typename?: 'User'
-      id?: string | null
+      id: string
       username?: string | null
-      role?: string | null
-      mobile?: string | null
+      role: RoleType
+      mobile: string
       type?: string | null
-      status?: string | null
+      status: Status
       underInvestigation?: boolean | null
-      name?: Array<{
+      name: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
-      } | null> | null
+      }>
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
   } | null
@@ -2896,22 +2915,22 @@ export type GetUserQuery = {
   __typename?: 'Query'
   getUser?: {
     __typename?: 'User'
-    id?: string | null
+    id: string
     username?: string | null
-    mobile?: string | null
-    role?: string | null
+    mobile: string
+    role: RoleType
     type?: string | null
-    status?: string | null
+    status: Status
     underInvestigation?: boolean | null
-    practitionerId?: string | null
-    creationDate?: string | null
+    practitionerId: string
+    creationDate: string
     device?: string | null
-    name?: Array<{
+    name: Array<{
       __typename?: 'HumanName'
       use?: string | null
       firstNames?: string | null
       familyName?: string | null
-    } | null> | null
+    }>
     identifier?: {
       __typename?: 'Identifier'
       system?: string | null
@@ -3012,14 +3031,14 @@ export type MarkBirthAsRegisteredMutation = {
         timestamp?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
-          role?: string | null
-          name?: Array<{
+          id: string
+          role: RoleType
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
+          }>
         } | null
         location?: {
           __typename?: 'Location'
@@ -3310,15 +3329,15 @@ export type FetchBirthRegistrationForReviewQuery = {
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
-        id?: string | null
+        id: string
         type?: string | null
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
           familyName?: string | null
           use?: string | null
-        } | null> | null
+        }>
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
       signature?: {
@@ -3332,7 +3351,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         createdAt?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
+          id: string
           username?: string | null
           avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
         } | null
@@ -3601,15 +3620,15 @@ export type FetchBirthRegistrationForCertificateQuery = {
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
-        id?: string | null
+        id: string
         type?: string | null
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
           familyName?: string | null
           use?: string | null
-        } | null> | null
+        }>
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
       signature?: {
@@ -3623,7 +3642,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         createdAt?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
+          id: string
           username?: string | null
           avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
         } | null
@@ -3711,14 +3730,14 @@ export type MarkDeathAsRegisteredMutation = {
         timestamp?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
-          role?: string | null
-          name?: Array<{
+          id: string
+          role: RoleType
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
+          }>
         } | null
         location?: {
           __typename?: 'Location'
@@ -3966,15 +3985,15 @@ export type FetchDeathRegistrationForReviewQuery = {
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
-        id?: string | null
+        id: string
         type?: string | null
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
           familyName?: string | null
           use?: string | null
-        } | null> | null
+        }>
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
       signature?: {
@@ -3988,7 +4007,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         createdAt?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
+          id: string
           username?: string | null
           avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
         } | null
@@ -4239,15 +4258,15 @@ export type FetchDeathRegistrationForCertificationQuery = {
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
-        id?: string | null
+        id: string
         type?: string | null
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
           familyName?: string | null
           use?: string | null
-        } | null> | null
+        }>
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
       signature?: {
@@ -4261,7 +4280,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         createdAt?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
+          id: string
           username?: string | null
           avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
         } | null
@@ -5534,12 +5553,12 @@ export type GetUserByMobileQuery = {
   __typename?: 'Query'
   getUserByMobile?: {
     __typename?: 'User'
-    id?: string | null
+    id: string
     username?: string | null
-    mobile?: string | null
-    role?: string | null
+    mobile: string
+    role: RoleType
     type?: string | null
-    status?: string | null
+    status: Status
   } | null
 }
 
@@ -5556,6 +5575,7 @@ export type UpdateApplicationConfigMutation = {
     PHONE_NUMBER_PATTERN?: string | null
     HIDE_EVENT_REGISTER_INFORMATION?: boolean | null
     ADDRESSES?: number | null
+    ADMIN_LEVELS?: number | null
     COUNTRY_LOGO?: {
       __typename?: 'CountryLogo'
       fileName?: string | null
@@ -6013,13 +6033,13 @@ export type GetEventsWithProgressQuery = {
       } | null
       startedBy?: {
         __typename?: 'User'
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           use?: string | null
           firstNames?: string | null
           familyName?: string | null
-        } | null> | null
+        }>
       } | null
       progressReport?: {
         __typename?: 'EventProgressData'
@@ -6070,17 +6090,17 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           registrarPractitioner?: {
             __typename?: 'User'
-            role?: string | null
+            role: RoleType
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
             } | null
-            name?: Array<{
+            name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
               familyName?: string | null
               use?: string | null
-            } | null> | null
+            }>
           } | null
         }>
       }
@@ -6124,7 +6144,7 @@ export type SearchFieldAgentsQuery = {
       practitionerId?: string | null
       fullName?: string | null
       type?: string | null
-      status?: string | null
+      status?: Status | null
       primaryOfficeId?: string | null
       creationDate?: string | null
       totalNumberOfDeclarationStarted?: number | null
@@ -6419,15 +6439,15 @@ export type FetchViewRecordByCompositionQuery = {
           } | null
           user?: {
             __typename?: 'User'
-            id?: string | null
+            id: string
             type?: string | null
-            role?: string | null
-            name?: Array<{
+            role: RoleType
+            name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
               familyName?: string | null
               use?: string | null
-            } | null> | null
+            }>
             avatar?: {
               __typename?: 'Avatar'
               data: string
@@ -6445,7 +6465,7 @@ export type FetchViewRecordByCompositionQuery = {
             createdAt?: any | null
             user?: {
               __typename?: 'User'
-              id?: string | null
+              id: string
               username?: string | null
               avatar?: {
                 __typename?: 'Avatar'
@@ -6697,15 +6717,15 @@ export type FetchViewRecordByCompositionQuery = {
           } | null
           user?: {
             __typename?: 'User'
-            id?: string | null
+            id: string
             type?: string | null
-            role?: string | null
-            name?: Array<{
+            role: RoleType
+            name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
               familyName?: string | null
               use?: string | null
-            } | null> | null
+            }>
             avatar?: {
               __typename?: 'Avatar'
               data: string
@@ -6723,7 +6743,7 @@ export type FetchViewRecordByCompositionQuery = {
             createdAt?: any | null
             user?: {
               __typename?: 'User'
-              id?: string | null
+              id: string
               username?: string | null
               avatar?: {
                 __typename?: 'Avatar'

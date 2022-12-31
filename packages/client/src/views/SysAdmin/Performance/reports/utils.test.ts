@@ -47,6 +47,7 @@ describe('reports utils tests', () => {
         physicalType: 'Jurisdiction',
         jurisdictionType: 'DIVISION',
         type: 'ADMIN_STRUCTURE',
+        status: 'active',
         partOf: 'Location/0'
       })
     })
@@ -62,6 +63,7 @@ describe('reports utils tests', () => {
         alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
         physicalType: 'Building',
         type: 'CRVS_OFFICE',
+        status: 'active',
         partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
       })
     })

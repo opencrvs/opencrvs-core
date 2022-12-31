@@ -43,47 +43,18 @@ export async function transformBirthBundle(
     )
     switch (scope) {
       case 'nationalId':
-        const child: fhir.Patient = await getResourceBySection(
+        return getPermissionsBundle(
+          bundle,
+          [
+            'child-details',
+            'mother-details',
+            'father-details',
+            'supporting-documents',
+            'informant-details'
+          ],
           composition,
-          'child-details',
           authHeader
         )
-        const mother: fhir.Patient = await getResourceBySection(
-          composition,
-          'mother-details',
-          authHeader
-        )
-        const father: fhir.Patient = await getResourceBySection(
-          composition,
-          'father-details',
-          authHeader
-        )
-        const informant: fhir.Patient = await getResourceBySection(
-          composition,
-          'informant-details',
-          authHeader
-        )
-        const document: any = await getResourceBySection(
-          composition,
-          'supporting-documents',
-          authHeader
-        )
-        if (child) {
-          bundle.entry.push({ resource: child } as fhir.BundleEntry)
-        }
-        if (mother) {
-          bundle.entry.push({ resource: mother } as fhir.BundleEntry)
-        }
-        if (father) {
-          bundle.entry.push({ resource: father } as fhir.BundleEntry)
-        }
-        if (informant) {
-          bundle.entry.push({ resource: informant } as fhir.BundleEntry)
-        }
-        if (document) {
-          bundle.entry.push({ resource: document } as fhir.BundleEntry)
-        }
-        return bundle
       case 'webhook':
         return getPermissionsBundle(
           bundle,
@@ -116,40 +87,17 @@ export async function transformDeathBundle(
     )
     switch (scope) {
       case 'nationalId':
-        const deceased: fhir.Patient = await getResourceBySection(
+        return getPermissionsBundle(
+          bundle,
+          [
+            'deceased-details',
+            'supporting-documents',
+            'informant-details',
+            'death-encounter'
+          ],
           composition,
-          'deceased-details',
           authHeader
         )
-        const document: any = await getResourceBySection(
-          composition,
-          'supporting-documents',
-          authHeader
-        )
-        const informant: fhir.Patient = await getResourceBySection(
-          composition,
-          'informant-details',
-          authHeader
-        )
-        const encounter: fhir.Patient = await getResourceBySection(
-          composition,
-          'death-encounter',
-          authHeader
-        )
-
-        if (encounter) {
-          bundle.entry.push({ resource: encounter } as fhir.BundleEntry)
-        }
-        if (deceased) {
-          bundle.entry.push({ resource: deceased } as fhir.BundleEntry)
-        }
-        if (document) {
-          bundle.entry.push({ resource: document } as fhir.BundleEntry)
-        }
-        if (informant) {
-          bundle.entry.push({ resource: informant } as fhir.BundleEntry)
-        }
-        return bundle
       case 'webhook':
         return getPermissionsBundle(
           bundle,

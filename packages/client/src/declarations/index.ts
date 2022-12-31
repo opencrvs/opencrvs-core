@@ -839,6 +839,18 @@ export async function writeDeclarationByUser(
     )
   }
 
+  if (
+    declaration.registrationStatus &&
+    declaration.registrationStatus === 'REGISTERED'
+  ) {
+    updateWorkqueueData(
+      getState(),
+      declaration,
+      'printTab',
+      currentUserData.workqueue
+    )
+  }
+
   await storage.setItem('USER_DATA', JSON.stringify(allUserData))
   return declaration
 }
@@ -1348,19 +1360,25 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       if (!downloadQueueInprogress.length) {
         return loop(
           newStateAfterDownload,
-          Cmd.run(writeDeclarationByUser, {
-            args: [
-              Cmd.getState,
-              state.userID,
-              newDeclarationsAfterDownload[downloadingDeclarationIndex]
+          Cmd.list<IDownloadDeclarationFail | UpdateRegistrarWorkqueueAction>(
+            [
+              Cmd.run(writeDeclarationByUser, {
+                args: [
+                  Cmd.getState,
+                  state.userID,
+                  newDeclarationsAfterDownload[downloadingDeclarationIndex]
+                ],
+                failActionCreator: (err) =>
+                  downloadDeclarationFail(
+                    err,
+                    newDeclarationsAfterDownload[downloadingDeclarationIndex],
+                    clientFromSuccess
+                  )
+              }),
+              Cmd.action(updateRegistrarWorkqueue())
             ],
-            failActionCreator: (err) =>
-              downloadDeclarationFail(
-                err,
-                newDeclarationsAfterDownload[downloadingDeclarationIndex],
-                clientFromSuccess
-              )
-          })
+            { sequence: true }
+          )
         )
       }
 
@@ -1375,7 +1393,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       // Return state, write to indexedDB and download the next ready to download declaration, all in sequence
       return loop(
         newStateAfterDownload,
-        Cmd.list(
+        Cmd.list<IDownloadDeclarationFail | UpdateRegistrarWorkqueueAction>(
           [
             Cmd.run(writeDeclarationByUser, {
               args: [
@@ -1385,6 +1403,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
               ],
               failActionCreator: downloadDeclarationFail
             }),
+            Cmd.action(updateRegistrarWorkqueue()),
             Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(
               requestWithStateWrapper,
               {

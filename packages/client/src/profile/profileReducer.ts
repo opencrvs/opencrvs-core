@@ -28,13 +28,14 @@ import {
   removeToken
 } from '@client/utils/authUtils'
 
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import { GQLQuery, GQLUser } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from '@apollo/client'
 import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
+import { Query } from '@client/utils/gateway'
 
 export type ProfileState = {
   authenticated: boolean
@@ -124,11 +125,11 @@ export const profileReducer: LoopReducer<
         ])
       )
     case actions.SET_USER_DETAILS:
-      const result: ApolloQueryResult<GQLQuery> = action.payload
-      const data: GQLQuery = result && result.data
+      const result: ApolloQueryResult<Query> = action.payload
+      const data: Query = result && result.data
 
       if (data && data.getUser) {
-        const userDetails = getUserDetails(data.getUser)
+        const userDetails = getUserDetails(data.getUser as unknown as GQLUser)
 
         return loop(
           {

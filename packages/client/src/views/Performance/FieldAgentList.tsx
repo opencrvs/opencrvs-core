@@ -389,6 +389,7 @@ function FieldAgentListComponent(props: IProps) {
   }
   const skip = (currentPageNumber - 1) * 1
   queryVariables.skip = skip
+  // TODO: Do we really need FIELD_AGENT_AUDIT_LOCATIONS?
   return (
     <SysAdminContentWrapper
       id="field-agent-list"

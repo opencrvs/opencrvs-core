@@ -111,7 +111,6 @@ export const resolvers: GQLResolver = {
           {},
           authHeader
         )
-
         if (getTotalRequest.total >= system.settings.dailyQuota) {
           return await Promise.reject(new Error('Daily search quota exceeded'))
         }
@@ -170,14 +169,7 @@ export const resolvers: GQLResolver = {
           searchCriteria.sortColumn = sortColumn
         }
 
-        //register scope can search records of other locations
-        if (hasScope(authHeader, 'register')) {
-          const { declarationLocationId, ...restParam } =
-            advancedSearchParameters
-          searchCriteria.parameters = { ...restParam }
-        } else {
-          searchCriteria.parameters = { ...advancedSearchParameters }
-        }
+        searchCriteria.parameters = { ...advancedSearchParameters }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)

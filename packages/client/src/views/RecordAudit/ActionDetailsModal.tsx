@@ -425,17 +425,17 @@ export const ActionDetailsModalListTable = ({
         )}
 
       {/* Correction Requester */}
-      {actionDetailsData.requester && (
-        <Table
-          noResultText=" "
-          columns={requesterColumn}
-          content={[{ requester: requesterLabel }]}
-        />
-      )}
+      {actionDetailsData.requester &&
+        actionDetailsData.action === RegAction.RequestedCorrection && (
+          <Table
+            noResultText=" "
+            columns={requesterColumn}
+            content={[{ requester: requesterLabel }]}
+          />
+        )}
 
       {/* Correction Requester Id Verified */}
-      {(actionDetailsData.action === RegAction.RequestedCorrection ||
-        actionDetailsData.regStatus === RegStatus.Certified) &&
+      {actionDetailsData.action === RegAction.RequestedCorrection &&
         actionDetailsData.requester !== CorrectorRelationship.ANOTHER_AGENT &&
         actionDetailsData.requester !== CorrectorRelationship.REGISTRAR && (
           <Table
@@ -482,17 +482,19 @@ export const ActionDetailsModalListTable = ({
       )}
 
       {/* For Data Updated */}
-      {declarationUpdates.length > 0 && (
-        <Table
-          noResultText=" "
-          columns={declarationUpdatedColumns}
-          content={declarationUpdates}
-          pageSize={10}
-          totalItems={declarationUpdates.length}
-          currentPage={currentPage}
-          onPageChange={pageChangeHandler}
-        />
-      )}
+      {declarationUpdates.length > 0 &&
+        (actionDetailsData.action === RegAction.RequestedCorrection ||
+          actionDetailsData.regStatus === RegStatus.DeclarationUpdated) && (
+          <Table
+            noResultText=" "
+            columns={declarationUpdatedColumns}
+            content={declarationUpdates}
+            pageSize={10}
+            totalItems={declarationUpdates.length}
+            currentPage={currentPage}
+            onPageChange={pageChangeHandler}
+          />
+        )}
 
       {/* For Certificate */}
       {!isEmpty(collectorData) && (

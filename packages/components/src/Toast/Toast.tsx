@@ -90,7 +90,7 @@ const Close = styled(Button)`
 const NotificationMessage = styled(Text).attrs({
   color: 'white',
   variant: 'bold16',
-  element: 'p'
+  element: 'span'
 })`
   position: relative;
   width: 100%;
