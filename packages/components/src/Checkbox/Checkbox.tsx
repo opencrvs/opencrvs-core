@@ -14,11 +14,12 @@ import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
 
 const Wrapper = styled.li`
-  padding-bottom: 10px;
-  padding-top: 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   list-style-type: none;
   display: flex;
   align-items: center;
+  position: relative;
 `
 
 const Label = styled.label`
@@ -143,7 +144,6 @@ export class Checkbox extends React.Component<ICheckbox> {
           value={value}
           onChange={onChange}
           size={size === 'large' ? 40 : 16}
-          hidden={true}
         />
         <Check size={size}>
           {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
