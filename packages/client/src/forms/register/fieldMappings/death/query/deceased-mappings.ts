@@ -12,6 +12,8 @@
 
 import { IFormData, IFormField } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
+import { GQLDeathRegistration } from '@opencrvs/gateway/src/graphql/schema'
+import { capitalize } from 'lodash'
 
 export const deceasedAddressStateTransformer = (
   transformedData: IFormData,
@@ -66,3 +68,33 @@ export const deceasedAddressLocalityTransformer = (
   }
   transformedData[sectionId][field.name] = locality.name
 }
+
+export const deceasedAddressLineTransformer =
+  (addressType: string, type: 'RURAL' | 'URBAN', lineNumber: number) =>
+  (
+    transformedData: IFormData,
+    registration: GQLDeathRegistration,
+    sectionId: string,
+    field: IFormField
+  ) => {
+    const addressLine = registration.deceased?.address?.find(
+      (address) => address?.type === addressType
+    )?.line
+    if (
+      !addressLine ||
+      !Array.isArray(addressLine) ||
+      lineNumber < 1 ||
+      /**
+       * As for both rural, urban case, this same transformer
+       * is used, address type checking prevents overwriting
+       * the value while iterating over the fields in gqlToDraftTransformer
+       */
+      addressLine[addressLine.length - 1] !== type
+    )
+      return
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    const addressName = addressLine[lineNumber - 1] ?? ''
+    transformedData[sectionId][field.name] = capitalize(addressName)
+  }
