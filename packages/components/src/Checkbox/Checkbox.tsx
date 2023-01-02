@@ -59,6 +59,7 @@ const Check = styled.span<{ size?: string }>`
     transform: translate(-50%, -50%);
     transition: background 0.25s linear;
     -webkit-transition: background 0.25s linear;
+    border-radius: 2px;
   }
   &:focus {
     ${({ size }) =>
@@ -107,7 +108,7 @@ const Input = styled.input`
       box-sizing: content-box;
       border: 4px solid ${({ theme }) => theme.colors.grey600};
       box-shadow: ${({ theme, disabled }) => theme.colors.grey300} 0 0 0 8px;
-      border-radius: 4px;
+      border-radius: 6px;
     }
   }
 `
