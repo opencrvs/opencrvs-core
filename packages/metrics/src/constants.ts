@@ -46,3 +46,5 @@ export const mockFetchConfig = {
   ADDRESSES: 1
 }
 export const DEFAULT_TIMEOUT = 600000
+export const HEARTH_MONGO_URL =
+  process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'

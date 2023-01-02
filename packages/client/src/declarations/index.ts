@@ -1639,7 +1639,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
               'REGISTERED',
               'VALIDATED',
               'IN_PROGRESS',
-              'DECLARED'
+              'DECLARED',
+              'REJECTED'
             ].includes(status.type!)
           })?.type || ''
       newDeclarationsAfterDownload[downloadingDeclarationIndex] =

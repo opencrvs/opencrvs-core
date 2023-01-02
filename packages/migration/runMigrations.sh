@@ -13,10 +13,14 @@
 yarn migrate-mongo up --file migrate-mongo-config-hearth.js
 yarn migrate-mongo status --file migrate-mongo-config-hearth.js
 
-#openhim migrations
+# openhim migrations
 yarn migrate-mongo up --file migrate-mongo-config-openhim.js
 yarn migrate-mongo status --file migrate-mongo-config-openhim.js
 
-#application-config migrations
+# application-config migrations
 yarn migrate-mongo up --file migrate-mongo-config-application-config.js
 yarn migrate-mongo status --file migrate-mongo-config-application-config.js
+
+# analytics migrations
+yarn migrate-mongo up --file migrate-mongo-config-analytics.js
+yarn migrate-mongo status --file migrate-mongo-config-analytics.js

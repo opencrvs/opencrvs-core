@@ -14,10 +14,11 @@ import {
   ICON_ALIGNMENT,
   PrimaryButton,
   SuccessButton,
+  SecondaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
+import { Upload, Check, Cross, Archive } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
@@ -41,6 +42,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
     action: SubmissionAction
   ) => void
   rejectDeclarationAction?: () => void
+  onArchiveDeclaration?: () => void
 }
 
 const Container = styled.div`
@@ -63,6 +65,11 @@ const Content = styled.div`
     padding-bottom: 32px;
   }
 `
+
+const ArchieveButton = styled(SecondaryButton)`
+  height: 48px;
+`
+
 const UnderLayBackground = styled.div<{ background: string }>`
   background-color: ${({ background, theme }) =>
     background === 'success'
@@ -319,7 +326,8 @@ class ReviewActionComponent extends React.Component<
       submitDeclarationAction,
       draftDeclaration,
       rejectDeclarationAction,
-      intl
+      intl,
+      onArchiveDeclaration
     } = this.props
 
     const background = !completeDeclaration
@@ -399,6 +407,16 @@ class ReviewActionComponent extends React.Component<
               >
                 {intl.formatMessage(buttonMessages.reject)}
               </DangerButton>
+            )}
+            {onArchiveDeclaration && alreadyRejectedDeclaration && (
+              <ArchieveButton
+                id="archive_confirm"
+                align={ICON_ALIGNMENT.LEFT}
+                icon={() => <Archive color="currentColor" />}
+                onClick={onArchiveDeclaration}
+              >
+                {intl.formatMessage(buttonMessages.archive)}
+              </ArchieveButton>
             )}
           </ActionContainer>
         </Content>

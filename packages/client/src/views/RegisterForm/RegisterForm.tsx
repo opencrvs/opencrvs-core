@@ -39,7 +39,8 @@ import {
   modifyDeclaration,
   SUBMISSION_STATUS,
   writeDeclaration,
-  DOWNLOAD_STATUS
+  DOWNLOAD_STATUS,
+  archiveDeclaration as archiveDeclarationAction
 } from '@client/declarations'
 import {
   FormFieldGenerator,
@@ -184,6 +185,7 @@ export type RouteProps = RouteComponentProps<{
 type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
+  archiveDeclaration: typeof archiveDeclarationAction
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToHome: typeof goToHome
   goToHomeTab: typeof goToHomeTab
@@ -357,6 +359,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.props.modifyDeclaration(declaration)
   }
 
+  archiveDeclaration = (declaration: IDeclaration) => {
+    this.props.archiveDeclaration(declaration.id)
+    this.props.history.push(HOME)
+  }
   confirmSubmission = (
     declaration: IDeclaration,
     submissionStatus: string,
@@ -655,7 +661,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     }}
                     menuItems={[menuItemDeleteOrClose]}
                   />
+
                   <ReviewSection
+                    onArchiveDeclaration={() =>
+                      this.archiveDeclaration(declaration)
+                    }
                     pageRoute={this.props.pageRoute}
                     draft={declaration}
                     submitClickEvent={this.confirmSubmission}
@@ -689,7 +699,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                     />
                   )}
+
                   <ReviewSection
+                    onArchiveDeclaration={() =>
+                      this.archiveDeclaration(declaration)
+                    }
                     pageRoute={this.props.pageRoute}
                     draft={declaration}
                     rejectDeclarationClickEvent={this.toggleRejectForm}
@@ -1042,6 +1056,7 @@ export const RegisterForm = connect<
   writeDeclaration,
   modifyDeclaration,
   deleteDeclaration,
+  archiveDeclaration: archiveDeclarationAction,
   goToPageGroup: goToPageGroupAction,
   goBack: goBackAction,
   goToCertificateCorrection,
