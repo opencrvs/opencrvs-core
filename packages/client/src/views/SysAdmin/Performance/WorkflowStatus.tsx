@@ -66,7 +66,6 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import register from '@client/registerServiceWorker'
-import { useEffect } from 'react'
 
 type IDispatchProps = {
   goToSearchResult: typeof goToSearchResult
@@ -216,7 +215,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(
     'declarationStartedOn'
   )
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const pageSize = 10
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
@@ -227,13 +225,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     timeStart = historyState.timeStart
     timeEnd = historyState.timeEnd
   }
-  useEffect(() => {
-    const recordWindowWidth = () => {
-      setWindowWidth(window.innerWidth)
-    }
-    window.addEventListener('resize', recordWindowWidth)
-    return () => window.removeEventListener('resize', recordWindowWidth)
-  }, [])
 
   function toggleSort(key: keyof SortMap) {
     const invertedOrder =
