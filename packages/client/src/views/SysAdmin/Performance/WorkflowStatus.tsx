@@ -67,7 +67,6 @@ import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import register from '@client/registerServiceWorker'
 import { useEffect } from 'react'
-import { isMobileDevice } from '@client/utils/commonUtils'
 
 type IDispatchProps = {
   goToSearchResult: typeof goToSearchResult
@@ -246,12 +245,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   }
 
   function getColumns(): IColumn[] {
-    const mobileDevice = isMobileDevice()
     const keys = [
       {
         label: intl.formatMessage(constantsMessages.trackingId),
         key: 'id',
-        width: mobileDevice ? 30 : 12,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('id'),
         icon: columnToBeSort === 'id' ? <ArrowDownBlue /> : <></>,
@@ -260,7 +258,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.status),
         key: 'status',
-        width: mobileDevice ? 35 : 12,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('status'),
         icon: columnToBeSort === 'status' ? <ArrowDownBlue /> : <></>,
@@ -269,7 +267,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.eventType),
         key: 'eventType',
-        width: mobileDevice ? 20 : 8,
+        width: 8,
         isSortable: true,
         sortFunction: () => toggleSort('eventType'),
         icon: columnToBeSort === 'eventType' ? <ArrowDownBlue /> : <></>,
@@ -278,7 +276,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.name),
         key: 'nameIntl',
-        width: mobileDevice ? 35 : 12,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('nameIntl'),
         icon: columnToBeSort === 'nameIntl' ? <ArrowDownBlue /> : <></>,
@@ -287,7 +285,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(formMessages.informantName),
         key: 'informant',
-        width: mobileDevice ? 40 : 14,
+        width: 14,
         isSortable: true,
         sortFunction: () => toggleSort('informant'),
         icon: columnToBeSort === 'informant' ? <ArrowDownBlue /> : <></>,
@@ -296,7 +294,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.declarationStarted),
         key: 'declarationStartedOn',
-        width: mobileDevice ? 35 : 10,
+        width: 10,
         isSortable: true,
         sortFunction: () => toggleSort('declarationStartedOn'),
         icon:
@@ -306,7 +304,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.declarationStartedBy),
         key: 'declarationStartedBy',
-        width: mobileDevice ? 35 : 10,
+        width: 10,
         isSortable: true,
         sortFunction: () => toggleSort('declarationStartedBy'),
         icon:
@@ -316,7 +314,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.eventDate),
         key: 'dateOfEvent',
-        width: mobileDevice ? 35 : 12,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('dateOfEvent'),
         icon: columnToBeSort === 'dateOfEvent' ? <ArrowDownBlue /> : <></>,
@@ -325,7 +323,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeInProgress),
         key: 'timeLoggedInProgress',
-        width: mobileDevice ? 35 : 12,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedInProgress'),
         icon:
@@ -335,7 +333,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeReadyForReview),
         key: 'timeLoggedDeclared',
-        width: mobileDevice ? 35 : 12,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedDeclared'),
         icon:
@@ -345,7 +343,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeRequireUpdates),
         key: 'timeLoggedRejected',
-        width: mobileDevice ? 35 : 12,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRejected'),
         icon:
@@ -355,7 +353,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeWatingApproval),
         key: 'timeLoggedValidated',
-        width: mobileDevice ? 35 : 12,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedValidated'),
         icon:
@@ -367,7 +365,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           constantsMessages.timeWaitingExternalValidation
         ),
         key: 'timeLoggedWaitingValidation',
-        width: mobileDevice ? 35 : 12,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedWaitingValidation'),
         icon:
@@ -382,7 +380,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeReadyToPrint),
         key: 'timeLoggedRegistered',
-        width: mobileDevice ? 35 : 12,
+        width: 12,
         alignment: ColumnContentAlignment.LEFT,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRegistered'),
@@ -816,6 +814,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   columns={getColumns()}
                   isLoading={loading || Boolean(error)}
                   noResultText={intl.formatMessage(constantsMessages.noResults)}
+                  fixedWidth={2050}
                   tableHeight={150}
                   highlightRowOnMouseOver
                   noPagination
