@@ -129,6 +129,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         }
       }
       ... on BirthRegistration {
+        _fhirIDMap
         child {
           id
           name {
@@ -259,6 +260,7 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         }
       }
       ... on DeathRegistration {
+        _fhirIDMap
         deceased {
           id
           name {

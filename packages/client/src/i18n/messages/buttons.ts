@@ -23,6 +23,7 @@ interface IButtonsMessages
   configure: MessageDescriptor
   continueButton: MessageDescriptor
   createUser: MessageDescriptor
+  create: MessageDescriptor
   deactivate: MessageDescriptor
   delete: MessageDescriptor
   edit: MessageDescriptor
@@ -45,6 +46,7 @@ interface IButtonsMessages
   retry: MessageDescriptor
   review: MessageDescriptor
   save: MessageDescriptor
+  refresh: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteDeclaration: MessageDescriptor
   closeDeclaration: MessageDescriptor
@@ -68,6 +70,9 @@ interface IButtonsMessages
   makeCorrection: MessageDescriptor
   publish: MessageDescriptor
   add: MessageDescriptor
+  copy: MessageDescriptor
+  copied: MessageDescriptor
+  exactDateUnknown: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -120,6 +125,12 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Continue',
     description: 'Continue Button Text',
     id: 'buttons.continue'
+  },
+
+  create: {
+    defaultMessage: 'Create',
+    description: 'Label for submit button of client integration creation form',
+    id: 'buttons.create'
   },
   createUser: {
     defaultMessage: 'Create user',
@@ -236,6 +247,13 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Review button text',
     id: 'buttons.review'
   },
+
+  refresh: {
+    defaultMessage: 'Refresh',
+    description: 'Refresh button',
+    id: 'buttons.refresh'
+  },
+
   save: {
     defaultMessage: 'Save',
     description: 'Save Button Text',
@@ -355,6 +373,22 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.add',
     defaultMessage: 'Add',
     description: 'Add button text on form config'
+  },
+  copy: {
+    id: 'buttons.copy',
+    defaultMessage: 'Copy',
+    description: 'Copy button text'
+  },
+  copied: {
+    id: 'buttons.copied',
+    defaultMessage: 'Copied',
+    description: 'Copied button text'
+  },
+  exactDateUnknown: {
+    id: 'buttons.exactDateUnknown',
+    defaultMessage: 'Exact date unknown',
+    description:
+      'Label for DateRangePickerForFormField components daterangepicker toggle button'
   }
 }
 

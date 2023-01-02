@@ -46,6 +46,7 @@ import {
   FHIR_URL,
   SEARCH_URL,
   METRICS_URL,
+  HEARTH_URL,
   DOCUMENTS_URL
 } from '@gateway/constants'
 import { IAuthHeader } from '@gateway/common-types'
@@ -73,7 +74,6 @@ import {
   GQLRegStatus
 } from '@gateway/graphql/schema'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
-
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
@@ -82,7 +82,6 @@ export interface IEventDurationResponse {
   status: string
   durationInSeconds: number
 }
-
 export function findCompositionSectionInBundle(
   code: string,
   fhirBundle: ITemplatedBundle
@@ -1047,6 +1046,52 @@ export const fetchFHIR = <T = any>(
     })
 }
 
+export const fetchFromHearth = <T = any>(
+  suffix: string,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  return fetch(`${HEARTH_URL}${suffix}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    },
+    body
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`FHIR with Hearth request failed: ${error.message}`)
+      )
+    })
+}
+
+export const sendToFhir = async (
+  body: string,
+  suffix: string,
+  method: string,
+  token: string
+) => {
+  return fetch(`${FHIR_URL}${suffix}`, {
+    method,
+    body,
+    headers: {
+      'Content-Type': 'application/fhir+json',
+      Authorization: `${token}`
+    }
+  })
+    .then((response) => {
+      return response
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`FHIR ${method} failed: ${error.message}`)
+      )
+    })
+}
+
 export async function postAssignmentSearch(
   authHeader: IAuthHeader,
   compositionId: string
@@ -1065,28 +1110,6 @@ export async function postAssignmentSearch(
     .catch((error) => {
       return Promise.reject(
         new Error(`Search assignment failed: ${error.message}`)
-      )
-    })
-}
-
-export const postSearch = (
-  authHeader: IAuthHeader,
-  criteria: ISearchCriteria
-) => {
-  return fetch(`${SEARCH_URL}search`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    },
-    body: JSON.stringify(criteria)
-  })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Search request failed: ${error.message}`)
       )
     })
 }
@@ -1357,7 +1380,6 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
     findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
   return extension
 }
-
 export const fetchDocuments = async <T = any>(
   suffix: string,
   authHeader: IAuthHeader,

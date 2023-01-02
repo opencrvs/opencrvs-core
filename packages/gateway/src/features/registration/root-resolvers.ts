@@ -221,11 +221,11 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'performance')
       ) {
         const payload: {
-          declarationLocationHirarchyId?: string
+          declarationJurisdictionId?: string
           status: string[]
           event?: string
         } = {
-          declarationLocationHirarchyId: locationId,
+          declarationJurisdictionId: locationId,
           status: status as string[],
           event
         }
@@ -544,7 +544,6 @@ async function createEventRegistration(
       return await getDeclarationIds(duplicateCompostion, authHeader)
     }
   }
-
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
@@ -706,7 +705,6 @@ export async function markRecordAsDownloadedOrAssigned(
   const taskBundle = taskBundleWithExtension(taskEntry, extension)
 
   await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
-
   // return the full composition
   return fetchFHIR(`/Composition/${id}`, authHeader)
 }

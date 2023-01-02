@@ -138,18 +138,18 @@ export const ViewRecord = () => {
   const { declarationId } = useParams<{ declarationId: string }>()
 
   const { loading, error, data } = useQuery(FETCH_VIEW_RECORD_BY_COMPOSITION, {
-    variables: { id: declarationId }
+    variables: { id: declarationId },
+    fetchPolicy: 'network-only'
   })
 
   if (loading) return <LoadingState />
 
   if (error) return <GenericErrorToast />
 
-  const eventType =
-    data?.fetchRegistrationForViewing?.__typename === 'BirthRegistration'
-      ? Event.Birth
-      : Event.Death
   const eventData = data?.fetchRegistrationForViewing
+  const eventType =
+    data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as Event
+
   const transData: IFormData = gqlToDraftTransformer(
     form[eventType],
     data?.fetchRegistrationForViewing,

@@ -41,3 +41,27 @@ export const CREATE_FORM_DRAFT = gql`
     }
   }
 `
+
+export const CREATE_FORM_DATA_SET = gql`
+  mutation createFormDataset($formDataset: FormDatasetInput!) {
+    createFormDataset(formDataset: $formDataset) {
+      status
+      msg
+      data {
+        options {
+          value
+          label {
+            lang
+            descriptor {
+              id
+              defaultMessage
+            }
+          }
+        }
+        fileName
+        createdAt
+        _id
+      }
+    }
+  }
+`

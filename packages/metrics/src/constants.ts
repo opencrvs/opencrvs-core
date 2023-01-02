@@ -40,8 +40,8 @@ export const VS_EXPORT_SCRIPT_PATH =
 export const BIRTH_REPORT_PATH =
   process.env.NODE_ENV === 'production'
     ? '/usr/src/app/packages/metrics/src/scripts/Birth_Report.csv'
-    : join(__dirname, '../../scripts/Birth_Report.csv')
+    : join(__dirname, '../src/scripts/Birth_Report.csv')
 export const DEATH_REPORT_PATH =
   process.env.NODE_ENV === 'production'
     ? '/usr/src/app/packages/metrics/src/scripts/Death_Report.csv'
-    : join(__dirname, '../../scripts/Death_Report.csv')
+    : join(__dirname, '../src/scripts/Death_Report.csv')

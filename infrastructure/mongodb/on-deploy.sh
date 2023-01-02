@@ -63,7 +63,7 @@ function checkIfUserExists {
 # Rotate passwords to match the ones given to this script or create new users
 
 CONFIG_USER=$(echo $(checkIfUserExists "config"))
-if [[ $CONFIG_USER != *"FOUND"* ]]; then
+if [[ $CONFIG_USER != "FOUND" ]]; then
   echo "config user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use application-config
@@ -84,7 +84,7 @@ EOF
 fi
 
 HEARTH_USER=$(echo $(checkIfUserExists "hearth"))
-if [[ $HEARTH_USER != *"FOUND"* ]]; then
+if [[ $HEARTH_USER != "FOUND" ]]; then
   echo "hearth user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use hearth-dev
@@ -105,7 +105,7 @@ EOF
 fi
 
 USER_MGNT_USER=$(echo $(checkIfUserExists "user-mgnt"))
-if [[ $USER_MGNT_USER != *"FOUND"* ]]; then
+if [[ $USER_MGNT_USER != "FOUND" ]]; then
   echo "user-mgnt user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use user-mgnt
@@ -126,7 +126,7 @@ EOF
 fi
 
 OPENHIM_USER=$(echo $(checkIfUserExists "openhim"))
-if [[ $OPENHIM_USER != *"FOUND"* ]]; then
+if [[ $OPENHIM_USER != "FOUND" ]]; then
   echo "openhim user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use openhim-dev
@@ -147,7 +147,7 @@ EOF
 fi
 
 METRICS_USER=$(echo $(checkIfUserExists "metrics"))
-if [[ $METRICS_USER != *"FOUND"* ]]; then
+if [[ $METRICS_USER != "FOUND" ]]; then
   echo "metrics user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use metrics
@@ -168,7 +168,7 @@ EOF
 fi
 
 WEBHOOKS_USER=$(echo $(checkIfUserExists "webhooks"))
-if [[ $WEBHOOKS_USER != *"FOUND"* ]]; then
+if [[ $WEBHOOKS_USER != "FOUND" ]]; then
   echo "webhooks user not found"
   mongo $(mongo_credentials) --host $HOST <<EOF
   use webhooks

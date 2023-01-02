@@ -24,42 +24,42 @@ interface ILocationMessages
 const messagesToDefine: ILocationMessages = {
   /* UNION & DIVISION is needed for unit tests. Can be removed after the tests are refactored */
   UNION: {
-    id: 'location.jurisdictionType.UNION',
+    id: 'form.field.label.UNION',
     defaultMessage: 'Union',
     description: 'Label for Union'
   },
   DIVISION: {
-    id: 'location.jurisdictionType.DIVISION',
+    id: 'form.field.label.DIVISION',
     defaultMessage: 'Division',
     description: 'Label for Division'
   },
   DISTRICT: {
-    id: 'location.jurisdictionType.DISTRICT',
+    id: 'form.field.label.district',
     defaultMessage: 'District',
     description: 'Label for District'
   },
   CITY: {
-    id: 'location.jurisdictionType.CITY',
+    id: 'form.field.label.cityUrbanOption',
     defaultMessage: 'City',
     description: 'Label for City'
   },
   STATE: {
-    id: 'location.jurisdictionType.STATE',
+    id: 'form.field.label.state',
     defaultMessage: 'State',
     description: 'Label for State'
   },
   LOCATION_LEVEL_3: {
-    id: 'location.jurisdictionType.LOCATION_LEVEL_3',
+    id: 'form.field.label.locationLevel3',
     defaultMessage: 'Location Level 3',
     description: 'Label for locationLevel3'
   },
   LOCATION_LEVEL_4: {
-    id: 'location.jurisdictionType.LOCATION_LEVEL_4',
+    id: 'form.field.label.locationLevel4',
     defaultMessage: 'Location Level 4',
     description: 'Label for locationLevel4'
   },
   LOCATION_LEVEL_5: {
-    id: 'location.jurisdictionType.LOCATION_LEVEL_5',
+    id: 'form.field.label.locationLevel5',
     defaultMessage: 'Location Level 5',
     description: 'Label for locationLevel5'
   }
