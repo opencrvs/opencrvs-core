@@ -666,7 +666,7 @@ function RegistrationListComponent(props: IProps) {
                       noResultText={intl.formatMessage(
                         constantsMessages.noResults
                       )}
-                      fixedWidth={994}
+                      fixedWidth={1200}
                       isLoading={loading}
                       disableScrollOnOverflow={true}
                       columns={getColumns()}
