@@ -9,23 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled from '@client/styledComponents'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { FormFieldGenerator } from '@client/components/form'
-import { IFormSectionData, SubmissionAction } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { hasFormError } from '@client/forms/utils'
-import { IRejectRegistrationForm } from '@opencrvs/client/src/review/reject-registration'
-import { getRejectForm } from '@opencrvs/client/src/review/selectors'
-import { IStoreState } from '@opencrvs/client/src/store'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
 import { IDeclaration, IPayload, SUBMISSION_STATUS } from '@client/declarations'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { goToSearchResult } from '@client/navigation'
+import { IFormSectionData, SubmissionAction } from '@client/forms'
+import { hasFormError } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/reject'
+import styled from '@client/styledComponents'
+import { Event } from '@client/utils/gateway'
+import {
+  IRejectRegistrationForm,
+  rejectRegistration
+} from '@opencrvs/client/src/review/reject-registration'
+import { IStoreState } from '@opencrvs/client/src/store'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
@@ -152,12 +153,6 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 }
 
-export const RejectRegistrationForm = connect(
-  (state: IStoreState) => ({
-    language: state.i18n.language,
-    form: getRejectForm(state)
-  }),
-  {
-    goToSearchResult
-  }
-)(injectIntl(RejectRegistrationView))
+export const RejectRegistrationForm = connect((state: IStoreState) => ({
+  form: rejectRegistration
+}))(injectIntl(RejectRegistrationView))

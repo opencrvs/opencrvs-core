@@ -34,7 +34,7 @@ const messagesToDefine: IRejectMessages = {
   rejectionFormInstruction: {
     id: 'review.rejection.form.instruction',
     defaultMessage:
-      'Please document specific details of required updates for follow up action.',
+      'Please describe the updates required to this record for follow up action.',
     description: 'Rejection form instruction'
   },
   rejectionReasonSubmit: {
