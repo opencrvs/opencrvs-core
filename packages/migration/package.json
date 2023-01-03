@@ -24,6 +24,7 @@
     "influx": "^5.0.7",
     "minio": "^7.0.30",
     "file-type": "^16.5.3",
+    "uuid": "^3.2.1",
     "@elastic/elasticsearch": "7.17.0"
   },
   "devDependencies": {
