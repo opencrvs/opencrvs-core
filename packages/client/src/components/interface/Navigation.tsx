@@ -425,9 +425,6 @@ export const NavigationView = (props: IFullProps) => {
               }}
             />
           </NavigationGroup>
-          {menuCollapse && (
-            <NavigationGroup>{getSettingsAndLogout(props)}</NavigationGroup>
-          )}
         </>
       ) : (
         <>
@@ -697,46 +694,49 @@ export const NavigationView = (props: IFullProps) => {
                       )}
                     </>
                   )}
-                {menuCollapse && getSettingsAndLogout(props)}
               </NavigationGroup>
             )}
         </>
       )}
-
-      {userDetails?.searches && userDetails?.searches.length > 0 ? (
-        userDetails?.searches.map((bookmarkResult, index) => {
-          return (
-            <NavigationItem
-              icon={() => (
-                <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
-              )}
-              id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
-              label={bookmarkResult.name}
-              disabled={
-                advancedSearchParams.searchId === bookmarkResult.searchId &&
-                props.location.pathname === ADVANCED_SEARCH_RESULT
-              }
-              onClick={() => {
-                const filteredParam = omit(
-                  bookmarkResult.parameters,
-                  '__typename'
-                ) as IAdvancedSearchParamState
-                setAdvancedSearchParam({
-                  ...filteredParam,
-                  searchId: bookmarkResult.searchId
-                })
-                goToAdvancedSearchResultAction()
-              }}
-              isSelected={
-                advancedSearchParams.searchId === bookmarkResult.searchId &&
-                props.location.pathname === ADVANCED_SEARCH_RESULT
-              }
-            />
-          )
-        })
-      ) : (
-        <></>
-      )}
+      <NavigationGroup>
+        {userDetails?.searches && userDetails?.searches.length > 0 ? (
+          userDetails?.searches.map((bookmarkResult, index) => {
+            return (
+              <NavigationItem
+                icon={() => (
+                  <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
+                )}
+                id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
+                label={bookmarkResult.name}
+                disabled={
+                  advancedSearchParams.searchId === bookmarkResult.searchId &&
+                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                }
+                onClick={() => {
+                  const filteredParam = omit(
+                    bookmarkResult.parameters,
+                    '__typename'
+                  ) as IAdvancedSearchParamState
+                  setAdvancedSearchParam({
+                    ...filteredParam,
+                    searchId: bookmarkResult.searchId
+                  })
+                  goToAdvancedSearchResultAction()
+                }}
+                isSelected={
+                  advancedSearchParams.searchId === bookmarkResult.searchId &&
+                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                }
+              />
+            )
+          })
+        ) : (
+          <></>
+        )}
+      </NavigationGroup>
+      <NavigationGroup>
+        {menuCollapse && getSettingsAndLogout(props)}
+      </NavigationGroup>
     </LeftNavigation>
   )
 }

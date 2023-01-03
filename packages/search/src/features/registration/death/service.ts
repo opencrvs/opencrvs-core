@@ -181,7 +181,7 @@ async function createDeceasedIndex(
     bundleEntries
   ) as fhir.Patient
 
-  await addEventLocation(body, DEATH_ENCOUNTER_CODE, composition, bundleEntries)
+  await addEventLocation(body, DEATH_ENCOUNTER_CODE, composition)
 
   const deceasedName = deceased && findName(NAME_EN, deceased.name)
   const deceasedNameLocal = deceased && findNameLocale(deceased.name)

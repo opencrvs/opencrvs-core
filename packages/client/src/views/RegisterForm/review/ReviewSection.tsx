@@ -403,9 +403,47 @@ const renderValue = (
   field: IFormField,
   intl: IntlShape,
   offlineCountryConfiguration: IOfflineData,
-  language: string
+  language: string,
+  isOriginalData = false
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+
+  // Showing State & District Name instead of their ID
+  if (
+    [
+      'statePrimary',
+      'districtPrimary',
+      'internationalStatePrimary',
+      'internationalDistrictPrimary'
+    ].includes(field.name) &&
+    isOriginalData
+  ) {
+    const sectionData = draftData[sectionId]
+
+    if (sectionData.countryPrimary === window.config.COUNTRY) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
+      }
+      dynamicOption.dependency = [
+        'internationalStatePrimary',
+        'statePrimary'
+      ].includes(field.name)
+        ? 'countryPrimary'
+        : 'statePrimary'
+
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineCountryConfiguration,
+        language
+      )
+    }
+
+    return value
+  }
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
@@ -932,7 +970,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean,
-    replaceEmpty?: boolean
+    replaceEmpty?: boolean,
+    isOriginalData?: boolean
   ) => {
     const { intl, offlineCountryConfiguration, language } = this.props
 
@@ -942,7 +981,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field,
       intl,
       offlineCountryConfiguration,
-      language
+      language,
+      isOriginalData
     )
 
     if (replaceEmpty && !value) {
@@ -978,7 +1018,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 nestedField,
                 intl,
                 offlineCountryConfiguration,
-                language
+                language,
+                isOriginalData
               )) ||
             ''
           return (
@@ -1113,7 +1154,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               errorsOnFields,
               undefined,
-              !index
+              !index,
+              true
             )
           )
           .filter((value) => value)
