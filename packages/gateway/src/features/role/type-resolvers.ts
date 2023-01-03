@@ -12,24 +12,29 @@
 import { GQLResolver } from '@gateway/graphql/schema'
 import { IMongoComparisonObject } from '@gateway/features/role/utils'
 
+type Role = {
+  lang: string
+  label: string
+}
+
 interface IRoleModelData {
   _id: string
   title: string
   value: string
-  types: string[]
+  roles: Role[]
   active: boolean
 }
 
 export interface IRoleSearchPayload {
   title?: string
   value?: IMongoComparisonObject
-  type?: string
+  role?: string
   active?: boolean
   sortBy?: string
   sortOrder?: string
 }
 export const roleTypeResolvers: GQLResolver = {
-  Role: {
+  SystemRole: {
     id(roleModel: IRoleModelData) {
       return roleModel._id
     }

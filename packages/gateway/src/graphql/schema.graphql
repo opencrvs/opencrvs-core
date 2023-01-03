@@ -139,11 +139,11 @@ type Query {
   getRoles(
     title: String
     value: ComparisonInput
-    type: String
+    role: String
     active: Boolean
     sortBy: String
     sortOrder: String
-  ): [Role]
+  ): [SystemRole]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
@@ -537,11 +537,10 @@ type EventProgressResultSet {
   totalItems: Int
 }
 
-type Role {
+type SystemRole {
   id: ID!
-  title: String
   value: String
-  types: [String]
+  roles: [Role]
   active: Boolean
 }
 
@@ -1111,6 +1110,11 @@ type EventProgressSet {
   startedByFacility: String
   startedAt: Date
   progressReport: EventProgressData
+}
+
+type Role {
+  lang: String
+  label: String
 }
 
 enum DraftStatus {

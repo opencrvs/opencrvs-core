@@ -46,7 +46,7 @@ export interface GQLQuery {
   getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
-  getRoles?: Array<GQLRole | null>
+  getRoles?: Array<GQLSystemRole | null>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getFormDraft?: Array<GQLFormDraft>
@@ -420,11 +420,10 @@ export interface GQLEventProgressResultSet {
   totalItems?: number
 }
 
-export interface GQLRole {
+export interface GQLSystemRole {
   id: string
-  title?: string
   value?: string
-  types?: Array<string | null>
+  roles?: Array<GQLRole | null>
   active?: boolean
 }
 
@@ -1016,6 +1015,11 @@ export interface GQLEventProgressSet {
   startedByFacility?: string
   startedAt?: GQLDate
   progressReport?: GQLEventProgressData
+}
+
+export interface GQLRole {
+  lang?: string
+  label?: string
 }
 
 export const enum GQLDraftStatus {
@@ -1782,7 +1786,7 @@ export interface GQLResolver {
   UserAuditLogResultSet?: GQLUserAuditLogResultSetTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
-  Role?: GQLRoleTypeResolver
+  SystemRole?: GQLSystemRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   FormDraft?: GQLFormDraftTypeResolver
   System?: GQLSystemTypeResolver
@@ -1827,6 +1831,7 @@ export interface GQLResolver {
   }
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
+  Role?: GQLRoleTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   FormDatasetOption?: GQLFormDatasetOptionTypeResolver
@@ -2455,7 +2460,7 @@ export interface QueryToGetEventsWithProgressResolver<
 export interface QueryToGetRolesArgs {
   title?: string
   value?: GQLComparisonInput
-  type?: string
+  role?: string
   active?: boolean
   sortBy?: string
   sortOrder?: string
@@ -4338,31 +4343,26 @@ export interface EventProgressResultSetToTotalItemsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLRoleTypeResolver<TParent = any> {
-  id?: RoleToIdResolver<TParent>
-  title?: RoleToTitleResolver<TParent>
-  value?: RoleToValueResolver<TParent>
-  types?: RoleToTypesResolver<TParent>
-  active?: RoleToActiveResolver<TParent>
+export interface GQLSystemRoleTypeResolver<TParent = any> {
+  id?: SystemRoleToIdResolver<TParent>
+  value?: SystemRoleToValueResolver<TParent>
+  roles?: SystemRoleToRolesResolver<TParent>
+  active?: SystemRoleToActiveResolver<TParent>
 }
 
-export interface RoleToIdResolver<TParent = any, TResult = any> {
+export interface SystemRoleToIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToTitleResolver<TParent = any, TResult = any> {
+export interface SystemRoleToValueResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToValueResolver<TParent = any, TResult = any> {
+export interface SystemRoleToRolesResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToTypesResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface RoleToActiveResolver<TParent = any, TResult = any> {
+export interface SystemRoleToActiveResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5695,6 +5695,19 @@ export interface EventProgressSetToProgressReportResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLRoleTypeResolver<TParent = any> {
+  lang?: RoleToLangResolver<TParent>
+  label?: RoleToLabelResolver<TParent>
+}
+
+export interface RoleToLangResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RoleToLabelResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

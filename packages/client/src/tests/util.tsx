@@ -2279,34 +2279,126 @@ export const mockFetchRoleGraphqlOperation = {
     data: {
       getRoles: [
         {
-          title: 'Field Agent',
           value: 'FIELD_AGENT',
-          types: ['HOSPITAL', 'CHA']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Healthcare Worker'
+            },
+            {
+              lang: 'fr',
+              label: 'Professionnel de Santé'
+            },
+            {
+              lang: 'en',
+              label: 'Police Officer'
+            },
+            {
+              lang: 'fr',
+              label: 'Agent de Police'
+            },
+            {
+              lang: 'en',
+              label: 'Social Worker'
+            },
+            {
+              lang: 'fr',
+              label: 'Travailleur Social'
+            },
+            {
+              lang: 'en',
+              label: 'Local Leader'
+            },
+            {
+              lang: 'fr',
+              label: 'Leader Local'
+            }
+          ],
+          active: true
         },
         {
-          title: 'Registration Agent',
           value: 'REGISTRATION_AGENT',
-          types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Registration Agent'
+            },
+            {
+              lang: 'fr',
+              label: "Agent d'enregistrement"
+            }
+          ],
+          active: true
         },
         {
-          title: 'Registrar',
           value: 'LOCAL_REGISTRAR',
-          types: ['SECRETARY', 'CHAIRMAN', 'MAYOR']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Local Registrar'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local'
+            }
+          ],
+          active: true
         },
         {
-          title: 'System admin (local)',
           value: 'LOCAL_SYSTEM_ADMIN',
-          types: ['LOCAL_SYSTEM_ADMIN']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Local System_admin'
+            },
+            {
+              lang: 'fr',
+              label: 'Administrateur système local'
+            }
+          ],
+          active: true
         },
         {
-          title: 'System admin (national)',
           value: 'NATIONAL_SYSTEM_ADMIN',
-          types: ['NATIONAL_SYSTEM_ADMIN']
+          roles: [
+            {
+              lang: 'en',
+              label: 'National System_admin'
+            },
+            {
+              lang: 'fr',
+              label: 'Administrateur système national'
+            }
+          ],
+          active: true
         },
         {
-          title: 'Performance Management',
           value: 'PERFORMANCE_MANAGEMENT',
-          types: ['HEALTH_DIVISION', 'ORG_DIVISION']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Performance Management'
+            },
+            {
+              lang: 'fr',
+              label: 'Gestion des performances'
+            }
+          ],
+          active: true
+        },
+        {
+          value: 'NATIONAL_REGISTRAR',
+          roles: [
+            {
+              lang: 'en',
+              label: 'National Registrar'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire national'
+            }
+          ],
+          active: true
         }
       ]
     }

@@ -16,7 +16,10 @@ export const getRolesQuery = gql`
   query getRoles($value: ComparisonInput) {
     getRoles(active: true, value: $value) {
       value
-      types
+      roles {
+        lang
+        label
+      }
     }
   }
 `

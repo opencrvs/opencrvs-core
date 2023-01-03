@@ -93,7 +93,7 @@ export async function alterRolesBasedOnUserRole(
   const userDetails = getUserDetails(getState())
   const roleSearchCriteria = getRoleSearchCriteria(userDetails?.systemRole)
   const roleData = await roleQueries.fetchRoles(roleSearchCriteria)
-  const roles = roleData.data.getRoles as Array<GQLRole>
+  const roles = roleData.data.getRoles.roles as Array<GQLRole>
 
   // This is a legacy function that allows you to filter available roles
   // It was used if some countries want to customise role types such as MAYOR

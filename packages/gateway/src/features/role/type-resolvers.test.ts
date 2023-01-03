@@ -21,12 +21,135 @@ describe('Role type resolvers', () => {
     _id: 'ba7022f0ff4822',
     title: 'Field Agent',
     value: 'FIELD_AGENT',
-    types: ['Hospital', 'CHA'],
+    roles: [
+      {
+        value: 'FIELD_AGENT',
+        roles: [
+          {
+            lang: 'en',
+            label: 'Healthcare Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Professionnel de Santé'
+          },
+          {
+            lang: 'en',
+            label: 'Police Officer'
+          },
+          {
+            lang: 'fr',
+            label: 'Agent de Police'
+          },
+          {
+            lang: 'en',
+            label: 'Social Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Travailleur Social'
+          },
+          {
+            lang: 'en',
+            label: 'Local Leader'
+          },
+          {
+            lang: 'fr',
+            label: 'Leader Local'
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'REGISTRATION_AGENT',
+        roles: [
+          {
+            lang: 'en',
+            label: 'Registration Agent'
+          },
+          {
+            lang: 'fr',
+            label: "Agent d'enregistrement"
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'LOCAL_REGISTRAR',
+        roles: [
+          {
+            lang: 'en',
+            label: 'Local Registrar'
+          },
+          {
+            lang: 'fr',
+            label: 'Registraire local'
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'LOCAL_SYSTEM_ADMIN',
+        roles: [
+          {
+            lang: 'en',
+            label: 'Local System_admin'
+          },
+          {
+            lang: 'fr',
+            label: 'Administrateur système local'
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'NATIONAL_SYSTEM_ADMIN',
+        roles: [
+          {
+            lang: 'en',
+            label: 'National System_admin'
+          },
+          {
+            lang: 'fr',
+            label: 'Administrateur système national'
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'PERFORMANCE_MANAGEMENT',
+        roles: [
+          {
+            lang: 'en',
+            label: 'Performance Management'
+          },
+          {
+            lang: 'fr',
+            label: 'Gestion des performances'
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'NATIONAL_REGISTRAR',
+        roles: [
+          {
+            lang: 'en',
+            label: 'National Registrar'
+          },
+          {
+            lang: 'fr',
+            label: 'Registraire national'
+          }
+        ],
+        active: true
+      }
+    ],
     active: true,
     creationDate: 1559054406433
   }
   it('return id type', () => {
-    const res = roleTypeResolvers.Role.id(mockResponse)
+    const res = roleTypeResolvers.SystemRole.id(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
   })
 })

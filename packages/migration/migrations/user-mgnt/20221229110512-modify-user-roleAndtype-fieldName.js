@@ -94,6 +94,8 @@ export const up = async (db, client) => {
     await db.collection('roles').updateMany({}, { $rename: { types: 'roles' } })
     //remove 'title' field from all 'roles' collection documents
     await db.collection('roles').updateMany({}, { $unset: { title: 1 } })
+    //rename 'roles' collection name to 'systemroles'
+    await db.collection('roles').renameCollection('systemroles')
   } finally {
     await session.endSession()
   }
@@ -137,7 +139,6 @@ export const down = async (db, client) => {
             const newType = role.types
               .filter((role) => role.lang === 'en')
               .map((role) => role.label.toUpperCase().replace(/ /g, '_'))
-            console.log('newType', newType)
             await db
               .collection('roles')
               .updateOne({ _id: role._id }, { $set: { types: newType } })
@@ -149,6 +150,8 @@ export const down = async (db, client) => {
     await db
       .collection('roles')
       .updateMany({ value: { $ne: 'FIELD_AGENT' } }, { $set: { types: '' } })
+    //rename 'systemroles' collection name to 'roles'
+    await db.collection('roles').renameCollection('roles')
   } finally {
     await session.endSession()
   }

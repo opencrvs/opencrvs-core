@@ -31,25 +31,126 @@ const token = jwt.sign(
 )
 const dummyRoleList = [
   {
-    title: 'Field Agent',
     value: 'FIELD_AGENT',
-    types: ['Hospital', 'CHA'],
-    active: true,
-    creationDate: 1559054406433
+    roles: [
+      {
+        lang: 'en',
+        label: 'Healthcare Worker'
+      },
+      {
+        lang: 'fr',
+        label: 'Professionnel de Santé'
+      },
+      {
+        lang: 'en',
+        label: 'Police Officer'
+      },
+      {
+        lang: 'fr',
+        label: 'Agent de Police'
+      },
+      {
+        lang: 'en',
+        label: 'Social Worker'
+      },
+      {
+        lang: 'fr',
+        label: 'Travailleur Social'
+      },
+      {
+        lang: 'en',
+        label: 'Local Leader'
+      },
+      {
+        lang: 'fr',
+        label: 'Leader Local'
+      }
+    ],
+    active: true
   },
   {
-    title: 'Registration Agent',
     value: 'REGISTRATION_AGENT',
-    types: ['Entrepeneur', 'Data entry clerk'],
-    active: true,
-    creationDate: 1559054406444
+    roles: [
+      {
+        lang: 'en',
+        label: 'Registration Agent'
+      },
+      {
+        lang: 'fr',
+        label: "Agent d'enregistrement"
+      }
+    ],
+    active: true
   },
   {
-    title: 'Registrar',
     value: 'LOCAL_REGISTRAR',
-    types: ['Secretary', 'Chairman', 'Mayor'],
-    active: true,
-    creationDate: 1559054406455
+    roles: [
+      {
+        lang: 'en',
+        label: 'Local Registrar'
+      },
+      {
+        lang: 'fr',
+        label: 'Registraire local'
+      }
+    ],
+    active: true
+  },
+  {
+    value: 'LOCAL_SYSTEM_ADMIN',
+    roles: [
+      {
+        lang: 'en',
+        label: 'Local System_admin'
+      },
+      {
+        lang: 'fr',
+        label: 'Administrateur système local'
+      }
+    ],
+    active: true
+  },
+  {
+    value: 'NATIONAL_SYSTEM_ADMIN',
+    roles: [
+      {
+        lang: 'en',
+        label: 'National System_admin'
+      },
+      {
+        lang: 'fr',
+        label: 'Administrateur système national'
+      }
+    ],
+    active: true
+  },
+  {
+    value: 'PERFORMANCE_MANAGEMENT',
+    roles: [
+      {
+        lang: 'en',
+        label: 'Performance Management'
+      },
+      {
+        lang: 'fr',
+        label: 'Gestion des performances'
+      }
+    ],
+    active: true
+  },
+  {
+    value: 'NATIONAL_REGISTRAR',
+    roles: [
+      {
+        lang: 'en',
+        label: 'National Registrar'
+      },
+      {
+        lang: 'fr',
+        label: 'Registraire national'
+      }
+    ],
+    active: true
   }
 ]
 
@@ -79,9 +180,8 @@ describe('getRoles tests', () => {
       payload: {
         sortBy: '_id',
         sortOrder: 'desc',
-        title: 'Registrar',
         value: { $eq: 'LOCAL_REGISTRAR' },
-        type: 'Mayor',
+        role: 'Mayor',
         active: true
       },
       headers: {

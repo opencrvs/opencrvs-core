@@ -22,7 +22,7 @@ export const resolvers: GQLResolver = {
       {
         title = null,
         value = null,
-        type = null,
+        role = null,
         active = null,
         sortBy = null,
         sortOrder = null
@@ -39,8 +39,8 @@ export const resolvers: GQLResolver = {
           value: transformMongoComparisonObject(value)
         }
       }
-      if (type) {
-        payload = { ...payload, type }
+      if (role) {
+        payload = { ...payload, role }
       }
       if (sortBy) {
         payload = { ...payload, sortBy }

@@ -1531,7 +1531,7 @@ export type Query = {
   getFormDraft?: Maybe<Array<FormDraft>>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
-  getRoles?: Maybe<Array<Maybe<Role>>>
+  getRoles?: Maybe<Array<Maybe<SystemRole>>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
   getTotalCorrections?: Maybe<Array<CorrectionMetric>>
   getTotalMetrics?: Maybe<TotalMetricsResult>
@@ -1637,10 +1637,10 @@ export type QueryGetRegistrationsListByFilterArgs = {
 
 export type QueryGetRolesArgs = {
   active?: InputMaybe<Scalars['Boolean']>
+  role?: InputMaybe<Scalars['String']>
   sortBy?: InputMaybe<Scalars['String']>
   sortOrder?: InputMaybe<Scalars['String']>
   title?: InputMaybe<Scalars['String']>
-  type?: InputMaybe<Scalars['String']>
   value?: InputMaybe<ComparisonInput>
 }
 
@@ -1964,11 +1964,8 @@ export type RemoveBookmarkedSeachInput = {
 
 export type Role = {
   __typename?: 'Role'
-  active?: Maybe<Scalars['Boolean']>
-  id: Scalars['ID']
-  title?: Maybe<Scalars['String']>
-  types?: Maybe<Array<Maybe<Scalars['String']>>>
-  value?: Maybe<Scalars['String']>
+  label?: Maybe<Scalars['String']>
+  lang?: Maybe<Scalars['String']>
 }
 
 export enum RoleType {
@@ -2057,6 +2054,14 @@ export type SystemInput = {
   name: Scalars['String']
   settings?: InputMaybe<SystemSettings>
   type: SystemType
+}
+
+export type SystemRole = {
+  __typename?: 'SystemRole'
+  active?: Maybe<Scalars['Boolean']>
+  id: Scalars['ID']
+  roles?: Maybe<Array<Maybe<Role>>>
+  value?: Maybe<Scalars['String']>
 }
 
 export type SystemSecret = {
@@ -2365,9 +2370,13 @@ export type GetRolesQueryVariables = Exact<{
 export type GetRolesQuery = {
   __typename?: 'Query'
   getRoles?: Array<{
-    __typename?: 'Role'
+    __typename?: 'SystemRole'
     value?: string | null
-    types?: Array<string | null> | null
+    roles?: Array<{
+      __typename?: 'Role'
+      lang?: string | null
+      label?: string | null
+    } | null> | null
   } | null> | null
 }
 

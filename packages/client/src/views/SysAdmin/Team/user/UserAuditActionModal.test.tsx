@@ -32,7 +32,7 @@ const users = [
       }
     ],
     username: 'r.tagore',
-    role: RoleType.RegistrationAgent,
+    systemRole: RoleType.RegistrationAgent,
     localRegistrar: {
       name: [
         {
@@ -44,7 +44,7 @@ const users = [
       role: RoleType.LocalRegistrar,
       signature: undefined
     },
-    type: 'ENTREPENEUR',
+    role: 'ENTREPENEUR',
     status: Status.Active,
     creationDate: '2022-10-03T10:42:46.920Z',
     userMgntUserID: '5eba726866458970cf2e23c2',
@@ -80,7 +80,7 @@ const users = [
       }
     ],
     username: 'np.huq',
-    role: RoleType.LocalRegistrar,
+    systemRole: RoleType.LocalRegistrar,
     type: 'MAYOR',
     status: Status.Deactivated,
     localRegistrar: {

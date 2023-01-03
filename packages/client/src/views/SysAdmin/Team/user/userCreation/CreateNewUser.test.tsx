@@ -40,33 +40,128 @@ import { vi, Mock } from 'vitest'
 export const mockRoles = {
   data: {
     getRoles: [
-      { value: 'FIELD_AGENT', types: ['HOSPITAL', 'CHA'], __typename: 'Role' },
+      {
+        value: 'FIELD_AGENT',
+        roles: [
+          {
+            lang: 'en',
+            label: 'Healthcare Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Professionnel de Santé'
+          },
+          {
+            lang: 'en',
+            label: 'Police Officer'
+          },
+          {
+            lang: 'fr',
+            label: 'Agent de Police'
+          },
+          {
+            lang: 'en',
+            label: 'Social Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Travailleur Social'
+          },
+          {
+            lang: 'en',
+            label: 'Local Leader'
+          },
+          {
+            lang: 'fr',
+            label: 'Leader Local'
+          }
+        ],
+        __typename: 'Role'
+      },
       {
         value: 'REGISTRATION_AGENT',
-        types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'Registration Agent'
+          },
+          {
+            lang: 'fr',
+            label: "Agent d'enregistrement"
+          }
+        ],
         __typename: 'Role'
       },
       {
         value: 'LOCAL_REGISTRAR',
-        types: ['SECRETARY', 'CHAIRMAN', 'MAYOR'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'Local Registrar'
+          },
+          {
+            lang: 'fr',
+            label: 'Registraire local'
+          }
+        ],
         __typename: 'Role'
       },
       {
         value: 'LOCAL_SYSTEM_ADMIN',
-        types: ['LOCAL_SYSTEM_ADMIN'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'Local System_admin'
+          },
+          {
+            lang: 'fr',
+            label: 'Administrateur système local'
+          }
+        ],
         __typename: 'Role'
       },
       {
         value: 'NATIONAL_SYSTEM_ADMIN',
-        types: ['NATIONAL_SYSTEM_ADMIN'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'National System_admin'
+          },
+          {
+            lang: 'fr',
+            label: 'Administrateur système national'
+          }
+        ],
         __typename: 'Role'
       },
       {
         value: 'PERFORMANCE_MANAGEMENT',
-        types: ['HEALTH_DIVISION', 'ORG_DIVISION'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'Performance Management'
+          },
+          {
+            lang: 'fr',
+            label: 'Gestion des performances'
+          }
+        ],
         __typename: 'Role'
       },
-      { value: 'API_USER', types: ['API_USER'], __typename: 'Role' }
+      {
+        value: 'NATIONAL_REGISTRAR',
+        roles: [
+          {
+            lang: 'en',
+            label: 'National Registrar'
+          },
+          {
+            lang: 'fr',
+            label: 'Registraire national'
+          }
+        ],
+        __typename: 'Role'
+      }
     ]
   }
 }
