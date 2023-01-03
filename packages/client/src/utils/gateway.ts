@@ -6093,10 +6093,12 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           registrarPractitioner?: {
             __typename?: 'User'
+            id?: Scalars['ID']
             role?: string | null
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
+              id?: string | null
             } | null
             name?: Array<{
               __typename?: 'HumanName'
