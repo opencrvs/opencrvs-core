@@ -55,18 +55,14 @@ export const deceasedAddressLocalityTransformer = (
   transformedData: IFormData,
   registration: any,
   sectionId: string,
-  field: IFormField,
-  _?: IFormField,
-  offlineData?: IOfflineData
+  field: IFormField
 ) => {
-  const localityId = registration.deceased?.address?.[0]?.city
-  if (!localityId) return
-  const locality = offlineData?.locations[localityId]
+  const locality = registration.deceased?.address?.[0]?.city
   if (!locality) return
   if (!transformedData[sectionId]) {
     transformedData[sectionId] = {}
   }
-  transformedData[sectionId][field.name] = locality.name
+  transformedData[sectionId][field.name] = capitalize(locality)
 }
 
 export const deceasedAddressLineTransformer =
