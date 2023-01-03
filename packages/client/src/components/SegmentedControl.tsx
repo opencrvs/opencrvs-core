@@ -44,7 +44,6 @@ const Segment = styled(Button)<{ isSelected?: boolean }>`
 
 const Container = styled.div`
   margin: 0;
-  height: 32px;
 `
 export function SegmentedControl(
   props: Omit<ISelect2Props, 'options' | 'onChange'> & {
