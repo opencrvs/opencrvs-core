@@ -373,12 +373,12 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       selectedLocation &&
       this.isOfficeSelected(selectedLocation) &&
       this.props.userDetails &&
-      this.props.userDetails.role
+      this.props.userDetails.systemRole
     ) {
-      if (this.props.userDetails?.role === 'NATIONAL_REGISTRAR') {
+      if (this.props.userDetails?.systemRole === 'NATIONAL_REGISTRAR') {
         return true
       } else if (
-        REGISTRAR_ROLES.includes(this.props.userDetails?.role) &&
+        REGISTRAR_ROLES.includes(this.props.userDetails?.systemRole) &&
         this.props.userDetails.primaryOffice?.id === selectedLocation.id
       ) {
         return true

@@ -87,8 +87,8 @@ export const mockUsers = {
             }
           ],
           username: 'api.user',
+          systemRole: 'API_USER',
           role: 'API_USER',
-          type: 'API_USER',
           status: 'active',
           __typename: 'User'
         },
@@ -103,8 +103,8 @@ export const mockUsers = {
             }
           ],
           username: 'shahriar.nafis',
+          systemRole: 'LOCAL_SYSTEM_ADMIN',
           role: 'LOCAL_SYSTEM_ADMIN',
-          type: 'LOCAL_SYSTEM_ADMIN',
           status: 'active',
           __typename: 'User'
         },
@@ -119,8 +119,8 @@ export const mockUsers = {
             }
           ],
           username: 'mohamed.abu',
-          role: 'NATIONAL_REGISTRAR',
-          type: 'SECRETARY',
+          systemRole: 'NATIONAL_REGISTRAR',
+          role: 'SECRETARY',
           status: 'active',
           __typename: 'User'
         },
@@ -135,8 +135,8 @@ export const mockUsers = {
             }
           ],
           username: 'nasreen.pervin',
-          role: 'STATE_REGISTRAR',
-          type: 'MAYOR',
+          systemRole: 'STATE_REGISTRAR',
+          role: 'MAYOR',
           status: 'active',
           __typename: 'User'
         },
@@ -151,8 +151,8 @@ export const mockUsers = {
             }
           ],
           username: 'muid.khan',
-          role: 'DISTRICT_REGISTRAR',
-          type: 'MAYOR',
+          systemRole: 'DISTRICT_REGISTRAR',
+          role: 'MAYOR',
           status: 'active',
           __typename: 'User'
         },
@@ -167,8 +167,8 @@ export const mockUsers = {
             }
           ],
           username: 'mohammad.ashraful',
-          role: 'LOCAL_REGISTRAR',
-          type: 'CHAIRMAN',
+          systemRole: 'LOCAL_REGISTRAR',
+          role: 'CHAIRMAN',
           status: 'active',
           __typename: 'User'
         },
@@ -183,8 +183,8 @@ export const mockUsers = {
             }
           ],
           username: 'tamim.iqbal',
-          role: 'REGISTRATION_AGENT',
-          type: 'ENTREPENEUR',
+          systemRole: 'REGISTRATION_AGENT',
+          role: 'ENTREPENEUR',
           status: 'active',
           __typename: 'User'
         },
@@ -199,8 +199,8 @@ export const mockUsers = {
             }
           ],
           username: 'sakibal.hasan',
-          role: 'FIELD_AGENT',
-          type: 'CHA',
+          systemRole: 'FIELD_AGENT',
+          role: 'CHA',
           status: 'active',
           __typename: 'User'
         }
@@ -366,8 +366,8 @@ describe('edit user tests', () => {
               value: '101488192',
               __typename: 'Identifier'
             },
+            systemRole: 'API_USER',
             role: 'API_USER',
-            type: 'API_USER',
             status: 'active',
             underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',

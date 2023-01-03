@@ -321,34 +321,34 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       if (
         userQueryData &&
         userQueryData.data.getUser &&
-        userQueryData.data.getUser.role &&
-        userQueryData.data.getUser.type
+        userQueryData.data.getUser.systemRole &&
+        userQueryData.data.getUser.role
       ) {
         // This logic combined with the function alterRolesBasedOnUserRole
         // controls only showing unique user types in the case where 1 mayor should exist per location
         // this functionality may be reintroduced in the future.
         // for now types should only exist for field agents as per this requirement:
         //
-        const { role: existingRole, type: existingType } =
+        const { systemRole: existingSystemRole, role: existingRole } =
           userQueryData.data.getUser
         const roleData = (
           data as Array<{
             value: string
             types: string[]
           }>
-        ).find(({ value }: { value: string }) => value === existingRole)
+        ).find(({ value }: { value: string }) => value === existingSystemRole)
 
-        if (roleData && !roleData.types.includes(existingType)) {
+        if (roleData && !roleData.types.includes(existingRole)) {
           ;(
             data as Array<{
               value: string
               types: string[]
             }>
           ).map((role) => {
-            if (role.value === existingRole) {
+            if (role.value === existingSystemRole) {
               return {
                 ...role,
-                types: [existingRole, ...role.types]
+                types: [existingSystemRole, ...role.types]
               }
             } else {
               return role
@@ -360,7 +360,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
               value: string
               types: string[]
             }>
-          ).push({ value: existingRole, types: [existingType] })
+          ).push({ value: existingSystemRole, types: [existingRole] })
         }
       }
       updatedSections.forEach((section) => {

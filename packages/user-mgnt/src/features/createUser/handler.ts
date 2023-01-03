@@ -63,14 +63,14 @@ export default async function createUser(
       user.primaryOfficeId,
       token
     )
-    user.role = user.role ?? 'FIELD_AGENT'
+    user.systemRole = user.systemRole ?? 'FIELD_AGENT'
 
-    if (user.role === 'FIELD_AGENT') {
-      if (!user.type || !Object.values(FIELD_AGENT_TYPES).includes(user.type)) {
+    if (user.systemRole === 'FIELD_AGENT') {
+      if (!user.role || !Object.values(FIELD_AGENT_TYPES).includes(user.role)) {
         return h.response('Type not supported for this user').code(403)
       }
     } else {
-      if (user.type) {
+      if (user.role) {
         return h.response('Type not supported for this user').code(403)
       }
     }
@@ -82,7 +82,7 @@ export default async function createUser(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
-    const userScopes: string[] = roleScopeMapping[user.role]
+    const userScopes: string[] = roleScopeMapping[user.systemRole]
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')
@@ -93,9 +93,9 @@ export default async function createUser(
     user.scope = userScopes
 
     if (
-      user.role === 'NOTIFICATION_API_USER' ||
-      user.role === 'VALIDATOR_API_USER' ||
-      user.role === 'AGE_VERIFICATION_API_USER'
+      user.systemRole === 'NOTIFICATION_API_USER' ||
+      user.systemRole === 'VALIDATOR_API_USER' ||
+      user.systemRole === 'AGE_VERIFICATION_API_USER'
     ) {
       // Immediately active API users
       user.status = statuses.ACTIVE

@@ -413,7 +413,7 @@ export type BirthRegistrationInput = {
   birthType?: InputMaybe<BirthType>
   child?: InputMaybe<PersonInput>
   childrenBornAliveToMother?: InputMaybe<Scalars['Int']>
-  createdAt: Scalars['Date']
+  createdAt?: InputMaybe<Scalars['Date']>
   eventLocation?: InputMaybe<LocationInput>
   father?: InputMaybe<PersonInput>
   foetalDeathsToMother?: InputMaybe<Scalars['Int']>
@@ -423,7 +423,7 @@ export type BirthRegistrationInput = {
   otherAttendantAtBirth?: InputMaybe<Scalars['String']>
   questionnaire?: InputMaybe<Array<InputMaybe<QuestionnaireQuestionInput>>>
   registration?: InputMaybe<RegistrationInput>
-  updatedAt: Scalars['Date']
+  updatedAt?: InputMaybe<Scalars['Date']>
   weightAtBirth?: InputMaybe<Scalars['Float']>
 }
 
@@ -1769,10 +1769,10 @@ export type QuerySearchUsersArgs = {
   locationId?: InputMaybe<Scalars['String']>
   mobile?: InputMaybe<Scalars['String']>
   primaryOfficeId?: InputMaybe<Scalars['String']>
-  role?: InputMaybe<Scalars['String']>
   skip?: InputMaybe<Scalars['Int']>
   sort?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Scalars['String']>
+  systemRole?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
 }
 
@@ -1989,11 +1989,11 @@ export type SearchFieldAgentResponse = {
   fullName?: Maybe<Scalars['String']>
   practitionerId?: Maybe<Scalars['String']>
   primaryOfficeId?: Maybe<Scalars['String']>
+  role?: Maybe<Scalars['String']>
   status?: Maybe<Status>
   totalNumberOfDeclarationStarted?: Maybe<Scalars['Int']>
   totalNumberOfInProgressAppStarted?: Maybe<Scalars['Int']>
   totalNumberOfRejectedDeclarations?: Maybe<Scalars['Int']>
-  type?: Maybe<Scalars['String']>
 }
 
 export type SearchFieldAgentResult = {
@@ -2130,11 +2130,11 @@ export type User = {
   name: Array<HumanName>
   practitionerId: Scalars['String']
   primaryOffice?: Maybe<Location>
-  role: RoleType
+  role?: Maybe<Scalars['String']>
   searches?: Maybe<Array<Maybe<BookmarkedSeachItem>>>
   signature?: Maybe<Signature>
   status: Status
-  type?: Maybe<Scalars['String']>
+  systemRole: RoleType
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID: Scalars['ID']
   username?: Maybe<Scalars['String']>
@@ -2184,9 +2184,9 @@ export type UserInput = {
   mobile: Scalars['String']
   name: Array<HumanNameInput>
   primaryOffice?: InputMaybe<Scalars['String']>
-  role: RoleType
+  role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
-  type?: InputMaybe<Scalars['String']>
+  systemRole: RoleType
   username?: InputMaybe<Scalars['String']>
 }
 
@@ -2586,8 +2586,8 @@ export type FetchUserQuery = {
     userMgntUserID: string
     practitionerId: string
     mobile: string
-    role: RoleType
-    type?: string | null
+    systemRole: RoleType
+    role?: string | null
     status: Status
     name: Array<{
       __typename?: 'HumanName'
@@ -2852,9 +2852,9 @@ export type SearchUsersQuery = {
       __typename?: 'User'
       id: string
       username?: string | null
-      role: RoleType
+      systemRole: RoleType
       mobile: string
-      type?: string | null
+      role?: string | null
       status: Status
       underInvestigation?: boolean | null
       name: Array<{
@@ -2918,8 +2918,8 @@ export type GetUserQuery = {
     id: string
     username?: string | null
     mobile: string
-    role: RoleType
-    type?: string | null
+    systemRole: RoleType
+    role?: string | null
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
@@ -3032,7 +3032,7 @@ export type MarkBirthAsRegisteredMutation = {
         user?: {
           __typename?: 'User'
           id: string
-          role: RoleType
+          role?: string | null
           name: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -3330,8 +3330,8 @@ export type FetchBirthRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        type?: string | null
-        role: RoleType
+        role?: string | null
+        systemRole: RoleType
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -3621,8 +3621,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        type?: string | null
-        role: RoleType
+        role?: string | null
+        systemRole: RoleType
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -3731,7 +3731,7 @@ export type MarkDeathAsRegisteredMutation = {
         user?: {
           __typename?: 'User'
           id: string
-          role: RoleType
+          role?: string | null
           name: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -3986,8 +3986,8 @@ export type FetchDeathRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        type?: string | null
-        role: RoleType
+        role?: string | null
+        systemRole: RoleType
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -4259,8 +4259,8 @@ export type FetchDeathRegistrationForCertificationQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        type?: string | null
-        role: RoleType
+        role?: string | null
+        systemRole: RoleType
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -5556,8 +5556,8 @@ export type GetUserByMobileQuery = {
     id: string
     username?: string | null
     mobile: string
-    role: RoleType
-    type?: string | null
+    systemRole: RoleType
+    role?: string | null
     status: Status
   } | null
 }
@@ -6033,7 +6033,7 @@ export type GetEventsWithProgressQuery = {
       } | null
       startedBy?: {
         __typename?: 'User'
-        role: RoleType
+        role?: string | null
         name: Array<{
           __typename?: 'HumanName'
           use?: string | null
@@ -6090,7 +6090,7 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           registrarPractitioner?: {
             __typename?: 'User'
-            role: RoleType
+            role?: string | null
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
@@ -6143,7 +6143,7 @@ export type SearchFieldAgentsQuery = {
       __typename?: 'SearchFieldAgentResponse'
       practitionerId?: string | null
       fullName?: string | null
-      type?: string | null
+      role?: string | null
       status?: Status | null
       primaryOfficeId?: string | null
       creationDate?: string | null
@@ -6440,8 +6440,8 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            type?: string | null
-            role: RoleType
+            role?: string | null
+            systemRole: RoleType
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -6718,8 +6718,8 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            type?: string | null
-            role: RoleType
+            role?: string | null
+            systemRole: RoleType
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null

@@ -120,7 +120,7 @@ export const mockConditionals = {
   },
   isRegistrarRoleSelected: {
     action: 'hide',
-    expression: 'values.role!=="LOCAL_REGISTRAR"'
+    expression: 'values.systemRole!=="LOCAL_REGISTRAR"'
   },
   isOfficePreSelected: {
     action: 'hide',

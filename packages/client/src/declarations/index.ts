@@ -597,7 +597,7 @@ async function getCurrentUserRole(): Promise<string> {
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as IUserDetails).role || ''
+  return (JSON.parse(userDetails) as IUserDetails).systemRole || ''
 }
 
 export async function getCurrentUserID(): Promise<string> {

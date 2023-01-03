@@ -38,14 +38,14 @@ export function Hamburger() {
       : ''
   }
 
-  const role =
-    userDetails && userDetails.role
-      ? intl.formatMessage(userMessages[userDetails.role])
+  const systemRole =
+    userDetails && userDetails.systemRole
+      ? intl.formatMessage(userMessages[userDetails.systemRole])
       : ''
 
   const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
 
-  const userInfo = { name, role, avatar }
+  const userInfo = { name, systemRole, avatar }
 
   return (
     <>

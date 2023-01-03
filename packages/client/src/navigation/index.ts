@@ -615,7 +615,7 @@ export function goToPage(
 }
 
 export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
-  const role = userDetails?.role
+  const role = userDetails?.systemRole
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
     if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
@@ -642,7 +642,7 @@ export function goToPerformanceView(userDetails: IUserDetails) {
 }
 
 export function goToTeamView(userDetails: IUserDetails) {
-  if (userDetails && userDetails.role) {
+  if (userDetails && userDetails.systemRole) {
     return goToTeamUserList(
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
     )

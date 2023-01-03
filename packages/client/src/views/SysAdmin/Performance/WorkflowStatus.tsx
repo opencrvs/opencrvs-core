@@ -508,8 +508,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               eventProgress.startedByFacility ||
               ''
             starterPractitionerRole =
-              (user.role &&
-                intl.formatMessage(userMessages[user.role as string])) ||
+              (user.systemRole &&
+                intl.formatMessage(userMessages[user.systemRole as string])) ||
               ''
           }
 

@@ -91,8 +91,8 @@ const transformUserQueryResult = (
         ''
     },
     name: createNamesMap(userData.name as HumanName[])[locale],
+    systemRole: userData.systemRole,
     role: userData.role,
-    type: userData.type,
     number: userData.mobile,
     status: userData.status,
     underInvestigation: userData.underInvestigation,
@@ -338,7 +338,7 @@ export const UserAudit = () => {
               <UserAuditHistory
                 practitionerId={user.practitionerId}
                 practitionerName={user.name}
-                loggedInUserRole={userDetails!.role}
+                loggedInUserRole={userDetails!.systemRole}
               />
             )}
           </>

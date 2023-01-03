@@ -24,9 +24,9 @@ export const SEARCH_USERS = gql`
           familyName
         }
         username
-        role
+        systemRole
         mobile
-        type
+        role
         status
         underInvestigation
         avatar {
@@ -93,8 +93,8 @@ export const GET_USER = gql`
         system
         value
       }
+      systemRole
       role
-      type
       status
       underInvestigation
       practitionerId

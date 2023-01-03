@@ -240,8 +240,8 @@ export interface GQLUser {
   name: Array<GQLHumanName>
   username?: string
   mobile: string
-  role: GQLRoleType
-  type?: string
+  systemRole: GQLRoleType
+  role?: string
   email?: string
   status: GQLStatus
   underInvestigation?: boolean
@@ -511,8 +511,8 @@ export interface GQLBirthRegistrationInput {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
-  createdAt: GQLDate
-  updatedAt: GQLDate
+  createdAt?: GQLDate
+  updatedAt?: GQLDate
 }
 
 export interface GQLReinstated {
@@ -548,8 +548,8 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile: string
-  role: GQLRoleType
-  type?: string
+  systemRole: GQLRoleType
+  role?: string
   email?: string
   primaryOffice?: string
   catchmentArea?: Array<string | null>
@@ -917,7 +917,7 @@ export interface GQLBookmarkedSeachItem {
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
-  type?: string
+  role?: string
   status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string
@@ -2184,7 +2184,7 @@ export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
   status?: string
-  role?: string
+  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count?: number
@@ -3840,8 +3840,8 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
+  systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
-  type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
@@ -3880,11 +3880,11 @@ export interface UserToMobileResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToRoleResolver<TParent = any, TResult = any> {
+export interface UserToSystemRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToTypeResolver<TParent = any, TResult = any> {
+export interface UserToRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5365,7 +5365,7 @@ export interface BookmarkedSeachItemToParametersResolver<
 export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   practitionerId?: SearchFieldAgentResponseToPractitionerIdResolver<TParent>
   fullName?: SearchFieldAgentResponseToFullNameResolver<TParent>
-  type?: SearchFieldAgentResponseToTypeResolver<TParent>
+  role?: SearchFieldAgentResponseToRoleResolver<TParent>
   status?: SearchFieldAgentResponseToStatusResolver<TParent>
   avatar?: SearchFieldAgentResponseToAvatarResolver<TParent>
   primaryOfficeId?: SearchFieldAgentResponseToPrimaryOfficeIdResolver<TParent>
@@ -5390,7 +5390,7 @@ export interface SearchFieldAgentResponseToFullNameResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SearchFieldAgentResponseToTypeResolver<
+export interface SearchFieldAgentResponseToRoleResolver<
   TParent = any,
   TResult = any
 > {

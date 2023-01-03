@@ -184,7 +184,7 @@ interface ICount {
 
 interface IUserInfo {
   name: string
-  role: string
+  systemRole: string
   avatar: JSX.Element
 }
 
@@ -319,7 +319,7 @@ export const NavigationView = (props: IFullProps) => {
     updateRegistrarWorkqueue(
       userDetails.practitionerId,
       10, // Page size shouldn't matter here as we're only interested in totals
-      userDetails.role === 'FIELD_AGENT'
+      userDetails.systemRole === 'FIELD_AGENT'
     )
   }, [userDetails, updateRegistrarWorkqueue, loadWorkqueueStatuses])
 
@@ -364,12 +364,12 @@ export const NavigationView = (props: IFullProps) => {
       buildVersion={import.meta.env.VITE_APP_VERSION ?? 'Development'}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
-      role={userInfo && userInfo.role}
+      role={userInfo && userInfo.systemRole}
       avatar={() => userInfo && userInfo.avatar}
       warning={isMobileDevice() ? <></> : <UnpublishedWarning compact={true} />}
       className={className}
     >
-      {userDetails?.role === 'FIELD_AGENT' ? (
+      {userDetails?.systemRole === 'FIELD_AGENT' ? (
         <>
           <NavigationGroup>
             <NavigationItem
@@ -431,13 +431,13 @@ export const NavigationView = (props: IFullProps) => {
         </>
       ) : (
         <>
-          {userDetails?.role &&
-            USER_SCOPE[userDetails.role].includes(
+          {userDetails?.systemRole &&
+            USER_SCOPE[userDetails.systemRole].includes(
               GROUP_ID.declarationGroup
             ) && (
               <NavigationGroup>
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.inProgress
                   ) && (
                     <NavigationItem
@@ -454,8 +454,8 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.readyForReview
                   ) && (
                     <NavigationItem
@@ -472,8 +472,8 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.requiresUpdate
                   ) && (
                     <NavigationItem
@@ -490,8 +490,8 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.sentForApproval
                   ) && (
                     <NavigationItem
@@ -523,8 +523,8 @@ export const NavigationView = (props: IFullProps) => {
                     }}
                   />
                 )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.readyToPrint
                   ) && (
                     <NavigationItem
@@ -541,8 +541,8 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.outbox
                   ) && (
                     <NavigationItem
@@ -561,11 +561,11 @@ export const NavigationView = (props: IFullProps) => {
                   )}
               </NavigationGroup>
             )}
-          {userDetails?.role &&
-            USER_SCOPE[userDetails.role].includes(GROUP_ID.menuGroup) && (
+          {userDetails?.systemRole &&
+            USER_SCOPE[userDetails.systemRole].includes(GROUP_ID.menuGroup) && (
               <NavigationGroup>
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.performance
                   ) && (
                     <NavigationItem
@@ -583,8 +583,8 @@ export const NavigationView = (props: IFullProps) => {
                       }
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.vsexports
                   ) && (
                     <NavigationItem
@@ -600,8 +600,8 @@ export const NavigationView = (props: IFullProps) => {
                       }
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.team
                   ) && (
                     <NavigationItem
@@ -618,8 +618,8 @@ export const NavigationView = (props: IFullProps) => {
                     />
                   )}
 
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.config
                   ) && (
                     <>

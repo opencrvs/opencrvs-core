@@ -49,9 +49,9 @@ export const transformRoleDataToDefinitions = (
     }))
 
   return fields.map((field) => {
-    if (field.name === 'role') {
-      if (userFormData && userFormData.role) {
-        userFormData.role = ''
+    if (field.name === 'systemRole') {
+      if (userFormData && userFormData.systemRole) {
+        userFormData.systemRole = ''
       }
       ;(field as ISelectFormFieldWithOptions).options = roles.map(
         ({ value }: { value: string }) => ({
@@ -91,7 +91,7 @@ export async function alterRolesBasedOnUserRole(
   getState: () => IStoreState
 ) {
   const userDetails = getUserDetails(getState())
-  const roleSearchCriteria = getRoleSearchCriteria(userDetails?.role)
+  const roleSearchCriteria = getRoleSearchCriteria(userDetails?.systemRole)
   const roleData = await roleQueries.fetchRoles(roleSearchCriteria)
   const roles = roleData.data.getRoles as Array<GQLRole>
 
@@ -195,10 +195,10 @@ export function checkIfLocalLanguageProvided() {
 }
 
 export function getUserRole(
-  user: { role?: string | null },
+  user: { systemRole?: string | null },
   intl: IntlShape
 ): string | undefined {
-  switch (user.role) {
+  switch (user.systemRole) {
     case Roles.FIELD_AGENT:
       return intl.formatMessage(userMessages.FIELD_AGENT)
     case Roles.REGISTRATION_AGENT:
@@ -219,11 +219,11 @@ export function getUserRole(
 }
 
 export function getUserType(
-  user: { type?: string | null },
+  user: { role?: string | null },
   intl: IntlShape
 ): string | undefined {
-  if (user.type) {
-    return intl.formatMessage(userMessages[user.type as string])
+  if (user.role) {
+    return intl.formatMessage(userMessages[user.role as string])
   } else {
     return undefined
   }

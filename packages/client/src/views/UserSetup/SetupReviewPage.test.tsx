@@ -25,7 +25,7 @@ describe('SetupReviewPage page tests', () => {
   it('render page', async () => {
     store.dispatch(
       getStorageUserDetailsSuccess(
-        JSON.stringify({ ...userDetails, type: 'CHA' })
+        JSON.stringify({ ...userDetails, role: 'CHA' })
       )
     )
     const testComponent = await createTestComponent(

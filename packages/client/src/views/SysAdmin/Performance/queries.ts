@@ -227,7 +227,7 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
       results {
         practitionerId
         fullName
-        type
+        role
         status
         avatar {
           type

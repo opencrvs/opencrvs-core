@@ -133,7 +133,7 @@ describe('Submission Controller', () => {
             scope: ['declare']
           }
         },
-        offline: { userDetails: { role: 'FIELD_AGENT' } },
+        offline: { userDetails: { systemRole: 'FIELD_AGENT' } },
         declarationsState: {
           declarations: [
             {

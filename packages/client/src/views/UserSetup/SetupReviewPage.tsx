@@ -86,12 +86,14 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
 
   const typeRole =
     (userDetails &&
-      userDetails.role &&
-      (userDetails.type
+      userDetails.systemRole &&
+      (userDetails.role
         ? `${intl.formatMessage(
-            userMessages[userDetails.role as string]
-          )} / ${intl.formatMessage(userMessages[userDetails.type as string])}`
-        : `${intl.formatMessage(userMessages[userDetails.role as string])}`)) ||
+            userMessages[userDetails.systemRole as string]
+          )} / ${intl.formatMessage(userMessages[userDetails.role as string])}`
+        : `${intl.formatMessage(
+            userMessages[userDetails.systemRole as string]
+          )}`)) ||
     ''
 
   const primaryOffice =

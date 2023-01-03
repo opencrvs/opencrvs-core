@@ -1270,7 +1270,7 @@ export const userDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  role: 'FIELD_AGENT',
+  systemRole: 'FIELD_AGENT',
   mobile: '01677701431',
   primaryOffice: {
     id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
@@ -1471,7 +1471,7 @@ export const mockUserResponse = {
           }
         ]
       },
-      role: 'LOCAL_REGISTRAR'
+      systemRole: 'LOCAL_REGISTRAR'
     }
   }
 }
@@ -1536,7 +1536,7 @@ export const mockLocalSysAdminUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      role: 'LOCAL_SYSTEM_ADMIN',
+      systemRole: 'LOCAL_SYSTEM_ADMIN',
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -1620,7 +1620,7 @@ export const mockRegistrarUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      role: 'LOCAL_REGISTRAR',
+      systemRole: 'LOCAL_REGISTRAR',
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -2190,8 +2190,8 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          role: RoleType.FieldAgent,
-          type: 'CHA',
+          systemRole: RoleType.FieldAgent,
+          role: 'CHA',
           status: Status.Active,
           name: [
             {
@@ -2324,8 +2324,8 @@ export const mockCompleteFormData = {
   nid: '123456789',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'FIELD_AGENT',
-  type: 'HOSPITAL',
+  systemRole: 'FIELD_AGENT',
+  role: 'HOSPITAL',
   userDetails: '',
   username: ''
 }
@@ -2574,7 +2574,7 @@ export const mockUserGraphqlOperation = {
                     validate: []
                   },
                   {
-                    name: 'role',
+                    name: 'systemRole',
                     type: 'SELECT_WITH_OPTIONS',
                     label: {
                       defaultMessage: 'Role',
@@ -2587,7 +2587,7 @@ export const mockUserGraphqlOperation = {
                     options: []
                   },
                   {
-                    name: 'type',
+                    name: 'role',
                     type: 'SELECT_WITH_DYNAMIC_OPTIONS',
                     label: {
                       defaultMessage: 'Type',
@@ -2599,7 +2599,7 @@ export const mockUserGraphqlOperation = {
                     initialValue: '',
                     validate: [],
                     dynamicOptions: {
-                      dependency: 'role',
+                      dependency: 'systemRole',
                       options: {}
                     }
                   },
@@ -2628,7 +2628,7 @@ export const mockUserGraphqlOperation = {
                   {
                     action: 'hide',
                     expression:
-                      'values.role!=="LOCAL_REGISTRAR" && values.role!=="REGISTRATION_AGENT"'
+                      'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="REGISTRATION_AGENT"'
                   }
                 ],
                 fields: [
@@ -2707,8 +2707,8 @@ export const mockDataWithRegistarRoleSelected = {
   nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'LOCAL_REGISTRAR',
-  type: 'SECRETARY',
+  systemRole: 'LOCAL_REGISTRAR',
+  role: 'SECRETARY',
   userDetails: '',
   username: '',
   signature: {

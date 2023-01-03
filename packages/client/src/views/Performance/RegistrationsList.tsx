@@ -386,7 +386,7 @@ function RegistrationListComponent(props: IProps) {
             ? getName(result.registrarPractitioner.name, 'en')
             : '',
           location: result.registrarPractitioner.primaryOffice.name,
-          role: getFieldAgentTypeLabel(result.registrarPractitioner.role),
+          role: getFieldAgentTypeLabel(result.registrarPractitioner.systemRole),
           total: String(result.total),
           delayed: showWithTooltip(
             result.total,

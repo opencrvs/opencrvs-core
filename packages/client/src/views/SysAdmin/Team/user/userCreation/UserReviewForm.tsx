@@ -193,7 +193,7 @@ class UserReviewFormComponent extends React.Component<
               actions:
                 !(
                   field.name === 'registrationOffice' &&
-                  this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
+                  this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
                 ) && !field.readonly ? (
                   <LinkButton
                     id={`btn_change_${field.name}`}
@@ -249,10 +249,10 @@ class UserReviewFormComponent extends React.Component<
 
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
-        ? field.name === 'role'
+        ? field.name === 'systemRole'
+          ? intl.formatMessage(userMessages[formData.systemRole as string])
+          : field.name === 'role'
           ? intl.formatMessage(userMessages[formData.role as string])
-          : field.name === 'type'
-          ? intl.formatMessage(userMessages[formData.type as string])
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label
       : ''
@@ -295,8 +295,8 @@ class UserReviewFormComponent extends React.Component<
         <SuccessButton
           id="submit-edit-user-form"
           disabled={
-            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
-              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
+            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
+              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -312,8 +312,8 @@ class UserReviewFormComponent extends React.Component<
         <PrimaryButton
           id="submit_user_form"
           disabled={
-            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
-              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
+            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
+              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}

@@ -295,8 +295,8 @@ function UserListComponent(props: IProps) {
     offlineCountryConfig,
     location: { search }
   } = props
-  const isNatlSysAdmin = userDetails?.role
-    ? NATL_ADMIN_ROLES.includes(userDetails.role)
+  const isNatlSysAdmin = userDetails?.systemRole
+    ? NATL_ADMIN_ROLES.includes(userDetails.systemRole)
       ? true
       : false
     : false
@@ -507,17 +507,17 @@ function UserListComponent(props: IProps) {
   ) {
     if (
       userDetails &&
-      userDetails.role &&
+      userDetails.systemRole &&
       userDetails.primaryOffice &&
-      SYS_ADMIN_ROLES.includes(userDetails.role) &&
+      SYS_ADMIN_ROLES.includes(userDetails.systemRole) &&
       locationId === userDetails.primaryOffice.id &&
       !onlyNational
     ) {
       return false
     } else if (
       userDetails &&
-      userDetails.role &&
-      NATL_ADMIN_ROLES.includes(userDetails.role)
+      userDetails.systemRole &&
+      NATL_ADMIN_ROLES.includes(userDetails.systemRole)
     ) {
       return false
     } else {
@@ -552,8 +552,8 @@ function UserListComponent(props: IProps) {
       underInvestigation?: boolean
     }) {
       const canEditUserDetails =
-        userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
-        (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
+        userDetails?.systemRole === 'NATIONAL_SYSTEM_ADMIN' ||
+        (userDetails?.systemRole === 'LOCAL_SYSTEM_ADMIN' &&
           userDetails?.primaryOffice?.id === locationId)
           ? true
           : false
@@ -599,7 +599,9 @@ function UserListComponent(props: IProps) {
                   ] as string))) ||
               ''
             const role =
-              (user.role && intl.formatMessage(userMessages[user.role])) || '-'
+              (user.systemRole &&
+                intl.formatMessage(userMessages[user.systemRole])) ||
+              '-'
 
             const avatar = user.avatar
 

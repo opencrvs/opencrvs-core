@@ -278,8 +278,8 @@ export const roleUserTransformer = (
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
-    history?.user?.role
-      ? (userMessages[history.user.role] as MessageDescriptor &
+    history?.user?.systemRole
+      ? (userMessages[history.user.systemRole] as MessageDescriptor &
           Record<string, string>)
       : ''
 }

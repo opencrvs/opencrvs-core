@@ -39,7 +39,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: String
+    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -370,8 +370,8 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String!
-  role: RoleType!
-  type: String
+  systemRole: RoleType!
+  role: String
   email: String
   status: Status!
   underInvestigation: Boolean
@@ -628,8 +628,8 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: Date
+  updatedAt: Date
 }
 
 type Reinstated {
@@ -665,8 +665,8 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String!
-  role: RoleType!
-  type: String
+  systemRole: RoleType!
+  role: String
   email: String
   primaryOffice: String
   catchmentArea: [String]
@@ -1034,7 +1034,7 @@ type BookmarkedSeachItem {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  type: String
+  role: String
   status: Status
   avatar: Avatar
   primaryOfficeId: String
