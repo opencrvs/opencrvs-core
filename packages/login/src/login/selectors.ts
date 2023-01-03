@@ -46,10 +46,6 @@ export function selectApplicationName(store: IStoreState) {
   return getKey(store, 'config').APPLICATION_NAME
 }
 
-export const getStepOneDetails = (
-  store: IStoreState
-): LoginState['authenticationDetails'] => getKey(store, 'authenticationDetails')
-
 export function selectImageToObjectFit(store: IStoreState) {
   if (getKey(store, 'config').LOGIN_BACKGROUND?.imageFit) {
     return getKey(store, 'config').LOGIN_BACKGROUND?.imageFit
@@ -58,39 +54,6 @@ export function selectImageToObjectFit(store: IStoreState) {
   }
 }
 
-export function usePersistentCountryBackground() {
-  const [offlineBackground, setOfflineBackground] = React.useState(
-    localStorage.getItem('country-background') ?? ''
-  )
-  const background = useSelector(selectCountryBackground)
-  if (background && background !== offlineBackground) {
-    setOfflineBackground(background)
-    localStorage.setItem('country-background', background)
-  }
-
-  return offlineBackground
-}
-export function useImageToObjectFit() {
-  const [offlineBackground, setOfflineBackground] = React.useState(
-    localStorage.getItem('country-image-fit') ?? ''
-  )
-  const background = useSelector(selectImageToObjectFit)
-  if (background && background !== offlineBackground) {
-    setOfflineBackground(background)
-    localStorage.setItem('country-image-fit', background)
-  }
-
-  return offlineBackground
-}
-
-export function usePersistentCountryLogo() {
-  const [offlineLogo, setOfflineLogo] = React.useState(
-    localStorage.getItem('country-logo') ?? ''
-  )
-  const logo = useSelector(selectCountryLogo)
-  if (logo && logo !== offlineLogo) {
-    setOfflineLogo(logo)
-    localStorage.setItem('country-logo', logo)
-  }
-  return offlineLogo
-}
+export const getStepOneDetails = (
+  store: IStoreState
+): LoginState['authenticationDetails'] => getKey(store, 'authenticationDetails')

@@ -19,39 +19,20 @@ import styled from '@client/styledComponents'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { getUserName, IUserDetails } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
-import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
-import { Activity, Logout } from '@opencrvs/components/lib/icons'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { buttonMessages, errorMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { Button } from '@opencrvs/components/lib/buttons'
-import { Toast } from '@opencrvs/components'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Link, Stack, Toast } from '@opencrvs/components'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
-export const PageWrapper = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  ${({ theme }) => theme.colors.primary};
-  background: ${({ color, theme }) =>
-    color ? color : theme.colors.backgroundPrimary};
-`
-
-export const LogoutHeader = styled.a`
-  width: 100%;
-  color: ${({ theme }) => theme.colors.white};
-  display: flex;
-  justify-content: flex-end;
-
-  span {
-    margin-right: 10px;
-  }
-`
 const Container = styled.div`
   text-align: center;
   display: flex;
@@ -64,13 +45,24 @@ const Container = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
 `
-const Name = styled.p`
-  color: ${({ theme }) => theme.colors.grey600};
-`
-const ForgottenPinLink = styled(Button)`
-  ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.blue};
-  text-transform: none;
+
+interface IPageProps {
+  background?: string
+  backGroundUrl?: string
+  imageFitter?: string
+}
+
+const PageWrapper = styled.div<IPageProps>`
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  background: ${({ background }) => `#${background}`};
+  background-image: ${({ backGroundUrl }) => `url(${backGroundUrl})`};
+  background-size: ${({ imageFitter }) =>
+    imageFitter === 'FILL' ? `cover` : `auto`};
 `
 
 interface IState {
@@ -115,23 +107,6 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     this.screenLockTimer()
     document.addEventListener('mouseup', this.handleClick, false)
     this.focusKeypad()
-  }
-
-  showName() {
-    const { userDetails } = this.props
-    const nameObj =
-      (userDetails &&
-        userDetails.name &&
-        (userDetails.name.find(
-          // @ts-ignore
-          (storedName: GQLHumanName) => storedName.use === 'en'
-        ) as GQLHumanName)) ||
-      null
-    const fullName =
-      (nameObj &&
-        `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`) ||
-      ''
-    return <Name>{fullName}</Name>
   }
 
   showErrorMessage() {
@@ -248,52 +223,47 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   render() {
     const { userDetails, offlineCountryConfiguration } = this.props
     return (
-      <>
-        {' '}
-        <div
-          className="main"
-          color={`#${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor}`}
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            height: '100vh',
-            background: 'green',
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          <Container onClick={this.focusKeypad}>
-            <LogoutHeader onClick={this.logout} id="logout">
-              <span>
-                {this.props.intl.formatMessage(buttonMessages.logout)}
-              </span>
-              <Logout stroke={'#4A8AD7'} />
-            </LogoutHeader>
+      <PageWrapper
+        background={
+          offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor
+        }
+        backGroundUrl={
+          offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage
+        }
+        imageFitter={
+          offlineCountryConfiguration.config.LOGIN_BACKGROUND.imageFit
+        }
+      >
+        <Container onClick={this.focusKeypad}>
+          <Stack
+            style={{ width: '100%' }}
+            direction="row"
+            justifyContent="flex-end"
+          >
+            <Button type="icon" onClick={this.logout} id="logout">
+              <Icon name="LogOut" />
+            </Button>
+          </Stack>
 
-            <AvatarLarge
-              name={getUserName(userDetails)}
-              avatar={userDetails?.avatar}
-            />
-            <PINKeypad
-              forgotPinComponent={
-                <ForgottenPinLink
-                  id="forgotten_pin"
-                  onClick={this.props.onForgetPin}
-                >
-                  {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
-                </ForgottenPinLink>
-              }
-              ref={(elem: any) => (this.pinKeyRef = elem)}
-              onComplete={this.onPinProvided}
-              pin={this.state.pin}
-              key={this.state.resetKey}
-            />
+          <AvatarLarge
+            name={getUserName(userDetails)}
+            avatar={userDetails?.avatar}
+          />
+          <PINKeypad
+            forgotPinComponent={
+              <Link id="forgot_password" onClick={this.props.onForgetPin}>
+                {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
+              </Link>
+            }
+            ref={(elem: any) => (this.pinKeyRef = elem)}
+            onComplete={this.onPinProvided}
+            pin={this.state.pin}
+            key={this.state.resetKey}
+          />
 
-            {this.showErrorMessage()}
-          </Container>
-        </div>
-      </>
+          {this.showErrorMessage()}
+        </Container>
+      </PageWrapper>
     )
   }
 }

@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { connect, useSelector } from 'react-redux'
-import { Page, IPage } from '@login/common/Page'
-import { IStoreState } from '@login/store'
-import { withRouter, RouteComponentProps } from 'react-router'
-import { LoginBackground } from '@login/common/LoginBackground/LoginBackground'
 import React from 'react'
+import { connect } from 'react-redux'
+import { IPage, Page } from '@login/common/Page'
+import { IStoreState } from '@login/store'
+import { RouteComponentProps, withRouter } from 'react-router'
 import { selectCountryBackground } from '@login/login/selectors'
+
 const mapStateToProps = (store: IStoreState): IPage => {
   return {
     submitting: store.login.submitting,
@@ -27,10 +27,4 @@ export const PageContainer = withRouter(
   connect<IPage, {}, IPage & RouteComponentProps<{}>, IStoreState>(
     mapStateToProps
   )(Page)
-) as any
-
-export const LoginBackgroundContainer = withRouter(
-  connect<IPage, {}, IPage & RouteComponentProps<{}>, IStoreState>(
-    mapStateToProps
-  )(LoginBackground)
 ) as any

@@ -16,8 +16,7 @@ import {
   getErrorCode,
   getSubmissionError,
   getsubmitting,
-  selectApplicationName,
-  usePersistentCountryLogo
+  selectApplicationName
 } from '@login/login/selectors'
 import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
@@ -35,31 +34,19 @@ import {
 import { IAuthenticationData } from '@login/utils/authApi'
 import * as actions from '@login/login/actions'
 import { goToForgottenItemForm } from '@login/login/actions'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Toast } from '@opencrvs/components/lib/Toast/Toast'
+import { usePersistentCountryLogo } from '@login/common/LoginBackground/LoginBackgroundWrapper'
 import {
   ActionWrapper,
+  Container,
   FieldWrapper,
   FormWrapper,
   LogoContainer,
   StyledButton,
-  StyledButtonWrapper
-} from '@login/views/StepOne/StepOneForm'
-import styled from 'styled-components'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Toast } from '@opencrvs/components/lib/Toast/Toast'
-
-const StyledH2 = styled.h2`
-  ${({ theme }) => theme.fonts.h2};
-  font-weight: 400;
-  text-align: center;
-  color: ${({ theme }) => theme.colors.grey600};
-`
-const Container = styled.div`
-  position: relative;
-  height: auto;
-  padding: 0px;
-  margin: 0px auto;
-  width: min(500px, 90%);
-`
+  StyledButtonWrapper,
+  StyledH2
+} from '@login/views/Common'
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
@@ -123,7 +110,7 @@ const Password = () => {
 
 const FORM_NAME = 'STEP_ONE'
 
-export function StepOneContainer1() {
+export function StepOneContainer() {
   const submitting = useSelector(getsubmitting)
   const errorCode = useSelector(getErrorCode)
   const submissionError = useSelector(getSubmissionError)

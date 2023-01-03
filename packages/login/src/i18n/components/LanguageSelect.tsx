@@ -20,7 +20,6 @@ import styled from 'styled-components'
 import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useHistory, useLocation } from 'react-router'
-import { usePersistentCountryBackground } from '@login/common/LoginBackground/LoginBackground'
 
 type IProps = {
   background: string

@@ -126,13 +126,6 @@ export class PINKeypad extends React.Component<IProps, IState> {
         {...this.props}
       >
         <div>
-          <input
-            type="number"
-            ref={this.pinInput}
-            value={this.state.pin}
-            onKeyDown={this.keyDown}
-          />
-
           <h2>Enter your pin</h2>
           <div
             onClick={() => {

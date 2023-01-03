@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { Field, Form } from 'react-final-form'
 import { InputField } from '@opencrvs/components/lib/InputField'
@@ -19,15 +18,6 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
 import { Text } from '@opencrvs/components/lib/Text'
 
-import {
-  ActionWrapper,
-  FieldWrapper,
-  FormWrapper,
-  LogoContainer,
-  StyledButton,
-  StyledButtonWrapper,
-  Title
-} from '@login/views/StepOne/StepOneForm'
 import * as actions from '@login/login/actions'
 import { IVerifyCodeNumbers } from '@login/login/actions'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
@@ -40,27 +30,25 @@ import {
   getStepOneDetails,
   getSubmissionError,
   getsubmitting,
-  selectApplicationName,
-  usePersistentCountryLogo
+  selectApplicationName
 } from '@login/login/selectors'
 import { Toast } from '@opencrvs/components'
-
-const StyledH2 = styled.h2`
-  ${({ theme }) => theme.fonts.h2};
-  font-weight: 400;
-  color: ${({ theme }) => theme.colors.grey600};
-`
-const Container = styled.div`
-  position: relative;
-  height: auto;
-  padding: 0px;
-  margin: 0px auto;
-  width: min(500px, 90%);
-`
+import { usePersistentCountryLogo } from '@login/common/LoginBackground/LoginBackgroundWrapper'
+import {
+  ActionWrapper,
+  Container,
+  FieldWrapper,
+  FormWrapper,
+  LogoContainer,
+  StyledButton,
+  StyledButtonWrapper,
+  StyledH2,
+  Title
+} from '@login/views/Common'
 
 const FORM_NAME = 'STEP_TWO'
 
-export function StepTwoContainer2() {
+export function StepTwoContainer() {
   const dispatch = useDispatch()
   const logo = usePersistentCountryLogo()
 
