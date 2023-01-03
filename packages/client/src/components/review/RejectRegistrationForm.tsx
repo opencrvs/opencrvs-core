@@ -114,6 +114,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
           width={918}
           contentHeight={480}
           handleClose={this.props.onClose}
+          showHeaderBorder={true}
           actions={[
             <TertiaryButton
               id="cancel"
