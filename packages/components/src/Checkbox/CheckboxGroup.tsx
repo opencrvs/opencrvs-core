@@ -24,6 +24,16 @@ const List = styled.ul`
   padding: 0;
 `
 
+export const LegendWrapper = styled.h6`
+  padding-bottom: 10px;
+  ${({ theme }) => theme.fonts.bold18};
+  color: ${({ theme }) => theme.colors.grey600};
+`
+export const HintWrapper = styled.p`
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.grey500};
+`
+
 export interface ICheckboxOption {
   label: string
   value: string
@@ -32,7 +42,9 @@ export interface ICheckboxOption {
 export interface ICheckboxGroup {
   options: ICheckboxOption[]
   name: string
+  hint?: string
   id: string
+  legend?: string
   value: string[]
   onChange: (value: string[]) => void
 }
@@ -48,10 +60,12 @@ export class CheckboxGroup extends React.Component<ICheckboxGroup> {
   }
 
   render() {
-    const { options, value, name, ...props } = this.props
+    const { options, value, name, hint, legend, ...props } = this.props
 
     return (
       <Wrapper>
+        {legend && <LegendWrapper>{legend}</LegendWrapper>}
+        {hint && <HintWrapper>{hint}</HintWrapper>}
         <List>
           {options.map((option) => {
             return (
