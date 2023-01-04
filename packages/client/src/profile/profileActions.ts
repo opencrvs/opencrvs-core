@@ -13,8 +13,7 @@
 import { RouterAction } from 'connected-react-router'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from '@apollo/client'
-import { User } from '@client/utils/gateway'
-import { Query } from '@client/utils/gateway'
+import { User, Query } from '@client/utils/gateway'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =

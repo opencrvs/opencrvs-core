@@ -591,10 +591,16 @@ export function getInitialValueForSelectDynamicValue(
 
   if (catchmentAreas) {
     catchmentAreas.forEach((catchmentArea) => {
-      if (catchmentArea.identifier?.find(({ value }) => value === 'DISTRICT')) {
+      if (
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'DISTRICT'
+        )
+      ) {
         district = catchmentArea.id
       } else if (
-        catchmentArea.identifier?.find(({ value }) => value === 'STATE')
+        catchmentArea?.identifier?.find(
+          (identifier) => identifier?.value === 'STATE'
+        )
       ) {
         state = catchmentArea.id
       }

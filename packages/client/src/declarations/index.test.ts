@@ -18,7 +18,7 @@ import {
   filterProcessingDeclarations,
   filterProcessingDeclarationsFromQuery
 } from '.'
-import { Event, User } from '@client/utils/gateway'
+import { Event, RoleType, Status, User } from '@client/utils/gateway'
 import { AppStore, createStore } from '@client/store'
 import { mockDeclarationData, flushPromises } from '@client/tests/util'
 import { storage } from '@client/storage'
@@ -284,7 +284,14 @@ describe('archiveDeclaration tests', () => {
 
     const currentUserDetails: User = {
       userMgntUserID: '123',
-      localRegistrar: { name: [] }
+      id: '123',
+      practitionerId: '123',
+      status: 'active' as Status,
+      creationDate: '2133213212',
+      mobile: '09123433',
+      role: 'FIELD_AGENT' as RoleType,
+      name: [],
+      localRegistrar: { name: [], role: 'FIELD_AGENT' as RoleType }
     }
 
     indexedDB = {

@@ -18,7 +18,7 @@ import {
   storeUserDetails,
   removeUserDetails
 } from '@client/utils/userUtils'
-import { User } from '@client/utils/gateway'
+import { User, Query } from '@client/utils/gateway'
 import {
   getTokenPayload,
   ITokenPayload,
@@ -35,7 +35,6 @@ import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
-import { Query } from '@client/utils/gateway'
 
 export type ProfileState = {
   authenticated: boolean

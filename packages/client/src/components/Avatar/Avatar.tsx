@@ -17,7 +17,7 @@ import styled from '@client/styledComponents'
 
 interface IProps extends React.HTMLAttributes<Element> {
   name?: string
-  avatar?: AvatarType | undefined
+  avatar?: AvatarType | undefined | null
 }
 
 const AvatarImage = styled.img`

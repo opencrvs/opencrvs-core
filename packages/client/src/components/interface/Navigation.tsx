@@ -710,25 +710,25 @@ export const NavigationView = (props: IFullProps) => {
               icon={() => (
                 <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
               )}
-              id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
-              label={bookmarkResult.name}
+              id={`bookmarked_advanced_search_${bookmarkResult?.searchId}`}
+              label={bookmarkResult?.name}
               disabled={
-                advancedSearchParams.searchId === bookmarkResult.searchId &&
+                advancedSearchParams.searchId === bookmarkResult?.searchId &&
                 props.location.pathname === ADVANCED_SEARCH_RESULT
               }
               onClick={() => {
                 const filteredParam = omit(
-                  bookmarkResult.parameters,
+                  bookmarkResult?.parameters,
                   '__typename'
                 ) as IAdvancedSearchParamState
                 setAdvancedSearchParam({
                   ...filteredParam,
-                  searchId: bookmarkResult.searchId
+                  searchId: bookmarkResult?.searchId
                 })
                 goToAdvancedSearchResultAction()
               }}
               isSelected={
-                advancedSearchParams.searchId === bookmarkResult.searchId &&
+                advancedSearchParams.searchId === bookmarkResult?.searchId &&
                 props.location.pathname === ADVANCED_SEARCH_RESULT
               }
             />
