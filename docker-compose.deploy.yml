@@ -274,7 +274,7 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_DOMAIN=minio.{{hostname}}
-      - MINIO_SERVER_URL=https://minio.{{hostname}}
+      - MINIO_SERVER_URL=http://minio:9000
       - MINIO_BROWSER_REDIRECT_URL=https://minio-console.{{hostname}}
     ports:
       - '9000:9000'
