@@ -19,7 +19,7 @@ export enum Event {
 export interface IVSExportModel extends IVSExport, Document {}
 export interface IVSExport {
   event: Event
-  year: number
+  month: number
   fileSize: string
   url: string
   createdOn: number
@@ -30,7 +30,7 @@ const vsExportSchema = new Schema({
     type: String,
     enum: [Event.BIRTH, Event.DEATH]
   },
-  year: { type: Number },
+  month: { type: Number },
   fileSize: { type: String },
   url: { type: String },
   createdOn: { type: Number, default: Date.now }

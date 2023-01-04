@@ -2,9 +2,6 @@
 
 echo 'Calling VSExport end-point in metrics...'
 
-END_DATE=$(date +%Y-%m-%d)
-YEAR=$(date +%Y)
-ONE_YEAR_FROM_NOW=$(( YEAR - 1 ))
-START_DATE="${ONE_YEAR_FROM_NOW}$(date +-%m-%d)"
+PREVIOUS_DAY=$(date -d "yesterday" '+%Y-%m-%d')
 
-curl "$METRICS_URL/vsExport?startDate=$START_DATE&endDate=$END_DATE"
+curl "$METRICS_URL/vsExport?startDate=$PREVIOUS_DAY&endDate=$PREVIOUS_DAY&isScheduler=true"

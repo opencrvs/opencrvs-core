@@ -21,13 +21,15 @@ import VS_Export, { Event, IVSExport } from '@metrics/models/vsExports'
 import { fork } from 'child_process'
 import * as fs from 'fs'
 import { internal } from '@hapi/boom'
+import { isFirstDayOfMonth } from 'date-fns'
 
 export async function vsExportHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const startDate = request.query.startDate //yyyy-mm-dd
-  const endDate = request.query.endDate //yyyy-mm-dd
+  const startDate = String(request.query.startDate) //yyyy-mm-dd
+  const endDate = String(request.query.endDate) //yyyy-mm-dd
+  const isScheduler = request.query['isScheduler'] === 'true' ? true : false //boolean
   if (!isValidDate(startDate) || !isValidDate(endDate)) {
     return h
       .response({
@@ -42,51 +44,11 @@ export async function vsExportHandler(
 
   script.on('close', async (code) => {
     console.log(`child process exited with code ${code}`)
-    try {
-      if (
-        fs.existsSync(BIRTH_REPORT_PATH) &&
-        fs.existsSync(DEATH_REPORT_PATH)
-      ) {
-        //get year
-        const year = startDate.split('-')[0]
 
-        //get files stats
-        const fileStats = {
-          [Event.BIRTH]: fs.statSync(BIRTH_REPORT_PATH),
-          [Event.DEATH]: fs.statSync(DEATH_REPORT_PATH)
-        }
-
-        //convert csv files to base64
-        const fileContents = {
-          [Event.BIRTH]: fs.readFileSync(BIRTH_REPORT_PATH),
-          [Event.DEATH]: fs.readFileSync(DEATH_REPORT_PATH)
-        }
-
-        //upload files to minio
-        const uploadResponse = {
-          [Event.BIRTH]: await uploadFileToMinio(fileContents.birth),
-          [Event.DEATH]: await uploadFileToMinio(fileContents.death)
-        }
-
-        try {
-          await VS_Export.create(
-            [Event.BIRTH, Event.DEATH].map((event) => ({
-              event,
-              year,
-              fileSize: formatBytes(fileStats[event].size),
-              url: uploadResponse[event],
-              createdOn: Date.now()
-            }))
-          )
-          //delete csv files
-          fs.unlinkSync(BIRTH_REPORT_PATH)
-          fs.unlinkSync(DEATH_REPORT_PATH)
-        } catch (error) {
-          throw internal(error)
-        }
-      }
-    } catch (err) {
-      console.error(err)
+    if (isScheduler && isFirstDayOfMonth(new Date())) {
+      await uploadVSExportFile(startDate)
+    } else if (!isScheduler) {
+      await uploadVSExportFile(startDate)
     }
   })
   return h
@@ -95,6 +57,51 @@ export async function vsExportHandler(
       statusCode: 202
     })
     .code(202)
+}
+
+async function uploadVSExportFile(startDate: string) {
+  try {
+    if (fs.existsSync(BIRTH_REPORT_PATH) && fs.existsSync(DEATH_REPORT_PATH)) {
+      const month = startDate.split('-')[1]
+
+      //get files stats
+      const fileStats = {
+        [Event.BIRTH]: fs.statSync(BIRTH_REPORT_PATH),
+        [Event.DEATH]: fs.statSync(DEATH_REPORT_PATH)
+      }
+
+      //convert csv files to base64
+      const fileContents = {
+        [Event.BIRTH]: fs.readFileSync(BIRTH_REPORT_PATH),
+        [Event.DEATH]: fs.readFileSync(DEATH_REPORT_PATH)
+      }
+
+      //upload files to minio
+      const uploadResponse = {
+        [Event.BIRTH]: await uploadFileToMinio(fileContents.birth),
+        [Event.DEATH]: await uploadFileToMinio(fileContents.death)
+      }
+
+      try {
+        await VS_Export.create(
+          [Event.BIRTH, Event.DEATH].map((event) => ({
+            event,
+            month,
+            fileSize: formatBytes(fileStats[event].size),
+            url: uploadResponse[event],
+            createdOn: Date.now()
+          }))
+        )
+        //delete csv files
+        fs.unlinkSync(BIRTH_REPORT_PATH)
+        fs.unlinkSync(DEATH_REPORT_PATH)
+      } catch (error) {
+        throw internal(error)
+      }
+    }
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 function isValidDate(date: string) {
