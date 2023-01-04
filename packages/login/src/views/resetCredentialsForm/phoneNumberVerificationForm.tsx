@@ -29,6 +29,7 @@ import styled from 'styled-components'
 import { Title } from './commons'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { convertToMSISDN } from '@login/utils/dataCleanse'
+import { messages as validationMessages } from '@login/i18n/messages/validations'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -75,7 +76,13 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
   handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!this.state.phone || this.state.error) {
-      this.setState({ error: true })
+      this.setState({
+        touched: true,
+        error: true,
+        errorMessage: this.props.intl.formatMessage(
+          validationMessages.phoneNumberFormat
+        )
+      })
       return
     }
     try {

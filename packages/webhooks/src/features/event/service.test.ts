@@ -11,7 +11,10 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { transformBirthBundle } from '@webhooks/features/event/service'
+import {
+  getPermissionsBundle,
+  transformBirthBundle
+} from '@webhooks/features/event/service'
 
 import * as fetchMock from 'jest-fetch-mock'
 
@@ -478,5 +481,48 @@ describe('Webhook transformBirthBundle for national id integration', () => {
     afterAll(async () => {
       jest.clearAllMocks()
     })
+  })
+})
+
+describe('webhook transformBirthBundle for webhook permissions integrations ', () => {
+  beforeEach(async () => {
+    fetch.resetMocks()
+  })
+
+  it('should return webhook permissions bundle', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(childResource), { status: 200 }],
+      [JSON.stringify(motherResource), { status: 200 }],
+      [JSON.stringify(informantResource), { status: 200 }],
+      [JSON.stringify(documentResource), { status: 200 }]
+    )
+
+    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:webhooks-user'
+    })
+
+    const authHeader = {
+      Authorization: `Bearer ${token}`,
+      'x-correlation-id': '1'
+    }
+
+    const permissionsBundle = await getPermissionsBundle(
+      taskBundle,
+      [
+        'child-details',
+        'mother-details',
+        'informant-details',
+        'supporting-documents'
+      ],
+      compositionResource,
+      authHeader
+    )
+    expect(permissionsBundle).toEqual(taskBundle)
+  })
+
+  afterAll(async () => {
+    jest.clearAllMocks()
   })
 })

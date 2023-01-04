@@ -17,7 +17,7 @@ export const Tick = (props: React.HTMLAttributes<SVGElement>) => (
     <path
       d="M1 3.437L4.288 7 9 1"
       stroke="currentColor"
-      strokeWidth={3}
+      strokeWidth={2}
       fill="none"
       fillRule="evenodd"
       strokeLinecap="round"

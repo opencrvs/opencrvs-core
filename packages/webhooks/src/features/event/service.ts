@@ -113,7 +113,7 @@ export async function transformDeathBundle(
   }
 }
 
-const getPermissionsBundle = async (
+export const getPermissionsBundle = async (
   bundle: fhir.Bundle,
   permissions: string[] = [],
   composition: fhir.Composition,
