@@ -32,7 +32,7 @@ import { EMPTY_STRING } from '@client/utils/constants'
 
 const getInformantEngName = (sectionData: IFormSectionData): string => {
   if (sectionData.firstNamesEng && sectionData.familyNameEng) {
-    return `${sectionData.familyNameEng}, ${[
+    return `${(sectionData.familyNameEng as string).trim()}, ${[
       sectionData.firstNamesEng,
       sectionData.middleNamesEng
     ]
@@ -45,11 +45,11 @@ const getInformantEngName = (sectionData: IFormSectionData): string => {
 
 const getInformantOthreName = (sectionData: IFormSectionData): string => {
   if (sectionData.firstNames) {
-    return `${sectionData.familyName as string}, ${
+    return `${(sectionData.familyName as string).trim()}, ${
       sectionData.firstNames as string
     }`
   } else {
-    return sectionData.familyName as string
+    return (sectionData.familyName as string).trim()
   }
 }
 
@@ -65,7 +65,7 @@ const getInformantFullName = (
     fullName = getInformantEngName(sectionData)
   } else {
     if (sectionData.firstNames && sectionData.familyName) {
-      fullName = `${sectionData.familyName}, ${[
+      fullName = `${(sectionData.familyName as string).trim()}, ${[
         sectionData.firstNames,
         sectionData.middleNames
       ]
