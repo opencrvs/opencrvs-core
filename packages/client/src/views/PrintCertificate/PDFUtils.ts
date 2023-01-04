@@ -119,6 +119,30 @@ export function printCertificate(
   )
 }
 
+export function getTextOnlyTemplate(svgTemplate: string) {
+  const html = document.createElement('html')
+  html.innerHTML = svgTemplate
+  const elementsToKeep = [
+    'text',
+    'image[data-type="qrCode"]',
+    'g[data-type="specimenWatermark"]',
+    'line[data-type="signatureUnderline"]'
+  ]
+  const elementsToRemove = [
+    'text[data-type="countryName"]',
+    'text[data-type="orgName"]',
+    'text[data-type="certificateSubject"]',
+    'text[data-type="formNumber"]'
+  ]
+  html
+    .querySelectorAll(
+      `svg > :not(${elementsToKeep.join(',')}),${elementsToRemove.join(',')}`
+    )
+    .forEach((elem) => elem.remove())
+
+  return html.getElementsByTagName('svg')[0].outerHTML
+}
+
 function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
@@ -133,7 +157,13 @@ function getPDFTemplateWithSVG(
       svgTemplate = offlineResource.templates.certificates!.birth.definition
     }
   } else {
-    svgTemplate = offlineResource.templates.certificates!.death.definition
+    if (textOnly) {
+      svgTemplate = getTextOnlyTemplate(
+        offlineResource.templates.certificates!.death.definition
+      )
+    } else {
+      svgTemplate = offlineResource.templates.certificates!.death.definition
+    }
   }
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,

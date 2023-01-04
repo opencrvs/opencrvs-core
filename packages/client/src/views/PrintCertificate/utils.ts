@@ -211,7 +211,7 @@ export function getEventDate(data: IFormData, event: Event) {
     case Event.Birth:
       return data.child.childBirthDate as string
     case Event.Death:
-      return data.deathEvent.deathDate as string
+      return data.deceased.deathDate as string
     case Event.Adoption:
       return data.child.childBirthDate as string // TODO: Amend
     case Event.Marriage:
