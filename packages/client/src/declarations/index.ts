@@ -291,7 +291,7 @@ type Payment = {
 
 interface IArchiveDeclarationAction {
   type: typeof ARCHIVE_DECLARATION
-  payload: { declarationId: string }
+  payload: { declarationId: string; reason?: string; comment?: string }
 }
 
 interface IStoreDeclarationAction {
@@ -553,9 +553,14 @@ export const getStorageDeclarationsFailed =
   })
 
 export function archiveDeclaration(
-  declarationId: string
+  declarationId: string,
+  reason?: string,
+  comment?: string
 ): IArchiveDeclarationAction {
-  return { type: ARCHIVE_DECLARATION, payload: { declarationId } }
+  return {
+    type: ARCHIVE_DECLARATION,
+    payload: { declarationId, reason, comment }
+  }
 }
 
 export function deleteDeclaration(
@@ -1551,7 +1556,11 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
           action: SubmissionAction.ARCHIVE_DECLARATION,
-          payload: { id: declaration.id }
+          payload: {
+            id: declaration.id,
+            reason: action.payload.reason || '',
+            comment: action.payload.comment || ''
+          }
         }
         return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
       }

@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FormFieldGenerator } from '@client/components/form'
-import { IDeclaration, IPayload, SUBMISSION_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  IPayload,
+  SUBMISSION_STATUS,
+  archiveDeclaration
+} from '@client/declarations'
 import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
@@ -22,18 +27,20 @@ import {
   rejectRegistration
 } from '@opencrvs/client/src/review/reject-registration'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Button } from '@opencrvs/components/lib/Button'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
+import { isEmpty } from 'lodash'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
 `
 interface IState {
   data: IFormSectionData
-  enableUploadButton: boolean
+  enableSendForUpdateBtn: boolean
+  enableArchiveBtn: boolean
 }
 interface IProps {
   draftId: string
@@ -41,6 +48,7 @@ interface IProps {
   event: Event
   duplicate?: boolean
   onClose: () => void
+  archiveDeclaration: typeof archiveDeclaration
   confirmRejectionEvent: (
     declaration: IDeclaration,
     status: string,
@@ -56,7 +64,8 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
     super(props)
     this.state = {
       data: {},
-      enableUploadButton: false
+      enableSendForUpdateBtn: false,
+      enableArchiveBtn: false
     }
   }
 
@@ -65,15 +74,21 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
       () => ({ data: rejectionFormData }),
       () =>
         this.setState(() => ({
-          enableUploadButton: this.shouldEnableUploadButton(rejectionFormData)
+          enableSendForUpdateBtn:
+            this.shouldEnableSendForUpdateBtn(rejectionFormData),
+          enableArchiveBtn: !hasFormError(
+            this.props.form.fields,
+            rejectionFormData
+          )
         }))
     )
   }
 
-  shouldEnableUploadButton = (rejectionFormData: IFormSectionData) => {
+  shouldEnableSendForUpdateBtn = (rejectionFormData: IFormSectionData) => {
     return (
       rejectionFormData &&
-      !hasFormError(this.props.form.fields, rejectionFormData)
+      !hasFormError(this.props.form.fields, rejectionFormData) &&
+      isEmpty(rejectionFormData.rejectionReason)
     )
   }
 
@@ -112,18 +127,37 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
           title={intl.formatMessage(messages.rejectionFormTitle)}
           show={true}
           width={918}
-          contentHeight={480}
+          contentHeight={270}
           handleClose={this.props.onClose}
           showHeaderBorder={true}
           actions={[
-            <TertiaryButton
+            <Button
               id="cancel"
+              size="medium"
+              type="tertiary"
               key="cancel"
               onClick={this.props.onClose}
             >
               {intl.formatMessage(buttonMessages.cancel)}
-            </TertiaryButton>,
-            <PrimaryButton
+            </Button>,
+            <Button
+              id="submit_archive"
+              size="medium"
+              type="secondary_negative"
+              onClick={() => {
+                this.props.archiveDeclaration(
+                  payload.id,
+                  payload.reason as string,
+                  payload.comment as string
+                )
+              }}
+              disabled={!this.state.enableArchiveBtn}
+            >
+              {intl.formatMessage(buttonMessages.archive)}
+            </Button>,
+            <Button
+              size="medium"
+              type="negative"
               id="submit_reject_form"
               onClick={() =>
                 confirmRejectionEvent(
@@ -133,10 +167,10 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
                   payload
                 )
               }
-              disabled={!this.state.enableUploadButton}
+              disabled={!this.state.enableSendForUpdateBtn}
             >
-              {intl.formatMessage(buttonMessages.confirm)}
-            </PrimaryButton>
+              {intl.formatMessage(buttonMessages.sendForUpdates)}
+            </Button>
           ]}
         >
           <Instruction>
@@ -154,6 +188,11 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 }
 
-export const RejectRegistrationForm = connect((state: IStoreState) => ({
-  form: rejectRegistration
-}))(injectIntl(RejectRegistrationView))
+export const RejectRegistrationForm = connect(
+  (state: IStoreState) => ({
+    form: rejectRegistration
+  }),
+  {
+    archiveDeclaration
+  }
+)(injectIntl(RejectRegistrationView))

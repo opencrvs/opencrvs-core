@@ -23,6 +23,8 @@ interface IRejectMessages
   rejectionReasonOther: MessageDescriptor
   rejectionCommentForHealthWorkerLabel: MessageDescriptor
   rejectionFormInstruction: MessageDescriptor
+  markAsDuplicate: MessageDescriptor
+  emptyLabel: MessageDescriptor
 }
 
 const messagesToDefine: IRejectMessages = {
@@ -57,6 +59,11 @@ const messagesToDefine: IRejectMessages = {
     defaultMessage: 'Duplicate declaration',
     description: 'Label for rejection option duplicate'
   },
+  markAsDuplicate: {
+    id: 'review.rejection.form.reasons.markDuplicate',
+    defaultMessage: 'Mark as a duplicate',
+    description: 'Label for rejection option duplicate'
+  },
   rejectionReasonMisspelling: {
     id: 'review.rejection.form.reasons.misspelling',
     defaultMessage: 'Misspelling',
@@ -76,6 +83,10 @@ const messagesToDefine: IRejectMessages = {
     id: 'review.rejection.form.commentLabel',
     defaultMessage:
       'Comments or instructions for health worker to rectify declaration'
+  },
+  emptyLabel: {
+    id: 'review.rejection.form.emptyLabel',
+    defaultMessage: ' '
   }
 }
 

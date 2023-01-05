@@ -230,7 +230,8 @@ function GeneratedInputField({
     disabled: fieldDefinition.disabled,
     error: Boolean(error),
     touched: Boolean(touched),
-    placeholder: fieldDefinition.placeholder
+    placeholder: fieldDefinition.placeholder,
+    ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
   }
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (

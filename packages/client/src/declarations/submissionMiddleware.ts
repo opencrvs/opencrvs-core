@@ -106,7 +106,12 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             details: gqlDetails
           }
         })
-      } else if (submissionAction === SubmissionAction.REJECT_DECLARATION) {
+      } else if (
+        [
+          SubmissionAction.REJECT_DECLARATION,
+          SubmissionAction.ARCHIVE_DECLARATION
+        ].includes(submissionAction)
+      ) {
         await client.mutate({
           mutation,
           variables: {

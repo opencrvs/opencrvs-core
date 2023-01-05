@@ -2717,6 +2717,8 @@ export interface MutationToMarkEventAsReinstatedResolver<
 
 export interface MutationToMarkEventAsArchivedArgs {
   id: string
+  reason?: string
+  comment?: string
 }
 export interface MutationToMarkEventAsArchivedResolver<
   TParent = any,

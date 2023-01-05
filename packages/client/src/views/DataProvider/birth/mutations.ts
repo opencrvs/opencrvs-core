@@ -77,8 +77,12 @@ export const REJECT_BIRTH_DECLARATION = gql`
 `
 
 export const ARCHIVE_BIRTH_DECLARATION = gql`
-  mutation markEventAsArchived($id: String!) {
-    markEventAsArchived(id: $id)
+  mutation markEventAsArchived(
+    $id: String!
+    $reason: String
+    $comment: String
+  ) {
+    markEventAsArchived(id: $id, reason: $reason, comment: $comment)
   }
 `
 

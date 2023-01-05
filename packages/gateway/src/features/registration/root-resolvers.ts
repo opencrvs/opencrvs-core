@@ -388,7 +388,7 @@ export const resolvers: GQLResolver = {
       // return the taskId
       return taskEntry.resource.id
     },
-    async markEventAsArchived(_, { id }, authHeader) {
+    async markEventAsArchived(_, { id, reason, comment }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -401,7 +401,9 @@ export const resolvers: GQLResolver = {
       const taskEntry = await getTaskEntry(id, authHeader)
       const newTaskBundle = await updateFHIRTaskBundle(
         taskEntry,
-        GQLRegStatus.ARCHIVED
+        GQLRegStatus.ARCHIVED,
+        reason,
+        comment
       )
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId

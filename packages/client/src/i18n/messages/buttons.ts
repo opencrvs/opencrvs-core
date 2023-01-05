@@ -73,6 +73,7 @@ interface IButtonsMessages
   copy: MessageDescriptor
   copied: MessageDescriptor
   exactDateUnknown: MessageDescriptor
+  sendForUpdates: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -389,6 +390,10 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Exact date unknown',
     description:
       'Label for DateRangePickerForFormField components daterangepicker toggle button'
+  },
+  sendForUpdates: {
+    id: 'buttons.sendForUpdates',
+    defaultMessage: 'Send for updates'
   }
 }
 
