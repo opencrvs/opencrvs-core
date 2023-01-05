@@ -49,6 +49,8 @@ import { CorrectionReason } from '@client/forms/correction/reason'
 import { Table } from '@client/../../components/lib'
 import { History, RegAction, RegStatus } from '@client/utils/gateway'
 import { GQLHumanName } from '@client/../../gateway/src/graphql/schema'
+import { Pill } from '@opencrvs/components/lib/Pill'
+import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -125,7 +127,11 @@ function prepareComments(
       ? currentHistoryItemIndex
       : currentHistoryItemIndex - 1
 
-  if (actionDetailsData.regStatus === RegStatus.Rejected) {
+  if (
+    [RegStatus.Rejected, RegStatus.Archived].includes(
+      actionDetailsData.regStatus as RegStatus
+    )
+  ) {
     return actionDetailsData.statusReason?.text
       ? [{ comment: actionDetailsData.statusReason.text }]
       : []
@@ -479,6 +485,16 @@ export const ActionDetailsModalListTable = ({
       {/* For Comments */}
       {content.length > 0 && (
         <Table noResultText=" " columns={commentsColumn} content={content} />
+      )}
+
+      {actionDetailsData.reason === 'duplicate' && (
+        <p>
+          <Pill
+            label={intl.formatMessage(recordAuditMessages.markAsDuplicate)}
+            size="small"
+            type="inactive"
+          />
+        </p>
       )}
 
       {/* For Data Updated */}
