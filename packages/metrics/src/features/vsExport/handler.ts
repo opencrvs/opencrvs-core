@@ -21,7 +21,7 @@ import VS_Export, { Event, IVSExport } from '@metrics/models/vsExports'
 import { fork } from 'child_process'
 import * as fs from 'fs'
 import { internal } from '@hapi/boom'
-import { isFirstDayOfMonth } from 'date-fns'
+import { isFirstDayOfMonth, format } from 'date-fns'
 
 export async function vsExportHandler(
   request: Hapi.Request,
@@ -46,9 +46,9 @@ export async function vsExportHandler(
     console.log(`child process exited with code ${code}`)
 
     if (isScheduler && isFirstDayOfMonth(new Date())) {
-      await uploadVSExportFile(startDate)
+      await uploadVSExportFile(startDate, endDate)
     } else if (!isScheduler) {
-      await uploadVSExportFile(startDate)
+      await uploadVSExportFile(startDate, endDate)
     }
   })
   return h
@@ -59,11 +59,9 @@ export async function vsExportHandler(
     .code(202)
 }
 
-async function uploadVSExportFile(startDate: string) {
+async function uploadVSExportFile(startDate: string, endDate: string) {
   try {
     if (fs.existsSync(BIRTH_REPORT_PATH) && fs.existsSync(DEATH_REPORT_PATH)) {
-      const month = startDate.split('-')[1]
-
       //get files stats
       const fileStats = {
         [Event.BIRTH]: fs.statSync(BIRTH_REPORT_PATH),
@@ -86,7 +84,8 @@ async function uploadVSExportFile(startDate: string) {
         await VS_Export.create(
           [Event.BIRTH, Event.DEATH].map((event) => ({
             event,
-            month,
+            startDate: format(new Date(startDate), 'yyyy-MM-01'),
+            endDate,
             fileSize: formatBytes(fileStats[event].size),
             url: uploadResponse[event],
             createdOn: Date.now()
@@ -131,6 +130,7 @@ export async function getAllVSExport(
   h: Hapi.ResponseToolkit
 ) {
   let vsexports: IVSExport[]
+
   try {
     vsexports = await VS_Export.find()
   } catch (error) {
