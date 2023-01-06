@@ -193,6 +193,7 @@ export function ForgotPIN(props: IForgotPINProps) {
 
   return (
     <PageWrapper
+      id="forgot_pin_page"
       background={
         offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor
       }
@@ -246,7 +247,7 @@ export function ForgotPIN(props: IForgotPINProps) {
           </Stack>
         </StyledForm>
         {error && (
-          <Toast type="error" onClose={() => setError('')}>
+          <Toast type="error" id="form_error" onClose={() => setError('')}>
             {error}
           </Toast>
         )}

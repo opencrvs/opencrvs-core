@@ -112,7 +112,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   showErrorMessage() {
     return (
       this.state.errorMessage && (
-        <Toast type="error" onClose={() => this.setState({ errorMessage: '' })}>
+        <Toast
+          type="error"
+          id="errorMsg"
+          onClose={() => this.setState({ errorMessage: '' })}
+        >
           {this.state.errorMessage}
         </Toast>
       )
@@ -224,6 +228,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     const { userDetails, offlineCountryConfiguration } = this.props
     return (
       <PageWrapper
+        id="unlockPage"
         background={
           offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor
         }
@@ -251,7 +256,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           />
           <PINKeypad
             forgotPinComponent={
-              <Link id="forgot_password" onClick={this.props.onForgetPin}>
+              <Link id="forgotten_pin" onClick={this.props.onForgetPin}>
                 {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
               </Link>
             }

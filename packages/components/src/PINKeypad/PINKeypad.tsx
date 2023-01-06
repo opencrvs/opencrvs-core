@@ -11,7 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Backspace } from '../icons/Backspace'
+import { userMessages } from '@opencrvs/client/src/i18n/messages'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 interface IProps {
   id?: string
@@ -61,6 +62,13 @@ const DotUnfilled = styled.span`
     margin: 14px;
   }
 `
+
+type Props = IntlShapeProps
+
+const EnterPinLabel = injectIntl((props: Props) => {
+  const { intl } = props
+  return <h2>{intl.formatMessage(userMessages.enterPinLabel)}</h2>
+})
 
 export class PINKeypad extends React.Component<IProps, IState> {
   state = { pin: this.props.pin || '' }
@@ -126,10 +134,18 @@ export class PINKeypad extends React.Component<IProps, IState> {
         {...this.props}
       >
         <div>
-          <h2>Enter your pin</h2>
+          <EnterPinLabel />
+          <div>
+            <input
+              hidden
+              type="number"
+              onKeyDown={this.keyDown}
+              id="pin-input"
+              ref={this.pinInput}
+            />
+          </div>
           <div
             onClick={() => {
-              console.log(this.pinInput?.current)
               this.pinInput?.current?.focus()
             }}
           >
