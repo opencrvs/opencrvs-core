@@ -487,15 +487,17 @@ export const ActionDetailsModalListTable = ({
         <Table noResultText=" " columns={commentsColumn} content={content} />
       )}
 
-      {actionDetailsData.reason === 'duplicate' && (
-        <p>
-          <Pill
-            label={intl.formatMessage(recordAuditMessages.markAsDuplicate)}
-            size="small"
-            type="inactive"
-          />
-        </p>
-      )}
+      {/* Show Duplicate pill for Archived declarations */}
+      {actionDetailsData.reason === 'duplicate' &&
+        actionDetailsData.regStatus === RegStatus.Archived && (
+          <p>
+            <Pill
+              label={intl.formatMessage(recordAuditMessages.markAsDuplicate)}
+              size="small"
+              type="inactive"
+            />
+          </p>
+        )}
 
       {/* For Data Updated */}
       {declarationUpdates.length > 0 &&
