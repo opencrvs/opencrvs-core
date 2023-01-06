@@ -364,23 +364,23 @@ type Location {
 }
 
 type User {
-  id: ID
-  userMgntUserID: ID
-  practitionerId: String
-  name: [HumanName]
+  id: ID!
+  userMgntUserID: ID!
+  practitionerId: String!
+  name: [HumanName!]!
   username: String
-  mobile: String
-  role: String
+  mobile: String!
+  role: RoleType!
   type: String
   email: String
-  status: String
+  status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
-  creationDate: String
+  creationDate: String!
   avatar: Avatar
   device: String
   searches: [BookmarkedSeachItem]
@@ -628,8 +628,8 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 type Reinstated {
@@ -661,11 +661,11 @@ input DeathRegistrationInput {
 
 input UserInput {
   id: ID
-  name: [HumanNameInput]
+  name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String
-  role: String
+  mobile: String!
+  role: RoleType!
   type: String
   email: String
   primaryOffice: String
@@ -1001,9 +1001,26 @@ enum LocationType {
   OTHER
 }
 
+enum RoleType {
+  FIELD_AGENT
+  REGISTRATION_AGENT
+  LOCAL_REGISTRAR
+  LOCAL_SYSTEM_ADMIN
+  NATIONAL_SYSTEM_ADMIN
+  PERFORMANCE_MANAGEMENT
+  NATIONAL_REGISTRAR
+}
+
+enum Status {
+  active
+  deactivated
+  pending
+  disabled
+}
+
 type LocalRegistrar {
   name: [HumanName]!
-  role: String!
+  role: RoleType!
   signature: Signature
 }
 
@@ -1022,7 +1039,7 @@ type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
   type: String
-  status: String
+  status: Status
   avatar: Avatar
   primaryOfficeId: String
   creationDate: String
