@@ -59,7 +59,7 @@ export const fetchLocation = async (
 export async function fetchLocationsByType(
   type: string,
   authHeader: IAuthHeader
-): Promise<fhir.Location[]> {
+): Promise<(fhir.Location & { id: string })[]> {
   const bundle = await fetchFHIR(`Location?_count=0&type=${type}`, authHeader)
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
@@ -100,7 +100,7 @@ export async function fetchChildLocationsByParentId(
 export async function fetchAllChildLocationsByParentId(
   locationId: string,
   authHeader: IAuthHeader
-): Promise<fhir.Location[]> {
+): Promise<(fhir.Location & { id: string })[]> {
   const bundle = await fetchFHIR(
     `Location?_count=0&partof=${locationId}`,
     authHeader

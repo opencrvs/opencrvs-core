@@ -14,7 +14,6 @@ import {
   fetchChildLocationsByParentId,
   fetchLocationsByType,
   countUsersByLocation,
-  ICountByLocation,
   fetchAllChildLocationsByParentId
 } from '@metrics/api'
 import { getPopulation, getLocationType } from '@metrics/features/metrics/utils'
@@ -28,7 +27,7 @@ interface ILocationStatisticsResponse {
 
 async function getAdminLocationStatistics(
   location: fhir.Location,
-  registrarsCountByLocation: Array<ICountByLocation>,
+  registrarsCountByLocation: Record<string, number | undefined>,
   populationYear: number,
   authHeader: IAuthHeader,
   cumulativeResult: ILocationStatisticsResponse = {
@@ -49,10 +48,7 @@ async function getAdminLocationStatistics(
   for (const each of childLocations) {
     if (getLocationType(each) === 'CRVS_OFFICE') {
       cumulativeResult.offices += 1
-      cumulativeResult.registrars +=
-        registrarsCountByLocation.find(
-          ({ locationId }) => locationId === each.id
-        )?.total || 0
+      cumulativeResult.registrars += registrarsCountByLocation[each.id] ?? 0
     } else {
       await getAdminLocationStatistics(
         each,
@@ -69,7 +65,7 @@ async function getAdminLocationStatistics(
 
 async function getCountryWideLocationStatistics(
   populationYear: number,
-  registrarsCountByLocation: Array<ICountByLocation>,
+  registrarsCountByLocation: Record<string, number | undefined>,
   authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
   let population = 0
@@ -85,10 +81,7 @@ async function getCountryWideLocationStatistics(
   const locationOffices = await fetchLocationsByType('CRVS_OFFICE', authHeader)
   for (const office of locationOffices) {
     offices += 1
-    registrars +=
-      registrarsCountByLocation.find(
-        ({ locationId }) => locationId === office.id
-      )?.total || 0
+    registrars += registrarsCountByLocation[office.id] ?? 0
   }
   return {
     population,
@@ -106,18 +99,26 @@ export async function getLocationStatistics(
     { role: 'LOCAL_REGISTRAR' },
     authHeader
   )
+  const registrarsCountByLocationMap = registrarsCountByLocation.reduce<
+    Record<string, number | undefined>
+  >((countMap, currentLocation) => {
+    return {
+      ...countMap,
+      [currentLocation.locationId]: currentLocation.total
+    }
+  }, {})
   if (locationId) {
     const location = await fetchLocation(locationId, authHeader)
     return getAdminLocationStatistics(
       location,
-      registrarsCountByLocation,
+      registrarsCountByLocationMap,
       populationYear,
       authHeader
     )
   } else {
     return getCountryWideLocationStatistics(
       populationYear,
-      registrarsCountByLocation,
+      registrarsCountByLocationMap,
       authHeader
     )
   }
