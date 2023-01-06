@@ -33,6 +33,9 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { isEmpty } from 'lodash'
+import { goToHome } from '@client/navigation'
+import { HOME } from '@client/navigation/routes'
+import { RouteComponentProps } from 'react-router'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
@@ -49,6 +52,7 @@ interface IProps {
   duplicate?: boolean
   onClose: () => void
   archiveDeclaration: typeof archiveDeclaration
+  goToHome: typeof goToHome
   confirmRejectionEvent: (
     declaration: IDeclaration,
     status: string,
@@ -150,6 +154,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
                   payload.reason as string,
                   payload.comment as string
                 )
+                this.props.goToHome()
               }}
               disabled={!this.state.enableArchiveBtn}
             >
@@ -193,6 +198,7 @@ export const RejectRegistrationForm = connect(
     form: rejectRegistration
   }),
   {
-    archiveDeclaration
+    archiveDeclaration,
+    goToHome
   }
 )(injectIntl(RejectRegistrationView))

@@ -92,7 +92,7 @@ export const secondary_negative = css`
     color: ${({ theme }) => theme.colors.negativeDark};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.negativeDarker};
+    background: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.negativeDarker};
   }
   &:focus-visible {
