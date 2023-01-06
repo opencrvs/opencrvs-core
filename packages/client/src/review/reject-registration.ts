@@ -20,10 +20,11 @@ export const rejectRegistration: IRejectRegistrationForm = {
     {
       name: 'rejectionCommentForHealthWorker',
       type: TEXTAREA,
-      label: messages.emptyLabel,
+      label: messages.rejectionCommentForHealthWorkerLabel,
       initialValue: '',
       required: true,
       hideAsterisk: true,
+      hideHeader: true,
       validate: [],
       maxLength: 500,
       ignoreMediaQuery: true,
@@ -32,7 +33,8 @@ export const rejectRegistration: IRejectRegistrationForm = {
     {
       name: 'rejectionReason',
       type: CHECKBOX_GROUP,
-      label: messages.emptyLabel,
+      label: messages.rejectionReason,
+      hideHeader: true,
       hideAsterisk: true,
       initialValue: [],
       validate: [],

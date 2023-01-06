@@ -24,7 +24,6 @@ interface IRejectMessages
   rejectionCommentForHealthWorkerLabel: MessageDescriptor
   rejectionFormInstruction: MessageDescriptor
   markAsDuplicate: MessageDescriptor
-  emptyLabel: MessageDescriptor
 }
 
 const messagesToDefine: IRejectMessages = {
@@ -83,10 +82,6 @@ const messagesToDefine: IRejectMessages = {
     id: 'review.rejection.form.commentLabel',
     defaultMessage:
       'Comments or instructions for health worker to rectify declaration'
-  },
-  emptyLabel: {
-    id: 'review.rejection.form.emptyLabel',
-    defaultMessage: ' '
   }
 }
 
