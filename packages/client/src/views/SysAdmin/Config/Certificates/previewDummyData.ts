@@ -1266,6 +1266,8 @@ const mockOfflineData: Partial<IOfflineData> = {
 }
 const mockUserDetails = {
   language: 'en',
+  id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
+  creationDate: '2022-03-25T12:30:34.597+00:00',
   localRegistrar: {
     name: [
       {
@@ -1301,8 +1303,8 @@ const mockUserDetails = {
     name: 'Ibombo District Office',
     alias: ['Ibombo District Office'],
     status: 'active'
-  },
-  catchmentArea: [
+  }
+  /*catchmentArea: [
     {
       id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
       name: 'Ibombo',
@@ -1335,7 +1337,7 @@ const mockUserDetails = {
         }
       ]
     }
-  ]
+  ]*/
 }
 
 export const getDummyDeclarationData = (

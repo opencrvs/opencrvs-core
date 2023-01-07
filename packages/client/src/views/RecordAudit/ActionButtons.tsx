@@ -34,7 +34,7 @@ import {
 } from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { User } from '@client/utils/gateway'
+import { User, RoleType } from '@client/utils/gateway'
 import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
@@ -76,8 +76,8 @@ export const ShowDownloadButton = ({
 
   if (
     declaration.assignment &&
-    (userDetails?.role === Roles.LOCAL_REGISTRAR ||
-      userDetails?.role === Roles.NATIONAL_REGISTRAR)
+    (userDetails?.role === RoleType.LocalRegistrar ||
+      userDetails?.role === RoleType.NationalRegistrar)
   ) {
     refetchQueries = [
       { query: FETCH_DECLARATION_SHORT_INFO, variables: { id: declaration.id } }

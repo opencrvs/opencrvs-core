@@ -190,7 +190,7 @@ export function getJurisidictionType(location: GQLLocation): string | null {
 export function isUnderJurisdictionOfUser(
   locations: { [key: string]: ILocation },
   locationId: string,
-  jurisdictionLocation: string | undefined
+  jurisdictionLocation: string | undefined | null
 ) {
   if (!jurisdictionLocation) return false
 
@@ -219,10 +219,10 @@ export function getJurisdictionLocationIdFromUserDetails(userDetails: User) {
     userDetails.catchmentArea &&
     userDetails.catchmentArea.find((location) => {
       const jurisdictionTypeIdentifier =
-        location.identifier &&
-        location.identifier.find(
+        location?.identifier &&
+        location?.identifier.find(
           (identifier) =>
-            identifier.system ===
+            identifier?.system ===
             'http://opencrvs.org/specs/id/jurisdiction-type'
         )
       return (

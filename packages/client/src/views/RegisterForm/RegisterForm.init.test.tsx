@@ -28,7 +28,7 @@ import {
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { vi } from 'vitest'
 
-import { Event, User } from '@client/utils/gateway'
+import { Event, RoleType, Status, User } from '@client/utils/gateway'
 import { storage } from '@client/storage'
 describe('when user logs in', () => {
   // Some mock data
@@ -48,7 +48,22 @@ describe('when user logs in', () => {
 
   const currentUserDetails: User = {
     userMgntUserID: 'shakib75',
-    localRegistrar: { name: [] }
+    id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
+    creationDate: '2022-03-25T12:30:34.597+00:00',
+    practitionerId: '12345',
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Jonathan',
+        familyName: 'Campbell',
+        __typename: 'HumanName'
+      }
+    ],
+    mobile: '+260921111111',
+    role: 'NATIONAL_SYSTEM_ADMIN' as RoleType,
+    type: 'NATIONAL_SYSTEM_ADMIN',
+    status: 'active' as Status,
+    localRegistrar: { name: [], role: 'FIELD_AGENT' as RoleType }
   }
 
   const indexedDB = {
