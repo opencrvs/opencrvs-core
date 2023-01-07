@@ -292,8 +292,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <ArrowBack />,
-              handler: () => window.history.back()
+              icon: () => <HistoryNavigator hideForward />,
+              handler: () => {}
             }
           ],
           mobileBody: this.renderSearchInput(this.props, true)
