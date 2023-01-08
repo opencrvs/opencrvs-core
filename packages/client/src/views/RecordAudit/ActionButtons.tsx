@@ -39,7 +39,6 @@ import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
-import { Roles } from '@client/utils/authUtils'
 
 export type CMethodParams = {
   declaration: IDeclarationData

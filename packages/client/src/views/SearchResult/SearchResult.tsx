@@ -41,7 +41,7 @@ import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { Roles, Scope } from '@client/utils/authUtils'
+import { Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,
   NAME_TEXT,

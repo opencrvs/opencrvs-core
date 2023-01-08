@@ -19,13 +19,13 @@ import {
 } from '@client/pdfRenderer/transformer/types'
 import { userMessages } from '@client/i18n/messages'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { User } from '@client/utils/gateway'
+import { User, HumanName, LocalRegistrar } from '@client/utils/gateway'
 
-export function getUserName(userDetails: Pick<User, 'name'>) {
+export function getUserName(userDetails: Pick<User | LocalRegistrar, 'name'>) {
   const nameObj =
     userDetails.name &&
-    (userDetails.name.find((storedName: GQLHumanName | null) => {
-      const name = storedName as GQLHumanName
+    (userDetails.name.find((storedName: HumanName | null) => {
+      const name = storedName as HumanName
       return name.use === 'en' // TODO should be replaced with 'intl.locale' when userDetails will have proper data
     }) as GQLHumanName)
 
@@ -146,10 +146,10 @@ export const userTransformers: IFunctionTransformer = {
       templateData.userDetails.catchmentArea &&
       templateData.userDetails.catchmentArea.find((cArea) => {
         return (
-          (cArea.identifier &&
+          (cArea?.identifier &&
             cArea.identifier.find(
               (identifier) =>
-                identifier.system ===
+                identifier?.system ===
                   'http://opencrvs.org/specs/id/jurisdiction-type' &&
                 identifier.value === key.jurisdictionType
             )) ||

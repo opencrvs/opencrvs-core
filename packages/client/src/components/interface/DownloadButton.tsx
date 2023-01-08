@@ -24,7 +24,7 @@ import {
   deleteDeclaration as deleteDeclarationAction
 } from '@client/declarations'
 import { Action } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RoleType } from '@client/utils/gateway'
 import {
   ApolloClient,
   InternalRefetchQueriesInclude,
@@ -45,7 +45,6 @@ import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import ReactTooltip from 'react-tooltip'
-import { Roles } from '@client/utils/authUtils'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -65,7 +64,7 @@ interface DownloadButtonProps {
 }
 
 interface IConnectProps {
-  userRole?: Roles
+  userRole?: RoleType
   userId?: string
 }
 interface IDispatchProps {
@@ -113,7 +112,7 @@ function getAssignModalOptions(
     onUnassign: () => void
     onCancel: () => void
   },
-  userRole?: Roles,
+  userRole?: RoleType,
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
   const assignAction: IModalAction = {
@@ -143,8 +142,8 @@ function getAssignModalOptions(
     }
   } else if (assignment) {
     if (
-      userRole === Roles.LOCAL_REGISTRAR ||
-      userRole === Roles.NATIONAL_REGISTRAR
+      userRole === RoleType.LocalRegistrar ||
+      userRole === RoleType.NationalRegistrar
     ) {
       return {
         title: conflictsMessages.unassignTitle,
@@ -371,7 +370,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.role as Roles | undefined,
+  userRole: state.profile.userDetails?.role as RoleType | undefined,
   userId: state.profile.userDetails?.userMgntUserID
 })
 

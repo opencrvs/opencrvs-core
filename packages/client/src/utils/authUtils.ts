@@ -15,17 +15,7 @@ import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { User } from '@client/utils/gateway'
-
-export enum Roles {
-  FIELD_AGENT = 'FIELD_AGENT',
-  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
-  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
-  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
-  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
-  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
-  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
-}
+import { User, RoleType } from '@client/utils/gateway'
 export interface IURLParams {
   [key: string]: string | string[] | undefined
 }
@@ -145,10 +135,10 @@ export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
 }
 
 export const hasAccessToRoute = (
-  roles: Roles[],
+  roles: RoleType[],
   userDetails: User
 ): boolean => {
-  const userRole = userDetails.role as Roles
+  const userRole = userDetails.role as RoleType
   if (roles.includes(userRole)) {
     return true
   }

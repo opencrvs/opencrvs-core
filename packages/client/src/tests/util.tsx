@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { App } from '@client/App'
-import { Event, RoleType, Status } from '@client/utils/gateway'
+import { Event, RoleType, Status, User } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
@@ -1259,9 +1259,12 @@ export const currentUserDeclarations = {
   ]
 }
 
-export const userDetails = {
+export const userDetails: User = {
   userMgntUserID: '123',
-  language: 'en',
+  id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
+  status: 'active' as Status,
+  creationDate: '1487076708000',
+  practitionerId: '12345',
   name: [
     {
       use: 'en',
@@ -1270,7 +1273,7 @@ export const userDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  role: 'FIELD_AGENT',
+  role: 'FIELD_AGENT' as RoleType,
   mobile: '01677701431',
   primaryOffice: {
     id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
@@ -1349,7 +1352,7 @@ export const userDetails = {
     }
   ],
   localRegistrar: {
-    role: 'LOCAL_REGISTRAR',
+    role: 'LOCAL_REGISTRAR' as RoleType,
     signature: {
       data: `data:image/png;base64,${validImageB64String}`,
       type: 'image/png'

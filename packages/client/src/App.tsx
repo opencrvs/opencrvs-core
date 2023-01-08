@@ -57,7 +57,6 @@ import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
-import { Roles } from '@client/utils/authUtils'
 import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
@@ -65,6 +64,7 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { RoleType } from '@client/utils/gateway'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -218,7 +218,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                              RoleType.NationalSystemAdmin
                                             ]}
                                             path={routes.CERTIFICATE_CONFIG}
                                             component={CertificatesConfig}
@@ -226,9 +226,9 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              Roles.LOCAL_REGISTRAR,
-                                              Roles.REGISTRATION_AGENT,
-                                              Roles.NATIONAL_REGISTRAR
+                                              RoleType.LocalRegistrar,
+                                              RoleType.RegistrationAgent,
+                                              RoleType.NationalRegistrar
                                             ]}
                                             path={routes.ADVANCED_SEARCH}
                                             component={AdvancedSearchConfig}
@@ -236,9 +236,9 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              Roles.LOCAL_REGISTRAR,
-                                              Roles.REGISTRATION_AGENT,
-                                              Roles.NATIONAL_REGISTRAR
+                                              RoleType.LocalRegistrar,
+                                              RoleType.RegistrationAgent,
+                                              RoleType.NationalRegistrar
                                             ]}
                                             path={routes.ADVANCED_SEARCH_RESULT}
                                             component={AdvancedSearchResult}
@@ -246,7 +246,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                              RoleType.NationalSystemAdmin
                                             ]}
                                             path={routes.APPLICATION_CONFIG}
                                             component={ApplicationConfig}
@@ -320,11 +320,11 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              Roles.REGISTRATION_AGENT,
-                                              Roles.LOCAL_REGISTRAR,
-                                              Roles.LOCAL_SYSTEM_ADMIN,
-                                              Roles.NATIONAL_SYSTEM_ADMIN,
-                                              Roles.PERFORMANCE_MANAGEMENT
+                                              RoleType.RegistrationAgent,
+                                              RoleType.LocalRegistrar,
+                                              RoleType.LocalSystemAdmin,
+                                              RoleType.NationalSystemAdmin,
+                                              RoleType.PerformanceManagement
                                             ]}
                                             path={routes.TEAM_SEARCH}
                                             component={TeamSearch}
@@ -369,12 +369,12 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              Roles.REGISTRATION_AGENT,
-                                              Roles.LOCAL_REGISTRAR,
-                                              Roles.LOCAL_SYSTEM_ADMIN,
-                                              Roles.NATIONAL_SYSTEM_ADMIN,
-                                              Roles.PERFORMANCE_MANAGEMENT,
-                                              Roles.NATIONAL_REGISTRAR
+                                              RoleType.RegistrationAgent,
+                                              RoleType.LocalRegistrar,
+                                              RoleType.LocalSystemAdmin,
+                                              RoleType.NationalSystemAdmin,
+                                              RoleType.PerformanceManagement,
+                                              RoleType.NationalRegistrar
                                             ]}
                                             path={routes.PERFORMANCE_HOME}
                                             component={PerformanceHome}
@@ -382,8 +382,8 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              Roles.NATIONAL_SYSTEM_ADMIN,
-                                              Roles.NATIONAL_REGISTRAR
+                                              RoleType.NationalSystemAdmin,
+                                              RoleType.NationalRegistrar
                                             ]}
                                             path={routes.VS_EXPORTS}
                                             component={VSExport}

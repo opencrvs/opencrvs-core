@@ -27,7 +27,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { IStoreState } from '@client/store'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { Roles } from '@client/utils/authUtils'
+import { RoleType } from '@client/utils/gateway'
 
 export enum UserStatus {
   ACTIVE,
@@ -195,23 +195,23 @@ export function checkIfLocalLanguageProvided() {
 }
 
 export function getUserRole(
-  user: { role?: string | null },
+  user: { role: RoleType },
   intl: IntlShape
 ): string | undefined {
   switch (user.role) {
-    case Roles.FIELD_AGENT:
+    case RoleType.FieldAgent:
       return intl.formatMessage(userMessages.FIELD_AGENT)
-    case Roles.REGISTRATION_AGENT:
+    case RoleType.RegistrationAgent:
       return intl.formatMessage(userMessages.REGISTRATION_AGENT)
-    case Roles.NATIONAL_REGISTRAR:
+    case RoleType.NationalRegistrar:
       return intl.formatMessage(userMessages.NATIONAL_REGISTRAR)
-    case Roles.LOCAL_REGISTRAR:
+    case RoleType.LocalRegistrar:
       return intl.formatMessage(userMessages.LOCAL_REGISTRAR)
-    case Roles.LOCAL_SYSTEM_ADMIN:
+    case RoleType.LocalSystemAdmin:
       return intl.formatMessage(userMessages.LOCAL_SYSTEM_ADMIN)
-    case Roles.NATIONAL_SYSTEM_ADMIN:
+    case RoleType.NationalSystemAdmin:
       return intl.formatMessage(userMessages.NATIONAL_SYSTEM_ADMIN)
-    case Roles.PERFORMANCE_MANAGEMENT:
+    case RoleType.PerformanceManagement:
       return intl.formatMessage(userMessages.PERFORMANCE_MANAGEMENT)
     default:
       return undefined

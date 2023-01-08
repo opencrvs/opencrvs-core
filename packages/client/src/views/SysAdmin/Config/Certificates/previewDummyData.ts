@@ -12,6 +12,7 @@
 import { gqlToDraftTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
+import { RoleType, Status } from '@client/utils/gateway'
 
 const dummyBirthRegistrationResponse = {
   _fhirIDMap: {
@@ -1273,16 +1274,16 @@ const mockUserDetails = {
       {
         use: 'en',
         firstNames: 'Kennedy',
-        familyName: 'Mweene',
-        __typename: 'HumanName'
+        familyName: 'Mweene'
+        // __typename: 'HumanName'
       }
     ],
-    role: 'LOCAL_REGISTRAR',
+    role: 'LOCAL_REGISTRAR' as RoleType,
     signature: {
-      type: 'image/png',
-      __typename: 'Signature'
-    },
-    __typename: 'LocalRegistrar'
+      type: 'image/png'
+      // __typename: 'Signature'
+    }
+    // __typename: 'LocalRegistrar'
   },
   userMgntUserID: '622f81b42cd537bf91daa10b',
   practitionerId: '9c8a1a9f-f1d1-47f1-8874-5da5f238effa',
@@ -1290,20 +1291,20 @@ const mockUserDetails = {
     {
       use: 'en',
       firstNames: 'Jonathan',
-      familyName: 'Campbell',
-      __typename: 'HumanName'
+      familyName: 'Campbell'
+      // __typename: 'HumanName'
     }
   ],
   mobile: '+260921111111',
-  role: 'NATIONAL_SYSTEM_ADMIN',
+  role: 'NATIONAL_SYSTEM_ADMIN' as RoleType,
   type: 'NATIONAL_SYSTEM_ADMIN',
-  status: 'active',
-  primaryOffice: {
+  status: 'active' as Status
+  /*primaryOffice: {
     id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
     name: 'Ibombo District Office',
     alias: ['Ibombo District Office'],
     status: 'active'
-  }
+  }*/
   /*catchmentArea: [
     {
       id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
