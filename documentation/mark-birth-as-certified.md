@@ -67,9 +67,12 @@ sequenceDiagram
     Metrics->>Influx DB: Write points
 
     Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Get operation histories
+    Note over Search,ElasticSearch: Get operation history
 
     Search->>User management: Get user
-    Search->>ElasticSearch: Update composition
 
+    Search->>Hearth: Get office location
+    Note over Search,Hearth: Compose new history entry
+
+    Search->>ElasticSearch: Update composition history
 ```
