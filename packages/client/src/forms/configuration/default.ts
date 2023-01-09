@@ -3257,7 +3257,7 @@ export const registerForms: IDefaultRegisterForms = {
                 checkedValue: 'true',
                 uncheckedValue: 'false',
                 hideHeader: true,
-                initialValue: 'true',
+                initialValue: 'false',
                 validate: [],
                 mapping: {
                   mutation: {

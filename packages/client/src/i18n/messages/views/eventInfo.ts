@@ -57,7 +57,7 @@ const marriageBulletListItemsToDefine: MessageDescriptor[] = [
   {
     id: 'register.eventInfo.marriage.listItem0',
     defaultMessage:
-      'The Compulsory Birth and Death Registration Act mandates all registrars to ensure that the divorce register is regularly updated.',
+      'The Compulsory Birth and Death Registration Act mandates all registrars to ensure that the marriage register is regularly updated.',
     description: 'Event info bullet list item for marriage'
   },
   {
