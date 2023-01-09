@@ -24,7 +24,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, userMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getOfflineData } from '@client/offline/selectors'
@@ -89,6 +89,13 @@ type IFullProps = Props &
 
 const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
+
+type IntlProps = IntlShapeProps
+
+export const EnterPinLabel = injectIntl((props: IntlProps) => {
+  const { intl } = props
+  return <h2>{intl.formatMessage(userMessages.enterPinLabel)}</h2>
+})
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
   pinKeyRef: any
@@ -254,6 +261,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
             name={getUserName(userDetails)}
             avatar={userDetails?.avatar}
           />
+          <EnterPinLabel />
           <PINKeypad
             forgotPinComponent={
               <Link id="forgotten_pin" onClick={this.props.onForgetPin}>

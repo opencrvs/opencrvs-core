@@ -19,6 +19,17 @@ import { vi } from 'vitest'
 
 storage.setItem = vi.fn()
 
+const pressPin = (component: ReactWrapper, keyCode: number) => {
+  component.find('#pin-input').simulate('keyDown', { keyCode })
+  component.update()
+}
+
+const clearPassword = (component: ReactWrapper) => {
+  const pinInput = component.find('#pin-input')
+  pinInput.simulate('keypress', { key: 'Backspace' })
+  component.update()
+}
+
 describe('Create PIN view', () => {
   let c: ReactWrapper
 
@@ -33,10 +44,10 @@ describe('Create PIN view', () => {
   })
 
   it("shows and error when PINs don't match", async () => {
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-2').simulate('click')
+    pressPin(c, 48)
+    pressPin(c, 54)
+    pressPin(c, 48)
+    pressPin(c, 54)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -46,10 +57,10 @@ describe('Create PIN view', () => {
 
     c.update()
 
-    c.find('span#keypad-2').simulate('click')
-    c.find('span#keypad-2').simulate('click')
-    c.find('span#keypad-3').simulate('click')
-    c.find('span#keypad-2').simulate('click')
+    pressPin(c, 48)
+    pressPin(c, 49)
+    pressPin(c, 48)
+    pressPin(c, 54)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -63,11 +74,7 @@ describe('Create PIN view', () => {
   })
 
   it('allows the user to backspace keypresses', async () => {
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-backspace').simulate('click')
-    c.find('span#keypad-1').simulate('click')
+    pressPin(c, 48)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -79,7 +86,7 @@ describe('Create PIN view', () => {
 
     expect(c.find('span#title-text').text()).toBe('Create a PIN')
 
-    c.find('span#keypad-2').simulate('click')
+    clearPassword(c)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -93,10 +100,10 @@ describe('Create PIN view', () => {
   })
 
   it('prevents the user from using 4 sequential digits as PIN', async () => {
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
+    pressPin(c, 48)
+    pressPin(c, 48)
+    pressPin(c, 48)
+    pressPin(c, 48)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -112,10 +119,7 @@ describe('Create PIN view', () => {
   })
 
   it('prevents the user from using 4 sequential digits as PIN', async () => {
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-2').simulate('click')
-    c.find('span#keypad-3').simulate('click')
-    c.find('span#keypad-4').simulate('click')
+    pressPin(c, 48)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -131,10 +135,10 @@ describe('Create PIN view', () => {
   })
 
   it('stores the hashed PIN in storage if PINs match', async () => {
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-2').simulate('click')
+    pressPin(c, 48)
+    pressPin(c, 48)
+    pressPin(c, 48)
+    pressPin(c, 48)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -144,10 +148,10 @@ describe('Create PIN view', () => {
 
     c.update()
 
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-1').simulate('click')
-    c.find('span#keypad-2').simulate('click')
+    pressPin(c, 48)
+    pressPin(c, 48)
+    pressPin(c, 48)
+    pressPin(c, 48)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {

@@ -63,13 +63,6 @@ const DotUnfilled = styled.span`
   }
 `
 
-type Props = IntlShapeProps
-
-const EnterPinLabel = injectIntl((props: Props) => {
-  const { intl } = props
-  return <h2>{intl.formatMessage(userMessages.enterPinLabel)}</h2>
-})
-
 export class PINKeypad extends React.Component<IProps, IState> {
   state = { pin: this.props.pin || '' }
 
@@ -134,7 +127,6 @@ export class PINKeypad extends React.Component<IProps, IState> {
         {...this.props}
       >
         <div>
-          <EnterPinLabel />
           <div>
             <input
               hidden

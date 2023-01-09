@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
-import { PIN } from '@opencrvs/components/lib/icons'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import styled from '@client/styledComponents'
 import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/client/src/storage'
@@ -20,41 +20,32 @@ import { messages } from '@client/i18n/messages/views/pin'
 import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
-import { Box } from '@client/../../components/lib/Box'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
+import { Toast } from '@opencrvs/components'
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  ${({ theme }) => theme.gradients.primary};
-  background: ${({ color, theme }) =>
-    color ? color : theme.colors.backgroundPrimary};
   height: 100vh;
   width: 100%;
-  position: absolute;
-  overflow-y: hidden;
-  overflow-x: hidden;
 `
-const BoxWrapper = styled(Box)`
-  width: 32rem;
+const BoxWrapper = styled.div`
   text-align: center;
-`
+  border-radius: 4px;
+  padding: 24px;
+  width: min(500px, 90%);
 
-const StyledPIN = styled(PIN)`
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: auto;
-  @media (max-height: 780px) {
-    margin-top: 0px;
-  }
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  background: ${({ theme }) => theme.colors.white};
 `
 
 const TitleText = styled.span`
+  display: flex;
+  justify-content: center;
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.h2};
   text-align: center;
@@ -78,16 +69,15 @@ const DescriptionText = styled.span`
   }
 `
 
-const ErrorBox = styled.div`
+export const LogoContainer = styled.div`
+  flex-direction: row;
   display: flex;
-  align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.reg16};
-  background: ${({ theme }) => theme.colors.negative};
-  height: 40px;
-  width: 360px;
-  margin-top: -20px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    & svg {
+      transform: scale(0.8);
+    }
+  }
 `
 
 type IProps = IntlShapeProps & {
@@ -173,7 +163,11 @@ class CreatePinComponent extends React.Component<IProps> {
         }}
       >
         <BoxWrapper>
-          <StyledPIN />
+          <LogoContainer>
+            <CountryLogo
+              src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
+            />
+          </LogoContainer>
           {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
             <>
               <TitleText id="title-text">
@@ -183,9 +177,15 @@ class CreatePinComponent extends React.Component<IProps> {
                 {intl.formatMessage(messages.createDescription)}
               </DescriptionText>
               {pinMatchError && (
-                <ErrorBox id="error-text">
+                <Toast
+                  type="error"
+                  id="errorMsg"
+                  onClose={() => {
+                    this.setState({ pinMatchError: false })
+                  }}
+                >
                   {intl.formatMessage(messages.pinMatchError)}
-                </ErrorBox>
+                </Toast>
               )}
               <PINKeypad
                 pin=""
@@ -202,9 +202,15 @@ class CreatePinComponent extends React.Component<IProps> {
               <DescriptionText id="description-text">
                 {intl.formatMessage(messages.createDescription)}
               </DescriptionText>
-              <ErrorBox id="error-text">
+              <Toast
+                type="error"
+                id="errorMsg"
+                onClose={() => {
+                  this.setState({ pinHasSeqDigits: false })
+                }}
+              >
                 {intl.formatMessage(messages.pinSequentialDigitsError)}
-              </ErrorBox>
+              </Toast>
               <PINKeypad
                 onComplete={this.firstPINEntry}
                 key={refresher.toString()}
@@ -219,9 +225,15 @@ class CreatePinComponent extends React.Component<IProps> {
               <DescriptionText id="description-text">
                 {intl.formatMessage(messages.createDescription)}
               </DescriptionText>
-              <ErrorBox id="error-text">
+              <Toast
+                type="error"
+                id="errorMsg"
+                onClose={() => {
+                  this.setState({ pinHasSameDigits: false })
+                }}
+              >
                 {intl.formatMessage(messages.pinSameDigitsError)}
-              </ErrorBox>
+              </Toast>
               <PINKeypad
                 ref={(elem: any) => (this.pinKeyRef = elem)}
                 onComplete={this.firstPINEntry}
