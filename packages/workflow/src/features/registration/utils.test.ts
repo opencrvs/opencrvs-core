@@ -27,21 +27,9 @@ import {
   informantSMSNotificationMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/handler'
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
-
-const token = jwt.sign(
-  { scope: ['register'] },
-  readFileSync('../auth/test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:workflow-user'
-  }
-)
 
 describe('Verify utility functions', () => {
   beforeEach(async () => {
@@ -87,7 +75,6 @@ describe('Verify utility functions', () => {
         fhirBundle,
         Events.BIRTH_IN_PROGRESS_DEC,
         '01711111111',
-        token,
         {
           Authorization: 'bearer acd '
         }
@@ -97,15 +84,9 @@ describe('Verify utility functions', () => {
   it('send Birth declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundle)
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.BIRTH_NEW_DEC,
-        '01711111111',
-        token,
-        {
-          Authorization: 'bearer acd '
-        }
-      )
+      sendEventNotification(fhirBundle, Events.BIRTH_NEW_DEC, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Birth declaration notification logs an error in case of invalid data', async () => {
@@ -118,7 +99,6 @@ describe('Verify utility functions', () => {
       testFhirBundle,
       Events.BIRTH_NEW_DEC,
       '01711111111',
-      token,
       {
         Authorization: 'bearer acd '
       }
@@ -135,15 +115,9 @@ describe('Verify utility functions', () => {
       value: '20196816020000129'
     })
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.BIRTH_MARK_REG,
-        '01711111111',
-        token,
-        {
-          Authorization: 'bearer acd '
-        }
-      )
+      sendEventNotification(fhirBundle, Events.BIRTH_MARK_REG, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Birth registration notification logs an error in case of invalid data', async () => {
@@ -156,7 +130,6 @@ describe('Verify utility functions', () => {
       testFhirBundle,
       Events.BIRTH_NEW_DEC,
       '01711111111',
-      token,
       {
         Authorization: 'bearer acd '
       }
@@ -168,15 +141,9 @@ describe('Verify utility functions', () => {
   it('send Birth rejection notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundle)
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.BIRTH_MARK_VOID,
-        '01711111111',
-        token,
-        {
-          Authorization: 'bearer acd '
-        }
-      )
+      sendEventNotification(fhirBundle, Events.BIRTH_MARK_VOID, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send in-progress death declaration notification successfully', async () => {
@@ -187,7 +154,6 @@ describe('Verify utility functions', () => {
         fhirBundle,
         Events.DEATH_IN_PROGRESS_DEC,
         '01711111111',
-        token,
         {
           Authorization: 'bearer acd '
         }
@@ -197,15 +163,9 @@ describe('Verify utility functions', () => {
   it('send Death declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.DEATH_NEW_DEC,
-        '01711111111',
-        token,
-        {
-          Authorization: 'bearer acd '
-        }
-      )
+      sendEventNotification(fhirBundle, Events.DEATH_NEW_DEC, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Death declaration notification logs an error in case of invalid data', async () => {
@@ -218,7 +178,6 @@ describe('Verify utility functions', () => {
       testFhirBundleWithIdsForDeath,
       Events.DEATH_NEW_DEC,
       '01711111111',
-      token,
       {
         Authorization: 'bearer acd '
       }
@@ -235,15 +194,9 @@ describe('Verify utility functions', () => {
       value: '20196816020000129'
     })
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.DEATH_MARK_REG,
-        '01711111111',
-        token,
-        {
-          Authorization: 'bearer acd '
-        }
-      )
+      sendEventNotification(fhirBundle, Events.DEATH_MARK_REG, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Death registration notification logs an error in case of invalid data', async () => {
@@ -256,7 +209,6 @@ describe('Verify utility functions', () => {
       testFhirBundleWithIdsForDeath,
       Events.DEATH_MARK_REG,
       '01711111111',
-      token,
       {
         Authorization: 'bearer acd '
       }
@@ -268,29 +220,17 @@ describe('Verify utility functions', () => {
   it('send Death rejection notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.DEATH_MARK_VOID,
-        '01711111111',
-        token,
-        {
-          Authorization: 'bearer acd '
-        }
-      )
+      sendEventNotification(fhirBundle, Events.DEATH_MARK_VOID, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
   it('send Death declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     expect(
-      sendEventNotification(
-        fhirBundle,
-        Events.DEATH_NEW_DEC,
-        '01711111111',
-        token,
-        {
-          Authorization: 'bearer acd '
-        }
-      )
+      sendEventNotification(fhirBundle, Events.DEATH_NEW_DEC, '01711111111', {
+        Authorization: 'bearer acd '
+      })
     ).toBeDefined()
   })
 })

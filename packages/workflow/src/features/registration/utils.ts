@@ -122,7 +122,7 @@ export async function sendEventNotification(
     case Events.BIRTH_NEW_DEC:
     case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
       if (
-        !isInformantSMSNotificationEnabled(
+        isInformantSMSNotificationEnabled(
           informantSMSNotifications,
           InformantSMSNotificationName.birthDeclarationSMS
         )

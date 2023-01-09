@@ -45,7 +45,8 @@ import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAudit
 import {
   GetUserQuery,
   GetUserQueryVariables,
-  HumanName
+  HumanName,
+  User
 } from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -89,7 +90,9 @@ const transformUserQueryResult = (
               '')) ||
         ''
     },
-    name: createNamesMap(userData.name as HumanName[])[locale],
+    name:
+      createNamesMap(userData.name as HumanName[])[locale] ||
+      createNamesMap(userData.name as HumanName[])[LANG_EN],
     role: userData.role,
     type: userData.type,
     number: userData.mobile,
@@ -343,7 +346,7 @@ export const UserAudit = () => {
           </>
           <UserAuditActionModal
             show={modalVisible}
-            user={data.getUser!}
+            user={data.getUser! as User}
             onClose={() => toggleUserActivationModal()}
             onConfirmRefetchQueries={[
               {
