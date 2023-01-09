@@ -90,7 +90,7 @@ jobs:
         run: |
           git clone https://github.com/opencrvs/opencrvs-farajaland.git
 
-      # Get latest version hashes from repos if they are not given as inputs
+      # Get the latest version hashes from repos if they are not given as inputs
       - name: Get COUNTRY_CONFIG_VERSION
         if: ${{ !inputs.farajaland-image-tag }}
         run: |

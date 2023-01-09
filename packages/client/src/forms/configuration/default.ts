@@ -15,7 +15,7 @@ import {
   ISerializedForm,
   DeathSection,
   TEXTAREA
-} from '@client/forms/index'
+} from '@client/forms'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
 import {
@@ -1413,6 +1413,85 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
+                name: 'placeOfBirth',
+                customisable: false,
+                type: 'SELECT_WITH_OPTIONS',
+                previewGroup: 'placeOfBirth',
+                ignoreFieldLabelOnErrorMessage: true,
+                label: formMessageDescriptors.motherPlaceOfBirth,
+                required: true,
+                initialValue: '',
+                validate: [],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: [
+                  {
+                    value: 'HEALTH_FACILITY',
+                    label: formMessageDescriptors.healthInstitution
+                  },
+                  {
+                    value: 'PRIVATE_HOME',
+                    label: formMessageDescriptors.privateHome
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.otherInstitution
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'birthEventLocationMutationTransformer',
+                    parameters: []
+                  },
+                  query: {
+                    operation: 'eventLocationTypeQueryTransformer',
+                    parameters: []
+                  }
+                }
+              },
+              {
+                name: 'dateOfLastLivingDeath',
+                type: 'DATE',
+                label: formMessageDescriptors.dateOfLastLivingDeath,
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'dateFormatIsCorrect',
+                    parameters: []
+                  },
+                  {
+                    operation: 'dateInPast',
+                    parameters: []
+                  },
+                  {
+                    operation: 'isValidParentsBirthDate',
+                    parameters: [5]
+                  }
+                ],
+                mapping: {
+                  template: {
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'dateOfLastLivingDeath',
+                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                  },
+                  mutation: {
+                    operation: 'longDateTransformer',
+                    parameters: ['birthDate']
+                  },
+                  query: {
+                    operation: 'fieldValueTransformer',
+                    parameters: ['birthDate']
+                  }
+                }
+              },
+              {
                 name: 'firstNamesEng',
                 previewGroup: 'motherNameInEnglish',
                 type: 'TEXT',
@@ -1641,6 +1720,62 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
+                name: 'durationOfResidence',
+                type: 'NUMBER',
+                label: {
+                  defaultMessage: 'Duration of residence',
+                  description: 'text for duration of residence form field',
+                  id: 'form.field.label.durationOfResidence'
+                },
+                customisable: true,
+                required: false,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'DurationOfResidence',
+                    operation: 'plainInputTransformer'
+                  }
+                }
+              },
+              {
+                name: 'phoneNumber',
+                type: 'TEL',
+                label: {
+                  defaultMessage: 'Phone Number of Mother',
+                  description: 'Field for phone number of mother',
+                  id: 'form.field.label.phoneNumber'
+                },
+                customisable: true,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'phoneNumberFormat'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'motherPhoneNumber',
+                    operation: 'plainInputTransformer'
+                  }
+                }
+              },
+              {
                 name: 'educationalAttainment',
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.educationAttainment,
@@ -1712,6 +1847,16 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.preview.group.label.mother.english.name'
                 },
                 fieldToRedirect: 'familyNameEng',
+                delimiter: ' '
+              },
+              {
+                id: 'placeOfBirth',
+                label: {
+                  defaultMessage: 'Place of birth',
+                  description: "Group label for mother's Place of Birth",
+                  id: 'form.preview.group.label.mother.placeOfBirth'
+                },
+                fieldToRedirect: 'placeOfBirth',
                 delimiter: ' '
               }
             ]

@@ -114,6 +114,8 @@ interface IFormMessages
   defaultLabel: MessageDescriptor
   deliveryAddress: MessageDescriptor
   deliveryInstitution: MessageDescriptor
+  dateOfLastLivingDeath: MessageDescriptor
+  motherPhoneNumber: MessageDescriptor
   deny: MessageDescriptor
   district: MessageDescriptor
   docTaxReceipt: MessageDescriptor
@@ -230,6 +232,7 @@ interface IFormMessages
   phoneNumber: MessageDescriptor
   phoneVerificationWarning: MessageDescriptor
   placeOfBirth: MessageDescriptor
+  motherPlaceOfBirth: MessageDescriptor
   postCode: MessageDescriptor
   presentBoth: MessageDescriptor
   presentFather: MessageDescriptor
@@ -773,6 +776,16 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Usual place of residence',
     description: 'Title of the primary adress ',
     id: 'form.field.label.primaryAddress'
+  },
+  dateOfLastLivingDeath: {
+    defaultMessage: 'Date of last living death',
+    description: 'Date of last living death',
+    id: 'form.field.label.dateOfLastLivingDeath'
+  },
+  motherPhoneNumber: {
+    defaultMessage: 'phone number of Mother',
+    description: 'Phone Number of MOther',
+    id: 'form.field.label.motherPhoneNumber'
   },
   dateOfMarriage: {
     defaultMessage: 'Date of marriage',
@@ -1511,6 +1524,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Location',
     description: 'Label for form field: Place of delivery',
     id: 'form.field.label.placeOfBirth'
+  },
+  motherPlaceOfBirth: {
+    defaultMessage: 'Place of Birth',
+    description: 'Label for form field: Place of Birth',
+    id: 'form.field.label.motherPlaceOfBirth'
   },
   nameInEnglishPreviewGroup: {
     defaultMessage: 'English name',
