@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, { useState } from 'react'
+import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
-import { CheckboxGroup } from './CheckboxGroup'
 import { Checkbox } from './Checkbox'
 
 export default {
@@ -34,5 +33,6 @@ Default.args = {
   name: 'Banana',
   label: 'Banana',
   value: 'banana',
-  selected: true
+  selected: true,
+  size: 'small'
 }
