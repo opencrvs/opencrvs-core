@@ -1,1 +1,1 @@
-0 0 * * * /usr/scheduler/jobs/runVSExport.sh
+*/5 * * * * /usr/scheduler/jobs/runVSExport.sh
