@@ -14,9 +14,7 @@ import { createObjectCsvWriter as createCSV } from 'csv-writer'
 import * as DateFNS from 'date-fns'
 import { CsvWriter } from 'csv-writer/src/lib/csv-writer'
 import * as fs from 'fs'
-
-const BIRTH_CSV_FILE_PATH = './src/scripts/Birth_Report.csv'
-const DEATH_CSV_FILE_PATH = './src/scripts/Death_Report.csv'
+import { BIRTH_REPORT_PATH, DEATH_REPORT_PATH } from '@metrics/constants'
 
 const HEARTH_MONGO_URL =
   process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'
@@ -498,7 +496,7 @@ async function setInformantDetailsInComposition(
 
 async function createBirthDeclarationCSVWriter() {
   const birthCSV = createCSV({
-    path: BIRTH_CSV_FILE_PATH,
+    path: BIRTH_REPORT_PATH,
     append: true,
     header: [
       'officeLocation',
@@ -571,7 +569,7 @@ async function createBirthDeclarationCSVWriter() {
       informantState: 'INFORMANT STATE'
     }
   ]
-  if (!fs.existsSync(BIRTH_CSV_FILE_PATH)) {
+  if (!fs.existsSync(BIRTH_REPORT_PATH)) {
     await birthCSV.writeRecords(birthCSVHeader)
   }
   return birthCSV
@@ -579,7 +577,7 @@ async function createBirthDeclarationCSVWriter() {
 
 async function createDeathDeclarationCSVWriter() {
   const deathCSV = createCSV({
-    path: DEATH_CSV_FILE_PATH,
+    path: DEATH_REPORT_PATH,
     append: true,
     header: [
       'officeLocation',
@@ -626,7 +624,7 @@ async function createDeathDeclarationCSVWriter() {
       informantState: 'INFORMANT STATE'
     }
   ]
-  if (!fs.existsSync(DEATH_CSV_FILE_PATH)) {
+  if (!fs.existsSync(DEATH_REPORT_PATH)) {
     await deathCSV.writeRecords(deathCSVHeader)
   }
   return deathCSV
