@@ -85,7 +85,10 @@ import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
 import * as Joi from 'joi'
-import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
+import {
+  countUsersByLocationHandler,
+  countRegistrarsByLocationHandler
+} from '@user-mgnt/features/countUsersByLocation/handler'
 import getUserAvatar from '@user-mgnt/features/getAvatar/handler'
 import {
   createSearchHandler,
@@ -647,6 +650,29 @@ export const getRoutes = () => {
       }
     },
 
+    {
+      method: 'GET',
+      path: '/countRegistrarsByLocation',
+      handler: countRegistrarsByLocationHandler,
+      config: {
+        tags: ['api'],
+        description: 'Gets count of users group by office ids',
+        auth: {
+          scope: [
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          query: Joi.object({
+            locationId: Joi.string()
+          })
+        }
+      }
+    },
     {
       method: 'GET',
       path: '/countUsersByLocation',

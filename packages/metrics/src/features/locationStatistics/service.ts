@@ -10,13 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  fetchLocation,
   fetchChildLocationsByParentId,
-  fetchLocationsByType,
-  countUsersByLocation,
-  fetchAllChildLocationsByParentId
+  countRegistrarsByLocation,
+  totalOfficesInCountry,
+  fetchLocationsByType
 } from '@metrics/api'
-import { getPopulation, getLocationType } from '@metrics/features/metrics/utils'
+import { getPopulation } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
 
 interface ILocationStatisticsResponse {
@@ -25,63 +24,60 @@ interface ILocationStatisticsResponse {
   offices: number
 }
 
+function isUnderJurisdiction(
+  locationsMap: Record<string, fhir.Location>,
+  jurisdictionId: string,
+  location: fhir.Location
+): boolean {
+  const partOf = location.partOf?.reference?.split('/')[1]
+  // already at the highest level
+  if (!partOf || partOf === '0') return false
+  if (partOf === jurisdictionId) return true
+  return isUnderJurisdiction(locationsMap, jurisdictionId, locationsMap[partOf])
+}
+
 async function getAdminLocationStatistics(
-  location: fhir.Location,
-  registrarsCountByLocation: Record<string, number | undefined>,
+  locationId: string,
+  registrars: number,
   populationYear: number,
-  authHeader: IAuthHeader,
-  cumulativeResult: ILocationStatisticsResponse = {
-    population: 0,
-    offices: 0,
-    registrars: 0
-  }
+  authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
-  if (!cumulativeResult.population) {
-    cumulativeResult.population = getPopulation(location, populationYear)
-  }
-
-  const childLocations = await fetchAllChildLocationsByParentId(
-    location.id as string,
-    authHeader
+  const [locations, offices] = await Promise.all([
+    fetchLocationsByType('ADMIN_STRUCTURE', authHeader),
+    fetchLocationsByType('CRVS_OFFICE', authHeader)
+  ])
+  const locationsMap = locations.reduce<Record<string, fhir.Location>>(
+    (locationsMap, location) => ({
+      ...locationsMap,
+      [location.id]: location
+    }),
+    {}
   )
-
-  for (const each of childLocations) {
-    if (getLocationType(each) === 'CRVS_OFFICE') {
-      cumulativeResult.offices += 1
-      cumulativeResult.registrars += registrarsCountByLocation[each.id] ?? 0
-    } else {
-      await getAdminLocationStatistics(
-        each,
-        registrarsCountByLocation,
-        populationYear,
-        authHeader,
-        cumulativeResult
-      )
-    }
+  return {
+    population:
+      locationsMap[locationId] &&
+      getPopulation(locationsMap[locationId], populationYear),
+    offices: offices.reduce<number>(
+      (total, office) =>
+        total + Number(isUnderJurisdiction(locationsMap, locationId, office)),
+      0
+    ),
+    registrars
   }
-
-  return cumulativeResult
 }
 
 async function getCountryWideLocationStatistics(
   populationYear: number,
-  registrarsCountByLocation: Record<string, number | undefined>,
+  registrars: number,
   authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
   let population = 0
-  let offices = 0
-  let registrars = 0
-  const childLocations = await fetchChildLocationsByParentId(
-    'Location/0',
-    authHeader
-  )
+  const [childLocations, offices] = await Promise.all([
+    fetchChildLocationsByParentId('Location/0', authHeader),
+    totalOfficesInCountry(authHeader)
+  ])
   for (const each of childLocations) {
     population += getPopulation(each, populationYear) || 0
-  }
-  const locationOffices = await fetchLocationsByType('CRVS_OFFICE', authHeader)
-  for (const office of locationOffices) {
-    offices += 1
-    registrars += registrarsCountByLocation[office.id] ?? 0
   }
   return {
     population,
@@ -95,30 +91,20 @@ export async function getLocationStatistics(
   populationYear: number,
   authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
-  const registrarsCountByLocation = await countUsersByLocation(
-    { role: 'LOCAL_REGISTRAR' },
-    authHeader
-  )
-  const registrarsCountByLocationMap = registrarsCountByLocation.reduce<
-    Record<string, number | undefined>
-  >((countMap, currentLocation) => {
-    return {
-      ...countMap,
-      [currentLocation.locationId]: currentLocation.total
-    }
-  }, {})
+  locationId = locationId?.split('/')[1]
+  const { registrars } = await countRegistrarsByLocation(authHeader, locationId)
+
   if (locationId) {
-    const location = await fetchLocation(locationId, authHeader)
     return getAdminLocationStatistics(
-      location,
-      registrarsCountByLocationMap,
+      locationId,
+      registrars,
       populationYear,
       authHeader
     )
   } else {
     return getCountryWideLocationStatistics(
       populationYear,
-      registrarsCountByLocationMap,
+      registrars,
       authHeader
     )
   }

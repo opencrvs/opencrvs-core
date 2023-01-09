@@ -86,6 +86,14 @@ export async function fetchTaskIdByCompositionID(
   return taskBundle.entry[0].resource.id
 }
 
+export async function totalOfficesInCountry(authHeader: IAuthHeader) {
+  const bundle: fhir.Bundle = await fetchFHIR(
+    'Location?type=CRVS_OFFICE',
+    authHeader
+  )
+  return bundle.total ?? 0
+}
+
 export async function fetchChildLocationsByParentId(
   locationId: string,
   authHeader: IAuthHeader
@@ -198,6 +206,25 @@ interface IUserCountSearchCriteria {
 export interface ICountByLocation {
   total: number
   locationId: string
+}
+
+export async function countRegistrarsByLocation(
+  authHeader: IAuthHeader,
+  locationId?: string
+): Promise<{ registrars: number }> {
+  const res = await fetch(
+    locationId
+      ? `${USER_MANAGEMENT_URL}/countRegistrarsByLocation?locationId=${locationId}`
+      : `${USER_MANAGEMENT_URL}/countRegistrarsByLocation`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
+    }
+  )
+  return res.json()
 }
 
 export async function countUsersByLocation(

@@ -11,6 +11,31 @@
  */
 import User from '@user-mgnt/model/user'
 
+export async function countRegistrarsByLocation(
+  locationId: string | undefined
+) {
+  // For the whole country
+  if (!locationId) {
+    const resArray = await User.aggregate([
+      { $match: { scope: 'register' } },
+      { $count: 'registrars' }
+    ])
+    return resArray[0]
+  }
+  const resArray = await User.aggregate([
+    {
+      $match: {
+        catchmentAreaIds: locationId,
+        scope: 'register'
+      }
+    },
+    { $unwind: '$catchmentAreaIds' },
+    { $group: { _id: '$catchmentAreaIds', registrars: { $sum: 1 } } },
+    { $match: { _id: locationId } }
+  ])
+  return resArray[0]
+}
+
 export async function countUsersByLocation(
   searchCriteria: Record<string, unknown>
 ) {
