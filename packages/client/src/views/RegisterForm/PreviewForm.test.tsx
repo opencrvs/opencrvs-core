@@ -214,8 +214,6 @@ describe('when user is previewing the form data', () => {
 
       app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
-      app.find('#rejectionReasonmisspelling').hostNodes().simulate('change')
-
       app
         .find('#rejectionCommentForHealthWorker')
         .hostNodes()
@@ -353,7 +351,7 @@ describe('when user is previewing the form data', () => {
 
       app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
-      app.find('#rejectionReasonmisspelling').hostNodes().simulate('change')
+      // app.find('#rejectionReasonduplicate').hostNodes().simulate('change')
 
       app
         .find('#rejectionCommentForHealthWorker')
@@ -364,7 +362,6 @@ describe('when user is previewing the form data', () => {
             value: 'reject reason'
           }
         })
-
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
       expect(history.location.pathname).toEqual('/')
