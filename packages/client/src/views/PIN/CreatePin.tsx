@@ -25,14 +25,25 @@ import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { Toast } from '@opencrvs/components'
 
-const Container = styled.div`
+interface IPageProps {
+  background?: string
+  backGroundUrl?: string
+  imageFitter?: string
+}
+
+const PageWrapper = styled.div<IPageProps>`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
   height: 100vh;
   width: 100%;
+  justify-content: center;
+  align-items: center;
+  background: ${({ background }) => `#${background}`};
+  background-image: ${({ backGroundUrl }) => `url(${backGroundUrl})`};
+  background-size: ${({ imageFitter }) =>
+    imageFitter === 'FILL' ? `cover` : `auto`};
 `
+
 const BoxWrapper = styled.div`
   text-align: center;
   border-radius: 4px;
@@ -156,11 +167,17 @@ class CreatePinComponent extends React.Component<IProps> {
     const { intl, offlineCountryConfiguration } = this.props
 
     return (
-      <Container
-        color={`#${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor}`}
-        style={{
-          backgroundImage: `url(${offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage})`
-        }}
+      <PageWrapper
+        id="unlockPage"
+        background={
+          offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor
+        }
+        backGroundUrl={
+          offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage
+        }
+        imageFitter={
+          offlineCountryConfiguration.config.LOGIN_BACKGROUND.imageFit
+        }
       >
         <BoxWrapper>
           <LogoContainer>
@@ -179,7 +196,7 @@ class CreatePinComponent extends React.Component<IProps> {
               {pinMatchError && (
                 <Toast
                   type="error"
-                  id="errorMsg"
+                  id="pinMatchErrorMsg"
                   onClose={() => {
                     this.setState({ pinMatchError: false })
                   }}
@@ -204,7 +221,7 @@ class CreatePinComponent extends React.Component<IProps> {
               </DescriptionText>
               <Toast
                 type="error"
-                id="errorMsg"
+                id="pinHasSeqDigitsErrorMsg"
                 onClose={() => {
                   this.setState({ pinHasSeqDigits: false })
                 }}
@@ -227,7 +244,7 @@ class CreatePinComponent extends React.Component<IProps> {
               </DescriptionText>
               <Toast
                 type="error"
-                id="errorMsg"
+                id="pinHasSameDigitsErrorMsg"
                 onClose={() => {
                   this.setState({ pinHasSameDigits: false })
                 }}
@@ -257,7 +274,7 @@ class CreatePinComponent extends React.Component<IProps> {
             </>
           )}
         </BoxWrapper>
-      </Container>
+      </PageWrapper>
     )
   }
 

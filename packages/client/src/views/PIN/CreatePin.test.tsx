@@ -70,11 +70,14 @@ describe('Create PIN view', () => {
 
     c.update()
 
-    expect(c.find('div#error-text')).toHaveLength(1)
+    expect(c.exists('#pinMatchErrorMsg'))
   })
 
   it('allows the user to backspace keypresses', async () => {
     pressPin(c, 48)
+    pressPin(c, 54)
+    pressPin(c, 48)
+    clearPassword(c)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -86,20 +89,18 @@ describe('Create PIN view', () => {
 
     expect(c.find('span#title-text').text()).toBe('Create a PIN')
 
-    clearPassword(c)
-
     await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve()
       }, 50)
     })
-
+    pressPin(c, 54)
     c.update()
 
     expect(c.find('span#title-text').text()).toBe('Re-enter your new PIN')
   })
 
-  it('prevents the user from using 4 sequential digits as PIN', async () => {
+  it('prevents the user from using 4 same digits as PIN', async () => {
     pressPin(c, 48)
     pressPin(c, 48)
     pressPin(c, 48)
@@ -113,9 +114,7 @@ describe('Create PIN view', () => {
 
     c.update()
 
-    expect(c.find('div#error-text').text()).toBe(
-      'PIN cannot have same 4 digits'
-    )
+    expect(c.exists('#pinHasSameDigitsErrorMsg'))
   })
 
   it('prevents the user from using 4 sequential digits as PIN', async () => {
@@ -129,16 +128,14 @@ describe('Create PIN view', () => {
 
     c.update()
 
-    expect(c.find('div#error-text').text()).toBe(
-      'PIN cannot contain sequential digits'
-    )
+    expect(c.exists('#pinHasSeqDigitsErrorMsg'))
   })
 
   it('stores the hashed PIN in storage if PINs match', async () => {
     pressPin(c, 48)
+    pressPin(c, 54)
     pressPin(c, 48)
-    pressPin(c, 48)
-    pressPin(c, 48)
+    pressPin(c, 54)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -149,9 +146,9 @@ describe('Create PIN view', () => {
     c.update()
 
     pressPin(c, 48)
+    pressPin(c, 54)
     pressPin(c, 48)
-    pressPin(c, 48)
-    pressPin(c, 48)
+    pressPin(c, 54)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
