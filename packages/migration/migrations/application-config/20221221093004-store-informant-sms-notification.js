@@ -31,4 +31,14 @@ export const up = async (db, client) => {
   }
 }
 
-export const down = async (db, client) => {}
+export const down = async (db, client) => {
+  const session = client.startSession()
+  try {
+    await session.withTransaction(async () => {
+      await db.collection(INFORMANT_SMS_NOTIFICATION_COLLECTION).drop()
+    })
+  } finally {
+    console.log(`Migration - DOWN - INFORMANT_SMS_NOTIFICATION - DONE `)
+    await session.endSession()
+  }
+}

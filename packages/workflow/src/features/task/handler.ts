@@ -56,7 +56,7 @@ export default async function updateTaskHandler(
     /* sending notification to the contact */
     if (msisdn) {
       logger.info(`updateTaskHandler(${event}) sending event notification`)
-      sendEventNotification(payload, event, msisdn, token, {
+      sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })
     } else {

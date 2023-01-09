@@ -207,7 +207,7 @@ export async function createRegistrationHandler(
       return resBundle
     }
     logger.info('createRegistrationHandler sending event notification')
-    sendEventNotification(payload, event, msisdn, token, {
+    sendEventNotification(payload, event, msisdn, {
       Authorization: request.headers.authorization
     })
     return resBundle

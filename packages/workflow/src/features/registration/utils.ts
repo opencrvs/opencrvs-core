@@ -93,16 +93,15 @@ export async function sendEventNotification(
   fhirBundle: fhir.Bundle,
   event: Events,
   msisdn: string,
-  token: string,
   authHeader: { Authorization: string }
 ) {
   const informantSMSNotifications = (await getInformantSMSNotification(
-    token
+    authHeader.Authorization
   )) as IInformantSMSNotification[] | []
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       if (
-        isInformantSMSNotificationEnable(
+        isInformantSMSNotificationEnabled(
           informantSMSNotifications,
           InformantSMSNotificationName.birthInProgressSMS
         )
@@ -118,11 +117,12 @@ export async function sendEventNotification(
           }
         )
       }
+
       break
     case Events.BIRTH_NEW_DEC:
     case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
       if (
-        isInformantSMSNotificationEnable(
+        !isInformantSMSNotificationEnabled(
           informantSMSNotifications,
           InformantSMSNotificationName.birthDeclarationSMS
         )
@@ -141,7 +141,7 @@ export async function sendEventNotification(
       break
     case Events.BIRTH_MARK_REG:
       if (
-        isInformantSMSNotificationEnable(
+        isInformantSMSNotificationEnabled(
           informantSMSNotifications,
           InformantSMSNotificationName.birthRegistrationSMS
         )
@@ -163,7 +163,7 @@ export async function sendEventNotification(
       break
     case Events.BIRTH_MARK_VOID:
       if (
-        isInformantSMSNotificationEnable(
+        isInformantSMSNotificationEnabled(
           informantSMSNotifications,
           InformantSMSNotificationName.birthRejectionSMS
         )
@@ -182,7 +182,7 @@ export async function sendEventNotification(
       break
     case Events.DEATH_IN_PROGRESS_DEC:
       if (
-        isInformantSMSNotificationEnable(
+        isInformantSMSNotificationEnabled(
           informantSMSNotifications,
           InformantSMSNotificationName.deathInProgressSMS
         )
@@ -202,7 +202,7 @@ export async function sendEventNotification(
     case Events.DEATH_NEW_DEC:
     case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
       if (
-        isInformantSMSNotificationEnable(
+        isInformantSMSNotificationEnabled(
           informantSMSNotifications,
           InformantSMSNotificationName.deathDeclarationSMS
         )
@@ -221,7 +221,7 @@ export async function sendEventNotification(
       break
     case Events.DEATH_MARK_REG:
       if (
-        isInformantSMSNotificationEnable(
+        isInformantSMSNotificationEnabled(
           informantSMSNotifications,
           InformantSMSNotificationName.deathRegistrationSMS
         )
@@ -243,7 +243,7 @@ export async function sendEventNotification(
       break
     case Events.DEATH_MARK_VOID:
       if (
-        isInformantSMSNotificationEnable(
+        isInformantSMSNotificationEnabled(
           informantSMSNotifications,
           InformantSMSNotificationName.deathRejectionSMS
         )
@@ -568,7 +568,7 @@ async function getInformantSMSNotification(token: string) {
   }
 }
 
-function isInformantSMSNotificationEnable(
+function isInformantSMSNotificationEnabled(
   informantSMSNotifications: IInformantSMSNotification[],
   name: InformantSMSNotificationName
 ) {

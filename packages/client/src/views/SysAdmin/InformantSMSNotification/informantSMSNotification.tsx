@@ -40,7 +40,6 @@ import {
 } from '@client/utils/gateway'
 import { find, lowerFirst } from 'lodash'
 import { Frame } from '@opencrvs/components/lib/Frame'
-import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -48,7 +47,8 @@ import { useMutation, useQuery } from '@apollo/client'
 import { TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION } from './mutations'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { Toast } from '@opencrvs/components/lib/Toast'
-
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 const ToggleWrapper = styled.div`
   margin-left: 24px;
 `
@@ -60,18 +60,20 @@ type SmsNotificationProps = {
   items: SmsNotification[]
 }
 
-enum INotificationName {
-  birthInProgressSMS = 'birthInProgressSMS',
-  birthDeclarationSMS = 'birthDeclarationSMS',
-  birthRegistrationSMS = 'birthRegistrationSMS',
-  birthRejectionSMS = 'birthRejectionSMS',
-  deathInProgressSMS = 'deathInProgressSMS',
-  deathDeclarationSMS = 'deathDeclarationSMS',
-  deathRegistrationSMS = 'deathRegistrationSMS',
-  deathRejectionSMS = 'deathRejectionSMS'
-}
+const NotificationNames = [
+  'birthInProgressSMS',
+  'birthDeclarationSMS',
+  'birthRegistrationSMS',
+  'birthRejectionSMS',
+  'deathInProgressSMS',
+  'deathDeclarationSMS',
+  'deathRegistrationSMS',
+  'deathRejectionSMS'
+] as const
 
-type IState = { [key in INotificationName]: boolean }
+type INotificationName = typeof NotificationNames[number]
+
+type IState = Record<INotificationName, boolean>
 
 const InformantNotification = () => {
   const intl = useIntl()
@@ -80,7 +82,22 @@ const InformantNotification = () => {
     useQuery<GetInformantSmsNotificationsQuery>(
       GET_INFORMANT_SMS_NOTIFICATIONS,
       {
-        fetchPolicy: 'no-cache'
+        fetchPolicy: 'no-cache',
+        onCompleted: (data) => {
+          if (data && data.informantSMSNotifications) {
+            setInformantSMSNotificationState((state) => {
+              const modifiedState: IState = { ...state }
+              informantNotifitionsData.forEach((notification) => {
+                modifiedState[notification.name as INotificationName] =
+                  notification.enabled
+              })
+              return {
+                ...state,
+                ...modifiedState
+              }
+            })
+          }
+        }
       }
     )
 
@@ -99,25 +116,6 @@ const InformantNotification = () => {
       deathRegistrationSMS: true,
       deathRejectionSMS: true
     })
-
-  React.useEffect(() => {
-    const updateState = () => {
-      if (data && data.informantSMSNotifications) {
-        setInformantSMSNotificationState((state) => {
-          const modifiedState: IState = { ...state }
-          informantNotifitionsData.forEach((notification) => {
-            modifiedState[notification.name as INotificationName] =
-              notification.enabled
-          })
-          return {
-            ...state,
-            ...modifiedState
-          }
-        })
-      }
-    }
-    updateState()
-  }, [data, setInformantSMSNotificationState, informantNotifitionsData])
 
   const [activeTabId, setActiveTabId] = React.useState(Event.Birth)
   const [notificationStatus, setNotificationStatus] =
@@ -158,7 +156,7 @@ const InformantNotification = () => {
     })
   }
 
-  const [informantSMSNotificationshResult] = useMutation<
+  const [informantSMSNotificationsResult] = useMutation<
     ToggleInformantSmsNotificationMutation,
     ToggleInformantSmsNotificationMutationVariables
   >(TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION, {
@@ -166,8 +164,6 @@ const InformantNotification = () => {
       setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     },
     async onCompleted() {
-      console.log('here')
-
       await refetch()
       setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     }
@@ -188,7 +184,7 @@ const InformantNotification = () => {
       }
     )
 
-    await informantSMSNotificationshResult({
+    await informantSMSNotificationsResult({
       variables: {
         smsNotifications:
           updatedInformantNotifications as SmsNotificationInput[]
@@ -239,7 +235,12 @@ const InformantNotification = () => {
   return (
     <>
       <Frame
-        header={<Header mobileSearchBar={true} enableMenuSelection={false} />}
+        header={
+          <AppBar
+            desktopLeft={<HistoryNavigator />}
+            mobileLeft={<HistoryNavigator hideForward />}
+          />
+        }
         navigation={<Navigation />}
         skipToContentText={intl.formatMessage(
           constantsMessages.skipToMainContent
