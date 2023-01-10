@@ -98,7 +98,6 @@ services:
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - DOCUMENTS_URL=http://documents:9050
-      - INFLUXDB_URL=http://influxdb:8086
   # END User facing services
   scheduler:
     image: opencrvs/ocrvs-scheduler:${VERSION:-latest}

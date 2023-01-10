@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { INFLUXDB_URL } from '@metrics/constants'
+import { INFLUXDB_URL, INFLUX_DB } from '@metrics/influxdb/constants'
 import {
   FEMALE,
   MALE,
@@ -997,7 +997,7 @@ export async function fetchRegistrationsGroupByTime(
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
 
   const fluxQuery = `
-   from(bucket:"ocrvs/")
+   from(bucket: "${INFLUX_DB}")
    |> range(start: ${timeFrom}, stop: ${timeTo})
    |> filter(fn: (r) => 
       r._measurement == "${measurement}" and
@@ -1021,6 +1021,7 @@ export async function fetchRegistrationsGroupByTime(
     },
     body: fluxQuery
   })
+  // slice(4) to ignoring unwanted rows in csv
   const fluxJson = (await csvToJSON(await res.text())).slice(4)
   const keys = ['eventLocationType', 'timeLabel', 'total', 'time']
   const fluxRes: IMetricsTotalGroupByTime[] = fluxJson
@@ -1028,6 +1029,7 @@ export async function fetchRegistrationsGroupByTime(
     .map((item) => {
       const obj: Partial<IMetricsTotalGroupByTime> = {}
       keys.forEach((key, i) => {
+        // item[i+5] to ignore the first 5 values of json & count from index 5
         obj[key] = item[i + 5]
         if (key === 'total') {
           obj[key] = Number(item[i + 5])
@@ -1035,26 +1037,6 @@ export async function fetchRegistrationsGroupByTime(
       })
       return obj as IMetricsTotalGroupByTime
     })
-
-  // const result: IMetricsTotalGroupByTime[] = await query(
-  //   `SELECT COUNT(${column}) AS total
-  //     FROM ${measurement}
-  //     WHERE time > '${timeFrom}'
-  //     AND time <= '${timeTo}'
-  //     ${
-  //       locationId
-  //         ? `AND ( locationLevel2 = '${locationId}'
-  //     OR locationLevel3 = '${locationId}'
-  //     OR locationLevel4 = '${locationId}'
-  //     OR locationLevel5 = '${locationId}'
-  //     OR officeLocation = '${locationId}')`
-  //         : ``
-  //     }
-  //   GROUP BY time(30d), timeLabel, eventLocationType ORDER BY time DESC
-
-  //   `
-  // )
-  // console.log(result)
 
   return fluxRes
 }

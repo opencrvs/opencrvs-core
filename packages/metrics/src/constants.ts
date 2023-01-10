@@ -23,7 +23,6 @@ export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030'
 export const DOCUMENTS_URL =
   process.env.DOCUMENTS_URL || 'http://localhost:9050'
-export const INFLUXDB_URL = process.env.INFLUXDB_URL || 'http://localhost:8086'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const PRODUCTION = process.env.NODE_ENV === 'production'
 export const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost/metrics'

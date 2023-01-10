@@ -223,12 +223,7 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
 }
 
 export function goToPerformanceHome(
-  timeStart: Date = new Date(
-    startOfMonth(subMonths(new Date(Date.now()), 11)).getTime() -
-      startOfMonth(subMonths(new Date(Date.now()), 11)).getTimezoneOffset() *
-        60 *
-        1000
-  ),
+  timeStart: Date = startOfMonth(subMonths(new Date(Date.now()), 11)),
   timeEnd: Date = new Date(Date.now()),
   locationId?: string
 ) {
