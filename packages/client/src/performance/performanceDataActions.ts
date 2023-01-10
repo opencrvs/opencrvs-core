@@ -17,7 +17,7 @@ export function isAvailable(
   query: DocumentNode
 ) {
   return {
-    type: 'QUERY_DATA_AVAILABLE' as const,
+    type: 'PERFORMANCE/QUERY_DATA_AVAILABLE' as const,
     payload: {
       operationName,
       variables,
@@ -31,7 +31,7 @@ export function fetch(
   query: DocumentNode
 ) {
   return {
-    type: 'FETCH_QUERY_DATA' as const,
+    type: 'PERFORMANCE/FETCH_QUERY_DATA' as const,
     payload: {
       operationName,
       variables,
@@ -45,7 +45,7 @@ export function write(
   variables: Record<string, string>
 ) {
   return {
-    type: 'WRITE_QUERY_DATA' as const,
+    type: 'PERFORMANCE/WRITE_QUERY_DATA' as const,
     payload: {
       operationName,
       variables
@@ -65,7 +65,7 @@ export function read({
   query: DocumentNode
 }) {
   return {
-    type: 'READ_QUERY_DATA' as const,
+    type: 'PERFORMANCE/READ_QUERY_DATA' as const,
     payload: {
       data,
       operationName,
@@ -81,7 +81,7 @@ export function fetchSuccess(
   variables: Record<string, string>
 ) {
   return {
-    type: 'FETCH_QUERY_DATA_SUCCESS' as const,
+    type: 'PERFORMANCE/FETCH_QUERY_DATA_SUCCESS' as const,
     payload: {
       data,
       operationName,

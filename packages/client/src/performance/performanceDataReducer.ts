@@ -13,15 +13,21 @@ import {
   Action,
   fetchSuccess,
   read,
-  fetch
-} from '@client/performance/persistentDataActions'
+  fetch,
+  isAvailable
+} from '@client/performance/performanceDataActions'
+import { Action as ProfileAction } from '@client/profile/profileActions'
 import { client } from '@client/utils/apolloClient'
 import { Cmd, loop, Loop } from 'redux-loop'
-import { createKey } from './persistentDataSelectors'
+import { createKey } from './performanceDataSelectors'
 import { storage } from '@client/storage'
 import { DocumentNode } from 'graphql'
+import { getDefaultPerformanceLocationId } from '@client/utils/locationUtils'
+import { PERFORMANCE_STATS } from '@client/views/SysAdmin/Performance/metricsQuery'
 
-export type PerformancePersistentDataState = {
+const PERFORMANCE_DATA = 'performanceStats'
+
+export type PerformanceDataState = {
   /**
    * key format:
    * `${operationName},${event},${locationId},${startDate},${endDate}`
@@ -39,7 +45,7 @@ async function getStoredData(
   variables: Record<string, string>,
   query: DocumentNode
 ) {
-  const stored = await storage.getItem('performanceStats')
+  const stored = await storage.getItem(PERFORMANCE_DATA)
   return {
     data: stored ? JSON.parse(stored) : null,
     operationName,
@@ -53,31 +59,59 @@ async function updateStoredData(
   operationName: string,
   variables: Record<string, string>
 ) {
-  const stored = await storage.getItem('performanceStats')
+  const stored = await storage.getItem(PERFORMANCE_DATA)
   const json = stored ? JSON.parse(stored) : {}
   const key = createKey({ operationName, variables })
   const newJson = { ...json, [key]: data }
-  await storage.setItem('performanceStats', newJson)
+  await storage.setItem(PERFORMANCE_DATA, JSON.stringify(newJson))
 }
 
-export const persistentDataReducer = (
-  state: PerformancePersistentDataState = {},
-  action: Action
+export const performanceDataReducer = (
+  state: PerformanceDataState = {},
+  action: Action | ProfileAction
 ):
-  | PerformancePersistentDataState
-  | Loop<PerformancePersistentDataState, Action> => {
+  | PerformanceDataState
+  | Loop<PerformanceDataState, Action | ProfileAction> => {
   switch (action.type) {
-    case 'QUERY_DATA_AVAILABLE': {
+    case 'PROFILE/USER_DETAILS_AVAILABLE': {
+      const locationId = getDefaultPerformanceLocationId(action.payload)
+      let variables: Record<string, any> = {
+        populationYear: new Date().getFullYear(),
+        event: 'BIRTH',
+        status: [
+          'IN_PROGRESS',
+          'DECLARED',
+          'REJECTED',
+          'VALIDATED',
+          'WAITING_VALIDATION',
+          'REGISTERED'
+        ],
+        officeSelected: false
+      }
+      if (locationId) {
+        variables = {
+          locationId,
+          ...variables
+        }
+      }
+      return loop(
+        state,
+        Cmd.action(
+          isAvailable('getLocationStatistics', variables, PERFORMANCE_STATS)
+        )
+      )
+    }
+    case 'PERFORMANCE/QUERY_DATA_AVAILABLE': {
       const { operationName, variables, query } = action.payload
       return loop(
         state,
-        Cmd.run(() => getStoredData, {
+        Cmd.run(getStoredData, {
           successActionCreator: read,
-          args: [operationName, variables]
+          args: [operationName, variables, query]
         })
       )
     }
-    case 'READ_QUERY_DATA': {
+    case 'PERFORMANCE/READ_QUERY_DATA': {
       const { data, operationName, variables, query } = action.payload
       const key = createKey({ operationName, variables })
       return loop(
@@ -92,7 +126,7 @@ export const persistentDataReducer = (
         Cmd.action(fetch(operationName, variables, query))
       )
     }
-    case 'FETCH_QUERY_DATA': {
+    case 'PERFORMANCE/FETCH_QUERY_DATA': {
       const { operationName, variables, query } = action.payload
       const key = createKey({ operationName, variables })
       return loop(
@@ -105,11 +139,12 @@ export const persistentDataReducer = (
           }
         },
         Cmd.run(() => client.query({ query, variables }), {
-          successActionCreator: fetchSuccess
+          successActionCreator: (data) =>
+            fetchSuccess(data, operationName, variables)
         })
       )
     }
-    case 'FETCH_QUERY_DATA_SUCCESS': {
+    case 'PERFORMANCE/FETCH_QUERY_DATA_SUCCESS': {
       const { data, operationName, variables } = action.payload
       const key = createKey({ operationName, variables })
       return loop(
@@ -117,11 +152,11 @@ export const persistentDataReducer = (
           ...state,
           [key]: {
             loading: false,
-            data,
+            data: data?.data,
             error: null
           }
         },
-        Cmd.run(() => updateStoredData, {
+        Cmd.run(updateStoredData, {
           args: [data, operationName, variables]
         })
       )

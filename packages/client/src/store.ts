@@ -64,6 +64,10 @@ import {
   IFormConfigState
 } from './forms/configuration/formConfig/reducer'
 import { submissionMiddleware } from './declarations/submissionMiddleware'
+import {
+  PerformanceDataState,
+  performanceDataReducer
+} from './performance/performanceDataReducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -80,6 +84,7 @@ export interface IStoreState {
   userForm: IUserFormState
   workqueueState: WorkqueueState
   formConfig: IFormConfigState
+  performanceData: PerformanceDataState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -106,7 +111,8 @@ export const createStore = <T>(
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: registrarWorkqueueReducer,
-    formConfig: formConfigReducer
+    formConfig: formConfigReducer,
+    performanceData: performanceDataReducer
   })
   // @ts-ignore
   const enhancer = compose(

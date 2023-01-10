@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PerformancePersistentDataState } from '@client/performance/persistentDataReducer'
+import { PerformanceDataState } from '@client/performance/performanceDataReducer'
 import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
 
@@ -23,13 +23,15 @@ export function createKey({
   return [
     operationName,
     Object.values(variables).map((value) =>
-      isValid(new Date(value)) ? format(new Date(value), 'yyyy-MM') : value
+      typeof value === 'string' && isValid(new Date(value))
+        ? format(new Date(value), 'yyyy-MM')
+        : value.toString()
     )
   ].join(',')
 }
 
-export function getPersistentData(
-  state: PerformancePersistentDataState,
+export function getPerformanceData(
+  state: PerformanceDataState,
   options: {
     operationName: string
     variables: Record<string, string>
