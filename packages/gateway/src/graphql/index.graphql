@@ -28,6 +28,8 @@
 # import Mutation from '../features/bookmarkAdvancedSearch/schema.graphql'
 # import Mutation.* from '../features/formDataset/schema.graphql'
 # import Query.* from '../features/formDataset/schema.graphql'
+# import Query.* from '../features/informantSMSNotifications/schema.graphql'
+# import Mutation.* from '../features/informantSMSNotifications/schema.graphql'
 # import * from 'common.graphql'
 
 # TODO
