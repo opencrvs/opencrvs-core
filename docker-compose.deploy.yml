@@ -924,32 +924,32 @@ services:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'webhooks'
 secrets:
-  "jwt-public-key.{{ts}}":
+  jwt-public-key.{{ts}}:
     external: true
-  "jwt-private-key.{{ts}}":
+  jwt-private-key.{{ts}}:
     external: true
 configs:
-  "openhim-console-conf.{{ts}}":
+  openhim-console-conf.{{ts}}:
     file: ./infrastructure/openhim-console-config.deploy.json
-  "hearth-check-dupe-plugin.{{ts}}":
+  hearth-check-dupe-plugin.{{ts}}:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
-  "hearth-queryparam-extensions-conf.{{ts}}":
+  hearth-queryparam-extensions-conf.{{ts}}:
     file: ./infrastructure/hearth-queryparam-extensions.json
-  "metricbeat-conf.{{ts}}":
+  metricbeat-conf.{{ts}}:
     file: ./infrastructure/monitoring/beats/metricbeat.yml
-  "mongo-on-deploy.{{ts}}":
+  mongo-on-deploy.{{ts}}:
     file: ./infrastructure/mongodb/on-deploy.sh
-  "metricbeat-rollover-policy.{{ts}}":
+  metricbeat-rollover-policy.{{ts}}:
     file: ./infrastructure/monitoring/beats/rollover-policy.json
-  "kibana.{{ts}}":
+  kibana.{{ts}}:
     file: ./infrastructure/monitoring/kibana/kibana.yml
-  "apm.{{ts}}":
+  apm.{{ts}}:
     file: ./infrastructure/monitoring/apm/apm-server.yml
-  "logstash.{{ts}}":
+  logstash.{{ts}}:
     file: ./infrastructure/monitoring/logstash/logstash.yml
-  "logstash-pipeline.{{ts}}":
+  logstash-pipeline.{{ts}}:
     file: ./infrastructure/monitoring/logstash/logstash.conf
-  "influxdb-conf.{{ts}}":
+  influxdb-conf.{{ts}}:
     file: ./infrastructure/influxdb.conf
 networks:
   overlay_net:
