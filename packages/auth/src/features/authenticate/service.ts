@@ -119,7 +119,7 @@ export async function createToken(
   scope: string[],
   audience: string[],
   issuer: string,
-  system?: boolean
+  temporary?: boolean
 ): Promise<string> {
   if (typeof userId === undefined) {
     throw new Error('Invalid userId found for token creation')
@@ -127,7 +127,7 @@ export async function createToken(
   return sign({ scope }, cert, {
     subject: userId,
     algorithm: 'RS256',
-    expiresIn: system
+    expiresIn: temporary
       ? CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
       : CONFIG_TOKEN_EXPIRY_SECONDS,
     audience,

@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Select the crontab file based on the environment

@@ -206,6 +206,7 @@ export type AdvancedSearchParametersInput = {
 export type ApplicationConfiguration = {
   __typename?: 'ApplicationConfiguration'
   ADDRESSES?: Maybe<Scalars['Int']>
+  ADMIN_LEVELS?: Maybe<Scalars['Int']>
   APPLICATION_NAME?: Maybe<Scalars['String']>
   BIRTH?: Maybe<Birth>
   COUNTRY_LOGO?: Maybe<CountryLogo>
@@ -220,6 +221,7 @@ export type ApplicationConfiguration = {
 
 export type ApplicationConfigurationInput = {
   ADDRESSES?: InputMaybe<Scalars['Int']>
+  ADMIN_LEVELS?: InputMaybe<Scalars['Int']>
   APPLICATION_NAME?: InputMaybe<Scalars['String']>
   BIRTH?: InputMaybe<BirthInput>
   COUNTRY_LOGO?: InputMaybe<CountryLogoInput>
@@ -5550,6 +5552,7 @@ export type UpdateApplicationConfigMutation = {
     PHONE_NUMBER_PATTERN?: string | null
     HIDE_EVENT_REGISTER_INFORMATION?: boolean | null
     ADDRESSES?: number | null
+    ADMIN_LEVELS?: number | null
     COUNTRY_LOGO?: {
       __typename?: 'CountryLogo'
       fileName?: string | null
@@ -6090,10 +6093,12 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           registrarPractitioner?: {
             __typename?: 'User'
+            id?: Scalars['ID']
             role?: string | null
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
+              id?: string | null
             } | null
             name?: Array<{
               __typename?: 'HumanName'

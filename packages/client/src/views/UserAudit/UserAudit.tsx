@@ -89,7 +89,9 @@ const transformUserQueryResult = (
               '')) ||
         ''
     },
-    name: createNamesMap(userData.name as HumanName[])[locale],
+    name:
+      createNamesMap(userData.name as HumanName[])[locale] ||
+      createNamesMap(userData.name as HumanName[])[LANG_EN],
     role: userData.role,
     type: userData.type,
     number: userData.mobile,
