@@ -69,19 +69,21 @@ export const up = async (db, client) => {
           if (role.types && role.types.length) {
             const newType = []
             role.types.forEach((type) => {
-              newType.push(
-                {
-                  lang: 'en',
-                  label: type
-                    .replace('_', ' ')
-                    .toLowerCase()
-                    .replace(/\b\w/g, (l) => l.toUpperCase())
-                },
-                {
-                  lang: 'fr',
-                  label: FRENCH_TYPE_LABEL_MAPPING[type]
-                }
-              )
+              newType.push({
+                labels: [
+                  {
+                    lang: 'en',
+                    label: type
+                      .replace('_', ' ')
+                      .toLowerCase()
+                      .replace(/\b\w/g, (l) => l.toUpperCase())
+                  },
+                  {
+                    lang: 'fr',
+                    label: FRENCH_TYPE_LABEL_MAPPING[type]
+                  }
+                ]
+              })
             })
             await db
               .collection('roles')
@@ -95,7 +97,7 @@ export const up = async (db, client) => {
     //remove 'title' field from all 'roles' collection documents
     await db.collection('roles').updateMany({}, { $unset: { title: 1 } })
     //rename 'roles' collection name to 'systemroles'
-    await db.collection('roles').renameCollection('systemroles')
+    await db.collection('roles').rename('systemroles')
   } finally {
     await session.endSession()
   }
@@ -127,21 +129,31 @@ export const down = async (db, client) => {
 
     /* ==============Migration for "roles" Collection============== */
 
+    //rename 'systemroles' collection name to 'roles'
+    await db.collection('systemroles').rename('roles')
+
     //rename 'roles' field to 'types' for all 'roles' collection documents
     await db.collection('roles').updateMany({}, { $rename: { roles: 'types' } })
 
     //modified 'types' field of 'roles' collection
-    const roles = await db.collection('roles').find({}).toArray()
-    if (roles && roles.length) {
+    const rolesCollectionData = await db.collection('roles').find({}).toArray()
+    if (rolesCollectionData && rolesCollectionData.length) {
       await Promise.all(
-        roles.map(async (role) => {
-          if (role.types && role.types.length) {
-            const newType = role.types
-              .filter((role) => role.lang === 'en')
-              .map((role) => role.label.toUpperCase().replace(/ /g, '_'))
+        rolesCollectionData.map(async (roleDoc) => {
+          if (
+            roleDoc.types &&
+            roleDoc.types.length &&
+            roleDoc.value === 'FIELD_AGENT'
+          ) {
+            const newType = roleDoc.types.map((role) => {
+              let label = role.labels.find((x) => x.lang === 'en').label
+              label = label.toUpperCase().replace(/\s+/g, '_')
+              return label
+            })
+
             await db
               .collection('roles')
-              .updateOne({ _id: role._id }, { $set: { types: newType } })
+              .updateOne({ _id: roleDoc._id }, { $set: { types: newType } })
           }
         })
       )
@@ -149,9 +161,7 @@ export const down = async (db, client) => {
     //set 'types' to empty for 'roles' collection documents where value not equal to 'FIELD_AGENT
     await db
       .collection('roles')
-      .updateMany({ value: { $ne: 'FIELD_AGENT' } }, { $set: { types: '' } })
-    //rename 'systemroles' collection name to 'roles'
-    await db.collection('roles').renameCollection('roles')
+      .updateMany({ value: { $ne: 'FIELD_AGENT' } }, { $set: { types: [] } })
   } finally {
     await session.endSession()
   }
