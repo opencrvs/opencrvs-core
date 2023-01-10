@@ -8695,6 +8695,33 @@
       },
       {
         "kind": "OBJECT",
+        "name": "Label",
+        "description": null,
+        "fields": [
+          {
+            "name": "labels",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Role",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "LocalRegistrar",
         "description": null,
         "fields": [
@@ -17490,7 +17517,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Role",
+                "name": "Label",
                 "ofType": null
               }
             },

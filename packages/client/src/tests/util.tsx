@@ -2282,36 +2282,52 @@ export const mockFetchRoleGraphqlOperation = {
           value: 'FIELD_AGENT',
           roles: [
             {
-              lang: 'en',
-              label: 'Healthcare Worker'
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Healthcare Worker'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Professionnel de Santé'
+                }
+              ]
             },
             {
-              lang: 'fr',
-              label: 'Professionnel de Santé'
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Police Officer'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Agent de Police'
+                }
+              ]
             },
             {
-              lang: 'en',
-              label: 'Police Officer'
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Social Worker'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Travailleur Social'
+                }
+              ]
             },
             {
-              lang: 'fr',
-              label: 'Agent de Police'
-            },
-            {
-              lang: 'en',
-              label: 'Social Worker'
-            },
-            {
-              lang: 'fr',
-              label: 'Travailleur Social'
-            },
-            {
-              lang: 'en',
-              label: 'Local Leader'
-            },
-            {
-              lang: 'fr',
-              label: 'Leader Local'
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Local Leader'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Leader Local'
+                }
+              ]
             }
           ],
           active: true

@@ -540,7 +540,7 @@ type EventProgressResultSet {
 type SystemRole {
   id: ID!
   value: String
-  roles: [Role]
+  roles: [Label]
   active: Boolean
 }
 
@@ -1112,9 +1112,8 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
-type Role {
-  lang: String
-  label: String
+type Label {
+  labels: [Role]
 }
 
 enum DraftStatus {
@@ -1627,6 +1626,11 @@ type EventProgressData {
   timeInWaitingForApproval: Int
   timeInWaitingForBRIS: Int
   timeInReadyToPrint: Int
+}
+
+type Role {
+  lang: String
+  label: String
 }
 
 type FormDatasetOptionLabel {

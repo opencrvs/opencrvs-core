@@ -1004,6 +1004,11 @@ export type InputOutput = {
   valueString?: Maybe<Scalars['String']>
 }
 
+export type Label = {
+  __typename?: 'Label'
+  labels?: Maybe<Array<Maybe<Role>>>
+}
+
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
@@ -2060,7 +2065,7 @@ export type SystemRole = {
   __typename?: 'SystemRole'
   active?: Maybe<Scalars['Boolean']>
   id: Scalars['ID']
-  roles?: Maybe<Array<Maybe<Role>>>
+  roles?: Maybe<Array<Maybe<Label>>>
   value?: Maybe<Scalars['String']>
 }
 
@@ -2373,9 +2378,12 @@ export type GetRolesQuery = {
     __typename?: 'SystemRole'
     value?: string | null
     roles?: Array<{
-      __typename?: 'Role'
-      lang?: string | null
-      label?: string | null
+      __typename?: 'Label'
+      labels?: Array<{
+        __typename?: 'Role'
+        lang?: string | null
+        label?: string | null
+      } | null> | null
     } | null> | null
   } | null> | null
 }

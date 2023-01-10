@@ -17,8 +17,10 @@ export const getRolesQuery = gql`
     getRoles(active: true, value: $value) {
       value
       roles {
-        lang
-        label
+        labels {
+          lang
+          label
+        }
       }
     }
   }

@@ -13,9 +13,13 @@ input RoleInput {
   label: String
 }
 
+input LabelInput {
+  labels: [RoleInput]
+}
+
 input SystemRoleInput {
   value: String
-  roles: [RoleInput]
+  roles: [LabelInput]
 }
 
 type Role {
@@ -23,10 +27,14 @@ type Role {
   label: String
 }
 
+type Label {
+  labels: [Role]
+}
+
 type SystemRole {
   id: ID!
   value: String
-  roles: [Role]
+  roles: [Label]
   active: Boolean
 }
 

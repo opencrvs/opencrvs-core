@@ -19,16 +19,28 @@ interface ISystemRole {
 }
 
 type Role = {
-  lang: string
-  label: string
+  labels: Array<{
+    lang: string
+    label: string
+  }>
 }
 
 export interface ISystemRoleModel extends ISystemRole, Document {}
 
-const RoleSchema = new Schema({
-  lang: String,
-  label: String
-})
+const LabelSchema = new Schema(
+  {
+    lang: String,
+    label: String
+  },
+  { _id: false }
+)
+
+const RoleSchema = new Schema(
+  {
+    labels: [LabelSchema]
+  },
+  { _id: false }
+)
 
 const systemRoleSchema = new Schema({
   value: String,

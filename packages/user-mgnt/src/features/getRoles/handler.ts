@@ -40,7 +40,7 @@ export default async function getRoles(
     criteria = { ...criteria, value }
   }
   if (role) {
-    criteria = { ...criteria, 'roles.label': role }
+    criteria = { ...criteria, 'roles.labels.label': role }
   }
   if (active !== undefined) {
     criteria = { ...criteria, active }
