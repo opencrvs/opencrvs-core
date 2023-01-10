@@ -16,7 +16,7 @@ import {
   flushPromises,
   userDetails
 } from '@client/tests/util'
-import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/informantSMSNotification'
+import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import { AppStore, createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
 import { formatUrl } from '@client/navigation'

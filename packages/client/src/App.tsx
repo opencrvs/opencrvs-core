@@ -65,7 +65,7 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/informantSMSNotification'
+import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 
 interface IAppProps {
   client?: ApolloClient<{}>
