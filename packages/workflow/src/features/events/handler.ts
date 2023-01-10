@@ -11,7 +11,10 @@
  */
 import { OPENHIM_URL } from '@workflow/constants'
 import { isUserAuthorized } from '@workflow/features/events/auth'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import {
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL
+} from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
   hasDeathRegistrationNumber,
@@ -99,9 +102,16 @@ function detectEvent(request: Hapi.Request): Events {
     ) {
       const firstEntry = fhirBundle.entry[0].resource
       if (firstEntry.resourceType === 'Composition') {
+        const composition = firstEntry as fhir.Composition
+        const isADuplicate = composition?.extension?.find(
+          (ext) =>
+            ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
+            ext.valueBoolean
+        )
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
-          if (firstEntry.id) {
+          const wasJustCreated = firstEntry.id
+          if (wasJustCreated) {
             if (!hasBirthRegistrationNumber(fhirBundle)) {
               if (hasValidateScope(request)) {
                 return Events.BIRTH_MARK_VALID
@@ -121,6 +131,10 @@ function detectEvent(request: Hapi.Request): Events {
             }
           } else {
             if (hasRegisterScope(request)) {
+              if (isADuplicate) {
+                return Events.BIRTH_NEW_DEC
+              }
+
               return Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
             }
 

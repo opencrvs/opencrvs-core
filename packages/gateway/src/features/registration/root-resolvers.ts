@@ -17,7 +17,8 @@ import {
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  OPENCRVS_SPECIFICATION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -528,24 +529,37 @@ async function createEventRegistration(
   const draftId =
     details && details.registration && details.registration.draftId
 
-  const duplicateCompostion =
-    draftId && (await lookForDuplicate(draftId, authHeader))
+  const existingComposition =
+    draftId && (await lookForComposition(draftId, authHeader))
 
-  if (duplicateCompostion) {
+  if (existingComposition) {
     if (hasScope(authHeader, 'register')) {
       return await getRegistrationIds(
-        duplicateCompostion,
+        existingComposition,
         event,
         false,
         authHeader
       )
     } else {
       // return tracking-id
-      return await getDeclarationIds(duplicateCompostion, authHeader)
+      return await getDeclarationIds(existingComposition, authHeader)
     }
   }
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  if (hasScope(authHeader, 'register')) {
+
+  /*
+   * Some custom logic added here. If you are a registar and
+   * we flagged the declaration as a duplicate, we push the declaration into
+   * "Ready for review" queue and not ready to print.
+   */
+  const isADuplicate = doc.entry
+    .find((entry) => entry.resource.resourceType === 'Composition')
+    ?.resource?.extension?.find(
+      (ext) =>
+        ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` && ext.valueBoolean
+    )
+
+  if (hasScope(authHeader, 'register') && !isADuplicate) {
     // return the registrationNumber
     return await getRegistrationIdsFromResponse(res, event, authHeader)
   } else {
@@ -554,7 +568,7 @@ async function createEventRegistration(
   }
 }
 
-export async function lookForDuplicate(
+export async function lookForComposition(
   identifier: string,
   authHeader: IAuthHeader
 ) {
