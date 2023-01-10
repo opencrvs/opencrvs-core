@@ -52,6 +52,7 @@ export interface GQLQuery {
   getFormDraft?: Array<GQLFormDraft>
   fetchSystem?: GQLSystem
   getFormDataset?: Array<GQLFormDataset>
+  informantSMSNotifications?: Array<GQLSMSNotification>
 }
 
 export interface GQLMutation {
@@ -99,6 +100,7 @@ export interface GQLMutation {
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
   createFormDataset?: GQLFormDatasetResponse
+  toggleInformantSMSNotification?: Array<GQLSMSNotification>
 }
 
 export interface GQLDummy {
@@ -477,6 +479,15 @@ export interface GQLFormDataset {
   _id?: string
 }
 
+export interface GQLSMSNotification {
+  id?: string
+  name: string
+  message: string
+  enabled: boolean
+  updatedAt: string
+  createdAt: string
+}
+
 export interface GQLNotificationInput {
   child?: GQLPersonInput
   mother?: GQLPersonInput
@@ -667,6 +678,12 @@ export interface GQLFormDatasetResponse {
 export interface GQLFormDatasetInput {
   fileName: string
   base64Data: string
+}
+
+export interface GQLSMSNotificationInput {
+  id: string
+  name: string
+  enabled: boolean
 }
 
 export type GQLMap = any
@@ -1795,6 +1812,7 @@ export interface GQLResolver {
   FormDraft?: GQLFormDraftTypeResolver
   System?: GQLSystemTypeResolver
   FormDataset?: GQLFormDatasetTypeResolver
+  SMSNotification?: GQLSMSNotificationTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -1913,6 +1931,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getFormDraft?: QueryToGetFormDraftResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
   getFormDataset?: QueryToGetFormDatasetResolver<TParent>
+  informantSMSNotifications?: QueryToInformantSMSNotificationsResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2522,6 +2541,13 @@ export interface QueryToGetFormDatasetResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface QueryToInformantSMSNotificationsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLMutationTypeResolver<TParent = any> {
   createNotification?: MutationToCreateNotificationResolver<TParent>
   voidNotification?: MutationToVoidNotificationResolver<TParent>
@@ -2567,6 +2593,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
   createFormDataset?: MutationToCreateFormDatasetResolver<TParent>
+  toggleInformantSMSNotification?: MutationToToggleInformantSMSNotificationResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -3233,6 +3260,21 @@ export interface MutationToCreateFormDatasetResolver<
   (
     parent: TParent,
     args: MutationToCreateFormDatasetArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToToggleInformantSMSNotificationArgs {
+  smsNotifications?: Array<GQLSMSNotificationInput>
+}
+export interface MutationToToggleInformantSMSNotificationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToToggleInformantSMSNotificationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4524,6 +4566,51 @@ export interface FormDatasetToCreatedAtResolver<TParent = any, TResult = any> {
 }
 
 export interface FormDatasetTo_idResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSMSNotificationTypeResolver<TParent = any> {
+  id?: SMSNotificationToIdResolver<TParent>
+  name?: SMSNotificationToNameResolver<TParent>
+  message?: SMSNotificationToMessageResolver<TParent>
+  enabled?: SMSNotificationToEnabledResolver<TParent>
+  updatedAt?: SMSNotificationToUpdatedAtResolver<TParent>
+  createdAt?: SMSNotificationToCreatedAtResolver<TParent>
+}
+
+export interface SMSNotificationToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToMessageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToEnabledResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToUpdatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToCreatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
