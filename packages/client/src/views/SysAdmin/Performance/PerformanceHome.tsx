@@ -82,6 +82,7 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { LocationPicker } from '@client/components/LocationPicker'
+import { PersistentQueryDataWrapper } from './PersistentQueryDataWrapper'
 
 const Layout = styled.div`
   display: flex;
@@ -568,7 +569,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               )}
             </Content>
           </LayoutLeft>
-          <Query
+          <PersistentQueryDataWrapper
+            operationName="getLocationStatistics"
             query={PERFORMANCE_STATS}
             variables={{
               locationId:
@@ -588,7 +590,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               ],
               officeSelected: this.state.officeSelected
             }}
-            fetchPolicy="no-cache"
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
@@ -685,7 +686,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 </>
               )
             }}
-          </Query>
+          </PersistentQueryDataWrapper>
         </Layout>
       </SysAdminContentWrapper>
     )

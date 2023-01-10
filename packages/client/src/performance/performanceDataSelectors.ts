@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PerformanceDataState } from '@client/performance/performanceDataReducer'
 import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
+import { IStoreState } from '@client/store'
 
 export function createKey({
   operationName,
@@ -22,21 +22,25 @@ export function createKey({
 }) {
   return [
     operationName,
-    Object.values(variables).map((value) =>
-      typeof value === 'string' && isValid(new Date(value))
-        ? format(new Date(value), 'yyyy-MM')
-        : value.toString()
-    )
+    Object.values(variables)
+      .filter(Boolean)
+      .map((value) =>
+        typeof value === 'string' && isValid(new Date(value))
+          ? format(new Date(value), 'yyyy-MM')
+          : value.toString()
+      )
   ].join(',')
 }
 
 export function getPerformanceData(
-  state: PerformanceDataState,
+  state: IStoreState,
   options: {
     operationName: string
     variables: Record<string, string>
   }
 ) {
   const key = createKey(options)
-  return state[key]
+  return (
+    state.performanceData[key] ?? { loading: true, data: null, error: null }
+  )
 }

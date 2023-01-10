@@ -24,6 +24,7 @@ import { storage } from '@client/storage'
 import { DocumentNode } from 'graphql'
 import { getDefaultPerformanceLocationId } from '@client/utils/locationUtils'
 import { PERFORMANCE_STATS } from '@client/views/SysAdmin/Performance/metricsQuery'
+import { IUserDetails } from '@client/utils/userUtils'
 
 const PERFORMANCE_DATA = 'performanceStats'
 
@@ -46,8 +47,9 @@ async function getStoredData(
   query: DocumentNode
 ) {
   const stored = await storage.getItem(PERFORMANCE_DATA)
+  const key = createKey({ operationName, variables })
   return {
-    data: stored ? JSON.parse(stored) : null,
+    data: stored ? JSON.parse(stored)[key] : null,
     operationName,
     variables,
     query
@@ -62,8 +64,34 @@ async function updateStoredData(
   const stored = await storage.getItem(PERFORMANCE_DATA)
   const json = stored ? JSON.parse(stored) : {}
   const key = createKey({ operationName, variables })
-  const newJson = { ...json, [key]: data }
+  const newJson = { ...json, [key]: data?.data }
   await storage.setItem(PERFORMANCE_DATA, JSON.stringify(newJson))
+}
+
+const prefetchLocationStatisticsCmd = (userDetails: IUserDetails) => {
+  const locationId = getDefaultPerformanceLocationId(userDetails)
+  let variables: Record<string, any> = {
+    populationYear: new Date().getFullYear(),
+    event: 'birth',
+    status: [
+      'IN_PROGRESS',
+      'DECLARED',
+      'REJECTED',
+      'VALIDATED',
+      'WAITING_VALIDATION',
+      'REGISTERED'
+    ],
+    officeSelected: false
+  }
+  if (locationId) {
+    variables = {
+      locationId,
+      ...variables
+    }
+  }
+  return Cmd.action(
+    isAvailable('getLocationStatistics', variables, PERFORMANCE_STATS)
+  )
 }
 
 export const performanceDataReducer = (
@@ -74,31 +102,9 @@ export const performanceDataReducer = (
   | Loop<PerformanceDataState, Action | ProfileAction> => {
   switch (action.type) {
     case 'PROFILE/USER_DETAILS_AVAILABLE': {
-      const locationId = getDefaultPerformanceLocationId(action.payload)
-      let variables: Record<string, any> = {
-        populationYear: new Date().getFullYear(),
-        event: 'BIRTH',
-        status: [
-          'IN_PROGRESS',
-          'DECLARED',
-          'REJECTED',
-          'VALIDATED',
-          'WAITING_VALIDATION',
-          'REGISTERED'
-        ],
-        officeSelected: false
-      }
-      if (locationId) {
-        variables = {
-          locationId,
-          ...variables
-        }
-      }
       return loop(
         state,
-        Cmd.action(
-          isAvailable('getLocationStatistics', variables, PERFORMANCE_STATS)
-        )
+        Cmd.list([prefetchLocationStatisticsCmd(action.payload)])
       )
     }
     case 'PERFORMANCE/QUERY_DATA_AVAILABLE': {
