@@ -18,7 +18,12 @@ import {
   GQLBookmarkedSeachItem
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/client/src/storage'
-import { Avatar, Location, HumanName, User } from '@client/utils/gateway'
+import {
+  BookmarkedSeachItem,
+  Location,
+  HumanName,
+  User
+} from '@client/utils/gateway'
 import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
@@ -26,7 +31,7 @@ import { IStoreState } from '@client/store'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
-export function getUserDetails(user: GQLUser): User {
+export function getUserDetails(user: User): User {
   const {
     catchmentArea,
     primaryOffice,
@@ -108,7 +113,7 @@ export function getUserDetails(user: GQLUser): User {
   }
 
   if (searches) {
-    userDetails.searches = searches as GQLBookmarkedSeachItem[]
+    userDetails.searches = searches as BookmarkedSeachItem[]
   }
 
   return userDetails
