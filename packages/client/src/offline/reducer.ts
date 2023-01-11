@@ -51,7 +51,6 @@ export interface ILocation {
   name: string
   status: string
   alias: string
-  address?: string
   physicalType: string
   jurisdictionType?: string
   type: string

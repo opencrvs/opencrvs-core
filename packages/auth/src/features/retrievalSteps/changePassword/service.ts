@@ -13,13 +13,22 @@ import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@auth/constants'
 import { resolve } from 'url'
 
-export async function changePassword(userId: string, password: string) {
+export async function changePassword(
+  userId: string,
+  password: string,
+  remoteAddress: string,
+  userAgent: string
+) {
   const url = resolve(USER_MANAGEMENT_URL, '/changePassword')
 
   const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({ userId, password }),
-    headers: { 'Content-Type': 'application/json' }
+    headers: {
+      'Content-Type': 'application/json',
+      'x-real-ip': remoteAddress,
+      'x-real-user-agent': userAgent
+    }
   })
 
   if (res.status !== 200) {
