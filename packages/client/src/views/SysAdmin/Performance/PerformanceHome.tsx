@@ -40,7 +40,6 @@ import { Event } from '@client/utils/gateway'
 
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { Query } from '@client/components/Query'
 import {
   CORRECTION_TOTALS,
   PERFORMANCE_METRICS,
@@ -436,9 +435,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             >
               {isOnline ? (
                 <>
-                  <Query
+                  <PersistentQueryDataWrapper
                     query={PERFORMANCE_METRICS}
-                    fetchPolicy="no-cache"
+                    operationName="getTotalMetrics"
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -519,10 +518,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         </>
                       )
                     }}
-                  </Query>
-                  <Query
-                    fetchPolicy="no-cache"
+                  </PersistentQueryDataWrapper>
+                  <PersistentQueryDataWrapper
                     query={CORRECTION_TOTALS}
+                    operationName="getTotalCorrections"
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -557,7 +556,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         <CorrectionsReport data={data!.getTotalCorrections} />
                       )
                     }}
-                  </Query>
+                  </PersistentQueryDataWrapper>
                 </>
               ) : (
                 <ConnectivityContainer>

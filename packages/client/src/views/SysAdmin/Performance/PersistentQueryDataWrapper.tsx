@@ -6,7 +6,7 @@ import { IStoreState } from '@client/store'
 import { isAvailable } from '@client/performance/performanceDataActions'
 
 interface PersistentQueryDataWrapperProps {
-  key: number
+  key?: number
   query: DocumentNode
   operationName: string
   variables: Record<string, any>

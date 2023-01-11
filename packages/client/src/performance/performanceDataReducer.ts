@@ -26,6 +26,7 @@ import { DocumentNode } from 'graphql'
 import { getDefaultPerformanceLocationId } from '@client/utils/locationUtils'
 import { PERFORMANCE_STATS } from '@client/views/SysAdmin/Performance/metricsQuery'
 import { IUserDetails } from '@client/utils/userUtils'
+import { REGISTRAR_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 
 const PERFORMANCE_DATA = 'performanceStats'
 
@@ -82,7 +83,9 @@ const prefetchLocationStatisticsCmd = (userDetails: IUserDetails) => {
       'WAITING_VALIDATION',
       'REGISTERED'
     ],
-    officeSelected: false
+    officeSelected:
+      !userDetails.supervisoryArea &&
+      [...REGISTRAR_ROLES, ...SYS_ADMIN_ROLES].includes(userDetails.role!)
   }
   if (locationId) {
     variables = {
