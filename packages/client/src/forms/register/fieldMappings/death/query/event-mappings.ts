@@ -103,6 +103,16 @@ export function getDeathRegistrationSectionTransformer(
       queryData[REGISTRATION_SECTION].registrationNumber
   }
 
+  if (queryData[REGISTRATION_SECTION].informantsSignature) {
+    transformedData[REGISTRATION_SECTION].informantsSignature =
+      queryData[REGISTRATION_SECTION].informantsSignature
+  }
+
+  if (queryData[REGISTRATION_SECTION].informantsSignatureRecording) {
+    transformedData[REGISTRATION_SECTION].informantsSignatureRecording =
+      queryData[REGISTRATION_SECTION].informantsSignatureRecording
+  }
+
   if (
     queryData[REGISTRATION_SECTION].type &&
     queryData[REGISTRATION_SECTION].type === 'DEATH'

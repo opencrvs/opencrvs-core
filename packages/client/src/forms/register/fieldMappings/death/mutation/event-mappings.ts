@@ -160,6 +160,16 @@ export function setDeathRegistrationSectionTransformer(
       })
     }
 
+    if (draftData[sectionId].informantsSignature) {
+      transformedData[sectionId].informantsSignature =
+        draftData[sectionId].informantsSignature
+    }
+
+    if (draftData[sectionId].informantsSignatureRecording) {
+      transformedData[sectionId].informantsSignatureRecording =
+        draftData[sectionId].informantsSignatureRecording
+    }
+
     if (draftData.registration.certificates) {
       transformCertificateData(
         transformedData,
