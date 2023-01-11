@@ -149,6 +149,7 @@ type Query {
   getFormDraft: [FormDraft!]
   fetchSystem(clientId: ID!): System
   getFormDataset: [FormDataset!]
+  informantSMSNotifications: [SMSNotification!]
 }
 
 type Mutation {
@@ -240,6 +241,9 @@ type Mutation {
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
   createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
+  toggleInformantSMSNotification(
+    smsNotifications: [SMSNotificationInput!]
+  ): [SMSNotification!]
 }
 
 type Dummy {
@@ -595,6 +599,15 @@ type FormDataset {
   _id: String
 }
 
+type SMSNotification {
+  id: String
+  name: String!
+  message: String!
+  enabled: Boolean!
+  updatedAt: String!
+  createdAt: String!
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -789,6 +802,12 @@ type FormDatasetResponse {
 input FormDatasetInput {
   fileName: String!
   base64Data: String!
+}
+
+input SMSNotificationInput {
+  id: String!
+  name: String!
+  enabled: Boolean!
 }
 
 scalar Map

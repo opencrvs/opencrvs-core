@@ -1185,6 +1185,7 @@ export type Mutation = {
   requestDeathRegistrationCorrection: Scalars['ID']
   resendSMSInvite?: Maybe<Scalars['String']>
   resetPasswordSMS?: Maybe<Scalars['String']>
+  toggleInformantSMSNotification?: Maybe<Array<SmsNotification>>
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
@@ -1370,6 +1371,10 @@ export type MutationResetPasswordSmsArgs = {
   userId: Scalars['String']
 }
 
+export type MutationToggleInformantSmsNotificationArgs = {
+  smsNotifications?: InputMaybe<Array<SmsNotificationInput>>
+}
+
 export type MutationUpdateApplicationConfigArgs = {
   applicationConfig?: InputMaybe<ApplicationConfigurationInput>
 }
@@ -1541,6 +1546,7 @@ export type Query = {
   getUserByMobile?: Maybe<User>
   getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
+  informantSMSNotifications?: Maybe<Array<SmsNotification>>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   listNotifications?: Maybe<Array<Maybe<Notification>>>
   locationById?: Maybe<Location>
@@ -1979,6 +1985,22 @@ export enum RoleType {
   NationalSystemAdmin = 'NATIONAL_SYSTEM_ADMIN',
   PerformanceManagement = 'PERFORMANCE_MANAGEMENT',
   RegistrationAgent = 'REGISTRATION_AGENT'
+}
+
+export type SmsNotification = {
+  __typename?: 'SMSNotification'
+  createdAt: Scalars['String']
+  enabled: Scalars['Boolean']
+  id?: Maybe<Scalars['String']>
+  message: Scalars['String']
+  name: Scalars['String']
+  updatedAt: Scalars['String']
+}
+
+export type SmsNotificationInput = {
+  enabled: Scalars['Boolean']
+  id: Scalars['String']
+  name: Scalars['String']
 }
 
 export type SearchFieldAgentResponse = {
@@ -5856,6 +5878,42 @@ export type DeleteSystemMutation = {
   } | null
 }
 
+export type ToggleInformantSmsNotificationMutationVariables = Exact<{
+  smsNotifications?: InputMaybe<
+    Array<SmsNotificationInput> | SmsNotificationInput
+  >
+}>
+
+export type ToggleInformantSmsNotificationMutation = {
+  __typename?: 'Mutation'
+  toggleInformantSMSNotification?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    message: string
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
+export type GetInformantSmsNotificationsQueryVariables = Exact<{
+  [key: string]: never
+}>
+
+export type GetInformantSmsNotificationsQuery = {
+  __typename?: 'Query'
+  informantSMSNotifications?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    message: string
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
 export type GetTotalCorrectionsQueryVariables = Exact<{
   event: Scalars['String']
   timeStart: Scalars['String']
@@ -6090,12 +6148,12 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           registrarPractitioner?: {
             __typename?: 'User'
-            id?: Scalars['ID']
+            id: string
             role: RoleType
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
-              id?: string | null
+              id: string
             } | null
             name: Array<{
               __typename?: 'HumanName'

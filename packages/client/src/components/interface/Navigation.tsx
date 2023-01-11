@@ -34,7 +34,8 @@ import {
   goToFormConfigHome,
   goToApplicationConfig,
   goToAdvancedSearchResult,
-  goToVSExport
+  goToVSExport,
+  goToInformantNotification
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -89,8 +90,10 @@ export const WORKQUEUE_TABS = {
   certificate: 'certificate',
   systems: 'integration',
   settings: 'settings',
+  declarationForms: 'form',
   logout: 'logout',
-  declarationForms: 'form'
+  communications: 'communications',
+  informantNotification: 'informantnotification'
 } as const
 
 const GROUP_ID = {
@@ -166,6 +169,8 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
     WORKQUEUE_TABS.vsexports,
+    WORKQUEUE_TABS.communications,
+    WORKQUEUE_TABS.informantNotification,
     GROUP_ID.menuGroup
   ],
   PERFORMANCE_MANAGEMENT: [WORKQUEUE_TABS.performance, GROUP_ID.menuGroup]
@@ -212,6 +217,7 @@ interface IDispatchProps {
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
+  goToInformantNotification: typeof goToInformantNotification
 }
 
 interface IStateProps {
@@ -289,6 +295,7 @@ export const NavigationView = (props: IFullProps) => {
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
     setAdvancedSearchParam,
+    goToInformantNotification,
     className
   } = props
   const tabId = deselectAllTabs
@@ -304,7 +311,11 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.declarationForms,
     WORKQUEUE_TABS.systems
   ]
+  const conmmunicationTab: string[] = [WORKQUEUE_TABS.informantNotification]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
+  const [isCommunationExpanded, setIsCommunationExpanded] =
+    React.useState(false)
+
   const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
     data,
@@ -621,7 +632,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <>
                       <NavigationItem
-                        icon={() => <Configuration />}
+                        icon={() => <Icon name="Compass" size="small" />}
                         id={`navigation_${WORKQUEUE_TABS.config}_main`}
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.config]
@@ -688,6 +699,55 @@ export const NavigationView = (props: IFullProps) => {
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === WORKQUEUE_TABS.systems
+                            }
+                          />
+                        </>
+                      )}
+                    </>
+                  )}
+
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.communications
+                  ) && (
+                    <>
+                      <NavigationItem
+                        icon={() => <Icon name="MessageCircle" size="small" />}
+                        id={`navigation_${WORKQUEUE_TABS.communications}_main`}
+                        label={intl.formatMessage(
+                          navigationMessages[WORKQUEUE_TABS.communications]
+                        )}
+                        onClick={() =>
+                          setIsCommunationExpanded(!isCommunationExpanded)
+                        }
+                        isSelected={
+                          enableMenuSelection &&
+                          conmmunicationTab.includes(activeMenuItem)
+                        }
+                        expandableIcon={() =>
+                          isCommunationExpanded ||
+                          conmmunicationTab.includes(activeMenuItem) ? (
+                            <Expandable selected={true} />
+                          ) : (
+                            <Expandable />
+                          )
+                        }
+                      />
+                      {(isCommunationExpanded ||
+                        conmmunicationTab.includes(activeMenuItem)) && (
+                        <>
+                          <NavigationSubItem
+                            label={intl.formatMessage(
+                              navigationMessages[
+                                WORKQUEUE_TABS.informantNotification
+                              ]
+                            )}
+                            id={`navigation_${WORKQUEUE_TABS.informantNotification}`}
+                            onClick={goToInformantNotification}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem ===
+                                WORKQUEUE_TABS.informantNotification
                             }
                           />
                         </>
@@ -764,22 +824,24 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
     advancedSearchParams: getAdvancedSearchParamsState(state),
-    activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
+    activeMenuItem: window.location.href.endsWith(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
-      : window.location.href.includes(WORKQUEUE_TABS.team)
+      : window.location.href.endsWith(WORKQUEUE_TABS.team)
       ? WORKQUEUE_TABS.team
-      : window.location.href.includes(WORKQUEUE_TABS.vsexports)
+      : window.location.href.endsWith(WORKQUEUE_TABS.vsexports)
       ? WORKQUEUE_TABS.vsexports
-      : window.location.href.includes(WORKQUEUE_TABS.application)
+      : window.location.href.endsWith(WORKQUEUE_TABS.application)
       ? WORKQUEUE_TABS.application
-      : window.location.href.includes(WORKQUEUE_TABS.settings)
+      : window.location.href.endsWith(WORKQUEUE_TABS.settings)
       ? WORKQUEUE_TABS.settings
-      : window.location.href.includes(WORKQUEUE_TABS.certificate)
+      : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
       ? WORKQUEUE_TABS.certificate
-      : window.location.href.includes(WORKQUEUE_TABS.declarationForms)
+      : window.location.href.endsWith(WORKQUEUE_TABS.declarationForms)
       ? WORKQUEUE_TABS.declarationForms
-      : window.location.href.includes(WORKQUEUE_TABS.systems)
+      : window.location.href.endsWith(WORKQUEUE_TABS.systems)
       ? WORKQUEUE_TABS.systems
+      : window.location.href.endsWith(WORKQUEUE_TABS.informantNotification)
+      ? WORKQUEUE_TABS.informantNotification
       : ''
   }
 }
@@ -802,7 +864,8 @@ export const Navigation = connect<
   redirectToAuthentication,
   goToSettings,
   updateRegistrarWorkqueue,
-  setAdvancedSearchParam
+  setAdvancedSearchParam,
+  goToInformantNotification
 })(injectIntl(withRouter(NavigationView)))
 
 /** @deprecated since the introduction of `<Frame>` */
