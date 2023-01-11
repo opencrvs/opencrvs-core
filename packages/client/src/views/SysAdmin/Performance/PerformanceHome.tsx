@@ -40,7 +40,6 @@ import { Event } from '@client/utils/gateway'
 
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { Query } from '@client/components/Query'
 import {
   CORRECTION_TOTALS,
   PERFORMANCE_METRICS,
@@ -82,6 +81,7 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { LocationPicker } from '@client/components/LocationPicker'
+import { PersistentQueryDataWrapper } from './PersistentQueryDataWrapper'
 
 const Layout = styled.div`
   display: flex;
@@ -435,9 +435,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             >
               {isOnline ? (
                 <>
-                  <Query
+                  <PersistentQueryDataWrapper
                     query={PERFORMANCE_METRICS}
-                    fetchPolicy="no-cache"
+                    operationName="getTotalMetrics"
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -518,10 +518,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         </>
                       )
                     }}
-                  </Query>
-                  <Query
-                    fetchPolicy="no-cache"
+                  </PersistentQueryDataWrapper>
+                  <PersistentQueryDataWrapper
                     query={CORRECTION_TOTALS}
+                    operationName="getTotalCorrections"
                     variables={
                       this.state.selectedLocation &&
                       !isCountry(this.state.selectedLocation)
@@ -556,7 +556,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         <CorrectionsReport data={data!.getTotalCorrections} />
                       )
                     }}
-                  </Query>
+                  </PersistentQueryDataWrapper>
                 </>
               ) : (
                 <ConnectivityContainer>
@@ -568,7 +568,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               )}
             </Content>
           </LayoutLeft>
-          <Query
+          <PersistentQueryDataWrapper
+            operationName="getLocationStatistics"
             query={PERFORMANCE_STATS}
             variables={{
               locationId:
@@ -588,7 +589,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               ],
               officeSelected: this.state.officeSelected
             }}
-            fetchPolicy="no-cache"
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
@@ -685,7 +685,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 </>
               )
             }}
-          </Query>
+          </PersistentQueryDataWrapper>
         </Layout>
       </SysAdminContentWrapper>
     )
