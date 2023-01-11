@@ -76,7 +76,7 @@ describe('date picker tests', () => {
       const presetElement = await waitForElement(component, '#preset-small')
       presetElement.find('#last12Months').hostNodes().simulate('click')
       expect(onDatesChangeMock).toBeCalledWith({
-        startDate: new Date(Date.parse('2019-06-15T15:00:32.409Z')),
+        startDate: new Date(Date.parse('2019-06-30T18:00:00.000Z')),
         endDate: new Date(Date.parse('2020-06-15T15:00:32.409Z'))
       })
     })
