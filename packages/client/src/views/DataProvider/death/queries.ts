@@ -125,6 +125,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         duplicates
+        informantsSignature
+        informantsSignatureRecording
         attachments {
           data
           type
@@ -369,6 +371,8 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        informantsSignature
+        informantsSignatureRecording
         status {
           comments {
             comment

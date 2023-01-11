@@ -2643,7 +2643,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'deceasedFamilyName',
-                    operation: 'nameToFieldTransformer',
+                    operation: 'upperCaseNameToFieldTransformer',
                     parameters: ['en', 'familyName']
                   },
                   mutation: {
@@ -2672,7 +2672,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'deceasedFirstName',
-                    operation: 'nameToFieldTransformer',
+                    operation: 'upperCaseNameToFieldTransformer',
                     parameters: ['en', 'firstNames']
                   },
                   mutation: {
