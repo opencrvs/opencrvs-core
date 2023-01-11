@@ -37,7 +37,7 @@ import {
   GQLQuery,
   GQLUser,
   GQLLocation,
-  GQLRole
+  GQLLabel
 } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
@@ -76,13 +76,13 @@ const initialState: IUserFormState = {
 interface IUpdateUserFormFieldDefsAction {
   type: typeof UPDATE_FORM_FIELD_DEFINITIONS
   payload: {
-    data: GQLRole[]
+    data: GQLLabel[]
     queryData?: ApolloQueryResult<GQLQuery>
   }
 }
 
 export function updateUserFormFieldDefinitions(
-  data: GQLRole[],
+  data: GQLLabel[],
   queryData?: ApolloQueryResult<GQLQuery>
 ): IUpdateUserFormFieldDefsAction {
   return {
@@ -308,7 +308,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           loadingRoles: true
         },
         Cmd.run(alterRolesBasedOnUserRole, {
-          successActionCreator: (data: GQLRole[]) =>
+          successActionCreator: (data: GQLLabel[]) =>
             updateUserFormFieldDefinitions(data, fetchUserQueryData),
           args: [primaryOfficeId, Cmd.getState]
         })
@@ -331,36 +331,30 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         //
         const { systemRole: existingSystemRole, role: existingRole } =
           userQueryData.data.getUser
-        const roleData = (
-          data as Array<{
-            value: string
-            types: string[]
-          }>
-        ).find(({ value }: { value: string }) => value === existingSystemRole)
+        const roleData = data.find(
+          (item) => item.labels[0].label === existingSystemRole
+        )
 
-        if (roleData && !roleData.types.includes(existingRole)) {
-          ;(
-            data as Array<{
-              value: string
-              types: string[]
-            }>
-          ).map((role) => {
-            if (role.value === existingSystemRole) {
+        if (roleData && !roleData.labels[0].label.includes(existingRole)) {
+          data.map((role) => {
+            if (role.labels[0].label === existingSystemRole) {
               return {
                 ...role,
-                types: [existingSystemRole, ...role.types]
+                types: [existingSystemRole, ...role.labels[0].label]
               }
             } else {
               return role
             }
           })
         } else if (!roleData) {
-          ;(
-            data as Array<{
-              value: string
-              types: string[]
-            }>
-          ).push({ value: existingSystemRole, types: [existingRole] })
+          data.push({
+            labels: [
+              {
+                lang: 'en',
+                label: existingSystemRole
+              }
+            ]
+          })
         }
       }
       updatedSections.forEach((section) => {

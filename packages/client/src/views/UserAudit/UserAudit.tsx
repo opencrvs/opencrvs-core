@@ -24,7 +24,10 @@ import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Button } from '@opencrvs/components/lib/Button'
-import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
+import {
+  getUserSystemRole,
+  getUserType
+} from '@client/views/SysAdmin//Team/utils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
@@ -137,7 +140,7 @@ export const UserAudit = () => {
     GetUserQueryVariables
   >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
-  const userRole = user && getUserRole(user, intl)
+  const userRole = user && getUserSystemRole(user, intl)
   const userType = user && getUserType(user, intl)
 
   const toggleUserActivationModal = () => {

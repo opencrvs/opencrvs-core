@@ -23,7 +23,7 @@ interface IVerifyPayload {
   sortOrder?: SortOrder
 }
 
-export default async function getRoles(
+export default async function getSystemRoles(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {

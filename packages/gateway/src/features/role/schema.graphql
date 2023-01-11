@@ -23,19 +23,19 @@ input SystemRoleInput {
 }
 
 type Role {
-  lang: String
-  label: String
+  lang: String!
+  label: String!
 }
 
 type Label {
-  labels: [Role]
+  labels: [Role!]!
 }
 
 type SystemRole {
   id: ID!
-  value: String
-  roles: [Label]
-  active: Boolean
+  value: String!
+  roles: [Label!]!
+  active: Boolean!
 }
 
 input ComparisonInput {
@@ -50,12 +50,12 @@ input ComparisonInput {
 }
 
 type Query {
-  getRoles(
+  getSystemRoles(
     title: String
     value: ComparisonInput
     role: String
     active: Boolean
     sortBy: String
     sortOrder: String
-  ): [SystemRole]
+  ): [SystemRole!]
 }

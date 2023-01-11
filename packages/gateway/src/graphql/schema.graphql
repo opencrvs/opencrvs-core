@@ -136,14 +136,14 @@ type Query {
     skip: Int
     sort: String
   ): EventProgressResultSet
-  getRoles(
+  getSystemRoles(
     title: String
     value: ComparisonInput
     role: String
     active: Boolean
     sortBy: String
     sortOrder: String
-  ): [SystemRole]
+  ): [SystemRole!]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
@@ -543,9 +543,9 @@ type EventProgressResultSet {
 
 type SystemRole {
   id: ID!
-  value: String
-  roles: [Label]
-  active: Boolean
+  value: String!
+  roles: [Label!]!
+  active: Boolean!
 }
 
 input ComparisonInput {
@@ -1132,7 +1132,7 @@ type EventProgressSet {
 }
 
 type Label {
-  labels: [Role]
+  labels: [Role!]!
 }
 
 enum DraftStatus {
@@ -1648,8 +1648,8 @@ type EventProgressData {
 }
 
 type Role {
-  lang: String
-  label: String
+  lang: String!
+  label: String!
 }
 
 type FormDatasetOptionLabel {

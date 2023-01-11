@@ -63,6 +63,7 @@ export const CERTIFICATE_CONFIG = '/config/certificate'
 export const FORM_CONFIG_HOME = '/config/form'
 export const APPLICATION_CONFIG = '/config/application'
 export const SYSTEM_LIST = '/config/integration'
+export const USER_ROLES_CONFIG = '/config/userroles'
 export const FORM_CONFIG_WIZARD = '/config/form/wizard/:event/:section'
 
 export const INFORMANT_NOTIFICATION = '/communications/informantnotification'

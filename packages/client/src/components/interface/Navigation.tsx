@@ -35,7 +35,8 @@ import {
   goToApplicationConfig,
   goToAdvancedSearchResult,
   goToVSExport,
-  goToInformantNotification
+  goToInformantNotification,
+  goToUserRolesConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -89,6 +90,7 @@ export const WORKQUEUE_TABS = {
   application: 'application',
   certificate: 'certificate',
   systems: 'integration',
+  userRoles: 'userroles',
   settings: 'settings',
   declarationForms: 'form',
   logout: 'logout',
@@ -170,6 +172,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.config,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.communications,
+    WORKQUEUE_TABS.userRoles,
     WORKQUEUE_TABS.informantNotification,
     GROUP_ID.menuGroup
   ],
@@ -208,6 +211,7 @@ interface IDispatchProps {
   goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
   goToFormConfigAction: typeof goToFormConfigHome
+  goToUserRolesConfigAction: typeof goToUserRolesConfig
   goToApplicationConfigAction: typeof goToApplicationConfig
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
@@ -281,6 +285,7 @@ export const NavigationView = (props: IFullProps) => {
     loadWorkqueueStatuses = true,
     activeMenuItem,
     goToCertificateConfigAction,
+    goToUserRolesConfigAction,
     goToVSExportsAction,
     goToFormConfigAction,
     goToSystemViewAction,
@@ -309,7 +314,8 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.application,
     WORKQUEUE_TABS.certificate,
     WORKQUEUE_TABS.declarationForms,
-    WORKQUEUE_TABS.systems
+    WORKQUEUE_TABS.systems,
+    WORKQUEUE_TABS.userRoles
   ]
   const conmmunicationTab: string[] = [WORKQUEUE_TABS.informantNotification]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
@@ -701,6 +707,18 @@ export const NavigationView = (props: IFullProps) => {
                               activeMenuItem === WORKQUEUE_TABS.systems
                             }
                           />
+
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.userRoles}`}
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.userRoles]
+                            )}
+                            onClick={goToUserRolesConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.userRoles
+                            }
+                          />
                         </>
                       )}
                     </>
@@ -842,6 +860,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.systems
       : window.location.href.endsWith(WORKQUEUE_TABS.informantNotification)
       ? WORKQUEUE_TABS.informantNotification
+      : window.location.href.endsWith(WORKQUEUE_TABS.userRoles)
+      ? WORKQUEUE_TABS.userRoles
       : ''
   }
 }
@@ -855,6 +875,7 @@ export const Navigation = connect<
   goToHomeTab,
   goToCertificateConfigAction: goToCertificateConfig,
   goToFormConfigAction: goToFormConfigHome,
+  goToUserRolesConfigAction: goToUserRolesConfig,
   goToApplicationConfigAction: goToApplicationConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,

@@ -1006,7 +1006,7 @@ export type InputOutput = {
 
 export type Label = {
   __typename?: 'Label'
-  labels?: Maybe<Array<Maybe<Role>>>
+  labels: Array<Role>
 }
 
 export type LocalRegistrar = {
@@ -1541,7 +1541,7 @@ export type Query = {
   getFormDraft?: Maybe<Array<FormDraft>>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
-  getRoles?: Maybe<Array<Maybe<SystemRole>>>
+  getSystemRoles?: Maybe<Array<SystemRole>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
   getTotalCorrections?: Maybe<Array<CorrectionMetric>>
   getTotalMetrics?: Maybe<TotalMetricsResult>
@@ -1646,7 +1646,7 @@ export type QueryGetRegistrationsListByFilterArgs = {
   timeStart: Scalars['String']
 }
 
-export type QueryGetRolesArgs = {
+export type QueryGetSystemRolesArgs = {
   active?: InputMaybe<Scalars['Boolean']>
   role?: InputMaybe<Scalars['String']>
   sortBy?: InputMaybe<Scalars['String']>
@@ -1975,8 +1975,8 @@ export type RemoveBookmarkedSeachInput = {
 
 export type Role = {
   __typename?: 'Role'
-  label?: Maybe<Scalars['String']>
-  lang?: Maybe<Scalars['String']>
+  label: Scalars['String']
+  lang: Scalars['String']
 }
 
 export enum RoleType {
@@ -2085,10 +2085,10 @@ export type SystemInput = {
 
 export type SystemRole = {
   __typename?: 'SystemRole'
-  active?: Maybe<Scalars['Boolean']>
+  active: Scalars['Boolean']
   id: Scalars['ID']
-  roles?: Maybe<Array<Maybe<Label>>>
-  value?: Maybe<Scalars['String']>
+  roles: Array<Label>
+  value: Scalars['String']
 }
 
 export type SystemSecret = {
@@ -2390,24 +2390,20 @@ export type CreateOrUpdateUserMutation = {
   createOrUpdateUser: { __typename?: 'User'; username?: string | null }
 }
 
-export type GetRolesQueryVariables = Exact<{
+export type GetSystemRolesQueryVariables = Exact<{
   value?: InputMaybe<ComparisonInput>
 }>
 
-export type GetRolesQuery = {
+export type GetSystemRolesQuery = {
   __typename?: 'Query'
-  getRoles?: Array<{
+  getSystemRoles?: Array<{
     __typename?: 'SystemRole'
-    value?: string | null
-    roles?: Array<{
+    value: string
+    roles: Array<{
       __typename?: 'Label'
-      labels?: Array<{
-        __typename?: 'Role'
-        lang?: string | null
-        label?: string | null
-      } | null> | null
-    } | null> | null
-  } | null> | null
+      labels: Array<{ __typename?: 'Role'; lang: string; label: string }>
+    }>
+  }> | null
 }
 
 export type AdvancedSeachParametersFragment = {

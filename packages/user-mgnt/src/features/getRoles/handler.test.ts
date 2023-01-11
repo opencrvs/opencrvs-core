@@ -208,14 +208,14 @@ const dummyRoleList = [
   }
 ]
 
-describe('getRoles tests', () => {
+describe('getSystemRoles tests', () => {
   it('Successfully returns full role list', async () => {
     Role.find = jest.fn().mockReturnValue(dummyRoleList)
     Role.find().sort = jest.fn().mockReturnValue(dummyRoleList)
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/getRoles',
+      url: '/getSystemRoles',
       payload: {},
       headers: {
         Authorization: `Bearer ${token}`
@@ -230,7 +230,7 @@ describe('getRoles tests', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/getRoles',
+      url: '/getSystemRoles',
       payload: {
         sortBy: '_id',
         sortOrder: 'desc',

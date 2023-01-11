@@ -19,7 +19,7 @@ import changeAvatarHandler, {
   changeAvatarRequestSchema
 } from '@user-mgnt/features/changeAvatar/handler'
 import createUser from '@user-mgnt/features/createUser/handler'
-import getRoles, {
+import getSystemRoles, {
   searchRoleSchema
 } from '@user-mgnt/features/getRoles/handler'
 import getUser, {
@@ -402,8 +402,8 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/getRoles',
-      handler: getRoles,
+      path: '/getSystemRoles',
+      handler: getSystemRoles,
       config: {
         auth: {
           scope: [RouteScope.SYSADMIN]

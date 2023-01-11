@@ -22,7 +22,7 @@ import {
   NATL_ADMIN_ROLES,
   NATIONAL_REGISTRAR_ROLES
 } from '@client/utils/constants'
-import { GQLRole } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLLabel, GQLRole } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { IStoreState } from '@client/store'
@@ -93,7 +93,9 @@ export async function alterRolesBasedOnUserRole(
   const userDetails = getUserDetails(getState())
   const roleSearchCriteria = getRoleSearchCriteria(userDetails?.systemRole)
   const roleData = await roleQueries.fetchRoles(roleSearchCriteria)
-  const roles = roleData.data.getRoles.roles as Array<GQLRole>
+  const roles = roleData.data.getSystemRoles as Array<GQLLabel>
+  console.log(roleSearchCriteria)
+  console.log(roles)
 
   // This is a legacy function that allows you to filter available roles
   // It was used if some countries want to customise role types such as MAYOR
@@ -112,7 +114,7 @@ export async function alterRolesBasedOnUserRole(
   const hasMayor = users.some((user) => user.type === ROLE_TYPE_MAYOR)
   const hasChariman = users.some((user) => user.type === ROLE_TYPE_CHAIRMAN)*/
 
-  const roleList = [] as Array<GQLRole>
+  const roleList = [] as Array<GQLLabel>
 
   /* eslint-disable array-callback-return */
   roles.map((role) => {
@@ -141,7 +143,6 @@ export async function alterRolesBasedOnUserRole(
     }*/
   })
 
-  /* eslint-enable array-callback-return */
   return roleList
 }
 
@@ -194,7 +195,7 @@ export function checkIfLocalLanguageProvided() {
   return window.config.LANGUAGES.split(',').length > 1
 }
 
-export function getUserRole(
+export function getUserSystemRole(
   user: { systemRole?: string | null },
   intl: IntlShape
 ): string | undefined {

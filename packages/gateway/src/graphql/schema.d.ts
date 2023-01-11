@@ -46,7 +46,7 @@ export interface GQLQuery {
   getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
-  getRoles?: Array<GQLSystemRole | null>
+  getSystemRoles?: Array<GQLSystemRole>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getFormDraft?: Array<GQLFormDraft>
@@ -424,9 +424,9 @@ export interface GQLEventProgressResultSet {
 
 export interface GQLSystemRole {
   id: string
-  value?: string
-  roles?: Array<GQLLabel | null>
-  active?: boolean
+  value: string
+  roles: Array<GQLLabel>
+  active: boolean
 }
 
 export interface GQLComparisonInput {
@@ -1035,7 +1035,7 @@ export interface GQLEventProgressSet {
 }
 
 export interface GQLLabel {
-  labels?: Array<GQLRole | null>
+  labels: Array<GQLRole>
 }
 
 export const enum GQLDraftStatus {
@@ -1552,8 +1552,8 @@ export interface GQLEventProgressData {
 }
 
 export interface GQLRole {
-  lang?: string
-  label?: string
+  lang: string
+  label: string
 }
 
 export interface GQLFormDatasetOptionLabel {
@@ -1925,7 +1925,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
-  getRoles?: QueryToGetRolesResolver<TParent>
+  getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   getFormDraft?: QueryToGetFormDraftResolver<TParent>
@@ -2481,7 +2481,7 @@ export interface QueryToGetEventsWithProgressResolver<
   ): TResult
 }
 
-export interface QueryToGetRolesArgs {
+export interface QueryToGetSystemRolesArgs {
   title?: string
   value?: GQLComparisonInput
   role?: string
@@ -2489,10 +2489,10 @@ export interface QueryToGetRolesArgs {
   sortBy?: string
   sortOrder?: string
 }
-export interface QueryToGetRolesResolver<TParent = any, TResult = any> {
+export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToGetRolesArgs,
+    args: QueryToGetSystemRolesArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

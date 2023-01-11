@@ -56,7 +56,8 @@ import {
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
   PERFORMANCE_REGISTRATIONS_LIST,
-  INFORMANT_NOTIFICATION
+  INFORMANT_NOTIFICATION,
+  USER_ROLES_CONFIG
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -172,6 +173,10 @@ export function goToHome() {
 
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+
+export function goToUserRolesConfig() {
+  return push(USER_ROLES_CONFIG)
 }
 
 export function goToInformantNotification() {

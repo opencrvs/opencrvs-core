@@ -101,6 +101,10 @@ interface IConfigMessages
   registrationSMS: MessageDescriptor
   rejectionSMS: MessageDescriptor
   informantNotificationUpdatingMessage: MessageDescriptor
+  userRoles: MessageDescriptor
+  userRolesSubtitle: MessageDescriptor
+  systemRoles: MessageDescriptor
+  role: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -562,6 +566,27 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.informantNotification.success',
     defaultMessage: 'Informant notifications updated',
     description: 'Notification for informant update success'
+  },
+  userRoles: {
+    id: 'config.userRoles.title',
+    defaultMessage: 'User roles',
+    description: 'The title for user roles'
+  },
+  userRolesSubtitle: {
+    id: 'config.userRoles.subtitle',
+    defaultMessage:
+      'Map user roles to each system role so that specific permissions and privileges are correctly assigned. To learn more about the different system roles see ... {link}',
+    description: 'Subtile for informant sms notification'
+  },
+  systemRoles: {
+    id: 'config.userRoles.systemRoles',
+    defaultMessage: 'SYSTEM ROLES',
+    description: 'ListViewSimplified header for system roles'
+  },
+  role: {
+    id: 'config.userRoles.role',
+    defaultMessage: 'ROLE',
+    description: 'ListViewSimplified header for role'
   }
 }
 

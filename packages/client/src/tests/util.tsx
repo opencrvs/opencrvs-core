@@ -53,7 +53,7 @@ import { mockOfflineData } from './mock-offline-data'
 import { Section, SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { vi } from 'vitest'
-import { getRolesQuery } from '@client/forms/user/query/queries'
+import { getSystemRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
@@ -2272,12 +2272,12 @@ export function createRouterProps<
 
 export const mockFetchRoleGraphqlOperation = {
   request: {
-    query: getRolesQuery,
+    query: getSystemRolesQuery,
     variables: {}
   },
   result: {
     data: {
-      getRoles: [
+      getSystemRoles: [
         {
           value: 'FIELD_AGENT',
           roles: [

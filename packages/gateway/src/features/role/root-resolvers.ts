@@ -17,7 +17,7 @@ import { transformMongoComparisonObject } from '@gateway/features/role/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getRoles(
+    async getSystemRoles(
       _,
       {
         title = null,
@@ -51,7 +51,7 @@ export const resolvers: GQLResolver = {
       if (active !== null) {
         payload = { ...payload, active }
       }
-      const res = await fetch(`${USER_MANAGEMENT_URL}getRoles`, {
+      const res = await fetch(`${USER_MANAGEMENT_URL}getSystemRoles`, {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: {

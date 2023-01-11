@@ -17,7 +17,7 @@ beforeEach(() => {
 })
 
 describe('Role root resolvers', () => {
-  describe('getRoles()', () => {
+  describe('getSystemRoles()', () => {
     const dummyRoleList = [
       {
         _id: '63a06b979538ca7ab52f9759',
@@ -199,14 +199,14 @@ describe('Role root resolvers', () => {
     it('returns full role list', async () => {
       fetch.mockResponseOnce(JSON.stringify(dummyRoleList))
 
-      const response = await resolvers.Query.getRoles({}, {})
+      const response = await resolvers.Query.getSystemRoles({}, {})
 
       expect(response).toEqual(dummyRoleList)
     })
     it('returns filtered role list', async () => {
       fetch.mockResponseOnce(JSON.stringify([dummyRoleList[2]]))
 
-      const response = await resolvers.Query.getRoles(
+      const response = await resolvers.Query.getSystemRoles(
         {},
         {
           sortBy: '_id',

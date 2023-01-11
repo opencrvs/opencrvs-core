@@ -39,7 +39,7 @@ import { vi, Mock } from 'vitest'
 
 export const mockRoles = {
   data: {
-    getRoles: [
+    getSystemRoles: [
       {
         value: 'FIELD_AGENT',
         roles: [
