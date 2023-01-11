@@ -14,7 +14,8 @@ import {
   fetchSuccess,
   read,
   fetch,
-  isAvailable
+  isAvailable,
+  fetchFail
 } from '@client/performance/performanceDataActions'
 import { Action as ProfileAction } from '@client/profile/profileActions'
 import { client } from '@client/utils/apolloClient'
@@ -139,14 +140,16 @@ export const performanceDataReducer = (
         {
           ...state,
           [key]: {
-            loading: true,
-            data: null,
+            loading: !state[key]?.data,
+            data: state[key].data ?? null,
             error: null
           }
         },
         Cmd.run(() => client.query({ query, variables }), {
           successActionCreator: (data) =>
-            fetchSuccess(data, operationName, variables)
+            fetchSuccess(data, operationName, variables),
+          failActionCreator: (error) =>
+            fetchFail(error, operationName, variables)
         })
       )
     }
@@ -166,6 +169,18 @@ export const performanceDataReducer = (
           args: [data, operationName, variables]
         })
       )
+    }
+    case 'PERFORMANCE/FETCH_QUERY_DATA_FAIL': {
+      const { error, operationName, variables } = action.payload
+      const key = createKey({ operationName, variables })
+      return {
+        ...state,
+        [key]: {
+          loading: false,
+          data: state[key]?.data ?? null,
+          error
+        }
+      }
     }
     default:
       return state

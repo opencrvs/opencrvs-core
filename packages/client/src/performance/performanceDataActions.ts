@@ -13,7 +13,7 @@ import { DocumentNode } from 'graphql'
 
 export function isAvailable(
   operationName: string,
-  variables: Record<string, string>,
+  variables: Record<string, any>,
   query: DocumentNode
 ) {
   return {
@@ -27,7 +27,7 @@ export function isAvailable(
 }
 export function fetch(
   operationName: string,
-  variables: Record<string, string>,
+  variables: Record<string, any>,
   query: DocumentNode
 ) {
   return {
@@ -40,10 +40,7 @@ export function fetch(
   }
 }
 
-export function write(
-  operationName: string,
-  variables: Record<string, string>
-) {
+export function write(operationName: string, variables: Record<string, any>) {
   return {
     type: 'PERFORMANCE/WRITE_QUERY_DATA' as const,
     payload: {
@@ -61,7 +58,7 @@ export function read({
 }: {
   data: any
   operationName: string
-  variables: Record<string, string>
+  variables: Record<string, any>
   query: DocumentNode
 }) {
   return {
@@ -78,12 +75,27 @@ export function read({
 export function fetchSuccess(
   data: any,
   operationName: string,
-  variables: Record<string, string>
+  variables: Record<string, any>
 ) {
   return {
     type: 'PERFORMANCE/FETCH_QUERY_DATA_SUCCESS' as const,
     payload: {
       data,
+      operationName,
+      variables
+    }
+  }
+}
+
+export function fetchFail(
+  error: any,
+  operationName: string,
+  variables: Record<string, any>
+) {
+  return {
+    type: 'PERFORMANCE/FETCH_QUERY_DATA_FAIL' as const,
+    payload: {
+      error,
       operationName,
       variables
     }
@@ -96,3 +108,4 @@ export type Action =
   | ReturnType<typeof write>
   | ReturnType<typeof read>
   | ReturnType<typeof fetchSuccess>
+  | ReturnType<typeof fetchFail>
