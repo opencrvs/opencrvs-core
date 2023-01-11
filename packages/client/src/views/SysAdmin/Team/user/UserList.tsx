@@ -317,8 +317,6 @@ function UserListComponent(props: IProps) {
     ({ id }) => locationId === id
   )
 
-  console.log({ searchedLocation })
-
   const getAddressName = ({ name, partOf }: ILocation): string => {
     const parentLocationId = partOf.split('/')[1]
     if (parentLocationId === '0') return name
