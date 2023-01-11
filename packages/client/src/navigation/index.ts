@@ -55,7 +55,8 @@ import {
   VS_EXPORTS,
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST
+  PERFORMANCE_REGISTRATIONS_LIST,
+  INFORMANT_NOTIFICATION
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -171,6 +172,11 @@ export function goToHome() {
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
+
+export function goToInformantNotification() {
+  return push(INFORMANT_NOTIFICATION)
+}
+
 export function goToVSExport() {
   return push(VS_EXPORTS)
 }

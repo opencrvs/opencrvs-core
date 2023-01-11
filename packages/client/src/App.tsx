@@ -65,6 +65,7 @@ import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { RoleType } from '@client/utils/gateway'
+import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -226,9 +227,21 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
+                                              // Fix this
                                               RoleType.LocalRegistrar,
                                               RoleType.RegistrationAgent,
                                               RoleType.NationalRegistrar
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
+                                            path={routes.INFORMANT_NOTIFICATION}
+                                            component={InformantNotification}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.NATIONAL_REGISTRAR
                                             ]}
                                             path={routes.ADVANCED_SEARCH}
                                             component={AdvancedSearchConfig}
