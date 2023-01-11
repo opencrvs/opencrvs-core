@@ -227,11 +227,10 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              // Fix this
                                               RoleType.LocalRegistrar,
                                               RoleType.RegistrationAgent,
-                                              RoleType.NationalRegistrar
-                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                              RoleType.NationalRegistrar,
+                                              RoleType.NationalSystemAdmin
                                             ]}
                                             path={routes.INFORMANT_NOTIFICATION}
                                             component={InformantNotification}
@@ -239,9 +238,9 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              Roles.LOCAL_REGISTRAR,
-                                              Roles.REGISTRATION_AGENT,
-                                              Roles.NATIONAL_REGISTRAR
+                                              RoleType.LocalRegistrar,
+                                              RoleType.RegistrationAgent,
+                                              RoleType.NationalRegistrar
                                             ]}
                                             path={routes.ADVANCED_SEARCH}
                                             component={AdvancedSearchConfig}
