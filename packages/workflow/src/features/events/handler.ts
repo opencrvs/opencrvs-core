@@ -95,12 +95,9 @@ function detectEvent(request: Hapi.Request): Events {
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
   ) {
-    if (
-      fhirBundle.entry &&
-      fhirBundle.entry[0] &&
-      fhirBundle.entry[0].resource
-    ) {
-      const firstEntry = fhirBundle.entry[0].resource
+    const firstEntry = fhirBundle.entry?.[0]?.resource
+    if (firstEntry) {
+      const isNewEntry = !firstEntry.id
       if (firstEntry.resourceType === 'Composition') {
         const composition = firstEntry as fhir.Composition
         const isADuplicate = composition?.extension?.find(
@@ -110,8 +107,7 @@ function detectEvent(request: Hapi.Request): Events {
         )
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
-          const wasJustCreated = firstEntry.id
-          if (wasJustCreated) {
+          if (!isNewEntry) {
             if (!hasBirthRegistrationNumber(fhirBundle)) {
               if (hasValidateScope(request)) {
                 return Events.BIRTH_MARK_VALID
@@ -147,7 +143,7 @@ function detectEvent(request: Hapi.Request): Events {
               : Events.BIRTH_NEW_DEC
           }
         } else if (eventType === EVENT_TYPE.DEATH) {
-          if (firstEntry.id) {
+          if (!isNewEntry) {
             if (!hasDeathRegistrationNumber(fhirBundle)) {
               if (hasValidateScope(request)) {
                 return Events.DEATH_MARK_VALID
@@ -180,7 +176,7 @@ function detectEvent(request: Hapi.Request): Events {
           }
         }
       }
-      if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+      if (firstEntry.resourceType === 'Task' && !isNewEntry) {
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
           if (hasValidateScope(request)) {
