@@ -21,6 +21,7 @@ import { DateRangePicker } from '@client/components/DateRangePicker'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { Mock, vi } from 'vitest'
+import startOfMonth from 'date-fns/startOfMonth'
 
 describe('date picker tests', () => {
   let component: ReactWrapper
@@ -76,7 +77,9 @@ describe('date picker tests', () => {
       const presetElement = await waitForElement(component, '#preset-small')
       presetElement.find('#last12Months').hostNodes().simulate('click')
       expect(onDatesChangeMock).toBeCalledWith({
-        startDate: new Date(Date.parse('2019-06-30T18:00:00.000Z')),
+        startDate: new Date(
+          startOfMonth(Date.parse('2019-07-15T18:00:00.000Z'))
+        ),
         endDate: new Date(Date.parse('2020-06-15T15:00:32.409Z'))
       })
     })
