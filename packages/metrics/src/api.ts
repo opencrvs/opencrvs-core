@@ -50,7 +50,7 @@ export const fetchLocation = async (
   locationId: string,
   authHeader: IAuthHeader
 ) => {
-  return await fetchFHIR<fhir.Location>(
+  return await fetchFHIR<fhir.Location & { id: string }>(
     locationId.startsWith('Location/') ? locationId : `Location/${locationId}`,
     authHeader
   )

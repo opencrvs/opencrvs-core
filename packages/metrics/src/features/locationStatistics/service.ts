@@ -13,10 +13,12 @@ import {
   fetchChildLocationsByParentId,
   countRegistrarsByLocation,
   totalOfficesInCountry,
-  fetchLocationsByType
+  fetchLocationsByType,
+  fetchLocation
 } from '@metrics/api'
 import { getPopulation } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
+import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 
 interface ILocationStatisticsResponse {
   registrars: number
@@ -24,44 +26,104 @@ interface ILocationStatisticsResponse {
   offices: number
 }
 
-function isUnderJurisdiction(
-  locationsMap: Record<string, fhir.Location>,
-  jurisdictionId: string,
-  location: fhir.Location
-): boolean {
-  const partOf = location.partOf?.reference?.split('/')[1]
-  // already at the highest level
-  if (!partOf || partOf === '0') return false
-  if (partOf === jurisdictionId) return true
-  return isUnderJurisdiction(locationsMap, jurisdictionId, locationsMap[partOf])
+type Location = fhir.Location & { id: string }
+
+type LocationsMap = Record<string, Location | undefined>
+
+const OFFICE_COUNT_CACHE: Record<string, number | undefined> = {}
+
+function dfs(
+  locationsMap: LocationsMap,
+  currentLocation: Location,
+  adjacency: Record<string, string[] | undefined>
+): number {
+  if (
+    OFFICE_COUNT_CACHE[currentLocation.id] &&
+    OFFICE_COUNT_CACHE[currentLocation.id] !== -1
+  ) {
+    return OFFICE_COUNT_CACHE[currentLocation.id] as number
+  }
+  let offices = 0
+  adjacency[currentLocation.id]?.forEach((childLocationId) => {
+    const childLocation = locationsMap[childLocationId]
+    /*
+     * The offices are not present in the locationsMap
+     * so when the child location is undefined, it means
+     * that we have found an office
+     */
+    if (!childLocation) {
+      offices++
+      return
+    }
+    offices += dfs(locationsMap, childLocation, adjacency)
+  })
+  OFFICE_COUNT_CACHE[currentLocation.id] = offices
+  return offices
 }
 
-async function getAdminLocationStatistics(
-  locationId: string,
-  registrars: number,
-  populationYear: number,
-  authHeader: IAuthHeader
-): Promise<ILocationStatisticsResponse> {
+async function cacheOfficeCount(authHeader: IAuthHeader) {
   const [locations, offices] = await Promise.all([
     fetchLocationsByType('ADMIN_STRUCTURE', authHeader),
     fetchLocationsByType('CRVS_OFFICE', authHeader)
   ])
-  const locationsMap = locations.reduce<Record<string, fhir.Location>>(
+  locations.forEach(({ id }) => (OFFICE_COUNT_CACHE[id] = -1))
+  const locationsMap = locations.reduce<LocationsMap>(
     (locationsMap, location) => ({
       ...locationsMap,
       [location.id]: location
     }),
     {}
   )
+  const adjacency: Record<string, string[] | undefined> = {}
+  offices.forEach((office) => {
+    let currentLocation = office
+    const partOf = currentLocation.partOf?.reference?.split('/')[1]
+    let parentLocation = locationsMap[partOf ?? '']
+    while (parentLocation) {
+      adjacency[parentLocation.id] = [
+        ...(adjacency[parentLocation.id] ?? []),
+        currentLocation.id
+      ]
+      currentLocation = parentLocation
+      const partOf = currentLocation.partOf?.reference?.split('/')[1]
+      parentLocation = locationsMap[partOf ?? '']
+    }
+  })
+  /*
+   *  Run dfs from the top level locations
+   */
+  locations
+    .filter(({ partOf }) => partOf?.reference?.split('/')[1] === '0')
+    .forEach((location) => dfs(locationsMap, location, adjacency))
+}
+
+function isOffice(location: Location) {
+  return (
+    location.type?.coding?.find(
+      ({ system }) => system === `${OPENCRVS_SPECIFICATION_URL}location-type`
+    )?.code === 'CRVS_OFFICE'
+  )
+}
+
+async function getAdminLocationStatistics(
+  location: Location,
+  registrars: number,
+  populationYear: number,
+  authHeader: IAuthHeader
+): Promise<ILocationStatisticsResponse> {
+  if (isOffice(location)) {
+    return {
+      population: 0,
+      offices: 1,
+      registrars
+    }
+  }
+  if (!OFFICE_COUNT_CACHE[location.id]) {
+    await cacheOfficeCount(authHeader)
+  }
   return {
-    population:
-      locationsMap[locationId] &&
-      getPopulation(locationsMap[locationId], populationYear),
-    offices: offices.reduce<number>(
-      (total, office) =>
-        total + Number(isUnderJurisdiction(locationsMap, locationId, office)),
-      0
-    ),
+    population: getPopulation(location, populationYear),
+    offices: OFFICE_COUNT_CACHE[location.id] ?? 0,
     registrars
   }
 }
@@ -95,8 +157,9 @@ export async function getLocationStatistics(
   const { registrars } = await countRegistrarsByLocation(authHeader, locationId)
 
   if (locationId) {
+    const location = await fetchLocation(locationId, authHeader)
     return getAdminLocationStatistics(
-      locationId,
+      location,
       registrars,
       populationYear,
       authHeader
