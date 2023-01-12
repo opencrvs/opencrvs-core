@@ -16,8 +16,12 @@ services:
   traefik:
     image: 'traefik:v2.8'
     ports:
-      - '80:80'
-      - '443:443'
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /data/traefik/acme.json:/acme.json
@@ -67,7 +71,7 @@ services:
       - KIBANA_PASSWORD=${KIBANA_PASSWORD}
       - BEATS_USERNAME=beats_system
       - BEATS_PASSWORD=${ROTATING_METRICBEAT_ELASTIC_PASSWORD}
-    command: ['--strict.perms=false', '-system.hostfs=/hostfs']
+    command: [ '--strict.perms=false', '-system.hostfs=/hostfs' ]
     hostname: 'metricbeat-{{.Node.Hostname}}'
     restart: always
     deploy:
@@ -299,7 +303,7 @@ services:
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
-    entrypoint: ['bash', '/usr/app/setup.sh']
+    entrypoint: [ 'bash', '/usr/app/setup.sh' ]
     restart: on-failure
     depends_on:
       - elasticsearch
@@ -379,8 +383,8 @@ services:
     depends_on:
       - elasticsearch
       - kibana
-    cap_add: ['CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID']
-    cap_drop: ['ALL']
+    cap_add: [ 'CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID' ]
+    cap_drop: [ 'ALL' ]
     restart: always
     ports:
       - 8200:8200
@@ -425,6 +429,9 @@ services:
       placement:
         constraints:
           - node.labels.data1 == true
+    configs:
+      - source: influxdb-conf.{{ts}}
+        target: /etc/influxdb/influxdb.conf
     networks:
       - overlay_net
     logging:
@@ -586,6 +593,7 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
+      - RECORD_SEARCH_QUOTA=2000
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://user-mgnt:${USER_MGNT_MONGODB_PASSWORD}@mongo1/user-mgnt?replicaSet=rs0
     deploy:
@@ -767,9 +775,16 @@ services:
         tag: 'config'
   migration:
     environment:
+      - USER_MGNT_MONGO_URL=mongodb://user-mgnt:${USER_MGNT_MONGODB_PASSWORD}@mongo1/user-mgnt?replicaSet=rs0
+      - APPLICATION_CONFIG_MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1/application-config?replicaSet=rs0
       - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
       - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
       - ES_HOST=search-user:${ROTATING_SEARCH_ELASTIC_PASSWORD}@elasticsearch:9200
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - MINIO_BUCKET=ocrvs
     deploy:
       labels:
         - 'traefik.enable=false'
@@ -934,6 +949,8 @@ configs:
     file: ./infrastructure/monitoring/logstash/logstash.yml
   logstash-pipeline.{{ts}}:
     file: ./infrastructure/monitoring/logstash/logstash.conf
+  influxdb-conf.{{ts}}:
+    file: ./infrastructure/influxdb.conf
 networks:
   overlay_net:
     driver: overlay

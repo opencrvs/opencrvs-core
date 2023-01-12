@@ -14,79 +14,113 @@ import { query, writePoints } from './../../utils/influx-helper.js'
 export const up = async (db, client) => {
   const session = client.startSession()
   await session.withTransaction(async () => {
-    const resultBirth = await query(
-      "SELECT * FROM birth_registration WHERE registrarPractitionerId = ''"
-    )
-    const birthPromises = updateInflux(resultBirth, 'birth_registration', db)
-    await Promise.all(birthPromises)
-
-    const result = await query(
-      "SELECT * FROM death_registration WHERE registrarPractitionerId = ''"
-    )
-    const deathPromises = updateInflux(result, 'death_registration', db)
-    await Promise.all(deathPromises)
+    await migrateRegistrations('birth_registration', db)
+    await migrateRegistrations('death_registration', db)
   })
 }
 
-const updateInflux = (result, measurement, db) => {
-  return result.map(
-    async ({
-      compositionId,
-      time,
-      ageInDays,
-      ageInYears,
-      currentStatus,
-      deathDays,
-      ...tags
-    }) => {
-      let task = await db.collection('Task').findOne({
-        focus: {
-          reference: `Composition/${compositionId}`
-        },
-        'businessStatus.coding.code': 'REGISTERED'
-      })
+const LIMIT = 100
 
-      if (!task) {
-        task = await db.collection('Task_history').findOne({
+async function migrateRegistrations(measurement, db) {
+  const result = await query(
+    `SELECT COUNT(compositionId) as total FROM ${measurement} WHERE registrarPractitionerId = ''`
+  )
+
+  const totalCount = result[0]?.total ?? 0
+
+  console.log(
+    `Migration - InfluxDB :: Total points found for measurement ${measurement}: ${totalCount}`
+  )
+
+  let processed = 0
+
+  while (processed < totalCount) {
+    const registrations = await query(
+      `SELECT * FROM ${measurement} WHERE registrarPractitionerId = '' LIMIT ${LIMIT}`
+    )
+    console.log(
+      `Migration - InfluxDB :: Processing ${measurement}, ${processed + 1}-${
+        processed + registrations.length
+      }`
+    )
+    const updatedPoints = await getUpdatedPoints(registrations, measurement, db)
+
+    await writePoints(updatedPoints)
+
+    const startTime = registrations[0].time.getNanoTime()
+    const endTime = registrations[registrations.length - 1].time.getNanoTime()
+
+    const deleteQuery = `DELETE FROM ${measurement} WHERE registrarPractitionerId = '' AND time >= ${startTime} AND time <= ${endTime}`
+    await query(deleteQuery)
+
+    processed += registrations.length
+    console.log(
+      `Migration - InfluxDB :: Processing done: ${(
+        (processed / totalCount) *
+        100
+      ).toFixed(2)}%`
+    )
+  }
+}
+
+const getUpdatedPoints = async (registrations, measurement, db) => {
+  return Promise.all(
+    registrations.map(
+      async ({
+        compositionId,
+        time,
+        ageInDays,
+        ageInYears,
+        currentStatus,
+        deathDays,
+        ...tags
+      }) => {
+        let task = await db.collection('Task').findOne({
           focus: {
             reference: `Composition/${compositionId}`
           },
           'businessStatus.coding.code': 'REGISTERED'
         })
-      }
 
-      const practitionerExtension = task.extension.find(
-        (extension) =>
-          extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
-      )
-      const id = practitionerExtension.valueReference.reference.replace(
-        'Practitioner/',
-        ''
-      )
-      const fields = { compositionId, currentStatus }
-      if (measurement === 'birth_registration') {
-        fields.ageInDays = ageInDays
-      }
-      if (measurement === 'death_registration') {
-        fields.deathDays = deathDays
-        fields.ageInYears = ageInYears
-      }
+        if (!task) {
+          task = await db.collection('Task_history').findOne({
+            focus: {
+              reference: `Composition/${compositionId}`
+            },
+            'businessStatus.coding.code': 'REGISTERED'
+          })
+        }
 
-      const practitioner = await db.collection('Practitioner').findOne({ id })
+        const practitionerExtension = task.extension.find(
+          (extension) =>
+            extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
+        )
+        const id = practitionerExtension.valueReference.reference.replace(
+          'Practitioner/',
+          ''
+        )
+        const fields = { compositionId, currentStatus }
+        if (measurement === 'birth_registration') {
+          fields.ageInDays = ageInDays
+        }
+        if (measurement === 'death_registration') {
+          fields.deathDays = deathDays
+          fields.ageInYears = ageInYears
+        }
 
-      const point = {
-        measurement,
-        tags: {
-          ...tags,
-          registrarPractitionerId: practitioner.id
-        },
-        fields,
-        timestamp: time.getNanoTime()
+        const practitioner = await db.collection('Practitioner').findOne({ id })
+
+        return {
+          measurement,
+          tags: {
+            ...tags,
+            registrarPractitionerId: practitioner.id
+          },
+          fields,
+          timestamp: time.getNanoTime()
+        }
       }
-      const deleteQuery = `DELETE FROM ${measurement} WHERE registrarPractitionerId = '' AND time = ${time.getNanoTime()}`
-      await writePoints([point])
-      return await query(deleteQuery)
-    }
+    )
   )
 }
 

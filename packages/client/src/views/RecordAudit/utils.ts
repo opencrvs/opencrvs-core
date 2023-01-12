@@ -40,8 +40,20 @@ import {
   regActionMessages,
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
-import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { Event, Maybe, RegAction, RegStatus, User } from '@client/utils/gateway'
+import {
+  EMPTY_STRING,
+  FIELD_AGENT_ROLES,
+  LANG_EN
+} from '@client/utils/constants'
+import {
+  Event,
+  Maybe,
+  RegAction,
+  RegStatus,
+  User,
+  History,
+  HumanName
+} from '@client/utils/gateway'
 import { IUserDetails } from '@client/utils/userUtils'
 
 export interface IDeclarationData {
@@ -278,8 +290,15 @@ export function notNull<T>(value: T | null): value is T {
   return value !== null
 }
 
-export const getName = (name: (GQLHumanName | null)[], language: string) => {
-  return createNamesMap(name.filter(notNull))[language]
+export const getName = (names: (HumanName | null)[], language: string) => {
+  if (names && names.length) {
+    return (
+      (createNamesMap(names as HumanName[])[language] as string) ||
+      (createNamesMap(names as HumanName[])[LANG_EN] as string) ||
+      EMPTY_STRING
+    )
+  }
+  return EMPTY_STRING
 }
 
 export const getDraftDeclarationData = (
@@ -409,4 +428,10 @@ export function getStatusLabel(
     return intl.formatMessage(recordAuditMessages.started)
   }
   return regStatus ? intl.formatMessage(regStatusMessages[regStatus]) : ''
+}
+
+export function isSystemInitiated(history: History) {
+  return Boolean(
+    (history.dhis2Notification && !history.user?.id) || history.system
+  )
 }

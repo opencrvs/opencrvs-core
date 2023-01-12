@@ -89,7 +89,9 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
         this.props.location.state.forgottenItem
       )
     } catch (error) {
-      // @todo error handling
+      this.setState({
+        error: true
+      })
     }
   }
 

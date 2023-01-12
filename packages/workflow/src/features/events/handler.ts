@@ -48,6 +48,7 @@ import {
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
+import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
@@ -202,24 +203,24 @@ function detectEvent(request: Hapi.Request): Events {
     }
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
+      if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
+        return Events.BIRTH_MARK_REINSTATED
+      }
       if (isRejectedTask(taskResource)) {
         return Events.BIRTH_MARK_VOID
       }
       if (isArchiveTask(taskResource)) {
         return Events.BIRTH_MARK_ARCHIVED
       }
-      if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
-        return Events.BIRTH_MARK_REINSTATED
-      }
     } else if (eventType === EVENT_TYPE.DEATH) {
+      if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
+        return Events.DEATH_MARK_REINSTATED
+      }
       if (isRejectedTask(taskResource)) {
         return Events.DEATH_MARK_VOID
       }
       if (isArchiveTask(taskResource)) {
         return Events.DEATH_MARK_ARCHIVED
-      }
-      if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
-        return Events.DEATH_MARK_REINSTATED
       }
     }
   }
@@ -244,6 +245,10 @@ export async function fhirWorkflowEventHandler(
     !isUserAuthorized(request.auth.credentials.scope, event)
   ) {
     return h.response().code(401)
+  }
+
+  if (event != Events.UNKNOWN) {
+    setupSystemIdentifier(request)
   }
 
   let response

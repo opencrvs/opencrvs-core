@@ -61,13 +61,8 @@ echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a confi
 
 echo -e "\033[32m:::::::::::::::::: Installing Farajaland Reference Data ::::::::::::::::::\033[0m"
 echo
-yarn db:clear:all
-yarn db:backup:restore
-echo
-echo -e "\033[32m::::::::::::::::::::: Running migration scripts :::::::::::::::::::::\033[0m"
-echo
-cd $PATH_TO_OPEN_CRVS_CORE_DIRECTORY/packages/migration
-bash runMigrations.sh
+yarn db:clear:all --path_to_core=$PATH_TO_OPEN_CRVS_CORE_DIRECTORY
+yarn db:backup:restore --path_to_core=$PATH_TO_OPEN_CRVS_CORE_DIRECTORY
 echo
 echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::::::::::::::::\033[0m"
 echo
