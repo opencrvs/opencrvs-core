@@ -316,7 +316,10 @@ function RegistrationListComponent(props: IProps) {
         ...commonColumns,
         {
           key: 'home',
-          label: intl.formatMessage(messages.performanceHomeBirth),
+          label:
+            event === EVENT_OPTIONS.DEATH
+              ? intl.formatMessage(messages.performanceHomeDeath)
+              : intl.formatMessage(messages.performanceHomeBirth),
           width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('home_num'),
@@ -330,7 +333,10 @@ function RegistrationListComponent(props: IProps) {
         },
         {
           key: 'healthFacility',
-          label: intl.formatMessage(messages.performanceHealthFacilityBirth),
+          label:
+            event === EVENT_OPTIONS.DEATH
+              ? intl.formatMessage(messages.performanceHealthFacilityDeath)
+              : intl.formatMessage(messages.performanceHealthFacilityBirth),
           width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('healthFacility_num'),
@@ -666,7 +672,7 @@ function RegistrationListComponent(props: IProps) {
                       noResultText={intl.formatMessage(
                         constantsMessages.noResults
                       )}
-                      fixedWidth={994}
+                      fixedWidth={1200}
                       isLoading={loading}
                       disableScrollOnOverflow={true}
                       columns={getColumns()}

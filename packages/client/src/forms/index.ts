@@ -706,6 +706,7 @@ export interface IDynamicFormField
 }
 
 export interface IConditional {
+  description?: string
   action: string
   expression: string
 }
