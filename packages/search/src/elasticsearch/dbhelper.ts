@@ -59,7 +59,7 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
 
 export const searchForDuplicates = async (body: IBirthCompositionBody) => {
   try {
-    const response = client.search<ISearchResponse<any>>({
+    return await client.search<ISearchResponse<IBirthCompositionBody>>({
       index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       body: {
@@ -185,7 +185,6 @@ export const searchForDuplicates = async (body: IBirthCompositionBody) => {
         }
       }
     })
-    return response
   } catch (err) {
     logger.error(`searchDuplicates error: ${err}`)
     throw err

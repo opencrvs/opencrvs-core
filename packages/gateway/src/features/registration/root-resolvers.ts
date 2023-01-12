@@ -552,19 +552,26 @@ async function createEventRegistration(
    * we flagged the declaration as a duplicate, we push the declaration into
    * "Ready for review" queue and not ready to print.
    */
-  const isADuplicate = doc.entry
-    .find((entry) => entry.resource.resourceType === 'Composition')
-    ?.resource?.extension?.find(
-      (ext) =>
-        ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` && ext.valueBoolean
-    )
+  const hasDuplicates = Boolean(
+    doc.entry
+      .find((entry) => entry.resource.resourceType === 'Composition')
+      ?.resource?.extension?.find(
+        (ext) =>
+          ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
+          ext.valueBoolean
+      )
+  )
 
-  if (hasScope(authHeader, 'register') && !isADuplicate) {
+  if (hasScope(authHeader, 'register') && !hasDuplicates) {
     // return the registrationNumber
     return await getRegistrationIdsFromResponse(res, event, authHeader)
   } else {
-    // return tracking-id
-    return await getDeclarationIdsFromResponse(res, authHeader)
+    // return tracking-id and potential duplicates
+    const ids = await getDeclarationIdsFromResponse(res, authHeader)
+    return {
+      ...ids,
+      isPotentiallyDuplicate: hasDuplicates
+    }
   }
 }
 

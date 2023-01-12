@@ -413,7 +413,7 @@ export type BirthRegistrationInput = {
   birthType?: InputMaybe<BirthType>
   child?: InputMaybe<PersonInput>
   childrenBornAliveToMother?: InputMaybe<Scalars['Int']>
-  createdAt: Scalars['Date']
+  createdAt?: InputMaybe<Scalars['Date']>
   eventLocation?: InputMaybe<LocationInput>
   father?: InputMaybe<PersonInput>
   foetalDeathsToMother?: InputMaybe<Scalars['Int']>
@@ -423,7 +423,7 @@ export type BirthRegistrationInput = {
   otherAttendantAtBirth?: InputMaybe<Scalars['String']>
   questionnaire?: InputMaybe<Array<InputMaybe<QuestionnaireQuestionInput>>>
   registration?: InputMaybe<RegistrationInput>
-  updatedAt: Scalars['Date']
+  updatedAt?: InputMaybe<Scalars['Date']>
   weightAtBirth?: InputMaybe<Scalars['Float']>
 }
 
@@ -588,6 +588,7 @@ export type CountryLogoInput = {
 export type CreatedIds = {
   __typename?: 'CreatedIds'
   compositionId?: Maybe<Scalars['String']>
+  isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
   registrationNumber?: Maybe<Scalars['String']>
   trackingId?: Maybe<Scalars['String']>
 }
@@ -2998,6 +2999,7 @@ export type CreateBirthRegistrationMutation = {
     __typename?: 'CreatedIds'
     trackingId?: string | null
     compositionId?: string | null
+    isPotentiallyDuplicate?: boolean | null
   }
 }
 
@@ -6090,12 +6092,12 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           registrarPractitioner?: {
             __typename?: 'User'
-            id?: Scalars['ID']
+            id: string
             role: RoleType
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
-              id?: string | null
+              id: string
             } | null
             name: Array<{
               __typename?: 'HumanName'
