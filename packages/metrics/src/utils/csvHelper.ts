@@ -9,7 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
-export const INFLUX_PORT = process.env.INFLUX_PORT || 8086
-export const INFLUX_DB = process.env.INFLUX_DB || 'ocrvs'
-export const INFLUXDB_URL = `http://${INFLUX_HOST}:${INFLUX_PORT}`
+import { parseString } from 'fast-csv'
+
+export type PlainObject = {
+  [key: string]: string
+}
+
+export function csvToJSON(csv: string): Promise<PlainObject[]> {
+  return new Promise((resolve, reject) => {
+    const result = [] as any[]
+    parseString(csv, { headers: false })
+      .on('error', (error) => reject(error))
+      .on('data', (row) => result.push(row))
+      .on('end', () => resolve(result))
+  })
+}
