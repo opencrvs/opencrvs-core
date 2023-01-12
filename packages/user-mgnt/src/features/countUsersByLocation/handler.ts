@@ -10,25 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import {
-  countRegistrarsByLocation,
-  countUsersByLocation
-} from '@user-mgnt/features/countUsersByLocation/service'
+import { countUsersByLocation } from '@user-mgnt/features/countUsersByLocation/service'
 
-const ROLE = 'role'
-const LOCATION_ID = 'locationId'
-
-export async function countRegistrarsByLocationHandler(request: Hapi.Request) {
-  const locationId = request.query[LOCATION_ID]
-
-  return countRegistrarsByLocation(locationId)
+type Payload = {
+  role: string
+  locationId?: string
 }
 
-export async function countUsersByLocationHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const role = request.query[ROLE]
+export async function countUsersByLocationHandler(request: Hapi.Request) {
+  const { locationId, role } = request.payload as Payload
 
-  return countUsersByLocation({ role })
+  return countUsersByLocation(role, locationId)
 }

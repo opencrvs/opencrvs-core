@@ -199,10 +199,6 @@ export const fetchPractitionerRole = async (
   }
 }
 
-interface IUserCountSearchCriteria {
-  role: string
-}
-
 export interface ICountByLocation {
   total: number
   locationId: string
@@ -212,36 +208,17 @@ export async function countRegistrarsByLocation(
   authHeader: IAuthHeader,
   locationId?: string
 ): Promise<{ registrars: number }> {
-  const res = await fetch(
-    locationId
-      ? `${USER_MANAGEMENT_URL}/countRegistrarsByLocation?locationId=${locationId}`
-      : `${USER_MANAGEMENT_URL}/countRegistrarsByLocation`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    }
-  )
-  return res.json()
-}
-
-export async function countUsersByLocation(
-  searchCriteria: Partial<IUserCountSearchCriteria>,
-  authHeader: IAuthHeader
-): Promise<ICountByLocation[]> {
-  const { role } = searchCriteria
-  const res = await fetch(
-    `${USER_MANAGEMENT_URL}/countUsersByLocation?role=${role}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    }
-  )
+  const res = await fetch(`${USER_MANAGEMENT_URL}/countUsersByLocation`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify({
+      role: 'LOCAL_REGISTRAR',
+      locationId
+    })
+  })
   return res.json()
 }
 
