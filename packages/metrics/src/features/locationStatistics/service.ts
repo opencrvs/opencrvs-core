@@ -75,18 +75,14 @@ async function cacheOfficeCount(authHeader: IAuthHeader) {
     {}
   )
   const adjacency: Record<string, string[] | undefined> = {}
-  offices.forEach((office) => {
-    let currentLocation = office
-    const partOf = currentLocation.partOf?.reference?.split('/')[1]
-    let parentLocation = locationsMap[partOf ?? '']
-    while (parentLocation) {
+  ;[...offices, ...locations].forEach((location) => {
+    const partOf = location.partOf?.reference?.split('/')[1]
+    const parentLocation = locationsMap[partOf ?? '']
+    if (parentLocation) {
       adjacency[parentLocation.id] = [
         ...(adjacency[parentLocation.id] ?? []),
-        currentLocation.id
+        location.id
       ]
-      currentLocation = parentLocation
-      const partOf = currentLocation.partOf?.reference?.split('/')[1]
-      parentLocation = locationsMap[partOf ?? '']
     }
   })
   /*
