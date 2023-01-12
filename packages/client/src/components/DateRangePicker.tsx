@@ -38,6 +38,7 @@ import addDays from 'date-fns/addDays'
 import addYears from 'date-fns/addYears'
 import isAfter from 'date-fns/isAfter'
 import isBefore from 'date-fns/isBefore'
+import startOfMonth from 'date-fns/startOfMonth'
 
 const { useState, useEffect, useMemo } = React
 
@@ -409,7 +410,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
       const currentYear = today.getFullYear()
       const date30DaysBack = subDays(today, 30)
 
-      const date12MonthsBack = subMonths(today, 12)
+      const date12MonthsBack = startOfMonth(subMonths(new Date(Date.now()), 11))
 
       const lastYear = new Date(currentYear - 1, 0)
       const last2Year = new Date(currentYear - 2, 0)
