@@ -188,8 +188,18 @@ export function ExportReportModal({
             console.log('Click')
             const dd = {
               content: [
-                'Performance Report',
-                'Now just need to get some real data and layout in here'
+                { text: 'Performance Report', fontSize: 18 },
+                'Certification rate is the no. of certificates issues, expressed as a percentage of the total number of registrations',
+                {
+                  layout: 'lightHorizontalLines', // optional
+                  table: {
+                    widths: ['auto', '*'],
+                    body: [
+                      ['Total', '0'],
+                      ['Certification rate', '0.0%']
+                    ]
+                  }
+                }
               ]
             }
 
