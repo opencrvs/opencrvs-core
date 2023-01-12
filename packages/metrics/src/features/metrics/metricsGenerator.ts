@@ -318,11 +318,12 @@ export async function getCurrentAndLowerLocationLevels(
   const allPointsContainingLocationId = await query(
     `SELECT LAST(*) FROM ${measurement} WHERE time > '${timeStart}' AND time <= '${timeEnd}'
       AND ( officeLocation = '${locationId}'
+        OR locationLevel1 = '${locationId}'
         OR locationLevel2 = '${locationId}'
         OR locationLevel3 = '${locationId}'
         OR locationLevel4 = '${locationId}'
         OR locationLevel5 = '${locationId}' )
-      GROUP BY officeLocation,locationLevel2,locationLevel3,locationLevel4,locationLevel5`
+      GROUP BY officeLocation,locationLevel1,locationLevel2,locationLevel3,locationLevel4,locationLevel5`
   )
 
   if (
@@ -420,7 +421,8 @@ export async function fetchKeyFigures(
       FROM birth_registration
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}
-      AND ( locationLevel2 = '${queryLocationId}'
+      AND ( locationLevel1 = '${queryLocationId}'
+          OR locationLevel2 = '${queryLocationId}'
           OR locationLevel3 = '${queryLocationId}'
           OR locationLevel4 = '${queryLocationId}'
           OR locationLevel5 = '${queryLocationId}' )
@@ -451,7 +453,8 @@ export async function fetchKeyFigures(
       FROM birth_registration
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}
-      AND ( locationLevel2 = '${queryLocationId}'
+      AND ( locationLevel1 = '${queryLocationId}'
+          OR locationLevel2 = '${queryLocationId}'
           OR locationLevel3 = '${queryLocationId}'
           OR locationLevel4 = '${queryLocationId}'
           OR locationLevel5 = '${queryLocationId}' )
@@ -755,7 +758,8 @@ export async function getTotalNumberOfRegistrations(
       FROM ${measurement}
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'
-      AND ( locationLevel2 = '${locationId}'
+      AND ( locationLevel1 = '${locationId}'
+          OR locationLevel2 = '${locationId}'
           OR locationLevel3 = '${locationId}'
           OR locationLevel4 = '${locationId}'
           OR locationLevel5 = '${locationId}' )`
@@ -782,7 +786,8 @@ export async function fetchLocationWiseEventEstimations(
       FROM ${measurement}
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'
-      AND ( locationLevel2 = '${locationId}'
+      AND ( locationLevel1 = '${locationId}'
+          OR locationLevel2 = '${locationId}'
           OR locationLevel3 = '${locationId}'
           OR locationLevel4 = '${locationId}'
           OR locationLevel5 = '${locationId}' )
@@ -865,7 +870,8 @@ export async function fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
       FROM ${measurement}
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'
-      AND ( locationLevel2 = '${locationId}'
+      AND ( locationLevel1 = '${locationId}'
+          OR locationLevel2 = '${locationId}'
           OR locationLevel3 = '${locationId}'
           OR locationLevel4 = '${locationId}'
           OR locationLevel5 = '${locationId}' )
@@ -902,10 +908,11 @@ export async function fetchEventsGroupByMonthDates(
       AND time <= '${timeTo}'
       ${
         locationId
-          ? `AND ( locationLevel2 = '${locationId}'
-      OR locationLevel3 = '${locationId}'
-      OR locationLevel4 = '${locationId}'
-      OR locationLevel5 = '${locationId}' )`
+          ? `AND ( locationLevel1 = '${locationId}'
+          OR locationLevel2 = '${locationId}'
+          OR locationLevel3 = '${locationId}'
+          OR locationLevel4 = '${locationId}'
+          OR locationLevel5 = '${locationId}' )`
           : ``
       }
     GROUP BY dateLabel, timeLabel`
@@ -931,7 +938,8 @@ export async function getTotalMetrics(
       AND time <= '${timeTo}'
       ${
         locationId
-          ? `AND ( locationLevel2 = '${locationId}'
+          ? `AND ( locationLevel1 = '${locationId}'
+      OR locationLevel2 = '${locationId}'
       OR locationLevel3 = '${locationId}'
       OR locationLevel4 = '${locationId}'
       OR locationLevel5 = '${locationId}'
@@ -973,7 +981,8 @@ export async function fetchRegistrationsGroupByOfficeLocation(
       AND time <= '${timeTo}' 
       ${
         locationId
-          ? `AND ( locationLevel2 = '${locationId}'
+          ? `AND ( locationLevel1 = '${locationId}'
+      OR locationLevel2 = '${locationId}'
       OR locationLevel3 = '${locationId}'
       OR locationLevel4 = '${locationId}'
       OR locationLevel5 = '${locationId}'
@@ -999,13 +1008,18 @@ export async function fetchRegistrationsGroupByTime(
   const fluxQuery = `
    from(bucket: "${INFLUX_DB}")
    |> range(start: ${timeFrom}, stop: ${timeTo})
-   |> filter(fn: (r) => 
-      r._measurement == "${measurement}" and
-      (r.locationLevel2 == "${locationId}" or
-       r.locationLevel3 == "${locationId}" or 
-       r.locationLevel4 == "${locationId}" or
-       r.locationLevel5 == "${locationId}" or
-       r.officeLocation == "${locationId}"))
+   |> filter(fn: (r) => r._measurement == "${measurement}") 
+   ${
+     locationId
+       ? `|> filter(fn: (r) => 
+   (r.locationLevel1 == "${locationId}" or
+    r.locationLevel2 == "${locationId}" or
+    r.locationLevel3 == "${locationId}" or 
+    r.locationLevel4 == "${locationId}" or
+    r.locationLevel5 == "${locationId}" or
+    r.officeLocation == "${locationId}"))`
+       : ``
+   }
     |> filter(fn: (r) => r._field == "${column}")
     |> group(columns: ["timeLabel", "eventLocationType"])
     |> aggregateWindow(every: 1mo, fn: count, timeSrc: "_start")
