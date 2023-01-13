@@ -10,21 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { connect } from 'react-redux'
-import { IPage, Page } from '@login/common/Page'
-import { IStoreState } from '@login/store'
-import { RouteComponentProps, withRouter } from 'react-router'
-import { selectCountryBackground } from '@login/login/selectors'
+import styled from 'styled-components'
 
-const mapStateToProps = (store: IStoreState): IPage => {
-  return {
-    submitting: store.login.submitting,
-    background: selectCountryBackground(store)
+export const PageContainer = styled.div`
+  background: ${({ theme }) => theme.colors.background};
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-}
 
-export const PageContainer = withRouter(
-  connect<IPage, {}, IPage & RouteComponentProps<{}>, IStoreState>(
-    mapStateToProps
-  )(Page)
-) as any
+  *:before,
+  *:after {
+    box-sizing: border-box;
+  }
+`

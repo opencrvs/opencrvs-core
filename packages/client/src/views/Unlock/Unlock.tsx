@@ -15,7 +15,6 @@ import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { getUserName, IUserDetails } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
@@ -33,37 +32,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Link, Stack, Toast } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
-const Container = styled.div`
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: min(500px, 90%);
-  border-radius: 4px;
-  padding: 24px;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
-`
-
-interface IPageProps {
-  background?: string
-  backgroundUrl?: string
-  imageFitter?: string
-}
-
-const PageWrapper = styled.div<IPageProps>`
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  background: ${({ background }) => `#${background}`};
-  background-image: ${({ backgroundUrl }) => `url(${backgroundUrl})`};
-  background-size: ${({ imageFitter }) =>
-    imageFitter === 'FILL' ? `cover` : `auto`};
-`
+import { Container, PageWrapper } from '@client/views/common/Common'
 
 interface IState {
   pin: string

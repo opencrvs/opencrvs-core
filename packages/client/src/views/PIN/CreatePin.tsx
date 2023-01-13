@@ -12,7 +12,6 @@
 import * as React from 'react'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import styled from '@client/styledComponents'
 import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/client/src/storage'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -24,72 +23,13 @@ import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { Toast } from '@opencrvs/components'
-
-interface IPageProps {
-  background?: string
-  backgroundUrl?: string
-  imageFitter?: string
-}
-
-const PageWrapper = styled.div<IPageProps>`
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  background: ${({ background }) => `#${background}`};
-  background-image: ${({ backgroundUrl }) => `url(${backgroundUrl})`};
-  background-size: ${({ imageFitter }) =>
-    imageFitter === 'FILL' ? `cover` : `auto`};
-`
-
-const BoxWrapper = styled.div`
-  text-align: center;
-  border-radius: 4px;
-  padding: 24px;
-  width: min(500px, 90%);
-
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
-`
-
-const TitleText = styled.span`
-  display: flex;
-  justify-content: center;
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.h2};
-  text-align: center;
-  margin-top: 24px;
-  margin-bottom: 16px;
-  @media (max-height: 780px) {
-    ${({ theme }) => theme.fonts.h3};
-    margin-top: 0.3em;
-    margin-bottom: 0.3em;
-  }
-`
-
-const DescriptionText = styled.span`
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.reg18};
-  text-align: center;
-  max-width: 360px;
-  margin-bottom: 40px;
-  @media (max-height: 780px) {
-    ${({ theme }) => theme.fonts.reg16};
-  }
-`
-
-export const LogoContainer = styled.div`
-  flex-direction: row;
-  display: flex;
-  justify-content: center;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    & svg {
-      transform: scale(0.8);
-    }
-  }
-`
+import {
+  BoxWrapper,
+  DescriptionText,
+  LogoContainer,
+  PageWrapper,
+  TitleText
+} from '@client/views/common/Common'
 
 type IProps = IntlShapeProps & {
   onComplete: () => void

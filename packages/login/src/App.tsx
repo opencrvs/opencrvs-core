@@ -29,7 +29,7 @@ import { RecoveryCodeEntry } from './views/resetCredentialsForm/recoveryCodeEntr
 import { SecurityQuestion } from './views/resetCredentialsForm/securityQuestionForm'
 import { UpdatePassword } from './views/resetCredentialsForm/updatePasswordForm'
 import { Page } from './Page'
-import { LoginBackgroundWrapper } from '@login/common/LoginBackground/LoginBackgroundWrapper'
+import { LoginBackgroundWrapper } from '@login/common/LoginBackgroundWrapper'
 import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 
 export const { store, history } = createStore()

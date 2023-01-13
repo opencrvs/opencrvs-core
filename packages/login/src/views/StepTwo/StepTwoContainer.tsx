@@ -33,7 +33,7 @@ import {
   selectApplicationName
 } from '@login/login/selectors'
 import { Toast } from '@opencrvs/components'
-import { usePersistentCountryLogo } from '@login/common/LoginBackground/LoginBackgroundWrapper'
+import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import {
   ActionWrapper,
   Container,

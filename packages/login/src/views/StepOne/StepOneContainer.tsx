@@ -36,7 +36,7 @@ import * as actions from '@login/login/actions'
 import { goToForgottenItemForm } from '@login/login/actions'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Toast } from '@opencrvs/components/lib/Toast/Toast'
-import { usePersistentCountryLogo } from '@login/common/LoginBackground/LoginBackgroundWrapper'
+import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import {
   ActionWrapper,
   Container,
