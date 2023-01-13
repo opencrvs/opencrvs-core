@@ -979,10 +979,11 @@ export interface GQLTotalMetricsByTime {
 
 export interface GQLVSExport {
   event: string
-  year: number
+  startDate: GQLDate
+  endDate: GQLDate
   fileSize: string
   url: string
-  createdOn: string
+  createdOn: GQLDate
 }
 
 export type GQLUserAuditLogResultItem =
@@ -5681,7 +5682,8 @@ export interface TotalMetricsByTimeToTotalResolver<
 
 export interface GQLVSExportTypeResolver<TParent = any> {
   event?: VSExportToEventResolver<TParent>
-  year?: VSExportToYearResolver<TParent>
+  startDate?: VSExportToStartDateResolver<TParent>
+  endDate?: VSExportToEndDateResolver<TParent>
   fileSize?: VSExportToFileSizeResolver<TParent>
   url?: VSExportToUrlResolver<TParent>
   createdOn?: VSExportToCreatedOnResolver<TParent>
@@ -5691,7 +5693,11 @@ export interface VSExportToEventResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface VSExportToYearResolver<TParent = any, TResult = any> {
+export interface VSExportToStartDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToEndDateResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

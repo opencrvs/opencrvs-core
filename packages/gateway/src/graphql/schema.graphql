@@ -1098,10 +1098,11 @@ type TotalMetricsByTime {
 
 type VSExport {
   event: String!
-  year: Int!
+  startDate: Date!
+  endDate: Date!
   fileSize: String!
   url: String!
-  createdOn: String!
+  createdOn: Date!
 }
 
 union UserAuditLogResultItem =
