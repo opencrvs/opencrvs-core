@@ -36,10 +36,15 @@ export function selectCountryLogo(store: IStoreState) {
 }
 
 export function selectCountryBackground(store: IStoreState) {
-  if (getKey(store, 'config').LOGIN_BACKGROUND?.backgroundImage) {
-    return getKey(store, 'config').LOGIN_BACKGROUND?.backgroundImage
-  } else {
-    return getKey(store, 'config').LOGIN_BACKGROUND?.backgroundColor
+  const countryBackground = getKey(store, 'config').LOGIN_BACKGROUND
+  if (countryBackground?.backgroundImage) {
+    return {
+      backgroundImage: countryBackground.backgroundImage,
+      imageFit: countryBackground.imageFit
+    }
+  }
+  return {
+    backgroundColor: countryBackground?.backgroundColor ?? '36304E'
   }
 }
 export function selectApplicationName(store: IStoreState) {

@@ -14,35 +14,27 @@ import styled, { css } from 'styled-components'
 
 import {
   selectCountryBackground,
-  selectCountryLogo,
-  selectImageToObjectFit
+  selectCountryLogo
 } from '@login/login/selectors'
 import { LanguageSelect } from '@login/i18n/components/LanguageSelect'
 import { useSelector } from 'react-redux'
+import { isEqual } from 'lodash-es'
 
-interface IPageProps {
-  background?: string
-  imageFitter?: string
-}
-
-const StyledPage = styled.div<IPageProps>`
+const StyledPage = styled.div<{
+  background: ReturnType<typeof selectCountryBackground>
+}>`
   min-height: 100vh;
   width: 100%;
 
-  ${({ imageFitter, background, theme }) =>
-    background
+  ${({ background: { backgroundImage, imageFit, backgroundColor } }) =>
+    backgroundImage
       ? css`
-          background-image: url(${background});
-          background-repeat: ${imageFitter === 'FILL' ? 'no-repeat' : 'repeat'};
-          background-size: ${imageFitter === 'FILL' ? `cover` : `auto`};
-          background: ${background
-            ? `#${background}`
-            : theme.colors.backgroundPrimary};
+          background-image: url(${backgroundImage});
+          background-repeat: ${imageFit === 'FILL' ? 'no-repeat' : 'repeat'};
+          background-size: ${imageFit === 'FILL' ? `cover` : `auto`};
         `
       : css`
-          background: ${background
-            ? `#${background}`
-            : theme.colors.backgroundPrimary};
+          background: #${backgroundColor};
         `}
   * {
     box-sizing: border-box;
@@ -61,25 +53,20 @@ export interface IProps {
 }
 
 export function usePersistentCountryBackground() {
-  const [offlineBackground, setOfflineBackground] = React.useState(
-    localStorage.getItem('country-background') ?? ''
-  )
-  const background = useSelector(selectCountryBackground)
-  if (background && background !== offlineBackground) {
-    setOfflineBackground(background)
-    localStorage.setItem('country-background', background)
-  }
+  const countryBackground: ReturnType<typeof selectCountryBackground> =
+    JSON.parse(
+      localStorage.getItem('country-background') ??
+        `{"backgroundColor" : "36304E"}`
+    )
 
-  return offlineBackground
-}
-export function useImageToObjectFit() {
-  const [offlineBackground, setOfflineBackground] = React.useState(
-    localStorage.getItem('country-image-fit') ?? ''
-  )
-  const background = useSelector(selectImageToObjectFit)
-  if (background && background !== offlineBackground) {
+  const [offlineBackground, setOfflineBackground] =
+    React.useState(countryBackground)
+
+  const background = useSelector(selectCountryBackground)
+
+  if (background && !isEqual(background, offlineBackground)) {
     setOfflineBackground(background)
-    localStorage.setItem('country-image-fit', background)
+    localStorage.setItem('country-background', JSON.stringify(background))
   }
 
   return offlineBackground
@@ -99,10 +86,9 @@ export function usePersistentCountryLogo() {
 
 export function LoginBackgroundWrapper({ children }: IProps) {
   const countryBackground = usePersistentCountryBackground()
-  const fit = useImageToObjectFit()
   return (
     <div>
-      <StyledPage background={countryBackground} imageFitter={fit}>
+      <StyledPage background={countryBackground}>
         <LanguageSelect />
         {children}
       </StyledPage>

@@ -33,20 +33,21 @@ import {
 } from '@login/utils/authUtils'
 import { IAuthenticationData } from '@login/utils/authApi'
 import * as actions from '@login/login/actions'
-import { goToForgottenItemForm } from '@login/login/actions'
+import {
+  goToForgottenItemForm,
+  resetSubmissionError
+} from '@login/login/actions'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Toast } from '@opencrvs/components/lib/Toast/Toast'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import {
-  ActionWrapper,
   Container,
-  FieldWrapper,
   FormWrapper,
   LogoContainer,
-  StyledButton,
-  StyledButtonWrapper,
   StyledH2
 } from '@login/views/Common'
+import { Link } from '@opencrvs/components/lib/Link/Link'
+import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
@@ -138,17 +139,15 @@ export function StepOneContainer() {
         >
           {({ handleSubmit }) => (
             <FormWrapper id={FORM_NAME} onSubmit={handleSubmit}>
-              <StyledH2>
-                {intl.formatMessage(messages.stepOneLoginText)}
-              </StyledH2>
+              <Stack direction="column" alignItems="stretch" gap={16}>
+                <StyledH2>
+                  {intl.formatMessage(messages.stepOneLoginText)}
+                </StyledH2>
 
-              <FieldWrapper>
                 <Field name={userNameField.name} component={UserNameInput} />
-              </FieldWrapper>
-              <FieldWrapper>
+
                 <Field name={passwordField.name} component={Password} />
-              </FieldWrapper>
-              <ActionWrapper>
+
                 <Button
                   id="login-mobile-submit"
                   type="primary"
@@ -156,23 +155,20 @@ export function StepOneContainer() {
                 >
                   {intl.formatMessage(messages.submit)}
                 </Button>
-                <StyledButtonWrapper>
-                  <StyledButton
-                    id="login-forgot-password"
-                    type="button"
-                    onClick={() => dispatch(goToForgottenItemForm())}
-                  >
-                    {intl.formatMessage(messages.forgotPassword)}
-                  </StyledButton>
-                </StyledButtonWrapper>
-              </ActionWrapper>
+                <Link
+                  id="login-forgot-password"
+                  onClick={() => dispatch(goToForgottenItemForm())}
+                >
+                  {intl.formatMessage(messages.forgotPassword)}
+                </Link>
+              </Stack>
             </FormWrapper>
           )}
         </Form>
       </Box>
 
       {submissionError && errorCode ? (
-        <Toast type="error">
+        <Toast type="error" onClose={() => dispatch(resetSubmissionError())}>
           {errorCode === ERROR_CODE_FIELD_MISSING &&
             intl.formatMessage(messages.fieldMissing)}
           {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&

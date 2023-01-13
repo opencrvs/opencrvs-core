@@ -77,8 +77,8 @@ export interface IApplicationConfig {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
-  LOGIN_BACKGROUND: ILoginBackground
   ADMIN_LEVELS: number
+  LOGIN_BACKGROUND: ILoginBackground
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig

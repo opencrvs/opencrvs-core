@@ -11,25 +11,15 @@
  */
 
 import styled from 'styled-components'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Text } from '@opencrvs/components/lib/Text/Text'
 
 export const FormWrapper = styled.form`
-  position: relative;
-  margin: auto;
   width: 100%;
-  margin-bottom: 50px;
-  margin-top: 64px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-top: 48px;
   }
 `
 
-export const ActionWrapper = styled.div`
-  position: relative;
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-`
 export const LogoContainer = styled.div`
   flex-direction: row;
   display: flex;
@@ -41,68 +31,22 @@ export const LogoContainer = styled.div`
   }
 `
 
-export const Title = styled.div`
-  margin: auto;
-  margin-top: 30px;
-  color: ${({ theme }) => theme.colors.white};
-  text-align: center;
-  ${({ theme }) => theme.fonts.reg16};
-`
-
-export const StyledButton = styled(LinkButton)`
-  color: ${({ theme }) => theme.colors.black};
-  flex-direction: row;
-  justify-content: center;
-  text-decoration: none;
-  margin: 10px ${({ theme }) => theme.grid.margin}px;
-  ${({ theme }) => theme.fonts.reg16};
-
-  :hover {
-    text-decoration: underline;
-    text-decoration-color: ${({ theme }) => theme.colors.secondary};
-  }
-
-  &:focus {
-    outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
-  }
-
-  &:not([data-focus-visible-added]) {
-    background: transparent;
-    outline: none;
-    color: ${({ theme }) => theme.colors.black};
-  }
-
-  &:active:not([data-focus-visible-added]):enabled {
-    outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
-    color: ${({ theme }) => theme.colors.copy};
-  }
-`
-export const StyledButtonWrapper = styled.div`
-  display: inline-flex;
-  justify-content: center;
-`
-export const FieldWrapper = styled.div`
-  min-height: 6.5em;
-`
 export interface IProps {
   formId: string
   submissionError: boolean
   errorCode?: number
 }
 
-export const StyledH2 = styled.h2`
-  ${({ theme }) => theme.fonts.h2};
-  font-weight: 400;
+export const StyledH2 = styled(Text).attrs({
+  color: 'grey600',
+  variant: 'bold21',
+  element: 'h2'
+})`
   text-align: center;
-  color: ${({ theme }) => theme.colors.grey600};
 `
 export const Container = styled.div`
   position: relative;
   height: auto;
-  padding: 0px;
-  margin: 0px auto;
-  width: min(500px, 90%);
+  margin: auto;
+  width: min(380px, 90%);
 `

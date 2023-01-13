@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import styled from '@client/styledComponents'
+import styled, { css } from 'styled-components'
 
 interface IPageProps {
   background?: string
@@ -25,10 +25,21 @@ export const PageWrapper = styled.div<IPageProps>`
   width: 100%;
   justify-content: center;
   align-items: center;
-  background: ${({ background }) => `#${background}`};
-  background-image: ${({ backgroundUrl }) => `url(${backgroundUrl})`};
-  background-size: ${({ imageFitter }) =>
-    imageFitter === 'FILL' ? `cover` : `auto`};
+  ${({ imageFitter, background, theme }) =>
+    background
+      ? css`
+          background-image: url(${background});
+          background-repeat: ${imageFitter === 'FILL' ? 'no-repeat' : 'repeat'};
+          background-size: ${imageFitter === 'FILL' ? `cover` : `auto`};
+          background: ${background
+            ? `#${background}`
+            : theme.colors.backgroundPrimary};
+        `
+      : css`
+          background: ${background
+            ? `#${background}`
+            : theme.colors.backgroundPrimary};
+        `}
 `
 
 export const BoxWrapper = styled.div`
