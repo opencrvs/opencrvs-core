@@ -1136,7 +1136,6 @@ export const postAdvancedSearch = (
     })
 }
 
-/** TODO: Import this from schema / the same place every else type gets imported?  */
 type DuplicateSearchBody = {
   childFirstNames?: string
   childFamilyName?: string
