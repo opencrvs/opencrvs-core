@@ -30,6 +30,10 @@ import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { Event, GetVsExportsQuery, VsExport } from '@client/utils/gateway'
+import { Link } from '@client/../../components/lib'
+import { chunk, sortBy } from 'lodash'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
+const DEFAULT_LIST_SIZE = 12
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -58,33 +62,46 @@ async function downloadURI(uri: string, name: string) {
 function TabContent(props: VSExportProps) {
   const intl = useIntl()
   const items: VsExport[] = props.items
+  const totalItems = items.length
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const pages = chunk(items, DEFAULT_LIST_SIZE)
+  const getPage = (pageNumber: number) => pages[pageNumber - 1]
+
   return (
     <>
-      {items.map((item: VsExport) => {
+      {sortBy(getPage(currentPageNumber), 'startDate').map((item: VsExport) => {
         const fileName = intl.formatMessage(messages.vitalStatisticsExport, {
-          year: item.year,
+          month: intl.formatDate(new Date(item.startDate), { month: 'long' }),
           event: item.event,
           fileSize: ''
         })
+
         const label = intl.formatMessage(messages.vitalStatisticsExport, {
-          year: item.year,
+          month: intl.formatDate(new Date(item.startDate), { month: 'long' }),
           event: item.event,
           fileSize: item.fileSize
         })
         const downloadFilePath = `${window.config.MINIO_URL}${item.url}`
 
         return (
-          <ListViewSimplified key={`${item.createdOn}_${item.event}`}>
+          <ListViewSimplified
+            key={`${item.createdOn}_${item.event}`}
+            bottomBorder
+          >
             <ListViewItemSimplified
               compactLabel
-              label={<Label id={`${item.year}_label`}>{item.year}</Label>}
+              label={
+                <Label id={`${item.createdOn}_label`}>
+                  {new Date(item.startDate).getFullYear()}
+                </Label>
+              }
               value={<Value id={`${item.createdOn}_value`}>{label}</Value>}
               actions={
                 <DynamicHeightLinkButton
-                  id={`${item.year}_export_button`}
+                  id={`${item.createdOn}_export_button`}
                   disabled={false}
                   onClick={async () =>
-                    await downloadURI(downloadFilePath, fileName)
+                    await downloadURI(downloadFilePath, fileName.trim())
                   }
                 >
                   {intl.formatMessage(messages.export)}
@@ -94,13 +111,19 @@ function TabContent(props: VSExportProps) {
           </ListViewSimplified>
         )
       })}
+      {totalItems > 0 && (
+        <Pagination
+          currentPage={currentPageNumber}
+          totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
+          onPageChange={(page: any) => setCurrentPageNumber(page)}
+        />
+      )}
     </>
   )
 }
 
 const VSExport = () => {
   const intl = useIntl()
-
   const [activeTabId, setActiveTabId] = React.useState(Event.Birth)
   const tabSections = [
     {
@@ -126,7 +149,18 @@ const VSExport = () => {
           <Content
             title={intl.formatMessage(messages.vsexport)}
             titleColor={'copy'}
-            subtitle={intl.formatMessage(messages.vsEmptyStateText)}
+            subtitle={intl.formatMessage(messages.vsEmptyStateText, {
+              posit: (
+                <Link
+                  onClick={() => {
+                    window.open('https://posit.co/', '_blank')
+                  }}
+                  font="reg16"
+                >
+                  RStudio/Posit
+                </Link>
+              )
+            })}
             tabBarContent={
               <FormTabs
                 sections={tabSections}
@@ -151,11 +185,13 @@ const VSExport = () => {
                 } else {
                   const vsExports = data?.getVSExports?.results || []
                   return (
-                    <TabContent
-                      items={vsExports.filter(
-                        ({ event }) => event === activeTabId
-                      )}
-                    />
+                    <>
+                      <TabContent
+                        items={vsExports.filter(
+                          ({ event }) => event === activeTabId
+                        )}
+                      />
+                    </>
                   )
                 }
               }}

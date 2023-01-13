@@ -587,7 +587,6 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'auth'
-
   user-mgnt:
     secrets:
       - jwt-public-key.{{ts}}
@@ -692,6 +691,8 @@ services:
   metrics:
     secrets:
       - jwt-public-key.{{ts}}
+    volumes:
+      - /data/vsexport:/usr/src/app/packages/metrics/src/scripts
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
