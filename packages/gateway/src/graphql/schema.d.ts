@@ -522,8 +522,8 @@ export interface GQLBirthRegistrationInput {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
-  createdAt: GQLDate
-  updatedAt: GQLDate
+  createdAt?: GQLDate
+  updatedAt?: GQLDate
 }
 
 export interface GQLReinstated {
