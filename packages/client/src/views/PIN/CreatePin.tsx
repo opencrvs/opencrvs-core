@@ -22,20 +22,28 @@ import { IOfflineData } from '@client/offline/reducer'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { Toast } from '@opencrvs/components'
-import {
-  BoxWrapper,
-  DescriptionText,
-  LogoContainer,
-  PageWrapper,
-  TitleText
-} from '@client/views/common/Common'
+import { Box, Text, Toast } from '@opencrvs/components'
+import { BackgroundWrapper, LogoContainer } from '@client/views/common/Common'
+import styled from 'styled-components'
 
 type IProps = IntlShapeProps & {
   onComplete: () => void
   offlineCountryConfiguration: IOfflineData
 }
 
+export const StyledTitle = styled(Text).attrs({
+  variant: 'h3',
+  element: 'h3'
+})`
+  text-align: center;
+`
+
+export const ConfirmPinDescription = styled(Text).attrs({
+  variant: 'bold21',
+  element: 'p'
+})`
+  text-align: center;
+`
 class CreatePinComponent extends React.Component<IProps> {
   pinKeyRef: any
 
@@ -107,19 +115,8 @@ class CreatePinComponent extends React.Component<IProps> {
     const { intl, offlineCountryConfiguration } = this.props
 
     return (
-      <PageWrapper
-        id="unlockPage"
-        background={
-          offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor
-        }
-        backgroundUrl={
-          offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage
-        }
-        imageFitter={
-          offlineCountryConfiguration.config.LOGIN_BACKGROUND.imageFit
-        }
-      >
-        <BoxWrapper>
+      <BackgroundWrapper>
+        <Box id="Box">
           <LogoContainer>
             <CountryLogo
               src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
@@ -127,12 +124,14 @@ class CreatePinComponent extends React.Component<IProps> {
           </LogoContainer>
           {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
             <>
-              <TitleText id="title-text">
+              <StyledTitle>
                 {intl.formatMessage(messages.createTitle)}
-              </TitleText>
-              <DescriptionText id="description-text">
+              </StyledTitle>
+
+              <Text element="p" variant="reg16">
                 {intl.formatMessage(messages.createDescription)}
-              </DescriptionText>
+              </Text>
+
               {pinMatchError && (
                 <Toast
                   type="error"
@@ -153,12 +152,12 @@ class CreatePinComponent extends React.Component<IProps> {
           )}
           {pinHasSeqDigits && (
             <>
-              <TitleText id="title-text">
+              <StyledTitle id="title-text">
                 {intl.formatMessage(messages.createTitle)}
-              </TitleText>
-              <DescriptionText id="description-text">
+              </StyledTitle>
+              <Text element="p" variant="reg16" id="description-text">
                 {intl.formatMessage(messages.createDescription)}
-              </DescriptionText>
+              </Text>
               <Toast
                 type="error"
                 id="pinHasSeqDigitsErrorMsg"
@@ -176,12 +175,12 @@ class CreatePinComponent extends React.Component<IProps> {
           )}
           {pinHasSameDigits && (
             <>
-              <TitleText id="title-text">
+              <StyledTitle id="title-text">
                 {intl.formatMessage(messages.createTitle)}
-              </TitleText>
-              <DescriptionText id="description-text">
+              </StyledTitle>
+              <Text element="p" variant="reg16" id="description-text">
                 {intl.formatMessage(messages.createDescription)}
-              </DescriptionText>
+              </Text>
               <Toast
                 type="error"
                 id="pinHasSameDigitsErrorMsg"
@@ -200,12 +199,12 @@ class CreatePinComponent extends React.Component<IProps> {
           )}
           {pin && (
             <>
-              <TitleText id="title-text">
-                {intl.formatMessage(messages.reEnterTitle)}
-              </TitleText>
-              <DescriptionText id="description-text">
-                {intl.formatMessage(messages.reEnterDescription)}
-              </DescriptionText>
+              <StyledTitle id="title-text">
+                {intl.formatMessage(messages.confirmPinTitle)}
+              </StyledTitle>
+              <ConfirmPinDescription id="description-text">
+                ....
+              </ConfirmPinDescription>
 
               <PINKeypad
                 ref={(elem: any) => (this.pinKeyRef = elem)}
@@ -213,8 +212,8 @@ class CreatePinComponent extends React.Component<IProps> {
               />
             </>
           )}
-        </BoxWrapper>
-      </PageWrapper>
+        </Box>
+      </BackgroundWrapper>
     )
   }
 

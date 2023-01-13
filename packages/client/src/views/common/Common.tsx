@@ -9,74 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as React from 'react'
 
 import styled, { css } from 'styled-components'
+import { useSelector } from 'react-redux'
+import { isEqual } from 'lodash-es'
+import { selectCountryBackground } from '@client/offline/selectors'
 
-interface IPageProps {
-  background?: string
-  backgroundUrl?: string
-  imageFitter?: string
+export interface IProps {
+  children: React.ReactNode
 }
-
-export const PageWrapper = styled.div<IPageProps>`
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  ${({ imageFitter, background, theme }) =>
-    background
-      ? css`
-          background-image: url(${background});
-          background-repeat: ${imageFitter === 'FILL' ? 'no-repeat' : 'repeat'};
-          background-size: ${imageFitter === 'FILL' ? `cover` : `auto`};
-          background: ${background
-            ? `#${background}`
-            : theme.colors.backgroundPrimary};
-        `
-      : css`
-          background: ${background
-            ? `#${background}`
-            : theme.colors.backgroundPrimary};
-        `}
-`
-
-export const BoxWrapper = styled.div`
-  text-align: center;
-  border-radius: 4px;
-  padding: 24px;
-  width: min(500px, 90%);
-
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
-`
-
-export const TitleText = styled.span`
-  display: flex;
-  justify-content: center;
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.h2};
-  text-align: center;
-  margin-top: 24px;
-  margin-bottom: 16px;
-  @media (max-height: 780px) {
-    ${({ theme }) => theme.fonts.h3};
-    margin-top: 0.3em;
-    margin-bottom: 0.3em;
-  }
-`
-
-export const DescriptionText = styled.span`
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.reg18};
-  text-align: center;
-  max-width: 360px;
-  margin-bottom: 40px;
-  @media (max-height: 780px) {
-    ${({ theme }) => theme.fonts.reg16};
-  }
-`
 
 export const LogoContainer = styled.div`
   flex-direction: row;
@@ -88,15 +30,70 @@ export const LogoContainer = styled.div`
     }
   }
 `
-export const Container = styled.div`
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: min(500px, 90%);
-  border-radius: 4px;
-  padding: 24px;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
+
+const StyledPage = styled.div<{
+  background: ReturnType<typeof selectCountryBackground>
+}>`
+  height: 100vh;
+  width: 100%;
+  position: relative;
+
+  ${({ background: { backgroundImage, imageFit, backgroundColor } }) =>
+    backgroundImage
+      ? css`
+          background-image: url(${backgroundImage});
+          background-repeat: ${imageFit === 'FILL' ? 'no-repeat' : 'repeat'};
+          background-size: ${imageFit === 'FILL' ? `cover` : `auto`};
+        `
+      : css`
+          background: #${backgroundColor};
+        `}
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  *:before,
+  *:after {
+    box-sizing: border-box;
+  }
 `
+export const Container = styled.div`
+  margin: auto;
+  height: auto;
+  padding-top: 104px;
+  width: min(363px, 90%);
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    padding-top: 70px;
+  }
+`
+
+export function usePersistentCountryBackground() {
+  const countryBackground: ReturnType<typeof selectCountryBackground> =
+    JSON.parse(
+      localStorage.getItem('country-background') ??
+        `{"backgroundColor" : "36304E"}`
+    )
+
+  const [offlineBackground, setOfflineBackground] =
+    React.useState(countryBackground)
+
+  const background = useSelector(selectCountryBackground)
+
+  if (background && !isEqual(background, offlineBackground)) {
+    setOfflineBackground(background)
+    localStorage.setItem('country-background', JSON.stringify(background))
+  }
+
+  return offlineBackground
+}
+
+export function BackgroundWrapper({ children }: IProps) {
+  const countryBackground = usePersistentCountryBackground()
+  return (
+    <StyledPage background={countryBackground}>
+      <Container> {children}</Container>
+    </StyledPage>
+  )
+}

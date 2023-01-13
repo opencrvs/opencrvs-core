@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as React from 'react'
+import * as ReactDOM from 'react-dom'
+
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { messages } from '@client/i18n/messages/views/pin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -19,8 +22,6 @@ import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { getUserName, IUserDetails } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
-import * as React from 'react'
-import * as ReactDOM from 'react-dom'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { buttonMessages, userMessages } from '@client/i18n/messages'
@@ -29,10 +30,10 @@ import { AvatarLarge } from '@client/components/Avatar'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Link, Stack, Toast } from '@opencrvs/components'
+import { Box, Link, Stack, Text, Toast } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
-import { Container, PageWrapper } from '@client/views/common/Common'
+import { BackgroundWrapper } from '@client/views/common/Common'
 
 interface IState {
   pin: string
@@ -63,7 +64,11 @@ type IntlProps = IntlShapeProps
 
 export const EnterPinLabel = injectIntl((props: IntlProps) => {
   const { intl } = props
-  return <h2>{intl.formatMessage(userMessages.enterPinLabel)}</h2>
+  return (
+    <Text element="h3" variant="h3">
+      {intl.formatMessage(userMessages.enterPinLabel)}
+    </Text>
+  )
 })
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
@@ -201,51 +206,36 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   }
 
   render() {
-    const { userDetails, offlineCountryConfiguration } = this.props
+    const { userDetails } = this.props
     return (
-      <PageWrapper
-        id="unlockPage"
-        background={
-          offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor
-        }
-        backgroundUrl={
-          offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage
-        }
-        imageFitter={
-          offlineCountryConfiguration.config.LOGIN_BACKGROUND.imageFit
-        }
-      >
-        <Container onClick={this.focusKeypad}>
-          <Stack
-            style={{ width: '100%' }}
-            direction="row"
-            justifyContent="flex-end"
-          >
+      <BackgroundWrapper>
+        <Box id="Box" onClick={this.focusKeypad}>
+          <Stack direction="row" justifyContent="flex-end">
             <Button type="icon" onClick={this.logout} id="logout">
               <Icon name="LogOut" />
             </Button>
           </Stack>
 
-          <AvatarLarge
-            name={getUserName(userDetails)}
-            avatar={userDetails?.avatar}
-          />
-          <EnterPinLabel />
-          <PINKeypad
-            forgotPinComponent={
-              <Link id="forgotten_pin" onClick={this.props.onForgetPin}>
-                {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
-              </Link>
-            }
-            ref={(elem: any) => (this.pinKeyRef = elem)}
-            onComplete={this.onPinProvided}
-            pin={this.state.pin}
-            key={this.state.resetKey}
-          />
+          <Stack direction="column" justifyContent="stretch">
+            <AvatarLarge
+              name={getUserName(userDetails)}
+              avatar={userDetails?.avatar}
+            />
+            <EnterPinLabel />
+            <PINKeypad
+              ref={(elem: any) => (this.pinKeyRef = elem)}
+              onComplete={this.onPinProvided}
+              pin={this.state.pin}
+              key={this.state.resetKey}
+            />
+            <Link id="forgotten_pin" onClick={this.props.onForgetPin}>
+              {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
+            </Link>
+          </Stack>
 
           {this.showErrorMessage()}
-        </Container>
-      </PageWrapper>
+        </Box>
+      </BackgroundWrapper>
     )
   }
 }

@@ -23,7 +23,7 @@ import { isEqual } from 'lodash-es'
 const StyledPage = styled.div<{
   background: ReturnType<typeof selectCountryBackground>
 }>`
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
 
   ${({ background: { backgroundImage, imageFit, backgroundColor } }) =>

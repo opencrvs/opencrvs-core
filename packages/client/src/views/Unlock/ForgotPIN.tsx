@@ -38,56 +38,17 @@ import { getUserName } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { Link, Stack, Toast } from '@opencrvs/components'
+import { Box, Link, Stack, Toast } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { BackgroundWrapper } from '@client/views/common/Common'
 
 interface IForgotPINProps {
   goBack: () => void
   onVerifyPassword: () => void
 }
 
-interface IPageProps {
-  background?: string
-  backgroundUrl?: string
-  imageFitter?: string
-}
-
-const PageWrapper = styled.div<IPageProps>`
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  background: ${({ background }) => `#${background}`};
-  background-image: ${({ backgroundUrl }) => `url(${backgroundUrl})`};
-  background-size: ${({ imageFitter }) =>
-    imageFitter === 'FILL' ? `cover` : `auto`};
-`
-const Container = styled.div`
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: min(500px, 90%);
-  border-radius: 4px;
-  padding: 24px;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    top: 20px;
-  }
-`
 const StyledForm = styled.form`
-  text-align: left;
   width: 100%;
-`
-
-const HeaderContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
 `
 
 const VerifyButton = styled(Button)`
@@ -136,9 +97,7 @@ export function ForgotPIN(props: IForgotPINProps) {
   const [error, setError] = useState<string>('')
   const intl = useIntl()
   const [verifyingPassword, setVerifyingPassword] = useState<boolean>(false)
-  const offlineCountryConfiguration = useSelector((store: IStoreState) =>
-    getOfflineData(store)
-  )
+
   const userDetails = useSelector(getUserDetails)
   const dispatch = useDispatch()
   const logout = useCallback(() => {
@@ -192,36 +151,29 @@ export function ForgotPIN(props: IForgotPINProps) {
   }, [])
 
   return (
-    <PageWrapper
-      id="forgot_pin_page"
-      background={
-        offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor
-      }
-      backgroundUrl={
-        offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage
-      }
-      imageFitter={offlineCountryConfiguration.config.LOGIN_BACKGROUND.imageFit}
-    >
-      <Container>
-        <HeaderContainer>
+    <BackgroundWrapper>
+      <Box id="Box">
+        <Stack direction="row" justifyContent="space-between">
           <Button type="icon" id="action_back" onClick={props.goBack}>
             <Icon name="ArrowLeft" />
           </Button>
           <Button type="icon" onClick={logout} id="logout">
             <Icon name="LogOut" />
           </Button>
-        </HeaderContainer>
-        <AvatarLarge
-          name={getUserName(userDetails)}
-          avatar={userDetails?.avatar}
-        />
+        </Stack>
+        <Stack direction="column">
+          <AvatarLarge
+            name={getUserName(userDetails)}
+            avatar={userDetails?.avatar}
+          />
+        </Stack>
 
         <StyledForm id="password_verification_form" onSubmit={onSubmit}>
           <Stack
-            direction={'column'}
-            gap={13}
+            direction="column"
+            gap={18}
             alignItems="stretch"
-            className={'button-group'}
+            className="button-group"
           >
             <Password
               id="password"
@@ -232,26 +184,25 @@ export function ForgotPIN(props: IForgotPINProps) {
                 value: password
               }}
             />
-            <Stack direction={'column'} gap={13}>
-              <VerifyButton
-                loading={verifyingPassword}
-                type="primary"
-                id="form_submit"
-              >
-                {intl.formatMessage(buttonMessages.verify)}
-              </VerifyButton>
-              <Link id="forgot_password" onClick={onForgetPassword}>
-                {intl.formatMessage(buttonMessages.forgotPassword)}
-              </Link>
-            </Stack>
+            <VerifyButton
+              loading={verifyingPassword}
+              type="primary"
+              id="form_submit"
+            >
+              {intl.formatMessage(buttonMessages.verify)}
+            </VerifyButton>
+            <Link id="forgot_password" onClick={onForgetPassword}>
+              {intl.formatMessage(buttonMessages.forgotPassword)}
+            </Link>
           </Stack>
         </StyledForm>
+
         {error && (
           <Toast type="error" id="form_error" onClose={() => setError('')}>
             {error}
           </Toast>
         )}
-      </Container>
-    </PageWrapper>
+      </Box>
+    </BackgroundWrapper>
   )
 }
