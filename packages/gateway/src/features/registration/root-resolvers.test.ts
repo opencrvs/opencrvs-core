@@ -579,7 +579,8 @@ describe('Registration root resolvers', () => {
       expect(result).toBeDefined()
       expect(result).toEqual({
         compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        trackingId: 'DewpkiM'
+        trackingId: 'DewpkiM',
+        isPotentiallyDuplicate: false
       })
       expect(result.trackingId.length).toBe(7)
       expect(result.trackingId).toMatch(/^D/)
