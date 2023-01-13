@@ -48,7 +48,7 @@ interface IForgotPINProps {
 
 interface IPageProps {
   background?: string
-  backGroundUrl?: string
+  backgroundUrl?: string
   imageFitter?: string
 }
 
@@ -60,7 +60,7 @@ const PageWrapper = styled.div<IPageProps>`
   justify-content: center;
   align-items: center;
   background: ${({ background }) => `#${background}`};
-  background-image: ${({ backGroundUrl }) => `url(${backGroundUrl})`};
+  background-image: ${({ backgroundUrl }) => `url(${backgroundUrl})`};
   background-size: ${({ imageFitter }) =>
     imageFitter === 'FILL' ? `cover` : `auto`};
 `
@@ -197,7 +197,7 @@ export function ForgotPIN(props: IForgotPINProps) {
       background={
         offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundColor
       }
-      backGroundUrl={
+      backgroundUrl={
         offlineCountryConfiguration.config.LOGIN_BACKGROUND.backgroundImage
       }
       imageFitter={offlineCountryConfiguration.config.LOGIN_BACKGROUND.imageFit}
