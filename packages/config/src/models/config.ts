@@ -54,9 +54,8 @@ export interface IApplicationConfigurationModel extends Document {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
-  INTEGRATIONS: [Integration]
-  LOGIN_BACKGROUND: ILoginBackground
   ADMIN_LEVELS: number
+  LOGIN_BACKGROUND: ILoginBackground
 }
 
 const birthSchema = new Schema<IBirth>({

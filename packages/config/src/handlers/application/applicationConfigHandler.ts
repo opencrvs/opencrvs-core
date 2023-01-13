@@ -152,10 +152,6 @@ export const updateApplicationConfig = Joi.object({
   NID_NUMBER_PATTERN: Joi.string(),
   ADDRESSES: Joi.number().valid(...[1, 2]),
   ADMIN_LEVELS: Joi.number().valid(...[1, 2, 3, 4, 5]),
-  INTEGRATIONS: Joi.array().items({
-    name: Joi.string().required(),
-    status: Joi.string().required()
-  }),
   LOGIN_BACKGROUND: Joi.object({
     backgroundColor: Joi.string().allow('').optional(),
     backgroundImage: Joi.string().allow('').optional(),
