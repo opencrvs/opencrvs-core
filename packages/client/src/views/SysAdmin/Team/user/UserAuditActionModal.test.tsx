@@ -81,7 +81,7 @@ const users = [
     ],
     username: 'np.huq',
     systemRole: RoleType.LocalRegistrar,
-    type: 'MAYOR',
+    role: 'MAYOR',
     status: Status.Deactivated,
     localRegistrar: {
       name: [

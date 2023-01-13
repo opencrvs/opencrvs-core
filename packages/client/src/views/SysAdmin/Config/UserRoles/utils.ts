@@ -10,11 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { LANG_EN } from '@client/utils/constants'
 import { IRoles } from './UserRoles'
 
 export function getUserRole(lang: string, roles: IRoles) {
   return roles.map((role) => {
+    const defaultLabel = role.labels?.find((label) => label.lang === LANG_EN)
     const label = role.labels?.find((label) => label.lang === lang)
-    return label?.label || ''
+    return label?.label || defaultLabel
   })
 }

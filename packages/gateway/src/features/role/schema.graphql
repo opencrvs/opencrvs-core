@@ -22,19 +22,19 @@ input SystemRoleInput {
   roles: [LabelInput]
 }
 
-type Role {
+type RoleLabel {
   lang: String!
   label: String!
 }
 
-type Label {
-  labels: [Role!]!
+type Role {
+  labels: [RoleLabel!]!
 }
 
 type SystemRole {
   id: ID!
   value: String!
-  roles: [Label!]!
+  roles: [Role!]!
   active: Boolean!
 }
 

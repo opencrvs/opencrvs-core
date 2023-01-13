@@ -375,7 +375,7 @@ type User {
   username: String
   mobile: String!
   systemRole: RoleType!
-  role: String
+  role: String!
   email: String
   status: Status!
   underInvestigation: Boolean
@@ -544,7 +544,7 @@ type EventProgressResultSet {
 type SystemRole {
   id: ID!
   value: String!
-  roles: [Label!]!
+  roles: [Role!]!
   active: Boolean!
 }
 
@@ -1131,8 +1131,8 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
-type Label {
-  labels: [Role!]!
+type Role {
+  labels: [RoleLabel!]!
 }
 
 enum DraftStatus {
@@ -1647,7 +1647,7 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
-type Role {
+type RoleLabel {
   lang: String!
   label: String!
 }

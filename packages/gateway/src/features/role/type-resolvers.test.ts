@@ -23,8 +23,7 @@ describe('Role type resolvers', () => {
     value: 'FIELD_AGENT',
     roles: [
       {
-        value: 'FIELD_AGENT',
-        roles: [
+        labels: [
           {
             lang: 'en',
             label: 'Healthcare Worker'
@@ -32,7 +31,11 @@ describe('Role type resolvers', () => {
           {
             lang: 'fr',
             label: 'Professionnel de Santé'
-          },
+          }
+        ]
+      },
+      {
+        labels: [
           {
             lang: 'en',
             label: 'Police Officer'
@@ -40,7 +43,11 @@ describe('Role type resolvers', () => {
           {
             lang: 'fr',
             label: 'Agent de Police'
-          },
+          }
+        ]
+      },
+      {
+        labels: [
           {
             lang: 'en',
             label: 'Social Worker'
@@ -48,7 +55,11 @@ describe('Role type resolvers', () => {
           {
             lang: 'fr',
             label: 'Travailleur Social'
-          },
+          }
+        ]
+      },
+      {
+        labels: [
           {
             lang: 'en',
             label: 'Local Leader'
@@ -57,92 +68,7 @@ describe('Role type resolvers', () => {
             lang: 'fr',
             label: 'Leader Local'
           }
-        ],
-        active: true
-      },
-      {
-        value: 'REGISTRATION_AGENT',
-        roles: [
-          {
-            lang: 'en',
-            label: 'Registration Agent'
-          },
-          {
-            lang: 'fr',
-            label: "Agent d'enregistrement"
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'LOCAL_REGISTRAR',
-        roles: [
-          {
-            lang: 'en',
-            label: 'Local Registrar'
-          },
-          {
-            lang: 'fr',
-            label: 'Registraire local'
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'LOCAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            lang: 'en',
-            label: 'Local System_admin'
-          },
-          {
-            lang: 'fr',
-            label: 'Administrateur système local'
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'NATIONAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            lang: 'en',
-            label: 'National System_admin'
-          },
-          {
-            lang: 'fr',
-            label: 'Administrateur système national'
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'PERFORMANCE_MANAGEMENT',
-        roles: [
-          {
-            lang: 'en',
-            label: 'Performance Management'
-          },
-          {
-            lang: 'fr',
-            label: 'Gestion des performances'
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'NATIONAL_REGISTRAR',
-        roles: [
-          {
-            lang: 'en',
-            label: 'National Registrar'
-          },
-          {
-            lang: 'fr',
-            label: 'Registraire national'
-          }
-        ],
-        active: true
+        ]
       }
     ],
     active: true,

@@ -70,6 +70,7 @@ export const up = async (db, client) => {
             const newType = []
             role.types.forEach((type) => {
               newType.push({
+                value: type,
                 labels: [
                   {
                     lang: 'en',
@@ -145,15 +146,23 @@ export const down = async (db, client) => {
             roleDoc.types.length &&
             roleDoc.value === 'FIELD_AGENT'
           ) {
-            const newType = roleDoc.types.map((role) => {
+            const types = roleDoc.types.map((role) => {
               let label = role.labels.find((x) => x.lang === 'en').label
               label = label.toUpperCase().replace(/\s+/g, '_')
               return label
             })
 
+            const roles = Object.keys(FRENCH_TYPE_LABEL_MAPPING)
+            const newTypes = types.map((type) => {
+              if (!roles.includes(type.toUpperCase().replace(/\s+/g, '_'))) {
+                return roles[0]
+              }
+              return type
+            })
+
             await db
               .collection('roles')
-              .updateOne({ _id: roleDoc._id }, { $set: { types: newType } })
+              .updateOne({ _id: roleDoc._id }, { $set: { types: newTypes } })
           }
         })
       )
