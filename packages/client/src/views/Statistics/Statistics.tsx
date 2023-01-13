@@ -30,7 +30,9 @@ import { ILocation } from '@client/offline/reducer'
 import {
   NATL_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES,
-  SYS_ADMIN_ROLES
+  SYS_ADMIN_ROLES,
+  REGISTRAR_ROLES,
+  ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
 const StyledIFrame = styled(IframeResizer)`
   width: 100%;
@@ -109,7 +111,9 @@ function shouldSeeView(userDetails: IUserDetails) {
   return (
     SYS_ADMIN_ROLES.includes(userDetails.role!) ||
     NATL_ADMIN_ROLES.includes(userDetails.role!) ||
-    PERFORMANCE_MANAGEMENT_ROLES.includes(userDetails.role!)
+    PERFORMANCE_MANAGEMENT_ROLES.includes(userDetails.role!) ||
+    userDetails.role! === ROLE_REGISTRATION_AGENT ||
+    (REGISTRAR_ROLES.includes(userDetails.role!) && userDetails.supervisoryArea)
   )
 }
 
