@@ -35,6 +35,7 @@ import {
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
+import { goToDeclarationRecordAudit } from '@client/navigation'
 
 type NotificationProps = {
   language?: string
@@ -65,6 +66,7 @@ type DispatchProps = {
   hideUnassignedModal: typeof hideUnassignedModal
   hideCreateUserErrorToast: typeof hideCreateUserErrorToast
   hideUserReconnectedToast: typeof hideUserReconnectedToast
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
 class Component extends React.Component<
@@ -113,7 +115,8 @@ class Component extends React.Component<
       downloadDeclarationFailedToast,
       unassignedModal,
       userCreateDuplicateMobileFailedToast,
-      userReconnectedToast
+      userReconnectedToast,
+      goToDeclarationRecordAudit
     } = this.props
 
     return (
@@ -190,7 +193,7 @@ class Component extends React.Component<
             {intl.formatMessage(messages.updatePINSuccess)}
           </Toast>
         )}
-        {showDuplicateRecordsToast && (
+        {showDuplicateRecordsToast && duplicateCompositionId && (
           <Toast
             id="duplicateRecordsToast"
             type="error"
@@ -199,8 +202,16 @@ class Component extends React.Component<
             {intl.formatMessage(messages.duplicateRecord, {
               trackingId: (
                 <Link
+                  underline
+                  color="white"
                   element="button"
-                  onClick={() => alert(duplicateCompositionId)}
+                  onClick={() =>
+                    this.props.hideDuplicateRecordsToast() &&
+                    goToDeclarationRecordAudit(
+                      'reviewTab',
+                      duplicateCompositionId
+                    )
+                  }
                 >
                   {duplicateTrackingId}
                 </Link>
@@ -280,6 +291,7 @@ export const NotificationComponent = withRouter(
     hideDownloadDeclarationFailedToast,
     hideUnassignedModal,
     hideCreateUserErrorToast,
-    hideUserReconnectedToast
+    hideUserReconnectedToast,
+    goToDeclarationRecordAudit
   })(injectIntl(Component))
 )
