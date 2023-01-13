@@ -11,7 +11,7 @@
  */
 import {
   resolvers,
-  lookForDuplicate
+  lookForComposition
 } from '@gateway/features/registration/root-resolvers'
 import {
   DOWNLOADED_EXTENSION_URL,
@@ -526,7 +526,7 @@ describe('Registration root resolvers', () => {
     it('checks no task entry with draftId', async () => {
       fetch.mockResponses([JSON.stringify({})])
 
-      const result = await lookForDuplicate(
+      const result = await lookForComposition(
         '9633042c-ca34-4b9f-959b-9d16909fd85c'
       )
 
