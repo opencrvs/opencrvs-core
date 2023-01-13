@@ -25,9 +25,7 @@ export interface IFacilitiesDataResponse {
 export interface IContentResponse {
   languages: ILanguage[]
 }
-export interface IAssetResponse {
-  logo: string
-}
+
 export interface ICountryLogo {
   fileName: string
   file: string
@@ -52,10 +50,6 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
-interface IIntegration {
-  name: string
-  status: string
-}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {
@@ -83,7 +77,6 @@ export interface IApplicationConfig {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
-  INTEGRATIONS?: [IIntegration]
   LOGIN_BACKGROUND: ILoginBackground
   ADMIN_LEVELS: number
 }

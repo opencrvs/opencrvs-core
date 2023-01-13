@@ -24,7 +24,7 @@ const pressPin = (component: ReactWrapper, keyCode: number) => {
   component.update()
 }
 
-const clearPassword = (component: ReactWrapper) => {
+const pressBackspace = (component: ReactWrapper) => {
   const pinInput = component.find('#pin-input')
   pinInput.simulate('keypress', { key: 'Backspace' })
   component.update()
@@ -77,7 +77,7 @@ describe('Create PIN view', () => {
     pressPin(c, 48)
     pressPin(c, 54)
     pressPin(c, 48)
-    clearPassword(c)
+    pressBackspace(c)
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {

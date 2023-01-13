@@ -726,8 +726,8 @@ type ApplicationConfiguration {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   INTEGRATIONS: [Integration]
-  LOGIN_BACKGROUND: LoginBackground
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 input ApplicationConfigurationInput {
@@ -743,8 +743,8 @@ input ApplicationConfigurationInput {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   INTEGRATIONS: [IntegrationInput]
-  LOGIN_BACKGROUND: LoginBackgroundInput
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 input FormDraftInput {
