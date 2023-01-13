@@ -641,8 +641,8 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: Date
+  updatedAt: Date
 }
 
 type Reinstated {
