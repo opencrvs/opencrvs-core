@@ -1419,3 +1419,9 @@ export function isBase64FileString(str: string) {
   const strSplit = str.split(':')
   return strSplit.length > 0 && strSplit[0] === 'data'
 }
+
+export async function fetchCompositionByIdFromHearth(id: string) {
+  const composition = await fetchFromHearth(`/Composition/${id}`)
+
+  return composition
+}

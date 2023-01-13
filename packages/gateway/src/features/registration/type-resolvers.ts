@@ -17,7 +17,8 @@ import {
   getStatusFromTask,
   ITimeLoggedResponse,
   getCertificatesFromTask,
-  getActionFromTask
+  getActionFromTask,
+  fetchCompositionByIdFromHearth
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -489,7 +490,7 @@ export const typeResolvers: GQLResolver = {
         `/${task.focus.reference}`,
         authHeader
       )
-      return (
+      const duplicateCompositionIds =
         composition.relatesTo &&
         composition.relatesTo.map((duplicate: fhir.CompositionRelatesTo) => {
           if (
@@ -502,7 +503,21 @@ export const typeResolvers: GQLResolver = {
           }
           return null
         })
-      )
+
+      const duplicateData =
+        duplicateCompositionIds &&
+        (await Promise.all(
+          duplicateCompositionIds.map(async (compositionId: string) => {
+            const compositionData = (await fetchCompositionByIdFromHearth(
+              compositionId
+            )) as fhir.Composition
+            return {
+              compositionId: compositionId,
+              trackingId: compositionData.identifier?.value
+            }
+          })
+        ))
+      return duplicateData
     },
     certificates: async (task, _, authHeader) =>
       await getCertificatesFromTask(task, _, authHeader),

@@ -21,7 +21,7 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Event, Query } from '@client/utils/gateway'
+import { DuplicatesInfo, Event, Query } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -193,10 +193,15 @@ export interface ITaskHistory {
   rejectComment?: string
 }
 
+export interface IDuplicates {
+  compositionId: string
+  trackingId: string
+}
+
 export interface IDeclaration {
   id: string
   data: IFormData
-  duplicates?: string[]
+  duplicates?: IDuplicates[]
   originalData?: IFormData
   savedOn?: number
   createdAt?: string
@@ -490,7 +495,7 @@ export function createReviewDeclaration(
   formData: IFormData,
   event: Event,
   status?: string,
-  duplicates?: string[]
+  duplicates?: IDuplicates[]
 ): IDeclaration {
   return {
     id: declarationId,
@@ -1341,7 +1346,9 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           transData,
           downloadingDeclaration.event,
           downloadedAppStatus,
-          getPotentialDuplicateIds(eventData)
+          eventData?.registration?.duplicates?.filter(
+            (duplicate: string) => !!duplicate
+          )
         )
       newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED

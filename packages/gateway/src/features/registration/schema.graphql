@@ -222,6 +222,11 @@ type RegWorkflow { # Task
   timeLogged: Int # -> from metrics
 }
 
+type DuplicatesInfo {
+  compositionId: ID
+  trackingId: String
+}
+
 type InputOutput {
   valueCode: String
   valueId: String
@@ -422,7 +427,7 @@ type Registration { # -> Task
   inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
   certificates: [Certificate] # -> Composition.section(code='certificates').entry.reference
-  duplicates: [ID]
+  duplicates: [DuplicatesInfo]
 }
 
 input CertificateInput {

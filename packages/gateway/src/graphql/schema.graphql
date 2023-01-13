@@ -829,7 +829,7 @@ type Registration {
   inCompleteFields: String
   attachments: [Attachment]
   certificates: [Certificate]
-  duplicates: [ID]
+  duplicates: [DuplicatesInfo]
 }
 
 type RelatedPerson {
@@ -1398,6 +1398,11 @@ type Certificate {
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
   data: String
+}
+
+type DuplicatesInfo {
+  compositionId: ID
+  trackingId: String
 }
 
 enum RegAction {

@@ -1791,7 +1791,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 <>
                   {!isCorrection(declaration) ? (
                     <>
-                      <DuplicateWarning duplicateIds={declaration.duplicates} />
+                      <DuplicateWarning
+                        duplicateIds={declaration.duplicates?.map(
+                          (duplicate) => duplicate.compositionId
+                        )}
+                      />
                       <ReviewAction
                         completeDeclaration={isComplete}
                         totalFileSizeExceeded={totalFileSizeExceeded}

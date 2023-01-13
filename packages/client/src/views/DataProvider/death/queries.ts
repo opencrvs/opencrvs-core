@@ -118,7 +118,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
-        duplicates
+        duplicates {
+          compositionId
+          trackingId
+        }
         attachments {
           data
           type
