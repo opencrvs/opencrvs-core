@@ -34,6 +34,7 @@ export const up = async (db) => {
           'locationLevel4',
           'locationLevel3',
           'locationLevel2',
+          'locationLevel1',
           'missingFieldGroupId',
           'missingFieldId',
           'missingFieldSectionId'
