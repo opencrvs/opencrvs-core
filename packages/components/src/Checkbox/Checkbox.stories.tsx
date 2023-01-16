@@ -30,9 +30,9 @@ export const Default: ComponentStory<typeof Checkbox> = (args) => (
   <Checkbox {...args} />
 )
 Default.args = {
-  name: 'Banana',
-  label: 'Banana',
-  value: 'banana',
+  name: 'CRVS options',
+  label: 'The gold standard for digital civil registration',
+  value: 'The gold standard for digital civil registration',
   selected: true,
   size: 'small'
 }
