@@ -847,7 +847,7 @@ export const individualAddressTransformer =
     }
 
     const address =
-      queryData[sectionId].address || queryData[sectionId].individual.address
+      queryData[sectionId].address || queryData[sectionId]?.individual?.address
     const addressFromQuery = (address || []).find(
       (addr: { type: AddressCases }) => addr.type === addressCase
     )
@@ -879,7 +879,9 @@ export const addressLineTemplateTransformer =
     offlineData?: IOfflineData
   ) => {
     const address = (
-      queryData[sectionId]?.individual?.address || queryData[sectionId].address
+      queryData[sectionId]?.individual?.address ||
+      queryData[sectionId].address ||
+      []
     ).find((add: { type: AddressCases }) => add.type === addressCase)
 
     if (!address) {
