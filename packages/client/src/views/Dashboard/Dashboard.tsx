@@ -38,6 +38,11 @@ const Container = styled.div`
     visible ? 'visible' : 'hidden'};
   z-index: ${({ visible }: { visible: boolean }) => (visible ? 3 : -1)};
 `
+
+const ScrollableFullScreen = styled(FullScreen)`
+  overflow: auto;
+`
+
 export function Dashboard({ visible }: { visible: boolean }) {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -57,7 +62,7 @@ export function Dashboard({ visible }: { visible: boolean }) {
         pageIcon={<div />}
         goHome={() => dispatch(goToHome())}
       />
-      <FullScreen handle={handle}>
+      <ScrollableFullScreen handle={handle}>
         <FullBodyContent>
           {!window.config.DASHBOARD_EMBED_URL && (
             <h1>Dashboard URL configuration missing</h1>
@@ -69,7 +74,7 @@ export function Dashboard({ visible }: { visible: boolean }) {
             />
           )}
         </FullBodyContent>
-      </FullScreen>
+      </ScrollableFullScreen>
     </Container>
   )
 }
