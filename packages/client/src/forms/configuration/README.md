@@ -759,3 +759,54 @@ This object holds sections for death declaration forms. All sections are in sect
   - #### `uploadDocForCauseOfDeath`
 
     This field is conditional and only appears if the Cause of Death has been established. The `extraValue` of this field is DECEASED_DEATH_CAUSE_PROOF. The options are Medically Certified Cause of Death, Verbal Autopsy Report & Other.
+
+### Using addresses in certificate
+
+- #### `Place of Event`
+
+  - #### `placeOfBirth/placeOfDeath`
+    This is a formatted place of event which will show district, state country. This field is always available for relevant event.
+  - #### `placeOfBirthCountry/placeOfDeathCountry`
+    This field is always available.
+  - #### `placeOfBirthState/placeOfDeathState`
+    This is only available is the place of event is anything other than health facility.
+  - #### `placeOfBirthDistrict/placeOfDeathDistrict`
+    This is only available is the place of event is anything other than health facility.
+  - #### `placeOfBirthCity/placeOfDeathCity`
+    This is only available is the place of event is anything other than health facility.
+  - #### `placeOfBirthAddressLine1/placeOfDeathAddressLine1`
+    This is only available is the place of event is anything other than health facility.
+  - #### `placeOfBirthAddressLine2/placeOfDeathAddressLine2`
+    This is only available is the place of event is anything other than health facility.
+  - #### `placeOfBirthAddressLine3/placeOfDeathAddressLine3`
+    This is only available is the place of event is anything other than health facility.
+  - #### `placeOfBirthAddressLine5/placeOfDeathAddressLine5`
+    This is only available is the place of event is anything other than health facility.
+  - #### `placeOfBirthNumber/placeOfDeathNumber`
+    This is only available is the place of event is anything other than health facility.
+  - #### `placeOfBirthPostalCode/placeOfDeathPostalCode`
+    This is only available is the place of event is anything other than health facility.
+
+- #### `Father/Mother/Informant/deceased Address`
+  - #### `informant/father/mother/deceased`
+    This is a formatted place of event which will show district, state country. This field is always available for relevant event.
+  - #### `informantCountry/fatherCountry/motherCountry/deceasedCountry`
+    This field is always available.
+  - #### `informantCity/fatherCity/motherCity/deceasedCity`
+    This field is optionaly available if they are provided.
+  - #### `informantAddressLine3/fatherAddressLine3/motherAddressLine3/deceasedAddressLine3`
+    This field is optionaly available if they are provided.
+  - #### `informantAddressLine2/fatherAddressLine2/motherAddressLine2/deceasedAddressLine2`
+    This field is optionaly available if they are provided.
+  - #### `informantNumber/fatherNumber/motherNumber/deceasedNumber`
+    This field is optionaly available if they are provided.
+  - #### `informantPostalCode/fatherPostalCode/motherPostalCode/deceasedPostalCode`
+    This field is optionaly available if they are provided.
+  - #### `informantAddressLine5/fatherAddressLine5/motherAddressLine5/deceasedAddressLine5`
+    This field is optionaly available if they are provided.
+  - #### `informantState/fatherState/motherState/deceasedState`
+    This field is optionaly available if they are provided.
+  - #### `informantDistrict/fatherDistrict/motherDistrict/deceasedDistrict`
+    This field is optionaly available if they are provided.
+  - #### `informantAddressLine1/fatherAddressLine1/motherAddressLine1/deceasedAddressLine1`
+    This field is optionaly available if they are provided.
