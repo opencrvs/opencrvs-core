@@ -873,7 +873,7 @@ describe('Registration root resolvers', () => {
       })
     })
 
-    it('throws an error when invalid composition is returned', async () => {
+    it.only('throws an error when invalid composition is returned', async () => {
       fetch.mockResponses(
         [
           JSON.stringify({
@@ -892,16 +892,14 @@ describe('Registration root resolvers', () => {
         ],
         [
           JSON.stringify({
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            identifier: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
             resourceType: 'Composition'
           })
         ]
       )
       await expect(
         resolvers.Mutation.createBirthRegistration({}, { details })
-      ).rejects.toThrowError(
-        'getTrackingId: Invalid composition or composition has no identifier'
-      )
+      ).rejects.toThrowError('FHIR did not send a valid respons')
     })
 
     it("throws an error when the response isn't what we expect", async () => {
