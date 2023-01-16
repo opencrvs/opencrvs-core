@@ -454,13 +454,23 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       return (
                         <>
                           {!officeSelected && (
-                            <CompletenessReport
-                              data={data!.getTotalMetrics}
-                              selectedEvent={
-                                event.toUpperCase() as 'BIRTH' | 'DEATH'
-                              }
-                              onClickDetails={this.onClickDetails}
-                            />
+                            <>
+                              <ExportReportButton
+                                selectedLocation={this.state.selectedLocation}
+                                event={this.state.event}
+                                timeStart={this.state.timeStart}
+                                timeEnd={this.state.timeEnd}
+                                officeSelected={this.state.officeSelected}
+                                data={data!.getTotalMetrics}
+                              />
+                              <CompletenessReport
+                                data={data!.getTotalMetrics}
+                                selectedEvent={
+                                  event.toUpperCase() as 'BIRTH' | 'DEATH'
+                                }
+                                onClickDetails={this.onClickDetails}
+                              />
+                            </>
                           )}
                           <RegistrationsReport
                             data={data!.getTotalMetrics}
@@ -648,13 +658,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     </ResponsiveModalContent>
                   </ResponsiveModal>
                   <LayoutRight>
-                    <ExportReportButton
-                      selectedLocation={this.state.selectedLocation}
-                      event={this.state.event}
-                      timeStart={this.state.timeStart}
-                      timeEnd={this.state.timeEnd}
-                      officeSelected={this.state.officeSelected}
-                    />
                     {!officeSelected && (
                       <LocationStats>
                         {!isOnline ? null : loading ? (

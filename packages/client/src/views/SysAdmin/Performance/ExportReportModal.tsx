@@ -29,6 +29,7 @@ import { messages as performanceMessages } from '@client/i18n/messages/views/per
 import ReactToPdf from 'react-to-pdf'
 import { useRef } from 'react'
 import { PdfReport } from './PdfReport'
+import { GQLTotalMetricsResult } from '@client/../../gateway/src/graphql/schema'
 
 interface IExportReportModalProps {
   show: boolean

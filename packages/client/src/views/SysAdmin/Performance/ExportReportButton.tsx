@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Box, ISearchLocation, Link } from '@client/../../components/lib'
+import { GQLTotalMetricsResult } from '@client/../../gateway/src/graphql/schema'
 import { userMessages } from '@client/i18n/messages'
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
 import styled from '@client/styledComponents'
@@ -40,6 +41,7 @@ export type IExportReportButtonProps = {
   timeStart: Date
   timeEnd: Date
   officeSelected: boolean
+  data: GQLTotalMetricsResult
 } & IntlShapeProps
 
 type State = {
