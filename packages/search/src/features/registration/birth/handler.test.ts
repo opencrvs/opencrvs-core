@@ -13,7 +13,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
-  searchComposition,
+  searchForDuplicates,
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import { createServer } from '@search/server'
@@ -111,7 +111,7 @@ describe('Verify handlers', () => {
 
     it('should return status code 500 when composition has no ID', async () => {
       ;(indexComposition as jest.Mock).mockReturnValue({})
-      ;(searchComposition as jest.Mock).mockReturnValue(mockSearchResponse)
+      ;(searchForDuplicates as jest.Mock).mockReturnValue(mockSearchResponse)
       ;(updateComposition as jest.Mock).mockReturnValue({})
       fetch.mockResponses(
         [JSON.stringify(mockCompositionResponse), { status: 200 }],

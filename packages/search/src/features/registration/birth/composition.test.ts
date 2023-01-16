@@ -13,7 +13,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
-  searchComposition,
+  searchForDuplicates,
   updateComposition,
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
@@ -45,12 +45,12 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchComposition = searchComposition as jest.Mocked<any>
+      const mockedsearchForDuplicates = searchForDuplicates as jest.Mocked<any>
       const mockedSearchByCompositionId =
         searchByCompositionId as jest.Mocked<any>
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
       mockedIndexComposition.mockReturnValue({})
-      mockedSearchComposition.mockReturnValue(mockSearchResponse)
+      mockedsearchForDuplicates.mockReturnValue(mockSearchResponse)
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
       mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
@@ -89,7 +89,7 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
-      const mockedSearchComposition = searchComposition as jest.Mocked<any>
+      const mockedSearchComposition = searchForDuplicates as jest.Mocked<any>
       const mockedSearchByCompositionId =
         searchByCompositionId as jest.Mocked<any>
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
