@@ -42,9 +42,10 @@ export function selectCountryBackground(store: IStoreState) {
       backgroundImage: countryBackground.backgroundImage,
       imageFit: countryBackground.imageFit
     }
-  }
-  return {
-    backgroundColor: countryBackground?.backgroundColor ?? '36304E'
+  } else if (countryBackground?.backgroundColor) {
+    return {
+      backgroundColor: countryBackground?.backgroundColor
+    }
   }
 }
 export function selectApplicationName(store: IStoreState) {

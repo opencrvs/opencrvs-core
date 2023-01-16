@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import styled, { css, useTheme } from 'styled-components'
 
 import {
   selectCountryBackground,
@@ -19,9 +19,10 @@ import {
 import { LanguageSelect } from '@login/i18n/components/LanguageSelect'
 import { useSelector } from 'react-redux'
 import { isEqual } from 'lodash-es'
+import { ITheme } from '@opencrvs/components'
 
 const StyledPage = styled.div<{
-  background: ReturnType<typeof selectCountryBackground>
+  background: NonNullable<ReturnType<typeof selectCountryBackground>>
 }>`
   height: 100vh;
   width: 100%;
@@ -53,11 +54,15 @@ export interface IProps {
 }
 
 export function usePersistentCountryBackground() {
-  const countryBackground: ReturnType<typeof selectCountryBackground> =
-    JSON.parse(
-      localStorage.getItem('country-background') ??
-        `{"backgroundColor" : "36304E"}`
-    )
+  const theme = useTheme()
+  const countryBackground: NonNullable<
+    ReturnType<typeof selectCountryBackground>
+  > = JSON.parse(
+    localStorage.getItem('country-background') ??
+      `{"backgroundColor" : "${(theme as ITheme).colors.backgroundPrimary}"}`
+  )
+
+  console.log(countryBackground)
 
   const [offlineBackground, setOfflineBackground] =
     React.useState(countryBackground)

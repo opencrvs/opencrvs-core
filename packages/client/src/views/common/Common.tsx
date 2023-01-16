@@ -18,6 +18,7 @@ import { selectCountryBackground } from '@client/offline/selectors'
 
 export interface IProps {
   children: React.ReactNode
+  id?: string
 }
 
 export const LogoContainer = styled.div`
@@ -69,30 +70,11 @@ export const Container = styled.div`
   }
 `
 
-export function usePersistentCountryBackground() {
-  const countryBackground: ReturnType<typeof selectCountryBackground> =
-    JSON.parse(
-      localStorage.getItem('country-background') ??
-        `{"backgroundColor" : "36304E"}`
-    )
+export function BackgroundWrapper({ children, id }: IProps) {
+  const countryBackground = useSelector(selectCountryBackground)
 
-  const [offlineBackground, setOfflineBackground] =
-    React.useState(countryBackground)
-
-  const background = useSelector(selectCountryBackground)
-
-  if (background && !isEqual(background, offlineBackground)) {
-    setOfflineBackground(background)
-    localStorage.setItem('country-background', JSON.stringify(background))
-  }
-
-  return offlineBackground
-}
-
-export function BackgroundWrapper({ children }: IProps) {
-  const countryBackground = usePersistentCountryBackground()
   return (
-    <StyledPage background={countryBackground}>
+    <StyledPage id={id} background={countryBackground}>
       <Container> {children}</Container>
     </StyledPage>
   )

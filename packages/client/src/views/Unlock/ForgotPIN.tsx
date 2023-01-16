@@ -151,7 +151,7 @@ export function ForgotPIN(props: IForgotPINProps) {
   }, [])
 
   return (
-    <BackgroundWrapper>
+    <BackgroundWrapper id="forgotPinPage">
       <Box id="Box">
         <Stack direction="row" justifyContent="space-between">
           <Button type="icon" id="action_back" onClick={props.goBack}>

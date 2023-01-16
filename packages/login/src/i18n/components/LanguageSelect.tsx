@@ -21,10 +21,6 @@ import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useHistory, useLocation } from 'react-router'
 
-type IProps = {
-  background: string
-}
-
 const SelectContainer = styled.div`
   ${({ theme }) => theme.colors.primary};
   display: flex;
@@ -33,7 +29,7 @@ const SelectContainer = styled.div`
 `
 
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
-  const applicationLangauges = window.config.LANGUAGES.split(',')
+  const applicationLanguages = window.config.LANGUAGES.split(',')
   const history = useHistory()
   const location = useLocation()
   const dispatch = useDispatch()
@@ -41,7 +37,7 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
 
   const languageOptions: ISelect2Option[] = Object.values(languages)
     .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
-    .filter(({ value }) => applicationLangauges.includes(value))
+    .filter(({ value }) => applicationLanguages.includes(value))
 
   const onChange = ({ value }: ISelect2Option) => {
     if (paramLanguage) {

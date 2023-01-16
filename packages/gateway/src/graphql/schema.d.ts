@@ -607,8 +607,8 @@ export interface GQLApplicationConfiguration {
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
   INTEGRATIONS?: Array<GQLIntegration | null>
-  LOGIN_BACKGROUND?: GQLLoginBackground
   ADMIN_LEVELS?: number
+  LOGIN_BACKGROUND?: GQLLoginBackground
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -624,8 +624,8 @@ export interface GQLApplicationConfigurationInput {
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
   INTEGRATIONS?: Array<GQLIntegrationInput | null>
-  LOGIN_BACKGROUND?: GQLLoginBackgroundInput
   ADMIN_LEVELS?: number
+  LOGIN_BACKGROUND?: GQLLoginBackgroundInput
 }
 
 export interface GQLFormDraftInput {
@@ -4711,8 +4711,8 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
   INTEGRATIONS?: ApplicationConfigurationToINTEGRATIONSResolver<TParent>
-  LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
   ADMIN_LEVELS?: ApplicationConfigurationToADMIN_LEVELSResolver<TParent>
+  LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -4799,14 +4799,14 @@ export interface ApplicationConfigurationToINTEGRATIONSResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationConfigurationToLOGIN_BACKGROUNDResolver<
+export interface ApplicationConfigurationToADMIN_LEVELSResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationConfigurationToADMIN_LEVELSResolver<
+export interface ApplicationConfigurationToLOGIN_BACKGROUNDResolver<
   TParent = any,
   TResult = any
 > {

@@ -17,11 +17,11 @@ import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
-  NOTIFICATION_STATUS,
-  isWithinFileLength,
   callApplicationConfigMutation,
+  isValidHexColorCode,
   isValidHexColorCodeEntry,
-  isValidHexColorCode
+  isWithinFileLength,
+  NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { messages } from '@client/i18n/messages/views/config'
 import { buttonMessages } from '@client/i18n/messages'
@@ -53,14 +53,17 @@ import { CountryLogo } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { InputField } from '@client/components/form/InputField'
 import { Select2 } from '@opencrvs/components/lib/Select/Select2'
+
 export enum TabId {
   COLOUR = 'Colour',
   IMAGE = 'Image'
 }
+
 enum BackgroundSize {
   FILL = 'FILL',
   TILE = 'TILE'
 }
+
 const Box = styled.span`
   width: 40px;
   height: 40px;
@@ -68,38 +71,22 @@ const Box = styled.span`
   border: 2px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${(p) => (p.color ? p.color : '#fff')};
 `
+
 const HexInput = styled(HalfWidthInput)`
   width: 200px;
 `
+
 export const LoginBackground = () => {
   const intl = useIntl()
   const dispatch = useDispatch()
-  const offlineCountryConfiguration = useSelector((store: IStoreState) =>
-    getOfflineData(store)
-  )
-  const [loginBackgroundFileName, setBackgroundFileName] =
-    React.useState(EMPTY_STRING)
   const [hexValue, setHexValue] = React.useState(EMPTY_STRING)
   const [isRequestValid, setRequestValid] = React.useState(false)
-  const selectOptions = () => {
-    const arr = [
-      { label: BackgroundSize.FILL, value: BackgroundSize.FILL },
-      { label: BackgroundSize.TILE, value: BackgroundSize.TILE }
-    ]
-    return arr
-  }
-  const [selectedOption, onOptionChange] = React.useState({
-    label: BackgroundSize.FILL,
-    value: BackgroundSize.FILL
-  })
-  const [backgroundType, setBackgroundType] = React.useState(
-    BackgroundSize.FILL
-  )
   const [showColour, setShowColour] = React.useState(false)
-  const [errorOccured, setErrorOccured] = React.useState(false)
+  const [errorOccurred, setErrorOccurred] = React.useState(false)
   const [errorMessages, setErrorMessages] = React.useState(EMPTY_STRING)
   const [backgroundImage, setBackgroundImage] = React.useState(EMPTY_STRING)
-  const [isFileUploading, setIsFileUploading] = React.useState(false)
+  const [showModal, setShowModal] = React.useState(false)
+  const [activeTabId, setActiveTabId] = React.useState(TabId.COLOUR)
   const [backgroundFile, setBackgroundFile] = React.useState<{
     name?: string
     type: string
@@ -109,10 +96,14 @@ export const LoginBackground = () => {
     type: EMPTY_STRING,
     data: EMPTY_STRING
   })
+  const [backgroundType, setBackgroundType] = React.useState(
+    BackgroundSize.FILL
+  )
+  const offlineCountryConfiguration = useSelector((store: IStoreState) =>
+    getOfflineData(store)
+  )
   const [notificationStatus, setNotificationStatus] =
     React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
-  const [activeTabId, setActiveTabId] = React.useState(TabId.COLOUR)
-
   const tabSections = [
     {
       id: TabId.COLOUR,
@@ -123,6 +114,7 @@ export const LoginBackground = () => {
       title: intl.formatMessage(messages.imageTabTitle)
     }
   ]
+
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value.toUpperCase()
 
@@ -138,10 +130,16 @@ export const LoginBackground = () => {
     }
   }
 
+  const selectOptions = [
+    { label: BackgroundSize.FILL, value: BackgroundSize.FILL },
+    { label: BackgroundSize.TILE, value: BackgroundSize.TILE }
+  ]
+
   const handleBackgroundImage = (data: string) => {
     setBackgroundImage(data)
     setRequestValid(true)
   }
+
   const clearInputs = () => {
     setBackgroundImage(EMPTY_STRING)
     setRequestValid(false)
@@ -156,14 +154,11 @@ export const LoginBackground = () => {
   const handleBackgroundImageFile = (data: IAttachmentValue) => {
     setBackgroundFile(data)
   }
+
   const handleBackgroundImageFileName = (attachment: IAttachmentValue) => {
-    setBackgroundFileName(attachment.name ?? EMPTY_STRING)
     if (!attachment) setRequestValid(false)
   }
-  const onUploadingStateChanged = (isUploading: boolean) => {
-    setIsFileUploading(isUploading)
-  }
-  const [showModal, setShowModal] = React.useState(false)
+
   const toggleModal = () => {
     setShowModal((prev) => !prev)
     setErrorMessages(EMPTY_STRING)
@@ -203,7 +198,9 @@ export const LoginBackground = () => {
       }
     }
   }
+
   const id = GeneralActionId.LOGIN_BACKGROUND
+
   return (
     <>
       <ListViewItemSimplified
@@ -275,7 +272,7 @@ export const LoginBackground = () => {
         ]}
         handleClose={toggleModal}
       >
-        {errorOccured && (
+        {errorOccurred && (
           <ErrorContent>
             <ErrorMessage>
               <div>{errorMessages}</div>
@@ -327,7 +324,7 @@ export const LoginBackground = () => {
                 name={intl.formatMessage(messages.loginBackgroundLabel)}
                 allowedDocType={['image/png', 'image/svg']}
                 onComplete={(file) => {
-                  setErrorOccured(false)
+                  setErrorOccurred(false)
                   setErrorMessages(EMPTY_STRING)
                   handleBackgroundImage(
                     (file as IAttachmentValue).data as string
@@ -336,7 +333,6 @@ export const LoginBackground = () => {
                   handleBackgroundImageFileName(file as IAttachmentValue)
                 }}
                 files={backgroundFile}
-                onUploadingStateChanged={onUploadingStateChanged}
                 touched
                 error={errorMessages}
               />
@@ -350,10 +346,9 @@ export const LoginBackground = () => {
               >
                 <Select2
                   value={backgroundType}
-                  options={selectOptions()}
-                  onChange={({ value, label }) => {
+                  options={selectOptions}
+                  onChange={({ value }) => {
                     setBackgroundType(value)
-                    onOptionChange({ value, label })
                   }}
                 />
               </Stack>

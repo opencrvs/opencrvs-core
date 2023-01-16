@@ -208,7 +208,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   render() {
     const { userDetails } = this.props
     return (
-      <BackgroundWrapper>
+      <BackgroundWrapper id="unlockPage">
         <Box id="Box" onClick={this.focusKeypad}>
           <Stack direction="row" justifyContent="flex-end">
             <Button type="icon" onClick={this.logout} id="logout">

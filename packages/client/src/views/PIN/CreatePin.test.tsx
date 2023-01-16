@@ -87,7 +87,7 @@ describe('Create PIN view', () => {
 
     c.update()
 
-    expect(c.find('span#title-text').text()).toBe('Create a PIN')
+    expect(c.find('h3#title-text').text()).toBe('Create a PIN')
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -97,7 +97,7 @@ describe('Create PIN view', () => {
     pressPin(c, 54)
     c.update()
 
-    expect(c.find('span#title-text').text()).toBe('Re-enter your new PIN')
+    expect(c.find('h3#title-text').text()).toBe('Re-enter your new PIN')
   })
 
   it('prevents the user from using 4 same digits as PIN', async () => {

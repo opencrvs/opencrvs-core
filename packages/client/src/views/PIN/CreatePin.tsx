@@ -124,7 +124,7 @@ class CreatePinComponent extends React.Component<IProps> {
           </LogoContainer>
           {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
             <>
-              <StyledTitle>
+              <StyledTitle id="title-text">
                 {intl.formatMessage(messages.createTitle)}
               </StyledTitle>
 
@@ -200,7 +200,7 @@ class CreatePinComponent extends React.Component<IProps> {
           {pin && (
             <>
               <StyledTitle id="title-text">
-                {intl.formatMessage(messages.confirmPinTitle)}
+                {intl.formatMessage(messages.reEnterTitle)}
               </StyledTitle>
               <ConfirmPinDescription id="description-text">
                 ....
