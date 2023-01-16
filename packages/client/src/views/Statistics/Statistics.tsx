@@ -117,6 +117,10 @@ function shouldSeeView(userDetails: IUserDetails) {
   )
 }
 
+const ScrollableFullScreen = styled(FullScreen)`
+  overflow: auto;
+`
+
 export function Statistics({ visible }: { visible: boolean }) {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -161,7 +165,7 @@ export function Statistics({ visible }: { visible: boolean }) {
         pageIcon={<div />}
         goHome={() => dispatch(goToHome())}
       />
-      <FullScreen handle={handle}>
+      <ScrollableFullScreen handle={handle}>
         <FullBodyContent>
           {!window.config.STATISTICS_EMBED_URL && (
             <h1>Statistics dashboard URL configuration missing</h1>
@@ -170,7 +174,7 @@ export function Statistics({ visible }: { visible: boolean }) {
             <StyledIFrame src={embedUrl} allowFullScreen />
           )}
         </FullBodyContent>
-      </FullScreen>
+      </ScrollableFullScreen>
     </Container>
   )
 }
