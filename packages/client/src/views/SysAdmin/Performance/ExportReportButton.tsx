@@ -11,7 +11,9 @@
  */
 import { Box, ISearchLocation, Link } from '@client/../../components/lib'
 import { userMessages } from '@client/i18n/messages'
+import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
 import styled from '@client/styledComponents'
+import { Event } from '@client/utils/gateway'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { FileText } from 'react-feather'
@@ -21,15 +23,18 @@ import {
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { ExportReportModal } from './ExportReportModal'
-import { Event } from '@client/utils/gateway'
 
 const ButtonIcon = styled(FileText)`
   position: relative;
   top: 3px;
   margin-right: 5px;
+  height: 18px;
+  width: 18px;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.primary};
 `
 
-export type IExportReportFilters = {
+export type IExportReportButtonProps = {
   selectedLocation: ISearchLocation
   event: Event
   timeStart: Date
@@ -43,10 +48,10 @@ type State = {
 }
 
 class ExportReportButtonComp extends React.Component<
-  IExportReportFilters,
+  IExportReportButtonProps,
   State
 > {
-  constructor(props: IExportReportFilters) {
+  constructor(props: IExportReportButtonProps) {
     super(props)
     this.state = {
       showModal: false,
@@ -75,10 +80,11 @@ class ExportReportButtonComp extends React.Component<
     return (
       <>
         <Box>
-          {/* How do I set this colour and font weight correctly? */}
-          <ButtonIcon size={18} fontWeight="bold" color="#4972BB" />
+          <ButtonIcon />
           <Link font="bold14" onClick={this.toggleReportExportModal}>
-            Export report
+            {this.props.intl.formatMessage(
+              performanceMessages.exportReportTitle
+            )}
           </Link>
         </Box>
         <ExportReportModal
@@ -87,7 +93,7 @@ class ExportReportButtonComp extends React.Component<
           onSuccess={this.handleSuccess}
           filterState={this.props}
         />
-        {/* DO WE NEED A SUCCESS TOAST? */}
+        {/* TODO: DO WE NEED A SUCCESS TOAST? */}
         {this.state.showSuccessNotification && (
           <Toast type="success" onClose={this.toggleSuccessNotification}>
             <FormattedMessage {...userMessages.phoneNumberUpdated} />
@@ -98,6 +104,6 @@ class ExportReportButtonComp extends React.Component<
   }
 }
 
-export const ExportReportButton = injectIntl<'intl', IExportReportFilters>(
+export const ExportReportButton = injectIntl<'intl', IExportReportButtonProps>(
   ExportReportButtonComp
 )

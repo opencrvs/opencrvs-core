@@ -211,6 +211,17 @@ const messagesToDefine = {
     defaultMessage: 'Hospitals (DHIS2)',
     description: 'Hospitals declarations started title'
   },
+  exportReportTitle: {
+    id: 'performance.reports.exportdialog.title',
+    defaultMessage: 'Export Report',
+    description: 'Header text for export report dialog'
+  },
+  exportReportMessage: {
+    id: 'performance.reports.exportdialog.message',
+    defaultMessage:
+      'A PDF report will be generated with the following sections',
+    description: 'Message text for export report dialog'
+  },
   overTime: {
     id: 'performance.regRates.select.item.overTime',
     defaultMessage: 'Over time',
@@ -375,6 +386,36 @@ const messagesToDefine = {
     id: 'performance.registrationsListTable.totalRegistrationsColumn',
     defaultMessage: 'Total Registrations',
     description: 'Title for total registrations column in the table'
+  },
+  reportCrvTitle: {
+    id: 'performance.reports.pdf.crvTitle',
+    defaultMessage: 'CRV Report',
+    description: 'Title text for exported pdf'
+  },
+  reportLocationLabel: {
+    id: 'performance.reports.pdf.locationLabel',
+    defaultMessage: 'Location',
+    description: 'Table label for exported pdf'
+  },
+  reportEventLabel: {
+    id: 'performance.reports.pdf.eventLabel',
+    defaultMessage: 'Event',
+    description: 'Table label for exported pdf'
+  },
+  reportTimePeriodLabel: {
+    id: 'performance.reports.pdf.timePeriodLabel',
+    defaultMessage: 'Time period',
+    description: 'Table label for exported pdf'
+  },
+  reportCreatedOnLabel: {
+    id: 'performance.reports.pdf.createdOnLabel',
+    defaultMessage: 'Created on',
+    description: 'Table label for exported pdf'
+  },
+  reportExportedByLabel: {
+    id: 'performance.reports.pdf.exportedByLabel',
+    defaultMessage: 'Exported by',
+    description: 'Table label for exported pdf'
   }
 }
 

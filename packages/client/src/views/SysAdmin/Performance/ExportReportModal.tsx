@@ -21,7 +21,7 @@ import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Calendar, User, MapPin } from 'react-feather'
 import styled from '@client/styledComponents'
-import { IExportReportFilters } from './ExportReportButton'
+import { IExportReportButtonProps } from './ExportReportButton'
 import { endOfYear, subDays, subMonths } from 'date-fns'
 import format from '@client/utils/date-formatting'
 import { constantsMessages as messages } from '@client/i18n/messages/constants'
@@ -30,11 +30,11 @@ import ReactToPdf from 'react-to-pdf'
 import { useRef } from 'react'
 import { PdfReport } from './PdfReport'
 
-interface IProps {
+interface IExportReportModalProps {
   show: boolean
   onSuccess: () => void
   onClose: () => void
-  filterState: IExportReportFilters
+  filterState: IExportReportButtonProps
 }
 
 const LocationIcon = styled(MapPin)`
@@ -49,14 +49,23 @@ const UserIcon = styled(User)`
 
 const CalendarIcon = styled(Calendar)`
   margin-right: 8px;
-  color: ${({ theme }) => theme.colors.grey600};
+  // TODO: Can I set the color from the theme?
+  color: black;
+  height: 14px;
+  width: 14px;
 `
 
 const FilterRow = styled.div`
   margin: 4px 0;
 `
 
-function getRangeDescription(startDate: Date, endDate: Date): string {
+// const OffScreenDiv = styled(div)`
+//   position: relative;
+//   top: 3px;
+//   margin-right: 5px;
+// `
+
+export function getRangeDescription(startDate: Date, endDate: Date): string {
   // TODO: Is this the right way to use intl?
   const intl = useIntl()
   const today = new Date(Date.now())
@@ -102,7 +111,7 @@ export function ExportReportModal({
   onClose,
   onSuccess,
   filterState
-}: IProps) {
+}: IExportReportModalProps) {
   const intl = useIntl()
 
   const inputProps = {
@@ -185,7 +194,7 @@ export function ExportReportModal({
     <ResponsiveModal
       id="ExportReportModal"
       show={show}
-      title="Export report"
+      title={intl.formatMessage(performanceMessages.exportReportTitle)}
       actions={[
         <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
@@ -203,7 +212,10 @@ export function ExportReportModal({
             )}
           </ReactToPdf>
 
-          <div ref={ref}>
+          <div
+            ref={ref}
+            style={{ position: 'absolute', left: '-10000px', top: '0px' }}
+          >
             <PdfReport intl={intl} filters={filterState} />
           </div>
         </>
@@ -214,7 +226,7 @@ export function ExportReportModal({
     >
       {/* TODO: Localise this string */}
       <Text element="p" color="supportingCopy" variant="reg16">
-        A PDF report will be generated with the following sections
+        {intl.formatMessage(performanceMessages.exportReportMessage)}
       </Text>
       <FilterRow>
         <LocationIcon size={14} color="black" />
@@ -232,8 +244,7 @@ export function ExportReportModal({
         </Text>
       </FilterRow>
       <FilterRow>
-        {/* How to set the colour correctly? */}
-        <CalendarIcon size={14} color="black" />
+        <CalendarIcon />
         <Text element="span" color="copy" variant="bold16">
           {getRangeDescription(filterState.timeStart, filterState.timeEnd)}
         </Text>
