@@ -275,6 +275,34 @@
         mode: ugo+rwx
       when: not minio_data_backup.stat.exists
 
+    - name: Check vsexport data directory
+      stat:
+        path: /data/vsexport
+      register: vsexport_data
+
+    - name: 'Create vsexport data directory'
+      file:
+        path: /data/vsexport
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: ugo+rwx
+      when: not vsexport_data.stat.exists
+
+    - name: Check vsexport data backup directory
+      stat:
+        path: /data/backups/vsexport
+      register: vsexport_data_backup
+
+    - name: 'Create vsexport backup directory'
+      file:
+        path: /data/backups/vsexport
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: ugo+rwx
+      when: not vsexport_data_backup.stat.exists
+
     - name: 'Install UFW'
       apt:
         name: ufw
