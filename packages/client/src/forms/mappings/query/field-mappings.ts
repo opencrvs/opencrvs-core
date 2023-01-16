@@ -28,7 +28,7 @@ import {
   ISelectFormFieldWithOptions
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { camelCase, cloneDeep, get } from 'lodash'
+import { camelCase, cloneDeep, get, isArray } from 'lodash'
 import format from '@client/utils/date-formatting'
 import {
   IOfflineData,
@@ -694,9 +694,13 @@ export const sectionTransformer =
               localTransformedData[sectionId][key] as string[]
             )
         } else {
-          transformedData[transformedSectionId][targetKey] =
-            transformedData.template[key] ||
-            localTransformedData[sectionId][key]
+          const transformedValue = localTransformedData[sectionId][key]
+          if (isArray(transformedValue)) {
+            transformedData[transformedSectionId][targetKey] = transformedValue
+          } else {
+            transformedData[transformedSectionId][targetKey] =
+              transformedData.template[key] || transformedValue
+          }
         }
       })
     } else {
