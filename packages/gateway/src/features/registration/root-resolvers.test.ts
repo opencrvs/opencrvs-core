@@ -460,7 +460,7 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
   })
-  describe('ducplicate entry', () => {
+  describe('duplicate entry', () => {
     const details = {
       child: {
         name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
@@ -482,6 +482,7 @@ describe('Registration root resolvers', () => {
     }
     it('checks duplicate draftId', async () => {
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -718,6 +719,7 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -752,7 +754,8 @@ describe('Registration root resolvers', () => {
       expect(result).toBeDefined()
       expect(result).toEqual({
         compositionId: '9633042c-ca34-4b9f-959b-9d16909fd85c',
-        trackingId: 'BewpkiM'
+        trackingId: 'BewpkiM',
+        isPotentiallyDuplicate: false
       })
       expect(result.trackingId.length).toBe(7)
       expect(result.trackingId).toMatch(/^B/)
@@ -773,6 +776,7 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -873,8 +877,9 @@ describe('Registration root resolvers', () => {
       })
     })
 
-    it.only('throws an error when invalid composition is returned', async () => {
+    it('throws an error when invalid composition is returned', async () => {
       fetch.mockResponses(
+        [JSON.stringify([])],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -892,14 +897,16 @@ describe('Registration root resolvers', () => {
         ],
         [
           JSON.stringify({
-            identifier: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
             resourceType: 'Composition'
           })
         ]
       )
       await expect(
         resolvers.Mutation.createBirthRegistration({}, { details })
-      ).rejects.toThrowError('FHIR did not send a valid respons')
+      ).rejects.toThrowError(
+        'getTrackingId: Invalid composition or composition has no identifier'
+      )
     })
 
     it("throws an error when the response isn't what we expect", async () => {
@@ -1950,6 +1957,7 @@ describe('Registration root resolvers', () => {
       }
     }
     it('posts a fhir bundle', async () => {
+      fetch.mockResponseOnce('[]')
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -2027,6 +2035,7 @@ describe('Registration root resolvers', () => {
       fetch.mockResponses(
         [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)],
+        ['[]'],
         [
           JSON.stringify({
             resourceType: 'Bundle',
