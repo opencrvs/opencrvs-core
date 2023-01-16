@@ -105,10 +105,8 @@ export default async function updateUser(
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
     if (request.auth.credentials?.scope?.includes('natlsysadmin')) {
       existingUser.primaryOfficeId = user.primaryOfficeId
-      user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
-        user.primaryOfficeId,
-        token
-      )
+      existingUser.catchmentAreaIds =
+        await getCatchmentAreaIdsByPrimaryOfficeId(user.primaryOfficeId, token)
     } else {
       throw new Error('Location can be changed only by National System Admin')
     }
