@@ -167,8 +167,11 @@ export async function totalMetricsByLocation(
         result.eventLocationType === EVENT_LOCATION_TYPE.HEALTH_FACILITY
     )
 
-    const homeRegistrations = registrations.filter(
-      (result) => result.eventLocationType === EVENT_LOCATION_TYPE.PRIVATE_HOME
+    const homeRegistrations = registrations.filter((result) =>
+      event === 'BIRTH'
+        ? result.eventLocationType === EVENT_LOCATION_TYPE.PRIVATE_HOME
+        : result.eventLocationType ===
+          EVENT_LOCATION_TYPE.DECEASED_USUAL_RESIDENCE
     )
 
     response.push({
