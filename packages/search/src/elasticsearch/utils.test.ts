@@ -11,7 +11,6 @@
  */
 import {
   detectDuplicates,
-  buildQuery,
   createStatusHistory,
   IBirthCompositionBody
 } from '@search/elasticsearch/utils'
