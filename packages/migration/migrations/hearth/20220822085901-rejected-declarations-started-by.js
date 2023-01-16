@@ -33,7 +33,8 @@ export const up = async (db) => {
           'locationLevel5',
           'locationLevel4',
           'locationLevel3',
-          'locationLevel2'
+          'locationLevel2',
+          'locationLevel1'
         ]
       }
     ]

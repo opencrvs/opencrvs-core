@@ -122,7 +122,7 @@ const messagesToDefine: IConfigMessages = {
   vitalStatisticsExport: {
     id: 'config.application.vitalStatistics',
     defaultMessage:
-      '{year}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
+      'Month-{month}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
     description: 'Vital Statistics Export'
   },
   export: {
@@ -133,7 +133,7 @@ const messagesToDefine: IConfigMessages = {
   vsEmptyStateText: {
     id: 'config.application.emptystate',
     defaultMessage:
-      "The previous year's vital statistics data (based on vital event registrations occurring within that year) will become available for you to export as of 1st January.",
+      "The previous month's vital statistics data (based on vital event registrations occurring within that month) will become available for you to export as of the 1st of every month. Large CSV files cannot be opened in Excel and should therefore be opened in a statistical program such as {posit}.",
     description: 'Vital Statistics Export Empty State Text'
   },
   applicationNameChangeMessage: {

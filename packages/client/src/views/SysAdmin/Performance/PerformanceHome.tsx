@@ -28,7 +28,7 @@ import styled, { withTheme } from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
-import subYears from 'date-fns/subYears'
+import subMonths from 'date-fns/subMonths'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
@@ -255,7 +255,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     return {
       selectedLocation,
       timeStart:
-        (timeStart && new Date(timeStart)) || subYears(new Date(Date.now()), 1),
+        (timeStart && new Date(timeStart)) ||
+        subMonths(new Date(Date.now()), 11),
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.Birth,
       toggleStatus: false,
