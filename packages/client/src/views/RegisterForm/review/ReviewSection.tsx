@@ -1517,10 +1517,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   shouldShowChangeAll = (section: IFormSection) => {
     const {
-      draft: { data, event },
+      draft: { data, event, duplicates },
       viewRecord
     } = this.props
-    if (viewRecord) {
+
+    if (viewRecord || Boolean(duplicates)) {
       return false
     }
     return (
@@ -1640,19 +1641,21 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onContinue,
       viewRecord
     } = this.props
-    const formSections = viewRecord
-      ? this.getViewableSection(registerForm[event]).map((section) => {
-          return {
-            ...section,
-            groups: section.groups.map((group) => {
-              return {
-                ...group,
-                fields: group.fields.map(fieldToReadOnlyFields)
-              }
-            })
-          }
-        })
-      : this.getViewableSection(registerForm[event])
+    const isDuplicate = Boolean(declaration.duplicates)
+    const formSections =
+      viewRecord || isDuplicate
+        ? this.getViewableSection(registerForm[event]).map((section) => {
+            return {
+              ...section,
+              groups: section.groups.map((group) => {
+                return {
+                  ...group,
+                  fields: group.fields.map(fieldToReadOnlyFields)
+                }
+              })
+            }
+          })
+        : this.getViewableSection(registerForm[event])
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
@@ -1768,18 +1771,22 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               })}
               {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                 this.getAllAttachmentInPreviewList(declaration)}
-              {(!isCorrection(declaration) || viewRecord) && (
-                <InputWrapper>
-                  <InputField
-                    id="additional_comments"
-                    touched={false}
-                    required={false}
-                    label={intl.formatMessage(messages.additionalComments)}
-                  >
-                    <TextArea {...{ ...textAreaProps, readonly: viewRecord }} />
-                  </InputField>
-                </InputWrapper>
-              )}
+              {!isCorrection(declaration) ||
+                viewRecord ||
+                (!isDuplicate && (
+                  <InputWrapper>
+                    <InputField
+                      id="additional_comments"
+                      touched={false}
+                      required={false}
+                      label={intl.formatMessage(messages.additionalComments)}
+                    >
+                      <TextArea
+                        {...{ ...textAreaProps, readonly: viewRecord }}
+                      />
+                    </InputField>
+                  </InputWrapper>
+                ))}
               {totalFileSizeExceeded && (
                 <Alert type="warning">
                   {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
@@ -1787,7 +1794,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   })}
                 </Alert>
               )}
-              {viewRecord ? null : (
+              {viewRecord || isDuplicate ? null : (
                 <>
                   {!isCorrection(declaration) ? (
                     <>
@@ -1844,7 +1851,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })}
                   {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                     intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
-                  {viewRecord ? null : (
+                  {viewRecord || isDuplicate ? null : (
                     <LinkButton
                       id="edit-document"
                       disabled={
