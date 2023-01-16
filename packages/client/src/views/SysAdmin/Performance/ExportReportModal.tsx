@@ -39,7 +39,8 @@ interface IExportReportModalProps {
 
 const LocationIcon = styled(MapPin)`
   margin-right: 8px;
-  color: ${({ theme }) => theme.colors.grey600};
+  // TODO: Can I set the color from the theme?
+  color: black;
 `
 
 const UserIcon = styled(User)`
@@ -51,8 +52,6 @@ const CalendarIcon = styled(Calendar)`
   margin-right: 8px;
   // TODO: Can I set the color from the theme?
   color: black;
-  height: 14px;
-  width: 14px;
 `
 
 const FilterRow = styled.div`
@@ -129,31 +128,31 @@ export function ExportReportModal({
 
   const sectionOptions: ICheckboxOption[] = [
     {
-      value: '2',
+      value: performanceMessages.performanceTotalRegistrationsHeader.id,
       label: intl.formatMessage(
         performanceMessages.performanceTotalRegistrationsHeader
       )
     },
     {
-      value: '3',
+      value: performanceMessages.performanceTotalCertificatesHeader.id,
       label: intl.formatMessage(
         performanceMessages.performanceTotalCertificatesHeader
       )
     },
     {
-      value: '4',
+      value: performanceMessages.performanceApplicationSourcesHeader.id,
       label: intl.formatMessage(
         performanceMessages.performanceApplicationSourcesHeader
       )
     },
     {
-      value: '5',
+      value: performanceMessages.performanceTotalCorrectionsHeader.id,
       label: intl.formatMessage(
         performanceMessages.performanceTotalCorrectionsHeader
       )
     },
     {
-      value: '6',
+      value: performanceMessages.performanceTotalPaymentsHeader.id,
       label: intl.formatMessage(
         performanceMessages.performanceTotalPaymentsHeader
       )
@@ -162,7 +161,7 @@ export function ExportReportModal({
 
   if (!filterState.officeSelected) {
     sectionOptions.splice(0, 0, {
-      value: '1',
+      value: performanceMessages.performanceCompletenessRatesHeader.id,
       label: intl.formatMessage(
         performanceMessages.performanceCompletenessRatesHeader
       )
@@ -216,7 +215,11 @@ export function ExportReportModal({
             ref={ref}
             style={{ position: 'absolute', left: '-10000px', top: '0px' }}
           >
-            <PdfReport intl={intl} filters={filterState} />
+            <PdfReport
+              intl={intl}
+              filters={filterState}
+              selectedSections={selectedSections}
+            />
           </div>
         </>
       ]}
@@ -224,7 +227,6 @@ export function ExportReportModal({
       contentHeight={390}
       contentScrollableY={true}
     >
-      {/* TODO: Localise this string */}
       <Text element="p" color="supportingCopy" variant="reg16">
         {intl.formatMessage(performanceMessages.exportReportMessage)}
       </Text>
@@ -244,7 +246,7 @@ export function ExportReportModal({
         </Text>
       </FilterRow>
       <FilterRow>
-        <CalendarIcon />
+        <CalendarIcon size={14} />
         <Text element="span" color="copy" variant="bold16">
           {getRangeDescription(filterState.timeStart, filterState.timeEnd)}
         </Text>
