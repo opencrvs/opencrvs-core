@@ -42,6 +42,7 @@ import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
+import { AddressCases } from '@client/forms/configuration/administrative/addresses'
 
 interface IName {
   [key: string]: any
@@ -694,6 +695,7 @@ export const sectionTransformer =
             )
         } else {
           transformedData[transformedSectionId][targetKey] =
+            transformedData.template[key] ||
             localTransformedData[sectionId][key]
         }
       })
@@ -825,6 +827,95 @@ export const addressOfflineTransformer =
         offlineData
       )
     }
+  }
+
+export const individualAddressTransformer =
+  (
+    addressCase: AddressCases,
+    addressLocationLevel: keyof typeof LocationLevel
+  ) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField,
+    _?: IFormField,
+    offlineData?: IOfflineData
+  ) => {
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+
+    const address =
+      queryData[sectionId].address || queryData[sectionId].individual.address
+    const addressFromQuery = (address || []).find(
+      (addr: { type: AddressCases }) => addr.type === addressCase
+    )
+
+    if (addressFromQuery) {
+      transformAddressTemplateArray(
+        transformedData,
+        addressFromQuery,
+        addressLocationLevel,
+        sectionId,
+        sectionId,
+        offlineData
+      )
+    }
+  }
+
+export const addressLineTemplateTransformer =
+  (
+    addressCase: AddressCases,
+    lineNumber: number,
+    transformedFieldName: string
+  ) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField,
+    _?: IFormField,
+    offlineData?: IOfflineData
+  ) => {
+    const address = (
+      queryData[sectionId]?.individual?.address || queryData[sectionId].address
+    ).find((add: { type: AddressCases }) => add.type === addressCase)
+
+    if (!address) {
+      return
+    }
+
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
+    const newTransformedName = camelCase(`${sectionId} ${transformedFieldName}`)
+    transformedData[sectionId][newTransformedName] = address.line[index] || ''
+  }
+
+export const eventLocationAddressLineTemplateTransformer =
+  (lineNumber: number, transformedFieldName: string) =>
+  (
+    transformedData: IFormData,
+    queryData: any,
+    sectionId: string,
+    field: IFormField,
+    _?: IFormField,
+    offlineData?: IOfflineData
+  ) => {
+    if (
+      queryData.eventLocation?.type &&
+      queryData.eventLocation?.type == 'HEALTH_FACILITY'
+    ) {
+      return
+    }
+    if (!transformedData[sectionId]) {
+      transformedData[sectionId] = {}
+    }
+    const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
+    transformedData[sectionId][transformedFieldName] =
+      queryData.eventLocation.address.line[index] || ''
   }
 
 export const eventLocationAddressOfflineTransformer =
