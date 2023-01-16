@@ -57,6 +57,7 @@
     "react-redux": "^7.1.1",
     "react-router": "^5.1.2",
     "react-stickynode": "^2.0.1",
+    "react-to-pdf": "^0.0.14",
     "react-tooltip": "^4.2.21",
     "react-transition-group": "^4.2.1",
     "redux": "^4.0.4",

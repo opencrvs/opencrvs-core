@@ -18,7 +18,6 @@ import { FileText } from 'react-feather'
 import {
   FormattedMessage,
   injectIntl,
-  useIntl,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { ExportReportModal } from './ExportReportModal'

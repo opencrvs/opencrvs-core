@@ -26,8 +26,9 @@ import { endOfYear, subDays, subMonths } from 'date-fns'
 import format from '@client/utils/date-formatting'
 import { constantsMessages as messages } from '@client/i18n/messages/constants'
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
-import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
-import pdfFonts from 'pdfmake/build/vfs_fonts'
+import ReactToPdf from 'react-to-pdf'
+import { useRef } from 'react'
+import { PdfReport } from './PdfReport'
 
 interface IProps {
   show: boolean
@@ -163,6 +164,8 @@ export function ExportReportModal({
     sectionOptions.map((o) => o.value)
   )
 
+  const ref = useRef<HTMLDivElement>(null)
+
   const restoreState = () => {
     //setSelectedSections([])
   }
@@ -171,6 +174,12 @@ export function ExportReportModal({
       restoreState()
     }
   }, [show])
+
+  const options = {
+    orientation: 'landscape'
+    //unit: 'in',
+    //format: [4, 2]
+  }
 
   return (
     <ResponsiveModal
@@ -181,38 +190,23 @@ export function ExportReportModal({
         <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
-        <PrimaryButton
-          id="continue-button"
-          key="continue"
-          onClick={() => {
-            console.log('Click')
-            const dd = {
-              content: [
-                { text: 'Performance Report', fontSize: 18 },
-                'Certification rate is the no. of certificates issues, expressed as a percentage of the total number of registrations',
-                {
-                  layout: 'lightHorizontalLines', // optional
-                  table: {
-                    widths: ['auto', '*'],
-                    body: [
-                      ['Total', '0'],
-                      ['Certification rate', '0.0%']
-                    ]
-                  }
-                }
-              ]
-            }
+        <>
+          <ReactToPdf targetRef={ref} filename="report.pdf" options={options}>
+            {({ toPdf }: any) => (
+              <PrimaryButton
+                id="continue-button"
+                key="continue"
+                onClick={toPdf}
+              >
+                {intl.formatMessage(buttonMessages.exportButton)}
+              </PrimaryButton>
+            )}
+          </ReactToPdf>
 
-            pdfMake.vfs = pdfFonts.pdfMake.vfs
-            const layout = pdfMake.createPdf(dd)
-            layout.getDataUrl((a) => console.log(a))
-            layout.print()
-            //continueButtonHandler(phoneNumber)
-          }}
-          //disabled={!Boolean(phoneNumber.length) || isInvalidPhoneNumber}
-        >
-          {intl.formatMessage(buttonMessages.exportButton)}
-        </PrimaryButton>
+          <div ref={ref}>
+            <PdfReport intl={intl} filters={filterState} />
+          </div>
+        </>
       ]}
       handleClose={onClose}
       contentHeight={390}
