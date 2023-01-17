@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { badRequest } from '@hapi/boom'
-import { sendToFhir } from '@gateway/features/fhir/utils'
+import { fetchFHIR } from '@gateway/features/fhir/utils'
 
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
@@ -96,10 +96,10 @@ export async function eventNotificationHandler(
   } catch (e) {
     return badRequest(e)
   }
-  return sendToFhir(
-    JSON.stringify(req.payload),
+  return fetchFHIR(
     '',
+    { Authorization: req.headers.authorization },
     'POST',
-    req.headers.authorization
+    JSON.stringify(req.payload)
   )
 }

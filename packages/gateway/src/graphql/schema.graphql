@@ -149,6 +149,7 @@ type Query {
   getFormDraft: [FormDraft!]
   fetchSystem(clientId: ID!): System
   getFormDataset: [FormDataset!]
+  informantSMSNotifications: [SMSNotification!]
 }
 
 type Mutation {
@@ -240,6 +241,9 @@ type Mutation {
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
   createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
+  toggleInformantSMSNotification(
+    smsNotifications: [SMSNotificationInput!]
+  ): [SMSNotification!]
 }
 
 type Dummy {
@@ -364,23 +368,23 @@ type Location {
 }
 
 type User {
-  id: ID
-  userMgntUserID: ID
-  practitionerId: String
-  name: [HumanName]
+  id: ID!
+  userMgntUserID: ID!
+  practitionerId: String!
+  name: [HumanName!]!
   username: String
-  mobile: String
-  role: String
+  mobile: String!
+  role: RoleType!
   type: String
   email: String
-  status: String
+  status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
-  creationDate: String
+  creationDate: String!
   avatar: Avatar
   device: String
   searches: [BookmarkedSeachItem]
@@ -595,6 +599,15 @@ type FormDataset {
   _id: String
 }
 
+type SMSNotification {
+  id: String
+  name: String!
+  message: String!
+  enabled: Boolean!
+  updatedAt: String!
+  createdAt: String!
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -661,11 +674,11 @@ input DeathRegistrationInput {
 
 input UserInput {
   id: ID
-  name: [HumanNameInput]
+  name: [HumanNameInput!]!
   identifier: [UserIdentifierInput]
   username: String
-  mobile: String
-  role: String
+  mobile: String!
+  role: RoleType!
   type: String
   email: String
   primaryOffice: String
@@ -712,6 +725,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  ADMIN_LEVELS: Int
 }
 
 input ApplicationConfigurationInput {
@@ -726,6 +740,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  ADMIN_LEVELS: Int
 }
 
 input FormDraftInput {
@@ -783,6 +798,12 @@ type FormDatasetResponse {
 input FormDatasetInput {
   fileName: String!
   base64Data: String!
+}
+
+input SMSNotificationInput {
+  id: String!
+  name: String!
+  enabled: Boolean!
 }
 
 scalar Map
@@ -996,9 +1017,26 @@ enum LocationType {
   OTHER
 }
 
+enum RoleType {
+  FIELD_AGENT
+  REGISTRATION_AGENT
+  LOCAL_REGISTRAR
+  LOCAL_SYSTEM_ADMIN
+  NATIONAL_SYSTEM_ADMIN
+  PERFORMANCE_MANAGEMENT
+  NATIONAL_REGISTRAR
+}
+
+enum Status {
+  active
+  deactivated
+  pending
+  disabled
+}
+
 type LocalRegistrar {
   name: [HumanName]!
-  role: String!
+  role: RoleType!
   signature: Signature
 }
 
@@ -1017,7 +1055,7 @@ type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
   type: String
-  status: String
+  status: Status
   avatar: Avatar
   primaryOfficeId: String
   creationDate: String
@@ -1061,10 +1099,11 @@ type TotalMetricsByTime {
 
 type VSExport {
   event: String!
-  year: Int!
+  startDate: Date!
+  endDate: Date!
   fileSize: String!
   url: String!
-  createdOn: String!
+  createdOn: Date!
 }
 
 union UserAuditLogResultItem =

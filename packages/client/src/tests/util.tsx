@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { App } from '@client/App'
-import { Event } from '@client/utils/gateway'
+import { Event, RoleType, Status } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
@@ -1926,7 +1926,6 @@ export const mockOfflineDataDispatch = {
   templates: mockOfflineData.templates,
   locations: mockOfflineData.locations,
   facilities: mockOfflineData.facilities,
-  pilotLocations: mockOfflineData.pilotLocations,
   offices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
@@ -2195,9 +2194,9 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          role: 'FIELD_AGENT',
+          role: RoleType.FieldAgent,
           type: 'CHA',
-          status: 'active',
+          status: Status.Active,
           name: [
             {
               use: 'en',
@@ -2232,7 +2231,7 @@ export function loginAsFieldAgent(store: AppStore) {
                 familyName: 'Ashraful'
               }
             ],
-            role: 'LOCAL_REGISTRAR',
+            role: RoleType.LocalRegistrar,
             signature: undefined
           }
         }

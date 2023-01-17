@@ -1224,8 +1224,8 @@ const mockOfflineData: Partial<IOfflineData> = {
       id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
       name: 'ARK Private Clinic',
       alias: 'ARK Private Clinic',
-      address: '',
       physicalType: 'Building',
+      status: 'active',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/f244b79e-16e7-40b2-834f-c1c57bd7eae8'
     }
@@ -1236,6 +1236,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Abwe',
       alias: 'Abwe',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
@@ -1245,6 +1246,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Ibombo',
       alias: 'Ibombo',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
@@ -1254,6 +1256,7 @@ const mockOfflineData: Partial<IOfflineData> = {
       name: 'Central',
       alias: 'Central',
       physicalType: 'Jurisdiction',
+      status: 'active',
       jurisdictionType: 'STATE',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'

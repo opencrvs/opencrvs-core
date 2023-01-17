@@ -46,7 +46,8 @@ export const resolvers: GQLResolver = {
           applicationConfig.EXTERNAL_VALIDATION_WORKQUEUE as boolean,
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
-        ADDRESSES: applicationConfig.ADDRESSES as number
+        ADDRESSES: applicationConfig.ADDRESSES as number,
+        ADMIN_LEVELS: applicationConfig.ADMIN_LEVELS as number
       }
 
       const res = await fetch(

@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
-
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   applicationSettings: MessageDescriptor
@@ -95,6 +94,13 @@ interface IConfigMessages
   testNumber: MessageDescriptor
   validExample: MessageDescriptor
   invalidExample: MessageDescriptor
+  informantNotifications: MessageDescriptor
+  informantNotificationSubtitle: MessageDescriptor
+  inProgressSMS: MessageDescriptor
+  declarationSMS: MessageDescriptor
+  registrationSMS: MessageDescriptor
+  rejectionSMS: MessageDescriptor
+  informantNotificationUpdatingMessage: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -122,7 +128,7 @@ const messagesToDefine: IConfigMessages = {
   vitalStatisticsExport: {
     id: 'config.application.vitalStatistics',
     defaultMessage:
-      '{year}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
+      'Month-{month}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
     description: 'Vital Statistics Export'
   },
   export: {
@@ -133,7 +139,7 @@ const messagesToDefine: IConfigMessages = {
   vsEmptyStateText: {
     id: 'config.application.emptystate',
     defaultMessage:
-      "The previous year's vital statistics data (based on vital event registrations occurring within that year) will become available for you to export as of 1st January.",
+      "The previous month's vital statistics data (based on vital event registrations occurring within that month) will become available for you to export as of the 1st of every month. Large CSV files cannot be opened in Excel and should therefore be opened in a statistical program such as {posit}.",
     description: 'Vital Statistics Export Empty State Text'
   },
   applicationNameChangeMessage: {
@@ -520,6 +526,42 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.application.phoneNumberChangeNotification',
     defaultMessage: 'Phone Number Pattern Pattern of application updated',
     description: 'Message for phone number  Pattern change modal'
+  },
+  informantNotifications: {
+    id: 'config.informantNotification.title',
+    defaultMessage: 'Informant notifications',
+    description: 'The title for Informant notifications'
+  },
+  informantNotificationSubtitle: {
+    id: 'config.informantNotification.subtitle',
+    defaultMessage:
+      'Select the SMS notification to send to the Informant to keep them informed of the progress to their declaration. SMS copy can be updated from.... ',
+    description: 'Subtile for informant sms notification'
+  },
+  inProgressSMS: {
+    id: 'config.informantNotification.inProgressSMS',
+    defaultMessage: 'Notification sent to Office',
+    description: 'Title for informant inProgressSMS notification'
+  },
+  declarationSMS: {
+    id: 'config.informantNotification.declarationSMS',
+    defaultMessage: 'Declaration sent for review',
+    description: 'Title for informant declarationSMS notification'
+  },
+  registrationSMS: {
+    id: 'config.informantNotification.registrationSMS',
+    defaultMessage: 'Declaration registered',
+    description: 'Title for informant registrationSMS notification'
+  },
+  rejectionSMS: {
+    id: 'config.informantNotification.rejectionSMS',
+    defaultMessage: 'Declaration rejected',
+    description: 'Title for informant rejectionSMS notification'
+  },
+  informantNotificationUpdatingMessage: {
+    id: 'config.informantNotification.success',
+    defaultMessage: 'Informant notifications updated',
+    description: 'Notification for informant update success'
   }
 }
 

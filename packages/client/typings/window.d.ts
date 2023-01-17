@@ -56,6 +56,7 @@ interface Window {
     LOGROCKET: string
     SENTRY: string
     ADDRESSES: number
+    ADMIN_LEVELS: number
   }
   __localeId__: string
 }

@@ -138,7 +138,7 @@ describe('Registraion Rates tests', () => {
             time: 'withinTarget',
             locationId: LOCATION_DHAKA_DIVISION.id,
             timeEnd: new Date(1487076708000).toISOString(),
-            timeStart: new Date(1455454308000).toISOString()
+            timeStart: new Date(1456868800000).toISOString()
           })
         }}
       />,

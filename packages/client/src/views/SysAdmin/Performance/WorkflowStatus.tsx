@@ -81,7 +81,9 @@ const ToolTipContainer = styled.span`
 const DoubleLineValueWrapper = styled.div`
   margin: 0px 0px;
 `
-
+const TableDiv = styled.div`
+  overflow: auto;
+`
 const { useState } = React
 
 interface SortMap {
@@ -799,25 +801,30 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 
             return (
               <>
-                <Table
-                  id="declaration-status-list"
-                  content={getContent(data)}
-                  columns={getColumns()}
-                  isLoading={loading || Boolean(error)}
-                  noResultText={intl.formatMessage(constantsMessages.noResults)}
-                  tableHeight={150}
-                  highlightRowOnMouseOver
-                  noPagination
-                  isFullPage
-                />
-                {error && <GenericErrorToast />}
-                {total > pageSize && (
-                  <Pagination
-                    currentPage={currentPageNumber}
-                    totalPages={Math.ceil(total / pageSize)}
-                    onPageChange={onPageChange}
+                <TableDiv id="table-div-wrapper">
+                  <Table
+                    id="declaration-status-list"
+                    content={getContent(data)}
+                    columns={getColumns()}
+                    isLoading={loading || Boolean(error)}
+                    noResultText={intl.formatMessage(
+                      constantsMessages.noResults
+                    )}
+                    fixedWidth={2050}
+                    tableHeight={150}
+                    highlightRowOnMouseOver
+                    noPagination
+                    isFullPage
                   />
-                )}
+                  {error && <GenericErrorToast />}
+                  {total > pageSize && (
+                    <Pagination
+                      currentPage={currentPageNumber}
+                      totalPages={Math.ceil(total / pageSize)}
+                      onPageChange={onPageChange}
+                    />
+                  )}
+                </TableDiv>
               </>
             )
           }}
