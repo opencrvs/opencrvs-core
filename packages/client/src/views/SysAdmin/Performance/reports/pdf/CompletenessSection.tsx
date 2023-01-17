@@ -10,8 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ListViewItemSimplified } from '@client/../../components/lib'
+import { GQLEventMetrics } from '@client/../../gateway/src/graphql/schema'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { Query } from '@client/components/Query'
+import { advancedSearchDeathSectionInformantDetails } from '@client/forms/advancedSearch/fieldDefinitions/Death'
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
 import React from 'react'
 import { IntlShape } from 'react-intl'
@@ -40,181 +42,156 @@ interface ICompletenessSectionProps {
 
 interface ICompletenessSectionForTimeframeProps
   extends ICompletenessSectionProps {
-  title: { id: string; defaultMessage: string; description: string }
+  title: string
   range: string
   time: CompletenessRateTime
+  filterFunction: (p: GQLEventMetrics) => boolean
 }
 
 export const CompletenessSection = ({
   intl,
   filters
 }: ICompletenessSectionProps) => {
-  return (
-    <>
-      {/* <CompletenessSectionForTimeframe
-        intl={intl}
-        filters={filters}
-        title={performanceMessages.performanceWithinTargetDaysLabel}
-        range="withinTarget"
-        time={CompletenessRateTime.WithinTarget}
-      /> */}
-      <CompletenessSectionForTimeframe
-        intl={intl}
-        filters={filters}
-        title={performanceMessages.performanceWithin1YearLabel}
-        range="within1Year"
-        time={CompletenessRateTime.Within1Year}
-      />
-      <CompletenessSectionForTimeframe
-        intl={intl}
-        filters={filters}
-        title={performanceMessages.performanceWithin5YearsLabel}
-        range="within5Years"
-        time={CompletenessRateTime.Within5Years}
-      />
-    </>
-  )
-}
-
-export const CompletenessSectionForTimeframe = ({
-  intl,
-  filters,
-  title,
-  range,
-  time
-}: ICompletenessSectionForTimeframeProps) => {
-  return (
-    <div key={title.id}>
-      <PerformanceListHeader>
-        {intl.formatMessage(
-          performanceMessages.performanceCompletenessRatesHeader
-        )}
-      </PerformanceListHeader>
-      <PerformanceListSubHeader>
-        {intl.formatMessage(
-          performanceMessages.performanceCompletenessRatesSubHeader,
-          {
-            event: filters.event
+  {
+    // TODO: Is there a way to reuse these components, rather than duplicating what is in CompletenessReport and CompletenessRate components?
+    return (
+      <>
+        <PerformanceListHeader>
+          {intl.formatMessage(
+            performanceMessages.performanceCompletenessRatesHeader
+          )}
+        </PerformanceListHeader>
+        <PerformanceListSubHeader>
+          {intl.formatMessage(
+            performanceMessages.performanceCompletenessRatesSubHeader,
+            {
+              event: filters.event
+            }
+          )}
+        </PerformanceListSubHeader>
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(
+                performanceMessages.performanceWithinTargetDaysLabel,
+                {
+                  target:
+                    window.config[
+                      (filters.event.toUpperCase() as 'BIRTH') || 'DEATH'
+                    ].REGISTRATION_TARGET,
+                  withPrefix: false
+                }
+              )}
+            </PerformanceTitle>
           }
-        )}
-      </PerformanceListSubHeader>
-      <ListViewItemSimplified
-        label={<PerformanceTitle>{intl.formatMessage(title)}</PerformanceTitle>}
-        value={
-          <div>
-            <PerformanceValue>
-              <PercentageDisplay
-                total={filters.data.results
-                  .filter((p) => p.timeLabel === 'withinTarget')
-                  .reduce((t, x) => t + x.total, 0)}
-                ofNumber={filters.data.estimated.totalEstimation}
-              />
-            </PerformanceValue>
-            <Breakdown>
-              <BreakdownRow>
-                <BreakdownLabel>
-                  {intl.formatMessage(performanceMessages.performanceMaleLabel)}
-                  :{' '}
-                </BreakdownLabel>
-                <BreakdownValue>
-                  {
-                    <PercentageDisplay
-                      total={calculateTotal(
-                        filters.data.results.filter(
-                          (x) =>
-                            (x.gender === 'male' &&
-                              x.timeLabel === 'withinTarget') ||
-                            x.timeLabel === 'withinLate' ||
-                            x.timeLabel === range
-                        )
-                      )}
-                      ofNumber={calculateTotal(
-                        filters.data.results.filter(
-                          (x) =>
-                            x.timeLabel === 'withinTarget' ||
-                            x.timeLabel === 'withinLate' ||
-                            x.timeLabel === range
-                        )
-                      )}
-                    />
-                  }
-                </BreakdownValue>
-              </BreakdownRow>
-              <BreakdownRow>
-                <BreakdownLabel>
-                  {intl.formatMessage(
-                    performanceMessages.performanceFemaleLabel
-                  )}
-                  :{' '}
-                </BreakdownLabel>
-                <BreakdownValue>
-                  {
-                    <PercentageDisplay
-                      total={calculateTotal(
-                        filters.data.results.filter(
-                          (x) =>
-                            (x.gender === 'female' &&
-                              x.timeLabel === 'withinTarget') ||
-                            x.timeLabel === 'withinLate' ||
-                            x.timeLabel === range
-                        )
-                      )}
-                      ofNumber={calculateTotal(
-                        filters.data.results.filter(
-                          (x) =>
-                            x.timeLabel === 'withinTarget' ||
-                            x.timeLabel === 'withinLate' ||
-                            x.timeLabel === range
-                        )
-                      )}
-                    />
-                  }
-                </BreakdownValue>
-              </BreakdownRow>
-            </Breakdown>
-          </div>
-        }
-      />
-      <Query
-        query={FETCH_LOCATION_WISE_EVENT_ESTIMATIONS}
-        variables={{
-          event: filters.event,
-          timeStart: filters.timeStart,
-          timeEnd: filters.timeEnd
-          //locationId: props.filters.selectedLocation.searchableText - EMPTY FOR COUNTRIES, SEND IT FOR DISTRICTS
-        }}
-      >
-        {({ data, loading, error }) => {
-          if (error) {
-            return (
-              <>
-                <CompletenessDataTable
-                  loading={true}
-                  base={{
-                    baseType: COMPLETENESS_RATE_REPORT_BASE.LOCATION
-                  }}
-                  completenessRateTime={time}
+          value={
+            <div>
+              <PerformanceValue>
+                <PercentageDisplay
+                  total={filters.data.results
+                    .filter((p) => p.timeLabel === 'withinTarget')
+                    .reduce((t, x) => t + x.total, 0)}
+                  ofNumber={filters.data.estimated.totalEstimation}
                 />
-                <GenericErrorToast />
-              </>
-            )
-          } else {
-            return (
-              <>
-                <CompletenessDataTable
-                  loading={loading}
-                  base={{
-                    baseType: COMPLETENESS_RATE_REPORT_BASE.LOCATION
-                  }}
-                  data={data && data.fetchLocationWiseEventMetrics}
-                  eventType={filters.event}
-                  completenessRateTime={time}
-                />
-              </>
-            )
+              </PerformanceValue>
+              <Breakdown>
+                <BreakdownRow>
+                  <BreakdownLabel>
+                    {intl.formatMessage(
+                      performanceMessages.performanceMaleLabel
+                    )}
+                    :{' '}
+                  </BreakdownLabel>
+                  <BreakdownValue>
+                    {
+                      <PercentageDisplay
+                        total={calculateTotal(
+                          filters.data.results.filter(
+                            (x) =>
+                              x.gender === 'male' &&
+                              x.timeLabel === 'withinTarget'
+                          )
+                        )}
+                        ofNumber={calculateTotal(
+                          filters.data.results.filter(
+                            (x) => x.timeLabel === 'withinTarget'
+                          )
+                        )}
+                      />
+                    }
+                  </BreakdownValue>
+                </BreakdownRow>
+                <BreakdownRow>
+                  <BreakdownLabel>
+                    {intl.formatMessage(
+                      performanceMessages.performanceFemaleLabel
+                    )}
+                    :{' '}
+                  </BreakdownLabel>
+                  <BreakdownValue>
+                    {
+                      <PercentageDisplay
+                        total={calculateTotal(
+                          filters.data.results.filter(
+                            (x) =>
+                              x.gender === 'female' &&
+                              x.timeLabel === 'withinTarget'
+                          )
+                        )}
+                        ofNumber={calculateTotal(
+                          filters.data.results.filter(
+                            (x) => x.timeLabel === 'withinTarget'
+                          )
+                        )}
+                      />
+                    }
+                  </BreakdownValue>
+                </BreakdownRow>
+              </Breakdown>
+            </div>
           }
-        }}
-      </Query>
-    </div>
-  )
+        />
+        <Query
+          query={FETCH_LOCATION_WISE_EVENT_ESTIMATIONS}
+          variables={{
+            event: filters.event,
+            timeStart: filters.timeStart,
+            timeEnd: filters.timeEnd
+            //locationId: props.filters.selectedLocation.searchableText - EMPTY FOR COUNTRIES, SEND IT FOR DISTRICTS
+          }}
+        >
+          {({ data, loading, error }) => {
+            if (error) {
+              return (
+                <>
+                  <CompletenessDataTable
+                    loading={true}
+                    base={{
+                      baseType: COMPLETENESS_RATE_REPORT_BASE.LOCATION
+                    }}
+                    completenessRateTime={CompletenessRateTime.WithinTarget}
+                  />
+                  <GenericErrorToast />
+                </>
+              )
+            } else {
+              return (
+                <>
+                  <CompletenessDataTable
+                    loading={loading}
+                    base={{
+                      baseType: COMPLETENESS_RATE_REPORT_BASE.LOCATION
+                    }}
+                    data={data && data.fetchLocationWiseEventMetrics}
+                    eventType={filters.event}
+                    completenessRateTime={CompletenessRateTime.WithinTarget}
+                  />
+                </>
+              )
+            }
+          }}
+        </Query>
+      </>
+    )
+  }
 }

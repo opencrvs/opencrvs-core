@@ -74,6 +74,7 @@ import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
 import { ExportReportButton } from './ExportReportButton'
+import { createRef, RefObject, useRef } from 'react'
 
 const Layout = styled.div`
   display: flex;
@@ -455,23 +456,13 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       return (
                         <>
                           {!officeSelected && (
-                            <>
-                              <ExportReportButton
-                                selectedLocation={this.state.selectedLocation}
-                                event={this.state.event}
-                                timeStart={this.state.timeStart}
-                                timeEnd={this.state.timeEnd}
-                                officeSelected={this.state.officeSelected}
-                                data={data!.getTotalMetrics}
-                              />
-                              <CompletenessReport
-                                data={data!.getTotalMetrics}
-                                selectedEvent={
-                                  event.toUpperCase() as 'BIRTH' | 'DEATH'
-                                }
-                                onClickDetails={this.onClickDetails}
-                              />
-                            </>
+                            <CompletenessReport
+                              data={data!.getTotalMetrics}
+                              selectedEvent={
+                                event.toUpperCase() as 'BIRTH' | 'DEATH'
+                              }
+                              onClickDetails={this.onClickDetails}
+                            />
                           )}
                           <RegistrationsReport
                             data={data!.getTotalMetrics}
@@ -659,6 +650,52 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     </ResponsiveModalContent>
                   </ResponsiveModal>
                   <LayoutRight>
+                    {/* TODO: Share the results of this query from above rather than calling it twice */}
+                    <Query
+                      query={PERFORMANCE_METRICS}
+                      fetchPolicy="no-cache"
+                      variables={
+                        this.state.selectedLocation &&
+                        !isCountry(this.state.selectedLocation)
+                          ? {
+                              ...queryVariablesWithoutLocationId,
+                              locationId: this.state.selectedLocation.id
+                            }
+                          : queryVariablesWithoutLocationId
+                      }
+                    >
+                      {({
+                        loading,
+                        error,
+                        data
+                      }: {
+                        loading: boolean
+                        error?: ApolloError
+                        data?: IMetricsQueryResult
+                      }) => {
+                        if (error) {
+                          return <GenericErrorToast />
+                        }
+
+                        if (loading) {
+                          return (
+                            <Spinner id="performance-home-loading" size={24} />
+                          )
+                        }
+
+                        return (
+                          <ExportReportButton
+                            selectedLocation={this.state.selectedLocation}
+                            event={this.state.event}
+                            timeStart={this.state.timeStart}
+                            timeEnd={this.state.timeEnd}
+                            officeSelected={this.state.officeSelected}
+                            data={data!.getTotalMetrics}
+                          />
+                        )
+                      }}
+                    </Query>
+
                     {!officeSelected && (
                       <LocationStats>
                         {!isOnline ? null : loading ? (

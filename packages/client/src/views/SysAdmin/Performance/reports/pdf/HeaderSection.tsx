@@ -61,7 +61,7 @@ export const HeaderSection = ({ filters, intl }: IHeaderSectionProps) => {
             label: intl.formatMessage(
               performanceMessages.reportExportedByLabel
             ),
-            value: "TODO: Get current user's name"
+            value: 'Jonathan Campbell'
           }
         ]}
       />
