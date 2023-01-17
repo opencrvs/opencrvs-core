@@ -39,34 +39,129 @@ import { vi, Mock } from 'vitest'
 
 export const mockRoles = {
   data: {
-    getRoles: [
-      { value: 'FIELD_AGENT', types: ['HOSPITAL', 'CHA'], __typename: 'Role' },
+    getSystemRoles: [
+      {
+        value: 'FIELD_AGENT',
+        roles: [
+          {
+            lang: 'en',
+            label: 'Healthcare Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Professionnel de Santé'
+          },
+          {
+            lang: 'en',
+            label: 'Police Officer'
+          },
+          {
+            lang: 'fr',
+            label: 'Agent de Police'
+          },
+          {
+            lang: 'en',
+            label: 'Social Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Travailleur Social'
+          },
+          {
+            lang: 'en',
+            label: 'Local Leader'
+          },
+          {
+            lang: 'fr',
+            label: 'Leader Local'
+          }
+        ],
+        __typename: 'Role'
+      },
       {
         value: 'REGISTRATION_AGENT',
-        types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'Registration Agent'
+          },
+          {
+            lang: 'fr',
+            label: "Agent d'enregistrement"
+          }
+        ],
         __typename: 'Role'
       },
       {
         value: 'LOCAL_REGISTRAR',
-        types: ['SECRETARY', 'CHAIRMAN', 'MAYOR'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'Local Registrar'
+          },
+          {
+            lang: 'fr',
+            label: 'Registraire local'
+          }
+        ],
         __typename: 'Role'
       },
       {
         value: 'LOCAL_SYSTEM_ADMIN',
-        types: ['LOCAL_SYSTEM_ADMIN'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'Local System_admin'
+          },
+          {
+            lang: 'fr',
+            label: 'Administrateur système local'
+          }
+        ],
         __typename: 'Role'
       },
       {
         value: 'NATIONAL_SYSTEM_ADMIN',
-        types: ['NATIONAL_SYSTEM_ADMIN'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'National System_admin'
+          },
+          {
+            lang: 'fr',
+            label: 'Administrateur système national'
+          }
+        ],
         __typename: 'Role'
       },
       {
         value: 'PERFORMANCE_MANAGEMENT',
-        types: ['HEALTH_DIVISION', 'ORG_DIVISION'],
+        roles: [
+          {
+            lang: 'en',
+            label: 'Performance Management'
+          },
+          {
+            lang: 'fr',
+            label: 'Gestion des performances'
+          }
+        ],
         __typename: 'Role'
       },
-      { value: 'API_USER', types: ['API_USER'], __typename: 'Role' }
+      {
+        value: 'NATIONAL_REGISTRAR',
+        roles: [
+          {
+            lang: 'en',
+            label: 'National Registrar'
+          },
+          {
+            lang: 'fr',
+            label: 'Registraire national'
+          }
+        ],
+        __typename: 'Role'
+      }
     ]
   }
 }
@@ -87,8 +182,8 @@ export const mockUsers = {
             }
           ],
           username: 'api.user',
+          systemRole: 'API_USER',
           role: 'API_USER',
-          type: 'API_USER',
           status: 'active',
           __typename: 'User'
         },
@@ -103,8 +198,8 @@ export const mockUsers = {
             }
           ],
           username: 'shahriar.nafis',
+          systemRole: 'LOCAL_SYSTEM_ADMIN',
           role: 'LOCAL_SYSTEM_ADMIN',
-          type: 'LOCAL_SYSTEM_ADMIN',
           status: 'active',
           __typename: 'User'
         },
@@ -119,8 +214,8 @@ export const mockUsers = {
             }
           ],
           username: 'mohamed.abu',
-          role: 'NATIONAL_REGISTRAR',
-          type: 'SECRETARY',
+          systemRole: 'NATIONAL_REGISTRAR',
+          role: 'SECRETARY',
           status: 'active',
           __typename: 'User'
         },
@@ -135,8 +230,8 @@ export const mockUsers = {
             }
           ],
           username: 'nasreen.pervin',
-          role: 'STATE_REGISTRAR',
-          type: 'MAYOR',
+          systemRole: 'STATE_REGISTRAR',
+          role: 'MAYOR',
           status: 'active',
           __typename: 'User'
         },
@@ -151,8 +246,8 @@ export const mockUsers = {
             }
           ],
           username: 'muid.khan',
-          role: 'DISTRICT_REGISTRAR',
-          type: 'MAYOR',
+          systemRole: 'DISTRICT_REGISTRAR',
+          role: 'MAYOR',
           status: 'active',
           __typename: 'User'
         },
@@ -167,8 +262,8 @@ export const mockUsers = {
             }
           ],
           username: 'mohammad.ashraful',
-          role: 'LOCAL_REGISTRAR',
-          type: 'CHAIRMAN',
+          systemRole: 'LOCAL_REGISTRAR',
+          role: 'CHAIRMAN',
           status: 'active',
           __typename: 'User'
         },
@@ -183,8 +278,8 @@ export const mockUsers = {
             }
           ],
           username: 'tamim.iqbal',
-          role: 'REGISTRATION_AGENT',
-          type: 'ENTREPENEUR',
+          systemRole: 'REGISTRATION_AGENT',
+          role: 'ENTREPENEUR',
           status: 'active',
           __typename: 'User'
         },
@@ -199,8 +294,8 @@ export const mockUsers = {
             }
           ],
           username: 'sakibal.hasan',
-          role: 'FIELD_AGENT',
-          type: 'CHA',
+          systemRole: 'FIELD_AGENT',
+          role: 'CHA',
           status: 'active',
           __typename: 'User'
         }
@@ -366,8 +461,8 @@ describe('edit user tests', () => {
               value: '101488192',
               __typename: 'Identifier'
             },
+            systemRole: 'API_USER',
             role: 'API_USER',
-            type: 'API_USER',
             status: 'active',
             underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',

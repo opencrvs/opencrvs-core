@@ -44,8 +44,8 @@ export interface IUserModelData {
   email: string
   mobile: string
   status: string
+  systemRole: string
   role: string
-  type: string
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
@@ -82,8 +82,8 @@ export interface IUserPayload
   > {
   id?: string
   identifiers: GQLUserIdentifierInput[]
+  systemRole: string
   role: string
-  type: string
   signature?: GQLSignatureInput
 }
 
@@ -91,7 +91,7 @@ export interface IUserSearchPayload {
   username?: string
   mobile?: string
   status?: string
-  role?: string
+  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count: number
@@ -185,7 +185,7 @@ export const userTypeResolvers: GQLResolver = {
         ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
         : {
             practitionerId: `Practitioner/${userModel.practitionerId}`,
-            practitionerRole: userModel.role
+            practitionerRole: userModel.systemRole
           }
 
       if (!practitionerId) {
@@ -204,7 +204,7 @@ export const userTypeResolvers: GQLResolver = {
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
       const signature =
-        userModel.role === 'FIELD_AGENT'
+        userModel.systemRole === 'FIELD_AGENT'
           ? null
           : signatureExtension && signatureExtension.valueSignature
 

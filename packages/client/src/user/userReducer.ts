@@ -37,7 +37,7 @@ import {
   GQLQuery,
   GQLUser,
   GQLLocation,
-  GQLRole
+  GQLLabel
 } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
@@ -76,13 +76,13 @@ const initialState: IUserFormState = {
 interface IUpdateUserFormFieldDefsAction {
   type: typeof UPDATE_FORM_FIELD_DEFINITIONS
   payload: {
-    data: GQLRole[]
+    data: GQLLabel[]
     queryData?: ApolloQueryResult<GQLQuery>
   }
 }
 
 export function updateUserFormFieldDefinitions(
-  data: GQLRole[],
+  data: GQLLabel[],
   queryData?: ApolloQueryResult<GQLQuery>
 ): IUpdateUserFormFieldDefsAction {
   return {
@@ -308,7 +308,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           loadingRoles: true
         },
         Cmd.run(alterRolesBasedOnUserRole, {
-          successActionCreator: (data: GQLRole[]) =>
+          successActionCreator: (data: GQLLabel[]) =>
             updateUserFormFieldDefinitions(data, fetchUserQueryData),
           args: [primaryOfficeId, Cmd.getState]
         })
@@ -321,46 +321,40 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       if (
         userQueryData &&
         userQueryData.data.getUser &&
-        userQueryData.data.getUser.role &&
-        userQueryData.data.getUser.type
+        userQueryData.data.getUser.systemRole &&
+        userQueryData.data.getUser.role
       ) {
         // This logic combined with the function alterRolesBasedOnUserRole
         // controls only showing unique user types in the case where 1 mayor should exist per location
         // this functionality may be reintroduced in the future.
         // for now types should only exist for field agents as per this requirement:
         //
-        const { role: existingRole, type: existingType } =
+        const { systemRole: existingSystemRole, role: existingRole } =
           userQueryData.data.getUser
-        const roleData = (
-          data as Array<{
-            value: string
-            types: string[]
-          }>
-        ).find(({ value }: { value: string }) => value === existingRole)
+        const roleData = data.find(
+          (item) => item.labels[0].label === existingSystemRole
+        )
 
-        if (roleData && !roleData.types.includes(existingType)) {
-          ;(
-            data as Array<{
-              value: string
-              types: string[]
-            }>
-          ).map((role) => {
-            if (role.value === existingRole) {
+        if (roleData && !roleData.labels[0].label.includes(existingRole)) {
+          data.map((role) => {
+            if (role.labels[0].label === existingSystemRole) {
               return {
                 ...role,
-                types: [existingRole, ...role.types]
+                types: [existingSystemRole, ...role.labels[0].label]
               }
             } else {
               return role
             }
           })
         } else if (!roleData) {
-          ;(
-            data as Array<{
-              value: string
-              types: string[]
-            }>
-          ).push({ value: existingRole, types: [existingType] })
+          data.push({
+            labels: [
+              {
+                lang: 'en',
+                label: existingSystemRole
+              }
+            ]
+          })
         }
       }
       updatedSections.forEach((section) => {

@@ -39,7 +39,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: String
+    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -136,14 +136,14 @@ type Query {
     skip: Int
     sort: String
   ): EventProgressResultSet
-  getRoles(
+  getSystemRoles(
     title: String
     value: ComparisonInput
-    type: String
+    role: String
     active: Boolean
     sortBy: String
     sortOrder: String
-  ): [Role]
+  ): [SystemRole!]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getFormDraft: [FormDraft!]
@@ -374,8 +374,8 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String!
-  role: RoleType!
-  type: String
+  systemRole: RoleType!
+  role: String!
   email: String
   status: Status!
   underInvestigation: Boolean
@@ -541,12 +541,11 @@ type EventProgressResultSet {
   totalItems: Int
 }
 
-type Role {
+type SystemRole {
   id: ID!
-  title: String
-  value: String
-  types: [String]
-  active: Boolean
+  value: String!
+  roles: [Role!]!
+  active: Boolean!
 }
 
 input ComparisonInput {
@@ -678,8 +677,8 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String!
-  role: RoleType!
-  type: String
+  systemRole: RoleType!
+  role: String
   email: String
   primaryOffice: String
   catchmentArea: [String]
@@ -1053,7 +1052,7 @@ type BookmarkedSeachItem {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  type: String
+  role: String
   status: Status
   avatar: Avatar
   primaryOfficeId: String
@@ -1131,6 +1130,10 @@ type EventProgressSet {
   startedByFacility: String
   startedAt: Date
   progressReport: EventProgressData
+}
+
+type Role {
+  labels: [RoleLabel!]!
 }
 
 enum DraftStatus {
@@ -1643,6 +1646,11 @@ type EventProgressData {
   timeInWaitingForApproval: Int
   timeInWaitingForBRIS: Int
   timeInReadyToPrint: Int
+}
+
+type RoleLabel {
+  lang: String!
+  label: String!
 }
 
 type FormDatasetOptionLabel {

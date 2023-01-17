@@ -109,7 +109,7 @@ export const createFhirPractitionerRole = (
           coding: [
             {
               system: `http://opencrvs.org/specs/roles`,
-              code: user.role
+              code: user.systemRole
             }
           ]
         },
@@ -117,7 +117,7 @@ export const createFhirPractitionerRole = (
           coding: [
             {
               system: `http://opencrvs.org/specs/types`,
-              code: user.type
+              code: user.role
             }
           ]
         }

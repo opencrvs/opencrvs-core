@@ -46,8 +46,8 @@ export interface IUserDetails {
   userMgntUserID?: string
   practitionerId?: string
   mobile?: string
+  systemRole?: string
   role?: string
-  type?: string
   status?: string
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
@@ -68,7 +68,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     name,
     mobile,
     role,
-    type,
+    systemRole,
     status,
     userMgntUserID,
     practitionerId,
@@ -95,8 +95,8 @@ export function getUserDetails(user: GQLUser): IUserDetails {
   if (role) {
     userDetails.role = role
   }
-  if (type) {
-    userDetails.type = type
+  if (systemRole) {
+    userDetails.systemRole = systemRole
   }
   if (status) {
     userDetails.status = status

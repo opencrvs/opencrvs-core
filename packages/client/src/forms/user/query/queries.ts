@@ -12,11 +12,16 @@
 import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
 
-export const getRolesQuery = gql`
-  query getRoles($value: ComparisonInput) {
-    getRoles(active: true, value: $value) {
+export const getSystemRolesQuery = gql`
+  query getSystemRoles($value: ComparisonInput) {
+    getSystemRoles(active: true, value: $value) {
       value
-      types
+      roles {
+        labels {
+          lang
+          label
+        }
+      }
     }
   }
 `
@@ -24,7 +29,7 @@ async function fetchRoles(criteria = {}) {
   return (
     client &&
     client.query({
-      query: getRolesQuery,
+      query: getSystemRolesQuery,
       variables: criteria,
       fetchPolicy: 'no-cache'
     })

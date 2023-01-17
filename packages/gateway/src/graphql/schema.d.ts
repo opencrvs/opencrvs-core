@@ -46,7 +46,7 @@ export interface GQLQuery {
   getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
-  getRoles?: Array<GQLRole | null>
+  getSystemRoles?: Array<GQLSystemRole>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG | null>
   getFormDraft?: Array<GQLFormDraft>
@@ -242,8 +242,8 @@ export interface GQLUser {
   name: Array<GQLHumanName>
   username?: string
   mobile: string
-  role: GQLRoleType
-  type?: string
+  systemRole: GQLRoleType
+  role?: string
   email?: string
   status: GQLStatus
   underInvestigation?: boolean
@@ -422,12 +422,11 @@ export interface GQLEventProgressResultSet {
   totalItems?: number
 }
 
-export interface GQLRole {
+export interface GQLSystemRole {
   id: string
-  title?: string
-  value?: string
-  types?: Array<string | null>
-  active?: boolean
+  value: string
+  roles: Array<GQLLabel>
+  active: boolean
 }
 
 export interface GQLComparisonInput {
@@ -559,8 +558,8 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile: string
-  role: GQLRoleType
-  type?: string
+  systemRole: GQLRoleType
+  role?: string
   email?: string
   primaryOffice?: string
   catchmentArea?: Array<string | null>
@@ -934,7 +933,7 @@ export interface GQLBookmarkedSeachItem {
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
-  type?: string
+  role?: string
   status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string
@@ -1034,6 +1033,10 @@ export interface GQLEventProgressSet {
   startedByFacility?: string
   startedAt?: GQLDate
   progressReport?: GQLEventProgressData
+}
+
+export interface GQLLabel {
+  labels: Array<GQLRole>
 }
 
 export const enum GQLDraftStatus {
@@ -1549,6 +1552,11 @@ export interface GQLEventProgressData {
   timeInReadyToPrint?: number
 }
 
+export interface GQLRole {
+  lang: string
+  label: string
+}
+
 export interface GQLFormDatasetOptionLabel {
   lang: string
   descriptor: GQLMesssageDescriptor
@@ -1800,7 +1808,7 @@ export interface GQLResolver {
   UserAuditLogResultSet?: GQLUserAuditLogResultSetTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
-  Role?: GQLRoleTypeResolver
+  SystemRole?: GQLSystemRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
   FormDraft?: GQLFormDraftTypeResolver
   System?: GQLSystemTypeResolver
@@ -1846,6 +1854,7 @@ export interface GQLResolver {
   }
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
+  Label?: GQLLabelTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   FormDatasetOption?: GQLFormDatasetOptionTypeResolver
@@ -1870,6 +1879,7 @@ export interface GQLResolver {
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
+  Role?: GQLRoleTypeResolver
   FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
@@ -1916,7 +1926,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
-  getRoles?: QueryToGetRolesResolver<TParent>
+  getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   getFormDraft?: QueryToGetFormDraftResolver<TParent>
@@ -2204,7 +2214,7 @@ export interface QueryToSearchUsersArgs {
   username?: string
   mobile?: string
   status?: string
-  role?: string
+  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count?: number
@@ -2472,18 +2482,18 @@ export interface QueryToGetEventsWithProgressResolver<
   ): TResult
 }
 
-export interface QueryToGetRolesArgs {
+export interface QueryToGetSystemRolesArgs {
   title?: string
   value?: GQLComparisonInput
-  type?: string
+  role?: string
   active?: boolean
   sortBy?: string
   sortOrder?: string
 }
-export interface QueryToGetRolesResolver<TParent = any, TResult = any> {
+export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToGetRolesArgs,
+    args: QueryToGetSystemRolesArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3883,8 +3893,8 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
+  systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
-  type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
@@ -3923,11 +3933,11 @@ export interface UserToMobileResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToRoleResolver<TParent = any, TResult = any> {
+export interface UserToSystemRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToTypeResolver<TParent = any, TResult = any> {
+export interface UserToRoleResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4381,31 +4391,26 @@ export interface EventProgressResultSetToTotalItemsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLRoleTypeResolver<TParent = any> {
-  id?: RoleToIdResolver<TParent>
-  title?: RoleToTitleResolver<TParent>
-  value?: RoleToValueResolver<TParent>
-  types?: RoleToTypesResolver<TParent>
-  active?: RoleToActiveResolver<TParent>
+export interface GQLSystemRoleTypeResolver<TParent = any> {
+  id?: SystemRoleToIdResolver<TParent>
+  value?: SystemRoleToValueResolver<TParent>
+  roles?: SystemRoleToRolesResolver<TParent>
+  active?: SystemRoleToActiveResolver<TParent>
 }
 
-export interface RoleToIdResolver<TParent = any, TResult = any> {
+export interface SystemRoleToIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToTitleResolver<TParent = any, TResult = any> {
+export interface SystemRoleToValueResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToValueResolver<TParent = any, TResult = any> {
+export interface SystemRoleToRolesResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToTypesResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface RoleToActiveResolver<TParent = any, TResult = any> {
+export interface SystemRoleToActiveResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5453,7 +5458,7 @@ export interface BookmarkedSeachItemToParametersResolver<
 export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   practitionerId?: SearchFieldAgentResponseToPractitionerIdResolver<TParent>
   fullName?: SearchFieldAgentResponseToFullNameResolver<TParent>
-  type?: SearchFieldAgentResponseToTypeResolver<TParent>
+  role?: SearchFieldAgentResponseToRoleResolver<TParent>
   status?: SearchFieldAgentResponseToStatusResolver<TParent>
   avatar?: SearchFieldAgentResponseToAvatarResolver<TParent>
   primaryOfficeId?: SearchFieldAgentResponseToPrimaryOfficeIdResolver<TParent>
@@ -5478,7 +5483,7 @@ export interface SearchFieldAgentResponseToFullNameResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface SearchFieldAgentResponseToTypeResolver<
+export interface SearchFieldAgentResponseToRoleResolver<
   TParent = any,
   TResult = any
 > {
@@ -5788,6 +5793,14 @@ export interface EventProgressSetToProgressReportResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLLabelTypeResolver<TParent = any> {
+  labels?: LabelToLabelsResolver<TParent>
+}
+
+export interface LabelToLabelsResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -7097,6 +7110,19 @@ export interface EventProgressDataToTimeInReadyToPrintResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLRoleTypeResolver<TParent = any> {
+  lang?: RoleToLangResolver<TParent>
+  label?: RoleToLabelResolver<TParent>
+}
+
+export interface RoleToLangResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RoleToLabelResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

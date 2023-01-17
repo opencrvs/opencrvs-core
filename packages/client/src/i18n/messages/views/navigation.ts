@@ -30,6 +30,7 @@ interface INavigationMessages
   form: MessageDescriptor
   integration: MessageDescriptor
   communications: MessageDescriptor
+  userroles: MessageDescriptor
   informantnotification: MessageDescriptor
   outbox: MessageDescriptor
 }
@@ -119,6 +120,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Communications',
     description: 'Communications label in navigation',
     id: 'navigation.communications'
+  },
+  userroles: {
+    defaultMessage: 'User roles',
+    description: 'User roles label in navigation',
+    id: 'navigation.userroles'
   },
   informantnotification: {
     defaultMessage: 'Informant notifications',

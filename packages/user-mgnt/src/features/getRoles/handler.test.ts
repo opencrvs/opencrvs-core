@@ -31,36 +31,191 @@ const token = jwt.sign(
 )
 const dummyRoleList = [
   {
-    title: 'Field Agent',
+    _id: '63a06b979538ca7ab52f9759',
+    active: true,
     value: 'FIELD_AGENT',
-    types: ['Hospital', 'CHA'],
-    active: true,
-    creationDate: 1559054406433
+    creationDate: 1671457687106,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Healthcare Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Professionnel de Santé'
+          }
+        ]
+      },
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Police Officer'
+          },
+          {
+            lang: 'fr',
+            label: 'Agent de Police'
+          }
+        ]
+      },
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Social Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Travailleur Social'
+          }
+        ]
+      },
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Local Leader'
+          },
+          {
+            lang: 'fr',
+            label: 'Leader Local'
+          }
+        ]
+      }
+    ]
   },
   {
-    title: 'Registration Agent',
+    _id: '63a06b979538ca7ab52f975a',
+    active: true,
     value: 'REGISTRATION_AGENT',
-    types: ['Entrepeneur', 'Data entry clerk'],
-    active: true,
-    creationDate: 1559054406444
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Registration Agent'
+          },
+          {
+            lang: 'fr',
+            label: "Agent d'enregistrement"
+          }
+        ]
+      }
+    ]
   },
   {
-    title: 'Registrar',
-    value: 'LOCAL_REGISTRAR',
-    types: ['Secretary', 'Chairman', 'Mayor'],
+    _id: '63a06b979538ca7ab52f975b',
     active: true,
-    creationDate: 1559054406455
+    value: 'LOCAL_REGISTRAR',
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Local Registrar'
+          },
+          {
+            lang: 'fr',
+            label: 'Registraire local'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: '63a06b979538ca7ab52f975c',
+    active: true,
+    value: 'LOCAL_SYSTEM_ADMIN',
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Local System_admin'
+          },
+          {
+            lang: 'fr',
+            label: 'Administrateur système local'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: '63a06b979538ca7ab52f975d',
+    active: true,
+    value: 'NATIONAL_SYSTEM_ADMIN',
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'National System_admin'
+          },
+          {
+            lang: 'fr',
+            label: 'Administrateur système national'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: '63a06b979538ca7ab52f975e',
+    active: true,
+    value: 'PERFORMANCE_MANAGEMENT',
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Performance Management'
+          },
+          {
+            lang: 'fr',
+            label: 'Gestion des performances'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: '63a06b979538ca7ab52f975f',
+    active: true,
+    value: 'NATIONAL_REGISTRAR',
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'National Registrar'
+          },
+          {
+            lang: 'fr',
+            label: 'Registraire national'
+          }
+        ]
+      }
+    ]
   }
 ]
 
-describe('getRoles tests', () => {
+describe('getSystemRoles tests', () => {
   it('Successfully returns full role list', async () => {
     Role.find = jest.fn().mockReturnValue(dummyRoleList)
     Role.find().sort = jest.fn().mockReturnValue(dummyRoleList)
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/getRoles',
+      url: '/getSystemRoles',
       payload: {},
       headers: {
         Authorization: `Bearer ${token}`
@@ -75,13 +230,12 @@ describe('getRoles tests', () => {
 
     const res = await server.server.inject({
       method: 'POST',
-      url: '/getRoles',
+      url: '/getSystemRoles',
       payload: {
         sortBy: '_id',
         sortOrder: 'desc',
-        title: 'Registrar',
         value: { $eq: 'LOCAL_REGISTRAR' },
-        type: 'Mayor',
+        role: 'Mayor',
         active: true
       },
       headers: {

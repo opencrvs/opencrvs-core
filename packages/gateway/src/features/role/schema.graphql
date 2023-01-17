@@ -7,18 +7,35 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
+
 input RoleInput {
-  title: String
+  lang: String
+  label: String
+}
+
+input LabelInput {
+  labels: [RoleInput]
+}
+
+input SystemRoleInput {
   value: String
-  types: [String]
+  roles: [LabelInput]
+}
+
+type RoleLabel {
+  lang: String!
+  label: String!
 }
 
 type Role {
+  labels: [RoleLabel!]!
+}
+
+type SystemRole {
   id: ID!
-  title: String
-  value: String
-  types: [String]
-  active: Boolean
+  value: String!
+  roles: [Role!]!
+  active: Boolean!
 }
 
 input ComparisonInput {
@@ -33,12 +50,12 @@ input ComparisonInput {
 }
 
 type Query {
-  getRoles(
+  getSystemRoles(
     title: String
     value: ComparisonInput
-    type: String
+    role: String
     active: Boolean
     sortBy: String
     sortOrder: String
-  ): [Role]
+  ): [SystemRole!]
 }

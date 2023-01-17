@@ -41,16 +41,16 @@ export function isOfflineDataLoaded(
 export function isSystemAdmin(userDetails: IUserDetails | undefined) {
   return (
     userDetails &&
-    userDetails.role &&
-    SYS_ADMIN_ROLES.includes(userDetails.role)
+    userDetails.systemRole &&
+    SYS_ADMIN_ROLES.includes(userDetails.systemRole)
   )
 }
 
 export function isNationalSystemAdmin(userDetails: IUserDetails | undefined) {
   return (
     userDetails &&
-    userDetails.role &&
-    NATL_ADMIN_ROLES.includes(userDetails.role)
+    userDetails.systemRole &&
+    NATL_ADMIN_ROLES.includes(userDetails.systemRole)
   )
 }
 

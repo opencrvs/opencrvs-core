@@ -73,12 +73,12 @@ export default async function updateUser(
   existingUser.localRegistrar = user.localRegistrar
   existingUser.device = user.device
   let changingRole = false
-  if (existingUser.role !== user.role) {
+  if (existingUser.systemRole !== user.systemRole) {
     changingRole = true
-    existingUser.role = user.role
+    existingUser.systemRole = user.systemRole
     // Updating user sope
     const userScopes: string[] =
-      roleScopeMapping[existingUser.role || 'FIELD_AGENT']
+      roleScopeMapping[existingUser.systemRole || 'FIELD_AGENT']
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')
@@ -87,18 +87,18 @@ export default async function updateUser(
     }
     existingUser.scope = userScopes
   }
-  existingUser.type = user.type
+  existingUser.role = user.role
 
-  if (existingUser.role === 'FIELD_AGENT') {
+  if (existingUser.systemRole === 'FIELD_AGENT') {
     if (
-      !existingUser.type ||
-      !Object.values(FIELD_AGENT_TYPES).includes(existingUser.type)
+      !existingUser.role ||
+      !Object.values(FIELD_AGENT_TYPES).includes(existingUser.role)
     ) {
-      return h.response('Type not supported for this user').code(403)
+      return h.response('Role not supported for this user').code(403)
     }
   } else {
-    if (existingUser.type) {
-      return h.response('Type not supported for this user').code(403)
+    if (existingUser.role) {
+      return h.response('Role not supported for this user').code(403)
     }
   }
 

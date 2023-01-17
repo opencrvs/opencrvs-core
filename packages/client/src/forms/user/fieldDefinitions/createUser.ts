@@ -182,7 +182,7 @@ export const userSectionFormType: ISerializedFormSection = {
           conditionals: []
         },
         {
-          name: 'role',
+          name: 'systemRole',
           type: SELECT_WITH_OPTIONS,
           label: userFormMessages.labelRole,
           required: true,
@@ -220,20 +220,20 @@ export const userSectionFormType: ISerializedFormSection = {
           ]
         },
         {
-          name: 'type',
+          name: 'role',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
           label: userFormMessages.type,
           required: true,
           initialValue: '',
           validate: [],
           dynamicOptions: {
-            dependency: 'role',
+            dependency: 'systemRole',
             options: {}
           },
           conditionals: [
             {
               action: 'hide',
-              expression: '(values.role!="FIELD_AGENT")'
+              expression: '(values.systemRole!="FIELD_AGENT")'
             }
           ]
         },
@@ -254,7 +254,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           action: 'hide',
           expression:
-            'values.role!=="LOCAL_REGISTRAR" && values.role!=="NATIONAL_REGISTRAR"'
+            'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
         }
       ],
       fields: [

@@ -242,8 +242,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ]
         }
       } else if (
-        this.props.userDetails?.role &&
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role)
+        this.props.userDetails?.systemRole &&
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole)
       ) {
         return {
           mobileLeft: [
@@ -276,8 +276,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         }
       }
     } else if (
-      this.props.userDetails?.role &&
-      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
+      this.props.userDetails?.systemRole &&
+      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
     ) {
       return {
         mobileLeft: [
@@ -323,7 +323,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   isLandingPage = () => {
-    const role = this.props.userDetails && this.props.userDetails.role
+    const role = this.props.userDetails && this.props.userDetails.systemRole
     const location = this.props.history.location.pathname
     if (
       (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
@@ -400,7 +400,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
         navigationList={
-          FIELD_AGENT_ROLES.includes(this.props.userDetails?.role as string)
+          FIELD_AGENT_ROLES.includes(
+            this.props.userDetails?.systemRole as string
+          )
             ? undefined
             : navigationList
         }
@@ -413,8 +415,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   goToTeamView(props: IFullProps) {
     const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
-    if (userDetails && userDetails.role) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+    if (userDetails && userDetails.systemRole) {
+      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
         return goToTeamSearchAction()
       } else {
         return goToTeamUserListAction(
@@ -426,8 +428,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   goToPerformanceView(props: IFullProps) {
     const { userDetails, goToPerformanceHomeAction } = props
-    if (userDetails && userDetails.role) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+    if (userDetails && userDetails.systemRole) {
+      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
         return goToPerformanceHomeAction()
       } else {
         const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
@@ -470,8 +472,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         element: (
           <>
             {!(
-              this.props.userDetails?.role &&
-              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
+              this.props.userDetails?.systemRole &&
+              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
             ) && (
               <HeaderCenter>
                 <StyledPrimaryButton
@@ -498,8 +500,10 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     if (
       activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
-      (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))
+      (NATL_ADMIN_ROLES.includes(
+        this.props.userDetails?.systemRole as string
+      ) ||
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole as string))
     ) {
       rightMenu = [
         {

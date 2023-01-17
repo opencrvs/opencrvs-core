@@ -20,8 +20,8 @@ export const FETCH_USER = gql`
       userMgntUserID
       practitionerId
       mobile
+      systemRole
       role
-      type
       status
       name {
         use

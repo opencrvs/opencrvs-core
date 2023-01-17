@@ -12,51 +12,46 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
-import Role from '@user-mgnt/model/role'
+import SystemRole from '@user-mgnt/model/role'
 import { SortOrder } from 'mongoose'
 
 interface IVerifyPayload {
-  title?: string
   value?: string
-  type?: string
+  role?: string
   active?: boolean
   sortBy?: string
   sortOrder?: SortOrder
 }
 
-export default async function getRoles(
+export default async function getSystemRoles(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const {
-    title,
     value,
-    type,
+    role,
     active,
     sortBy = 'creationDate',
     sortOrder = 'asc'
   } = request.payload as IVerifyPayload
   let criteria = {}
-  if (title) {
-    criteria = { ...criteria, title }
-  }
+
   if (value) {
     criteria = { ...criteria, value }
   }
-  if (type) {
-    criteria = { ...criteria, types: type }
+  if (role) {
+    criteria = { ...criteria, 'roles.labels.label': role }
   }
   if (active !== undefined) {
     criteria = { ...criteria, active }
   }
 
-  return await Role.find(criteria).sort({
+  return await SystemRole.find(criteria).sort({
     [sortBy]: sortOrder
   })
 }
 
 export const searchRoleSchema = Joi.object({
-  title: Joi.string().optional(),
   value: Joi.object({
     $eq: Joi.string().optional(),
     $gt: Joi.string().optional(),
@@ -67,7 +62,7 @@ export const searchRoleSchema = Joi.object({
     $in: Joi.array().items(Joi.string()).optional(),
     $nin: Joi.array().items(Joi.string()).optional()
   }).optional(),
-  type: Joi.string().optional(),
+  role: Joi.string().optional(),
   active: Joi.boolean().optional(),
   sortBy: Joi.string().optional(),
   sortOrder: Joi.string().valid('asc', 'desc').optional()
