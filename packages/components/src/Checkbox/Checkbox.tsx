@@ -14,22 +14,25 @@ import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
 
 const Wrapper = styled.li`
-  padding-top: 5px;
-  padding-bottom: 5px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   list-style-type: none;
   display: flex;
   align-items: center;
+  position: relative;
 `
 
 const Label = styled.label`
   position: relative;
-  margin-left: 16px;
+  cursor: pointer;
+  padding-left: 15px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
 `
 
 const Check = styled.span<{ size?: string }>`
   display: inline-block;
+  border-radius: 4px;
   background: ${({ theme }) => theme.colors.copy};
   ${({ size }) =>
     size === 'large'
@@ -50,12 +53,13 @@ const Check = styled.span<{ size?: string }>`
         ? `height: 36px;
     width: 36px;`
         : ` height: 16px;
-    width: 16px;`}
+    width: 17px;`}
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     transition: background 0.25s linear;
     -webkit-transition: background 0.25s linear;
+    border-radius: 2px;
   }
   &:focus {
     ${({ size }) =>
@@ -82,8 +86,30 @@ const Input = styled.input`
   opacity: 0;
   z-index: 2;
   cursor: pointer;
+
+  &:active ~ ${Check} {
+    &::after {
+      border-radius: 4px;
+      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
+    }
+  }
+
   &:focus ~ ${Check} {
-    box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
+    &::after {
+      box-sizing: content-box;
+      border-radius: 4px;
+      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
+    }
+  }
+  &:hover ~ ${Check} {
+    &::after {
+      box-sizing: content-box;
+      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme, disabled }) => theme.colors.grey300} 0 0 0 8px;
+      border-radius: 6px;
+    }
   }
 `
 type Size = 'large' | 'small'

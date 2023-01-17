@@ -52,6 +52,7 @@ export interface IApplicationConfigurationModel extends Document {
   DATE_OF_BIRTH_UNKNOWN: boolean
   INFORMANT_SIGNATURE: boolean
   INFORMANT_SIGNATURE_REQUIRED: boolean
+  ADMIN_LEVELS: number
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -130,7 +131,17 @@ const configSchema = new Schema({
   },
   DATE_OF_BIRTH_UNKNOWN: { type: Boolean, required: true, default: false },
   INFORMANT_SIGNATURE: { type: Boolean, required: true, default: true },
-  INFORMANT_SIGNATURE_REQUIRED: { type: Boolean, required: true, default: true }
+  INFORMANT_SIGNATURE_REQUIRED: {
+    type: Boolean,
+    required: true,
+    default: true
+  },
+  ADMIN_LEVELS: {
+    type: Number,
+    required: true,
+    enum: [1, 2, 3, 4, 5],
+    default: 2
+  }
 })
 
 export default model<IApplicationConfigurationModel>('Config', configSchema)

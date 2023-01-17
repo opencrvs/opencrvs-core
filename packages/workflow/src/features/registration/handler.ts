@@ -104,7 +104,10 @@ function getSectionIndex(
 ): number | undefined {
   let index
   section.filter((obj: fhir.CompositionSection, i: number) => {
-    if (obj.title && obj.title === 'Birth encounter') {
+    if (
+      obj.title &&
+      ['Birth encounter', 'Death encounter'].includes(obj.title)
+    ) {
       index = i
     }
   })
@@ -162,9 +165,10 @@ export async function createRegistrationHandler(
   event: Events
 ) {
   try {
+    const token = getToken(request)
     let payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
-      getToken(request)
+      token
     )
     if (
       event ===
@@ -174,16 +178,13 @@ export async function createRegistrationHandler(
     ) {
       payload = await markBundleAsWaitingValidation(
         payload as fhir.Bundle,
-        getToken(request)
+        token
       )
     } else if (
       event === Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION ||
       event === Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION
     ) {
-      payload = await markBundleAsValidated(
-        payload as fhir.Bundle,
-        getToken(request)
-      )
+      payload = await markBundleAsValidated(payload as fhir.Bundle, token)
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)

@@ -18,11 +18,14 @@ import fetch from 'node-fetch'
 export const locationService = async (query: any) => {
   const queryObj = { ...query, _count: 0 }
 
-  const locations = await fetch(
-    `${GATEWAY_URL}location?${Object.keys(queryObj)
+  const locationUrl = new URL(
+    `location?${Object.keys(queryObj)
       .map((key) => key + '=' + queryObj[key])
-      .join('&')}`
-  )
+      .join('&')}`,
+    GATEWAY_URL
+  ).toString()
+
+  const locations = await fetch(locationUrl)
   const facilities = await locations.json()
 
   return facilities.entry.map((i: any) => ({

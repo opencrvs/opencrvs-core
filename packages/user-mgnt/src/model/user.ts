@@ -130,12 +130,12 @@ export interface IAvatar {
 export interface IUser {
   name: IUserName[]
   username: string
-  identifiers?: IIdentifier[]
-  email?: string
+  identifiers: IIdentifier[]
+  email: string
   mobile: string
   passwordHash: string
   salt: string
-  role?: string
+  role: string
   type?: FIELD_AGENT_TYPES
   practitionerId: string
   primaryOfficeId: string
@@ -145,7 +145,7 @@ export interface IUser {
   localRegistrar?: ILocalRegistrar
   status: string
   device?: string
-  securityQuestionAnswers?: ISecurityQuestionAnswer[]
+  securityQuestionAnswers: ISecurityQuestionAnswer[]
   creationDate: number
   auditHistory?: IAuditHistory[]
   avatar?: IAvatar

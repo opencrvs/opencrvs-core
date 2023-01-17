@@ -55,7 +55,8 @@ import {
   VS_EXPORTS,
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST
+  PERFORMANCE_REGISTRATIONS_LIST,
+  INFORMANT_NOTIFICATION
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -77,8 +78,10 @@ import {
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
-import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import startOfMonth from 'date-fns/startOfMonth'
+import subMonths from 'date-fns/subMonths'
+
 export interface IDynamicValues {
   [key: string]: any
 }
@@ -172,6 +175,11 @@ export function goToHome() {
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
+
+export function goToInformantNotification() {
+  return push(INFORMANT_NOTIFICATION)
+}
+
 export function goToVSExport() {
   return push(VS_EXPORTS)
 }
@@ -221,7 +229,7 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
 }
 
 export function goToPerformanceHome(
-  timeStart: Date = subYears(new Date(Date.now()), 1),
+  timeStart: Date = startOfMonth(subMonths(new Date(Date.now()), 11)),
   timeEnd: Date = new Date(Date.now()),
   locationId?: string
 ) {

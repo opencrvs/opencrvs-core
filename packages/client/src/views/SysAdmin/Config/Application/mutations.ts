@@ -26,6 +26,7 @@ const applicationConfigMutation = gql`
       INFORMANT_SIGNATURE
       INFORMANT_SIGNATURE_REQUIRED
       ADDRESSES
+      ADMIN_LEVELS
       COUNTRY_LOGO {
         fileName
         file

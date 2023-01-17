@@ -56,10 +56,10 @@ interface Window {
     LOGROCKET: string
     SENTRY: string
     ADDRESSES: number
-    INTEGRATIONS: any[]
     DATE_OF_BIRTH_UNKNOWN: boolean
     INFORMANT_SIGNATURE: boolean
     INFORMANT_SIGNATURE_REQUIRED: boolean
+    ADMIN_LEVELS: number
   }
   __localeId__: string
 }

@@ -14,8 +14,7 @@ import {
   GQLCurrencyInput,
   GQLDeathInput,
   GQLCountryLogoInput,
-  GQLResolver,
-  GQLIntegrationInput
+  GQLResolver
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
@@ -48,12 +47,12 @@ export const resolvers: GQLResolver = {
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
         ADDRESSES: applicationConfig.ADDRESSES as number,
-        INTEGRATIONS: applicationConfig.INTEGRATIONS as GQLIntegrationInput[],
         DATE_OF_BIRTH_UNKNOWN:
           applicationConfig.DATE_OF_BIRTH_UNKNOWN as boolean,
         INFORMANT_SIGNATURE: applicationConfig.INFORMANT_SIGNATURE as boolean,
         INFORMANT_SIGNATURE_REQUIRED:
-          applicationConfig.INFORMANT_SIGNATURE_REQUIRED as boolean
+          applicationConfig.INFORMANT_SIGNATURE_REQUIRED as boolean,
+        ADMIN_LEVELS: applicationConfig.ADMIN_LEVELS as number
       }
 
       const res = await fetch(

@@ -52,6 +52,7 @@ export interface GQLQuery {
   getFormDraft?: Array<GQLFormDraft>
   fetchSystem?: GQLSystem
   getFormDataset?: Array<GQLFormDataset>
+  informantSMSNotifications?: Array<GQLSMSNotification>
 }
 
 export interface GQLMutation {
@@ -99,6 +100,7 @@ export interface GQLMutation {
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
   createFormDataset?: GQLFormDatasetResponse
+  toggleInformantSMSNotification?: Array<GQLSMSNotification>
 }
 
 export interface GQLDummy {
@@ -236,23 +238,23 @@ export interface GQLLocation {
 }
 
 export interface GQLUser {
-  id?: string
-  userMgntUserID?: string
-  practitionerId?: string
-  name?: Array<GQLHumanName | null>
+  id: string
+  userMgntUserID: string
+  practitionerId: string
+  name: Array<GQLHumanName>
   username?: string
-  mobile?: string
-  role?: string
+  mobile: string
+  role: GQLRoleType
   type?: string
   email?: string
-  status?: string
+  status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
-  creationDate?: string
+  creationDate: string
   avatar?: GQLAvatar
   device?: string
   searches?: Array<GQLBookmarkedSeachItem | null>
@@ -480,6 +482,15 @@ export interface GQLFormDataset {
   _id?: string
 }
 
+export interface GQLSMSNotification {
+  id?: string
+  name: string
+  message: string
+  enabled: boolean
+  updatedAt: string
+  createdAt: string
+}
+
 export interface GQLNotificationInput {
   child?: GQLPersonInput
   mother?: GQLPersonInput
@@ -546,11 +557,11 @@ export interface GQLDeathRegistrationInput {
 
 export interface GQLUserInput {
   id?: string
-  name?: Array<GQLHumanNameInput | null>
+  name: Array<GQLHumanNameInput>
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
-  mobile?: string
-  role?: string
+  mobile: string
+  role: GQLRoleType
   type?: string
   email?: string
   primaryOffice?: string
@@ -597,10 +608,10 @@ export interface GQLApplicationConfiguration {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
-  INTEGRATIONS?: Array<GQLIntegration | null>
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
   DATE_OF_BIRTH_UNKNOWN?: boolean
+  ADMIN_LEVELS?: number
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -615,10 +626,10 @@ export interface GQLApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
-  INTEGRATIONS?: Array<GQLIntegrationInput | null>
   INFORMANT_SIGNATURE?: boolean
   INFORMANT_SIGNATURE_REQUIRED?: boolean
   DATE_OF_BIRTH_UNKNOWN?: boolean
+  ADMIN_LEVELS?: number
 }
 
 export interface GQLFormDraftInput {
@@ -676,6 +687,12 @@ export interface GQLFormDatasetResponse {
 export interface GQLFormDatasetInput {
   fileName: string
   base64Data: string
+}
+
+export interface GQLSMSNotificationInput {
+  id: string
+  name: string
+  enabled: boolean
 }
 
 export type GQLMap = any
@@ -891,9 +908,26 @@ export const enum GQLLocationType {
   OTHER = 'OTHER'
 }
 
+export const enum GQLRoleType {
+  FIELD_AGENT = 'FIELD_AGENT',
+  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
+  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
+  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
+  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
+  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
+  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
+}
+
+export const enum GQLStatus {
+  active = 'active',
+  deactivated = 'deactivated',
+  pending = 'pending',
+  disabled = 'disabled'
+}
+
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
-  role: string
+  role: GQLRoleType
   signature?: GQLSignature
 }
 
@@ -912,7 +946,7 @@ export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
   type?: string
-  status?: string
+  status?: GQLStatus
   avatar?: GQLAvatar
   primaryOfficeId?: string
   creationDate?: string
@@ -956,10 +990,11 @@ export interface GQLTotalMetricsByTime {
 
 export interface GQLVSExport {
   event: string
-  year: number
+  startDate: GQLDate
+  endDate: GQLDate
   fileSize: string
   url: string
-  createdOn: string
+  createdOn: GQLDate
 }
 
 export type GQLUserAuditLogResultItem =
@@ -1183,11 +1218,6 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
-export interface GQLIntegration {
-  name?: string
-  status?: string
-}
-
 export interface GQLBirthInput {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
@@ -1207,11 +1237,6 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
-}
-
-export interface GQLIntegrationInput {
-  name?: string
-  status?: string
 }
 
 export interface GQLQuestionInput {
@@ -1795,6 +1820,7 @@ export interface GQLResolver {
   FormDraft?: GQLFormDraftTypeResolver
   System?: GQLSystemTypeResolver
   FormDataset?: GQLFormDatasetTypeResolver
+  SMSNotification?: GQLSMSNotificationTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -1842,7 +1868,6 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
-  Integration?: GQLIntegrationTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -1912,6 +1937,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getFormDraft?: QueryToGetFormDraftResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
   getFormDataset?: QueryToGetFormDatasetResolver<TParent>
+  informantSMSNotifications?: QueryToInformantSMSNotificationsResolver<TParent>
 }
 
 export interface QueryToListNotificationsArgs {
@@ -2521,6 +2547,13 @@ export interface QueryToGetFormDatasetResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface QueryToInformantSMSNotificationsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLMutationTypeResolver<TParent = any> {
   createNotification?: MutationToCreateNotificationResolver<TParent>
   voidNotification?: MutationToVoidNotificationResolver<TParent>
@@ -2566,6 +2599,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
   createFormDataset?: MutationToCreateFormDatasetResolver<TParent>
+  toggleInformantSMSNotification?: MutationToToggleInformantSMSNotificationResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -3232,6 +3266,21 @@ export interface MutationToCreateFormDatasetResolver<
   (
     parent: TParent,
     args: MutationToCreateFormDatasetArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToToggleInformantSMSNotificationArgs {
+  smsNotifications?: Array<GQLSMSNotificationInput>
+}
+export interface MutationToToggleInformantSMSNotificationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToToggleInformantSMSNotificationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4547,6 +4596,51 @@ export interface FormDatasetTo_idResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLSMSNotificationTypeResolver<TParent = any> {
+  id?: SMSNotificationToIdResolver<TParent>
+  name?: SMSNotificationToNameResolver<TParent>
+  message?: SMSNotificationToMessageResolver<TParent>
+  enabled?: SMSNotificationToEnabledResolver<TParent>
+  updatedAt?: SMSNotificationToUpdatedAtResolver<TParent>
+  createdAt?: SMSNotificationToCreatedAtResolver<TParent>
+}
+
+export interface SMSNotificationToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToMessageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToEnabledResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToUpdatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SMSNotificationToCreatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -4615,10 +4709,10 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
-  INTEGRATIONS?: ApplicationConfigurationToINTEGRATIONSResolver<TParent>
   INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
   INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
   DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
+  ADMIN_LEVELS?: ApplicationConfigurationToADMIN_LEVELSResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -4698,13 +4792,6 @@ export interface ApplicationConfigurationToADDRESSESResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationConfigurationToINTEGRATIONSResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
   TParent = any,
   TResult = any
@@ -4720,6 +4807,13 @@ export interface ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<
 }
 
 export interface ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToADMIN_LEVELSResolver<
   TParent = any,
   TResult = any
 > {
@@ -5667,7 +5761,8 @@ export interface TotalMetricsByTimeToTotalResolver<
 
 export interface GQLVSExportTypeResolver<TParent = any> {
   event?: VSExportToEventResolver<TParent>
-  year?: VSExportToYearResolver<TParent>
+  startDate?: VSExportToStartDateResolver<TParent>
+  endDate?: VSExportToEndDateResolver<TParent>
   fileSize?: VSExportToFileSizeResolver<TParent>
   url?: VSExportToUrlResolver<TParent>
   createdOn?: VSExportToCreatedOnResolver<TParent>
@@ -5677,7 +5772,11 @@ export interface VSExportToEventResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface VSExportToYearResolver<TParent = any, TResult = any> {
+export interface VSExportToStartDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToEndDateResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5903,19 +6002,6 @@ export interface DeathToREGISTRATION_TARGETResolver<
 }
 
 export interface DeathToFEEResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLIntegrationTypeResolver<TParent = any> {
-  name?: IntegrationToNameResolver<TParent>
-  status?: IntegrationToStatusResolver<TParent>
-}
-
-export interface IntegrationToNameResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface IntegrationToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

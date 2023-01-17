@@ -857,7 +857,6 @@
         "performance.body.header.monthly.reports": "Monthly reports",
         "performance.topbar.tab.title.monthly": "Monthly",
         "performance.reports.exportAll": "Export all performance data",
-        "performance.reports.noResultForLocation": "No data for {searchedLocation}. We are currently piloting for following areas:",
         "print.certificate.button.confirmPrint": "Print",
         "print.certificate.review.title": "Review certificate",
         "print.certificate.review.description": "Please confirm that the information on the certificate is correct and that it is ready to print.",
