@@ -21,40 +21,35 @@ export interface IFormTabs<T extends string | number = string> {
   title: string
   disabled?: boolean
   icon?: React.ReactNode
+  color?: ITabColor
 }
 export interface IFormTabProps<T extends string | number = string> {
   sections: Array<IFormTabs<T>>
   activeTabId: string
   onTabClick: (tabId: T) => void
-  activeColor?: ITabColor
 }
 
 function FormTabsComponent<T extends string | number = string>({
   sections,
   activeTabId,
-  onTabClick,
-  activeColor
+  onTabClick
 }: IFormTabProps<T>) {
   return (
     <Tabs>
-      {sections.map(({ title, id, disabled, icon }) => (
+      {sections.map(({ title, id, disabled, icon, color }) => (
         <>
           <Tab
             id={`tab_${id}`}
-            color={activeColor}
+            color={color}
             onClick={() => onTabClick(id)}
             key={id}
             active={activeTabId === id}
             disabled={disabled}
-            activeColor={activeColor}
+            activeColor={color}
           >
             <Stack>
               {icon}
-              <Text
-                variant="bold14"
-                element="span"
-                color={activeColor ?? 'primary'}
-              >
+              <Text variant="bold14" element="span" color={color ?? 'primary'}>
                 {title}
               </Text>
             </Stack>

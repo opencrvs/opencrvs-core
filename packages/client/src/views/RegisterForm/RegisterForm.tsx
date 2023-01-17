@@ -110,6 +110,7 @@ import {
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { IUserDetails } from '@client/utils/userUtils'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
+import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -704,6 +705,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                     />
                   )}
+                  {duplicate && <DuplicateFormTabs declaration={declaration} />}
                   <ReviewSection
                     pageRoute={this.props.pageRoute}
                     draft={declaration}

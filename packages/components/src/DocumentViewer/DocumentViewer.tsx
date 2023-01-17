@@ -17,7 +17,6 @@ import { DocumentImage } from './components/DocumentImage'
 const Container = styled.div`
   width: calc(40vw - 50px);
   position: fixed;
-  top: 80px;
   background-color: ${({ theme }) => theme.colors.grey100};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
