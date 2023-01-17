@@ -165,17 +165,6 @@ const messagesToDefine = {
     defaultMessage: 'Search for an office',
     description: 'Header for system admin team home page'
   },
-  noResultForLocation: {
-    id: 'performance.reports.noResultForLocation',
-    defaultMessage:
-      'No data for {searchedLocation}. We are currently piloting for following areas:',
-    description: 'Message to show if no data is found for a location'
-  },
-  noResultForLocationWithoutPilotAreas: {
-    id: 'performance.reports.noResultInPilot',
-    defaultMessage: 'No data for {searchedLocation}.',
-    description: 'Message to show if no data is found for a location'
-  },
   operational: {
     id: 'performance.reports.select.item.operational',
     defaultMessage: 'Operational',
@@ -336,11 +325,6 @@ const messagesToDefine = {
     id: 'performance.fieldAgents.showMore',
     defaultMessage: 'Show next {pageSize}',
     description: 'Label for show more link'
-  },
-  pilotAreaListHeader: {
-    id: 'performance.pilotArea.header',
-    defaultMessage: 'Pilot Areas',
-    description: 'Label for pilot area list header'
   },
   stats: {
     id: 'performance.stats.header',

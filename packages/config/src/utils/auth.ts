@@ -9,18 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import * as Hapi from '@hapi/hapi'
 
-export const GET_TOTAL_VSEXPORT = gql`
-  query getVSExports {
-    getVSExports {
-      results {
-        event
-        year
-        url
-        createdOn
-        fileSize
-      }
-    }
+export const getToken = (request: Hapi.Request): string => {
+  if (request.headers.authorization.indexOf('Bearer') > -1) {
+    return request.headers.authorization.split(' ')[1]
+  } else {
+    return request.headers.authorization
   }
-`
+}

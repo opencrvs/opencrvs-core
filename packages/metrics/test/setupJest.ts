@@ -65,12 +65,7 @@ jest.mock('@metrics/configApi', () => {
           languagesAndCountry: ['en-ZM']
         },
         ADDRESSES: 1,
-        INTEGRATIONS: [
-          {
-            name: 'MOSIP',
-            status: statuses.ACTIVE
-          }
-        ]
+        ADMIN_LEVELS: 2
       })
   }
 })

@@ -29,7 +29,6 @@ interface IFormMessages
   informantsGivenNames: MessageDescriptor
   informantsGivenNamesEng: MessageDescriptor
   informantsIdType: MessageDescriptor
-  informantsNationality: MessageDescriptor
   informantsRelationWithChild: MessageDescriptor
   informantsRelationWithDeceased: MessageDescriptor
   informantTitle: MessageDescriptor
@@ -62,16 +61,15 @@ interface IFormMessages
   causeOfDeathTitle: MessageDescriptor
   certification: MessageDescriptor
   changeButtonLabel: MessageDescriptor
-  childDateOfBirth: MessageDescriptor
+  dateOfBirth: MessageDescriptor
   childFamilyName: MessageDescriptor
-  childFamilyNameEng: MessageDescriptor
   childFirstNames: MessageDescriptor
-  childFirstNamesEng: MessageDescriptor
-  childSex: MessageDescriptor
-  childSexFemale: MessageDescriptor
-  childSexMale: MessageDescriptor
+  firstNames: MessageDescriptor
+  sex: MessageDescriptor
+  sexFemale: MessageDescriptor
+  sexMale: MessageDescriptor
   childSexOther: MessageDescriptor
-  childSexUnknown: MessageDescriptor
+  sexUnknown: MessageDescriptor
   childTab: MessageDescriptor
   childTitle: MessageDescriptor
   commentsOrNotesDescription: MessageDescriptor
@@ -101,24 +99,17 @@ interface IFormMessages
   placeOfDeathSameAsPrimary: MessageDescriptor
   placeOfDeathType: MessageDescriptor
   deceasedCurrentAddressSameAsPrimary: MessageDescriptor
-  deceasedDateOfBirth: MessageDescriptor
   deceasedDeathProof: MessageDescriptor
   deceasedDoBProof: MessageDescriptor
   deceasedFamilyName: MessageDescriptor
-  deceasedFamilyNameEng: MessageDescriptor
   deceasedGivenNames: MessageDescriptor
-  deceasedGivenNamesEng: MessageDescriptor
   deceasedIDProof: MessageDescriptor
   deceasedIdType: MessageDescriptor
   deceasedName: MessageDescriptor
   deceasedParagraph: MessageDescriptor
   deceasedPrimaryAddressProof: MessageDescriptor
-  deceasedSex: MessageDescriptor
-  deceasedSexFemale: MessageDescriptor
-  deceasedSexMale: MessageDescriptor
   nameInEnglishPreviewGroup: MessageDescriptor
   deceasedSexOther: MessageDescriptor
-  deceasedSexUnknown: MessageDescriptor
   deceasedTitle: MessageDescriptor
   defaultLabel: MessageDescriptor
   deliveryAddress: MessageDescriptor
@@ -153,12 +144,8 @@ interface IFormMessages
   enterResponse: MessageDescriptor
   familyName: MessageDescriptor
   father: MessageDescriptor
-  fatherDateOfBirth: MessageDescriptor
-  fatherEducationAttainment: MessageDescriptor
   fatherFamilyName: MessageDescriptor
-  fatherFamilyNameEng: MessageDescriptor
   fatherFirstNames: MessageDescriptor
-  fatherFirstNamesEng: MessageDescriptor
   fatherName: MessageDescriptor
   fathersDetailsExist: MessageDescriptor
   mothersDetailsExist: MessageDescriptor
@@ -218,12 +205,9 @@ interface IFormMessages
   deathDescription: MessageDescriptor
   methodOfCauseOfDeath: MessageDescriptor
   mother: MessageDescriptor
-  motherDateOfBirth: MessageDescriptor
-  motherEducationAttainment: MessageDescriptor
+  educationAttainment: MessageDescriptor
   motherFamilyName: MessageDescriptor
-  motherFamilyNameEng: MessageDescriptor
   motherFirstNames: MessageDescriptor
-  motherFirstNamesEng: MessageDescriptor
   motherName: MessageDescriptor
   motherTitle: MessageDescriptor
   multipleBirth: MessageDescriptor
@@ -330,8 +314,7 @@ interface IFormMessages
   parentDetailsType: MessageDescriptor
   motherRadioButton: MessageDescriptor
   fatherRadioButton: MessageDescriptor
-  reasonMNA: MessageDescriptor
-  reasonFNA: MessageDescriptor
+  reasonNA: MessageDescriptor
   reasonParentsNotApplying: MessageDescriptor
   motherDeceasedLabel: MessageDescriptor
   fatherDeceasedLabel: MessageDescriptor
@@ -342,7 +325,6 @@ interface IFormMessages
   informantCaregiverTypeLabel: MessageDescriptor
   otherCaregiverTypeLabel: MessageDescriptor
   nameFieldLabel: MessageDescriptor
-  reasonNotApplyingFieldLabel: MessageDescriptor
   reasonMNAPreview: MessageDescriptor
   reasonFNAPreview: MessageDescriptor
   tooltipNationalID: MessageDescriptor
@@ -519,11 +501,6 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for form field: Existing ID',
     id: 'form.field.label.informantsIdType'
   },
-  informantsNationality: {
-    defaultMessage: 'Nationality',
-    description: 'Label for form field: Nationality',
-    id: 'form.field.label.informants.nationality'
-  },
   informantsRelationWithChild: {
     defaultMessage: 'Relationship to child',
     description: 'Label for Relationship to child',
@@ -687,55 +664,50 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Certification regarding NGO worker',
     id: 'form.section.documents.list.certification'
   },
-  childDateOfBirth: {
+  dateOfBirth: {
     defaultMessage: 'Date of birth',
     description: 'Label for form field: Date of birth',
-    id: 'form.field.label.childDateOfBirth'
+    id: 'form.field.label.dateOfBirth'
   },
   childFamilyName: {
     defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.childFamilyName'
   },
-  childFamilyNameEng: {
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english',
-    id: 'form.field.label.childFamilyNameEng'
-  },
   childFirstNames: {
     defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: First names',
     id: 'form.field.label.childFirstNames'
   },
-  childFirstNamesEng: {
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: First names in english',
-    id: 'form.field.label.childFirstNamesEng'
+  firstNames: {
+    defaultMessage: 'First name(s)',
+    description: 'Label for form field: First names',
+    id: 'form.field.label.firstNames'
   },
-  childSex: {
+  sex: {
     defaultMessage: 'Sex',
     description: 'Label for form field: Sex name',
-    id: 'form.field.label.childSex'
+    id: 'form.field.label.sex'
   },
-  childSexFemale: {
+  sexFemale: {
     defaultMessage: 'Female',
     description: 'Option for form field: Sex name',
-    id: 'form.field.label.childSexFemale'
+    id: 'form.field.label.sexFemale'
   },
-  childSexMale: {
+  sexMale: {
     defaultMessage: 'Male',
     description: 'Option for form field: Sex name',
-    id: 'form.field.label.childSexMale'
+    id: 'form.field.label.sexMale'
   },
   childSexOther: {
     defaultMessage: 'Other',
     description: 'Option for form field: Sex name',
     id: 'form.field.label.childSexOther'
   },
-  childSexUnknown: {
+  sexUnknown: {
     defaultMessage: 'Unknown',
     description: 'Option for form field: Sex name',
-    id: 'form.field.label.childSexUnknown'
+    id: 'form.field.label.sexUnknown'
   },
   childTab: {
     defaultMessage: 'Child',
@@ -897,11 +869,6 @@ export const formMessageDescriptors: IFormMessages = {
       'Title for the radio button to select that the deceased current address is the same as their permanent address',
     id: 'form.field.label.deceasedCurAddSamePerm'
   },
-  deceasedDateOfBirth: {
-    defaultMessage: 'Date of Birth',
-    description: 'Label for form field: Date of birth',
-    id: 'form.field.label.deceasedDateOfBirth'
-  },
   deceasedDeathProof: {
     defaultMessage: 'Proof of death of deceased',
     description: 'Option for radio group field: Type of Document To Upload',
@@ -917,20 +884,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for form field: Family name',
     id: 'form.field.label.deceasedFamilyName'
   },
-  deceasedFamilyNameEng: {
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english',
-    id: 'form.field.label.deceasedFamilyNameEng'
-  },
   deceasedGivenNames: {
     defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.deceasedGivenNames'
-  },
-  deceasedGivenNamesEng: {
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: Given names in english',
-    id: 'form.field.label.deceasedGivenNamesEng'
   },
   deceasedIDProof: {
     defaultMessage: "Proof of deceased's ID",
@@ -958,30 +915,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.deceasedPrimaryAddressProof'
   },
-  deceasedSex: {
-    defaultMessage: 'Sex',
-    description: 'Label for form field: Sex name',
-    id: 'form.field.label.deceasedSex'
-  },
-  deceasedSexFemale: {
-    defaultMessage: 'Female',
-    description: 'Option for form field: Sex name',
-    id: 'form.field.label.deceasedSexFemale'
-  },
-  deceasedSexMale: {
-    defaultMessage: 'Male',
-    description: 'Option for form field: Sex name',
-    id: 'form.field.label.deceasedSexMale'
-  },
   deceasedSexOther: {
     defaultMessage: 'Other',
     description: 'Option for form field: Sex name',
     id: 'form.field.label.deceasedSexOther'
-  },
-  deceasedSexUnknown: {
-    defaultMessage: 'Unknown',
-    description: 'Option for form field: Sex name',
-    id: 'form.field.label.deceasedSexUnknown'
   },
   deceasedTitle: {
     defaultMessage: 'What are the deceased details?',
@@ -1146,42 +1083,22 @@ export const formMessageDescriptors: IFormMessages = {
   familyName: {
     defaultMessage: 'Last name',
     description: 'Label for family name text input',
-    id: 'form.field.label.print.otherPersonFamilyName'
+    id: 'form.field.label.familyName'
   },
   father: {
     defaultMessage: 'Father',
     description: 'Label for option Father',
     id: 'form.field.label.informantRelation.father'
   },
-  fatherDateOfBirth: {
-    defaultMessage: 'Date of birth',
-    description: 'Label for form field: Date of birth',
-    id: 'form.field.label.fatherDateOfBirth'
-  },
-  fatherEducationAttainment: {
-    defaultMessage: "Father's level of formal education attained",
-    description: 'Label for form field: Father education',
-    id: 'form.field.label.fatherEducationAttainment'
-  },
   fatherFamilyName: {
     defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.fatherFamilyName'
   },
-  fatherFamilyNameEng: {
-    defaultMessage: 'Last Name(s) in English',
-    description: 'Label for form field: Family name in english',
-    id: 'form.field.label.fatherFamilyNameEng'
-  },
   fatherFirstNames: {
     defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: First name',
     id: 'form.field.label.fatherFirstNames'
-  },
-  fatherFirstNamesEng: {
-    defaultMessage: 'First Name(s) in English',
-    description: 'Label for form field: First names in english',
-    id: 'form.field.label.fatherFirstNamesEng'
   },
   fatherName: {
     defaultMessage: 'Father',
@@ -1440,35 +1357,20 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for option Mother',
     id: 'form.field.label.informantRelation.mother'
   },
-  motherDateOfBirth: {
-    defaultMessage: 'Date of birth',
-    description: 'Label for form field: Date of birth',
-    id: 'form.field.label.motherDateOfBirth'
-  },
-  motherEducationAttainment: {
-    defaultMessage: "Mother's level of formal education attained",
-    description: 'Label for form field: Mother education',
-    id: 'form.field.label.motherEducationAttainment'
+  educationAttainment: {
+    defaultMessage: 'Level of education',
+    description: 'Label for form field: Education Attainment',
+    id: 'form.field.label.educationAttainment'
   },
   motherFamilyName: {
     defaultMessage: 'Last name',
     description: 'Label for form field: Family name',
     id: 'form.field.label.motherFamilyName'
   },
-  motherFamilyNameEng: {
-    defaultMessage: 'Last name',
-    description: 'Label for form field: Family name in english',
-    id: 'form.field.label.motherFamilyNameEng'
-  },
   motherFirstNames: {
     defaultMessage: 'First name(s)',
     description: 'Label for form field: First names',
     id: 'form.field.label.motherFirstNames'
-  },
-  motherFirstNamesEng: {
-    defaultMessage: 'First name(s)',
-    description: 'Label for form field: First names in english',
-    id: 'form.field.label.motherFirstNamesEng'
   },
   motherName: {
     defaultMessage: 'Mother',
@@ -1488,7 +1390,7 @@ export const formMessageDescriptors: IFormMessages = {
   nationality: {
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality',
-    id: 'form.field.label.deceased.nationality'
+    id: 'form.field.label.nationality'
   },
   nationalityBangladesh: {
     defaultMessage: 'Bangladesh',
@@ -2082,15 +1984,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'confirmation label for father radio button',
     id: 'form.field.label.radio.father'
   },
-  reasonMNA: {
-    defaultMessage: 'Reason for mother',
-    description: 'Label for form field: reasonMotherNotApplying',
-    id: 'form.field.label.reasonMotherNotApplying'
-  },
-  reasonFNA: {
-    defaultMessage: 'Reason for father',
-    description: 'Label for form field: reasonFatherNotApplying',
-    id: 'form.field.label.reasonFatherNotApplying'
+  reasonNA: {
+    defaultMessage: 'Reason',
+    description: 'Label for form field: reasonNotApplying',
+    id: 'form.field.label.reasonNotApplying'
   },
   reasonMNAPreview: {
     defaultMessage: 'Reason for mother not applying',
@@ -2151,11 +2048,6 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Name',
     description: 'Label for form field: name',
     id: 'form.field.label.name'
-  },
-  reasonNotApplyingFieldLabel: {
-    defaultMessage: 'Reason not applying',
-    description: 'Label for form field: ReasonNotApplying',
-    id: 'form.field.label.ReasonNotApplying'
   },
   tooltipNationalID: {
     defaultMessage:

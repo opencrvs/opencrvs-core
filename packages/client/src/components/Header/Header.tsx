@@ -11,7 +11,7 @@
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { constantsMessages, userMessages } from '@client/i18n/messages'
+import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import {
@@ -46,12 +46,10 @@ import {
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
-import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { IUserDetails } from '@client/utils/userUtils'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowBack,
-  BackArrowDeepBlue,
-  ForwardArrowDeepBlue,
   Plus,
   SearchDark,
   Activity,
@@ -64,15 +62,12 @@ import {
   ISearchType,
   INavigationType
 } from '@opencrvs/components/lib/SearchTool'
-import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { FixedNavigation } from '@client/components/interface/Navigation'
-import { Avatar } from '@client/components/Avatar'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
   HOME,
@@ -82,6 +77,9 @@ import {
 } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { HistoryNavigator } from './HistoryNavigator'
+import { Hamburger } from './Hamburger'
+import { Event } from '@client/utils/gateway'
 
 type IStateProps = {
   userDetails: IUserDetails | null
@@ -115,6 +113,11 @@ interface IProps extends RouteComponentProps {
   enableMenuSelection?: boolean
   changeTeamLocation?: () => void
   mapPerformanceClickHandler?: () => void
+  /** Sets default mobile right actions */
+  mobileRight?: {
+    icon: () => React.ReactNode
+    handler: () => void
+  }[]
 }
 
 type IFullProps = IntlShapeProps &
@@ -124,7 +127,6 @@ type IFullProps = IntlShapeProps &
   IDomProps
 
 interface IState {
-  showMenu: boolean
   showLogoutModal: boolean
 }
 
@@ -136,7 +138,8 @@ enum ACTIVE_MENU_ITEM {
   USERS,
   CERTIFICATE,
   APPLICATION,
-  FORM
+  FORM,
+  INTEGRATION
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
@@ -172,14 +175,6 @@ const HeaderCenter = styled.div`
   align-items: center;
   background: ${({ theme }) => theme.colors.white};
 `
-const HeaderLeft = styled.div`
-  height: 40px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 4px;
-  background: ${({ theme }) => theme.colors.white};
-`
 const HeaderRight = styled.div`
   height: 40px;
   background: ${({ theme }) => theme.colors.white};
@@ -195,45 +190,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     super(props)
 
     this.state = {
-      showMenu: false,
       showLogoutModal: false
     }
-  }
-
-  hamburger = () => {
-    const { userDetails, language, intl } = this.props
-    let name = ''
-    if (userDetails && userDetails.name) {
-      const nameObj = getIndividualNameObj(userDetails.name, language)
-      name = nameObj
-        ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-        : ''
-    }
-
-    const role =
-      userDetails && userDetails.role
-        ? intl.formatMessage(userMessages[userDetails.role])
-        : ''
-
-    const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
-
-    const userInfo = { name, role, avatar }
-
-    return (
-      <>
-        <ExpandingMenu
-          showMenu={this.state.showMenu}
-          menuCollapse={() => this.toggleMenu()}
-          navigation={() => (
-            <FixedNavigation
-              navigationWidth={320}
-              menuCollapse={() => this.toggleMenu()}
-              userInfo={userInfo}
-            />
-          )}
-        />
-      </>
-    )
   }
 
   getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM, theme: ITheme) {
@@ -244,8 +202,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
+            icon: () => <Hamburger />,
+            handler: () => {}
           }
         ],
         mobileRight: [
@@ -262,8 +220,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ],
           mobileRight: [
@@ -291,8 +249,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ],
           mobileRight: [
@@ -312,8 +270,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ]
         }
@@ -325,8 +283,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       return {
         mobileLeft: [
           {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
+            icon: () => <Hamburger />,
+            handler: () => {}
           }
         ]
       }
@@ -335,8 +293,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <ArrowBack />,
-              handler: () => window.history.back()
+              icon: () => <HistoryNavigator hideForward />,
+              handler: () => {}
             }
           ],
           mobileBody: this.renderSearchInput(this.props, true)
@@ -345,8 +303,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
           ],
           mobileRight: [
@@ -381,10 +339,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     } else {
       return false
     }
-  }
-
-  toggleMenu = () => {
-    this.setState((prevState) => ({ showMenu: !prevState.showMenu }))
   }
 
   renderSearchInput(props: IFullProps, isMobile?: boolean) {
@@ -446,7 +400,11 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}
-        navigationList={navigationList}
+        navigationList={
+          FIELD_AGENT_ROLES.includes(this.props.userDetails?.role as string)
+            ? undefined
+            : navigationList
+        }
         searchHandler={(text, type) =>
           props.goToSearchResult(text, type, isMobile)
         }
@@ -476,38 +434,16 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
         return (
           (locationId &&
-            goToPerformanceHomeAction(undefined, undefined, locationId)) ||
+            goToPerformanceHomeAction(
+              undefined,
+              undefined,
+              Event.Birth,
+              locationId
+            )) ||
           goToPerformanceHomeAction()
         )
       }
     }
-  }
-
-  arrowNavigator() {
-    return (
-      <HeaderLeft>
-        <CircleButton
-          id="header-go-back-button"
-          disabled={
-            (this.props.history.action === 'POP' ||
-              this.props.history.action === 'REPLACE') &&
-            this.isLandingPage()
-          }
-          onClick={() => this.props.goBack()}
-        >
-          <BackArrowDeepBlue />
-        </CircleButton>
-        <CircleButton
-          disabled={
-            this.props.history.action === 'PUSH' ||
-            this.props.history.action === 'REPLACE'
-          }
-          onClick={() => this.props.goForward()}
-        >
-          <ForwardArrowDeepBlue />
-        </CircleButton>
-      </HeaderLeft>
-    )
   }
 
   render() {
@@ -527,12 +463,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           ? constantsMessages.applicationTitle
           : activeMenuItem === ACTIVE_MENU_ITEM.FORM
           ? constantsMessages.formDeclarationTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
+          ? constantsMessages.integrationTitle
           : constantsMessages.declarationTitle
       )
 
     let rightMenu = [
       {
-        element: this.arrowNavigator()
+        element: <HistoryNavigator />
       },
       {
         element: (
@@ -571,7 +509,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     ) {
       rightMenu = [
         {
-          element: this.arrowNavigator()
+          element: <HistoryNavigator />
         },
         {
           element: <ProfileMenu key="profileMenu" />
@@ -584,13 +522,18 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       theme
     )
 
+    const mobileHeaderActionPropsWithDefaults = {
+      mobileRight: this.props.mobileRight,
+      ...mobileHeaderActionProps
+    }
+
     return (
       <AppHeader
         id="register_app_header"
         desktopRightMenu={rightMenu}
         className={className}
         title={title}
-        {...mobileHeaderActionProps}
+        {...mobileHeaderActionPropsWithDefaults}
       />
     )
   }
@@ -610,6 +553,8 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.APPLICATION
       : window.location.href.includes('config/form')
       ? ACTIVE_MENU_ITEM.FORM
+      : window.location.href.includes('config/integration')
+      ? ACTIVE_MENU_ITEM.INTEGRATION
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)

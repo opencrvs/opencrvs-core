@@ -1284,7 +1284,7 @@ describe('When an existing declaration is marked certified', () => {
       payload
     })
     const declarationEventPoint =
-      influxClient.writePoints.mock.calls[0][0].find(
+      influxClient.writePoints.mock.calls[1][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'declaration_event_duration'
       )
@@ -1306,7 +1306,7 @@ describe('When an existing declaration is marked certified', () => {
       })
       expect(res.statusCode).toBe(200)
       const declarationEventPoint =
-        influxClient.writePoints.mock.calls[0][0].find(
+        influxClient.writePoints.mock.calls[1][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'declaration_event_duration'
         )
@@ -1328,7 +1328,7 @@ describe('When an existing declaration is marked certified', () => {
       })
       expect(res.statusCode).toBe(200)
       const declarationEventPoint =
-        influxClient.writePoints.mock.calls[0][0].find(
+        influxClient.writePoints.mock.calls[1][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'payment'
         )
@@ -1357,7 +1357,7 @@ describe('When an in-progress declaration is received', () => {
       payload
     })
     const inCompleteFieldPoints =
-      influxClient.writePoints.mock.calls[0][0].find(
+      influxClient.writePoints.mock.calls[1][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'in_complete_fields'
       )

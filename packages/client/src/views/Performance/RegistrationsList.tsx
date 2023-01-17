@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ISearchLocation } from '@client/../../components/lib'
+import { ISearchLocation, Stack } from '@client/../../components/lib'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
@@ -21,8 +21,11 @@ import {
   goToFieldAgentList,
   goToPerformanceHome,
   goToRegistrationsList,
-  IDynamicValues
+  IDynamicValues,
+  goToUserProfile,
+  goToTeamUserList
 } from '@client/navigation'
+import { AvatarSmall } from '@client/components/Avatar'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -50,18 +53,19 @@ import { Table } from '@opencrvs/components/lib/Table'
 import { GQLMixedTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { get, orderBy } from 'lodash'
 import { parse } from 'query-string'
-import * as React from 'react'
+import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import { Link } from '@opencrvs/components/lib/Link'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
 const DEFAULT_PAGE_SIZE = 10
-const { useState, useEffect } = React
+
 interface SortMap {
   month: SORT_ORDER
   location: SORT_ORDER
@@ -109,6 +113,8 @@ interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToFieldAgentList: typeof goToFieldAgentList
   goToRegistrationsList: typeof goToRegistrationsList
+  goToTeamUserList: typeof goToTeamUserList
+  goToUserProfile: typeof goToUserProfile
 }
 type IProps = RouteComponentProps &
   WrappedComponentProps &
@@ -158,7 +164,8 @@ function RegistrationListComponent(props: IProps) {
   } = parse(search) as unknown as ISearchParams
   const isOfficeSelected = isLocationOffice(locationId)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
-  const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>('time')
+  const [columnToBeSort, setColumnToBeSort] =
+    React.useState<keyof SortMap>('time')
 
   const currentPage = parseInt(currentPageNumber)
   const recordCount = DEFAULT_PAGE_SIZE * currentPage
@@ -257,7 +264,10 @@ function RegistrationListComponent(props: IProps) {
         ...commonColumns,
         {
           key: 'home',
-          label: intl.formatMessage(messages.performanceHomeBirth),
+          label:
+            event === EVENT_OPTIONS.DEATH
+              ? intl.formatMessage(messages.performanceHomeDeath)
+              : intl.formatMessage(messages.performanceHomeBirth),
           width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('home_num'),
@@ -271,7 +281,10 @@ function RegistrationListComponent(props: IProps) {
         },
         {
           key: 'healthFacility',
-          label: intl.formatMessage(messages.performanceHealthFacilityBirth),
+          label:
+            event === EVENT_OPTIONS.DEATH
+              ? intl.formatMessage(messages.performanceHealthFacilityDeath)
+              : intl.formatMessage(messages.performanceHealthFacilityBirth),
           width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('healthFacility_num'),
@@ -303,7 +316,10 @@ function RegistrationListComponent(props: IProps) {
         ...commonColumns,
         {
           key: 'home',
-          label: intl.formatMessage(messages.performanceHomeBirth),
+          label:
+            event === EVENT_OPTIONS.DEATH
+              ? intl.formatMessage(messages.performanceHomeDeath)
+              : intl.formatMessage(messages.performanceHomeBirth),
           width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('home_num'),
@@ -317,7 +333,10 @@ function RegistrationListComponent(props: IProps) {
         },
         {
           key: 'healthFacility',
-          label: intl.formatMessage(messages.performanceHealthFacilityBirth),
+          label:
+            event === EVENT_OPTIONS.DEATH
+              ? intl.formatMessage(messages.performanceHealthFacilityDeath)
+              : intl.formatMessage(messages.performanceHealthFacilityBirth),
           width: 20,
           isSortable: true,
           sortFunction: () => toggleSort('healthFacility_num'),
@@ -382,10 +401,39 @@ function RegistrationListComponent(props: IProps) {
       finalContent = content.results.map(
         (result: IDynamicValues, index: number) => ({
           ...result,
-          name: result.registrarPractitioner.name
-            ? getName(result.registrarPractitioner.name, 'en')
-            : '',
-          location: result.registrarPractitioner.primaryOffice.name,
+          name: (
+            <Stack>
+              <AvatarSmall
+                name={
+                  result.registrarPractitioner.name
+                    ? getName(result.registrarPractitioner.name, 'en')
+                    : ''
+                }
+              />
+              <Link
+                font="bold14"
+                onClick={() => {
+                  props.goToUserProfile(String(result.registrarPractitioner.id))
+                }}
+              >
+                {result.registrarPractitioner.name
+                  ? getName(result.registrarPractitioner.name, 'en')
+                  : ''}
+              </Link>
+            </Stack>
+          ),
+          location: (
+            <Link
+              font="bold14"
+              onClick={() => {
+                props.goToTeamUserList(
+                  result.registrarPractitioner.primaryOffice?.id as string
+                )
+              }}
+            >
+              {result.registrarPractitioner.primaryOffice.name}
+            </Link>
+          ),
           role: getFieldAgentTypeLabel(result.registrarPractitioner.role),
           total: String(result.total),
           delayed: showWithTooltip(
@@ -617,25 +665,27 @@ function RegistrationListComponent(props: IProps) {
             } else {
               const totalData = get(data, 'getRegistrationsListByFilter.total')
               return (
-                <TableDiv>
-                  <Table
-                    id={'registrations-list-result'}
-                    noResultText={intl.formatMessage(
-                      constantsMessages.noResults
-                    )}
-                    isLoading={loading}
-                    disableScrollOnOverflow={true}
-                    columns={getColumns()}
-                    content={getContent(
-                      data && data.getRegistrationsListByFilter
-                    )}
-                    totalItems={totalData}
-                    currentPage={currentPage}
-                    pageSize={recordCount}
-                    isFullPage={true}
-                    highlightRowOnMouseOver
-                    noPagination={true}
-                  />
+                <>
+                  <TableDiv>
+                    <Table
+                      id={'registrations-list-result'}
+                      noResultText={intl.formatMessage(
+                        constantsMessages.noResults
+                      )}
+                      fixedWidth={1200}
+                      isLoading={loading}
+                      disableScrollOnOverflow={true}
+                      columns={getColumns()}
+                      content={getContent(
+                        data && data.getRegistrationsListByFilter
+                      )}
+                      totalItems={totalData}
+                      currentPage={currentPage}
+                      pageSize={recordCount}
+                      highlightRowOnMouseOver
+                      noPagination={true}
+                    />
+                  </TableDiv>
                   {totalData > DEFAULT_PAGE_SIZE && (
                     <Pagination
                       currentPage={currentPage}
@@ -652,7 +702,7 @@ function RegistrationListComponent(props: IProps) {
                       }}
                     />
                   )}
-                </TableDiv>
+                </>
               )
             }
           }}
@@ -671,5 +721,11 @@ export const RegistrationList = connect(
       offlineLocations
     }
   },
-  { goToPerformanceHome, goToFieldAgentList, goToRegistrationsList }
+  {
+    goToPerformanceHome,
+    goToFieldAgentList,
+    goToRegistrationsList,
+    goToUserProfile,
+    goToTeamUserList
+  }
 )(injectIntl(RegistrationListComponent))

@@ -24,26 +24,14 @@ import {
   GQLUserAuditLogResultItem,
   GQLUserAuditLogResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import {
-  ArrowDownBlue,
-  StatusCollected,
-  StatusGray,
-  StatusGreen,
-  StatusOrange,
-  StatusProgress,
-  StatusRejected,
-  StatusWaitingValidation
-} from '@opencrvs/components/lib/icons'
+import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  IColumn,
-  ColumnContentAlignment
-} from '@opencrvs/components/lib/Workqueue'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { orderBy } from 'lodash'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
@@ -56,24 +44,16 @@ import {
   GetUserAuditLogQuery,
   UserAuditLogResultItem
 } from '@client/utils/gateway'
-import { getFormattedDate } from '@client/views/RecordAudit/utils'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import format from '@client/utils/date-formatting'
 import { Link } from '@opencrvs/components'
 
 const DEFAULT_LIST_SIZE = 10
 
-const InformationCaption = styled.div`
-  ${({ theme }) => theme.fonts.reg12};
-  padding-bottom: 5px;
+const TableDiv = styled.div`
+  overflow: auto;
 `
 
-const AuditDescTimeContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  & > :first-child {
-    padding-top: 5px;
-  }
-`
 const HistoryHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -99,25 +79,13 @@ const SectionTitle = styled.div`
   margin-bottom: 10px;
 `
 
-const StatusIcon = styled.div`
-  margin-top: 4px;
-`
-
-const AdjustedStatusIcon = styled.div`
-  margin-left: 3px;
-`
-
-const InformationTitle = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  width: 320px;
-`
 const AuditContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
 `
 
 const BoldContent = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bold12};
+  ${({ theme }) => theme.fonts.bold14};
 `
 interface IBaseProp {
   practitionerId: string
@@ -143,6 +111,8 @@ export enum SORTED_COLUMN {
   DATE = 'auditTime',
   DEVICE = 'deviceIpAddress'
 }
+
+const ADMIN_ACTIONS = ['DEACTIVATE', 'REACTIVATE', 'EDIT_USER', 'CREATE_USER']
 
 type State = {
   timeStart: Date
@@ -213,111 +183,44 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   }
 
   getAuditColumns() {
-    const { theme, intl } = this.props
-    let columns: IColumn[] = []
-    if (this.state.viewportWidth <= theme.grid.breakpoints.md) {
-      columns = [
-        {
-          label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 80,
-          key: 'actionDescriptionWithAuditTime'
-        },
-        {
-          label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
-          width: 20,
-          key: 'trackingId',
-          alignment: ColumnContentAlignment.RIGHT
-        }
-      ]
-    } else {
-      columns = [
-        {
-          label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 25,
-          isSortable: true,
-          icon: <ArrowDownBlue />,
-          key: 'actionDescription',
-          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.ACTION)
-        },
-        {
-          label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
-          width: 25,
-          isSortable: true,
-          icon: <ArrowDownBlue />,
-          key: 'trackingId',
-          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.RECORD)
-        },
-        {
-          label: intl.formatMessage(messages.auditDeviceIpAddressColumnTitle),
-          width: 25,
-          isSortable: true,
-          icon: <ArrowDownBlue />,
-          key: 'deviceIpAddress',
-          alignment: ColumnContentAlignment.LEFT,
-          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DEVICE)
-        },
-        {
-          label: intl.formatMessage(messages.auditDateColumnTitle),
-          width: 25,
-          key: 'auditTime',
-          isSortable: true,
-          isSorted: true,
-          icon: <ArrowDownBlue />,
-          alignment: ColumnContentAlignment.RIGHT,
-          sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DATE)
-        }
-      ]
-    }
-    return columns
-  }
-
-  getWorkflowStatusIcon = (status: string) => {
-    switch (status) {
-      case 'IN_PROGRESS':
-        return <StatusProgress />
-      case 'DECLARED':
-        return (
-          <AdjustedStatusIcon>
-            <StatusOrange />
-          </AdjustedStatusIcon>
-        )
-      case 'VALIDATED':
-        return (
-          <StatusIcon>
-            <StatusGray />
-          </StatusIcon>
-        )
-      case 'WAITING_VALIDATION':
-        return (
-          <StatusIcon>
-            <StatusWaitingValidation />
-          </StatusIcon>
-        )
-      case 'REGISTERED':
-        return (
-          <StatusIcon>
-            <StatusGreen />
-          </StatusIcon>
-        )
-      case 'REJECTED':
-        return (
-          <StatusIcon>
-            <StatusRejected />
-          </StatusIcon>
-        )
-      case 'CERTIFIED':
-        return (
-          <StatusIcon>
-            <StatusCollected />
-          </StatusIcon>
-        )
-      default:
-        return (
-          <StatusIcon>
-            <StatusOrange />
-          </StatusIcon>
-        )
-    }
+    const { intl } = this.props
+    return [
+      {
+        label: intl.formatMessage(messages.auditActionColumnTitle),
+        width: 25,
+        isSortable: true,
+        icon: <ArrowDownBlue />,
+        key: 'actionDescription',
+        sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.ACTION)
+      },
+      {
+        label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
+        width: 25,
+        isSortable: true,
+        icon: <ArrowDownBlue />,
+        key: 'trackingId',
+        sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.RECORD)
+      },
+      {
+        label: intl.formatMessage(messages.auditDeviceIpAddressColumnTitle),
+        width: 25,
+        isSortable: true,
+        icon: <ArrowDownBlue />,
+        key: 'deviceIpAddress',
+        alignment: ColumnContentAlignment.LEFT,
+        sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DEVICE)
+      },
+      {
+        label: intl.formatMessage(messages.auditDateColumnTitle),
+        width: 25,
+        key: 'auditTime',
+        isSortable: true,
+        isSorted: true,
+        icon: <ArrowDownBlue />,
+        alignment: ColumnContentAlignment.RIGHT,
+        sortFunction: () => this.toggleSortOrder(SORTED_COLUMN.DATE)
+      }
+    ]
   }
 
   toggleActionDetails = (actionItem: UserAuditLogResultItem | null) => {
@@ -373,7 +276,8 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             >
               {actionMessage}
             </Link>
-          ) : !isSystemAdmin ? (
+          ) : !isSystemAdmin &&
+            !ADMIN_ACTIONS.includes(userAuditItem.action) ? (
             <Link
               font="bold14"
               onClick={() => {
@@ -386,14 +290,27 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
             <BoldContent>{actionMessage}</BoldContent>
           ),
 
-        actionDescriptionWithAuditTime: (
-          <AuditDescTimeContainer>
-            <InformationTitle>{actionMessage}</InformationTitle>
-            <InformationCaption>
-              {getFormattedDate(new Date(userAuditItem.time))}
-            </InformationCaption>
-          </AuditDescTimeContainer>
-        ),
+        actionDescriptionWithAuditTime:
+          isSystemAdmin &&
+          isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
+            <Link
+              onClick={() => {
+                this.toggleActionDetails(userAuditItem)
+              }}
+            >
+              {actionMessage}
+            </Link>
+          ) : !isSystemAdmin ? (
+            <Link
+              onClick={() => {
+                this.toggleActionDetails(userAuditItem)
+              }}
+            >
+              {actionMessage}
+            </Link>
+          ) : (
+            <BoldContent>{actionMessage}</BoldContent>
+          ),
         trackingId:
           isUserAuditItemWithDeclarationDetials(userAuditItem) &&
           !isSystemAdmin ? (
@@ -416,7 +333,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
         trackingIdString: isUserAuditItemWithDeclarationDetials(userAuditItem)
           ? userAuditItem.data.trackingId
           : null,
-        auditTime: getFormattedDate(new Date(userAuditItem.time))
+        auditTime: format(new Date(userAuditItem.time), 'MMMM dd, yyyy hh:mm a')
       }
     })
     return (
@@ -505,13 +422,14 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                     )
 
                     return (
-                      <>
+                      <TableDiv>
                         <Table
                           columns={this.getAuditColumns()}
                           content={this.getAuditData(data.getUserAuditLog)}
                           noResultText={intl.formatMessage(
                             messages.noAuditFound
                           )}
+                          fixedWidth={1088}
                           isLoading={loading}
                           hideTableHeader={
                             this.state.viewportWidth <=
@@ -542,8 +460,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                             <>
                               <AuditContent>
                                 {this.props.practitionerName} -{' '}
-                                {getFormattedDate(
-                                  new Date(this.state.actionDetailsData.time)
+                                {format(
+                                  new Date(this.state.actionDetailsData.time),
+                                  'MMMM dd, yyyy hh:mm a'
                                 )}{' '}
                                 {' | '}
                                 {this.getIpAdress(this.state.actionDetailsData)}
@@ -551,7 +470,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
                             </>
                           </ResponsiveModal>
                         )}
-                      </>
+                      </TableDiv>
                     )
                   }
                 }}

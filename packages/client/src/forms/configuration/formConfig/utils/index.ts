@@ -23,15 +23,18 @@ import {
   IRadioGroupWithNestedFieldsFormField,
   ISelectFormFieldWithOptions,
   IDocumentUploaderWithOptionsFormField,
-  SerializedFormField
+  SerializedFormField,
+  IFormDataSet
 } from '@client/forms'
 import {
   IQuestionConfig,
   isDefaultQuestionConfig,
   getConfiguredQuestions,
-  getIdentifiersFromFieldId
+  getIdentifiersFromFieldId,
+  ICustomSelectOption,
+  ICustomQuestionConfig
 } from '@client/forms/questionConfig'
-import { Event, QuestionInput } from '@client/utils/gateway'
+import { CustomFieldType, Event, QuestionInput } from '@client/utils/gateway'
 import { FieldPosition } from '@client/forms/configuration'
 import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import { createCustomField } from '@client/forms/configuration/customUtils'
@@ -47,6 +50,7 @@ import {
   hasDefaultFieldChanged
 } from './defaultConfig'
 import { getField } from '@client/forms/configuration/defaultUtils'
+import { ISelectOption as IDataSourceOption } from '@opencrvs/components/lib/Select'
 
 export * from './previewGroup'
 export * from './customConfig'
@@ -58,6 +62,10 @@ export type IConfigField =
   | IPreviewGroupConfigField
 
 export type ISectionFieldMap = Record<string, IConfigField[]>
+
+export type IDataSourceSelectOption = IDataSourceOption & {
+  options: ICustomSelectOption[] | ISelectOption[]
+}
 
 export function getFieldDefinition(
   configField: IDefaultConfigField | ICustomConfigField,
@@ -128,10 +136,27 @@ export function getCertificateHandlebar(formField: IFormField) {
   return formField.mapping?.template?.[0]
 }
 
+function resolveOptionsFormDatasetId(
+  question: ICustomQuestionConfig,
+  formDataset: IFormDataSet[]
+) {
+  if (question.fieldType === CustomFieldType.SelectWithOptions) {
+    const options =
+      formDataset.find((dataset) => dataset._id === question.datasetId)
+        ?.options || []
+    return {
+      ...question,
+      options
+    }
+  }
+  return question
+}
+
 export function generateConfigFields(
   event: Event,
   defaultForm: ISerializedForm,
-  questions: IQuestionConfig[]
+  questions: IQuestionConfig[],
+  formDataset: IFormDataSet[]
 ) {
   questions = questions.filter((question) => question.fieldId.startsWith(event))
 
@@ -143,7 +168,7 @@ export function generateConfigFields(
             ...configFields,
             isDefaultQuestionConfig(question)
               ? defaultQuestionToConfigField(question, defaultForm)
-              : question
+              : resolveOptionsFormDatasetId(question, formDataset)
           ],
           []
         )
@@ -216,6 +241,8 @@ export function generateModifiedQuestionConfigs(
         const { identifiers, ...rest } = questionConfig
         return rest
       }
-      return questionConfig
+
+      delete questionConfig.options
+      return questionConfig as QuestionInput
     })
 }

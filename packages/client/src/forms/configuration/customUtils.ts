@@ -23,6 +23,7 @@ import {
   FATHER_DETAILS_DONT_EXIST,
   MOTHER_DETAILS_DONT_EXIST
 } from './administrative/addresses'
+import { CustomFieldType } from '@client/utils/gateway'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
 
@@ -61,7 +62,8 @@ export function createCustomField({
   placeholder,
   required,
   maxLength,
-  conditionals
+  conditionals,
+  options
 }: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
     name: fieldName,
@@ -74,6 +76,7 @@ export function createCustomField({
     validate: [],
     description: getDefaultLanguageMessage(description),
     tooltip: getDefaultLanguageMessage(tooltip),
+    options: [],
     mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
@@ -125,6 +128,17 @@ export function createCustomField({
   }
   if (baseField.type === 'TEXT' || baseField.type === 'TEXTAREA') {
     baseField.maxLength = maxLength
+  }
+  if (baseField.type === CustomFieldType.SelectWithOptions) {
+    baseField.options =
+      options?.map((option) => {
+        return {
+          ...option,
+          label: Array.isArray(option.label)
+            ? (getDefaultLanguageMessage(option.label) as MessageDescriptor)
+            : option.label
+        }
+      }) || []
   }
   return baseField
 }

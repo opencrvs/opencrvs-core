@@ -25,7 +25,7 @@ import User, {
   IUser,
   IUserModel
 } from '@user-mgnt/model/user'
-import { roleScopeMapping } from '@user-mgnt/utils/userUtils'
+import { getUserId, roleScopeMapping } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
@@ -46,10 +46,24 @@ export default async function updateUser(
     token,
     `/Practitioner/${existingUser.practitionerId}`
   )
-  const existingPractitionerRole = await getFromFhir(
+  const existingPractitionerRoleBundle: fhir.Bundle = await getFromFhir(
     token,
     `/PractitionerRole?practitioner=${existingUser.practitionerId}`
   )
+  let existingPractitionerRole: fhir.PractitionerRole
+  if (
+    !existingPractitionerRoleBundle ||
+    !existingPractitionerRoleBundle.entry ||
+    !existingPractitionerRoleBundle.entry[0] ||
+    !existingPractitionerRoleBundle.entry[0].resource
+  ) {
+    throw new Error(
+      `No PractitionerRole by given id in bundle: ${existingUser.practitionerId}`
+    )
+  } else {
+    existingPractitionerRole = existingPractitionerRoleBundle.entry[0]
+      .resource as fhir.PractitionerRole
+  }
   // Update existing user's fields
   existingUser.name = user.name
   existingUser.identifiers = user.identifiers
@@ -58,7 +72,9 @@ export default async function updateUser(
   existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar
   existingUser.device = user.device
+  let changingRole = false
   if (existingUser.role !== user.role) {
+    changingRole = true
     existingUser.role = user.role
     // Updating user sope
     const userScopes: string[] =
@@ -89,17 +105,15 @@ export default async function updateUser(
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
     if (request.auth.credentials?.scope?.includes('natlsysadmin')) {
       existingUser.primaryOfficeId = user.primaryOfficeId
-      user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
-        user.primaryOfficeId,
-        token
-      )
+      existingUser.catchmentAreaIds =
+        await getCatchmentAreaIdsByPrimaryOfficeId(user.primaryOfficeId, token)
     } else {
       throw new Error('Location can be changed only by National System Admin')
     }
   }
-  // Updating practitioner and practitioner role in hearth
-  const practitioner = createFhirPractitioner(user, false)
+  const practitioner = createFhirPractitioner(existingUser, false)
   practitioner.id = existingPractitioner.id
+
   const practitionerId = await postFhir(token, practitioner)
   if (!practitionerId) {
     throw new Error(
@@ -107,12 +121,13 @@ export default async function updateUser(
     )
   }
   const practitionerRole = createFhirPractitionerRole(
-    user,
+    existingUser,
     existingUser.practitionerId,
     false
   )
+
   practitionerRole.id = existingPractitionerRole.id
-  const practitionerRoleId = await postFhir(token, practitioner)
+  const practitionerRoleId = await postFhir(token, practitionerRole)
   if (!practitionerRoleId) {
     throw new Error(
       'PractitionerRole resource not updated correctly, practitionerRole ID not returned'
@@ -129,6 +144,9 @@ export default async function updateUser(
       existingUser.username = newUserName
       userNameChanged = true
     }
+    if (changingRole && practitionerId !== existingUser.practitionerId) {
+      existingUser.practitionerId = practitionerId
+    }
 
     // update user in user-mgnt data store
     await User.update({ _id: existingUser._id }, existingUser)
@@ -137,7 +155,7 @@ export default async function updateUser(
     await rollbackUpdateUser(
       token,
       existingPractitioner,
-      existingPractitionerRole.entry[0].resource
+      existingPractitionerRole
     )
     if (err.code === 11000) {
       return h.response().code(403)
@@ -159,11 +177,16 @@ export default async function updateUser(
     request.headers['x-real-user-agent'] || request.headers['user-agent']
 
   try {
+    const systemAdminUser: IUserModel | null = await User.findById(
+      getUserId({ Authorization: request.headers.authorization })
+    )
     await postUserActionToMetrics(
       'EDIT_USER',
       request.headers.authorization,
       remoteAddress,
-      userAgent
+      userAgent,
+      systemAdminUser?.practitionerId,
+      practitionerId
     )
   } catch (err) {
     logger.error(err.message)

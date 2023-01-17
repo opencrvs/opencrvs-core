@@ -36,7 +36,7 @@ import {
   findTaskExtension,
   findTaskIdentifier,
   findEntryResourceByUrl,
-  getLocationHirarchyIDs,
+  getdeclarationJurisdictionIds,
   addEventLocation
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
@@ -181,7 +181,7 @@ async function createDeceasedIndex(
     bundleEntries
   ) as fhir.Patient
 
-  await addEventLocation(body, DEATH_ENCOUNTER_CODE, composition, bundleEntries)
+  await addEventLocation(body, DEATH_ENCOUNTER_CODE, composition)
 
   const deceasedName = deceased && findName(NAME_EN, deceased.name)
   const deceasedNameLocal = deceased && findNameLocale(deceased.name)
@@ -202,6 +202,7 @@ async function createDeceasedIndex(
     deceased.identifier &&
     deceased.identifier.find((identifier) => identifier.type === 'NATIONAL_ID')
       ?.value
+  body.deceasedDoB = deceased && deceased.birthDate
 }
 
 function createMotherIndex(
@@ -403,7 +404,7 @@ async function createDeclarationIndex(
     placeOfDeclarationExtension.valueReference &&
     placeOfDeclarationExtension.valueReference.reference &&
     placeOfDeclarationExtension.valueReference.reference.split('/')[1]
-  body.declarationJurisdictionIds = await getLocationHirarchyIDs(
+  body.declarationJurisdictionIds = await getdeclarationJurisdictionIds(
     body.declarationLocationId
   )
 

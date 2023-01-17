@@ -19,7 +19,9 @@ interface IConfigMessages
   vsexport: MessageDescriptor
   vitalStatisticsExport: MessageDescriptor
   export: MessageDescriptor
+  vsEmptyStateText: MessageDescriptor
   applicationNameChangeMessage: MessageDescriptor
+  applicationNameChangeNotification: MessageDescriptor
   govtLogoChangeMessage: MessageDescriptor
   govtLogoChangeNotification: MessageDescriptor
   govtLogoChangeError: MessageDescriptor
@@ -36,6 +38,13 @@ interface IConfigMessages
   birthDefaultTempDesc: MessageDescriptor
   eventUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
+  certificateUploading: MessageDescriptor
+  certificateUpdated: MessageDescriptor
+  certificateValidationError: MessageDescriptor
+  uploadCertificateDialogTitle: MessageDescriptor
+  uploadCertificateDialogDescription: MessageDescriptor
+  uploadCertificateDialogConfirm: MessageDescriptor
+  uploadCertificateDialogCancel: MessageDescriptor
   listDetailsQsn: MessageDescriptor
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
@@ -75,7 +84,9 @@ interface IConfigMessages
   withinLegallySpecifiedTimeLabel: MessageDescriptor
   generalTabTitle: MessageDescriptor
   birthTabTitle: MessageDescriptor
+  birthTabTitleExport: MessageDescriptor
   deathTabTitle: MessageDescriptor
+  deathTabTitleExport: MessageDescriptor
   registrationTimePeriodsGroupTitle: MessageDescriptor
   registrationFeesGroupTitle: MessageDescriptor
   eventTargetInputLabel: MessageDescriptor
@@ -111,7 +122,7 @@ const messagesToDefine: IConfigMessages = {
   vitalStatisticsExport: {
     id: 'config.application.vitalStatistics',
     defaultMessage:
-      '{year}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
+      'Month-{month}-Farajaland-{event, select, birth{birth} death{death} other{birth}}-event-statistics.csv {fileSize}',
     description: 'Vital Statistics Export'
   },
   export: {
@@ -122,7 +133,7 @@ const messagesToDefine: IConfigMessages = {
   vsEmptyStateText: {
     id: 'config.application.emptystate',
     defaultMessage:
-      "The previous year's vital statistics data (based on vital event registrations occurring within that year) will become available for you to export as of 1st January.",
+      "The previous month's vital statistics data (based on vital event registrations occurring within that month) will become available for you to export as of the 1st of every month. Large CSV files cannot be opened in Excel and should therefore be opened in a statistical program such as {posit}.",
     description: 'Vital Statistics Export Empty State Text'
   },
   applicationNameChangeMessage: {

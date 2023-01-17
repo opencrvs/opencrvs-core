@@ -199,6 +199,10 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           id
           name
         }
+        system {
+          name
+          type
+        }
         user {
           id
           type
@@ -447,6 +451,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         office {
           id
           name
+        }
+        system {
+          name
+          type
         }
         user {
           id

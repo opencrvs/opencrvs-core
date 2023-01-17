@@ -41,7 +41,7 @@ import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { Scope } from '@client/utils/authUtils'
+import { Roles, Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,
   NAME_TEXT,
@@ -346,9 +346,15 @@ export class SearchResultView extends React.Component<
                             ? convertToMSISDN(searchText)
                             : '',
                         name: searchType === NAME_TEXT ? searchText : '',
-                        declarationLocationId: userDetails
-                          ? getUserLocation(userDetails).id
-                          : ''
+                        declarationLocationId:
+                          userDetails &&
+                          ![
+                            Roles.LOCAL_REGISTRAR,
+                            Roles.NATIONAL_REGISTRAR,
+                            Roles.REGISTRATION_AGENT
+                          ].includes(userDetails.role as Roles)
+                            ? getUserLocation(userDetails).id
+                            : ''
                       },
                       sort: SEARCH_RESULT_SORT
                     }
@@ -450,9 +456,15 @@ export class SearchResultView extends React.Component<
             query={SEARCH_EVENTS}
             variables={{
               advancedSearchParameters: {
-                declarationLocationId: userDetails
-                  ? getUserLocation(userDetails).id
-                  : '',
+                declarationLocationId:
+                  userDetails &&
+                  ![
+                    Roles.LOCAL_REGISTRAR,
+                    Roles.NATIONAL_REGISTRAR,
+                    Roles.REGISTRATION_AGENT
+                  ].includes(userDetails.role as Roles)
+                    ? getUserLocation(userDetails).id
+                    : '',
                 trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
                 nationalId: searchType === NATIONAL_ID_TEXT ? searchText : '',
                 registrationNumber:

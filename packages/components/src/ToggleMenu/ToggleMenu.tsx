@@ -14,12 +14,10 @@ import React from 'react'
 import { CircleButton } from '../buttons'
 import { noop } from 'lodash'
 
-// TODO: margin-left value of auto needs to be refactored out
 const ToggleMenuContainer = styled.nav`
   position: relative;
   height: 40px;
   display: flex;
-  margin-left: auto;
   button {
     padding: 0;
     height: auto;
