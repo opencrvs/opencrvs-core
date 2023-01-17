@@ -122,7 +122,7 @@ import {
 } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { flatten, isArray, flattenDeep, get, clone, flatMap } from 'lodash'
+import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import {
@@ -481,18 +481,6 @@ function renderSelectOrRadioLabel(
 ) {
   const option = options.find((option) => option.value === value)
   return option ? intl.formatMessage(option.label) : value
-}
-
-function hasB1Form(draft: IDeclaration) {
-  if (!draft.data.documents.uploadDocForChildDOB) {
-    return false
-  }
-
-  return (
-    draft.data.documents.uploadDocForChildDOB as Array<{
-      optionValues: string[]
-    }>
-  ).some((item) => item.optionValues[1] === 'B1_FORM')
 }
 
 export function renderSelectDynamicLabel(
@@ -1852,10 +1840,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     const isSignatureMissing = isCorrection(declaration)
       ? false
-      : !(
-          hasB1Form(declaration) ||
-          declaration.data.registration?.informantsSignature
-        )
+      : offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED &&
+        !declaration.data.registration?.informantsSignature
 
     const isComplete =
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
@@ -1993,8 +1979,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               )}
 
               {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
-                !isCorrection(declaration) &&
-                !hasB1Form(declaration) && (
+                !isCorrection(declaration) && (
                   <InputWrapper>
                     <InputField
                       id="informant_signature"
