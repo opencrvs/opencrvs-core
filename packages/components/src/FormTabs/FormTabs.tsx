@@ -11,35 +11,55 @@
  */
 import * as React from 'react'
 import { Tab, Tabs } from './components/Tabs'
+import { colors } from '../colors'
+import { Text } from '../Text'
+import { Stack } from '../Stack'
 
+export type ITabColor = keyof typeof colors
 export interface IFormTabs<T extends string | number = string> {
   id: T
   title: string
   disabled?: boolean
+  icon?: React.ReactNode
 }
 export interface IFormTabProps<T extends string | number = string> {
   sections: Array<IFormTabs<T>>
   activeTabId: string
   onTabClick: (tabId: T) => void
+  activeColor?: ITabColor
 }
 
 function FormTabsComponent<T extends string | number = string>({
   sections,
   activeTabId,
-  onTabClick
+  onTabClick,
+  activeColor
 }: IFormTabProps<T>) {
   return (
     <Tabs>
-      {sections.map(({ title, id, disabled }) => (
-        <Tab
-          id={`tab_${id}`}
-          onClick={() => onTabClick(id)}
-          key={id}
-          active={activeTabId === id}
-          disabled={disabled}
-        >
-          {title}
-        </Tab>
+      {sections.map(({ title, id, disabled, icon }) => (
+        <>
+          <Tab
+            id={`tab_${id}`}
+            color={activeColor}
+            onClick={() => onTabClick(id)}
+            key={id}
+            active={activeTabId === id}
+            disabled={disabled}
+            activeColor={activeColor}
+          >
+            <Stack>
+              {icon}
+              <Text
+                variant="bold14"
+                element="span"
+                color={activeColor ?? 'primary'}
+              >
+                {title}
+              </Text>
+            </Stack>
+          </Tab>
+        </>
       ))}
     </Tabs>
   )
