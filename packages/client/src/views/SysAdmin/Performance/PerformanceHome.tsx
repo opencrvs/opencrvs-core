@@ -239,11 +239,7 @@ interface ICorrectionsQueryResult {
 class PerformanceHomeComponent extends React.Component<Props, State> {
   transformPropsToState(props: Props) {
     const { selectedLocation, locations, offices } = props
-
-    console.log(locations)
-
     return {
-      selectedLocation,
       toggleStatus: false,
       officeSelected: this.isOfficeSelected(selectedLocation),
       isAccessibleOffice: this.isAccessibleOfficeSelected(selectedLocation)
@@ -312,11 +308,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               this.props.event,
               newLocation.id
             )
-            // this.setState({ selectedLocation: newLocation })
           }}
         />
         <PerformanceSelect
-          //onChange={(option) => this.setState({ event: option.value as Event })}
           onChange={(option) => {
             const { timeStart, timeEnd, selectedLocation } = this.props
             this.props.goToPerformanceHome(
@@ -352,12 +346,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               locationId
             )
           }}
-          // onDatesChange={({ startDate, endDate }) => {
-          //   this.setState({
-          //     timeStart: startDate,
-          //     timeEnd: endDate
-          //   })
-          // }}
         />
       </>
     )
@@ -400,7 +388,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   render() {
     const { intl, isOnline } = this.props
     const { toggleStatus, officeSelected, isAccessibleOffice } = this.state
-    const { timeStart, timeEnd, event } = this.props
+    const { timeStart, timeEnd, event, selectedLocation } = this.props
 
     const queryVariablesWithoutLocationId = {
       timeStart: timeStart.toISOString(),
@@ -419,7 +407,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             <Content
               title={intl.formatMessage(navigationMessages.performance)}
               size={ContentSize.LARGE}
-              filterContent={this.getFilter(intl, this.props.selectedLocation)}
+              filterContent={this.getFilter(intl, selectedLocation)}
             >
               {isOnline ? (
                 <>
@@ -427,11 +415,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     query={PERFORMANCE_METRICS}
                     fetchPolicy="no-cache"
                     variables={
-                      this.props.selectedLocation &&
-                      !isCountry(this.props.selectedLocation)
+                      selectedLocation && !isCountry(selectedLocation)
                         ? {
                             ...queryVariablesWithoutLocationId,
-                            locationId: this.props.selectedLocation.id
+                            locationId: selectedLocation.id
                           }
                         : queryVariablesWithoutLocationId
                     }
@@ -473,17 +460,17 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             }
                             timeStart={timeStart.toISOString()}
                             timeEnd={timeEnd.toISOString()}
-                            locationId={this.props.selectedLocation.id}
+                            locationId={selectedLocation.id}
                           />
                           <CertificationRatesReport
                             totalRegistrations={calculateTotal(
                               data?.getTotalMetrics.results || []
                             )}
-                            {...(this.props.selectedLocation &&
-                            !isCountry(this.props.selectedLocation)
+                            {...(selectedLocation &&
+                            !isCountry(selectedLocation)
                               ? {
                                   ...queryVariablesWithoutLocationId,
-                                  locationId: this.props.selectedLocation.id
+                                  locationId: selectedLocation.id
                                 }
                               : queryVariablesWithoutLocationId)}
                           />
@@ -491,9 +478,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             data={data!.getTotalMetrics}
                             isAccessibleOffice={this.state.isAccessibleOffice}
                             locationId={
-                              isCountry(this.props.selectedLocation)
+                              isCountry(selectedLocation)
                                 ? undefined
-                                : this.props.selectedLocation.id
+                                : selectedLocation.id
                             }
                             timeStart={timeStart.toISOString()}
                             timeEnd={timeEnd.toISOString()}
@@ -506,11 +493,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     fetchPolicy="no-cache"
                     query={CORRECTION_TOTALS}
                     variables={
-                      this.props.selectedLocation &&
-                      !isCountry(this.props.selectedLocation)
+                      selectedLocation && !isCountry(selectedLocation)
                         ? {
                             ...queryVariablesWithoutLocationId,
-                            locationId: this.props.selectedLocation.id
+                            locationId: selectedLocation.id
                           }
                         : queryVariablesWithoutLocationId
                     }
@@ -540,11 +526,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     fetchPolicy="no-cache"
                     query={GET_TOTAL_PAYMENTS}
                     variables={
-                      this.props.selectedLocation &&
-                      !isCountry(this.props.selectedLocation)
+                      selectedLocation && !isCountry(selectedLocation)
                         ? {
                             ...queryVariablesWithoutLocationId,
-                            locationId: this.props.selectedLocation.id
+                            locationId: selectedLocation.id
                           }
                         : queryVariablesWithoutLocationId
                     }
@@ -583,12 +568,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             query={PERFORMANCE_STATS}
             variables={{
               locationId:
-                this.props.selectedLocation &&
-                !isCountry(this.props.selectedLocation)
-                  ? this.props.selectedLocation.id
+                selectedLocation && !isCountry(selectedLocation)
+                  ? selectedLocation.id
                   : undefined,
               populationYear: timeEnd.getFullYear(),
-              event: this.props.event,
+              event,
               status: [
                 'IN_PROGRESS',
                 'DECLARED',
