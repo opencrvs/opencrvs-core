@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
 import { ILocation } from '@client/offline/reducer'
@@ -19,7 +18,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-
+import * as React from 'react'
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
@@ -36,7 +35,11 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
-
+import {
+  CORRECTION_TOTALS,
+  PERFORMANCE_METRICS,
+  PERFORMANCE_STATS
+} from './metricsQuery'
 import { ApolloError } from '@apollo/client'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
