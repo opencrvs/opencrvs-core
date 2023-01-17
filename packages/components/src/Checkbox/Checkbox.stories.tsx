@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
+import React, { useState } from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Checkbox } from './Checkbox'
 
@@ -26,9 +26,18 @@ export default {
   }
 } as ComponentMeta<typeof Checkbox>
 
-export const Default: ComponentStory<typeof Checkbox> = (args) => (
-  <Checkbox {...args} />
-)
+export const Default: ComponentStory<typeof Checkbox> = (args) => {
+  const [isChecked, setChecked] = useState(false)
+
+  return (
+    <Checkbox
+      {...args}
+      id="default-checkbox"
+      selected={isChecked}
+      onChange={() => setChecked(!isChecked)}
+    />
+  )
+}
 Default.args = {
   name: 'CRVS options',
   label: 'The gold standard for digital civil registration',
