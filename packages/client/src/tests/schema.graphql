@@ -308,6 +308,7 @@ type Person {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  ageOfIndividualInYears: Int
   dateOfMarriage: Date
   multipleBirth: Int
   address: [Address]
@@ -951,6 +952,7 @@ input PersonInput {
   occupation: String
   detailsExist: Boolean
   reasonNotApplying: String
+  ageOfIndividualInYears: Int
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]

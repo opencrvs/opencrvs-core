@@ -57,7 +57,6 @@ const messagesToDefine = {
     description: 'Label for button that deletes signature',
     id: 'review.signature.delete'
   },
-
   additionalComments: {
     defaultMessage: 'Any additional comments?',
     description: 'Label for input Additional comments',

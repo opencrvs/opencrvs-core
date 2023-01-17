@@ -648,7 +648,7 @@ function createOccupationBulder(resource: fhir.Patient, fieldValue: string) {
   }
 }
 
-function createReasonNotApplyingBulder(
+function createReasonNotApplyingBuilder(
   resource: fhir.Patient,
   fieldValue: string
 ) {
@@ -667,6 +667,30 @@ function createReasonNotApplyingBulder(
   } else {
     resource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
+      valueString: fieldValue
+    })
+  }
+}
+
+function createAgeOfIndividualInYearsBuilder(
+  resource: fhir.Patient,
+  fieldValue: string
+) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+
+  const hasAgeOfIndividualInYears = resource.extension.find(
+    (extention) =>
+      extention.url ===
+      `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`
+  )
+
+  if (hasAgeOfIndividualInYears) {
+    hasAgeOfIndividualInYears.valueString = fieldValue
+  } else {
+    resource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
       valueString: fieldValue
     })
   }
@@ -1178,7 +1202,15 @@ export const builders: IFieldBuilders = {
         MOTHER_TITLE,
         fhirBundle
       )
-      return createReasonNotApplyingBulder(person, fieldValue as string)
+      return createReasonNotApplyingBuilder(person, fieldValue as string)
+    },
+    ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const mother = selectOrCreatePersonResource(
@@ -1293,7 +1325,15 @@ export const builders: IFieldBuilders = {
         FATHER_TITLE,
         fhirBundle
       )
-      return createReasonNotApplyingBulder(person, fieldValue as string)
+      return createReasonNotApplyingBuilder(person, fieldValue as string)
+    },
+    ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const father = selectOrCreatePersonResource(
@@ -1490,6 +1530,14 @@ export const builders: IFieldBuilders = {
       )
       return createAgeBuilder(person, fieldValue as string)
     },
+    ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
+    },
     maritalStatus: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
@@ -1592,6 +1640,10 @@ export const builders: IFieldBuilders = {
       gender: (fhirBundle, fieldValue, context) => {
         const person = selectOrCreateInformantResource(fhirBundle)
         person.gender = fieldValue as string
+      },
+      ageOfIndividualInYears: (fhirBundle, fieldValue) => {
+        const person = selectOrCreateInformantResource(fhirBundle)
+        return createAgeOfIndividualInYearsBuilder(person, fieldValue as string)
       },
       identifier: {
         id: (
