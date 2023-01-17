@@ -44,11 +44,6 @@ type CountryLogo {
   file: String
 }
 
-type Integration {
-  name: String
-  status: String
-}
-
 type Currency {
   isoCode: String
   languagesAndCountry: [String]
@@ -126,7 +121,6 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
-  INTEGRATIONS: [IntegrationInput]
   ADMIN_LEVELS: Int
   LOGIN_BACKGROUND: LoginBackgroundInput
 }
@@ -143,7 +137,6 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
-  INTEGRATIONS: [Integration]
   ADMIN_LEVELS: Int
   LOGIN_BACKGROUND: LoginBackground
 }

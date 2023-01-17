@@ -61,9 +61,6 @@ export function usePersistentCountryBackground() {
     localStorage.getItem('country-background') ??
       `{"backgroundColor" : "${(theme as ITheme).colors.backgroundPrimary}"}`
   )
-
-  console.log(countryBackground)
-
   const [offlineBackground, setOfflineBackground] =
     React.useState(countryBackground)
 

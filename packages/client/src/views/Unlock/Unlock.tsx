@@ -22,13 +22,15 @@ import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { getUserName, IUserDetails } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  useIntl,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { buttonMessages, userMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { AvatarLarge } from '@client/components/Avatar'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Box, Link, Stack, Text, Toast } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -54,22 +56,19 @@ type IFullProps = Props &
   IntlShapeProps & {
     onCorrectPinMatch: () => void
     onForgetPin: () => void
-    offlineCountryConfiguration: IOfflineData
   }
 
 const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
-type IntlProps = IntlShapeProps
-
-export const EnterPinLabel = injectIntl((props: IntlProps) => {
-  const { intl } = props
+export const EnterPinLabel = () => {
+  const intl = useIntl()
   return (
     <Text element="h3" variant="h3">
       {intl.formatMessage(userMessages.enterPinLabel)}
     </Text>
   )
-})
+}
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
   pinKeyRef: any
@@ -242,8 +241,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
 export const Unlock = connect(
   (store: IStoreState) => ({
-    userDetails: getUserDetails(store),
-    offlineCountryConfiguration: getOfflineData(store)
+    userDetails: getUserDetails(store)
   }),
   {
     redirectToAuthentication

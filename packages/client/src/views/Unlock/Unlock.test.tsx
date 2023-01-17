@@ -21,7 +21,7 @@ import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { vi, Mock } from 'vitest'
 
-const pressBackspace = (component: ReactWrapper) => {
+const clearPassword = (component: ReactWrapper) => {
   const pinInput = component.find('#pin-input')
   pinInput.simulate('keypress', { key: 'Backspace' })
   pinInput.simulate('keypress', { key: 'Backspace' })
@@ -78,8 +78,8 @@ describe('Unlock page loads Properly', () => {
     expect(elem).toBe(1)
   })
 
-  it('There should be no error message after providing successfull Pin', () => {
-    pressBackspace(testComponent)
+  it('There should be no error message after providing successfully Pin', () => {
+    clearPassword(testComponent)
     pressPin(testComponent, 48)
     pressPin(testComponent, 48)
     pressPin(testComponent, 48)

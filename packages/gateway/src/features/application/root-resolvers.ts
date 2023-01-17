@@ -14,7 +14,6 @@ import {
   GQLCurrencyInput,
   GQLDeathInput,
   GQLCountryLogoInput,
-  GQLIntegrationInput,
   GQLLoginBackgroundInput,
   GQLResolver
 } from '@gateway/graphql/schema'
@@ -51,7 +50,6 @@ export const resolvers: GQLResolver = {
         NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
         ADDRESSES: applicationConfig.ADDRESSES as number,
         ADMIN_LEVELS: applicationConfig.ADMIN_LEVELS as number,
-        INTEGRATIONS: applicationConfig.INTEGRATIONS as GQLIntegrationInput[],
         LOGIN_BACKGROUND:
           applicationConfig.LOGIN_BACKGROUND as GQLLoginBackgroundInput
       }
