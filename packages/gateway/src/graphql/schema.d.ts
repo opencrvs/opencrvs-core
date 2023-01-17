@@ -606,7 +606,6 @@ export interface GQLApplicationConfiguration {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
-  INTEGRATIONS?: Array<GQLIntegration | null>
   ADMIN_LEVELS?: number
   LOGIN_BACKGROUND?: GQLLoginBackground
 }
@@ -623,7 +622,6 @@ export interface GQLApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
-  INTEGRATIONS?: Array<GQLIntegrationInput | null>
   ADMIN_LEVELS?: number
   LOGIN_BACKGROUND?: GQLLoginBackgroundInput
 }
@@ -983,10 +981,11 @@ export interface GQLTotalMetricsByTime {
 
 export interface GQLVSExport {
   event: string
-  year: number
+  startDate: GQLDate
+  endDate: GQLDate
   fileSize: string
   url: string
-  createdOn: string
+  createdOn: GQLDate
 }
 
 export type GQLUserAuditLogResultItem =
@@ -1206,11 +1205,6 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
-export interface GQLIntegration {
-  name?: string
-  status?: string
-}
-
 export interface GQLLoginBackground {
   backgroundColor?: string
   backgroundImage?: string
@@ -1236,11 +1230,6 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
-}
-
-export interface GQLIntegrationInput {
-  name?: string
-  status?: string
 }
 
 export interface GQLLoginBackgroundInput {
@@ -1883,7 +1872,6 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
-  Integration?: GQLIntegrationTypeResolver
   LoginBackground?: GQLLoginBackgroundTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
@@ -4710,7 +4698,6 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
-  INTEGRATIONS?: ApplicationConfigurationToINTEGRATIONSResolver<TParent>
   ADMIN_LEVELS?: ApplicationConfigurationToADMIN_LEVELSResolver<TParent>
   LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
 }
@@ -4786,13 +4773,6 @@ export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
 }
 
 export interface ApplicationConfigurationToADDRESSESResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToINTEGRATIONSResolver<
   TParent = any,
   TResult = any
 > {
@@ -5730,7 +5710,8 @@ export interface TotalMetricsByTimeToTotalResolver<
 
 export interface GQLVSExportTypeResolver<TParent = any> {
   event?: VSExportToEventResolver<TParent>
-  year?: VSExportToYearResolver<TParent>
+  startDate?: VSExportToStartDateResolver<TParent>
+  endDate?: VSExportToEndDateResolver<TParent>
   fileSize?: VSExportToFileSizeResolver<TParent>
   url?: VSExportToUrlResolver<TParent>
   createdOn?: VSExportToCreatedOnResolver<TParent>
@@ -5740,7 +5721,11 @@ export interface VSExportToEventResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface VSExportToYearResolver<TParent = any, TResult = any> {
+export interface VSExportToStartDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToEndDateResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5966,19 +5951,6 @@ export interface DeathToREGISTRATION_TARGETResolver<
 }
 
 export interface DeathToFEEResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLIntegrationTypeResolver<TParent = any> {
-  name?: IntegrationToNameResolver<TParent>
-  status?: IntegrationToStatusResolver<TParent>
-}
-
-export interface IntegrationToNameResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface IntegrationToStatusResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -41,7 +41,8 @@ export const influx = new InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -67,7 +68,8 @@ export const influx = new InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     },
     {
@@ -82,7 +84,8 @@ export const influx = new InfluxDB({
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
-        'locationLevel2'
+        'locationLevel2',
+        'locationLevel1'
       ]
     }
   ]

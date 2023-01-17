@@ -163,7 +163,7 @@ interface IProps {
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
   filterContent?: React.ReactNode
-  subtitle?: string
+  subtitle?: string | React.ReactNode
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: ContentSize

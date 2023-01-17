@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as React from 'react'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
 import { ILocation } from '@client/offline/reducer'
@@ -18,7 +19,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import * as React from 'react'
+
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
@@ -28,18 +29,14 @@ import styled, { withTheme } from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
-import subYears from 'date-fns/subYears'
+import subMonths from 'date-fns/subMonths'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
-import {
-  CORRECTION_TOTALS,
-  PERFORMANCE_METRICS,
-  PERFORMANCE_STATS
-} from './metricsQuery'
+
 import { ApolloError } from '@apollo/client'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
@@ -254,7 +251,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     return {
       selectedLocation,
       timeStart:
-        (timeStart && new Date(timeStart)) || subYears(new Date(Date.now()), 1),
+        (timeStart && new Date(timeStart)) ||
+        subMonths(new Date(Date.now()), 11),
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.Birth,
       toggleStatus: false,
