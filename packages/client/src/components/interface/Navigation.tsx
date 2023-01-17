@@ -34,7 +34,9 @@ import {
   goToFormConfigHome,
   goToApplicationConfig,
   goToAdvancedSearchResult,
-  goToVSExport
+  goToVSExport,
+  goToOrganizationList,
+  goToOrganizationView
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -85,6 +87,7 @@ export const WORKQUEUE_TABS = {
   vsexports: 'vsexports',
   team: 'team',
   config: 'config',
+  organization: 'organization',
   application: 'application',
   certificate: 'certificate',
   systems: 'integration',
@@ -117,6 +120,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.sentForApproval,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organization,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -128,6 +132,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organization,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -139,6 +144,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organization,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -150,6 +156,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organization,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
@@ -158,6 +165,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   ],
   LOCAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organization,
     WORKQUEUE_TABS.team,
     GROUP_ID.menuGroup
   ],
@@ -165,6 +173,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
+    WORKQUEUE_TABS.organization,
     WORKQUEUE_TABS.vsexports,
     GROUP_ID.menuGroup
   ],
@@ -208,6 +217,7 @@ interface IDispatchProps {
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
+  goToOrganizationViewAction: typeof goToOrganizationView
   goToSystemViewAction: typeof goToSystemList
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
@@ -599,6 +609,25 @@ export const NavigationView = (props: IFullProps) => {
                   )}
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.organization
+                  ) && (
+                    <NavigationItem
+                      icon={() => <Users />}
+                      id={`navigation_${WORKQUEUE_TABS.organization}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.organization]
+                      )}
+                      onClick={() =>
+                        props.goToOrganizationViewAction(userDetails)
+                      }
+                      isSelected={
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TABS.organization
+                      }
+                    />
+                  )}
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
                     WORKQUEUE_TABS.team
                   ) && (
                     <NavigationItem
@@ -797,6 +826,7 @@ export const Navigation = connect<
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
+  goToOrganizationViewAction: goToOrganizationView,
   goToTeamViewAction: goToTeamView,
   goToSystemViewAction: goToSystemList,
   redirectToAuthentication,

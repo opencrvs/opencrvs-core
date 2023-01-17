@@ -55,7 +55,8 @@ import {
   VS_EXPORTS,
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST
+  PERFORMANCE_REGISTRATIONS_LIST,
+  LIST_OF_ORGANIZATIONS
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -242,6 +243,15 @@ export function goToTeamUserList(id: string) {
     pathname: TEAM_USER_LIST,
     search: stringify({
       locationId: id
+    })
+  })
+}
+
+export function goToOrganizationList(partOf: string) {
+  return push({
+    pathname: LIST_OF_ORGANIZATIONS,
+    search: stringify({
+      partOf: partOf ?? 'Location/0'
     })
   })
 }
@@ -648,6 +658,12 @@ export function goToTeamView(userDetails: IUserDetails) {
     return goToTeamUserList(
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
     )
+  }
+}
+
+export function goToOrganizationView(userDetails: IUserDetails) {
+  if (userDetails && userDetails.role) {
+    return goToOrganizationList('Location/0')
   }
 }
 

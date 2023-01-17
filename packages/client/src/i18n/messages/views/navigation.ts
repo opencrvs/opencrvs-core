@@ -22,6 +22,7 @@ interface INavigationMessages
   print: MessageDescriptor
   application: MessageDescriptor
   performance: MessageDescriptor
+  organization: MessageDescriptor
   team: MessageDescriptor
   vsexports: MessageDescriptor
   config: MessageDescriptor
@@ -96,6 +97,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Vital statistics',
     description: 'Reports label in navigation',
     id: 'navigation.reports'
+  },
+  organization: {
+    defaultMessage: 'Organization',
+    description: 'List of organizations',
+    id: 'navigation.organization'
   },
   completenessRates: {
     defaultMessage: 'Completeness rates',
