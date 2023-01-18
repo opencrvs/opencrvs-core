@@ -27,6 +27,11 @@ const applicationConfigMutation = gql`
       INFORMANT_SIGNATURE_REQUIRED
       ADDRESSES
       ADMIN_LEVELS
+      LOGIN_BACKGROUND {
+        backgroundColor
+        backgroundImage
+        imageFit
+      }
       COUNTRY_LOGO {
         fileName
         file

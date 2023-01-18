@@ -87,6 +87,23 @@ input CurrencyInput {
   languagesAndCountry: [String]
 }
 
+enum ImageFit {
+  FILL
+  TILE
+}
+
+input LoginBackgroundInput {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
+type LoginBackground {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
 input ApplicationConfigurationInput {
   APPLICATION_NAME: String
   BIRTH: BirthInput
@@ -103,6 +120,7 @@ input ApplicationConfigurationInput {
   INFORMANT_SIGNATURE_REQUIRED: Boolean
   DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 type ApplicationConfiguration {
@@ -121,6 +139,7 @@ type ApplicationConfiguration {
   INFORMANT_SIGNATURE_REQUIRED: Boolean
   DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 type Mutation {

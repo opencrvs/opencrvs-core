@@ -612,6 +612,7 @@ export interface GQLApplicationConfiguration {
   INFORMANT_SIGNATURE_REQUIRED?: boolean
   DATE_OF_BIRTH_UNKNOWN?: boolean
   ADMIN_LEVELS?: number
+  LOGIN_BACKGROUND?: GQLLoginBackground
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -630,6 +631,7 @@ export interface GQLApplicationConfigurationInput {
   INFORMANT_SIGNATURE_REQUIRED?: boolean
   DATE_OF_BIRTH_UNKNOWN?: boolean
   ADMIN_LEVELS?: number
+  LOGIN_BACKGROUND?: GQLLoginBackgroundInput
 }
 
 export interface GQLFormDraftInput {
@@ -1218,6 +1220,12 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
+export interface GQLLoginBackground {
+  backgroundColor?: string
+  backgroundImage?: string
+  imageFit?: GQLImageFit
+}
+
 export interface GQLBirthInput {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
@@ -1237,6 +1245,12 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
+}
+
+export interface GQLLoginBackgroundInput {
+  backgroundColor?: string
+  backgroundImage?: string
+  imageFit?: GQLImageFit
 }
 
 export interface GQLQuestionInput {
@@ -1655,6 +1669,11 @@ export interface GQLDeathFee {
   DELAYED?: number
 }
 
+export const enum GQLImageFit {
+  FILL = 'FILL',
+  TILE = 'TILE'
+}
+
 export interface GQLBirthFeeInput {
   ON_TIME?: number
   LATE?: number
@@ -1868,6 +1887,7 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
+  LoginBackground?: GQLLoginBackgroundTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -4713,6 +4733,7 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
   DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
   ADMIN_LEVELS?: ApplicationConfigurationToADMIN_LEVELSResolver<TParent>
+  LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -4814,6 +4835,13 @@ export interface ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<
 }
 
 export interface ApplicationConfigurationToADMIN_LEVELSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToLOGIN_BACKGROUNDResolver<
   TParent = any,
   TResult = any
 > {
@@ -6002,6 +6030,33 @@ export interface DeathToREGISTRATION_TARGETResolver<
 }
 
 export interface DeathToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLLoginBackgroundTypeResolver<TParent = any> {
+  backgroundColor?: LoginBackgroundToBackgroundColorResolver<TParent>
+  backgroundImage?: LoginBackgroundToBackgroundImageResolver<TParent>
+  imageFit?: LoginBackgroundToImageFitResolver<TParent>
+}
+
+export interface LoginBackgroundToBackgroundColorResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LoginBackgroundToBackgroundImageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LoginBackgroundToImageFitResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
