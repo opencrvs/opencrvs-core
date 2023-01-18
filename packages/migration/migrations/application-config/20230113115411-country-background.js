@@ -9,7 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
-export const INFLUX_PORT = process.env.INFLUX_PORT || 8086
-export const INFLUX_DB = process.env.INFLUX_DB || 'ocrvs'
-export const INFLUXDB_URL = `http://${INFLUX_HOST}:${INFLUX_PORT}`
+
+export const up = async (db, client) => {
+  await db.collection('configs').updateMany(
+    {},
+    {
+      $set: {
+        LOGIN_BACKGROUND: {
+          backgroundColor: '36304E'
+        }
+      }
+    }
+  )
+}
+
+export const down = async (db, client) => {
+  await db.collection('configs').updateMany(
+    {},
+    {
+      $unset: {
+        LOGIN_BACKGROUND: ''
+      }
+    }
+  )
+}

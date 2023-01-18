@@ -3592,13 +3592,9 @@
             "name": "createdAt",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Date",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Date",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -3720,13 +3716,9 @@
             "name": "updatedAt",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Date",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Date",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -18966,7 +18958,23 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Date",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "endDate",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Date",
                 "ofType": null
               }
             },
@@ -19006,6 +19014,22 @@
             "deprecationReason": null
           },
           {
+            "name": "startDate",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Date",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "url",
             "description": null,
             "args": [],
@@ -19015,22 +19039,6 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "year",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
                 "ofType": null
               }
             },

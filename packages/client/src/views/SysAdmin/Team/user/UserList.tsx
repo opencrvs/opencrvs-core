@@ -158,11 +158,6 @@ const LocationInfoValue = styled.div`
   ${({ theme }) => theme.fonts.reg18};
 `
 
-const LocationInfoEmptyValue = styled.div`
-  color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.reg16};
-`
-
 const StatusMenuContainer = styled.div`
   display: flex;
   align-items: center;
@@ -320,6 +315,18 @@ function UserListComponent(props: IProps) {
   const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
   )
+
+  const getAddressName = ({ name, partOf }: ILocation): string => {
+    const parentLocationId = partOf.split('/')[1]
+    if (parentLocationId === '0') return name
+    const parentLocation = offlineCountryConfig.locations[parentLocationId]
+    return `${name}, ${getAddressName(parentLocation)}`
+  }
+
+  const getParentLocation = ({ partOf }: ILocation) => {
+    const parentLocationId = partOf.split('/')[1]
+    return offlineCountryConfig.locations[parentLocationId]
+  }
 
   const toggleUserActivationModal = useCallback(
     function toggleUserActivationModal(user?: User) {
@@ -890,14 +897,10 @@ function UserListComponent(props: IProps) {
                       {(searchedLocation && searchedLocation.name) || ''}
                     </Header>
                     <LocationInfo>
-                      {searchedLocation && searchedLocation.address ? (
+                      {searchedLocation && (
                         <LocationInfoValue>
-                          {searchedLocation.address}
+                          {getAddressName(getParentLocation(searchedLocation))}
                         </LocationInfoValue>
-                      ) : (
-                        <LocationInfoEmptyValue>
-                          {intl.formatMessage(constantsMessages.notAvailable)}
-                        </LocationInfoEmptyValue>
                       )}
                     </LocationInfo>
                     <RenderUserList

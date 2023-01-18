@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { INFLUXDB_URL, INFLUX_DB } from '@metrics/influxdb/constants'
 import {
   FEMALE,
   MALE,
@@ -28,7 +29,9 @@ import {
 } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
 import { query } from '@metrics/influxdb/client'
+import { csvToJSON } from '@metrics/utils/csvHelper'
 import { format } from 'date-fns'
+import fetch from 'node-fetch'
 interface IGroupedByGender {
   total: number
   gender: string
@@ -329,6 +332,7 @@ export async function getCurrentAndLowerLocationLevels(
   const allPointsContainingLocationId = await query(
     `SELECT LAST(*) FROM ${measurement} WHERE time > $timeStart AND time <= $timeEnd
       AND ( officeLocation = $locationId
+        OR locationLevel1 = $locationId
         OR locationLevel2 = $locationId
         OR locationLevel3 = $locationId
         OR locationLevel4 = $locationId
@@ -438,7 +442,8 @@ export async function fetchKeyFigures(
       FROM birth_registration
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}
-      AND ( locationLevel2 = $queryLocationId
+      AND ( locationLevel1 = $queryLocationId
+          OR locationLevel2 = $queryLocationId
           OR locationLevel3 = $queryLocationId
           OR locationLevel4 = $queryLocationId
           OR locationLevel5 = $queryLocationId )
@@ -474,7 +479,8 @@ export async function fetchKeyFigures(
       FROM birth_registration
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}
-      AND ( locationLevel2 = $queryLocationId
+      AND ( locationLevel1 = $queryLocationId
+          OR locationLevel2 = $queryLocationId
           OR locationLevel3 = $queryLocationId
           OR locationLevel4 = $queryLocationId
           OR locationLevel5 = $queryLocationId )
@@ -798,7 +804,8 @@ export async function getTotalNumberOfRegistrations(
       FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
-      AND ( locationLevel2 = $locationId
+      AND ( locationLevel1 = $locationId
+          OR locationLevel2 = $locationId
           OR locationLevel3 = $locationId
           OR locationLevel4 = $locationId
           OR locationLevel5 = $locationId )`,
@@ -832,7 +839,8 @@ export async function fetchLocationWiseEventEstimations(
       FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
-      AND ( locationLevel2 = $locationId
+      AND ( locationLevel1 = $locationId
+          OR locationLevel2 = $locationId
           OR locationLevel3 = $locationId
           OR locationLevel4 = $locationId
           OR locationLevel5 = $locationId )
@@ -922,7 +930,8 @@ export async function fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
       FROM ${measurement}
     WHERE time > $timeFrom
       AND time <= $timeTo
-      AND ( locationLevel2 = $locationId
+      AND ( locationLevel1 = $locationId
+          OR locationLevel2 = $locationId
           OR locationLevel3 = $locationId
           OR locationLevel4 = $locationId
           OR locationLevel5 = $locationId )
@@ -966,7 +975,8 @@ export async function fetchEventsGroupByMonthDates(
       AND time <= $timeTo
       ${
         locationId
-          ? `AND ( locationLevel2 = $locationId
+          ? `AND ( locationLevel1 = $locationId
+      OR locationLevel2 = $locationId
       OR locationLevel3 = $locationId
       OR locationLevel4 = $locationId
       OR locationLevel5 = $locationId )`
@@ -1002,7 +1012,8 @@ export async function getTotalMetrics(
       AND time <= $timeTo
       ${
         locationId
-          ? `AND ( locationLevel2 = $locationId
+          ? `AND ( locationLevel1 = $locationId
+      OR locationLevel2 = $locationId
       OR locationLevel3 = $locationId
       OR locationLevel4 = $locationId
       OR locationLevel5 = $locationId
@@ -1051,7 +1062,8 @@ export async function fetchRegistrationsGroupByOfficeLocation(
       AND time <= '${timeTo}'
       ${
         locationId
-          ? `AND ( locationLevel2 = '${locationId}'
+          ? `AND ( locationLevel1 = '${locationId}'
+      OR locationLevel2 = '${locationId}'
       OR locationLevel3 = '${locationId}'
       OR locationLevel4 = '${locationId}'
       OR locationLevel5 = '${locationId}'
@@ -1074,26 +1086,54 @@ export async function fetchRegistrationsGroupByTime(
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
 
-  const result: IMetricsTotalGroupByTime[] = await query(
-    `SELECT COUNT(${column}) AS total
-      FROM ${measurement}
-      WHERE time > '${timeFrom}'
-      AND time <= '${timeTo}'
-      ${
-        locationId
-          ? `AND ( locationLevel2 = '${locationId}'
-      OR locationLevel3 = '${locationId}'
-      OR locationLevel4 = '${locationId}'
-      OR locationLevel5 = '${locationId}'
-      OR officeLocation = '${locationId}')`
-          : ``
-      }
-    GROUP BY time(30d), timeLabel, eventLocationType ORDER BY time DESC
+  const fluxQuery = `
+   from(bucket: "${INFLUX_DB}")
+   |> range(start: ${timeFrom}, stop: ${timeTo})
+   |> filter(fn: (r) => r._measurement == "${measurement}") 
+   ${
+     locationId
+       ? `|> filter(fn: (r) => 
+   (r.locationLevel1 == "${locationId}" or
+    r.locationLevel2 == "${locationId}" or
+    r.locationLevel3 == "${locationId}" or 
+    r.locationLevel4 == "${locationId}" or
+    r.locationLevel5 == "${locationId}" or
+    r.officeLocation == "${locationId}"))`
+       : ``
+   }
+    |> filter(fn: (r) => r._field == "${column}")
+    |> group(columns: ["timeLabel", "eventLocationType"])
+    |> aggregateWindow(every: 1mo, fn: count, timeSrc: "_start")
+    |> sort(columns: ["_time"], desc: true)
+    |> rename(columns: {_value: "total"})
+   `
 
-    `
-  )
+  const res = await fetch(`${INFLUXDB_URL}/api/v2/query`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/csv',
+      'Content-type': 'application/vnd.flux'
+    },
+    body: fluxQuery
+  })
+  // slice(4) to ignoring unwanted rows in csv
+  const fluxJson = (await csvToJSON(await res.text())).slice(4)
+  const keys = ['eventLocationType', 'timeLabel', 'total', 'time']
+  const fluxRes: IMetricsTotalGroupByTime[] = fluxJson
+    .slice(0, -1)
+    .map((item) => {
+      const obj: Partial<IMetricsTotalGroupByTime> = {}
+      keys.forEach((key, i) => {
+        // item[i+5] to ignore the first 5 values of json & count from index 5
+        obj[key] = item[i + 5]
+        if (key === 'total') {
+          obj[key] = Number(item[i + 5])
+        }
+      })
+      return obj as IMetricsTotalGroupByTime
+    })
 
-  return result
+  return fluxRes
 }
 
 function populateGenderBasisMetrics(

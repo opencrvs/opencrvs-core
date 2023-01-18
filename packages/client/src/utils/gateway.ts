@@ -413,7 +413,7 @@ export type BirthRegistrationInput = {
   birthType?: InputMaybe<BirthType>
   child?: InputMaybe<PersonInput>
   childrenBornAliveToMother?: InputMaybe<Scalars['Int']>
-  createdAt: Scalars['Date']
+  createdAt?: InputMaybe<Scalars['Date']>
   eventLocation?: InputMaybe<LocationInput>
   father?: InputMaybe<PersonInput>
   foetalDeathsToMother?: InputMaybe<Scalars['Int']>
@@ -423,7 +423,7 @@ export type BirthRegistrationInput = {
   otherAttendantAtBirth?: InputMaybe<Scalars['String']>
   questionnaire?: InputMaybe<Array<InputMaybe<QuestionnaireQuestionInput>>>
   registration?: InputMaybe<RegistrationInput>
-  updatedAt: Scalars['Date']
+  updatedAt?: InputMaybe<Scalars['Date']>
   weightAtBirth?: InputMaybe<Scalars['Float']>
 }
 
@@ -2214,11 +2214,12 @@ export type UserInput = {
 
 export type VsExport = {
   __typename?: 'VSExport'
-  createdOn: Scalars['String']
+  createdOn: Scalars['Date']
+  endDate: Scalars['Date']
   event: Scalars['String']
   fileSize: Scalars['String']
+  startDate: Scalars['Date']
   url: Scalars['String']
-  year: Scalars['Int']
 }
 
 export type VerifyPasswordResult = {
@@ -6258,9 +6259,10 @@ export type GetVsExportsQuery = {
     results?: Array<{
       __typename?: 'VSExport'
       event: string
-      year: number
+      startDate: any
+      endDate: any
       url: string
-      createdOn: string
+      createdOn: any
       fileSize: string
     }> | null
   } | null

@@ -512,6 +512,16 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/0'
     },
+    '7a18cb4c-38f3-449f-b3dc-508473d485f3': {
+      id: '7a18cb4c-38f3-449f-b3dc-508473d485f3',
+      name: 'Chandpur',
+      alias: 'চাঁদপুর',
+      physicalType: 'Jurisdiction',
+      status: 'active',
+      jurisdictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/5926982b-845c-4463-80aa-cbfb86762e0a'
+    },
     'bc4b9f99-0db3-4815-926d-89fd56889407': {
       id: 'bc4b9f99-0db3-4815-926d-89fd56889407',
       name: 'BARGUNA',
@@ -724,6 +734,11 @@ export const mockOfflineData = {
       fileName: 'logo.png',
       file: `data:image;base64,${validImageB64String}`
     },
+    LOGIN_BACKGROUND: {
+      backgroundColor: 'FFF',
+      backgroundImage: '',
+      imageFit: 'FILL'
+    },
     CURRENCY: {
       isoCode: 'ZMW',
       languagesAndCountry: ['en-ZM']
@@ -750,7 +765,6 @@ export const mockOfflineLocationsWithHierarchy: Record<
       id: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
       name: 'ARK Private Clinic',
       alias: 'ARK Private Clinic',
-      address: '',
       physicalType: 'Building',
       status: 'active',
       type: 'HEALTH_FACILITY',
@@ -762,7 +776,6 @@ export const mockOfflineLocationsWithHierarchy: Record<
       id: 'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
       name: 'Ibombo District Office',
       alias: 'Ibombo District Office',
-      address: 'Ibombo District, Central Province',
       physicalType: 'Building',
       status: 'active',
       type: 'CRVS_OFFICE',

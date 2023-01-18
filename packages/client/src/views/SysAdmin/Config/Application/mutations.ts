@@ -24,6 +24,11 @@ const applicationConfigMutation = gql`
       HIDE_EVENT_REGISTER_INFORMATION
       ADDRESSES
       ADMIN_LEVELS
+      LOGIN_BACKGROUND {
+        backgroundColor
+        backgroundImage
+        imageFit
+      }
       COUNTRY_LOGO {
         fileName
         file

@@ -16,7 +16,8 @@ export const GET_TOTAL_VSEXPORT = gql`
     getVSExports {
       results {
         event
-        year
+        startDate
+        endDate
         url
         createdOn
         fileSize
