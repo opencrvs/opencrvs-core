@@ -25,6 +25,7 @@ interface IProps {
   processingText: string
   outboxText: string
   theme: ITheme
+  children?: React.ReactNode
 }
 const NotificationBar = styled.div`
   padding: 8px 16px;
