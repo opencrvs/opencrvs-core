@@ -2197,7 +2197,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.hideLabel'
   },
   openCamera: {
-    defaultMessage: 'Open Camera',
+    defaultMessage: 'Photo',
     description: 'The text displayed on the Open Camera button',
     id: 'form.field.label.openCamera'
   },

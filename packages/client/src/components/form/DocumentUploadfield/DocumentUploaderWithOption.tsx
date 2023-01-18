@@ -29,6 +29,7 @@ import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { CameraUploadField } from './CameraUploadField'
+import { Camera, Upload } from 'react-feather'
 
 const options = {
   maxSizeMB: 0.4,
@@ -279,6 +280,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
   renderDocumentUploaderWithDocumentTypeBlock = () => {
     const { name, intl } = this.props
+    const isMobile = isMobileDevice()
     return this.props.splitView ? (
       this.state.dropDownOptions.map((opt, idx) => (
         <Flex splitView key={idx}>
@@ -311,19 +313,30 @@ class DocumentUploaderWithOptionComp extends React.Component<
             onChange={this.onChange}
           />
 
-          {!isMobileDevice() && (
-            <ImageUploader
-              id="upload_document"
-              title={intl.formatMessage(formMessages.addFile)}
-              onClick={(e) => !this.isValid() && e.preventDefault()}
-              handleFileChange={this.handleFileChange}
-              disabled={this.state.filesBeingProcessed.length > 0}
-            />
+          {!isMobile && (
+            <>
+              <ImageUploader
+                id="upload_document"
+                icon={() => <Upload />}
+                title={intl.formatMessage(formMessages.addFile)}
+                onClick={(e) => !this.isValid() && e.preventDefault()}
+                handleFileChange={this.handleFileChange}
+                disabled={this.state.filesBeingProcessed.length > 0}
+              />
+              <CameraUploadField
+                isMobile={isMobile}
+                handleFileChange={this.handleFileChange}
+                isValid={this.isValid}
+                disabled={this.state.filesBeingProcessed.length > 0}
+              />
+            </>
           )}
-          {isMobileDevice() && (
+          {isMobile && (
             <CameraUploadField
+              isMobile={isMobile}
               handleFileChange={this.handleFileChange}
               isValid={this.isValid}
+              disabled={this.state.filesBeingProcessed.length > 0}
             />
           )}
         </Flex>

@@ -19,12 +19,9 @@ import { messages } from '@client/i18n/messages/views/notifications'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import React, { ReactNode } from 'react'
+import { Camera } from 'react-feather'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
-
-const PhotoUploader = styled(SecondaryButton)`
-  margin: 8px 0;
-`
 
 export const ErrorMessage = styled.div`
   margin-bottom: 16px;
@@ -35,18 +32,28 @@ const VideoOverlay = styled.div`
   width: 100%;
   height: 100%;
   left: 0;
-  top: 0;
+  top: -64px;
   z-index: 1;
   background: ${({ theme }) => theme.colors.white};
-  padding: 16px;
 `
 
-const VideoButtonHolder = styled.div`
-  padding: 16px 0;
+const Video = styled.video`
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
 `
 
 const TakePhotoButton = styled(PrimaryButton)`
-  margin-right: 16px;
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  border-radius: 36px;
+  background-color: blue;
+  padding: 0 12px;
+  z-index: 2;
 `
 
 const VideoLoadingIndicator = styled(LoadingIndicator)`
@@ -59,6 +66,8 @@ const VideoLoadingIndicator = styled(LoadingIndicator)`
 
 type IFullProps = {
   isValid: () => boolean
+  isMobile: boolean
+  disabled: boolean
   handleFileChange: (uploadedImage: File) => void
 } & IntlShapeProps
 
@@ -103,6 +112,7 @@ class CameraUploadFieldComp extends React.Component<IFullProps, IState> {
       let mediaOptions: ISelectOption[] = []
       devices.map((mediaDeviceInfo, index, arr) => {
         if (mediaDeviceInfo.kind === 'videoinput') {
+          // TODO: If there is more than one camera, add a button to switch to other camera (for mobile devices)
           mediaOptions = mediaOptions.concat({
             value: mediaDeviceInfo.deviceId,
             label: mediaDeviceInfo.label || 'Camera ' + (index + 1)
@@ -184,19 +194,21 @@ class CameraUploadFieldComp extends React.Component<IFullProps, IState> {
   }
 
   render(): ReactNode {
-    const { intl } = this.props
+    const { intl, isMobile } = this.props
     return (
       <div>
-        <PhotoUploader
+        <SecondaryButton
           id="upload_photo"
+          icon={() => <Camera />}
+          disabled={this.props.disabled}
           onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>): void => {
             if (this.props.isValid()) {
               this.startStreaming()
             }
           }}
         >
-          {intl.formatMessage(formMessages.openCamera)}
-        </PhotoUploader>
+          {isMobile ? undefined : intl.formatMessage(formMessages.openCamera)}
+        </SecondaryButton>
         <ErrorMessage id="upload-error">
           {this.state.errorMessage && (
             <ErrorText>{this.state.errorMessage}</ErrorText>
@@ -206,36 +218,14 @@ class CameraUploadFieldComp extends React.Component<IFullProps, IState> {
           style={{ display: this.state.showVideo ? 'block' : 'none' }}
         >
           {this.state.loadingVideo && <VideoLoadingIndicator loading={true} />}
-          <video
-            autoPlay
-            playsInline
-            ref={this.videoRef}
-            style={{ width: '100%', height: '70%' }}
-          ></video>
-          <Select
-            id="camera-source"
-            options={this.state.cameraOptions}
-            onChange={this.onCameraChange}
-            value={this.state.selectedCamera}
+          <Video autoPlay playsInline ref={this.videoRef} />
+          <TakePhotoButton
+            id="take_photo"
+            icon={() => <Camera />}
+            onClick={(e): void => {
+              this.takePhoto()
+            }}
           />
-          <VideoButtonHolder>
-            <TakePhotoButton
-              id="take_photo"
-              onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>): void => {
-                this.takePhoto()
-              }}
-            >
-              {intl.formatMessage(formMessages.takePhoto)}
-            </TakePhotoButton>
-            <SecondaryButton
-              id="cancel_photo"
-              onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>): void => {
-                this.cancel()
-              }}
-            >
-              {intl.formatMessage(buttonMessages.cancel)}
-            </SecondaryButton>
-          </VideoButtonHolder>
         </VideoOverlay>
       </div>
     )
