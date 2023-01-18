@@ -43,7 +43,6 @@ import { User } from '@client/utils/gateway'
 import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
-import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
@@ -760,22 +759,22 @@ export const NavigationView = (props: IFullProps) => {
       )}
 
       <NavigationGroup>
-        {userDetails?.searches && userDetails?.searches.length > 0 ? (
-          userDetails?.searches.map((bookmarkResult, index) => {
+        {userDetails?.searches && userDetails.searches.length > 0 ? (
+          userDetails.searches.map((bookmarkResult) => {
             return (
               <NavigationItem
                 icon={() => (
                   <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
                 )}
-                id={`bookmarked_advanced_search_${bookmarkResult?.searchId}`}
-                label={bookmarkResult?.name}
+                id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
+                label={bookmarkResult.name}
                 disabled={
-                  advancedSearchParams.searchId === bookmarkResult?.searchId &&
+                  advancedSearchParams.searchId === bookmarkResult.searchId &&
                   props.location.pathname === ADVANCED_SEARCH_RESULT
                 }
                 onClick={() => {
                   const filteredParam = omit(
-                    bookmarkResult?.parameters,
+                    bookmarkResult.parameters,
                     '__typename'
                   ) as IAdvancedSearchParamState
                   setAdvancedSearchParam({
@@ -785,7 +784,7 @@ export const NavigationView = (props: IFullProps) => {
                   goToAdvancedSearchResultAction()
                 }}
                 isSelected={
-                  advancedSearchParams.searchId === bookmarkResult?.searchId &&
+                  advancedSearchParams.searchId === bookmarkResult.searchId &&
                   props.location.pathname === ADVANCED_SEARCH_RESULT
                 }
               />

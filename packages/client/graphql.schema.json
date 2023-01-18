@@ -18342,9 +18342,13 @@
               "kind": "LIST",
               "name": null,
               "ofType": {
-                "kind": "OBJECT",
-                "name": "BookmarkedSeachItem",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "BookmarkedSeachItem",
+                  "ofType": null
+                }
               }
             },
             "isDeprecated": false,

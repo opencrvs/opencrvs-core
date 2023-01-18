@@ -255,7 +255,7 @@ export interface GQLUser {
   creationDate: string
   avatar?: GQLAvatar
   device?: string
-  searches?: Array<GQLBookmarkedSeachItem | null>
+  searches?: Array<GQLBookmarkedSeachItem>
 }
 
 export interface GQLSearchUserResult {

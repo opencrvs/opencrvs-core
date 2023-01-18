@@ -2153,7 +2153,7 @@ export type User = {
   practitionerId: Scalars['String']
   primaryOffice?: Maybe<Location>
   role: RoleType
-  searches?: Maybe<Array<Maybe<BookmarkedSeachItem>>>
+  searches?: Maybe<Array<BookmarkedSeachItem>>
   signature?: Maybe<Signature>
   status: Status
   type?: Maybe<Scalars['String']>
@@ -2605,6 +2605,8 @@ export type FetchUserQuery = {
   __typename?: 'Query'
   getUser?: {
     __typename?: 'User'
+    id: string
+    device?: string | null
     userMgntUserID: string
     practitionerId: string
     mobile: string
@@ -2713,7 +2715,7 @@ export type FetchUserQuery = {
         informantIdentifier?: string | null
         compositionType?: Array<string | null> | null
       }
-    } | null> | null
+    }> | null
   } | null
 }
 

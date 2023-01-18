@@ -17,6 +17,8 @@ export const FETCH_USER = gql`
   ${ADVANCED_SEARCH_PARAM_FIELDS}
   query fetchUser($userId: String!) {
     getUser(userId: $userId) {
+      id
+      device
       userMgntUserID
       practitionerId
       mobile
