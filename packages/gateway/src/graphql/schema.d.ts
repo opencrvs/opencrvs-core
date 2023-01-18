@@ -710,7 +710,7 @@ export interface GQLRegistration {
   inCompleteFields?: string
   attachments?: Array<GQLAttachment | null>
   certificates?: Array<GQLCertificate | null>
-  duplicates?: Array<string | null>
+  duplicates?: Array<GQLDuplicatesInfo | null>
 }
 
 export interface GQLRelatedPerson {
@@ -1303,6 +1303,11 @@ export interface GQLCertificate {
   data?: string
 }
 
+export interface GQLDuplicatesInfo {
+  compositionId?: string
+  trackingId?: string
+}
+
 export const enum GQLRegAction {
   ASSIGNED = 'ASSIGNED',
   UNASSIGNED = 'UNASSIGNED',
@@ -1855,6 +1860,7 @@ export interface GQLResolver {
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
+  DuplicatesInfo?: GQLDuplicatesInfoTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
@@ -6023,6 +6029,25 @@ export interface CertificateToPaymentsResolver<TParent = any, TResult = any> {
 }
 
 export interface CertificateToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLDuplicatesInfoTypeResolver<TParent = any> {
+  compositionId?: DuplicatesInfoToCompositionIdResolver<TParent>
+  trackingId?: DuplicatesInfoToTrackingIdResolver<TParent>
+}
+
+export interface DuplicatesInfoToCompositionIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DuplicatesInfoToTrackingIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

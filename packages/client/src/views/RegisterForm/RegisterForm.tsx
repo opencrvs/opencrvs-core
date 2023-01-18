@@ -23,7 +23,7 @@ import {
   SecondaryButton,
   DangerButton
 } from '@opencrvs/components/lib/buttons'
-import { BackArrow } from '@opencrvs/components/lib/icons'
+import { BackArrow, Duplicate } from '@opencrvs/components/lib/icons'
 import {
   FixedEventTopBar,
   IEventTopBarProps,
@@ -85,6 +85,7 @@ import {
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import {
   buttonMessages,
   constantsMessages,
@@ -109,6 +110,7 @@ import {
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { IUserDetails } from '@client/utils/userUtils'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
+import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -677,12 +679,22 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     />
                   ) : (
                     <FixedEventTopBar
-                      title={intl.formatMessage(
-                        messages.newVitalEventRegistration,
-                        {
-                          event: declaration.event
-                        }
-                      )}
+                      title={
+                        duplicate
+                          ? intl.formatMessage(
+                              duplicateMessages.duplicateReviewHeader,
+                              {
+                                event: declaration.event
+                              }
+                            )
+                          : intl.formatMessage(
+                              messages.newVitalEventRegistration,
+                              {
+                                event: declaration.event
+                              }
+                            )
+                      }
+                      pageIcon={duplicate ? <Duplicate /> : undefined}
                       iconColor={getDeclarationIconColor(declaration)}
                       saveAction={{
                         handler: () =>
@@ -693,6 +705,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                     />
                   )}
+                  {duplicate && <DuplicateFormTabs declaration={declaration} />}
                   <ReviewSection
                     pageRoute={this.props.pageRoute}
                     draft={declaration}
