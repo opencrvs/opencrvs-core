@@ -13,6 +13,8 @@ import { FindCursor, Document, MongoClient } from 'mongodb'
 import { createObjectCsvWriter as createCSV } from 'csv-writer'
 import * as DateFNS from 'date-fns'
 import { CsvWriter } from 'csv-writer/src/lib/csv-writer'
+import * as fs from 'fs'
+import { BIRTH_REPORT_PATH, DEATH_REPORT_PATH } from '@metrics/constants'
 
 const HEARTH_MONGO_URL =
   process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'
@@ -20,6 +22,8 @@ const client = new MongoClient(HEARTH_MONGO_URL)
 const officeLocationExtURL = 'http://opencrvs.org/specs/extension/regLastOffice'
 const patientOccupationExtURL =
   'http://opencrvs.org/specs/extension/patient-occupation'
+const patientNationalityExtURL =
+  'http://hl7.org/fhir/StructureDefinition/patient-nationality'
 const patientEduAttainmentExtURL =
   'http://opencrvs.org/specs/extension/educational-attainment'
 
@@ -33,10 +37,6 @@ type IObservation = {
   uncertifiedMannerOfDeath: string
   verbalAutopsyDescription: string
   causeOfDeathEstablished: string
-  causeOfDeath: string
-  numMaleDependentsOnDeceased: string
-  numFemaleDependentsOnDeceased: string
-  presentAtBirthReg: string
 }
 
 interface IInformant extends IPatient {
@@ -52,6 +52,7 @@ const TITLE_MAP = {
 }
 
 type IBirthRow = {
+  officeLocation: string
   childGen: string
   childDOB: string
   childOrd: number
@@ -59,11 +60,10 @@ type IBirthRow = {
   birthState: string
   birthDistrict: string
   healthCenter: string
-  officeLocation: string
   birthPluralityOfPregnancy: string
   bodyWeightMeasured: string
   birthAttendantTitle: string
-  presentAtBirthReg: string
+  motherNationality: string
   motherDOB: string
   motherMaritalStatus: string
   motherOccupation: string
@@ -71,6 +71,7 @@ type IBirthRow = {
   motherCity: string
   motherDistrict: string
   motherState: string
+  fatherNationality: string
   fatherDOB: string
   fatherMaritalStatus: string
   fatherOccupation: string
@@ -78,17 +79,16 @@ type IBirthRow = {
   fatherCity: string
   fatherDistrict: string
   fatherState: string
+  informantNationality: string
   informantDOB: string
-  informantMaritalStatus: string
-  informantOccupation: string
-  informantEducationalAttainment: string
   informantCity: string
   informantDistrict: string
   informantState: string
-  informantRelationship: string
 }
 
 type IDeathRow = {
+  officeLocation: string
+  deceasedNationality: string
   deceasedGen: string
   deceasedDOB: string
   deceasedMaritalStatus: string
@@ -97,21 +97,15 @@ type IDeathRow = {
   deathState: string
   deathDistrict: string
   healthCenter: string
-  officeLocation: string
   uncertifiedMannerOfDeath: string
-  verbalAutopsyDescription: string
-  causeOfDeathMethod: string
   causeOfDeathEstablished: string
-  causeOfDeath: string
-  numMaleDependentsOnDeceased: string
-  numFemaleDependentsOnDeceased: string
+  causeOfDeathMethod: string
+  verbalAutopsyDescription: string
+  informantNationality: string
   informantDOB: string
-  informantMaritalStatus: string
-  informantOccupation: string
   informantCity: string
   informantDistrict: string
   informantState: string
-  informantRelationship: string
 }
 
 interface IFullComposition {
@@ -237,6 +231,16 @@ function getValueFromExt(doc: fhir.Patient, extURL: string) {
   return docExt ? docExt.valueString : ''
 }
 
+function getNationalityByExt(doc: fhir.Patient, extURL: string) {
+  if (!doc.extension) {
+    return ''
+  }
+  const docExt = doc.extension.find((obj) => obj.url === extURL)
+  return docExt
+    ? docExt.extension?.[0].valueCodeableConcept?.coding?.[0].code
+    : ''
+}
+
 function makePatientObject(patient: fhir.Patient) {
   return {
     gender: patient.gender ?? '',
@@ -245,6 +249,7 @@ function makePatientObject(patient: fhir.Patient) {
     maritalStatus: patient.maritalStatus?.text ?? '',
     multipleBirth: patient.multipleBirthInteger ?? 0,
     occupation: getValueFromExt(patient, patientOccupationExtURL) ?? '',
+    nationality: getNationalityByExt(patient, patientNationalityExtURL) ?? '',
     educational_attainment:
       getValueFromExt(patient, patientEduAttainmentExtURL) ?? '',
     city: patient.address?.[0].city ?? '',
@@ -388,11 +393,7 @@ async function setObservationDetailsInComposition(
     birthAttendantTitle: '',
     uncertifiedMannerOfDeath: '',
     verbalAutopsyDescription: '',
-    causeOfDeathEstablished: '',
-    causeOfDeath: '',
-    numMaleDependentsOnDeceased: '',
-    numFemaleDependentsOnDeceased: '',
-    presentAtBirthReg: ''
+    causeOfDeathEstablished: ''
   }
 
   observations.forEach((observation) => {
@@ -424,22 +425,6 @@ async function setObservationDetailsInComposition(
       observation,
       OBSERVATION_CODE.CAUSE_OF_DEATH_ESTABLISHED
     )
-    const causeOfDeath = findCodeInObservation(
-      observation,
-      OBSERVATION_CODE.CAUSE_OF_DEATH
-    )
-    const numMaleDependentsOnDeceased = findCodeInObservation(
-      observation,
-      OBSERVATION_CODE.NUM_MALE_DEPENDENTS_ON_DECEASED
-    )
-    const numFemaleDependentsOnDeceased = findCodeInObservation(
-      observation,
-      OBSERVATION_CODE.NUM_FEMALE_DEPENDENTS_ON_DECEASED
-    )
-    const presentAtBirthReg = findCodeInObservation(
-      observation,
-      OBSERVATION_CODE.PRESENT_AT_BIRTH_REG
-    )
 
     if (causeOfDeathMethod) {
       observationObj['causeOfDeathMethod'] =
@@ -469,21 +454,6 @@ async function setObservationDetailsInComposition(
     if (causeOfDeathEstablished) {
       observationObj['causeOfDeathEstablished'] =
         causeOfDeathEstablished.valueCodeableConcept?.coding?.[0].code ?? ''
-    }
-    if (causeOfDeath) {
-      observationObj['causeOfDeath'] =
-        causeOfDeath.valueCodeableConcept?.coding?.[0].code ?? ''
-    }
-    if (numMaleDependentsOnDeceased) {
-      observationObj['numMaleDependentsOnDeceased'] =
-        numMaleDependentsOnDeceased.valueString ?? ''
-    }
-    if (numFemaleDependentsOnDeceased) {
-      observationObj['numFemaleDependentsOnDeceased'] =
-        numFemaleDependentsOnDeceased.valueString ?? ''
-    }
-    if (presentAtBirthReg) {
-      observationObj['presentAtBirthReg'] = presentAtBirthReg.valueString ?? ''
     }
   })
   fullComposition.observations = observationObj
@@ -526,9 +496,10 @@ async function setInformantDetailsInComposition(
 
 async function createBirthDeclarationCSVWriter() {
   const birthCSV = createCSV({
-    path: './src/scripts/Birth_Report.csv',
+    path: BIRTH_REPORT_PATH,
     append: true,
     header: [
+      'officeLocation',
       'childGen',
       'childDOB',
       'childOrd',
@@ -536,11 +507,10 @@ async function createBirthDeclarationCSVWriter() {
       'birthState',
       'birthDistrict',
       'healthCenter',
-      'officeLocation',
       'birthPluralityOfPregnancy',
       'bodyWeightMeasured',
       'birthAttendantTitle',
-      'presentAtBirthReg',
+      'motherNationality',
       'motherDOB',
       'motherMaritalStatus',
       'motherOccupation',
@@ -548,6 +518,7 @@ async function createBirthDeclarationCSVWriter() {
       'motherCity',
       'motherDistrict',
       'motherState',
+      'fatherNationality',
       'fatherDOB',
       'fatherMaritalStatus',
       'fatherOccupation',
@@ -555,18 +526,16 @@ async function createBirthDeclarationCSVWriter() {
       'fatherCity',
       'fatherDistrict',
       'fatherState',
+      'informantNationality',
       'informantDOB',
-      'informantMaritalStatus',
-      'informantOccupation',
-      'informantEducationalAttainment',
       'informantCity',
       'informantDistrict',
-      'informantState',
-      'informantRelationship'
+      'informantState'
     ]
   })
   const birthCSVHeader = [
     {
+      officeLocation: 'OFFICE LOCATION',
       childGen: 'CHILD GENDER',
       childDOB: 'CHILD DOB',
       childOrd: 'CHILD ORDER',
@@ -574,11 +543,10 @@ async function createBirthDeclarationCSVWriter() {
       birthState: 'BIRTH STATE',
       birthDistrict: 'BIRTH DISTRICT',
       healthCenter: 'HEALTH CENTER',
-      officeLocation: 'OFFICE LOCATION',
-      birthPluralityOfPregnancy: 'PLURALITY OF PREGNANCY',
-      bodyWeightMeasured: 'BODY WEIGHT MEASURED',
-      birthAttendantTitle: 'ATTENDANT TITLE',
-      presentAtBirthReg: 'PRESENT AT REG',
+      birthPluralityOfPregnancy: 'TYPE OF BIRTH',
+      bodyWeightMeasured: 'WEIGHT AT BIRTH',
+      birthAttendantTitle: 'ATTENDANT AT BIRTH',
+      motherNationality: 'MOTHER NATIONALITY',
       motherDOB: 'MOTHER DOB',
       motherMaritalStatus: 'MOTHER MARITAL STATUS',
       motherOccupation: 'MOTHER OCCUPATION',
@@ -586,6 +554,7 @@ async function createBirthDeclarationCSVWriter() {
       motherCity: 'MOTHER CITY',
       motherDistrict: 'MOTHER DISTRICT',
       motherState: 'MOTHER STATE',
+      fatherNationality: 'FATHER NATIONALITY',
       fatherDOB: 'FATHER DOB',
       fatherMaritalStatus: 'FATHER MARITAL STATUS',
       fatherOccupation: 'FATHER OCCUPATION',
@@ -593,25 +562,26 @@ async function createBirthDeclarationCSVWriter() {
       fatherCity: 'FATHER CITY',
       fatherDistrict: 'FATHER DISTRICT',
       fatherState: 'FATHER STATE',
+      informantNationality: 'INFORMANT NATIONALITY',
       informantDOB: 'INFORMANT DOB',
-      informantMaritalStatus: 'INFORMANT MARITAL STATUS',
-      informantOccupation: 'INFORMANT OCCUPATION',
-      informantEducationalAttainment: 'INFORMANT EDUCATION',
       informantCity: 'INFORMANT CITY',
       informantDistrict: 'INFORMANT DISTRICT',
-      informantState: 'INFORMANT STATE',
-      informantRelationship: 'INFORMANT RELATIONSHIP'
+      informantState: 'INFORMANT STATE'
     }
   ]
-  await birthCSV.writeRecords(birthCSVHeader)
+  if (!fs.existsSync(BIRTH_REPORT_PATH)) {
+    await birthCSV.writeRecords(birthCSVHeader)
+  }
   return birthCSV
 }
 
 async function createDeathDeclarationCSVWriter() {
   const deathCSV = createCSV({
-    path: './src/scripts/Death_Report.csv',
+    path: DEATH_REPORT_PATH,
     append: true,
     header: [
+      'officeLocation',
+      'deceasedNationality',
       'deceasedGen',
       'deceasedDOB',
       'deceasedMaritalStatus',
@@ -620,25 +590,21 @@ async function createDeathDeclarationCSVWriter() {
       'deathState',
       'deathDistrict',
       'healthCenter',
-      'officeLocation',
       'uncertifiedMannerOfDeath',
-      'verbalAutopsyDescription',
-      'causeOfDeathMethod',
       'causeOfDeathEstablished',
-      'causeOfDeath',
-      'numMaleDependentsOnDeceased',
-      'numFemaleDependentsOnDeceased',
+      'causeOfDeathMethod',
+      'verbalAutopsyDescription',
+      'informantNationality',
       'informantDOB',
-      'informantMaritalStatus',
-      'informantOccupation',
       'informantCity',
       'informantDistrict',
-      'informantState',
-      'informantRelationship'
+      'informantState'
     ]
   })
   const deathCSVHeader = [
     {
+      officeLocation: 'OFFICE LOCATION',
+      deceasedNationality: 'DECEASED NATIONALITY',
       deceasedGen: 'DECEASED GENDER',
       deceasedDOB: 'DECEASED DOB',
       deceasedMaritalStatus: 'DECEASED MARITAL STATUS',
@@ -647,24 +613,20 @@ async function createDeathDeclarationCSVWriter() {
       deathState: 'DEATH STATE',
       deathDistrict: 'DEATH DISTRICT',
       healthCenter: 'HEALTH CENTER',
-      officeLocation: 'OFFICE LOCATION',
-      uncertifiedMannerOfDeath: 'UNCERTIFIED MANNER OF DEATH',
-      verbalAutopsyDescription: 'VERBAL AUTOPSY DESCRIPTION',
-      causeOfDeathMethod: 'CAUSE OF DEATH METHOD',
+      uncertifiedMannerOfDeath: 'MANNER OF DEATH',
       causeOfDeathEstablished: 'CAUSE OF DEATH ESTABLISHED',
-      causeOfDeath: 'CAUSE OF DEATH',
-      numMaleDependentsOnDeceased: 'NUM MALE DEPENDENTS ON DECEASED',
-      numFemaleDependentsOnDeceased: 'NUM FEMALE DEPENDENTS ON DECEASED',
+      causeOfDeathMethod: 'SOURCE OF CAUSE OF DEATH',
+      verbalAutopsyDescription: 'VERBAL AUTOPSY DESCRIPTION',
+      informantNationality: 'INFORMANT NATIONALITY',
       informantDOB: 'INFORMANT DOB',
-      informantMaritalStatus: 'INFORMANT MARITAL STATUS',
-      informantOccupation: 'INFORMANT OCCUPATION',
       informantCity: 'INFORMANT CITY',
       informantDistrict: 'INFORMANT DISTRICT',
-      informantState: 'INFORMANT STATE',
-      informantRelationship: 'INFORMANT RELATIONSHIP'
+      informantState: 'INFORMANT STATE'
     }
   ]
-  await deathCSV.writeRecords(deathCSVHeader)
+  if (!fs.existsSync(DEATH_REPORT_PATH)) {
+    await deathCSV.writeRecords(deathCSVHeader)
+  }
   return deathCSV
 }
 
@@ -730,6 +692,7 @@ async function makeCompositionAndExportCSVReport(
           )
           if (fullComposition.event === 'Birth') {
             const birthRow: IBirthRow = {
+              officeLocation: '',
               childGen: '',
               childDOB: '',
               childOrd: 0,
@@ -737,11 +700,10 @@ async function makeCompositionAndExportCSVReport(
               birthState: '',
               birthDistrict: '',
               healthCenter: '',
-              officeLocation: '',
               birthPluralityOfPregnancy: '',
               bodyWeightMeasured: '',
               birthAttendantTitle: '',
-              presentAtBirthReg: '',
+              motherNationality: '',
               motherDOB: '',
               motherMaritalStatus: '',
               motherOccupation: '',
@@ -749,6 +711,7 @@ async function makeCompositionAndExportCSVReport(
               motherCity: '',
               motherDistrict: '',
               motherState: '',
+              fatherNationality: '',
               fatherDOB: '',
               fatherMaritalStatus: '',
               fatherOccupation: '',
@@ -756,14 +719,11 @@ async function makeCompositionAndExportCSVReport(
               fatherCity: '',
               fatherDistrict: '',
               fatherState: '',
+              informantNationality: '',
               informantDOB: '',
-              informantMaritalStatus: '',
-              informantOccupation: '',
-              informantEducationalAttainment: '',
               informantCity: '',
               informantDistrict: '',
-              informantState: '',
-              informantRelationship: ''
+              informantState: ''
             }
 
             //Address
@@ -779,6 +739,8 @@ async function makeCompositionAndExportCSVReport(
             birthRow.childOrd = fullComposition.child?.multipleBirth ?? 0
 
             //Mother details
+            birthRow.motherNationality =
+              fullComposition.mother?.nationality ?? ''
             birthRow.motherDOB = fullComposition.mother?.birthDate ?? ''
             birthRow.motherMaritalStatus =
               fullComposition.mother?.maritalStatus ?? ''
@@ -794,6 +756,8 @@ async function makeCompositionAndExportCSVReport(
             birthRow.motherState = fullComposition.mother?.state ?? ''
 
             //Father details
+            birthRow.fatherNationality =
+              fullComposition.father?.nationality ?? ''
             birthRow.fatherDOB = fullComposition.father?.birthDate ?? ''
             birthRow.fatherMaritalStatus =
               fullComposition.father?.maritalStatus ?? ''
@@ -809,23 +773,13 @@ async function makeCompositionAndExportCSVReport(
             birthRow.fatherState = fullComposition.father?.state ?? ''
 
             //Informant details
+            birthRow.informantNationality =
+              fullComposition.informant?.nationality ?? ''
             birthRow.informantDOB = fullComposition.informant?.birthDate ?? ''
-            birthRow.informantMaritalStatus =
-              fullComposition.informant?.maritalStatus ?? ''
-            birthRow.informantOccupation =
-              fullComposition.informant?.occupation ?? ''
-            birthRow.informantEducationalAttainment =
-              (fullComposition.informant?.educational_attainment &&
-                EDUCATION_LEVEL_MAP[
-                  fullComposition.informant?.educational_attainment
-                ]) ??
-              ''
             birthRow.informantCity = fullComposition.informant?.city ?? ''
             birthRow.informantDistrict =
               fullComposition.informant?.district ?? ''
             birthRow.informantState = fullComposition.informant?.state ?? ''
-            birthRow.informantRelationship =
-              fullComposition.informant?.relationship ?? ''
 
             //Observations
             birthRow.birthPluralityOfPregnancy =
@@ -834,12 +788,12 @@ async function makeCompositionAndExportCSVReport(
               fullComposition.observations?.bodyWeightMeasured ?? ''
             birthRow.birthAttendantTitle =
               fullComposition.observations?.birthAttendantTitle ?? ''
-            birthRow.presentAtBirthReg =
-              fullComposition.observations?.presentAtBirthReg ?? ''
 
             await birthCSVWriter.writeRecords([birthRow])
           } else if (fullComposition.event === 'Death') {
             const deathRow: IDeathRow = {
+              officeLocation: '',
+              deceasedNationality: '',
               deceasedGen: '',
               deceasedDOB: '',
               deceasedMaritalStatus: '',
@@ -848,21 +802,15 @@ async function makeCompositionAndExportCSVReport(
               deathState: '',
               deathDistrict: '',
               healthCenter: '',
-              officeLocation: '',
               uncertifiedMannerOfDeath: '',
               verbalAutopsyDescription: '',
               causeOfDeathMethod: '',
               causeOfDeathEstablished: '',
-              causeOfDeath: '',
-              numMaleDependentsOnDeceased: '',
-              numFemaleDependentsOnDeceased: '',
+              informantNationality: '',
               informantDOB: '',
-              informantMaritalStatus: '',
-              informantOccupation: '',
               informantCity: '',
               informantDistrict: '',
-              informantState: '',
-              informantRelationship: ''
+              informantState: ''
             }
 
             //Address
@@ -873,6 +821,8 @@ async function makeCompositionAndExportCSVReport(
             deathRow.deathCity = fullComposition.deceased?.city ?? ''
 
             //Deceased details
+            deathRow.deceasedNationality =
+              fullComposition.deceased?.nationality ?? ''
             deathRow.deceasedGen = fullComposition.deceased?.gender ?? ''
             deathRow.deceasedDOB = fullComposition.deceased?.birthDate ?? ''
             deathRow.deceasedMaritalStatus =
@@ -880,17 +830,13 @@ async function makeCompositionAndExportCSVReport(
             deathRow.deceasedDate = fullComposition.deceased?.deceasedDate ?? ''
 
             //Informant details
+            deathRow.informantNationality =
+              fullComposition.informant?.nationality ?? ''
             deathRow.informantDOB = fullComposition.informant?.birthDate ?? ''
-            deathRow.informantMaritalStatus =
-              fullComposition.informant?.maritalStatus ?? ''
-            deathRow.informantOccupation =
-              fullComposition.informant?.occupation ?? ''
             deathRow.informantCity = fullComposition.informant?.city ?? ''
             deathRow.informantDistrict =
               fullComposition.informant?.district ?? ''
             deathRow.informantState = fullComposition.informant?.state ?? ''
-            deathRow.informantRelationship =
-              fullComposition.informant?.relationship ?? ''
 
             //Observations
             deathRow.uncertifiedMannerOfDeath =
@@ -903,12 +849,6 @@ async function makeCompositionAndExportCSVReport(
               ?.causeOfDeathEstablished
               ? 'Yes'
               : 'No'
-            deathRow.causeOfDeath =
-              fullComposition.observations?.causeOfDeath ?? ''
-            deathRow.numMaleDependentsOnDeceased =
-              fullComposition.observations?.numMaleDependentsOnDeceased ?? ''
-            deathRow.numFemaleDependentsOnDeceased =
-              fullComposition.observations?.numFemaleDependentsOnDeceased ?? ''
 
             await deathCSVWriter.writeRecords([deathRow])
           }
