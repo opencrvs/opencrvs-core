@@ -1971,6 +1971,7 @@ export type RemoveBookmarkedSeachInput = {
 export type Role = {
   __typename?: 'Role'
   labels: Array<RoleLabel>
+  value: Scalars['String']
 }
 
 export type RoleLabel = {
@@ -2402,6 +2403,7 @@ export type GetSystemRolesQuery = {
     value: string
     roles: Array<{
       __typename?: 'Role'
+      value: string
       labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
     }>
   }> | null

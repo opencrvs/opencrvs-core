@@ -28,6 +28,7 @@ type RoleLabel {
 }
 
 type Role {
+  value: String!
   labels: [RoleLabel!]!
 }
 

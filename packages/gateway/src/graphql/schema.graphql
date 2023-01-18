@@ -1133,6 +1133,7 @@ type EventProgressSet {
 }
 
 type Role {
+  value: String!
   labels: [RoleLabel!]!
 }
 

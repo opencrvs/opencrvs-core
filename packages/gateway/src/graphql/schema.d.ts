@@ -243,7 +243,7 @@ export interface GQLUser {
   username?: string
   mobile: string
   systemRole: GQLRoleType
-  role?: string
+  role: string
   email?: string
   status: GQLStatus
   underInvestigation?: boolean
@@ -425,7 +425,7 @@ export interface GQLEventProgressResultSet {
 export interface GQLSystemRole {
   id: string
   value: string
-  roles: Array<GQLLabel>
+  roles: Array<GQLRole>
   active: boolean
 }
 
@@ -1035,8 +1035,9 @@ export interface GQLEventProgressSet {
   progressReport?: GQLEventProgressData
 }
 
-export interface GQLLabel {
-  labels: Array<GQLRole>
+export interface GQLRole {
+  value: string
+  labels: Array<GQLRoleLabel>
 }
 
 export const enum GQLDraftStatus {
@@ -1552,7 +1553,7 @@ export interface GQLEventProgressData {
   timeInReadyToPrint?: number
 }
 
-export interface GQLRole {
+export interface GQLRoleLabel {
   lang: string
   label: string
 }
@@ -1854,7 +1855,7 @@ export interface GQLResolver {
   }
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
-  Label?: GQLLabelTypeResolver
+  Role?: GQLRoleTypeResolver
   DraftHistory?: GQLDraftHistoryTypeResolver
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   FormDatasetOption?: GQLFormDatasetOptionTypeResolver
@@ -1879,7 +1880,7 @@ export interface GQLResolver {
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
-  Role?: GQLRoleTypeResolver
+  RoleLabel?: GQLRoleLabelTypeResolver
   FormDatasetOptionLabel?: GQLFormDatasetOptionLabelTypeResolver
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
@@ -5796,11 +5797,16 @@ export interface EventProgressSetToProgressReportResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLLabelTypeResolver<TParent = any> {
-  labels?: LabelToLabelsResolver<TParent>
+export interface GQLRoleTypeResolver<TParent = any> {
+  value?: RoleToValueResolver<TParent>
+  labels?: RoleToLabelsResolver<TParent>
 }
 
-export interface LabelToLabelsResolver<TParent = any, TResult = any> {
+export interface RoleToValueResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RoleToLabelsResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -7113,16 +7119,16 @@ export interface EventProgressDataToTimeInReadyToPrintResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLRoleTypeResolver<TParent = any> {
-  lang?: RoleToLangResolver<TParent>
-  label?: RoleToLabelResolver<TParent>
+export interface GQLRoleLabelTypeResolver<TParent = any> {
+  lang?: RoleLabelToLangResolver<TParent>
+  label?: RoleLabelToLabelResolver<TParent>
 }
 
-export interface RoleToLangResolver<TParent = any, TResult = any> {
+export interface RoleLabelToLangResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RoleToLabelResolver<TParent = any, TResult = any> {
+export interface RoleLabelToLabelResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

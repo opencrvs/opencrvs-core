@@ -17,6 +17,7 @@ export const getSystemRolesQuery = gql`
     getSystemRoles(active: true, value: $value) {
       value
       roles {
+        value
         labels {
           lang
           label
