@@ -153,7 +153,7 @@ interface IProps {
   handleClose?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   hideHeaderBoxShadow?: boolean
   preventClickOnParent?: boolean
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 export class ResponsiveModal extends React.Component<IProps> {

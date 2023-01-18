@@ -81,6 +81,7 @@ interface IPageProps {
   formConfigLoaded: boolean
   loadingError: boolean
   offlineData: IOfflineData | undefined
+  children?: React.ReactNode
 }
 
 interface IDispatchProps {

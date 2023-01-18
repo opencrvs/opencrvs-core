@@ -46,6 +46,7 @@ type NotificationProps = {
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
   userReconnectedToast: boolean
+  children?: React.ReactNode
 }
 
 type DispatchProps = {
