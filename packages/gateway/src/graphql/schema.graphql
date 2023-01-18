@@ -726,6 +726,7 @@ type ApplicationConfiguration {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 input ApplicationConfigurationInput {
@@ -741,6 +742,7 @@ input ApplicationConfigurationInput {
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 input FormDraftInput {
@@ -1300,6 +1302,12 @@ type Death {
   FEE: DeathFee
 }
 
+type LoginBackground {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1319,6 +1327,12 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+}
+
+input LoginBackgroundInput {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
 }
 
 input QuestionInput {
@@ -1734,6 +1748,11 @@ type BirthFee {
 type DeathFee {
   ON_TIME: Float
   DELAYED: Float
+}
+
+enum ImageFit {
+  FILL
+  TILE
 }
 
 input BirthFeeInput {

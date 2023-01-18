@@ -106,7 +106,7 @@ describe('ForgotPIN tests', () => {
   })
 
   it('renders forgotPIN overlay', () => {
-    expect(component.find('#forgot_pin_page').hostNodes()).toHaveLength(1)
+    expect(component.find('#forgotPinPage').hostNodes()).toHaveLength(1)
   })
 
   it('clicking on back triggers goBack', async () => {

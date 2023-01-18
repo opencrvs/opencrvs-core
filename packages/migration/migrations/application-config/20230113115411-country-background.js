@@ -9,9 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from './ApplicationName'
-export * from './Currency'
-export * from './GovtLogo'
-export * from './NIDNumPattern'
-export * from './PhoneNumPattern'
-export * from './LoginBackground'
+
+export const up = async (db, client) => {
+  await db.collection('configs').updateMany(
+    {},
+    {
+      $set: {
+        LOGIN_BACKGROUND: {
+          backgroundColor: '36304E'
+        }
+      }
+    }
+  )
+}
+
+export const down = async (db, client) => {
+  await db.collection('configs').updateMany(
+    {},
+    {
+      $unset: {
+        LOGIN_BACKGROUND: ''
+      }
+    }
+  )
+}

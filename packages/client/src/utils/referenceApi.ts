@@ -25,12 +25,15 @@ export interface IFacilitiesDataResponse {
 export interface IContentResponse {
   languages: ILanguage[]
 }
-export interface IAssetResponse {
-  logo: string
-}
+
 export interface ICountryLogo {
   fileName: string
   file: string
+}
+export interface ILoginBackground {
+  backgroundColor?: string
+  backgroundImage?: string
+  imageFit?: string
 }
 export interface ICertificateTemplateData {
   event: Event
@@ -75,6 +78,7 @@ export interface IApplicationConfig {
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
   ADMIN_LEVELS: number
+  LOGIN_BACKGROUND: ILoginBackground
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig

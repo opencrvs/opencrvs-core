@@ -14,6 +14,7 @@ import {
   GQLCurrencyInput,
   GQLBirthInput,
   GQLDeathInput,
+  GQLLoginBackgroundInput,
   GQLCountryLogoInput
 } from '@gateway/graphql/schema'
 
@@ -30,4 +31,5 @@ export interface IApplicationConfigPayload {
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
   ADMIN_LEVELS: number
+  LOGIN_BACKGROUND: GQLLoginBackgroundInput
 }
