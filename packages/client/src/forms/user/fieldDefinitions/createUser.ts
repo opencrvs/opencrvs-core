@@ -22,6 +22,8 @@ import {
 import { NATIONAL_ID } from '@client/forms/identity'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { userMessages } from '@client/i18n/messages/user'
+import { MessageFormatElement } from '@formatjs/icu-messageformat-parser'
+import { roleQueries } from '@client/forms/user/query/queries'
 
 export const userSectionFormType: ISerializedFormSection = {
   id: UserSection.User,
@@ -230,12 +232,7 @@ export const userSectionFormType: ISerializedFormSection = {
             dependency: 'systemRole',
             options: {}
           },
-          conditionals: [
-            {
-              action: 'hide',
-              expression: '(values.systemRole!="FIELD_AGENT")'
-            }
-          ]
+          conditionals: []
         },
         {
           name: 'device',

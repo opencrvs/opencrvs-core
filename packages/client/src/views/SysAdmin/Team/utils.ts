@@ -117,7 +117,7 @@ export async function alterRolesBasedOnUserRole(
   /* eslint-disable array-callback-return */
   roles.map((role) => {
     roleList.push(role)
-    // Leaving this logic here in case in the future we wish to add config UI to manage functionality restricting user roles.
+    // Leaving this logic here in case inX the future we wish to add config UI to manage functionality restricting user roles.
 
     /*if (
       role.value === ROLE_FIELD_AGENT ||

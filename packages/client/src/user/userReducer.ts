@@ -13,7 +13,13 @@ import {
   IForm,
   IFormSectionData,
   UserSection,
-  IFormSection
+  IFormSection,
+  ISelectOption,
+  ISerializedFormSection,
+  ISelectFormFieldWithDynamicOptions,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SerializedFormFieldWithDynamicDefinitions,
+  IFormFieldWithDynamicDefinitions
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
@@ -44,8 +50,11 @@ import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { modifyUserDetails } from '@client/profile/profileActions'
+import { roleQueries } from '@client/forms/user/query/queries'
+import { Role, SystemRole } from '@client/utils/gateway'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
+const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
 const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA' as const
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
@@ -152,6 +161,7 @@ interface ISubmitSuccessAction {
     isUpdate: boolean
   }
 }
+
 interface ISubmitFailedAction {
   type: typeof SUBMIT_USER_FORM_DATA_FAIL
   payload: {
@@ -258,6 +268,23 @@ function updateFormAndFormData(
     }
   }
 }
+
+interface IUpdateSystemRoleLoadedAction {
+  type: typeof ROLES_LOADED
+  payload: {
+    systemRoles: SystemRole[]
+  }
+}
+
+function rolesLoaded(systemRoles: SystemRole[]): IUpdateSystemRoleLoadedAction {
+  return {
+    type: ROLES_LOADED,
+    payload: {
+      systemRoles
+    }
+  }
+}
+
 type UserFormAction =
   | IUpdateUserFormFieldDefsAction
   | IUserFormDataModifyAction
@@ -270,6 +297,7 @@ type UserFormAction =
   | IUpdateFormAndFormData
   | profileActions.Action
   | ShowCreateUserErrorToast
+  | IUpdateSystemRoleLoadedAction
   | ReturnType<typeof clearUserFormData>
   | ReturnType<typeof showSubmitFormSuccessToast>
   | ReturnType<typeof showSubmitFormErrorToast>
@@ -284,14 +312,70 @@ export interface IUserFormState {
   userAuditForm: IUserAuditForm
 }
 
+const fetchRoles = async () => {
+  const roles = await roleQueries.fetchRoles()
+  return roles.data.getSystemRoles
+}
+
+const optionsGenerator = (systemRoles: SystemRole[]) => {
+  const options: { [key: string]: ISelectOption[] } = {}
+  systemRoles.forEach((systemRole: SystemRole) => {
+    const generateRolesBySystemRole: ISelectOption[] = []
+
+    systemRole.roles.forEach((role: Role) => {
+      generateRolesBySystemRole.push({
+        value: role.value,
+        label: {
+          id: `${systemRole.value}.role.${role.value}`,
+          description: '',
+          defaultMessage: role.labels[0].label
+        }
+      })
+    })
+    options[systemRole.value] = generateRolesBySystemRole
+  })
+
+  return options
+}
+
+const generateUserFormWithRoles = (
+  form: IForm,
+  mutateOptions: { [key: string]: ISelectOption[] }
+) => {
+  const section = form.sections.find((section) => section.id === 'user')!
+  const group = section.groups.find((group) => group.id === 'user-view-group')
+
+  if (group) {
+    const field = group.fields.find(
+      (field) => field.name === 'role'
+    ) as ISelectFormFieldWithDynamicOptions
+
+    if (field) {
+      field.dynamicOptions.options = mutateOptions
+    }
+  }
+}
+
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
   state: IUserFormState = initialState,
   action: UserFormAction | offlineActions.Action
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
     case offlineActions.READY:
+      return loop(
+        {
+          ...state,
+          loadingRoles: true
+        },
+        Cmd.run(fetchRoles, {
+          successActionCreator: rolesLoaded
+        })
+      )
+    case ROLES_LOADED:
+      const { systemRoles } = action.payload
       const form = deserializeForm(createUserForm)
-
+      const mutateOptions = optionsGenerator(systemRoles)
+      generateUserFormWithRoles(form, mutateOptions)
       return {
         ...state,
         userForm: {

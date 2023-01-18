@@ -148,6 +148,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   render = () => {
     const { section, intl, activeGroup, userId, formData, goToTeamUserList } =
       this.props
+
+    console.log('saaaaaaaaaa')
     const title = activeGroup?.title
       ? intl.formatMessage(activeGroup.title)
       : ''
