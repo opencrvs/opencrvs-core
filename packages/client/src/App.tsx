@@ -435,7 +435,7 @@ export class App extends React.Component<IAppProps> {
                                               Roles.PERFORMANCE_MANAGEMENT,
                                               Roles.NATIONAL_REGISTRAR
                                             ]}
-                                            path={routes.LIST_OF_ORGANIZATIONS}
+                                            path={routes.ORGANIZATIONS_INDEX}
                                             component={ListOfOrganizations}
                                           />
                                         </Switch>

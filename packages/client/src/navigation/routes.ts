@@ -96,4 +96,5 @@ export const USER_PROFILE = '/userProfile/:userId'
 export const FORM_CONFIG_WIZARD = '/config/form/wizard/:event/:section'
 
 export const VIEW_RECORD = '/:declarationId/viewRecord'
-export const LIST_OF_ORGANIZATIONS = '/organization'
+// export const LIST_OF_ORGANIZATIONS = '/organization/'
+export const ORGANIZATIONS_INDEX = '/organization/:index?'
