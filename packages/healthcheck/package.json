@@ -18,6 +18,11 @@
     "next": "13.1.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "styled-components": "5.3.6",
     "typescript": "4.9.4"
+  },
+  "resolutions": {
+    "//": "See https://github.com/opencrvs/opencrvs-core/issues/3820 Which affects the root package.json, and therefore we need to override it here.",
+    "@types/react": "18.0.26"
   }
 }

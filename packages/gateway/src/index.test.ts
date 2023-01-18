@@ -203,4 +203,17 @@ describe('Route authorization', () => {
     })
     expect(res.result.message).toEqual('An internal server error occurred')
   })
+  it('Tests the health check with multiple services', async () => {
+    fetch.mockResponse(
+      JSON.stringify({
+        success: true
+      })
+    )
+    const res = await server.app.inject({
+      method: 'GET',
+      url: '/ping?service=auth&service=search'
+    })
+
+    expect(res.result.message).toEqual({ auth: true, search: true })
+  })
 })

@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
-import { badRequest, internal } from '@hapi/boom'
 import {
   AUTH_URL,
   SEARCH_URL,
@@ -22,99 +20,43 @@ import {
   WORKFLOW_URL
 } from '@gateway/constants'
 import fetch from 'node-fetch'
+import * as path from 'path'
 
-export async function checkServiceHealth(url: string) {
-  const res = await fetch(url, {
-    method: 'GET'
-  })
+export async function checkServiceHealth(service: typeof services[0]) {
+  try {
+    const res = await fetch(path.join(service.url, '/ping'), {
+      method: 'GET'
+    })
 
-  const body = await res.json()
+    const body = await res.json()
 
-  if (body.success === true) {
-    return true
-  }
-
-  return false
-}
-
-enum Services {
-  AUTH = 'auth',
-  USER_MGNT = 'user-mgnt',
-  METRICS = 'metrics',
-  NOTIFICATION = 'notification',
-  COUNTRY_CONFIG = 'countryconfig',
-  SEARCH = 'search',
-  WORKFLOW = 'workflow',
-  GATEWAY = 'gateway'
-}
-
-export default async function healthCheckHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  let service
-  if (request.query['service'] && request.query['service'][0]) {
-    service = request.query['service'][0]
-  } else {
-    throw badRequest('Received no service to check')
-  }
-
-  let response
-
-  switch (service) {
-    case Services.GATEWAY:
-      response = true
-      break
-    case Services.AUTH:
-      response = await checkServiceHealth(`${AUTH_URL}/ping`)
-      break
-    case Services.SEARCH:
-      response = await checkServiceHealth(`${SEARCH_URL}ping`)
-      break
-    case Services.USER_MGNT:
-      response = await checkServiceHealth(`${USER_MANAGEMENT_URL}ping`)
-      break
-    case Services.METRICS:
-      response = await checkServiceHealth(`${METRICS_URL}/ping`)
-      break
-    case Services.NOTIFICATION:
-      response = await checkServiceHealth(`${NOTIFICATION_URL}ping`)
-      break
-    case Services.COUNTRY_CONFIG:
-      response = await checkServiceHealth(`${COUNTRY_CONFIG_URL}/ping`)
-      break
-    case Services.WORKFLOW:
-      response = await checkServiceHealth(`${WORKFLOW_URL}ping`)
-      break
-    default:
-      response = false
-  }
-
-  if (!response) {
-    throw internal('Service health check failed for: ', service)
-  } else {
-    return {
-      success: response
+    if (body.success === true) {
+      return { ...service, status: true }
+    } else {
+      return { ...service, status: false }
     }
+  } catch (e) {
+    return { ...service, status: false }
   }
 }
 
-export const querySchema = Joi.object({
-  service: Joi.array()
-    .items(
-      Joi.string().valid(
-        Services.AUTH,
-        Services.USER_MGNT,
-        Services.METRICS,
-        Services.NOTIFICATION,
-        Services.COUNTRY_CONFIG,
-        Services.SEARCH,
-        Services.WORKFLOW,
-        Services.GATEWAY
-      )
-    )
-    .single()
-})
-export const responseSchema = Joi.object({
-  success: Joi.boolean()
+const services = [
+  { name: 'auth', url: AUTH_URL },
+  { name: 'user-mgnt', url: USER_MANAGEMENT_URL },
+  { name: 'metrics', url: METRICS_URL },
+  { name: 'notification', url: NOTIFICATION_URL },
+  { name: 'countryconfig', url: COUNTRY_CONFIG_URL },
+  { name: 'search', url: SEARCH_URL },
+  { name: 'workflow', url: WORKFLOW_URL }
+]
+
+export default async function healthCheckHandler() {
+  const response = await Promise.all(services.map(checkServiceHealth))
+  return response
+}
+
+export const responseSchema = Joi.array().items({
+  name: Joi.string(),
+  url: Joi.string(),
+  status: Joi.boolean()
 })

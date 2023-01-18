@@ -67,8 +67,6 @@
     "postinstall-postinstall": "^2.0.0"
   },
   "resolutions": {
-    "underscore": ">1.12.1",
-    "//": "See https://github.com/opencrvs/opencrvs-core/issues/3820",
-    "@types/react": "^16.9.4"
+    "underscore": ">1.12.1"
   }
 }
