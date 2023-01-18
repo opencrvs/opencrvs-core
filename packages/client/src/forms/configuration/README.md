@@ -769,25 +769,25 @@ This object holds sections for death declaration forms. All sections are in sect
   - #### `placeOfBirthCountry/placeOfDeathCountry`
     This field is always available.
   - #### `placeOfBirthState/placeOfDeathState`
-    This is only available is the place of event is anything other than health facility.
+    This is only available if the place of event is anything other than health facility.
   - #### `placeOfBirthDistrict/placeOfDeathDistrict`
-    This is only available is the place of event is anything other than health facility.
+    This is only available if the place of event is anything other than health facility.
   - #### `placeOfBirthCity/placeOfDeathCity`
-    This is only available is the place of event is anything other than health facility.
+    This is only available if the place of event is anything other than health facility.
   - #### `placeOfBirthAddressLine1/placeOfDeathAddressLine1`
-    This is only available is the place of event is anything other than health facility.
+    This is only available if the place of event is anything other than health facility.
   - #### `placeOfBirthAddressLine2/placeOfDeathAddressLine2`
-    This is only available is the place of event is anything other than health facility.
+    This is only available if the place of event is anything other than health facility.
   - #### `placeOfBirthAddressLine3/placeOfDeathAddressLine3`
-    This is only available is the place of event is anything other than health facility.
+    This is only available if the place of event is anything other than health facility.
   - #### `placeOfBirthAddressLine5/placeOfDeathAddressLine5`
-    This is only available is the place of event is anything other than health facility.
+    This is only available if the place of event is anything other than health facility.
   - #### `placeOfBirthNumber/placeOfDeathNumber`
-    This is only available is the place of event is anything other than health facility.
+    This is only available if the place of event is anything other than health facility.
   - #### `placeOfBirthPostalCode/placeOfDeathPostalCode`
-    This is only available is the place of event is anything other than health facility.
+    This is only available if the place of event is anything other than health facility.
 
-- #### `Father/Mother/Informant/deceased Address`
+- #### `Father/Mother/Informant/Deceased Address`
   - #### `informant/father/mother/deceased`
     This is a formatted place of event which will show district, state country. This field is always available for relevant event.
   - #### `informantCountry/fatherCountry/motherCountry/deceasedCountry`
