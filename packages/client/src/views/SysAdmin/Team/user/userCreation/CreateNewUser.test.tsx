@@ -23,7 +23,7 @@ import {
   mockOfflineData,
   mockOfflineDataDispatch
 } from '@client/tests/util'
-import { modifyUserFormData, processRoles } from '@client/user/userReducer'
+import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -380,7 +380,7 @@ describe('create new user tests', () => {
   describe('when user in review page', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
+      // store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
       testComponent = await createTestComponent(
         // @ts-ignore
         <CreateNewUser

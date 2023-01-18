@@ -12,14 +12,8 @@
 import {
   IForm,
   IFormSectionData,
-  UserSection,
-  IFormSection,
-  ISelectOption,
-  ISerializedFormSection,
   ISelectFormFieldWithDynamicOptions,
-  SELECT_WITH_DYNAMIC_OPTIONS,
-  SerializedFormFieldWithDynamicDefinitions,
-  IFormFieldWithDynamicDefinitions
+  ISelectOption
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
@@ -31,40 +25,23 @@ import {
 } from '@client/notification/actions'
 import * as offlineActions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
+import { modifyUserDetails } from '@client/profile/profileActions'
 import { SEARCH_USERS } from '@client/user/queries'
-import {
-  alterRolesBasedOnUserRole,
-  transformRoleDataToDefinitions
-} from '@client/views/SysAdmin/Team/utils'
-import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
+import { ApolloClient, ApolloError } from '@apollo/client'
 import { Action } from 'redux'
 import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
-import {
-  GQLQuery,
-  GQLUser,
-  GQLLocation,
-  GQLLabel
-} from '@opencrvs/gateway/src/graphql/schema'
-import { gqlToDraftTransformer } from '@client/transformer'
-import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
+import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
-import { modifyUserDetails } from '@client/profile/profileActions'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Role, SystemRole } from '@client/utils/gateway'
 
-const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
 const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA' as const
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
-const STORE_USER_FORM_DATA = 'USER_FORM/STORE_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
 const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
-const PROCESS_ROLES = 'USER_FORM/PROCESS_ROLES'
-const FETCH_USER_DATA = 'USER_FORM/FETCH_USER_DATA'
-const UPDATE_DEFINITIONS_AND_FORM_DATA =
-  'USER_FORM/UPDATE_DEFINTIONS_AND_FORM_DATA'
 
 export enum TOAST_MESSAGES {
   SUCCESS = 'userFormSuccess',
@@ -80,42 +57,6 @@ const initialState: IUserFormState = {
   loadingRoles: false,
   submissionError: false,
   userAuditForm
-}
-
-interface IUpdateUserFormFieldDefsAction {
-  type: typeof UPDATE_FORM_FIELD_DEFINITIONS
-  payload: {
-    data: GQLLabel[]
-    queryData?: ApolloQueryResult<GQLQuery>
-  }
-}
-
-export function updateUserFormFieldDefinitions(
-  data: GQLLabel[],
-  queryData?: ApolloQueryResult<GQLQuery>
-): IUpdateUserFormFieldDefsAction {
-  return {
-    type: UPDATE_FORM_FIELD_DEFINITIONS,
-    payload: { data, queryData }
-  }
-}
-
-interface IProcessRoles {
-  type: typeof PROCESS_ROLES
-  payload: {
-    primaryOfficeId: string
-    queryData?: ApolloQueryResult<GQLQuery>
-  }
-}
-
-export function processRoles(
-  primaryOfficeId: string,
-  queryData?: ApolloQueryResult<GQLQuery>
-): IProcessRoles {
-  return {
-    type: PROCESS_ROLES,
-    payload: { primaryOfficeId, queryData }
-  }
 }
 
 interface IUserFormDataModifyAction {
@@ -147,28 +88,6 @@ interface IUserFormDataSubmitAction {
   }
 }
 
-interface IStoreUserFormDataAction {
-  type: typeof STORE_USER_FORM_DATA
-  payload: {
-    queryData: ApolloQueryResult<GQLQuery>
-  }
-}
-
-interface ISubmitSuccessAction {
-  type: typeof SUBMIT_USER_FORM_DATA_SUCCESS
-  payload: {
-    locationId: string
-    isUpdate: boolean
-  }
-}
-
-interface ISubmitFailedAction {
-  type: typeof SUBMIT_USER_FORM_DATA_FAIL
-  payload: {
-    errorData: ApolloError
-  }
-}
-
 export function submitUserFormData(
   client: ApolloClient<unknown>,
   mutation: any,
@@ -194,6 +113,14 @@ export function clearUserFormData() {
   }
 }
 
+interface ISubmitSuccessAction {
+  type: typeof SUBMIT_USER_FORM_DATA_SUCCESS
+  payload: {
+    locationId: string
+    isUpdate: boolean
+  }
+}
+
 export function submitSuccess(
   locationId: string,
   isUpdate = false
@@ -207,64 +134,18 @@ export function submitSuccess(
   }
 }
 
+interface ISubmitFailedAction {
+  type: typeof SUBMIT_USER_FORM_DATA_FAIL
+  payload: {
+    errorData: ApolloError
+  }
+}
+
 export function submitFail(errorData: ApolloError): ISubmitFailedAction {
   return {
     type: SUBMIT_USER_FORM_DATA_FAIL,
     payload: {
       errorData
-    }
-  }
-}
-
-export function storeUserFormData(
-  queryData: ApolloQueryResult<GQLQuery>
-): IStoreUserFormDataAction {
-  return {
-    type: STORE_USER_FORM_DATA,
-    payload: {
-      queryData
-    }
-  }
-}
-
-interface IFetchAndStoreUserData {
-  type: typeof FETCH_USER_DATA
-  payload: {
-    client: ApolloClient<unknown>
-    query: any
-    variables: { userId: string }
-  }
-}
-
-export function fetchAndStoreUserData(
-  client: ApolloClient<unknown>,
-  query: any,
-  variables: { userId: string }
-): IFetchAndStoreUserData {
-  return {
-    type: FETCH_USER_DATA,
-    payload: {
-      client,
-      query,
-      variables
-    }
-  }
-}
-
-interface IUpdateFormAndFormData {
-  type: typeof UPDATE_DEFINITIONS_AND_FORM_DATA
-  payload: {
-    queryData: ApolloQueryResult<GQLQuery>
-  }
-}
-
-function updateFormAndFormData(
-  queryData: ApolloQueryResult<GQLQuery>
-): IUpdateFormAndFormData {
-  return {
-    type: UPDATE_DEFINITIONS_AND_FORM_DATA,
-    payload: {
-      queryData
     }
   }
 }
@@ -286,15 +167,10 @@ function rolesLoaded(systemRoles: SystemRole[]): IUpdateSystemRoleLoadedAction {
 }
 
 type UserFormAction =
-  | IUpdateUserFormFieldDefsAction
   | IUserFormDataModifyAction
   | IUserFormDataSubmitAction
-  | IStoreUserFormDataAction
   | ISubmitSuccessAction
   | ISubmitFailedAction
-  | IProcessRoles
-  | IFetchAndStoreUserData
-  | IUpdateFormAndFormData
   | profileActions.Action
   | ShowCreateUserErrorToast
   | IUpdateSystemRoleLoadedAction
@@ -343,17 +219,12 @@ const generateUserFormWithRoles = (
   mutateOptions: { [key: string]: ISelectOption[] }
 ) => {
   const section = form.sections.find((section) => section.id === 'user')!
-  const group = section.groups.find((group) => group.id === 'user-view-group')
+  const group = section.groups.find((group) => group.id === 'user-view-group')!
+  const field = group.fields.find(
+    (field) => field.name === 'role'
+  ) as ISelectFormFieldWithDynamicOptions
 
-  if (group) {
-    const field = group.fields.find(
-      (field) => field.name === 'role'
-    ) as ISelectFormFieldWithDynamicOptions
-
-    if (field) {
-      field.dynamicOptions.options = mutateOptions
-    }
-  }
+  field.dynamicOptions.options = mutateOptions
 }
 
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
@@ -371,98 +242,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           successActionCreator: rolesLoaded
         })
       )
-    case ROLES_LOADED:
-      const { systemRoles } = action.payload
-      const form = deserializeForm(createUserForm)
-      const mutateOptions = optionsGenerator(systemRoles)
-      generateUserFormWithRoles(form, mutateOptions)
-      return {
-        ...state,
-        userForm: {
-          ...form
-        }
-      }
-    case PROCESS_ROLES:
-      const { primaryOfficeId, queryData: fetchUserQueryData } = (
-        action as IProcessRoles
-      ).payload
-      return loop(
-        {
-          ...state,
-          loadingRoles: true
-        },
-        Cmd.run(alterRolesBasedOnUserRole, {
-          successActionCreator: (data: GQLLabel[]) =>
-            updateUserFormFieldDefinitions(data, fetchUserQueryData),
-          args: [primaryOfficeId, Cmd.getState]
-        })
-      )
-    case UPDATE_FORM_FIELD_DEFINITIONS:
-      const { data, queryData: userQueryData } = (
-        action as IUpdateUserFormFieldDefsAction
-      ).payload
-      const updatedSections = state.userForm!.sections
-      if (
-        userQueryData &&
-        userQueryData.data.getUser &&
-        userQueryData.data.getUser.systemRole &&
-        userQueryData.data.getUser.role
-      ) {
-        // This logic combined with the function alterRolesBasedOnUserRole
-        // controls only showing unique user types in the case where 1 mayor should exist per location
-        // this functionality may be reintroduced in the future.
-        // for now types should only exist for field agents as per this requirement:
-        //
-        const { systemRole: existingSystemRole, role: existingRole } =
-          userQueryData.data.getUser
-        const roleData = data.find(
-          (item) => item.labels[0].label === existingSystemRole
-        )
 
-        if (roleData && !roleData.labels[0].label.includes(existingRole)) {
-          data.map((role) => {
-            if (role.labels[0].label === existingSystemRole) {
-              return {
-                ...role,
-                types: [existingSystemRole, ...role.labels[0].label]
-              }
-            } else {
-              return role
-            }
-          })
-        } else if (!roleData) {
-          data.push({
-            labels: [
-              {
-                lang: 'en',
-                label: existingSystemRole
-              }
-            ]
-          })
-        }
-      }
-      updatedSections.forEach((section) => {
-        section.groups.forEach((group) => {
-          group.fields = transformRoleDataToDefinitions(
-            group.fields,
-            data,
-            state.userFormData
-          )
-        })
-      })
-      const newState = {
-        ...state,
-        loadingRoles: false,
-        submitting: false,
-        userForm: {
-          sections: updatedSections
-        }
-      }
-
-      if (userQueryData) {
-        return loop(newState, Cmd.action(storeUserFormData(userQueryData)))
-      }
-      return newState
     case MODIFY_USER_FORM_DATA:
       let submitting = state.submitting
       if (state.loadingRoles) {
@@ -473,11 +253,13 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         submitting,
         userFormData: (action as IUserFormDataModifyAction).payload.data
       }
+
     case CLEAR_USER_FORM_DATA:
       return {
         ...initialState,
         userForm: state.userForm
       }
+
     case SUBMIT_USER_FORM_DATA:
       const { client, mutation, variables, officeLocationId, isUpdate } = (
         action as IUserFormDataSubmitAction
@@ -485,7 +267,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const token = getToken()
       const tokenPayload = getTokenPayload(token)
       const userDetails = variables.user
-      const isSelfUpdate = userDetails.id === tokenPayload?.sub ? true : false
+      const isSelfUpdate = userDetails.id === tokenPayload?.sub
       const commandList: (RunCmd<Action> | ActionCmd<Action>)[] = [
         Cmd.run(
           () =>
@@ -512,6 +294,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         { ...state, submitting: true },
         Cmd.list<UserFormAction>(commandList)
       )
+
     case SUBMIT_USER_FORM_DATA_SUCCESS:
       const list = Cmd.list<
         | ReturnType<typeof clearUserFormData>
@@ -544,50 +327,19 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
         )
       }
-    case STORE_USER_FORM_DATA:
-      const { queryData } = (action as IStoreUserFormDataAction).payload
-      const formData = gqlToDraftTransformer(
-        { sections: (state.userForm as IForm).sections as IFormSection[] },
-        { [UserSection.User]: queryData.data.getUser }
-      )
 
+    case ROLES_LOADED:
+      const { systemRoles } = action.payload
+      const form = deserializeForm(createUserForm)
+      const mutateOptions = optionsGenerator(systemRoles)
+      generateUserFormWithRoles(form, mutateOptions)
       return {
         ...state,
-        userFormData: formData.user,
-        userDetailsStored: true
+        userForm: {
+          ...form
+        }
       }
-    case FETCH_USER_DATA:
-      const {
-        client: userClient,
-        query: getUserQuery,
-        variables: { userId }
-      } = (action as IFetchAndStoreUserData).payload
-      return loop(
-        state,
-        Cmd.run(
-          () =>
-            userClient.query({
-              query: getUserQuery,
-              variables: { userId },
-              fetchPolicy: 'no-cache'
-            }),
-          {
-            successActionCreator: updateFormAndFormData,
-            failActionCreator: () =>
-              showSubmitFormErrorToast(TOAST_MESSAGES.FAIL)
-          }
-        )
-      )
-    case UPDATE_DEFINITIONS_AND_FORM_DATA:
-      const { queryData: getUserQueryData } = (action as IUpdateFormAndFormData)
-        .payload
-      const { primaryOffice } = getUserQueryData.data.getUser as GQLUser
-      return loop(
-        state,
-        Cmd.action(
-          processRoles((primaryOffice as GQLLocation).id, getUserQueryData)
-        )
-      )
+
     default:
       return state
   }
