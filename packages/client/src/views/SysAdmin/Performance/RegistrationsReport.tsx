@@ -182,17 +182,12 @@ export function RegistrationsReport({
                           data.results.filter(
                             (x) =>
                               x.gender === 'female' &&
-                              !['withinLate', 'withinTarget'].includes(
-                                x.timeLabel
-                              )
+                              ['withinLate'].includes(x.timeLabel)
                           )
                         )}
                         ofNumber={calculateTotal(
-                          data.results.filter(
-                            (x) =>
-                              !['withinLate', 'withinTarget'].includes(
-                                x.timeLabel
-                              )
+                          data.results.filter((x) =>
+                            ['withinLate'].includes(x.timeLabel)
                           )
                         )}
                       />
