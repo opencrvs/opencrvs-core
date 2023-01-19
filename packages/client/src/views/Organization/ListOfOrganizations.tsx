@@ -22,50 +22,90 @@ import {
   Link,
   ListViewItemSimplified,
   ListViewSimplified,
-  Stack,
-  Text
+  NoResultText,
+  Stack
 } from '@opencrvs/components'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { ILocation } from '@client/offline/reducer'
-import { useHistory, useParams } from 'react-router'
-import { goToOrganizationList } from '@client/navigation'
-import { Activity } from '@opencrvs/components/lib/icons'
+import { ILocation, LocationType } from '@client/offline/reducer'
+import { useParams } from 'react-router'
+import {
+  goToOrganizationList,
+  goToPerformanceHome,
+  goToTeamUserList
+} from '@client/navigation'
+import { Activity, User } from '@opencrvs/components/lib/icons'
 import { Button } from '@opencrvs/components/lib/Button'
+import startOfMonth from 'date-fns/startOfMonth'
+import subMonths from 'date-fns/subMonths'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
+
+type IRouteProps = {
+  index: string
+}
+
+type IGetNewLevel = {
+  currentLevel: null | ILocation
+  dataLevel: ILocation[]
+}
+
 export function ListOfOrganizations() {
   const intl = useIntl()
-  const { index } = useParams()
+  const { index } = useParams<IRouteProps>()
   const dispatch = useDispatch()
   //
   const getNewLevel =
     (index: string) =>
-    (store: IStoreState): ILocation[] => {
-      let currentLevel = Object.values(
-        store.offline.offlineData.locations as { [key: string]: ILocation }
-      ).filter((s) => s.partOf === `Location/${index ?? '0'}`)
-      if (currentLevel.length === 0) {
-        currentLevel = Object.values(
-          store.offline.offlineData.offices as { [key: string]: ILocation }
-        ).filter((s) => s.partOf === `Location/${index ?? '0'}`)
+    (store: IStoreState): IGetNewLevel => {
+      const indexString = index ?? '0'
+      const locations = store.offline.offlineData.locations as {
+        [key: string]: ILocation
       }
-      return currentLevel
+      const offices = store.offline.offlineData.offices as {
+        [key: string]: ILocation
+      }
+
+      let dataLevel = Object.values(locations).filter(
+        (s) => s.partOf === `Location/${indexString}`
+      )
+
+      let currentLevel = null
+
+      if (indexString !== '0') {
+        const keyLevel = Object.keys(locations)
+        currentLevel = keyLevel.includes(indexString)
+          ? locations[indexString]
+          : null
+      }
+
+      if (dataLevel.length === 0) {
+        dataLevel = Object.values(offices).filter(
+          (s) => s.partOf === `Location/${indexString}`
+        )
+
+        const keyLevel = Object.keys(offices)
+        currentLevel = keyLevel.includes(indexString)
+          ? offices[indexString]
+          : null
+      }
+
+      return {
+        currentLevel,
+        dataLevel
+      }
     }
 
   const levelOne = useSelector<IStoreState, any>(getNewLevel(index))
-  const totalNumber = levelOne.length
+  const totalNumber = levelOne.dataLevel.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
 
   const [links, setLink] = React.useState([
     {
       label: 'Cameroon',
-      to: '/organization/',
-      isActive: false
+      index: null
     }
   ])
-
-  //
 
   const changeLevelAction = (
     e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
@@ -75,17 +115,26 @@ export function ListOfOrganizations() {
     dispatch(goToOrganizationList(id))
   }
 
+  const onClickBreadCrumb = (crumb: Record<any, string>) => {
+    dispatch(goToOrganizationList(crumb.index))
+  }
+
   React.useEffect(() => {
-    setLink((links) => [
-      ...links,
-      {
-        label: 'New Label',
-        to: `organization/${index}`,
-        isActive: true
-      }
-    ])
-    console.log(index)
-  }, [index])
+    const currentLevel = levelOne.currentLevel
+    if (currentLevel) {
+      setLink((links) => [
+        ...links,
+        {
+          label: currentLevel.name,
+          index: currentLevel.index
+        }
+      ])
+    } else {
+      setLink((links) => {
+        return links.filter((r) => r.index === null)
+      })
+    }
+  }, [levelOne.currentLevel])
   //
   return (
     <Frame
@@ -102,34 +151,55 @@ export function ListOfOrganizations() {
         showTitleOnMobile={true}
       >
         <ListViewSimplified bottomBorder={true}>
-          <ListViewItemSimplified label={<BreadCrumb Links={links} />} />
-          {levelOne
-            ?.slice(
-              (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
-              currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
-            )
-            .map((level: ILocation, index: number) => (
-              <ListViewItemSimplified
-                key={index}
-                label={
-                  <Link
-                    element="a"
-                    onClick={(e) => changeLevelAction(e, level.id)}
-                  >
-                    {level?.name}
-                  </Link>
-                }
-                actions={
-                  <Button
-                    type="icon"
-                    size="large"
-                    aria-label="View performance data"
-                  >
-                    <Activity />
-                  </Button>
-                }
-              />
-            ))}
+          <ListViewItemSimplified
+            label={<BreadCrumb crumbs={links} onSelect={onClickBreadCrumb} />}
+          />
+          {!levelOne.dataLevel.length && (
+            <NoResultText id="no-record">Empty data</NoResultText>
+          )}
+          {levelOne.dataLevel.length > 0 &&
+            levelOne.dataLevel
+              ?.slice(
+                (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
+                currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
+              )
+              .map((level: ILocation, index: number) => (
+                <ListViewItemSimplified
+                  key={index}
+                  label={
+                    <Link
+                      element="a"
+                      onClick={(e) => changeLevelAction(e, level.id)}
+                    >
+                      {level?.name}
+                    </Link>
+                  }
+                  actions={
+                    <Button
+                      type="icon"
+                      size="large"
+                      aria-label="View performance data"
+                      onClick={() => {
+                        if (level.type === LocationType.CRVS_OFFICE)
+                          dispatch(goToTeamUserList(level.id))
+                        if (level.type === LocationType.ADMIN_STRUCTURE)
+                          dispatch(
+                            goToPerformanceHome(
+                              startOfMonth(subMonths(new Date(Date.now()), 11)),
+                              new Date(Date.now()),
+                              level.id
+                            )
+                          )
+                      }}
+                    >
+                      {level.type === LocationType.CRVS_OFFICE && <User />}
+                      {level.type === LocationType.ADMIN_STRUCTURE && (
+                        <Activity />
+                      )}
+                    </Button>
+                  }
+                />
+              ))}
         </ListViewSimplified>
         {totalNumber > DEFAULT_PAGINATION_LIST_SIZE && (
           <Pagination
@@ -145,12 +215,27 @@ export function ListOfOrganizations() {
   )
 }
 
-function BreadCrumb(props: { Links: Record<any, string>[] }) {
+function BreadCrumb(props: {
+  crumbs: Record<any, string>[]
+  onSelect: (x: Record<any, string>) => void
+}) {
+  const isLast = (index: number): boolean => {
+    return index === props.crumbs.length - 1 && props.crumbs.length > 1
+  }
+
   return (
     <Stack gap={8} direction="row">
-      {props.Links.map((x, idx) => {
+      {props.crumbs.map((x, idx) => {
         return (
-          <Link key={idx} color={x.isActive ? 'primary' : 'copy'} element="a">
+          <Link
+            key={idx}
+            color={!isLast(idx) ? 'primary' : 'copy'}
+            disabled={isLast(idx)}
+            onClick={(e) => {
+              e.preventDefault()
+              props.onSelect(x)
+            }}
+          >
             {x?.label}
           </Link>
         )
@@ -158,30 +243,3 @@ function BreadCrumb(props: { Links: Record<any, string>[] }) {
     </Stack>
   )
 }
-
-interface BreadCrumbInterface {
-  label: string
-  to: string
-  Icon?: JSX.Element
-}
-const TestBreadCrumb = (props: BreadCrumbInterface[]) => {
-  const [state, setState] = React.useState(props)
-
-  const watchNavigation = (payload: BreadCrumbInterface) => {
-    setState((prevState: BreadCrumbInterface[]) =>
-      prevState.slice(0, state.indexOf(payload))
-    )
-  }
-
-  return props.map(({ label, to, Icon }, idx: number) => (
-    <Link key={idx} element="a" onClick={() => watchNavigation({ label, to })}>
-      {label}
-    </Link>
-  ))
-}
-
-const Separator = ({ children, ...props }: any) => (
-  <span style={{ color: 'teal' }} {...props}>
-    {children}
-  </span>
-)
