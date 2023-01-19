@@ -51,6 +51,8 @@ export function RegistrationsReport({
   timeEnd,
   locationId
 }: RegistrationsReportProps) {
+  console.log(data)
+
   const dispatch = useDispatch()
   const intl = useIntl()
   return (
@@ -333,9 +335,11 @@ export function RegistrationsReport({
                   total={calculateTotal(
                     data.results.filter(
                       (x) =>
-                        !['DECEASED_USUAL_RESIDENCE', 'PRIVATE_HOME'].includes(
-                          x.eventLocationType
-                        )
+                        ![
+                          'DECEASED_USUAL_RESIDENCE',
+                          'PRIVATE_HOME',
+                          'OTHER'
+                        ].includes(x.eventLocationType)
                     )
                   )}
                   ofNumber={calculateTotal(data.results)}
