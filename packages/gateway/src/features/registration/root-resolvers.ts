@@ -399,7 +399,7 @@ export const resolvers: GQLResolver = {
         )
       }
       const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = await updateFHIRTaskBundle(
+      const newTaskBundle = updateFHIRTaskBundle(
         taskEntry,
         GQLRegStatus.ARCHIVED
       )
@@ -621,7 +621,7 @@ async function markEventAsCertified(
   event: EVENT_TYPE
 ) {
   await setCertificateCollector(details, authHeader)
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = buildFHIRBundle(details, event, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return composition-id
