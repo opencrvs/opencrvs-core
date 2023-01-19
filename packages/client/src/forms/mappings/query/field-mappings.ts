@@ -901,8 +901,10 @@ export const addressLineTemplateTransformer =
       transformedData[sectionId] = {}
     }
     const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
+    const addCase =
+      addressCase === AddressCases.SECONDARY_ADDRESS ? 'secondary' : 'primary'
     const newTransformedName = camelCase(
-      `${sectionId}_${addressCase}_${transformedFieldName}`
+      `${sectionId}_${addCase}_${transformedFieldName}`
     )
     transformedData[sectionId][newTransformedName] = address.line[index] || ''
   }

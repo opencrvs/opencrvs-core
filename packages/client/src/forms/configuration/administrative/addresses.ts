@@ -768,7 +768,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -837,7 +837,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -906,7 +906,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -975,7 +975,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -1044,7 +1044,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -1113,7 +1113,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "RURAL"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "RURAL"`
         },
         {
           action: 'hide',
