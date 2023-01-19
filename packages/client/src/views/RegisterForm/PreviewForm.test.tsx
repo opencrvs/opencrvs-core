@@ -22,7 +22,9 @@ import {
   secondaryAddressData,
   secondaryInternationalAddressLines,
   eventAddressData,
-  flushPromises
+  flushPromises,
+  getFileFromBase64String,
+  validImageB64String
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
