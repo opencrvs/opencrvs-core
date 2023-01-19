@@ -64,7 +64,10 @@ function getGqlDetails(form: IForm, draft: IDeclaration) {
   return gqlDetails
 }
 
-function updateDeclaration(dispatch: Dispatch, declaration: IDeclaration) {
+export function updateDeclaration(
+  dispatch: Dispatch,
+  declaration: IDeclaration
+) {
   dispatch(modifyDeclaration(declaration))
   dispatch(writeDeclaration(declaration))
 }

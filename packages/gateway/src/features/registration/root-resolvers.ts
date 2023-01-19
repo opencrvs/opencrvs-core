@@ -385,6 +385,27 @@ export const resolvers: GQLResolver = {
       )
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+
+      const composition = await fetchFHIR(
+        `/Composition/${id}`,
+        authHeader,
+        'GET'
+      )
+
+      removeDuplicatesFromComposition(composition, id)
+
+      await fetch(`${FHIR_URL}/Composition/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/fhir+json',
+          ...authHeader
+        },
+        body: JSON.stringify(composition)
+      }).catch((error) => {
+        return Promise.reject(
+          new Error(`FHIR request failed: ${error.message}`)
+        )
+      })
       // return the taskId
       return taskEntry.resource.id
     },
@@ -610,9 +631,22 @@ async function markEventAsRegistered(
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
-  const res = await fetchFHIR(`/Composition/${id}`, authHeader)
+  const composition = await fetchFHIR(`/Composition/${id}`, authHeader, 'GET')
 
-  return res
+  removeDuplicatesFromComposition(composition, id)
+
+  await fetch(`${FHIR_URL}/Composition/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/fhir+json',
+      ...authHeader
+    },
+    body: JSON.stringify(composition)
+  }).catch((error) => {
+    return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
+  })
+
+  return composition
 }
 
 async function markEventAsCertified(

@@ -18,6 +18,10 @@ import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import { useIntl } from 'react-intl'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { ResponsiveModal } from '@client/../../components/lib'
+import { buttonMessages } from '@client/i18n/messages'
+import { useDispatch } from 'react-redux'
+import { updateDeclaration } from '@client/declarations/submissionMiddleware'
 
 interface IProps {
   declaration: IDeclaration
@@ -30,8 +34,10 @@ const SubPageContent = styled(Content)`
 
 export const DuplicateForm = (props: IProps) => {
   const intl = useIntl()
+  const dispatch = useDispatch()
   const { data } = props.declaration
-  const trackingIds = props.declaration.duplicates
+  const { duplicates, ...withoutDuplicates } = props.declaration
+  const trackingIds = duplicates
     ?.map((duplicate) => duplicate.trackingId)
     .join(', ')
 
@@ -42,10 +48,16 @@ export const DuplicateForm = (props: IProps) => {
     ].join(' ')
   }
 
+  const [toggleNotDuplicate, setToggleNotDuplicate] = React.useState(false)
+
+  const toggleNotDuplicateModal = () => {
+    setToggleNotDuplicate((prevValue) => !prevValue)
+  }
+
   const notADuplicateButton = (
     <Button
       onClick={() => {
-        alert('Not a duplicate')
+        toggleNotDuplicateModal()
       }}
       type="positive"
     >
@@ -67,15 +79,58 @@ export const DuplicateForm = (props: IProps) => {
   )
 
   return (
-    <SubPageContent
-      title={intl.formatMessage(duplicateMessages.duplicateContentTitle, {
-        name: getName(),
-        trackingId: String(data.registration.trackingId)
-      })}
-      subtitle={intl.formatMessage(duplicateMessages.duplicateContentSubtitle, {
-        trackingIds
-      })}
-      bottomActionButtons={[notADuplicateButton, markASDuplicateButton]}
-    ></SubPageContent>
+    <>
+      <SubPageContent
+        title={intl.formatMessage(duplicateMessages.duplicateContentTitle, {
+          name: getName(),
+          trackingId: String(data.registration.trackingId)
+        })}
+        subtitle={intl.formatMessage(
+          duplicateMessages.duplicateContentSubtitle,
+          {
+            trackingIds
+          }
+        )}
+        bottomActionButtons={[notADuplicateButton, markASDuplicateButton]}
+      ></SubPageContent>
+      <ResponsiveModal
+        id="not-duplicate-modal"
+        show={toggleNotDuplicate}
+        autoHeight={true}
+        responsive={false}
+        titleHeightAuto={true}
+        handleClose={() => toggleNotDuplicateModal()}
+        title={intl.formatMessage(
+          duplicateMessages.notDuplicateContentConfirmationTitle,
+          {
+            name: getName(),
+            trackingId: String(data.registration.trackingId)
+          }
+        )}
+        actions={[
+          <Button
+            type="tertiary"
+            id="not-duplicate-cancel"
+            key="not-duplicateRegistration-cancel"
+            onClick={() => toggleNotDuplicateModal()}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="primary"
+            id="not-duplicate-confirm"
+            key="not-duplicateRegistration-confirm"
+            onClick={() => {
+              if (duplicates) {
+                updateDeclaration(dispatch, withoutDuplicates)
+              }
+              toggleNotDuplicateModal()
+            }}
+          >
+            {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
+        ]}
+      ></ResponsiveModal>
+    </>
   )
 }

@@ -1007,21 +1007,27 @@ export function getMaritalStatusCode(fieldValue: string) {
 export function removeDuplicatesFromComposition(
   composition: fhir.Composition,
   compositionId: string,
-  duplicateId: string
+  duplicateId?: string
 ) {
-  const removeAllDuplicates = compositionId === duplicateId
-  const updatedRelatesTo =
-    composition.relatesTo &&
-    composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
-      return (
-        relatesTo.code !== 'duplicate' ||
-        (!removeAllDuplicates &&
-          relatesTo.targetReference &&
-          relatesTo.targetReference.reference !== `Composition/${duplicateId}`)
-      )
-    })
-  composition.relatesTo = updatedRelatesTo
-  return composition
+  if (duplicateId) {
+    const removeAllDuplicates = compositionId === duplicateId
+    const updatedRelatesTo =
+      composition.relatesTo &&
+      composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
+        return (
+          relatesTo.code !== 'duplicate' ||
+          (!removeAllDuplicates &&
+            relatesTo.targetReference &&
+            relatesTo.targetReference.reference !==
+              `Composition/${duplicateId}`)
+        )
+      })
+    composition.relatesTo = updatedRelatesTo
+    return composition
+  } else {
+    composition.relatesTo = []
+    return composition
+  }
 }
 
 export const fetchFHIR = <T = any>(
@@ -1420,8 +1426,7 @@ export function isBase64FileString(str: string) {
   return strSplit.length > 0 && strSplit[0] === 'data'
 }
 
-export async function fetchCompositionByIdFromHearth(id: string) {
-  const composition = await fetchFromHearth(`/Composition/${id}`)
-
-  return composition
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
+  const task = await fetchFromHearth(`/Task?focus=Composition/${id}`)
+  return task
 }

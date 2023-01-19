@@ -18,6 +18,7 @@ interface IDuplicateDeclarationMessages
   duplicateContentSubtitle: MessageDescriptor
   notDuplicateButton: MessageDescriptor
   markAsDuplicateButton: MessageDescriptor
+  notDuplicateContentConfirmationTitle: MessageDescriptor
 }
 
 const messagesToDefine: IDuplicateDeclarationMessages = {
@@ -46,6 +47,11 @@ const messagesToDefine: IDuplicateDeclarationMessages = {
     id: 'duplicates.button.markAsDuplicate',
     defaultMessage: 'Mark as duplicate',
     description: 'Mark as duplicate button text'
+  },
+  notDuplicateContentConfirmationTitle: {
+    id: 'duplicates.content.notDuplicateConfirmationTitle',
+    defaultMessage: 'Are you sure {name} ({trackingId}) is not duplicate?',
+    description: 'Not a duplicate content confirmation title message'
   }
 }
 

@@ -19,7 +19,7 @@ export async function deduplicateHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    await removeDuplicate(request.payload as fhir.Bundle)
+    await removeDuplicate(request.payload as fhir.Composition & { id: string })
   } catch (error) {
     logger.error(`Search/searchDeclarationHandler: error: ${error}`)
     return internal(error)

@@ -17,7 +17,9 @@ import {
 import { ICompositionBody } from '@search/elasticsearch/utils'
 import { get } from 'lodash'
 
-export const removeDuplicate = async (bundle: fhir.Bundle) => {
+export const removeDuplicate = async (
+  bundle: fhir.Composition & { id: string }
+) => {
   const compositionId = bundle.id
 
   if (!compositionId) {
@@ -29,11 +31,10 @@ export const removeDuplicate = async (bundle: fhir.Bundle) => {
   await updateComposition(compositionId, body)
 }
 
-const extractRelatesToIDs = (bundle: fhir.Bundle) => {
+const extractRelatesToIDs = (bundle: fhir.Composition & { id: string }) => {
   const relatesToBundle = get(bundle, 'relatesTo') || []
 
   return relatesToBundle.map(
-    (item: { targetReference: { reference: string } }) =>
-      item.targetReference.reference.replace('Composition/', '')
+    (item) => item.targetReference?.reference?.replace('Composition/', '') ?? ''
   )
 }
