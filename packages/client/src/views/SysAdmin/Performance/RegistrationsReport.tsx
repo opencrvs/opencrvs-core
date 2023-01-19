@@ -51,8 +51,6 @@ export function RegistrationsReport({
   timeEnd,
   locationId
 }: RegistrationsReportProps) {
-  console.log(data)
-
   const dispatch = useDispatch()
   const intl = useIntl()
   return (
