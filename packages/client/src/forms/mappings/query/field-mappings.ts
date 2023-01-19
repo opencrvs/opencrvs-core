@@ -29,7 +29,6 @@ import {
 } from '@client/forms'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { camelCase, cloneDeep, get, isArray } from 'lodash'
-import { camelCase, cloneDeep, get, isArray } from 'lodash'
 import format from '@client/utils/date-formatting'
 import {
   IOfflineData,
@@ -43,7 +42,6 @@ import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
 import { getLocationNameMapOfFacility } from '@client/utils/locationUtils'
 import { getCountryName } from '@client/views/SysAdmin/Config/Application/utils'
-import { AddressCases } from '@client/forms/configuration/administrative/addresses'
 import { AddressCases } from '@client/forms/configuration/administrative/addresses'
 
 interface IName {
