@@ -770,7 +770,8 @@ const transformAddressTemplateArray = (
   addressLocationLevel: keyof typeof LocationLevel,
   sectionId: string,
   nameKey: string,
-  offlineData?: IOfflineData
+  offlineData?: IOfflineData,
+  addressCases?: AddressCases
 ) => {
   if (!transformedData[sectionId]) {
     transformedData[sectionId] = {}
@@ -792,8 +793,10 @@ const transformAddressTemplateArray = (
     LocationLevel[addressLocationLevel]
   ] = addressName
 
-  transformedData[sectionId][camelCase(`${nameKey}_${addressLocationLevel}`)] =
-    addressName as string | Record<string, string>
+  const addressCase = addressCases === AddressCases.SECONDARY_ADDRESS ?  'secondary' : 'primary'
+  transformedData[sectionId][
+    camelCase(`${nameKey}_${addressCase}_${addressLocationLevel}`)
+  ] = addressName as string | Record<string, string>
 }
 
 export const addressOfflineTransformer =
@@ -863,7 +866,8 @@ export const individualAddressTransformer =
         addressLocationLevel,
         sectionId,
         sectionId,
-        offlineData
+        offlineData,
+        addressCase
       )
     }
   }
@@ -896,7 +900,9 @@ export const addressLineTemplateTransformer =
       transformedData[sectionId] = {}
     }
     const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
-    const newTransformedName = camelCase(`${sectionId} ${transformedFieldName}`)
+    const newTransformedName = camelCase(
+      `${sectionId}_${addressCase}_${transformedFieldName}`
+    )
     transformedData[sectionId][newTransformedName] = address.line[index] || ''
   }
 
