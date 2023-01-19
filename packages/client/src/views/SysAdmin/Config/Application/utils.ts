@@ -209,7 +209,12 @@ export async function callApplicationConfigMutation(
   try {
     setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
     const res = await configApplicationMutations.mutateApplicationConfig(
-      isGeneralOrConfigAction(configProperty)
+      configProperty === ConfigActionType.INFORMANT_SIGNATURE
+        ? {
+            INFORMANT_SIGNATURE: appConfig.INFORMANT_SIGNATURE,
+            INFORMANT_SIGNATURE_REQUIRED: appConfig.INFORMANT_SIGNATURE_REQUIRED
+          }
+        : isGeneralOrConfigAction(configProperty)
         ? {
             [configProperty]: appConfig[configProperty]
           }
