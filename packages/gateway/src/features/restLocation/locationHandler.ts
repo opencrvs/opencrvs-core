@@ -19,6 +19,7 @@ import {
   getLocationsByIdentifier,
   updateStatisticalExtensions
 } from './utils'
+import { HEARTH_URL } from '@gateway/constants'
 
 enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
@@ -134,10 +135,24 @@ export async function fetchLocationHandler(
   let response
 
   if (locationId) {
-    response = await fetchFromHearth(`/Location/${locationId}`)
+    response = await fetchFromHearth<fhir.Bundle>(`/Location/${locationId}`)
   } else {
-    response = await fetchFromHearth(`/Location${searchParam}`)
+    response = await fetchFromHearth<fhir.Bundle>(`/Location${searchParam}`)
   }
+
+  response.link = response.link?.map((link) => ({
+    ...link,
+    url: link.url
+      .replace(`${HEARTH_URL}`, `${request.url.origin}`)
+      .replace('Location', 'location')
+  }))
+
+  response.entry = response.entry?.map((entry) => ({
+    ...entry,
+    fullUrl: entry.fullUrl
+      ?.replace(`${HEARTH_URL}`, `${request.url.origin}`)
+      .replace('Location', 'location')
+  }))
 
   return response
 }
