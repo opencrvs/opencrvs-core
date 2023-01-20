@@ -47,8 +47,13 @@ type IRouteProps = {
 }
 
 type IGetNewLevel = {
-  currentLocation: null | ILocation
   childLocations: ILocation[]
+  breadCrumb: IBreadCrumbData[]
+}
+
+type IBreadCrumbData = {
+  paramId: string | null | undefined
+  label: string | null
 }
 
 export function ListOfOrganisations() {
@@ -71,55 +76,51 @@ export function ListOfOrganisations() {
         (s) => s.partOf === `Location/${location}`
       )
 
-      let currentLocation = null
-
-      if (location !== '0') {
-        const keyLevel = Object.keys(locations)
-        currentLocation = keyLevel.includes(location)
-          ? locations[location]
-          : null
-      }
-
-      if (childLocations.length === 0) {
+      if (!childLocations.length) {
         childLocations = Object.values(offices).filter(
           (s) => s.partOf === `Location/${location}`
         )
-
-        const keyLevel = Object.keys(offices)
-        currentLocation = keyLevel.includes(location) ? offices[location] : null
       }
 
-      return {
-        currentLocation,
-        childLocations
-      }
-    }
-
-  const getBreadCrumb =
-    (currentlySelectedLocation: string) =>
-    (store: IStoreState): { index: null; label: string }[] => {
-      const dataOfBreadCrumb = [
+      let dataOfBreadCrumb: IBreadCrumbData[] = [
         {
           label: 'Cameroon',
-          index: null
+          paramId: ''
         }
       ]
 
-      return dataOfBreadCrumb
+      if (currentlySelectedLocation) {
+        let currentLocationId = currentlySelectedLocation
+        const LocationBreadCrumb: IBreadCrumbData[] | null = []
+        do {
+          const currentOffice = locations[currentLocationId]
+
+          if (currentOffice) {
+            LocationBreadCrumb.push({
+              label: currentOffice.name,
+              paramId: currentOffice.id
+            })
+            currentLocationId = currentOffice.partOf.split('/')[1]
+          } else {
+            currentLocationId = ''
+          }
+        } while (currentLocationId !== '')
+
+        dataOfBreadCrumb = [
+          ...dataOfBreadCrumb,
+          ...LocationBreadCrumb.reverse()
+        ]
+      }
+
+      return {
+        breadCrumb: dataOfBreadCrumb,
+        childLocations
+      }
     }
 
   const dataLocations = useSelector<IStoreState, any>(getNewLevel(locationId))
   const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
-
-  const breadCrumb = useSelector<IStoreState, any>(getBreadCrumb(locationId))
-
-  const [links, setLink] = React.useState([
-    {
-      label: 'Cameroon',
-      index: null
-    }
-  ])
 
   const changeLevelAction = (
     e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
@@ -129,26 +130,10 @@ export function ListOfOrganisations() {
     dispatch(goToOrganizationList(id))
   }
 
-  const onClickBreadCrumb = (crumb: Record<any, string>) => {
-    dispatch(goToOrganizationList(crumb.index))
+  const onClickBreadCrumb = (crumb: IBreadCrumbData) => {
+    dispatch(goToOrganizationList(crumb.paramId))
   }
 
-  React.useEffect(() => {
-    const currentLocation = dataLocations.currentLocation
-    if (currentLocation) {
-      setLink((links) => [
-        ...links,
-        {
-          label: currentLocation.name,
-          index: currentLocation.index
-        }
-      ])
-    } else {
-      setLink((links) => {
-        return links.filter((r) => r.index === null)
-      })
-    }
-  }, [dataLocations.currentLocation])
   //
   return (
     <Frame
@@ -166,7 +151,12 @@ export function ListOfOrganisations() {
       >
         <ListViewSimplified bottomBorder={true}>
           <ListViewItemSimplified
-            label={<BreadCrumb crumbs={links} onSelect={onClickBreadCrumb} />}
+            label={
+              <BreadCrumb
+                crumbs={dataLocations.breadCrumb}
+                onSelect={onClickBreadCrumb}
+              />
+            }
           />
           {!dataLocations.childLocations.length && (
             <NoResultText id="no-record">Empty data</NoResultText>
@@ -230,22 +220,21 @@ export function ListOfOrganisations() {
 }
 
 function BreadCrumb(props: {
-  crumbs: Record<any, string>[]
-  onSelect: (x: Record<any, string>) => void
+  crumbs: IBreadCrumbData[]
+  onSelect: (x: IBreadCrumbData) => void
 }) {
   const isLast = (index: number): boolean => {
     return index === props.crumbs.length - 1 && props.crumbs.length > 1
   }
 
   return (
-    <Stack gap={8} direction="row">
+    <Stack gap={8} direction="row" wrap>
       {props.crumbs.map((x, idx) => {
         return (
-          <>
+          <div key={idx}>
             {idx > 0 && '/ '}
             {!isLast(idx) ? (
               <Link
-                key={idx}
                 color={'primary'}
                 onClick={(e) => {
                   e.preventDefault()
@@ -259,7 +248,7 @@ function BreadCrumb(props: {
                 {x?.label}
               </Text>
             )}
-          </>
+          </div>
         )
       })}
     </Stack>
