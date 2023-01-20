@@ -855,7 +855,7 @@ export const individualAddressTransformer =
     }
 
     const address =
-      queryData[sectionId].address || queryData[sectionId]?.individual?.address
+      queryData[sectionId]?.address || queryData[sectionId]?.individual?.address
     const addressFromQuery = (address || []).find(
       (addr: { type: AddressCases }) => addr.type === addressCase
     )
@@ -889,7 +889,7 @@ export const addressLineTemplateTransformer =
   ) => {
     const address = (
       queryData[sectionId]?.individual?.address ||
-      queryData[sectionId].address ||
+      queryData[sectionId]?.address ||
       []
     ).find((add: { type: AddressCases }) => add.type === addressCase)
 
@@ -930,7 +930,7 @@ export const eventLocationAddressLineTemplateTransformer =
     }
     const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
     transformedData[sectionId][transformedFieldName] =
-      queryData.eventLocation.address.line[index] || ''
+      queryData.eventLocation?.address.line[index] || ''
   }
 
 export const eventLocationAddressOfflineTransformer =
