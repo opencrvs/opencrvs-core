@@ -23,6 +23,7 @@ import { useSelector } from 'react-redux'
 import { getLanguages } from '@client/i18n/selectors'
 import { getUserSystemRole } from '@client/views/SysAdmin/Team/utils'
 import { messages } from '@client/i18n/messages/views/config'
+import _ from 'lodash'
 
 const StyledTextInput = styled(TextInput)`
   ${({ theme }) => theme.fonts.reg14};
