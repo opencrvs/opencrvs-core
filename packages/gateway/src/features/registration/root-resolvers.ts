@@ -432,7 +432,7 @@ export const resolvers: GQLResolver = {
         { url: REINSTATED_EXTENSION_URL }
       ]
 
-      const newTaskBundle = await updateFHIRTaskBundle(taskEntry, prevRegStatus)
+      const newTaskBundle = updateFHIRTaskBundle(taskEntry, prevRegStatus)
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
 
