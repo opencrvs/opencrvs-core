@@ -36,12 +36,13 @@ import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Role, SystemRole } from '@client/utils/gateway'
 
-const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
+export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
 const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA' as const
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
 const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
+const MODIFY_LOADING_ROLE_DATA = 'USER_FORM/MODIFY_LOADING_ROLE_DATA'
 
 export enum TOAST_MESSAGES {
   SUCCESS = 'userFormSuccess',
@@ -57,6 +58,16 @@ const initialState: IUserFormState = {
   loadingRoles: false,
   submissionError: false,
   userAuditForm
+}
+
+export interface IRolesMessageAddedAction {
+  type: typeof MODIFY_LOADING_ROLE_DATA
+}
+
+export function rolesMessageAddData(): IRolesMessageAddedAction {
+  return {
+    type: MODIFY_LOADING_ROLE_DATA
+  }
 }
 
 interface IUserFormDataModifyAction {
@@ -150,14 +161,14 @@ export function submitFail(errorData: ApolloError): ISubmitFailedAction {
   }
 }
 
-interface IUpdateSystemRoleLoadedAction {
+export interface IRoleLoadedAction {
   type: typeof ROLES_LOADED
   payload: {
     systemRoles: SystemRole[]
   }
 }
 
-function rolesLoaded(systemRoles: SystemRole[]): IUpdateSystemRoleLoadedAction {
+export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
     payload: {
@@ -173,7 +184,8 @@ type UserFormAction =
   | ISubmitFailedAction
   | profileActions.Action
   | ShowCreateUserErrorToast
-  | IUpdateSystemRoleLoadedAction
+  | IRoleLoadedAction
+  | IRolesMessageAddedAction
   | ReturnType<typeof clearUserFormData>
   | ReturnType<typeof showSubmitFormSuccessToast>
   | ReturnType<typeof showSubmitFormErrorToast>
@@ -193,20 +205,27 @@ const fetchRoles = async () => {
   return roles.data.getSystemRoles
 }
 
+const generateIntlObject = (
+  systemRole: SystemRole,
+  role: Role
+): ISelectOption => {
+  return {
+    value: role.value,
+    label: {
+      id: `${systemRole.value}.role.${role.value}`,
+      description: '',
+      defaultMessage: role.labels[0].label
+    }
+  }
+}
+
 const optionsGenerator = (systemRoles: SystemRole[]) => {
   const options: { [key: string]: ISelectOption[] } = {}
   systemRoles.forEach((systemRole: SystemRole) => {
     const generateRolesBySystemRole: ISelectOption[] = []
 
     systemRole.roles.forEach((role: Role) => {
-      generateRolesBySystemRole.push({
-        value: role.value,
-        label: {
-          id: `${systemRole.value}.role.${role.value}`,
-          description: '',
-          defaultMessage: role.labels[0].label
-        }
-      })
+      generateRolesBySystemRole.push(generateIntlObject(systemRole, role))
     })
     options[systemRole.value] = generateRolesBySystemRole
   })
@@ -338,6 +357,11 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userForm: {
           ...form
         }
+      }
+    case MODIFY_LOADING_ROLE_DATA:
+      return {
+        ...state,
+        loadingRoles: false
       }
 
     default:

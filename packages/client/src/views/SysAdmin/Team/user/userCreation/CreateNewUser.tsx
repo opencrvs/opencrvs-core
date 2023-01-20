@@ -117,19 +117,8 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
   }
 
   render() {
-    const {
-      section,
-      submitting,
-      userDetailsStored,
-      loadingRoles,
-      userId,
-      match
-    } = this.props
-    if (
-      submitting ||
-      (userId && !userDetailsStored) ||
-      (match.params.locationId && loadingRoles)
-    ) {
+    const { section, submitting, loadingRoles } = this.props
+    if (loadingRoles || submitting) {
       return this.renderLoadingPage()
     }
 
