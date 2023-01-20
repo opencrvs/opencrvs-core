@@ -22,7 +22,6 @@ import {
   Link,
   ListViewItemSimplified,
   ListViewSimplified,
-  NoResultText,
   Stack,
   Text
 } from '@opencrvs/components'
@@ -158,9 +157,6 @@ export function ListOfOrganisations() {
               />
             }
           />
-          {!dataLocations.childLocations.length && (
-            <NoResultText id="no-record">Empty data</NoResultText>
-          )}
           {dataLocations.childLocations.length > 0 &&
             dataLocations.childLocations
               ?.slice(
@@ -171,12 +167,18 @@ export function ListOfOrganisations() {
                 <ListViewItemSimplified
                   key={index}
                   label={
-                    <Link
-                      element="a"
-                      onClick={(e) => changeLevelAction(e, level.id)}
-                    >
-                      {level?.name}
-                    </Link>
+                    level.type === LocationType.CRVS_OFFICE ? (
+                      <Text variant={'bold16'} element={'span'}>
+                        {level?.name}
+                      </Text>
+                    ) : (
+                      <Link
+                        element="a"
+                        onClick={(e) => changeLevelAction(e, level.id)}
+                      >
+                        {level?.name}
+                      </Link>
+                    )
                   }
                   actions={
                     <Button
