@@ -19,11 +19,7 @@ import {
   getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
-import User, {
-  FIELD_AGENT_TYPES,
-  IUser,
-  IUserModel
-} from '@user-mgnt/model/user'
+import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import {
   generateSaltedHash,
   generateRandomPassword
@@ -64,16 +60,6 @@ export default async function createUser(
       token
     )
     user.systemRole = user.systemRole ?? 'FIELD_AGENT'
-
-    if (user.systemRole === 'FIELD_AGENT') {
-      if (!user.role || !Object.values(FIELD_AGENT_TYPES).includes(user.role)) {
-        return h.response('Type not supported for this user').code(403)
-      }
-    } else {
-      if (user.role) {
-        return h.response('Type not supported for this user').code(403)
-      }
-    }
 
     const role = createFhirPractitionerRole(user, practitionerId, false)
     roleId = await postFhir(token, role)
