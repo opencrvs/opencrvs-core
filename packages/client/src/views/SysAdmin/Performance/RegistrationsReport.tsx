@@ -331,13 +331,8 @@ export function RegistrationsReport({
               {
                 <TotalDisplayWithPercentage
                   total={calculateTotal(
-                    data.results.filter(
-                      (x) =>
-                        ![
-                          'DECEASED_USUAL_RESIDENCE',
-                          'PRIVATE_HOME',
-                          'OTHER'
-                        ].includes(x.eventLocationType)
+                    data.results.filter((x) =>
+                      ['HEALTH_FACILITY'].includes(x.eventLocationType)
                     )
                   )}
                   ofNumber={calculateTotal(data.results)}
