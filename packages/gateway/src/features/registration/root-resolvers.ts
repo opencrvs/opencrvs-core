@@ -289,7 +289,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
+        const doc = buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
 
         const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
         // return composition-id
