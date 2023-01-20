@@ -23,7 +23,8 @@ import {
   ListViewItemSimplified,
   ListViewSimplified,
   NoResultText,
-  Stack
+  Stack,
+  Text
 } from '@opencrvs/components'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
@@ -42,23 +43,23 @@ import subMonths from 'date-fns/subMonths'
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
 type IRouteProps = {
-  index: string
+  locationId: string
 }
 
 type IGetNewLevel = {
-  currentLevel: null | ILocation
-  dataLevel: ILocation[]
+  currentLocation: null | ILocation
+  childLocations: ILocation[]
 }
 
-export function ListOfOrganizations() {
+export function ListOfOrganisations() {
   const intl = useIntl()
-  const { index } = useParams<IRouteProps>()
+  const { locationId } = useParams<IRouteProps>()
   const dispatch = useDispatch()
   //
   const getNewLevel =
-    (index: string) =>
+    (currentlySelectedLocation: string) =>
     (store: IStoreState): IGetNewLevel => {
-      const indexString = index ?? '0'
+      const location = currentlySelectedLocation ?? '0'
       const locations = store.offline.offlineData.locations as {
         [key: string]: ILocation
       }
@@ -66,39 +67,52 @@ export function ListOfOrganizations() {
         [key: string]: ILocation
       }
 
-      let dataLevel = Object.values(locations).filter(
-        (s) => s.partOf === `Location/${indexString}`
+      let childLocations = Object.values(locations).filter(
+        (s) => s.partOf === `Location/${location}`
       )
 
-      let currentLevel = null
+      let currentLocation = null
 
-      if (indexString !== '0') {
+      if (location !== '0') {
         const keyLevel = Object.keys(locations)
-        currentLevel = keyLevel.includes(indexString)
-          ? locations[indexString]
+        currentLocation = keyLevel.includes(location)
+          ? locations[location]
           : null
       }
 
-      if (dataLevel.length === 0) {
-        dataLevel = Object.values(offices).filter(
-          (s) => s.partOf === `Location/${indexString}`
+      if (childLocations.length === 0) {
+        childLocations = Object.values(offices).filter(
+          (s) => s.partOf === `Location/${location}`
         )
 
         const keyLevel = Object.keys(offices)
-        currentLevel = keyLevel.includes(indexString)
-          ? offices[indexString]
-          : null
+        currentLocation = keyLevel.includes(location) ? offices[location] : null
       }
 
       return {
-        currentLevel,
-        dataLevel
+        currentLocation,
+        childLocations
       }
     }
 
-  const levelOne = useSelector<IStoreState, any>(getNewLevel(index))
-  const totalNumber = levelOne.dataLevel.length
+  const getBreadCrumb =
+    (currentlySelectedLocation: string) =>
+    (store: IStoreState): { index: null; label: string }[] => {
+      const dataOfBreadCrumb = [
+        {
+          label: 'Cameroon',
+          index: null
+        }
+      ]
+
+      return dataOfBreadCrumb
+    }
+
+  const dataLocations = useSelector<IStoreState, any>(getNewLevel(locationId))
+  const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
+
+  const breadCrumb = useSelector<IStoreState, any>(getBreadCrumb(locationId))
 
   const [links, setLink] = React.useState([
     {
@@ -120,13 +134,13 @@ export function ListOfOrganizations() {
   }
 
   React.useEffect(() => {
-    const currentLevel = levelOne.currentLevel
-    if (currentLevel) {
+    const currentLocation = dataLocations.currentLocation
+    if (currentLocation) {
       setLink((links) => [
         ...links,
         {
-          label: currentLevel.name,
-          index: currentLevel.index
+          label: currentLocation.name,
+          index: currentLocation.index
         }
       ])
     } else {
@@ -134,12 +148,12 @@ export function ListOfOrganizations() {
         return links.filter((r) => r.index === null)
       })
     }
-  }, [levelOne.currentLevel])
+  }, [dataLocations.currentLocation])
   //
   return (
     <Frame
       header={
-        <Header title={intl.formatMessage(navigationMessages.organization)} />
+        <Header title={intl.formatMessage(navigationMessages.organisation)} />
       }
       skipToContentText={intl.formatMessage(
         constantsMessages.skipToMainContent
@@ -147,18 +161,18 @@ export function ListOfOrganizations() {
       navigation={<Navigation />}
     >
       <Content
-        title={intl.formatMessage(navigationMessages.organization)}
+        title={intl.formatMessage(navigationMessages.organisation)}
         showTitleOnMobile={true}
       >
         <ListViewSimplified bottomBorder={true}>
           <ListViewItemSimplified
             label={<BreadCrumb crumbs={links} onSelect={onClickBreadCrumb} />}
           />
-          {!levelOne.dataLevel.length && (
+          {!dataLocations.childLocations.length && (
             <NoResultText id="no-record">Empty data</NoResultText>
           )}
-          {levelOne.dataLevel.length > 0 &&
-            levelOne.dataLevel
+          {dataLocations.childLocations.length > 0 &&
+            dataLocations.childLocations
               ?.slice(
                 (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
                 currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
@@ -227,17 +241,25 @@ function BreadCrumb(props: {
     <Stack gap={8} direction="row">
       {props.crumbs.map((x, idx) => {
         return (
-          <Link
-            key={idx}
-            color={!isLast(idx) ? 'primary' : 'copy'}
-            disabled={isLast(idx)}
-            onClick={(e) => {
-              e.preventDefault()
-              props.onSelect(x)
-            }}
-          >
-            {x?.label}
-          </Link>
+          <>
+            {idx > 0 && '/ '}
+            {!isLast(idx) ? (
+              <Link
+                key={idx}
+                color={'primary'}
+                onClick={(e) => {
+                  e.preventDefault()
+                  props.onSelect(x)
+                }}
+              >
+                {x?.label}
+              </Link>
+            ) : (
+              <Text variant={'bold16'} element={'span'}>
+                {x?.label}
+              </Text>
+            )}
+          </>
         )
       })}
     </Stack>

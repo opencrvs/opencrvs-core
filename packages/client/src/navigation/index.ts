@@ -56,7 +56,7 @@ import {
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
   PERFORMANCE_REGISTRATIONS_LIST,
-  ORGANIZATIONS_INDEX
+  ORGANISATIONS_INDEX
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -247,8 +247,8 @@ export function goToTeamUserList(id: string) {
   })
 }
 
-export function goToOrganizationList(index?: string) {
-  return push(formatUrl(ORGANIZATIONS_INDEX, { index: index ?? '' }))
+export function goToOrganizationList(locationId?: string) {
+  return push(formatUrl(ORGANISATIONS_INDEX, { locationId: locationId ?? '' }))
 }
 
 export function goToSystemList() {
@@ -656,10 +656,8 @@ export function goToTeamView(userDetails: IUserDetails) {
   }
 }
 
-export function goToOrganizationView(userDetails: IUserDetails) {
-  if (userDetails && userDetails.role) {
-    return goToOrganizationList()
-  }
+export function goToOrganisationView(userDetails: IUserDetails) {
+  return goToOrganizationList()
 }
 
 export type INavigationState = undefined

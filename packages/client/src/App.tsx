@@ -65,7 +65,7 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import { ListOfOrganizations } from '@client/views/Organization/ListOfOrganizations'
+import { ListOfOrganisations } from '@client/views/Organisation/ListOfOrganisations'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -435,8 +435,8 @@ export class App extends React.Component<IAppProps> {
                                               Roles.PERFORMANCE_MANAGEMENT,
                                               Roles.NATIONAL_REGISTRAR
                                             ]}
-                                            path={routes.ORGANIZATIONS_INDEX}
-                                            component={ListOfOrganizations}
+                                            path={routes.ORGANISATIONS_INDEX}
+                                            component={ListOfOrganisations}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
