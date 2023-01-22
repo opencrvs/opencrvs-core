@@ -162,7 +162,7 @@ class Component extends React.Component<
   }
 }
 
-const mapStateToProps = (store: IStoreState): IPageProps => {
+const mapStateToProps = (store: IStoreState) => {
   return {
     initialDeclarationsLoaded: getInitialDeclarationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
@@ -182,8 +182,5 @@ const mapDispatchToProps = {
 }
 
 export const Page = withRouter(
-  connect<IPageProps, IDispatchProps, {}, IStoreState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(Component)
+  connect(mapStateToProps, mapDispatchToProps)(Component)
 )

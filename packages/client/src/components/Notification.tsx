@@ -63,7 +63,10 @@ type DispatchProps = {
 }
 
 class Component extends React.Component<
-  NotificationProps & DispatchProps & IntlShapeProps & RouteComponentProps<{}>
+  NotificationProps &
+    DispatchProps &
+    IntlShapeProps &
+    RouteComponentProps<{}> & { children?: any }
 > {
   hideConfigurationErrorNotification = () => {
     this.props.hideConfigurationErrorNotification()
@@ -240,7 +243,7 @@ const mapStateToProps = (store: IStoreState) => {
 }
 
 export const NotificationComponent = withRouter(
-  connect<NotificationProps, DispatchProps, {}, IStoreState>(mapStateToProps, {
+  connect(mapStateToProps, {
     hideConfigurationErrorNotification,
     hideSubmitFormSuccessToast,
     hideSubmitFormErrorToast,
