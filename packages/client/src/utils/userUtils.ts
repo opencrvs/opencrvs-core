@@ -33,6 +33,9 @@ export const USER_DETAILS = 'USER_DETAILS'
 
 export function getUserDetails(user: User): User {
   const {
+    id,
+    device,
+    creationDate,
     catchmentArea,
     primaryOffice,
     name,
@@ -46,30 +49,24 @@ export function getUserDetails(user: User): User {
     avatar,
     searches
   } = user
-  const userDetails: User = {}
+
+  const userDetails: User = {
+    id,
+    device,
+    userMgntUserID,
+    role,
+    creationDate,
+    name,
+    status,
+    mobile,
+    practitionerId
+  }
+
   if (localRegistrar) {
     userDetails.localRegistrar = localRegistrar
   }
-  if (userMgntUserID) {
-    userDetails.userMgntUserID = userMgntUserID
-  }
-  if (practitionerId) {
-    userDetails.practitionerId = practitionerId
-  }
-  if (name) {
-    userDetails.name = name
-  }
-  if (mobile) {
-    userDetails.mobile = mobile
-  }
-  if (role) {
-    userDetails.role = role
-  }
   if (type) {
     userDetails.type = type
-  }
-  if (status) {
-    userDetails.status = status
   }
   if (primaryOffice) {
     userDetails.primaryOffice = {
