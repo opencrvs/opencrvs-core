@@ -17,7 +17,6 @@ import {
   IFormData,
   IFormFieldValue,
   IContactPoint,
-  Sort,
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
