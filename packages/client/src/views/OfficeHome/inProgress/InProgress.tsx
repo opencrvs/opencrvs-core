@@ -177,11 +177,12 @@ export class InProgressComponent extends React.Component<
       const regId = reg.id
       const event = reg.type
       const lastModificationDate =
-        reg.operationHistories &&
-        getPreviousOperationDateByOperationType(
-          reg.operationHistories as ITaskHistory[],
-          RegStatus.InProgress
-        )
+        (reg.operationHistories &&
+          getPreviousOperationDateByOperationType(
+            reg.operationHistories as ITaskHistory[],
+            RegStatus.InProgress
+          )) ||
+        ''
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
 
       let name
@@ -288,7 +289,7 @@ export class InProgressComponent extends React.Component<
           />
         ),
         dateOfEvent,
-        notificationSent: lastModificationDate,
+        notificationSent: lastModificationDate || '',
         actions
       }
     })
@@ -301,7 +302,8 @@ export class InProgressComponent extends React.Component<
       return {
         ...item,
         notificationSent:
-          item.notificationSent && formattedDuration(item.notificationSent),
+          item.notificationSent &&
+          formattedDuration(item.notificationSent as any),
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date)
       }

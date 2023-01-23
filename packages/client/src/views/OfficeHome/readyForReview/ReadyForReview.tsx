@@ -21,7 +21,6 @@ import {
   Workqueue,
   COLUMNS,
   SORT_ORDER,
-  IDynamicValues,
   IAction
 } from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -207,7 +206,8 @@ class ReadyForReviewComponent extends React.Component<
         getPreviousOperationDateByOperationType(
           reg.operationHistories,
           RegStatus.Validated
-        )
+        ) ||
+        ''
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
@@ -264,7 +264,7 @@ class ReadyForReviewComponent extends React.Component<
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
         sentForReview:
-          item.sentForReview && formattedDuration(item.sentForReview)
+          item.sentForReview && formattedDuration(item.sentForReview as any)
       }
     })
   }
