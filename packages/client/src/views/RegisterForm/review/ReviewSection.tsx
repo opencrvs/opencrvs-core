@@ -146,7 +146,7 @@ import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateFor
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
-const RequiredField = styled.span`
+export const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
   text-transform: lowercase;
@@ -291,7 +291,7 @@ type State = {
   previewImage: IFileValue | null
 }
 
-interface IErrorsBySection {
+export interface IErrorsBySection {
   [sectionId: string]: Errors
 }
 
@@ -528,7 +528,7 @@ const renderValue = (
   return value
 }
 
-const getErrorsOnFieldsBySection = (
+export const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   offlineCountryConfig: IOfflineData,
   draft: IDeclaration
