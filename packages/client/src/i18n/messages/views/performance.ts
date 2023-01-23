@@ -51,8 +51,8 @@ const messagesToDefine = {
   },
   performanceApplicationSourcesHeader: {
     id: 'performance.reports.header.applicationSources',
-    defaultMessage: 'Sources of applications',
-    description: 'Header for sources of applications'
+    defaultMessage: 'Sources of registrations',
+    description: 'Header for sources of registrations'
   },
   performanceTotalLabel: {
     id: 'performance.values.labels.total',
