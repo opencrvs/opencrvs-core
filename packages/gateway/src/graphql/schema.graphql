@@ -149,6 +149,7 @@ type Query {
   getFormDraft: [FormDraft!]
   fetchSystem(clientId: ID!): System
   getFormDataset: [FormDataset!]
+  informantSMSNotifications: [SMSNotification!]
 }
 
 type Mutation {
@@ -240,6 +241,9 @@ type Mutation {
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
   createFormDataset(formDataset: FormDatasetInput!): FormDatasetResponse
+  toggleInformantSMSNotification(
+    smsNotifications: [SMSNotificationInput!]
+  ): [SMSNotification!]
 }
 
 type Dummy {
@@ -326,6 +330,8 @@ type Person {
   deceased: Deceased
   nationality: [String]
   educationalAttainment: EducationType
+  ageOfIndividualInYears: Int
+  exactDateOfBirthUnknown: Boolean
 }
 
 type BirthRegResultSet {
@@ -595,6 +601,15 @@ type FormDataset {
   _id: String
 }
 
+type SMSNotification {
+  id: String
+  name: String!
+  message: String!
+  enabled: Boolean!
+  updatedAt: String!
+  createdAt: String!
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -713,7 +728,11 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 input ApplicationConfigurationInput {
@@ -728,7 +747,11 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 input FormDraftInput {
@@ -788,6 +811,12 @@ input FormDatasetInput {
   base64Data: String!
 }
 
+input SMSNotificationInput {
+  id: String!
+  name: String!
+  enabled: Boolean!
+}
+
 scalar Map
 
 type Registration {
@@ -805,6 +834,7 @@ type Registration {
   assignment: AssignmentData
   contact: String
   contactRelationship: String
+  informantsSignature: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -821,6 +851,8 @@ type RelatedPerson {
   otherRelationship: String
   affidavit: [Attachment]
   individual: Person
+  exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 enum BirthType {
@@ -1080,10 +1112,11 @@ type TotalMetricsByTime {
 
 type VSExport {
   event: String!
-  year: Int!
+  startDate: Date!
+  endDate: Date!
   fileSize: String!
   url: String!
-  createdOn: String!
+  createdOn: Date!
 }
 
 union UserAuditLogResultItem =
@@ -1169,6 +1202,7 @@ input PersonInput {
   deceased: DeceasedInput
   nationality: [String]
   educationalAttainment: EducationType
+  ageOfIndividualInYears: Int
 }
 
 input LocationInput {
@@ -1197,6 +1231,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantsSignature: String
   informantType: InformantType
   otherInformantType: String
   contact: String
@@ -1218,6 +1253,8 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput!]
   individual: PersonInput
+  exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 input QuestionnaireQuestionInput {
@@ -1281,6 +1318,12 @@ type Death {
   FEE: DeathFee
 }
 
+type LoginBackground {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1300,6 +1343,12 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+}
+
+input LoginBackgroundInput {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
 }
 
 input QuestionInput {
@@ -1715,6 +1764,11 @@ type BirthFee {
 type DeathFee {
   ON_TIME: Float
   DELAYED: Float
+}
+
+enum ImageFit {
+  FILL
+  TILE
 }
 
 input BirthFeeInput {
