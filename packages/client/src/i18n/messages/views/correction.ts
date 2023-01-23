@@ -146,7 +146,7 @@ const messagesToDefine: ICorrectionMessages = {
   },
   reasonForChange: {
     id: 'correction.reason.reasonForChange',
-    defaultMessage: 'Reason for change',
+    defaultMessage: 'Reason for correction',
     description: 'Label for other reason for correction reason form'
   },
   additionalComment: {

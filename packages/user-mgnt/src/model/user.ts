@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Document, model, Schema } from 'mongoose'
-// tslint:disable-next-line
-import { statuses } from '../utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
 
 export enum AUDIT_REASON {
   TERMINATED,
@@ -66,10 +65,68 @@ export interface IAuditHistory {
   reason: string
   comment?: string
 }
+
+export enum Event {
+  BIRTH = 'birth',
+  DEATH = 'death'
+}
+export interface ISearch {
+  searchId: string
+  name: string
+  parameters: {
+    event?: Event
+    registrationStatuses?: string[]
+    dateOfEvent?: string
+    dateOfEventStart?: string
+    dateOfEventEnd?: string
+    registrationNumber?: string
+    trackingId?: string
+    dateOfRegistration?: string
+    dateOfRegistrationStart?: string
+    dateOfRegistrationEnd?: string
+    declarationLocationId?: string
+    declarationJurisdictionId?: string
+    eventLocationId?: string
+    eventCountry?: string
+    eventLocationLevel1?: string
+    eventLocationLevel2?: string
+    eventLocationLevel3?: string
+    eventLocationLevel4?: string
+    eventLocationLevel5?: string
+    childFirstNames?: string
+    childLastName?: string
+    childDoB?: string
+    childDoBStart?: string
+    childDoBEnd?: string
+    childGender?: string
+    deceasedFirstNames?: string
+    deceasedFamilyName?: string
+    deceasedGender?: string
+    deceasedDoB?: string
+    deceasedDoBStart?: string
+    deceasedDoBEnd?: string
+    motherFirstNames?: string
+    motherFamilyName?: string
+    motherDoB?: string
+    motherDoBStart?: string
+    motherDoBEnd?: string
+    fatherFirstNames?: string
+    fatherFamilyName?: string
+    fatherDoB?: string
+    fatherDoBStart?: string
+    fatherDoBEnd?: string
+    informantFirstNames?: string
+    informantFamilyName?: string
+    informantDoB?: string
+    informantDoBStart?: string
+    informantDoBEnd?: string
+  }
+}
 export interface IAvatar {
   type: string
   data: string
 }
+
 export interface IUser {
   name: IUserName[]
   username: string
@@ -92,11 +149,11 @@ export interface IUser {
   creationDate: number
   auditHistory?: IAuditHistory[]
   avatar?: IAvatar
+  searches?: ISearch[]
 }
 
 export interface IUserModel extends IUser, Document {}
 
-// tslint:disable-next-line
 export const UserNameSchema = new Schema(
   {
     use: String,
@@ -105,7 +162,7 @@ export const UserNameSchema = new Schema(
   },
   { _id: false }
 )
-// tslint:disable-next-line
+
 const IdentifierSchema = new Schema(
   {
     system: String,
@@ -113,7 +170,7 @@ const IdentifierSchema = new Schema(
   },
   { _id: false }
 )
-// tslint:disable-next-line
+
 const SecurityQuestionAnswerSchema = new Schema(
   {
     questionKey: String,
@@ -121,7 +178,7 @@ const SecurityQuestionAnswerSchema = new Schema(
   },
   { _id: false }
 )
-// tslint:disable-next-line
+
 const AuditHistory = new Schema(
   {
     auditedBy: String,
@@ -157,7 +214,80 @@ const AuditHistory = new Schema(
     _id: false
   }
 )
-// tslint:disable-next-line
+
+const AdvanceSearchParameters = new Schema(
+  {
+    event: {
+      type: String,
+      enum: [Event.BIRTH, Event.DEATH],
+      required: false
+    },
+    registrationStatuses: [
+      {
+        type: String
+      }
+    ],
+    dateOfEvent: { type: String },
+    dateOfEventStart: { type: String },
+    dateOfEventEnd: { type: String },
+    registrationNumber: { type: String },
+    trackingId: { type: String },
+    dateOfRegistration: { type: String },
+    dateOfRegistrationStart: { type: String },
+    dateOfRegistrationEnd: { type: String },
+    declarationLocationId: { type: String },
+    declarationJurisdictionId: { type: String },
+    eventCountry: { type: String },
+    eventLocationId: { type: String },
+    eventLocationLevel1: { type: String },
+    eventLocationLevel2: { type: String },
+    eventLocationLevel3: { type: String },
+    eventLocationLevel4: { type: String },
+    eventLocationLevel5: { type: String },
+    childFirstNames: { type: String },
+    childLastName: { type: String },
+    childDoB: { type: String },
+    childDoBStart: { type: String },
+    childDoBEnd: { type: String },
+    childGender: { type: String },
+    deceasedFirstNames: { type: String },
+    deceasedFamilyName: { type: String },
+    deceasedGender: { type: String },
+    deceasedDoB: { type: String },
+    deceasedDoBStart: { type: String },
+    deceasedDoBEnd: { type: String },
+    motherFirstNames: { type: String },
+    motherFamilyName: { type: String },
+    motherDoB: { type: String },
+    motherDoBStart: { type: String },
+    motherDoBEnd: { type: String },
+    fatherFirstNames: { type: String },
+    fatherFamilyName: { type: String },
+    fatherDoB: { type: String },
+    fatherDoBStart: { type: String },
+    fatherDoBEnd: { type: String },
+    informantFirstNames: { type: String },
+    informantFamilyName: { type: String },
+    informantDoB: { type: String },
+    informantDoBStart: { type: String },
+    informantDoBEnd: { type: String }
+  },
+  {
+    _id: false
+  }
+)
+
+const SearchesSchema = new Schema(
+  {
+    searchId: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    parameters: { type: AdvanceSearchParameters, required: true }
+  },
+  {
+    _id: false
+  }
+)
+
 const Avatar = new Schema(
   {
     type: String,
@@ -196,7 +326,8 @@ const userSchema = new Schema({
   device: String,
   creationDate: { type: Number, default: Date.now },
   auditHistory: [AuditHistory],
-  avatar: Avatar
+  avatar: Avatar,
+  searches: [SearchesSchema]
 })
 
 export default model<IUserModel>('User', userSchema)

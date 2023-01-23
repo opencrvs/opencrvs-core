@@ -10,6 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { HEARTH_URL } from '@search/constants'
+import {
+  IBirthCompositionBody,
+  IDeathCompositionBody
+} from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
 import fetch from 'node-fetch'
 
@@ -78,27 +82,59 @@ export function findEntry(
   return findEntryResourceByUrl(reference, bundleEntries)
 }
 
-export async function findEventLocation(
+export async function addEventLocation(
+  body: IBirthCompositionBody | IDeathCompositionBody,
   code: string,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: fhir.Composition
 ) {
   let data
-  if (bundleEntries) {
-    data = findEntry(code, composition, bundleEntries)
-  } else {
-    const encounterSection = findCompositionSection(code, composition)
-    if (!encounterSection || !encounterSection.entry) {
-      return undefined
-    }
+  let location: fhir.Location | undefined
+
+  const encounterSection = findCompositionSection(code, composition)
+  if (encounterSection && encounterSection.entry) {
     data = await getFromFhir(
       `/Encounter/${encounterSection.entry[0].reference}`
     )
+    if (data && data.location && data.location[0].location) {
+      location = await getFromFhir(`/${data.location[0].location.reference}`)
+    }
   }
-  if (!data || !data.location || !data.location[0].location) {
-    return null
+
+  if (location) {
+    const isLocationHealthFacility =
+      location.type &&
+      location.type.coding &&
+      location.type.coding.find((obCode) => obCode.code === 'HEALTH_FACILITY')
+
+    if (isLocationHealthFacility) {
+      body.eventLocationId = location.id
+    } else {
+      body.eventJurisdictionIds = []
+      if (location.address?.country) {
+        body.eventCountry = location.address.country
+      }
+      //eventLocationLevel1
+      if (location.address?.state) {
+        body.eventJurisdictionIds.push(location.address.state)
+      }
+      //eventLocationLevel2
+      if (location.address?.district) {
+        body.eventJurisdictionIds.push(location.address.district)
+      }
+      //eventLocationLevel3
+      if (location.address?.line?.[10]) {
+        body.eventJurisdictionIds.push(location.address.line[10])
+      }
+      //eventLocationLevel4
+      if (location.address?.line?.[11]) {
+        body.eventJurisdictionIds.push(location.address.line[11])
+      }
+      //eventLocationLevel5
+      if (location.address?.line?.[12]) {
+        body.eventJurisdictionIds.push(location.address.line[12])
+      }
+    }
   }
-  return await getFromFhir(`/${data.location[0].location.reference}`)
 }
 
 export function findEntryResourceByUrl(
@@ -243,7 +279,14 @@ export function selectObservationEntry(
     : undefined
 }
 
-export async function getLocationHirarchyIDs(declarationLocationId?: string) {
+export async function fetchParentLocationByLocationID(locationID: string) {
+  const location = await getFromFhir(`/${locationID}`)
+  return location && location.partOf && location.partOf.reference
+}
+
+export async function getdeclarationJurisdictionIds(
+  declarationLocationId?: string
+) {
   if (!declarationLocationId) {
     return []
   }
@@ -257,9 +300,4 @@ export async function getLocationHirarchyIDs(declarationLocationId?: string) {
     locationHirarchyIds.push(locationId.split('/')[1])
   }
   return locationHirarchyIds
-}
-
-export async function fetchParentLocationByLocationID(locationID: string) {
-  const location = await getFromFhir(`/${locationID}`)
-  return location && location.partOf && location.partOf.reference
 }

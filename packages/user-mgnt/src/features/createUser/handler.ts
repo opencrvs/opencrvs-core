@@ -19,7 +19,11 @@ import {
   getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
-import User, { FIELD_AGENT_TYPES, IUser } from '@user-mgnt/model/user'
+import User, {
+  FIELD_AGENT_TYPES,
+  IUser,
+  IUserModel
+} from '@user-mgnt/model/user'
 import {
   generateSaltedHash,
   generateRandomPassword
@@ -27,11 +31,13 @@ import {
 import {
   statuses,
   roleScopeMapping,
-  hasDemoScope
+  hasDemoScope,
+  getUserId
 } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
+import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 export default async function createUser(
   request: Hapi.Request,
@@ -128,6 +134,27 @@ export default async function createUser(
   sendCredentialsNotification(user.mobile, user.username, autoGenPassword, {
     Authorization: request.headers.authorization
   })
+
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
+
+  try {
+    const systemAdminUser: IUserModel | null = await User.findById(
+      getUserId({ Authorization: request.headers.authorization })
+    )
+    await postUserActionToMetrics(
+      'CREATE_USER',
+      request.headers.authorization,
+      remoteAddress,
+      userAgent,
+      systemAdminUser?.practitionerId,
+      practitionerId
+    )
+  } catch (err) {
+    logger.error(err.message)
+  }
 
   const resUser = _.omit(userModelObject.toObject(), ['passwordHash', 'salt'])
   return h.response(resUser).code(201)

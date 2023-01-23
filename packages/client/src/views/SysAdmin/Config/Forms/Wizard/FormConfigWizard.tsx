@@ -23,7 +23,7 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton, CircleButton } from '@opencrvs/components/lib/buttons'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
-import { EventTopBar } from '@opencrvs/components/lib/interface'
+import { EventTopBar } from '@opencrvs/components/lib/EventTopBar'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { BirthSection, DeathSection, WizardSection } from '@client/forms'
@@ -44,7 +44,7 @@ import {
   selectFormDraft,
   selectConfigFields
 } from '@client/forms/configuration/formConfig/selectors'
-import { FieldPosition, FieldEnabled } from '@client/forms/configuration'
+import { FieldEnabled } from '@client/forms/configuration'
 
 const Container = styled.div`
   display: flex;
@@ -53,8 +53,7 @@ const Container = styled.div`
 `
 
 const WizardContainer = styled.div`
-  margin-top: 56px;
-  height: calc(100% - 56px);
+  height: 100%;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
@@ -130,7 +129,9 @@ function useSelectedField() {
   )
   const selectedField =
     selectedFieldId && section !== 'settings'
-      ? sectionFieldsMap[section][selectedFieldId]
+      ? sectionFieldsMap[section].find(
+          ({ fieldId }) => fieldId === selectedFieldId
+        )!
       : null
 
   return [selectedField, setSelectedFieldId] as const
@@ -157,15 +158,15 @@ function useHiddenFields([selectedField, setSelectedField]: ReturnType<
   return [showHiddenFields, setShowHiddenFields] as const
 }
 
-function useFieldsMapRef(event: Event, section: WizardSection) {
-  const fieldsMap = useSelector((store: IStoreState) =>
+function useConfigFieldsRef(event: Event, section: WizardSection) {
+  const fields = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  const fieldsMapRef = React.useRef(fieldsMap)
+  const fieldsRef = React.useRef(fields)
 
-  fieldsMapRef.current = fieldsMap
+  fieldsRef.current = fields
 
-  return fieldsMapRef
+  return fieldsRef
 }
 
 function FormConfigWizardView() {
@@ -186,16 +187,12 @@ function FormConfigWizardView() {
    * the latest fields, even after adding a custom field,
    * before selecting the last field from them
    */
-  const fieldsMapRef = useFieldsMapRef(event, section)
+  const fieldsRef = useConfigFieldsRef(event, section)
   const canvasRef = React.useRef<HTMLDivElement>(null)
 
   const selectLastField = () => {
-    const lastField = Object.values(fieldsMapRef.current).find(
-      ({ foregoingFieldId }) => foregoingFieldId === FieldPosition.BOTTOM
-    )
-    if (lastField) {
-      setSelectedField(lastField.fieldId)
-    }
+    const fields = fieldsRef.current
+    setSelectedField(fields[fields.length - 1].fieldId)
   }
 
   const scrollToLastField = () =>

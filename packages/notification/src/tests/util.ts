@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-/* tslint:disable */
 export function createServerWithEnvironment(env: any) {
   jest.resetModules()
   process.env = { ...process.env, ...env }
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   return require('../server').createServer()
 }
 export const translationsMock = {
@@ -45,7 +45,9 @@ export const translationsMock = {
         retieveUserNameNotification:
           'Your username for OpenCRVS is: {{username}}',
         updateUserNameNotification:
-          'Your OpenCRVS username has been updated to: {{username}}. Your password has not changed.'
+          'Your OpenCRVS username has been updated to: {{username}}. Your password has not changed.',
+        resetUserPasswordNotification:
+          'Your password has been reset. Please login to {{applicationName}} with the temporary password: {{password}}.'
       }
     },
     {
@@ -75,7 +77,9 @@ export const translationsMock = {
         retieveUserNameNotification:
           'আপনার OpenCRVS এর username হল: {{username}}',
         updateUserNameNotification:
-          'আপনার OpenCRVS এর বদলকৃত username হল: {{username}}। আপনার password এখনো অপরিবর্তিত রয়েছে।'
+          'আপনার OpenCRVS এর বদলকৃত username হল: {{username}}। আপনার password এখনো অপরিবর্তিত রয়েছে।',
+        resetUserPasswordNotification:
+          'আপনার পাসওয়ার্ড পুনরায় সেট করা হয়েছে. অনুগ্রহ করে {{applicationName}} এ লগইন করুন আপনার অস্থায়ী পাসওয়ার্ড দিয়ে: {{password}}.'
       }
     }
   ]

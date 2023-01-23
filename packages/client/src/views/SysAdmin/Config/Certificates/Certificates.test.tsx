@@ -11,15 +11,24 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import {
+  createTestComponent,
+  flushPromises,
+  getFileFromBase64String,
+  loginAsFieldAgent
+} from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { CertificatesConfig } from './Certificates'
 import { waitForElement } from '@client/tests/wait-for-element'
-import * as fetchMock from 'jest-fetch-mock'
+import createFetchMock from 'vitest-fetch-mock'
 import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
-
-const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+import { SpyInstance, vi } from 'vitest'
+import * as pdfRender from '@client/pdfRenderer'
+export const validImageB64String =
+  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+const fetch = createFetchMock(vi)
+fetch.enableMocks()
 
 enum MENU_ITEM {
   PREVIEW,
@@ -48,19 +57,25 @@ async function clickOnMenuItem(
     .find(`#template-birth-action-menuItem${item}`)
     .hostNodes()
     .simulate('click')
+  await flushPromises()
   testComponent.update()
 }
 
-describe('ConfigHome page when already has uploaded certificate template', () => {
+describe('ConfigHome page when already has uploaded certificate template', async () => {
   const { store, history } = createStore()
-
+  await loginAsFieldAgent(store)
   let testComponent: ReactWrapper
+  const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
   beforeEach(async () => {
     testComponent = await createTestComponent(
-      <CertificatesConfig history={history}></CertificatesConfig>,
+      <CertificatesConfig></CertificatesConfig>,
       { store, history }
     )
     testComponent.update()
+  })
+
+  afterEach(() => {
+    spy.mockReset()
   })
 
   it('shows default birth certificate template text', () => {
@@ -93,19 +108,19 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
   })
 
   describe('Testing sub menu item on config page', () => {
-    let printCertificateSpy: jest.SpyInstance
-    let downloadFileSpy: jest.SpyInstance
-    let updateCertificateMutationSpy: jest.SpyInstance
-
+    let printCertificateSpy: SpyInstance
+    let downloadFileSpy: SpyInstance
+    let updateCertificateMutationSpy: SpyInstance
     beforeEach(() => {
+      //Mocking with Response(blob) dosen't work
       fetch.mockImplementationOnce(() =>
         Promise.resolve({
           blob: () => new Blob(['data'])
-        })
+        } as any)
       )
-      printCertificateSpy = jest.spyOn(PDFUtils, 'printCertificate')
-      downloadFileSpy = jest.spyOn(PDFUtils, 'downloadFile')
-      updateCertificateMutationSpy = jest.spyOn(
+      printCertificateSpy = vi.spyOn(PDFUtils, 'printCertificate')
+      downloadFileSpy = vi.spyOn(PDFUtils, 'downloadFile')
+      updateCertificateMutationSpy = vi.spyOn(
         certificateTemplateMutations,
         'updateCertificateTemplate'
       )
@@ -115,9 +130,13 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
       printCertificateSpy.mockRestore()
       downloadFileSpy.mockRestore()
     })
+
+    afterEach(() => {
+      printCertificateSpy.mockClear()
+      downloadFileSpy.mockClear()
+    })
     it('should show upload modal when clicked on upload', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.UPLOAD)
-
       expect(
         testComponent.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(1)
@@ -128,18 +147,34 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
       expect(
         testComponent.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(1)
-      testComponent.find('#send').hostNodes().simulate('click')
+      testComponent.find('#upload_document').hostNodes().simulate('click')
       testComponent
-        .find('#birth_file_uploader_field_undefined')
+        .find('#image_file_uploader_field')
         .hostNodes()
-        .first()
         .simulate('change', {
           target: {
-            files: [new Blob(['<svg></svg>'], { type: 'image/svg+xml' })],
-            id: 'birth_file_uploader_field_undefined'
+            files: [
+              getFileFromBase64String(
+                validImageB64String,
+                'certificate.svg',
+                'image/svg+xml'
+              )
+            ]
           }
         })
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, 50)
+      })
+
       testComponent.update()
+      expect(
+        testComponent.find('#apply_change').hostNodes().props().disabled
+      ).toBeFalsy()
+
+      testComponent.find('#apply_change').hostNodes().simulate('click')
+      testComponent.update()
+
       await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })
@@ -168,6 +203,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
 
     it('should call print certificate after clicking print', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PRINT)
+      testComponent.update()
       await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })

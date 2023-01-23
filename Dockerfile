@@ -1,6 +1,6 @@
 # This dockerfile only installs dependencies and build all packages
 # It is used by each packages Dockerfile to copy out build artifacts
-FROM node:erbium
+FROM node:14.18.0
 
 # Make sure version variable is set
 ARG VERSION
@@ -28,6 +28,7 @@ COPY packages/search/package.json packages/search/package.json
 COPY packages/user-mgnt/package.json packages/user-mgnt/package.json
 COPY packages/workflow/package.json packages/workflow/package.json
 COPY packages/webhooks/package.json packages/webhooks/package.json
+COPY packages/documents/package.json packages/documents/package.json
 COPY patches patches
 RUN yarn install
 

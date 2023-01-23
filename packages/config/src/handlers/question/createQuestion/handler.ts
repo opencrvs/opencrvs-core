@@ -38,6 +38,19 @@ export const messageSchema = Joi.array().items({
   })
 })
 
+export const conditionalSchema = Joi.array().items({
+  fieldId: Joi.string(),
+  regexp: Joi.string()
+})
+
+export const optionSchema = Joi.array().items({
+  value: Joi.string().required(),
+  label: Joi.object({
+    id: Joi.string().required(),
+    defaultMessage: Joi.string().required()
+  })
+})
+
 export const requestSchema = Joi.object({
   fieldId: Joi.string().required(),
   label: messageSchema,
@@ -51,7 +64,15 @@ export const requestSchema = Joi.object({
   precedingFieldId: Joi.string().required(),
   required: Joi.boolean(),
   enabled: Joi.string().allow(''),
-  custom: Joi.boolean()
+  custom: Joi.boolean(),
+  conditionals: conditionalSchema,
+  datasetId: Joi.string().optional(),
+  options: optionSchema.optional()
+})
+
+export const formDatasetSchema = Joi.object({
+  fileName: Joi.string().required(),
+  base64Data: Joi.string().required()
 })
 
 export const responseSchema = Joi.object({})

@@ -26,7 +26,7 @@ services:
       - discovery.type=single-node
 
   influxdb:
-    image: influxdb:1.7.9
+    image: influxdb:1.8.0
     restart: unless-stopped
 
   hearth:
@@ -54,4 +54,8 @@ services:
 
   openhim-console:
     image: jembi/openhim-console:1.13
+    restart: unless-stopped
+
+  minio:
+    image: quay.io/minio/minio:RELEASE.2022-11-11T03-44-20Z.fips
     restart: unless-stopped

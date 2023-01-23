@@ -13,11 +13,7 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import {
-  createTestComponent,
-  createTestStore,
-  flushPromises
-} from '@client/tests/util'
+import { createTestComponent, createTestStore } from '@client/tests/util'
 import { AppStore } from '@client/store'
 import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { EVENT_COMPLETENESS_RATES } from '@client/navigation/routes'
@@ -28,6 +24,7 @@ import {
 import { waitForElement } from '@client/tests/wait-for-element'
 import { stringify, parse } from 'query-string'
 import { GraphQLError } from 'graphql'
+import { vi } from 'vitest'
 
 const LOCATION_DHAKA_DIVISION = {
   displayLabel: 'Dhaka Division',
@@ -120,7 +117,7 @@ describe('Registraion Rates tests', () => {
   let history: History<any>
 
   beforeAll(async () => {
-    Date.now = jest.fn(() => 1487076708000)
+    Date.now = vi.fn(() => 1487076708000)
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
@@ -141,7 +138,7 @@ describe('Registraion Rates tests', () => {
             time: 'withinTarget',
             locationId: LOCATION_DHAKA_DIVISION.id,
             timeEnd: new Date(1487076708000).toISOString(),
-            timeStart: new Date(1455454308000).toISOString()
+            timeStart: new Date(1456868800000).toISOString()
           })
         }}
       />,
@@ -287,7 +284,7 @@ describe('Registraion Rates error state tests', () => {
   let history: History
 
   beforeEach(async () => {
-    Date.now = jest.fn(() => 1487076708000)
+    Date.now = vi.fn(() => 1487076708000)
     ;({ store, history } = await createTestStore())
 
     component = await createTestComponent(

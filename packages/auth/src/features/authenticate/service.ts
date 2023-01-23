@@ -17,7 +17,8 @@ import {
   CONFIG_TOKEN_EXPIRY_SECONDS,
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   PRODUCTION,
-  QA_ENV
+  QA_ENV,
+  METRICS_URL
 } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -25,7 +26,6 @@ import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
 import { get, set } from '@auth/database'
 import * as t from 'io-ts'
-import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
 import {
   generateVerificationCode,
   sendVerificationCode,
@@ -33,12 +33,14 @@ import {
 } from '@auth/features/verifyCode/service'
 import { logger } from '@auth/logger'
 import { unauthorized } from '@hapi/boom'
+import { chainW, tryCatch } from 'fp-ts/Either'
+import { pipe } from 'fp-ts/function'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 const sign = promisify(jwt.sign) as (
-  payload: string | Buffer | object,
+  payload: string | Buffer | Record<string, unknown>,
   secretOrPrivateKey: jwt.Secret,
   options?: jwt.SignOptions
 ) => Promise<string>
@@ -79,6 +81,7 @@ export async function authenticate(
   }
 
   const body = await res.json()
+
   return {
     userId: body.id,
     scope: body.scope,
@@ -88,10 +91,8 @@ export async function authenticate(
 }
 
 export async function authenticateSystem(
-  /* tslint:disable */
   client_id: string,
   client_secret: string
-  /* tslint:enable */
 ): Promise<ISystemAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/verifySystem')
 
@@ -118,7 +119,7 @@ export async function createToken(
   scope: string[],
   audience: string[],
   issuer: string,
-  system?: boolean
+  temporary?: boolean
 ): Promise<string> {
   if (typeof userId === undefined) {
     throw new Error('Invalid userId found for token creation')
@@ -126,7 +127,7 @@ export async function createToken(
   return sign({ scope }, cert, {
     subject: userId,
     algorithm: 'RS256',
-    expiresIn: system
+    expiresIn: temporary
       ? CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
       : CONFIG_TOKEN_EXPIRY_SECONDS,
     audience,
@@ -160,9 +161,12 @@ export async function generateAndSendVerificationCode(
   scope: string[]
 ) {
   const isDemoUser = scope.indexOf('demo') > -1
-  logger.info('isDemoUser', {
-    isDemoUser: isDemoUser
-  })
+  logger.info(
+    `isDemoUser,
+      ${JSON.stringify({
+        isDemoUser: isDemoUser
+      })}`
+  )
   let verificationCode
   if (isDemoUser) {
     verificationCode = '000000'
@@ -171,10 +175,13 @@ export async function generateAndSendVerificationCode(
     verificationCode = await generateVerificationCode(nonce, mobile)
   }
   if (!PRODUCTION || QA_ENV) {
-    logger.info('Sending a verification SMS', {
-      mobile: mobile,
-      verificationCode
-    })
+    logger.info(
+      `Sending a verification SMS,
+        ${JSON.stringify({
+          mobile: mobile,
+          verificationCode
+        })}`
+    )
   } else {
     if (isDemoUser) {
       throw unauthorized()
@@ -194,16 +201,44 @@ const tokenPayload = t.type({
 
 export type ITokenPayload = t.TypeOf<typeof tokenPayload>
 
-export function verifyToken(token: string): ITokenPayload {
-  const decoded = jwt.verify(token, publicCert, {
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:auth-user'
-  })
-  const result = tokenPayload.decode(decoded)
-  ThrowReporter.report(result)
-  return result.value as ITokenPayload
+function safeVerifyJwt(token: string) {
+  return tryCatch(
+    () =>
+      jwt.verify(token, publicCert, {
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:auth-user'
+      }),
+    (e) => (e instanceof Error ? e : new Error('Unkown error'))
+  )
+}
+
+export function verifyToken(token: string) {
+  return pipe(token, safeVerifyJwt, chainW(tokenPayload.decode))
 }
 
 export function getPublicKey() {
   return publicCert
+}
+
+export async function postUserActionToMetrics(
+  action: string,
+  token: string,
+  remoteAddress: string,
+  userAgent: string,
+  practitionerId?: string
+) {
+  const url = resolve(METRICS_URL, '/audit/events')
+  const body = { action: action, practitionerId }
+  const authentication = 'Bearer ' + token
+
+  await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authentication,
+      'x-real-ip': remoteAddress,
+      'x-real-user-agent': userAgent
+    }
+  })
 }

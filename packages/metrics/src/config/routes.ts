@@ -9,43 +9,72 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Joi from 'joi'
-import {
-  inProgressHandler,
-  markBirthRegisteredHandler,
-  newBirthRegistrationHandler,
-  markCertifiedHandler,
-  markValidatedHandler,
-  markRejectedHandler,
-  waitingExternalValidationHandler,
-  markDeathRegisteredHandler,
-  newDeathRegistrationHandler,
-  newDeclarationHandler,
-  registrarRegistrationWaitingExternalValidationHandler,
-  requestForRegistrarValidationHandler,
-  requestCorrectionHandler
-} from '@metrics/features/registration/handler'
-import {
-  metricsDeleteMeasurementHandler,
-  metricsHandler
-} from '@metrics/features/metrics/handler'
-import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
-import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
+
 import {
   declarationsStartedHandler,
   declarationStartedMetricsByPractitionersHandler
 } from '@metrics/features/declarationsStarted/handler'
-import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import {
   exportHandler,
   monthlyExportHandler
 } from '@metrics/features/export/handler'
 import { getEventDurationHandler } from '@metrics/features/getEventDuration/handler'
-import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
+import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
+import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
+import {
+  metricsDeleteMeasurementHandler,
+  metricsHandler
+} from '@metrics/features/metrics/handler'
+import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
+
+import {
+  inProgressHandler,
+  markBirthRegisteredHandler,
+  markCertifiedHandler,
+  markDeathRegisteredHandler,
+  markRejectedHandler,
+  markValidatedHandler,
+  newBirthRegistrationHandler,
+  newDeathRegistrationHandler,
+  newDeclarationHandler,
+  registrarRegistrationWaitingExternalValidationHandler,
+  requestCorrectionHandler,
+  requestForRegistrarValidationHandler,
+  declarationAssignedHandler,
+  declarationUnassignedHandler,
+  waitingExternalValidationHandler,
+  declarationViewedHandler,
+  declarationDownloadedHandler,
+  birthDeclarationArchivedHandler,
+  deathDeclarationArchivedHandler,
+  birthDeclarationReinstatedHandler,
+  deathDeclarationReinstatedHandler,
+  declarationUpdatedHandler
+} from '@metrics/features/registration/handler'
+import {
+  getAdvancedSearchByClient,
+  postAdvancedSearchByClient,
+  responseSchema
+} from '@metrics/features/searchMetrics/handler'
+import {
+  totalMetricsByLocation,
+  totalMetricsByRegistrar,
+  totalMetricsByTime,
+  totalMetricsHandler
+} from '@metrics/features/totalMetrics/handler'
 import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
 import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import {
+  getUserAuditsHandler,
+  newAuditHandler
+} from '@metrics/features/audit/handler'
+import * as Joi from 'joi'
+import {
+  getAllVSExport,
+  vsExportHandler
+} from '@metrics/features/vsExport/handler'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -229,6 +258,27 @@ export const getRoutes = () => {
       }
     },
 
+    // Advanced Search quota
+    {
+      method: 'GET',
+      path: '/advancedSearch',
+      handler: getAdvancedSearchByClient,
+      config: {
+        tags: ['api'],
+        response: {
+          schema: responseSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/advancedSearch',
+      handler: postAdvancedSearchByClient,
+      config: {
+        tags: ['api']
+      }
+    },
+
     // Request correction
     {
       method: 'POST',
@@ -242,6 +292,79 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/death/request-correction',
       handler: requestCorrectionHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    // Event assigned / unassigned
+    {
+      method: 'POST',
+      path: '/events/assigned',
+      handler: declarationAssignedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/downloaded',
+      handler: declarationDownloadedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/viewed',
+      handler: declarationViewedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-archived',
+      handler: birthDeclarationArchivedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-archived',
+      handler: deathDeclarationArchivedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-reinstated',
+      handler: birthDeclarationReinstatedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-reinstated',
+      handler: deathDeclarationReinstatedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/unassigned',
+      handler: declarationUnassignedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/declaration-updated',
+      handler: declarationUpdatedHandler,
       config: {
         tags: ['api']
       }
@@ -293,6 +416,62 @@ export const getRoutes = () => {
             timeEnd: Joi.string().required(),
             locationId: Joi.string(),
             event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    {
+      method: 'GET',
+      path: '/totalMetricsByRegistrar',
+      handler: totalMetricsByRegistrar,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string(),
+            event: Joi.string().required(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    {
+      method: 'GET',
+      path: '/totalMetricsByLocation',
+      handler: totalMetricsByLocation,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            event: Joi.string().required(),
+            locationId: Joi.string(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/totalMetricsByTime',
+      handler: totalMetricsByTime,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            event: Joi.string().required(),
+            locationId: Joi.string(),
+            skip: Joi.number().required(),
+            size: Joi.number().required()
           })
         },
         tags: ['api']
@@ -486,6 +665,23 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
+    {
+      method: 'GET',
+      path: '/vsExport',
+      handler: vsExportHandler,
+      config: {
+        tags: ['api'],
+        auth: false
+      }
+    },
+    {
+      method: 'GET',
+      path: '/fetchVSExport',
+      handler: getAllVSExport,
+      config: {
+        tags: ['api']
+      }
+    },
     // used for tests to check JWT auth
     {
       method: 'GET',
@@ -522,6 +718,34 @@ export const getRoutes = () => {
       config: {
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
+        },
+        tags: ['api']
+      }
+    },
+    // new Audit handler
+    {
+      method: 'POST',
+      path: '/audit/events',
+      handler: newAuditHandler,
+      config: {
+        tags: ['api'],
+        auth: false
+      }
+    },
+    // GET user audit events
+    {
+      method: 'GET',
+      path: '/audit/events',
+      handler: getUserAuditsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            practitionerId: Joi.string().required(),
+            skip: Joi.number(),
+            count: Joi.number(),
+            timeStart: Joi.string(),
+            timeEnd: Joi.string()
+          })
         },
         tags: ['api']
       }

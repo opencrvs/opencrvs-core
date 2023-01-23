@@ -10,17 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  CheckboxGroup,
-  DateField,
-  RadioGroup,
-  Select,
-  TextArea,
-  TextInput,
-  WarningMessage,
-  RadioSize
-} from '@opencrvs/components/lib/forms'
-import { Paragraph, Link } from '@opencrvs/components/lib/typography'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
+import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { Select } from '@opencrvs/components/lib/Select'
+import { DateField } from '@opencrvs/components/lib/DateField'
+import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
+import { Link } from '@opencrvs/components/lib/Link'
+import { Text } from '@opencrvs/components/lib/Text'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -42,6 +40,7 @@ import {
   SELECT_WITH_OPTIONS,
   RADIO_GROUP,
   CHECKBOX_GROUP,
+  CHECKBOX,
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION,
   TEXTAREA,
@@ -80,7 +79,9 @@ import {
   Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
   Ii18nTextareaFormField,
-  TEXT
+  TEXT,
+  DATE_RANGE_PICKER,
+  IDateRangePickerValue
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -114,13 +115,15 @@ import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/declarations'
-import { LocationSearch } from '@opencrvs/components/lib/interface'
+import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
+import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
+import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -132,10 +135,7 @@ const FormItem = styled.div<{
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '40px'};
-`
-const LinkFormField = styled(Link)`
-  ${({ theme }) => theme.fonts.reg16};
+    ignoreBottomMargin ? '0px' : '28px'};
 `
 
 const FieldGroupTitle = styled.div`
@@ -369,6 +369,29 @@ function GeneratedInputField({
     )
   }
 
+  if (fieldDefinition.type === CHECKBOX) {
+    const { checkedValue = true, uncheckedValue = false } = fieldDefinition
+    return (
+      <InputField {...inputFieldProps}>
+        <Checkbox
+          {...inputProps}
+          label={fieldDefinition.label}
+          name={fieldDefinition.name}
+          value={String(value)}
+          selected={(value as string) === checkedValue}
+          onChange={(event) =>
+            onSetFieldValue(
+              fieldDefinition.name,
+              event.target.value === String(checkedValue)
+                ? uncheckedValue
+                : checkedValue
+            )
+          }
+        />
+      </InputField>
+    )
+  }
+
   if (fieldDefinition.type === DATE) {
     return (
       <InputField {...inputFieldProps}>
@@ -378,6 +401,21 @@ function GeneratedInputField({
           ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
           onChange={(val: string) => onSetFieldValue(fieldDefinition.name, val)}
           value={value as string}
+        />
+      </InputField>
+    )
+  }
+  if (fieldDefinition.type === DATE_RANGE_PICKER) {
+    return (
+      <InputField {...inputFieldProps}>
+        <DateRangePickerForFormField
+          inputProps={{ ...inputProps }}
+          notice={fieldDefinition.notice}
+          ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
+          onChange={(val: IDateRangePickerValue) =>
+            onSetFieldValue(fieldDefinition.name, val)
+          }
+          value={value as IDateRangePickerValue}
         />
       </InputField>
     )
@@ -419,14 +457,14 @@ function GeneratedInputField({
     const label = fieldDefinition.label as unknown as MessageDescriptor
 
     return (
-      <Paragraph fontSize={fieldDefinition.fontSize}>
+      <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
         <FormattedMessage
           {...label}
           values={{
             [fieldDefinition.name]: value as any
           }}
         />
-      </Paragraph>
+      </Text>
     )
   }
   if (fieldDefinition.type === LIST) {
@@ -477,11 +515,12 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === LINK) {
     return (
-      <LinkFormField
+      <Link
+        type="reg16"
         onClick={() => onSetFieldValue(fieldDefinition.name, true)}
       >
         {fieldDefinition.label}
-      </LinkFormField>
+      </Link>
     )
   }
 
@@ -619,6 +658,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
+  initialValues?: IBaseAdvancedSearchState
 }
 
 interface IStateProps {
@@ -909,16 +949,19 @@ class FormSectionComponent extends React.Component<Props> {
               ? {
                   ...field,
                   locationList: generateLocations(
-                    getListOfLocations(
-                      offlineCountryConfig,
-                      field.searchableResource
-                    ),
+                    field.searchableResource.reduce((locations, resource) => {
+                      return {
+                        ...locations,
+                        ...getListOfLocations(offlineCountryConfig, resource)
+                      }
+                    }, {}),
                     intl,
                     undefined,
-                    [field.searchableType as LocationType]
+                    field.searchableType as LocationType[]
                   )
                 }
               : field
+
           if (
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
@@ -1090,7 +1133,9 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionData
 >({
   mapPropsToValues: (props) =>
-    mapFieldsToValues(props.fields, props.userDetails),
+    props.initialValues
+      ? props.initialValues
+      : mapFieldsToValues(props.fields, props.userDetails),
   handleSubmit: (values) => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(

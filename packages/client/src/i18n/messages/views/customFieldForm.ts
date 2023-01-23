@@ -18,8 +18,13 @@ interface ICustomFieldFormMessages
   customTextAreaHeading: MessageDescriptor
   customNumberFieldHeading: MessageDescriptor
   customPhoneFieldHeading: MessageDescriptor
+  customSelectFieldHeading: MessageDescriptor
   hideFieldLabel: MessageDescriptor
   requiredFieldLabel: MessageDescriptor
+  conditionalFieldHeaderLabel: MessageDescriptor
+  conditionalFieldLabel: MessageDescriptor
+  conditionalFieldDesc: MessageDescriptor
+  conditionalRegexField: MessageDescriptor
   label: MessageDescriptor
   placeholderLabel: MessageDescriptor
   descriptionLabel: MessageDescriptor
@@ -27,6 +32,18 @@ interface ICustomFieldFormMessages
   errorMessage: MessageDescriptor
   maxLengthLabel: MessageDescriptor
   duplicateField: MessageDescriptor
+  copyHeading: MessageDescriptor
+  copyDescription: MessageDescriptor
+  dataSourceHeading: MessageDescriptor
+  dataSourceDescription: MessageDescriptor
+  validatingCSVFile: MessageDescriptor
+  validatingCSVFilesValidatingDescription: MessageDescriptor
+  statusValidating: MessageDescriptor
+  statusValidated: MessageDescriptor
+  statusFailed: MessageDescriptor
+  statusAppliedToCustomSelect: MessageDescriptor
+  statusNoDataFound: MessageDescriptor
+  statusTranslationMissing: MessageDescriptor
 }
 
 const messagesToDefine: ICustomFieldFormMessages = {
@@ -55,6 +72,11 @@ const messagesToDefine: ICustomFieldFormMessages = {
     defaultMessage: 'Custom phone number',
     description: 'Heading of Custom FieldForm'
   },
+  customSelectFieldHeading: {
+    id: 'custom.field.select.heading',
+    defaultMessage: 'Custom select',
+    description: 'Heading of Custom FieldForm'
+  },
   hideFieldLabel: {
     id: 'custom.field.form.hideField',
     defaultMessage: 'Hide field',
@@ -64,6 +86,27 @@ const messagesToDefine: ICustomFieldFormMessages = {
     id: 'custom.field.form.requiredField',
     defaultMessage: 'Required for registration',
     description: 'Heading of Custom FieldForm'
+  },
+  conditionalFieldHeaderLabel: {
+    id: 'custom.field.form.conditionalFieldHeader',
+    defaultMessage: 'Conditional parameters',
+    description: 'Heading of Custom FieldForm'
+  },
+  conditionalFieldLabel: {
+    id: 'custom.field.form.conditionalField',
+    defaultMessage: 'Conditional field',
+    description: 'Heading of Custom FieldForm'
+  },
+  conditionalFieldDesc: {
+    id: 'custom.field.form.conditionalFieldDesc',
+    defaultMessage:
+      'Select the field and the conditions on which this field should show',
+    description: 'Description of Conditonal Custom FieldForm'
+  },
+  conditionalRegexField: {
+    id: 'custom.field.form.conditionalRegex',
+    defaultMessage: 'Value RegEx',
+    description: 'Description of Conditonal Regex FieldForm'
   },
   label: {
     id: 'custom.field.form.label',
@@ -98,8 +141,63 @@ const messagesToDefine: ICustomFieldFormMessages = {
   duplicateField: {
     id: 'custom.field.form.duplicateField',
     defaultMessage:
-      'Sorry that certificate handlebar already exists. Please change the English label.',
+      'Label already exists in this form section. Please create a unique label',
     description: 'Duplicate field error message'
+  },
+  copyHeading: {
+    id: 'custom.select.copy.heading',
+    defaultMessage: 'Copy',
+    description: 'Heading for custom field heading'
+  },
+  copyDescription: {
+    id: 'custom.select.copy.description',
+    defaultMessage:
+      'Complete the copy requirements for all available languages',
+    description: 'Description for custom select field'
+  },
+  dataSourceHeading: {
+    id: 'custom.select.dataSource.heading',
+    defaultMessage: 'Data source',
+    description: 'Heading for data source in Custom Select field'
+  },
+  dataSourceDescription: {
+    id: 'custom.select.dataSource.description',
+    defaultMessage:
+      'Use an existing data source or upload a csv file containing the select options for each language.',
+    description: 'Description for Data source'
+  },
+  validatingCSVFile: {
+    id: 'custom.select.text.validatingCSVFile',
+    defaultMessage: 'Validating CSV file'
+  },
+  validatingCSVFilesValidatingDescription: {
+    id: 'custom.select.text.csvValidatingDescription',
+    defaultMessage:
+      'We are checking your .csv file for... this should take a few minutes... link to documentation'
+  },
+  statusValidating: {
+    id: 'custom.select.text.statusValidating',
+    defaultMessage: 'Validating .csv'
+  },
+  statusValidated: {
+    id: 'custom.select.text.statusValidated',
+    defaultMessage: 'Validated .csv'
+  },
+  statusFailed: {
+    id: 'custom.select.text.statusFailed',
+    defaultMessage: 'Failed to validate. Please try again'
+  },
+  statusAppliedToCustomSelect: {
+    id: 'custom.select.text.statusAppliedToCustomSelect',
+    defaultMessage: 'Applied to custom select'
+  },
+  statusNoDataFound: {
+    id: 'custom.select.text.statusNoDataFound',
+    defaultMessage: 'No option was found'
+  },
+  statusTranslationMissing: {
+    id: 'custom.select.text.statusTranslationMissing',
+    defaultMessage: 'Translation is missing'
   }
 }
 

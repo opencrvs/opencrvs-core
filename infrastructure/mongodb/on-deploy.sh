@@ -13,7 +13,7 @@
 # passwords of MongoDB users to passwords given to this service as environment varibles
 
 apt-get update
-apt-get install curl
+apt-get install -y curl
 
 curl -L https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait --output /wait
 chmod +x /wait
@@ -53,38 +53,137 @@ else
   exit 1
 fi
 
-# Rotate passwords to match the ones given to this script
-mongo $(mongo_credentials) --host $HOST <<EOF
-  use hearth-dev
-  db.updateUser('hearth', {
-    pwd: '$HEARTH_MONGODB_PASSWORD'
+function checkIfUserExists {
+  local user=$1
+  local JSON="{\"user\": \"$user\"}"
+  CMD='mongo admin --host $HOST $(mongo_credentials) --quiet --eval "db.getCollection(\"system.users\").find($JSON).length() > 0 ? \"FOUND\" : \"NOT_FOUND\""'
+  eval $CMD
+}
+
+# Rotate passwords to match the ones given to this script or create new users
+
+CONFIG_USER=$(echo $(checkIfUserExists "config"))
+if [[ $CONFIG_USER != "FOUND" ]]; then
+  echo "config user not found"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use application-config
+  db.createUser({
+    user: 'config',
+    pwd: '$CONFIG_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'application-config' }]
   })
 EOF
-
-mongo $(mongo_credentials) --host $HOST <<EOF
-  use user-mgnt
-  db.updateUser('user-mgnt', {
-    pwd: '$USER_MGNT_MONGODB_PASSWORD'
-  })
-EOF
-
-mongo $(mongo_credentials) --host $HOST <<EOF
-  use openhim-dev
-  db.updateUser('openhim', {
-    pwd: '$OPENHIM_MONGODB_PASSWORD'
-  })
-EOF
-
-mongo $(mongo_credentials) --host $HOST <<EOF
+else
+  echo "config user exists"
+  mongo $(mongo_credentials) --host $HOST <<EOF
   use application-config
   db.updateUser('config', {
     pwd: '$CONFIG_MONGODB_PASSWORD'
   })
 EOF
+fi
 
-mongo $(mongo_credentials) --host $HOST <<EOF
+HEARTH_USER=$(echo $(checkIfUserExists "hearth"))
+if [[ $HEARTH_USER != "FOUND" ]]; then
+  echo "hearth user not found"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use hearth-dev
+  db.createUser({
+    user: 'hearth',
+    pwd: '$HEARTH_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'hearth' }, { role: 'readWrite', db: 'hearth-dev' }]
+  })
+EOF
+else
+  echo "hearth user exists"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use hearth-dev
+  db.updateUser('hearth', {
+    pwd: '$HEARTH_MONGODB_PASSWORD'
+  })
+EOF
+fi
+
+USER_MGNT_USER=$(echo $(checkIfUserExists "user-mgnt"))
+if [[ $USER_MGNT_USER != "FOUND" ]]; then
+  echo "user-mgnt user not found"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use user-mgnt
+  db.createUser({
+    user: 'user-mgnt',
+    pwd: '$USER_MGNT_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'user-mgnt' }]
+  })
+EOF
+else
+  echo "user-mgnt user exists"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use user-mgnt
+  db.updateUser('user-mgnt', {
+    pwd: '$USER_MGNT_MONGODB_PASSWORD'
+  })
+EOF
+fi
+
+OPENHIM_USER=$(echo $(checkIfUserExists "openhim"))
+if [[ $OPENHIM_USER != "FOUND" ]]; then
+  echo "openhim user not found"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use openhim-dev
+  db.createUser({
+    user: 'openhim',
+    pwd: '$OPENHIM_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'openhim' }, { role: 'readWrite', db: 'openhim-dev' }]
+  })
+EOF
+else
+  echo "openhim user exists"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use openhim-dev
+  db.updateUser('openhim', {
+    pwd: '$OPENHIM_MONGODB_PASSWORD'
+  })
+EOF
+fi
+
+METRICS_USER=$(echo $(checkIfUserExists "metrics"))
+if [[ $METRICS_USER != "FOUND" ]]; then
+  echo "metrics user not found"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use metrics
+  db.createUser({
+    user: 'metrics',
+    pwd: '$METRICS_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'metrics' }]
+  })
+EOF
+else
+  echo "metrics user exists"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use metrics
+  db.updateUser('metrics', {
+    pwd: '$METRICS_MONGODB_PASSWORD'
+  })
+EOF
+fi
+
+WEBHOOKS_USER=$(echo $(checkIfUserExists "webhooks"))
+if [[ $WEBHOOKS_USER != "FOUND" ]]; then
+  echo "webhooks user not found"
+  mongo $(mongo_credentials) --host $HOST <<EOF
+  use webhooks
+  db.createUser({
+    user: 'webhooks',
+    pwd: '$WEBHOOKS_MONGODB_PASSWORD',
+    roles: [{ role: 'readWrite', db: 'webhooks' }]
+  })
+EOF
+else
+  echo "webhooks user exists"
+  mongo $(mongo_credentials) --host $HOST <<EOF
   use webhooks
   db.updateUser('webhooks', {
     pwd: '$WEBHOOKS_MONGODB_PASSWORD'
   })
 EOF
+fi

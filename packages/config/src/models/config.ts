@@ -48,6 +48,7 @@ export interface IApplicationConfigurationModel extends Document {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
+  ADMIN_LEVELS: number
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -77,6 +78,18 @@ const currencySchema = new Schema<ICurrency>({
   isoCode: { type: String },
   languagesAndCountry: { type: [String] }
 })
+
+export interface Integration {
+  name: string
+  status: string
+}
+
+export const statuses = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  DISABLED: 'disabled',
+  DEACTIVATED: 'deactivated'
+}
 
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
@@ -111,6 +124,12 @@ const systemSchema = new Schema({
     required: false,
     enum: [1, 2],
     default: 1
+  },
+  ADMIN_LEVELS: {
+    type: Number,
+    required: true,
+    enum: [1, 2, 3, 4, 5],
+    default: 2
   }
 })
 

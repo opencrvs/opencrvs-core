@@ -23,7 +23,7 @@ import {
   touchBundle,
   markBundleAsDeclarationUpdated,
   markBundleAsRequestedForCorrection,
-  removeExtensionFromBundle
+  validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -32,7 +32,6 @@ import {
   getSharedContactMsisdn,
   postToHearth,
   generateEmptyBundle,
-  forwardToHearth,
   mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
@@ -56,10 +55,6 @@ import {
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
-import {
-  REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -109,7 +104,10 @@ function getSectionIndex(
 ): number | undefined {
   let index
   section.filter((obj: fhir.CompositionSection, i: number) => {
-    if (obj.title && obj.title === 'Birth encounter') {
+    if (
+      obj.title &&
+      ['Birth encounter', 'Death encounter'].includes(obj.title)
+    ) {
       index = i
     }
   })
@@ -201,7 +199,7 @@ export async function createRegistrationHandler(
     ) {
       // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
       // validate registration with resource service and set resulting registration number
-      invokeRegistrationValidation(payload, getToken(request))
+      invokeRegistrationValidation(payload, request.headers)
     }
     if (isEventNonNotifiable(event)) {
       return resBundle
@@ -245,6 +243,7 @@ export async function markEventAsValidatedHandler(
         getToken(request)
       )
       await postToHearth(payload)
+      await triggerEvent(Events.DECLARATION_UPDATED, payload, request.headers)
       delete taskResource.input
       delete taskResource.output
     }
@@ -304,7 +303,7 @@ export async function markEventAsRegisteredCallbackHandler(
     )
 
     /** pushing registrationNumber on related person's identifier */
-    const patient = await updatePatientIdentifierWithRN(
+    let patient = await updatePatientIdentifierWithRN(
       composition,
       event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE,
       event === EVENT_TYPE.BIRTH
@@ -313,10 +312,17 @@ export async function markEventAsRegisteredCallbackHandler(
       registrationNumber
     )
 
+    if (event === EVENT_TYPE.DEATH) {
+      patient = await validateDeceasedDetails(patient, {
+        Authorization: request.headers.authorization
+      })
+    }
+
     //** Making sure db automicity */
     const bundle = generateEmptyBundle()
     bundle.entry?.push({ resource: task })
     bundle.entry?.push({ resource: patient })
+
     await sendBundleToHearth(bundle)
 
     const phoneNo = await getPhoneNo(task, event)
@@ -346,7 +352,6 @@ export async function markEventAsRegisteredCallbackHandler(
     // have time to complete indexing the previous waiting for external validation state before we update the search index with a BRN / DRN
     // If an external system is being used, then its processing time will mean a wait is not required.
     if (!VALIDATING_EXTERNALLY) {
-      // tslint:disable-next-line
       await new Promise((resolve) => setTimeout(resolve, 2000))
     }
     // Trigger an event for the registration
@@ -386,6 +391,7 @@ export async function markEventAsWaitingValidationHandler(
         getToken(request)
       )
       await postToHearth(payload)
+      await triggerEvent(Events.DECLARATION_UPDATED, payload, request.headers)
       delete taskResource.input
       delete taskResource.output
     }
@@ -396,7 +402,7 @@ export async function markEventAsWaitingValidationHandler(
     )
     const resBundle = await postToHearth(payload)
     populateCompositionWithID(payload, resBundle)
-    invokeRegistrationValidation(payload, getToken(request))
+    invokeRegistrationValidation(payload, request.headers)
 
     return resBundle
   } catch (error) {
@@ -424,25 +430,24 @@ export async function markEventAsCertifiedHandler(
   }
 }
 
-export async function markDownloadedEventAsAssignedOrUnassignedHandler(
+export async function actionEventHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  event: Events
 ) {
   try {
-    let payload = await touchBundle(
-      request.payload as fhir.Bundle,
-      getToken(request)
-    )
-    payload = removeExtensionFromBundle(payload, [
-      REINSTATED_EXTENSION_URL,
-      REQUEST_CORRECTION_EXTENSION_URL
-    ])
-    const newRequest = { ...request, payload } as Hapi.Request
-    return await forwardToHearth(newRequest, h)
+    let payload = request.payload as fhir.Bundle
+    payload = await touchBundle(payload, getToken(request))
+    const taskResource = payload.entry?.[0].resource as fhir.Task
+    return await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(taskResource),
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    })
   } catch (error) {
-    logger.error(
-      `Workflow/markDownloadedEventAsAssignedOrUnassignedHandler: error: ${error}`
-    )
+    logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
     throw new Error(error)
   }
 }

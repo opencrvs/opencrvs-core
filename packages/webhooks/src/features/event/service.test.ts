@@ -11,7 +11,10 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { transformBirthBundle } from '@webhooks/features/event/service'
+import {
+  getPermissionsBundle,
+  transformBirthBundle
+} from '@webhooks/features/event/service'
 
 import * as fetchMock from 'jest-fetch-mock'
 
@@ -159,6 +162,19 @@ const compositionResource = {
       entry: [{ reference: 'Patient/6795ce21-7e53-4595-8fea-3b8d39cd0747' }]
     },
     {
+      title: "Informant's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'informant-details'
+          }
+        ],
+        text: "Informant's details"
+      },
+      entry: [{ reference: 'Patient/6795ce21-7e53-4595-8fea-3b8d39cd0747' }]
+    },
+    {
       title: 'Birth encounter',
       code: {
         coding: [
@@ -183,6 +199,36 @@ const compositionResource = {
 }
 
 const childResource = {
+  resourceType: 'Patient',
+  active: true,
+  name: [{ use: 'en', given: ['esrgstg'], family: ['srthsrt'] }],
+  gender: 'male',
+  birthDate: '2019-12-23',
+  multipleBirthInteger: 1,
+  meta: {
+    lastUpdated: '2020-09-27T09:15:20.166+00:00',
+    versionId: '9f5f1a5e-7059-4f5b-bf2f-8aa4f641b37c'
+  },
+  id: '1e9ca16b-7c9a-469d-8101-ddd0db229077',
+  identifier: [{ type: 'BIRTH_REGISTRATION_NUMBER', value: '2020B6E6YJB' }]
+}
+
+const motherResource = {
+  resourceType: 'Patient',
+  active: true,
+  name: [{ use: 'en', given: ['esrgstg'], family: ['srthsrt'] }],
+  gender: 'male',
+  birthDate: '2019-12-23',
+  multipleBirthInteger: 1,
+  meta: {
+    lastUpdated: '2020-09-27T09:15:20.166+00:00',
+    versionId: '9f5f1a5e-7059-4f5b-bf2f-8aa4f641b37c'
+  },
+  id: '1e9ca16b-7c9a-469d-8101-ddd0db229077',
+  identifier: [{ type: 'BIRTH_REGISTRATION_NUMBER', value: '2020B6E6YJB' }]
+}
+
+const informantResource = {
   resourceType: 'Patient',
   active: true,
   name: [{ use: 'en', given: ['esrgstg'], family: ['srthsrt'] }],
@@ -328,6 +374,42 @@ const mosipBundle = {
     },
     {
       resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [{ use: 'en', given: ['esrgstg'], family: ['srthsrt'] }],
+        gender: 'male',
+        birthDate: '2019-12-23',
+        multipleBirthInteger: 1,
+        meta: {
+          lastUpdated: '2020-09-27T09:15:20.166+00:00',
+          versionId: '9f5f1a5e-7059-4f5b-bf2f-8aa4f641b37c'
+        },
+        id: '1e9ca16b-7c9a-469d-8101-ddd0db229077',
+        identifier: [
+          { type: 'BIRTH_REGISTRATION_NUMBER', value: '2020B6E6YJB' }
+        ]
+      }
+    },
+    {
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [{ use: 'en', given: ['esrgstg'], family: ['srthsrt'] }],
+        gender: 'male',
+        birthDate: '2019-12-23',
+        multipleBirthInteger: 1,
+        meta: {
+          lastUpdated: '2020-09-27T09:15:20.166+00:00',
+          versionId: '9f5f1a5e-7059-4f5b-bf2f-8aa4f641b37c'
+        },
+        id: '1e9ca16b-7c9a-469d-8101-ddd0db229077',
+        identifier: [
+          { type: 'BIRTH_REGISTRATION_NUMBER', value: '2020B6E6YJB' }
+        ]
+      }
+    },
+    {
+      resource: {
         resourceType: 'DocumentReference',
         masterIdentifier: {
           system: 'urn:ietf:rfc:3986',
@@ -371,6 +453,8 @@ describe('Webhook transformBirthBundle for national id integration', () => {
       fetch.mockResponses(
         [JSON.stringify(compositionResource), { status: 200 }],
         [JSON.stringify(childResource), { status: 200 }],
+        [JSON.stringify(motherResource), { status: 200 }],
+        [JSON.stringify(informantResource), { status: 200 }],
         [JSON.stringify(documentResource), { status: 200 }]
       )
 
@@ -397,5 +481,48 @@ describe('Webhook transformBirthBundle for national id integration', () => {
     afterAll(async () => {
       jest.clearAllMocks()
     })
+  })
+})
+
+describe('webhook transformBirthBundle for webhook permissions integrations ', () => {
+  beforeEach(async () => {
+    fetch.resetMocks()
+  })
+
+  it('should return webhook permissions bundle', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(childResource), { status: 200 }],
+      [JSON.stringify(motherResource), { status: 200 }],
+      [JSON.stringify(informantResource), { status: 200 }],
+      [JSON.stringify(documentResource), { status: 200 }]
+    )
+
+    const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:webhooks-user'
+    })
+
+    const authHeader = {
+      Authorization: `Bearer ${token}`,
+      'x-correlation-id': '1'
+    }
+
+    const permissionsBundle = await getPermissionsBundle(
+      taskBundle,
+      [
+        'child-details',
+        'mother-details',
+        'informant-details',
+        'supporting-documents'
+      ],
+      compositionResource,
+      authHeader
+    )
+    expect(permissionsBundle).toEqual(taskBundle)
+  })
+
+  afterAll(async () => {
+    jest.clearAllMocks()
   })
 })

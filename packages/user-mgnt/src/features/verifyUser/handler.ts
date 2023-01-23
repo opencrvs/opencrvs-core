@@ -32,6 +32,7 @@ interface IVerifyResponse {
   securityQuestionKey: string
   id: string
   username: string
+  practitionerId: string
 }
 
 export default async function verifyUserHandler(
@@ -60,7 +61,8 @@ export default async function verifyUserHandler(
     status: user.status,
     securityQuestionKey: getRandomQuestionKey(user.securityQuestionAnswers),
     id: user.id,
-    username: user.username
+    username: user.username,
+    practitionerId: user.practitionerId
   }
 
   return response
@@ -72,13 +74,11 @@ export function getRandomQuestionKey(
 ): string {
   const filteredQuestions = questionKeyToSkip
     ? securityQuestionAnswers.filter(
-        securityQnA => securityQnA.questionKey !== questionKeyToSkip
+        (securityQnA) => securityQnA.questionKey !== questionKeyToSkip
       )
     : securityQuestionAnswers
-  return filteredQuestions[
-    // tslint:disable-next-line
-    Math.floor(Math.random() * filteredQuestions.length)
-  ].questionKey
+  return filteredQuestions[Math.floor(Math.random() * filteredQuestions.length)]
+    .questionKey
 }
 
 export const requestSchema = Joi.object({
@@ -91,5 +91,6 @@ export const responseSchema = Joi.object({
   status: Joi.string(),
   securityQuestionKey: Joi.string(),
   id: Joi.string(),
-  username: Joi.string()
+  username: Joi.string(),
+  practitionerId: Joi.string()
 })

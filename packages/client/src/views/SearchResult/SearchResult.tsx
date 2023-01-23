@@ -16,7 +16,7 @@ import {
   getProcessingDeclarationIds
 } from '@client/declarations'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { Header } from '@client/components/interface/Header/Header'
+import { Header } from '@client/components/Header/Header'
 import { Query } from '@client/components/Query'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
 import { DownloadAction } from '@client/forms'
@@ -41,10 +41,11 @@ import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { Scope } from '@client/utils/authUtils'
+import { Roles, Scope } from '@client/utils/authUtils'
 import {
   BRN_DRN_TEXT,
   NAME_TEXT,
+  NATIONAL_ID_TEXT,
   PHONE_TEXT,
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
@@ -53,10 +54,11 @@ import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 
 import {
   ColumnContentAlignment,
-  GridTable,
+  Workqueue,
   IAction,
   COLUMNS
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/Workqueue'
+import { Frame } from '@opencrvs/components/lib/Frame'
 
 import { SearchEventsQuery } from '@client/utils/gateway'
 import * as React from 'react'
@@ -83,13 +85,6 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const BodyContainer = styled.div`
-  margin-left: 0px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 250px;
-    padding: 0px 24px;
-  }
-`
 const ToolTipContainer = styled.span`
   text-align: center;
 `
@@ -339,21 +334,29 @@ export class SearchResultView extends React.Component<
                   {
                     query: SEARCH_EVENTS,
                     variables: {
-                      locationIds: this.userHasRegisterScope()
-                        ? null
-                        : userDetails
-                        ? [getUserLocation(userDetails).id]
-                        : [],
-                      sort: SEARCH_RESULT_SORT,
-                      trackingId:
-                        searchType === TRACKING_ID_TEXT ? searchText : '',
-                      registrationNumber:
-                        searchType === BRN_DRN_TEXT ? searchText : '',
-                      contactNumber:
-                        searchType === PHONE_TEXT
-                          ? convertToMSISDN(searchText)
-                          : '',
-                      name: searchType === NAME_TEXT ? searchText : ''
+                      advancedSearchParameters: {
+                        trackingId:
+                          searchType === TRACKING_ID_TEXT ? searchText : '',
+                        nationalId:
+                          searchType === NATIONAL_ID_TEXT ? searchText : '',
+                        registrationNumber:
+                          searchType === BRN_DRN_TEXT ? searchText : '',
+                        contactNumber:
+                          searchType === PHONE_TEXT
+                            ? convertToMSISDN(searchText)
+                            : '',
+                        name: searchType === NAME_TEXT ? searchText : '',
+                        declarationLocationId:
+                          userDetails &&
+                          ![
+                            Roles.LOCAL_REGISTRAR,
+                            Roles.NATIONAL_REGISTRAR,
+                            Roles.REGISTRATION_AGENT
+                          ].includes(userDetails.role as Roles)
+                            ? getUserLocation(userDetails).id
+                            : ''
+                      },
+                      sort: SEARCH_RESULT_SORT
                     }
                   }
                 ],
@@ -384,7 +387,6 @@ export class SearchResultView extends React.Component<
         const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
         const NameComponent = reg.name ? (
           <NameContainer
-            isBoldLink={true}
             id={`name_${index}`}
             onClick={() =>
               this.props.goToDeclarationRecordAudit('search', reg.id)
@@ -435,95 +437,101 @@ export class SearchResultView extends React.Component<
     const { intl, match, userDetails } = this.props
     const { searchText, searchType } = match.params
     return (
-      <>
-        <Header
-          searchText={searchText}
-          selectedSearchType={searchType}
-          mobileSearchBar={true}
-          enableMenuSelection={false}
-        />
-        <Navigation />
-        <BodyContainer>
-          <>
-            {searchText && searchType && (
-              <Query<SearchEventsQuery>
-                query={SEARCH_EVENTS}
-                variables={{
-                  locationIds: this.userHasRegisterScope()
-                    ? null
-                    : userDetails
-                    ? [getUserLocation(userDetails).id]
-                    : [],
-                  sort: SEARCH_RESULT_SORT,
-                  trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
-                  registrationNumber:
-                    searchType === BRN_DRN_TEXT ? searchText : '',
-                  contactNumber:
-                    searchType === PHONE_TEXT
-                      ? convertToMSISDN(searchText)
-                      : '',
-                  name: searchType === NAME_TEXT ? searchText : ''
-                }}
-                fetchPolicy="cache-and-network"
-              >
-                {({ loading, error, data }) => {
-                  const total = loading
-                    ? -1
-                    : data?.searchEvents?.results?.length || 0
-
-                  return (
-                    <WQContentWrapper
-                      title={intl.formatMessage(messages.searchResultFor, {
-                        param: searchText
-                      })}
-                      isMobileSize={
-                        this.state.width < this.props.theme.grid.breakpoints.lg
-                      }
-                      noResultText={intl.formatMessage(messages.noResultFor, {
-                        param: searchText
-                      })}
-                      noContent={total < 1 && !loading}
-                    >
-                      {loading ? (
-                        <div id="search_loader">
-                          <LoadingIndicator loading={true} />
-                        </div>
-                      ) : error ? (
-                        <ErrorText id="search-result-error-text">
-                          {intl.formatMessage(errorMessages.queryError)}
-                        </ErrorText>
-                      ) : (
-                        data?.searchEvents &&
-                        total > 0 && (
-                          <>
-                            <ReactTooltip id="validateTooltip">
-                              <ToolTipContainer>
-                                {this.props.intl.formatMessage(
-                                  registrarHomeMessages.validatedDeclarationTooltipForRegistrar
-                                )}
-                              </ToolTipContainer>
-                            </ReactTooltip>
-                            <GridTable
-                              content={this.transformSearchContent(
-                                data.searchEvents
-                              )}
-                              columns={this.getColumns()}
-                              noResultText={intl.formatMessage(
-                                constantsMessages.noResults
-                              )}
-                              hideLastBorder={true}
-                            />
-                          </>
-                        )
-                      )}
-                    </WQContentWrapper>
-                  )
-                }}
-              </Query>
-            )}
-          </>
-        </BodyContainer>
-      </>
+      <Frame
+        header={
+          <Header
+            searchText={searchText}
+            selectedSearchType={searchType}
+            mobileSearchBar={true}
+            enableMenuSelection={false}
+          />
+        }
+        navigation={<Navigation />}
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+      >
+        {searchText && searchType && (
+          <Query<SearchEventsQuery>
+            query={SEARCH_EVENTS}
+            variables={{
+              advancedSearchParameters: {
+                declarationLocationId:
+                  userDetails &&
+                  ![
+                    Roles.LOCAL_REGISTRAR,
+                    Roles.NATIONAL_REGISTRAR,
+                    Roles.REGISTRATION_AGENT
+                  ].includes(userDetails.role as Roles)
+                    ? getUserLocation(userDetails).id
+                    : '',
+                trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
+                nationalId: searchType === NATIONAL_ID_TEXT ? searchText : '',
+                registrationNumber:
+                  searchType === BRN_DRN_TEXT ? searchText : '',
+                contactNumber:
+                  searchType === PHONE_TEXT ? convertToMSISDN(searchText) : '',
+                name: searchType === NAME_TEXT ? searchText : ''
+              },
+              sort: SEARCH_RESULT_SORT
+            }}
+            fetchPolicy="cache-and-network"
+          >
+            {({ loading, error, data }) => {
+              const total = loading
+                ? -1
+                : data?.searchEvents?.results?.length || 0
+              return (
+                <WQContentWrapper
+                  title={intl.formatMessage(messages.searchResultFor, {
+                    param: searchText
+                  })}
+                  isMobileSize={
+                    this.state.width < this.props.theme.grid.breakpoints.lg
+                  }
+                  noResultText={intl.formatMessage(messages.noResultFor, {
+                    param: searchText
+                  })}
+                  noContent={total < 1 && !loading}
+                >
+                  {loading ? (
+                    <div id="search_loader">
+                      <LoadingIndicator loading={true} />
+                    </div>
+                  ) : error ? (
+                    <ErrorText id="search-result-error-text">
+                      {intl.formatMessage(errorMessages.queryError)}
+                    </ErrorText>
+                  ) : (
+                    data?.searchEvents &&
+                    total > 0 && (
+                      <>
+                        <ReactTooltip id="validateTooltip">
+                          <ToolTipContainer>
+                            {this.props.intl.formatMessage(
+                              registrarHomeMessages.validatedDeclarationTooltipForRegistrar
+                            )}
+                          </ToolTipContainer>
+                        </ReactTooltip>
+                        <Workqueue
+                          content={this.transformSearchContent(
+                            data.searchEvents
+                          )}
+                          columns={this.getColumns()}
+                          noResultText={intl.formatMessage(
+                            constantsMessages.noResults
+                          )}
+                          hideLastBorder={true}
+                        />
+                      </>
+                    )
+                  )}
+                </WQContentWrapper>
+              )
+            }}
+          </Query>
+        )}
+      </Frame>
     )
   }
 }

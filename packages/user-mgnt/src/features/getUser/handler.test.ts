@@ -13,7 +13,7 @@ import User from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import mockingoose from 'mockingoose'
+import * as mockingoose from 'mockingoose'
 
 let server: any
 
@@ -72,7 +72,17 @@ const dummyUser = {
     }
   ],
   creationDate: 1559054406433,
-  auditHistory: []
+  auditHistory: [],
+  searches: [
+    {
+      searchId: '121212',
+      name: 'Advanced Search',
+      parameters: {
+        event: 'birth',
+        registrationStatuses: []
+      }
+    }
+  ]
 }
 
 describe('getUser tests', () => {

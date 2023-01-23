@@ -33,7 +33,8 @@ export const up = async (db) => {
           'locationLevel5',
           'locationLevel4',
           'locationLevel3',
-          'locationLevel2'
+          'locationLevel2',
+          'locationLevel1'
         ]
       }
     ]
@@ -46,15 +47,19 @@ export const up = async (db) => {
     timestamp: time.getNanoTime()
   }))
 
-  const startedByMap = await getCompositionIdToStartedByMap(db, rejectedPoints.map(({ compositionId }) => compositionId))
+  const startedByMap = await getCompositionIdToStartedByMap(
+    db,
+    rejectedPoints.map(({ compositionId }) => compositionId)
+  )
 
-  const rejectedPointsWithCorrectStartedBy = rejectedPoints
-    .map(({ compositionId, timestamp, ...tags }) => ({
+  const rejectedPointsWithCorrectStartedBy = rejectedPoints.map(
+    ({ compositionId, timestamp, ...tags }) => ({
       measurement: 'declarations_rejected',
-      tags: {...tags, startedBy: startedByMap.get(compositionId)},
+      tags: { ...tags, startedBy: startedByMap.get(compositionId) },
       fields: { compositionId },
       timestamp
-    }))
+    })
+  )
 
   await influx.dropMeasurement('declarations_rejected')
 
@@ -68,7 +73,10 @@ async function getCompositionIdToStartedByMap(db, compositionIds) {
   await cursor.forEach((task) => {
     const compositionId = extractId(task.focus.reference)
     if (startedByMap.has(compositionId)) return
-    startedByMap.set(compositionId, extractId(task.extension[0].valueReference.reference))
+    startedByMap.set(
+      compositionId,
+      extractId(task.extension[0].valueReference.reference)
+    )
   })
   return startedByMap
 }
@@ -76,8 +84,14 @@ async function getCompositionIdToStartedByMap(db, compositionIds) {
 function getTaskCursor(db, compositionIds) {
   const query = {
     $match: {
-      'businessStatus.coding.code': { $in: ['IN_PROGRESS', 'DECLARED', 'VALIDATED']},
-      'focus.reference': { $in: compositionIds.map((compositionId) => `Composition/${compositionId}`)}
+      'businessStatus.coding.code': {
+        $in: ['IN_PROGRESS', 'DECLARED', 'VALIDATED']
+      },
+      'focus.reference': {
+        $in: compositionIds.map(
+          (compositionId) => `Composition/${compositionId}`
+        )
+      }
     }
   }
   const projection = {
@@ -100,9 +114,7 @@ function getTaskCursor(db, compositionIds) {
     }
   }
   const sort = { $sort: { 'meta.lastUpdated': 1 } }
-  return db
-    .collection('Task_history')
-    .aggregate([query, projection, sort])
+  return db.collection('Task_history').aggregate([query, projection, sort])
 }
 
 export const down = async () => {}

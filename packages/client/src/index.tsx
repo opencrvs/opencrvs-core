@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+// eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
@@ -18,20 +19,19 @@ import { createStore } from '@client/store'
 import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
-import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
 import WebFont from 'webfontloader'
-import { BACKGROUND_SYNC_BROADCAST_CHANNEL } from './utils/constants'
+import { BrowserTracing } from '@sentry/tracing'
 
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:400']
   }
 })
-
+const pdfjsWorker = import('pdfjs-dist/build/pdf.worker.entry')
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
 storage.configStorage('OpenCRVS')
@@ -45,8 +45,13 @@ if (
   // setup error reporting using sentry
   if (window.config.SENTRY) {
     Sentry.init({
-      release: process.env.REACT_APP_VERSION,
-      environment: process.env.NODE_ENV,
+      release: import.meta.env.REACT_APP_VERSION,
+      environment: import.meta.env.NODE_ENV,
+      integrations: [new BrowserTracing()],
+
+      // We recommend adjusting this value in production, or using tracesSampler
+      // for finer control
+      tracesSampleRate: 1.0,
       dsn: window.config.SENTRY
     })
   }
@@ -54,7 +59,7 @@ if (
   // setup log rocket to ship log messages and record user errors
   if (window.config.LOGROCKET) {
     LogRocket.init(window.config.LOGROCKET, {
-      release: process.env.REACT_APP_VERSION
+      release: import.meta.env.VITE_APP_VERSION
     })
   }
 
@@ -84,18 +89,12 @@ function onNewContentAvailable(waitingSW: ServiceWorker | null) {
   }
 }
 
-function onBackGroundSync() {
-  if (typeof BroadcastChannel === 'undefined') {
-    return
-  }
-  const channel = new BroadcastChannel(BACKGROUND_SYNC_BROADCAST_CHANNEL)
-  channel.onmessage = (e) => {
-    const action = actions.showBackgroundSyncedNotification()
-    store.dispatch(action)
-  }
+function userReconnectedToast() {
+  const action = actions.showUserReconnectedToast()
+  store.dispatch(action)
 }
 
-onBackGroundSync()
+window.addEventListener('online', userReconnectedToast)
 
 ReactDOM.render(
   <App store={store} history={history} />,

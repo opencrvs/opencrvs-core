@@ -20,7 +20,10 @@ export const CERT_PUBLIC_KEY_PATH =
   '../../.secrets/public-key.pem'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const QA_ENV = process.env.QA_ENV || false
+export const RECORD_SEARCH_QUOTA =
+  Number(process.env.RECORD_SEARCH_QUOTA) || 2000
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const DEFAULT_TIMEOUT = 600000
+export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'

@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { BirthSection, DeathSection } from '@client/forms'
+import { BirthSection, DeathSection, SELECT_WITH_OPTIONS } from '@client/forms'
 import { Event } from '@client/utils/gateway'
-import { FieldPosition, FieldEnabled } from '@client/forms/configuration'
+import { FieldEnabled } from '@client/forms/configuration'
 import {
   removeCustomField,
   shiftConfigFieldDown,
@@ -21,7 +21,6 @@ import {
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import {
   IConfigField,
-  IConfigFieldMap,
   isDefaultConfigField,
   isPreviewGroupConfigField,
   isCustomConfigField,
@@ -32,12 +31,15 @@ import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
-import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
+import { FormConfigElementCard } from '@opencrvs/components/lib/FormConfigElementCard'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import ConfigPlaceholder from './ConfigPlaceholder'
+import { Text } from '@opencrvs/components/lib/Text'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const CanvasBox = styled.div`
   display: flex;
@@ -47,6 +49,11 @@ const CanvasBox = styled.div`
   gap: 8px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
+`
+
+const CardContentWrapper = styled(Stack)`
+  flex-direction: column;
+  align-items: normal;
 `
 
 type IRouteProps = {
@@ -61,32 +68,11 @@ type ICanvasProps = {
   ref: React.RefObject<HTMLDivElement>
 }
 
-function generateConfigFields(formFieldMap: IConfigFieldMap) {
-  const firstField = Object.values(formFieldMap).find(
-    (formField) => formField.precedingFieldId === FieldPosition.TOP
-  )
-
-  if (!firstField) {
-    throw new Error(`No starting field found in section`)
-  }
-
-  const configFields: IConfigField[] = []
-  let currentField: IConfigField | null = firstField
-  while (currentField) {
-    configFields.push(currentField)
-    currentField = currentField.foregoingFieldId
-      ? formFieldMap[currentField.foregoingFieldId]
-      : null
-  }
-  return configFields
-}
-
 function useConfigFields() {
   const { event, section } = useParams<IRouteProps>()
-  const fieldsMap = useSelector((store: IStoreState) =>
+  return useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  return React.useMemo(() => generateConfigFields(fieldsMap), [fieldsMap])
 }
 
 function FormField({
@@ -121,27 +107,35 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
                 ? configField.enabled !== FieldEnabled.DISABLED
                 : true
             )
-        ).map((configField) => {
-          const { fieldId, precedingFieldId, foregoingFieldId } = configField
+        ).map((configField, index, configFields) => {
+          const { fieldId } = configField
           const isCustom = isCustomConfigField(configField)
           const isSelected = selectedField?.fieldId === fieldId
           const isHidden =
             isDefaultConfigField(configField) &&
             configField.enabled === FieldEnabled.DISABLED
 
+          const conditionalField = isCustomConfigField(configField)
+            ? configField.conditionals
+            : undefined
+          const enableInteraction =
+            isCustomConfigField(configField) &&
+            configField.fieldType === SELECT_WITH_OPTIONS
           return (
             <FormConfigElementCard
               id={fieldId}
               key={fieldId}
               selected={isSelected}
-              onClick={() => setSelectedField(fieldId)}
-              movable={isCustom && isSelected}
+              enableInteraction={enableInteraction}
+              onClick={() => {
+                setSelectedField(fieldId)
+              }}
               status={
                 isHidden ? intl.formatMessage(messages.hidden) : undefined
               }
               removable={isCustom}
-              isUpDisabled={precedingFieldId === FieldPosition.TOP}
-              isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
+              isUpDisabled={!index}
+              isDownDisabled={index === configFields.length - 1}
               onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}
               onMoveDown={() => dispatch(shiftConfigFieldDown(fieldId))}
               onRemove={() => {
@@ -152,7 +146,17 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
               {isPreviewGroupConfigField(configField) ? (
                 <ConfigPlaceholder label={configField.previewGroupLabel} />
               ) : (
-                <FormField configField={configField} />
+                <CardContentWrapper>
+                  {conditionalField && conditionalField.length > 0 && (
+                    <Stack>
+                      <Icon name="GitBranch" size="small" color="grey400" />
+                      <Text variant="reg14" element="span" color="grey400">
+                        {conditionalField[0].fieldId}
+                      </Text>
+                    </Stack>
+                  )}
+                  <FormField configField={configField} />
+                </CardContentWrapper>
               )}
             </FormConfigElementCard>
           )

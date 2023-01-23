@@ -83,10 +83,16 @@ const mockQuestion = {
   precedingFieldId: 'myPreviousFieldId',
   required: true,
   custom: true,
-  initialValue: 'myValue'
+  initialValue: 'myValue',
+  conditionals: [
+    {
+      fieldId: 'currentFieldId',
+      regexp: 'FARAJALAND'
+    }
+  ]
 } as unknown as IQuestion & { _id: string }
 
-let mockQuestions = [mockQuestion]
+const mockQuestions = [mockQuestion]
 
 describe('getQuestions', () => {
   let server: any

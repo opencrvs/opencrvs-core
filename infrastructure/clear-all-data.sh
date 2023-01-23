@@ -87,6 +87,8 @@ drop_database user-mgnt;
 
 drop_database application-config
 
+drop_database metrics
+
 # Delete all data from elasticsearch
 #-----------------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elasticsearch_host)/ocrvs" -v
@@ -94,3 +96,8 @@ docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elas
 # Delete all data from metrics
 #-----------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
+
+# Delete all data from minio
+#-----------------------------
+rm -rf /data/minio/ocrvs
+mkdir -p /data/minio/ocrvs

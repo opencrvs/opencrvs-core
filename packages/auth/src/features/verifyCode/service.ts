@@ -40,7 +40,6 @@ export async function generateVerificationCode(
   nonce: string,
   mobile: string
 ): Promise<SixDigitVerificationCode> {
-  // tslint:disable-next-line
   const code = Math.floor(100000 + Math.random() * 900000).toString()
 
   await storeVerificationCode(nonce, code)
@@ -75,8 +74,9 @@ export async function sendVerificationCode(
       Authorization: `Bearer ${await createToken(
         'auth',
         ['service'],
-        ['opencrvs:notification-user'],
-        JWT_ISSUER
+        ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
+        JWT_ISSUER,
+        true
       )}`
     }
   })

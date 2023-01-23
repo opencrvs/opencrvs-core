@@ -10,10 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { DateRangePicker } from '@client/components/DateRangePicker'
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
+import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
@@ -28,10 +25,8 @@ import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completen
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
-import {
-  ColumnContentAlignment,
-  TableView
-} from '@opencrvs/components/lib/interface'
+import { Table } from '@opencrvs/components/lib/Table'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
@@ -43,17 +38,9 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IAvatar } from '@client/utils/userUtils'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import {
-  PaginationWrapper,
-  MobileWrapper,
-  DesktopWrapper
-} from '@opencrvs/components/lib/styleForPagination'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { userMessages } from '@client/i18n/messages'
 
 const ToolTipContainer = styled.span`
@@ -402,6 +389,7 @@ function FieldAgentListComponent(props: IProps) {
   }
   const skip = (currentPageNumber - 1) * 1
   queryVariables.skip = skip
+  // TODO: Do we really need FIELD_AGENT_AUDIT_LOCATIONS?
   return (
     <SysAdminContentWrapper
       id="field-agent-list"
@@ -501,17 +489,16 @@ function FieldAgentListComponent(props: IProps) {
             if (error) {
               return (
                 <>
-                  <TableView
+                  <Table
                     id={'field-agent-error-list'}
                     noResultText={intl.formatMessage(
                       messages.fieldAgentsNoResult
                     )}
                     isLoading={true}
-                    hideBoxShadow={true}
                     columns={getColumns(data && data.searchFieldAgents)}
                     content={getContent(data && data.searchFieldAgents)}
                   />
-                  <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                  <GenericErrorToast />
                 </>
               )
             } else {
@@ -521,7 +508,7 @@ function FieldAgentListComponent(props: IProps) {
                 data.searchFieldAgents.totalItems
               return (
                 <TableDiv>
-                  <TableView
+                  <Table
                     id={'field-agent-list'}
                     noResultText={intl.formatMessage(
                       messages.fieldAgentsNoResult
@@ -541,42 +528,19 @@ function FieldAgentListComponent(props: IProps) {
                     onPageChange={(currentPage: number) => {
                       setCurrentPageNumber(currentPage)
                     }}
-                    loadMoreText={intl.formatMessage(
-                      messages.showMoreUsersLinkLabel,
-                      {
-                        pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
-                      }
-                    )}
                     isFullPage
                     highlightRowOnMouseOver
                   />
                   {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-                    <PaginationWrapper>
-                      <DesktopWrapper>
-                        <PaginationModified
-                          size="small"
-                          initialPage={currentPageNumber}
-                          totalPages={Math.ceil(
-                            totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                          )}
-                          onPageChange={(currentPage: number) => {
-                            setCurrentPageNumber(currentPage)
-                          }}
-                        />
-                      </DesktopWrapper>
-                      <MobileWrapper>
-                        <PaginationModified
-                          size="large"
-                          initialPage={currentPageNumber}
-                          totalPages={Math.ceil(
-                            totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                          )}
-                          onPageChange={(currentPage: number) => {
-                            setCurrentPageNumber(currentPage)
-                          }}
-                        />
-                      </MobileWrapper>
-                    </PaginationWrapper>
+                    <Pagination
+                      currentPage={currentPageNumber}
+                      totalPages={Math.ceil(
+                        totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                      )}
+                      onPageChange={(currentPage: number) => {
+                        setCurrentPageNumber(currentPage)
+                      }}
+                    />
                   )}
                 </TableDiv>
               )

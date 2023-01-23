@@ -29,38 +29,108 @@ export function createRequestSignature(
 export async function transformBirthBundle(
   bundle: fhir.Bundle,
   scope: string,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  permissions: string[] = []
 ) {
   if (!bundle || !bundle.entry || !bundle.entry[0].resource) {
     throw new Error('Invalid FHIR bundle found')
   }
   const task: fhir.Task = bundle.entry[0].resource as fhir.Task
   if (task && task.focus && task.focus.reference) {
+    const composition = await getComposition(
+      task.focus.reference as string,
+      authHeader
+    )
     switch (scope) {
       case 'nationalId':
-        const composition = await getComposition(
-          task.focus.reference as string,
-          authHeader
-        )
-        const child: fhir.Patient = await getResourceBySection(
+        return getPermissionsBundle(
+          bundle,
+          [
+            'child-details',
+            'mother-details',
+            'father-details',
+            'supporting-documents',
+            'informant-details'
+          ],
           composition,
-          'child-details',
           authHeader
         )
-        const document: any = await getResourceBySection(
+      case 'webhook':
+        return getPermissionsBundle(
+          bundle,
+          permissions,
           composition,
-          'supporting-documents',
           authHeader
         )
-        bundle.entry.push({ resource: child } as fhir.BundleEntry)
-        bundle.entry.push({ resource: document } as fhir.BundleEntry)
-        return bundle
       default:
         return bundle
     }
   } else {
     throw new Error('Task has no composition reference')
   }
+}
+
+export async function transformDeathBundle(
+  bundle: fhir.Bundle,
+  scope: string,
+  authHeader: IAuthHeader,
+  permissions: string[] = []
+) {
+  if (!bundle || !bundle.entry || !bundle.entry[0].resource) {
+    throw new Error('Invalid FHIR bundle found')
+  }
+  const task: fhir.Task = bundle.entry[0].resource as fhir.Task
+  if (task && task.focus && task.focus.reference) {
+    const composition = await getComposition(
+      task.focus.reference as string,
+      authHeader
+    )
+    switch (scope) {
+      case 'nationalId':
+        return getPermissionsBundle(
+          bundle,
+          [
+            'deceased-details',
+            'supporting-documents',
+            'informant-details',
+            'death-encounter'
+          ],
+          composition,
+          authHeader
+        )
+      case 'webhook':
+        return getPermissionsBundle(
+          bundle,
+          permissions,
+          composition,
+          authHeader
+        )
+      default:
+        return bundle
+    }
+  } else {
+    throw new Error('Task has no composition reference')
+  }
+}
+
+export const getPermissionsBundle = async (
+  bundle: fhir.Bundle,
+  permissions: string[] = [],
+  composition: fhir.Composition,
+  authHeader: IAuthHeader
+) => {
+  const resources = await Promise.all(
+    permissions.map((sectionCode) =>
+      getResourceBySection(composition, sectionCode, authHeader)
+    )
+  )
+  resources.forEach((resource: fhir.BundleEntry) => {
+    if (resource) {
+      bundle.entry!.push({ resource })
+    }
+  })
+
+  return bundle
 }
 
 const getFromFhir = (suffix: string, authHeader: IAuthHeader) => {
@@ -103,7 +173,7 @@ async function getResourceBySection(
     })
 
   if (!resourceSection || !resourceSection.entry) {
-    throw new Error(`No section found for given code: ${sectionCode}`)
+    return null
   }
   // TODO: For a proper implementation, all the documents should be requested
   // and searched to find which document is the visual identity MOSIP requires.

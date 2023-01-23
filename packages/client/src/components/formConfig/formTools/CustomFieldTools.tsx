@@ -16,42 +16,81 @@ import {
   TEXTAREA,
   BirthSection,
   DeathSection,
-  IFormField
+  IFormField,
+  SELECT_WITH_OPTIONS,
+  ISelectOption,
+  IFormDataSet
 } from '@client/forms'
-import { IMessage } from '@client/forms/questionConfig'
-import { Event } from '@client/utils/gateway'
+import {
+  getIdentifiersFromFieldId,
+  ICustomSelectOption,
+  IMessage
+} from '@client/forms/questionConfig'
+import { CreateFormDatasetMutation, Event } from '@client/utils/gateway'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
   getCertificateHandlebar,
-  getConfigFieldIdentifiers,
-  ICustomConfigField
+  ICustomConfigField,
+  IDataSourceSelectOption,
+  isPreviewGroupConfigField
 } from '@client/forms/configuration/formConfig/utils'
-import { buttonMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  formMessageDescriptors,
+  locationMessages
+} from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
-import { ILanguageState, initLanguages } from '@client/i18n/reducer'
+import {
+  ILanguageState,
+  initLanguages,
+  IntlMessages
+} from '@client/i18n/reducer'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  Select,
-  TextArea,
-  TextInput
-} from '@opencrvs/components/lib/forms'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { Button } from '@opencrvs/components/src/Button'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { Link } from '@opencrvs/components/lib/Link'
+import { Select } from '@opencrvs/components/lib/Select'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface'
-import { camelCase, debounce } from 'lodash'
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { camelCase, debounce, isEmpty } from 'lodash'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
+import {
+  injectIntl,
+  MessageDescriptor,
+  WrappedComponentProps as IntlShapeProp
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
-import { Title, Label, RequiredToggleAction, ToolTip } from './components'
+import {
+  Title,
+  Label,
+  RequiredToggleAction,
+  ToolTip,
+  ConditionalToggleAction,
+  RegisterFormFieldIds
+} from './components'
 import { messages } from '@client/i18n/messages/views/formConfig'
+import { Text } from '@opencrvs/components/lib/Text'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { FileSelectLink } from '@opencrvs/components/lib/FileSelectLink'
+import { getBase64String } from '@client/utils/imageUtils'
+import { ResponsiveModal } from '@client/../../components/lib'
+import { client } from '@client/utils/apolloClient'
+import { CREATE_FORM_DATA_SET } from '@client/views/SysAdmin/Config/Forms/mutations'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import { createCustomFieldHandlebarName } from '@client/forms/configuration/customUtils'
+import { offlineFormConfigAddFormDataset } from '@client/offline/actions'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -65,6 +104,37 @@ const CTextInput = styled(TextInput)`
   ${({ theme }) => theme.fonts.reg14};
   height: 32px;
   border: solid 1px ${({ theme }) => theme.colors.grey600};
+`
+const CSelect = styled(Select)`
+  width: 100%;
+  margin: 20px 0px;
+  border-radius: 2px;
+  .react-select__control {
+    border: solid 1px ${({ theme }) => theme.colors.grey600};
+    max-height: 32px;
+    min-height: 32px;
+  }
+  .react-select__control:hover {
+    border: solid 1px ${({ theme }) => theme.colors.grey600};
+  }
+  .react-select__placeholder {
+    color: ${({ theme }) => theme.colors.grey400};
+  }
+  .react-select__value-container {
+    display: block;
+  }
+  div {
+    ${({ theme }) => theme.fonts.reg14};
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+`
+
+const ConditionalWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 const CTextArea = styled(TextArea)`
@@ -107,7 +177,7 @@ const ListRow = styled.div`
 
 const LanguageSelect = styled(Select)`
   width: 175px;
-  border: solid 2px ${({ theme }) => theme.colors.indigoDark};
+  border: solid 2px ${({ theme }) => theme.colors.primaryDark};
   border-radius: 2px;
   .react-select__control {
     max-height: 32px;
@@ -118,7 +188,23 @@ const LanguageSelect = styled(Select)`
   }
   div {
     ${({ theme }) => theme.fonts.reg14};
-    color: ${({ theme }) => theme.colors.indigoDark};
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+`
+const ConditionalFieldIdSelect = styled(Select)`
+  width: 100%;
+  border: solid 2px ${({ theme }) => theme.colors.primaryDark};
+  border-radius: 2px;
+  .react-select__control {
+    max-height: 32px;
+    min-height: 32px;
+  }
+  .react-select__value-container {
+    display: block;
+  }
+  div {
+    ${({ theme }) => theme.fonts.reg14};
+    color: ${({ theme }) => theme.colors.primaryDark};
   }
 `
 
@@ -130,6 +216,39 @@ const ListColumn = styled.div`
 
 const CErrorText = styled(ErrorText)`
   width: 200px;
+`
+const Body = styled.div`
+  margin: 16px 0px;
+`
+
+const CustomSelectHeading = styled.span`
+  display: flex;
+  gap: 5px;
+`
+
+const CFileSelectLink = styled(FileSelectLink)`
+  border: 2px solid ${({ theme }) => theme.colors.primary};
+  border-radius: 4px;
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 0px 12px;
+  height: 40px;
+
+  &:hover {
+    text-decoration: underline;
+    background: ${({ theme }) => theme.colors.grey100};
+    border: 2px solid ${({ theme }) => theme.colors.primaryDark};
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDarker};
+  }
+  &:focus-visible {
+    border: 2px solid ${({ theme }) => theme.colors.grey600};
+    background: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.grey600};
+    box-shadow: none;
+  }
 `
 
 type IFormFieldWrapper = { formField: IFormField }
@@ -158,13 +277,33 @@ interface ICustomField {
 interface IFieldForms {
   [key: string]: ICustomField
 }
+interface IConditionalFieldForms {
+  fieldId: string
+  regex: string
+}
+
+enum STATUS_TYPES {
+  INPROGRESS = 'loading',
+  COMPLETED = 'success',
+  ERROR = 'error'
+}
+
+interface CSVUploadStatus {
+  statusType: STATUS_TYPES
+  message: string
+}
 
 interface ICustomFieldState {
-  isFieldDuplicate: boolean
   selectedLanguage: string
+  conditionalField: IConditionalFieldForms
   handleBars: string
   maxLength: number
   fieldForms: IFieldForms
+  showCSVUploadingModal: boolean
+  CSVUploadStatuses: CSVUploadStatus[]
+  CSVUploaderModalActions: JSX.Element[]
+  dataSourceSelectOptions: IDataSourceSelectOption[]
+  selectedDataSource: string | null | undefined
 }
 
 interface IOptionalContent {
@@ -180,6 +319,54 @@ class CustomFieldToolsComp extends React.Component<
     this.state = this.getInitialState()
   }
 
+  prepareDataSourceOptions(
+    formDataset: IFormDataSet[]
+  ): IDataSourceSelectOption[] {
+    const { selectedLanguage, intl } = this.props
+
+    const dataSourceOptions =
+      formDataset.map((dataset) => {
+        const optionsFromCSV = dataset?.options
+          ?.map((option) => {
+            const label = option?.label
+              ? option.label.find((i) => i?.lang === selectedLanguage)
+              : null
+
+            if (label) {
+              return {
+                value: option.value,
+                label: label.descriptor
+              } as ISelectOption
+            }
+          })
+          .filter((i) => i) as ISelectOption[]
+
+        const datasetResourceLabel: { [key: string]: MessageDescriptor } = {
+          HEALTH_FACILITY: formMessageDescriptors.healthInstitution,
+          STATE: locationMessages.STATE,
+          DISTRICT: locationMessages.DISTRICT,
+          LOCATION_LEVEL_3: locationMessages.LOCATION_LEVEL_3,
+          LOCATION_LEVEL_4: locationMessages.LOCATION_LEVEL_4,
+          LOCATION_LEVEL_5: locationMessages.LOCATION_LEVEL_5
+        }
+        let label = dataset.fileName
+        if (dataset.resource && dataset.resource in datasetResourceLabel) {
+          label = intl.formatMessage(datasetResourceLabel[dataset.resource])
+        }
+        return {
+          value: dataset._id,
+          label,
+          options: optionsFromCSV
+        }
+      }) || []
+    for (let i = dataSourceOptions.length - 1; i >= 0; --i) {
+      if (dataSourceOptions[i].options.length === 0) {
+        dataSourceOptions.splice(i, 1)
+      }
+    }
+    return dataSourceOptions
+  }
+
   componentDidUpdate({ selectedField: { fieldId } }: IFullProps) {
     if (fieldId !== this.props.selectedField.fieldId) {
       this.setState(this.getInitialState())
@@ -190,8 +377,8 @@ class CustomFieldToolsComp extends React.Component<
     const defaultLanguage = getDefaultLanguage()
     const languages = this.getLanguages()
     const { selectedField, formField } = this.props
-
     const fieldForms: { [key: string]: ICustomField } = {}
+    const conditionalfield = selectedField.conditionals?.[0]
 
     Object.keys(languages).forEach((lang) => {
       const label = this.getIntlMessage(selectedField.label, lang)
@@ -203,14 +390,23 @@ class CustomFieldToolsComp extends React.Component<
         errorMessage: this.getIntlMessage(selectedField.errorMessage, lang)
       }
     })
+
     return {
-      isFieldDuplicate: false,
-      handleBars:
-        getCertificateHandlebar(formField) ||
-        camelCase(fieldForms[defaultLanguage].label),
+      handleBars: camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
+      conditionalField: {
+        fieldId: conditionalfield?.fieldId ?? EMPTY_STRING,
+        regex: conditionalfield?.regexp ?? EMPTY_STRING
+      },
       maxLength: selectedField.maxLength ?? DEFAULT_MAX_LENGTH,
-      fieldForms
+      fieldForms,
+      showCSVUploadingModal: false,
+      CSVUploadStatuses: [],
+      CSVUploaderModalActions: [],
+      dataSourceSelectOptions: this.prepareDataSourceOptions(
+        this.props.formDataset || []
+      ),
+      selectedDataSource: this.props.selectedField.datasetId
     }
   }
 
@@ -224,6 +420,15 @@ class CustomFieldToolsComp extends React.Component<
 
   getLanguages(): ILanguageState {
     return initLanguages()
+  }
+
+  setConditionalFieldId(fieldId: string) {
+    this.setState({
+      conditionalField: {
+        ...this.state.conditionalField,
+        fieldId: fieldId
+      }
+    })
   }
 
   setValue(field: string, value: string) {
@@ -246,8 +451,18 @@ class CustomFieldToolsComp extends React.Component<
     return true
   }
 
+  isConditionalFormValid(): boolean {
+    if (this.props.selectedField.conditionals) {
+      return (
+        !!this.state.conditionalField.fieldId &&
+        !!this.state.conditionalField.regex
+      )
+    }
+    return true
+  }
+
   generateNewFieldID() {
-    const { event, sectionId, groupId } = getConfigFieldIdentifiers(
+    const { event, sectionId, groupId } = getIdentifiersFromFieldId(
       this.props.selectedField.fieldId
     )
 
@@ -294,7 +509,7 @@ class CustomFieldToolsComp extends React.Component<
 
   prepareModifiedFormField(): ICustomConfigField {
     const { selectedField } = this.props
-    const { fieldForms, handleBars } = this.state
+    const { fieldForms, handleBars, conditionalField } = this.state
     const languages = this.getLanguages()
     const newFieldID = this.generateNewFieldID()
 
@@ -350,6 +565,15 @@ class CustomFieldToolsComp extends React.Component<
       maxLength: this.state.maxLength || DEFAULT_MAX_LENGTH,
       label
     }
+
+    if (selectedField.conditionals) {
+      modifiedField.conditionals = [
+        {
+          fieldId: conditionalField.fieldId,
+          regexp: conditionalField.regex
+        }
+      ]
+    }
     return modifiedField
   }
 
@@ -361,7 +585,14 @@ class CustomFieldToolsComp extends React.Component<
       return false
     }
 
-    return newGeneratedFieldID in fieldsMap
+    return fieldsMap.some((field) => {
+      if (isPreviewGroupConfigField(field)) {
+        return field.configFields.some(
+          ({ fieldId }) => fieldId === newGeneratedFieldID
+        )
+      }
+      return field.fieldId === newGeneratedFieldID
+    })
   }
 
   getHeadingText(): string {
@@ -381,6 +612,10 @@ class CustomFieldToolsComp extends React.Component<
       case TEL:
         return intl.formatMessage(
           customFieldFormMessages.customPhoneFieldHeading
+        )
+      case SELECT_WITH_OPTIONS:
+        return intl.formatMessage(
+          customFieldFormMessages.customSelectFieldHeading
         )
       default:
         return intl.formatMessage(
@@ -415,8 +650,14 @@ class CustomFieldToolsComp extends React.Component<
     )
   }
 
-  toggleButtons() {
+  toggleButtons(fieldIds: string[]) {
     const { intl, selectedField } = this.props
+    const initConditionals = [
+      {
+        fieldId: fieldIds[0],
+        regexp: EMPTY_STRING
+      }
+    ]
     return (
       <ListContainer>
         <Title>{this.getHeadingText()}</Title>
@@ -435,26 +676,107 @@ class CustomFieldToolsComp extends React.Component<
             }
             actions={<RequiredToggleAction {...selectedField} />}
           />
+          <ListViewItemSimplified
+            label={
+              <Label>
+                {intl.formatMessage(
+                  customFieldFormMessages.conditionalFieldLabel
+                )}
+                <ToolTip
+                  label={intl.formatMessage(
+                    messages.conditionalForRegistrationTooltip
+                  )}
+                  id={'conditional-field-label'}
+                />
+              </Label>
+            }
+            actions={
+              <ConditionalToggleAction
+                {...selectedField}
+                initConditionals={initConditionals}
+              />
+            }
+          />
         </ListViewSimplified>
       </ListContainer>
     )
   }
 
+  conditionalParameters(fieldIds: string[]) {
+    const { intl } = this.props
+    const fieldIdOptions = fieldIds.map((fieldId) => ({
+      value: fieldId,
+      label: fieldId
+    }))
+
+    return (
+      <FieldContainer>
+        <ConditionalWrapper>
+          <Stack>
+            <Icon name="GitBranch" color="grey600" />
+            <Title>
+              {intl.formatMessage(
+                customFieldFormMessages.conditionalFieldHeaderLabel
+              )}
+            </Title>
+          </Stack>
+          <Text variant="reg14" element="span" color="grey500">
+            {intl.formatMessage(customFieldFormMessages.conditionalFieldDesc)}
+          </Text>
+          <>
+            <ConditionalFieldIdSelect
+              id="selectConditionalField"
+              isDisabled={false}
+              onChange={(val: string) => {
+                this.setConditionalFieldId(val)
+                this.props.modifyConfigField(this.props.selectedField.fieldId, {
+                  conditionals: [
+                    {
+                      fieldId: val,
+                      regexp: this.state.conditionalField.regex
+                    }
+                  ]
+                })
+              }}
+              value={
+                this.state.conditionalField.fieldId ||
+                this.setConditionalFieldId(fieldIds[0])
+              }
+              options={fieldIdOptions}
+            />
+          </>
+          <CInputField
+            id={`conditional-regex-input`}
+            required={true}
+            label={intl.formatMessage(
+              customFieldFormMessages.conditionalRegexField
+            )}
+            touched={true}
+          >
+            <CTextInput
+              value={this.state.conditionalField.regex}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                this.setState({
+                  conditionalField: {
+                    fieldId: this.state.conditionalField.fieldId,
+                    regex: event.target.value.replaceAll('"', '')
+                  }
+                })
+              }
+            />
+          </CInputField>
+        </ConditionalWrapper>
+      </FieldContainer>
+    )
+  }
+
   inputFields() {
-    const {
-      intl,
-      selectedField,
-      modifyConfigField,
-      formField,
-      setSelectedField
-    } = this.props
+    const { intl, formField } = this.props
     const languages = this.getLanguages()
     const defaultLanguage = getDefaultLanguage()
-    const debouncedNullifySelectedField = debounce(() => {
-      setSelectedField(null)
-    }, 300)
     return (
       <>
+        {this.getLanguageDropDown()}
         {Object.keys(languages).map((language, index) => {
           return (
             <React.Fragment key={index}>
@@ -488,6 +810,11 @@ class CustomFieldToolsComp extends React.Component<
                     }}
                   />
                 </CInputField>
+                {this.isFieldNameDuplicate() && (
+                  <Text variant="reg14" element="p" color="red">
+                    {intl.formatMessage(customFieldFormMessages.duplicateField)}
+                  </Text>
+                )}
               </FieldContainer>
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
@@ -583,7 +910,7 @@ class CustomFieldToolsComp extends React.Component<
             <CTextInput
               type="number"
               defaultValue={this.state.maxLength}
-              onChange={(event) =>
+              onChange={(event: { target: { value: string | number } }) =>
                 this.setState({
                   maxLength: +event.target.value
                 })
@@ -591,44 +918,333 @@ class CustomFieldToolsComp extends React.Component<
             />
           </CInputField>
         </FieldContainer>
-        <ListContainer>
-          <ListRow>
-            <ListColumn>
-              <CPrimaryButton
-                onClick={() => {
-                  if (this.isFieldNameDuplicate()) {
-                    this.setState({
-                      isFieldDuplicate: true
-                    })
-                    return
-                  }
-                  const modifiedField = this.prepareModifiedFormField()
-                  modifyConfigField(selectedField.fieldId, modifiedField)
-                  debouncedNullifySelectedField()
-                }}
-                disabled={!this.isFormValid()}
-              >
-                {intl.formatMessage(buttonMessages.save)}
-              </CPrimaryButton>
-            </ListColumn>
-          </ListRow>
-        </ListContainer>
       </>
     )
   }
 
-  render(): React.ReactNode {
+  showErrorMessage(errCode: string) {
     const { intl } = this.props
+    const messages: IntlMessages = {
+      SUCCESSFUL: intl.formatMessage(customFieldFormMessages.statusValidated),
+      NO_DATA_FOUND: intl.formatMessage(
+        customFieldFormMessages.statusNoDataFound
+      ),
+      TRANSLATION_MISSING: intl.formatMessage(
+        customFieldFormMessages.statusTranslationMissing
+      ),
+      FAILED: intl.formatMessage(customFieldFormMessages.statusFailed)
+    }
+
+    if (errCode in messages) return messages[errCode]
+    return messages.FAILED
+  }
+
+  selectField() {
+    const { intl, formField } = this.props
+    const languages = this.getLanguages()
+    const defaultLanguage = getDefaultLanguage()
+
     return (
       <>
-        {this.toggleButtons()}
+        <Text variant="bold16" element="p">
+          <CustomSelectHeading>
+            <Icon color="currentColor" name="Type" size="large" />
+            {intl.formatMessage(customFieldFormMessages.copyHeading)}
+          </CustomSelectHeading>
+        </Text>
+        <Text color="grey500" variant="reg14" element="span">
+          {intl.formatMessage(customFieldFormMessages.copyDescription)}
+        </Text>
+        <br></br>
+        <br></br>
+
         {this.getLanguageDropDown()}
-        {this.inputFields()}
-        {this.state.isFieldDuplicate && (
-          <CErrorText ignoreMediaQuery={true}>
-            {intl.formatMessage(customFieldFormMessages.duplicateField)}
-          </CErrorText>
-        )}
+
+        {Object.keys(languages).map((language, index) => {
+          return (
+            <React.Fragment key={index}>
+              <FieldContainer hide={language !== this.state.selectedLanguage}>
+                <CInputField
+                  id={`custom-form-label-${language}`}
+                  label={intl.formatMessage(customFieldFormMessages.label)}
+                  touched={true}
+                >
+                  <CTextInput
+                    value={this.state.fieldForms[language].label}
+                    onChange={(event: any) => {
+                      const { value } = event.target
+                      this.setState({
+                        handleBars:
+                          defaultLanguage === this.state.selectedLanguage
+                            ? camelCase(
+                                value || getCertificateHandlebar(formField)
+                              )
+                            : this.state.handleBars,
+                        fieldForms: {
+                          ...this.state.fieldForms,
+                          [this.state.selectedLanguage]: {
+                            ...this.state.fieldForms[
+                              this.state.selectedLanguage
+                            ],
+                            label: value
+                          }
+                        }
+                      })
+                    }}
+                  />
+                </CInputField>
+              </FieldContainer>
+            </React.Fragment>
+          )
+        })}
+
+        <Text variant="bold16" element="p">
+          <CustomSelectHeading>
+            <Icon color="currentColor" name="Database" size="large" />
+            {intl.formatMessage(customFieldFormMessages.dataSourceHeading)}
+          </CustomSelectHeading>
+        </Text>
+        <Text color="grey500" variant="reg14" element="span">
+          {intl.formatMessage(customFieldFormMessages.dataSourceDescription)}
+          &nbsp;
+        </Text>
+        <Link
+          onClick={() => {
+            window.open('https://documentation.opencrvs.org/', '_blank')
+          }}
+          font="reg14"
+        >
+          documentation.opencrvs.org
+        </Link>
+        {this.CSVUploadModal()}
+
+        <CSelect
+          value={this.state.selectedDataSource}
+          onChange={(selectedDataSource: string) => {
+            this.dataSourceSelected(selectedDataSource)
+          }}
+          options={this.state.dataSourceSelectOptions.map((option) => ({
+            label: option.label,
+            value: option.value
+          }))}
+        />
+
+        <FileSelectLink
+          id="upload-data-source"
+          accept=".csv"
+          handleFileChange={this.onFileChangeHandler.bind(this)}
+          title={intl.formatMessage(buttonMessages.upload)}
+        />
+        <br></br>
+        <br></br>
+      </>
+    )
+  }
+
+  dataSourceSelected(selectedDataSource: string) {
+    const { selectedField, modifyConfigField, formDataset } = this.props
+
+    const dataSourceSelectOptions = this.prepareDataSourceOptions(
+      formDataset || []
+    )
+    this.setState({ selectedDataSource, dataSourceSelectOptions })
+
+    const options = dataSourceSelectOptions.find(
+      (option) => option.value === selectedDataSource
+    )
+
+    const modifiedField = {
+      options: options ? (options.options as ICustomSelectOption[]) : [],
+      datasetId: selectedDataSource
+    }
+    modifyConfigField(selectedField.fieldId, modifiedField)
+  }
+
+  async onFileChangeHandler(file: File) {
+    const { intl, offlineFormConfigAddFormDataset } = this.props
+    try {
+      const encodedFile = await getBase64String(file)
+      const base64Data = (encodedFile as string).split(',')[1]
+      const fileName = file.name
+
+      this.setState({
+        showCSVUploadingModal: true,
+        CSVUploadStatuses: [
+          {
+            message: intl.formatMessage(
+              customFieldFormMessages.statusValidating
+            ),
+            statusType: STATUS_TYPES.INPROGRESS
+          }
+        ]
+      })
+      const res: { data: CreateFormDatasetMutation } = await client.mutate({
+        mutation: CREATE_FORM_DATA_SET,
+        variables: { formDataset: { fileName, base64Data } }
+      })
+
+      if (res?.data?.createFormDataset?.data?._id) {
+        const { _id, fileName, options } = res.data.createFormDataset.data
+        const newDataSource: IFormDataSet = {
+          _id,
+          fileName,
+          options: options as ICustomSelectOption[]
+        }
+        offlineFormConfigAddFormDataset(newDataSource)
+        this.dataSourceSelected(res.data.createFormDataset.data._id)
+      }
+      this.setState({
+        CSVUploaderModalActions: [],
+        CSVUploadStatuses: [
+          {
+            message: intl.formatMessage(
+              customFieldFormMessages.statusValidated
+            ),
+            statusType: STATUS_TYPES.COMPLETED
+          },
+          {
+            message: intl.formatMessage(
+              customFieldFormMessages.statusAppliedToCustomSelect
+            ),
+            statusType: STATUS_TYPES.COMPLETED
+          }
+        ]
+      })
+    } catch (ex: any) {
+      this.setState({
+        CSVUploadStatuses: [
+          {
+            message: this.showErrorMessage(ex.message as string),
+            statusType: STATUS_TYPES.ERROR
+          }
+        ],
+        CSVUploaderModalActions: [
+          <Button onClick={this.closeCSVUploadModal.bind(this)} type="tertiary">
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <CFileSelectLink
+            id="upload-data-source"
+            accept=".csv"
+            handleFileChange={this.onFileChangeHandler.bind(this)}
+            title={intl.formatMessage(buttonMessages.upload)}
+          />
+        ]
+      })
+    }
+  }
+
+  saveButton() {
+    const { intl, selectedField, modifyConfigField, setSelectedField } =
+      this.props
+    const debouncedNullifySelectedField = debounce(() => {
+      setSelectedField(null)
+    }, 300)
+
+    return (
+      <ListContainer>
+        <ListRow>
+          <ListColumn>
+            <CPrimaryButton
+              id={'custom-tool-save-button'}
+              onClick={() => {
+                const modifiedField = this.prepareModifiedFormField()
+                modifyConfigField(selectedField.fieldId, modifiedField)
+                debouncedNullifySelectedField()
+              }}
+              disabled={
+                !this.isFormValid() ||
+                !this.isConditionalFormValid() ||
+                this.isFieldNameDuplicate()
+              }
+            >
+              {intl.formatMessage(buttonMessages.save)}
+            </CPrimaryButton>
+          </ListColumn>
+        </ListRow>
+      </ListContainer>
+    )
+  }
+
+  closeCSVUploadModal() {
+    this.setState({ showCSVUploadingModal: false })
+  }
+
+  CSVUploadModal() {
+    const { intl } = this.props
+    return (
+      <ResponsiveModal
+        title={intl.formatMessage(customFieldFormMessages.validatingCSVFile)}
+        handleClose={this.closeCSVUploadModal.bind(this)}
+        show={this.state.showCSVUploadingModal}
+        actions={this.state.CSVUploaderModalActions}
+      >
+        <>
+          {intl.formatMessage(
+            customFieldFormMessages.validatingCSVFilesValidatingDescription
+          )}
+          <br />
+          <br />
+
+          {this.state.CSVUploadStatuses.map((status, key) => {
+            return (
+              <>
+                <Alert
+                  key={key}
+                  onActionClick={() => {}}
+                  type={status.statusType}
+                >
+                  {status.message}
+                </Alert>
+                <br />
+              </>
+            )
+          })}
+        </>
+      </ResponsiveModal>
+    )
+  }
+
+  showHandlebar() {
+    const { selectedField, intl } = this.props
+    const customHandlebarName = createCustomFieldHandlebarName(
+      selectedField.fieldId
+    )
+    return (
+      <Body>
+        <Stack>
+          <Text variant="bold14" element="span" color="grey600">
+            {intl.formatMessage(customFieldFormMessages.handleBardHeading)}
+          </Text>
+          <ToolTip
+            label={intl.formatMessage(messages.certHandelbarsTooltip)}
+            id={'cert-handelbars'}
+          />
+        </Stack>
+        <Text variant="reg14" element="span" color="grey500">
+          {`{{ ${customHandlebarName} }}`}
+        </Text>
+      </Body>
+    )
+  }
+
+  render(): React.ReactNode {
+    const { intl, selectedField } = this.props
+    return (
+      <>
+        <RegisterFormFieldIds>
+          {(fieldIds: string[]) => (
+            <>
+              {this.toggleButtons(fieldIds)}
+              {!isEmpty(selectedField.conditionals) &&
+                this.conditionalParameters(fieldIds)}
+            </>
+          )}
+        </RegisterFormFieldIds>
+
+        {selectedField.fieldType !== SELECT_WITH_OPTIONS && this.inputFields()}
+        {selectedField.fieldType === SELECT_WITH_OPTIONS && this.selectField()}
+        {this.saveButton()}
+        {this.showHandlebar()}
       </>
     )
   }
@@ -646,12 +1262,16 @@ function withFieldDefinition<T extends { selectedField: ICustomConfigField }>(
 const mapStateToProps = (store: IStoreState, props: IProps) => {
   const { event, section } = props
   return {
-    fieldsMap: selectConfigFields(store, event, section)
+    fieldsMap: selectConfigFields(store, event, section),
+    facilities: store.offline.offlineData.facilities,
+    selectedLanguage: store.i18n.language,
+    formDataset: store.formConfig.formDataset
   }
 }
 
 const mapDispatchToProps = {
-  modifyConfigField
+  modifyConfigField,
+  offlineFormConfigAddFormDataset
 }
 
 export const CustomFieldTools = connect(

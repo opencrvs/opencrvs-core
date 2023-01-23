@@ -13,29 +13,20 @@ import {
   IFormField,
   IFormSectionData,
   ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOptions,
-  Section
+  ISelectFormFieldWithOptions
 } from '@client/forms'
-import { deserializeFormSection } from '@client/forms/mappings/deserializer'
-import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
-import { getRolesQuery, roleQueries } from '@client/forms/user/query/queries'
+import { roleQueries } from '@client/forms/user/query/queries'
 import { userMessages } from '@client/i18n/messages'
-import { userQueries } from '@client/user/queries'
-import { draftToGqlTransformer } from '@client/transformer'
 import {
-  ROLE_FIELD_AGENT,
-  ROLE_LOCAL_REGISTRAR,
-  ROLE_REGISTRATION_AGENT,
   SYS_ADMIN_ROLES,
   NATL_ADMIN_ROLES,
   NATIONAL_REGISTRAR_ROLES
 } from '@client/utils/constants'
-import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRole } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { IStoreState } from '@client/store'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserData } from './user/userProfilie/UserProfile'
 import { Roles } from '@client/utils/authUtils'
 
 export enum UserStatus {
@@ -43,453 +34,6 @@ export enum UserStatus {
   DEACTIVATED,
   PENDING,
   DISABLED
-}
-
-export const mockIncompleteFormData = {
-  accountDetails: '',
-  assignedRegistrationOffice: '',
-  device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
-  nid: '101488192',
-  phoneNumber: '',
-  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'FIELD_AGENT',
-  userDetails: '',
-  username: ''
-}
-
-export const mockCompleteFormData = {
-  accountDetails: '',
-  assignedRegistrationOffice: '',
-  device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
-  nid: '123456789',
-  phoneNumber: '01662132132',
-  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'FIELD_AGENT',
-  type: 'HOSPITAL',
-  userDetails: '',
-  username: ''
-}
-
-export const mockDataWithRegistarRoleSelected = {
-  accountDetails: '',
-  assignedRegistrationOffice: '',
-  device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
-  nid: '101488192',
-  phoneNumber: '01662132132',
-  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'LOCAL_REGISTRAR',
-  type: 'SECRETARY',
-  userDetails: '',
-  username: '',
-  signature: {
-    type: 'image/png',
-    data: 'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
-  }
-}
-
-export const mockUserGraphqlOperation = {
-  request: {
-    query: createOrUpdateUserMutation,
-    variables: draftToGqlTransformer(
-      {
-        sections: [
-          deserializeFormSection({
-            id: 'user' as Section,
-            viewType: 'form',
-            name: {
-              defaultMessage: 'User',
-              description: 'The name of the user form',
-              id: 'constants.user'
-            },
-            title: {
-              defaultMessage: 'Create new user',
-              description: 'The title of user form',
-              id: 'form.section.user.title'
-            },
-            groups: [
-              {
-                id: 'registration-office',
-                title: {
-                  defaultMessage: 'Assigned Registration Office',
-                  description: 'Assigned Registration Office section',
-                  id: 'form.section.assignedRegistrationOffice'
-                },
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      'values.skippedOfficeSelction && values.registrationOffice'
-                  }
-                ],
-                fields: [
-                  {
-                    name: 'assignedRegistrationOffice',
-                    type: 'FIELD_GROUP_TITLE',
-                    label: {
-                      defaultMessage: 'Assigned registration office',
-                      description: 'Assigned Registration Office section',
-                      id: 'form.section.assignedRegistrationOfficeGroupTitle'
-                    },
-                    required: false,
-                    hidden: true,
-                    initialValue: '',
-                    validate: []
-                  },
-                  {
-                    name: 'registrationOffice',
-                    type: 'LOCATION_SEARCH_INPUT',
-                    label: {
-                      defaultMessage: 'Registration Office',
-                      description: 'Registration office',
-                      id: 'form.field.label.registrationOffice'
-                    },
-                    required: true,
-                    initialValue: '',
-                    searchableResource: 'facilities',
-                    searchableType: 'CRVS_OFFICE',
-                    locationList: [],
-                    validate: [
-                      {
-                        operation: 'officeMustBeSelected'
-                      }
-                    ],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldNameTransformer',
-                        parameters: ['primaryOffice']
-                      },
-                      query: {
-                        operation: 'locationIDToFieldTransformer',
-                        parameters: ['primaryOffice']
-                      }
-                    }
-                  }
-                ]
-              },
-              {
-                id: 'user-view-group',
-                fields: [
-                  {
-                    name: 'userDetails',
-                    type: 'FIELD_GROUP_TITLE',
-                    label: {
-                      defaultMessage: 'User details',
-                      description: 'User details section',
-                      id: 'form.section.userDetails'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: []
-                  },
-                  {
-                    name: 'firstNames',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'Bengali first name',
-                      description: 'Bengali first name',
-                      id: 'form.field.label.firstNameBN'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: [{ operation: 'bengaliOnlyNameFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['bn']
-                      },
-                      query: {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['bn']
-                      }
-                    }
-                  },
-                  {
-                    name: 'familyName',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'Bengali last name',
-                      description: 'Bengali last name',
-                      id: 'form.field.label.lastNameBN'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [{ operation: 'bengaliOnlyNameFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['bn']
-                      },
-                      query: {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['bn']
-                      }
-                    }
-                  },
-                  {
-                    name: 'firstNamesEng',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'English first name',
-                      description: 'English first name',
-                      id: 'form.field.label.firstNameEN'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: [{ operation: 'englishOnlyNameFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'firstNames']
-                      },
-                      query: {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['en', 'firstNames']
-                      }
-                    }
-                  },
-                  {
-                    name: 'familyNameEng',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'English last name',
-                      description: 'English last name',
-                      id: 'form.field.label.lastNameEN'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [{ operation: 'englishOnlyNameFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToNameTransformer',
-                        parameters: ['en', 'familyName']
-                      },
-                      query: {
-                        operation: 'nameToFieldTransformer',
-                        parameters: ['en', 'familyName']
-                      }
-                    }
-                  },
-                  {
-                    name: 'phoneNumber',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'Phone number',
-                      description: 'Input label for phone input',
-                      id: 'form.field.label.phoneNumber'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [{ operation: 'phoneNumberFormat' }],
-                    mapping: {
-                      mutation: {
-                        operation: 'msisdnTransformer',
-                        parameters: ['user.mobile']
-                      },
-                      query: {
-                        operation: 'localPhoneTransformer',
-                        parameters: ['user.mobile']
-                      }
-                    }
-                  },
-                  {
-                    name: 'nid',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'NID',
-                      description: 'National ID',
-                      id: 'form.field.label.NID'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [
-                      {
-                        operation: 'validIDNumber',
-                        parameters: ['NATIONAL_ID']
-                      }
-                    ],
-                    mapping: {
-                      mutation: {
-                        operation: 'fieldToIdentifierWithTypeTransformer',
-                        parameters: ['NATIONAL_ID']
-                      },
-                      query: {
-                        operation: 'identifierWithTypeToFieldTransformer',
-                        parameters: ['NATIONAL_ID']
-                      }
-                    }
-                  },
-                  {
-                    name: 'accountDetails',
-                    type: 'FIELD_GROUP_TITLE',
-                    label: {
-                      defaultMessage: 'Account details',
-                      description: 'Account details section',
-                      id: 'form.section.accountDetails'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: []
-                  },
-                  {
-                    name: 'role',
-                    type: 'SELECT_WITH_OPTIONS',
-                    label: {
-                      defaultMessage: 'Role',
-                      description: 'Role label',
-                      id: 'constants.role'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [],
-                    options: []
-                  },
-                  {
-                    name: 'type',
-                    type: 'SELECT_WITH_DYNAMIC_OPTIONS',
-                    label: {
-                      defaultMessage: 'Type',
-                      description:
-                        'Label for type of event in work queue list item',
-                      id: 'constants.type'
-                    },
-                    required: true,
-                    initialValue: '',
-                    validate: [],
-                    dynamicOptions: {
-                      dependency: 'role',
-                      options: {}
-                    }
-                  },
-                  {
-                    name: 'device',
-                    type: 'TEXT',
-                    label: {
-                      defaultMessage: 'Device',
-                      description: 'User device',
-                      id: 'form.field.label.userDevice'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: []
-                  }
-                ]
-              },
-              {
-                id: 'signature-attachment',
-                title: {
-                  defaultMessage: 'Attach the signature',
-                  description: 'Title for user signature attachment',
-                  id: 'form.field.label.userSignatureAttachmentTitle'
-                },
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      'values.role!=="LOCAL_REGISTRAR" && values.role!=="REGISTRATION_AGENT"'
-                  }
-                ],
-                fields: [
-                  {
-                    name: 'attachmentTitle',
-                    type: 'FIELD_GROUP_TITLE',
-                    hidden: true,
-                    label: {
-                      defaultMessage: 'Attachments',
-                      description: 'label for user signature attachment',
-                      id: 'form.field.label.userAttachmentSection'
-                    },
-                    required: false,
-                    initialValue: '',
-                    validate: []
-                  },
-                  {
-                    name: 'signature',
-                    type: 'SIMPLE_DOCUMENT_UPLOADER',
-                    label: {
-                      defaultMessage: 'User’s signature',
-                      description: 'Input label for user signature attachment',
-                      id: 'form.field.label.userSignatureAttachment'
-                    },
-                    description: {
-                      defaultMessage:
-                        'Ask the user to sign a piece of paper and then scan or take a photo.',
-                      description: 'Description for user signature attachment',
-                      id: 'form.field.label.userSignatureAttachmentDesc'
-                    },
-                    allowedDocType: ['image/png'],
-                    initialValue: '',
-                    required: false,
-                    validate: []
-                  }
-                ]
-              }
-            ]
-          })
-        ]
-      },
-      { user: mockCompleteFormData }
-    )
-  },
-  result: {
-    data: {
-      createOrUpdateUserMutation: { username: 'hossain123', __typename: 'User' }
-    }
-  }
-}
-
-export const mockFetchRoleGraphqlOperation = {
-  request: {
-    query: getRolesQuery,
-    variables: {}
-  },
-  result: {
-    data: {
-      getRoles: [
-        {
-          title: 'Field Agent',
-          value: 'FIELD_AGENT',
-          types: ['HOSPITAL', 'CHA']
-        },
-        {
-          title: 'Registration Agent',
-          value: 'REGISTRATION_AGENT',
-          types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK']
-        },
-        {
-          title: 'Registrar',
-          value: 'LOCAL_REGISTRAR',
-          types: ['SECRETARY', 'CHAIRMAN', 'MAYOR']
-        },
-        {
-          title: 'System admin (local)',
-          value: 'LOCAL_SYSTEM_ADMIN',
-          types: ['LOCAL_SYSTEM_ADMIN']
-        },
-        {
-          title: 'System admin (national)',
-          value: 'NATIONAL_SYSTEM_ADMIN',
-          types: ['NATIONAL_SYSTEM_ADMIN']
-        },
-        {
-          title: 'Performance Management',
-          value: 'PERFORMANCE_MANAGEMENT',
-          types: ['HEALTH_DIVISION', 'ORG_DIVISION']
-        }
-      ]
-    }
-  }
 }
 
 export const transformRoleDataToDefinitions = (
@@ -607,10 +151,32 @@ const AuditDescriptionMapping: {
   IN_PROGRESS: messages.inProgressAuditAction,
   DECLARED: messages.declaredAuditAction,
   VALIDATED: messages.validatedAuditAction,
-  WAITING_VALIDATION: messages.waitingForValidationAuditAction,
+  DECLARATION_UPDATED: messages.updatedAuditAction,
   REGISTERED: messages.registeredAuditAction,
   REJECTED: messages.rejectedAuditAction,
-  CERTIFIED: messages.certifiedAuditAction
+  CERTIFIED: messages.certifiedAuditAction,
+  ASSIGNED: messages.assignedAuditAction,
+  UNASSIGNED: messages.unAssignedAuditAction,
+  CORRECTED: messages.correctedAuditAction,
+  ARCHIVED: messages.archivedAuditAction,
+  LOGGED_IN: messages.loggedInAuditAction,
+  LOGGED_OUT: messages.loggedOutAuditAction,
+  PHONE_NUMBER_CHANGED: messages.phoneNumberChangedAuditAction,
+  PASSWORD_CHANGED: messages.passwordChangedAuditAction,
+  DEACTIVATE: messages.deactivateAuditAction,
+  REACTIVATE: messages.reactivateAuditAction,
+  EDIT_USER: messages.editUserAuditAction,
+  CREATE_USER: messages.createUserAuditAction,
+  PASSWORD_RESET: messages.passwordResetAuditAction,
+  USERNAME_REMINDER: messages.userNameReminderAuditAction,
+  USERNAME_REMINDER_BY_ADMIN: messages.usernameReminderByAdmin,
+  PASSWORD_RESET_BY_ADMIN: messages.passwordResetByAdmin,
+  RETRIEVED: messages.retrievedAuditAction,
+  VIEWED: messages.viewedAuditAction,
+  REINSTATED_IN_PROGRESS: messages.reInstatedInProgressAuditAction,
+  REINSTATED_DECLARED: messages.reInstatedInReviewAuditAction,
+  REINSTATED_REJECTED: messages.reInStatedRejectedAuditAction,
+  SENT_FOR_APPROVAL: messages.sentForApprovalAuditAction
 }
 
 export function getUserAuditDescription(
@@ -629,7 +195,7 @@ export function checkIfLocalLanguageProvided() {
 }
 
 export function getUserRole(
-  user: IUserData,
+  user: { role?: string | null },
   intl: IntlShape
 ): string | undefined {
   switch (user.role) {
@@ -653,7 +219,7 @@ export function getUserRole(
 }
 
 export function getUserType(
-  user: IUserData,
+  user: { type?: string | null },
   intl: IntlShape
 ): string | undefined {
   if (user.type) {

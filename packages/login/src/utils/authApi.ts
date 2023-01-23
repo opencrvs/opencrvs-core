@@ -11,7 +11,7 @@
  */
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { resolve } from 'url'
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 
 export interface ICodeVerifyData {
   nonce: string
@@ -63,7 +63,7 @@ export interface ITokenResponse {
   token: string
 }
 
-function request<T>(options: AxiosRequestConfig) {
+export function request<T>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
     return response.data
   }

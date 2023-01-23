@@ -50,9 +50,10 @@ import { createIntl } from 'react-intl'
 import { phoneNumberFormat } from '@client/utils/validate'
 import { formMessages } from '@client/i18n/messages'
 import { LocationType } from '@client/offline/reducer'
+import { vi, Mock, SpyInstance } from 'vitest'
 
 const { store, history } = createStore()
-const mockHandler = jest.fn()
+const mockHandler = vi.fn()
 
 const draft = createDeclaration(DeclarationEvent.Birth)
 draft.data = {
@@ -90,14 +91,14 @@ const rejectedDraftDeath = createReviewDeclaration(
 )
 
 describe('when in device of large viewport', () => {
-  let userAgentMock: jest.SpyInstance
+  let userAgentMock: SpyInstance
 
   beforeEach(() => {
-    userAgentMock = jest.spyOn(window.navigator, 'userAgent', 'get')
+    userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     Object.assign(window, { outerWidth: 1034 })
 
     userAgentMock.mockReturnValue('Desktop')
-    ;(isMobileDevice as jest.Mock).mockRestore()
+    ;(isMobileDevice as Mock).mockRestore()
   })
 
   const intl = createIntl({ locale: 'en' })
@@ -219,7 +220,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page for rejected birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -266,7 +267,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page to validate birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
       const testComponent = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -325,12 +326,12 @@ describe('when in device of large viewport', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
 
     beforeAll(() => {
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     beforeEach(async () => {
-      jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-      jest.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      vi.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
         birth: {
           sections: [
             {
@@ -514,12 +515,12 @@ describe('when in device of large viewport', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
 
     beforeAll(() => {
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     beforeEach(async () => {
-      jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-      jest.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      vi.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
         birth: {
           sections: [
             {
@@ -535,8 +536,8 @@ describe('when in device of large viewport', () => {
                     {
                       name: 'birthLocation',
                       type: LOCATION_SEARCH_INPUT,
-                      searchableResource: 'facilities',
-                      searchableType: LocationType.HEALTH_FACILITY,
+                      searchableResource: ['facilities'],
+                      searchableType: [LocationType.HEALTH_FACILITY],
                       locationList: [],
                       required: true,
                       validate: [],
@@ -593,19 +594,19 @@ describe('when in device of large viewport', () => {
 
 describe('when in device of small viewport', () => {
   let reviewSectionComponent: ReactWrapper<{}, {}>
-  let userAgentMock: jest.SpyInstance
+  let userAgentMock: SpyInstance
   const { store } = createStore()
 
   beforeAll(() => {
     resizeWindow(600, 960)
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   beforeEach(async () => {
-    userAgentMock = jest.spyOn(window.navigator, 'userAgent', 'get')
+    userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     userAgentMock.mockReturnValue('Android')
-    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-    jest.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
+    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+    vi.spyOn(declarationSelectors, 'getRegisterForm').mockReturnValue({
       birth: {
         sections: [
           {
@@ -621,7 +622,7 @@ describe('when in device of small viewport', () => {
                   {
                     name: 'motherBirthDate',
                     type: DATE,
-                    label: formMessages.motherDateOfBirth,
+                    label: formMessages.dateOfBirth,
                     required: true,
                     validate: [],
                     initialValue: ''
@@ -671,7 +672,7 @@ describe('when in device of small viewport', () => {
         ]
       }
     })
-    ;(isMobileDevice as jest.Mock).mockRestore()
+    ;(isMobileDevice as Mock).mockRestore()
 
     const data = {
       documents: {
@@ -737,20 +738,6 @@ describe('when in device of small viewport', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(
-        reviewSectionComponent.find('#preview_image_field').hostNodes()
-      ).toHaveLength(0)
-    })
-
-    it('clicking on delete button modifies declaration by removing uploaded file', () => {
-      reviewSectionComponent
-        .find('#preview_image_field')
-        .hostNodes()
-        .find('#preview_delete')
-        .hostNodes()
-        .simulate('click')
-
-      expect(mockHandler).toBeCalled()
       expect(
         reviewSectionComponent.find('#preview_image_field').hostNodes()
       ).toHaveLength(0)

@@ -10,54 +10,101 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { logger } from '@user-mgnt/logger'
-import System, { ISystemModel } from '@user-mgnt/model/system'
-import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
-import { statuses, systemScopeMapping } from '@user-mgnt/utils/userUtils'
-import { QA_ENV } from '@user-mgnt/constants'
-import * as Hapi from '@hapi/hapi'
-import * as _ from 'lodash'
-import * as Joi from 'joi'
-import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { unauthorized } from '@hapi/boom'
-import * as uuid from 'uuid/v4'
+import * as Hapi from '@hapi/hapi'
+import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
+import { logger } from '@user-mgnt/logger'
+import System, {
+  ISystemModel,
+  WebhookPermissions
+} from '@user-mgnt/model/system'
+import User, { IUserModel } from '@user-mgnt/model/user'
+import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
+import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
+import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
+import * as Joi from 'joi'
+import { pick } from 'lodash'
+import { Types } from 'mongoose'
+import * as uuid from 'uuid/v4'
+
+export enum EventType {
+  Birth = 'birth',
+  Death = 'death'
+}
+
+interface WebHookPayload {
+  event: EventType
+  permissions: WebhookPermissions[]
+}
 
 interface IRegisterSystemPayload {
-  scope: string
+  name: string
+  settings: {
+    dailyQuota: number
+    webhook: WebHookPayload[]
+  }
+  type: string
 }
 
-interface IRegisterSystemResponse {
-  client_id: string
-  client_secret: string
-  sha_secret: string
-}
+/** Returns a curated System with only the params we want to expose */
+const pickSystem = (system: ISystemModel & { _id: Types.ObjectId }) => ({
+  ...pick(system, ['name', 'status', 'type']),
+  // TODO: client_id and sha_secret should be camelCased in the Mongoose-model
+  _id: system._id.toString(),
+  shaSecret: system.sha_secret,
+  clientId: system.client_id,
+  settings: system.settings.webhook.map((ite) => ({
+    event: ite.event,
+    permissions: ite.permissions
+  }))
+})
 
-export async function registerSystemClient(
+export async function registerSystem(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { scope } = request.payload as IRegisterSystemPayload
+  const { name, type } = request.payload as IRegisterSystemPayload
+  let { settings } = request.payload as IRegisterSystemPayload
   try {
+    if (type === types.WEBHOOK && !settings) {
+      logger.error('Webhook payloads are required !')
+      return h.response('Webhook payloads are required !').code(400)
+    }
+
+    if (type === types.RECORD_SEARCH && !settings) {
+      settings = {
+        dailyQuota: RECORD_SEARCH_QUOTA,
+        webhook: []
+      }
+    }
     const token: ITokenPayload = getTokenPayload(
       request.headers.authorization.split(' ')[1]
     )
     const userId = token.sub
     const systemAdminUser: IUserModel | null = await User.findById(userId)
+
+    const existingSystem: ISystemModel | null = await System.findOne({
+      type: type
+    })
+
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
       logger.error('active system admin user details cannot be found')
       throw unauthorized()
     }
-    if (!systemScopeMapping[scope]) {
+
+    if (existingSystem && existingSystem.type === types.NATIONAL_ID) {
+      throw new Error('System with NATIONAL_ID already exists !')
+    }
+    if (!systemScopeMapping[type]) {
       logger.error('scope doesnt exist')
       return h.response().code(400)
     }
-    const systemScopes: string[] = systemScopeMapping[scope]
+    const systemScopes: string[] = systemScopeMapping[type]
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
@@ -65,12 +112,12 @@ export async function registerSystemClient(
     ) {
       systemScopes.push('demo')
     }
-    /* tslint:disable */
+
     const client_id = uuid()
-    const secret_id = uuid()
+    const clientSecret = uuid()
     const sha_secret = uuid()
-    /* tslint:enable */
-    const { hash, salt } = generateSaltedHash(secret_id)
+
+    const { hash, salt } = generateSaltedHash(clientSecret)
 
     const practitioner = createFhirPractitioner(systemAdminUser, true)
     const practitionerId = await postFhir(
@@ -93,25 +140,55 @@ export async function registerSystemClient(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
-    const system = {
+
+    if (type === types.WEBHOOK || type === types.RECORD_SEARCH) {
+      const systemDetails = {
+        client_id,
+        name: name || systemAdminUser.username,
+        createdBy: userId,
+        username: systemAdminUser.username,
+        status: statuses.ACTIVE,
+        scope: systemScopes,
+        practitionerId,
+        secretHash: hash,
+        salt,
+        sha_secret,
+        settings,
+        type
+      }
+      const newSystem = await System.create(systemDetails)
+
+      return h
+        .response({
+          // NOTE! Client secret is visible for only this response and then forever gone
+          clientSecret,
+          system: pickSystem(newSystem)
+        })
+        .code(201)
+    }
+
+    const systemDetails = {
       client_id,
-      name: systemAdminUser.name,
+      name: name || systemAdminUser.username,
+      createdBy: userId,
       username: systemAdminUser.username,
       status: statuses.ACTIVE,
       scope: systemScopes,
       practitionerId,
       secretHash: hash,
       salt,
-      sha_secret
+      sha_secret,
+      type
     }
+    const newSystem = await System.create(systemDetails)
 
-    await System.create(system)
-    const response: IRegisterSystemResponse = {
-      client_id,
-      client_secret: secret_id,
-      sha_secret
-    }
-    return h.response(response).code(201)
+    return h
+      .response({
+        // NOTE! Client secret is visible for only this response and then forever gone
+        clientSecret,
+        system: pickSystem(newSystem)
+      })
+      .code(201)
   } catch (err) {
     logger.error(err)
     // return 400 if there is a validation error when saving to mongo
@@ -119,21 +196,11 @@ export async function registerSystemClient(
   }
 }
 
-export const reqRegisterSystemSchema = Joi.object({
-  scope: Joi.string().required()
-})
-
-export const resRegisterSystemSchema = Joi.object({
-  client_id: Joi.string(),
-  client_secret: Joi.string(),
-  sha_secret: Joi.string()
-})
-
-interface IAuditSystemPayload {
-  client_id: string
+interface SystemClientIdPayload {
+  clientId: string
 }
 
-export async function deactivateSystemClient(
+export async function deactivateSystem(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -144,39 +211,39 @@ export async function deactivateSystemClient(
     const userId = token.sub
     const systemAdminUser: IUserModel | null = await User.findById(userId)
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
-      logger.error('active system admin user details cannot be found')
+      logger.error('Active system admin user details cannot be found')
       throw unauthorized()
     }
 
-    const auditSystemPayload = request.payload as IAuditSystemPayload
+    const { clientId } = request.payload as SystemClientIdPayload
 
-    const system: ISystemModel | null = await System.findById(
-      auditSystemPayload.client_id
-    )
+    const system: ISystemModel | null = await System.findOne({
+      client_id: clientId
+    })
     if (!system) {
       logger.error(
-        `No system details found for requested client_id: ${auditSystemPayload.client_id}`
+        `No system details found for requested client_id: ${clientId}`
       )
       throw unauthorized()
     }
-
     system.status = statuses.DEACTIVATED
 
-    try {
-      // tslint:disable-next-line
-      await System.update({ _id: system._id }, system)
-    } catch (err) {
-      logger.error(err.message)
-      return h.response().code(400)
-    }
-    return h.response().code(200)
+    const newSystem = await System.findOneAndUpdate(
+      { _id: system._id },
+      system,
+      {
+        returnDocument: 'after'
+      }
+    )
+
+    return h.response(pickSystem(newSystem!)).code(200)
   } catch (err) {
     logger.error(err)
     return h.response().code(400)
   }
 }
 
-export async function reactivateSystemClient(
+export async function reactivateSystem(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -191,37 +258,33 @@ export async function reactivateSystemClient(
       throw unauthorized()
     }
 
-    const auditSystemPayload = request.payload as IAuditSystemPayload
+    const { clientId } = request.payload as SystemClientIdPayload
 
-    const system: ISystemModel | null = await System.findById(
-      auditSystemPayload.client_id
-    )
+    const system: ISystemModel | null = await System.findOne({
+      client_id: clientId
+    })
     if (!system) {
       logger.error(
-        `No system details found for requested client_id: ${auditSystemPayload.client_id}`
+        `No system details found for requested client_id: ${clientId}`
       )
       throw unauthorized()
     }
-
     system.status = statuses.ACTIVE
 
-    try {
-      // tslint:disable-next-line
-      await System.update({ _id: system._id }, system)
-    } catch (err) {
-      logger.error(err.message)
-      return h.response().code(400)
-    }
-    return h.response().code(200)
+    const newSystem = await System.findOneAndUpdate(
+      { _id: system._id },
+      system,
+      {
+        returnDocument: 'after'
+      }
+    )
+
+    return h.response(pickSystem(newSystem!)).code(200)
   } catch (err) {
     logger.error(err)
     return h.response().code(400)
   }
 }
-
-export const auditSystemSchema = Joi.object({
-  client_id: Joi.string().required()
-})
 
 interface IVerifyPayload {
   client_id: string
@@ -240,7 +303,6 @@ export async function verifySystemHandler(
 ) {
   const { client_id, client_secret } = request.payload as IVerifyPayload
 
-  // tslint:disable-next-line
   const system: ISystemModel | null = await System.findOne({ client_id })
 
   if (!system) {
@@ -274,42 +336,208 @@ export const verifySystemResSchema = Joi.object({
 
 interface IGetSystemPayload {
   systemId: string
+  clientId: string
 }
 
 export async function getSystemHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { systemId } = request.payload as IGetSystemPayload
+  const { systemId, clientId } = request.payload as IGetSystemPayload
+  let criteria = {}
+  if (systemId) {
+    criteria = { ...criteria, _id: systemId }
+  }
+  if (clientId) {
+    criteria = { ...criteria, client_id: clientId }
+  }
 
-  // tslint:disable-next-line
-  const system: ISystemModel | null = await System.findOne({ _id: systemId })
+  const system: ISystemModel | null = await System.findOne(criteria)
 
   if (!system) {
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
+  const systemName = system.name
   return {
-    name: `${system.name[0].given} ${system.name[0].family}`,
+    name: systemName || system.createdBy,
+    createdBy: system.createdBy,
     client_id: system.client_id,
     username: system.username,
     status: system.status,
     scope: system.scope,
     sha_secret: system.sha_secret,
-    practitionerId: system.practitionerId
+    practitionerId: system.practitionerId,
+    type: system.type,
+    settings: system.settings
   }
 }
 
+export async function getAllSystemsHandler() {
+  const systems = await System.find()
+  return systems.map((system) => pickSystem(system))
+}
+
 export const getSystemRequestSchema = Joi.object({
-  systemId: Joi.string()
+  systemId: Joi.string(),
+  clientId: Joi.string()
 })
+
+const webHookSchema = Joi.array().items(
+  Joi.object({
+    event: Joi.string().required(),
+    permissions: Joi.array().items(Joi.string())
+  })
+)
 
 export const getSystemResponseSchema = Joi.object({
   name: Joi.string(),
+  createdBy: Joi.string(),
   username: Joi.string(),
   client_id: Joi.string(),
   status: Joi.string(),
   scope: Joi.array().items(Joi.string()),
   sha_secret: Joi.string(),
-  practitionerId: Joi.string()
+  practitionerId: Joi.string(),
+  type: Joi.string(),
+  settings: Joi.object({
+    dailyQuota: Joi.number(),
+    webhook: Joi.any().optional()
+  })
 })
+
+export const clientIdSchema = Joi.object({
+  clientId: Joi.string()
+})
+
+export const SystemSchema = Joi.object({
+  _id: Joi.string(),
+  name: Joi.string(),
+  status: Joi.string(),
+  type: Joi.string(),
+  shaSecret: Joi.string(),
+  clientId: Joi.string(),
+  settings: webHookSchema.optional()
+})
+
+export const resSystemSchema = Joi.object({
+  clientSecret: Joi.string().uuid(),
+  system: SystemSchema
+})
+
+interface IUpdateSystemPayload {
+  clientId: string
+  webhook: WebHookPayload[]
+}
+
+export async function updatePermissions(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const { clientId, webhook } = request.payload as IUpdateSystemPayload
+
+    const existingSystem: ISystemModel | null = await System.findOne({
+      client_id: clientId
+    })
+
+    if (!existingSystem) {
+      logger.error('No system client is found !')
+      return h.response('No system client is found').code(404)
+    }
+    existingSystem.settings.webhook = webhook
+    const newSystem = await System.findOneAndUpdate(
+      { client_id: clientId },
+      existingSystem,
+      {
+        new: true
+      }
+    )
+
+    return h.response(pickSystem(newSystem!)).code(200)
+  } catch (err) {
+    logger.error(err)
+    return h.response(err.message).code(400)
+  }
+}
+
+export const reqUpdateSystemSchema = Joi.object({
+  clientId: Joi.string().required(),
+  webhook: webHookSchema.required()
+})
+
+export const reqRegisterSystemSchema = Joi.object({
+  type: Joi.string().required(),
+  name: Joi.string().required(),
+  settings: Joi.object({
+    dailyQuota: Joi.number(),
+    webhook: webHookSchema
+  }).optional()
+})
+
+export async function refreshSystemSecretHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const { clientId } = request.payload as SystemClientIdPayload
+
+    const systemUser: ISystemModel | null = await System.findOne({
+      client_id: clientId
+    })
+
+    if (!systemUser) {
+      logger.error(`No user details found by given clientId: ${clientId}`)
+      throw unauthorized()
+    }
+
+    const client_secret = uuid()
+    const { hash, salt } = generateSaltedHash(client_secret)
+
+    systemUser.salt = salt
+    systemUser.secretHash = hash
+
+    const newSystem = await System.findOneAndUpdate(
+      { client_id: clientId },
+      systemUser,
+      {
+        new: true
+      }
+    )
+    return h
+      .response({
+        clientSecret: client_secret,
+        system: pickSystem(newSystem!)
+      })
+      .code(200)
+  } catch (e) {
+    return h.response(e.message).code(400)
+  }
+}
+
+export const systemSecretRequestSchema = Joi.object({
+  clientId: Joi.string()
+})
+
+export async function deleteSystem(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const { clientId } = request.payload as SystemClientIdPayload
+
+    const system = await System.findOneAndDelete({
+      client_id: clientId
+    })
+
+    if (system) {
+      logger.info(`System has been deleted by clientId ${clientId}`)
+      return h.response(pickSystem(system)).code(200)
+    }
+
+    return h.response(`No system found by clientId: ${clientId}`).code(404)
+  } catch (e) {
+    logger.info(e.message)
+    return h.response(e.message).code(400)
+  }
+}

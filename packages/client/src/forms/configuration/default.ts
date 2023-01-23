@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/forms'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 import {
   BirthSection,
   ISerializedForm,
@@ -561,6 +561,14 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrationNumberTransformer'
             },
             {
+              fieldName: 'mosipAid',
+              operation: 'mosipAidTransformer'
+            },
+            {
+              fieldName: 'mosipAIDLabel',
+              operation: 'mosipAidLabelTransformer'
+            },
+            {
               fieldName: 'certificateDate',
               operation: 'certificateDateTransformer',
               parameters: ['en', 'dd MMMM yyyy']
@@ -604,7 +612,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'childBirthDate',
                 customisable: false,
                 type: 'DATE',
-                label: formMessageDescriptors.childDateOfBirth,
+                label: formMessageDescriptors.dateOfBirth,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -633,7 +641,7 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'childNameInEnglish',
                 customisable: false,
                 type: 'TEXT',
-                label: formMessageDescriptors.childFirstNames,
+                label: formMessageDescriptors.firstName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -663,7 +671,7 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'childNameInEnglish',
                 customisable: false,
                 type: 'TEXT',
-                label: formMessageDescriptors.childFamilyName,
+                label: formMessageDescriptors.familyName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -692,29 +700,29 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'gender',
                 customisable: false,
                 type: 'SELECT_WITH_OPTIONS',
-                label: formMessageDescriptors.childSex,
+                label: formMessageDescriptors.sex,
                 required: true,
                 initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
-                    fieldName: 'informantGender',
+                    fieldName: 'childGender',
                     operation: 'selectTransformer'
                   }
                 },
                 options: [
                   {
                     value: 'male',
-                    label: formMessageDescriptors.childSexMale
+                    label: formMessageDescriptors.sexMale
                   },
                   {
                     value: 'female',
-                    label: formMessageDescriptors.childSexFemale
+                    label: formMessageDescriptors.sexFemale
                   },
                   {
                     value: 'unknown',
-                    label: formMessageDescriptors.childSexUnknown
+                    label: formMessageDescriptors.sexUnknown
                   }
                 ]
               },
@@ -780,6 +788,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: []
+                  },
+                  template: {
+                    fieldName: 'attendantAtBirth',
+                    operation: 'selectTransformer'
                   }
                 }
               },
@@ -827,6 +839,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: []
+                  },
+                  template: {
+                    fieldName: 'birthType',
+                    operation: 'selectTransformer'
                   }
                 }
               },
@@ -853,6 +869,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: []
+                  },
+                  template: {
+                    fieldName: 'weightAtBirth',
+                    operation: 'plainInputTransformer'
                   }
                 },
                 inputFieldWidth: '78px'
@@ -910,8 +930,8 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'placeOfBirth',
                 required: true,
                 initialValue: '',
-                searchableResource: 'facilities',
-                searchableType: 'HEALTH_FACILITY',
+                searchableResource: ['facilities'],
+                searchableType: ['HEALTH_FACILITY'],
                 dynamicOptions: {
                   resource: 'facilities'
                 },
@@ -930,7 +950,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     fieldName: 'placeOfBirth',
                     operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
+                    parameters: ['facilities', 'placeOfBirth']
                   },
                   mutation: {
                     operation: 'birthEventLocationMutationTransformer',
@@ -1007,6 +1027,10 @@ export const registerForms: IDefaultRegisterForms = {
                         operation: 'arrayToFieldTransformer'
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantNationality',
+                    operation: 'nationalityTransformer'
                   }
                 }
               },
@@ -1025,6 +1049,14 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'duplicateIDNumber',
                     parameters: ['deceased.iD']
+                  },
+                  {
+                    operation: 'duplicateIDNumber',
+                    parameters: ['mother.iD']
+                  },
+                  {
+                    operation: 'duplicateIDNumber',
+                    parameters: ['father.iD']
                   }
                 ],
                 conditionals: [],
@@ -1048,13 +1080,18 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['id', 'NATIONAL_ID']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantNID',
+                    operation: 'identityToFieldTransformer',
+                    parameters: ['id', 'NATIONAL_ID', 'individual']
                   }
                 }
               },
               {
                 name: 'informantBirthDate',
                 type: 'DATE',
-                label: formMessageDescriptors.motherDateOfBirth,
+                label: formMessageDescriptors.dateOfBirth,
                 required: true,
                 customisable: true,
                 initialValue: '',
@@ -1089,6 +1126,16 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['birthDate']
                       }
                     ]
+                  },
+                  template: {
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'informantBirthDate',
+                    parameters: [
+                      'birthDate',
+                      'en',
+                      'do MMMM yyyy',
+                      'individual'
+                    ]
                   }
                 }
               },
@@ -1096,11 +1143,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'firstNamesEng',
                 previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'First name(s)',
-                  description: 'Label for form field: Given names',
-                  id: 'form.field.label.childFirstNames'
-                },
+                label: formMessageDescriptors.firstNames,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -1130,6 +1173,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['en', 'firstNames']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantFirstName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames', 'informant', 'individual']
                   }
                 }
               },
@@ -1137,11 +1185,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'familyNameEng',
                 previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last name',
-                  description: 'Label for form field: Last name in english',
-                  id: 'form.field.label.childFamilyName'
-                },
+                label: formMessageDescriptors.familyName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -1171,6 +1215,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['en', 'familyName']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName', 'informant', 'individual']
                   }
                 }
               }
@@ -1212,21 +1261,14 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'detailsExist',
-                type: 'RADIO_GROUP',
+                type: 'CHECKBOX',
                 label: formMessageDescriptors.mothersDetailsExist,
                 required: true,
+                checkedValue: false,
+                uncheckedValue: true,
+                hideHeader: true,
                 initialValue: true,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1249,11 +1291,17 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 type: 'TEXT',
-                label: formMessageDescriptors.reasonMNA,
+                label: formMessageDescriptors.reasonNA,
                 validate: [],
                 initialValue: '',
                 customisable: true,
-                required: true
+                required: true,
+                mapping: {
+                  template: {
+                    fieldName: 'motherReasonNotApplying',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'nationality',
@@ -1279,7 +1327,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'motherNationality',
-                    operation: 'selectTransformer'
+                    operation: 'nationalityTransformer'
                   },
                   mutation: {
                     operation: 'fieldToArrayTransformer'
@@ -1332,11 +1380,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'motherBirthDate',
                 type: 'DATE',
-                label: {
-                  defaultMessage: 'Date of birth',
-                  description: 'Label for form field: Date of birth',
-                  id: 'form.field.label.motherDateOfBirth'
-                },
+                label: formMessageDescriptors.dateOfBirth,
                 conditionals: [
                   {
                     action: 'hide',
@@ -1380,11 +1424,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'firstNamesEng',
                 previewGroup: 'motherNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'First name(s)',
-                  description: 'Label for form field: First names in english',
-                  id: 'form.field.label.motherFirstNamesEng'
-                },
+                label: formMessageDescriptors.firstName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -1420,11 +1460,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'familyNameEng',
                 previewGroup: 'motherNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last Name',
-                  description: 'Label for form field: Family name in english',
-                  id: 'form.field.label.motherFamilyNameEng'
-                },
+                label: formMessageDescriptors.familyName,
                 conditionals: [
                   {
                     action: 'hide',
@@ -1578,7 +1614,13 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'maxLength',
                     parameters: [2]
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'multipleBirth',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'occupation',
@@ -1598,16 +1640,18 @@ export const registerForms: IDefaultRegisterForms = {
                     expression:
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'motherOccupation',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'educationalAttainment',
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'level of education',
-                  description: 'Label for form field: Mother education',
-                  id: 'form.field.label.motherEducationAttainment'
-                },
+                label: formMessageDescriptors.educationAttainment,
                 required: false,
                 customisable: true,
                 initialValue: '',
@@ -1653,7 +1697,13 @@ export const registerForms: IDefaultRegisterForms = {
                       id: 'form.field.label.educationAttainmentISCED5'
                     }
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'motherEducationalAttainment',
+                    operation: 'selectTransformer'
+                  }
+                }
               }
               // PRIMARY ADDRESS SUBSECTION
               // PRIMARY ADDRESS
@@ -1701,26 +1751,14 @@ export const registerForms: IDefaultRegisterForms = {
             fields: [
               {
                 name: 'detailsExist',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage: "Do you have the father's details?",
-                  description:
-                    "Question to ask the user if they have the father's details",
-                  id: 'form.field.label.fathersDetailsExist'
-                },
+                type: 'CHECKBOX',
+                label: formMessageDescriptors.fathersDetailsExist,
                 required: true,
+                checkedValue: false,
+                uncheckedValue: true,
+                hideHeader: true,
                 initialValue: true,
                 validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 conditionals: [
                   {
                     action: 'hide',
@@ -1743,11 +1781,17 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 type: 'TEXT',
-                label: formMessageDescriptors.reasonFNA,
+                label: formMessageDescriptors.reasonNA,
                 customisable: true,
                 validate: [],
                 initialValue: '',
-                required: true
+                required: true,
+                mapping: {
+                  template: {
+                    fieldName: 'fatherReasonNotApplying',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'nationality',
@@ -1773,7 +1817,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'fatherNationality',
-                    operation: 'selectTransformer'
+                    operation: 'nationalityTransformer'
                   },
                   mutation: {
                     operation: 'fieldToArrayTransformer'
@@ -1826,11 +1870,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'fatherBirthDate',
                 type: 'DATE',
-                label: {
-                  defaultMessage: 'Date of birth',
-                  description: 'Label for form field: Date of birth',
-                  id: 'form.field.label.motherDateOfBirth'
-                },
+                label: formMessageDescriptors.dateOfBirth,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -1874,11 +1914,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'firstNamesEng',
                 previewGroup: 'fatherNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'First Name',
-                  description: 'Label for form field: First names in english',
-                  id: 'form.field.label.fatherFirstNamesEng'
-                },
+                label: formMessageDescriptors.firstName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -1914,11 +1950,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'familyNameEng',
                 previewGroup: 'fatherNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last Name',
-                  description: 'Label for form field: Family name in english',
-                  id: 'form.field.label.fatherFamilyNameEng'
-                },
+                label: formMessageDescriptors.familyName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -2064,16 +2096,18 @@ export const registerForms: IDefaultRegisterForms = {
                     expression:
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'fatheroccupation',
+                    operation: 'plainInputTransformer'
+                  }
+                }
               },
               {
                 name: 'educationalAttainment',
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'level of education',
-                  description: 'Label for form field: Mother education',
-                  id: 'form.field.label.motherEducationAttainment'
-                },
+                label: formMessageDescriptors.educationAttainment,
                 customisable: true,
                 required: false,
                 initialValue: '',
@@ -2119,7 +2153,13 @@ export const registerForms: IDefaultRegisterForms = {
                       id: 'form.field.label.educationAttainmentISCED5'
                     }
                   }
-                ]
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'fatherEducationalAttainment',
+                    operation: 'selectTransformer'
+                  }
+                }
               }
               // PRIMARY ADDRESS SAME AS MOTHER
               // PRIMARY ADDRESS SUBSECTION
@@ -2160,14 +2200,6 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'documents-view-group',
-            conditionals: [
-              {
-                description: 'Hidden for record correction',
-                action: 'hide',
-                expression:
-                  'draftData && draftData.corrector && draftData.corrector.relationship'
-              }
-            ],
             fields: [
               {
                 name: 'paragraph',
@@ -3000,7 +3032,7 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   template: {
                     fieldName: 'deceasedNationality',
-                    operation: 'selectTransformer'
+                    operation: 'nationalityTransformer'
                   },
                   mutation: {
                     operation: 'fieldToArrayTransformer'
@@ -3047,7 +3079,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'birthDate',
                 type: 'DATE',
-                label: formMessageDescriptors.deceasedDateOfBirth,
+                label: formMessageDescriptors.dateOfBirth,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -3071,7 +3103,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'firstNamesEng',
                 previewGroup: 'deceasedNameInEnglish',
                 type: 'TEXT',
-                label: formMessageDescriptors.deceasedGivenNamesEng,
+                label: formMessageDescriptors.firstName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -3100,7 +3132,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'familyNameEng',
                 previewGroup: 'deceasedNameInEnglish',
                 type: 'TEXT',
-                label: formMessageDescriptors.deceasedFamilyNameEng,
+                label: formMessageDescriptors.familyName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -3128,7 +3160,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'gender',
                 type: 'SELECT_WITH_OPTIONS',
-                label: formMessageDescriptors.deceasedSex,
+                label: formMessageDescriptors.sex,
                 required: true,
                 initialValue: '',
                 validate: [],
@@ -3142,15 +3174,15 @@ export const registerForms: IDefaultRegisterForms = {
                 options: [
                   {
                     value: 'male',
-                    label: formMessageDescriptors.deceasedSexMale
+                    label: formMessageDescriptors.sexMale
                   },
                   {
                     value: 'female',
-                    label: formMessageDescriptors.deceasedSexFemale
+                    label: formMessageDescriptors.sexFemale
                   },
                   {
                     value: 'unknown',
-                    label: formMessageDescriptors.deceasedSexUnknown
+                    label: formMessageDescriptors.sexUnknown
                   }
                 ]
               },
@@ -3293,7 +3325,7 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'manner',
+                name: 'mannerOfDeath',
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.manner,
                 required: false,
@@ -3330,28 +3362,24 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: ['mannerOfDeath']
+                  },
+                  template: {
+                    fieldName: 'mannerOfDeath',
+                    operation: 'selectTransformer'
                   }
                 }
               },
               {
                 name: 'causeOfDeathEstablished',
-                type: 'RADIO_GROUP',
+                type: 'CHECKBOX',
                 label: formMessageDescriptors.causeOfDeathEstablished,
                 required: true,
+                checkedValue: 'true',
+                uncheckedValue: 'false',
                 customisable: true,
-                initialValue: 'true',
-                size: RadioSize.NORMAL,
+                hideHeader: true,
+                initialValue: 'false',
                 validate: [],
-                options: [
-                  {
-                    value: 'true',
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: 'false',
-                    label: formMessageDescriptors.deny
-                  }
-                ],
                 mapping: {
                   mutation: {
                     operation: 'sectionFieldToBundleFieldTransformer',
@@ -3360,6 +3388,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: ['causeOfDeathEstablished']
+                  },
+                  template: {
+                    fieldName: 'causeOfDeathEstablished',
+                    operation: 'plainInputTransformer'
                   }
                 }
               },
@@ -3404,6 +3436,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: ['causeOfDeathMethod']
+                  },
+                  template: {
+                    fieldName: 'causeOfDeathMethod',
+                    operation: 'selectTransformer'
                   }
                 }
               },
@@ -3415,7 +3451,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      'values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
+                      'values.causeOfDeathEstablished !== "true" || values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
                   }
                 ],
                 initialValue: '',
@@ -3431,6 +3467,10 @@ export const registerForms: IDefaultRegisterForms = {
                   query: {
                     operation: 'bundleFieldToSectionFieldTransformer',
                     parameters: ['deathDescription']
+                  },
+                  template: {
+                    fieldName: 'deathDescription',
+                    operation: 'plainInputTransformer'
                   }
                 }
               },
@@ -3483,8 +3523,8 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'placeOfDeath',
                 required: true,
                 initialValue: '',
-                searchableResource: 'facilities',
-                searchableType: 'HEALTH_FACILITY',
+                searchableResource: ['facilities'],
+                searchableType: ['HEALTH_FACILITY'],
                 dynamicOptions: {
                   resource: 'facilities'
                 },
@@ -3503,7 +3543,7 @@ export const registerForms: IDefaultRegisterForms = {
                   template: {
                     fieldName: 'placeOfDeath',
                     operation: 'eventLocationNameQueryOfflineTransformer',
-                    parameters: ['facilities']
+                    parameters: ['facilities', 'placeOfDeath']
                   },
                   mutation: {
                     operation: 'deathEventLocationMutationTransformer',
@@ -3561,6 +3601,10 @@ export const registerForms: IDefaultRegisterForms = {
                         operation: 'arrayToFieldTransformer'
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantNationality',
+                    operation: 'nationalityTransformer'
                   }
                 }
               },
@@ -3602,13 +3646,18 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['id', 'NATIONAL_ID']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantNID',
+                    operation: 'identityToFieldTransformer',
+                    parameters: ['id', 'NATIONAL_ID', 'individual']
                   }
                 }
               },
               {
                 name: 'informantBirthDate',
                 type: 'DATE',
-                label: formMessageDescriptors.motherDateOfBirth,
+                label: formMessageDescriptors.dateOfBirth,
                 required: true,
                 customisable: true,
                 initialValue: '',
@@ -3643,6 +3692,16 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['birthDate']
                       }
                     ]
+                  },
+                  template: {
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'informantBirthDate',
+                    parameters: [
+                      'birthDate',
+                      'en',
+                      'do MMMM yyyy',
+                      'individual'
+                    ]
                   }
                 }
               },
@@ -3650,7 +3709,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'firstNamesEng',
                 previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
-                label: formMessageDescriptors.childFirstNames,
+                label: formMessageDescriptors.firstName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -3680,6 +3739,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['en', 'firstNames']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantFirstName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames', 'informant', 'individual']
                   }
                 }
               },
@@ -3687,7 +3751,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'familyNameEng',
                 previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
-                label: formMessageDescriptors.childFamilyName,
+                label: formMessageDescriptors.familyName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -3717,6 +3781,11 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['en', 'familyName']
                       }
                     ]
+                  },
+                  template: {
+                    fieldName: 'informantFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName', 'informant', 'individual']
                   }
                 }
               }

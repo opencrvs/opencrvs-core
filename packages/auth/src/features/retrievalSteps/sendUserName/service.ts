@@ -24,12 +24,12 @@ export async function sendUserName(mobile: string, username: string) {
       Authorization: `Bearer ${await createToken(
         'auth',
         ['service'],
-        ['opencrvs:notification-user'],
-        JWT_ISSUER
+        ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
+        JWT_ISSUER,
+        true
       )}`
     }
   })
-
   if (res.status !== 200) {
     throw Error(`Unable to send username`)
   }

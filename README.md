@@ -62,7 +62,7 @@ Dependencies are required. Ensure you have satisfied all the following requireme
 - **Admin rights**: You must have admin rights over your computer and a sudo password
 - **Disk space and RAM:** A minimum of 20GB of hard drive space available and at least 16GB of RAM. If you are using virtualisation, ensure this is dedicated to the environment.
 - **Docker**: On Ubuntu, install [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/). On Mac, install [Docker for Mac](https://docs.docker.com/desktop/mac/install/). On Mac, in Docker for Mac preferences, assign 4 CPUs, at least 8GB Memory or more, Swap 4GB and 4 CPUs if your system allows. Elastic search needs a lot of memory to run. On Ubuntu we set enough RAM automatically. OpenCRVS has been tested on Docker version 20.10.11 and docker-compose version 1.29.2
-- **Nodejs:** You must install Node v.14.17.0, v.14.17.6, v14.18.0 or v14.18.1 (this release has been tested on those versions) using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm). OpenCRVS has not been tested on newer versions of Node and you may experience issues if you are using an untested Node version.
+- **Nodejs:** You must install Node v14.18.0 or v14.18.1 (this release has been tested on those versions) using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm). OpenCRVS has not been tested on newer versions of Node and you may experience issues if you are using an untested Node version.
 - **Yarn:** Install the [Yarn Package Manager](https://classic.yarnpkg.com/en/docs/install) for Node
 - **Chrome:** Install [Google Chrome](https://www.google.com/chrome). The OpenCRVS client application is a progressive web application.
 - **tmux:** Install [tmux](https://github.com/tmux/tmux/wiki). Multiple terminal windows are required to run OpenCRVS Core alongside the default country configuration. On Ubuntu run: `sudo apt-get install tmux` to install. On Mac, you can install tmux using Homebrew or MacPorts.
@@ -107,47 +107,47 @@ Ilanga District in Sulaka Province is meant to demonstrate a provincial district
 
 A Social Worker in an urban district:
 
-Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Username: **k.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
 A Local Leader in a provincial district:
 
-Username: **patrick.gondwe** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
+Username: **p.gondwe** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Registration Agent
 
-Username: **felix.katongo** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Username: **f.katongo** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **joshua.mutale** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
+Username: **j.mutale** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Registrar
 
-Username: **kennedy.mweene** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Username: **k.mweene** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **derrick.bulaya** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
+Username: **d.bulaya** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Local System Admin
 
-Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Username: **e.mayuka** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
-Username: **alex.ngonga** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
+Username: **a.ngonga** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### National System Admin
 
 Based in the country HQ Office:
 
-Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
+Username: **j.campbell** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
 
 ### National Registrar
 
 Based in the country HQ Office:
 
-Username: **joseph.musonda** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
+Username: **j.musonda** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
 
 ### Performance Manager
 
 Based in the country HQ Office:
 
-Username: **edgar.kazembe** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
+Username: **e.kazembe** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
 
 ## Starting and stopping OpenCRVS
 
@@ -170,7 +170,7 @@ To start and stop opencrvs-core and the country configuration server, use the fo
 
 5. Open a new terminal window
 6. Run `cd ../opencrvs-farajaland`
-7. Run `yarn dev <!-- paste in the absolute path to your opencrvs-core directory here -->` to start the country configuration server
+7. Run `yarn dev` to start the country configuration server
 
 ### Stopping
 

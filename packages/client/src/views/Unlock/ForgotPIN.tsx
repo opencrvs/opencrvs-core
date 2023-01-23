@@ -15,10 +15,6 @@ import React, {
   ChangeEvent,
   useState
 } from 'react'
-import {
-  PageWrapper as UnlockPageWrapper,
-  LogoutHeader as LogoutContainer
-} from '@client/views/Unlock/Unlock'
 import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { storage } from '@client/storage'
@@ -33,12 +29,9 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import {
-  InputField,
-  PasswordInput,
-  THEME_MODE,
-  ErrorMessage
-} from '@opencrvs/components/lib/forms'
+import { InputField, THEME_MODE } from '@opencrvs/components/lib/InputField'
+import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
+import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
 import { injectIntl, WrappedComponentProps, useIntl } from 'react-intl'
 import {
   constantsMessages,
@@ -47,10 +40,15 @@ import {
   buttonMessages
 } from '@client/i18n/messages'
 import { userQueries } from '@client/user/queries'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getUserName } from '@client/utils/userUtils'
+import {
+  PageWrapper as UnlockPageWrapper,
+  LogoutHeader as LogoutContainer
+} from '@client/views/Unlock/Unlock'
+import { getLanguage } from '@client/i18n/selectors'
 
 interface IForgotPINProps {
   goBack: () => void
@@ -60,6 +58,7 @@ interface IForgotPINProps {
 const PageWrapper = styled(UnlockPageWrapper)`
   justify-content: flex-start;
 `
+
 const BackButton = styled(CircleButton)`
   float: left;
   color: ${({ theme }) => theme.colors.white};
@@ -67,6 +66,7 @@ const BackButton = styled(CircleButton)`
   position: absolute;
   top: 30px;
   left: 20px;
+
   svg {
     path {
       stroke: ${({ theme }) => theme.colors.white};
@@ -80,6 +80,8 @@ const Container = styled.div`
   width: 300px;
   position: relative;
   margin-top: 104px;
+  margin-left: auto;
+  margin-right: auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: 80px;
   }
@@ -147,23 +149,23 @@ export function ForgotPIN(props: IForgotPINProps) {
   const [password, setPassword] = useState<string>('')
   const [touched, setTouched] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
-
   const intl = useIntl()
   const [verifyingPassword, setVerifyingPassword] = useState<boolean>(false)
 
   const userDetails = useSelector(getUserDetails)
   const dispatch = useDispatch()
-
   const logout = useCallback(() => {
     storage.removeItem(SCREEN_LOCK)
     storage.removeItem(SECURITY_PIN_EXPIRED_AT)
     dispatch(redirectToAuthentication())
   }, [dispatch])
-
+  const language = useSelector(getLanguage)
   const onForgetPassword = useCallback(() => {
     logout()
-    window.location.assign(window.config.LOGIN_URL + '/forgotten-item')
-  }, [logout])
+    window.location.assign(
+      window.config.LOGIN_URL + `/forgotten-item?lang=${language}`
+    )
+  }, [language, logout])
 
   function showName() {
     const nameObj =
@@ -174,9 +176,7 @@ export function ForgotPIN(props: IForgotPINProps) {
           (storedName: GQLHumanName) => storedName.use === 'en'
         ) as GQLHumanName)) ||
       {}
-    const fullName = `${String(nameObj.firstNames)} ${String(
-      nameObj.familyName
-    )}`
+    const fullName = `${nameObj.firstNames ?? ''} ${nameObj.familyName ?? ''}`
     return <Name>{fullName}</Name>
   }
 

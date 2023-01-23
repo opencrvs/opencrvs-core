@@ -44,6 +44,11 @@ type CountryLogo {
   file: String
 }
 
+type Integration {
+  name: String
+  status: String
+}
+
 type Currency {
   isoCode: String
   languagesAndCountry: [String]
@@ -82,6 +87,11 @@ input CountryLogoInput {
   file: String
 }
 
+input IntegrationInput {
+  name: String
+  status: String
+}
+
 input CurrencyInput {
   isoCode: String
   languagesAndCountry: [String]
@@ -99,6 +109,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  ADMIN_LEVELS: Int
 }
 
 type ApplicationConfiguration {
@@ -113,6 +124,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  ADMIN_LEVELS: Int
 }
 
 type Mutation {

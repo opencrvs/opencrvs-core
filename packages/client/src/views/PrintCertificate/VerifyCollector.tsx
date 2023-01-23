@@ -9,11 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import {
+  IPrintableDeclaration,
+  modifyDeclaration,
+  writeDeclaration
+} from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
+  formatUrl,
   goBack,
   goToHomeTab,
   goToPrintCertificatePayment,
@@ -27,7 +32,7 @@ import {
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { getEventDate, getRegisteredDate, isFreeOfCost } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
@@ -36,6 +41,7 @@ import {
   verifyIDOnBirthCertificateCollectorDefinition
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 interface IMatchParams {
   registrationId: string
@@ -51,6 +57,7 @@ interface IDispatchProps {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
   modifyDeclaration: typeof modifyDeclaration
+  writeDeclaration: typeof writeDeclaration
   goToReviewCertificate: typeof goToReviewCertificate
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
 }
@@ -65,6 +72,15 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const eventDate = getEventDate(this.props.declaration.data, event)
     const registeredDate = getRegisteredDate(this.props.declaration.data)
     const { offlineCountryConfiguration } = this.props
+
+    const declaration = { ...this.props.declaration }
+    if (declaration.data.registration.certificates.length) {
+      declaration.data.registration.certificates[0].hasShowedVerifiedDocument =
+        true
+    }
+
+    this.props.modifyDeclaration(declaration)
+    this.props.writeDeclaration(declaration)
 
     if (
       isFreeOfCost(
@@ -145,6 +161,16 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   render() {
     const { collector } = this.props.match.params
     const { intl } = this.props
+    if (!this.props.declaration) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToPrint,
+            selectorId: ''
+          })}
+        />
+      )
+    }
     return (
       <ActionPageLight
         goBack={this.props.goBack}
@@ -192,6 +218,7 @@ export const VerifyCollector = connect(mapStateToProps, {
   goBack,
   goToHomeTab,
   modifyDeclaration,
+  writeDeclaration,
   goToReviewCertificate,
   goToPrintCertificatePayment
 })(injectIntl(VerifyCollectorComponent))

@@ -42,7 +42,13 @@ import {
   ITemplatedComposition
 } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
-import { FHIR_URL, SEARCH_URL, METRICS_URL } from '@gateway/constants'
+import {
+  FHIR_URL,
+  SEARCH_URL,
+  METRICS_URL,
+  HEARTH_URL,
+  DOCUMENTS_URL
+} from '@gateway/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import {
   FHIR_OBSERVATION_CATEGORY_URL,
@@ -51,7 +57,11 @@ import {
   BIRTH_REG_NO,
   DEATH_REG_NO,
   DOWNLOADED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
+  REQUEST_CORRECTION_EXTENSION_URL,
+  ASSIGNED_EXTENSION_URL,
+  UNASSIGNED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL,
+  VIEWED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -60,10 +70,10 @@ import { logger } from '@gateway/logger'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLRegAction,
   GQLRegStatus
 } from '@gateway/graphql/schema'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
-
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
@@ -72,7 +82,6 @@ export interface IEventDurationResponse {
   status: string
   durationInSeconds: number
 }
-
 export function findCompositionSectionInBundle(
   code: string,
   fhirBundle: ITemplatedBundle
@@ -814,7 +823,7 @@ export function selectOrCreateTaskRefResource(
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,
-  value: string | string[] | object,
+  value: string | string[] | Record<string, unknown>,
   propName: string,
   context: any,
   contextProperty?: string
@@ -953,21 +962,28 @@ export async function getCertificatesFromTask(
   )
 }
 export function getActionFromTask(task: fhir.Task) {
-  const businessStatus = getStatusFromTask(task)
-  const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
-  if (businessStatus === extensionStatusWhileDownloaded) {
-    return GQLRegStatus.DOWNLOADED
-  } else if (hasRequestCorrectionExtension(task)) {
-    return GQLRegStatus.REQUESTED_CORRECTION
+  const extensions = task.extension || []
+  if (findExtension(DOWNLOADED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.DOWNLOADED
+  } else if (findExtension(ASSIGNED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.ASSIGNED
+  } else if (findExtension(UNASSIGNED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.UNASSIGNED
+  } else if (findExtension(REQUEST_CORRECTION_EXTENSION_URL, extensions)) {
+    return GQLRegAction.REQUESTED_CORRECTION
+  } else if (findExtension(REINSTATED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.REINSTATED
+  } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
+    return GQLRegAction.VIEWED
   }
-  return businessStatus
+  return null
 }
 export function getStatusFromTask(task: fhir.Task) {
   const statusType = task.businessStatus?.coding?.find(
     (coding: fhir.Coding) =>
       coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
   )
-  return statusType && statusType.code
+  return statusType && (statusType.code as GQLRegStatus)
 }
 export function getMaritalStatusCode(fieldValue: string) {
   switch (fieldValue) {
@@ -1011,7 +1027,7 @@ export function removeDuplicatesFromComposition(
 export const fetchFHIR = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET',
+  method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
   return fetch(`${FHIR_URL}${suffix}`, {
@@ -1030,11 +1046,79 @@ export const fetchFHIR = <T = any>(
     })
 }
 
-export const postSearch = (
+export const fetchFromHearth = <T = any>(
+  suffix: string,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  return fetch(`${HEARTH_URL}${suffix}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    },
+    body
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`FHIR with Hearth request failed: ${error.message}`)
+      )
+    })
+}
+
+export const sendToFhir = async (
+  body: string,
+  suffix: string,
+  method: string,
+  token: string
+) => {
+  return fetch(`${FHIR_URL}${suffix}`, {
+    method,
+    body,
+    headers: {
+      'Content-Type': 'application/fhir+json',
+      Authorization: `${token}`
+    }
+  })
+    .then((response) => {
+      return response
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`FHIR ${method} failed: ${error.message}`)
+      )
+    })
+}
+
+export async function postAssignmentSearch(
+  authHeader: IAuthHeader,
+  compositionId: string
+) {
+  return fetch(`${SEARCH_URL}search/assignment`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify({ compositionId })
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search assignment failed: ${error.message}`)
+      )
+    })
+}
+
+export const postAdvancedSearch = (
   authHeader: IAuthHeader,
   criteria: ISearchCriteria
 ) => {
-  return fetch(`${SEARCH_URL}search`, {
+  return fetch(`${SEARCH_URL}advancedRecordSearch`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1295,4 +1379,43 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
     task.extension &&
     findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
   return extension
+}
+export const fetchDocuments = async <T = any>(
+  suffix: string,
+  authHeader: IAuthHeader,
+  method = 'GET',
+  body: string | undefined = undefined
+): Promise<T> => {
+  const result = await fetch(`${DOCUMENTS_URL}${suffix}`, {
+    method,
+    headers: {
+      ...authHeader,
+      'Content-Type': 'application/json'
+    },
+    body
+  })
+  const res = await result.json()
+  return await res
+}
+
+export async function uploadBase64ToMinio(
+  fileData: string,
+  authHeader: IAuthHeader
+): Promise<string> {
+  const docUploadResponse = await fetchDocuments(
+    '/upload',
+    authHeader,
+    'POST',
+    JSON.stringify({ fileData: fileData })
+  )
+
+  return docUploadResponse.refUrl
+}
+
+export function isBase64FileString(str: string) {
+  if (str === '' || str.trim() === '') {
+    return false
+  }
+  const strSplit = str.split(':')
+  return strSplit.length > 0 && strSplit[0] === 'data'
 }

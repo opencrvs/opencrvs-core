@@ -16,7 +16,7 @@ import { Event } from '@client/utils/gateway'
 import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
 import { Query } from '@client/components/Query'
-import { WatchQueryFetchPolicy } from 'apollo-client'
+import { WatchQueryFetchPolicy } from '@apollo/client'
 
 interface IQueryProviderProps {
   event: Event

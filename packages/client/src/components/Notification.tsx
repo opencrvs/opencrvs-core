@@ -17,13 +17,8 @@ import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import {
-  NOTIFICATION_TYPE,
-  FloatingNotification,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
-import {
-  hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification,
   hideSubmitFormSuccessToast,
@@ -33,7 +28,8 @@ import {
   hideDownloadDeclarationFailedToast,
   ShowUnassignedPayload,
   hideUnassignedModal,
-  hideCreateUserErrorToast
+  hideCreateUserErrorToast,
+  hideUserReconnectedToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
@@ -41,7 +37,6 @@ import { NotificationState } from '@client/notification/reducer'
 type NotificationProps = {
   language?: string
   configurationErrorVisible: boolean
-  backgroundSyncMessageVisible: boolean
   saveDraftClicked: boolean
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
@@ -50,10 +45,10 @@ type NotificationProps = {
   downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
+  userReconnectedToast: boolean
 }
 
 type DispatchProps = {
-  hideBackgroundSyncedNotification: typeof hideBackgroundSyncedNotification
   hideConfigurationErrorNotification: typeof hideConfigurationErrorNotification
   hideSubmitFormSuccessToast: typeof hideSubmitFormSuccessToast
   hideSubmitFormErrorToast: typeof hideSubmitFormErrorToast
@@ -63,15 +58,12 @@ type DispatchProps = {
   hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
   hideUnassignedModal: typeof hideUnassignedModal
   hideCreateUserErrorToast: typeof hideCreateUserErrorToast
+  hideUserReconnectedToast: typeof hideUserReconnectedToast
 }
 
 class Component extends React.Component<
   NotificationProps & DispatchProps & IntlShapeProps & RouteComponentProps<{}>
 > {
-  hideBackgroundSyncedNotification = () => {
-    this.props.hideBackgroundSyncedNotification()
-  }
-
   hideConfigurationErrorNotification = () => {
     this.props.hideConfigurationErrorNotification()
   }
@@ -95,11 +87,13 @@ class Component extends React.Component<
   hideUserAuditSuccessToast = () => {
     this.props.hideUserAuditSuccessToast()
   }
+  hideUserReconnectedToast = () => {
+    this.props.hideUserReconnectedToast()
+  }
 
   render() {
     const {
       children,
-      backgroundSyncMessageVisible,
       configurationErrorVisible,
       intl,
       saveDraftClicked,
@@ -109,121 +103,114 @@ class Component extends React.Component<
       showPINUpdateSuccess,
       downloadDeclarationFailedToast,
       unassignedModal,
-      userCreateDuplicateMobileFailedToast
+      userCreateDuplicateMobileFailedToast,
+      userReconnectedToast
     } = this.props
 
     return (
       <div>
         {children}
-        {backgroundSyncMessageVisible && (
-          <FloatingNotification
-            id="backgroundSyncShowNotification"
-            show={backgroundSyncMessageVisible}
-            callback={this.hideBackgroundSyncedNotification}
+        {userReconnectedToast && (
+          <Toast
+            type="success"
+            id="userOnlineReconnectedToast"
+            onClose={this.hideUserReconnectedToast}
           >
-            {intl.formatMessage(messages.declarationsSynced)}
-          </FloatingNotification>
+            {intl.formatMessage(messages.onlineUserStatus)}
+          </Toast>
         )}
         {configurationErrorVisible && (
-          <FloatingNotification
-            type={NOTIFICATION_TYPE.ERROR}
+          <Toast
+            type="warning"
             id="configErrorShowNotification"
-            show={configurationErrorVisible}
-            callback={this.hideConfigurationErrorNotification}
+            onClose={this.hideConfigurationErrorNotification}
           >
             OpenCRVS has been only partially configured - Awaiting facilities
             and locations
-          </FloatingNotification>
+          </Toast>
         )}
         {saveDraftClicked && (
-          <FloatingNotification
+          <Toast
+            type="success"
             id="draftsSavedNotification"
-            show={saveDraftClicked}
-            callback={this.hideDraftsSavedNotification}
+            onClose={this.hideDraftsSavedNotification}
           >
             {intl.formatMessage(messages.draftsSaved)}
-          </FloatingNotification>
+          </Toast>
         )}
 
         {submitFormSuccessToast && (
-          <FloatingNotification
+          <Toast
             id="submissionSuccessToast"
-            show={Boolean(submitFormSuccessToast)}
-            type={NOTIFICATION_TYPE.SUCCESS}
-            callback={this.hideSubmitFormSuccessToast}
+            type="success"
+            onClose={this.hideSubmitFormSuccessToast}
           >
             {submitFormSuccessToast === TOAST_MESSAGES.UPDATE_SUCCESS
               ? intl.formatMessage(messages.userFormUpdateSuccess)
               : intl.formatMessage(messages.userFormSuccess)}
-          </FloatingNotification>
+          </Toast>
         )}
 
         {submitFormErrorToast && (
-          <FloatingNotification
+          <Toast
             id="submissionErrorToast"
-            show={Boolean(submitFormErrorToast)}
-            type={NOTIFICATION_TYPE.ERROR}
-            callback={this.hideSubmitFormErrorToast}
+            type="warning"
+            onClose={this.hideSubmitFormErrorToast}
           >
             {intl.formatMessage(messages.userFormFail)}
-          </FloatingNotification>
+          </Toast>
         )}
         {userAuditSuccessToast.visible && (
-          <FloatingNotification
+          <Toast
             id="userAuditSuccessToast"
-            show={userAuditSuccessToast.visible}
-            type={NOTIFICATION_TYPE.SUCCESS}
-            callback={this.hideUserAuditSuccessToast}
+            type="success"
+            onClose={this.hideUserAuditSuccessToast}
           >
             {intl.formatMessage(messages.userAuditSuccess, {
               name: userAuditSuccessToast.userFullName,
               action: userAuditSuccessToast.action
             })}
-          </FloatingNotification>
+          </Toast>
         )}
         {showPINUpdateSuccess && (
-          <FloatingNotification
+          <Toast
             id="PINUpdateSuccessToast"
-            show={showPINUpdateSuccess}
-            type={NOTIFICATION_TYPE.SUCCESS}
-            callback={this.props.hidePINUpdateSuccessToast}
+            type="success"
+            onClose={this.props.hidePINUpdateSuccessToast}
           >
             {intl.formatMessage(messages.updatePINSuccess)}
-          </FloatingNotification>
+          </Toast>
         )}
         {downloadDeclarationFailedToast && (
-          <FloatingNotification
+          <Toast
             id="PINUpdateSuccessToast"
-            show={Boolean(downloadDeclarationFailedToast)}
-            type={NOTIFICATION_TYPE.ALTERNATE_ERROR}
-            callback={this.props.hideDownloadDeclarationFailedToast}
+            type="warning"
+            onClose={this.props.hideDownloadDeclarationFailedToast}
           >
             {intl.formatMessage(messages.downloadDeclarationFailed)}
-          </FloatingNotification>
+          </Toast>
         )}
         {unassignedModal !== null && (
-          <FloatingNotification
+          <Toast
             id="unassignedModal"
-            show
-            type={NOTIFICATION_TYPE.ALTERNATE_ERROR}
-            callback={this.props.hideUnassignedModal}
+            type="warning"
+            onClose={this.props.hideUnassignedModal}
           >
             {intl.formatMessage(messages.unassigned, {
               trackingId: unassignedModal.trackingId
             })}
-          </FloatingNotification>
+          </Toast>
         )}
         {userCreateDuplicateMobileFailedToast.visible && (
-          <FloatingNotification
+          <Toast
             id="createUserDuplicateMobileFailedToast"
-            show={Boolean(userCreateDuplicateMobileFailedToast.visible)}
-            type={NOTIFICATION_TYPE.ERROR}
-            callback={this.hideCreateUserFormErrorToast}
+            type="warning"
+            onClose={this.hideCreateUserFormErrorToast}
           >
             {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
               number: userCreateDuplicateMobileFailedToast.mobile
             })}
-          </FloatingNotification>
+          </Toast>
         )}
         {/* More notification types can be added here */}
       </div>
@@ -246,13 +233,13 @@ const mapStateToProps = (store: IStoreState) => {
       store.notification.downloadDeclarationFailedToast,
     unassignedModal: store.notification.unassignedModal,
     userCreateDuplicateMobileFailedToast:
-      store.notification.userCreateDuplicateMobileFailedToast
+      store.notification.userCreateDuplicateMobileFailedToast,
+    userReconnectedToast: store.notification.userReconnectedToast
   }
 }
 
 export const NotificationComponent = withRouter(
   connect<NotificationProps, DispatchProps, {}, IStoreState>(mapStateToProps, {
-    hideBackgroundSyncedNotification,
     hideConfigurationErrorNotification,
     hideSubmitFormSuccessToast,
     hideSubmitFormErrorToast,
@@ -261,6 +248,7 @@ export const NotificationComponent = withRouter(
     hidePINUpdateSuccessToast,
     hideDownloadDeclarationFailedToast,
     hideUnassignedModal,
-    hideCreateUserErrorToast
+    hideCreateUserErrorToast,
+    hideUserReconnectedToast
   })(injectIntl(Component))
 )

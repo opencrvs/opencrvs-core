@@ -14,18 +14,16 @@ import {
   TertiaryButton,
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  ISelectOption as SelectComponentOptions,
-  TextArea
-} from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/Select'
+import { Alert } from '@opencrvs/components/lib/Alert'
 import {
   DocumentViewer,
-  IDocumentViewerOptions,
-  ResponsiveModal,
-  Warning
-} from '@opencrvs/components/lib/interface'
-import { FullBodyContent } from '@opencrvs/components/lib/layout'
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/DocumentViewer'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { FullBodyContent } from '@opencrvs/components/lib/Content'
 import {
   IDeclaration,
   SUBMISSION_STATUS,
@@ -65,21 +63,19 @@ import {
   IDocumentUploaderWithOptionsFormField,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  SubmissionAction
+  SubmissionAction,
+  ICheckboxFormField,
+  CHECKBOX,
+  INestedInputFields,
+  DeathSection
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
   getBirthSection,
   getRegisterForm
 } from '@client/forms/register/declaration-selectors'
-import {
-  birthSectionMapping,
-  birthSectionTitle
-} from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
-import {
-  deathSectionMapping,
-  deathSectionTitle
-} from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
+import { birthSectionMapping } from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
+import { deathSectionMapping } from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
 import {
   getConditionalActionsForField,
   getSectionFields,
@@ -92,7 +88,11 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessageDescriptors
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -108,8 +108,12 @@ import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import { isMobileDevice } from '@client/utils/commonUtils'
-import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
+import { isMobileDevice, isBase64FileString } from '@client/utils/commonUtils'
+import {
+  ACCUMULATED_FILE_SIZE,
+  ENABLE_REVIEW_ATTACHMENTS_SCROLLING,
+  REJECTED
+} from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
@@ -135,7 +139,7 @@ import {
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 
 const Deleted = styled.del`
@@ -274,6 +278,7 @@ interface IProps {
   writeDeclaration: typeof writeDeclaration
   registrationSection: IFormSection
   documentsSection: IFormSection
+  viewRecord?: boolean
 }
 type State = {
   displayEditDialog: boolean
@@ -345,6 +350,19 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckboxFieldValue = (
+  field: ICheckboxFormField,
+  value: string,
+  intl: IntlShape
+) => {
+  const { checkedValue = true } = field
+  return intl.formatMessage(
+    value === String(checkedValue)
+      ? formMessageDescriptors.confirm
+      : formMessageDescriptors.deny
+  )
+}
+
 const getCheckBoxGroupFieldValue = (
   field: ICheckboxGroupFormField,
   value: string[],
@@ -385,9 +403,60 @@ const renderValue = (
   field: IFormField,
   intl: IntlShape,
   offlineCountryConfiguration: IOfflineData,
-  language: string
+  language: string,
+  isOriginalData = false
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+
+  // Showing State & District Name instead of their ID
+  if (
+    [
+      'statePrimary',
+      'districtPrimary',
+      'internationalStatePrimary',
+      'internationalDistrictPrimary',
+      'stateSecondary',
+      'districtSecondary',
+      'internationalStateSecondary',
+      'internationalDistrictSecondary'
+    ].includes(field.name) &&
+    isOriginalData
+  ) {
+    const sectionData = draftData[sectionId]
+
+    if (sectionData.countryPrimary === window.config.COUNTRY) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
+      }
+      if (field.name.includes('Secondary')) {
+        dynamicOption.dependency = [
+          'internationalStateSecondary',
+          'stateSecondary'
+        ].includes(field.name)
+          ? 'countrySecondary'
+          : 'stateSecondary'
+      } else {
+        dynamicOption.dependency = [
+          'internationalStatePrimary',
+          'statePrimary'
+        ].includes(field.name)
+          ? 'countryPrimary'
+          : 'statePrimary'
+      }
+
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineCountryConfiguration,
+        language
+      )
+    }
+
+    return value
+  }
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
@@ -431,13 +500,22 @@ const renderValue = (
     )
   }
 
+  if (field.type === CHECKBOX) {
+    return getCheckboxFieldValue(field, String(value), intl)
+  }
+
   if (value && field.type === CHECKBOX_GROUP) {
     return getCheckBoxGroupFieldValue(field, value as string[], intl)
   }
 
   if (value && field.type === LOCATION_SEARCH_INPUT) {
     const searchableListOfLocations = generateLocations(
-      getListOfLocations(offlineCountryConfiguration, field.searchableResource),
+      field.searchableResource.reduce((locations, resource) => {
+        return {
+          ...locations,
+          ...getListOfLocations(offlineCountryConfiguration, resource)
+        }
+      }, {}),
       intl
     )
     const selectedLocation = searchableListOfLocations.find(
@@ -446,14 +524,18 @@ const renderValue = (
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
 
-  if (typeof value === 'string') {
-    return value
-  }
   if (typeof value === 'boolean') {
     return value
       ? intl.formatMessage(buttonMessages.yes)
       : intl.formatMessage(buttonMessages.no)
   }
+
+  if (typeof value === 'string' || typeof value === 'number') {
+    return field.postfix
+      ? String(value).concat(` ${field.postfix.toLowerCase()}`)
+      : value
+  }
+
   return value
 }
 
@@ -507,10 +589,6 @@ const SECTION_MAPPING = {
   [Event.Birth]: birthSectionMapping,
   [Event.Death]: deathSectionMapping
 }
-const SECTION_TITLE = {
-  [Event.Birth]: birthSectionTitle,
-  [Event.Death]: deathSectionTitle
-}
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
   hasChangesBeenMade = false
@@ -533,7 +611,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   componentDidMount() {
-    !isMobileDevice() && window.addEventListener('scroll', this.onScroll)
+    !isMobileDevice() &&
+      ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+      window.addEventListener('scroll', this.onScroll)
   }
 
   componentWillUnmount() {
@@ -608,7 +688,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     })
   }
 
-  getLabelForDocType = (_: string, docType: string) => {
+  getLabelForDoc = (docForWhom: string, docType: string) => {
     const { intl } = this.props
     const documentSection = this.props.registerForm[
       this.props.draft.event
@@ -620,22 +700,73 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         (field) =>
           field.extraValue && field.type === DOCUMENT_UPLOADER_WITH_OPTION
       ) as IDocumentUploaderWithOptionsFormField[])
-    const allOptionsForPerson: ISelectOption[][] = []
-    if (docFieldsWithOptions) {
-      for (let i = 0; i < docFieldsWithOptions.length; i++) {
-        allOptionsForPerson.push(docFieldsWithOptions[i].options)
-      }
-    }
-    const matchedOption = allOptionsForPerson
-      .flat()
-      .find((option) => option.value === docType)
-    return matchedOption && intl.formatMessage(matchedOption.label)
+    const matchedField = docFieldsWithOptions?.find(
+      (field) => field.extraValue === docForWhom
+    )
+    const matchedOption = matchedField?.options.find(
+      (option) => option.value === docType
+    )
+    return (
+      matchedField &&
+      matchedOption &&
+      intl.formatMessage(matchedField.label) +
+        ' (' +
+        intl.formatMessage(matchedOption.label) +
+        ')'
+    )
   }
+  getAllAttachmentInPreviewList = (declaration: IDeclaration) => {
+    const options = this.prepSectionDocsBasedOnScrollFlag(
+      declaration,
+      this.state.activeSection || this.docSections[0].id
+    )
+
+    return (
+      <DocumentListPreviewContainer>
+        <DocumentListPreview
+          id="all_attachment_list"
+          documents={options.uploadedDocuments}
+          onSelect={this.selectForPreview}
+          dropdownOptions={options.selectOptions}
+          inReviewSection={true}
+        />
+      </DocumentListPreviewContainer>
+    )
+  }
+
+  prepSectionDocsBasedOnScrollFlag = (
+    draft: IDeclaration,
+    activeSection: Section
+  ): IDocumentViewerOptions & {
+    uploadedDocuments: IFileValue[]
+  } => {
+    if (!ENABLE_REVIEW_ATTACHMENTS_SCROLLING) {
+      let selectOptions: SelectComponentOptions[] = []
+      let documentOptions: SelectComponentOptions[] = []
+      let uploadedDocuments: IFileValue[] = []
+      for (const section of this.docSections) {
+        const prepDocumentOption = this.prepSectionDocuments(draft, section.id)
+        selectOptions = [...selectOptions, ...prepDocumentOption.selectOptions]
+        documentOptions = [
+          ...documentOptions,
+          ...prepDocumentOption.documentOptions
+        ]
+        uploadedDocuments = [
+          ...uploadedDocuments,
+          ...prepDocumentOption.uploadedDocuments
+        ]
+      }
+      return { selectOptions, documentOptions, uploadedDocuments }
+    } else {
+      return this.prepSectionDocuments(draft, activeSection)
+    }
+  }
+
   prepSectionDocuments = (
     draft: IDeclaration,
     activeSection: Section
   ): IDocumentViewerOptions & { uploadedDocuments: IFileValue[] } => {
-    const { documentsSection, intl } = this.props
+    const { documentsSection } = this.props
 
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
@@ -654,7 +785,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     uploadedDocuments = uploadedDocuments.filter((document) => {
       const sectionMapping = SECTION_MAPPING[draft.event]
-      const sectionTitle = SECTION_TITLE[draft.event]
 
       const allowedDocumentType: string[] =
         sectionMapping[activeSection as keyof typeof sectionMapping] || []
@@ -662,15 +792,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (
         allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
       ) {
-        const title: string =
-          sectionTitle[activeSection as keyof typeof sectionMapping]
         const label =
-          intl.formatMessage(messages.documentForWhom, {
-            section: title.toLowerCase()
-          }) +
-          ' ' +
-          (this.getLabelForDocType(title, document.optionValues[1] as string) ||
-            document.optionValues[1])
+          this.getLabelForDoc(
+            document.optionValues[0] as string,
+            document.optionValues[1] as string
+          ) || (document.optionValues[1] as string)
 
         /**
          * Skip insertion if the value already exist
@@ -679,8 +805,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           return true
         }
 
+        const documentData = !isBase64FileString(document.data)
+          ? `${window.config.MINIO_URL}${document.data}`
+          : document.data
+
         documentOptions.push({
-          value: document.data,
+          value: documentData,
           label
         })
         selectOptions.push({
@@ -853,7 +983,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     field: IFormField,
     sectionErrors: IErrorsBySection,
     ignoreNestedFieldWrapping?: boolean,
-    replaceEmpty?: boolean
+    replaceEmpty?: boolean,
+    isOriginalData?: boolean
   ) => {
     const { intl, offlineCountryConfiguration, language } = this.props
 
@@ -863,7 +994,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       field,
       intl,
       offlineCountryConfiguration,
-      language
+      language,
+      isOriginalData
     )
 
     if (replaceEmpty && !value) {
@@ -899,7 +1031,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 nestedField,
                 intl,
                 offlineCountryConfiguration,
-                language
+                language,
+                isOriginalData
               )) ||
             ''
           return (
@@ -1034,7 +1167,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               errorsOnFields,
               undefined,
-              !index
+              !index,
+              true
             )
           )
           .filter((value) => value)
@@ -1341,7 +1475,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
-    this.setState({ previewImage: previewImage as IFileValue })
+    const previewImageTransformed = { ...previewImage }
+    previewImageTransformed.data = isBase64FileString(
+      previewImageTransformed.data
+    )
+      ? previewImageTransformed.data
+      : `${window.config.MINIO_URL}${previewImageTransformed.data}`
+
+    this.setState({ previewImage: previewImageTransformed as IFileValue })
   }
 
   closePreviewSection = (callBack?: () => void) => {
@@ -1389,12 +1530,30 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   shouldShowChangeAll = (section: IFormSection) => {
     const {
-      draft: { data, event }
+      draft: { data, event },
+      viewRecord
     } = this.props
+    if (viewRecord) {
+      return false
+    }
     return (
       event === Event.Birth &&
       ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
         (section.id === BirthSection.Father && !!data.father?.detailsExist))
+    )
+  }
+
+  isLastNameFirst = () => {
+    const { registerForm, draft: declaration } = this.props
+    const fields = registerForm[declaration.event].sections.find((section) =>
+      declaration.event === Event.Birth
+        ? section.id === BirthSection.Child
+        : section.id === DeathSection.Deceased
+    )?.groups[0]?.fields
+    if (!fields) return false
+    return (
+      fields.findIndex((field) => field.name === 'familyNameEng') <
+      fields.findIndex((field) => field.name === 'firstNamesEng')
     )
   }
 
@@ -1406,7 +1565,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const overriddenFields =
       this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
-
     return formSections.map((section) => {
       let items: any[] = []
       const visitedTags: string[] = []
@@ -1492,9 +1650,22 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       documentsSection,
       offlineCountryConfiguration,
       draft: { event },
-      onContinue
+      onContinue,
+      viewRecord
     } = this.props
-    const formSections = this.getViewableSection(registerForm[event])
+    const formSections = viewRecord
+      ? this.getViewableSection(registerForm[event]).map((section) => {
+          return {
+            ...section,
+            groups: section.groups.map((group) => {
+              return {
+                ...group,
+                fields: group.fields.map(fieldToReadOnlyFields)
+              }
+            })
+          }
+        })
+      : this.getViewableSection(registerForm[event])
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
@@ -1523,7 +1694,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const informantName = getDraftInformantFullName(declaration, intl.locale)
+    const informantName = getDraftInformantFullName(
+      declaration,
+      intl.locale,
+      this.isLastNameFirst()
+    )
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections,
@@ -1566,14 +1741,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         )}
                       </Title>
                     )}
-                    <DocumentListPreviewContainer>
-                      <DocumentListPreview
-                        id={sec.id}
-                        documents={uploadedDocuments}
-                        onSelect={this.selectForPreview}
-                        dropdownOptions={selectOptions}
-                      />
-                    </DocumentListPreviewContainer>
+                    {ENABLE_REVIEW_ATTACHMENTS_SCROLLING && (
+                      <DocumentListPreviewContainer>
+                        <DocumentListPreview
+                          id={sec.id}
+                          documents={uploadedDocuments}
+                          onSelect={this.selectForPreview}
+                          dropdownOptions={selectOptions}
+                          inReviewSection={true}
+                        />
+                      </DocumentListPreviewContainer>
+                    )}
                     <ListViewSimplified id={'Section_' + sec.id}>
                       {sec.items.map((item, index) => {
                         return (
@@ -1601,7 +1779,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </SectionContainer>
                 )
               })}
-              {!isCorrection(declaration) && (
+              {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                this.getAllAttachmentInPreviewList(declaration)}
+              {(!isCorrection(declaration) || viewRecord) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1609,45 +1789,48 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     required={false}
                     label={intl.formatMessage(messages.additionalComments)}
                   >
-                    <TextArea {...textAreaProps} />
+                    <TextArea {...{ ...textAreaProps, readonly: viewRecord }} />
                   </InputField>
                 </InputWrapper>
               )}
               {totalFileSizeExceeded && (
-                <Warning
-                  label={intl.formatMessage(
-                    constantsMessages.totalFileSizeExceed,
-                    { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
-                  )}
-                />
+                <Alert type="warning">
+                  {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
+                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
+                  })}
+                </Alert>
               )}
-              {!isCorrection(declaration) ? (
+              {viewRecord ? null : (
                 <>
-                  <DuplicateWarning duplicateIds={declaration.duplicates} />
-                  <ReviewAction
-                    completeDeclaration={isComplete}
-                    totalFileSizeExceeded={totalFileSizeExceeded}
-                    declarationToBeValidated={this.userHasValidateScope()}
-                    declarationToBeRegistered={this.userHasRegisterScope()}
-                    alreadyRejectedDeclaration={
-                      this.props.draft.registrationStatus === REJECTED
-                    }
-                    draftDeclaration={draft}
-                    declaration={declaration}
-                    submitDeclarationAction={submitClickEvent}
-                    rejectDeclarationAction={rejectDeclarationClickEvent}
-                  />
+                  {!isCorrection(declaration) ? (
+                    <>
+                      <DuplicateWarning duplicateIds={declaration.duplicates} />
+                      <ReviewAction
+                        completeDeclaration={isComplete}
+                        totalFileSizeExceeded={totalFileSizeExceeded}
+                        declarationToBeValidated={this.userHasValidateScope()}
+                        declarationToBeRegistered={this.userHasRegisterScope()}
+                        alreadyRejectedDeclaration={
+                          this.props.draft.registrationStatus === REJECTED
+                        }
+                        draftDeclaration={draft}
+                        declaration={declaration}
+                        submitDeclarationAction={submitClickEvent}
+                        rejectDeclarationAction={rejectDeclarationClickEvent}
+                      />
+                    </>
+                  ) : (
+                    <FooterArea>
+                      <PrimaryButton
+                        id="continue_button"
+                        onClick={onContinue}
+                        disabled={!isComplete || !this.hasChangesBeenMade}
+                      >
+                        {intl.formatMessage(buttonMessages.continueButton)}
+                      </PrimaryButton>
+                    </FooterArea>
+                  )}
                 </>
-              ) : (
-                <FooterArea>
-                  <PrimaryButton
-                    id="continue_button"
-                    onClick={onContinue}
-                    disabled={!isComplete || !this.hasChangesBeenMade}
-                  >
-                    {intl.formatMessage(buttonMessages.continueButton)}
-                  </PrimaryButton>
-                </FooterArea>
               )}
             </FormData>
           </LeftColumn>
@@ -1658,37 +1841,42 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               <DocumentViewer
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
-                options={this.prepSectionDocuments(
+                options={this.prepSectionDocsBasedOnScrollFlag(
                   declaration,
                   this.state.activeSection || this.docSections[0].id
                 )}
               >
                 <ZeroDocument id={`zero_document_${sectionName}`}>
-                  {intl.formatMessage(messages.zeroDocumentsText, {
-                    section: sectionName
-                  })}
-                  <LinkButton
-                    id="edit-document"
-                    disabled={
-                      isCorrection(declaration) ||
-                      motherDoesNotExistAndStateIsMother(
-                        declaration,
-                        sectionName
-                      ) ||
-                      fatherDoesNotExistAndStateIsFather(
-                        declaration,
-                        sectionName
-                      )
-                    }
-                    onClick={() =>
-                      this.editLinkClickHandlerForDraft(
-                        documentsSection.id,
-                        documentsSection.groups[0].id!
-                      )
-                    }
-                  >
-                    {intl.formatMessage(messages.editDocuments)}
-                  </LinkButton>
+                  {ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                    intl.formatMessage(messages.zeroDocumentsText, {
+                      section: sectionName
+                    })}
+                  {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
+                    intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
+                  {viewRecord ? null : (
+                    <LinkButton
+                      id="edit-document"
+                      disabled={
+                        isCorrection(declaration) ||
+                        motherDoesNotExistAndStateIsMother(
+                          declaration,
+                          sectionName
+                        ) ||
+                        fatherDoesNotExistAndStateIsFather(
+                          declaration,
+                          sectionName
+                        )
+                      }
+                      onClick={() =>
+                        this.editLinkClickHandlerForDraft(
+                          documentsSection.id,
+                          documentsSection.groups[0].id!
+                        )
+                      }
+                    >
+                      {intl.formatMessage(messages.editDocuments)}
+                    </LinkButton>
+                  )}
                 </ZeroDocument>
               </DocumentViewer>
             </ResponsiveDocumentViewer>
@@ -1731,11 +1919,33 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             title={intl.formatMessage(buttonMessages.preview)}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}
+            disableDelete={true}
           />
         )}
       </FullBodyContent>
     )
   }
+}
+
+function fieldToReadOnlyFields(field: IFormField): IFormField {
+  const readyOnlyField = {
+    ...field,
+    readonly: true
+  }
+  if (field.nestedFields) {
+    readyOnlyField.nestedFields = Object.entries(
+      field.nestedFields
+    ).reduce<INestedInputFields>((nestedInputFields, [key, nestedFields]) => {
+      return {
+        ...nestedInputFields,
+        [key]: nestedFields.map((nestedField) => ({
+          ...nestedField,
+          readonly: true
+        }))
+      }
+    }, {})
+  }
+  return readyOnlyField
 }
 
 function motherDoesNotExistAndStateIsMother(

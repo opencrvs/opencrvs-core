@@ -21,15 +21,6 @@ import { getToken } from '@workflow/utils/authUtils'
 import { logger } from '@workflow/logger'
 import { sendEventNotification } from '@workflow/features/registration/utils'
 import { Events } from '@workflow/features/events/handler'
-import {
-  filterTaskExtensions,
-  getTaskBusinessStatus
-} from '@workflow/features/task/fhir/utils'
-import {
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  REQUEST_CORRECTION_EXTENSION_URL
-} from '@workflow/features/task/fhir/constants'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,
@@ -45,17 +36,6 @@ export default async function updateTaskHandler(
     const taskResource = payload.entry?.[0].resource as fhir.Task | undefined
     if (!taskResource) {
       throw new Error('TaskBundle has no entry')
-    }
-    if (taskResource.extension) {
-      taskResource.extension = filterTaskExtensions(
-        taskResource.extension,
-        [
-          REINSTATED_EXTENSION_URL,
-          DOWNLOADED_EXTENSION_URL,
-          REQUEST_CORRECTION_EXTENSION_URL
-        ],
-        getTaskBusinessStatus(taskResource)
-      )
     }
     const res = await fetch(`${HEARTH_URL}/Task/${taskId}`, {
       method: 'PUT',
@@ -74,9 +54,7 @@ export default async function updateTaskHandler(
     const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
-      logger.info(
-        'updateTaskHandler(reject declaration) sending event notification'
-      )
+      logger.info(`updateTaskHandler(${event}) sending event notification`)
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })

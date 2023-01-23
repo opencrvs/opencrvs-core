@@ -9,10 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import gql from 'graphql-tag'
+import { gql } from '@apollo/client'
 import { client } from '@client/utils/apolloClient'
+import { ADVANCED_SEARCH_PARAM_FIELDS } from './mutations'
 
 export const FETCH_USER = gql`
+  ${ADVANCED_SEARCH_PARAM_FIELDS}
   query fetchUser($userId: String!) {
     getUser(userId: $userId) {
       userMgntUserID
@@ -57,6 +59,13 @@ export const FETCH_USER = gql`
       avatar {
         type
         data
+      }
+      searches {
+        searchId
+        name
+        parameters {
+          ...AdvancedSeachParameters
+        }
       }
     }
   }

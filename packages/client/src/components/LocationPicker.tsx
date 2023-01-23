@@ -17,7 +17,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import {
   ISearchLocation,
   LocationSearch
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/LocationSearch'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
@@ -32,7 +32,7 @@ import {
   CancelableArea
 } from '@client/components/DateRangePicker'
 import styled from '@client/styledComponents'
-import { ILocation } from '@client/offline/reducer'
+import { ILocation, LocationType } from '@client/offline/reducer'
 
 const { useState, useEffect } = React
 
@@ -40,6 +40,7 @@ interface IConnectProps {
   offlineLocations: { [key: string]: ILocation }
   offlineOffices: { [key: string]: ILocation }
   jurisidictionTypeFilter: string[] | undefined
+  locationTypeFilter: LocationType[] | undefined
 }
 
 interface IBaseProps {
@@ -48,6 +49,7 @@ interface IBaseProps {
   disabled?: boolean
   onChangeLocation: (locationId: string) => void
   requiredJurisdictionTypes?: string
+  requiredLocationTypes?: string
 }
 
 type LocationPickerProps = IBaseProps & IConnectProps & WrappedComponentProps
@@ -108,22 +110,21 @@ function LocationPickerComponent(props: LocationPickerProps) {
     selectedLocationId,
     disabled,
     additionalLocations = [],
+    locationTypeFilter,
     intl
   } = props
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 
   const offlineSearchableLocations = generateLocations(
-    offlineLocations,
+    { ...offlineLocations, ...offlineOffices },
     intl,
-    jurisidictionTypeFilter
+    jurisidictionTypeFilter,
+    locationTypeFilter
   )
-
-  const offlineSearchableOffices = generateLocations(offlineOffices, intl)
 
   const searchableLocations = [
     ...additionalLocations,
-    ...offlineSearchableLocations,
-    ...offlineSearchableOffices
+    ...offlineSearchableLocations
   ]
 
   const selectedSearchedLocation = searchableLocations.find(
@@ -206,10 +207,14 @@ function mapStateToProps(state: IStoreState, props: IBaseProps): IConnectProps {
     (props.requiredJurisdictionTypes &&
       props.requiredJurisdictionTypes.split(',')) ||
     undefined
+  const locationTypeFilter =
+    ((props.requiredLocationTypes &&
+      props.requiredLocationTypes.split(',')) as LocationType[]) || undefined
   return {
     offlineLocations,
     offlineOffices,
-    jurisidictionTypeFilter
+    jurisidictionTypeFilter,
+    locationTypeFilter
   }
 }
 

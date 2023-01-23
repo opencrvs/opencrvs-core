@@ -30,6 +30,11 @@ input MesssageInput {
   descriptor: MesssageDescriptorInput!
 }
 
+input ConditionalInput {
+  fieldId: String!
+  regexp: String!
+}
+
 enum CustomFieldType {
   TEXT
   TEL
@@ -37,6 +42,13 @@ enum CustomFieldType {
   NUMBER
   SUBSECTION
   PARAGRAPH
+  SELECT_WITH_OPTIONS
+}
+
+input CustomSelectOption {
+  value: String!
+  # label: [MesssageInput!]
+  label: MesssageDescriptorInput!
 }
 
 input QuestionInput {
@@ -53,4 +65,7 @@ input QuestionInput {
   required: Boolean
   enabled: String
   custom: Boolean
+  conditionals: [ConditionalInput!]
+  datasetId: String
+  options: [CustomSelectOption!]
 }

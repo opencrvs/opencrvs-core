@@ -1,4 +1,2 @@
-craco.config.js
-src/extract-translations.ts
 # dependencies
 /node_modules

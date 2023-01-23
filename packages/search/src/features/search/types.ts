@@ -13,35 +13,68 @@ export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc'
 }
-export interface ISearchQuery {
-  query?: string
-  trackingId?: string
-  contactNumber?: string
-  registrationNumber?: string
+export interface IAdvancedSearchParam {
+  event?: string
   name?: string
-  ageCheck?: string
-  nameCombinations?: INameCombination[]
+  registrationStatuses?: string[]
+  dateOfEvent?: string
+  dateOfEventStart?: string
+  dateOfEventEnd?: string
+  contactNumber?: string
+  nationalId?: string
+  registrationNumber?: string
+  trackingId?: string
+  dateOfRegistration?: string
+  dateOfRegistrationStart?: string
+  dateOfRegistrationEnd?: string
+  declarationLocationId?: string
+  declarationJurisdictionId?: string
   eventLocationId?: string
-  gender?: string
-  event?: string
-  type?: string[]
-  status?: string[]
-  declarationLocationId?: string | string[]
-  declarationLocationHirarchyId?: string
-  createdBy?: string
-  from?: number
-  size?: number
-  sort?: SortOrder
+  eventCountry?: string
+  eventLocationLevel1?: string
+  eventLocationLevel2?: string
+  eventLocationLevel3?: string
+  eventLocationLevel4?: string
+  eventLocationLevel5?: string
+  childFirstNames?: string
+  childLastName?: string
+  childDoB?: string
+  childDoBStart?: string
+  childDoBEnd?: string
+  childGender?: string
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deceasedGender?: string
+  deceasedDoB?: string
+  deceasedDoBStart?: string
+  deceasedDoBEnd?: string
+  deceasedIdentifier?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  motherDoBStart?: string
+  motherDoBEnd?: string
+  motherIdentifier?: string
+  fatherFirstNames?: string
+  fatherFamilyName?: string
+  fatherDoB?: string
+  fatherDoBStart?: string
+  fatherDoBEnd?: string
+  fatherIdentifier?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  informantDoB?: string
+  informantDoBStart?: string
+  informantDoBEnd?: string
+  informantIdentifier?: string
+  compositionType?: string[]
+}
+
+export interface ISearchCriteria {
+  parameters: IAdvancedSearchParam
+  sort?: string
   sortColumn?: string
-}
-
-export interface INameCombination {
-  name: string
-  fields: string
-}
-
-export interface IFilter {
-  event?: string
-  status?: string[]
-  type?: string[]
+  size?: number
+  from?: number
+  createdBy?: string
 }

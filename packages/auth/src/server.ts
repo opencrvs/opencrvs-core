@@ -63,9 +63,7 @@ import sendUserNameHandler, {
 import {
   authenticateSystemClientHandler,
   requestSchema as reqSystemSchema,
-  responseSchema as resSystemSchema,
-  registerSystemClient,
-  registerRquestSchema
+  responseSchema as resSystemSchema
 } from '@auth/features/system/handler'
 import { logger } from '@auth/logger'
 import { getPublicKey } from '@auth/features/authenticate/service'
@@ -93,12 +91,11 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
-    handler: (request: any, h: any) => {
+    handler: (request: any, h: any) =>
       // Perform any health checks and return true or false for success prop
-      return {
+      ({
         success: true
-      }
-    },
+      }),
     options: {
       auth: false,
       tags: ['api'],
@@ -349,18 +346,6 @@ export async function createServer() {
       },
       response: {
         schema: resSystemSchema
-      }
-    }
-  })
-
-  server.route({
-    method: 'POST',
-    path: '/registerSystemClient',
-    handler: registerSystemClient,
-    options: {
-      tags: ['api'],
-      validate: {
-        payload: registerRquestSchema
       }
     }
   })

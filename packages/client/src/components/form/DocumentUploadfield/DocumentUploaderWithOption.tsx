@@ -9,12 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ImageUploader,
-  ISelectOption,
-  Select
-} from '@opencrvs/components/lib/forms'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { ISelectOption, Select } from '@opencrvs/components/lib/Select'
+import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { IFileValue, IFormFieldValue, IAttachmentValue } from '@client/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@client/utils/constants'
@@ -30,7 +27,6 @@ import { remove, clone } from 'lodash'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
-import { FACILITIES_FAILED } from '@client/offline/actions'
 
 const options = {
   maxSizeMB: 0.4,
@@ -39,30 +35,24 @@ const options = {
 }
 
 const UploaderWrapper = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: 28px;
 `
+
 const Label = styled.label`
   position: relative;
-  top: -6px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg18};
 `
 const Flex = styled.div<{ splitView?: boolean }>`
   display: flex;
   flex-wrap: nowrap;
+  gap: 8px;
   margin-bottom: ${({ splitView }) => {
     return splitView ? '10px' : '0px'
   }};
 `
 export const ErrorMessage = styled.div`
   margin-bottom: 16px;
-`
-const DocumentUploader = styled(ImageUploader)`
-  margin-left: 16px;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 8px;
-  }
 `
 
 type IFullProps = {
@@ -295,7 +285,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
             onChange={this.onChange}
           />
 
-          <DocumentUploader
+          <ImageUploader
             id={`upload_document${idx}`}
             title={intl.formatMessage(formMessages.addFile)}
             onClick={(e) => {
@@ -316,7 +306,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
           onChange={this.onChange}
         />
 
-        <DocumentUploader
+        <ImageUploader
           id="upload_document"
           title={intl.formatMessage(formMessages.addFile)}
           onClick={(e) => !this.isValid() && e.preventDefault()}
