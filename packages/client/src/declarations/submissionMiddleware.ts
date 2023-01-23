@@ -110,7 +110,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           }
         })
         const { isPotentiallyDuplicate, trackingId, compositionId } =
-          response.data.createBirthRegistration
+          response?.data?.createBirthRegistration ?? {}
 
         if (isPotentiallyDuplicate) {
           dispatch(
