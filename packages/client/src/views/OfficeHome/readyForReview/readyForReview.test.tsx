@@ -31,7 +31,7 @@ import { createClient } from '@client/utils/apolloClient'
 import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { EVENT_STATUS } from '@client/workqueue'
-import { Workqueue, COLUMNS } from '@opencrvs/components/lib/Workqueue'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { ApolloClient } from '@apollo/client'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
@@ -303,7 +303,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     const workqueue = await waitForElement(testComponent, Workqueue)
 
-    const data = workqueue.prop<Array<Record<COLUMNS, string>>>('content')
+    const data = workqueue.prop<Array<Record<string, string>>>('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
       new Date(mockDeclarationDateStr)
     )
@@ -339,7 +339,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     )
 
     const workqueue = await waitForElement(testComponent, Workqueue)
-    const data = workqueue.prop<Array<Record<COLUMNS, string>>>('content')
+    const data = workqueue.prop<Array<Record<string, string>>>('content')
     expect(data.length).toBe(0)
   })
 
