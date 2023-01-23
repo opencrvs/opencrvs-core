@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Workqueue } from '@opencrvs/components/lib/Workqueue'
+import { Workqueue, COLUMNS } from '@opencrvs/components/lib/Workqueue'
 import {
   createDeclaration,
   IDeclaration,
@@ -542,7 +542,9 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      const data = testComponent.find(Workqueue).prop('content')
+      const data = testComponent
+        .find(Workqueue)
+        .prop<Array<Record<COLUMNS, string>>>('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
       expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
       expect(data[0].name).toBe('k m abdullah al amin khan')
@@ -902,15 +904,17 @@ describe('In Progress tab', () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
         testComponent.update()
-        const data = testComponent.find(Workqueue).prop('content')
+        const data = testComponent
+          .find(Workqueue)
+          .prop<Array<Record<COLUMNS, string>>>('content')
         const EXPECTED_DATE_OF_REJECTION = formattedDuration(
           new Date(birthNotificationSentDateStr)
         )
 
-        expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
-        expect(data[0].name).toBe('anik hoque')
-        expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
-        expect(data[0].event).toBe('Birth')
+        expect(data[1].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
+        expect(data[1].name).toBe('anik hoque')
+        expect(data[1].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
+        expect(data[1].event).toBe('Birth')
       })
     })
   })
