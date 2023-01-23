@@ -174,7 +174,13 @@ export const intlReducer: LoopReducer<IntlState, any> = (
       const loadedLanguagesState: ILanguageState = languages.reduce(
         (indexedByLang, language) => ({
           ...indexedByLang,
-          [language.lang]: language
+          [language.lang]: {
+            ...language,
+            messages: {
+              ...state.languages[language.lang].messages,
+              ...language.messages
+            }
+          }
         }),
         {}
       )
