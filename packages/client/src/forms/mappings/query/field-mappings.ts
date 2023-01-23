@@ -770,7 +770,8 @@ const transformAddressTemplateArray = (
   addressLocationLevel: keyof typeof LocationLevel,
   sectionId: string,
   nameKey: string,
-  offlineData?: IOfflineData
+  offlineData?: IOfflineData,
+  addressCases?: AddressCases
 ) => {
   if (!transformedData[sectionId]) {
     transformedData[sectionId] = {}
@@ -792,8 +793,11 @@ const transformAddressTemplateArray = (
     LocationLevel[addressLocationLevel]
   ] = addressName
 
-  transformedData[sectionId][camelCase(`${nameKey}_${addressLocationLevel}`)] =
-    addressName as string | Record<string, string>
+  const addressCase =
+    addressCases === AddressCases.SECONDARY_ADDRESS ? 'secondary' : 'primary'
+  transformedData[sectionId][
+    camelCase(`${nameKey}_${addressCase}_${addressLocationLevel}`)
+  ] = addressName as string | Record<string, string>
 }
 
 export const addressOfflineTransformer =
@@ -851,7 +855,7 @@ export const individualAddressTransformer =
     }
 
     const address =
-      queryData[sectionId].address || queryData[sectionId]?.individual?.address
+      queryData[sectionId]?.address || queryData[sectionId]?.individual?.address
     const addressFromQuery = (address || []).find(
       (addr: { type: AddressCases }) => addr.type === addressCase
     )
@@ -863,7 +867,8 @@ export const individualAddressTransformer =
         addressLocationLevel,
         sectionId,
         sectionId,
-        offlineData
+        offlineData,
+        addressCase
       )
     }
   }
@@ -884,7 +889,7 @@ export const addressLineTemplateTransformer =
   ) => {
     const address = (
       queryData[sectionId]?.individual?.address ||
-      queryData[sectionId].address ||
+      queryData[sectionId]?.address ||
       []
     ).find((add: { type: AddressCases }) => add.type === addressCase)
 
@@ -896,7 +901,11 @@ export const addressLineTemplateTransformer =
       transformedData[sectionId] = {}
     }
     const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
-    const newTransformedName = camelCase(`${sectionId} ${transformedFieldName}`)
+    const addCase =
+      addressCase === AddressCases.SECONDARY_ADDRESS ? 'secondary' : 'primary'
+    const newTransformedName = camelCase(
+      `${sectionId}_${addCase}_${transformedFieldName}`
+    )
     transformedData[sectionId][newTransformedName] = address.line[index] || ''
   }
 
@@ -921,7 +930,7 @@ export const eventLocationAddressLineTemplateTransformer =
     }
     const index = lineNumber > 0 ? lineNumber - 1 : lineNumber
     transformedData[sectionId][transformedFieldName] =
-      queryData.eventLocation.address.line[index] || ''
+      queryData.eventLocation?.address.line[index] || ''
   }
 
 export const eventLocationAddressOfflineTransformer =
