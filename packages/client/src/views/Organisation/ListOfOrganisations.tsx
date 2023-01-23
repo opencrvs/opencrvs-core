@@ -22,9 +22,10 @@ import {
   Link,
   ListViewItemSimplified,
   ListViewSimplified,
-  Stack,
-  Text
+  Text,
+  BreadCrumb
 } from '@opencrvs/components'
+import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { ILocation, LocationType } from '@client/offline/reducer'
@@ -48,11 +49,6 @@ type IRouteProps = {
 type IGetNewLevel = {
   childLocations: ILocation[]
   breadCrumb: IBreadCrumbData[]
-}
-
-type IBreadCrumbData = {
-  paramId: string | null | undefined
-  label: string | null
 }
 
 export function ListOfOrganisations() {
@@ -117,7 +113,9 @@ export function ListOfOrganisations() {
       }
     }
 
-  const dataLocations = useSelector<IStoreState, any>(getNewLevel(locationId))
+  const dataLocations = useSelector<IStoreState, IGetNewLevel>(
+    getNewLevel(locationId)
+  )
   const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
 
@@ -152,7 +150,7 @@ export function ListOfOrganisations() {
           <ListViewItemSimplified
             label={
               <BreadCrumb
-                crumbs={dataLocations.breadCrumb}
+                items={dataLocations.breadCrumb}
                 onSelect={onClickBreadCrumb}
               />
             }
@@ -218,41 +216,5 @@ export function ListOfOrganisations() {
         )}
       </Content>
     </Frame>
-  )
-}
-
-function BreadCrumb(props: {
-  crumbs: IBreadCrumbData[]
-  onSelect: (x: IBreadCrumbData) => void
-}) {
-  const isLast = (index: number): boolean => {
-    return index === props.crumbs.length - 1 && props.crumbs.length > 1
-  }
-
-  return (
-    <Stack gap={8} direction="row" wrap>
-      {props.crumbs.map((x, idx) => {
-        return (
-          <div key={idx}>
-            {idx > 0 && '/ '}
-            {!isLast(idx) ? (
-              <Link
-                color={'primary'}
-                onClick={(e) => {
-                  e.preventDefault()
-                  props.onSelect(x)
-                }}
-              >
-                {x?.label}
-              </Link>
-            ) : (
-              <Text variant={'bold16'} element={'span'}>
-                {x?.label}
-              </Text>
-            )}
-          </div>
-        )
-      })}
-    </Stack>
   )
 }

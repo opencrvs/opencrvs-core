@@ -247,7 +247,7 @@ export function goToTeamUserList(id: string) {
   })
 }
 
-export function goToOrganizationList(locationId?: string | null | undefined) {
+export function goToOrganizationList(locationId?: string | undefined | null) {
   return push(formatUrl(ORGANISATIONS_INDEX, { locationId: locationId ?? '' }))
 }
 
