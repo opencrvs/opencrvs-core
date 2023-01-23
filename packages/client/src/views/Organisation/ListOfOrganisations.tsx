@@ -79,7 +79,7 @@ export function ListOfOrganisations() {
 
       let dataOfBreadCrumb: IBreadCrumbData[] = [
         {
-          label: 'Cameroon',
+          label: intl.formatMessage(constantsMessages.countryName),
           paramId: ''
         }
       ]
