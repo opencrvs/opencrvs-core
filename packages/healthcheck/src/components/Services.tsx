@@ -9,21 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import path from 'path'
 
-if (!process.env.GATEWAY_URL) {
-  throw new Error('Environment variable "GATEWAY_URL" is not set')
-}
+import { Service } from '@/lib/check-health'
 
-const GATEWAY_HEALTHCHECK_PATH = path.join(process.env.GATEWAY_URL, '/ping')
-
-export type Service = {
-  name: string
-  url: string
-  status: boolean
-}
-
-export async function checkHealth() {
-  const res = await fetch(GATEWAY_HEALTHCHECK_PATH)
-  return res.json() as Promise<Service[]>
+export const Services = ({ services }: { services: Service[] }) => {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {services.map((service) => (
+          <tr key={service.name}>
+            <td>{service.name}</td>
+            <td>{service.status ? '✅' : '❌'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
 }
