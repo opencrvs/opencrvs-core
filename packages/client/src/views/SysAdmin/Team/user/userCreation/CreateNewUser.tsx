@@ -20,6 +20,11 @@ import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdm
 import { goBack } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
+import { GET_USER } from '@client/user/queries'
+import {
+  clearUserFormData,
+  fetchAndStoreUserData
+} from '@client/user/userReducer'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { UserReviewForm } from '@client/views/SysAdmin/Team/user/userCreation/UserReviewForm'
@@ -33,6 +38,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
+import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 
 interface IMatchParams {
   userId?: string
@@ -55,6 +61,8 @@ type IUserProps = {
 
 interface IDispatchProps {
   goBack: typeof goBack
+  clearUserFormData: typeof clearUserFormData
+  fetchAndStoreUserData: typeof fetchAndStoreUserData
 }
 
 export type Props = RouteComponentProps<IMatchParams> &
@@ -84,7 +92,19 @@ const SpinnerWrapper = styled.div`
 `
 
 class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
-  async componentDidMount() {}
+  async componentDidMount() {
+    const { userId, client } = this.props
+    if (
+      this.props.match.path.includes(CREATE_USER_ON_LOCATION.split('/:')[0])
+    ) {
+      this.props.clearUserFormData()
+    }
+    if (userId) {
+      this.props.fetchAndStoreUserData(client as ApolloClient<any>, GET_USER, {
+        userId
+      })
+    }
+  }
 
   renderLoadingPage = () => {
     const { intl, userId } = this.props
@@ -117,8 +137,19 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
   }
 
   render() {
-    const { section, submitting, loadingRoles } = this.props
-    if (loadingRoles || submitting) {
+    const {
+      section,
+      submitting,
+      userDetailsStored,
+      loadingRoles,
+      userId,
+      match
+    } = this.props
+    if (
+      submitting ||
+      (userId && !userDetailsStored) ||
+      (match.params.locationId && loadingRoles)
+    ) {
       return this.renderLoadingPage()
     }
 
@@ -238,5 +269,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
 }
 
 export const CreateNewUser = connect(mapStateToProps, {
-  goBack
+  goBack,
+  clearUserFormData,
+  fetchAndStoreUserData
 })(injectIntl(withApollo<Props>(CreateNewUserComponent)))

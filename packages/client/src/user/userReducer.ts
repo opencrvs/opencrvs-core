@@ -27,7 +27,7 @@ import * as offlineActions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { modifyUserDetails } from '@client/profile/profileActions'
 import { SEARCH_USERS } from '@client/user/queries'
-import { ApolloClient, ApolloError } from '@apollo/client'
+import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
 import { Action } from 'redux'
 import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
@@ -35,6 +35,11 @@ import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Role, SystemRole } from '@client/utils/gateway'
+import {
+  GQLLocation,
+  GQLQuery,
+  GQLUser
+} from '@opencrvs/gateway/src/graphql/schema'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -176,6 +181,30 @@ export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
     }
   }
 }
+const FETCH_USER_DATA = 'USER_FORM/FETCH_USER_DATA'
+interface IFetchAndStoreUserData {
+  type: typeof FETCH_USER_DATA
+  payload: {
+    client: ApolloClient<unknown>
+    query: any
+    variables: { userId: string }
+  }
+}
+
+export function fetchAndStoreUserData(
+  client: ApolloClient<unknown>,
+  query: any,
+  variables: { userId: string }
+): IFetchAndStoreUserData {
+  return {
+    type: FETCH_USER_DATA,
+    payload: {
+      client,
+      query,
+      variables
+    }
+  }
+}
 
 type UserFormAction =
   | IUserFormDataModifyAction
@@ -185,6 +214,7 @@ type UserFormAction =
   | profileActions.Action
   | ShowCreateUserErrorToast
   | IRoleLoadedAction
+  | IFetchAndStoreUserData
   | IRolesMessageAddedAction
   | ReturnType<typeof clearUserFormData>
   | ReturnType<typeof showSubmitFormSuccessToast>
@@ -358,6 +388,34 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           ...form
         }
       }
+    case FETCH_USER_DATA:
+      const {
+        client: userClient,
+        query: getUserQuery,
+        variables: { userId }
+      } = (action as IFetchAndStoreUserData).payload
+      debugger
+      return state
+    /* return loop(
+        state,
+        Cmd.run(
+          () =>
+            userClient.query({
+              query: getUserQuery,
+              variables: { userId },
+              fetchPolicy: 'no-cache'
+            }),
+          {
+            successActionCreator: () => {
+              console.log('asdasd')
+
+              return null
+            },
+            failActionCreator: () =>
+              showSubmitFormErrorToast(TOAST_MESSAGES.FAIL)
+          }
+        )
+      )*/
     case MODIFY_LOADING_ROLE_DATA:
       return {
         ...state,
