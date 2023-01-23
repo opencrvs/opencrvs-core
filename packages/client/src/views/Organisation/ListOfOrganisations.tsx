@@ -185,18 +185,13 @@ export function ListOfOrganisations() {
                         size="large"
                         aria-label="View performance data"
                         onClick={() => {
-                          if (level.type === LocationType.CRVS_OFFICE)
-                            dispatch(goToTeamUserList(level.id))
-                          if (level.type === LocationType.ADMIN_STRUCTURE)
-                            dispatch(
-                              goToPerformanceHome(
-                                startOfMonth(
-                                  subMonths(new Date(Date.now()), 11)
-                                ),
-                                new Date(Date.now()),
-                                level.id
-                              )
+                          dispatch(
+                            goToPerformanceHome(
+                              startOfMonth(subMonths(new Date(Date.now()), 11)),
+                              new Date(Date.now()),
+                              level.id
                             )
+                          )
                         }}
                       >
                         <Activity />
