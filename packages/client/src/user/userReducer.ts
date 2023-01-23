@@ -11,9 +11,11 @@
  */
 import {
   IForm,
+  IFormSection,
   IFormSectionData,
   ISelectFormFieldWithDynamicOptions,
-  ISelectOption
+  ISelectOption,
+  UserSection
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
@@ -35,11 +37,8 @@ import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Role, SystemRole } from '@client/utils/gateway'
-import {
-  GQLLocation,
-  GQLQuery,
-  GQLUser
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import { gqlToDraftTransformer } from '@client/transformer'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -48,6 +47,8 @@ const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
 const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
 const MODIFY_LOADING_ROLE_DATA = 'USER_FORM/MODIFY_LOADING_ROLE_DATA'
+const STORE_USER_FORM_DATA = 'USER_FORM/STORE_USER_FORM_DATA'
+const FETCH_USER_DATA = 'USER_FORM/FETCH_USER_DATA'
 
 export enum TOAST_MESSAGES {
   SUCCESS = 'userFormSuccess',
@@ -181,7 +182,7 @@ export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
     }
   }
 }
-const FETCH_USER_DATA = 'USER_FORM/FETCH_USER_DATA'
+
 interface IFetchAndStoreUserData {
   type: typeof FETCH_USER_DATA
   payload: {
@@ -206,6 +207,24 @@ export function fetchAndStoreUserData(
   }
 }
 
+interface IStoreUserFormDataAction {
+  type: typeof STORE_USER_FORM_DATA
+  payload: {
+    queryData: ApolloQueryResult<GQLQuery>
+  }
+}
+
+export function storeUserFormData(
+  queryData: ApolloQueryResult<GQLQuery>
+): IStoreUserFormDataAction {
+  return {
+    type: STORE_USER_FORM_DATA,
+    payload: {
+      queryData
+    }
+  }
+}
+
 type UserFormAction =
   | IUserFormDataModifyAction
   | IUserFormDataSubmitAction
@@ -215,6 +234,7 @@ type UserFormAction =
   | ShowCreateUserErrorToast
   | IRoleLoadedAction
   | IFetchAndStoreUserData
+  | IStoreUserFormDataAction
   | IRolesMessageAddedAction
   | ReturnType<typeof clearUserFormData>
   | ReturnType<typeof showSubmitFormSuccessToast>
@@ -394,9 +414,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         query: getUserQuery,
         variables: { userId }
       } = (action as IFetchAndStoreUserData).payload
-      debugger
-      return state
-    /* return loop(
+      return loop(
         state,
         Cmd.run(
           () =>
@@ -406,22 +424,29 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
               fetchPolicy: 'no-cache'
             }),
           {
-            successActionCreator: () => {
-              console.log('asdasd')
-
-              return null
-            },
+            successActionCreator: storeUserFormData,
             failActionCreator: () =>
               showSubmitFormErrorToast(TOAST_MESSAGES.FAIL)
           }
         )
-      )*/
+      )
+
+    case STORE_USER_FORM_DATA:
+      const { queryData } = (action as IStoreUserFormDataAction).payload
+      const formData = gqlToDraftTransformer(
+        { sections: (state.userForm as IForm).sections as IFormSection[] },
+        { [UserSection.User]: queryData.data.getUser }
+      )
+      return {
+        ...state,
+        userFormData: formData.user,
+        userDetailsStored: true
+      }
     case MODIFY_LOADING_ROLE_DATA:
       return {
         ...state,
         loadingRoles: false
       }
-
     default:
       return state
   }

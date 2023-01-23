@@ -106,6 +106,10 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
     }
   }
 
+  async componentWillUnmount() {
+    this.props.clearUserFormData()
+  }
+
   renderLoadingPage = () => {
     const { intl, userId } = this.props
     return (

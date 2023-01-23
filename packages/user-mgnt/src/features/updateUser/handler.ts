@@ -96,10 +96,6 @@ export default async function updateUser(
     ) {
       return h.response('Role not supported for this user').code(403)
     }
-  } else {
-    if (existingUser.role) {
-      return h.response('Role not supported for this user').code(403)
-    }
   }
 
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
