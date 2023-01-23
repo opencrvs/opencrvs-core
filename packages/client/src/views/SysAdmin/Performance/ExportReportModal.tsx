@@ -29,7 +29,6 @@ import { messages as performanceMessages } from '@client/i18n/messages/views/per
 import ReactToPdf from 'react-to-pdf'
 import { useRef } from 'react'
 import { PdfReport } from './PdfReport'
-import { GQLTotalMetricsResult } from '@client/../../gateway/src/graphql/schema'
 
 interface IExportReportModalProps {
   show: boolean
@@ -40,7 +39,7 @@ interface IExportReportModalProps {
 
 const LocationIcon = styled(MapPin)`
   margin-right: 8px;
-  // TODO: Can I set the color from the theme?
+  // TODO: Can I set the black color from the theme?
   color: black;
 `
 
@@ -51,19 +50,13 @@ const UserIcon = styled(User)`
 
 const CalendarIcon = styled(Calendar)`
   margin-right: 8px;
-  // TODO: Can I set the color from the theme?
+  // TODO: Can I set the black color from the theme?
   color: black;
 `
 
 const FilterRow = styled.div`
   margin: 4px 0;
 `
-
-// const OffScreenDiv = styled(div)`
-//   position: relative;
-//   top: 3px;
-//   margin-right: 5px;
-// `
 
 export function getRangeDescription(startDate: Date, endDate: Date): string {
   // TODO: Is this the right way to use intl?
@@ -81,6 +74,7 @@ export function getRangeDescription(startDate: Date, endDate: Date): string {
     if (startDate.toDateString() == date30DaysBack.toDateString()) {
       return intl.formatMessage(constantsMessages.last30Days)
     }
+    // TODO: There is an issue with this logic, the filter sends different start dates for last12months depending on if the user interacts with the filter or not
     if (startDate.toDateString() == date12MonthsBack.toDateString()) {
       return intl.formatMessage(constantsMessages.last12Months)
     }
@@ -174,15 +168,6 @@ export function ExportReportModal({
   )
 
   const ref = useRef<HTMLDivElement>(null)
-
-  const restoreState = () => {
-    //setSelectedSections([])
-  }
-  React.useEffect(() => {
-    if (!show) {
-      restoreState()
-    }
-  }, [show])
 
   const options = {
     orientation: 'landscape'
