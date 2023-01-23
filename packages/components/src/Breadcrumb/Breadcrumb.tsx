@@ -13,6 +13,11 @@ import React from 'react'
 import { Link } from '../Link'
 import { Stack } from '../Stack'
 import { Text } from '../Text'
+import styled from 'styled-components'
+
+const Container = styled.div`
+  font-size: 14px !important;
+`
 
 export interface IBreadCrumbData {
   paramId: string | null | undefined
@@ -30,36 +35,39 @@ export const BreadCrumb = ({ items = [], onSelect }: IBreadCrumbProps) => {
   }
 
   return (
-    <Stack gap={4} direction="row" wrap>
-      {items.length > 0 &&
-        items.map((x, idx) => {
-          return (
-            <>
-              {idx > 0 && (
-                <Text variant="bold16" element="span">
-                  /
-                </Text>
-              )}
-              <div key={idx}>
-                {!isLast(idx) ? (
-                  <Link
-                    color={'primary'}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      if (onSelect) onSelect(x)
-                    }}
-                  >
-                    {x?.label}
-                  </Link>
-                ) : (
-                  <Text variant={'bold16'} element={'span'}>
-                    {x?.label}
+    <Container>
+      <Stack gap={4} direction="row" wrap>
+        {items.length > 0 &&
+          items.map((x, idx) => {
+            return (
+              <>
+                {idx > 0 && (
+                  <Text variant="bold14" element="span">
+                    /
                   </Text>
                 )}
-              </div>
-            </>
-          )
-        })}
-    </Stack>
+                <div key={idx}>
+                  {!isLast(idx) ? (
+                    <Link
+                      color={'primary'}
+                      font={'bold14'}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (onSelect) onSelect(x)
+                      }}
+                    >
+                      {x?.label}
+                    </Link>
+                  ) : (
+                    <Text variant={'bold14'} element={'span'}>
+                      {x?.label}
+                    </Text>
+                  )}
+                </div>
+              </>
+            )
+          })}
+      </Stack>
+    </Container>
   )
 }

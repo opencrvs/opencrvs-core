@@ -127,6 +127,7 @@ export function ListOfOrganisations() {
   }
 
   const onClickBreadCrumb = (crumb: IBreadCrumbData) => {
+    setCurrentPageNumber(1)
     dispatch(goToOrganizationList(crumb.paramId))
   }
 
@@ -170,8 +171,10 @@ export function ListOfOrganisations() {
                       <Link
                         element="a"
                         onClick={(e) => {
-                          if (level.type === LocationType.ADMIN_STRUCTURE)
+                          if (level.type === LocationType.ADMIN_STRUCTURE){
+                            setCurrentPageNumber(1)
                             changeLevelAction(e, level.id)
+                          }
                           if (level.type === LocationType.CRVS_OFFICE)
                             dispatch(goToTeamUserList(level.id))
                         }}
@@ -189,6 +192,7 @@ export function ListOfOrganisations() {
                             goToPerformanceHome(
                               startOfMonth(subMonths(new Date(Date.now()), 11)),
                               new Date(Date.now()),
+                              undefined,
                               level.id
                             )
                           )
