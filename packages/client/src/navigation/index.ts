@@ -231,12 +231,14 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
 export function goToPerformanceHome(
   timeStart: Date = startOfMonth(subMonths(new Date(Date.now()), 11)),
   timeEnd: Date = new Date(Date.now()),
+  event?: Event,
   locationId?: string
 ) {
   return push({
     pathname: PERFORMANCE_HOME,
     search: stringify({
       locationId,
+      event,
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString()
     })
@@ -643,6 +645,7 @@ export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
 
 export function goToPerformanceView(userDetails: IUserDetails) {
   return goToPerformanceHome(
+    undefined,
     undefined,
     undefined,
     getDefaultPerformanceLocationId(userDetails)

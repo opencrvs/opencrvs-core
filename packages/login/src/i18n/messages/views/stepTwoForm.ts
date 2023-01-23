@@ -27,7 +27,7 @@ interface IStepTwoFormMessages
 const messagesToDefine: IStepTwoFormMessages = {
   stepTwoTitle: {
     id: 'login.stepTwoTitle',
-    defaultMessage: 'Verify your mobile',
+    defaultMessage: 'Verify your account',
     description: 'The title that appears in step two of the form'
   },
   stepTwoResendTitle: {

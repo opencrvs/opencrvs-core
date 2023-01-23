@@ -174,7 +174,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.forgotPassword'
   },
   forgottenPIN: {
-    defaultMessage: 'Forgotten pin',
+    defaultMessage: 'Forgotten PIN',
     description: 'The label for forgotten pin button',
     id: 'buttons.forgottenPIN'
   },

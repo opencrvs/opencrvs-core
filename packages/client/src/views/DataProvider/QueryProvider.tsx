@@ -23,6 +23,7 @@ interface IQueryProviderProps {
   action: Action
   payload?: any
   fetchPolicy?: WatchQueryFetchPolicy
+  children?: React.ReactNode
 }
 type IProps = IQueryProviderProps & IntlShapeProps
 /* Need to add mappings for events here */

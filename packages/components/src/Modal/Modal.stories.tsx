@@ -9,25 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { PrimaryButton } from '../buttons'
 import { Modal } from './Modal'
 import React from 'react'
 
-interface IProps {
-  title?: string
-  actions: JSX.Element[]
-  show: boolean
-  handleClose?: () => void
-  className?: string
-}
-
-const Template: Story<IProps> = (args) => <Modal {...args} />
+const Template: ComponentStory<typeof Modal> = (args) => <Modal {...args} />
 
 export const ModalView = Template.bind({})
 ModalView.args = {
   title: 'Modal',
   show: true,
+  children: <p>Modal content</p>,
   actions: [
     <PrimaryButton
       key="submit"
@@ -53,4 +46,4 @@ ModalView.args = {
 export default {
   title: 'Deprecated/Modal',
   component: Modal
-} as Meta
+} as ComponentMeta<typeof Modal>
