@@ -26,32 +26,38 @@ export interface IBreadCrumbProps {
 
 export const BreadCrumb = ({ items = [], onSelect }: IBreadCrumbProps) => {
   const isLast = (index: number): boolean => {
-    return index === items.length - 1 && items.length > 1
+    return index === items.length - 1
   }
 
   return (
-    <Stack gap={8} direction="row" wrap>
+    <Stack gap={4} direction="row" wrap>
       {items.length > 0 &&
         items.map((x, idx) => {
           return (
-            <div key={idx}>
-              {idx > 0 && '/ '}
-              {!isLast(idx) ? (
-                <Link
-                  color={'primary'}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    if (onSelect) onSelect(x)
-                  }}
-                >
-                  {x?.label}
-                </Link>
-              ) : (
-                <Text variant={'bold16'} element={'span'}>
-                  {x?.label}
+            <>
+              {idx > 0 && (
+                <Text variant="bold16" element="span">
+                  /
                 </Text>
               )}
-            </div>
+              <div key={idx}>
+                {!isLast(idx) ? (
+                  <Link
+                    color={'primary'}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      if (onSelect) onSelect(x)
+                    }}
+                  >
+                    {x?.label}
+                  </Link>
+                ) : (
+                  <Text variant={'bold16'} element={'span'}>
+                    {x?.label}
+                  </Text>
+                )}
+              </div>
+            </>
           )
         })}
     </Stack>

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Header } from '@client/components/Header/Header'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
@@ -22,7 +22,6 @@ import {
   Link,
   ListViewItemSimplified,
   ListViewSimplified,
-  Text,
   BreadCrumb
 } from '@opencrvs/components'
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
@@ -144,67 +143,69 @@ export function ListOfOrganisations() {
     >
       <Content
         title={intl.formatMessage(navigationMessages.organisation)}
-        showTitleOnMobile={true}
+        showTitleOnMobile={false}
       >
-        <ListViewSimplified bottomBorder={true}>
-          <ListViewItemSimplified
-            label={
-              <BreadCrumb
-                items={dataLocations.breadCrumb}
-                onSelect={onClickBreadCrumb}
-              />
-            }
-          />
-          {dataLocations.childLocations.length > 0 &&
-            dataLocations.childLocations
-              ?.slice(
-                (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
-                currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
-              )
-              .map((level: ILocation, index: number) => (
-                <ListViewItemSimplified
-                  key={index}
-                  label={
-                    level.type === LocationType.CRVS_OFFICE ? (
-                      <Text variant={'bold16'} element={'span'}>
-                        {level?.name}
-                      </Text>
-                    ) : (
+        <Fragment key={'.0'}>
+          <ListViewSimplified>
+            <ListViewItemSimplified
+              compactLabel={true}
+              label={
+                <BreadCrumb
+                  items={dataLocations.breadCrumb}
+                  onSelect={onClickBreadCrumb}
+                />
+              }
+            />
+            {dataLocations.childLocations.length > 0 &&
+              dataLocations.childLocations
+                ?.slice(
+                  (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
+                  currentPageNumber * DEFAULT_PAGINATION_LIST_SIZE
+                )
+                .map((level: ILocation, index: number) => (
+                  <ListViewItemSimplified
+                    key={index}
+                    compactLabel={true}
+                    label={
                       <Link
                         element="a"
-                        onClick={(e) => changeLevelAction(e, level.id)}
+                        onClick={(e) => {
+                          if (level.type === LocationType.ADMIN_STRUCTURE)
+                            changeLevelAction(e, level.id)
+                          if (level.type === LocationType.CRVS_OFFICE)
+                            dispatch(goToTeamUserList(level.id))
+                        }}
                       >
                         {level?.name}
                       </Link>
-                    )
-                  }
-                  actions={
-                    <Button
-                      type="icon"
-                      size="large"
-                      aria-label="View performance data"
-                      onClick={() => {
-                        if (level.type === LocationType.CRVS_OFFICE)
-                          dispatch(goToTeamUserList(level.id))
-                        if (level.type === LocationType.ADMIN_STRUCTURE)
-                          dispatch(
-                            goToPerformanceHome(
-                              startOfMonth(subMonths(new Date(Date.now()), 11)),
-                              new Date(Date.now()),
-                              level.id
+                    }
+                    actions={
+                      <Button
+                        type="icon"
+                        size="large"
+                        aria-label="View performance data"
+                        onClick={() => {
+                          if (level.type === LocationType.CRVS_OFFICE)
+                            dispatch(goToTeamUserList(level.id))
+                          if (level.type === LocationType.ADMIN_STRUCTURE)
+                            dispatch(
+                              goToPerformanceHome(
+                                startOfMonth(
+                                  subMonths(new Date(Date.now()), 11)
+                                ),
+                                new Date(Date.now()),
+                                level.id
+                              )
                             )
-                          )
-                      }}
-                    >
-                      {level.type === LocationType.CRVS_OFFICE && <User />}
-                      {level.type === LocationType.ADMIN_STRUCTURE && (
+                        }}
+                      >
                         <Activity />
-                      )}
-                    </Button>
-                  }
-                />
-              ))}
-        </ListViewSimplified>
+                      </Button>
+                    }
+                  />
+                ))}
+          </ListViewSimplified>
+        </Fragment>
         {totalNumber > DEFAULT_PAGINATION_LIST_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
