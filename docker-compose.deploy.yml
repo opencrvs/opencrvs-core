@@ -227,8 +227,6 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=true
       - xpack.security.authc.api_key.enabled=true
-    ports:
-      - 9200:9200
     networks:
       - overlay_net
     logging:
