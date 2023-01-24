@@ -629,6 +629,11 @@ function getAddressCaseFields(
         resource: 'countries'
       },
       mapping: {
+        template: {
+          fieldName: `country${sentenceCase(useCase)}`,
+          operation: 'individualAddressTransformer',
+          parameters: [addressCase, 'country']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -763,7 +768,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -773,6 +778,11 @@ function getAddressCaseFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: `cityUrbanOption${sentenceCase(useCase)}`,
+          operation: 'individualAddressTransformer',
+          parameters: [addressCase, 'city']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -827,7 +837,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -837,6 +847,11 @@ function getAddressCaseFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: `addressLine3UrbanOption${sentenceCase(useCase)}`,
+          operation: 'addressLineTemplateTransformer',
+          parameters: [addressCase, 3, 'addressLine3']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -891,7 +906,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -901,6 +916,11 @@ function getAddressCaseFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: `addressLine2UrbanOption${sentenceCase(useCase)}`,
+          operation: 'addressLineTemplateTransformer',
+          parameters: [addressCase, 2, 'addressLine2']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -955,7 +975,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -965,6 +985,11 @@ function getAddressCaseFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: `numberUrbanOption${sentenceCase(useCase)}`,
+          operation: 'addressLineTemplateTransformer',
+          parameters: [addressCase, 1, 'number']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1019,7 +1044,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "URBAN"`
         },
         {
           action: 'hide',
@@ -1029,6 +1054,11 @@ function getAddressCaseFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: `postcode${sentenceCase(useCase)}`,
+          operation: 'individualAddressTransformer',
+          parameters: [addressCase, 'postalCode']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1083,7 +1113,7 @@ function getAddressCaseFields(
         },
         {
           action: 'hide',
-          expression: 'values.ruralOrUrbanPrimary !== "RURAL"'
+          expression: `values.ruralOrUrban${sentenceCase(useCase)} !== "RURAL"`
         },
         {
           action: 'hide',
@@ -1092,8 +1122,12 @@ function getAddressCaseFields(
           )})`
         }
       ]),
-
       mapping: {
+        template: {
+          fieldName: `addressLine5${sentenceCase(useCase)}`,
+          operation: 'addressLineTemplateTransformer',
+          parameters: [addressCase, 5, 'addressLine5']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1148,6 +1182,11 @@ function getAddressCaseFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: `internationalState${sentenceCase(useCase)}`,
+          operation: 'individualAddressTransformer',
+          parameters: [addressCase, 'state']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1202,6 +1241,11 @@ function getAddressCaseFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: `internationalDistrict${sentenceCase(useCase)}`,
+          operation: 'individualAddressTransformer',
+          parameters: [addressCase, 'district']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1256,6 +1300,11 @@ function getAddressCaseFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: `internationalCity${sentenceCase(useCase)}`,
+          operation: 'individualAddressTransformer',
+          parameters: [addressCase, 'city']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1310,6 +1359,11 @@ function getAddressCaseFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: `internationalAddressLine1${sentenceCase(useCase)}`,
+          operation: 'addressLineTemplateTransformer',
+          parameters: [addressCase, 7, 'addressLine1']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1364,6 +1418,11 @@ function getAddressCaseFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: `internationalAddressLine2${sentenceCase(useCase)}`,
+          operation: 'addressLineTemplateTransformer',
+          parameters: [addressCase, 8, 'addressLine2']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1418,6 +1477,11 @@ function getAddressCaseFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: `internationalAddressLine3${sentenceCase(useCase)}`,
+          operation: 'addressLineTemplateTransformer',
+          parameters: [addressCase, 9, 'addressLine3']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1472,6 +1536,11 @@ function getAddressCaseFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: `internationalPostcode${sentenceCase(useCase)}`,
+          operation: 'individualAddressTransformer',
+          parameters: [addressCase, 'postalCode']
+        },
         mutation: informant
           ? {
               operation: 'fieldValueNestingTransformer',
@@ -1653,6 +1722,11 @@ export function getPlaceOfEventAddressFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: configCase,
+          operation: 'eventLocationAddressOfflineTransformer',
+          parameters: ['city', configCase]
+        },
         mutation: {
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
@@ -1699,6 +1773,11 @@ export function getPlaceOfEventAddressFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: configCase,
+          operation: 'eventLocationAddressLineTemplateTransformer',
+          parameters: [3, `${configCase}AddressLine3`]
+        },
         mutation: {
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
@@ -1745,6 +1824,11 @@ export function getPlaceOfEventAddressFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: configCase,
+          operation: 'eventLocationAddressLineTemplateTransformer',
+          parameters: [2, `${configCase}AddressLine2`]
+        },
         mutation: {
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
@@ -1791,6 +1875,11 @@ export function getPlaceOfEventAddressFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: configCase,
+          operation: 'eventLocationAddressLineTemplateTransformer',
+          parameters: [1, `${configCase}Number`]
+        },
         mutation: {
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
@@ -1837,6 +1926,11 @@ export function getPlaceOfEventAddressFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: configCase,
+          operation: 'eventLocationAddressOfflineTransformer',
+          parameters: ['postalCode', configCase]
+        },
         mutation: {
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
@@ -1883,6 +1977,11 @@ export function getPlaceOfEventAddressFields(
         }
       ]),
       mapping: {
+        template: {
+          fieldName: configCase,
+          operation: 'eventLocationAddressLineTemplateTransformer',
+          parameters: [5, `${configCase}AddressLine5`]
+        },
         mutation: {
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
@@ -2065,6 +2164,11 @@ export function getPlaceOfEventAddressFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: configCase,
+          operation: 'eventLocationAddressLineTemplateTransformer',
+          parameters: [7, `${configCase}AddressLine1`]
+        },
         mutation: {
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
@@ -2103,6 +2207,11 @@ export function getPlaceOfEventAddressFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: configCase,
+          operation: 'eventLocationAddressLineTemplateTransformer',
+          parameters: [8, `${configCase}AddressLine2`]
+        },
         mutation: {
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
@@ -2141,6 +2250,11 @@ export function getPlaceOfEventAddressFields(
         }
       ],
       mapping: {
+        template: {
+          fieldName: configCase,
+          operation: 'eventLocationAddressLineTemplateTransformer',
+          parameters: [9, `${configCase}AddressLine3`]
+        },
         mutation: {
           operation:
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH

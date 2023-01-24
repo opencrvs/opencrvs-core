@@ -71,7 +71,7 @@ services:
       - KIBANA_PASSWORD=${KIBANA_PASSWORD}
       - BEATS_USERNAME=beats_system
       - BEATS_PASSWORD=${ROTATING_METRICBEAT_ELASTIC_PASSWORD}
-    command: ['--strict.perms=false', '-system.hostfs=/hostfs']
+    command: [ '--strict.perms=false', '-system.hostfs=/hostfs' ]
     hostname: 'metricbeat-{{.Node.Hostname}}'
     restart: always
     deploy:
@@ -274,7 +274,7 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_DOMAIN=minio.{{hostname}}
-      - MINIO_SERVER_URL=https://minio.{{hostname}}
+      - MINIO_SERVER_URL=http://minio:9000
       - MINIO_BROWSER_REDIRECT_URL=https://minio-console.{{hostname}}
     ports:
       - '9000:9000'
@@ -303,7 +303,7 @@ services:
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
-    entrypoint: ['bash', '/usr/app/setup.sh']
+    entrypoint: [ 'bash', '/usr/app/setup.sh' ]
     restart: on-failure
     depends_on:
       - elasticsearch
@@ -383,8 +383,8 @@ services:
     depends_on:
       - elasticsearch
       - kibana
-    cap_add: ['CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID']
-    cap_drop: ['ALL']
+    cap_add: [ 'CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID' ]
+    cap_drop: [ 'ALL' ]
     restart: always
     ports:
       - 8200:8200
@@ -429,6 +429,9 @@ services:
       placement:
         constraints:
           - node.labels.data1 == true
+    configs:
+      - source: influxdb-conf.{{ts}}
+        target: /etc/influxdb/influxdb.conf
     networks:
       - overlay_net
     logging:
@@ -584,7 +587,6 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'auth'
-
   user-mgnt:
     secrets:
       - jwt-public-key.{{ts}}
@@ -689,6 +691,8 @@ services:
   metrics:
     secrets:
       - jwt-public-key.{{ts}}
+    volumes:
+      - /data/vsexport:/usr/src/app/packages/metrics/src/scripts
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
@@ -946,6 +950,8 @@ configs:
     file: ./infrastructure/monitoring/logstash/logstash.yml
   logstash-pipeline.{{ts}}:
     file: ./infrastructure/monitoring/logstash/logstash.conf
+  influxdb-conf.{{ts}}:
+    file: ./infrastructure/influxdb.conf
 networks:
   overlay_net:
     driver: overlay

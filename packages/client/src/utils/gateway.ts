@@ -2177,11 +2177,12 @@ export type UserInput = {
 
 export type VsExport = {
   __typename?: 'VSExport'
-  createdOn: Scalars['String']
+  createdOn: Scalars['Date']
+  endDate: Scalars['Date']
   event: Scalars['String']
   fileSize: Scalars['String']
+  startDate: Scalars['Date']
   url: Scalars['String']
-  year: Scalars['Int']
 }
 
 export type VerifyPasswordResult = {

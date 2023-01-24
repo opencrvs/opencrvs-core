@@ -1049,6 +1049,14 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'duplicateIDNumber',
                     parameters: ['deceased.iD']
+                  },
+                  {
+                    operation: 'duplicateIDNumber',
+                    parameters: ['mother.iD']
+                  },
+                  {
+                    operation: 'duplicateIDNumber',
+                    parameters: ['father.iD']
                   }
                 ],
                 conditionals: [],

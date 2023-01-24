@@ -150,7 +150,6 @@ interface IConstantsMessages
   timePeriod: MessageDescriptor
   totalRegistered: MessageDescriptor
   viewAll: MessageDescriptor
-  notAvailable: MessageDescriptor
   history: MessageDescriptor
   requireUpdatesLoading: MessageDescriptor
   noConnection: MessageDescriptor
@@ -893,11 +892,6 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.viewAll',
     defaultMessage: 'View all',
     description: 'Label for view all link'
-  },
-  notAvailable: {
-    id: 'constants.notAvailable',
-    defaultMessage: 'Not available',
-    description: 'Placeholder for empty value'
   },
   history: {
     id: 'constants.history',

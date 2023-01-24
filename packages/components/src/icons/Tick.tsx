@@ -12,14 +12,18 @@
 import * as React from 'react'
 
 export const Tick = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={10} height={8} {...props}>
-    <title>Line 2</title>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
     <path
-      d="M1 3.437L4.288 7 9 1"
-      stroke="currentColor"
-      strokeWidth={2}
-      fill="none"
-      fillRule="evenodd"
+      d="M13.3332 4L5.99984 11.3333L2.6665 8"
+      stroke="black"
+      strokeWidth="3"
       strokeLinecap="round"
       strokeLinejoin="round"
     />

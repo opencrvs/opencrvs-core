@@ -414,7 +414,11 @@ const renderValue = (
       'statePrimary',
       'districtPrimary',
       'internationalStatePrimary',
-      'internationalDistrictPrimary'
+      'internationalDistrictPrimary',
+      'stateSecondary',
+      'districtSecondary',
+      'internationalStateSecondary',
+      'internationalDistrictSecondary'
     ].includes(field.name) &&
     isOriginalData
   ) {
@@ -425,12 +429,21 @@ const renderValue = (
         resource: 'locations',
         initialValue: 'agentDefault'
       }
-      dynamicOption.dependency = [
-        'internationalStatePrimary',
-        'statePrimary'
-      ].includes(field.name)
-        ? 'countryPrimary'
-        : 'statePrimary'
+      if (field.name.includes('Secondary')) {
+        dynamicOption.dependency = [
+          'internationalStateSecondary',
+          'stateSecondary'
+        ].includes(field.name)
+          ? 'countrySecondary'
+          : 'stateSecondary'
+      } else {
+        dynamicOption.dependency = [
+          'internationalStatePrimary',
+          'statePrimary'
+        ].includes(field.name)
+          ? 'countryPrimary'
+          : 'statePrimary'
+      }
 
       return renderSelectDynamicLabel(
         value,
