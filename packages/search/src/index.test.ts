@@ -21,7 +21,7 @@ describe('Route authorization', () => {
       url: '/ping'
     })
     expect(res.statusCode).toBe(200)
-    expect(res.payload).toBe(JSON.stringify({ success: true }))
+    expect(res.payload).toBe(JSON.stringify({ status: 'ok' }))
   })
   it('blocks requests without a token', async () => {
     const server = await createServer()

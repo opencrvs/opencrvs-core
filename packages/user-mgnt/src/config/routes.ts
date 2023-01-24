@@ -117,7 +117,7 @@ export const getRoutes = () => {
       handler: (request: any, h: any) => {
         // Perform any health checks and return true or false for success prop
         return {
-          success: true
+          status: 'ok'
         }
       },
       config: {

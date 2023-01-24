@@ -54,6 +54,6 @@ export const serviceHealthSchema = Joi.array().items(
   Joi.object({
     name: Joi.string(),
     url: Joi.object(),
-    status: Joi.boolean()
+    status: Joi.string().valid('error', 'ok')
   }).unknown()
 )

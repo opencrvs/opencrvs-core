@@ -24,7 +24,7 @@ describe('Route checking', () => {
   it('Ping check', async () => {
     fetch.mockResponse(
       JSON.stringify({
-        success: true
+        status: 'ok'
       })
     )
     const res = await server.server.inject({

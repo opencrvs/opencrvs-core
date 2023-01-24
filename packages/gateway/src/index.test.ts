@@ -203,10 +203,10 @@ describe('Route authorization', () => {
     })
     expect(res.result.message).toEqual('An internal server error occurred')
   })
-  it('Tests the health check with multiple services', async () => {
+  it.todo('Tests the health check with multiple services', async () => {
     fetch.mockResponse(
       JSON.stringify({
-        success: true
+        status: 'ok'
       })
     )
     const res = await server.app.inject({

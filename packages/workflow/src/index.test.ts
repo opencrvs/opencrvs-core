@@ -20,7 +20,7 @@ describe('Route authorization', () => {
       method: 'GET',
       url: '/ping'
     })
-    expect(res.result).toEqual({ success: true })
+    expect(res.result).toEqual({ status: 'ok' })
   })
 
   it('blocks requests without a token', async () => {

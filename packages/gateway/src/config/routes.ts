@@ -12,7 +12,7 @@
 import * as glob from 'glob'
 import { join, resolve } from 'path'
 import healthCheckHandler, {
-  responseSchema as healthCheckResponseSchema
+  serviceHealthSchema
 } from '@gateway/features/healthCheck/handler'
 import {
   createLocationHandler,
@@ -45,9 +45,8 @@ export const getRoutes = () => {
       config: {
         auth: false,
         description: 'Checks the health of all services.',
-        notes: 'Pass the service as a query param: service',
         response: {
-          schema: healthCheckResponseSchema
+          schema: serviceHealthSchema
         }
       }
     },

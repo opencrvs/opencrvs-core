@@ -94,7 +94,7 @@ export async function createServer() {
     handler: (request: any, h: any) =>
       // Perform any health checks and return true or false for success prop
       ({
-        success: true
+        status: 'ok'
       }),
     options: {
       auth: false,
