@@ -46,7 +46,7 @@ const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA' as const
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
 const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
-const MODIFY_LOADING_ROLE_DATA = 'USER_FORM/MODIFY_LOADING_ROLE_DATA'
+const ROLE_MESSAGES_LOADED = 'USER_FORM/ROLE_MESSAGES_LOADED'
 const STORE_USER_FORM_DATA = 'USER_FORM/STORE_USER_FORM_DATA'
 const FETCH_USER_DATA = 'USER_FORM/FETCH_USER_DATA'
 
@@ -66,13 +66,13 @@ const initialState: IUserFormState = {
   userAuditForm
 }
 
-export interface IRolesMessageAddedAction {
-  type: typeof MODIFY_LOADING_ROLE_DATA
+export interface IRoleMessagesLoadedAction {
+  type: typeof ROLE_MESSAGES_LOADED
 }
 
-export function rolesMessageAddData(): IRolesMessageAddedAction {
+export function rolesMessageAddData(): IRoleMessagesLoadedAction {
   return {
-    type: MODIFY_LOADING_ROLE_DATA
+    type: ROLE_MESSAGES_LOADED
   }
 }
 
@@ -235,7 +235,7 @@ type UserFormAction =
   | IRoleLoadedAction
   | IFetchAndStoreUserData
   | IStoreUserFormDataAction
-  | IRolesMessageAddedAction
+  | IRoleMessagesLoadedAction
   | ReturnType<typeof clearUserFormData>
   | ReturnType<typeof showSubmitFormSuccessToast>
   | ReturnType<typeof showSubmitFormErrorToast>
@@ -437,7 +437,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userFormData: formData.user,
         userDetailsStored: true
       }
-    case MODIFY_LOADING_ROLE_DATA:
+    case ROLE_MESSAGES_LOADED:
       return {
         ...state,
         loadingRoles: false

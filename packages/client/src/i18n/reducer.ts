@@ -19,7 +19,7 @@ import {
 import * as offlineActions from '@client/offline/actions'
 import { ILocation } from '@client/offline/reducer'
 import {
-  IRolesMessageAddedAction,
+  IRoleMessagesLoadedAction,
   IRoleLoadedAction,
   rolesMessageAddData,
   ROLES_LOADED
@@ -155,7 +155,7 @@ export const intlReducer: LoopReducer<IntlState, any> = (
   | IntlState
   | Loop<
       IntlState,
-      actions.Action | offlineActions.Action | IRolesMessageAddedAction
+      actions.Action | offlineActions.Action | IRoleMessagesLoadedAction
     > => {
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:
