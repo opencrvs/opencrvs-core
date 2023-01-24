@@ -54,6 +54,12 @@ const messagesToDefine = {
     defaultMessage: 'Sources of registrations',
     description: 'Header for sources of registrations'
   },
+  performanceApplicationSourcesSubHeader: {
+    id: 'performance.reports.subHeader.applicationSources',
+    defaultMessage:
+      'The number and percentage of declarations started by the each system roles that have been registered',
+    description: 'Subheader for sources of registrations'
+  },
   performanceTotalLabel: {
     id: 'performance.values.labels.total',
     defaultMessage: 'Total',
