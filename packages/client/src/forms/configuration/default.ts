@@ -1105,6 +1105,12 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: []
                   }
                 ],
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: 'values.exactDateOfBirthUnknown'
+                  }
+                ],
                 mapping: {
                   mutation: {
                     operation: 'fieldValueNestingTransformer',
@@ -1136,6 +1142,76 @@ export const registerForms: IDefaultRegisterForms = {
                       'do MMMM yyyy',
                       'individual'
                     ]
+                  }
+                }
+              },
+              {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                hideInPreview: true,
+                required: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'ignoreFieldTransformer'
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'booleanTransformer'
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfInformant,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.exactDateOfBirthUnknown'
+                  }
+                ],
+                postfix: 'years',
+                inputFieldWidth: '78px',
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: ['individual']
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: ['individual']
                   }
                 }
               },
@@ -1352,10 +1428,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'duplicateIDNumber',
                     parameters: ['father.iD']
-                  },
-                  {
-                    operation: 'duplicateIDNumber',
-                    parameters: ['informant.informantID']
                   }
                 ],
                 conditionals: [
@@ -1390,6 +1462,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'disable',
+                    expression: 'values.exactDateOfBirthUnknown'
                   }
                 ],
                 required: true,
@@ -1423,6 +1499,62 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['birthDate']
                   }
                 }
+              },
+              {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                required: true,
+                hideInPreview: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant)'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  },
+                  mutation: {
+                    operation: 'ignoreFieldTransformer'
+                  }
+                }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfMother,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.exactDateOfBirthUnknown || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)'
+                  }
+                ],
+                postfix: 'years',
+                inputFieldWidth: '78px'
               },
               {
                 name: 'firstNamesEng',
@@ -1846,10 +1978,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'duplicateIDNumber',
                     parameters: ['mother.iD']
-                  },
-                  {
-                    operation: 'duplicateIDNumber',
-                    parameters: ['informant.informantID']
                   }
                 ],
                 conditionals: [
@@ -1900,6 +2028,10 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression:
                       '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                  },
+                  {
+                    action: 'disable',
+                    expression: 'values.exactDateOfBirthUnknown'
                   }
                 ],
                 mapping: {
@@ -1917,6 +2049,62 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['birthDate']
                   }
                 }
+              },
+              {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                required: true,
+                hideInPreview: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!window.config.DATE_OF_BIRTH_UNKNOWN || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  },
+                  mutation: {
+                    operation: 'ignoreFieldTransformer'
+                  }
+                }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfFather,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.exactDateOfBirthUnknown || (!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant)'
+                  }
+                ],
+                postfix: 'years',
+                inputFieldWidth: '78px'
               },
               {
                 name: 'firstNamesEng',
@@ -3090,6 +3278,12 @@ export const registerForms: IDefaultRegisterForms = {
                 label: formMessageDescriptors.dateOfBirth,
                 required: true,
                 initialValue: '',
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: 'values.exactDateOfBirthUnknown'
+                  }
+                ],
                 validate: [
                   {
                     operation: 'isValidBirthDate'
@@ -3106,6 +3300,60 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: []
                   }
                 }
+              },
+              {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                hideInPreview: true,
+                required: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  },
+                  mutation: {
+                    operation: 'ignoreFieldTransformer'
+                  }
+                }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfDeceased,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.exactDateOfBirthUnknown'
+                  }
+                ],
+                postfix: 'years',
+                inputFieldWidth: '78px'
               },
               {
                 name: 'firstNamesEng',
@@ -3669,6 +3917,12 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 customisable: true,
                 initialValue: '',
+                conditionals: [
+                  {
+                    action: 'disable',
+                    expression: 'values.exactDateOfBirthUnknown'
+                  }
+                ],
                 validate: [
                   {
                     operation: 'dateFormatIsCorrect',
@@ -3710,6 +3964,76 @@ export const registerForms: IDefaultRegisterForms = {
                       'do MMMM yyyy',
                       'individual'
                     ]
+                  }
+                }
+              },
+              {
+                name: 'exactDateOfBirthUnknown',
+                type: 'CHECKBOX',
+                label: {
+                  defaultMessage: 'Exact date of birth unknown',
+                  description: 'Checkbox for exact date of birth unknown',
+                  id: 'form.field.label.exactDateOfBirthUnknown'
+                },
+                hideInPreview: true,
+                required: true,
+                hideHeader: true,
+                initialValue: false,
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!window.config.DATE_OF_BIRTH_UNKNOWN'
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'ignoreFieldTransformer'
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'booleanTransformer'
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'ageOfIndividualInYears',
+                type: 'NUMBER',
+                label: formMessageDescriptors.ageOfInformant,
+                customisable: true,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'range',
+                    parameters: [12, 120]
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [3]
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.exactDateOfBirthUnknown'
+                  }
+                ],
+                postfix: 'years',
+                inputFieldWidth: '78px',
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: ['individual']
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: ['individual']
                   }
                 }
               },

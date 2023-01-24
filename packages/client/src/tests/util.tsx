@@ -1674,6 +1674,7 @@ export const mockDeclarationData = {
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
     nationality: 'BGD',
+    exactDateOfBirthUnknown: false,
     ...primaryAddressData,
     ...primaryInternationalAddressLines,
     ...secondaryAddressData,
@@ -1688,6 +1689,7 @@ export const mockDeclarationData = {
     iD: '123456789',
     iDType: 'PASSPORT',
     fatherBirthDate: '1950-05-19',
+    exactDateOfBirthUnknown: false,
     dateOfMarriage: '1972-09-19',
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
@@ -1707,6 +1709,8 @@ export const mockDeclarationData = {
       value: 'MOTHER',
       nestedFields: { otherInformantType: '' }
     },
+    informantsSignature: 'data:image/png;base64,abcd',
+
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -1716,7 +1720,8 @@ export const mockDeclarationData = {
       officeAddressLevel4: 'Dhaka'
     },
     certificates: [{}]
-  }
+  },
+  documents: {}
 }
 
 export const mockDeathDeclarationData = {
@@ -1731,6 +1736,7 @@ export const mockDeathDeclarationData = {
     gender: 'male',
     maritalStatus: 'MARRIED',
     birthDate: '1987-02-16',
+    exactDateOfBirthUnknown: false,
     ...primaryAddressData,
     ...primaryInternationalAddressLines,
     ...secondaryAddressData,
@@ -1825,6 +1831,7 @@ export const mockBirthRegistrationSectionData = {
     value: 'MOTHER',
     nestedFields: { otherInformantType: '' }
   },
+  informantsSignature: 'data:image/png;base64,abcd',
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
   registrationNumber: '201908122365BDSS0SE1',

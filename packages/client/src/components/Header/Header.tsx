@@ -46,7 +46,7 @@ import {
   TRACKING_ID_TEXT,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { User } from '@client/utils/gateway'
+import { User, Event } from '@client/utils/gateway'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ArrowBack,
@@ -433,7 +433,12 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
         return (
           (locationId &&
-            goToPerformanceHomeAction(undefined, undefined, locationId)) ||
+            goToPerformanceHomeAction(
+              undefined,
+              undefined,
+              Event.Birth,
+              locationId
+            )) ||
           goToPerformanceHomeAction()
         )
       }

@@ -24,11 +24,8 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { buttonMessages } from '@client/i18n/messages'
 import { EMPTY_STRING } from '@client/utils/constants'
-import {
-  LinkButton,
-  PrimaryButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Link } from '@opencrvs/components/lib/Link'
 import styled from 'styled-components'
 import { Toggle } from '@opencrvs/components/lib/Toggle'
 import { RadioGroup } from '@opencrvs/components/lib/Radio'
@@ -75,7 +72,10 @@ const DescriptionMessage = styled.div`
 
 export enum ConfigActionType {
   HIDE_EVENT_REGISTER_INFORMATION = 'HIDE_EVENT_REGISTER_INFORMATION',
-  ADDRESSES = 'ADDRESSES'
+  ADDRESSES = 'ADDRESSES',
+  DATE_OF_BIRTH_UNKNOWN = 'DATE_OF_BIRTH_UNKNOWN',
+  INFORMANT_SIGNATURE = 'INFORMANT_SIGNATURE',
+  INFORMANT_SIGNATURE_REQUIRED = 'INFORMANT_SIGNATURE_REQUIRED'
 }
 
 function FormConfigSettingsComponent() {
@@ -93,6 +93,15 @@ function FormConfigSettingsComponent() {
   const [numberOfAddresses, setNumberOfAddresses] = React.useState(
     offlineCountryConfiguration.config.ADDRESSES
   )
+  const [dateOfBirthUnknown, setDateOfBirthUnknown] = React.useState(
+    offlineCountryConfiguration.config.DATE_OF_BIRTH_UNKNOWN
+  )
+  const [informantSignature, setInformantSignature] = React.useState(
+    offlineCountryConfiguration.config.INFORMANT_SIGNATURE
+  )
+  const [requiredForRegistration, setRequiredForRegistration] = React.useState(
+    offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED
+  )
   const [showModal, setShowModal] = React.useState(false)
   const [errorOccured, setErrorOccured] = React.useState(false)
   const [showNotification, setShowNotification] = React.useState(false)
@@ -104,7 +113,9 @@ function FormConfigSettingsComponent() {
   const changeValue = async () => {
     if (
       modalName === ConfigActionType.ADDRESSES ||
-      modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION
+      modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION ||
+      modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN ||
+      modalName === ConfigActionType.INFORMANT_SIGNATURE
     ) {
       try {
         await callApplicationConfigMutation(
@@ -114,6 +125,18 @@ function FormConfigSettingsComponent() {
                 ...offlineCountryConfiguration.config,
                 [ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION]:
                   introductionPage
+              }
+            : modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN
+            ? {
+                ...offlineCountryConfiguration.config,
+                [ConfigActionType.DATE_OF_BIRTH_UNKNOWN]: dateOfBirthUnknown
+              }
+            : modalName == ConfigActionType.INFORMANT_SIGNATURE
+            ? {
+                ...offlineCountryConfiguration.config,
+                [ConfigActionType.INFORMANT_SIGNATURE_REQUIRED]:
+                  requiredForRegistration,
+                [ConfigActionType.INFORMANT_SIGNATURE]: informantSignature
               }
             : {
                 ...offlineCountryConfiguration.config,
@@ -131,6 +154,10 @@ function FormConfigSettingsComponent() {
                   ? intl.formatMessage(messages.disable)
                   : intl.formatMessage(messages.enable)
               })
+            : modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN
+            ? intl.formatMessage(messages.dateOfBirthUnknownSuccessNotification)
+            : modalName == ConfigActionType.INFORMANT_SIGNATURE
+            ? intl.formatMessage(messages.informantSignatureSuccessNotification)
             : intl.formatMessage(messages.noOfAddressesSuccessNotification)
         )
       } catch {
@@ -145,6 +172,16 @@ function FormConfigSettingsComponent() {
 
   const handleNumberOfAddresses = (noOfAddresses: string) => {
     setNumberOfAddresses(parseInt(noOfAddresses))
+  }
+
+  const handleDateOfBirthUnknown = () => {
+    setDateOfBirthUnknown(!dateOfBirthUnknown)
+  }
+  const handleInformantSignature = () => {
+    setInformantSignature(!informantSignature)
+  }
+  const handleRequiredForRegistration = () => {
+    setRequiredForRegistration(!requiredForRegistration)
   }
 
   const toggleConfigModal = () => {
@@ -169,7 +206,7 @@ function FormConfigSettingsComponent() {
               </span>
             ]}
             actions={[
-              <LinkButton
+              <Link
                 id={'introductionPageSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION)
@@ -177,14 +214,14 @@ function FormConfigSettingsComponent() {
                 }}
               >
                 {intl.formatMessage(buttonMessages.change)}
-              </LinkButton>
+              </Link>
             ]}
           />
           <ListViewItemSimplified
             label={intl.formatMessage(messages.addressesSettings)}
             value={<span id="numberOfAddresses">{numberOfAddresses}</span>}
             actions={[
-              <LinkButton
+              <Link
                 id={'addressesSettings'}
                 onClick={() => {
                   setModalName(ConfigActionType.ADDRESSES)
@@ -192,7 +229,51 @@ function FormConfigSettingsComponent() {
                 }}
               >
                 {intl.formatMessage(buttonMessages.change)}
-              </LinkButton>
+              </Link>
+            ]}
+          />
+          <ListViewItemSimplified
+            label={intl.formatMessage(messages.exactDateOfBirthUnknownSettings)}
+            value={
+              <span id="exactDateOfBirthUnknown">
+                {dateOfBirthUnknown
+                  ? intl.formatMessage(messages.enable)
+                  : intl.formatMessage(messages.disable)}
+              </span>
+            }
+            actions={[
+              <Link
+                id={'exactDateOfBirthUnknownSettings'}
+                onClick={() => {
+                  setModalName(ConfigActionType.DATE_OF_BIRTH_UNKNOWN)
+                  toggleConfigModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.change)}
+              </Link>
+            ]}
+          />
+          <ListViewItemSimplified
+            label={intl.formatMessage(messages.informantSignatureSettings)}
+            value={
+              <span id="informantSignature">
+                {!informantSignature
+                  ? intl.formatMessage(messages.disable)
+                  : requiredForRegistration
+                  ? intl.formatMessage(messages.enableAndRequired)
+                  : intl.formatMessage(messages.enable)}
+              </span>
+            }
+            actions={[
+              <Link
+                id={'informantSignatureSettings'}
+                onClick={() => {
+                  setModalName(ConfigActionType.INFORMANT_SIGNATURE)
+                  toggleConfigModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.change)}
+              </Link>
             ]}
           />
         </ListViewSimplified>
@@ -205,6 +286,10 @@ function FormConfigSettingsComponent() {
             ? intl.formatMessage(messages.introductionPageSettingsDialogTitle)
             : modalName === ConfigActionType.ADDRESSES
             ? intl.formatMessage(messages.addressesSettingsDialogTitle)
+            : modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN
+            ? intl.formatMessage(messages.exactDateOfBirthUnknownSettings)
+            : modalName === ConfigActionType.INFORMANT_SIGNATURE
+            ? intl.formatMessage(messages.informantSignatureSettings)
             : EMPTY_STRING
         }
         autoHeight={true}
@@ -231,6 +316,10 @@ function FormConfigSettingsComponent() {
           </DescriptionMessage>
         ) : modalName === ConfigActionType.ADDRESSES ? (
           intl.formatMessage(messages.addressesSettingsDialogDesc)
+        ) : modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN ? (
+          intl.formatMessage(messages.exactDateOfBirthUnknownSettingsDialogDesc)
+        ) : modalName === ConfigActionType.INFORMANT_SIGNATURE ? (
+          intl.formatMessage(messages.informantSignatureSettingsDialogDesc)
         ) : (
           EMPTY_STRING
         )}
@@ -270,6 +359,56 @@ function FormConfigSettingsComponent() {
               value={numberOfAddresses.toString() as string}
             />
           </RadioGroupWrapper>
+        ) : modalName === ConfigActionType.DATE_OF_BIRTH_UNKNOWN ? (
+          <ListViewSimplified>
+            <ListViewItemSimplified
+              label={
+                <Label>
+                  {intl.formatMessage(messages.showAllowAgeInYears)}
+                </Label>
+              }
+              actions={
+                <CenteredToggle
+                  id="dateOfBirthUnknown"
+                  defaultChecked={dateOfBirthUnknown}
+                  onChange={handleDateOfBirthUnknown}
+                />
+              }
+            />
+          </ListViewSimplified>
+        ) : modalName === ConfigActionType.INFORMANT_SIGNATURE ? (
+          <ListViewSimplified>
+            <ListViewItemSimplified
+              label={
+                <Label>
+                  {intl.formatMessage(messages.showCaptureInformantSignature)}
+                </Label>
+              }
+              actions={
+                <CenteredToggle
+                  id="informantSignature"
+                  defaultChecked={informantSignature}
+                  onChange={handleInformantSignature}
+                />
+              }
+            />
+            {informantSignature && (
+              <ListViewItemSimplified
+                label={
+                  <Label>
+                    {intl.formatMessage(messages.showRequiredForRegistration)}
+                  </Label>
+                }
+                actions={
+                  <CenteredToggle
+                    id="requiredForRegistration"
+                    defaultChecked={requiredForRegistration}
+                    onChange={handleRequiredForRegistration}
+                  />
+                }
+              />
+            )}
+          </ListViewSimplified>
         ) : (
           <></>
         )}
