@@ -9,23 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 
-export const Tick = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    <path
-      d="M13.3332 4L5.99984 11.3333L2.6665 8"
-      stroke="black"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-)
+export const up = async (db, client) => {
+  await db.collection('configs').updateMany(
+    {},
+    {
+      $set: {
+        LOGIN_BACKGROUND: {
+          backgroundColor: '36304E'
+        }
+      }
+    }
+  )
+}
+
+export const down = async (db, client) => {
+  await db.collection('configs').updateMany(
+    {},
+    {
+      $unset: {
+        LOGIN_BACKGROUND: ''
+      }
+    }
+  )
+}

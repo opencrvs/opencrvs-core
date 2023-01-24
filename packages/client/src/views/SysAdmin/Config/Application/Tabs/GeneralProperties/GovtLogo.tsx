@@ -41,8 +41,8 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { IAttachmentValue } from '@client/forms'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
+import { Link } from '@opencrvs/components/lib/Link'
 
 export function GovtLogo() {
   const intl = useIntl()
@@ -130,9 +130,9 @@ export function GovtLogo() {
           />
         }
         actions={
-          <LinkButton id={id} onClick={toggleModal}>
+          <Link id={id} onClick={toggleModal}>
             {intl.formatMessage(buttonMessages.change)}
-          </LinkButton>
+          </Link>
         }
       />
       <ResponsiveModal

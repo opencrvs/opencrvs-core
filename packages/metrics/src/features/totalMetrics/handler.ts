@@ -29,7 +29,8 @@ import { uniqBy } from 'lodash'
 
 enum EVENT_LOCATION_TYPE {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
-  PRIVATE_HOME = 'PRIVATE_HOME'
+  PRIVATE_HOME = 'PRIVATE_HOME',
+  DECEASED_USUAL_RESIDENCE = 'DECEASED_USUAL_RESIDENCE'
 }
 
 export async function totalMetricsHandler(
@@ -166,8 +167,11 @@ export async function totalMetricsByLocation(
         result.eventLocationType === EVENT_LOCATION_TYPE.HEALTH_FACILITY
     )
 
-    const homeRegistrations = registrations.filter(
-      (result) => result.eventLocationType === EVENT_LOCATION_TYPE.PRIVATE_HOME
+    const homeRegistrations = registrations.filter((result) =>
+      event === 'BIRTH'
+        ? result.eventLocationType === EVENT_LOCATION_TYPE.PRIVATE_HOME
+        : result.eventLocationType ===
+          EVENT_LOCATION_TYPE.DECEASED_USUAL_RESIDENCE
     )
 
     response.push({
@@ -246,8 +250,11 @@ export async function totalMetricsByTime(
         result.eventLocationType === EVENT_LOCATION_TYPE.HEALTH_FACILITY
     )
 
-    const homeRegistrations = filteredRegistrations.filter(
-      (result) => result.eventLocationType === EVENT_LOCATION_TYPE.PRIVATE_HOME
+    const homeRegistrations = filteredRegistrations.filter((result) =>
+      event === 'BIRTH'
+        ? result.eventLocationType === EVENT_LOCATION_TYPE.PRIVATE_HOME
+        : result.eventLocationType ===
+          EVENT_LOCATION_TYPE.DECEASED_USUAL_RESIDENCE
     )
 
     results.push({
