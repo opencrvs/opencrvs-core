@@ -51,6 +51,11 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { IValidationResult } from '@client/utils/validate'
 import { IFieldErrors } from '@client/forms/validation'
+import { ComparisonListView } from '@opencrvs/components/lib/ComparisonListView'
+import { FullBodyContent, Content } from '@opencrvs/components/lib/Content'
+import { Text } from '@opencrvs/components/lib/Text'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -68,12 +73,29 @@ const TopBar = styled.div`
 
 interface IProps {
   declaration: IDeclaration
+  selectedDuplicateComId: string
+  onTabClick: (id: string) => void
+}
+
+interface IComparisonDeclaration {
+  title: React.ReactNode | string
+  data: {
+    label: React.ReactNode
+    heading: {
+      right: string
+      left: string
+    }
+    rightValue: React.ReactNode
+    leftValue: React.ReactNode
+  }[]
 }
 
 export const DuplicateFormTabs = (props: IProps) => {
-  const [selectedDuplicateComId, setSelectedDuplicateComId] = React.useState(
-    props.declaration.id
-  )
+  const { selectedDuplicateComId, onTabClick } = props
+  const [comparisonDelcarationData, setComparisonDelcarationData] =
+    React.useState<IComparisonDeclaration[] | undefined>(undefined)
+  const [isLoading, setIsLoading] = React.useState(false)
+
   const form = useSelector(getReviewForm)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
@@ -228,9 +250,10 @@ export const DuplicateFormTabs = (props: IProps) => {
     group: IFormSectionGroup,
     field: IFormField,
     visitedTags: string[],
-    errorsOnFields: IErrorsBySection
+    errorsOnFields: IErrorsBySection,
+    declaration: IDeclaration
   ) => {
-    const draft = props.declaration
+    const draft = declaration
 
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
@@ -239,7 +262,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
         if (
-          isVisibleField(field, section, props.declaration, offlineData) &&
+          isVisibleField(field, section, declaration, offlineData) &&
           !isViewOnly(field)
         ) {
           if (field.previewGroup === baseTag) {
@@ -248,12 +271,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           for (const index in field.nestedFields) {
             field.nestedFields[index].forEach((tempField) => {
               if (
-                isVisibleField(
-                  tempField,
-                  section,
-                  props.declaration,
-                  offlineData
-                ) &&
+                isVisibleField(tempField, section, declaration, offlineData) &&
                 !isViewOnly(tempField) &&
                 tempField.previewGroup === baseTag
               ) {
@@ -355,9 +373,10 @@ export const DuplicateFormTabs = (props: IProps) => {
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
-    sectionErrors: IErrorsBySection
+    sectionErrors: IErrorsBySection,
+    declaration: IDeclaration
   ) => {
-    const draft = props.declaration
+    const draft = declaration
     const visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
@@ -380,7 +399,8 @@ export const DuplicateFormTabs = (props: IProps) => {
             group,
             nestedField,
             visitedTags,
-            sectionErrors
+            sectionErrors,
+            declaration
           )
         )
       } else {
@@ -451,12 +471,13 @@ export const DuplicateFormTabs = (props: IProps) => {
 
   const transformSectionData = (
     formSections: IFormSection[],
-    errorsOnFields: IErrorsBySection
+    errorsOnFields: IErrorsBySection,
+    declaration: IDeclaration
   ) => {
-    const draft = props.declaration
+    const draft = declaration
     const overriddenFields = getOverriddenFieldsListForPreview(
       formSections,
-      props.declaration,
+      declaration,
       offlineData
     )
     let tempItem: any
@@ -472,7 +493,7 @@ export const DuplicateFormTabs = (props: IProps) => {
         group.fields
           .filter(
             (field) =>
-              isVisibleField(field, section, props.declaration, offlineData) &&
+              isVisibleField(field, section, declaration, offlineData) &&
               !isViewOnly(field)
           )
           .filter((field) => !Boolean(field.hideInPreview))
@@ -484,10 +505,17 @@ export const DuplicateFormTabs = (props: IProps) => {
                   group,
                   field,
                   visitedTags,
-                  errorsOnFields
+                  errorsOnFields,
+                  declaration
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? getNestedPreviewField(section, group, field, errorsOnFields)
+              ? getNestedPreviewField(
+                  section,
+                  group,
+                  field,
+                  errorsOnFields,
+                  declaration
+                )
               : getSinglePreviewField(section, field, errorsOnFields)
 
             overriddenFields.forEach((overriddenField) => {
@@ -515,8 +543,11 @@ export const DuplicateFormTabs = (props: IProps) => {
     })
   }
 
-  const getVisibleSections = (formSections: IFormSection[]) => {
-    const draft = props.declaration
+  const getVisibleSections = (
+    formSections: IFormSection[],
+    declaration: IDeclaration
+  ) => {
+    const draft = declaration
     return formSections.filter(
       (section) =>
         getVisibleSectionGroupsBasedOnConditions(
@@ -527,13 +558,16 @@ export const DuplicateFormTabs = (props: IProps) => {
     )
   }
 
-  const getViewableSection = (registerForm: IForm): IFormSection[] => {
+  const getViewableSection = (
+    registerForm: IForm,
+    declaration: IDeclaration
+  ): IFormSection[] => {
     const sections = registerForm.sections.filter(
       ({ id, viewType }) =>
         id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
     )
 
-    return getVisibleSections(sections)
+    return getVisibleSections(sections, declaration)
   }
 
   const fetchDuplicateDeclaration = async (duplicateCompositionId: string) => {
@@ -559,43 +593,154 @@ export const DuplicateFormTabs = (props: IProps) => {
     color: 'red'
   })
 
+  const actualTrackingId = tabs[0].title
+  const duplicateTrackingId = tabs.find(
+    (tab) => tab.id === selectedDuplicateComId
+  )?.title as string
+
   const duplicateTabHandler = async (duplicateCompositionId: string) => {
-    setSelectedDuplicateComId(duplicateCompositionId)
-    const duplicateDeclarationData = await fetchDuplicateDeclaration(
-      duplicateCompositionId
-    )
-    const eventData =
-      duplicateDeclarationData?.data?.fetchRegistrationForViewing
-    const eventType =
-      duplicateDeclarationData?.data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as Event
+    if (String(props.declaration.id) !== duplicateCompositionId) {
+      setIsLoading(true)
+      const duplicateDeclarationGQLData = await fetchDuplicateDeclaration(
+        duplicateCompositionId
+      )
+      if (duplicateDeclarationGQLData) {
+        setIsLoading(false)
+      }
+      const eventData =
+        duplicateDeclarationGQLData?.data?.fetchRegistrationForViewing
+      const eventType =
+        duplicateDeclarationGQLData?.data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as Event
+      const duplicateDeclarationData = gqlToDraftTransformer(
+        form[eventType],
+        eventData,
+        offlineData,
+        userDetails!
+      )
 
-    const transDuplicateDeclarationData: IFormData = gqlToDraftTransformer(
-      form[eventType],
-      eventData,
-      offlineData,
-      userDetails!
-    )
+      const actualDeclarationFormSections = getViewableSection(
+        registerForm[eventType],
+        props.declaration
+      )
+      const actualDeclarationerrorsOnFields = getErrorsOnFieldsBySection(
+        actualDeclarationFormSections,
+        offlineData,
+        props.declaration
+      )
+      const actualDeclarationTransformData = transformSectionData(
+        actualDeclarationFormSections,
+        actualDeclarationerrorsOnFields,
+        props.declaration
+      )
 
-    const formSections = getViewableSection(registerForm[eventType])
+      const duplicateDeclarationFormSections = getViewableSection(
+        registerForm[eventType],
+        { data: duplicateDeclarationData } as IDeclaration
+      )
+      const duplicateDeclarationerrorsOnFields = getErrorsOnFieldsBySection(
+        duplicateDeclarationFormSections,
+        offlineData,
+        { data: duplicateDeclarationData } as IDeclaration
+      )
+      const duplicateDeclarationTransformData = transformSectionData(
+        duplicateDeclarationFormSections,
+        duplicateDeclarationerrorsOnFields,
+        { data: duplicateDeclarationData } as IDeclaration
+      )
 
-    const errorsOnFields = getErrorsOnFieldsBySection(
-      formSections,
-      offlineData,
-      duplicateDeclarationData
-    )
-
-    console.log('originalDeclarationData', props.declaration)
-    console.log('transData', transDuplicateDeclarationData)
-    console.log(transformSectionData(formSections, errorsOnFields))
+      const formatterData = actualDeclarationTransformData
+        .filter((data1) => data1.id !== 'registration')
+        .map((data1) => {
+          const data2 = duplicateDeclarationTransformData.find(
+            (d) => d.id === data1.id
+          )
+          return {
+            title: data1.title,
+            data: data1.items.map((item1) => {
+              const item2 = data2?.items.find((i) => i.label === item1.label)
+              return {
+                label: (
+                  <Text variant="bold16" element="span" color="grey600">
+                    {item1.label}
+                  </Text>
+                ),
+                heading: {
+                  right: duplicateTrackingId,
+                  left: actualTrackingId
+                },
+                leftValue: (
+                  <Text variant="reg16" element="span" color="grey600">
+                    {item1.value}
+                  </Text>
+                ),
+                rightValue: (
+                  <Text variant="reg16" element="span" color="grey600">
+                    {item2.value}
+                  </Text>
+                )
+              }
+            })
+          }
+        })
+      setComparisonDelcarationData(formatterData)
+    } else {
+      setComparisonDelcarationData(undefined)
+      setIsLoading(false)
+    }
+    onTabClick(duplicateCompositionId)
   }
 
+  console.log(isLoading)
+
   return (
-    <TopBar>
-      <FormTabs
-        sections={tabs}
-        activeTabId={selectedDuplicateComId || EMPTY_STRING}
-        onTabClick={async (id: string) => await duplicateTabHandler(id)}
-      />
-    </TopBar>
+    <>
+      <p>test</p>
+      {isLoading && <h1>Loading</h1>}
+      <TopBar>
+        <FormTabs
+          sections={tabs}
+          activeTabId={selectedDuplicateComId || EMPTY_STRING}
+          onTabClick={async (id: string) => await duplicateTabHandler(id)}
+        />
+      </TopBar>
+
+      <LoadingIndicator loading={isLoading} />
+
+      {comparisonDelcarationData && (
+        <FullBodyContent>
+          <Content
+            title={intl.formatMessage(
+              duplicateMessages.duplicateComparePageTitle,
+              { actualTrackingId, duplicateTrackingId }
+            )}
+          >
+            {comparisonDelcarationData.map((sections) => {
+              return (
+                <>
+                  <Text variant="bold18" element="span" color="grey600">
+                    {sections.title}
+                  </Text>
+                  <ComparisonListView
+                    headings={[actualTrackingId, duplicateTrackingId]}
+                  >
+                    {sections.data.map((item) => (
+                      <ComparisonListView.Row
+                        label={item.label}
+                        heading={{
+                          right: item.heading.right,
+                          left: item.heading.left
+                        }}
+                        leftValue={item.leftValue}
+                        rightValue={item.rightValue}
+                      />
+                    ))}
+                  </ComparisonListView>
+                </>
+              )
+            })}
+          </Content>
+        </FullBodyContent>
+      )}
+    </>
   )
 }

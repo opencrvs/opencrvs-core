@@ -33,11 +33,19 @@ export const Row: React.FC<{
     <>
       <Stack>{label}</Stack>
       <Stack style={{ gap: '50%' }}>
-        <HideOnLargeScreen>{heading.left}</HideOnLargeScreen>
+        <HideOnLargeScreen>
+          <Text variant="bold16" element="span" color="grey600">
+            {heading.left}
+          </Text>
+        </HideOnLargeScreen>
         {leftValue}
       </Stack>
       <Stack style={{ gap: '50%' }}>
-        <HideOnLargeScreen>{heading.right}</HideOnLargeScreen>
+        <HideOnLargeScreen>
+          <Text variant="bold16" element="span" color="grey600">
+            {heading.right}
+          </Text>
+        </HideOnLargeScreen>
         {rightValue}
       </Stack>
     </>

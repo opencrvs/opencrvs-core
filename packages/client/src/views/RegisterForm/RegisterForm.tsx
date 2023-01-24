@@ -98,7 +98,8 @@ import {
   DECLARED,
   REJECTED,
   VALIDATED,
-  ACCUMULATED_FILE_SIZE
+  ACCUMULATED_FILE_SIZE,
+  EMPTY_STRING
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
@@ -219,6 +220,7 @@ type State = {
   confirmDeleteDeclarationModal: boolean
   isFileUploading: boolean
   startTime: number
+  selectedDuplicateComId: string
 }
 
 const fadeFromTop = keyframes`
@@ -257,10 +259,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
       showConfirmationModal: false,
       confirmDeleteDeclarationModal: false,
       isFileUploading: false,
-      startTime: 0
+      startTime: 0,
+      selectedDuplicateComId: props.declaration.id
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
+
+  setSelectedCompId = (id: string) => {
+    this.setState({ selectedDuplicateComId: id })
+  }
 
   showAllValidationErrors = () => {
     const touched = getSectionFields(
@@ -705,20 +712,29 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                     />
                   )}
-                  {duplicate && <DuplicateFormTabs declaration={declaration} />}
-                  <ReviewSection
-                    pageRoute={this.props.pageRoute}
-                    draft={declaration}
-                    rejectDeclarationClickEvent={this.toggleRejectForm}
-                    submitClickEvent={this.confirmSubmission}
-                    onChangeReviewForm={this.modifyDeclaration}
-                    onContinue={() => {
-                      this.props.goToCertificateCorrection(
-                        this.props.declaration.id,
-                        CorrectionSection.SupportingDocuments
-                      )
-                    }}
-                  />
+                  {duplicate && (
+                    <DuplicateFormTabs
+                      declaration={declaration}
+                      selectedDuplicateComId={this.state.selectedDuplicateComId}
+                      onTabClick={this.setSelectedCompId}
+                    />
+                  )}
+                  {(!duplicate ||
+                    this.state.selectedDuplicateComId === declaration.id) && (
+                    <ReviewSection
+                      pageRoute={this.props.pageRoute}
+                      draft={declaration}
+                      rejectDeclarationClickEvent={this.toggleRejectForm}
+                      submitClickEvent={this.confirmSubmission}
+                      onChangeReviewForm={this.modifyDeclaration}
+                      onContinue={() => {
+                        this.props.goToCertificateCorrection(
+                          this.props.declaration.id,
+                          CorrectionSection.SupportingDocuments
+                        )
+                      }}
+                    />
+                  )}
                 </>
               )}
 
