@@ -11,9 +11,9 @@
  */
 
 import { RouterAction } from 'connected-react-router'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from '@apollo/client'
-import { User, Query } from '@client/utils/gateway'
+import { User, FetchUserQuery } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =
@@ -42,12 +42,12 @@ type CheckAuthAction = {
 
 type SetUserDetailsAction = {
   type: typeof SET_USER_DETAILS
-  payload: ApolloQueryResult<Query>
+  payload: ApolloQueryResult<FetchUserQuery>
 }
 
 type ModifyUserDetailsAction = {
   type: typeof MODIFY_USER_DETAILS
-  payload: User
+  payload: Partial<UserDetails>
 }
 type SendVerifyCode = {
   type: typeof SEND_VERIFY_CODE
@@ -84,20 +84,22 @@ export const checkAuth = (): CheckAuthAction => ({
 })
 
 export const setUserDetails = (
-  payload: ApolloQueryResult<Query>
+  payload: ApolloQueryResult<FetchUserQuery>
 ): SetUserDetailsAction => ({
   type: SET_USER_DETAILS,
   payload
 })
 
-export const userDetailsAvailable = (payload: User) => ({
+export const userDetailsAvailable = (payload: UserDetails) => ({
   type: USER_DETAILS_AVAILABLE,
   payload
 })
 
 export type UserDetailsAvailable = ReturnType<typeof userDetailsAvailable>
 
-export const modifyUserDetails = (payload: User): ModifyUserDetailsAction => ({
+export const modifyUserDetails = (
+  payload: Partial<UserDetails>
+): ModifyUserDetailsAction => ({
   type: MODIFY_USER_DETAILS,
   payload
 })

@@ -248,7 +248,7 @@ export interface GQLUser {
   status: GQLStatus
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
-  catchmentArea?: Array<GQLLocation | null>
+  catchmentArea?: Array<GQLLocation>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
