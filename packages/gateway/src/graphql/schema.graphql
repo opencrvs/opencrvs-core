@@ -352,13 +352,13 @@ type RegistrationCountResult {
 type Location {
   id: ID!
   _fhirID: ID
-  identifier: [Identifier]
-  status: String
-  name: String
-  alias: [String]
+  identifier: [Identifier!]
+  status: String!
+  name: String!
+  alias: [String!]!
   description: String
-  partOf: String
-  type: LocationType
+  partOf: String!
+  type: LocationType!
   telecom: [ContactPoint]
   address: Address
   longitude: Float

@@ -220,13 +220,13 @@ export interface GQLRegistrationCountResult {
 export interface GQLLocation {
   id: string
   _fhirID?: string
-  identifier?: Array<GQLIdentifier | null>
-  status?: string
-  name?: string
-  alias?: Array<string | null>
+  identifier?: Array<GQLIdentifier>
+  status: string
+  name: string
+  alias: Array<string>
   description?: string
-  partOf?: string
-  type?: GQLLocationType
+  partOf: string
+  type: GQLLocationType
   telecom?: Array<GQLContactPoint | null>
   address?: GQLAddress
   longitude?: number
