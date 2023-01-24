@@ -30,6 +30,9 @@ interface INavigationMessages
   completenessRates: MessageDescriptor
   form: MessageDescriptor
   integration: MessageDescriptor
+  communications: MessageDescriptor
+  informantnotification: MessageDescriptor
+  outbox: MessageDescriptor
 }
 
 const messagesToDefine: INavigationMessages = {
@@ -117,6 +120,16 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Integrations',
     description: 'Integration forms label in navigation',
     id: 'navigation.integration'
+  },
+  communications: {
+    defaultMessage: 'Communications',
+    description: 'Communications label in navigation',
+    id: 'navigation.communications'
+  },
+  informantnotification: {
+    defaultMessage: 'Informant notifications',
+    description: 'Informant notifications label in navigation',
+    id: 'navigation.informantNotification'
   },
   outbox: {
     defaultMessage: 'Outbox',

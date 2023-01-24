@@ -28,9 +28,10 @@ export default async function updateTaskHandler(
   event: Events
 ) {
   try {
+    const token = getToken(request)
     const payload = await modifyTaskBundle(
       request.payload as fhir.Bundle,
-      getToken(request)
+      token
     )
     const taskId = getEntryId(payload)
     const taskResource = payload.entry?.[0].resource as fhir.Task | undefined

@@ -66,6 +66,7 @@ import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { ListOfOrganisations } from '@client/views/Organisation/ListOfOrganisations'
+import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -223,6 +224,14 @@ export class App extends React.Component<IAppProps> {
                                             ]}
                                             path={routes.CERTIFICATE_CONFIG}
                                             component={CertificatesConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
+                                            path={routes.INFORMANT_NOTIFICATION}
+                                            component={InformantNotification}
                                           />
                                           <ProtectedRoute
                                             exact
