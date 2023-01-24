@@ -28,6 +28,7 @@ export async function fetchLocationWiseDeclarationsStarted(
         WHERE time > $timeFrom
           AND time <= $timeTo
           AND ( officeLocation = $locationId'
+              OR locationLevel1 = $locationId
               OR locationLevel2 = $locationId
               OR locationLevel3 = $locationId
               OR locationLevel4 = $locationId
@@ -48,6 +49,7 @@ export async function fetchLocationWiseDeclarationsStarted(
         WHERE time > $timeFrom
           AND time <= $timeTo
           AND ( officeLocation = $locationId
+              OR locationLevel1 = $locationId
               OR locationLevel2 = $locationId
               OR locationLevel3 = $locationId
               OR locationLevel4 = $locationId
@@ -68,6 +70,7 @@ export async function fetchLocationWiseDeclarationsStarted(
         WHERE time > $timeFrom
           AND time <= $timeTo
           AND ( officeLocation = $locationId
+              OR locationLevel1 = $locationId
               OR locationLevel2 = $locationId
               OR locationLevel3 = $locationId
               OR locationLevel4 = $locationId
@@ -114,6 +117,7 @@ export async function getNumberOfAppStartedByPractitioners(
             WHERE time > $timeFrom
               AND time <= $timeTo
               AND ( officeLocation = $locationId
+                  OR locationLevel1 = $locationId
                   OR locationLevel2 = $locationId
                   OR locationLevel3 = $locationId
                   OR locationLevel4 = $locationId
@@ -155,6 +159,7 @@ export async function getNumberOfRejectedAppStartedByPractitioners(
               WHERE time > $timeFrom
                 AND time <= $timeTo
                 AND ( officeLocation = $locationId
+                    OR locationLevel1 = $locationId
                     OR locationLevel2 = $locationId
                     OR locationLevel3 = $locationId
                     OR locationLevel4 = $locationId
@@ -200,6 +205,7 @@ export async function getAvgTimeSpentOnAppByPractitioners(
                     AND time <= $timeTo
                     AND currentStatus = $status
                     AND ( officeLocation = $locationId
+                        OR locationLevel1 = $locationId
                         OR locationLevel2 = $locationId
                         OR locationLevel3 = $locationId
                         OR locationLevel4 = $locationId

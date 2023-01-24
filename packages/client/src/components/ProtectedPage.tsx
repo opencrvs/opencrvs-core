@@ -11,7 +11,6 @@
  */
 import * as React from 'react'
 import PageVisibility from 'react-page-visibility'
-import { SecureAccount } from '@client/views/SecureAccount/SecureAccountView'
 import { Unlock } from '@client/views/Unlock/Unlock'
 import { storage } from '@client/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
@@ -34,6 +33,7 @@ import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { showPINUpdateSuccessToast } from '@client/notification/actions'
+import { CreatePin } from '@client/views/PIN/CreatePin'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -232,14 +232,13 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 
     if (!pinExists || passwordVerified) {
       return (
-        <SecureAccount
+        <CreatePin
           onComplete={() => {
             if (passwordVerified) {
               this.props.showPINUpdateSuccessToast()
             }
             this.markAsSecured()
           }}
-          collectPin={passwordVerified}
         />
       )
     }

@@ -96,6 +96,7 @@ const motherDetailsForBirth = {
   firstNamesEng: 'Sally',
   familyNameEng: 'Kane',
   motherBirthDate: '1990-02-02',
+  exactDateOfBirthUnknown: false,
   seperator: '',
   maritalStatus: 'MARRIED',
   multipleBirth: 1,
@@ -201,6 +202,7 @@ const deceasedDetails = {
   firstNamesEng: 'Harry',
   familyNameEng: 'Kane',
   birthDate: '1990-02-02',
+  exactDateOfBirthUnknown: false,
   gender: 'male',
   seperator: '',
   maritalStatus: 'MARRIED',
@@ -247,6 +249,7 @@ const informantDetailsForDeath = {
   nationality: 'FAR',
   informantID: '951951951',
   informantBirthDate: '1980-02-02',
+  exactDateOfBirthUnknown: false,
   firstNamesEng: 'Lesley',
   familyNameEng: 'Styles',
   primaryAddressSameAsOtherPrimary: true,
@@ -294,6 +297,7 @@ const informantDetailsForDeath = {
 
 const deathEventDetails = {
   deathDate: '2017-01-01',
+  exactDateOfBirthUnknown: false,
   manner: 'NATURAL_CAUSES',
   causeOfDeathEstablished: 'true',
   causeOfDeathMethod: 'VERBAL_AUTOPSY',

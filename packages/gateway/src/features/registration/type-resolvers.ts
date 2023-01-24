@@ -161,6 +161,28 @@ export const typeResolvers: GQLResolver = {
         null
       )
     },
+    ageOfIndividualInYears: (person) => {
+      const ageOfIndividualInYearsExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+        person.extension
+      )
+      return (
+        (ageOfIndividualInYearsExtension &&
+          ageOfIndividualInYearsExtension.valueString) ||
+        null
+      )
+    },
+    exactDateOfBirthUnknown: (person) => {
+      const exactDateOfBirthUnknownExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/age-of-individual-in-years`,
+        person.extension
+      )
+      return (
+        (exactDateOfBirthUnknownExtension &&
+          exactDateOfBirthUnknownExtension.valueString) ||
+        null
+      )
+    },
     detailsExist: (person) => {
       return person.active
     },
@@ -406,6 +428,15 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
+
+    informantsSignature: (task) => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
+
     contactRelationship: (task) => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,

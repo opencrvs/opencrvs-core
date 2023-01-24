@@ -17,7 +17,6 @@ import {
   IFormData,
   IFormFieldValue,
   IContactPoint,
-  Sort,
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
@@ -75,7 +74,7 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
-import { at } from 'lodash'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -1340,6 +1339,15 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           eventData.registration.status &&
           eventData.registration.status[0].type) ||
         ''
+      const updateWorkqueue = () =>
+        updateRegistrarWorkqueue(
+          userDetails?.practitionerId,
+          10,
+          Boolean(
+            userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+          )
+        )
+
       newDeclarationsAfterDownload[downloadingDeclarationIndex] =
         createReviewDeclaration(
           downloadingDeclaration.id,
@@ -1383,7 +1391,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
                     clientFromSuccess
                   )
               }),
-              Cmd.action(updateRegistrarWorkqueue())
+              Cmd.action(updateWorkqueue())
             ],
             { sequence: true }
           )
@@ -1411,7 +1419,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
               ],
               failActionCreator: downloadDeclarationFail
             }),
-            Cmd.action(updateRegistrarWorkqueue()),
+            Cmd.action(updateWorkqueue()),
             Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(
               requestWithStateWrapper,
               {

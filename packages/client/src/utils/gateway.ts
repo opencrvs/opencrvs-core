@@ -211,10 +211,13 @@ export type ApplicationConfiguration = {
   BIRTH?: Maybe<Birth>
   COUNTRY_LOGO?: Maybe<CountryLogo>
   CURRENCY?: Maybe<Currency>
+  DATE_OF_BIRTH_UNKNOWN?: Maybe<Scalars['Boolean']>
   DEATH?: Maybe<Death>
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -226,10 +229,13 @@ export type ApplicationConfigurationInput = {
   BIRTH?: InputMaybe<BirthInput>
   COUNTRY_LOGO?: InputMaybe<CountryLogoInput>
   CURRENCY?: InputMaybe<CurrencyInput>
+  DATE_OF_BIRTH_UNKNOWN?: InputMaybe<Scalars['Boolean']>
   DEATH?: InputMaybe<DeathInput>
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -1484,11 +1490,13 @@ export type Person = {
   _fhirID?: Maybe<Scalars['ID']>
   address?: Maybe<Array<Maybe<Address>>>
   age?: Maybe<Scalars['Float']>
+  ageOfIndividualInYears?: Maybe<Scalars['Int']>
   birthDate?: Maybe<Scalars['String']>
   dateOfMarriage?: Maybe<Scalars['Date']>
   deceased?: Maybe<Deceased>
   detailsExist?: Maybe<Scalars['Boolean']>
   educationalAttainment?: Maybe<EducationType>
+  exactDateOfBirthUnknown?: Maybe<Scalars['Boolean']>
   gender?: Maybe<Scalars['String']>
   id?: Maybe<Scalars['ID']>
   identifier?: Maybe<Array<Maybe<IdentityType>>>
@@ -1506,6 +1514,7 @@ export type PersonInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   address?: InputMaybe<Array<InputMaybe<AddressInput>>>
   age?: InputMaybe<Scalars['Float']>
+  ageOfIndividualInYears?: InputMaybe<Scalars['Int']>
   birthDate?: InputMaybe<Scalars['String']>
   dateOfMarriage?: InputMaybe<Scalars['Date']>
   deceased?: InputMaybe<DeceasedInput>
@@ -1882,6 +1891,7 @@ export type Registration = {
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
+  informantsSignature?: Maybe<Scalars['String']>
   mosipAid?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
@@ -1910,6 +1920,7 @@ export type RegistrationInput = {
   draftId?: InputMaybe<Scalars['String']>
   inCompleteFields?: InputMaybe<Scalars['String']>
   informantType?: InputMaybe<InformantType>
+  informantsSignature?: InputMaybe<Scalars['String']>
   location?: InputMaybe<LocationInput>
   mosipAid?: InputMaybe<Scalars['String']>
   otherInformantType?: InputMaybe<Scalars['String']>
@@ -1954,6 +1965,8 @@ export type RelatedPerson = {
   __typename?: 'RelatedPerson'
   _fhirID?: Maybe<Scalars['ID']>
   affidavit?: Maybe<Array<Maybe<Attachment>>>
+  ageOfIndividualInYears?: Maybe<Scalars['Int']>
+  exactDateOfBirthUnknown?: Maybe<Scalars['Boolean']>
   id?: Maybe<Scalars['ID']>
   individual?: Maybe<Person>
   otherRelationship?: Maybe<Scalars['String']>
@@ -1963,6 +1976,8 @@ export type RelatedPerson = {
 export type RelatedPersonInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   affidavit?: InputMaybe<Array<AttachmentInput>>
+  ageOfIndividualInYears?: InputMaybe<Scalars['Int']>
+  exactDateOfBirthUnknown?: InputMaybe<Scalars['Boolean']>
   id?: InputMaybe<Scalars['ID']>
   individual?: InputMaybe<PersonInput>
   otherRelationship?: InputMaybe<Scalars['String']>
@@ -2220,11 +2235,12 @@ export type UserInput = {
 
 export type VsExport = {
   __typename?: 'VSExport'
-  createdOn: Scalars['String']
+  createdOn: Scalars['Date']
+  endDate: Scalars['Date']
   event: Scalars['String']
   fileSize: Scalars['String']
+  startDate: Scalars['Date']
   url: Scalars['String']
-  year: Scalars['Int']
 }
 
 export type VerifyPasswordResult = {
@@ -3168,6 +3184,8 @@ export type FetchBirthRegistrationForReviewQuery = {
         occupation?: string | null
         nationality?: Array<string | null> | null
         birthDate?: string | null
+        ageOfIndividualInYears?: number | null
+        exactDateOfBirthUnknown?: boolean | null
         identifier?: Array<{
           __typename?: 'IdentityType'
           id?: string | null
@@ -3201,6 +3219,8 @@ export type FetchBirthRegistrationForReviewQuery = {
       occupation?: string | null
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       dateOfMarriage?: any | null
       educationalAttainment?: EducationType | null
       nationality?: Array<string | null> | null
@@ -3240,6 +3260,8 @@ export type FetchBirthRegistrationForReviewQuery = {
       occupation?: string | null
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       dateOfMarriage?: any | null
       educationalAttainment?: EducationType | null
       nationality?: Array<string | null> | null
@@ -3471,6 +3493,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
       occupation?: string | null
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -3510,6 +3534,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
       occupation?: string | null
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -3549,6 +3575,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
         nationality?: Array<string | null> | null
         occupation?: string | null
         birthDate?: string | null
+        ageOfIndividualInYears?: number | null
+        exactDateOfBirthUnknown?: boolean | null
         identifier?: Array<{
           __typename?: 'IdentityType'
           id?: string | null
@@ -3828,6 +3856,8 @@ export type FetchDeathRegistrationForReviewQuery = {
       id?: string | null
       birthDate?: string | null
       age?: number | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       gender?: string | null
       maritalStatus?: MaritalStatusType | null
       nationality?: Array<string | null> | null
@@ -3866,6 +3896,8 @@ export type FetchDeathRegistrationForReviewQuery = {
         nationality?: Array<string | null> | null
         occupation?: string | null
         birthDate?: string | null
+        ageOfIndividualInYears?: number | null
+        exactDateOfBirthUnknown?: boolean | null
         identifier?: Array<{
           __typename?: 'IdentityType'
           id?: string | null
@@ -4110,6 +4142,8 @@ export type FetchDeathRegistrationForCertificationQuery = {
       id?: string | null
       birthDate?: string | null
       age?: number | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       gender?: string | null
       maritalStatus?: MaritalStatusType | null
       nationality?: Array<string | null> | null
@@ -5618,6 +5652,9 @@ export type UpdateApplicationConfigMutation = {
     NID_NUMBER_PATTERN?: string | null
     PHONE_NUMBER_PATTERN?: string | null
     HIDE_EVENT_REGISTER_INFORMATION?: boolean | null
+    DATE_OF_BIRTH_UNKNOWN?: boolean | null
+    INFORMANT_SIGNATURE?: boolean | null
+    INFORMANT_SIGNATURE_REQUIRED?: boolean | null
     ADDRESSES?: number | null
     ADMIN_LEVELS?: number | null
     COUNTRY_LOGO?: {
@@ -6278,9 +6315,10 @@ export type GetVsExportsQuery = {
     results?: Array<{
       __typename?: 'VSExport'
       event: string
-      year: number
+      startDate: any
+      endDate: any
       url: string
-      createdOn: string
+      createdOn: any
       fileSize: string
     }> | null
   } | null
@@ -6336,6 +6374,8 @@ export type FetchViewRecordByCompositionQuery = {
             occupation?: string | null
             nationality?: Array<string | null> | null
             birthDate?: string | null
+            ageOfIndividualInYears?: number | null
+            exactDateOfBirthUnknown?: boolean | null
             identifier?: Array<{
               __typename?: 'IdentityType'
               id?: string | null
@@ -6365,6 +6405,8 @@ export type FetchViewRecordByCompositionQuery = {
           id?: string | null
           multipleBirth?: number | null
           birthDate?: string | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
           maritalStatus?: MaritalStatusType | null
           occupation?: string | null
           detailsExist?: boolean | null
@@ -6404,6 +6446,8 @@ export type FetchViewRecordByCompositionQuery = {
           __typename?: 'Person'
           id?: string | null
           birthDate?: string | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
           maritalStatus?: MaritalStatusType | null
           occupation?: string | null
           detailsExist?: boolean | null
@@ -6614,6 +6658,8 @@ export type FetchViewRecordByCompositionQuery = {
           id?: string | null
           birthDate?: string | null
           age?: number | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
           gender?: string | null
           maritalStatus?: MaritalStatusType | null
           nationality?: Array<string | null> | null
@@ -6655,6 +6701,8 @@ export type FetchViewRecordByCompositionQuery = {
             nationality?: Array<string | null> | null
             occupation?: string | null
             birthDate?: string | null
+            ageOfIndividualInYears?: number | null
+            exactDateOfBirthUnknown?: boolean | null
             identifier?: Array<{
               __typename?: 'IdentityType'
               id?: string | null

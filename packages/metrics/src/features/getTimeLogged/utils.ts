@@ -71,7 +71,8 @@ export async function getTimeLoggedForPractitioner(
           FROM declaration_time_logged
             WHERE time > $timeFrom AND time <= $timeTo
             AND practitionerId = $practitionerId
-            AND ( locationLevel2 = $locationId 
+            AND ( locationLevel1 = $locationId 
+            OR locationLevel2 = $locationId 
             OR locationLevel3 = $locationId 
             OR locationLevel4 = $locationId 
             OR locationLevel5 = $locationId)

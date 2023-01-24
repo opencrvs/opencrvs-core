@@ -12,11 +12,17 @@
 import {
   LinkButton,
   TertiaryButton,
-  PrimaryButton
+  PrimaryButton,
+  SecondaryButton
 } from '@opencrvs/components/lib/buttons'
-import { InputField } from '@opencrvs/components/lib/InputField'
-import { TextArea } from '@opencrvs/components/lib/TextArea'
-import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/Select'
+import SignatureCanvas from 'react-signature-canvas'
+import {
+  ImageUploader,
+  InputField,
+  ISelectOption as SelectComponentOptions,
+  TextArea
+} from '@opencrvs/components/lib/'
+
 import { Alert } from '@opencrvs/components/lib/Alert'
 import {
   DocumentViewer,
@@ -123,6 +129,7 @@ import {
   injectIntl,
   IntlShape,
   MessageDescriptor,
+  useIntl,
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
@@ -131,6 +138,11 @@ import { IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
+import {
+  ApplyButton,
+  CancelButton
+} from '@client/views/SysAdmin/Config/Application/Components'
+import { getBase64String } from '@client/utils/imageUtils'
 import {
   bytesToSize,
   isCorrection,
@@ -256,6 +268,173 @@ const DocumentListPreviewContainer = styled.div`
 const InputWrapper = styled.div`
   margin-top: 56px;
 `
+
+const CustomImageUpload = styled(ImageUploader)`
+  border: 0 !important;
+`
+const SignatureContainer = styled.div`
+  border: 2px solid ${({ theme }) => theme.colors.grey600};
+  border-radius: 4px;
+  width: 100%;
+`
+const SignatureInputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`
+const SignaturePreview = styled.img`
+  max-width: 50%;
+  display: block;
+`
+
+function SignCanvas({
+  value,
+  onChange
+}: {
+  value?: string
+  onChange: (value: string) => void
+}) {
+  const [canvasWidth, setCanvasWidth] = React.useState(300)
+  const canvasContainerRef = React.useRef<HTMLDivElement>(null)
+  const canvasRef = React.useRef<SignatureCanvas>(null)
+
+  React.useEffect(() => {
+    function handleResize() {
+      if (canvasContainerRef.current) {
+        setCanvasWidth(canvasContainerRef.current.offsetWidth)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    handleResize()
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [canvasContainerRef])
+
+  React.useEffect(() => {
+    if (canvasRef.current && value) {
+      canvasRef.current.fromDataURL(value)
+    }
+  }, [value])
+
+  function emitValueToParent() {
+    const data = canvasRef.current?.toDataURL()
+    if (!data) {
+      return
+    }
+    onChange(data)
+  }
+
+  function clear() {
+    canvasRef.current?.clear()
+    onChange('')
+  }
+
+  return (
+    <SignatureInputContainer>
+      <SignatureContainer ref={canvasContainerRef}>
+        <SignatureCanvas
+          ref={canvasRef}
+          onEnd={() => {
+            emitValueToParent()
+          }}
+          penColor="black"
+          canvasProps={{
+            width: canvasWidth,
+            height: 200
+          }}
+        />
+      </SignatureContainer>
+      <TertiaryButton onClick={clear}>Clear</TertiaryButton>
+    </SignatureInputContainer>
+  )
+}
+
+type SignatureInputProps = {
+  id?: string
+  value?: string
+  onChange: (value: string) => void
+}
+
+const SignatureDescription = styled.p`
+  margin-top: 0;
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.grey500};
+`
+
+function SignatureInput({ id, value, onChange }: SignatureInputProps) {
+  const [signatureDialogOpen, setSignatureDialogOpen] = React.useState(false)
+  const [signatureValue, setSignatureValue] = React.useState('')
+
+  const intl = useIntl()
+
+  function apply() {
+    setSignatureDialogOpen(false)
+    onChange(signatureValue)
+  }
+
+  return (
+    <div>
+      <SignatureDescription>
+        {intl.formatMessage(messages.signatureDescription)}
+      </SignatureDescription>
+      {!value && (
+        <>
+          <SecondaryButton onClick={() => setSignatureDialogOpen(true)}>
+            {intl.formatMessage(messages.signatureOpenSignatureInput)}
+          </SecondaryButton>
+          <CustomImageUpload
+            id="signature-file-upload"
+            title="Upload"
+            handleFileChange={async (file) => {
+              onChange((await getBase64String(file)).toString())
+            }}
+          />
+        </>
+      )}
+      {value && <SignaturePreview alt="Informant's signature" src={value} />}
+      {value && (
+        <TertiaryButton onClick={() => onChange('')}>
+          {intl.formatMessage(messages.signatureDelete)}
+        </TertiaryButton>
+      )}
+
+      <ResponsiveModal
+        id={`${id}Modal`}
+        title={intl.formatMessage(messages.informantsSignature)}
+        autoHeight={true}
+        titleHeightAuto={true}
+        width={600}
+        show={signatureDialogOpen}
+        actions={[
+          <CancelButton
+            key="cancel"
+            id="modal_cancel"
+            onClick={() => setSignatureDialogOpen(false)}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </CancelButton>,
+          <ApplyButton
+            key="apply"
+            id="apply_change"
+            disabled={false}
+            onClick={apply}
+          >
+            {intl.formatMessage(buttonMessages.apply)}
+          </ApplyButton>
+        ]}
+        handleClose={() => setSignatureDialogOpen(false)}
+      >
+        <SignatureDescription>
+          {intl.formatMessage(messages.signatureInputDescription)}
+        </SignatureDescription>
+        <SignCanvas value={value} onChange={setSignatureValue} />
+      </ResponsiveModal>
+    </div>
+  )
+}
+
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
   activeSection: IFormSection,
@@ -1523,7 +1702,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       viewRecord
     } = this.props
 
-    if (viewRecord || Boolean(duplicates)) {
+    if (
+      viewRecord ||
+      (Boolean(duplicates) && !isCorrection(this.props.draft))
+    ) {
       return false
     }
     return (
@@ -1645,7 +1827,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     } = this.props
     const isDuplicate = Boolean(declaration.duplicates)
     const formSections =
-      viewRecord || isDuplicate
+      (viewRecord || isDuplicate) && !isCorrection(declaration)
         ? this.getViewableSection(registerForm[event]).map((section) => {
             return {
               ...section,
@@ -1664,10 +1846,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       declaration
     )
 
+    const isSignatureMissing = isCorrection(declaration)
+      ? false
+      : offlineCountryConfiguration.config.INFORMANT_SIGNATURE_REQUIRED &&
+        !declaration.data.registration?.informantsSignature
+
     const isComplete =
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
-      ).length === 0
+      ).length === 0 && !isSignatureMissing
 
     const textAreaProps = {
       id: 'additional_comments',
@@ -1683,6 +1870,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           declaration.data.registration.commentsOrNotes) ||
         '',
       ignoreMediaQuery: true
+    }
+
+    const signatureInputProps = {
+      id: 'informants_signature',
+      onChange: (value: string) => {
+        this.props.onChangeReviewForm &&
+          this.props.onChangeReviewForm(
+            { informantsSignature: value },
+            registrationSection,
+            declaration
+          )
+      },
+      value: declaration.data.registration?.informantsSignature as string
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
@@ -1702,7 +1902,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       <FullBodyContent>
         <Row>
           <LeftColumn>
-            {isDuplicate && <DuplicateForm declaration={declaration} />}
+            {!isCorrection(declaration) && isDuplicate && (
+              <DuplicateForm declaration={declaration} />
+            )}
             <Items>
               <ReviewHeader
                 id="review_header"
@@ -1794,6 +1996,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </InputField>
                   </InputWrapper>
                 )}
+
+                {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
+                  !isCorrection(declaration) && (
+                    <InputWrapper>
+                      <InputField
+                        id="informant_signature"
+                        touched={false}
+                        required={window.config.INFORMANT_SIGNATURE_REQUIRED}
+                        label={intl.formatMessage(messages.informantsSignature)}
+                      >
+                        <SignatureInput {...signatureInputProps} />
+                      </InputField>
+                    </InputWrapper>
+                  )}
                 {totalFileSizeExceeded && (
                   <Alert type="warning">
                     {intl.formatMessage(constantsMessages.totalFileSizeExceed, {
@@ -1801,7 +2017,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })}
                   </Alert>
                 )}
-                {viewRecord || isDuplicate ? null : (
+                {(viewRecord || isDuplicate) &&
+                !isCorrection(declaration) ? null : (
                   <>
                     {!isCorrection(declaration) ? (
                       <>
@@ -1859,7 +2076,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     })}
                   {!ENABLE_REVIEW_ATTACHMENTS_SCROLLING &&
                     intl.formatMessage(messages.zeroDocumentsTextForAnySection)}
-                  {viewRecord || isDuplicate ? null : (
+                  {(viewRecord || isDuplicate) &&
+                  !isCorrection(declaration) ? null : (
                     <LinkButton
                       id="edit-document"
                       disabled={

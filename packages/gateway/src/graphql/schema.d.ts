@@ -187,6 +187,8 @@ export interface GQLPerson {
   deceased?: GQLDeceased
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
+  ageOfIndividualInYears?: number
+  exactDateOfBirthUnknown?: boolean
 }
 
 export interface GQLBirthRegResultSet {
@@ -606,7 +608,11 @@ export interface GQLApplicationConfiguration {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
+  INFORMANT_SIGNATURE?: boolean
+  INFORMANT_SIGNATURE_REQUIRED?: boolean
+  DATE_OF_BIRTH_UNKNOWN?: boolean
   ADMIN_LEVELS?: number
+  LOGIN_BACKGROUND?: GQLLoginBackground
 }
 
 export interface GQLApplicationConfigurationInput {
@@ -621,7 +627,11 @@ export interface GQLApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
+  INFORMANT_SIGNATURE?: boolean
+  INFORMANT_SIGNATURE_REQUIRED?: boolean
+  DATE_OF_BIRTH_UNKNOWN?: boolean
   ADMIN_LEVELS?: number
+  LOGIN_BACKGROUND?: GQLLoginBackgroundInput
 }
 
 export interface GQLFormDraftInput {
@@ -704,6 +714,7 @@ export interface GQLRegistration {
   assignment?: GQLAssignmentData
   contact?: string
   contactRelationship?: string
+  informantsSignature?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
@@ -720,6 +731,8 @@ export interface GQLRelatedPerson {
   otherRelationship?: string
   affidavit?: Array<GQLAttachment | null>
   individual?: GQLPerson
+  exactDateOfBirthUnknown?: boolean
+  ageOfIndividualInYears?: number
 }
 
 export const enum GQLBirthType {
@@ -979,10 +992,11 @@ export interface GQLTotalMetricsByTime {
 
 export interface GQLVSExport {
   event: string
-  year: number
+  startDate: GQLDate
+  endDate: GQLDate
   fileSize: string
   url: string
-  createdOn: string
+  createdOn: GQLDate
 }
 
 export type GQLUserAuditLogResultItem =
@@ -1090,6 +1104,7 @@ export interface GQLPersonInput {
   deceased?: GQLDeceasedInput
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
+  ageOfIndividualInYears?: number
 }
 
 export interface GQLLocationInput {
@@ -1118,6 +1133,7 @@ export interface GQLRegistrationInput {
   paperFormID?: string
   page?: string
   book?: string
+  informantsSignature?: string
   informantType?: GQLInformantType
   otherInformantType?: string
   contact?: string
@@ -1139,6 +1155,8 @@ export interface GQLRelatedPersonInput {
   otherRelationship?: string
   affidavit?: Array<GQLAttachmentInput>
   individual?: GQLPersonInput
+  exactDateOfBirthUnknown?: boolean
+  ageOfIndividualInYears?: number
 }
 
 export interface GQLQuestionnaireQuestionInput {
@@ -1202,6 +1220,12 @@ export interface GQLDeath {
   FEE?: GQLDeathFee
 }
 
+export interface GQLLoginBackground {
+  backgroundColor?: string
+  backgroundImage?: string
+  imageFit?: GQLImageFit
+}
+
 export interface GQLBirthInput {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
@@ -1221,6 +1245,12 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
+}
+
+export interface GQLLoginBackgroundInput {
+  backgroundColor?: string
+  backgroundImage?: string
+  imageFit?: GQLImageFit
 }
 
 export interface GQLQuestionInput {
@@ -1644,6 +1674,11 @@ export interface GQLDeathFee {
   DELAYED?: number
 }
 
+export const enum GQLImageFit {
+  FILL = 'FILL',
+  TILE = 'TILE'
+}
+
 export interface GQLBirthFeeInput {
   ON_TIME?: number
   LATE?: number
@@ -1857,6 +1892,7 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
+  LoginBackground?: GQLLoginBackgroundTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -3675,6 +3711,8 @@ export interface GQLPersonTypeResolver<TParent = any> {
   deceased?: PersonToDeceasedResolver<TParent>
   nationality?: PersonToNationalityResolver<TParent>
   educationalAttainment?: PersonToEducationalAttainmentResolver<TParent>
+  ageOfIndividualInYears?: PersonToAgeOfIndividualInYearsResolver<TParent>
+  exactDateOfBirthUnknown?: PersonToExactDateOfBirthUnknownResolver<TParent>
 }
 
 export interface PersonToIdResolver<TParent = any, TResult = any> {
@@ -3753,6 +3791,20 @@ export interface PersonToNationalityResolver<TParent = any, TResult = any> {
 }
 
 export interface PersonToEducationalAttainmentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToAgeOfIndividualInYearsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PersonToExactDateOfBirthUnknownResolver<
   TParent = any,
   TResult = any
 > {
@@ -4683,7 +4735,11 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
+  INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
+  INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
+  DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
   ADMIN_LEVELS?: ApplicationConfigurationToADMIN_LEVELSResolver<TParent>
+  LOGIN_BACKGROUND?: ApplicationConfigurationToLOGIN_BACKGROUNDResolver<TParent>
 }
 
 export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
@@ -4763,7 +4819,35 @@ export interface ApplicationConfigurationToADDRESSESResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface ApplicationConfigurationToADMIN_LEVELSResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationConfigurationToLOGIN_BACKGROUNDResolver<
   TParent = any,
   TResult = any
 > {
@@ -4839,6 +4923,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   assignment?: RegistrationToAssignmentResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
   contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
+  informantsSignature?: RegistrationToInformantsSignatureResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
@@ -4925,6 +5010,13 @@ export interface RegistrationToContactRelationshipResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface RegistrationToInformantsSignatureResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface RegistrationToContactPhoneNumberResolver<
   TParent = any,
   TResult = any
@@ -4975,6 +5067,8 @@ export interface GQLRelatedPersonTypeResolver<TParent = any> {
   otherRelationship?: RelatedPersonToOtherRelationshipResolver<TParent>
   affidavit?: RelatedPersonToAffidavitResolver<TParent>
   individual?: RelatedPersonToIndividualResolver<TParent>
+  exactDateOfBirthUnknown?: RelatedPersonToExactDateOfBirthUnknownResolver<TParent>
+  ageOfIndividualInYears?: RelatedPersonToAgeOfIndividualInYearsResolver<TParent>
 }
 
 export interface RelatedPersonToIdResolver<TParent = any, TResult = any> {
@@ -5007,6 +5101,20 @@ export interface RelatedPersonToAffidavitResolver<
 }
 
 export interface RelatedPersonToIndividualResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RelatedPersonToExactDateOfBirthUnknownResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RelatedPersonToAgeOfIndividualInYearsResolver<
   TParent = any,
   TResult = any
 > {
@@ -5687,7 +5795,8 @@ export interface TotalMetricsByTimeToTotalResolver<
 
 export interface GQLVSExportTypeResolver<TParent = any> {
   event?: VSExportToEventResolver<TParent>
-  year?: VSExportToYearResolver<TParent>
+  startDate?: VSExportToStartDateResolver<TParent>
+  endDate?: VSExportToEndDateResolver<TParent>
   fileSize?: VSExportToFileSizeResolver<TParent>
   url?: VSExportToUrlResolver<TParent>
   createdOn?: VSExportToCreatedOnResolver<TParent>
@@ -5697,7 +5806,11 @@ export interface VSExportToEventResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface VSExportToYearResolver<TParent = any, TResult = any> {
+export interface VSExportToStartDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface VSExportToEndDateResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5923,6 +6036,33 @@ export interface DeathToREGISTRATION_TARGETResolver<
 }
 
 export interface DeathToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLLoginBackgroundTypeResolver<TParent = any> {
+  backgroundColor?: LoginBackgroundToBackgroundColorResolver<TParent>
+  backgroundImage?: LoginBackgroundToBackgroundImageResolver<TParent>
+  imageFit?: LoginBackgroundToImageFitResolver<TParent>
+}
+
+export interface LoginBackgroundToBackgroundColorResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LoginBackgroundToBackgroundImageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LoginBackgroundToImageFitResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

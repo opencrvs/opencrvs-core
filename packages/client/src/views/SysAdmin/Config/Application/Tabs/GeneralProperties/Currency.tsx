@@ -37,10 +37,10 @@ import {
   getCurrencySelectOptions,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { lookup } from 'country-data'
 import { ICurrency } from '@client/utils/referenceApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
+import { Link } from '@opencrvs/components/lib/Link'
 
 export function Currency() {
   const intl = useIntl()
@@ -92,9 +92,9 @@ export function Currency() {
         }
         value={<Value id={`${id}_value`}>{countryCurrencyName[0].name}</Value>}
         actions={
-          <LinkButton id={id} onClick={toggleModal}>
+          <Link id={id} onClick={toggleModal}>
             {intl.formatMessage(buttonMessages.change)}
-          </LinkButton>
+          </Link>
         }
       />
 
