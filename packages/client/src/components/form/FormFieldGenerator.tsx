@@ -227,7 +227,7 @@ function GeneratedInputField({
     onChange,
     onBlur,
     value,
-    disabled: fieldDefinition.disabled,
+    disabled: fieldDefinition.disabled ?? disabled,
     error: Boolean(error),
     touched: Boolean(touched),
     placeholder: fieldDefinition.placeholder

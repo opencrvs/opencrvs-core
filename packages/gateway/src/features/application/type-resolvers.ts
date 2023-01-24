@@ -30,6 +30,9 @@ export interface IApplicationConfigPayload {
   PHONE_NUMBER_PATTERN: string
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
+  DATE_OF_BIRTH_UNKNOWN: boolean
+  INFORMANT_SIGNATURE: boolean
+  INFORMANT_SIGNATURE_REQUIRED: boolean
   ADMIN_LEVELS: number
   LOGIN_BACKGROUND: GQLLoginBackgroundInput
 }

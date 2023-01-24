@@ -77,6 +77,9 @@ export interface IApplicationConfig {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
+  DATE_OF_BIRTH_UNKNOWN: boolean
+  INFORMANT_SIGNATURE: boolean
+  INFORMANT_SIGNATURE_REQUIRED: boolean
   ADMIN_LEVELS: number
   LOGIN_BACKGROUND: ILoginBackground
 }
