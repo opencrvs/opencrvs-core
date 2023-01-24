@@ -126,11 +126,13 @@ export const formatRoleLanguageState = (
   systemRoles.forEach((systemRole) => {
     systemRole.roles.forEach((role) => {
       role.labels.forEach((label) => {
-        transformedLanguages[label.lang] = {
-          ...transformedLanguages[label.lang],
-          messages: {
-            ...transformedLanguages[label.lang].messages,
-            [`${systemRole.value}.role.${role.value}`]: label.label
+        if (transformedLanguages[label.lang]) {
+          transformedLanguages[label.lang] = {
+            ...transformedLanguages[label.lang],
+            messages: {
+              ...transformedLanguages[label.lang].messages,
+              [`${systemRole.value}.role.${role.value}`]: label.label
+            }
           }
         }
       })

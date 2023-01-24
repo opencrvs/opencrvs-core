@@ -313,13 +313,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case MODIFY_USER_FORM_DATA:
-      let submitting = state.submitting
-      if (state.loadingRoles) {
-        submitting = true
-      }
       return {
         ...state,
-        submitting,
         userFormData: (action as IUserFormDataModifyAction).payload.data
       }
 
