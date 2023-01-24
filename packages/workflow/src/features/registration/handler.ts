@@ -165,9 +165,10 @@ export async function createRegistrationHandler(
   event: Events
 ) {
   try {
+    const token = getToken(request)
     let payload = await modifyRegistrationBundle(
       request.payload as fhir.Bundle,
-      getToken(request)
+      token
     )
     if (
       event ===
@@ -177,16 +178,13 @@ export async function createRegistrationHandler(
     ) {
       payload = await markBundleAsWaitingValidation(
         payload as fhir.Bundle,
-        getToken(request)
+        token
       )
     } else if (
       event === Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION ||
       event === Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION
     ) {
-      payload = await markBundleAsValidated(
-        payload as fhir.Bundle,
-        getToken(request)
-      )
+      payload = await markBundleAsValidated(payload as fhir.Bundle, token)
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)

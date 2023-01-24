@@ -294,6 +294,10 @@ interface IFormMessages
   verbalAutopsyReport: MessageDescriptor
   warningNotVerified: MessageDescriptor
   weightAtBirth: MessageDescriptor
+  ageOfMother: MessageDescriptor
+  ageOfFather: MessageDescriptor
+  ageOfInformant: MessageDescriptor
+  ageOfDeceased: MessageDescriptor
   whatDocToUpload: MessageDescriptor
   whoIsPresentLabel: MessageDescriptor
   whoseContactDetailsLabel: MessageDescriptor
@@ -1888,6 +1892,26 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Weight at birth',
     description: 'Label for form field: Weight at birth',
     id: 'form.field.label.weightAtBirth'
+  },
+  ageOfMother: {
+    defaultMessage: 'Age of mother',
+    description: 'Label for form field: Age of mother',
+    id: 'form.field.label.ageOfMother'
+  },
+  ageOfFather: {
+    defaultMessage: 'Age of father',
+    description: 'Label for form field: Age of father',
+    id: 'form.field.label.ageOfFather'
+  },
+  ageOfInformant: {
+    defaultMessage: 'Age of informant',
+    description: 'Label for form field: Age of informant',
+    id: 'form.field.label.ageOfInformant'
+  },
+  ageOfDeceased: {
+    defaultMessage: 'Age of deceased',
+    description: 'Label for form field: Age of deceased',
+    id: 'form.field.label.ageOfDeceased'
   },
   placeOfBirthPreview: {
     defaultMessage: 'Place of delivery',
