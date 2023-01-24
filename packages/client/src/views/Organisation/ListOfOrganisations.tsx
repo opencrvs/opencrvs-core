@@ -22,8 +22,10 @@ import {
   Link,
   ListViewItemSimplified,
   ListViewSimplified,
-  BreadCrumb
-} from '@opencrvs/components'
+  BreadCrumb,
+  Divider,
+  ContentSize
+} from '@opencrvs/components/lib'
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
@@ -34,10 +36,11 @@ import {
   goToPerformanceHome,
   goToTeamUserList
 } from '@client/navigation'
-import { Activity, User } from '@opencrvs/components/lib/icons'
+import { Activity } from '@opencrvs/components/lib/icons'
 import { Button } from '@opencrvs/components/lib/Button'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
+import styled from 'styled-components'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -49,6 +52,16 @@ type IGetNewLevel = {
   childLocations: ILocation[]
   breadCrumb: IBreadCrumbData[]
 }
+
+const NoRecord = styled.div<{ isFullPage?: boolean }>`
+  ${({ theme }) => theme.fonts.h3};
+  text-align: left;
+  margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
+  color: ${({ theme }) => theme.colors.copy};
+  margin-top: 20px;
+`
+
+// const con
 
 export function ListOfOrganisations() {
   const intl = useIntl()
@@ -147,17 +160,13 @@ export function ListOfOrganisations() {
         showTitleOnMobile={false}
       >
         <Fragment key={'.0'}>
-          <ListViewSimplified>
-            <ListViewItemSimplified
-              compactLabel={true}
-              label={
-                <BreadCrumb
-                  items={dataLocations.breadCrumb}
-                  onSelect={onClickBreadCrumb}
-                />
-              }
-            />
-            {dataLocations.childLocations.length > 0 &&
+          <BreadCrumb
+            items={dataLocations.breadCrumb}
+            onSelect={onClickBreadCrumb}
+          />
+          <Divider />
+          <ListViewSimplified bottomBorder>
+            {dataLocations.childLocations.length > 0 ? (
               dataLocations.childLocations
                 ?.slice(
                   (currentPageNumber - 1) * DEFAULT_PAGINATION_LIST_SIZE,
@@ -166,12 +175,11 @@ export function ListOfOrganisations() {
                 .map((level: ILocation, index: number) => (
                   <ListViewItemSimplified
                     key={index}
-                    compactLabel={true}
                     label={
                       <Link
                         element="a"
                         onClick={(e) => {
-                          if (level.type === LocationType.ADMIN_STRUCTURE){
+                          if (level.type === LocationType.ADMIN_STRUCTURE) {
                             setCurrentPageNumber(1)
                             changeLevelAction(e, level.id)
                           }
@@ -185,8 +193,7 @@ export function ListOfOrganisations() {
                     actions={
                       <Button
                         type="icon"
-                        size="large"
-                        aria-label="View performance data"
+                        size="medium"
                         onClick={() => {
                           dispatch(
                             goToPerformanceHome(
@@ -198,11 +205,16 @@ export function ListOfOrganisations() {
                           )
                         }}
                       >
-                        <Activity />
+                        <Activity width={40} height={40} />
                       </Button>
                     }
                   />
-                ))}
+                ))
+            ) : (
+              <NoRecord id="no-record">
+                {intl.formatMessage(constantsMessages.noResults)}
+              </NoRecord>
+            )}
           </ListViewSimplified>
         </Fragment>
         {totalNumber > DEFAULT_PAGINATION_LIST_SIZE && (

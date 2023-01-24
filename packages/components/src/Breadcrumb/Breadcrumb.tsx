@@ -35,7 +35,7 @@ export const BreadCrumb = ({ items = [], onSelect }: IBreadCrumbProps) => {
   }
 
   return (
-    <Container>
+    <Container >
       <Stack gap={4} direction="row" wrap>
         {items.length > 0 &&
           items.map((x, idx) => {
