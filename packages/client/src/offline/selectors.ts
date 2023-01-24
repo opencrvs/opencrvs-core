@@ -66,6 +66,24 @@ export const getOfflineData = (store: IStoreState): IOfflineData => {
   return data
 }
 
+export const selectCountryBackground = (store: IStoreState) => {
+  const countryBackground = getKey(store, 'offlineData').config
+    ?.LOGIN_BACKGROUND
+  if (countryBackground?.backgroundImage) {
+    return {
+      backgroundImage: countryBackground.backgroundImage,
+      imageFit: countryBackground.imageFit
+    }
+  }
+  return {
+    backgroundColor: countryBackground?.backgroundColor ?? '36304E'
+  }
+}
+
+export const selectCountryLogo = (store: IStoreState) => {
+  return getKey(store, 'offlineData').config?.COUNTRY_LOGO?.file
+}
+
 export const getOfflineLoadingError = (
   store: IStoreState
 ): IOfflineDataState['loadingError'] => getKey(store, 'loadingError')

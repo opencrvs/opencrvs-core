@@ -563,6 +563,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)
+
   // eslint-disable-next-line no-unused-vars
   const mothersDetailsExistBasedOnContactAndInformant =
     selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
