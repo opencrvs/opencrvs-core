@@ -19,44 +19,41 @@ import {
   COUNTRY_CONFIG_URL,
   WORKFLOW_URL
 } from '@gateway/constants'
-import fetch from 'node-fetch'
-import * as path from 'path'
+import { getServiceHealth, PingService } from './api'
+import { performance } from 'perf_hooks'
+import { logger } from '@gateway/logger'
 
-export async function checkServiceHealth(service: typeof services[0]) {
+const SERVICES_TO_CHECK: readonly PingService[] = [
+  { name: 'auth', url: new URL('ping', AUTH_URL) },
+  { name: 'user-mgnt', url: new URL('ping', USER_MANAGEMENT_URL) },
+  { name: 'metrics', url: new URL('ping', METRICS_URL) },
+  { name: 'notification', url: new URL('ping', NOTIFICATION_URL) },
+  { name: 'countryconfig', url: new URL('ping', COUNTRY_CONFIG_URL) },
+  { name: 'search', url: new URL('ping', SEARCH_URL) },
+  { name: 'workflow', url: new URL('ping', WORKFLOW_URL) }
+]
+
+export async function checkServiceHealth(service: PingService) {
   try {
-    const res = await fetch(path.join(service.url, '/ping'), {
-      method: 'GET'
-    })
-
-    const body = await res.json()
-
-    if (body.success === true) {
-      return { ...service, status: true }
-    } else {
-      return { ...service, status: false }
-    }
+    const timeStart = performance.now()
+    const serviceHealth = await getServiceHealth(service)
+    const timeEnd = performance.now()
+    return { ...service, ...serviceHealth, ping: timeEnd - timeStart }
   } catch (e) {
-    return { ...service, status: false }
+    logger.error(e)
+    return { ...service, status: 'error' }
   }
 }
 
-const services = [
-  { name: 'auth', url: AUTH_URL },
-  { name: 'user-mgnt', url: USER_MANAGEMENT_URL },
-  { name: 'metrics', url: METRICS_URL },
-  { name: 'notification', url: NOTIFICATION_URL },
-  { name: 'countryconfig', url: COUNTRY_CONFIG_URL },
-  { name: 'search', url: SEARCH_URL },
-  { name: 'workflow', url: WORKFLOW_URL }
-]
-
 export default async function healthCheckHandler() {
-  const response = await Promise.all(services.map(checkServiceHealth))
+  const response = await Promise.all(SERVICES_TO_CHECK.map(checkServiceHealth))
   return response
 }
 
-export const responseSchema = Joi.array().items({
-  name: Joi.string(),
-  url: Joi.string(),
-  status: Joi.boolean()
-})
+export const serviceHealthSchema = Joi.array().items(
+  Joi.object({
+    name: Joi.string(),
+    url: Joi.object(),
+    status: Joi.boolean()
+  }).unknown()
+)

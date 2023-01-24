@@ -10,14 +10,24 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Service } from '@/lib/check-health'
+import { Service, Status } from '@/lib/check-health'
+import styled from 'styled-components'
+
+const Table = styled.table`
+  td,
+  th {
+    padding: 8px;
+    text-align: left;
+  }
+`
 
 export const Services = ({ services }: { services: Service[] }) => {
   return (
-    <table>
+    <Table>
       <thead>
         <tr>
           <th>Service</th>
+          <th>URL</th>
           <th>Status</th>
         </tr>
       </thead>
@@ -25,10 +35,11 @@ export const Services = ({ services }: { services: Service[] }) => {
         {services.map((service) => (
           <tr key={service.name}>
             <td>{service.name}</td>
-            <td>{service.status ? '✅' : '❌'}</td>
+            <td>{service.url}</td>
+            <td>{service.status === Status.OK ? '✅' : '❌'}</td>
           </tr>
         ))}
       </tbody>
-    </table>
+    </Table>
   )
 }

@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "npm run open-browser && next dev -p 6334",
+    "open-browser": "open http://localhost:6334",
     "lint": "next lint"
   },
   "dependencies": {

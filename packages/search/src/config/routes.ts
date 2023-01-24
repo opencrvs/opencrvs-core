@@ -24,6 +24,7 @@ import {
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
+import { healthCheckHandler } from '@search/features/health-check/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -53,12 +54,7 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
-        // Perform any health checks and return true or false for success prop
-        return {
-          success: true
-        }
-      },
+      handler: healthCheckHandler,
       config: {
         auth: false,
         tags: ['api'],
