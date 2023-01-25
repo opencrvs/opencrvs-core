@@ -377,7 +377,7 @@ export const resolvers: GQLResolver = {
         )
       }
       const taskEntry = await getTaskEntry(id, authHeader)
-      const newTaskBundle = await updateFHIRTaskBundle(
+      const newTaskBundle = updateFHIRTaskBundle(
         taskEntry,
         GQLRegStatus.REJECTED,
         reason,
