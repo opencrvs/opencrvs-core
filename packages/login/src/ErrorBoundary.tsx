@@ -20,7 +20,9 @@ const development = ['127.0.0.1', 'localhost'].includes(
   window.location.hostname
 )
 
-export class ErrorBoundary extends React.Component {
+export class ErrorBoundary extends React.Component<{
+  children?: React.ReactNode
+}> {
   render() {
     return (
       <Sentry.ErrorBoundary

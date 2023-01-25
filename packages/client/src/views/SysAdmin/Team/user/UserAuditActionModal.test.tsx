@@ -256,10 +256,10 @@ describe('user audit action modal tests', () => {
           '#deactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
-        await flushPromises()
-        expect(
-          store.getState().notification.userAuditSuccessToast.visible
-        ).toBe(true)
+        waitFor(
+          () =>
+            store.getState().notification.userAuditSuccessToast.visible === true
+        )
       })
     })
   })

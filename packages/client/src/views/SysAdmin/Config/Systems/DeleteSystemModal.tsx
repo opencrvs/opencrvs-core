@@ -17,7 +17,7 @@ import { System } from '@client/utils/gateway'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Text } from '@opencrvs/components/lib/Text'
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 interface ISystemProps {
   system: System
@@ -68,7 +68,7 @@ export function DeleteSystemModal({
       >
         <Text variant="reg16" element="span">
           {intl.formatMessage(integrationMessages.deleteSystemText, {
-            b: (chunks) => <strong>{chunks}</strong>
+            b: (chunks: ReactNode) => <strong>{chunks}</strong>
           })}
         </Text>
       </ResponsiveModal>
