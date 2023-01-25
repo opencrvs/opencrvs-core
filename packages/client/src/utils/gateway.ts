@@ -218,6 +218,7 @@ export type ApplicationConfiguration = {
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
+  LOGIN_BACKGROUND?: Maybe<LoginBackground>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -236,6 +237,7 @@ export type ApplicationConfigurationInput = {
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
+  LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -983,6 +985,11 @@ export type IdentityType = {
   type?: Maybe<IdentityIdType>
 }
 
+export enum ImageFit {
+  Fill = 'FILL',
+  Tile = 'TILE'
+}
+
 export enum InformantType {
   Brother = 'BROTHER',
   Daughter = 'DAUGHTER',
@@ -1085,6 +1092,19 @@ export type LocationWiseEstimationMetric = {
   within1Year: Scalars['Int']
   within5Years: Scalars['Int']
   withinTarget: Scalars['Int']
+}
+
+export type LoginBackground = {
+  __typename?: 'LoginBackground'
+  backgroundColor?: Maybe<Scalars['String']>
+  backgroundImage?: Maybe<Scalars['String']>
+  imageFit?: Maybe<ImageFit>
+}
+
+export type LoginBackgroundInput = {
+  backgroundColor?: InputMaybe<Scalars['String']>
+  backgroundImage?: InputMaybe<Scalars['String']>
+  imageFit?: InputMaybe<ImageFit>
 }
 
 export enum MannerOfDeath {
@@ -1985,8 +2005,8 @@ export type RemoveBookmarkedSeachInput = {
 
 export type Role = {
   __typename?: 'Role'
+  _id: Scalars['ID']
   labels: Array<RoleLabel>
-  value: Scalars['String']
 }
 
 export type RoleLabel = {
@@ -2178,7 +2198,7 @@ export type User = {
   name: Array<HumanName>
   practitionerId: Scalars['String']
   primaryOffice?: Maybe<Location>
-  role: Scalars['String']
+  role: Role
   searches?: Maybe<Array<Maybe<BookmarkedSeachItem>>>
   signature?: Maybe<Signature>
   status: Status
@@ -2418,7 +2438,7 @@ export type GetSystemRolesQuery = {
     value: string
     roles: Array<{
       __typename?: 'Role'
-      value: string
+      _id: string
       labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
     }>
   }> | null
@@ -2640,8 +2660,8 @@ export type FetchUserQuery = {
     practitionerId: string
     mobile: string
     systemRole: RoleType
-    role: string
     status: Status
+    role: { __typename?: 'Role'; _id: string }
     name: Array<{
       __typename?: 'HumanName'
       use?: string | null
@@ -2907,7 +2927,6 @@ export type SearchUsersQuery = {
       username?: string | null
       systemRole: RoleType
       mobile: string
-      role: string
       status: Status
       underInvestigation?: boolean | null
       name: Array<{
@@ -2916,6 +2935,7 @@ export type SearchUsersQuery = {
         firstNames?: string | null
         familyName?: string | null
       }>
+      role: { __typename?: 'Role'; _id: string }
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
   } | null
@@ -2972,7 +2992,6 @@ export type GetUserQuery = {
     username?: string | null
     mobile: string
     systemRole: RoleType
-    role: string
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
@@ -2989,6 +3008,7 @@ export type GetUserQuery = {
       system?: string | null
       value?: string | null
     } | null
+    role: { __typename?: 'Role'; _id: string }
     primaryOffice?: {
       __typename?: 'Location'
       id: string
@@ -3085,7 +3105,7 @@ export type MarkBirthAsRegisteredMutation = {
         user?: {
           __typename?: 'User'
           id: string
-          role: string
+          systemRole: RoleType
           name: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -3389,8 +3409,8 @@ export type FetchBirthRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        role: string
         systemRole: RoleType
+        role: { __typename?: 'Role'; _id: string }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -3686,8 +3706,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        role: string
         systemRole: RoleType
+        role: { __typename?: 'Role'; _id: string }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -3796,7 +3816,7 @@ export type MarkDeathAsRegisteredMutation = {
         user?: {
           __typename?: 'User'
           id: string
-          role: string
+          systemRole: RoleType
           name: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -4055,8 +4075,8 @@ export type FetchDeathRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        role: string
         systemRole: RoleType
+        role: { __typename?: 'Role'; _id: string }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -4330,8 +4350,8 @@ export type FetchDeathRegistrationForCertificationQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        role: string
         systemRole: RoleType
+        role: { __typename?: 'Role'; _id: string }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -5628,8 +5648,8 @@ export type GetUserByMobileQuery = {
     username?: string | null
     mobile: string
     systemRole: RoleType
-    role: string
     status: Status
+    role: { __typename?: 'Role'; _id: string }
   } | null
 }
 
@@ -5650,6 +5670,12 @@ export type UpdateApplicationConfigMutation = {
     INFORMANT_SIGNATURE_REQUIRED?: boolean | null
     ADDRESSES?: number | null
     ADMIN_LEVELS?: number | null
+    LOGIN_BACKGROUND?: {
+      __typename?: 'LoginBackground'
+      backgroundColor?: string | null
+      backgroundImage?: string | null
+      imageFit?: ImageFit | null
+    } | null
     COUNTRY_LOGO?: {
       __typename?: 'CountryLogo'
       fileName?: string | null
@@ -6143,7 +6169,7 @@ export type GetEventsWithProgressQuery = {
       } | null
       startedBy?: {
         __typename?: 'User'
-        role: string
+        systemRole: RoleType
         name: Array<{
           __typename?: 'HumanName'
           use?: string | null
@@ -6201,7 +6227,7 @@ export type GetRegistrationsListByFilterQuery = {
           registrarPractitioner?: {
             __typename?: 'User'
             id: string
-            role: string
+            systemRole: RoleType
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
@@ -6559,8 +6585,8 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            role: string
             systemRole: RoleType
+            role: { __typename?: 'Role'; _id: string }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -6841,8 +6867,8 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            role: string
             systemRole: RoleType
+            role: { __typename?: 'Role'; _id: string }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null

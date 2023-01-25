@@ -377,7 +377,7 @@ type User {
   username: String
   mobile: String!
   systemRole: RoleType!
-  role: String!
+  role: Role!
   email: String
   status: Status!
   underInvestigation: Boolean
@@ -1038,6 +1038,11 @@ enum RoleType {
   NATIONAL_REGISTRAR
 }
 
+type Role {
+  _id: ID!
+  labels: [RoleLabel!]!
+}
+
 enum Status {
   active
   deactivated
@@ -1143,11 +1148,6 @@ type EventProgressSet {
   startedByFacility: String
   startedAt: Date
   progressReport: EventProgressData
-}
-
-type Role {
-  value: String!
-  labels: [RoleLabel!]!
 }
 
 enum DraftStatus {
@@ -1521,6 +1521,11 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
 }
 
+type RoleLabel {
+  lang: String!
+  label: String!
+}
+
 type AdvancedSeachParameters {
   event: Event
   name: String
@@ -1676,11 +1681,6 @@ type EventProgressData {
   timeInWaitingForApproval: Int
   timeInWaitingForBRIS: Int
   timeInReadyToPrint: Int
-}
-
-type RoleLabel {
-  lang: String!
-  label: String!
 }
 
 type FormDatasetOptionLabel {

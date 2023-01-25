@@ -19,7 +19,9 @@ export const GET_USER = gql`
       username
       mobile
       systemRole
-      role
+      role {
+        _id
+      }
       status
     }
   }

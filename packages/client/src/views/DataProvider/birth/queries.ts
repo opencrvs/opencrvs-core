@@ -211,7 +211,9 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         user {
           id
-          role
+          role {
+            _id
+          }
           systemRole
           name {
             firstNames
@@ -470,7 +472,9 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
         user {
           id
-          role
+          role {
+            _id
+          }
           systemRole
           name {
             firstNames
