@@ -303,7 +303,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     const workqueue = await waitForElement(testComponent, Workqueue)
 
-    const data = workqueue.prop('content')
+    const data = workqueue.prop<Array<Record<string, string>>>('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
       new Date(mockDeclarationDateStr)
     )
@@ -339,7 +339,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     )
 
     const workqueue = await waitForElement(testComponent, Workqueue)
-    const data = workqueue.prop('content')
+    const data = workqueue.prop<Array<Record<string, string>>>('content')
     expect(data.length).toBe(0)
   })
 

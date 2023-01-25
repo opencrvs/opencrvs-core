@@ -252,6 +252,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       )
     }
     return (
+      // TODO: IdleTimer doesn't have children in it's type definition, due to React 18 starting to require it
+      // We would need to update IdleTimer to it's 5 version, which changed its API
+      // @ts-ignore
       <IdleTimer onIdle={this.onIdle} timeout={DESKTOP_TIME_OUT_MILLISECONDS}>
         {this.conditionalRenderUponSecuredState()}
       </IdleTimer>
