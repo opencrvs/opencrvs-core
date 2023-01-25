@@ -35,7 +35,7 @@ import {
   goToApplicationConfig,
   goToAdvancedSearchResult,
   goToVSExport,
-  goToOrganisationView
+  goToOrganisationView,
   goToInformantNotification
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
