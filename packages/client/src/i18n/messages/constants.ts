@@ -59,6 +59,8 @@ interface IConstantsMessages
   downloaded: MessageDescriptor
   eventDate: MessageDescriptor
   eventType: MessageDescriptor
+  registeredAt: MessageDescriptor
+  registeredBy: MessageDescriptor
   lastUpdated: MessageDescriptor
   startedAt: MessageDescriptor
   startedBy: MessageDescriptor
@@ -412,6 +414,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Event',
     description: 'Label for table header column Event type',
     id: 'constants.eventType'
+  },
+  registeredAt: {
+    defaultMessage: 'Registered at',
+    description: 'Label for comparison row registeredAt type',
+    id: 'constants.registeredAt'
+  },
+  registeredBy: {
+    defaultMessage: 'Registered by',
+    description: 'Label for comparison row registeredBy type',
+    id: 'constants.registeredBy'
   },
   lastUpdated: {
     defaultMessage: 'Last updated',

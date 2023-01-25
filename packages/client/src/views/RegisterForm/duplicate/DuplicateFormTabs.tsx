@@ -32,7 +32,7 @@ import {
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { Event } from '@client/utils/gateway'
+import { Event, HumanName, RegStatus, History } from '@client/utils/gateway'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { getLanguage } from '@client/i18n/selectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -55,7 +55,13 @@ import { ComparisonListView } from '@opencrvs/components/lib/ComparisonListView'
 import { FullBodyContent, Content } from '@opencrvs/components/lib/Content'
 import { Text } from '@opencrvs/components/lib/Text'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { getName, capitalize } from '@client/views/RecordAudit/utils'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import {
+  recordAuditMessages,
+  regStatusMessages
+} from '@client/i18n/messages/views/recordAudit'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -94,8 +100,6 @@ export const DuplicateFormTabs = (props: IProps) => {
   const { selectedDuplicateComId, onTabClick } = props
   const [comparisonDelcarationData, setComparisonDelcarationData] =
     React.useState<IComparisonDeclaration[] | undefined>(undefined)
-  const [isLoading, setIsLoading] = React.useState(false)
-
   const form = useSelector(getReviewForm)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
@@ -600,13 +604,9 @@ export const DuplicateFormTabs = (props: IProps) => {
 
   const duplicateTabHandler = async (duplicateCompositionId: string) => {
     if (String(props.declaration.id) !== duplicateCompositionId) {
-      setIsLoading(true)
       const duplicateDeclarationGQLData = await fetchDuplicateDeclaration(
         duplicateCompositionId
       )
-      if (duplicateDeclarationGQLData) {
-        setIsLoading(false)
-      }
       const eventData =
         duplicateDeclarationGQLData?.data?.fetchRegistrationForViewing
       const eventType =
@@ -648,54 +648,219 @@ export const DuplicateFormTabs = (props: IProps) => {
         { data: duplicateDeclarationData } as IDeclaration
       )
 
-      const formatterData = actualDeclarationTransformData
-        .filter((data1) => data1.id !== 'registration')
-        .map((data1) => {
-          const data2 = duplicateDeclarationTransformData.find(
-            (d) => d.id === data1.id
+      const duplicateRegData = {
+        status: eventData.history.find((data: History) => data.action === null)
+          .regStatus as RegStatus,
+        type: capitalize(eventData.registration.type),
+        trackingId: eventData.registration.trackingId,
+        registrationNumber: eventData.registration?.registrationNumber,
+        registeredAt: (eventData.history as History[]).find(
+          (data) => data.action === null
+        )?.office?.name,
+        registeredBy: getName(
+          (eventData.history as History[]).find((data) => data.action === null)
+            ?.user?.name as HumanName[],
+          language
+        )
+      }
+
+      const actualRegData = {
+        status: (props.declaration.data.history as unknown as History[]).find(
+          (data) => data.action === null
+        )?.regStatus,
+        type: capitalize(String(props.declaration.data.registration.type)),
+        trackingId: props.declaration.data.registration.trackingId,
+        registrationNumber:
+          props.declaration.data.registration?.registrationNumber,
+        registeredAt: (
+          props.declaration.data.history as unknown as History[]
+        ).find((data) => data.action === null)?.office?.name,
+        registeredBy: getName(
+          (props.declaration.data.history as unknown as History[]).find(
+            (data) => data.action === null
+          )?.user?.name as HumanName[],
+          language
+        )
+      }
+
+      const registrationFormatedData = [
+        {
+          label: (
+            <Text variant="bold16" element="span" color="grey600">
+              {intl.formatMessage(constantsMessages.status)}
+            </Text>
+          ),
+          heading: {
+            right: String(duplicateRegData.trackingId),
+            left: String(actualRegData.trackingId)
+          },
+          leftValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {actualRegData.status
+                ? intl.formatMessage(regStatusMessages[actualRegData.status])
+                : EMPTY_STRING}
+            </Text>
+          ),
+          rightValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {duplicateRegData.status
+                ? intl.formatMessage(regStatusMessages[duplicateRegData.status])
+                : EMPTY_STRING}
+            </Text>
           )
-          return {
-            title: data1.title,
-            data: data1.items.map((item1) => {
-              const item2 = data2?.items.find((i) => i.label === item1.label)
-              return {
-                label: (
-                  <Text variant="bold16" element="span" color="grey600">
-                    {item1.label}
-                  </Text>
-                ),
-                heading: {
-                  right: duplicateTrackingId,
-                  left: actualTrackingId
-                },
-                leftValue: (
-                  <Text variant="reg16" element="span" color="grey600">
-                    {item1.value}
-                  </Text>
-                ),
-                rightValue: (
-                  <Text variant="reg16" element="span" color="grey600">
-                    {item2.value}
-                  </Text>
-                )
-              }
-            })
-          }
-        })
+        },
+        {
+          label: (
+            <Text variant="bold16" element="span" color="grey600">
+              {intl.formatMessage(constantsMessages.eventType)}
+            </Text>
+          ),
+          heading: {
+            right: String(duplicateRegData.trackingId),
+            left: String(actualRegData.trackingId)
+          },
+          leftValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {actualRegData.type}
+            </Text>
+          ),
+          rightValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {duplicateRegData.type}
+            </Text>
+          )
+        },
+        {
+          label: (
+            <Text variant="bold16" element="span" color="grey600">
+              {intl.formatMessage(constantsMessages.trackingId)}
+            </Text>
+          ),
+          heading: {
+            right: String(duplicateRegData.trackingId),
+            left: String(actualRegData.trackingId)
+          },
+          leftValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {actualRegData.trackingId}
+            </Text>
+          ),
+          rightValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {duplicateRegData.trackingId}
+            </Text>
+          )
+        },
+        {
+          label: (
+            <Text variant="bold16" element="span" color="grey600">
+              {intl.formatMessage(
+                duplicateRegData.type.toLowerCase() === 'birth'
+                  ? recordAuditMessages.brn
+                  : recordAuditMessages.drn
+              )}
+            </Text>
+          ),
+          heading: {
+            right: String(duplicateRegData.trackingId),
+            left: String(actualRegData.trackingId)
+          },
+          leftValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {actualRegData.registrationNumber}
+            </Text>
+          ),
+          rightValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {duplicateRegData.registrationNumber}
+            </Text>
+          )
+        },
+        {
+          label: (
+            <Text variant="bold16" element="span" color="grey600">
+              {intl.formatMessage(constantsMessages.registeredAt)}
+            </Text>
+          ),
+          heading: {
+            right: String(duplicateRegData.trackingId),
+            left: String(actualRegData.trackingId)
+          },
+          leftValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {actualRegData.registeredAt}
+            </Text>
+          ),
+          rightValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {duplicateRegData.registeredAt}
+            </Text>
+          )
+        },
+        {
+          label: (
+            <Text variant="bold16" element="span" color="grey600">
+              {intl.formatMessage(constantsMessages.registeredBy)}
+            </Text>
+          ),
+          heading: {
+            right: String(duplicateRegData.trackingId),
+            left: String(actualRegData.trackingId)
+          },
+          leftValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {actualRegData.registeredBy}
+            </Text>
+          ),
+          rightValue: (
+            <Text variant="reg16" element="span" color="grey600">
+              {duplicateRegData.registeredBy}
+            </Text>
+          )
+        }
+      ]
+      const formatterData = actualDeclarationTransformData.map((data1) => {
+        const data2 = duplicateDeclarationTransformData.find(
+          (d) => d.id === data1.id
+        )
+        return {
+          title: data1.title,
+          data: data1.items.map((item1) => {
+            const item2 = data2?.items.find((i) => i.label === item1.label)
+            return {
+              label: (
+                <Text variant="bold16" element="span" color="grey600">
+                  {item1.label}
+                </Text>
+              ),
+              heading: {
+                right: duplicateTrackingId,
+                left: actualTrackingId
+              },
+              leftValue: (
+                <Text variant="reg16" element="span" color="grey600">
+                  {item1.value}
+                </Text>
+              ),
+              rightValue: (
+                <Text variant="reg16" element="span" color="grey600">
+                  {item2.value}
+                </Text>
+              )
+            }
+          })
+        }
+      })
+      formatterData[0].data.push(...registrationFormatedData)
       setComparisonDelcarationData(formatterData)
     } else {
       setComparisonDelcarationData(undefined)
-      setIsLoading(false)
     }
     onTabClick(duplicateCompositionId)
   }
 
-  console.log(isLoading)
-
   return (
     <>
-      <p>test</p>
-      {isLoading && <h1>Loading</h1>}
       <TopBar>
         <FormTabs
           sections={tabs}
@@ -704,40 +869,48 @@ export const DuplicateFormTabs = (props: IProps) => {
         />
       </TopBar>
 
-      <LoadingIndicator loading={isLoading} />
-
       {comparisonDelcarationData && (
         <FullBodyContent>
           <Content
             title={intl.formatMessage(
               duplicateMessages.duplicateComparePageTitle,
-              { actualTrackingId, duplicateTrackingId }
+              {
+                actualTrackingId: (
+                  <Text variant="bold21" element="span" color="negative">
+                    {actualTrackingId}
+                  </Text>
+                ),
+                duplicateTrackingId
+              }
             )}
           >
-            {comparisonDelcarationData.map((sections) => {
-              return (
-                <>
-                  <Text variant="bold18" element="span" color="grey600">
-                    {sections.title}
-                  </Text>
-                  <ComparisonListView
-                    headings={[actualTrackingId, duplicateTrackingId]}
-                  >
-                    {sections.data.map((item) => (
-                      <ComparisonListView.Row
-                        label={item.label}
-                        heading={{
-                          right: item.heading.right,
-                          left: item.heading.left
-                        }}
-                        leftValue={item.leftValue}
-                        rightValue={item.rightValue}
-                      />
-                    ))}
-                  </ComparisonListView>
-                </>
-              )
-            })}
+            <Stack direction="column" gap={20} alignItems={'stretch'}>
+              {comparisonDelcarationData.map((sections, index) => {
+                return (
+                  <div>
+                    <Text variant="bold21" element="span" color="grey600">
+                      {sections.title}
+                    </Text>
+                    <ComparisonListView
+                      headings={[actualTrackingId, duplicateTrackingId]}
+                      id={index}
+                    >
+                      {sections.data.map((item) => (
+                        <ComparisonListView.Row
+                          label={item.label}
+                          heading={{
+                            right: item.heading.right,
+                            left: item.heading.left
+                          }}
+                          leftValue={item.leftValue}
+                          rightValue={item.rightValue}
+                        />
+                      ))}
+                    </ComparisonListView>
+                  </div>
+                )
+              })}
+            </Stack>
           </Content>
         </FullBodyContent>
       )}

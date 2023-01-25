@@ -40,22 +40,32 @@ const HideOnSmallScreen = styled(Stack)`
 `
 
 export interface IComparisonListProps {
+  id: string | number
   children: React.ReactNode
   headings: React.ReactNode[] | string[]
 }
 
 export const ComparisonListView = ({
+  id,
   children,
   headings,
   ...props
 }: IComparisonListProps) => {
   return (
     <>
-      <Grid {...props} headingCount={headings.length + 1}>
+      <Grid id={String(id)} {...props} headingCount={headings.length + 1}>
         {[
           <HideOnSmallScreen></HideOnSmallScreen>,
-          ...headings.map((heading) => (
-            <HideOnSmallScreen>{heading}</HideOnSmallScreen>
+          ...headings.map((heading, index) => (
+            <HideOnSmallScreen>
+              <Text
+                variant="reg16"
+                element="span"
+                color={index ? 'grey600' : 'negative'}
+              >
+                {heading}
+              </Text>
+            </HideOnSmallScreen>
           ))
         ]}
         {children}

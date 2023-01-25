@@ -221,6 +221,7 @@ type State = {
   isFileUploading: boolean
   startTime: number
   selectedDuplicateComId: string
+  isDuplicateDeclarationLoading: boolean
 }
 
 const fadeFromTop = keyframes`
@@ -260,7 +261,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       confirmDeleteDeclarationModal: false,
       isFileUploading: false,
       startTime: 0,
-      selectedDuplicateComId: props.declaration.id
+      selectedDuplicateComId: props.declaration.id,
+      isDuplicateDeclarationLoading: false
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
