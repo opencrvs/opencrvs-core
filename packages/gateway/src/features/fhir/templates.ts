@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import {
+  DUPLICATE_TRACKING_ID,
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL
+} from '@gateway/features/fhir/constants'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
@@ -208,7 +212,8 @@ export function updateTaskTemplate(
   task: fhir.Task,
   status: string,
   reason?: string,
-  comment?: string
+  comment?: string,
+  duplicateTrackingId?: string
 ): fhir.Task {
   if (
     !task ||
@@ -232,6 +237,13 @@ export function updateTaskTemplate(
       text: comment
     }
     task.statusReason = statusReason
+  }
+  if (duplicateTrackingId) {
+    task.extension = task.extension || []
+    task.extension.push({
+      url: DUPLICATE_TRACKING_ID,
+      valueString: duplicateTrackingId
+    })
   }
   return task
 }

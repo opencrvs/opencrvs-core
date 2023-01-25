@@ -3642,10 +3642,17 @@ export async function updateFHIRTaskBundle(
   taskEntry: ITaskBundleEntry,
   status: string,
   reason?: string,
-  comment?: string
+  comment?: string,
+  duplicateTrackingId?: string
 ) {
   const taskResource = taskEntry.resource
-  taskEntry.resource = updateTaskTemplate(taskResource, status, reason, comment)
+  taskEntry.resource = updateTaskTemplate(
+    taskResource,
+    status,
+    reason,
+    comment,
+    duplicateTrackingId
+  )
   taskEntry.resource.lastModified = new Date().toISOString()
   const fhirBundle: ITaskBundle = {
     resourceType: 'Bundle',

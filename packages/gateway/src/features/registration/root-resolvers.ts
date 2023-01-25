@@ -17,7 +17,8 @@ import {
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARKED_AS_DUPLICATE
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -388,7 +389,11 @@ export const resolvers: GQLResolver = {
       // return the taskId
       return taskEntry.resource.id
     },
-    async markEventAsArchived(_, { id, reason, comment }, authHeader) {
+    async markEventAsArchived(
+      _,
+      { id, reason, comment, duplicateTrackingId },
+      authHeader
+    ) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
         throw new UnassignError('User has been unassigned')
@@ -403,7 +408,8 @@ export const resolvers: GQLResolver = {
         taskEntry,
         GQLRegStatus.ARCHIVED,
         reason,
-        comment
+        comment,
+        duplicateTrackingId
       )
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
       // return the taskId
@@ -516,6 +522,46 @@ export const resolvers: GQLResolver = {
       })
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       // return the taskId
+      return taskEntry.resource.id
+    },
+    async markEventAsDuplicate(
+      _,
+      { id, reason, comment, duplicateTrackingId },
+      authHeader
+    ) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      if (!inScope(authHeader, ['register', 'validate'])) {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+
+      const taskEntry = await getTaskEntry(id, authHeader)
+      const extension: fhir.Extension = { url: MARKED_AS_DUPLICATE }
+
+      if (comment || reason) {
+        if (!taskEntry.resource.reason) {
+          taskEntry.resource.reason = {
+            text: ''
+          }
+        }
+
+        taskEntry.resource.reason.text = reason || ''
+        const statusReason: fhir.CodeableConcept = {
+          text: comment
+        }
+        taskEntry.resource.statusReason = statusReason
+      }
+
+      if (duplicateTrackingId) {
+        extension.valueString = duplicateTrackingId
+      }
+
+      const taskBundle = taskBundleWithExtension(taskEntry, extension)
+      await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
       return taskEntry.resource.id
     }
   }
@@ -636,7 +682,8 @@ const ACTION_EXTENSIONS = [
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARKED_AS_DUPLICATE
 ]
 
 async function getTaskEntry(compositionId: string, authHeader: IAuthHeader) {
