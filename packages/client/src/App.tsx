@@ -43,7 +43,7 @@ import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatu
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { ApolloClient, ApolloProvider } from '@apollo/client'
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
@@ -89,13 +89,17 @@ const GlobalStyle = createGlobalStyle`
 `
 
 export class App extends React.Component<IAppProps> {
+  state = { apolloClient: new ApolloClient({ cache: new InMemoryCache() }) }
+  componentDidMount() {
+    createClient(this.props.store).then((client) =>
+      this.setState({ apolloClient: client })
+    )
+  }
   public render() {
     return (
       <ErrorBoundary>
         <GlobalStyle />
-        <ApolloProvider
-          client={this.props.client || createClient(this.props.store)}
-        >
+        <ApolloProvider client={this.props.client || this.state.apolloClient}>
           <Provider store={this.props.store}>
             <I18nContainer>
               <ThemeProvider theme={getTheme()}>

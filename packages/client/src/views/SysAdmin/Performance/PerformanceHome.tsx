@@ -413,7 +413,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 <>
                   <Query
                     query={PERFORMANCE_METRICS}
-                    fetchPolicy="no-cache"
+                    fetchPolicy="cache-and-network"
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
                         ? {
@@ -490,7 +490,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="no-cache"
+                    fetchPolicy="cache-and-network"
                     query={CORRECTION_TOTALS}
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
@@ -523,7 +523,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="no-cache"
+                    fetchPolicy="cache-and-network"
                     query={GET_TOTAL_PAYMENTS}
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
@@ -583,7 +583,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               ],
               officeSelected: this.state.officeSelected
             }}
-            fetchPolicy="no-cache"
+            fetchPolicy="cache-and-network"
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {

@@ -20,16 +20,18 @@ import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
 import { resolve } from 'url'
 import { showSessionExpireConfirmation } from '@client/notification/actions'
+import { persistCache, LocalForageWrapper } from 'apollo3-cache-persist'
 
 import { IStoreState } from '@client/store'
 import { AnyAction, Store } from 'redux'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
+import * as localforage from 'localforage'
 
 export let client: any = { mutate: () => {}, query: () => {} }
 
-export const createClient = (store: Store<IStoreState, AnyAction>) => {
+export const createClient = async (store: Store<IStoreState, AnyAction>) => {
   const httpLink = createHttpLink({
     uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
   })
@@ -64,10 +66,17 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
   })
 
   const timeoutLink = new TimeoutLink() as ApolloLink
+  const cache = new InMemoryCache()
+
+  // await before instantiating ApolloClient, else queries might run before the cache is persisted
+  await persistCache({
+    cache,
+    storage: new LocalForageWrapper(localforage)
+  })
 
   client = new ApolloClient({
     link: from([errorLink, timeoutLink, authLink, httpLink]),
-    cache: new InMemoryCache()
+    cache
   })
   return client
 }
