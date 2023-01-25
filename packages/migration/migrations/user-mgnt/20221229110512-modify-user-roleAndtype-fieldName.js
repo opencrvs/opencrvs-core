@@ -149,11 +149,11 @@ const UserRolesIndex = {
 export const up = async (db, client) => {
   const session = client.startSession()
   try {
-    /* ==============Create a new userRoles collection============== */
+    /* ==============Create a new userroles collection============== */
 
-    await db.createCollection('userRoles')
+    await db.createCollection('userroles')
 
-    const userRolesResult = await db.collection('userRoles').insertMany(
+    const userRolesResult = await db.collection('userroles').insertMany(
       UserRoles.map((userRole) => ({
         ...userRole,
         createdAt: Date.now().toString(),
@@ -204,8 +204,8 @@ export const up = async (db, client) => {
     await db.collection('roles').updateMany({}, { $rename: { types: 'roles' } })
     //remove 'title' field from all 'roles' collection documents
     await db.collection('roles').updateMany({}, { $unset: { title: 1 } })
-    //rename 'roles' collection name to 'systemRoles'
-    await db.collection('roles').rename('systemRoles')
+    //rename 'roles' collection name to 'systemroles'
+    await db.collection('roles').rename('systemroles')
   } finally {
     await session.endSession()
   }
@@ -214,9 +214,9 @@ export const up = async (db, client) => {
 export const down = async (db, client) => {
   const session = client.startSession()
   try {
-    /* ==============Drop collection userRoles============== */
+    /* ==============Drop collection userroles============== */
 
-    await db.dropCollection('userRoles')
+    await db.dropCollection('userroles')
 
     /* ==============Migration for "users" Collection============== */
 
@@ -238,7 +238,7 @@ export const down = async (db, client) => {
     /* ==============Migration for "roles" Collection============== */
 
     //rename 'systemroles' collection name to 'roles'
-    await db.collection('systemRoles').rename('roles')
+    await db.collection('systemroles').rename('roles')
 
     //rename 'roles' field to 'types' for all 'roles' collection documents
     await db.collection('roles').updateMany({}, { $rename: { roles: 'types' } })

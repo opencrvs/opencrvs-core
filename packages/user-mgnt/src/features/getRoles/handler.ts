@@ -46,9 +46,11 @@ export default async function getSystemRoles(
     criteria = { ...criteria, active }
   }
 
-  return await SystemRole.find(criteria).sort({
-    [sortBy]: sortOrder
-  })
+  return await SystemRole.find(criteria)
+    .populate('roles')
+    .sort({
+      [sortBy]: sortOrder
+    })
 }
 
 export const searchRoleSchema = Joi.object({

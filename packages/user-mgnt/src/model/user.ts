@@ -323,4 +323,31 @@ const userSchema = new Schema({
   searches: [SearchesSchema]
 })
 
+export interface IUserRole {
+  labels: Label[]
+}
+
+type Label = {
+  lang: string
+  label: string
+}
+
+export interface IUserRoleModel extends IUserRole, Document {}
+
+const LabelSchema = new Schema(
+  {
+    lang: String,
+    label: String
+  },
+  { _id: false }
+)
+
+const UserRoleSchema = new Schema(
+  {
+    labels: [LabelSchema]
+  },
+  { timestamps: true }
+)
+
+export const UserRole = model<IUserRoleModel>('UserRole', UserRoleSchema)
 export default model<IUserModel>('User', userSchema)
