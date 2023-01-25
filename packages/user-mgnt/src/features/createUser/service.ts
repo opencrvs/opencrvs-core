@@ -117,7 +117,7 @@ export const createFhirPractitionerRole = (
           coding: [
             {
               system: `http://opencrvs.org/specs/types`,
-              code: user.role
+              code: user.role.toString()
             }
           ]
         }

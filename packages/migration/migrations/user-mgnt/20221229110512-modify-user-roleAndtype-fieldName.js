@@ -10,38 +10,171 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-const FRENCH_TYPE_LABEL_MAPPING = {
-  HEALTHCARE_WORKER: 'Professionnel de Santé',
-  POLICE_OFFICER: 'Agent de Police',
-  SOCIAL_WORKER: 'Travailleur Social',
-  LOCAL_LEADER: 'Leader Local',
-  REGISTRATION_AGENT: "Agent d'enregistrement",
-  LOCAL_REGISTRAR: 'Registraire local',
-  LOCAL_SYSTEM_ADMIN: 'Administrateur système local',
-  NATIONAL_SYSTEM_ADMIN: 'Administrateur système national',
-  PERFORMANCE_MANAGEMENT: 'Gestion des performances',
-  NATIONAL_REGISTRAR: 'Registraire national'
+const UserRoles = [
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'Health Worker'
+      },
+      {
+        lang: 'fr',
+        label: 'Professionnel de Santé'
+      }
+    ]
+  },
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'Police Worker'
+      },
+      {
+        lang: 'fr',
+        label: 'Agent de Police'
+      }
+    ]
+  },
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'Social Worker'
+      },
+      {
+        lang: 'fr',
+        label: 'Travailleur Social'
+      }
+    ]
+  },
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'Local Leader'
+      },
+      {
+        lang: 'fr',
+        label: 'Leader Local'
+      }
+    ]
+  },
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'Registration Agent'
+      },
+      {
+        lang: 'fr',
+        label: "Agent d'enregistrement"
+      }
+    ]
+  },
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'Local Registrar'
+      },
+      {
+        lang: 'fr',
+        label: 'Registraire local'
+      }
+    ]
+  },
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'Local System Admin'
+      },
+      {
+        lang: 'fr',
+        label: 'Administrateur système local'
+      }
+    ]
+  },
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'National System Admin'
+      },
+      {
+        lang: 'fr',
+        label: 'Administrateur système national'
+      }
+    ]
+  },
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'Performance Manager'
+      },
+      {
+        lang: 'fr',
+        label: 'Gestion des performances'
+      }
+    ]
+  },
+  {
+    labels: [
+      {
+        lang: 'en',
+        label: 'National Registrar'
+      },
+      {
+        lang: 'fr',
+        label: 'Registraire national'
+      }
+    ]
+  }
+]
+
+const UserRolesIndex = {
+  HEALTHCARE_WORKER: 0,
+  POLICE_OFFICER: 1,
+  SOCIAL_WORKER: 2,
+  LOCAL_LEADER: 3,
+  REGISTRATION_AGENT: 4,
+  LOCAL_REGISTRAR: 5,
+  LOCAL_SYSTEM_ADMIN: 6,
+  NATIONAL_SYSTEM_ADMIN: 7,
+  PERFORMANCE_MANAGEMENT: 8,
+  NATIONAL_REGISTRAR: 9
 }
 
 export const up = async (db, client) => {
   const session = client.startSession()
   try {
+    /* ==============Create a new userRoles collection============== */
+
+    await db.createCollection('userRoles')
+
+    const userRolesResult = await db.collection('userRoles').insertMany(
+      UserRoles.map((userRole) => ({
+        ...userRole,
+        createdAt: Date.now().toString(),
+        updatedAt: Date.now().toString()
+      }))
+    )
+
     /* ==============Migration for "users" Collection============== */
 
-    const users = await db
-      .collection('users')
-      .find({ role: { $ne: 'FIELD_AGENT' } })
-      .toArray()
-    if (users && users.length) {
-      await Promise.all(
-        users.map(async (user) => {
-          await db
-            .collection('users')
-            .updateOne(
-              { username: user.username },
-              { $set: { type: user.role } }
-            )
-        })
+    for await (const user of db.collection('users').find()) {
+      await db.collection('users').updateOne(
+        { username: user.username },
+        {
+          $set: {
+            type: userRolesResult.insertedIds[
+              UserRolesIndex[
+                user.role === 'FIELD_AGENT' ? user.type : user.role
+              ]
+            ]
+          }
+        }
       )
     }
 
@@ -54,51 +187,25 @@ export const up = async (db, client) => {
 
     /* ==============Migration for "roles" Collection============== */
 
-    //set 'types' for 'roles' collection documents where value not equal to 'FIELD_AGENT
-    await db
-      .collection('roles')
-      .updateMany({ value: { $ne: 'FIELD_AGENT' } }, [
-        { $set: { types: ['$value'] } }
-      ])
-
-    //modified 'types' field of 'roles' collection
-    const roles = await db.collection('roles').find({}).toArray()
-    if (roles && roles.length) {
-      await Promise.all(
-        roles.map(async (role) => {
-          if (role.types && role.types.length) {
-            const newType = []
-            role.types.forEach((type) => {
-              newType.push({
-                value: type,
-                labels: [
-                  {
-                    lang: 'en',
-                    label: type
-                      .replace('_', ' ')
-                      .toLowerCase()
-                      .replace(/\b\w/g, (l) => l.toUpperCase())
-                  },
-                  {
-                    lang: 'fr',
-                    label: FRENCH_TYPE_LABEL_MAPPING[type]
-                  }
-                ]
-              })
-            })
-            await db
-              .collection('roles')
-              .updateOne({ _id: role._id }, { $set: { types: newType } })
+    for await (const role of db.collection('roles').find()) {
+      await db.collection('roles').updateOne(
+        { _id: role._id },
+        {
+          $set: {
+            types:
+              role.value === 'FIELD_AGENT'
+                ? Object.values(userRolesResult.insertedIds).slice(0, 4)
+                : [userRolesResult.insertedIds[UserRolesIndex[role.value]]]
           }
-        })
+        }
       )
     }
     //rename 'types' field to 'roles' for all 'roles' collection documents
     await db.collection('roles').updateMany({}, { $rename: { types: 'roles' } })
     //remove 'title' field from all 'roles' collection documents
     await db.collection('roles').updateMany({}, { $unset: { title: 1 } })
-    //rename 'roles' collection name to 'systemroles'
-    await db.collection('roles').rename('systemroles')
+    //rename 'roles' collection name to 'systemRoles'
+    await db.collection('roles').rename('systemRoles')
   } finally {
     await session.endSession()
   }
@@ -107,70 +214,49 @@ export const up = async (db, client) => {
 export const down = async (db, client) => {
   const session = client.startSession()
   try {
+    /* ==============Drop collection userRoles============== */
+
+    await db.dropCollection('userRoles')
+
     /* ==============Migration for "users" Collection============== */
 
+    //revert role to type
     await db.collection('users').updateMany({}, { $rename: { role: 'type' } })
+    //revert systemRole to role
     await db
       .collection('users')
       .updateMany({}, { $rename: { systemRole: 'role' } })
 
-    const users = await db
-      .collection('users')
-      .find({ role: { $ne: 'FIELD_AGENT' } })
-      .toArray()
-    if (users && users.length) {
-      await Promise.all(
-        users.map(async (user) => {
-          await db
-            .collection('users')
-            .updateOne({ username: user.username }, { $set: { type: '' } })
-        })
+    for await (const user of db.collection('users').find()) {
+      await db.collection('users').updateOne(
+        { username: user.username },
+        {
+          $set: { type: user.role === 'FIELD_AGENT' ? 'HEALTHCARE_WORKER' : '' }
+        }
       )
     }
-
     /* ==============Migration for "roles" Collection============== */
 
     //rename 'systemroles' collection name to 'roles'
-    await db.collection('systemroles').rename('roles')
+    await db.collection('systemRoles').rename('roles')
 
     //rename 'roles' field to 'types' for all 'roles' collection documents
     await db.collection('roles').updateMany({}, { $rename: { roles: 'types' } })
 
-    //modified 'types' field of 'roles' collection
-    const rolesCollectionData = await db.collection('roles').find({}).toArray()
-    if (rolesCollectionData && rolesCollectionData.length) {
-      await Promise.all(
-        rolesCollectionData.map(async (roleDoc) => {
-          if (
-            roleDoc.types &&
-            roleDoc.types.length &&
-            roleDoc.value === 'FIELD_AGENT'
-          ) {
-            const types = roleDoc.types.map((role) => {
-              let label = role.labels.find((x) => x.lang === 'en').label
-              label = label.toUpperCase().replace(/\s+/g, '_')
-              return label
-            })
-
-            const roles = Object.keys(FRENCH_TYPE_LABEL_MAPPING)
-            const newTypes = types.map((type) => {
-              if (!roles.includes(type.toUpperCase().replace(/\s+/g, '_'))) {
-                return roles[0]
-              }
-              return type
-            })
-
-            await db
-              .collection('roles')
-              .updateOne({ _id: roleDoc._id }, { $set: { types: newTypes } })
+    //revert 'types' field of 'roles' collection
+    for await (const role of db.collection('roles').find()) {
+      await db.collection('roles').updateOne(
+        { _id: role._id },
+        {
+          $set: {
+            types:
+              role.value === 'FIELD_AGENT'
+                ? Object.keys(UserRolesIndex).slice(0, 4)
+                : []
           }
-        })
+        }
       )
     }
-    //set 'types' to empty for 'roles' collection documents where value not equal to 'FIELD_AGENT
-    await db
-      .collection('roles')
-      .updateMany({ value: { $ne: 'FIELD_AGENT' } }, { $set: { types: [] } })
   } finally {
     await session.endSession()
   }

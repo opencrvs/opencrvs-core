@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { model, Schema, Document } from 'mongoose'
+import { model, Schema, Document, Types } from 'mongoose'
 
 interface ISystemRole {
   value: string
-  roles: string[]
+  roles: Types.ObjectId[]
   active: boolean
   creationDate: number
 }

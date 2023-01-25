@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Document, model, Schema } from 'mongoose'
+import { Document, model, Schema, Types } from 'mongoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
 
 export enum AUDIT_REASON {
@@ -32,13 +32,6 @@ export interface IUserName {
   use: string
   family: string
   given: string[]
-}
-
-export enum FIELD_AGENT_TYPES {
-  HEALTHCARE_WORKER = 'HEALTHCARE_WORKER',
-  POLICE_OFFICER = 'POLICE_OFFICER',
-  SOCIAL_WORKER = 'SOCIAL_WORKER',
-  LOCAL_LEADER = 'LOCAL_LEADER'
 }
 
 interface IIdentifier {
@@ -136,7 +129,7 @@ export interface IUser {
   passwordHash: string
   salt: string
   systemRole: string
-  role?: string
+  role: Types.ObjectId
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
@@ -306,7 +299,7 @@ const userSchema = new Schema({
   mobile: { type: String, unique: true },
   passwordHash: { type: String, required: true },
   salt: { type: String, required: true },
-  systemRole: String,
+  systemRole: { type: String, required: true },
   role: { type: Schema.Types.ObjectId, ref: 'UserRole' },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },

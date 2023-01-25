@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
-import SystemRole from '@user-mgnt/model/role'
+import SystemRole from '@user-mgnt/model/systemRole'
 import { SortOrder } from 'mongoose'
 
 interface IVerifyPayload {

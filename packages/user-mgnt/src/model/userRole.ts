@@ -13,7 +13,6 @@ import { model, Schema, Document } from 'mongoose'
 
 interface IUserRole {
   labels: Label[]
-  creationDate: number
 }
 
 type Label = {
@@ -31,9 +30,11 @@ const LabelSchema = new Schema(
   { _id: false }
 )
 
-const UserRoleSchema = new Schema({
-  labels: [LabelSchema],
-  creationDate: { type: Number, default: Date.now }
-})
+const UserRoleSchema = new Schema(
+  {
+    labels: [LabelSchema]
+  },
+  { timestamps: true }
+)
 
 export default model<IUserRoleModel>('UserRoles', UserRoleSchema)
