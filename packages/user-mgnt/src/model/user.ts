@@ -136,7 +136,7 @@ export interface IUser {
   passwordHash: string
   salt: string
   systemRole: string
-  role?: FIELD_AGENT_TYPES
+  role?: string
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
@@ -307,7 +307,7 @@ const userSchema = new Schema({
   passwordHash: { type: String, required: true },
   salt: { type: String, required: true },
   systemRole: String,
-  role: String,
+  role: { type: Schema.Types.ObjectId, ref: 'UserRole' },
   practitionerId: { type: String, required: true },
   primaryOfficeId: { type: String, required: true },
   catchmentAreaIds: { type: [String], required: true },
