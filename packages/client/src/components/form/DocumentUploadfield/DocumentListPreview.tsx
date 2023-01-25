@@ -109,7 +109,7 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
                       this.getFormattedLabelForDocType(
                         document.optionValues[1] as string
                       ) ||
-                      document.optionValues[1]}
+                      (document.optionValues[1] as string)}
                   </span>
                 </Link>
               </Label>

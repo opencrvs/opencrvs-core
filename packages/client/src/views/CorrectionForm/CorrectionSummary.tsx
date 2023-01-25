@@ -907,7 +907,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             return (
               <SupportingDocument>
                 <PaperClip />
-                <span>{doc[1]}</span>
+                <span>{doc[1] as any}</span>
               </SupportingDocument>
             )
           })}
