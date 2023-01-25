@@ -47,6 +47,8 @@ import { useSelector } from 'react-redux'
 import { getUserRole } from './utils'
 import { Stack } from '@opencrvs/components'
 import { ProfileMenu } from '@client/components/ProfileMenu'
+import { useModal } from '@client/hooks/useModal'
+import { UserRoleManagementModal } from '@client/views/UserRoles/UserRoleManagementModal'
 
 export type IRoles = Array<{
   labels: Array<{
@@ -58,6 +60,7 @@ export type IRoles = Array<{
 const UserRoles = () => {
   const intl = useIntl()
   const isOnline = useOnlineStatus()
+  const [userRoleMgntModalNode, openUserRoleManage] = useModal()
   const language = useSelector(getLanguage)
   const { loading, error, data, refetch } = useQuery<GetSystemRolesQuery>(
     getSystemRolesQuery,
@@ -70,6 +73,12 @@ const UserRoles = () => {
   const systemRolesData = React.useMemo(() => {
     return data?.getSystemRoles ?? []
   }, [data])
+
+  const roleChangeHandler = async (val) => {
+    const modalval = await openUserRoleManage<any>((close) => (
+      <UserRoleManagementModal userRolesDetail={val} closeCallback={close} />
+    ))
+  }
 
   return (
     <>
@@ -142,7 +151,12 @@ const UserRoles = () => {
                       </Value>
                     }
                     actions={
-                      <Link font="reg16" onClick={() => alert('Show Modal!')}>
+                      <Link
+                        font="reg16"
+                        onClick={() => {
+                          roleChangeHandler(systemRole)
+                        }}
+                      >
                         <span>{intl.formatMessage(buttonMessages.change)}</span>
                       </Link>
                     }
@@ -151,6 +165,7 @@ const UserRoles = () => {
               })}
             </ListViewSimplified>
           )}
+          {userRoleMgntModalNode}
         </Content>
       </Frame>
     </>

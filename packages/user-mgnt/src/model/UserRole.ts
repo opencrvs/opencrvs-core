@@ -11,20 +11,29 @@
  */
 import { model, Schema, Document } from 'mongoose'
 
-interface ISystemRole {
-  value: string
-  roles: string[]
-  active: boolean
+interface IUserRole {
+  labels: Label[]
   creationDate: number
 }
 
-export interface ISystemRoleModel extends ISystemRole, Document {}
+type Label = {
+  lang: string
+  label: string
+}
 
-const systemRoleSchema = new Schema({
-  value: String,
-  roles: [{ type: Schema.Types.ObjectId, ref: 'UserRole' }],
-  active: { type: Boolean, default: true },
+export interface IUserRoleModel extends IUserRole, Document {}
+
+const LabelSchema = new Schema(
+  {
+    lang: String,
+    label: String
+  },
+  { _id: false }
+)
+
+const UserRoleSchema = new Schema({
+  labels: [LabelSchema],
   creationDate: { type: Number, default: Date.now }
 })
 
-export default model<ISystemRoleModel>('SystemRole', systemRoleSchema)
+export default model<IUserRoleModel>('UserRoles', UserRoleSchema)

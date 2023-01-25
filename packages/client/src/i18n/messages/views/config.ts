@@ -113,6 +113,7 @@ interface IConfigMessages
   userRolesSubtitle: MessageDescriptor
   systemRoles: MessageDescriptor
   role: MessageDescriptor
+  roleUpdateInstruction: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -636,6 +637,12 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.userRoles.role',
     defaultMessage: 'ROLE',
     description: 'ListViewSimplified header for role'
+  },
+  roleUpdateInstruction: {
+    id: 'config.userRoles.roleUpdateInstruction',
+    defaultMessage:
+      'Add the roles to be assigned the system role of {systemRole}',
+    description: 'Instruction for adding/updating role in role management modal'
   }
 }
 
