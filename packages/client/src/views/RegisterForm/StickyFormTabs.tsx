@@ -34,6 +34,10 @@ function StickyFormTabsComponent({
 }: IStickyFormTabProps & IntlShapeProps) {
   return (
     <StickyFormTabsContainer id="form_tabs_container">
+      {/* 
+      // The version of react-stickynode we're using doesn't have children -property in it's type definition.
+      // React started to explicitly require it in version 18. React-stickynode would need to be updated.
+      // @ts-ignore */}
       <Sticky enabled={true} innerZ={2}>
         <FormTabs
           sections={sections}

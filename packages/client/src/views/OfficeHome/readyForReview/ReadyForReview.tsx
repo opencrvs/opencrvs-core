@@ -21,7 +21,6 @@ import {
   Workqueue,
   COLUMNS,
   SORT_ORDER,
-  IDynamicValues,
   IAction
 } from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -134,7 +133,7 @@ class ReadyForReviewComponent extends React.Component<
       return []
     }
     const transformedData = transformData(data, this.props.intl)
-    const items: IDynamicValues[] = transformedData.map((reg, index) => {
+    const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
@@ -265,7 +264,7 @@ class ReadyForReviewComponent extends React.Component<
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
         sentForReview:
-          item.sentForReview && formattedDuration(item.sentForReview as number)
+          item.sentForReview && formattedDuration(item.sentForReview as any)
       }
     })
   }

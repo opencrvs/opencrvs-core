@@ -98,7 +98,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
       mode
     } = this.props
 
-    const postfix = this.props.postfix as React.ComponentClass | string
+    const postfix = this.props.postfix as React.ReactNode | string
 
     const { prefix } = this.props
 

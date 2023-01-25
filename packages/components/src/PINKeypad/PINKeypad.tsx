@@ -11,7 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Backspace } from '../icons/Backspace'
+import { userMessages } from '@opencrvs/client/src/i18n/messages'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 interface IProps {
   id?: string
@@ -62,31 +63,10 @@ const DotUnfilled = styled.span`
   }
 `
 
-const NumberContainer = styled.div`
-  display: grid;
-  grid-template-columns: auto auto auto;
-
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
-
-const Key = styled.span`
-  color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.h1};
-  padding: 24px 48px;
-  text-align: center;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 20px 40px;
-    ${({ theme }) => theme.fonts.h1};
-  }
-  @media (max-height: 780px) {
-    ${({ theme }) => theme.fonts.h2};
-  }
-`
-
 export class PINKeypad extends React.Component<IProps, IState> {
   state = { pin: this.props.pin || '' }
+
+  pinInput = React.createRef<HTMLInputElement>()
 
   keyPress = (key: number) => {
     const { pin } = this.state
@@ -148,6 +128,19 @@ export class PINKeypad extends React.Component<IProps, IState> {
       >
         <div>
           <div>
+            <input
+              hidden
+              type="number"
+              onKeyDown={this.keyDown}
+              id="pin-input"
+              ref={this.pinInput}
+            />
+          </div>
+          <div
+            onClick={() => {
+              this.pinInput?.current?.focus()
+            }}
+          >
             {new Array(pin.length).fill('').map((e, i) => (
               <DotFilled key={`dot-filled-${i}`} />
             ))}
@@ -157,97 +150,6 @@ export class PINKeypad extends React.Component<IProps, IState> {
           </div>
           {this.props.forgotPinComponent}
         </div>
-        <NumberContainer>
-          <Key
-            id="keypad-1"
-            onClick={() => {
-              this.keyPress(1)
-            }}
-          >
-            1
-          </Key>
-          <Key
-            id="keypad-2"
-            onClick={() => {
-              this.keyPress(2)
-            }}
-          >
-            2
-          </Key>
-          <Key
-            id="keypad-3"
-            onClick={() => {
-              this.keyPress(3)
-            }}
-          >
-            3
-          </Key>
-          <Key
-            id="keypad-4"
-            onClick={() => {
-              this.keyPress(4)
-            }}
-          >
-            4
-          </Key>
-          <Key
-            id="keypad-5"
-            onClick={() => {
-              this.keyPress(5)
-            }}
-          >
-            5
-          </Key>
-          <Key
-            id="keypad-6"
-            onClick={() => {
-              this.keyPress(6)
-            }}
-          >
-            6
-          </Key>
-          <Key
-            id="keypad-7"
-            onClick={() => {
-              this.keyPress(7)
-            }}
-          >
-            7
-          </Key>
-          <Key
-            id="keypad-8"
-            onClick={() => {
-              this.keyPress(8)
-            }}
-          >
-            8
-          </Key>
-          <Key
-            id="keypad-9"
-            onClick={() => {
-              this.keyPress(9)
-            }}
-          >
-            9
-          </Key>
-          <Key id="keypad-blank">&nbsp;</Key>
-          <Key
-            id="keypad-0"
-            onClick={() => {
-              this.keyPress(0)
-            }}
-          >
-            0
-          </Key>
-          <Key
-            id="keypad-backspace"
-            onClick={() => {
-              this.keyPress(-1)
-            }}
-          >
-            <Backspace />
-          </Key>
-        </NumberContainer>
       </Container>
     )
   }
