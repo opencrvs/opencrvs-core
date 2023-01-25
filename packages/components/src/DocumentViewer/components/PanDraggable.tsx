@@ -44,6 +44,7 @@ export interface IReactPanZoomProps {
   onReset?: (dx: number, dy: number, zoom: number) => void
   onClick?: (e: React.MouseEvent) => void
   style?: {}
+  children?: React.ReactNode
 }
 export default class ReactPanZoom extends React.PureComponent<
   IReactPanZoomProps,

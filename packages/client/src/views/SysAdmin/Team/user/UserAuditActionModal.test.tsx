@@ -19,6 +19,7 @@ import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
+import { RoleType, Status } from '@client/utils/gateway'
 
 const users = [
   {
@@ -31,7 +32,7 @@ const users = [
       }
     ],
     username: 'r.tagore',
-    role: 'REGISTRATION_AGENT',
+    role: RoleType.RegistrationAgent,
     localRegistrar: {
       name: [
         {
@@ -40,10 +41,34 @@ const users = [
           familyName: 'Huq'
         }
       ],
-      role: 'LOCAL_REGISTRAR'
+      role: RoleType.LocalRegistrar,
+      signature: undefined
     },
     type: 'ENTREPENEUR',
-    status: 'active'
+    status: Status.Active,
+    creationDate: '2022-10-03T10:42:46.920Z',
+    userMgntUserID: '5eba726866458970cf2e23c2',
+    practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    mobile: '+8801711111111',
+    catchmentArea: [
+      {
+        id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+        name: 'Baniajan',
+        alias: ['বানিয়াজান'],
+        status: 'active',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+            value: 'division=9&district=30&upazila=233&union=4194'
+          }
+        ]
+      }
+    ],
+    primaryOffice: {
+      id: '0d8474da-0361-4d32-979e-af91f012340a',
+      name: 'Kaliganj Union Sub Center',
+      status: 'active'
+    }
   },
   {
     id: '5d08e102542c7a19fc55b793',
@@ -55,9 +80,9 @@ const users = [
       }
     ],
     username: 'np.huq',
-    role: 'STATE_REGISTRAR',
+    role: RoleType.LocalRegistrar,
     type: 'MAYOR',
-    status: 'deactivated',
+    status: Status.Deactivated,
     localRegistrar: {
       name: [
         {
@@ -66,7 +91,31 @@ const users = [
           familyName: 'Islam'
         }
       ],
-      role: 'LOCAL_REGISTRAR'
+      role: RoleType.LocalRegistrar,
+      signature: undefined
+    },
+    creationDate: '2022-10-03T10:42:46.920Z',
+    userMgntUserID: '5eba726866458970cf2e23c2',
+    practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    mobile: '+8801711111111',
+    catchmentArea: [
+      {
+        id: '514cbc3a-cc99-4095-983f-535ea8cb6ac0',
+        name: 'Baniajan',
+        alias: ['বানিয়াজান'],
+        status: 'active',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+            value: 'division=9&district=30&upazila=233&union=4194'
+          }
+        ]
+      }
+    ],
+    primaryOffice: {
+      id: '0d8474da-0361-4d32-979e-af91f012340a',
+      name: 'Kaliganj Union Sub Center',
+      status: 'active'
     }
   }
 ]
@@ -207,10 +256,10 @@ describe('user audit action modal tests', () => {
           '#deactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
-        await flushPromises()
-        expect(
-          store.getState().notification.userAuditSuccessToast.visible
-        ).toBe(true)
+        waitFor(
+          () =>
+            store.getState().notification.userAuditSuccessToast.visible === true
+        )
       })
     })
   })
