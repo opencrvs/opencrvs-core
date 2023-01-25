@@ -18,6 +18,20 @@ import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import { useIntl } from 'react-intl'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { useDispatch } from 'react-redux'
+import {
+  ResponsiveModal,
+  Select,
+  Stack,
+  Text,
+  TextArea,
+  TextInput
+} from '@client/../../components'
+import { CancelButton } from '@client/views/SysAdmin/Config/Application/Components'
+import { buttonMessages } from '@client/i18n/messages'
+import { InputField } from '@client/components/form/InputField'
+import { goToHome } from '@client/navigation'
 
 interface IProps {
   declaration: IDeclaration
@@ -28,8 +42,22 @@ const SubPageContent = styled(Content)`
   max-width: 100%;
 `
 
+const StyledSelect = styled(Select)`
+  width: 192px;
+  ${({ theme }) => theme.fonts.reg18};
+  padding-bottom: 20px;
+  .react-select__control {
+    border-radius: 4px;
+  }
+`
+
 export const DuplicateForm = (props: IProps) => {
   const intl = useIntl()
+  const [showModal, setShowModal] = React.useState(false)
+  const [selectedOption, setSelectedOption] = React.useState('')
+  const [isSelected, setIsSelected] = React.useState(false)
+  const [textValue, setTextValue] = React.useState(false)
+  const dispatch = useDispatch()
   const { data } = props.declaration
   const trackingIds = props.declaration.duplicates
     ?.map((duplicate) => duplicate.trackingId)
@@ -40,6 +68,10 @@ export const DuplicateForm = (props: IProps) => {
       data.child.firstNamesEng as string,
       data.child.familyNameEng as string
     ].join(' ')
+  }
+
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
   }
 
   const notADuplicateButton = (
@@ -54,10 +86,10 @@ export const DuplicateForm = (props: IProps) => {
     </Button>
   )
 
-  const markASDuplicateButton = (
+  const markAsDuplicateButton = (
     <Button
       onClick={() => {
-        alert('Mark as duplicate')
+        toggleModal()
       }}
       type="negative"
     >
@@ -67,15 +99,86 @@ export const DuplicateForm = (props: IProps) => {
   )
 
   return (
-    <SubPageContent
-      title={intl.formatMessage(duplicateMessages.duplicateContentTitle, {
-        name: getName(),
-        trackingId: String(data.registration.trackingId)
-      })}
-      subtitle={intl.formatMessage(duplicateMessages.duplicateContentSubtitle, {
-        trackingIds
-      })}
-      bottomActionButtons={[notADuplicateButton, markASDuplicateButton]}
-    ></SubPageContent>
+    <>
+      <SubPageContent
+        title={intl.formatMessage(duplicateMessages.duplicateContentTitle, {
+          name: getName(),
+          trackingId: String(data.registration.trackingId)
+        })}
+        subtitle={intl.formatMessage(
+          duplicateMessages.duplicateContentSubtitle,
+          {
+            trackingIds
+          }
+        )}
+        bottomActionButtons={[notADuplicateButton, markAsDuplicateButton]}
+      ></SubPageContent>
+
+      <ResponsiveModal
+        id="mark-as-duplicate-modal"
+        width={840}
+        title={intl.formatMessage(
+          duplicateMessages.markAsDuplicateConfirmationTitle,
+          {
+            trackingId: String(data.registration.trackingId)
+          }
+        )}
+        autoHeight={true}
+        titleHeightAuto={true}
+        show={showModal}
+        actions={[
+          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
+            {intl.formatMessage(buttonMessages.cancel)}
+          </CancelButton>,
+          <Button
+            id="mark-as-duplicate-button"
+            type="negative"
+            onClick={() => {
+              if (isSelected) {
+                dispatch(goToHome())
+                // dispatch archive declaration
+              }
+            }}
+            disabled={!isSelected}
+          >
+            {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
+          </Button>
+        ]}
+        handleClose={toggleModal}
+      >
+        {showModal && (
+          <>
+            <Stack direction="column" alignItems="stretch">
+              <Text variant="reg18" element="span">
+                {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
+              </Text>
+              <StyledSelect
+                value={selectedOption}
+                onChange={(val: string) => {
+                  setSelectedOption(val)
+                  setIsSelected(true)
+                }}
+                placeholder="Select"
+                options={props.declaration.duplicates?.map((id) => ({
+                  value: id.compositionId,
+                  label: id.trackingId
+                }))}
+              />
+              <Text id="reason-describe" variant="reg18" element="span">
+                {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
+                <TextArea
+                  ignoreMediaQuery
+                  {...{
+                    onChange: (event: any) => {
+                      setTextValue(true)
+                    }
+                  }}
+                />
+              </Text>
+            </Stack>
+          </>
+        )}
+      </ResponsiveModal>
+    </>
   )
 }

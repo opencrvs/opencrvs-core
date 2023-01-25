@@ -18,6 +18,9 @@ interface IDuplicateDeclarationMessages
   duplicateContentSubtitle: MessageDescriptor
   notDuplicateButton: MessageDescriptor
   markAsDuplicateButton: MessageDescriptor
+  markAsDuplicateConfirmationTitle: MessageDescriptor
+  markAsDuplicateReason: MessageDescriptor
+  duplicateDropdownMessage: MessageDescriptor
 }
 
 const messagesToDefine: IDuplicateDeclarationMessages = {
@@ -46,6 +49,21 @@ const messagesToDefine: IDuplicateDeclarationMessages = {
     id: 'duplicates.button.markAsDuplicate',
     defaultMessage: 'Mark as duplicate',
     description: 'Mark as duplicate button text'
+  },
+  markAsDuplicateConfirmationTitle: {
+    id: 'duplicates.content.markAsDuplicate',
+    defaultMessage: 'Mark {trackingId} as duplicate?',
+    description: 'Mark as duplicate content confirmation title message'
+  },
+  duplicateDropdownMessage: {
+    id: 'duplicates.content.duplicateDropdownMessage',
+    defaultMessage: 'Duplicate of',
+    description: 'Selecting from the duplicate trackingIds'
+  },
+  markAsDuplicateReason: {
+    id: 'duplicates.content.markAsDuplicateReason',
+    defaultMessage: 'Please describe your reason',
+    description: 'Review page header for duplicates declarations'
   }
 }
 
