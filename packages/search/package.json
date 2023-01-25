@@ -53,6 +53,7 @@
     "lint-staged": "^7.1.0",
     "nodemon": "^1.17.5",
     "prettier": "^2.5.1",
+    "testcontainers": "^9.1.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
     "typescript": "^4.8.3"
