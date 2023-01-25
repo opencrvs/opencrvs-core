@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { mount, configure } from 'enzyme'
 import { Provider } from 'react-redux'
-import Adapter from 'enzyme-adapter-react-16'
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
 import { Router } from 'react-router'
 import { ThemeProvider } from 'styled-components'
 

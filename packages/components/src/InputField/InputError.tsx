@@ -17,6 +17,7 @@ export interface IInputError {
   centred?: boolean
   ignoreMediaQuery?: boolean
   color?: string
+  children?: React.ReactNode
 }
 
 const InputErrorWrapper = styled.div<IInputError>`

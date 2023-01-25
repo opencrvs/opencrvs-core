@@ -9,4 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from './ExpandableNotification'
+
+import gql from 'graphql-tag'
+
+export const TOGGLE_INFORMANT_SMS_NOTIFICATION_MUTATION = gql`
+  mutation ToggleInformantSMSNotification(
+    $smsNotifications: [SMSNotificationInput!]
+  ) {
+    toggleInformantSMSNotification(smsNotifications: $smsNotifications) {
+      id
+      name
+      enabled
+      message
+      updatedAt
+      createdAt
+    }
+  }
+`
