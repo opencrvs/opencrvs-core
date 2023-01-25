@@ -18,19 +18,16 @@ import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import { useIntl } from 'react-intl'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { useDispatch } from 'react-redux'
 import {
   ResponsiveModal,
   Select,
   Stack,
   Text,
-  TextArea,
-  TextInput
+  TextArea
 } from '@client/../../components'
 import { CancelButton } from '@client/views/SysAdmin/Config/Application/Components'
 import { buttonMessages } from '@client/i18n/messages'
-import { InputField } from '@client/components/form/InputField'
 import { goToHome } from '@client/navigation'
 
 interface IProps {
@@ -49,6 +46,14 @@ const StyledSelect = styled(Select)`
   .react-select__control {
     border-radius: 4px;
   }
+`
+const StyledText = styled(Text)`
+  padding-bottom: 4px;
+`
+
+const StyledTextArea = styled(TextArea)`
+  border-radius: 4px;
+  margin-bottom: 24px;
 `
 
 export const DuplicateForm = (props: IProps) => {
@@ -148,7 +153,7 @@ export const DuplicateForm = (props: IProps) => {
       >
         {showModal && (
           <>
-            <Stack direction="column" alignItems="stretch">
+            <Stack direction="column" alignItems="stretch" gap={10}>
               <Text variant="reg18" element="span">
                 {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
               </Text>
@@ -164,17 +169,17 @@ export const DuplicateForm = (props: IProps) => {
                   label: id.trackingId
                 }))}
               />
-              <Text id="reason-describe" variant="reg18" element="span">
+              <StyledText id="describe-reason" variant="reg18" element="span">
                 {intl.formatMessage(duplicateMessages.markAsDuplicateReason)}
-                <TextArea
-                  ignoreMediaQuery
-                  {...{
-                    onChange: (event: any) => {
-                      setTextValue(true)
-                    }
-                  }}
-                />
-              </Text>
+              </StyledText>
+              <StyledTextArea
+                ignoreMediaQuery
+                {...{
+                  onChange: (event: any) => {
+                    setTextValue(true)
+                  }
+                }}
+              />
             </Stack>
           </>
         )}
