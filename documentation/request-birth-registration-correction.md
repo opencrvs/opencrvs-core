@@ -53,15 +53,61 @@ sequenceDiagram
     Workflow->>OpenHIM: Trigger event = request birth request correction
 
     OpenHIM--)Search: Forward event
+
+    %% upsertEvent
+    %% updateEvent
     Search->>ElasticSearch: Get composition
     Note over Search,ElasticSearch: Get operation history
-
+    %% createStatusHistory
     Search->>User management: Get user
+    Search->>Hearth: Get office location
+    Note over Search,Hearth: Compose new history entry
+    %% updateComposition
+    Search->>ElasticSearch: Update composition
 
+    %% indexAndSearchComposition
+    Search->>ElasticSearch: Get composition
+    Note over Search,ElasticSearch: Find createdAt
+    Search->>ElasticSearch: Get composition
+    Note over Search,ElasticSearch: Find operation history
+
+    %% createIndexBody
+      %% createChildIndex
+      %% addEventLocation
+    Search->>Hearth: Get Encounter
+    Search->>Hearth: Get Encounter location
+
+      %% createDeclarationIndex
+      %% getCreatedBy
+    Search->>ElasticSearch: Get composition
+    Note over Search,ElasticSearch: Find createdBy
+
+      %% createStatusHistory
+    Search->>User management: Get user
     Search->>Hearth: Get office location
     Note over Search,Hearth: Compose new history entry
 
-    Search->>ElasticSearch: Update composition history
+    %% indexComposition
+    Search->>ElasticSearch: Index composition
+
+    %% detectAndUpdateduplicates
+      %% detectDuplicates
+        %% searchComposition
+    Search->>ElasticSearch: Search Compositions for duplicates
+      %% updateCompositionWithDuplicates
+
+    loop no of duplicates
+        Search->>Hearth: Get Composition by id
+    end
+
+    Search->>ElasticSearch: Update Composition
+    Note over Search,ElasticSearch: Add duplicates to "relatesTo"
+
+    Search->>Hearth: Get Composition by id
+    Note over Search,Hearth: Add duplicates to Composition
+
+    Search->>Hearth: Put Composition
+    Note over Search,Hearth: Update duplicates to Hearth 'relatesTo'
 
     OpenHIM--)Metrics: Forward event
     Metrics->>InfluxDB: Create user audit point "CORRECTED"
