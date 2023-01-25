@@ -20,6 +20,7 @@ import {
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 import * as elastic from '@elastic/elasticsearch'
 import { searchForDuplicates } from './service'
+import { indexComposition } from '../../../elasticsearch/dbhelper'
 
 describe('Elastic Search Test Container Automation', () => {
   beforeAll(async () => await startContainer())
@@ -47,6 +48,7 @@ describe('Elastic Search Test Container Automation', () => {
 
   it('should makes sure similar names are marked as a duplicate', async () => {
     // await writeToElasticSearch(exampleRegistrationA)
+    await indexComposition('testId', exampleRegistrationA)
     expect(
       await searchForDuplicates({
         ...exampleRegistrationB,
