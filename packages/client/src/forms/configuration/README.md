@@ -789,24 +789,44 @@ This object holds sections for death declaration forms. All sections are in sect
 
 - #### `Father/Mother/Informant/Deceased Address`
   - #### `informant/father/mother/deceased`
-    This is a formatted place of event which will show district, state country. This field is always available for relevant event.
-  - #### `informantCountry/fatherCountry/motherCountry/deceasedCountry`
+    This is a formatted place of event which will show district, state country. This field is always available for relevant event & it will be the primary address.
+  - #### `informantPrimaryCountry/fatherPrimaryCountry/motherPrimaryCountry/deceasedPrimaryCountry`
     This field is always available.
-  - #### `informantCity/fatherCity/motherCity/deceasedCity`
-    This field is optionaly available if they are provided.
-  - #### `informantAddressLine3/fatherAddressLine3/motherAddressLine3/deceasedAddressLine3`
-    This field is optionaly available if they are provided.
-  - #### `informantAddressLine2/fatherAddressLine2/motherAddressLine2/deceasedAddressLine2`
-    This field is optionaly available if they are provided.
-  - #### `informantNumber/fatherNumber/motherNumber/deceasedNumber`
-    This field is optionaly available if they are provided.
-  - #### `informantPostalCode/fatherPostalCode/motherPostalCode/deceasedPostalCode`
-    This field is optionaly available if they are provided.
-  - #### `informantAddressLine5/fatherAddressLine5/motherAddressLine5/deceasedAddressLine5`
-    This field is optionaly available if they are provided.
-  - #### `informantState/fatherState/motherState/deceasedState`
-    This field is optionaly available if they are provided.
-  - #### `informantDistrict/fatherDistrict/motherDistrict/deceasedDistrict`
-    This field is optionaly available if they are provided.
-  - #### `informantAddressLine1/fatherAddressLine1/motherAddressLine1/deceasedAddressLine1`
-    This field is optionaly available if they are provided.
+  - #### `informantSecondaryCountry/fatherSecondaryCountry/motherSecondaryCountry/deceasedSecondaryCountry`
+    This field should be available if the No of address is configured for 2.
+  - #### `informantPrimaryCity/fatherPrimaryCity/motherPrimaryCity/deceasedPrimaryCity`
+    This field is optionally available if they are provided.
+  - #### `informantSecondaryCity/fatherSecondaryCity/motherSecondaryCity/deceasedSecondaryCity`
+    This field is optionally available if they are provided. Also it will be unavailable for No of address configured to 1.
+  - #### `informantPrimaryAddressLine3/fatherPrimaryAddressLine3/motherPrimaryAddressLine3/deceasedPrimaryAddressLine3`
+    This field is optionally available if they are provided.
+  - #### `informantSecondaryAddressLine3/fatherSecondaryAddressLine3/motherSecondaryAddressLine3/deceasedSecondaryAddressLine3`
+    This field is optionally available if they are provided. Also it will be unavailable for No of address configured to 1.
+  - #### `informantPrimaryAddressLine2/fatherPrimaryAddressLine2/motherPrimaryAddressLine2/deceasedPrimaryAddressLine2`
+    This field is optionally available if they are provided.
+  - #### `informantSecondaryAddressLine2/fatherSecondaryAddressLine2/motherSecondaryAddressLine2/deceasedSecondaryAddressLine2`
+    This field is optionally available if they are provided. Also it will be unavailable for No of address configured to 1.
+  - #### `informantPrimaryNumber/fatherPrimaryNumber/motherPrimaryNumber/deceasedPrimaryNumber`
+    This field is optionally available if they are provided.
+  - #### `informantSecondaryNumber/fatherSecondaryNumber/motherSecondaryNumber/deceasedSecondaryNumber`
+    This field is optionally available if they are provided. Also it will be unavailable for No of address configured to 1.
+  - #### `informantPrimaryPostalCode/fatherPrimaryPostalCode/motherPrimaryPostalCode/deceasedPrimaryPostalCode`
+    This field is optionally available if they are provided.
+    - #### `informantSecondaryPostalCode/fatherSecondaryPostalCode/motherSecondaryPostalCode/deceasedSecondaryPostalCode`
+      This field is optionally available if they are provided. Also it will be unavailable for No of address configured to 1.
+  - #### `informantPrimaryAddressLine5/fatherPrimaryAddressLine5/motherPrimaryAddressLine5/deceasedPrimaryAddressLine5`
+    This field is optionally available if they are provided.
+  - #### `informantSecondaryAddressLine5/fatherSecondaryAddressLine5/motherSecondaryAddressLine5/deceasedSecondaryAddressLine5`
+    This field is optionally available if they are provided. Also it will be unavailable for No of address configured to 1.
+  - #### `informantPrimaryState/fatherPrimaryState/motherPrimaryState/deceasedPrimaryState`
+    This field is optionally available if they are provided.
+    - #### `informantSecondaryState/fatherSecondaryState/motherSecondaryState/deceasedSecondaryState`
+      This field is optionally available if they are provided. Also it will be unavailable for No of address configured to 1.
+  - #### `informantPrimaryDistrict/fatherPrimaryDistrict/motherPrimaryDistrict/deceasedPrimaryDistrict`
+    This field is optionally available if they are provided.
+  - #### `informantSecondaryDistrict/fatherSecondaryDistrict/motherSecondaryDistrict/deceasedSecondaryDistrict`
+    This field is optionally available if they are provided. Also it will be unavailable for No of address configured to 1.
+  - #### `informantPrimaryAddressLine1/fatherPrimaryAddressLine1/motherPrimaryAddressLine1/deceasedPrimaryAddressLine1`
+    This field is optionally available if they are provided.
+  - #### `informantSecondaryAddressLine1/fatherSecondaryAddressLine1/motherSecondaryAddressLine1/deceasedSecondaryAddressLine1`
+    This field is optionally available if they are provided. Also it will be unavailable for No of address configured to 1.
