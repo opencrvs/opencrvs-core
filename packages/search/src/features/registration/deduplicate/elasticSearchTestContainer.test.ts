@@ -22,11 +22,10 @@ import * as elastic from '@elastic/elasticsearch'
 import { searchForDuplicates } from './service'
 import { indexComposition } from '@search/elasticsearch/dbhelper'
 
+beforeAll(async () => await startContainer())
+// beforeEach(async () => watchForContainer())
+afterAll(async () => stopContainer())
 describe('Elastic Search Test Container Automation', () => {
-  beforeAll(async () => await startContainer())
-  beforeEach(async () => watchForContainer())
-  afterAll(async () => stopContainer())
-
   const exampleBirthRegistrationA: IBirthCompositionBody = {
     childFirstNames: 'John',
     childFamilyName: 'Smith',
@@ -41,10 +40,12 @@ describe('Elastic Search Test Container Automation', () => {
   }
 
   it('should check elasticsearch is up', async () => {
+    const host = (await elasticsearch).getHost()
+    const port = (await elasticsearch).getMappedPort(
+      ELASTIC_SEARCH_HTTP_PORT || 9200
+    )
     const client = new elastic.Client({
-      node: `https://${(await elasticsearch).getHost()}:${(
-        await elasticsearch
-      ).getMappedPort(ELASTIC_SEARCH_HTTP_PORT || 9200)}`
+      node: `http://${host}:${port}`
     })
 
     await client.cluster.health()
