@@ -25,7 +25,7 @@ import {
   Stack,
   Text,
   TextArea
-} from '@client/../../components'
+} from '@opencrvs/components/lib'
 import { CancelButton } from '@client/views/SysAdmin/Config/Application/Components'
 import { buttonMessages } from '@client/i18n/messages'
 import { goToHome } from '@client/navigation'
@@ -81,6 +81,7 @@ export const DuplicateForm = (props: IProps) => {
 
   const notADuplicateButton = (
     <Button
+      id="not-a-duplicate"
       onClick={() => {
         alert('Not a duplicate')
       }}
@@ -93,6 +94,7 @@ export const DuplicateForm = (props: IProps) => {
 
   const markAsDuplicateButton = (
     <Button
+      id="mark-as-duplicate"
       onClick={() => {
         toggleModal()
       }}
@@ -158,12 +160,14 @@ export const DuplicateForm = (props: IProps) => {
                 {intl.formatMessage(duplicateMessages.duplicateDropdownMessage)}
               </Text>
               <StyledSelect
+                id="selectTrackingId"
+                isDisabled={false}
                 value={selectedOption}
                 onChange={(val: string) => {
+                  console.log('val', val)
                   setSelectedOption(val)
                   setIsSelected(true)
                 }}
-                placeholder="Select"
                 options={props.declaration.duplicates?.map((id) => ({
                   value: id.compositionId,
                   label: id.trackingId
