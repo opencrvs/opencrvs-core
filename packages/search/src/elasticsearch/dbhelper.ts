@@ -11,10 +11,7 @@
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
-import {
-  buildQuery,
-  ICompositionBody
-} from '@search/elasticsearch/utils'
+import { buildQuery, ICompositionBody } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
 
 export const indexComposition = async (
