@@ -17,11 +17,6 @@ import { createServer } from '@search/server'
 import { mockCompositionResponse, mockSearchResponse } from '@search/test/utils'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { IBirthCompositionBody } from '@search/elasticsearch/utils'
-import {
-  startContainer,
-  stopContainer
-} from './elasticSearchTestContainer'
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
 

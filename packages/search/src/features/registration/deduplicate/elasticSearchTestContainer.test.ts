@@ -20,41 +20,44 @@ import {
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 import * as elastic from '@elastic/elasticsearch'
 import { searchForDuplicates } from './service'
-import { indexComposition } from '../../../elasticsearch/dbhelper'
+import { indexComposition } from '@search/elasticsearch/dbhelper'
 
 describe('Elastic Search Test Container Automation', () => {
   beforeAll(async () => await startContainer())
   beforeEach(async () => watchForContainer())
   afterAll(async () => stopContainer())
 
-  const exampleRegistrationA: IBirthCompositionBody = {
+  const exampleBirthRegistrationA: IBirthCompositionBody = {
     childFirstNames: 'John',
-    childFamilyName: 'Smith' /* ... */
+    childFamilyName: 'Smith',
+    motherFirstNames: 'Marry',
+    motherFamilyName: 'Smith'
   }
-  const exampleRegistrationB: IBirthCompositionBody = {
+  const exampleBirthRegistrationB: IBirthCompositionBody = {
     childFirstNames: 'Maurice',
-    childFamilyName: 'Black' /* ... */
+    childFamilyName: 'Black',
+    motherFirstNames: 'Marry',
+    motherFamilyName: 'Black'
   }
 
   it('should check elasticsearch is up', async () => {
     const client = new elastic.Client({
-      node: `https://${(
+      node: `https://${(await elasticsearch).getHost()}:${(
         await elasticsearch
-      ).getHost()}:${ELASTIC_SEARCH_HTTP_PORT}`
+      ).getMappedPort(ELASTIC_SEARCH_HTTP_PORT || 9200)}`
     })
 
     await client.cluster.health()
   })
 
   it('should makes sure similar names are marked as a duplicate', async () => {
-    // await writeToElasticSearch(exampleRegistrationA)
-    await indexComposition('testId', exampleRegistrationA)
+    await indexComposition('testBirthRegistrationId', exampleBirthRegistrationA)
     expect(
       await searchForDuplicates({
-        ...exampleRegistrationB,
+        ...exampleBirthRegistrationB,
         childFirstNames: 'John',
         childFamilyName: 'Smith'
       })
-    ).to.have.length(1)
+    ).toHaveLength(1)
   })
 })

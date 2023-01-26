@@ -9,14 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  GenericContainer,
-  StartedTestContainer,
-  StoppedTestContainer
-} from 'testcontainers'
+import { GenericContainer, StartedTestContainer } from 'testcontainers'
 import { logger } from '@search/logger'
 
-export const ELASTIC_SEARCH_HTTP_PORT = 9202
+export const ELASTIC_SEARCH_HTTP_PORT = 9200
 export let elasticsearch!: Promise<StartedTestContainer>
 
 const container = async (): Promise<GenericContainer> =>
