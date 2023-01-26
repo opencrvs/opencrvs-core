@@ -167,6 +167,7 @@ interface IProps {
   hideHeaderBoxShadow?: boolean
   preventClickOnParent?: boolean
   showHeaderBorder?: boolean
+  children?: React.ReactNode
 }
 
 export class ResponsiveModal extends React.Component<IProps> {

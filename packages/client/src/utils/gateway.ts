@@ -211,10 +211,13 @@ export type ApplicationConfiguration = {
   BIRTH?: Maybe<Birth>
   COUNTRY_LOGO?: Maybe<CountryLogo>
   CURRENCY?: Maybe<Currency>
+  DATE_OF_BIRTH_UNKNOWN?: Maybe<Scalars['Boolean']>
   DEATH?: Maybe<Death>
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -226,10 +229,13 @@ export type ApplicationConfigurationInput = {
   BIRTH?: InputMaybe<BirthInput>
   COUNTRY_LOGO?: InputMaybe<CountryLogoInput>
   CURRENCY?: InputMaybe<CurrencyInput>
+  DATE_OF_BIRTH_UNKNOWN?: InputMaybe<Scalars['Boolean']>
   DEATH?: InputMaybe<DeathInput>
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
+  INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -1007,7 +1013,7 @@ export type InputOutput = {
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
-  role: Scalars['String']
+  role: RoleType
   signature?: Maybe<Signature>
 }
 
@@ -1185,6 +1191,7 @@ export type Mutation = {
   requestDeathRegistrationCorrection: Scalars['ID']
   resendSMSInvite?: Maybe<Scalars['String']>
   resetPasswordSMS?: Maybe<Scalars['String']>
+  toggleInformantSMSNotification?: Maybe<Array<SmsNotification>>
   updateApplicationConfig?: Maybe<ApplicationConfiguration>
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
@@ -1372,6 +1379,10 @@ export type MutationResetPasswordSmsArgs = {
   userId: Scalars['String']
 }
 
+export type MutationToggleInformantSmsNotificationArgs = {
+  smsNotifications?: InputMaybe<Array<SmsNotificationInput>>
+}
+
 export type MutationUpdateApplicationConfigArgs = {
   applicationConfig?: InputMaybe<ApplicationConfigurationInput>
 }
@@ -1475,11 +1486,13 @@ export type Person = {
   _fhirID?: Maybe<Scalars['ID']>
   address?: Maybe<Array<Maybe<Address>>>
   age?: Maybe<Scalars['Float']>
+  ageOfIndividualInYears?: Maybe<Scalars['Int']>
   birthDate?: Maybe<Scalars['String']>
   dateOfMarriage?: Maybe<Scalars['Date']>
   deceased?: Maybe<Deceased>
   detailsExist?: Maybe<Scalars['Boolean']>
   educationalAttainment?: Maybe<EducationType>
+  exactDateOfBirthUnknown?: Maybe<Scalars['Boolean']>
   gender?: Maybe<Scalars['String']>
   id?: Maybe<Scalars['ID']>
   identifier?: Maybe<Array<Maybe<IdentityType>>>
@@ -1497,6 +1510,7 @@ export type PersonInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   address?: InputMaybe<Array<InputMaybe<AddressInput>>>
   age?: InputMaybe<Scalars['Float']>
+  ageOfIndividualInYears?: InputMaybe<Scalars['Int']>
   birthDate?: InputMaybe<Scalars['String']>
   dateOfMarriage?: InputMaybe<Scalars['Date']>
   deceased?: InputMaybe<DeceasedInput>
@@ -1543,6 +1557,7 @@ export type Query = {
   getUserByMobile?: Maybe<User>
   getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
+  informantSMSNotifications?: Maybe<Array<SmsNotification>>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   listNotifications?: Maybe<Array<Maybe<Notification>>>
   locationById?: Maybe<Location>
@@ -1872,6 +1887,7 @@ export type Registration = {
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
+  informantsSignature?: Maybe<Scalars['String']>
   mosipAid?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
@@ -1900,6 +1916,7 @@ export type RegistrationInput = {
   draftId?: InputMaybe<Scalars['String']>
   inCompleteFields?: InputMaybe<Scalars['String']>
   informantType?: InputMaybe<InformantType>
+  informantsSignature?: InputMaybe<Scalars['String']>
   location?: InputMaybe<LocationInput>
   mosipAid?: InputMaybe<Scalars['String']>
   otherInformantType?: InputMaybe<Scalars['String']>
@@ -1944,6 +1961,8 @@ export type RelatedPerson = {
   __typename?: 'RelatedPerson'
   _fhirID?: Maybe<Scalars['ID']>
   affidavit?: Maybe<Array<Maybe<Attachment>>>
+  ageOfIndividualInYears?: Maybe<Scalars['Int']>
+  exactDateOfBirthUnknown?: Maybe<Scalars['Boolean']>
   id?: Maybe<Scalars['ID']>
   individual?: Maybe<Person>
   otherRelationship?: Maybe<Scalars['String']>
@@ -1953,6 +1972,8 @@ export type RelatedPerson = {
 export type RelatedPersonInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   affidavit?: InputMaybe<Array<AttachmentInput>>
+  ageOfIndividualInYears?: InputMaybe<Scalars['Int']>
+  exactDateOfBirthUnknown?: InputMaybe<Scalars['Boolean']>
   id?: InputMaybe<Scalars['ID']>
   individual?: InputMaybe<PersonInput>
   otherRelationship?: InputMaybe<Scalars['String']>
@@ -1973,6 +1994,32 @@ export type Role = {
   value?: Maybe<Scalars['String']>
 }
 
+export enum RoleType {
+  FieldAgent = 'FIELD_AGENT',
+  LocalRegistrar = 'LOCAL_REGISTRAR',
+  LocalSystemAdmin = 'LOCAL_SYSTEM_ADMIN',
+  NationalRegistrar = 'NATIONAL_REGISTRAR',
+  NationalSystemAdmin = 'NATIONAL_SYSTEM_ADMIN',
+  PerformanceManagement = 'PERFORMANCE_MANAGEMENT',
+  RegistrationAgent = 'REGISTRATION_AGENT'
+}
+
+export type SmsNotification = {
+  __typename?: 'SMSNotification'
+  createdAt: Scalars['String']
+  enabled: Scalars['Boolean']
+  id?: Maybe<Scalars['String']>
+  message: Scalars['String']
+  name: Scalars['String']
+  updatedAt: Scalars['String']
+}
+
+export type SmsNotificationInput = {
+  enabled: Scalars['Boolean']
+  id: Scalars['String']
+  name: Scalars['String']
+}
+
 export type SearchFieldAgentResponse = {
   __typename?: 'SearchFieldAgentResponse'
   avatar?: Maybe<Avatar>
@@ -1981,7 +2028,7 @@ export type SearchFieldAgentResponse = {
   fullName?: Maybe<Scalars['String']>
   practitionerId?: Maybe<Scalars['String']>
   primaryOfficeId?: Maybe<Scalars['String']>
-  status?: Maybe<Scalars['String']>
+  status?: Maybe<Status>
   totalNumberOfDeclarationStarted?: Maybe<Scalars['Int']>
   totalNumberOfInProgressAppStarted?: Maybe<Scalars['Int']>
   totalNumberOfRejectedDeclarations?: Maybe<Scalars['Int']>
@@ -2014,6 +2061,13 @@ export type Signature = {
 export type SignatureInput = {
   data: Scalars['String']
   type?: InputMaybe<Scalars['String']>
+}
+
+export enum Status {
+  Active = 'active',
+  Deactivated = 'deactivated',
+  Disabled = 'disabled',
+  Pending = 'pending'
 }
 
 export type StatusReason = {
@@ -2105,23 +2159,23 @@ export type User = {
   __typename?: 'User'
   avatar?: Maybe<Avatar>
   catchmentArea?: Maybe<Array<Maybe<Location>>>
-  creationDate?: Maybe<Scalars['String']>
+  creationDate: Scalars['String']
   device?: Maybe<Scalars['String']>
   email?: Maybe<Scalars['String']>
-  id?: Maybe<Scalars['ID']>
+  id: Scalars['ID']
   identifier?: Maybe<Identifier>
   localRegistrar?: Maybe<LocalRegistrar>
-  mobile?: Maybe<Scalars['String']>
-  name?: Maybe<Array<Maybe<HumanName>>>
-  practitionerId?: Maybe<Scalars['String']>
+  mobile: Scalars['String']
+  name: Array<HumanName>
+  practitionerId: Scalars['String']
   primaryOffice?: Maybe<Location>
-  role?: Maybe<Scalars['String']>
+  role: RoleType
   searches?: Maybe<Array<Maybe<BookmarkedSeachItem>>>
   signature?: Maybe<Signature>
-  status?: Maybe<Scalars['String']>
+  status: Status
   type?: Maybe<Scalars['String']>
   underInvestigation?: Maybe<Scalars['Boolean']>
-  userMgntUserID?: Maybe<Scalars['ID']>
+  userMgntUserID: Scalars['ID']
   username?: Maybe<Scalars['String']>
 }
 
@@ -2166,10 +2220,10 @@ export type UserInput = {
   email?: InputMaybe<Scalars['String']>
   id?: InputMaybe<Scalars['ID']>
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
-  mobile?: InputMaybe<Scalars['String']>
-  name?: InputMaybe<Array<InputMaybe<HumanNameInput>>>
+  mobile: Scalars['String']
+  name: Array<HumanNameInput>
   primaryOffice?: InputMaybe<Scalars['String']>
-  role?: InputMaybe<Scalars['String']>
+  role: RoleType
   signature?: InputMaybe<SignatureInput>
   type?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
@@ -2569,18 +2623,18 @@ export type FetchUserQuery = {
   __typename?: 'Query'
   getUser?: {
     __typename?: 'User'
-    userMgntUserID?: string | null
-    practitionerId?: string | null
-    mobile?: string | null
-    role?: string | null
+    userMgntUserID: string
+    practitionerId: string
+    mobile: string
+    role: RoleType
     type?: string | null
-    status?: string | null
-    name?: Array<{
+    status: Status
+    name: Array<{
       __typename?: 'HumanName'
       use?: string | null
       firstNames?: string | null
       familyName?: string | null
-    } | null> | null
+    }>
     catchmentArea?: Array<{
       __typename?: 'Location'
       id: string
@@ -2602,7 +2656,7 @@ export type FetchUserQuery = {
     } | null
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
-      role: string
+      role: RoleType
       name: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -2836,19 +2890,19 @@ export type SearchUsersQuery = {
     totalItems?: number | null
     results?: Array<{
       __typename?: 'User'
-      id?: string | null
+      id: string
       username?: string | null
-      role?: string | null
-      mobile?: string | null
+      role: RoleType
+      mobile: string
       type?: string | null
-      status?: string | null
+      status: Status
       underInvestigation?: boolean | null
-      name?: Array<{
+      name: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
-      } | null> | null
+      }>
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
   } | null
@@ -2901,22 +2955,22 @@ export type GetUserQuery = {
   __typename?: 'Query'
   getUser?: {
     __typename?: 'User'
-    id?: string | null
+    id: string
     username?: string | null
-    mobile?: string | null
-    role?: string | null
+    mobile: string
+    role: RoleType
     type?: string | null
-    status?: string | null
+    status: Status
     underInvestigation?: boolean | null
-    practitionerId?: string | null
-    creationDate?: string | null
+    practitionerId: string
+    creationDate: string
     device?: string | null
-    name?: Array<{
+    name: Array<{
       __typename?: 'HumanName'
       use?: string | null
       firstNames?: string | null
       familyName?: string | null
-    } | null> | null
+    }>
     identifier?: {
       __typename?: 'Identifier'
       system?: string | null
@@ -3017,14 +3071,14 @@ export type MarkBirthAsRegisteredMutation = {
         timestamp?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
-          role?: string | null
-          name?: Array<{
+          id: string
+          role: RoleType
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
+          }>
         } | null
         location?: {
           __typename?: 'Location'
@@ -3127,6 +3181,8 @@ export type FetchBirthRegistrationForReviewQuery = {
         occupation?: string | null
         nationality?: Array<string | null> | null
         birthDate?: string | null
+        ageOfIndividualInYears?: number | null
+        exactDateOfBirthUnknown?: boolean | null
         identifier?: Array<{
           __typename?: 'IdentityType'
           id?: string | null
@@ -3160,6 +3216,8 @@ export type FetchBirthRegistrationForReviewQuery = {
       occupation?: string | null
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       dateOfMarriage?: any | null
       educationalAttainment?: EducationType | null
       nationality?: Array<string | null> | null
@@ -3199,6 +3257,8 @@ export type FetchBirthRegistrationForReviewQuery = {
       occupation?: string | null
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       dateOfMarriage?: any | null
       educationalAttainment?: EducationType | null
       nationality?: Array<string | null> | null
@@ -3316,15 +3376,15 @@ export type FetchBirthRegistrationForReviewQuery = {
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
-        id?: string | null
+        id: string
         type?: string | null
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
           familyName?: string | null
           use?: string | null
-        } | null> | null
+        }>
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
       signature?: {
@@ -3338,7 +3398,7 @@ export type FetchBirthRegistrationForReviewQuery = {
         createdAt?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
+          id: string
           username?: string | null
           avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
         } | null
@@ -3426,6 +3486,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
       occupation?: string | null
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -3465,6 +3527,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
       occupation?: string | null
       detailsExist?: boolean | null
       reasonNotApplying?: string | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       name?: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -3504,6 +3568,8 @@ export type FetchBirthRegistrationForCertificateQuery = {
         nationality?: Array<string | null> | null
         occupation?: string | null
         birthDate?: string | null
+        ageOfIndividualInYears?: number | null
+        exactDateOfBirthUnknown?: boolean | null
         identifier?: Array<{
           __typename?: 'IdentityType'
           id?: string | null
@@ -3607,15 +3673,15 @@ export type FetchBirthRegistrationForCertificateQuery = {
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
-        id?: string | null
+        id: string
         type?: string | null
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
           familyName?: string | null
           use?: string | null
-        } | null> | null
+        }>
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
       signature?: {
@@ -3629,7 +3695,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
         createdAt?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
+          id: string
           username?: string | null
           avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
         } | null
@@ -3717,14 +3783,14 @@ export type MarkDeathAsRegisteredMutation = {
         timestamp?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
-          role?: string | null
-          name?: Array<{
+          id: string
+          role: RoleType
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
+          }>
         } | null
         location?: {
           __typename?: 'Location'
@@ -3783,6 +3849,8 @@ export type FetchDeathRegistrationForReviewQuery = {
       id?: string | null
       birthDate?: string | null
       age?: number | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       gender?: string | null
       maritalStatus?: MaritalStatusType | null
       nationality?: Array<string | null> | null
@@ -3821,6 +3889,8 @@ export type FetchDeathRegistrationForReviewQuery = {
         nationality?: Array<string | null> | null
         occupation?: string | null
         birthDate?: string | null
+        ageOfIndividualInYears?: number | null
+        exactDateOfBirthUnknown?: boolean | null
         identifier?: Array<{
           __typename?: 'IdentityType'
           id?: string | null
@@ -3972,15 +4042,15 @@ export type FetchDeathRegistrationForReviewQuery = {
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
-        id?: string | null
+        id: string
         type?: string | null
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
           familyName?: string | null
           use?: string | null
-        } | null> | null
+        }>
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
       signature?: {
@@ -3994,7 +4064,7 @@ export type FetchDeathRegistrationForReviewQuery = {
         createdAt?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
+          id: string
           username?: string | null
           avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
         } | null
@@ -4061,6 +4131,8 @@ export type FetchDeathRegistrationForCertificationQuery = {
       id?: string | null
       birthDate?: string | null
       age?: number | null
+      ageOfIndividualInYears?: number | null
+      exactDateOfBirthUnknown?: boolean | null
       gender?: string | null
       maritalStatus?: MaritalStatusType | null
       nationality?: Array<string | null> | null
@@ -4245,15 +4317,15 @@ export type FetchDeathRegistrationForCertificationQuery = {
       system?: { __typename?: 'System'; name: string; type: SystemType } | null
       user?: {
         __typename?: 'User'
-        id?: string | null
+        id: string
         type?: string | null
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
           familyName?: string | null
           use?: string | null
-        } | null> | null
+        }>
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
       signature?: {
@@ -4267,7 +4339,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
         createdAt?: any | null
         user?: {
           __typename?: 'User'
-          id?: string | null
+          id: string
           username?: string | null
           avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
         } | null
@@ -5540,12 +5612,12 @@ export type GetUserByMobileQuery = {
   __typename?: 'Query'
   getUserByMobile?: {
     __typename?: 'User'
-    id?: string | null
+    id: string
     username?: string | null
-    mobile?: string | null
-    role?: string | null
+    mobile: string
+    role: RoleType
     type?: string | null
-    status?: string | null
+    status: Status
   } | null
 }
 
@@ -5561,6 +5633,9 @@ export type UpdateApplicationConfigMutation = {
     NID_NUMBER_PATTERN?: string | null
     PHONE_NUMBER_PATTERN?: string | null
     HIDE_EVENT_REGISTER_INFORMATION?: boolean | null
+    DATE_OF_BIRTH_UNKNOWN?: boolean | null
+    INFORMANT_SIGNATURE?: boolean | null
+    INFORMANT_SIGNATURE_REQUIRED?: boolean | null
     ADDRESSES?: number | null
     ADMIN_LEVELS?: number | null
     COUNTRY_LOGO?: {
@@ -5843,6 +5918,42 @@ export type DeleteSystemMutation = {
   } | null
 }
 
+export type ToggleInformantSmsNotificationMutationVariables = Exact<{
+  smsNotifications?: InputMaybe<
+    Array<SmsNotificationInput> | SmsNotificationInput
+  >
+}>
+
+export type ToggleInformantSmsNotificationMutation = {
+  __typename?: 'Mutation'
+  toggleInformantSMSNotification?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    message: string
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
+export type GetInformantSmsNotificationsQueryVariables = Exact<{
+  [key: string]: never
+}>
+
+export type GetInformantSmsNotificationsQuery = {
+  __typename?: 'Query'
+  informantSMSNotifications?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    message: string
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
 export type GetTotalCorrectionsQueryVariables = Exact<{
   event: Scalars['String']
   timeStart: Scalars['String']
@@ -6020,13 +6131,13 @@ export type GetEventsWithProgressQuery = {
       } | null
       startedBy?: {
         __typename?: 'User'
-        role?: string | null
-        name?: Array<{
+        role: RoleType
+        name: Array<{
           __typename?: 'HumanName'
           use?: string | null
           firstNames?: string | null
           familyName?: string | null
-        } | null> | null
+        }>
       } | null
       progressReport?: {
         __typename?: 'EventProgressData'
@@ -6077,19 +6188,19 @@ export type GetRegistrationsListByFilterQuery = {
           delayed: number
           registrarPractitioner?: {
             __typename?: 'User'
-            id?: string | null
-            role?: string | null
+            id: string
+            role: RoleType
             primaryOffice?: {
               __typename?: 'Location'
               name?: string | null
               id: string
             } | null
-            name?: Array<{
+            name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
               familyName?: string | null
               use?: string | null
-            } | null> | null
+            }>
           } | null
         }>
       }
@@ -6133,7 +6244,7 @@ export type SearchFieldAgentsQuery = {
       practitionerId?: string | null
       fullName?: string | null
       type?: string | null
-      status?: string | null
+      status?: Status | null
       primaryOfficeId?: string | null
       creationDate?: string | null
       totalNumberOfDeclarationStarted?: number | null
@@ -6243,6 +6354,8 @@ export type FetchViewRecordByCompositionQuery = {
             occupation?: string | null
             nationality?: Array<string | null> | null
             birthDate?: string | null
+            ageOfIndividualInYears?: number | null
+            exactDateOfBirthUnknown?: boolean | null
             identifier?: Array<{
               __typename?: 'IdentityType'
               id?: string | null
@@ -6272,6 +6385,8 @@ export type FetchViewRecordByCompositionQuery = {
           id?: string | null
           multipleBirth?: number | null
           birthDate?: string | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
           maritalStatus?: MaritalStatusType | null
           occupation?: string | null
           detailsExist?: boolean | null
@@ -6311,6 +6426,8 @@ export type FetchViewRecordByCompositionQuery = {
           __typename?: 'Person'
           id?: string | null
           birthDate?: string | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
           maritalStatus?: MaritalStatusType | null
           occupation?: string | null
           detailsExist?: boolean | null
@@ -6428,15 +6545,15 @@ export type FetchViewRecordByCompositionQuery = {
           } | null
           user?: {
             __typename?: 'User'
-            id?: string | null
+            id: string
             type?: string | null
-            role?: string | null
-            name?: Array<{
+            role: RoleType
+            name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
               familyName?: string | null
               use?: string | null
-            } | null> | null
+            }>
             avatar?: {
               __typename?: 'Avatar'
               data: string
@@ -6454,7 +6571,7 @@ export type FetchViewRecordByCompositionQuery = {
             createdAt?: any | null
             user?: {
               __typename?: 'User'
-              id?: string | null
+              id: string
               username?: string | null
               avatar?: {
                 __typename?: 'Avatar'
@@ -6517,6 +6634,8 @@ export type FetchViewRecordByCompositionQuery = {
           id?: string | null
           birthDate?: string | null
           age?: number | null
+          ageOfIndividualInYears?: number | null
+          exactDateOfBirthUnknown?: boolean | null
           gender?: string | null
           maritalStatus?: MaritalStatusType | null
           nationality?: Array<string | null> | null
@@ -6558,6 +6677,8 @@ export type FetchViewRecordByCompositionQuery = {
             nationality?: Array<string | null> | null
             occupation?: string | null
             birthDate?: string | null
+            ageOfIndividualInYears?: number | null
+            exactDateOfBirthUnknown?: boolean | null
             identifier?: Array<{
               __typename?: 'IdentityType'
               id?: string | null
@@ -6706,15 +6827,15 @@ export type FetchViewRecordByCompositionQuery = {
           } | null
           user?: {
             __typename?: 'User'
-            id?: string | null
+            id: string
             type?: string | null
-            role?: string | null
-            name?: Array<{
+            role: RoleType
+            name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
               familyName?: string | null
               use?: string | null
-            } | null> | null
+            }>
             avatar?: {
               __typename?: 'Avatar'
               data: string
@@ -6732,7 +6853,7 @@ export type FetchViewRecordByCompositionQuery = {
             createdAt?: any | null
             user?: {
               __typename?: 'User'
-              id?: string | null
+              id: string
               username?: string | null
               avatar?: {
                 __typename?: 'Avatar'

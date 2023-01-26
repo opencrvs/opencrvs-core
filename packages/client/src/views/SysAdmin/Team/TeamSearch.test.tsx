@@ -24,6 +24,7 @@ import { parse } from 'query-string'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
 import { vi } from 'vitest'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('Team search test', () => {
   let store: AppStore
@@ -105,7 +106,8 @@ describe('Team search test', () => {
       app.update()
     })
 
-    it('loads the location in the search input box', () => {
+    it('loads the location in the search input box', async () => {
+      await waitForElement(app, '#locationSearchInput')
       expect(
         app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Alokbali Union Parishad')

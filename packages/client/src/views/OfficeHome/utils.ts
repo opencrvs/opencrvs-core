@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  IDynamicValues,
-  COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/Workqueue'
+import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/Workqueue'
 import { orderBy } from 'lodash'
 import { ITaskHistory } from '@client/declarations'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -36,11 +32,11 @@ export const EVENT_STATUS = {
   WAITING_VALIDATION: 'WAITING_VALIDATION'
 }
 
-export const getSortedItems = (
-  items: IDynamicValues[],
+export const getSortedItems = <T = any>(
+  items: T[],
   sortedCol: COLUMNS,
   sortOrder: SORT_ORDER
-): IDynamicValues[] => {
+) => {
   return orderBy(items, [sortedCol], [sortOrder])
 }
 

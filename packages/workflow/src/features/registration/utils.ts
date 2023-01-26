@@ -12,7 +12,8 @@
 import * as ShortUIDGen from 'short-uid'
 import {
   NOTIFICATION_SERVICE_URL,
-  MOSIP_TOKEN_SEEDER_URL
+  MOSIP_TOKEN_SEEDER_URL,
+  APPLICATION_CONFIG_URL
 } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
@@ -41,6 +42,24 @@ interface INotificationPayload {
   trackingId?: string
   crvsOffice?: string
   registrationNumber?: string
+}
+
+enum InformantSMSNotificationName {
+  birthInProgressSMS = 'birthInProgressSMS',
+  birthDeclarationSMS = 'birthDeclarationSMS',
+  birthRegistrationSMS = 'birthRegistrationSMS',
+  birthRejectionSMS = 'birthRejectionSMS',
+  deathInProgressSMS = 'deathInProgressSMS',
+  deathDeclarationSMS = 'deathDeclarationSMS',
+  deathRegistrationSMS = 'deathRegistrationSMS',
+  deathRejectionSMS = 'deathRejectionSMS'
+}
+interface IInformantSMSNotification {
+  _id: string
+  name: InformantSMSNotificationName
+  enabled: boolean
+  updatedAt: number
+  createdAt: number
 }
 export type Composition = fhir.Composition & { id: string }
 export type Patient = fhir.Patient & { id: string }
@@ -76,63 +95,170 @@ export async function sendEventNotification(
   msisdn: string,
   authHeader: { Authorization: string }
 ) {
-  logger.info(`sendEventNotification method for event: ${event}`)
+  const informantSMSNotifications = (await getInformantSMSNotification(
+    authHeader.Authorization
+  )) as IInformantSMSNotification[] | []
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
-      await sendNotification('birthInProgressSMS', msisdn, authHeader, {
-        trackingId: getTrackingId(fhirBundle),
-        crvsOffice: await getCRVSOfficeName(fhirBundle)
-      })
+      if (
+        isInformantSMSNotificationEnabled(
+          informantSMSNotifications,
+          InformantSMSNotificationName.birthInProgressSMS
+        )
+      ) {
+        logger.info(`sendEventNotification method for event: ${event}`)
+        await sendNotification(
+          InformantSMSNotificationName.birthInProgressSMS,
+          msisdn,
+          authHeader,
+          {
+            trackingId: getTrackingId(fhirBundle),
+            crvsOffice: await getCRVSOfficeName(fhirBundle)
+          }
+        )
+      }
+
       break
     case Events.BIRTH_NEW_DEC:
     case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
-      await sendNotification('birthDeclarationSMS', msisdn, authHeader, {
-        name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-        trackingId: getTrackingId(fhirBundle)
-      })
+      if (
+        isInformantSMSNotificationEnabled(
+          informantSMSNotifications,
+          InformantSMSNotificationName.birthDeclarationSMS
+        )
+      ) {
+        logger.info(`sendEventNotification method for event: ${event}`)
+        await sendNotification(
+          InformantSMSNotificationName.birthDeclarationSMS,
+          msisdn,
+          authHeader,
+          {
+            name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
+            trackingId: getTrackingId(fhirBundle)
+          }
+        )
+      }
       break
     case Events.BIRTH_MARK_REG:
-      await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
-        name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-        trackingId: getTrackingId(fhirBundle),
-        registrationNumber: getBirthRegistrationNumber(
-          getTaskResource(fhirBundle)
+      if (
+        isInformantSMSNotificationEnabled(
+          informantSMSNotifications,
+          InformantSMSNotificationName.birthRegistrationSMS
         )
-      })
+      ) {
+        logger.info(`sendEventNotification method for event: ${event}`)
+        await sendNotification(
+          InformantSMSNotificationName.birthRegistrationSMS,
+          msisdn,
+          authHeader,
+          {
+            name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
+            trackingId: getTrackingId(fhirBundle),
+            registrationNumber: getBirthRegistrationNumber(
+              getTaskResource(fhirBundle)
+            )
+          }
+        )
+      }
       break
     case Events.BIRTH_MARK_VOID:
-      await sendNotification('birthRejectionSMS', msisdn, authHeader, {
-        name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-        trackingId: getTrackingId(fhirBundle)
-      })
+      if (
+        isInformantSMSNotificationEnabled(
+          informantSMSNotifications,
+          InformantSMSNotificationName.birthRejectionSMS
+        )
+      ) {
+        logger.info(`sendEventNotification method for event: ${event}`)
+        await sendNotification(
+          InformantSMSNotificationName.birthRejectionSMS,
+          msisdn,
+          authHeader,
+          {
+            name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
+            trackingId: getTrackingId(fhirBundle)
+          }
+        )
+      }
       break
     case Events.DEATH_IN_PROGRESS_DEC:
-      await sendNotification('deathInProgressSMS', msisdn, authHeader, {
-        trackingId: getTrackingId(fhirBundle),
-        crvsOffice: await getCRVSOfficeName(fhirBundle)
-      })
+      if (
+        isInformantSMSNotificationEnabled(
+          informantSMSNotifications,
+          InformantSMSNotificationName.deathInProgressSMS
+        )
+      ) {
+        logger.info(`sendEventNotification method for event: ${event}`)
+        await sendNotification(
+          InformantSMSNotificationName.deathInProgressSMS,
+          msisdn,
+          authHeader,
+          {
+            trackingId: getTrackingId(fhirBundle),
+            crvsOffice: await getCRVSOfficeName(fhirBundle)
+          }
+        )
+      }
       break
     case Events.DEATH_NEW_DEC:
     case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
-      await sendNotification('deathDeclarationSMS', msisdn, authHeader, {
-        name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-        trackingId: getTrackingId(fhirBundle)
-      })
+      if (
+        isInformantSMSNotificationEnabled(
+          informantSMSNotifications,
+          InformantSMSNotificationName.deathDeclarationSMS
+        )
+      ) {
+        logger.info(`sendEventNotification method for event: ${event}`)
+        await sendNotification(
+          InformantSMSNotificationName.deathDeclarationSMS,
+          msisdn,
+          authHeader,
+          {
+            name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
+            trackingId: getTrackingId(fhirBundle)
+          }
+        )
+      }
       break
     case Events.DEATH_MARK_REG:
-      await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
-        name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-        trackingId: getTrackingId(fhirBundle),
-        registrationNumber: getDeathRegistrationNumber(
-          getTaskResource(fhirBundle)
+      if (
+        isInformantSMSNotificationEnabled(
+          informantSMSNotifications,
+          InformantSMSNotificationName.deathRegistrationSMS
         )
-      })
+      ) {
+        logger.info(`sendEventNotification method for event: ${event}`)
+        await sendNotification(
+          InformantSMSNotificationName.deathRegistrationSMS,
+          msisdn,
+          authHeader,
+          {
+            name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
+            trackingId: getTrackingId(fhirBundle),
+            registrationNumber: getDeathRegistrationNumber(
+              getTaskResource(fhirBundle)
+            )
+          }
+        )
+      }
       break
     case Events.DEATH_MARK_VOID:
-      await sendNotification('deathRejectionSMS', msisdn, authHeader, {
-        name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-        trackingId: getTrackingId(fhirBundle)
-      })
+      if (
+        isInformantSMSNotificationEnabled(
+          informantSMSNotifications,
+          InformantSMSNotificationName.deathRejectionSMS
+        )
+      ) {
+        logger.info(`sendEventNotification method for event: ${event}`)
+        await sendNotification(
+          InformantSMSNotificationName.deathRejectionSMS,
+          msisdn,
+          authHeader,
+          {
+            name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
+            trackingId: getTrackingId(fhirBundle)
+          }
+        )
+      }
   }
 }
 
@@ -420,4 +546,34 @@ export function getPatientBySection(
       }
     })?.resource as fhir.Patient)
   )
+}
+
+async function getInformantSMSNotification(token: string) {
+  try {
+    const informantSMSNotificationURL = new URL(
+      'informantSMSNotification',
+      APPLICATION_CONFIG_URL
+    ).toString()
+    const res = await fetch(informantSMSNotificationURL, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
+    })
+    return await res.json()
+  } catch (err) {
+    logger.error(`Unable to get informant SMS Notifications for error : ${err}`)
+    throw err
+  }
+}
+
+function isInformantSMSNotificationEnabled(
+  informantSMSNotifications: IInformantSMSNotification[],
+  name: InformantSMSNotificationName
+) {
+  const isNotificationEnabled = informantSMSNotifications.find(
+    (notification) => notification.name === name
+  )?.enabled
+  return Boolean(isNotificationEnabled)
 }
