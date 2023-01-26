@@ -29,8 +29,9 @@ const Template: Story<IComparisonListProps> = (args) => {
           </Text>
         }
         heading={{ right: 'Heading1', left: 'Heading2' }}
-        rightValue={<div>Data1</div>}
         leftValue={<div>Data2</div>}
+        rightValue={<div>Data1</div>}
+        key={'d1'}
       />
       <ComparisonListView.Row
         label={
@@ -39,8 +40,9 @@ const Template: Story<IComparisonListProps> = (args) => {
           </Text>
         }
         heading={{ right: 'Heading1', left: 'Heading2' }}
-        rightValue={<div>Data1</div>}
         leftValue={<div>Data2</div>}
+        rightValue={<div>Data1</div>}
+        key={'d2'}
       />
       <ComparisonListView.Row
         label={
@@ -49,8 +51,9 @@ const Template: Story<IComparisonListProps> = (args) => {
           </Text>
         }
         heading={{ right: 'Heading1', left: 'Heading2' }}
-        rightValue={<div>Data1</div>}
         leftValue={<div>Data2</div>}
+        rightValue={<div>Data1</div>}
+        key={'d3'}
       />
     </ComparisonListView>
   )

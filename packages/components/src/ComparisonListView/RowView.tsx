@@ -30,11 +30,11 @@ export const Row: React.FC<{
   rightValue: React.ReactNode
 }> = ({ label, leftValue, rightValue, heading }) => {
   return (
-    <>
+    <React.Fragment>
       <Stack>{label}</Stack>
       <Stack style={{ gap: '50%' }}>
         <HideOnLargeScreen>
-          <Text variant="bold16" element="span" color="negative">
+          <Text variant="reg16" element="span" color="redDark">
             {heading.left}
           </Text>
         </HideOnLargeScreen>
@@ -42,12 +42,12 @@ export const Row: React.FC<{
       </Stack>
       <Stack style={{ gap: '50%' }}>
         <HideOnLargeScreen>
-          <Text variant="bold16" element="span" color="grey600">
+          <Text variant="reg16" element="span" color="grey600">
             {heading.right}
           </Text>
         </HideOnLargeScreen>
         {rightValue}
       </Stack>
-    </>
+    </React.Fragment>
   )
 }

@@ -212,7 +212,7 @@ const LeftColumn = styled.div`
   }
 `
 
-const ZeroDocument = styled.div`
+export const ZeroDocument = styled.div`
   ${({ theme }) => theme.fonts.reg18};
   display: flex;
   flex-direction: column;
@@ -221,6 +221,8 @@ const ZeroDocument = styled.div`
 `
 
 const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
+  position: fixed;
+  width: fill-available;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
     margin-bottom: 11px;
@@ -753,7 +755,7 @@ export const getErrorsOnFieldsBySection = (
   }, {})
 }
 
-const SECTION_MAPPING = {
+export const SECTION_MAPPING = {
   [Event.Birth]: birthSectionMapping,
   [Event.Death]: deathSectionMapping
 }
@@ -1998,7 +2000,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 )}
 
                 {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
-                  !isCorrection(declaration) && (
+                  !isCorrection(declaration) &&
+                  !isDuplicate &&
+                  !viewRecord && (
                     <InputWrapper>
                       <InputField
                         id="informant_signature"

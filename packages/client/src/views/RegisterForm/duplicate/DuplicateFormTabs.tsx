@@ -10,14 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled from '@client/styledComponents'
-import { FormTabs, IFormTabs } from '@opencrvs/components/lib/FormTabs'
-import { IDeclaration } from '@client/declarations'
-import { EMPTY_STRING } from '@client/utils/constants'
-import { Icon } from '@opencrvs/components/lib/Icon/Icon'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { getReviewForm } from '@client/forms/register/review-selectors'
-import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import {
   IForm,
   IFormData,
@@ -36,12 +28,18 @@ import { Event, HumanName, RegStatus, History } from '@client/utils/gateway'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { getLanguage } from '@client/i18n/selectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { FormTabs, IFormTabs } from '@opencrvs/components/lib/FormTabs'
+import { IDeclaration } from '@client/declarations'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { Icon } from '@opencrvs/components/lib/Icon/Icon'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { getReviewForm } from '@client/forms/register/review-selectors'
+import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import {
   getErrorsOnFieldsBySection,
   IErrorsBySection,
   RequiredField
 } from '@client/views/RegisterForm/review/ReviewSection'
-import { get } from 'lodash'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import {
   getOverriddenFieldsListForPreview,
@@ -49,19 +47,26 @@ import {
   isVisibleField,
   renderValue
 } from '@client/views/CorrectionForm/utils'
+import {
+  FullBodyContent,
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/Content'
+import {
+  recordAuditMessages,
+  regStatusMessages
+} from '@client/i18n/messages/views/recordAudit'
+import styled from '@client/styledComponents'
+import { get } from 'lodash'
 import { IValidationResult } from '@client/utils/validate'
 import { IFieldErrors } from '@client/forms/validation'
 import { ComparisonListView } from '@opencrvs/components/lib/ComparisonListView'
-import { FullBodyContent, Content } from '@opencrvs/components/lib/Content'
 import { Text } from '@opencrvs/components/lib/Text'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import { getName, capitalize } from '@client/views/RecordAudit/utils'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { constantsMessages } from '@client/i18n/messages/constants'
-import {
-  recordAuditMessages,
-  regStatusMessages
-} from '@client/i18n/messages/views/recordAudit'
+import { SupportingDocumentsView } from '@client/views/RegisterForm/duplicate/SupportingDocumentsView'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
@@ -75,6 +80,12 @@ const TopBar = styled.div`
   width: 100%;
   position: sticky;
   z-index: 1;
+`
+const SupportingDocumentWrapper = styled(Stack)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `
 
 interface IProps {
@@ -96,10 +107,40 @@ interface IComparisonDeclaration {
   }[]
 }
 
+export const getVisibleSections = (
+  formSections: IFormSection[],
+  declaration: IDeclaration
+) => {
+  const draft = declaration
+  return formSections.filter(
+    (section) =>
+      getVisibleSectionGroupsBasedOnConditions(
+        section,
+        draft.data[section.id] || {},
+        draft.data
+      ).length > 0
+  )
+}
+
+export const getViewableSection = (
+  registerForm: IForm,
+  declaration: IDeclaration
+): IFormSection[] => {
+  const sections = registerForm.sections.filter(
+    ({ id, viewType }) =>
+      id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
+  )
+
+  return getVisibleSections(sections, declaration)
+}
+
 export const DuplicateFormTabs = (props: IProps) => {
   const { selectedDuplicateComId, onTabClick } = props
   const [comparisonDelcarationData, setComparisonDelcarationData] =
     React.useState<IComparisonDeclaration[] | undefined>(undefined)
+
+  const [duplicateDeclarationData, setDuplicateDeclarationData] =
+    React.useState<IDeclaration | undefined>(undefined)
   const form = useSelector(getReviewForm)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
@@ -547,33 +588,6 @@ export const DuplicateFormTabs = (props: IProps) => {
     })
   }
 
-  const getVisibleSections = (
-    formSections: IFormSection[],
-    declaration: IDeclaration
-  ) => {
-    const draft = declaration
-    return formSections.filter(
-      (section) =>
-        getVisibleSectionGroupsBasedOnConditions(
-          section,
-          draft.data[section.id] || {},
-          draft.data
-        ).length > 0
-    )
-  }
-
-  const getViewableSection = (
-    registerForm: IForm,
-    declaration: IDeclaration
-  ): IFormSection[] => {
-    const sections = registerForm.sections.filter(
-      ({ id, viewType }) =>
-        id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
-    )
-
-    return getVisibleSections(sections, declaration)
-  }
-
   const fetchDuplicateDeclaration = async (duplicateCompositionId: string) => {
     return await ViewRecordQueries.fetchDeclarationForViewing(
       duplicateCompositionId
@@ -617,6 +631,9 @@ export const DuplicateFormTabs = (props: IProps) => {
         offlineData,
         userDetails!
       )
+      setDuplicateDeclarationData({
+        data: duplicateDeclarationData
+      } as IDeclaration)
 
       const actualDeclarationFormSections = getViewableSection(
         registerForm[eventType],
@@ -683,7 +700,7 @@ export const DuplicateFormTabs = (props: IProps) => {
         )
       }
 
-      const registrationFormatedData = [
+      const registrationComparisonData = [
         {
           label: (
             <Text variant="bold16" element="span" color="grey600">
@@ -819,40 +836,42 @@ export const DuplicateFormTabs = (props: IProps) => {
           )
         }
       ]
-      const formatterData = actualDeclarationTransformData.map((data1) => {
-        const data2 = duplicateDeclarationTransformData.find(
-          (d) => d.id === data1.id
-        )
-        return {
-          title: data1.title,
-          data: data1.items.map((item1) => {
-            const item2 = data2?.items.find((i) => i.label === item1.label)
-            return {
-              label: (
-                <Text variant="bold16" element="span" color="grey600">
-                  {item1.label}
-                </Text>
-              ),
-              heading: {
-                right: duplicateTrackingId,
-                left: actualTrackingId
-              },
-              leftValue: (
-                <Text variant="reg16" element="span" color="grey600">
-                  {item1.value}
-                </Text>
-              ),
-              rightValue: (
-                <Text variant="reg16" element="span" color="grey600">
-                  {item2.value}
-                </Text>
-              )
-            }
-          })
+      const formatterComparisonData = actualDeclarationTransformData.map(
+        (data1) => {
+          const data2 = duplicateDeclarationTransformData.find(
+            (d) => d.id === data1.id
+          )
+          return {
+            title: data1.title,
+            data: data1.items.map((item1) => {
+              const item2 = data2?.items.find((i) => i.label === item1.label)
+              return {
+                label: (
+                  <Text variant="bold16" element="span" color="grey600">
+                    {item1.label}
+                  </Text>
+                ),
+                heading: {
+                  right: duplicateTrackingId,
+                  left: actualTrackingId
+                },
+                leftValue: (
+                  <Text variant="reg16" element="span" color="grey600">
+                    {item1.value}
+                  </Text>
+                ),
+                rightValue: (
+                  <Text variant="reg16" element="span" color="grey600">
+                    {item2.value}
+                  </Text>
+                )
+              }
+            })
+          }
         }
-      })
-      formatterData[0].data.push(...registrationFormatedData)
-      setComparisonDelcarationData(formatterData)
+      )
+      formatterComparisonData[0].data.push(...registrationComparisonData)
+      setComparisonDelcarationData(formatterComparisonData)
     } else {
       setComparisonDelcarationData(undefined)
     }
@@ -883,19 +902,21 @@ export const DuplicateFormTabs = (props: IProps) => {
                 duplicateTrackingId
               }
             )}
+            size={ContentSize.LARGE}
+            showTitleOnMobile
           >
             <Stack direction="column" gap={20} alignItems={'stretch'}>
               {comparisonDelcarationData.map((sections, index) => {
                 return (
-                  <div>
+                  <div key={`comparison-div-${index}`}>
                     <Text variant="bold21" element="span" color="grey600">
                       {sections.title}
                     </Text>
                     <ComparisonListView
                       headings={[actualTrackingId, duplicateTrackingId]}
-                      id={index}
+                      key={`comparison-${index}`}
                     >
-                      {sections.data.map((item) => (
+                      {sections.data.map((item, index) => (
                         <ComparisonListView.Row
                           label={item.label}
                           heading={{
@@ -904,6 +925,7 @@ export const DuplicateFormTabs = (props: IProps) => {
                           }}
                           leftValue={item.leftValue}
                           rightValue={item.rightValue}
+                          key={`row-${index}`}
                         />
                       ))}
                     </ComparisonListView>
@@ -911,6 +933,34 @@ export const DuplicateFormTabs = (props: IProps) => {
                 )
               })}
             </Stack>
+          </Content>
+
+          <Content
+            title={intl.formatMessage(
+              duplicateMessages.duplicateComparePageSupportingDocuments
+            )}
+            size={ContentSize.LARGE}
+            showTitleOnMobile
+          >
+            <SupportingDocumentWrapper
+              justifyContent={'space-between'}
+              gap={25}
+            >
+              <div style={{ flex: 1 }}>
+                <Text variant="bold14" element="p" color="redDark">
+                  {actualTrackingId}
+                </Text>
+                <SupportingDocumentsView declaration={props.declaration} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <Text variant="bold14" element="p" color="grey400">
+                  {duplicateTrackingId}
+                </Text>
+                <SupportingDocumentsView
+                  declaration={duplicateDeclarationData as IDeclaration}
+                />
+              </div>
+            </SupportingDocumentWrapper>
           </Content>
         </FullBodyContent>
       )}
