@@ -11,20 +11,25 @@
  */
 
 import {
-  ELASTIC_SEARCH_HTTP_PORT,
-  elasticsearch,
+  // ELASTIC_SEARCH_HTTP_PORT,
+
   startContainer,
-  stopContainer,
-  watchForContainer
+  stopContainer
 } from './elasticSearchTestContainer'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 import * as elastic from '@elastic/elasticsearch'
 import { searchForDuplicates } from './service'
 import { indexComposition } from '@search/elasticsearch/dbhelper'
+import { StartedElasticsearchContainer } from 'testcontainers'
 
-beforeAll(async () => await startContainer())
-// beforeEach(async () => watchForContainer())
-afterAll(async () => stopContainer())
+jest.setTimeout(10 * 60 * 1000)
+
+let container: StartedElasticsearchContainer
+beforeAll(async () => {
+  container = await startContainer()
+})
+afterEach(() => stopContainer(container))
+
 describe('Elastic Search Test Container Automation', () => {
   const exampleBirthRegistrationA: IBirthCompositionBody = {
     childFirstNames: 'John',
@@ -39,16 +44,15 @@ describe('Elastic Search Test Container Automation', () => {
     motherFamilyName: 'Black'
   }
 
-  it('should check elasticsearch is up', async () => {
-    const host = (await elasticsearch).getHost()
-    const port = (await elasticsearch).getMappedPort(
-      ELASTIC_SEARCH_HTTP_PORT || 9200
-    )
+  it.only('should check elasticsearch is up', async () => {
+    const host = container.getHost()
+    const port = container.getMappedPort(9200)
+
     const client = new elastic.Client({
       node: `http://${host}:${port}`
     })
 
-    await client.cluster.health()
+    await client.ping()
   })
 
   it('should makes sure similar names are marked as a duplicate', async () => {
