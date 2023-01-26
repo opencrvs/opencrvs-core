@@ -139,7 +139,7 @@ export function StepOneContainer() {
         >
           {({ handleSubmit }) => (
             <FormWrapper id={FORM_NAME} onSubmit={handleSubmit}>
-              <Stack direction="column" alignItems="stretch" gap={16}>
+              <Stack direction="column" alignItems="stretch" gap={24}>
                 <StyledH2>
                   {intl.formatMessage(messages.stepOneLoginText)}
                 </StyledH2>
@@ -151,6 +151,7 @@ export function StepOneContainer() {
                 <Button
                   id="login-mobile-submit"
                   type="primary"
+                  size="large"
                   loading={submitting}
                 >
                   {intl.formatMessage(messages.submit)}

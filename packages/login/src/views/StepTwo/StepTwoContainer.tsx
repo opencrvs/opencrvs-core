@@ -113,7 +113,7 @@ export function StepTwoContainer() {
         >
           {({ handleSubmit }) => (
             <FormWrapper id={FORM_NAME} onSubmit={handleSubmit}>
-              <Stack direction="column" alignItems="stretch" gap={16}>
+              <Stack direction="column" alignItems="stretch" gap={24}>
                 <Field name={field.name} field={field}>
                   {({ meta, input, ...otherProps }) => (
                     <InputField
@@ -136,10 +136,10 @@ export function StepTwoContainer() {
                   )}
                 </Field>
                 <Button
-                  size="medium"
+                  size="large"
                   type="primary"
                   id="login-mobile-submit"
-                  disabled={submitting}
+                  loading={submitting}
                 >
                   {intl.formatMessage(messages.verify)}
                 </Button>
