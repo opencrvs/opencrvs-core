@@ -17,14 +17,14 @@ import { BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION } from '@client/profile/mutati
 import {
   AdvancedSearchParametersInput,
   BookmarkAdvancedSearchMutation,
-  BookmarkAdvancedSearchMutationVariables
+  BookmarkAdvancedSearchMutationVariables,
+  BookmarkedSeachItem,
 } from '@client/utils/gateway'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@apollo/client'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { GQLBookmarkedSeachItem } from '@opencrvs/gateway/src/graphql/schema'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -120,7 +120,7 @@ export function BookmarkAdvancedSearchModal({
       dispatch(
         modifyUserDetails({
           ...userDetails,
-          searches: filteredSearchListData as GQLBookmarkedSeachItem[]
+          searches: filteredSearchListData as BookmarkedSeachItem[]
         })
       )
       dispatch(
