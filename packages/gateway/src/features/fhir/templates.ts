@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import {
   DUPLICATE_TRACKING_ID,
-  EVENT_TYPE,
-  OPENCRVS_SPECIFICATION_URL
+  EVENT_TYPE
 } from '@gateway/features/fhir/constants'
+import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 
 export const MOTHER_CODE = 'mother-details'
 export const FATHER_CODE = 'father-details'
