@@ -29,9 +29,9 @@ export default {
 
 const Template: Story<IBreadCrumbProps> = (args) => <BreadCrumb {...args} />
 
-export const AccordionView = Template.bind({})
+export const Default = Template.bind({})
 
-AccordionView.args = {
+Default.args = {
   items: [
     {
       label: 'Country',
