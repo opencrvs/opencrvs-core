@@ -10,25 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  // ELASTIC_SEARCH_HTTP_PORT,
-
-  startContainer,
-  stopContainer
-} from './elasticSearchTestContainer'
+import { startContainer, stopContainer } from './elasticSearchTestContainer'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
+import { indexComposition } from '@search/elasticsearch/dbhelper'
 import * as elastic from '@elastic/elasticsearch'
 import { searchForDuplicates } from './service'
-import { indexComposition } from '@search/elasticsearch/dbhelper'
 import { StartedElasticsearchContainer } from 'testcontainers'
 
 jest.setTimeout(10 * 60 * 1000)
 
 let container: StartedElasticsearchContainer
+
 beforeAll(async () => {
   container = await startContainer()
 })
-afterEach(() => stopContainer(container))
+afterAll(async () => await stopContainer(container))
 
 describe('Elastic Search Test Container Automation', () => {
   const exampleBirthRegistrationA: IBirthCompositionBody = {
@@ -45,8 +41,8 @@ describe('Elastic Search Test Container Automation', () => {
   }
 
   it.only('should check elasticsearch is up', async () => {
-    const host = container.getHost()
-    const port = container.getMappedPort(9200)
+    const host = container?.getHost() ?? '0.0.0.0'
+    const port = container?.getMappedPort(9200) ?? 9200
 
     const client = new elastic.Client({
       node: `http://${host}:${port}`
