@@ -12,7 +12,7 @@
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { App } from '@client/App'
 import registerServiceWorker from '@client/registerServiceWorker'
 import { createStore } from '@client/store'
@@ -96,10 +96,9 @@ function userReconnectedToast() {
 
 window.addEventListener('online', userReconnectedToast)
 
-ReactDOM.render(
-  <App store={store} history={history} />,
-  document.getElementById('root')
-)
+const container = document.getElementById('root')
+const root = createRoot(container!)
+root.render(<App store={store} history={history} />)
 
 registerServiceWorker(onNewContentAvailable)
 new SubmissionController(store).start()

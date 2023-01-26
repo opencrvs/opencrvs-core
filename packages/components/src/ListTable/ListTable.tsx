@@ -171,6 +171,9 @@ const ValueWrapper = styled.span<{
   totalWidth: number
   alignment?: string
   color?: string
+  // TODO: The children can be passed a `IDynamicValues` value, which is a very flexible / any-like type.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  children?: any
 }>`
   width: ${({ width, totalWidth }) =>
     totalWidth > 100 ? (width * 100) / totalWidth : width}%;
