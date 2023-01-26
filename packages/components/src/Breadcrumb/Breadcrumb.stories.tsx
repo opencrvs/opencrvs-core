@@ -16,7 +16,7 @@ import { Story, Meta } from '@storybook/react'
 import { BreadCrumb, IBreadCrumbData, IBreadCrumbProps } from './Breadcrumb'
 
 export default {
-  title: 'Data/Breadcrumb',
+  title: 'Input/Breadcrumb',
   component: BreadCrumb,
   parameters: {
     docs: {
@@ -27,9 +27,7 @@ export default {
   }
 } as Meta
 
-const Template: Story<IBreadCrumbProps> = (args) => (
-  <BreadCrumb {...args} />
-)
+const Template: Story<IBreadCrumbProps> = (args) => <BreadCrumb {...args} />
 
 export const AccordionView = Template.bind({})
 
