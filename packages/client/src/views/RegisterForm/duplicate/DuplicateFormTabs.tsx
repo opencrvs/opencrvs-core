@@ -759,7 +759,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           },
           leftValue: (
             <Text variant="reg16" element="span" color="grey600">
-              {actualRegData.trackingId}
+              {actualRegData.trackingId as string}
             </Text>
           ),
           rightValue: (
@@ -784,7 +784,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           },
           leftValue: (
             <Text variant="reg16" element="span" color="grey600">
-              {actualRegData.registrationNumber}
+              {actualRegData.registrationNumber as string}
             </Text>
           ),
           rightValue: (

@@ -1004,6 +1004,26 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
+export function removeDuplicatesFromComposition(
+  composition: fhir.Composition,
+  compositionId: string,
+  duplicateId: string
+) {
+  const removeAllDuplicates = compositionId === duplicateId
+  const updatedRelatesTo =
+    composition.relatesTo &&
+    composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
+      return (
+        relatesTo.code !== 'duplicate' ||
+        (!removeAllDuplicates &&
+          relatesTo.targetReference &&
+          relatesTo.targetReference.reference !== `Composition/${duplicateId}`)
+      )
+    })
+  composition.relatesTo = updatedRelatesTo
+  return composition
+}
+
 export const fetchFHIR = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
