@@ -18,7 +18,7 @@ import {
   AdvancedSearchParametersInput,
   BookmarkAdvancedSearchMutation,
   BookmarkAdvancedSearchMutationVariables,
-  BookmarkedSeachItem,
+  BookmarkedSeachItem
 } from '@client/utils/gateway'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@apollo/client'
