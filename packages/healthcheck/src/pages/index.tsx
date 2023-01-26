@@ -14,6 +14,7 @@ import { Services } from '@/components/Services'
 import { checkHealth, Service } from '@/lib/check-health'
 import type { InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
+import React from 'react'
 
 const isAllOk = (services: Service[]) =>
   services.every((service) => service.status)
@@ -42,6 +43,7 @@ export default function Home({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Favicon status={isAllOk ? 'ok' : 'error'} />
       </Head>
+
       <Services services={services} />
     </>
   )

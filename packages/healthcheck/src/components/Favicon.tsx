@@ -10,6 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import React from 'react'
+
 const HEALTH_COLORS = {
   ok: '#62d200',
   warn: '#ff9100',

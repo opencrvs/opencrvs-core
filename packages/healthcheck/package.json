@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npm run open-browser && next dev -p 6334",
+    "start": "next dev -p 6334 & npm run open-browser",
     "open-browser": "open http://localhost:6334",
     "lint": "next lint"
   },
@@ -19,7 +19,6 @@
     "next": "13.1.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "styled-components": "5.3.6",
     "typescript": "4.9.4"
   },
   "resolutions": {

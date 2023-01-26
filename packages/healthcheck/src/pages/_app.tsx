@@ -11,12 +11,15 @@
  */
 import type { AppProps } from 'next/app'
 import { GlobalStyle } from '@/components/GlobalStyle'
+import { ThemeProvider } from 'styled-components'
+import { getTheme } from '@opencrvs/components/lib/theme'
+import React from 'react'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <>
+    <ThemeProvider theme={getTheme()}>
       <GlobalStyle />
       <Component {...pageProps} />
-    </>
+    </ThemeProvider>
   )
 }

@@ -12,6 +12,8 @@
 
 import { Service, Status } from '@/lib/check-health'
 import styled from 'styled-components'
+import { Text } from '@opencrvs/components/lib/Text'
+import React from 'react'
 
 const Table = styled.table`
   td,
@@ -19,6 +21,10 @@ const Table = styled.table`
     padding: 8px;
     text-align: left;
   }
+
+  ${({ theme }) => {
+    return `color: ${theme.colors.yellow}`
+  }}
 `
 
 export const Services = ({ services }: { services: Service[] }) => {
@@ -26,7 +32,11 @@ export const Services = ({ services }: { services: Service[] }) => {
     <Table>
       <thead>
         <tr>
-          <th>Service</th>
+          <th>
+            <Text variant="h1" element="h1">
+              asdfasdf
+            </Text>
+          </th>
           <th>URL</th>
           <th>Status</th>
         </tr>

@@ -46,12 +46,15 @@ export const Text = ({
   overflowWrap,
   color = 'copy',
   ...props
-}: ITextProps) => (
-  <StyledText
-    $variant={variant}
-    $color={color}
-    as={element}
-    $overflowWrap={overflowWrap}
-    {...props}
-  />
-)
+}: ITextProps) => {
+  console.log(React)
+  return (
+    <StyledText
+      $variant={variant}
+      $color={color}
+      as={element}
+      $overflowWrap={overflowWrap}
+      {...props}
+    />
+  )
+}
