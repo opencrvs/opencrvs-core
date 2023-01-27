@@ -37,9 +37,10 @@ export function Icon({
   ...rest
 }: IconProps) {
   const IconComponent = icons[name]
+  console.log('ICON' + icons)
 
   return (
-    <IconComponent
+    /*<IconComponent
       size={IconSize[size]}
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
       fill={
@@ -50,6 +51,7 @@ export function Icon({
           : colors[fill]
       }
       {...rest}
-    />
+    />*/
+    <></>
   )
 }

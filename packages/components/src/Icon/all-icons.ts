@@ -11,4 +11,8 @@
  */
 
 export * from './custom-icons'
-export * from 'react-feather'
+export * from 'phosphor-react'
+
+export * from '../icons/ChevronRight'
+export * from '../icons/ChevronDown'
+export * from '../icons/Search'

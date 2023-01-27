@@ -13,6 +13,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Link, Stack, Text } from '../'
 import { Icon } from '../Icon'
+import { ChevronRight } from '../icons'
 
 const Container = styled.div`
   box-sizing: border-box;
