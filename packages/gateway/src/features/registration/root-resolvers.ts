@@ -524,7 +524,7 @@ async function createEventRegistration(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = buildFHIRBundle(details, event, authHeader)
   const draftId =
     details && details.registration && details.registration.draftId
 
@@ -593,7 +593,7 @@ async function markEventAsValidated(
       entry: taskEntry
     }
   } else {
-    doc = await buildFHIRBundle(details, event, authHeader)
+    doc = buildFHIRBundle(details, event, authHeader)
   }
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
@@ -605,7 +605,7 @@ async function markEventAsRegistered(
   event: EVENT_TYPE,
   details: GQLBirthRegistrationInput | GQLDeathRegistrationInput
 ) {
-  const doc = await buildFHIRBundle(details, event, authHeader)
+  const doc = buildFHIRBundle(details, event, authHeader)
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
