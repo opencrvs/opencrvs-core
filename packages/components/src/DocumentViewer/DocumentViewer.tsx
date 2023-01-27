@@ -56,6 +56,7 @@ export interface IDocumentViewerOptions {
 interface IProps {
   id?: string
   options: IDocumentViewerOptions
+  children?: React.ReactNode
 }
 
 interface IState {

@@ -76,6 +76,7 @@ function setLocationKey(currLocation: Location, prevLocation: Location) {
 }
 interface IProps {
   location: Location
+  children: React.ReactNode
 }
 interface IState {
   locations: Location[]

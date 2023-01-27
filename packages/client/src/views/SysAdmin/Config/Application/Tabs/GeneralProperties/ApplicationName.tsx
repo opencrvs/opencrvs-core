@@ -36,7 +36,7 @@ import {
   callApplicationConfigMutation,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Link } from '@opencrvs/components/lib/Link'
 
 export function ApplicationName() {
   const intl = useIntl()
@@ -93,9 +93,9 @@ export function ApplicationName() {
           </Value>
         }
         actions={
-          <LinkButton id={id} onClick={toggleModal}>
+          <Link id={id} onClick={toggleModal}>
             {intl.formatMessage(buttonMessages.change)}
-          </LinkButton>
+          </Link>
         }
       />
 

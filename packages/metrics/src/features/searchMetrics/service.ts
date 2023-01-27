@@ -21,6 +21,12 @@ export function getClientIdFromToken(token: string) {
 export async function fetchTotalSearchRequestByClientId(clientId: string) {
   const currentDate = format(new Date(), 'yyyy-MM-dd')
   return await query(
-    `SELECT COUNT(clientId) FROM search_requests WHERE clientId = '${clientId}' AND time >= '${currentDate}'`
+    `SELECT COUNT(clientId) FROM search_requests WHERE clientId = $clientId AND time >= $currentDate`,
+    {
+      placeholders: {
+        clientId,
+        currentDate
+      }
+    }
   )
 }

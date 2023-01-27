@@ -11,10 +11,9 @@
  */
 
 import { RouterAction } from 'connected-react-router'
-import { IURLParams } from '@client/utils/authUtils'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from '@apollo/client'
 import { IUserDetails } from '@client/utils/userUtils'
+import { Query } from '@client/utils/gateway'
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const
 export const REDIRECT_TO_AUTHENTICATION =
   'PROFILE/REDIRECT_TO_AUTHENTICATION' as const
@@ -42,7 +41,7 @@ type CheckAuthAction = {
 
 type SetUserDetailsAction = {
   type: typeof SET_USER_DETAILS
-  payload: ApolloQueryResult<GQLQuery>
+  payload: ApolloQueryResult<Query>
 }
 
 type ModifyUserDetailsAction = {
@@ -84,11 +83,12 @@ export const checkAuth = (): CheckAuthAction => ({
 })
 
 export const setUserDetails = (
-  payload: ApolloQueryResult<GQLQuery>
+  payload: ApolloQueryResult<Query>
 ): SetUserDetailsAction => ({
   type: SET_USER_DETAILS,
   payload
 })
+
 export const userDetailsAvailable = (payload: IUserDetails) => ({
   type: USER_DETAILS_AVAILABLE,
   payload

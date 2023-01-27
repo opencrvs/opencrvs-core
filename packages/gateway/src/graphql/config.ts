@@ -28,6 +28,7 @@ import { resolvers as applicationRootResolvers } from '@gateway/features/applica
 import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as formDatasetResolvers } from '@gateway/features/formDataset/root-resolver'
+import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -47,6 +48,7 @@ import { GraphQLSchema } from 'graphql'
 import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
+import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -78,7 +80,9 @@ const resolvers: StringIndexed<IResolvers> = merge(
   integrationResolver as IResolvers,
   formDatasetResolvers as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  formDatasetResolvers as IResolvers
+  formDatasetResolvers as IResolvers,
+  informantSMSNotificationResolvers as IResolvers,
+  informantSMSNotiTypeResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
