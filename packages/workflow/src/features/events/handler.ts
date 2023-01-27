@@ -431,11 +431,9 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.DOWNLOADED:
     case Events.VIEWED:
-      response = await actionEventHandler(request, h, event)
-      await triggerEvent(event, request.payload, request.headers)
-      break
     case Events.ASSIGNED_EVENT:
     case Events.UNASSIGNED_EVENT:
+    case Events.MARKED_AS_DUPLICATE:
       response = await actionEventHandler(request, h, event)
       await triggerEvent(event, request.payload, request.headers)
       break
