@@ -61,7 +61,7 @@ export default async function createUser(
     )
     user.systemRole = user.systemRole ?? 'FIELD_AGENT'
 
-    const role = createFhirPractitionerRole(user, practitionerId, false)
+    const role = await createFhirPractitionerRole(user, practitionerId, false)
     roleId = await postFhir(token, role)
     if (!roleId) {
       throw new Error(
