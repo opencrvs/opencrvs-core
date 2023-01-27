@@ -8,20 +8,6 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-input RoleInput {
-  lang: String
-  label: String
-}
-
-input LabelInput {
-  labels: [RoleInput]
-}
-
-input SystemRoleInput {
-  value: String
-  roles: [LabelInput]
-}
-
 type RoleLabel {
   lang: String!
   label: String!
@@ -34,9 +20,9 @@ type Role {
 
 type SystemRole {
   id: ID!
-  value: String!
-  roles: [Role!]!
-  active: Boolean!
+  value: String
+  roles: [Role!]
+  active: Boolean
 }
 
 input ComparisonInput {
@@ -50,6 +36,26 @@ input ComparisonInput {
   nin: [String!]
 }
 
+input LabelInput {
+  lang: String!
+  label: String!
+}
+
+input RoleInput {
+  labels: [LabelInput]!
+}
+
+input SystemRoleInput {
+  id: ID!
+  value: String
+  active: Boolean
+  roles: [RoleInput]
+}
+
+type Response {
+  msg: String!
+}
+
 type Query {
   getSystemRoles(
     title: String
@@ -59,4 +65,8 @@ type Query {
     sortBy: String
     sortOrder: String
   ): [SystemRole!]
+}
+
+type Mutation {
+  updateRole(systemRole: SystemRoleInput): Response!
 }

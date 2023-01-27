@@ -33,12 +33,12 @@ export interface ISystemRolesRequest {
   active?: boolean
 }
 
-export default async function updateRoles(
+export default async function updateRole(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const systemRolesRequest = request.payload as ISystemRolesRequest
-  let rolesIds: Types.ObjectId[] = []
+  let updatedRoleIds: Types.ObjectId[] = []
 
   const systemRole: ISystemRoleModel | null = await SystemRole.findOne({
     _id: systemRolesRequest.id
@@ -50,8 +50,8 @@ export default async function updateRoles(
 
   if (systemRolesRequest.roles) {
     try {
-      rolesIds = await updateParticularRoles(systemRolesRequest.roles)
-      systemRole.roles = rolesIds
+      updatedRoleIds = await updateParticularRoles(systemRolesRequest.roles)
+      systemRole.roles = updatedRoleIds
     } catch (err) {
       logger.error(err)
       return h

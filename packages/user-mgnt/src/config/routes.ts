@@ -96,7 +96,7 @@ import {
 import resetPasswordSMSHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
-import updateRoles from '@user-mgnt/features/updateRoles/handler'
+import updateRole from '@user-mgnt/features/updateRoles/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -711,8 +711,8 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/roleUpdate',
-      handler: updateRoles,
+      path: '/updateRole',
+      handler: updateRole,
       config: {
         tags: ['api'],
         description: 'Update user role for particular system role ',
