@@ -24,7 +24,7 @@ import {
   ListViewSimplified,
   BreadCrumb,
   Divider,
-  ContentSize
+  Icon
 } from '@opencrvs/components/lib'
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
 import { useDispatch, useSelector } from 'react-redux'
@@ -36,7 +36,6 @@ import {
   goToPerformanceHome,
   goToTeamUserList
 } from '@client/navigation'
-import { Activity } from '@opencrvs/components/lib/icons'
 import { Button } from '@opencrvs/components/lib/Button'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
@@ -63,7 +62,7 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
 
 // const con
 
-export function ListOfOrganisations() {
+export function AdministrativeLevels() {
   const intl = useIntl()
   const { locationId } = useParams<IRouteProps>()
   const dispatch = useDispatch()
@@ -165,7 +164,7 @@ export function ListOfOrganisations() {
             onSelect={onClickBreadCrumb}
           />
           <Divider />
-          <ListViewSimplified bottomBorder>
+          <ListViewSimplified bottomBorder rowHeight={'small'}>
             {dataLocations.childLocations.length > 0 ? (
               dataLocations.childLocations
                 ?.slice(
@@ -193,7 +192,7 @@ export function ListOfOrganisations() {
                     actions={
                       <Button
                         type="icon"
-                        size="medium"
+                        size="small"
                         onClick={() => {
                           dispatch(
                             goToPerformanceHome(
@@ -205,7 +204,11 @@ export function ListOfOrganisations() {
                           )
                         }}
                       >
-                        <Activity width={40} height={40} />
+                        <Icon
+                          name="Activity"
+                          color="currentColor"
+                          size="medium"
+                        />
                       </Button>
                     }
                   />

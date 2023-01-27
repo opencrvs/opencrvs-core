@@ -65,7 +65,7 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import { ListOfOrganisations } from '@client/views/Organisation/ListOfOrganisations'
+import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 
 interface IAppProps {
@@ -445,7 +445,7 @@ export class App extends React.Component<IAppProps> {
                                               Roles.NATIONAL_REGISTRAR
                                             ]}
                                             path={routes.ORGANISATIONS_INDEX}
-                                            component={ListOfOrganisations}
+                                            component={AdministrativeLevels}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
