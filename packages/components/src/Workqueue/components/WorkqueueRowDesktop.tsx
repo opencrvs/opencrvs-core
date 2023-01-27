@@ -11,16 +11,10 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import {
-  IActionObject,
-  ColumnContentAlignment,
-  IAction,
-  IColumn,
-  IDynamicValues
-} from '..'
+import { IActionObject, ColumnContentAlignment, IAction, IColumn } from '..'
 
 export interface IWorkqueueRow {
-  displayItems: IDynamicValues[]
+  displayItems: Array<Record<string, unknown>>
   columns: IColumn[]
   getRowClickHandler: (
     itemRowClickHandler: IActionObject[]

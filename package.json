@@ -55,14 +55,14 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
+    "@types/react-signature-canvas": "^1.0.2",
     "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
     "patch-package": "^6.1.2",
-    "postinstall-postinstall": "^2.0.0"
+    "postinstall-postinstall": "^2.0.0",
+    "react-signature-canvas": "^1.0.6"
   },
   "resolutions": {
-    "underscore": ">1.12.1",
-    "//": "See https://github.com/opencrvs/opencrvs-core/issues/3820",
-    "@types/react": "^16.9.4"
+    "@types/react": "^18.0.26"
   }
 }

@@ -19,6 +19,7 @@ interface IProps {
   show: boolean
   handleClose?: () => void
   className?: string
+  children: React.ReactNode
 }
 
 const Backdrop = styled.div`
