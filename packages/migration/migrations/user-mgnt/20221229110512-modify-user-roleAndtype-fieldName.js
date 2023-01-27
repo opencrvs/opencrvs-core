@@ -148,6 +148,9 @@ const UserRolesIndex = {
 
 export const up = async (db, client) => {
   const session = client.startSession()
+  const limit = 10
+  let skip = 0
+  let processedDocCount = 0
   try {
     /* ==============Create a new userroles collection============== */
 
@@ -163,18 +166,40 @@ export const up = async (db, client) => {
 
     /* ==============Migration for "users" Collection============== */
 
-    for await (const user of db.collection('users').find()) {
-      await db.collection('users').updateOne(
-        { username: user.username },
-        {
-          $set: {
-            type: userRolesResult.insertedIds[
-              UserRolesIndex[
-                user.role === 'FIELD_AGENT' ? user.type : user.role
+    const totalUserCount = await getTotalDocCountByCollectionName(db, 'users')
+
+    while (totalUserCount > processedDocCount) {
+      const userCursor = await getUserCursor(db, limit, skip)
+      const count = await userCursor.count()
+      // eslint-disable-next-line no-console
+      console.log(
+        `Migration Up - User role & Type :: Processing ${
+          processedDocCount + 1
+        } - ${processedDocCount + count} of ${totalUserCount} documents...`
+      )
+
+      while (await userCursor.hasNext()) {
+        const user = await userCursor.next()
+        await db.collection('users').updateOne(
+          { username: user.username },
+          {
+            $set: {
+              type: userRolesResult.insertedIds[
+                UserRolesIndex[
+                  user.role === 'FIELD_AGENT' ? user.type : user.role
+                ]
               ]
-            ]
+            }
           }
-        }
+        )
+      }
+
+      skip += limit
+      processedDocCount += count
+      const percentage = ((processedDocCount / totalUserCount) * 100).toFixed(2)
+      // eslint-disable-next-line no-console
+      console.log(
+        `Migration Up - User role & Type :: Processing done ${percentage}%`
       )
     }
 
@@ -260,4 +285,12 @@ export const down = async (db, client) => {
   } finally {
     await session.endSession()
   }
+}
+
+export async function getTotalDocCountByCollectionName(db, collectionName) {
+  return await db.collection(collectionName).count()
+}
+
+export async function getUserCursor(db, limit = 50, skip = 0) {
+  return db.collection('users').find({}, { limit, skip })
 }
