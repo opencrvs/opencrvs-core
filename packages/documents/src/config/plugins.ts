@@ -18,7 +18,7 @@ import { logger } from '@documents/logger'
 export default function getPlugins() {
   const plugins: any[] = [
     JWT,
-    ...(process.env.NODE_ENV === 'test' || process.env.LOG_LEVEL === 'silent'
+    ...(process.env.NODE_ENV !== 'production'
       ? []
       : [
           {
