@@ -96,7 +96,7 @@ import {
 import resetPasswordSMSHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
-import updateRole from '@user-mgnt/features/updateRoles/handler'
+import updateRole from '@user-mgnt/features/updateRole/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
