@@ -113,12 +113,16 @@ sequenceDiagram
     Metrics->>InfluxDB: Create user audit point "CORRECTED"
 
     loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
+        Metrics->>OpenHIM: Get parent of Location
+        OpenHIM->>Workflow: Get parent of Location
+        Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate payment point
 
     loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
+        Metrics->>OpenHIM: Get parent of Location
+        OpenHIM->>Workflow: Get parent of Location
+        Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate correction reason point
 
@@ -126,7 +130,9 @@ sequenceDiagram
     Note over Metrics,Hearth: Generate event duration point
 
     loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
+        Metrics->>OpenHIM: Get parent of Location
+        OpenHIM->>Workflow: Get parent of Location
+        Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate time logged point
     Metrics->>Influx DB: Write points

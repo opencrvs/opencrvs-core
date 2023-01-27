@@ -59,12 +59,16 @@ sequenceDiagram
     Metrics-->Hearth: Get Task history
 
     loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
+        Metrics->>OpenHIM: Get parent of Location
+        OpenHIM->>Workflow: Get parent of Location
+        Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate rejected points
 
     loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
+        Metrics->>OpenHIM: Get parent of Location
+        OpenHIM->>Workflow: Get parent of Location
+        Workflow->>Hearth: Get parent of Location
     end
     Note over Metrics,Hearth: Generate time logged point
 
