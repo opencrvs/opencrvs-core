@@ -98,6 +98,22 @@ export const MARK_EVENT_UNASSIGNED = gql`
   }
 `
 
+export const MARK_EVENT_AS_DUPLICATE = gql`
+  mutation markEventAsDuplicate(
+    $id: String!
+    $reason: String!
+    $comment: String
+    $duplicateTrackingId: String
+  ) {
+    markEventAsDuplicate(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
+  }
+`
+
 export function getBirthMutation(action: SubmissionAction) {
   switch (action) {
     case SubmissionAction.SUBMIT_FOR_REVIEW:
