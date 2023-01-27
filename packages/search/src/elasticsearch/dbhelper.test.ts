@@ -12,7 +12,7 @@
 import {
   indexComposition,
   updateComposition,
-  searchComposition,
+  searchForDuplicates,
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import { mockCompositionBody } from '@search/test/utils'
@@ -64,7 +64,7 @@ describe('elasticsearch db helper', () => {
 
     it('should perform search for composition', async () => {
       searchSpy = jest.spyOn(client, 'search')
-      searchComposition(mockCompositionBody)
+      searchForDuplicates(mockCompositionBody)
       if (
         searchSpy.mock &&
         searchSpy.mock.calls[0] &&

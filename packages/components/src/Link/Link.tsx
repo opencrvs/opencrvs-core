@@ -12,7 +12,7 @@
 import React from 'react'
 import { fonts, IFont } from '../fonts'
 import { colors, IColor } from '../colors'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export interface LinkProps
   extends React.HTMLProps<HTMLAnchorElement | HTMLButtonElement> {
@@ -24,9 +24,21 @@ export interface LinkProps
   color?: IColor
   /** Disabled */
   disabled?: boolean
+  /** Always underline link */
+  underline?: boolean
 }
 
-const StyledLink = styled.button<{ $font: IFont; $color: IColor }>`
+const underlineStyles = css`
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+`
+
+const StyledLink = styled.button<{
+  $font: IFont
+  $color: IColor
+  $underline: boolean
+}>`
   ${({ $font }) => fonts[$font]};
   ${({ $color }) => `color: ${colors[$color]};`}
   cursor: pointer;
@@ -39,12 +51,15 @@ const StyledLink = styled.button<{ $font: IFont; $color: IColor }>`
   overflow: hidden;
   max-width: 100%;
 
-  &:hover,
-  &:active {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
-  }
+  ${({ $underline }) =>
+    $underline
+      ? underlineStyles
+      : css`
+          &:hover,
+          &:active {
+            ${underlineStyles}
+          }
+        `}
 
   &:focus-visible {
     background: ${({ theme }) => theme.colors.yellow};
@@ -68,8 +83,15 @@ export const Link = ({
   element,
   font = 'bold16',
   color = 'primary',
+  underline = false,
   ...props
 }: LinkProps) => (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  <StyledLink $font={font} $color={color} as={element as any} {...props} />
+  <StyledLink
+    $font={font}
+    $color={color}
+    $underline={underline}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    as={element as any}
+    {...props}
+  />
 )

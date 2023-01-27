@@ -76,7 +76,8 @@ import {
   setQuestionnaireItem,
   uploadBase64ToMinio,
   isBase64FileString,
-  postAssignmentSearch
+  postAssignmentSearch,
+  findDuplicates
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -3692,10 +3693,11 @@ export async function buildFHIRBundle(
   const context: any = {
     event: eventType
   }
+  const composition = createCompositionTemplate(ref, context)
   const fhirBundle = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [createCompositionTemplate(ref, context)]
+    entry: [composition]
   }
 
   if (authHeader) {
@@ -3707,7 +3709,38 @@ export async function buildFHIRBundle(
     builders,
     context
   )
+  const isADuplicate =
+    eventType === EVENT_TYPE.BIRTH &&
+    (await hasBirthDuplicates(authHeader, reg as GQLBirthRegistrationInput))
+
+  if (isADuplicate) {
+    composition.resource.extension = composition.resource.extension || []
+    composition.resource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}duplicate`,
+      valueBoolean: true
+    })
+  }
   return fhirBundle
+}
+
+async function hasBirthDuplicates(
+  authHeader: IAuthHeader,
+  bundle: GQLBirthRegistrationInput
+) {
+  if (!bundle || !bundle.child) {
+    return false
+  }
+
+  const res = await findDuplicates(authHeader, {
+    childFirstNames: bundle.child.name?.[0]?.firstNames,
+    childFamilyName: bundle.child.name?.[0]?.familyName,
+    childDoB: bundle.child.birthDate,
+    motherFirstNames: bundle.mother?.name?.[0]?.firstNames,
+    motherFamilyName: bundle.mother?.name?.[0]?.familyName,
+    motherDoB: bundle.mother?.birthDate
+  })
+
+  return !res || res.length > 0
 }
 
 export async function updateFHIRTaskBundle(

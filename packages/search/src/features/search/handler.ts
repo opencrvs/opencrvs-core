@@ -15,8 +15,15 @@ import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
 import { client } from '@search/elasticsearch/client'
-import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
-import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
+import {
+  ICompositionBody,
+  EVENT,
+  IBirthCompositionBody
+} from '@search/elasticsearch/utils'
+import {
+  searchByCompositionId,
+  searchForDuplicates
+} from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
@@ -188,5 +195,20 @@ export async function advancedRecordSearch(
   } catch (err) {
     logger.error(`Search/searchDeclarationHandler: error: ${err}`)
     return badRequest(err.message)
+  }
+}
+
+export async function searchDuplicates(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const result = await searchForDuplicates(
+      request.payload as IBirthCompositionBody
+    )
+    return h.response(result.body?.hits?.hits || []).code(200)
+  } catch (error) {
+    logger.error(`Search/searchForDuplicates: error: ${error}`)
+    return internal(error)
   }
 }
