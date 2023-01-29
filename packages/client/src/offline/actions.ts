@@ -23,6 +23,7 @@ import { User, System } from '@client/utils/gateway'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IFormConfig, IFormDataSet } from '@client/forms'
 import { IQuestionConfig } from '@client/forms/questionConfig'
+import { UserDetails } from '@client/utils/userUtils'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -104,7 +105,7 @@ export type ApplicationConfigFailedAction = {
 export const GET_EXISTING_OFFLINE_DATA = 'OFFLINE/SET_OFFLINE_DATA'
 type SetOfflineData = {
   type: typeof GET_EXISTING_OFFLINE_DATA
-  payload: User
+  payload: UserDetails
 }
 export const GET_OFFLINE_DATA_SUCCESS = 'OFFLINE/GET_OFFLINE_DATA_SUCCESS'
 export type IGetOfflineDataSuccessAction = {
@@ -150,7 +151,7 @@ export const locationsFailed = (error: Error): LocationsFailedAction => ({
 /*
  * Only called from tests atm
  */
-export const setOfflineData = (userDetails: User): SetOfflineData => ({
+export const setOfflineData = (userDetails: UserDetails): SetOfflineData => ({
   type: GET_EXISTING_OFFLINE_DATA,
   payload: userDetails
 })

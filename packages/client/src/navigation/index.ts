@@ -80,6 +80,7 @@ import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
+import { UserDetails } from '@client/utils/userUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -623,7 +624,7 @@ export function goToPage(
   }
 }
 
-export function getDefaultPerformanceLocationId(userDetails: User) {
+export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
   const role = userDetails?.role
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
@@ -642,7 +643,7 @@ export function getDefaultPerformanceLocationId(userDetails: User) {
   )
 }
 
-export function goToPerformanceView(userDetails: User) {
+export function goToPerformanceView(userDetails: UserDetails) {
   return goToPerformanceHome(
     undefined,
     undefined,
@@ -651,7 +652,7 @@ export function goToPerformanceView(userDetails: User) {
   )
 }
 
-export function goToTeamView(userDetails: User) {
+export function goToTeamView(userDetails: UserDetails) {
   if (userDetails && userDetails.role) {
     return goToTeamUserList(
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''

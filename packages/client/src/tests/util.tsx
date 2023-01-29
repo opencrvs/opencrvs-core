@@ -11,6 +11,7 @@
  */
 import { App } from '@client/App'
 import { Event, RoleType, Status, User } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
@@ -1259,7 +1260,7 @@ export const currentUserDeclarations = {
   ]
 }
 
-export const userDetails: User = {
+export const userDetails: UserDetails = {
   userMgntUserID: '123',
   id: 'b77b78af-a259-4bc1-85d5-b1e8c1382273',
   status: 'active' as Status,
@@ -2227,7 +2228,8 @@ export function loginAsFieldAgent(store: AppStore) {
           primaryOffice: {
             id: '0d8474da-0361-4d32-979e-af91f012340a',
             name: 'Kaliganj Union Sub Center',
-            status: 'active'
+            status: 'active',
+            alias: ['বানিয়াজান']
           },
           localRegistrar: {
             name: [

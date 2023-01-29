@@ -2646,6 +2646,8 @@ export type FetchUserQuery = {
     userMgntUserID: string
     practitionerId: string
     mobile: string
+    creationDate: string
+    username?: string | null
     role: RoleType
     type?: string | null
     status: Status

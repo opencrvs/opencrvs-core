@@ -82,8 +82,8 @@ const getDeclarationIconColor = (declaration: IDeclaration): string => {
   return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
     ? 'purple'
     : declaration.registrationStatus
-    ? STATUSTOCOLOR[declaration.registrationStatus]
-    : 'orange'
+      ? STATUSTOCOLOR[declaration.registrationStatus]
+      : 'orange'
 }
 
 const LoadingState = () => {
@@ -207,7 +207,7 @@ export const ViewRecord = () => {
     >
       <ReviewSection
         viewRecord
-        submitClickEvent={() => {}}
+        submitClickEvent={() => { }}
         pageRoute={''}
         draft={declaration}
       />

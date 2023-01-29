@@ -14,7 +14,6 @@ import {
   FIELD_GROUP_TITLE,
   IAttachmentValue,
   IFormField,
-  IFormFieldValue,
   IFormSection,
   IFormSectionData,
   LOCATION_SEARCH_INPUT,
@@ -49,7 +48,6 @@ import {
 } from '@client/user/userReducer'
 import {
   Action,
-  FormTitle
 } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import {
   PrimaryButton,
@@ -68,7 +66,7 @@ import { RouteComponentProps } from 'react-router'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { User } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   ListViewSimplified,
   ListViewItemSimplified,
@@ -93,7 +91,7 @@ interface IDispatchProps {
   goBack: typeof goBack
   goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
-  userDetails: User | null
+  userDetails: UserDetails | null
 }
 
 interface ISectionData {

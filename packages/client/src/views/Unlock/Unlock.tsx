@@ -20,7 +20,7 @@ import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { getUserName } from '@client/utils/userUtils'
-import { User } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { PINKeypad } from '@opencrvs/components/lib/PINKeypad'
 import {
@@ -50,7 +50,7 @@ type ErrorState = {
 type IFullState = IState & ErrorState
 
 type Props = {
-  userDetails: User | null
+  userDetails: UserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
 }
 type IFullProps = Props &

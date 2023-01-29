@@ -83,6 +83,7 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query as QueryType, User } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
@@ -212,7 +213,7 @@ type IOnlineStatusProps = {
 type BaseProps = {
   theme: ITheme
   offlineOffices: ILocation[]
-  userDetails: User | null
+  userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
   goToCreateNewUser: typeof goToCreateNewUser
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
@@ -508,7 +509,7 @@ function UserListComponent(props: IProps) {
 
   function getViewOnly(
     locationId: string,
-    userDetails: User | null,
+    userDetails: UserDetails | null,
     onlyNational: boolean
   ) {
     if (
@@ -550,7 +551,7 @@ function UserListComponent(props: IProps) {
       status,
       underInvestigation
     }: {
-      userDetails: User | null
+      userDetails: UserDetails | null
       locationId: string
       user: User
       index: number
@@ -585,7 +586,7 @@ function UserListComponent(props: IProps) {
     function generateUserContents(
       data: QueryType,
       locationId: string,
-      userDetails: User | null
+      userDetails: UserDetails | null
     ) {
       if (!data || !data.searchUsers || !data.searchUsers.results) {
         return []
@@ -665,7 +666,7 @@ function UserListComponent(props: IProps) {
 
   const LocationButton = (
     locationId: string,
-    userDetails: User | null,
+    userDetails: UserDetails | null,
     onlyNational: boolean
   ) => {
     const buttons: React.ReactElement[] = []
@@ -692,7 +693,7 @@ function UserListComponent(props: IProps) {
     }: {
       data: any
       locationId: string
-      userDetails: User | null
+      userDetails: UserDetails | null
     }) {
       const totalData =
         (data && data.searchUsers && data.searchUsers.totalItems) || 0

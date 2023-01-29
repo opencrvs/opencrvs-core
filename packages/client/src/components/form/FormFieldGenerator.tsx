@@ -119,11 +119,11 @@ import { LocationSearch } from '@opencrvs/components/lib/LocationSearch'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
-import { User } from '@client/utils/gateway'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IBaseAdvancedSearchState } from '@client/search/advancedSearch/utils'
+import { UserDetails } from '@client/utils/userUtils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -582,7 +582,7 @@ function GeneratedInputField({
 
 export function getInitialValueForSelectDynamicValue(
   field: IFormField,
-  userDetails: User | null
+  userDetails: UserDetails | null
 ) {
   let fieldInitialValue = field.initialValue as IFormFieldValue
   const catchmentAreas = userDetails?.catchmentArea
@@ -616,7 +616,7 @@ export function getInitialValueForSelectDynamicValue(
   return fieldInitialValue
 }
 
-const mapFieldsToValues = (fields: IFormField[], userDetails: User | null) =>
+const mapFieldsToValues = (fields: IFormField[], userDetails: UserDetails | null) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
@@ -666,7 +666,7 @@ interface IFormSectionProps {
 
 interface IStateProps {
   offlineCountryConfig: IOfflineData
-  userDetails: User | null
+  userDetails: UserDetails | null
 }
 
 interface IDispatchProps {

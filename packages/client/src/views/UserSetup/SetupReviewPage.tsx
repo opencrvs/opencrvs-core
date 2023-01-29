@@ -25,14 +25,11 @@ import {
 } from '@client/components/ProtectedAccount'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { getUserName } from '@client/utils/userUtils'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import {
-  User,
   SubmitActivateUserMutation,
   SubmitActivateUserMutationVariables
 } from '@client/utils/gateway'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { Mutation } from '@apollo/client/react/components'
 import {
   userMessages,
@@ -79,7 +76,9 @@ interface IProps {
 export function UserSetupReview({ setupData, goToStep }: IProps) {
   const intl = useIntl()
   const [submitError, setSubmitError] = React.useState(false)
-  const userDetails = useSelector<IStoreState, User | null>(getUserDetails)
+  const userDetails = useSelector<IStoreState, UserDetails | null>(
+    getUserDetails
+  )
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
 

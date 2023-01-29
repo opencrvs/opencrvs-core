@@ -25,7 +25,8 @@ import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { IFormConfig } from '@client/forms'
-import { Event, System, User } from '@client/utils/gateway'
+import { Event, System } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   IQuestionConfig,
   isDefaultQuestionConfig
@@ -82,7 +83,7 @@ export type IOfflineDataState = {
   offlineData: Partial<IOfflineData>
   offlineDataLoaded: boolean
   loadingError: boolean
-  userDetails?: User
+  userDetails?: UserDetails
 }
 
 export const initialState: IOfflineDataState = {
