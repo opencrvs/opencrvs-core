@@ -47,11 +47,16 @@ export const up = async (db, client) => {
             (c) => c.coding[0].system === systemRoles
           )[0].coding[0].code
 
-          const titleCase = roleCode
-            .replace(/_/g, ' ')
-            .split(' ')
-            .map((s) => s[0].toUpperCase() + s.slice(1).toLowerCase())
-            .join(' ')
+          const typeCode = practitionerRole.code.filter(
+            (c) => c.coding[0].system === systemRoles
+          )[1].coding[0].code
+
+          const titleCase = (code) =>
+            code
+              .replace(/_/g, ' ')
+              .split(' ')
+              .map((s) => s[0].toUpperCase() + s.slice(1).toLowerCase())
+              .join(' ')
 
           const hasSystemTypes = practitionerRole.code.some((item) => {
             return item.coding.some((coding) => {
@@ -75,7 +80,16 @@ export const up = async (db, client) => {
             })
           })
 
-          if (!isAutomated && !hasSystemTypes) {
+          if (isAutomated) continue
+
+          if (hasSystemTypes) {
+            await db
+              .collection('PractitionerRole')
+              .updateOne(
+                { id: practitionerRole.id },
+                { $set: { 'code.1.coding.0.code': titleCase(typeCode) } }
+              )
+          } else {
             await db.collection('PractitionerRole').updateOne(
               { id: practitionerRole.id },
               {
@@ -84,7 +98,9 @@ export const up = async (db, client) => {
                     coding: [
                       {
                         system: 'http://opencrvs.org/specs/types',
-                        code: isFieldAgent ? 'Social Worker' : titleCase
+                        code: isFieldAgent
+                          ? 'Social Worker'
+                          : titleCase(roleCode)
                       }
                     ]
                   }
