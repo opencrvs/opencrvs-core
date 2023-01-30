@@ -24,6 +24,10 @@ import { getLanguages } from '@client/i18n/selectors'
 import { getUserSystemRole } from '@client/views/SysAdmin/Team/utils'
 import { messages } from '@client/i18n/messages/views/config'
 import _ from 'lodash'
+import {
+  ISystemRole,
+  RolesInput
+} from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 
 const StyledTextInput = styled(TextInput)`
   ${({ theme }) => theme.fonts.reg14};
@@ -40,25 +44,9 @@ interface ILanguageOptions {
   [key: string]: string
 }
 
-interface IUserRoleLabel {
-  lang: string
-  label: string
-}
-
-interface IUserRole {
-  value: string
-  labels: IUserRoleLabel[]
-}
-
-interface IUserRoleDetail {
-  value: string
-  roles: IUserRole[]
-  active?: boolean
-}
-
-interface IUserRoleManagementModalProps {
-  userRolesDetail: IUserRoleDetail
-  closeCallback: (result: any) => void
+interface IProps {
+  systemRole: ISystemRole
+  closeCallback: (result: RolesInput | null) => void
 }
 
 const LanguageSelect = styled(Select)`
@@ -77,9 +65,16 @@ const LanguageSelect = styled(Select)`
   }
 `
 
-export function UserRoleManagementModal(props: IUserRoleManagementModalProps) {
-  const [userRoles, setUserRoles] = useState<IUserRole[]>(
-    props.userRolesDetail.roles
+function stripTypenameFromRoles(roles: ISystemRole['roles']) {
+  return roles.map(({ __typename, ...rest }) => ({
+    ...rest,
+    labels: rest.labels.map(({ __typename, ...rest }) => rest)
+  }))
+}
+
+export function UserRoleManagementModal(props: IProps) {
+  const [userRoles, setUserRoles] = useState<RolesInput>(
+    stripTypenameFromRoles(props.systemRole.roles)
   )
   const [currentLanguage, setCurrentLanguage] = useState<string>('en')
   const [currentClipBoard, setCurrentClipBoard] = useState<string>('')
@@ -103,10 +98,10 @@ export function UserRoleManagementModal(props: IUserRoleManagementModalProps) {
   )
 
   const isRoleUpdateValid = () => {
-    if (_.isEqual(userRoles, props.userRolesDetail.roles)) {
+    if (_.isEqual(userRoles, props.systemRole.roles)) {
       return false
     }
-    const inCompleteRoleEntries = userRoles.filter((role, idx) => {
+    const inCompleteRoleEntries = userRoles.filter((role) => {
       for (const label of role.labels) {
         if (label.label === '') {
           return true
@@ -124,8 +119,7 @@ export function UserRoleManagementModal(props: IUserRoleManagementModalProps) {
   return (
     <ResponsiveModal
       title={
-        getUserSystemRole({ systemRole: props.userRolesDetail.value }, intl) ||
-        ''
+        getUserSystemRole({ systemRole: props.systemRole.value }, intl) || ''
       }
       autoHeight
       responsive={false}
@@ -158,10 +152,8 @@ export function UserRoleManagementModal(props: IUserRoleManagementModalProps) {
       <Text variant="reg16" element="p" color="grey500">
         {intl.formatMessage(messages.roleUpdateInstruction, {
           systemRole:
-            getUserSystemRole(
-              { systemRole: props.userRolesDetail.value },
-              intl
-            ) || ''
+            getUserSystemRole({ systemRole: props.systemRole.value }, intl) ||
+            ''
         })}
       </Text>
 
@@ -235,7 +227,7 @@ export function UserRoleManagementModal(props: IUserRoleManagementModalProps) {
             disabled={!currentClipBoard}
             type="icon"
             onClick={() => {
-              const newUserRoles = userRoles.map((userRole, idx) => {
+              const newUserRoles = userRoles.map((userRole) => {
                 return {
                   ...userRole,
                   labels: userRole.labels.map((label) => {
@@ -258,7 +250,6 @@ export function UserRoleManagementModal(props: IUserRoleManagementModalProps) {
               })
 
               newUserRoles.push({
-                value: 'new',
                 labels: newLabels
               })
               setUserRoles(newUserRoles)
