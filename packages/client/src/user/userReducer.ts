@@ -255,14 +255,18 @@ const fetchRoles = async () => {
   return roles.data.getSystemRoles
 }
 
+export const generateLabelKey = (systemRole: SystemRole, role: Role) => {
+  return `${systemRole.value}.role.${role._id}`
+}
+
 const generateIntlObject = (
   systemRole: SystemRole,
   role: Role
 ): ISelectOption => {
   return {
-    value: role.value,
+    value: role._id,
     label: {
-      id: `${systemRole.value}.role.${role.value}`,
+      id: generateLabelKey(systemRole, role),
       description: '',
       defaultMessage: role.labels[0].label
     }

@@ -184,7 +184,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'systemRole',
           type: SELECT_WITH_OPTIONS,
-          label: userFormMessages.labelRole,
+          label: userFormMessages.systemRole,
           required: true,
           initialValue: '',
           validate: [],
@@ -222,7 +222,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'role',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: userFormMessages.type,
+          label: userFormMessages.role,
           required: true,
           initialValue: '',
           validate: [],

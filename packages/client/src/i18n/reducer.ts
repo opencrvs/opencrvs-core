@@ -22,7 +22,8 @@ import {
   IRoleMessagesLoadedAction,
   IRoleLoadedAction,
   rolesMessageAddData,
-  ROLES_LOADED
+  ROLES_LOADED,
+  generateLabelKey
 } from '@client/user/userReducer'
 import { SystemRole } from '@client/utils/gateway'
 
@@ -127,11 +128,12 @@ export const formatRoleLanguageState = (
     systemRole.roles.forEach((role) => {
       role.labels.forEach((label) => {
         if (transformedLanguages[label.lang]) {
+          const generatedLabel = generateLabelKey(systemRole, role)
           transformedLanguages[label.lang] = {
             ...transformedLanguages[label.lang],
             messages: {
               ...transformedLanguages[label.lang].messages,
-              [`${systemRole.value}.role.${role.value}`]: label.label
+              [generatedLabel]: label.label
             }
           }
         }
