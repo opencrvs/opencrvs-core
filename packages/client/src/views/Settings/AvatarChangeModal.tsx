@@ -23,7 +23,6 @@ import Cropper from 'react-easy-crop'
 import { Point, Area, Size } from 'react-easy-crop/types'
 import { Mutation } from '@apollo/client/react/components'
 import styled from '@client/styledComponents'
-import { User } from '@client/utils/gateway'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
@@ -36,6 +35,7 @@ import {
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { withTheme } from 'styled-components'
 import { Square } from '@opencrvs/components/lib/icons'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Container = styled.div`
   align-self: center;
@@ -112,7 +112,7 @@ type IProps = IntlShapeProps &
     onErrorChanged: (error: string) => void
     onConfirmAvatarChange: () => void
     onAvatarChanged: (img: IImage) => void
-    userDetails: User | null
+    userDetails: UserDetails | null
   }
 
 const DEFAULT_SIZE: Size = {

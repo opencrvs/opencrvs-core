@@ -59,6 +59,7 @@ import {
   Field
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { UserDetails } from '@client/utils/userUtils'
 
 const ListViewContainer = styled.div`
   margin-top: 24px;
@@ -78,7 +79,7 @@ export enum SVGFile {
 }
 
 type Props = WrappedComponentProps & {
-  userDetails: User | null
+  userDetails: UserDetails | null
   scope: Scope | null
   offlineResources: IOfflineData
   registerForm: {

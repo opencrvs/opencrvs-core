@@ -28,8 +28,8 @@ import {
   dynamicConstantsMessages,
   userMessages
 } from '@client/i18n/messages'
-import { getIndividualNameObj } from '@client/utils/userUtils'
-import { User, History, RegAction, RegStatus } from '@client/utils/gateway'
+import { getIndividualNameObj, UserDetails } from '@client/utils/userUtils'
+import { History, RegAction, RegStatus } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { isEmpty, find, flatten, values } from 'lodash'
@@ -540,7 +540,7 @@ export const ActionDetailsModal = ({
   actionDetailsIndex: number
   toggleActionDetails: (param: History | null) => void
   intl: IntlShape
-  userDetails: User | null
+  userDetails: UserDetails | null
   goToUser: typeof goToUserProfile
   registerForm: IForm
   offlineData: Partial<IOfflineData>

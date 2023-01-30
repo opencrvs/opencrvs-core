@@ -83,7 +83,6 @@ import { CorrectionSection, IForm } from '@client/forms'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import {
-  User,
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
   Event,
@@ -122,6 +121,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { Button } from '@opencrvs/components/lib/Button'
+import { UserDetails } from '@client/utils/userUtils'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -165,7 +165,7 @@ const DesktopDiv = styled.div`
 `
 
 interface IStateProps {
-  userDetails: User | null
+  userDetails: UserDetails | null
   language: string
   resources: IOfflineData
   scope: Scope | null
@@ -305,7 +305,7 @@ function RecordAuditBody({
   duplicates?: string[]
   intl: IntlShape
   scope: Scope | null
-  userDetails: User | null
+  userDetails: UserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
   tab: IRecordAuditTabs

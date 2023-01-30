@@ -52,9 +52,9 @@ import {
   RegStatus,
   User,
   History,
-  User as UserType,
   HumanName
 } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 export interface IDeclarationData {
   id: string
@@ -407,7 +407,7 @@ export function getStatusLabel(
   regStatus: Maybe<RegStatus> | undefined,
   intl: IntlShape,
   performedBy: Maybe<User> | undefined,
-  loggedInUser: UserType | null
+  loggedInUser: UserDetails | null
 ) {
   if (action) {
     return intl.formatMessage(regActionMessages[action], {

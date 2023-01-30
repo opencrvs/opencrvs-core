@@ -50,8 +50,8 @@ import {
   SEARCH_RESULT_SORT,
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
-import { getUserLocation } from '@client/utils/userUtils'
-import { User, SearchEventsQuery, RoleType } from '@client/utils/gateway'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { SearchEventsQuery, RoleType } from '@client/utils/gateway'
 
 import {
   ColumnContentAlignment,
@@ -134,7 +134,7 @@ interface IBaseSearchResultProps {
   language: string
   scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: User | null
+  userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction

@@ -25,8 +25,7 @@ import { AvatarChangeModal } from '@client/views/Settings/AvatarChangeModal'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { useUserName } from '@client/utils/userUtils'
-import { User } from '@client/utils/gateway'
+import { UserDetails, useUserName } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
 
@@ -57,7 +56,7 @@ export function ProfileImage() {
 
   const englishName = useUserName()
 
-  const userDetails = useSelector<IStoreState, User | null>(getUserDetails)
+  const userDetails = useSelector<IStoreState, UserDetails | null>(getUserDetails)
   const dispatch = useDispatch()
 
   const changeAvatar = React.useCallback(

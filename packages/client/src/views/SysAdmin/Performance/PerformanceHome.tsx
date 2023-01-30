@@ -30,7 +30,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subMonths from 'date-fns/subMonths'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { Event, User } from '@client/utils/gateway'
+import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { Query } from '@client/components/Query'
@@ -76,6 +76,7 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Layout = styled.div`
   display: flex;
@@ -219,7 +220,7 @@ interface IDispatchProps {
 type Props = WrappedComponentProps &
   IDispatchProps &
   IOnlineStatusProps &
-  RouteComponentProps & { userDetails: User | null } & IConnectProps & {
+  RouteComponentProps & { userDetails: UserDetails | null } & IConnectProps & {
     theme: ITheme
   }
 
