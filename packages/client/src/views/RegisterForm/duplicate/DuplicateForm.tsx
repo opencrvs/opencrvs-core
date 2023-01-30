@@ -122,6 +122,7 @@ export const DuplicateForm = (props: IProps) => {
             key="not-duplicateRegistration-confirm"
             onClick={() => {
               if (duplicates) {
+                withoutDuplicates.isNotDuplicate = true
                 updateDeclaration(dispatch, withoutDuplicates)
               }
               toggleNotDuplicateModal()

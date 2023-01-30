@@ -221,6 +221,7 @@ export interface IDeclaration {
   timeLoggedMS?: number
   writingDraft?: boolean
   operationHistories?: ITaskHistory[]
+  isNotDuplicate?: boolean
 }
 
 type Relation =

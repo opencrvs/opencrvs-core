@@ -1182,7 +1182,7 @@ export type Mutation = {
   markEventAsUnassigned: Scalars['ID']
   markEventAsVoided: Scalars['ID']
   modifyDraftStatus?: Maybe<FormDraft>
-  notADuplicate: Scalars['ID']
+  markEventAsNotDuplicate: Scalars['ID']
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
@@ -1337,8 +1337,7 @@ export type MutationModifyDraftStatusArgs = {
   formDraft: FormDraftStatusModifyInput
 }
 
-export type MutationNotADuplicateArgs = {
-  duplicateId: Scalars['String']
+export type MutationMarkEventAsNotDuplicateArgs = {
   id: Scalars['String']
 }
 
@@ -3111,6 +3110,15 @@ export type MarkEventAsArchivedMutationVariables = Exact<{
 export type MarkEventAsArchivedMutation = {
   __typename?: 'Mutation'
   markEventAsArchived: string
+}
+
+export type MarkEventAsNotDuplicateMutationVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type MarkEventAsNotDuplicateMutation = {
+  __typename?: 'Mutation'
+  markEventAsNotDuplicate: string
 }
 
 export type MarkBirthAsCertifiedMutationVariables = Exact<{

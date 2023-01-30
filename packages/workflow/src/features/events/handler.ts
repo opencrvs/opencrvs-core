@@ -15,7 +15,8 @@ import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
   hasDeathRegistrationNumber,
-  forwardToHearth
+  forwardToHearth,
+  updateHearthWithExtension
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   createRegistrationHandler,
@@ -46,7 +47,8 @@ import {
   DOWNLOADED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARKED_AS_NOT_DUPLICATE
 } from '@workflow/features/task/fhir/constants'
 import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
@@ -201,6 +203,9 @@ function detectEvent(request: Hapi.Request): Events {
     if (hasExtension(taskResource, VIEWED_EXTENSION_URL)) {
       return Events.VIEWED
     }
+    if (hasExtension(taskResource, MARKED_AS_NOT_DUPLICATE)) {
+      return Events.EVENT_NOT_DUPLICATE
+    }
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
       if (hasExtension(taskResource, REINSTATED_EXTENSION_URL)) {
@@ -224,11 +229,6 @@ function detectEvent(request: Hapi.Request): Events {
       }
     }
   }
-
-  if (request.method === 'put' && request.path.includes('/fhir/Composition')) {
-    return Events.EVENT_NOT_DUPLICATE
-  }
-
   return Events.UNKNOWN
 }
 
@@ -417,7 +417,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(event, request.payload, request.headers)
       break
     case Events.EVENT_NOT_DUPLICATE:
-      response = await forwardToHearth(request, h)
+      response = await updateHearthWithExtension(request, h)
       await triggerEvent(
         Events.EVENT_NOT_DUPLICATE,
         request.payload,

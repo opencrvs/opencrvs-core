@@ -427,3 +427,29 @@ export async function mergePatientIdentifier(bundle: fhir.Bundle) {
       })
   }
 }
+
+export async function updateHearthWithExtension(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  logger.info(
+    `Forwarding to Hearth unchanged: ${request.method} ${request.path}`
+  )
+
+  const payload = request.payload as fhir.Bundle & { entry: fhir.BundleEntry[] }
+  const res = await Promise.all(
+    payload.entry.map((entry) => {
+      return fetch(
+        `${HEARTH_URL}/${entry.resource?.resourceType}/${entry.resource?.id}`,
+        {
+          method: 'PUT',
+          body: JSON.stringify(entry.resource),
+          headers: {
+            'Content-Type': 'application/fhir+json'
+          }
+        }
+      )
+    })
+  )
+  return res[res.length - 1]
+}

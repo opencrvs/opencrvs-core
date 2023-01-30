@@ -68,7 +68,7 @@ export interface GQLMutation {
   markEventAsVoided: string
   markEventAsReinstated?: GQLReinstated
   markEventAsArchived: string
-  notADuplicate: string
+  markEventAsNotDuplicate: string
   createDeathRegistration: GQLCreatedIds
   updateDeathRegistration: string
   markDeathAsVerified?: GQLDeathRegistration
@@ -2557,7 +2557,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   markEventAsReinstated?: MutationToMarkEventAsReinstatedResolver<TParent>
   markEventAsArchived?: MutationToMarkEventAsArchivedResolver<TParent>
-  notADuplicate?: MutationToNotADuplicateResolver<TParent>
+  markEventAsNotDuplicate?: MutationToMarkEventAsNotDuplicateResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
   updateDeathRegistration?: MutationToUpdateDeathRegistrationResolver<TParent>
   markDeathAsVerified?: MutationToMarkDeathAsVerifiedResolver<TParent>
@@ -2780,14 +2780,16 @@ export interface MutationToMarkEventAsArchivedResolver<
   ): TResult
 }
 
-export interface MutationToNotADuplicateArgs {
+export interface MutationToMarkEventAsNotDuplicateArgs {
   id: string
-  duplicateId: string
 }
-export interface MutationToNotADuplicateResolver<TParent = any, TResult = any> {
+export interface MutationToMarkEventAsNotDuplicateResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
-    args: MutationToNotADuplicateArgs,
+    args: MutationToMarkEventAsNotDuplicateArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

@@ -33,6 +33,7 @@ import { IForm, SubmissionAction } from '@client/forms'
 import { showUnassigned } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ApolloError } from '@apollo/client'
+import { NOT_A_DUPLICATE } from '@client/views/DataProvider/mutation'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -79,6 +80,26 @@ function updateWorkqueue(store: IStoreState, dispatch: Dispatch) {
   dispatch(updateRegistrarWorkqueue(userId, 10, isFieldAgent))
 }
 
+async function removeDuplicatesFromCompositionAndElastic(
+  declaration: IDeclaration,
+  submissionAction: SubmissionAction
+) {
+  if (
+    declaration.isNotDuplicate &&
+    [
+      SubmissionAction.REGISTER_DECLARATION,
+      SubmissionAction.REJECT_DECLARATION
+    ].includes(submissionAction)
+  ) {
+    await client.mutate({
+      mutation: NOT_A_DUPLICATE,
+      variables: {
+        id: declaration.id
+      }
+    })
+  }
+}
+
 export const submissionMiddleware: Middleware<{}, IStoreState> =
   ({ dispatch, getState }) =>
   (next) =>
@@ -110,6 +131,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           }
         })
       } else if (submissionAction === SubmissionAction.REJECT_DECLARATION) {
+        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
         await client.mutate({
           mutation,
           variables: {
@@ -117,6 +139,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           }
         })
       } else {
+        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
         await client.mutate({
           mutation,
           variables: {

@@ -1004,7 +1004,7 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export function removeDuplicatesFromComposition(
+export async function removeDuplicatesFromComposition(
   composition: fhir.Composition,
   compositionId: string,
   duplicateId?: string
@@ -1023,10 +1023,8 @@ export function removeDuplicatesFromComposition(
         )
       })
     composition.relatesTo = updatedRelatesTo
-    return composition
   } else {
     composition.relatesTo = []
-    return composition
   }
 }
 
