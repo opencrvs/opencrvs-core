@@ -23,19 +23,27 @@ jest.setTimeout(10 * 60 * 1000)
 
 let container: StartedElasticsearchContainer
 let client: elasticsearch.Client
+
 beforeAll(async () => {
   container = await startContainer()
+  const host = container?.getHost() ?? '0.0.0.0'
+  const port = container?.getMappedPort(9200) ?? 9200
+
+  client = new elasticsearch.Client({
+    node: `http://${host}:${port}`
+  })
 })
-afterAll(async () => stopContainer(container))
+
 describe('Elastic Search Test Container Automation', () => {
+  afterAll(async () => {
+    try {
+      await client.close()
+    } catch (error) {
+    } finally {
+      await stopContainer(container)
+    }
+  })
   it('should check elasticsearch is up', async () => {
-    const host = container?.getHost() ?? '0.0.0.0'
-    const port = container?.getMappedPort(9200) ?? 9200
-
-    client = new elasticsearch.Client({
-      node: `http://${host}:${port}`
-    })
-
     await client.ping()
   })
 

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+// @ts-ignore
 import {
   indexComposition,
   updateComposition,
@@ -20,35 +21,36 @@ import { logger } from '@search/logger'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 import * as elasticsearch from '@elastic/elasticsearch'
 import { StartedElasticsearchContainer } from 'testcontainers'
+// @ts-ignore
 import {
   startContainer,
   stopContainer
 } from '@search/features/registration/deduplicate/elasticSearchTestContainer'
 
 jest.setTimeout(10 * 60 * 1000)
-let container: StartedElasticsearchContainer
-let client: elasticsearch.Client
 
-beforeAll(async () => (container = await startContainer()))
-afterAll(async () => await stopContainer(container))
 describe('elasticsearch db helper', () => {
   let indexSpy: jest.SpyInstance<any, any[]>
   let updateSpy: jest.SpyInstance<any, any[]>
   let searchSpy: jest.SpyInstance<any, any[]>
-  it.only('should check elasticsearch is up', async () => {
-    const host = container?.getHost() ?? '0.0.0.0'
-    const port = container?.getMappedPort(9200) ?? 9200
-
-    client = new elasticsearch.Client({
-      node: `http://${host}:${port}`
-    })
-
-    await client.ping()
-  })
+  let container: StartedElasticsearchContainer
+  let client: elasticsearch.Client
 
   describe('elasticsearch db helper', () => {
     beforeAll(async () => {
       logger.error = jest.fn()
+
+      container = await startContainer()
+      const host = container?.getHost() ?? '0.0.0.0'
+      const port = container?.getMappedPort(9200) ?? 9200
+
+      client = new elasticsearch.Client({
+        node: `http://${host}:${port}`
+      })
+    })
+
+    it('should check elasticsearch is up', async () => {
+      await client.ping()
     })
 
     it('should index a composition with proper configuration', async () => {
@@ -104,9 +106,15 @@ describe('elasticsearch db helper', () => {
       expect(searchSpy).toBeCalled()
     })
 
-    afterAll(() => {
-      indexSpy.mockRestore()
-      searchSpy.mockRestore()
+    afterAll(async () => {
+      try {
+        indexSpy.mockRestore()
+        searchSpy.mockRestore()
+        await client.close()
+      } catch (error) {
+      } finally {
+        await stopContainer(container)
+      }
     })
   })
 })
