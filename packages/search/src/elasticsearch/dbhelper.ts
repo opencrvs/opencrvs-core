@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { client, ISearchResponse } from '@search/elasticsearch/client'
+import { ISearchResponse } from '@search/elasticsearch/client'
+import * as elastic from '@elastic/elasticsearch'
 import {
   IBirthCompositionBody,
   ICompositionBody
@@ -20,7 +21,8 @@ import { logger } from '@search/logger'
 
 export const indexComposition = async (
   compositionIdentifier: string,
-  body: ICompositionBody
+  body: ICompositionBody,
+  client: elastic.Client
 ) => {
   let response: any
   try {
@@ -38,7 +40,11 @@ export const indexComposition = async (
   return response
 }
 
-export const updateComposition = async (id: string, body: ICompositionBody) => {
+export const updateComposition = async (
+  id: string,
+  body: ICompositionBody,
+  client: elastic.Client
+) => {
   let response: any
   try {
     response = await client.update({
@@ -57,7 +63,10 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
   return response
 }
 
-export const searchForDuplicates = async (body: IBirthCompositionBody) => {
+export const searchForDuplicates = async (
+  body: IBirthCompositionBody,
+  client: elastic.Client
+) => {
   try {
     return await client.search<ISearchResponse<IBirthCompositionBody>>({
       index: OPENCRVS_INDEX_NAME,
@@ -191,7 +200,10 @@ export const searchForDuplicates = async (body: IBirthCompositionBody) => {
   }
 }
 
-export const searchByCompositionId = async (compositionId: string) => {
+export const searchByCompositionId = async (
+  compositionId: string,
+  client: elastic.Client
+) => {
   try {
     const response = await client.search<ISearchResponse<any>>({
       index: OPENCRVS_INDEX_NAME,

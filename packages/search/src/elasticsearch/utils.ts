@@ -93,6 +93,10 @@ export interface ICompositionBody {
   childFirstNames?: string
   childFamilyName?: string
   childFirstNamesLocal?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  childDoB?: string
   createdBy?: string
   updatedBy?: string
   createdAt?: string
