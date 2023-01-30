@@ -240,6 +240,13 @@ export const ActionDetailsModalListTable = ({
       width: 100
     }
   ]
+  const duplicateOfColumn = [
+    {
+      key: 'duplicateOf',
+      label: intl.formatMessage(constantsMessages.duplicateOf),
+      width: 100
+    }
+  ]
 
   const getItemName = (
     sectionName: MessageDescriptor,
@@ -481,6 +488,15 @@ export const ActionDetailsModalListTable = ({
             ]}
           />
         )}
+
+      {/* Duplicate of */}
+      {actionDetailsData.duplicateOf && (
+        <Table
+          noResultText=" "
+          columns={duplicateOfColumn}
+          content={[{ duplicateOf: actionDetailsData.duplicateOf }]}
+        />
+      )}
 
       {/* For Comments */}
       {content.length > 0 && (

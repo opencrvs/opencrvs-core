@@ -788,6 +788,7 @@ export interface GQLHistory {
   output?: Array<GQLInputOutput | null>
   certificates?: Array<GQLCertificate | null>
   signature?: GQLSignature
+  duplicateOf?: string
 }
 
 export const enum GQLMannerOfDeath {
@@ -1340,7 +1341,8 @@ export const enum GQLRegAction {
   REINSTATED = 'REINSTATED',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   DOWNLOADED = 'DOWNLOADED',
-  VIEWED = 'VIEWED'
+  VIEWED = 'VIEWED',
+  MARKED_AS_DUPLICATE = 'MARKED_AS_DUPLICATE'
 }
 
 export interface GQLStatusReason {
@@ -5176,6 +5178,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   output?: HistoryToOutputResolver<TParent>
   certificates?: HistoryToCertificatesResolver<TParent>
   signature?: HistoryToSignatureResolver<TParent>
+  duplicateOf?: HistoryToDuplicateOfResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -5253,6 +5256,10 @@ export interface HistoryToCertificatesResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToSignatureResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToDuplicateOfResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

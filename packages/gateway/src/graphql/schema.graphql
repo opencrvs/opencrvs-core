@@ -917,6 +917,7 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  duplicateOf: String
 }
 
 enum MannerOfDeath {
@@ -1448,6 +1449,7 @@ enum RegAction {
   REQUESTED_CORRECTION
   DOWNLOADED
   VIEWED
+  MARKED_AS_DUPLICATE
 }
 
 type StatusReason {

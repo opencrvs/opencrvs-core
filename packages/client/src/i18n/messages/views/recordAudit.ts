@@ -226,6 +226,11 @@ const actionMessagesToDefine: Record<RegAction, MessageDescriptor> = {
     id: 'recordAudit.regAction.viewed',
     defaultMessage: 'Viewed',
     description: 'Viewed Record action'
+  },
+  MARKED_AS_DUPLICATE: {
+    id: 'recordAudit.regAction.markedAsDuplicate',
+    defaultMessage: 'Marked as a duplicate',
+    description: 'Marked as a duplicate status message for record audit'
   }
 }
 
