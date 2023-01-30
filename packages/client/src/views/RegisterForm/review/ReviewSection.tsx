@@ -158,7 +158,7 @@ import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateFor
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
 `
-const RequiredField = styled.span`
+export const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   display: inline-block;
   text-transform: lowercase;
@@ -212,7 +212,7 @@ const LeftColumn = styled.div`
   }
 `
 
-const ZeroDocument = styled.div`
+export const ZeroDocument = styled.div`
   ${({ theme }) => theme.fonts.reg18};
   display: flex;
   flex-direction: column;
@@ -221,6 +221,8 @@ const ZeroDocument = styled.div`
 `
 
 const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
+  position: fixed;
+  width: fill-available;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
     margin-bottom: 11px;
@@ -470,7 +472,7 @@ type State = {
   previewImage: IFileValue | null
 }
 
-interface IErrorsBySection {
+export interface IErrorsBySection {
   [sectionId: string]: Errors
 }
 
@@ -720,7 +722,7 @@ const renderValue = (
   return value
 }
 
-const getErrorsOnFieldsBySection = (
+export const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   offlineCountryConfig: IOfflineData,
   draft: IDeclaration
@@ -766,7 +768,7 @@ const getErrorsOnFieldsBySection = (
   }, {})
 }
 
-const SECTION_MAPPING = {
+export const SECTION_MAPPING = {
   [Event.Birth]: birthSectionMapping,
   [Event.Death]: deathSectionMapping
 }
@@ -2013,7 +2015,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 )}
 
                 {offlineCountryConfiguration.config.INFORMANT_SIGNATURE &&
-                  !isCorrection(declaration) && (
+                  !isCorrection(declaration) &&
+                  !isDuplicate &&
+                  !viewRecord && (
                     <InputWrapper>
                       <InputField
                         id="informant_signature"

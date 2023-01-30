@@ -18,6 +18,7 @@ interface IDuplicateDeclarationMessages
   duplicateContentSubtitle: MessageDescriptor
   notDuplicateButton: MessageDescriptor
   markAsDuplicateButton: MessageDescriptor
+  duplicateComparePageTitle: MessageDescriptor
 }
 
 const messagesToDefine: IDuplicateDeclarationMessages = {
@@ -46,6 +47,16 @@ const messagesToDefine: IDuplicateDeclarationMessages = {
     id: 'duplicates.button.markAsDuplicate',
     defaultMessage: 'Mark as duplicate',
     description: 'Mark as duplicate button text'
+  },
+  duplicateComparePageTitle: {
+    id: 'duplicates.compare.title',
+    defaultMessage: 'Review {actualTrackingId} against {duplicateTrackingId}',
+    description: 'Duplicate compare page title message'
+  },
+  duplicateComparePageSupportingDocuments: {
+    id: 'duplicates.compare.supportingDocuments',
+    defaultMessage: 'Supporting documents',
+    description: 'Supporting documents header for duplicates comparison'
   }
 }
 

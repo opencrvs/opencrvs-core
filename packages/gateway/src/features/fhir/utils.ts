@@ -1420,8 +1420,7 @@ export function isBase64FileString(str: string) {
   return strSplit.length > 0 && strSplit[0] === 'data'
 }
 
-export async function fetchCompositionByIdFromHearth(id: string) {
-  const composition = await fetchFromHearth(`/Composition/${id}`)
-
-  return composition
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
+  const task = await fetchFromHearth(`/Task?focus=Composition/${id}`)
+  return task
 }

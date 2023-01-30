@@ -50,17 +50,25 @@ export const ComparisonListView = ({
   ...props
 }: IComparisonListProps) => {
   return (
-    <>
+    <React.Fragment>
       <Grid {...props} headingCount={headings.length + 1}>
         {[
           <HideOnSmallScreen></HideOnSmallScreen>,
-          ...headings.map((heading) => (
-            <HideOnSmallScreen>{heading}</HideOnSmallScreen>
+          ...headings.map((heading, index) => (
+            <HideOnSmallScreen>
+              <Text
+                variant="reg16"
+                element="span"
+                color={index ? 'grey600' : 'negative'}
+              >
+                {heading}
+              </Text>
+            </HideOnSmallScreen>
           ))
         ]}
         {children}
       </Grid>
-    </>
+    </React.Fragment>
   )
 }
 
