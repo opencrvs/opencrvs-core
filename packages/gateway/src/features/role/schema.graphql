@@ -20,9 +20,9 @@ type Role {
 
 type SystemRole {
   id: ID!
-  value: String
-  roles: [Role!]
-  active: Boolean
+  value: String!
+  roles: [Role!]!
+  active: Boolean!
 }
 
 input ComparisonInput {
@@ -42,14 +42,14 @@ input LabelInput {
 }
 
 input RoleInput {
-  labels: [LabelInput]!
+  labels: [LabelInput!]!
 }
 
 input SystemRoleInput {
   id: ID!
   value: String
   active: Boolean
-  roles: [RoleInput]
+  roles: [RoleInput!]
 }
 
 type Response {

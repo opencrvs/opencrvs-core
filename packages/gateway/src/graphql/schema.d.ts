@@ -427,9 +427,9 @@ export interface GQLEventProgressResultSet {
 
 export interface GQLSystemRole {
   id: string
-  value?: string
-  roles?: Array<GQLRole>
-  active?: boolean
+  value: string
+  roles: Array<GQLRole>
+  active: boolean
 }
 
 export interface GQLComparisonInput {
@@ -593,7 +593,7 @@ export interface GQLSystemRoleInput {
   id: string
   value?: string
   active?: boolean
-  roles?: Array<GQLRoleInput | null>
+  roles?: Array<GQLRoleInput>
 }
 
 export interface GQLCertificateSVGInput {
@@ -1216,7 +1216,7 @@ export interface GQLSignatureInput {
 }
 
 export interface GQLRoleInput {
-  labels: Array<GQLLabelInput | null>
+  labels: Array<GQLLabelInput>
 }
 
 export interface GQLBirth {

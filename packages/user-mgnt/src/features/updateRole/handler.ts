@@ -97,15 +97,13 @@ export default async function updateRole(
 }
 
 async function updateParticularRoles(roles: IRoleRequest[]) {
-  const ids: Types.ObjectId[] = []
+  const roleIds = roles.map((role) => new Types.ObjectId(role._id))
 
-  for (const role of roles) {
-    const id = new Types.ObjectId(role._id)
-    ids.push(id)
-    await UserRole.updateOne({ _id: id.toString() }, role, {
-      upsert: true
-    })
-  }
+  await Promise.all(
+    roles.map((role) =>
+      UserRole.updateOne({ _id: roleIds.toString() }, role, { upsert: true })
+    )
+  )
 
-  return ids
+  return roleIds
 }

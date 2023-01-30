@@ -546,9 +546,9 @@ type EventProgressResultSet {
 
 type SystemRole {
   id: ID!
-  value: String
-  roles: [Role!]
-  active: Boolean
+  value: String!
+  roles: [Role!]!
+  active: Boolean!
 }
 
 input ComparisonInput {
@@ -712,7 +712,7 @@ input SystemRoleInput {
   id: ID!
   value: String
   active: Boolean
-  roles: [RoleInput]
+  roles: [RoleInput!]
 }
 
 input CertificateSVGInput {
@@ -1313,7 +1313,7 @@ input SignatureInput {
 }
 
 input RoleInput {
-  labels: [LabelInput]!
+  labels: [LabelInput!]!
 }
 
 type Birth {
