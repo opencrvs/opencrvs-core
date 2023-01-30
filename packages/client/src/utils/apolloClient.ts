@@ -14,24 +14,30 @@ import {
   InMemoryCache,
   ApolloLink,
   from,
-  createHttpLink
+  createHttpLink,
+  NormalizedCacheObject
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
 import { resolve } from 'url'
 import { showSessionExpireConfirmation } from '@client/notification/actions'
-import { persistCache, LocalForageWrapper } from 'apollo3-cache-persist'
 
 import { IStoreState } from '@client/store'
 import { AnyAction, Store } from 'redux'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
+import * as React from 'react'
+import { CachePersistor, LocalForageWrapper } from 'apollo3-cache-persist'
 import * as localforage from 'localforage'
+import { createPersistLink, persistenceMapper } from '@client/utils/persistence'
 
 export let client: any = { mutate: () => {}, query: () => {} }
 
-export const createClient = async (store: Store<IStoreState, AnyAction>) => {
+export const createClient = (
+  store: Store<IStoreState, AnyAction>,
+  restoredCache?: InMemoryCache
+) => {
   const httpLink = createHttpLink({
     uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
   })
@@ -66,17 +72,48 @@ export const createClient = async (store: Store<IStoreState, AnyAction>) => {
   })
 
   const timeoutLink = new TimeoutLink() as ApolloLink
-  const cache = new InMemoryCache()
-
-  // await before instantiating ApolloClient, else queries might run before the cache is persisted
-  await persistCache({
-    cache,
-    storage: new LocalForageWrapper(localforage)
-  })
+  const persistLink = createPersistLink()
+  const cache = restoredCache || new InMemoryCache()
 
   client = new ApolloClient({
-    link: from([errorLink, timeoutLink, authLink, httpLink]),
+    link: from([errorLink, timeoutLink, authLink, persistLink, httpLink]),
     cache
   })
   return client
+}
+
+export function useApolloClient(store: Store<IStoreState, AnyAction>) {
+  const [client, setClient] = React.useState<
+    ApolloClient<NormalizedCacheObject>
+  >(new ApolloClient({ cache: new InMemoryCache() }))
+  const [persistor, setPersistor] =
+    React.useState<CachePersistor<NormalizedCacheObject>>()
+  const clearCache = React.useCallback(() => {
+    if (!persistor) {
+      return
+    }
+    persistor.purge()
+  }, [persistor])
+
+  React.useEffect(() => {
+    async function init() {
+      const cache = new InMemoryCache()
+      const newPersistor = new CachePersistor({
+        cache,
+        storage: new LocalForageWrapper(localforage),
+        trigger: 'write',
+        persistenceMapper
+      })
+      await newPersistor.restore()
+      setPersistor(newPersistor)
+      setClient(createClient(store, cache))
+    }
+
+    init()
+  }, [store])
+
+  return {
+    client,
+    clearCache
+  }
 }
