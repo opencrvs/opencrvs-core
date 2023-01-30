@@ -42,6 +42,15 @@ const mockUser = {
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   systemRole: 'LOCAL_REGISTRAR',
+  role: {
+    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    labels: [
+      {
+        lang: 'en',
+        label: 'LOCAL REGISTRAR'
+      }
+    ]
+  },
   primaryOfficeId: '321',
   catchmentAreaIds: [],
   scope: ['register'],
@@ -118,7 +127,7 @@ describe('createUser handler', () => {
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'FIELD_AGENT',
-        role: 'HEALTHCARE_WORKER',
+        role: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
         primaryOfficeId: '321',
         catchmentAreaIds: [],
         deviceId: 'D444',
@@ -155,7 +164,7 @@ describe('createUser handler', () => {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'HEALTHCARE_WORKER'
+              code: 'Field Agent'
             }
           ]
         }

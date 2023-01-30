@@ -45,6 +45,15 @@ const mockUser: IUser & { _id: string } = {
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   systemRole: 'LOCAL_REGISTRAR',
+  role: {
+    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    labels: [
+      {
+        lang: 'en',
+        label: 'LOCAL REGISTRAR'
+      }
+    ]
+  },
   status: 'pending',
   primaryOfficeId: '321',
   catchmentAreaIds: [],

@@ -45,6 +45,15 @@ const dummyUserList = [
       'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
     salt: '12345',
     systemRole: 'FIELD_AGENT',
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'Field Agent'
+        }
+      ]
+    },
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
     primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -71,6 +80,15 @@ const dummyUserList = [
       'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
     salt: '12345',
     systemRole: 'FIELD_AGENT',
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'Field Agent'
+        }
+      ]
+    },
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
     primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -112,6 +130,7 @@ const dummyUserList = [
 describe('searchUsers tests', () => {
   it('Successfully returns full user list', async () => {
     User.find = jest.fn().mockReturnValue(dummyUserList)
+    User.find().populate = jest.fn().mockReturnValue(dummyUserList)
     User.find().skip = jest.fn().mockReturnValue(dummyUserList)
     User.find().skip(0).limit = jest.fn().mockReturnValue(dummyUserList)
     User.find().skip(0).limit(10).sort = jest
@@ -134,6 +153,7 @@ describe('searchUsers tests', () => {
   it('Successfully returns filtered user list', async () => {
     const filteredUserList = [dummyUserList[2]]
     User.find = jest.fn().mockReturnValue(filteredUserList)
+    User.find().populate = jest.fn().mockReturnValue(filteredUserList)
     User.find().skip = jest.fn().mockReturnValue(filteredUserList)
     User.find().skip(0).limit = jest.fn().mockReturnValue(filteredUserList)
     User.find().skip(0).limit(10).sort = jest
