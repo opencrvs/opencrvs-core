@@ -16,23 +16,44 @@ import {
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import { mockCompositionBody } from '@search/test/utils'
-import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
+import * as elasticsearch from '@elastic/elasticsearch'
+import { StartedElasticsearchContainer } from 'testcontainers'
+import {
+  startContainer,
+  stopContainer
+} from '@search/features/registration/deduplicate/elasticSearchTestContainer'
 
+jest.setTimeout(10 * 60 * 1000)
+let container: StartedElasticsearchContainer
+let client: elasticsearch.Client
+
+beforeAll(async () => (container = await startContainer()))
+afterAll(async () => stopContainer(container).then())
 describe('elasticsearch db helper', () => {
   let indexSpy: jest.SpyInstance<any, any[]>
   let updateSpy: jest.SpyInstance<any, any[]>
   let searchSpy: jest.SpyInstance<any, any[]>
+  it.only('should check elasticsearch is up', async () => {
+    const host = container?.getHost() ?? '0.0.0.0'
+    const port = container?.getMappedPort(9200) ?? 9200
+
+    client = new elasticsearch.Client({
+      node: `http://${host}:${port}`
+    })
+
+    await client.ping()
+  })
 
   describe('elasticsearch db helper', () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       logger.error = jest.fn()
     })
 
     it('should index a composition with proper configuration', async () => {
       indexSpy = jest.spyOn(client, 'index')
-      indexComposition('testId', mockCompositionBody)
+      await indexComposition('testId', mockCompositionBody, client)
 
       expect(indexSpy).toBeCalled()
       expect(indexSpy).toBeCalledWith({
@@ -49,7 +70,7 @@ describe('elasticsearch db helper', () => {
         childFirstNames: 'testValue'
       }
       updateSpy = jest.spyOn(client, 'update')
-      updateComposition('testId', body)
+      await updateComposition('testId', body, client)
       expect(updateSpy).toBeCalled()
       expect(updateSpy).toBeCalledWith({
         index: 'ocrvs',
@@ -64,7 +85,7 @@ describe('elasticsearch db helper', () => {
 
     it('should perform search for composition', async () => {
       searchSpy = jest.spyOn(client, 'search')
-      searchForDuplicates(mockCompositionBody)
+      await searchForDuplicates(mockCompositionBody, client)
       if (
         searchSpy.mock &&
         searchSpy.mock.calls[0] &&
@@ -77,8 +98,8 @@ describe('elasticsearch db helper', () => {
       expect(searchSpy).toBeCalled()
     })
 
-    it('should perform search by compostion id', async () => {
-      searchByCompositionId('r1324-sd6k2-12121-1212')
+    it('should perform search by composition id', async () => {
+      await searchByCompositionId('r1324-sd6k2-12121-1212', client)
       expect(searchSpy.mock.calls[0][0].body.query).toBeDefined()
       expect(searchSpy).toBeCalled()
     })

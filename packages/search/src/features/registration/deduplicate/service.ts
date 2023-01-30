@@ -23,6 +23,7 @@ import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { logger } from '@search/logger'
 import { subYears, addYears } from 'date-fns'
+import * as elasticsearch from '@elastic/elasticsearch'
 
 export const removeDuplicate = async (bundle: fhir.Bundle) => {
   const compositionId = bundle.id
@@ -30,10 +31,10 @@ export const removeDuplicate = async (bundle: fhir.Bundle) => {
   if (!compositionId) {
     throw new Error('No Composition ID found')
   }
-  const composition = await searchByCompositionId(compositionId)
+  const composition = await searchByCompositionId(compositionId, client)
   const body = get(composition, 'body.hits.hits[0]._source') as ICompositionBody
   body.relatesTo = extractRelatesToIDs(bundle)
-  await updateComposition(compositionId, body)
+  await updateComposition(compositionId, body, client)
 }
 
 const extractRelatesToIDs = (bundle: fhir.Bundle) => {
@@ -52,7 +53,10 @@ const extractRelatesToIDs = (bundle: fhir.Bundle) => {
  * @param { IBirthCompositionBody } body -  Params
  * @returns { Promise<ApiResponse<ISearchResponse<IBirthCompositionBody>, Context>> } -  Promise
  * **/
-export const searchForDuplicates = async (body: IBirthCompositionBody) => {
+export const searchForDuplicates = async (
+  body: IBirthCompositionBody,
+  client: elasticsearch.Client
+) => {
   try {
     return await client.search<ISearchResponse<IBirthCompositionBody>>({
       index: OPENCRVS_INDEX_NAME,

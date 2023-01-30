@@ -11,22 +11,22 @@
  */
 
 import { startContainer, stopContainer } from './elasticSearchTestContainer'
+// @ts-ignore
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
+// @ts-ignore
 import { indexComposition } from '@search/elasticsearch/dbhelper'
-import * as elastic from '@elastic/elasticsearch'
+import * as elasticsearch from '@elastic/elasticsearch'
 import { searchForDuplicates } from './service'
 import { StartedElasticsearchContainer } from 'testcontainers'
 
 jest.setTimeout(10 * 60 * 1000)
 
-let container: StartedElasticsearchContainer
-
-beforeAll(async () => {
-  container = await startContainer()
-})
-afterAll(async () => await stopContainer(container))
-
 describe('Elastic Search Test Container Automation', () => {
+  let container: StartedElasticsearchContainer
+  let client: elasticsearch.Client
+  beforeAll(async () => {
+    container = await startContainer()
+  })
   const exampleBirthRegistrationA: IBirthCompositionBody = {
     childFirstNames: 'John',
     childFamilyName: 'Smith',
@@ -44,7 +44,7 @@ describe('Elastic Search Test Container Automation', () => {
     const host = container?.getHost() ?? '0.0.0.0'
     const port = container?.getMappedPort(9200) ?? 9200
 
-    const client = new elastic.Client({
+    client = new elasticsearch.Client({
       node: `http://${host}:${port}`
     })
 
@@ -52,13 +52,24 @@ describe('Elastic Search Test Container Automation', () => {
   })
 
   it('should makes sure similar names are marked as a duplicate', async () => {
-    await indexComposition('testBirthRegistrationId', exampleBirthRegistrationA)
+    await indexComposition(
+      'testBirthRegistrationId',
+      exampleBirthRegistrationA,
+      client
+    )
     expect(
-      await searchForDuplicates({
-        ...exampleBirthRegistrationB,
-        childFirstNames: 'John',
-        childFamilyName: 'Smith'
-      })
+      (
+        await searchForDuplicates(
+          {
+            ...exampleBirthRegistrationB,
+            childFirstNames: 'John',
+            childFamilyName: 'Smith'
+          },
+          client
+        )
+      ).body.hits.hits
     ).toHaveLength(1)
   })
+
+  afterAll(async () => await stopContainer(container))
 })
