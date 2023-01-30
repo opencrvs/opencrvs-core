@@ -96,7 +96,10 @@ import {
 import resetPasswordSMSHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
-import updateRole from '@user-mgnt/features/updateRole/handler'
+import updateRole, {
+  systemRoleResponseSchema,
+  systemRolesRequestSchema
+} from '@user-mgnt/features/updateRole/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -715,15 +718,17 @@ export const getRoutes = () => {
       handler: updateRole,
       config: {
         tags: ['api'],
-        description: 'Update user role for particular system role ',
+        description: 'Update user role for particular system role',
         notes: 'This is responsible for update userRole',
-        auth: false
-        /* validate: {
-          payload: clientIdSchema
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: systemRolesRequestSchema
         },
         response: {
-          schema: SystemSchema
-        }*/
+          schema: systemRoleResponseSchema
+        }
       }
     }
   ]

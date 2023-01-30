@@ -15,6 +15,28 @@ import { Types } from 'mongoose'
 import { logger } from '@user-mgnt/logger'
 import { UserRole } from '@user-mgnt/model/user'
 import SystemRole, { ISystemRoleModel } from '@user-mgnt/model/systemRole'
+import * as Joi from 'joi'
+
+const roleLabelSchema = Joi.object({
+  lang: Joi.string().required(),
+  label: Joi.string().required()
+})
+
+const roleRequestSchema = Joi.object({
+  _id: Joi.string().optional(),
+  labels: Joi.array().items(roleLabelSchema).required()
+})
+
+export const systemRolesRequestSchema = Joi.object({
+  id: Joi.string().required(),
+  value: Joi.string().optional(),
+  roles: Joi.array().items(roleRequestSchema).optional(),
+  active: Joi.boolean().optional()
+})
+
+export const systemRoleResponseSchema = Joi.object({
+  msg: Joi.string().required()
+})
 
 export interface IRoleLabel {
   lang: string

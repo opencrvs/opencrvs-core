@@ -226,20 +226,16 @@ describe('Role root resolvers', () => {
   })
 })
 
-describe('system role update ', () => {
+describe('system role update', () => {
   const mockSystemRole = {
-    _id: '63b3f284452f2e40afa4409e',
-    active: true,
-    value: 'FIELD_AGENT',
-    roles: ['63d27c9e2d06f966f28763fc']
+    systemRole: {
+      _id: '63b3f284452f2e40afa4409e',
+      active: true,
+      value: 'FIELD_AGENT_POLICE',
+      roles: ['63d27c9e2d06f966f28763fc']
+    }
   }
 
-  const mockExpectedSystemRole = {
-    _id: '63b3f284452f2e40afa4409e',
-    active: true,
-    value: 'FIELD_AGENT_POLICE',
-    roles: ['63d27c9e2d06f966f28763fc']
-  }
   const mockUpdateRoleRequest = {
     systemRole: {
       id: '63b3f284452f2e40afa4409e',
@@ -291,8 +287,6 @@ describe('system role update ', () => {
       authHeaderSysAdmin
     )
 
-    console.log(response)
-
-    expect(mockExpectedSystemRole).toEqual(response)
+    expect(mockSystemRole).toEqual(response)
   })
 })
