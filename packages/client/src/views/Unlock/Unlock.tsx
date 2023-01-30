@@ -211,7 +211,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
         <Box id="Box" onClick={this.focusKeypad}>
           <Stack direction="row" justifyContent="flex-end">
             <Button type="icon" onClick={this.logout} id="logout">
-              <Icon name="LogOut" />
+              <Icon name="SignOut" />
             </Button>
           </Stack>
 

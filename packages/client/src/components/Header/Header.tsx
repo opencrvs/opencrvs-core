@@ -356,8 +356,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
-        icon: <Icon name="Award" size="small" />,
-        invertIcon: <Icon name="Award" size="small" />,
+        icon: <Icon name="Medal" size="small" />,
+        invertIcon: <Icon name="Medal" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {

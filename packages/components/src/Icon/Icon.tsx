@@ -22,36 +22,35 @@ enum IconSize {
 
 type IconColor = keyof typeof colors | 'currentColor'
 
+type IconWeight = 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone'
+
 export type IconProps = {
   name: keyof typeof icons
   size?: keyof typeof IconSize
   color?: IconColor
-  fill?: IconColor | 'none'
+  weight?: IconWeight
 }
 
 export function Icon({
   name,
   size = 'medium',
   color = 'currentColor',
-  fill = 'none',
+  weight = 'regular',
   ...rest
 }: IconProps) {
-  const IconComponent = icons[name]
-  console.log('ICON' + icons)
-
+  const IconComponent = icons['' + name]
   return (
-    /*<IconComponent
-      size={IconSize[size]}
+    <IconComponent
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
-      fill={
-        fill === 'none'
-          ? 'none'
-          : fill === 'currentColor'
-          ? 'currentColor'
-          : colors[fill]
-      }
+      size={IconSize[size]}
+      weight={weight}
       {...rest}
-    />*/
-    <></>
+    />
   )
 }
+
+// ChevronRight = CaretRight
+// ChevronDown = CaretDown
+// Search = MagnifyingGlass
+// MessageCircle = ChatCircle
+// LogOut = SignOut
