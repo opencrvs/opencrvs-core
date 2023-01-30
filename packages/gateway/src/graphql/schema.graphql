@@ -330,6 +330,8 @@ type Person {
   deceased: Deceased
   nationality: [String]
   educationalAttainment: EducationType
+  ageOfIndividualInYears: Int
+  exactDateOfBirthUnknown: Boolean
 }
 
 type BirthRegResultSet {
@@ -375,7 +377,7 @@ type User {
   username: String
   mobile: String!
   systemRole: RoleType!
-  role: String!
+  role: Role!
   email: String
   status: Status!
   underInvestigation: Boolean
@@ -724,7 +726,11 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackground
 }
 
 input ApplicationConfigurationInput {
@@ -739,7 +745,11 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INFORMANT_SIGNATURE: Boolean
+  INFORMANT_SIGNATURE_REQUIRED: Boolean
+  DATE_OF_BIRTH_UNKNOWN: Boolean
   ADMIN_LEVELS: Int
+  LOGIN_BACKGROUND: LoginBackgroundInput
 }
 
 input FormDraftInput {
@@ -822,6 +832,7 @@ type Registration {
   assignment: AssignmentData
   contact: String
   contactRelationship: String
+  informantsSignature: String
   contactPhoneNumber: String
   status: [RegWorkflow]
   type: RegistrationType
@@ -838,6 +849,8 @@ type RelatedPerson {
   otherRelationship: String
   affidavit: [Attachment]
   individual: Person
+  exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 enum BirthType {
@@ -1025,6 +1038,11 @@ enum RoleType {
   NATIONAL_REGISTRAR
 }
 
+type Role {
+  _id: ID!
+  labels: [RoleLabel!]!
+}
+
 enum Status {
   active
   deactivated
@@ -1132,11 +1150,6 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
-type Role {
-  value: String!
-  labels: [RoleLabel!]!
-}
-
 enum DraftStatus {
   DRAFT
   IN_PREVIEW
@@ -1192,6 +1205,7 @@ input PersonInput {
   deceased: DeceasedInput
   nationality: [String]
   educationalAttainment: EducationType
+  ageOfIndividualInYears: Int
 }
 
 input LocationInput {
@@ -1220,6 +1234,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantsSignature: String
   informantType: InformantType
   otherInformantType: String
   contact: String
@@ -1241,6 +1256,8 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput!]
   individual: PersonInput
+  exactDateOfBirthUnknown: Boolean
+  ageOfIndividualInYears: Int
 }
 
 input QuestionnaireQuestionInput {
@@ -1304,6 +1321,12 @@ type Death {
   FEE: DeathFee
 }
 
+type LoginBackground {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
+}
+
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1323,6 +1346,12 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+}
+
+input LoginBackgroundInput {
+  backgroundColor: String
+  backgroundImage: String
+  imageFit: ImageFit
 }
 
 input QuestionInput {
@@ -1492,6 +1521,11 @@ enum AttachmentSubject {
   LEGAL_GUARDIAN_PROOF
 }
 
+type RoleLabel {
+  lang: String!
+  label: String!
+}
+
 type AdvancedSeachParameters {
   event: Event
   name: String
@@ -1649,11 +1683,6 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
-type RoleLabel {
-  lang: String!
-  label: String!
-}
-
 type FormDatasetOptionLabel {
   lang: String!
   descriptor: MesssageDescriptor!
@@ -1743,6 +1772,11 @@ type BirthFee {
 type DeathFee {
   ON_TIME: Float
   DELAYED: Float
+}
+
+enum ImageFit {
+  FILL
+  TILE
 }
 
 input BirthFeeInput {

@@ -26,6 +26,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         birthDate
         age
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         gender
         maritalStatus
         nationality
@@ -67,6 +69,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           nationality
           occupation
           birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
           telecom {
             system
             value
@@ -194,7 +198,9 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         user {
           id
-          role
+          role {
+            _id
+          }
           systemRole
           name {
             firstNames
@@ -270,6 +276,8 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         birthDate
         age
+        ageOfIndividualInYears
+        exactDateOfBirthUnknown
         gender
         maritalStatus
         nationality
@@ -433,7 +441,9 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         user {
           id
-          role
+          role {
+            _id
+          }
           systemRole
           name {
             firstNames

@@ -20,11 +20,7 @@ import {
   postFhir
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
-import User, {
-  FIELD_AGENT_TYPES,
-  IUser,
-  IUserModel
-} from '@user-mgnt/model/user'
+import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import { getUserId, roleScopeMapping } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
@@ -88,15 +84,6 @@ export default async function updateUser(
     existingUser.scope = userScopes
   }
   existingUser.role = user.role
-
-  if (existingUser.systemRole === 'FIELD_AGENT') {
-    if (
-      !existingUser.role ||
-      !Object.values(FIELD_AGENT_TYPES).includes(existingUser.role)
-    ) {
-      return h.response('Role not supported for this user').code(403)
-    }
-  }
 
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
     if (request.auth.credentials?.scope?.includes('natlsysadmin')) {

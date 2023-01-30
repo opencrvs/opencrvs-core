@@ -23,10 +23,7 @@ import {
   useOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
-import {
-  GetSystemRolesQuery,
-  GetSystemRolesQueryVariables
-} from '@client/utils/gateway'
+import { GetSystemRolesQuery, Role } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
@@ -47,6 +44,14 @@ import { useSelector } from 'react-redux'
 import { getUserRole } from './utils'
 import { Stack } from '@opencrvs/components'
 import { ProfileMenu } from '@client/components/ProfileMenu'
+import { useModal } from '@client/hooks/useModal'
+import { UserRoleManagementModal } from '@client/views/UserRoles/UserRoleManagementModal'
+
+export type RolesInput = (Omit<Role, '_id'> & { _id?: string })[]
+
+export type ISystemRole = NonNullable<
+  GetSystemRolesQuery['getSystemRoles']
+>[number]
 
 export type IRoles = Array<{
   labels: Array<{
@@ -57,19 +62,26 @@ export type IRoles = Array<{
 
 const UserRoles = () => {
   const intl = useIntl()
-  const isOnline = useOnlineStatus()
+  const [userRoleMgntModalNode, openUserRoleManage] = useModal()
   const language = useSelector(getLanguage)
-  const { loading, error, data, refetch } = useQuery<GetSystemRolesQuery>(
+  const { loading, error, data } = useQuery<GetSystemRolesQuery>(
     getSystemRolesQuery,
     {
-      fetchPolicy: 'no-cache',
-      onCompleted: (data) => {}
+      fetchPolicy: 'no-cache'
     }
   )
 
-  const systemRolesData = React.useMemo(() => {
-    return data?.getSystemRoles ?? []
-  }, [data])
+  const roleChangeHandler = async (systemRole: ISystemRole) => {
+    //TODO: call mutation using the changedRoles
+    const changedRoles = await openUserRoleManage<RolesInput | null>(
+      (close) => (
+        <UserRoleManagementModal
+          systemRole={systemRole}
+          closeCallback={close}
+        />
+      )
+    )
+  }
 
   return (
     <>
@@ -118,7 +130,7 @@ const UserRoles = () => {
                   </Text>
                 }
               />
-              {systemRolesData.map((systemRole) => {
+              {(data?.getSystemRoles ?? []).map((systemRole) => {
                 return (
                   <ListViewItemSimplified
                     label={
@@ -142,7 +154,12 @@ const UserRoles = () => {
                       </Value>
                     }
                     actions={
-                      <Link font="reg16" onClick={() => alert('Show Modal!')}>
+                      <Link
+                        font="reg16"
+                        onClick={() => {
+                          roleChangeHandler(systemRole)
+                        }}
+                      >
                         <span>{intl.formatMessage(buttonMessages.change)}</span>
                       </Link>
                     }
@@ -151,6 +168,7 @@ const UserRoles = () => {
               })}
             </ListViewSimplified>
           )}
+          {userRoleMgntModalNode}
         </Content>
       </Frame>
     </>

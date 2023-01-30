@@ -149,7 +149,6 @@ describe('Team search test', () => {
 
     it('loads the location in the search input box', async () => {
       await waitForElement(app, '#locationSearchInput')
-
       expect(
         app.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Alokbali Union Parishad')

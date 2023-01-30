@@ -28,7 +28,7 @@ type RoleLabel {
 }
 
 type Role {
-  value: String!
+  _id: ID!
   labels: [RoleLabel!]!
 }
 

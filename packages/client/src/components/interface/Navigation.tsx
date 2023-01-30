@@ -724,8 +724,8 @@ export const NavigationView = (props: IFullProps) => {
                     </>
                   )}
 
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.communications
                   ) && (
                     <>

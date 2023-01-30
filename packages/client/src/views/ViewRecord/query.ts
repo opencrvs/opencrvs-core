@@ -70,7 +70,9 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         }
         user {
           id
-          role
+          role {
+            _id
+          }
           systemRole
           name {
             firstNames
@@ -159,6 +161,8 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             occupation
             nationality
             birthDate
+            ageOfIndividualInYears
+            exactDateOfBirthUnknown
             address {
               type
               line
@@ -179,6 +183,8 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           }
           multipleBirth
           birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
           maritalStatus
           occupation
           detailsExist
@@ -213,6 +219,8 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             familyName
           }
           birthDate
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
           maritalStatus
           occupation
           detailsExist
@@ -270,6 +278,8 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
           }
           birthDate
           age
+          ageOfIndividualInYears
+          exactDateOfBirthUnknown
           gender
           maritalStatus
           nationality
@@ -311,6 +321,8 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
             nationality
             occupation
             birthDate
+            ageOfIndividualInYears
+            exactDateOfBirthUnknown
             telecom {
               system
               value
