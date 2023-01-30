@@ -18,14 +18,18 @@ import {
   IBirthCompositionBody,
   ICompositionBody
 } from '@search/elasticsearch/utils'
+
 import { get } from 'lodash'
-import { client, ISearchResponse } from '@search/elasticsearch/client'
+import { ISearchResponse } from '@search/elasticsearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { logger } from '@search/logger'
 import { subYears, addYears } from 'date-fns'
 import * as elasticsearch from '@elastic/elasticsearch'
 
-export const removeDuplicate = async (bundle: fhir.Bundle) => {
+export const removeDuplicate = async (
+  bundle: fhir.Bundle,
+  client: elasticsearch.Client
+) => {
   const compositionId = bundle.id
 
   if (!compositionId) {

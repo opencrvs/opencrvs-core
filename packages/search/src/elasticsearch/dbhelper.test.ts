@@ -30,7 +30,7 @@ let container: StartedElasticsearchContainer
 let client: elasticsearch.Client
 
 beforeAll(async () => (container = await startContainer()))
-afterAll(async () => stopContainer(container).then())
+afterAll(async () => await stopContainer(container))
 describe('elasticsearch db helper', () => {
   let indexSpy: jest.SpyInstance<any, any[]>
   let updateSpy: jest.SpyInstance<any, any[]>

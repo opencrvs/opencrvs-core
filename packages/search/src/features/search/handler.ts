@@ -39,7 +39,7 @@ export async function searchAssignment(
 ) {
   const payload = request.payload as IAssignmentPayload
   try {
-    const results = await searchByCompositionId(payload.compositionId)
+    const results = await searchByCompositionId(payload.compositionId, client)
     const result = results?.body?.hits?.hits[0]?._source as
       | ICompositionBody
       | undefined
@@ -204,7 +204,8 @@ export async function searchDuplicates(
 ) {
   try {
     const result = await searchForDuplicates(
-      request.payload as IBirthCompositionBody
+      request.payload as IBirthCompositionBody,
+      client
     )
     return h.response(result.body?.hits?.hits || []).code(200)
   } catch (error) {

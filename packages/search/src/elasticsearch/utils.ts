@@ -20,7 +20,7 @@ import {
   findTaskExtension,
   getFromFhir
 } from '@search/features/fhir/fhir-utils'
-import { ISearchResponse } from '@search/elasticsearch/client'
+import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
 import fetch from 'node-fetch'
 
@@ -93,6 +93,10 @@ export interface ICompositionBody {
   childFirstNames?: string
   childFamilyName?: string
   childFirstNamesLocal?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  childDoB?: string
   createdBy?: string
   updatedBy?: string
   createdAt?: string
@@ -166,19 +170,19 @@ export async function detectDuplicates(
   compositionId: string,
   body: IBirthCompositionBody
 ) {
-  const searchResponse = await searchForDuplicates(body)
+  const searchResponse = await searchForDuplicates(body, client)
   const duplicates = findDuplicateIds(compositionId, searchResponse)
   return duplicates
 }
 
 export async function getCreatedBy(compositionId: string) {
-  const results = await searchByCompositionId(compositionId)
+  const results = await searchByCompositionId(compositionId, client)
   const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
   return result?.createdBy
 }
 
 export const getStatus = async (compositionId: string) => {
-  const results = await searchByCompositionId(compositionId)
+  const results = await searchByCompositionId(compositionId, client)
   const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
   return result?.operationHistories as IOperationHistory[]
 }

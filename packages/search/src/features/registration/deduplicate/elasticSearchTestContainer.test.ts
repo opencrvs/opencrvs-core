@@ -21,26 +21,14 @@ import { StartedElasticsearchContainer } from 'testcontainers'
 
 jest.setTimeout(10 * 60 * 1000)
 
+let container: StartedElasticsearchContainer
+let client: elasticsearch.Client
+beforeAll(async () => {
+  container = await startContainer()
+})
+afterAll(async () => stopContainer(container))
 describe('Elastic Search Test Container Automation', () => {
-  let container: StartedElasticsearchContainer
-  let client: elasticsearch.Client
-  beforeAll(async () => {
-    container = await startContainer()
-  })
-  const exampleBirthRegistrationA: IBirthCompositionBody = {
-    childFirstNames: 'John',
-    childFamilyName: 'Smith',
-    motherFirstNames: 'Marry',
-    motherFamilyName: 'Smith'
-  }
-  const exampleBirthRegistrationB: IBirthCompositionBody = {
-    childFirstNames: 'Maurice',
-    childFamilyName: 'Black',
-    motherFirstNames: 'Marry',
-    motherFamilyName: 'Black'
-  }
-
-  it.only('should check elasticsearch is up', async () => {
+  it('should check elasticsearch is up', async () => {
     const host = container?.getHost() ?? '0.0.0.0'
     const port = container?.getMappedPort(9200) ?? 9200
 
@@ -51,25 +39,43 @@ describe('Elastic Search Test Container Automation', () => {
     await client.ping()
   })
 
-  it('should makes sure similar names are marked as a duplicate', async () => {
+  it('performs a duplicate check based on standard rules. Finds a duplicate with the exact same information', async () => {
+    /*
+     * Similar childs firstname(s)
+     * Similar childs lastname
+     * Date of birth within 5 days
+     * Similar Mother’s firstname(s)
+     * Similar Mother’s lastname.
+     * Similar Mother’s date of birth or Same Age of mother
+     * Same mother’s NID
+     */
+
     await indexComposition(
-      'testBirthRegistrationId',
-      exampleBirthRegistrationA,
+      '123-123-123-123',
+      {
+        childFirstNames: 'John',
+        childFamilyName: 'Smith',
+        childDoB: '2011-11-11',
+        motherFirstNames: 'Mother',
+        motherFamilyName: 'Smith',
+        motherDoB: '2000-11-11'
+      },
       client
     )
     expect(
       (
         await searchForDuplicates(
           {
-            ...exampleBirthRegistrationB,
             childFirstNames: 'John',
-            childFamilyName: 'Smith'
+            childFamilyName: 'Smith',
+            childDoB: '2011-11-11',
+            motherFirstNames: 'Mother',
+            motherFamilyName: 'Smith',
+            motherDoB: '2000-11-11'
           },
           client
         )
       ).body.hits.hits
     ).toHaveLength(1)
   })
-
-  afterAll(async () => await stopContainer(container))
 })
