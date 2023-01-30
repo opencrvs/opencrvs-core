@@ -36,14 +36,14 @@ import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
 import {
   GQLQuery,
   GQLUser,
-  GQLLocation,
-  GQLLabel
+  GQLLocation
 } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { modifyUserDetails } from '@client/profile/profileActions'
+import { RoleLabel } from '@client/utils/gateway'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -76,13 +76,13 @@ const initialState: IUserFormState = {
 interface IUpdateUserFormFieldDefsAction {
   type: typeof UPDATE_FORM_FIELD_DEFINITIONS
   payload: {
-    data: GQLLabel[]
+    data: RoleLabel[]
     queryData?: ApolloQueryResult<GQLQuery>
   }
 }
 
 export function updateUserFormFieldDefinitions(
-  data: GQLLabel[],
+  data: RoleLabel[],
   queryData?: ApolloQueryResult<GQLQuery>
 ): IUpdateUserFormFieldDefsAction {
   return {
@@ -308,7 +308,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           loadingRoles: true
         },
         Cmd.run(alterRolesBasedOnUserRole, {
-          successActionCreator: (data: GQLLabel[]) =>
+          successActionCreator: (data: RoleLabel[]) =>
             updateUserFormFieldDefinitions(data, fetchUserQueryData),
           args: [primaryOfficeId, Cmd.getState]
         })
@@ -331,16 +331,14 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         //
         const { systemRole: existingSystemRole, role: existingRole } =
           userQueryData.data.getUser
-        const roleData = data.find(
-          (item) => item.labels[0].label === existingSystemRole
-        )
+        const roleData = data.find((item) => item.label === existingSystemRole)
 
-        if (roleData && !roleData.labels[0].label.includes(existingRole)) {
+        if (roleData && !roleData.label.includes(String(existingRole))) {
           data.map((role) => {
-            if (role.labels[0].label === existingSystemRole) {
+            if (role.label === existingSystemRole) {
               return {
                 ...role,
-                types: [existingSystemRole, ...role.labels[0].label]
+                types: [existingSystemRole, ...role.label]
               }
             } else {
               return role
@@ -348,12 +346,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           })
         } else if (!roleData) {
           data.push({
-            labels: [
-              {
-                lang: 'en',
-                label: existingSystemRole
-              }
-            ]
+            lang: 'en',
+            label: String(existingSystemRole)
           })
         }
       }

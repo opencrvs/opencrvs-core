@@ -200,6 +200,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           id
           role {
             _id
+            labels {
+              lang
+              label
+            }
           }
           systemRole
           name {
@@ -443,6 +447,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           id
           role {
             _id
+            labels {
+              lang
+              label
+            }
           }
           systemRole
           name {

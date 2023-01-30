@@ -44,7 +44,15 @@ const users = [
       role: RoleType.LocalRegistrar,
       signature: undefined
     },
-    role: 'ENTREPENEUR',
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'ENTREPENEUR'
+        }
+      ]
+    },
     status: Status.Active,
     creationDate: '2022-10-03T10:42:46.920Z',
     userMgntUserID: '5eba726866458970cf2e23c2',
@@ -81,7 +89,15 @@ const users = [
     ],
     username: 'np.huq',
     systemRole: RoleType.LocalRegistrar,
-    role: 'MAYOR',
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'MAYOR'
+        }
+      ]
+    },
     status: Status.Deactivated,
     localRegistrar: {
       name: [

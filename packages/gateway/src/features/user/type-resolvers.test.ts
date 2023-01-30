@@ -45,7 +45,14 @@ describe('User type resolvers', () => {
       '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
     ],
     creationDate: '1559054406433',
-    role: 'MAYOR',
+    role: {
+      labels: [
+        {
+          lang: 'en',
+          label: 'MAYOR'
+        }
+      ]
+    },
     device: ''
   }
   it('return id type', () => {

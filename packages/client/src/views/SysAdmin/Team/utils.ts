@@ -22,12 +22,13 @@ import {
   NATL_ADMIN_ROLES,
   NATIONAL_REGISTRAR_ROLES
 } from '@client/utils/constants'
-import { GQLLabel, GQLRole } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { IStoreState } from '@client/store'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { Roles } from '@client/utils/authUtils'
+import { IUserRole } from '@client/utils/userUtils'
+import { Role } from '@client/utils/gateway'
 
 export enum UserStatus {
   ACTIVE,
@@ -93,7 +94,7 @@ export async function alterRolesBasedOnUserRole(
   const userDetails = getUserDetails(getState())
   const roleSearchCriteria = getRoleSearchCriteria(userDetails?.systemRole)
   const roleData = await roleQueries.fetchRoles(roleSearchCriteria)
-  const roles = roleData.data.getSystemRoles as Array<GQLLabel>
+  const roles = roleData.data.getSystemRoles as Role[]
 
   // This is a legacy function that allows you to filter available roles
   // It was used if some countries want to customise role types such as MAYOR
@@ -112,7 +113,7 @@ export async function alterRolesBasedOnUserRole(
   const hasMayor = users.some((user) => user.type === ROLE_TYPE_MAYOR)
   const hasChariman = users.some((user) => user.type === ROLE_TYPE_CHAIRMAN)*/
 
-  const roleList = [] as Array<GQLLabel>
+  const roleList = [] as Role[]
 
   /* eslint-disable array-callback-return */
   roles.map((role) => {
@@ -217,12 +218,9 @@ export function getUserSystemRole(
   }
 }
 
-export function getUserType(
-  user: { role?: string | null },
-  intl: IntlShape
-): string | undefined {
+export function getUserType(user: { role?: IUserRole }): string | undefined {
   if (user.role) {
-    return intl.formatMessage(userMessages[user.role as string])
+    return user.role.labels.find((label) => label.lang === 'en')?.label
   } else {
     return undefined
   }

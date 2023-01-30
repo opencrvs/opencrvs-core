@@ -42,12 +42,20 @@ export interface IAvatar {
   data: string
 }
 
+type Label = {
+  lang: string
+  label: string
+}
+export interface IUserRole {
+  labels: Label[]
+}
+
 export interface IUserDetails {
   userMgntUserID?: string
   practitionerId?: string
   mobile?: string
   systemRole?: string
-  role?: string
+  role?: IUserRole
   status?: string
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]

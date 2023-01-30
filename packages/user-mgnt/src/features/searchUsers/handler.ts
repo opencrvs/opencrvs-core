@@ -62,6 +62,7 @@ export default async function searchUsers(
     criteria = { ...criteria, status }
   }
   const userList: IUserModel[] = await User.find(criteria)
+    .populate('role')
     .skip(skip)
     .limit(count)
     .sort({
