@@ -51,8 +51,6 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 import { RegStatus } from '@client/utils/gateway'
 
 interface IBaseRejectTabProps {

@@ -156,14 +156,14 @@ interface IProps {
   icon?: () => React.ReactNode
   backButtonLabel?: string
   backButtonAction?: () => void
-  title?: string
+  title?: string | React.ReactNode
   titleColor?: keyof typeof colors
   showTitleOnMobile?: boolean
   truncateTitleOnMobile?: boolean
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
   filterContent?: React.ReactNode
-  subtitle?: string
+  subtitle?: string | React.ReactNode
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: ContentSize

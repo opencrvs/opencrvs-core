@@ -118,7 +118,9 @@ export function ListItemAction(props: IListItemActionProps) {
                 onClick={action.handler}
                 disabled={action.disabled}
               >
-                {action.icon} {action.label}
+                <>
+                  {action.icon} {action.label}
+                </>
               </ListItemSingleAction>
             )
           )}

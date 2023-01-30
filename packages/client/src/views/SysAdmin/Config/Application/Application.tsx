@@ -22,7 +22,8 @@ import {
   Currency,
   GovtLogo,
   NIDNumPattern,
-  PhoneNumPattern
+  PhoneNumPattern,
+  LoginBackground
 } from '@client/views/SysAdmin/Config/Application/Tabs/GeneralProperties'
 import {
   BirthDelayedFee,
@@ -61,7 +62,8 @@ export enum GeneralActionId {
   COUNTRY_LOGO = 'COUNTRY_LOGO',
   NID_NUMBER_PATTERN = 'NID_NUMBER_PATTERN',
   CURRENCY = 'CURRENCY',
-  PHONE_NUMBER_PATTERN = 'PHONE_NUMBER_PATTERN'
+  PHONE_NUMBER_PATTERN = 'PHONE_NUMBER_PATTERN',
+  LOGIN_BACKGROUND = 'LOGIN_BACKGROUND'
 }
 
 export enum BirthActionId {
@@ -89,6 +91,7 @@ function GeneralTabContent() {
     <ListViewSimplified>
       <ApplicationName />
       <GovtLogo />
+      <LoginBackground />
       <Currency />
       <PhoneNumPattern />
       <NIDNumPattern />

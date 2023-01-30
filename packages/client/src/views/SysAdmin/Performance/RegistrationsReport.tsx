@@ -182,17 +182,12 @@ export function RegistrationsReport({
                           data.results.filter(
                             (x) =>
                               x.gender === 'female' &&
-                              !['withinLate', 'withinTarget'].includes(
-                                x.timeLabel
-                              )
+                              ['withinLate'].includes(x.timeLabel)
                           )
                         )}
                         ofNumber={calculateTotal(
-                          data.results.filter(
-                            (x) =>
-                              !['withinLate', 'withinTarget'].includes(
-                                x.timeLabel
-                              )
+                          data.results.filter((x) =>
+                            ['withinLate'].includes(x.timeLabel)
                           )
                         )}
                       />
@@ -336,11 +331,8 @@ export function RegistrationsReport({
               {
                 <TotalDisplayWithPercentage
                   total={calculateTotal(
-                    data.results.filter(
-                      (x) =>
-                        !['DECEASED_USUAL_RESIDENCE', 'PRIVATE_HOME'].includes(
-                          x.eventLocationType
-                        )
+                    data.results.filter((x) =>
+                      ['HEALTH_FACILITY'].includes(x.eventLocationType)
                     )
                   )}
                   ofNumber={calculateTotal(data.results)}

@@ -1,7 +1,7 @@
 FROM alpine:3.15
 
 # Install required packages
-RUN apk add --update --no-cache bash curl
+RUN apk add --update --no-cache bash curl coreutils
 
 WORKDIR /usr/scheduler
 

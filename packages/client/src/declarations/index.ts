@@ -17,7 +17,6 @@ import {
   IFormData,
   IFormFieldValue,
   IContactPoint,
-  Sort,
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
@@ -75,7 +74,8 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
-import { at } from 'lodash'
+import { ViewRecordQueries } from '@client/views/ViewRecord/query'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -940,6 +940,7 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
+      await fetchAllDuplicateDeclarations(data.data as Query)
       await fetchAllMinioUrlsInAttachment(data.data as Query)
       resolve({ data, store, client })
     } catch (error) {
@@ -962,6 +963,26 @@ async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
     .map((a) => a && fetch(`${window.config.MINIO_URL}${a.data}`))
 
   return Promise.all(urlsWithMinioPath)
+}
+
+async function fetchAllDuplicateDeclarations(queryResultData: Query) {
+  const registration =
+    queryResultData.fetchBirthRegistration?.registration ||
+    queryResultData.fetchDeathRegistration?.registration
+
+  const duplicateCompositionIds = registration?.duplicates?.map(
+    (duplicate) => duplicate?.compositionId
+  )
+
+  if (!duplicateCompositionIds || !duplicateCompositionIds?.length) {
+    return
+  }
+
+  const fetchAllDuplicates = duplicateCompositionIds.map((id) =>
+    ViewRecordQueries.fetchDeclarationForViewing(id as string)
+  )
+
+  return Promise.all(fetchAllDuplicates)
 }
 
 function getDataKey(declaration: IDeclaration) {
@@ -1341,6 +1362,15 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           eventData.registration.status &&
           eventData.registration.status[0].type) ||
         ''
+      const updateWorkqueue = () =>
+        updateRegistrarWorkqueue(
+          userDetails?.practitionerId,
+          10,
+          Boolean(
+            userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+          )
+        )
+
       newDeclarationsAfterDownload[downloadingDeclarationIndex] =
         createReviewDeclaration(
           downloadingDeclaration.id,
@@ -1348,7 +1378,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           downloadingDeclaration.event,
           downloadedAppStatus,
           eventData?.registration?.duplicates?.filter(
-            (duplicate: string) => !!duplicate
+            (duplicate: IDuplicates) => !!duplicate
           )
         )
       newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
@@ -1384,7 +1414,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
                     clientFromSuccess
                   )
               }),
-              Cmd.action(updateRegistrarWorkqueue())
+              Cmd.action(updateWorkqueue())
             ],
             { sequence: true }
           )
@@ -1412,7 +1442,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
               ],
               failActionCreator: downloadDeclarationFail
             }),
-            Cmd.action(updateRegistrarWorkqueue()),
+            Cmd.action(updateWorkqueue()),
             Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(
               requestWithStateWrapper,
               {
