@@ -219,6 +219,7 @@ type Mutation {
   resendSMSInvite(userId: String!): String
   usernameSMSReminder(userId: String!): String
   resetPasswordSMS(userId: String!, applicationName: String!): String
+  updateRole(systemRole: SystemRoleInput): Response!
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
@@ -701,6 +702,17 @@ type Avatar {
 input AvatarInput {
   type: String!
   data: String!
+}
+
+type Response {
+  msg: String!
+}
+
+input SystemRoleInput {
+  id: ID!
+  value: String
+  active: Boolean
+  roles: [RoleInput!]
 }
 
 input CertificateSVGInput {
@@ -1300,6 +1312,10 @@ input SignatureInput {
   type: String
 }
 
+input RoleInput {
+  labels: [LabelInput!]!
+}
+
 type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1761,6 +1777,11 @@ input CorrectionInput {
   reason: String
   otherReason: String
   note: String
+}
+
+input LabelInput {
+  lang: String!
+  label: String!
 }
 
 type BirthFee {

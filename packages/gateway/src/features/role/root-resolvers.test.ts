@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { resolvers } from '@gateway/features/role/root-resolvers'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
+
+const fetch = fetchAny as any
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -219,5 +223,70 @@ describe('Role root resolvers', () => {
       )
       expect(response).toEqual([dummyRoleList[2]])
     })
+  })
+})
+
+describe('system role update', () => {
+  const mockSystemRole = {
+    systemRole: {
+      _id: '63b3f284452f2e40afa4409e',
+      active: true,
+      value: 'FIELD_AGENT_POLICE',
+      roles: ['63d27c9e2d06f966f28763fc']
+    }
+  }
+
+  const mockUpdateRoleRequest = {
+    systemRole: {
+      id: '63b3f284452f2e40afa4409e',
+      value: 'FIELD_AGENT_POLICE',
+      active: false,
+      roles: [
+        {
+          _id: '63d27c9e2d06f966f28763fc',
+          labels: [
+            {
+              lang: 'en',
+              label: 'Health Worker'
+            },
+            {
+              lang: 'fr',
+              label: 'Professionnel de Santé'
+            }
+          ]
+        }
+      ]
+    }
+  }
+  let authHeaderSysAdmin: { Authorization: string }
+
+  beforeEach(() => {
+    fetch.resetMocks()
+    const sysAdminToken = jwt.sign(
+      { scope: ['natlsysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderSysAdmin = {
+      Authorization: `Bearer ${sysAdminToken}`
+    }
+  })
+  it('should update system role', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockSystemRole), {
+      status: 200
+    })
+
+    const response = await resolvers.Mutation.updateRole(
+      {},
+      mockUpdateRoleRequest,
+      authHeaderSysAdmin
+    )
+
+    expect(mockSystemRole).toEqual(response)
   })
 })
