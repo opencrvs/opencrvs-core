@@ -56,7 +56,8 @@ import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
   REQUESTING_INDIVIDUAL,
-  HAS_SHOWED_VERIFIED_DOCUMENT
+  HAS_SHOWED_VERIFIED_DOCUMENT,
+  DUPLICATE_TRACKING_ID
 } from '@gateway/features/fhir/constants'
 import {
   ITaskBundle,
@@ -971,6 +972,14 @@ export const typeResolvers: GQLResolver = {
           data: signature.blob
         }
       )
+    },
+    duplicateOf: (task: fhir.Task) => {
+      const extensions = task.extension || []
+      const duplicateTrackingIdExt = findExtension(
+        DUPLICATE_TRACKING_ID,
+        extensions
+      )
+      return duplicateTrackingIdExt?.valueString
     }
   },
 

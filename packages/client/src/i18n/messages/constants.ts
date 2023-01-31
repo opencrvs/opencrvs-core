@@ -159,6 +159,7 @@ interface IConstantsMessages
   date: MessageDescriptor
   totalFileSizeExceed: MessageDescriptor
   refresh: MessageDescriptor
+  duplicateOf: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -930,6 +931,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Refresh',
     description: 'label for refresh',
     id: 'constants.refresh'
+  },
+  duplicateOf: {
+    defaultMessage: 'Duplicate of',
+    description: 'table header for `duplicate of` in record audit',
+    id: 'constants.duplicateOf'
   }
 }
 

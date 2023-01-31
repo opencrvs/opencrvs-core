@@ -271,6 +271,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }
@@ -530,6 +531,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }
