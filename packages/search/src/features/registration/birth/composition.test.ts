@@ -13,7 +13,6 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
-  searchForDuplicates,
   updateComposition,
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
@@ -29,6 +28,7 @@ import {
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
+import { searchForDuplicates } from '@search/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 

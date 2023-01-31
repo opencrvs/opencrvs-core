@@ -23,8 +23,8 @@ import {
   mockFacilityResponse,
   mockTaskBirthCorrectionBundle
 } from '@search/test/utils'
-import { searchForDuplicates } from '@search/elasticsearch/dbhelper'
 import * as fetchAny from 'jest-fetch-mock'
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch = fetchAny as any
 
