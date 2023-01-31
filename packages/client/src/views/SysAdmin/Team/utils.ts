@@ -15,18 +15,9 @@ import {
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions
 } from '@client/forms'
-import { roleQueries } from '@client/forms/user/query/queries'
 import { userMessages } from '@client/i18n/messages'
-import {
-  SYS_ADMIN_ROLES,
-  NATL_ADMIN_ROLES,
-  NATIONAL_REGISTRAR_ROLES
-} from '@client/utils/constants'
-import { GQLLabel, GQLRole } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
-import { IStoreState } from '@client/store'
-import { getUserDetails } from '@client/profile/profileSelectors'
 import { Roles } from '@client/utils/authUtils'
 
 export enum UserStatus {
@@ -75,73 +66,6 @@ export const transformRoleDataToDefinitions = (
       return field
     } else return field
   })
-}
-
-function getRoleSearchCriteria(currentUserRole?: string) {
-  if (currentUserRole && SYS_ADMIN_ROLES.includes(currentUserRole)) {
-    return {
-      value: { nin: NATL_ADMIN_ROLES.concat(NATIONAL_REGISTRAR_ROLES) }
-    }
-  }
-  return {}
-}
-
-export async function alterRolesBasedOnUserRole(
-  primaryOfficeId: string,
-  getState: () => IStoreState
-) {
-  const userDetails = getUserDetails(getState())
-  const roleSearchCriteria = getRoleSearchCriteria(userDetails?.systemRole)
-  const roleData = await roleQueries.fetchRoles(roleSearchCriteria)
-  const roles = roleData.data.getSystemRoles as Array<GQLLabel>
-
-  // This is a legacy function that allows you to filter available roles
-  // It was used if some countries want to customise role types such as MAYOR
-  // There was a legacy bug raised that there should be only one MAYOR per location
-  // But that is implementation specific for Bangladesh
-  // Leaving this function here in case in the future we wish to add config UI to manage something like that.
-  // removing for now because of this requirement that types should only be available for field agents with no control
-  // over how many of each user type can be created
-  // https://github.com/opencrvs/opencrvs-core/issues/2849
-
-  /*
-
-  const userData = await userQueries.searchUsers(primaryOfficeId)
-  const users = userData.data.searchUsers.results as Array<GQLUser>
-  const hasSecretary = users.some((user) => user.type === ROLE_TYPE_SECRETARY)
-  const hasMayor = users.some((user) => user.type === ROLE_TYPE_MAYOR)
-  const hasChariman = users.some((user) => user.type === ROLE_TYPE_CHAIRMAN)*/
-
-  const roleList = [] as Array<GQLLabel>
-
-  /* eslint-disable array-callback-return */
-  roles.map((role) => {
-    roleList.push(role)
-    // Leaving this logic here in case in the future we wish to add config UI to manage functionality restricting user roles.
-
-    /*if (
-      role.value === ROLE_FIELD_AGENT ||
-      role.value === ROLE_REGISTRATION_AGENT
-    ) {
-      if (hasSecretary && (hasChariman || hasMayor)) {
-        roleList.push(role)
-      }
-    } else if (role.value === ROLE_LOCAL_REGISTRAR) {
-      role.types =
-        (role.types &&
-          role.types.filter(
-            (t: string | null) =>
-              (t === ROLE_TYPE_SECRETARY && !hasSecretary) ||
-              (t === ROLE_TYPE_MAYOR && !hasMayor) ||
-              (t === ROLE_TYPE_CHAIRMAN && !hasChariman)
-          )) ||
-        []
-      role.types.length > 0 && roleList.push(role)
-    } else {
-    }*/
-  })
-
-  return roleList
 }
 
 const AuditDescriptionMapping: {
