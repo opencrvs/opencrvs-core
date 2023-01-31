@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
+import { Types } from 'mongoose'
 
 const sysAdminToken = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
@@ -39,6 +40,7 @@ const mockUser: IUser & { _id: string } = {
   email: 'j.doe@gmail.com',
   mobile: '+8801234567890',
   systemRole: 'LOCAL_REGISTRAR',
+  role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
   status: 'pending',
   primaryOfficeId: '321',
   practitionerId: '123',

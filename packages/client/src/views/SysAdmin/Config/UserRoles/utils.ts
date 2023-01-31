@@ -17,6 +17,6 @@ export function getUserRole(lang: string, roles: IRoles) {
   return roles.map((role) => {
     const defaultLabel = role.labels?.find((label) => label.lang === LANG_EN)
     const label = role.labels?.find((label) => label.lang === lang)
-    return label?.label || defaultLabel
+    return label?.label || defaultLabel?.label
   })
 }

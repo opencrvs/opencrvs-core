@@ -1339,7 +1339,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           userDetails?.practitionerId,
           10,
           Boolean(
-            userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+            userDetails?.systemRole &&
+              FIELD_AGENT_ROLES.includes(userDetails.systemRole)
           )
         )
 

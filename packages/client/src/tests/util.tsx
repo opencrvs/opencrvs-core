@@ -1271,6 +1271,15 @@ export const userDetails = {
     { use: 'bn', firstNames: '', familyName: '' }
   ],
   systemRole: 'FIELD_AGENT',
+  role: {
+    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    labels: [
+      {
+        lang: 'en',
+        label: 'ENTREPENEUR'
+      }
+    ]
+  },
   mobile: '01677701431',
   primaryOffice: {
     id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
@@ -2198,7 +2207,15 @@ export function loginAsFieldAgent(store: AppStore) {
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
           systemRole: RoleType.FieldAgent,
-          role: 'CHA',
+          role: {
+            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            labels: [
+              {
+                lang: 'en',
+                label: 'CHA'
+              }
+            ]
+          },
           status: Status.Active,
           name: [
             {

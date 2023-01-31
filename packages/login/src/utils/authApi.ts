@@ -45,7 +45,6 @@ export interface IAuthenticationData {
   password: string
 }
 
-
 export const client = axios.create({
   baseURL: window.config.AUTH_API_URL
 })

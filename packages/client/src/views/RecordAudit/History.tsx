@@ -243,11 +243,11 @@ export const GetHistory = ({
         )}
       </>
     ),
-    type: intl.formatMessage(
+    role:
       isSystemInitiated(item) || !item.user?.systemRole
-        ? getSystemType(item.system?.type)
-        : userMessages[item.user.systemRole]
-    ),
+        ? intl.formatMessage(getSystemType(item.system?.type))
+        : item.user.role.labels.find((label) => label.lang === 'en')?.label,
+
     location: isSystemInitiated(item) ? null : isFieldAgent ? (
       <>{item.office?.name}</>
     ) : (
@@ -281,9 +281,9 @@ export const GetHistory = ({
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
     },
     {
-      label: intl.formatMessage(constantsMessages.type),
+      label: intl.formatMessage(constantsMessages.labelRole),
       width: 15,
-      key: 'type'
+      key: 'role'
     },
     {
       label: intl.formatMessage(constantsMessages.location),

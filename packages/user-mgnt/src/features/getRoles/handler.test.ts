@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import Role from '@user-mgnt/model/role'
+import SystemRole from '@user-mgnt/model/systemRole'
 import { createServer } from '@user-mgnt/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -210,8 +210,9 @@ const dummyRoleList = [
 
 describe('getSystemRoles tests', () => {
   it('Successfully returns full role list', async () => {
-    Role.find = jest.fn().mockReturnValue(dummyRoleList)
-    Role.find().sort = jest.fn().mockReturnValue(dummyRoleList)
+    SystemRole.find = jest.fn().mockReturnValue(dummyRoleList)
+    SystemRole.find().sort = jest.fn().mockReturnValue(dummyRoleList)
+    SystemRole.find().populate = jest.fn().mockReturnValue(dummyRoleList)
 
     const res = await server.server.inject({
       method: 'POST',
@@ -225,8 +226,9 @@ describe('getSystemRoles tests', () => {
   })
   it('Successfully returns filtered user list', async () => {
     const filteredList = [dummyRoleList[2]]
-    Role.find = jest.fn().mockReturnValue(filteredList)
-    Role.find().sort = jest.fn().mockReturnValue(filteredList)
+    SystemRole.find = jest.fn().mockReturnValue(filteredList)
+    SystemRole.find().sort = jest.fn().mockReturnValue(filteredList)
+    SystemRole.find().populate = jest.fn().mockReturnValue(filteredList)
 
     const res = await server.server.inject({
       method: 'POST',
