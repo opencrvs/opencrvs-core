@@ -29,11 +29,12 @@ import {
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
-import { searchForDuplicates } from '@search/deduplicate/service'
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/features/registration/deduplicate/service')
 
 describe('Verify handlers', () => {
   let server: any

@@ -18,38 +18,17 @@ import {
 import { mockCompositionBody } from '@search/test/utils'
 import { logger } from '@search/logger'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
-import * as elasticsearch from '@elastic/elasticsearch'
-import { StartedElasticsearchContainer } from 'testcontainers'
-import {
-  startContainer,
-  stopContainer
-} from '@search/features/registration/deduplicate/deduplicate'
 import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
-
-jest.setTimeout(10 * 60 * 1000)
+import { client } from '@search/elasticsearch/client'
 
 describe('elasticsearch db helper', () => {
   let indexSpy: jest.SpyInstance<any, any[]>
   let updateSpy: jest.SpyInstance<any, any[]>
   let searchSpy: jest.SpyInstance<any, any[]>
-  let container: StartedElasticsearchContainer
-  let client: elasticsearch.Client
 
   describe('elasticsearch db helper', () => {
     beforeAll(async () => {
       logger.error = jest.fn()
-
-      container = await startContainer()
-      const host = container.getHost()
-      const port = container.getMappedPort(9200)
-
-      client = new elasticsearch.Client({
-        node: `http://${host}:${port}`
-      })
-    })
-
-    it('should check elasticsearch is up', async () => {
-      await client.ping()
     })
 
     it('should index a composition with proper configuration', async () => {
@@ -86,7 +65,7 @@ describe('elasticsearch db helper', () => {
 
     it('should perform search for composition', async () => {
       searchSpy = jest.spyOn(client, 'search')
-      await searchForDuplicates(mockCompositionBody, client)
+      searchForDuplicates(mockCompositionBody, client)
       if (
         searchSpy.mock &&
         searchSpy.mock.calls[0] &&
@@ -103,17 +82,6 @@ describe('elasticsearch db helper', () => {
       searchByCompositionId('r1324-sd6k2-12121-1212', client)
       expect(searchSpy.mock.calls[0][0].body.query).toBeDefined()
       expect(searchSpy).toBeCalled()
-    })
-
-    afterAll(async () => {
-      try {
-        indexSpy.mockRestore()
-        searchSpy.mockRestore()
-        await client.close()
-      } catch (error) {
-      } finally {
-        await stopContainer(container)
-      }
     })
   })
 })

@@ -20,14 +20,12 @@ import {
   EVENT,
   IBirthCompositionBody
 } from '@search/elasticsearch/utils'
-import {
-  searchByCompositionId,
-  searchForDuplicates
-} from '@search/elasticsearch/dbhelper'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
 import { RouteScope } from '@search/config/routes'
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 type IAssignmentPayload = {
   compositionId: string

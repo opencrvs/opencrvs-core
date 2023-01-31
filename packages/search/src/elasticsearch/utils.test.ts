@@ -28,6 +28,7 @@ import { searchForDuplicates } from '@search/features/registration/deduplicate/s
 
 const fetch = fetchAny as any
 
+jest.mock('@search/features/registration/deduplicate/service')
 jest.mock('@search/elasticsearch/dbhelper.ts')
 
 describe('elastic search utils', () => {

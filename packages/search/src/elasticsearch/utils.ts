@@ -10,10 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
-import {
-  searchByCompositionId,
-  searchForDuplicates
-} from '@search/elasticsearch/dbhelper'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
   findName,
   findNameLocale,
@@ -23,6 +20,7 @@ import {
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
 import fetch from 'node-fetch'
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 export const enum EVENT {
   BIRTH = 'Birth',
