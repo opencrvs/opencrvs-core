@@ -31,15 +31,15 @@ beforeAll(async () => {
   })
 })
 
+afterAll(async () => {
+  try {
+    await client.close()
+  } catch (error) {
+  } finally {
+    await stopContainer(container)
+  }
+})
 describe('Deduplication tests', () => {
-  afterAll(async () => {
-    try {
-      await client.close()
-    } catch (error) {
-    } finally {
-      await stopContainer(container)
-    }
-  })
   it('should check elasticsearch is up', async () => {
     await client.ping()
   })

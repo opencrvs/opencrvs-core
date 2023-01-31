@@ -26,7 +26,7 @@ const container: ElasticsearchContainer = new ElasticsearchContainer(
  * **/
 export const startContainer =
   async (): Promise<StartedElasticsearchContainer> => {
-    return await container
+    return container
       .withExposedPorts(ELASTIC_SEARCH_HTTP_PORT)
       .withStartupTimeout(120_000)
       .withEnvironment({ 'discovery.type': 'single-node' })
