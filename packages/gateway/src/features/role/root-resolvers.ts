@@ -14,6 +14,7 @@ import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { IRoleSearchPayload } from '@gateway/features/role/type-resolvers'
 import { transformMongoComparisonObject } from '@gateway/features/role/utils'
+import { hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -60,6 +61,30 @@ export const resolvers: GQLResolver = {
         }
       })
       return await res.json()
+    }
+  },
+  Mutation: {
+    async updateRole(_, { systemRole }, authHeader) {
+      if (!hasScope(authHeader, 'natlsysadmin')) {
+        return Promise.reject(
+          new Error(' Update Role is only allowed for natlsysadmin')
+        )
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}updateRole`, {
+        method: 'POST',
+        body: JSON.stringify(systemRole),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return new Error(
+          `Something went wrong on user management service. Couldn't update system role`
+        )
+      }
+      return res.json()
     }
   }
 }

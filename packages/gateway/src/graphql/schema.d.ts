@@ -86,6 +86,7 @@ export interface GQLMutation {
   resendSMSInvite?: string
   usernameSMSReminder?: string
   resetPasswordSMS?: string
+  updateRole: GQLResponse
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
   createFormDraft?: GQLFormDraft
@@ -582,6 +583,17 @@ export interface GQLAvatar {
 export interface GQLAvatarInput {
   type: string
   data: string
+}
+
+export interface GQLResponse {
+  msg: string
+}
+
+export interface GQLSystemRoleInput {
+  id: string
+  value?: string
+  active?: boolean
+  roles?: Array<GQLRoleInput>
 }
 
 export interface GQLCertificateSVGInput {
@@ -1203,6 +1215,10 @@ export interface GQLSignatureInput {
   type?: string
 }
 
+export interface GQLRoleInput {
+  labels: Array<GQLLabelInput>
+}
+
 export interface GQLBirth {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
@@ -1667,6 +1683,11 @@ export interface GQLCorrectionInput {
   note?: string
 }
 
+export interface GQLLabelInput {
+  lang: string
+  label: string
+}
+
 export interface GQLBirthFee {
   ON_TIME?: number
   LATE?: number
@@ -1852,6 +1873,7 @@ export interface GQLResolver {
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
+  Response?: GQLResponseTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
   SystemSecret?: GQLSystemSecretTypeResolver
   BookMarkedSearches?: GQLBookMarkedSearchesTypeResolver
@@ -2616,6 +2638,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendSMSInvite?: MutationToResendSMSInviteResolver<TParent>
   usernameSMSReminder?: MutationToUsernameSMSReminderResolver<TParent>
   resetPasswordSMS?: MutationToResetPasswordSMSResolver<TParent>
+  updateRole?: MutationToUpdateRoleResolver<TParent>
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   createFormDraft?: MutationToCreateFormDraftResolver<TParent>
@@ -3090,6 +3113,18 @@ export interface MutationToResetPasswordSMSResolver<
   (
     parent: TParent,
     args: MutationToResetPasswordSMSArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpdateRoleArgs {
+  systemRole?: GQLSystemRoleInput
+}
+export interface MutationToUpdateRoleResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToUpdateRoleArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4720,6 +4755,14 @@ export interface AvatarToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface AvatarToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLResponseTypeResolver<TParent = any> {
+  msg?: ResponseToMsgResolver<TParent>
+}
+
+export interface ResponseToMsgResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
