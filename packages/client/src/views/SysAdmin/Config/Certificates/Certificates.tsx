@@ -62,8 +62,9 @@ import {
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import { ISVGTemplate as File } from '@client/pdfRenderer/transformer/types'
-import { Link, Toggle } from '@client/../../components/lib'
+import { ISVGTemplate } from '@client/pdfRenderer/transformer/types'
+import { Link, Text, Toggle } from '@client/../../components/lib'
+import { Stack } from '@opencrvs/components/lib/Stack'
 
 const ListViewContainer = styled.div`
   margin-top: 24px;
@@ -73,7 +74,29 @@ const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
 const Value = styled.span`
-  ${({ theme }) => theme.fonts.reg16}
+  ${({ theme }) => theme.fonts.reg16};
+  margin-top: 15px;
+  margin-bottom: 8px;
+`
+
+const ToggleWrapper = styled.div`
+  margin-left: 24px;
+`
+const StyledText = styled.h6`
+  ${({ theme }) => theme.fonts.h4}
+  color: ${({ theme }) => theme.colors.copy};
+  margin-top: 15px;
+  margin-bottom: 8px;
+`
+const StyledSubtext = styled(Text)`
+  flex: none;
+  color: ${({ theme }) => theme.colors.grey500};
+  order: 1;
+  flex-grow: 0;
+`
+
+const StyledHeader = styled(ListViewItemSimplified)`
+  color: ${({ theme }) => theme.colors.grey400};
 `
 
 export type Scope = string[]
@@ -374,9 +397,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       activeTabId
     } = this.state
 
-    const ToggleWrapper = styled.div`
-      margin-left: 24px;
-    `
     const { intl, offlineResources } = this.props
     const tabSections = [
       {
@@ -458,9 +478,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     let certificateFileName
 
     const toggleOnChange = () => {
-      this.setState({
-        allowPrinting: !this.state.allowPrinting
-      })
+      this.setState((prevState) => ({
+        allowPrinting: !prevState.allowPrinting
+      }))
     }
 
     const TabContent = (props: CertificationProps) => {
@@ -469,11 +489,24 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
       return (
         <>
-          <ListViewSimplified key={1}>
+          <ListViewSimplified key={'certification'}>
+            <StyledHeader
+              key="template"
+              label={
+                <Text variant="bold14" element="p" color="grey400">
+                  {intl.formatMessage(messages.template)}
+                </Text>
+              }
+            />
+
             <ListViewItemSimplified
               compactLabel
-              key={`${props.item.id}`}
-              label={props.item.label}
+              key={`${props.item.id}_file`}
+              label={
+                <div>
+                  <StyledText>{props.item.label}</StyledText>
+                </div>
+              }
               value={
                 <Value id={`${props.item.id}_value`}>
                   {certificateFileName}
@@ -482,15 +515,32 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               actions={props.item.actionsMenu}
             />
 
+            <StyledHeader
+              key="options"
+              label={
+                <Text variant="bold14" element="p" color="grey400">
+                  {intl.formatMessage(messages.options)}
+                </Text>
+              }
+            />
             <ListViewItemSimplified
               key={`${props.item.id}`}
-              label={intl.formatMessage(messages.allowPrinting)}
+              label={
+                <div>
+                  <StyledText>
+                    {intl.formatMessage(messages.allowPrinting)}
+                  </StyledText>
+                  <StyledSubtext element="p" variant="reg14">
+                    {intl.formatMessage(messages.allowPrintingDescription)}
+                  </StyledSubtext>
+                </div>
+              }
               actions={
                 <ToggleWrapper>
                   <Toggle
-                    id={'toggle'}
-                    defaultChecked={true}
-                    onChange={() => toggleOnChange()}
+                    id={'allow-printing-toggle'}
+                    defaultChecked={this.state.allowPrinting}
+                    onChange={toggleOnChange}
                   />
                 </ToggleWrapper>
               }

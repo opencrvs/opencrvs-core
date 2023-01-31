@@ -38,7 +38,9 @@ interface IConfigMessages
   deathTemplate: MessageDescriptor
   certificateTemplate: MessageDescriptor
   template: MessageDescriptor
+  options: MessageDescriptor
   allowPrinting: MessageDescriptor
+  allowPrintingDescription: MessageDescriptor
   birthDefaultTempDesc: MessageDescriptor
   eventUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
@@ -629,6 +631,17 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.certificate.allowPrinting',
     defaultMessage: 'Allow printing in advanced of issuance',
     description: 'To allow printing in advanced of issuance'
+  },
+  options: {
+    id: 'config.certificate.options',
+    defaultMessage: 'Options',
+    description: 'Show options'
+  },
+  allowPrintingDescription: {
+    id: 'config.certificate.printDescription',
+    defaultMessage:
+      'This is the content describing what this configuration option is...',
+    description: 'Description of allowing printing'
   }
 }
 
