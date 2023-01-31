@@ -18,7 +18,8 @@ import {
 import { userTransformers } from '@client/pdfRenderer/transformer/userTransformer'
 import { createIntl } from 'react-intl'
 import { omit } from 'lodash'
-import { User, Event } from '@client/utils/gateway'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { TemplateTransformerData } from './types'
 
 describe("PDF template's logged-in user field related transformer tests", () => {
@@ -40,7 +41,7 @@ describe("PDF template's logged-in user field related transformer tests", () => 
       expect(transformedValue).toEqual('Mohammad Ashraful')
     })
     it('Returns empty name if no name found for given locale', () => {
-      data.userDetails = omit(userDetails, 'localRegistrar.name') as User
+      data.userDetails = omit(userDetails, 'localRegistrar.name') as UserDetails
       const transformedValue = userTransformers.LocalRegistrarUserName(
         data,
         intl
@@ -87,7 +88,7 @@ describe("PDF template's logged-in user field related transformer tests", () => 
       expect(transformedValue).toEqual('Registrar')
     })
     it('Returns empty role', () => {
-      data.userDetails = omit(userDetails, 'localRegistrar.role') as User
+      data.userDetails = omit(userDetails, 'localRegistrar.role') as UserDetails
       const transformedValue = userTransformers.LocalRegistrarUserRole(
         data,
         intl
@@ -119,7 +120,10 @@ describe("PDF template's logged-in user field related transformer tests", () => 
       )
     })
     it('Returns empty signature', () => {
-      data.userDetails = omit(userDetails, 'localRegistrar.signature') as User
+      data.userDetails = omit(
+        userDetails,
+        'localRegistrar.signature'
+      ) as UserDetails
       const transformedValue = userTransformers.LocalRegistrarUserSignature(
         data,
         intl
@@ -139,12 +143,12 @@ describe("PDF template's logged-in user field related transformer tests", () => 
       expect(transformedValue).toEqual('কালিগাঞ্জ ইউনিয়ন পরিষদ')
     })
     it('Returns empty name if no name found for given locale', () => {
-      data.userDetails = omit(userDetails, 'primaryOffice.name') as User
+      data.userDetails = omit(userDetails, 'primaryOffice.name') as UserDetails
       const transformedValue = userTransformers.CRVSOfficeName(data, intl)
       expect(transformedValue).toEqual('')
     })
     it('Returns empty alias if no name found for given locale', () => {
-      data.userDetails = omit(userDetails, 'primaryOffice.alias') as User
+      data.userDetails = omit(userDetails, 'primaryOffice.alias') as UserDetails
       const transformedValue = userTransformers.CRVSOfficeName(data, intl, {
         language: 'bn'
       })
@@ -179,7 +183,7 @@ describe("PDF template's logged-in user field related transformer tests", () => 
       expect(transformedValue).toEqual('')
     })
     it('Returns empty if no catchmentArea found', () => {
-      data.userDetails = omit(userDetails, 'catchmentArea') as User
+      data.userDetails = omit(userDetails, 'catchmentArea') as UserDetails
       const transformedValue = userTransformers.CRVSLocationName(data, intl, {
         jurisdictionType: 'UNION',
         language: 'bn'

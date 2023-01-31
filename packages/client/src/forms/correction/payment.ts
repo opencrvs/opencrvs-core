@@ -15,9 +15,7 @@ import {
   IFormSection,
   IFormSectionGroup,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  TEXTAREA
 } from '@client/forms'
-import { formMessages } from '@client/i18n/messages/form'
 import { messages } from '@client/i18n/messages/views/correction'
 
 export const correctionFeesPayment: IFormSectionGroup = {

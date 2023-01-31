@@ -14,7 +14,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Currency } from '@opencrvs/components/lib/Currency'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
-import { Event, User } from '@client/utils/gateway'
+import { Event } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
@@ -41,6 +41,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -80,7 +81,7 @@ interface IProps {
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
   goToHomeTab: typeof goToHomeTab
-  userDetails: User | null
+  userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
 }
 
