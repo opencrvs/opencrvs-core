@@ -99,24 +99,28 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this.closeMenu, true)
-    document.removeEventListener('click', this.showMenu, true)
-    document.removeEventListener('keyup', this.closeMenuOnEscape, true)
+    document.removeEventListener('click', this.closeMenu)
+    document.removeEventListener('click', this.showMenu)
+    document.removeEventListener('keyup', this.closeMenuOnEscape)
   }
   showMenu() {
     this.setState(() => ({
       showSubmenu: true
     }))
-    document.addEventListener('click', this.closeMenu, true)
-    document.addEventListener('keyup', this.closeMenuOnEscape, true)
+    //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
+    setTimeout(() => document.addEventListener('click', this.closeMenu), 0)
+    setTimeout(
+      () => document.addEventListener('keyup', this.closeMenuOnEscape),
+      0
+    )
   }
 
   closeMenu() {
     this.setState(() => ({
       showSubmenu: false
     }))
-    document.removeEventListener('click', this.closeMenu, true)
-    document.removeEventListener('keyup', this.closeMenuOnEscape, true)
+    document.removeEventListener('click', this.closeMenu)
+    document.removeEventListener('keyup', this.closeMenuOnEscape)
   }
 
   closeMenuOnEscape(e: KeyboardEvent) {
