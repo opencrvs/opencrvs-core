@@ -10,10 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { startContainer, stopContainer } from './elasticSearchTestContainer'
-// @ts-ignore
-import { IBirthCompositionBody } from '@search/elasticsearch/utils'
-// @ts-ignore
+import { startContainer, stopContainer } from './deduplicate'
 import { indexComposition } from '@search/elasticsearch/dbhelper'
 import * as elasticsearch from '@elastic/elasticsearch'
 import { searchForDuplicates } from './service'
@@ -26,15 +23,15 @@ let client: elasticsearch.Client
 
 beforeAll(async () => {
   container = await startContainer()
-  const host = container?.getHost() ?? '0.0.0.0'
-  const port = container?.getMappedPort(9200) ?? 9200
+  const host = container.getHost()
+  const port = container.getMappedPort(9200)
 
   client = new elasticsearch.Client({
     node: `http://${host}:${port}`
   })
 })
 
-describe('Elastic Search Test Container Automation', () => {
+describe('Deduplication tests', () => {
   afterAll(async () => {
     try {
       await client.close()
