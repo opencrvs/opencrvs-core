@@ -36,6 +36,9 @@ interface IConfigMessages
   listDetails: MessageDescriptor
   birthTemplate: MessageDescriptor
   deathTemplate: MessageDescriptor
+  certificateTemplate: MessageDescriptor
+  template: MessageDescriptor
+  allowPrinting: MessageDescriptor
   birthDefaultTempDesc: MessageDescriptor
   eventUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
@@ -223,7 +226,7 @@ const messagesToDefine: IConfigMessages = {
   },
   listTitle: {
     id: 'config.listTitle',
-    defaultMessage: 'Certificates templates',
+    defaultMessage: 'Certification',
     description: 'Title for certificates templates list'
   },
   listDetails: {
@@ -246,6 +249,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.deathTemplate',
     defaultMessage: 'Death certificate',
     description: 'Label for death certificate template'
+  },
+  certificateTemplate: {
+    id: 'config.certTemplate',
+    defaultMessage: 'Certificate Template',
+    description: 'Label for certificate templates'
   },
   birthDefaultTempDesc: {
     id: 'config.birthDefaultTempDesc',
@@ -611,6 +619,16 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.informantNotification.success',
     defaultMessage: 'Informant notifications updated',
     description: 'Notification for informant update success'
+  },
+  template: {
+    id: 'config.certificate.template',
+    defaultMessage: 'Template',
+    description: 'Template for certificates'
+  },
+  allowPrinting: {
+    id: 'config.certificate.allowPrinting',
+    defaultMessage: 'Allow printing in advanced of issuance',
+    description: 'To allow printing in advanced of issuance'
   }
 }
 
