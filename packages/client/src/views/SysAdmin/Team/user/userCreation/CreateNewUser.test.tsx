@@ -36,7 +36,6 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
-import { log } from 'logrocket'
 
 export const mockRoles = {
   data: {
@@ -224,7 +223,15 @@ export const mockUsers = {
           ],
           username: 'api.user',
           systemRole: 'API_USER',
-          role: 'API_USER',
+          role: {
+            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            labels: [
+              {
+                lang: 'en',
+                label: 'API_USER'
+              }
+            ]
+          },
           status: 'active',
           __typename: 'User'
         },

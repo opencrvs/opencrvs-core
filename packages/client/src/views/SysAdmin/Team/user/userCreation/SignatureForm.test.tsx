@@ -27,6 +27,9 @@ import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
+import { roleQueries } from '@client/forms/user/query/queries'
+import { Mock, describe, expect } from 'vitest'
+import { mockRoles } from './CreateNewUser.test'
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()
@@ -38,6 +41,7 @@ describe('signature upload tests', () => {
 
   describe('when user is in signature upload form page', () => {
     beforeEach(async () => {
+      ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
       testComponent = await createTestComponent(
         // @ts-ignore
         <CreateNewUser

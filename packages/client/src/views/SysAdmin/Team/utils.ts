@@ -19,6 +19,7 @@ import { userMessages } from '@client/i18n/messages'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { Roles } from '@client/utils/authUtils'
+import { IUserRole } from '@client/utils/userUtils'
 
 export enum UserStatus {
   ACTIVE,
@@ -141,12 +142,9 @@ export function getUserSystemRole(
   }
 }
 
-export function getUserType(
-  user: { role?: string | null },
-  intl: IntlShape
-): string | undefined {
+export function getUserType(user: { role?: IUserRole }): string | undefined {
   if (user.role) {
-    return intl.formatMessage(userMessages[user.role as string])
+    return user.role.labels.find((label) => label.lang === 'en')?.label
   } else {
     return undefined
   }
