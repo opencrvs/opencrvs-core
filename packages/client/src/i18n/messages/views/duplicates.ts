@@ -72,16 +72,6 @@ const messagesToDefine: IDuplicateDeclarationMessages = {
     id: 'duplicates.compare.supportingDocuments',
     defaultMessage: 'Supporting documents',
     description: 'Supporting documents header for duplicates comparison'
-  },
-  duplicateComparePageTitle: {
-    id: 'duplicates.compare.title',
-    defaultMessage: 'Review {actualTrackingId} against {duplicateTrackingId}',
-    description: 'Duplicate compare page title message'
-  },
-  duplicateComparePageSupportingDocuments: {
-    id: 'duplicates.compare.supportingDocuments',
-    defaultMessage: 'Supporting documents',
-    description: 'Supporting documents header for duplicates comparison'
   }
 }
 
