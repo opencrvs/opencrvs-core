@@ -1455,6 +1455,7 @@ enum RegAction {
   DOWNLOADED
   VIEWED
   MARKED_AS_DUPLICATE
+  MARKED_AS_NOT_DUPLICATE
 }
 
 type StatusReason {
