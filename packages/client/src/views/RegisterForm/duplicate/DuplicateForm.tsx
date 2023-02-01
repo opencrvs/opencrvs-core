@@ -60,7 +60,6 @@ export const DuplicateForm = (props: IProps) => {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
   const [selectedTrackingId, setSelectedTrackingId] = React.useState('')
-  const [isSelected, setIsSelected] = React.useState(false)
   const [comment, setComment] = React.useState('')
   const compositionId = props.declaration.id
   const dispatch = useDispatch()
@@ -146,21 +145,21 @@ export const DuplicateForm = (props: IProps) => {
             id="mark-as-duplicate-button"
             type="negative"
             onClick={() => {
-              if (isSelected) {
+              if (Boolean(selectedTrackingId)) {
                 dispatch(
                   archiveDeclaration(compositionId, selectedTrackingId, comment)
                 )
                 dispatch(goToHome())
               }
             }}
-            disabled={!isSelected}
+            disabled={!Boolean(selectedTrackingId)}
           >
             {intl.formatMessage(duplicateMessages.markAsDuplicateButton)}
           </Button>
         ]}
         handleClose={toggleModal}
       >
-        {showModal && (
+        {
           <>
             <Stack direction="column" alignItems="stretch" gap={10}>
               <Text variant="reg18" element="span">
@@ -172,7 +171,6 @@ export const DuplicateForm = (props: IProps) => {
                 value={selectedTrackingId}
                 onChange={(val: string) => {
                   setSelectedTrackingId(val)
-                  setIsSelected(true)
                 }}
                 options={props.declaration.duplicates?.map((id) => ({
                   value: id.compositionId,
@@ -190,7 +188,7 @@ export const DuplicateForm = (props: IProps) => {
               />
             </Stack>
           </>
-        )}
+        }
       </ResponsiveModal>
     </>
   )

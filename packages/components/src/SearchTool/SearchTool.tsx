@@ -289,7 +289,7 @@ export class SearchTool extends React.Component<IProps, IState> {
   toggleDropdownDisplay = () => {
     const handler = () => {
       this.setState({ dropDownIsVisible: false })
-      document.removeEventListener('click', handler, true)
+      document.removeEventListener('click', handler)
     }
     if (!this.state.dropDownIsVisible) {
       //https://github.com/facebook/react/issues/24657#issuecomment-1150119055

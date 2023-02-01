@@ -99,9 +99,9 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this.closeMenu, true)
-    document.removeEventListener('click', this.showMenu, true)
-    document.removeEventListener('keyup', this.closeMenuOnEscape, true)
+    document.removeEventListener('click', this.closeMenu)
+    document.removeEventListener('click', this.showMenu)
+    document.removeEventListener('keyup', this.closeMenuOnEscape)
   }
   showMenu() {
     this.setState(() => ({
@@ -119,8 +119,8 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     this.setState(() => ({
       showSubmenu: false
     }))
-    document.removeEventListener('click', this.closeMenu, true)
-    document.removeEventListener('keyup', this.closeMenuOnEscape, true)
+    document.removeEventListener('click', this.closeMenu)
+    document.removeEventListener('keyup', this.closeMenuOnEscape)
   }
 
   closeMenuOnEscape(e: KeyboardEvent) {
