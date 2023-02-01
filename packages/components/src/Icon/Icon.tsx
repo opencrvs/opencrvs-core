@@ -29,6 +29,7 @@ export type IconProps = {
   size?: keyof typeof IconSize
   color?: IconColor
   weight?: IconWeight
+  fill?: IconColor | 'none'
 }
 
 export function Icon({
@@ -36,6 +37,7 @@ export function Icon({
   size = 'medium',
   color = 'currentColor',
   weight = 'regular',
+  fill = 'none',
   ...rest
 }: IconProps) {
   const IconComponent = icons['' + name]
