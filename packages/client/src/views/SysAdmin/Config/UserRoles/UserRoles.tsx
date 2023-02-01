@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Header } from '@client/components/Header/Header'
 import { useIntl } from 'react-intl'
 import { Content } from '@opencrvs/components/lib/Content'
 import { messages } from '@client/i18n/messages/views/config'
@@ -18,22 +17,27 @@ import {
   ListViewItemSimplified,
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
-import {
-  LoadingIndicator,
-  useOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
-import { GetSystemRolesQuery, Role } from '@client/utils/gateway'
+import {
+  GetSystemRolesQuery,
+  Role,
+  SystemRoleInput,
+  UpdateRoleMutation,
+  UpdateRoleMutationVariables
+} from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Navigation } from '@client/components/interface/Navigation'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { Button } from '@opencrvs/components/lib/Button'
 import { useMutation, useQuery } from '@apollo/client'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
-import { getSystemRolesQuery } from '@client/forms/user/query/queries'
+import {
+  getSystemRolesQuery,
+  updateRoleQuery
+} from '@client/forms/user/query/queries'
 import {
   Label,
   Value
@@ -64,15 +68,31 @@ const UserRoles = () => {
   const intl = useIntl()
   const [userRoleMgntModalNode, openUserRoleManage] = useModal()
   const language = useSelector(getLanguage)
-  const { loading, error, data } = useQuery<GetSystemRolesQuery>(
+  const { loading, error, data, refetch } = useQuery<GetSystemRolesQuery>(
     getSystemRolesQuery,
     {
       fetchPolicy: 'no-cache'
     }
   )
 
+  const [
+    updateRoleMutate,
+    { loading: roleUpdatedLoading, error: updateRoleError }
+  ] = useMutation<UpdateRoleMutation, UpdateRoleMutationVariables>(
+    updateRoleQuery,
+    {
+      onCompleted: ({ updateRole }) => {
+        if (updateRole) {
+          refetch()
+        }
+      }
+    }
+  )
+
   const roleChangeHandler = async (systemRole: ISystemRole) => {
     //TODO: call mutation using the changedRoles
+
+    console.log(systemRole)
     const changedRoles = await openUserRoleManage<RolesInput | null>(
       (close) => (
         <UserRoleManagementModal
@@ -81,6 +101,21 @@ const UserRoles = () => {
         />
       )
     )
+
+    const mutationPayload: SystemRoleInput = {
+      id: systemRole.id,
+      value: systemRole.value,
+      active: true,
+      roles: changedRoles
+    }
+
+    console.log(JSON.stringify(mutationPayload))
+
+    updateRoleMutate({
+      variables: {
+        systemRole: mutationPayload
+      }
+    })
   }
 
   return (

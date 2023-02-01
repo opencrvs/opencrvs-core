@@ -15,6 +15,7 @@ import { client } from '@client/utils/apolloClient'
 export const getSystemRolesQuery = gql`
   query getSystemRoles($value: ComparisonInput) {
     getSystemRoles(active: true, value: $value) {
+      id
       value
       roles {
         _id
@@ -23,6 +24,14 @@ export const getSystemRolesQuery = gql`
           label
         }
       }
+    }
+  }
+`
+
+export const updateRoleQuery = gql`
+  mutation updateRole($systemRole: SystemRoleInput) {
+    updateRole(systemRole: $systemRole) {
+      msg
     }
   }
 `

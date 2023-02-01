@@ -1216,6 +1216,7 @@ export interface GQLSignatureInput {
 }
 
 export interface GQLRoleInput {
+  _id?: string
   labels: Array<GQLLabelInput>
 }
 

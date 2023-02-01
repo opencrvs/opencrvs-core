@@ -1017,6 +1017,11 @@ export type InputOutput = {
   valueString?: Maybe<Scalars['String']>
 }
 
+export type LabelInput = {
+  label: Scalars['String']
+  lang: Scalars['String']
+}
+
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
@@ -1216,6 +1221,7 @@ export type Mutation = {
   updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
+  updateRole: Response
   usernameSMSReminder?: Maybe<Scalars['String']>
   voidNotification?: Maybe<Notification>
 }
@@ -1417,6 +1423,10 @@ export type MutationUpdateDeathRegistrationArgs = {
 
 export type MutationUpdatePermissionsArgs = {
   setting: UpdatePermissionsInput
+}
+
+export type MutationUpdateRoleArgs = {
+  systemRole?: InputMaybe<SystemRoleInput>
 }
 
 export type MutationUsernameSmsReminderArgs = {
@@ -2003,10 +2013,20 @@ export type RemoveBookmarkedSeachInput = {
   userId: Scalars['String']
 }
 
+export type Response = {
+  __typename?: 'Response'
+  msg: Scalars['String']
+}
+
 export type Role = {
   __typename?: 'Role'
   _id: Scalars['ID']
   labels: Array<RoleLabel>
+}
+
+export type RoleInput = {
+  _id?: InputMaybe<Scalars['ID']>
+  labels: Array<LabelInput>
 }
 
 export type RoleLabel = {
@@ -2125,6 +2145,13 @@ export type SystemRole = {
   id: Scalars['ID']
   roles: Array<Role>
   value: Scalars['String']
+}
+
+export type SystemRoleInput = {
+  active?: InputMaybe<Scalars['Boolean']>
+  id: Scalars['ID']
+  roles?: InputMaybe<Array<RoleInput>>
+  value?: InputMaybe<Scalars['String']>
 }
 
 export type SystemSecret = {
@@ -2435,6 +2462,7 @@ export type GetSystemRolesQuery = {
   __typename?: 'Query'
   getSystemRoles?: Array<{
     __typename?: 'SystemRole'
+    id: string
     value: string
     roles: Array<{
       __typename?: 'Role'
@@ -2442,6 +2470,15 @@ export type GetSystemRolesQuery = {
       labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
     }>
   }> | null
+}
+
+export type UpdateRoleMutationVariables = Exact<{
+  systemRole?: InputMaybe<SystemRoleInput>
+}>
+
+export type UpdateRoleMutation = {
+  __typename?: 'Mutation'
+  updateRole: { __typename?: 'Response'; msg: string }
 }
 
 export type AdvancedSeachParametersFragment = {

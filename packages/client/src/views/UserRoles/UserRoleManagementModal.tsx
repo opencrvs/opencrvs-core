@@ -116,8 +116,43 @@ export function UserRoleManagementModal(props: IProps) {
     return true
   }
 
+  const updateRole = () => {
+    const newUserRoles = userRoles.map((userRole) => {
+      return {
+        ...userRole,
+        labels: userRole.labels.map((label) => {
+          if (label.lang === currentLanguage) {
+            return { ...label }
+          }
+          return label
+        })
+      }
+    })
+
+    const newLabels = availableLangs.map((lang) => {
+      if (lang === currentLanguage) {
+        return {
+          lang: currentLanguage,
+          label: currentClipBoard
+        }
+      }
+      return { lang: lang, label: '' }
+    })
+
+    newUserRoles.push({
+      labels: newLabels
+    })
+
+    console.log('newUserRoles', newUserRoles)
+    setUserRoles(newUserRoles)
+    setCurrentClipBoard('')
+    const newActiveItems = new Array(userRoles.length).fill(false)
+    setActives(newActiveItems)
+  }
+
   return (
     <ResponsiveModal
+      key={props.systemRole.id}
       title={
         getUserSystemRole({ systemRole: props.systemRole.value }, intl) || ''
       }
@@ -223,41 +258,7 @@ export function UserRoleManagementModal(props: IProps) {
               setCurrentClipBoard(e.target.value)
             }}
           />
-          <Button
-            disabled={!currentClipBoard}
-            type="icon"
-            onClick={() => {
-              const newUserRoles = userRoles.map((userRole) => {
-                return {
-                  ...userRole,
-                  labels: userRole.labels.map((label) => {
-                    if (label.lang === currentLanguage) {
-                      return { ...label }
-                    }
-                    return label
-                  })
-                }
-              })
-
-              const newLabels = availableLangs.map((lang) => {
-                if (lang === currentLanguage) {
-                  return {
-                    lang: currentLanguage,
-                    label: currentClipBoard
-                  }
-                }
-                return { lang: lang, label: '' }
-              })
-
-              newUserRoles.push({
-                labels: newLabels
-              })
-              setUserRoles(newUserRoles)
-              setCurrentClipBoard('')
-              const newActiveItems = new Array(userRoles.length).fill(false)
-              setActives(newActiveItems)
-            }}
-          >
+          <Button disabled={!currentClipBoard} type="icon" onClick={updateRole}>
             <Icon name="Plus" color="primary" />
           </Button>
         </Stack>
