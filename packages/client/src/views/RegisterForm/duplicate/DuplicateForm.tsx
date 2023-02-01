@@ -12,7 +12,7 @@
 
 import * as React from 'react'
 import { Content } from '@opencrvs/components/lib/Content'
-import { IDeclaration } from '@client/declarations'
+import { archiveDeclaration, IDeclaration } from '@client/declarations'
 import styled from 'styled-components'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
 import { useIntl } from 'react-intl'
@@ -59,9 +59,10 @@ const StyledTextArea = styled(TextArea)`
 export const DuplicateForm = (props: IProps) => {
   const intl = useIntl()
   const [showModal, setShowModal] = React.useState(false)
-  const [selectedOption, setSelectedOption] = React.useState('')
+  const [selectedTrackingId, setSelectedTrackingId] = React.useState('')
   const [isSelected, setIsSelected] = React.useState(false)
-  const [textValue, setTextValue] = React.useState(false)
+  const [comment, setComment] = React.useState('')
+  const compositionId = props.declaration.id
   const dispatch = useDispatch()
   const { data } = props.declaration
   const trackingIds = props.declaration.duplicates
@@ -77,6 +78,10 @@ export const DuplicateForm = (props: IProps) => {
 
   const toggleModal = () => {
     setShowModal((prev) => !prev)
+  }
+
+  const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setComment(event.target.value)
   }
 
   const notADuplicateButton = (
@@ -142,8 +147,10 @@ export const DuplicateForm = (props: IProps) => {
             type="negative"
             onClick={() => {
               if (isSelected) {
+                dispatch(
+                  archiveDeclaration(compositionId, selectedTrackingId, comment)
+                )
                 dispatch(goToHome())
-                // dispatch archive declaration
               }
             }}
             disabled={!isSelected}
@@ -162,10 +169,9 @@ export const DuplicateForm = (props: IProps) => {
               <StyledSelect
                 id="selectTrackingId"
                 isDisabled={false}
-                value={selectedOption}
+                value={selectedTrackingId}
                 onChange={(val: string) => {
-                  console.log('val', val)
-                  setSelectedOption(val)
+                  setSelectedTrackingId(val)
                   setIsSelected(true)
                 }}
                 options={props.declaration.duplicates?.map((id) => ({
@@ -179,9 +185,7 @@ export const DuplicateForm = (props: IProps) => {
               <StyledTextArea
                 ignoreMediaQuery
                 {...{
-                  onChange: (event: any) => {
-                    setTextValue(true)
-                  }
+                  onChange: handleCommentChange
                 }}
               />
             </Stack>
