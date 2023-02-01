@@ -582,7 +582,6 @@ type Mutation {
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
-  markEventAsArchived(id: String!): ID! # updates status to 'archived'
   markEventAsNotDuplicate(id: String!): ID! # removes duplicates from composition
   markEventAsArchived(
     id: String!

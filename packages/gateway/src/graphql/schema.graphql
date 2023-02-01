@@ -173,7 +173,6 @@ type Mutation {
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
-  markEventAsArchived(id: String!): ID!
   markEventAsNotDuplicate(id: String!): ID!
   markEventAsArchived(
     id: String!

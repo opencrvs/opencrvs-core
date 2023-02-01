@@ -67,8 +67,8 @@ export interface GQLMutation {
   requestBirthRegistrationCorrection: string
   markEventAsVoided: string
   markEventAsReinstated?: GQLReinstated
-  markEventAsArchived: string
   markEventAsNotDuplicate: string
+  markEventAsArchived: string
   createDeathRegistration: GQLCreatedIds
   updateDeathRegistration: string
   markDeathAsVerified?: GQLDeathRegistration
@@ -2595,8 +2595,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   requestBirthRegistrationCorrection?: MutationToRequestBirthRegistrationCorrectionResolver<TParent>
   markEventAsVoided?: MutationToMarkEventAsVoidedResolver<TParent>
   markEventAsReinstated?: MutationToMarkEventAsReinstatedResolver<TParent>
-  markEventAsArchived?: MutationToMarkEventAsArchivedResolver<TParent>
   markEventAsNotDuplicate?: MutationToMarkEventAsNotDuplicateResolver<TParent>
+  markEventAsArchived?: MutationToMarkEventAsArchivedResolver<TParent>
   createDeathRegistration?: MutationToCreateDeathRegistrationResolver<TParent>
   updateDeathRegistration?: MutationToUpdateDeathRegistrationResolver<TParent>
   markDeathAsVerified?: MutationToMarkDeathAsVerifiedResolver<TParent>
@@ -2805,6 +2805,21 @@ export interface MutationToMarkEventAsReinstatedResolver<
   ): TResult
 }
 
+export interface MutationToMarkEventAsNotDuplicateArgs {
+  id: string
+}
+export interface MutationToMarkEventAsNotDuplicateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkEventAsNotDuplicateArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToMarkEventAsArchivedArgs {
   id: string
   reason?: string
@@ -2818,21 +2833,6 @@ export interface MutationToMarkEventAsArchivedResolver<
   (
     parent: TParent,
     args: MutationToMarkEventAsArchivedArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToMarkEventAsNotDuplicateArgs {
-  id: string
-}
-export interface MutationToMarkEventAsNotDuplicateResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToMarkEventAsNotDuplicateArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
