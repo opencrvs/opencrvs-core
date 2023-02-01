@@ -32,6 +32,8 @@ export const REQUESTING_INDIVIDUAL = `${OPENCRVS_SPECIFICATION_URL}extension/req
 export const HAS_SHOWED_VERIFIED_DOCUMENT = `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
 export const VIEWED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regViewed`
 export const MARKED_AS_NOT_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate`
+export const MARKED_AS_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate`
+export const DUPLICATE_TRACKING_ID = `${OPENCRVS_SPECIFICATION_URL}extension/duplicateTrackingId`
 
 export const BIRTH_REG_NO = 'birth-registration-number'
 export const DEATH_REG_NO = 'death-registration-number'

@@ -18,3 +18,4 @@ export const UNASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/
 export const REQUEST_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/requestCorrection`
 export const VIEWED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regViewed`
 export const MARKED_AS_NOT_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate`
+export const MARKED_AS_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate`

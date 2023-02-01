@@ -48,7 +48,8 @@ import {
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
-  MARKED_AS_NOT_DUPLICATE
+  MARKED_AS_NOT_DUPLICATE,
+  MARKED_AS_DUPLICATE
 } from '@workflow/features/task/fhir/constants'
 import { setupSystemIdentifier } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
@@ -85,7 +86,8 @@ export enum Events {
   ASSIGNED_EVENT = '/events/assigned',
   UNASSIGNED_EVENT = '/events/unassigned',
   UNKNOWN = 'unknown',
-  VIEWED = '/events/viewed'
+  VIEWED = '/events/viewed',
+  MARKED_AS_DUPLICATE = '/events/markAsDuplicate'
 }
 
 function detectEvent(request: Hapi.Request): Events {
@@ -205,6 +207,9 @@ function detectEvent(request: Hapi.Request): Events {
     }
     if (hasExtension(taskResource, MARKED_AS_NOT_DUPLICATE)) {
       return Events.EVENT_NOT_DUPLICATE
+    }
+    if (hasExtension(taskResource, MARKED_AS_DUPLICATE)) {
+      return Events.MARKED_AS_DUPLICATE
     }
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
@@ -426,11 +431,9 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.DOWNLOADED:
     case Events.VIEWED:
-      response = await actionEventHandler(request, h, event)
-      await triggerEvent(event, request.payload, request.headers)
-      break
     case Events.ASSIGNED_EVENT:
     case Events.UNASSIGNED_EVENT:
+    case Events.MARKED_AS_DUPLICATE:
       response = await actionEventHandler(request, h, event)
       await triggerEvent(event, request.payload, request.headers)
       break
