@@ -47,10 +47,6 @@ export const up = async (db, client) => {
             (c) => c.coding[0].system === systemRoles
           )[0].coding[0].code
 
-          const typeCode = practitionerRole.code.filter(
-            (c) => c.coding[0].system === systemRoles
-          )[1].coding[0].code
-
           const titleCase = (code) =>
             code
               .replace(/_/g, ' ')
@@ -83,6 +79,9 @@ export const up = async (db, client) => {
           if (isAutomated) continue
 
           if (hasSystemTypes) {
+            const typeCode = practitionerRole.code.filter(
+              (c) => c.coding[0].system === systemTypes
+            )[0].coding[0].code
             await db
               .collection('PractitionerRole')
               .updateOne(
