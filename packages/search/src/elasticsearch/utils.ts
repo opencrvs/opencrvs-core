@@ -94,6 +94,7 @@ export interface ICompositionBody {
   motherFirstNames?: string
   motherFamilyName?: string
   motherDoB?: string
+  motherIdentifier?: string
   childDoB?: string
   createdBy?: string
   updatedBy?: string

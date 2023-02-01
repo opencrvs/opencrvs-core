@@ -44,17 +44,171 @@ describe('Deduplication tests', () => {
     await client.ping()
   })
 
-  it('performs a duplicate check based on standard rules. Finds a duplicate with the exact same information', async () => {
+  describe('Performs a duplicate check based on standard rules', () => {
+    it('Finds a duplicate with birth date less than 5days', async () => {
+      /*
+       * Similar child's firstname(s)
+       * Similar child's lastname
+       * Date of birth within 5 days
+       * Similar Mother’s firstname(s)
+       * Similar Mother’s lastname.
+       * Similar Mother’s date of birth or Same Age of mother
+       * Same mother’s NID
+       */
+
+      await indexComposition(
+        '123-123-123-123',
+        {
+          childFirstNames: 'John',
+          childFamilyName: 'Smith',
+          childDoB: '2011-11-11',
+          motherFirstNames: 'Mother',
+          motherFamilyName: 'Smith',
+          motherDoB: '2000-11-11',
+          motherIdentifier: '23412387'
+        },
+        client
+      )
+      expect(
+        (
+          await searchForDuplicates(
+            {
+              childFirstNames: 'Johnathan',
+              childFamilyName: 'Smith',
+              childDoB: '2011-11-13',
+              motherFirstNames: 'Motherina',
+              motherFamilyName: 'Smith',
+              motherDoB: '2000-11-12',
+              motherIdentifier: '23412387'
+            },
+            client
+          )
+        ).body.hits.hits
+      ).toHaveLength(1)
+    })
+
+    it('Finds no duplicate with different motherNID', async () => {
+      /*
+       * Similar child's firstname(s)
+       * Similar child's lastname
+       * Date of birth within 5 days
+       * Similar Mother’s firstname(s)
+       * Similar Mother’s lastname.
+       * Similar Mother’s date of birth or Same Age of mother
+       * Same mother’s NID
+       */
+
+      await indexComposition(
+        '123-123-123-123',
+        {
+          childFirstNames: 'John',
+          childFamilyName: 'Smith',
+          childDoB: '2011-11-11',
+          motherFirstNames: 'Mother',
+          motherFamilyName: 'Smith',
+          motherDoB: '2000-11-11',
+          motherIdentifier: '23412387'
+        },
+        client
+      )
+      expect(
+        (
+          await searchForDuplicates(
+            {
+              childFirstNames: 'Johnathan',
+              childFamilyName: 'Smith',
+              childDoB: '2011-11-13',
+              motherFirstNames: 'Motherina',
+              motherFamilyName: 'Smith',
+              motherDoB: '2000-11-12',
+              motherIdentifier: '23412389'
+            },
+            client
+          )
+        ).body.hits.hits
+      ).toHaveLength(0)
+    })
+  })
+
+  describe('performs a duplicate check based on two births in 9 months', () => {
     /*
-     * Similar childs firstname(s)
-     * Similar childs lastname
-     * Date of birth within 5 days
+     * Similar Mother’s firstname(s)
+     *Similar Mother’s lastname
+     * Similar Mother’s date of birth
+     * Similar Mother’s date of birth
+     * Same Mother’s NID
+     * Child’s d.o.b in the last 9 months of each other
+     */
+    it('Finds a duplicate with Same mother two births within 9 months', async () => {
+      await indexComposition(
+        '123-123-123-123',
+        {
+          childFirstNames: 'John',
+          childFamilyName: 'Smith',
+          childDoB: '2020-01-01',
+          motherFirstNames: 'Mother',
+          motherFamilyName: 'Smith',
+          motherDoB: '2000-11-11'
+        },
+        client
+      )
+      expect(
+        (
+          await searchForDuplicates(
+            {
+              childFirstNames: 'Martin',
+              childFamilyName: 'Smith',
+              childDoB: '2020-08-08',
+              motherFirstNames: 'Mother',
+              motherFamilyName: 'Smith',
+              motherDoB: '2000-11-11'
+            },
+            client
+          )
+        ).body.hits.hits
+      ).toHaveLength(1)
+    })
+
+    it('Finds no duplicate with Same mother two births more than 9 months apart', async () => {
+      await indexComposition(
+        '123-123-123-123',
+        {
+          childFirstNames: 'John',
+          childFamilyName: 'Smith',
+          childDoB: '2020-01-01',
+          motherFirstNames: 'Mother',
+          motherFamilyName: 'Smith',
+          motherDoB: '2000-11-11'
+        },
+        client
+      )
+      expect(
+        (
+          await searchForDuplicates(
+            {
+              childFirstNames: 'Angelo',
+              childFamilyName: 'Smith',
+              childDoB: '2020-12-12',
+              motherFirstNames: 'Mother',
+              motherFamilyName: 'Smith',
+              motherDoB: '2000-11-11'
+            },
+            client
+          )
+        ).body.hits.hits
+      ).toHaveLength(0)
+    })
+  })
+
+  it('performs a duplicate check child increase and decrease. Finds a duplicate for fraudulent records', async () => {
+    /*
+     * Similar child's firstname(s)
+     * Similar child's lastname
+     * Date of birth greater than 3 years
      * Similar Mother’s firstname(s)
      * Similar Mother’s lastname.
-     * Similar Mother’s date of birth or Same Age of mother
      * Same mother’s NID
      */
-
     await indexComposition(
       '123-123-123-123',
       {
@@ -62,8 +216,7 @@ describe('Deduplication tests', () => {
         childFamilyName: 'Smith',
         childDoB: '2011-11-11',
         motherFirstNames: 'Mother',
-        motherFamilyName: 'Smith',
-        motherDoB: '2000-11-11'
+        motherFamilyName: 'Smith'
       },
       client
     )
@@ -73,10 +226,9 @@ describe('Deduplication tests', () => {
           {
             childFirstNames: 'John',
             childFamilyName: 'Smith',
-            childDoB: '2011-11-11',
+            childDoB: '2014-11-11',
             motherFirstNames: 'Mother',
-            motherFamilyName: 'Smith',
-            motherDoB: '2000-11-11'
+            motherFamilyName: 'Smith'
           },
           client
         )
