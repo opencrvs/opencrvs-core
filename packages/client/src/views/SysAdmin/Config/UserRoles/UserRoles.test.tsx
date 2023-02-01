@@ -113,10 +113,7 @@ describe('render update system role', () => {
           ]
         }
       }
-    }
-  ]
-
-  const muatateSystemRoleMock = [
+    },
     {
       request: {
         query: updateRoleQuery,
@@ -198,7 +195,7 @@ describe('render update system role', () => {
     component = await createTestComponent(<UserRoles />, {
       store,
       history,
-      graphqlMocks: [mocks, muatateSystemRoleMock]
+      graphqlMocks: mocks
     })
 
     await new Promise((resolve) => {
