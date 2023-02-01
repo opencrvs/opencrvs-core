@@ -16,6 +16,7 @@ import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
+import { Types } from 'mongoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -42,6 +43,7 @@ const mockUser = {
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   systemRole: 'LOCAL_REGISTRAR',
+  role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
   primaryOfficeId: '321',
   catchmentAreaIds: [],
   scope: ['register'],
@@ -118,7 +120,7 @@ describe('createUser handler', () => {
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'FIELD_AGENT',
-        role: 'HEALTHCARE_WORKER',
+        role: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
         primaryOfficeId: '321',
         catchmentAreaIds: [],
         deviceId: 'D444',
@@ -155,7 +157,7 @@ describe('createUser handler', () => {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'HEALTHCARE_WORKER'
+              code: 'Field Agent'
             }
           ]
         }

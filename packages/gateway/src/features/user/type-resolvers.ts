@@ -32,6 +32,14 @@ interface IAvatar {
   data: string
 }
 
+type Label = {
+  lang: string
+  label: string
+}
+interface IUserRole {
+  labels: Label[]
+}
+
 export interface IUserModelData {
   _id: string
   username: string
@@ -45,7 +53,7 @@ export interface IUserModelData {
   mobile: string
   status: string
   systemRole: string
-  role: string
+  role: IUserRole
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
@@ -79,6 +87,7 @@ export interface IUserPayload
     | 'practitionerId'
     | 'username'
     | 'identifiers'
+    | 'role'
   > {
   id?: string
   identifiers: GQLUserIdentifierInput[]

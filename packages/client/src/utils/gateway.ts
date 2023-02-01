@@ -3045,7 +3045,11 @@ export type GetUserQuery = {
       system?: string | null
       value?: string | null
     } | null
-    role: { __typename?: 'Role'; _id: string }
+    role: {
+      __typename?: 'Role'
+      _id: string
+      labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
+    }
     primaryOffice?: {
       __typename?: 'Location'
       id: string
@@ -3447,7 +3451,15 @@ export type FetchBirthRegistrationForReviewQuery = {
         __typename?: 'User'
         id: string
         systemRole: RoleType
-        role: { __typename?: 'Role'; _id: string }
+        role: {
+          __typename?: 'Role'
+          _id: string
+          labels: Array<{
+            __typename?: 'RoleLabel'
+            lang: string
+            label: string
+          }>
+        }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -3744,7 +3756,15 @@ export type FetchBirthRegistrationForCertificateQuery = {
         __typename?: 'User'
         id: string
         systemRole: RoleType
-        role: { __typename?: 'Role'; _id: string }
+        role: {
+          __typename?: 'Role'
+          _id: string
+          labels: Array<{
+            __typename?: 'RoleLabel'
+            lang: string
+            label: string
+          }>
+        }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -4113,7 +4133,15 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'User'
         id: string
         systemRole: RoleType
-        role: { __typename?: 'Role'; _id: string }
+        role: {
+          __typename?: 'Role'
+          _id: string
+          labels: Array<{
+            __typename?: 'RoleLabel'
+            lang: string
+            label: string
+          }>
+        }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null
@@ -4388,7 +4416,15 @@ export type FetchDeathRegistrationForCertificationQuery = {
         __typename?: 'User'
         id: string
         systemRole: RoleType
-        role: { __typename?: 'Role'; _id: string }
+        role: {
+          __typename?: 'Role'
+          _id: string
+          labels: Array<{
+            __typename?: 'RoleLabel'
+            lang: string
+            label: string
+          }>
+        }
         name: Array<{
           __typename?: 'HumanName'
           firstNames?: string | null

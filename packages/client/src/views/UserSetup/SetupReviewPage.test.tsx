@@ -25,7 +25,18 @@ describe('SetupReviewPage page tests', () => {
   it('render page', async () => {
     store.dispatch(
       getStorageUserDetailsSuccess(
-        JSON.stringify({ ...userDetails, role: 'CHA' })
+        JSON.stringify({
+          ...userDetails,
+          role: {
+            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            labels: [
+              {
+                lang: 'en',
+                label: 'CHA'
+              }
+            ]
+          }
+        })
       )
     )
     const testComponent = await createTestComponent(
@@ -62,7 +73,7 @@ describe('SetupReviewPage page tests', () => {
       { store, history }
     )
     const role = testComponent.find('#RoleType_value').hostNodes().text()
-    expect(role).toEqual('Field Agent')
+    expect(role).toEqual('Field Agent / ENTREPENEUR')
   })
   it('clicks question to change', async () => {
     const testComponent = await createTestComponent(

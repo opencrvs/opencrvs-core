@@ -23,7 +23,7 @@ import {
   mockOfflineData,
   mockOfflineDataDispatch
 } from '@client/tests/util'
-import { modifyUserFormData, processRoles } from '@client/user/userReducer'
+import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -31,11 +31,11 @@ import {
   REVIEW_USER_FORM,
   REVIEW_USER_DETAILS
 } from '@client/navigation/routes'
-import { UserSection } from '@client/forms'
+import { ISelectFormFieldWithDynamicOptions, UserSection } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
-import { vi, Mock } from 'vitest'
+import { vi, Mock, describe, expect } from 'vitest'
 
 export const mockRoles = {
   data: {
@@ -44,123 +44,163 @@ export const mockRoles = {
         value: 'FIELD_AGENT',
         roles: [
           {
-            lang: 'en',
-            label: 'Healthcare Worker'
+            labels: [
+              {
+                lang: 'en',
+                label: 'Healthcare Worker'
+              },
+              {
+                lang: 'fr',
+                label: 'Professionnel de Santé'
+              }
+            ]
           },
           {
-            lang: 'fr',
-            label: 'Professionnel de Santé'
+            labels: [
+              {
+                lang: 'en',
+                label: 'Police Officer'
+              },
+              {
+                lang: 'fr',
+                label: 'Agent de Police'
+              }
+            ]
           },
           {
-            lang: 'en',
-            label: 'Police Officer'
+            labels: [
+              {
+                lang: 'en',
+                label: 'Social Worker'
+              },
+              {
+                lang: 'fr',
+                label: 'Travailleur Social'
+              }
+            ]
           },
           {
-            lang: 'fr',
-            label: 'Agent de Police'
-          },
-          {
-            lang: 'en',
-            label: 'Social Worker'
-          },
-          {
-            lang: 'fr',
-            label: 'Travailleur Social'
-          },
-          {
-            lang: 'en',
-            label: 'Local Leader'
-          },
-          {
-            lang: 'fr',
-            label: 'Leader Local'
+            labels: [
+              {
+                lang: 'en',
+                label: 'Local Leader'
+              },
+              {
+                lang: 'fr',
+                label: 'Leader Local'
+              }
+            ]
           }
         ],
-        __typename: 'Role'
+        active: true
       },
       {
         value: 'REGISTRATION_AGENT',
         roles: [
           {
-            lang: 'en',
-            label: 'Registration Agent'
-          },
-          {
-            lang: 'fr',
-            label: "Agent d'enregistrement"
+            labels: [
+              {
+                lang: 'en',
+                label: 'Registration Agent'
+              },
+              {
+                lang: 'fr',
+                label: "Agent d'enregistrement"
+              }
+            ]
           }
         ],
-        __typename: 'Role'
+        active: true
       },
       {
         value: 'LOCAL_REGISTRAR',
         roles: [
           {
-            lang: 'en',
-            label: 'Local Registrar'
-          },
-          {
-            lang: 'fr',
-            label: 'Registraire local'
+            labels: [
+              {
+                lang: 'en',
+                label: 'Local Registrar'
+              },
+              {
+                lang: 'fr',
+                label: 'Registraire local'
+              }
+            ]
           }
         ],
-        __typename: 'Role'
+        active: true
       },
       {
         value: 'LOCAL_SYSTEM_ADMIN',
         roles: [
           {
-            lang: 'en',
-            label: 'Local System_admin'
-          },
-          {
-            lang: 'fr',
-            label: 'Administrateur système local'
+            labels: [
+              {
+                lang: 'en',
+                label: 'Local System_admin'
+              },
+              {
+                lang: 'fr',
+                label: 'Administrateur système local'
+              }
+            ]
           }
         ],
-        __typename: 'Role'
+        active: true
       },
       {
         value: 'NATIONAL_SYSTEM_ADMIN',
         roles: [
           {
-            lang: 'en',
-            label: 'National System_admin'
-          },
-          {
-            lang: 'fr',
-            label: 'Administrateur système national'
+            labels: [
+              {
+                lang: 'en',
+                label: 'National System_admin'
+              },
+              {
+                lang: 'fr',
+                label: 'Administrateur système national'
+              }
+            ]
           }
         ],
-        __typename: 'Role'
+        active: true
       },
       {
         value: 'PERFORMANCE_MANAGEMENT',
         roles: [
           {
-            lang: 'en',
-            label: 'Performance Management'
-          },
-          {
-            lang: 'fr',
-            label: 'Gestion des performances'
+            labels: [
+              {
+                lang: 'en',
+                label: 'Performance Management'
+              },
+              {
+                lang: 'fr',
+                label: 'Gestion des performances'
+              }
+            ]
           }
         ],
-        __typename: 'Role'
+        active: true
       },
       {
         value: 'NATIONAL_REGISTRAR',
         roles: [
           {
-            lang: 'en',
-            label: 'National Registrar'
-          },
-          {
-            lang: 'fr',
-            label: 'Registraire national'
+            labels: [
+              {
+                lang: 'en',
+                label: 'National Registrar'
+              },
+              {
+                lang: 'fr',
+                label: 'Registraire national'
+              }
+            ]
           }
         ],
-        __typename: 'Role'
+        active: true
       }
     ]
   }
@@ -183,7 +223,15 @@ export const mockUsers = {
           ],
           username: 'api.user',
           systemRole: 'API_USER',
-          role: 'API_USER',
+          role: {
+            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            labels: [
+              {
+                lang: 'en',
+                label: 'API_USER'
+              }
+            ]
+          },
           status: 'active',
           __typename: 'User'
         },
@@ -316,6 +364,7 @@ describe('create new user tests', () => {
     const s = createStore()
     store = s.store
     history = s.history
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
   describe('when user is in create new user form', () => {
@@ -346,7 +395,6 @@ describe('create new user tests', () => {
 
       await flushPromises()
       testComponent.update()
-
       expect(
         testComponent
           .find(FormFieldGenerator)
@@ -379,8 +427,8 @@ describe('create new user tests', () => {
 
   describe('when user in review page', () => {
     beforeEach(async () => {
+      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
       testComponent = await createTestComponent(
         // @ts-ignore
         <CreateNewUser
@@ -492,6 +540,19 @@ describe('edit user tests', () => {
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+  })
+
+  it('check user role update', async () => {
+    const section = store
+      .getState()
+      .userForm.userForm?.sections.find((section) => section.id === 'user')
+    const group = section!.groups.find(
+      (group) => group.id === 'user-view-group'
+    )!
+    const field = group.fields.find(
+      (field) => field.name === 'role'
+    ) as ISelectFormFieldWithDynamicOptions
+    expect(field.dynamicOptions.options).not.toEqual({})
   })
 
   describe('when user is in update form page', () => {

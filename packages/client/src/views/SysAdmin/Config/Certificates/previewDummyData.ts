@@ -1292,8 +1292,16 @@ const mockUserDetails = {
     }
   ],
   mobile: '+260921111111',
-  role: 'NATIONAL_SYSTEM_ADMIN',
-  type: 'NATIONAL_SYSTEM_ADMIN',
+  systemrole: 'NATIONAL_SYSTEM_ADMIN',
+  role: {
+    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    labels: [
+      {
+        lang: 'en',
+        label: 'NATIONAL_SYSTEM_ADMIN'
+      }
+    ]
+  },
   status: 'active',
   primaryOffice: {
     id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',

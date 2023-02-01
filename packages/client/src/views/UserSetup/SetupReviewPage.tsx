@@ -90,7 +90,9 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
       (userDetails.role
         ? `${intl.formatMessage(
             userMessages[userDetails.systemRole as string]
-          )} / ${intl.formatMessage(userMessages[userDetails.role as string])}`
+          )} / ${
+            userDetails.role.labels.find((label) => label.lang === 'en')?.label
+          }`
         : `${intl.formatMessage(
             userMessages[userDetails.systemRole as string]
           )}`)) ||
@@ -145,7 +147,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
       id: 'RoleType',
       label: `${intl.formatMessage(
         constantsMessages.labelRole
-      )} / ${intl.formatMessage(constantsMessages.type)}`,
+      )} / ${intl.formatMessage(constantsMessages.labelRole)}`,
       value: typeRole
     },
     ...answeredQuestions

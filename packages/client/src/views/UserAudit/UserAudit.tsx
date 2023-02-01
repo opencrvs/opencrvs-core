@@ -141,7 +141,7 @@ export const UserAudit = () => {
   >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
   const userRole = user && getUserSystemRole(user, intl)
-  const userType = user && getUserType(user, intl)
+  const userType = user && getUserType(user)
 
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)

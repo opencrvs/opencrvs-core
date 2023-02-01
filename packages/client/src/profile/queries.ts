@@ -23,6 +23,10 @@ export const FETCH_USER = gql`
       systemRole
       role {
         _id
+        labels {
+          lang
+          label
+        }
       }
       status
       name {

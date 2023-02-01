@@ -103,7 +103,7 @@ export default async function updateUser(
       'Practitioner resource not updated correctly, practitioner ID not returned'
     )
   }
-  const practitionerRole = createFhirPractitionerRole(
+  const practitionerRole = await createFhirPractitionerRole(
     existingUser,
     existingUser.practitionerId,
     false

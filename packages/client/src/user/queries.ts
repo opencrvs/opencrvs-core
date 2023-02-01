@@ -98,6 +98,10 @@ export const GET_USER = gql`
       systemRole
       role {
         _id
+        labels {
+          lang
+          label
+        }
       }
       status
       underInvestigation
