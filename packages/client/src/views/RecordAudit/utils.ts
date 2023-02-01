@@ -435,3 +435,7 @@ export function isSystemInitiated(history: History) {
     (history.dhis2Notification && !history.user?.id) || history.system
   )
 }
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}

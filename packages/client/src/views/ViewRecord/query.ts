@@ -11,6 +11,7 @@
  */
 
 import { gql } from '@apollo/client'
+import { client } from '@client/utils/apolloClient'
 
 export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
   query fetchViewRecordByComposition($id: ID!) {
@@ -396,3 +397,18 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
     }
   }
 `
+
+async function fetchDeclarationForViewing(id: string) {
+  return (
+    client &&
+    client.query({
+      query: FETCH_VIEW_RECORD_BY_COMPOSITION,
+      variables: { id },
+      fetchPolicy: 'cache-first'
+    })
+  )
+}
+
+export const ViewRecordQueries = {
+  fetchDeclarationForViewing
+}

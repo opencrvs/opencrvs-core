@@ -77,6 +77,7 @@ export interface GQLMutation {
   markDeathAsCertified: string
   requestDeathRegistrationCorrection: string
   markEventAsUnassigned: string
+  markEventAsDuplicate: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -787,6 +788,7 @@ export interface GQLHistory {
   output?: Array<GQLInputOutput | null>
   certificates?: Array<GQLCertificate | null>
   signature?: GQLSignature
+  duplicateOf?: string
 }
 
 export const enum GQLMannerOfDeath {
@@ -1344,7 +1346,8 @@ export const enum GQLRegAction {
   REINSTATED = 'REINSTATED',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   DOWNLOADED = 'DOWNLOADED',
-  VIEWED = 'VIEWED'
+  VIEWED = 'VIEWED',
+  MARKED_AS_DUPLICATE = 'MARKED_AS_DUPLICATE'
 }
 
 export interface GQLStatusReason {
@@ -2602,6 +2605,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
+  markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2803,6 +2807,9 @@ export interface MutationToMarkEventAsReinstatedResolver<
 
 export interface MutationToMarkEventAsArchivedArgs {
   id: string
+  reason?: string
+  comment?: string
+  duplicateTrackingId?: string
 }
 export interface MutationToMarkEventAsArchivedResolver<
   TParent = any,
@@ -2950,6 +2957,24 @@ export interface MutationToMarkEventAsUnassignedResolver<
   (
     parent: TParent,
     args: MutationToMarkEventAsUnassignedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkEventAsDuplicateArgs {
+  id: string
+  reason: string
+  comment?: string
+  duplicateTrackingId?: string
+}
+export interface MutationToMarkEventAsDuplicateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkEventAsDuplicateArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -5159,6 +5184,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   output?: HistoryToOutputResolver<TParent>
   certificates?: HistoryToCertificatesResolver<TParent>
   signature?: HistoryToSignatureResolver<TParent>
+  duplicateOf?: HistoryToDuplicateOfResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -5236,6 +5262,10 @@ export interface HistoryToCertificatesResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToSignatureResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToDuplicateOfResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

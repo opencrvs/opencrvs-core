@@ -15,8 +15,7 @@ import { Select, ISelectOption as SelectComponentOptions } from '../Select'
 import { DocumentImage } from './components/DocumentImage'
 
 const Container = styled.div`
-  width: calc(40vw - 50px);
-  position: fixed;
+  position: relative;
   background-color: ${({ theme }) => theme.colors.grey100};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
@@ -55,6 +54,7 @@ export interface IDocumentViewerOptions {
 interface IProps {
   id?: string
   options: IDocumentViewerOptions
+  children?: React.ReactNode
 }
 
 interface IState {

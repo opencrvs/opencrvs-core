@@ -256,10 +256,10 @@ describe('user audit action modal tests', () => {
           '#deactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
-        await flushPromises()
-        expect(
-          store.getState().notification.userAuditSuccessToast.visible
-        ).toBe(true)
+        waitFor(
+          () =>
+            store.getState().notification.userAuditSuccessToast.visible === true
+        )
       })
     })
   })
@@ -288,9 +288,10 @@ describe('user audit action modal tests', () => {
 
       it('clicking confirm action dispatches error notification action', async () => {
         component.find('#deactivate-action').hostNodes().simulate('click')
-        await flushPromises()
-        expect(store.getState().notification.submitFormErrorToast).toBe(
-          'userFormFail'
+        waitFor(
+          () =>
+            store.getState().notification.submitFormErrorToast ===
+            'userFormFail'
         )
       })
     })

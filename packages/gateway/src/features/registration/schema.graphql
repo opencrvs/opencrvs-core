@@ -26,6 +26,7 @@ enum RegAction {
   REQUESTED_CORRECTION
   DOWNLOADED
   VIEWED
+  MARKED_AS_DUPLICATE
 }
 
 enum BirthRegType {
@@ -254,6 +255,7 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  duplicateOf: String
 }
 
 interface EventRegistration {
@@ -580,7 +582,12 @@ type Mutation {
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
-  markEventAsArchived(id: String!): ID! # updates status to 'archived'
+  markEventAsArchived(
+    id: String!
+    reason: String
+    comment: String
+    duplicateTrackingId: String
+  ): ID! # updates status to 'archived'
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
@@ -601,4 +608,10 @@ type Mutation {
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
+  markEventAsDuplicate(
+    id: String!
+    reason: String!
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
 }

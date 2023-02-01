@@ -258,6 +258,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }
@@ -499,6 +500,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             }
           }
         }
+        duplicateOf
       }
     }
   }

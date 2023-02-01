@@ -18,7 +18,7 @@ import {
   ITimeLoggedResponse,
   getCertificatesFromTask,
   getActionFromTask,
-  fetchCompositionByIdFromHearth
+  fetchTaskByCompositionIdFromHearth
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -56,9 +56,13 @@ import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
   REQUESTING_INDIVIDUAL,
-  HAS_SHOWED_VERIFIED_DOCUMENT
+  HAS_SHOWED_VERIFIED_DOCUMENT,
+  DUPLICATE_TRACKING_ID
 } from '@gateway/features/fhir/constants'
-import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
+import {
+  ITaskBundle,
+  ITemplatedComposition
+} from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
@@ -539,12 +543,11 @@ export const typeResolvers: GQLResolver = {
         duplicateCompositionIds &&
         (await Promise.all(
           duplicateCompositionIds.map(async (compositionId: string) => {
-            const compositionData = (await fetchCompositionByIdFromHearth(
-              compositionId
-            )) as fhir.Composition
+            const taskData: ITaskBundle =
+              await fetchTaskByCompositionIdFromHearth(compositionId)
             return {
               compositionId: compositionId,
-              trackingId: compositionData.identifier?.value
+              trackingId: taskData.entry?.[0].resource?.identifier?.[1].value
             }
           })
         ))
@@ -969,6 +972,14 @@ export const typeResolvers: GQLResolver = {
           data: signature.blob
         }
       )
+    },
+    duplicateOf: (task: fhir.Task) => {
+      const extensions = task.extension || []
+      const duplicateTrackingIdExt = findExtension(
+        DUPLICATE_TRACKING_ID,
+        extensions
+      )
+      return duplicateTrackingIdExt?.valueString
     }
   },
 
