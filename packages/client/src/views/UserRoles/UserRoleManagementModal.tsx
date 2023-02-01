@@ -142,12 +142,11 @@ export function UserRoleManagementModal(props: IProps) {
     newUserRoles.push({
       labels: newLabels
     })
-
-    console.log('newUserRoles', newUserRoles)
     setUserRoles(newUserRoles)
     setCurrentClipBoard('')
     const newActiveItems = new Array(userRoles.length).fill(false)
     setActives(newActiveItems)
+    debugger
   }
 
   return (

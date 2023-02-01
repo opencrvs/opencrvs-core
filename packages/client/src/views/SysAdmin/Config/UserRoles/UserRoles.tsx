@@ -46,7 +46,7 @@ import { getUserSystemRole } from '@client/views/SysAdmin//Team/utils'
 import { getLanguage } from '@client/i18n/selectors'
 import { useSelector } from 'react-redux'
 import { getUserRole } from './utils'
-import { Stack } from '@opencrvs/components'
+import { Stack, Toast } from '@opencrvs/components'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useModal } from '@client/hooks/useModal'
 import { UserRoleManagementModal } from '@client/views/UserRoles/UserRoleManagementModal'
@@ -75,9 +75,12 @@ const UserRoles = () => {
     }
   )
 
+  console.log(data)
+  console.log(error)
+
   const [
     updateRoleMutate,
-    { loading: roleUpdatedLoading, error: updateRoleError }
+    { data: roleUpdateSuccess, error: updateRoleError, reset }
   ] = useMutation<UpdateRoleMutation, UpdateRoleMutationVariables>(
     updateRoleQuery,
     {
@@ -90,9 +93,6 @@ const UserRoles = () => {
   )
 
   const roleChangeHandler = async (systemRole: ISystemRole) => {
-    //TODO: call mutation using the changedRoles
-
-    console.log(systemRole)
     const changedRoles = await openUserRoleManage<RolesInput | null>(
       (close) => (
         <UserRoleManagementModal
@@ -101,21 +101,19 @@ const UserRoles = () => {
         />
       )
     )
-
-    const mutationPayload: SystemRoleInput = {
-      id: systemRole.id,
-      value: systemRole.value,
-      active: true,
-      roles: changedRoles
-    }
-
-    console.log(JSON.stringify(mutationPayload))
-
-    updateRoleMutate({
-      variables: {
-        systemRole: mutationPayload
+    if (changedRoles) {
+      const mutateAbleSystemRole: SystemRoleInput = {
+        id: systemRole.id,
+        value: systemRole.value,
+        active: true,
+        roles: changedRoles
       }
-    })
+      updateRoleMutate({
+        variables: {
+          systemRole: mutateAbleSystemRole
+        }
+      })
+    }
   }
 
   return (
@@ -168,6 +166,7 @@ const UserRoles = () => {
               {(data?.getSystemRoles ?? []).map((systemRole) => {
                 return (
                   <ListViewItemSimplified
+                    key={systemRole.id}
                     label={
                       <Label id={`${systemRole?.value}_label`}>
                         {getUserSystemRole(
@@ -190,6 +189,8 @@ const UserRoles = () => {
                     }
                     actions={
                       <Link
+                        id="changeButton"
+                        key={systemRole.id}
                         font="reg16"
                         onClick={() => {
                           roleChangeHandler(systemRole)
@@ -206,6 +207,12 @@ const UserRoles = () => {
           {userRoleMgntModalNode}
         </Content>
       </Frame>
+
+      {roleUpdateSuccess && (
+        <Toast type="success" id="updateRoleSuccess" onClose={() => reset()}>
+          {intl.formatMessage(messages.systemRoleSuccessMsg)}
+        </Toast>
+      )}
     </>
   )
 }
