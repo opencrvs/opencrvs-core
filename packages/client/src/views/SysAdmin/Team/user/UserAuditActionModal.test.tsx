@@ -20,8 +20,9 @@ import { GraphQLError } from 'graphql'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
 import { RoleType, Status } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
-const users = [
+const users: UserDetails[] = [
   {
     id: '5d08e102542c7a19fc55b790',
     name: [
@@ -67,7 +68,8 @@ const users = [
     primaryOffice: {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
       name: 'Kaliganj Union Sub Center',
-      status: 'active'
+      status: 'active',
+      alias: ['Central']
     }
   },
   {
@@ -115,7 +117,8 @@ const users = [
     primaryOffice: {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
       name: 'Kaliganj Union Sub Center',
-      status: 'active'
+      status: 'active',
+      alias: ['Central']
     }
   }
 ]
