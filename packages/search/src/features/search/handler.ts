@@ -205,7 +205,7 @@ export async function searchDuplicates(
       request.payload as IBirthCompositionBody,
       client
     )
-    return h.response(result.body?.hits?.hits || []).code(200)
+    return h.response(result).code(200)
   } catch (error) {
     logger.error(`Search/searchForDuplicates: error: ${error}`)
     return internal(error)

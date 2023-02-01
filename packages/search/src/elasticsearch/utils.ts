@@ -18,7 +18,7 @@ import {
   getFromFhir
 } from '@search/features/fhir/fhir-utils'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
-import { ApiResponse } from '@elastic/elasticsearch'
+
 import fetch from 'node-fetch'
 import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
@@ -263,10 +263,9 @@ function isNotification(body: ICompositionBody): boolean {
 
 function findDuplicateIds(
   compositionIdentifier: string,
-  results: ApiResponse<ISearchResponse<any>> | null
+  results: ISearchResponse<IBirthCompositionBody>['hits']['hits']
 ) {
-  const hits = (results && results.body.hits.hits) || []
-  return hits
+  return results
     .filter(
       (hit) =>
         hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD

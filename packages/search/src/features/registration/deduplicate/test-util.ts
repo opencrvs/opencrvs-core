@@ -13,6 +13,10 @@ import {
   ElasticsearchContainer,
   StartedElasticsearchContainer
 } from 'testcontainers'
+import { indexComposition } from '@search/elasticsearch/dbhelper'
+import { IBirthCompositionBody } from '@search/elasticsearch/utils'
+import * as elasticsearch from '@elastic/elasticsearch'
+import { searchForDuplicates } from './service'
 
 export const ELASTIC_SEARCH_HTTP_PORT = 9200
 
@@ -41,4 +45,29 @@ export const stopContainer = async (
   container: StartedElasticsearchContainer
 ): Promise<void> => {
   await container.stop()
+}
+
+type ComparisonObject<T> = {
+  [Key in keyof T]: [T[Key], T[Key]]
+}
+type Values<T> = T[keyof T]
+
+export async function compare(
+  registrationComparison: ComparisonObject<IBirthCompositionBody>,
+  client: elasticsearch.Client
+) {
+  const existingComposition = Object.fromEntries(
+    Object.entries<Values<IBirthCompositionBody>[]>(registrationComparison).map(
+      ([key, values]) => [key, values[0]]
+    )
+  )
+  const newComposition = Object.fromEntries(
+    Object.entries<Values<IBirthCompositionBody>[]>(registrationComparison).map(
+      ([key, values]) => [key, values[1]]
+    )
+  )
+
+  await indexComposition('123-123-123-123', existingComposition, client)
+  const results = await searchForDuplicates(newComposition, client)
+  return results
 }

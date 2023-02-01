@@ -62,133 +62,165 @@ export const searchForDuplicates = async (
   body: IBirthCompositionBody,
   client: elasticsearch.Client
 ) => {
+  // Names of length of 3 or less characters = 0 edits allowed
+  // Names of length of 4 - 6 characters = 1 edit allowed
+  // Names of length of >7 characters = 2 edits allowed
+  const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
+
+  const mothersDetailsMatch = {
+    bool: {
+      must: [
+        // If mother identifier is provided, it needs to match 100%
+        body.motherIdentifier && {
+          match_phrase: {
+            motherIdentifier: body.motherIdentifier
+          }
+        },
+        body.motherFirstNames && {
+          match: {
+            motherFirstNames: {
+              query: body.motherFirstNames,
+              fuzziness: FIRST_NAME_FUZZINESS
+            }
+          }
+        },
+        body.motherFamilyName && {
+          match: {
+            motherFamilyName: {
+              query: body.motherFamilyName,
+              fuzziness: FIRST_NAME_FUZZINESS,
+              minimum_should_match: '100%'
+            }
+          }
+        },
+        body.motherDoB && {
+          range: {
+            motherDoB: {
+              gte: subYears(new Date(body.motherDoB), 1).toISOString(),
+              lte: addYears(new Date(body.motherDoB), 1).toISOString()
+            }
+          }
+        },
+        body.motherDoB && {
+          distance_feature: {
+            field: 'motherDoB',
+            pivot: '365d',
+            origin: new Date(body.motherDoB).toISOString(),
+            boost: 1.5
+          }
+        }
+      ].filter(Boolean)
+    }
+  }
+
+  const birthWithin9Months = {
+    bool: {
+      must: [
+        body.childDoB && {
+          range: {
+            childDoB: {
+              gte: subYears(new Date(body.childDoB), 1).toISOString(),
+              lte: addYears(new Date(body.childDoB), 1).toISOString()
+            }
+          }
+        },
+        body.childDoB && {
+          distance_feature: {
+            field: 'childDoB',
+            pivot: '365d',
+            origin: new Date(body.childDoB).toISOString(),
+            boost: 1
+          }
+        }
+      ].filter(Boolean)
+    }
+  }
+
   try {
-    return await client.search<ISearchResponse<IBirthCompositionBody>>({
+    const result = await client.search<ISearchResponse<IBirthCompositionBody>>({
       index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       body: {
         query: {
           bool: {
-            must: [
+            should: [
               {
                 bool: {
-                  must: [
-                    body.childFirstNames && {
-                      match: {
-                        childFirstNames: {
-                          query: body.childFirstNames,
-                          fuzziness: 'AUTO:4,7'
-                        }
-                      }
-                    },
-                    body.childFamilyName && {
-                      match: {
-                        childFamilyName: {
-                          query: body.childFamilyName,
-                          fuzziness: 'AUTO:4,7',
-                          minimum_should_match: '100%'
-                        }
-                      }
-                    }
-                  ].filter(Boolean)
-                }
-              },
-              body.childDoB && {
-                bool: {
-                  should: [
-                    {
-                      bool: {
-                        must: [
-                          {
-                            range: {
-                              childDoB: {
-                                gte: subYears(
-                                  new Date(body.childDoB),
-                                  1
-                                ).toISOString(),
-                                lte: addYears(
-                                  new Date(body.childDoB),
-                                  1
-                                ).toISOString()
-                              }
-                            }
-                          },
-                          {
-                            distance_feature: {
-                              field: 'childDoB',
-                              pivot: '365d',
-                              origin: new Date(body.childDoB).toISOString(),
-                              boost: 1
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
+                  must: [mothersDetailsMatch, birthWithin9Months]
                 }
               },
               {
                 bool: {
                   must: [
-                    body.motherFirstNames && {
-                      match: {
-                        motherFirstNames: {
-                          query: body.motherFirstNames,
-                          fuzziness: 'AUTO:4,7'
-                        }
-                      }
-                    },
-                    body.motherFamilyName && {
-                      match: {
-                        motherFamilyName: {
-                          query: body.motherFamilyName,
-                          fuzziness: 'AUTO:4,7',
-                          minimum_should_match: '100%'
-                        }
-                      }
-                    }
-                  ].filter(Boolean)
-                }
-              },
-              body.motherDoB && {
-                bool: {
-                  should: [
                     {
                       bool: {
                         must: [
-                          {
-                            range: {
-                              motherDoB: {
-                                gte: subYears(
-                                  new Date(body.motherDoB),
-                                  1
-                                ).toISOString(),
-                                lte: addYears(
-                                  new Date(body.motherDoB),
-                                  1
-                                ).toISOString()
+                          body.childFirstNames && {
+                            match: {
+                              childFirstNames: {
+                                query: body.childFirstNames,
+                                fuzziness: FIRST_NAME_FUZZINESS
                               }
                             }
                           },
+                          body.childFamilyName && {
+                            match: {
+                              childFamilyName: {
+                                query: body.childFamilyName,
+                                fuzziness: FIRST_NAME_FUZZINESS,
+                                minimum_should_match: '100%'
+                              }
+                            }
+                          }
+                        ].filter(Boolean)
+                      }
+                    },
+                    body.childDoB && {
+                      bool: {
+                        should: [
                           {
-                            distance_feature: {
-                              field: 'motherDoB',
-                              pivot: '365d',
-                              origin: new Date(body.motherDoB).toISOString(),
-                              boost: 1.5
+                            bool: {
+                              must: [
+                                {
+                                  range: {
+                                    childDoB: {
+                                      gte: subYears(
+                                        new Date(body.childDoB),
+                                        1
+                                      ).toISOString(),
+                                      lte: addYears(
+                                        new Date(body.childDoB),
+                                        1
+                                      ).toISOString()
+                                    }
+                                  }
+                                },
+                                {
+                                  distance_feature: {
+                                    field: 'childDoB',
+                                    pivot: '365d',
+                                    origin: new Date(
+                                      body.childDoB
+                                    ).toISOString(),
+                                    boost: 1
+                                  }
+                                }
+                              ]
                             }
                           }
                         ]
                       }
-                    }
-                  ]
+                    },
+                    mothersDetailsMatch
+                  ].filter(Boolean)
                 }
               }
-            ].filter(Boolean)
+            ]
           }
         }
       }
     })
+    return result.body.hits.hits
   } catch (err) {
     logger.error(`searchDuplicates error: ${err}`)
     throw err
