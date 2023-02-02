@@ -23,7 +23,7 @@ import { get } from 'lodash'
 import { ISearchResponse } from '@search/elasticsearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { logger } from '@search/logger'
-import { subYears, addYears } from 'date-fns'
+import { subYears, addYears, subMonths, addMonths } from 'date-fns'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 export const removeDuplicate = async (
@@ -119,15 +119,15 @@ export const searchForDuplicates = async (
         body.childDoB && {
           range: {
             childDoB: {
-              gte: subYears(new Date(body.childDoB), 1).toISOString(),
-              lte: addYears(new Date(body.childDoB), 1).toISOString()
+              gte: subMonths(new Date(body.childDoB), 9).toISOString(),
+              lte: addMonths(new Date(body.childDoB), 9).toISOString()
             }
           }
         },
         body.childDoB && {
           distance_feature: {
             field: 'childDoB',
-            pivot: '365d',
+            pivot: '273d', // 9 months in days
             origin: new Date(body.childDoB).toISOString(),
             boost: 1
           }

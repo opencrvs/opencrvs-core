@@ -120,7 +120,7 @@ describe('deduplication tests', () => {
           {
             childFirstNames: ['John', 'Janet'],
             childFamilyName: ['Smith', 'Smith'],
-            childDoB: ['2011-11-11', '2011-10-01'],
+            childDoB: ['2011-11-11', '2011-12-01'],
             motherFirstNames: ['Mother', 'Mother'],
             motherFamilyName: ['Smith', 'Smith'],
             motherDoB: ['2000-11-12', '2000-11-12'],
@@ -137,7 +137,7 @@ describe('deduplication tests', () => {
           {
             childFirstNames: ['John', 'Janet'],
             childFamilyName: ['Smith', 'Smith'],
-            childDoB: ['2011-11-11', '2013-10-01'],
+            childDoB: ['2011-11-11', '2012-10-01'],
             motherFirstNames: ['Mother', 'Mother'],
             motherFamilyName: ['Smith', 'Smith'],
             motherDoB: ['2000-11-12', '2000-11-12'],
