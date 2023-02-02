@@ -84,6 +84,7 @@ export type DECLARATION_STATUS =
   | 'REJECTED'
   | 'REQUESTED_CORRECTION'
   | 'CERTIFIED'
+  | 'ISSUED'
 
 export type USER_ACTION =
   | 'LOGGED_IN'
