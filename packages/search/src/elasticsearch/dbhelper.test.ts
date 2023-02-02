@@ -26,7 +26,7 @@ describe('elasticsearch db helper', () => {
   let searchSpy: jest.SpyInstance<any, any[]>
 
   describe('elasticsearch db helper', () => {
-    beforeAll(async () => {
+    beforeAll(() => {
       logger.error = jest.fn()
     })
 
