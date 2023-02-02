@@ -62,9 +62,9 @@ import {
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import { ISVGTemplate } from '@client/pdfRenderer/transformer/types'
 import { Link, Text, Toggle } from '@client/../../components/lib'
-import { Stack } from '@opencrvs/components/lib/Stack'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
+import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 
 const ListViewContainer = styled.div`
   margin-top: 24px;
@@ -126,7 +126,11 @@ interface State {
   previewImage: IAttachmentValue | null
   imageFile: IAttachmentValue
   activeTabId: Event
-  allowPrinting: boolean
+  allowPrinting: {
+    birth: boolean
+    death: boolean
+  }
+  notificationMessages: NOTIFICATION_STATUS
 }
 
 interface ICertification {
@@ -228,12 +232,52 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         type: EMPTY_STRING,
         data: EMPTY_STRING
       },
-      allowPrinting: false
+      allowPrinting: {
+        birth: this.props.offlineResources.config.BIRTH.PRINT_IN_ADVANCE,
+        death: this.props.offlineResources.config.DEATH.PRINT_IN_ADVANCE
+      },
+      notificationMessages: NOTIFICATION_STATUS.IDLE
     }
   }
 
   SUB_MENU_ID = {
     certificatesConfig: 'Certificates'
+  }
+
+  offlineConfig = this.props.offlineResources.config
+
+  async allowPrintMutationHandler() {
+    try {
+      const res = await configApplicationMutations.mutateApplicationConfig({
+        BIRTH: {
+          REGISTRATION_TARGET: this.offlineConfig.BIRTH.REGISTRATION_TARGET,
+          LATE_REGISTRATION_TARGET:
+            this.offlineConfig.BIRTH.LATE_REGISTRATION_TARGET,
+          FEE: {
+            ON_TIME: this.offlineConfig.BIRTH.FEE.ON_TIME,
+            LATE: this.offlineConfig.BIRTH.FEE.LATE,
+            DELAYED: this.offlineConfig.BIRTH.FEE.DELAYED
+          },
+          PRINT_IN_ADVANCE: this.state.allowPrinting.birth
+        },
+        DEATH: {
+          REGISTRATION_TARGET: this.offlineConfig.DEATH.REGISTRATION_TARGET,
+          FEE: {
+            ON_TIME: this.offlineConfig.DEATH.FEE.ON_TIME,
+            DELAYED: this.offlineConfig.DEATH.FEE.DELAYED
+          },
+          PRINT_IN_ADVANCE: this.state.allowPrinting.death
+        }
+      })
+      this.setState({
+        notificationMessages: NOTIFICATION_STATUS.IN_PROGRESS
+      })
+    } catch (err) {
+      this.setState({
+        notificationMessages: NOTIFICATION_STATUS.ERROR
+      })
+      console.log(err)
+    }
   }
 
   handleTabChange = (tab: Event) => {
@@ -477,10 +521,18 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
     let certificateFileName
 
-    const toggleOnChange = () => {
-      this.setState((prevState) => ({
-        allowPrinting: !prevState.allowPrinting
-      }))
+    const toggleOnChange = (event: Event) => {
+      this.setState(
+        (prevState) => ({
+          allowPrinting: {
+            ...prevState.allowPrinting,
+            [event]: !prevState.allowPrinting[event]
+          }
+        }),
+        async () => {
+          await this.allowPrintMutationHandler()
+        }
+      )
     }
 
     const TabContent = (props: CertificationProps) => {
@@ -539,8 +591,14 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 <ToggleWrapper>
                   <Toggle
                     id={'allow-printing-toggle'}
-                    defaultChecked={this.state.allowPrinting}
-                    onChange={toggleOnChange}
+                    defaultChecked={
+                      this.state.activeTabId === Event.Birth
+                        ? this.state.allowPrinting.birth
+                        : this.state.allowPrinting.death
+                    }
+                    onChange={async () => {
+                      await toggleOnChange(this.state.activeTabId)
+                    }}
                   />
                 </ToggleWrapper>
               }
@@ -564,7 +622,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 <FormTabs
                   sections={tabSections}
                   activeTabId={activeTabId}
-                  onTabClick={(id) => this.handleTabChange(id)}
+                  onTabClick={(id: Event) => this.handleTabChange(id)}
                 />
               }
             >
@@ -583,25 +641,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   {intl.formatMessage(messages.listDetailsQsn)}
                 </Link>
               </>
-              {/* <ListViewContainer>
-                <ListViewSimplified>
-                  {CertificateSection.items.map((item) => {
-                    return (
-                      <ListViewItemSimplified
-                        key={item.id}
-                        label={
-                          <Label id={`${item.id}_label`}>{item.label}</Label>
-                        }
-                        value={
-                          <Value id={`${item.id}_value`}>{item.value}</Value>
-                        }
-                        actions={item.actionsMenu}
-                      />
-                    )
-                  })}
-                </ListViewSimplified>
-              </ListViewContainer> */}
-
               <TabContent
                 item={
                   CertificateSection.items.find(
