@@ -13,7 +13,6 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
-  searchForDuplicates,
   updateComposition,
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
@@ -29,10 +28,12 @@ import {
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
+jest.mock('@search/features/registration/deduplicate/service')
 
 describe('Verify handlers', () => {
   let server: any
@@ -50,7 +51,9 @@ describe('Verify handlers', () => {
         searchByCompositionId as jest.Mocked<any>
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
       mockedIndexComposition.mockReturnValue({})
-      mockedsearchForDuplicates.mockReturnValue(mockSearchResponse)
+      mockedsearchForDuplicates.mockReturnValue(
+        mockSearchResponse.body.hits.hits
+      )
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
       mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
@@ -95,7 +98,7 @@ describe('Verify handlers', () => {
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
       mockedIndexComposition.mockReturnValue({})
       mockedSearchComposition.mockReturnValue(
-        mockSearchResponseWithoutCreatedBy
+        mockSearchResponseWithoutCreatedBy.body.hits.hits
       )
       mockedSearchByCompositionId.mockReturnValue(
         mockSearchResponseWithoutCreatedBy

@@ -40,6 +40,7 @@ import {
   addEventLocation
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
+import { client } from '@search/elasticsearch/client'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -56,7 +57,7 @@ export async function upsertEvent(requestBundle: Hapi.Request) {
   if (bundleEntries && bundleEntries.length === 1) {
     const resource = bundleEntries[0].resource
     if (resource && resource.resourceType === 'Task') {
-      updateEvent(resource as fhir.Task, authHeader)
+      await updateEvent(resource as fhir.Task, authHeader)
       return
     }
   }
@@ -130,7 +131,7 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     body.assignment = null
   }
   await createStatusHistory(body, task, authHeader)
-  await updateComposition(compositionId, body)
+  await updateComposition(compositionId, body, client)
 }
 
 async function indexDeclaration(
@@ -139,7 +140,7 @@ async function indexDeclaration(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const result = await searchByCompositionId(compositionId)
+  const result = await searchByCompositionId(compositionId, client)
   const body: ICompositionBody = {
     event: EVENT.DEATH,
     createdAt:
@@ -151,7 +152,7 @@ async function indexDeclaration(
   }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
-  await indexComposition(compositionId, body)
+  await indexComposition(compositionId, body, client)
 }
 
 async function createIndexBody(

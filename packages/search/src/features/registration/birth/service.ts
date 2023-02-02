@@ -45,6 +45,7 @@ import {
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from '@hapi/hapi'
+import { client } from '@search/elasticsearch/client'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -141,7 +142,7 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     body.assignment = null
   }
   await createStatusHistory(body, task, authHeader)
-  await updateComposition(compositionId, body)
+  await updateComposition(compositionId, body, client)
 }
 
 async function indexAndSearchComposition(
@@ -150,7 +151,7 @@ async function indexAndSearchComposition(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const result = await searchByCompositionId(compositionId)
+  const result = await searchByCompositionId(compositionId, client)
   const body: IBirthCompositionBody = {
     event: EVENT.BIRTH,
     createdAt:
@@ -162,7 +163,7 @@ async function indexAndSearchComposition(
   }
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
-  await indexComposition(compositionId, body)
+  await indexComposition(compositionId, body, client)
   if (body.type !== 'IN_PROGRESS') {
     await detectAndUpdateDuplicates(compositionId, composition, body)
   }
@@ -435,7 +436,7 @@ async function updateCompositionWithDuplicates(
   if (composition && composition.id) {
     const body: ICompositionBody = {}
     body.relatesTo = duplicateCompositionIds
-    await updateComposition(composition.id, body)
+    await updateComposition(composition.id, body, client)
   }
   const compositionFromFhir = (await getCompositionById(
     composition.id as string

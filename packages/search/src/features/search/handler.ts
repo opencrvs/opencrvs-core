@@ -20,14 +20,12 @@ import {
   EVENT,
   IBirthCompositionBody
 } from '@search/elasticsearch/utils'
-import {
-  searchByCompositionId,
-  searchForDuplicates
-} from '@search/elasticsearch/dbhelper'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
 import { RouteScope } from '@search/config/routes'
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -39,7 +37,7 @@ export async function searchAssignment(
 ) {
   const payload = request.payload as IAssignmentPayload
   try {
-    const results = await searchByCompositionId(payload.compositionId)
+    const results = await searchByCompositionId(payload.compositionId, client)
     const result = results?.body?.hits?.hits[0]?._source as
       | ICompositionBody
       | undefined
@@ -204,9 +202,10 @@ export async function searchDuplicates(
 ) {
   try {
     const result = await searchForDuplicates(
-      request.payload as IBirthCompositionBody
+      request.payload as IBirthCompositionBody,
+      client
     )
-    return h.response(result.body?.hits?.hits || []).code(200)
+    return h.response(result).code(200)
   } catch (error) {
     logger.error(`Search/searchForDuplicates: error: ${error}`)
     return internal(error)

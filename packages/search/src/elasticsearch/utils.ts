@@ -10,19 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
-import {
-  searchByCompositionId,
-  searchForDuplicates
-} from '@search/elasticsearch/dbhelper'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
   findName,
   findNameLocale,
   findTaskExtension,
   getFromFhir
 } from '@search/features/fhir/fhir-utils'
-import { ISearchResponse } from '@search/elasticsearch/client'
-import { ApiResponse } from '@elastic/elasticsearch'
+import { client, ISearchResponse } from '@search/elasticsearch/client'
+
 import fetch from 'node-fetch'
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -93,6 +91,11 @@ export interface ICompositionBody {
   childFirstNames?: string
   childFamilyName?: string
   childFirstNamesLocal?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  motherIdentifier?: string
+  childDoB?: string
   createdBy?: string
   updatedBy?: string
   createdAt?: string
@@ -166,19 +169,19 @@ export async function detectDuplicates(
   compositionId: string,
   body: IBirthCompositionBody
 ) {
-  const searchResponse = await searchForDuplicates(body)
+  const searchResponse = await searchForDuplicates(body, client)
   const duplicates = findDuplicateIds(compositionId, searchResponse)
   return duplicates
 }
 
 export async function getCreatedBy(compositionId: string) {
-  const results = await searchByCompositionId(compositionId)
+  const results = await searchByCompositionId(compositionId, client)
   const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
   return result?.createdBy
 }
 
 export const getStatus = async (compositionId: string) => {
-  const results = await searchByCompositionId(compositionId)
+  const results = await searchByCompositionId(compositionId, client)
   const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
   return result?.operationHistories as IOperationHistory[]
 }
@@ -260,10 +263,9 @@ function isNotification(body: ICompositionBody): boolean {
 
 function findDuplicateIds(
   compositionIdentifier: string,
-  results: ApiResponse<ISearchResponse<any>> | null
+  results: ISearchResponse<IBirthCompositionBody>['hits']['hits']
 ) {
-  const hits = (results && results.body.hits.hits) || []
-  return hits
+  return results
     .filter(
       (hit) =>
         hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD

@@ -10,17 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { client, ISearchResponse } from '@search/elasticsearch/client'
-import {
-  IBirthCompositionBody,
-  ICompositionBody
-} from '@search/elasticsearch/utils'
-import { subYears, addYears } from 'date-fns'
+import { ISearchResponse } from '@search/elasticsearch/client'
+import { ICompositionBody } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
+import * as elasticsearch from '@elastic/elasticsearch'
 
 export const indexComposition = async (
   compositionIdentifier: string,
-  body: ICompositionBody
+  body: ICompositionBody,
+  client: elasticsearch.Client
 ) => {
   let response: any
   try {
@@ -34,11 +32,14 @@ export const indexComposition = async (
   } catch (e) {
     logger.error(`indexComposition: error: ${e}`)
   }
-
   return response
 }
 
-export const updateComposition = async (id: string, body: ICompositionBody) => {
+export const updateComposition = async (
+  id: string,
+  body: ICompositionBody,
+  client: elasticsearch.Client
+) => {
   let response: any
   try {
     response = await client.update({
@@ -57,143 +58,12 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
   return response
 }
 
-export const searchForDuplicates = async (body: IBirthCompositionBody) => {
+export const searchByCompositionId = async (
+  compositionId: string,
+  client: elasticsearch.Client
+) => {
   try {
-    return await client.search<ISearchResponse<IBirthCompositionBody>>({
-      index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
-      body: {
-        query: {
-          bool: {
-            must: [
-              {
-                bool: {
-                  must: [
-                    body.childFirstNames && {
-                      match: {
-                        childFirstNames: {
-                          query: body.childFirstNames,
-                          fuzziness: 'AUTO:4,7'
-                        }
-                      }
-                    },
-                    body.childFamilyName && {
-                      match: {
-                        childFamilyName: {
-                          query: body.childFamilyName,
-                          fuzziness: 'AUTO:4,7',
-                          minimum_should_match: '100%'
-                        }
-                      }
-                    }
-                  ].filter(Boolean)
-                }
-              },
-              body.childDoB && {
-                bool: {
-                  should: [
-                    {
-                      bool: {
-                        must: [
-                          {
-                            range: {
-                              childDoB: {
-                                gte: subYears(
-                                  new Date(body.childDoB),
-                                  1
-                                ).toISOString(),
-                                lte: addYears(
-                                  new Date(body.childDoB),
-                                  1
-                                ).toISOString()
-                              }
-                            }
-                          },
-                          {
-                            distance_feature: {
-                              field: 'childDoB',
-                              pivot: '365d',
-                              origin: new Date(body.childDoB).toISOString(),
-                              boost: 1
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                bool: {
-                  must: [
-                    body.motherFirstNames && {
-                      match: {
-                        motherFirstNames: {
-                          query: body.motherFirstNames,
-                          fuzziness: 'AUTO:4,7'
-                        }
-                      }
-                    },
-                    body.motherFamilyName && {
-                      match: {
-                        motherFamilyName: {
-                          query: body.motherFamilyName,
-                          fuzziness: 'AUTO:4,7',
-                          minimum_should_match: '100%'
-                        }
-                      }
-                    }
-                  ].filter(Boolean)
-                }
-              },
-              body.motherDoB && {
-                bool: {
-                  should: [
-                    {
-                      bool: {
-                        must: [
-                          {
-                            range: {
-                              motherDoB: {
-                                gte: subYears(
-                                  new Date(body.motherDoB),
-                                  1
-                                ).toISOString(),
-                                lte: addYears(
-                                  new Date(body.motherDoB),
-                                  1
-                                ).toISOString()
-                              }
-                            }
-                          },
-                          {
-                            distance_feature: {
-                              field: 'motherDoB',
-                              pivot: '365d',
-                              origin: new Date(body.motherDoB).toISOString(),
-                              boost: 1.5
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
-            ].filter(Boolean)
-          }
-        }
-      }
-    })
-  } catch (err) {
-    logger.error(`searchDuplicates error: ${err}`)
-    throw err
-  }
-}
-
-export const searchByCompositionId = async (compositionId: string) => {
-  try {
-    const response = await client.search<ISearchResponse<any>>({
+    return await client.search<ISearchResponse<any>>({
       index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       body: {
@@ -204,7 +74,6 @@ export const searchByCompositionId = async (compositionId: string) => {
         }
       }
     })
-    return response
   } catch (err) {
     logger.error(`searchByCompositionId: error: ${err}`)
     return null
