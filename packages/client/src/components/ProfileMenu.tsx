@@ -29,7 +29,9 @@ import { getLanguage } from '@client/i18n/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { goToSettings } from '@client/navigation'
-import { buttonMessages, userMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
+import { Role } from '@client/utils/gateway'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -89,25 +91,14 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     return userName
   }
 
-  getUserRole = (intl: IntlShape, userDetails: IUserDetails | null): string => {
-    let userRole = ''
-
-    if (userDetails && userDetails.systemRole) {
-      userRole = intl.formatMessage(
-        userMessages[userDetails.systemRole as string]
-      )
-    }
-
-    return userRole
-  }
-
   getMenuHeader = (
-    intl: IntlShape,
     language: string,
     userDetails: IUserDetails | null
   ): JSX.Element => {
     const userName = this.getUserName(language, userDetails)
-    const userRole = this.getUserRole(intl, userDetails)
+    // let's remove this type assertion after #4458 merges in
+    const userRole =
+      userDetails?.role && getUserRole(language, userDetails.role as Role)
 
     return (
       <>
@@ -130,7 +121,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
               avatar={userDetails?.avatar}
             />
           }
-          menuHeader={this.getMenuHeader(intl, language, userDetails)}
+          menuHeader={this.getMenuHeader(language, userDetails)}
           menuItems={this.getMenuItems(intl)}
         />
       </>
