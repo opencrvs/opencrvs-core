@@ -132,7 +132,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           variables: {
             details: gqlDetails
           }
-        }) 
+        })
       } else if (
         [
           SubmissionAction.REJECT_DECLARATION,
