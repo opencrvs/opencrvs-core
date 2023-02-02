@@ -85,6 +85,7 @@ import { Location } from '@client/utils/gateway'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { UserDetails } from '@client/utils/userUtils'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -94,7 +95,7 @@ const SupportingDocument = styled.div`
   }
 `
 interface IProps {
-  userPrimaryOffice?: Location
+  userPrimaryOffice?: UserDetails['primaryOffice']
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
