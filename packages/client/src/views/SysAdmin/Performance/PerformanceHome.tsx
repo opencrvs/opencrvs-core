@@ -77,6 +77,7 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
+import startOfMonth from 'date-fns/startOfMonth'
 
 const Layout = styled.div`
   display: flex;
@@ -413,7 +414,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 <>
                   <Query
                     query={PERFORMANCE_METRICS}
-                    fetchPolicy="cache-and-network"
+                    fetchPolicy="cache-first"
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
                         ? {
@@ -490,7 +491,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="cache-and-network"
+                    fetchPolicy="cache-first"
                     query={CORRECTION_TOTALS}
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
@@ -523,7 +524,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     }}
                   </Query>
                   <Query
-                    fetchPolicy="cache-and-network"
+                    fetchPolicy="cache-first"
                     query={GET_TOTAL_PAYMENTS}
                     variables={
                       selectedLocation && !isCountry(selectedLocation)
@@ -583,7 +584,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               ],
               officeSelected: this.state.officeSelected
             }}
-            fetchPolicy="cache-and-network"
+            fetchPolicy="cache-first"
             key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
@@ -710,8 +711,13 @@ function mapStateToProps(
   return {
     locations,
     timeStart:
-      (timeStart && new Date(timeStart)) || subMonths(new Date(Date.now()), 11),
-    timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
+      (timeStart && new Date(timeStart)) ||
+      new Date(
+        startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
+      ),
+    timeEnd:
+      (timeEnd && new Date(timeEnd)) ||
+      new Date(new Date(Date.now()).setHours(0, 0, 0, 0)),
     event: event || Event.Birth,
     selectedLocation,
     offices: offlineCountryConfiguration.offices,

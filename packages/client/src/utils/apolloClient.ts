@@ -82,6 +82,20 @@ export const createClient = (
   return client
 }
 
+async function createPersistentClient(store: Store<IStoreState, AnyAction>) {
+  const cache = new InMemoryCache()
+  const newPersistor = new CachePersistor({
+    cache,
+    storage: new LocalForageWrapper(localforage),
+    trigger: 'write',
+    persistenceMapper
+  })
+  await newPersistor.restore()
+  return {
+    client: createClient(store, cache),
+    persistor: newPersistor
+  }
+}
 export function useApolloClient(store: Store<IStoreState, AnyAction>) {
   const [client, setClient] = React.useState<
     ApolloClient<NormalizedCacheObject>
@@ -97,16 +111,9 @@ export function useApolloClient(store: Store<IStoreState, AnyAction>) {
 
   React.useEffect(() => {
     async function init() {
-      const cache = new InMemoryCache()
-      const newPersistor = new CachePersistor({
-        cache,
-        storage: new LocalForageWrapper(localforage),
-        trigger: 'write',
-        persistenceMapper
-      })
-      await newPersistor.restore()
-      setPersistor(newPersistor)
-      setClient(createClient(store, cache))
+      const { client, persistor } = await createPersistentClient(store)
+      setPersistor(persistor)
+      setClient(client)
     }
 
     init()
