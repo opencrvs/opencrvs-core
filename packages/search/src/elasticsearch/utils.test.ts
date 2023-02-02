@@ -33,7 +33,9 @@ jest.mock('@search/elasticsearch/dbhelper.ts')
 
 describe('elastic search utils', () => {
   it('should return an array of duplicate identifiers for a composition', async () => {
-    ;(searchForDuplicates as jest.Mock).mockReturnValue(mockSearchResponse)
+    ;(searchForDuplicates as jest.Mock).mockReturnValue(
+      mockSearchResponse.body.hits.hits
+    )
     const duplicates = await detectDuplicates(
       'c79e8d62-335e-458d-9fcc-45ec5836c404',
       mockCompositionBody

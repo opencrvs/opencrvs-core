@@ -112,7 +112,9 @@ describe('Verify handlers', () => {
 
     it('should return status code 500 when composition has no ID', async () => {
       ;(indexComposition as jest.Mock).mockReturnValue({})
-      ;(searchForDuplicates as jest.Mock).mockReturnValue(mockSearchResponse)
+      ;(searchForDuplicates as jest.Mock).mockReturnValue(
+        mockSearchResponse.body.hits.hits
+      )
       ;(updateComposition as jest.Mock).mockReturnValue({})
       fetch.mockResponses(
         [JSON.stringify(mockCompositionResponse), { status: 200 }],

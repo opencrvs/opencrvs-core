@@ -51,7 +51,9 @@ describe('Verify handlers', () => {
         searchByCompositionId as jest.Mocked<any>
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
       mockedIndexComposition.mockReturnValue({})
-      mockedsearchForDuplicates.mockReturnValue(mockSearchResponse)
+      mockedsearchForDuplicates.mockReturnValue(
+        mockSearchResponse.body.hits.hits
+      )
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
       mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
@@ -96,7 +98,7 @@ describe('Verify handlers', () => {
       const mockedUpdateComposition = updateComposition as jest.Mocked<any>
       mockedIndexComposition.mockReturnValue({})
       mockedSearchComposition.mockReturnValue(
-        mockSearchResponseWithoutCreatedBy
+        mockSearchResponseWithoutCreatedBy.body.hits.hits
       )
       mockedSearchByCompositionId.mockReturnValue(
         mockSearchResponseWithoutCreatedBy

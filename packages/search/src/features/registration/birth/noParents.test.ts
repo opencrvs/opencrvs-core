@@ -22,6 +22,7 @@ import {
 import * as fetchMock from 'jest-fetch-mock'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
 jest.mock('@search/features/registration/deduplicate/service')
@@ -35,6 +36,7 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 while father and mother sections is not present', async () => {
+      ;(searchForDuplicates as jest.Mock).mockResolvedValueOnce([])
       fetch.mockResponses(
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
