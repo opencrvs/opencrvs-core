@@ -88,6 +88,12 @@ export const COLLECT_BIRTH_CERTIFICATE = gql`
   }
 `
 
+export const ISSUE_BIRTH_CERTIFICATE = gql`
+  mutation markBirthAsIssued($id: ID!, $details: BirthRegistrationInput!) {
+    markBirthAsIssued(id: $id, details: $details)
+  }
+`
+
 export const MARK_EVENT_UNASSIGNED = gql`
   mutation submitMutation($id: String!) {
     markEventAsUnassigned(id: $id)
@@ -108,6 +114,8 @@ export function getBirthMutation(action: SubmissionAction) {
       return ARCHIVE_BIRTH_DECLARATION
     case SubmissionAction.COLLECT_CERTIFICATE:
       return COLLECT_BIRTH_CERTIFICATE
+    case SubmissionAction.ISSUE_CERTIFICATE:
+      return ISSUE_BIRTH_CERTIFICATE
     case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
       return REQUEST_BIRTH_REG_CORRECTION
   }

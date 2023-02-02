@@ -83,7 +83,8 @@ export enum SubmissionAction {
   COLLECT_CERTIFICATE = 'collect certificate',
   REJECT_DECLARATION = 'reject',
   ARCHIVE_DECLARATION = 'archive',
-  REQUEST_CORRECTION_DECLARATION = 'request correction'
+  REQUEST_CORRECTION_DECLARATION = 'request correction',
+  ISSUE_CERTIFICATE = 'issue certificate'
 }
 
 export enum DownloadAction {
