@@ -2164,8 +2164,8 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a certify scope')
     })
   })
-  describe('notADuplicate()', () => {
-    it('returns composition id after removing duplicate id from it', async () => {
+  describe('markEventAsNotDuplicate()', () => {
+    it('returns composition id after removing all duplicates from it', async () => {
       fetch.mockResponses(
         [
           JSON.stringify({
@@ -2185,24 +2185,7 @@ describe('Registration root resolvers', () => {
             ]
           })
         ],
-        [
-          JSON.stringify({
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            resourceType: 'Composition',
-            identifier: {
-              system: 'urn:ietf:rfc:3986',
-              value: 'DewpkiM'
-            },
-            relatesTo: [
-              {
-                code: 'duplicate',
-                targetReference: {
-                  reference: 'Composition/5e3815d1-d039-4399-b47d-af9a9f51993b'
-                }
-              }
-            ]
-          })
-        ],
+        [JSON.stringify(mockTaskBundle)],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2220,11 +2203,10 @@ describe('Registration root resolvers', () => {
         ]
       )
       // @ts-ignore
-      const result = await resolvers.Mutation.notADuplicate(
+      const result = await resolvers.Mutation.markEventAsNotDuplicate(
         {},
         {
-          id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-          duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+          id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
         },
         authHeaderRegCert
       )
@@ -2239,11 +2221,10 @@ describe('Registration root resolvers', () => {
       ])
 
       await expect(
-        resolvers.Mutation.notADuplicate(
+        resolvers.Mutation.markEventAsNotDuplicate(
           {},
           {
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
           },
           authHeaderRegCert
         )
@@ -2274,25 +2255,23 @@ describe('Registration root resolvers', () => {
       )
 
       await expect(
-        resolvers.Mutation.notADuplicate(
+        resolvers.Mutation.markEventAsNotDuplicate(
           {},
           {
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
           },
           authHeaderRegCert
         )
-      ).rejects.toThrowError('Search request failed: Some error from search')
+      ).rejects.toThrowError('FHIR request failed: Some error from search')
     })
 
     it("throws an error when the user doesn't have register scope", async () => {
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
       await expect(
-        resolvers.Mutation.notADuplicate(
+        resolvers.Mutation.markEventAsNotDuplicate(
           {},
           {
-            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
-            duplicateId: '5e3815d1-d039-4399-b47d-af9a9f51993b'
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6'
           },
           authHeaderNotRegCert
         )

@@ -1029,8 +1029,10 @@ export async function removeDuplicatesFromComposition(
         )
       })
     composition.relatesTo = updatedRelatesTo
+    return composition
   } else {
     composition.relatesTo = []
+    return composition
   }
 }
 
