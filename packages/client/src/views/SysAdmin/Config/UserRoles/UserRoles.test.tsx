@@ -61,54 +61,19 @@ describe('render update system role', () => {
                   labels: [
                     {
                       lang: 'en',
-                      label: 'Health Worker'
+                      label: 'Health Worker',
+                      __typename: 'RoleLabel'
                     },
                     {
                       lang: 'fr',
-                      label: 'Professionnel de Santé'
+                      label: 'Professionnel de Santé',
+                      __typename: 'RoleLabel'
                     }
-                  ]
-                },
-                {
-                  _id: '63da2e0e079116030b195d9a',
-                  labels: [
-                    {
-                      lang: 'en',
-                      label: 'Police Worker'
-                    },
-                    {
-                      lang: 'fr',
-                      label: 'Agent de Police'
-                    }
-                  ]
-                },
-                {
-                  _id: '63da2e0e079116030b195d9b',
-                  labels: [
-                    {
-                      lang: 'en',
-                      label: 'Social Worker'
-                    },
-                    {
-                      lang: 'fr',
-                      label: 'Travailleur Social'
-                    }
-                  ]
-                },
-                {
-                  _id: '63da2e0e079116030b195d9c',
-                  labels: [
-                    {
-                      lang: 'en',
-                      label: 'Local Leader'
-                    },
-                    {
-                      lang: 'fr',
-                      label: 'Leader Local'
-                    }
-                  ]
+                  ],
+                  __typename: 'Role'
                 }
-              ]
+              ],
+              __typename: 'SystemRole'
             }
           ]
         }
@@ -120,8 +85,6 @@ describe('render update system role', () => {
         variables: {
           systemRole: {
             id: '63b3f284452f2e40afa4409d',
-            value: 'FIELD_AGENT',
-            active: false,
             roles: [
               {
                 _id: '63da2e0e079116030b195d99',
@@ -133,45 +96,6 @@ describe('render update system role', () => {
                   {
                     lang: 'fr',
                     label: 'Professionnel de Santé'
-                  }
-                ]
-              },
-              {
-                _id: '63da2e0e079116030b195d9a',
-                labels: [
-                  {
-                    lang: 'en',
-                    label: 'Police Worker'
-                  },
-                  {
-                    lang: 'fr',
-                    label: 'Agent de Police'
-                  }
-                ]
-              },
-              {
-                _id: '63da2e0e079116030b195d9b',
-                labels: [
-                  {
-                    lang: 'en',
-                    label: 'Social Worker'
-                  },
-                  {
-                    lang: 'fr',
-                    label: 'Travailleur Social'
-                  }
-                ]
-              },
-              {
-                _id: '63da2e0e079116030b195d9c',
-                labels: [
-                  {
-                    lang: 'en',
-                    label: 'Local Leader'
-                  },
-                  {
-                    lang: 'fr',
-                    label: 'Leader Local'
                   }
                 ]
               }
@@ -195,7 +119,7 @@ describe('render update system role', () => {
     component = await createTestComponent(<UserRoles />, {
       store,
       history,
-      graphqlMocks: mocks
+      graphqlMocks: mocks as any
     })
 
     await new Promise((resolve) => {
@@ -206,23 +130,15 @@ describe('render update system role', () => {
 
   it('should show the update system model after click the change button', async () => {
     component.find('#changeButton').hostNodes().first().simulate('click')
-    console.log(component.debug())
     expect(component.exists('ResponsiveModal')).toBeTruthy()
   })
 
-  it.only('should show the update system  role success message after click the change button', async () => {
-    component.find('#changeButton').hostNodes().simulate('click')
-    console.log(component.debug())
-
-    await waitForElement(component, '#ResponsiveModal')
-    console.log(component.debug())
-    component.find('#confirm').hostNodes().simulate('click')
-
-    await new Promise((resolve) => {
-      setTimeout(resolve, 0)
-    })
+  it('should show the update system  role success message after click the confirm button', async () => {
+    component.find('#changeButton').hostNodes().last().simulate('click')
     component.update()
-
+    component.find('#confirm').hostNodes().first().simulate('click')
+    component.update()
+    await waitForElement(component, '#updateRoleSuccess')
     expect(component.exists('#updateRoleSuccess')).toBeTruthy()
   })
 })

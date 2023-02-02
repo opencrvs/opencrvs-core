@@ -79,8 +79,6 @@ export const resolvers: GQLResolver = {
         }
       })
 
-      console.log(systemRole)
-
       if (res.status !== 200) {
         return new Error(
           `Something went wrong on user management service. Couldn't update system role`

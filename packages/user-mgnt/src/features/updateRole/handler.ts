@@ -82,7 +82,6 @@ export default async function updateRole(
     }
   }
 
-  console.log('systemRolesRequest', systemRolesRequest)
   try {
     systemRole.value = systemRolesRequest.value ?? systemRole.value
     systemRole.active = systemRolesRequest.active ?? systemRole.active

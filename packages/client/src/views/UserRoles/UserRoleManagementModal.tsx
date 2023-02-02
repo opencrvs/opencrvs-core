@@ -34,6 +34,7 @@ const StyledTextInput = styled(TextInput)`
   height: 40px;
   border: solid 1px ${({ theme }) => theme.colors.grey600};
   align-self: center;
+
   :disabled {
     border-color: ${({ theme }) => theme.colors.grey300};
     color: ${({ theme }) => theme.colors.grey500};
@@ -52,13 +53,16 @@ interface IProps {
 const LanguageSelect = styled(Select)`
   width: 175px;
   border-radius: 2px;
+
   .react-select__control {
     max-height: 32px;
     min-height: 32px;
   }
+
   .react-select__value-container {
     display: block;
   }
+
   div {
     ${({ theme }) => theme.fonts.reg14};
     color: ${({ theme }) => theme.colors.primaryDark};
@@ -98,7 +102,7 @@ export function UserRoleManagementModal(props: IProps) {
   )
 
   const isRoleUpdateValid = () => {
-    if (_.isEqual(userRoles, props.systemRole.roles)) {
+    if (_.isEqual(userRoles, stripTypenameFromRoles(props.systemRole.roles))) {
       return false
     }
     const inCompleteRoleEntries = userRoles.filter((role) => {
@@ -146,7 +150,6 @@ export function UserRoleManagementModal(props: IProps) {
     setCurrentClipBoard('')
     const newActiveItems = new Array(userRoles.length).fill(false)
     setActives(newActiveItems)
-    debugger
   }
 
   return (
