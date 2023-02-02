@@ -17,6 +17,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  ISSUED
 }
 
 enum RegAction {

@@ -159,7 +159,7 @@ class PaymentComponent extends React.Component<IFullProps> {
     return (
       <>
         <ActionPageLight
-          title={'Print certificate'}
+          title={intl.formatMessage(messages.print)}
           goBack={goBack}
           hideBackground
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}

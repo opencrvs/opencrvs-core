@@ -1175,7 +1175,8 @@ export const enum GQLRegStatus {
   VALIDATED = 'VALIDATED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
+  ISSUED = 'ISSUED'
 }
 
 export interface GQLMedicalPractitionerInput {

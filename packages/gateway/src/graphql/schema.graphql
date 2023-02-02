@@ -1273,6 +1273,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  ISSUED
 }
 
 input MedicalPractitionerInput {
