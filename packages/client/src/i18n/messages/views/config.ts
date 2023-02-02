@@ -636,8 +636,8 @@ const messagesToDefine: IConfigMessages = {
   },
   systemRoleSuccessMsg: {
     id: 'config.userRoles.systemRoleSuccessMsg',
-    defaultMessage: 'System role Updated successfully',
-    description: 'Label for System role Updated success message'
+    defaultMessage: 'System role updated successfully',
+    description: 'Label for System role updated success message'
   },
   role: {
     id: 'config.userRoles.role',
