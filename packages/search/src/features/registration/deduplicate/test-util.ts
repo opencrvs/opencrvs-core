@@ -24,10 +24,6 @@ const container: ElasticsearchContainer = new ElasticsearchContainer(
   'elasticsearch:7.17.7'
 )
 
-/**
- * @description Function that starts ElasticSearchTestContainer
- * @returns {Promise<void>} Promise<void>
- * **/
 export const startContainer =
   async (): Promise<StartedElasticsearchContainer> => {
     return container
@@ -37,10 +33,6 @@ export const startContainer =
       .start()
   }
 
-/**
- * @description Function that stops ElasticSearchTestContainer
- * @returns {Promise<void>} Promise<void>
- * **/
 export const stopContainer = async (
   container: StartedElasticsearchContainer
 ): Promise<void> => {

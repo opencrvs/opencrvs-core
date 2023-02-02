@@ -50,14 +50,6 @@ const extractRelatesToIDs = (bundle: fhir.Bundle) => {
   )
 }
 
-/**
- * @author
- * @kind module
- * @description search for duplicate birth declarations
- * @param { IBirthCompositionBody } body -  Params
- * @param client
- * @returns { Promise<ApiResponse<ISearchResponse<IBirthCompositionBody>, Context>> } -  Promise
- * **/
 export const searchForDuplicates = async (
   body: IBirthCompositionBody,
   client: elasticsearch.Client
