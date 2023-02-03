@@ -208,6 +208,7 @@ export function UserRoleManagementModal(props: IProps) {
           return (
             <Stack justifyContent="flex-start">
               <StyledTextInput
+                id="roleNameInput"
                 value={
                   item.labels.find((e) => e.lang === currentLanguage)?.label ||
                   ''
@@ -236,6 +237,7 @@ export function UserRoleManagementModal(props: IProps) {
               />
               {actives[index] && (
                 <Button
+                  id="editButton"
                   type="icon"
                   onClick={() => {
                     const newActiveItems = new Array(userRoles.length).fill(

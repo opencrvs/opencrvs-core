@@ -91,7 +91,7 @@ describe('render update system role', () => {
                 labels: [
                   {
                     lang: 'en',
-                    label: 'Health Worker'
+                    label: 'UP Chairman'
                   },
                   {
                     lang: 'fr',
@@ -136,9 +136,23 @@ describe('render update system role', () => {
   it('should show the update system  role success message after click the confirm button', async () => {
     component.find('#changeButton').hostNodes().last().simulate('click')
     component.update()
+    component.find('#editButton').first().simulate('click')
+
+    component
+      .find('#roleNameInput')
+      .hostNodes()
+      .simulate('change', {
+        target: {
+          name: 'roleNameInput',
+          value: 'UP Chairman'
+        }
+      })
+    component.update()
     component.find('#confirm').hostNodes().first().simulate('click')
     component.update()
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0)
+    })
     await waitForElement(component, '#updateRoleSuccess')
-    expect(component.exists('#updateRoleSuccess')).toBeTruthy()
   })
 })
