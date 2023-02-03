@@ -71,31 +71,35 @@ async function updateStoredData(
 }
 
 const prefetchLocationStatisticsCmd = (userDetails: IUserDetails) => {
-  const locationId = getDefaultPerformanceLocationId(userDetails)
-  let variables: Record<string, any> = {
-    populationYear: new Date().getFullYear(),
-    event: 'birth',
-    status: [
-      'IN_PROGRESS',
-      'DECLARED',
-      'REJECTED',
-      'VALIDATED',
-      'WAITING_VALIDATION',
-      'REGISTERED'
-    ],
-    officeSelected:
-      !userDetails.supervisoryArea &&
-      [...REGISTRAR_ROLES, ...SYS_ADMIN_ROLES].includes(userDetails.role!)
-  }
-  if (locationId) {
-    variables = {
-      locationId,
-      ...variables
+  try {
+    const locationId = getDefaultPerformanceLocationId(userDetails)
+    let variables: Record<string, any> = {
+      populationYear: new Date().getFullYear(),
+      event: 'birth',
+      status: [
+        'IN_PROGRESS',
+        'DECLARED',
+        'REJECTED',
+        'VALIDATED',
+        'WAITING_VALIDATION',
+        'REGISTERED'
+      ],
+      officeSelected:
+        !userDetails.supervisoryArea &&
+        [...REGISTRAR_ROLES, ...SYS_ADMIN_ROLES].includes(userDetails.role!)
     }
+    if (locationId) {
+      variables = {
+        locationId,
+        ...variables
+      }
+    }
+    return Cmd.action(
+      isAvailable('getLocationStatistics', variables, PERFORMANCE_STATS)
+    )
+  } catch (error) {
+    return Cmd.none
   }
-  return Cmd.action(
-    isAvailable('getLocationStatistics', variables, PERFORMANCE_STATS)
-  )
 }
 
 export const performanceDataReducer = (
