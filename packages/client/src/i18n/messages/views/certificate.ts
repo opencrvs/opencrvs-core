@@ -63,8 +63,10 @@ interface ICertificateMessages
   confirmAndPrint: MessageDescriptor
   reviewTitle: MessageDescriptor
   reviewDescription: MessageDescriptor
-  modalTitle: MessageDescriptor
-  modalBody: MessageDescriptor
+  printModalTitle: MessageDescriptor
+  printAndIssueModalTitle: MessageDescriptor
+  printModalBody: MessageDescriptor
+  printAndIssueModalBody: MessageDescriptor
   toastMessage: MessageDescriptor
   otherCollectorFormTitle: MessageDescriptor
   certificateCollectorError: MessageDescriptor
@@ -87,7 +89,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.addAnotherSignature'
   },
   certificateCollectionTitle: {
-    defaultMessage: 'Print certificate',
+    defaultMessage: 'Certify record',
     description: 'The title of print certificate action',
     id: 'print.certificate.section.title'
   },
@@ -301,7 +303,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'certificate.receipt.amount'
   },
   receiptService: {
-    defaultMessage: 'Service:',
+    defaultMessage: 'Service',
     description: 'Service received for receipt label',
     id: 'certificate.receipt.service'
   },
@@ -317,7 +319,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.serviceMonth'
   },
   amountDue: {
-    defaultMessage: 'Amount Due:',
+    defaultMessage: 'Fee',
     description: 'The label for due amount',
     id: 'certificate.receipt.amountDue'
   },
@@ -332,30 +334,41 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.whoToCollect'
   },
   confirmAndPrint: {
-    defaultMessage: 'Print',
+    defaultMessage: 'Yes, print certificate',
     description: 'The text for print button',
     id: 'print.certificate.button.confirmPrint'
   },
   reviewTitle: {
-    defaultMessage: 'Review certificate',
+    defaultMessage: 'Ready to certify?',
     description: 'Certificate review title',
     id: 'print.certificate.review.title'
   },
   reviewDescription: {
     defaultMessage:
-      'Please confirm that the information on the certificate is correct and that it is ready to print.',
+      'Please confirm that the informant has reviewed that the information on the certificate is correct and that it is ready to print.',
     description: 'Certificate review description',
     id: 'print.certificate.review.description'
   },
-  modalTitle: {
-    id: 'print.certificate.review.modal.title',
+  printModalTitle: {
+    id: 'print.certificate.review.printModalTitle',
     defaultMessage: 'Print certificate?',
     description: 'Print certificate modal title text'
   },
-  modalBody: {
-    id: 'print.certificate.review.modal.body',
+  printAndIssueModalTitle: {
+    id: 'print.certificate.review.printAndIssueModalTitle',
+    defaultMessage: 'Print and issue certificate?',
+    description: 'Print and issue certificate modal title text'
+  },
+  printModalBody: {
+    id: 'print.certificate.review.modal.body.print',
     defaultMessage:
-      'A PDF of the certificate will open in a new tab - please print from there',
+      'A PDF of the certificate will open in a new tab for you to print. This record will then be moved to your ready to issue work-queue',
+    description: 'Print certificate modal body text'
+  },
+  printAndIssueModalBody: {
+    id: 'print.certificate.review.modal.body.printAndIssue',
+    defaultMessage:
+      'A PDF of the certificate will open in a new tab for you to print and issue',
     description: 'Print certificate modal body text'
   },
   toastMessage: {

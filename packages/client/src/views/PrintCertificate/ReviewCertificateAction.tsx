@@ -87,7 +87,10 @@ const PdfWrapper = styled.div`
   display: flex;
   margin-top: 24px;
   margin-bottom: 56px;
-  height: 100%;
+  width: 595px;
+  height: 841px;
+  margin-inline: auto;
+  background: ${({ theme }) => theme.colors.white};
   align-items: center;
   justify-content: center;
 `
@@ -141,7 +144,7 @@ class ReviewCertificateActionComponent extends React.Component<
   readyToCertify = () => {
     const { draft } = this.props
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
-    draft.action = SubmissionAction.COLLECT_CERTIFICATE
+    draft.action = SubmissionAction.CERTIFY_DECLARATION
 
     const registeredDate = getRegisteredDate(draft.data)
     const certificate = draft.data.registration.certificates[0]
@@ -206,26 +209,6 @@ class ReviewCertificateActionComponent extends React.Component<
     this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
   }
 
-  getTitle = () => {
-    const { intl, event } = this.props
-    let eventName = intl.formatMessage(constantsMessages.birth).toLowerCase()
-    switch (event) {
-      case Event.Birth:
-        return intl.formatMessage(certificateMessages.reviewTitle, {
-          event: eventName
-        })
-      case Event.Death:
-        eventName = intl.formatMessage(constantsMessages.death).toLowerCase()
-        return intl.formatMessage(certificateMessages.reviewTitle, {
-          event: eventName
-        })
-      default:
-        return intl.formatMessage(certificateMessages.reviewTitle, {
-          event: eventName
-        })
-    }
-  }
-
   goBack = () => {
     const historyState = this.props.location.state
     const navigatedFromInsideApp = Boolean(
@@ -241,6 +224,7 @@ class ReviewCertificateActionComponent extends React.Component<
 
   render = () => {
     const { intl, scope } = this.props
+    const isPrintInAdvanced = isCertificateForPrintInAdvance(this.props.draft)
 
     /* The id of the draft is an empty string if it's not found in store*/
     if (!this.props.draft.id) {
@@ -264,8 +248,13 @@ class ReviewCertificateActionComponent extends React.Component<
         goBack={this.goBack}
         goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
+        <PdfWrapper id="pdfwrapper">
+          {this.state.certificatePdf && (
+            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
+          )}
+        </PdfWrapper>
         <Content
-          title={this.getTitle()}
+          title={intl.formatMessage(certificateMessages.reviewTitle)}
           subtitle={intl.formatMessage(certificateMessages.reviewDescription)}
         >
           <ButtonWrapper>
@@ -291,20 +280,25 @@ class ReviewCertificateActionComponent extends React.Component<
             )}
           </ButtonWrapper>
         </Content>
-        {this.state.certificatePdf && (
-          <PdfWrapper id="pdfwrapper">
-            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
-          </PdfWrapper>
-        )}
-
         <ResponsiveModal
           id="confirm-print-modal"
-          title={intl.formatMessage(certificateMessages.modalTitle)}
+          title={
+            isPrintInAdvanced
+              ? intl.formatMessage(certificateMessages.printModalTitle)
+              : intl.formatMessage(certificateMessages.printAndIssueModalTitle)
+          }
           actions={[
             <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
               {intl.formatMessage(buttonMessages.cancel)}
             </CustomTertiaryButton>,
-            <PrimaryButton onClick={this.readyToCertify} id="print-certificate">
+            <PrimaryButton
+              onClick={() => {
+                if (isPrintInAdvanced) {
+                  this.readyToCertify()
+                }
+              }}
+              id="print-certificate"
+            >
               {intl.formatMessage(buttonMessages.print)}
             </PrimaryButton>
           ]}
@@ -312,7 +306,9 @@ class ReviewCertificateActionComponent extends React.Component<
           handleClose={this.toggleModal}
           contentHeight={100}
         >
-          {intl.formatMessage(certificateMessages.modalBody)}
+          {isPrintInAdvanced
+            ? intl.formatMessage(certificateMessages.printModalBody)
+            : intl.formatMessage(certificateMessages.printAndIssueModalBody)}
         </ResponsiveModal>
       </ActionPageLight>
     )

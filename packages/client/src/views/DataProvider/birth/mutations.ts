@@ -112,7 +112,7 @@ export function getBirthMutation(action: SubmissionAction) {
       return REJECT_BIRTH_DECLARATION
     case SubmissionAction.ARCHIVE_DECLARATION:
       return ARCHIVE_BIRTH_DECLARATION
-    case SubmissionAction.COLLECT_CERTIFICATE:
+    case SubmissionAction.CERTIFY_DECLARATION:
       return COLLECT_BIRTH_CERTIFICATE
     case SubmissionAction.ISSUE_CERTIFICATE:
       return ISSUE_BIRTH_CERTIFICATE

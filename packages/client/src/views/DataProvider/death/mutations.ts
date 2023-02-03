@@ -106,7 +106,7 @@ export function getDeathMutation(action: SubmissionAction) {
       return REJECT_DEATH_DECLARATION
     case SubmissionAction.ARCHIVE_DECLARATION:
       return ARCHIVE_DEATH_DECLARATION
-    case SubmissionAction.COLLECT_CERTIFICATE:
+    case SubmissionAction.CERTIFY_DECLARATION:
       return COLLECT_DEATH_CERTIFICATE
     case SubmissionAction.ISSUE_CERTIFICATE:
       return ISSUE_DEATH_CERTIFICATE

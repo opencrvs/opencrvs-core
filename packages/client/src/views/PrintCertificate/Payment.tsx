@@ -42,6 +42,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { Summary } from '@opencrvs/components/lib/Summary'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -165,24 +166,25 @@ class PaymentComponent extends React.Component<IFullProps> {
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
           <Content title={intl.formatMessage(messages.payment)}>
-            <LabelValue
-              id="service"
-              label={intl.formatMessage(messages.receiptService)}
-              value={serviceMessage}
-            />
-            <LabelValue
-              id="amountDue"
-              label={intl.formatMessage(messages.amountDue)}
-              value={
-                <Currency
-                  value={paymentAmount}
-                  currency={offlineCountryConfig.config.CURRENCY.isoCode}
-                  languagesAndCountry={
-                    offlineCountryConfig.config.CURRENCY.languagesAndCountry[0]
-                  }
-                />
-              }
-            />
+            <Summary id="summary">
+              <Summary.Row
+                label={intl.formatMessage(messages.receiptService)}
+                value={serviceMessage}
+              />
+              <Summary.Row
+                label={intl.formatMessage(messages.amountDue)}
+                value={
+                  <Currency
+                    value={paymentAmount}
+                    currency={offlineCountryConfig.config.CURRENCY.isoCode}
+                    languagesAndCountry={
+                      offlineCountryConfig.config.CURRENCY
+                        .languagesAndCountry[0]
+                    }
+                  />
+                }
+              />
+            </Summary>
             <Action>
               <PrimaryButton
                 id="Continue"
