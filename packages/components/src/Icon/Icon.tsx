@@ -22,13 +22,10 @@ enum IconSize {
 
 type IconColor = keyof typeof colors | 'currentColor'
 
-type IconWeight = 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone'
-
 export type IconProps = {
   name: keyof typeof icons
   size?: keyof typeof IconSize
   color?: IconColor
-  weight?: IconWeight
   fill?: IconColor | 'none'
 }
 
@@ -36,7 +33,6 @@ export function Icon({
   name,
   size = 'medium',
   color = 'currentColor',
-  weight = 'regular',
   fill = 'none',
   ...rest
 }: IconProps) {
@@ -45,7 +41,7 @@ export function Icon({
     <IconComponent
       color={color === 'currentColor' ? 'currentColor' : colors[color]}
       size={IconSize[size]}
-      weight={weight}
+      weight={'bold'}
       {...rest}
     />
   )
