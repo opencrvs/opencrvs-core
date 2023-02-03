@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-
+import styled from 'styled-components'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { messages } from '@client/i18n/messages/views/pin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -58,13 +58,23 @@ type IFullProps = Props &
     onForgetPin: () => void
   }
 
+const LogoutButton = styled(Button)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+`
+
+const Content = styled(Stack)`
+  padding: 16px 0;
+`
+
 const MAX_LOCK_TIME = 1
 const MAX_ALLOWED_ATTEMPT = 3
 
 export const EnterPinLabel = () => {
   const intl = useIntl()
   return (
-    <Text element="h3" variant="h3">
+    <Text element="h1" variant="h2" align="center">
       {intl.formatMessage(userMessages.enterPinLabel)}
     </Text>
   )
@@ -209,28 +219,34 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     return (
       <BackgroundWrapper id="unlockPage">
         <Box id="Box" onClick={this.focusKeypad}>
-          <Stack direction="row" justifyContent="flex-end">
-            <Button type="icon" onClick={this.logout} id="logout">
-              <Icon name="LogOut" />
-            </Button>
-          </Stack>
+          <LogoutButton type="icon" onClick={this.logout} id="logout">
+            <Icon name="LogOut" />
+          </LogoutButton>
 
-          <Stack direction="column" justifyContent="stretch">
+          <Content direction="column" gap={0} justifyContent="flex-start">
             <AvatarLarge
               name={getUserName(userDetails)}
               avatar={userDetails?.avatar}
             />
             <EnterPinLabel />
-            <PINKeypad
-              ref={(elem: any) => (this.pinKeyRef = elem)}
-              onComplete={this.onPinProvided}
-              pin={this.state.pin}
-              key={this.state.resetKey}
-            />
-            <Link id="forgotten_pin" onClick={this.props.onForgetPin}>
-              {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
-            </Link>
-          </Stack>
+            <Stack direction="column" gap={16} justifyContent="flex-start">
+              <PINKeypad
+                ref={(elem: any) => (this.pinKeyRef = elem)}
+                onComplete={this.onPinProvided}
+                pin={this.state.pin}
+                key={this.state.resetKey}
+              />
+
+              <Button
+                size="small"
+                type="tertiary"
+                id="forgotten_pin"
+                onClick={this.props.onForgetPin}
+              >
+                {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
+              </Button>
+            </Stack>
+          </Content>
 
           {this.showErrorMessage()}
         </Box>

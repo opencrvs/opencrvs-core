@@ -40,12 +40,9 @@ import {
 import { Button } from '@opencrvs/components/lib/Button'
 import { Toast } from '@opencrvs/components/lib/Toast/Toast'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
-import {
-  Container,
-  FormWrapper,
-  LogoContainer,
-  StyledH2
-} from '@login/views/Common'
+import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
+import { LanguageSelect } from '@login/i18n/components/LanguageSelect'
+import { Text } from '@opencrvs/components/lib/Text/Text'
 import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 
@@ -140,9 +137,9 @@ export function StepOneContainer() {
           {({ handleSubmit }) => (
             <FormWrapper id={FORM_NAME} onSubmit={handleSubmit}>
               <Stack direction="column" alignItems="stretch" gap={24}>
-                <StyledH2>
+                <Text element="h1" variant="h2" align="center">
                   {intl.formatMessage(messages.stepOneLoginText)}
-                </StyledH2>
+                </Text>
 
                 <Field name={userNameField.name} component={UserNameInput} />
 
@@ -156,12 +153,14 @@ export function StepOneContainer() {
                 >
                   {intl.formatMessage(messages.submit)}
                 </Button>
-                <Link
+                <Button
+                  size="small"
+                  type="tertiary"
                   id="login-forgot-password"
                   onClick={() => dispatch(goToForgottenItemForm())}
                 >
                   {intl.formatMessage(messages.forgotPassword)}
-                </Link>
+                </Button>
               </Stack>
             </FormWrapper>
           )}

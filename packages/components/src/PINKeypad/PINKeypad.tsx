@@ -37,30 +37,19 @@ const Container = styled.div`
 const DotFilled = styled.span`
   height: 18px;
   width: 18px;
-  background-color: ${({ theme }) => theme.colors.secondary};
+  background-color: ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
   display: inline-block;
-  margin: 24px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 14px;
-    width: 14px;
-    margin: 14px;
-  }
+  margin: 0 8px;
 `
 
 const DotUnfilled = styled.span`
   height: 18px;
   width: 18px;
-  border: 2px solid ${({ theme }) => theme.colors.secondary};
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
   display: inline-block;
-  margin: 24px;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 14px;
-    width: 14px;
-    margin: 14px;
-  }
+  margin: 0 8px;
 `
 
 export class PINKeypad extends React.Component<IProps, IState> {

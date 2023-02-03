@@ -33,12 +33,7 @@ import {
 } from '@login/login/selectors'
 import { Toast } from '@opencrvs/components'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
-import {
-  Container,
-  FormWrapper,
-  LogoContainer,
-  StyledH2
-} from '@login/views/Common'
+import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
 import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -85,9 +80,9 @@ export function StepTwoContainer() {
         </LogoContainer>
         {resentSMS ? (
           <React.Fragment>
-            <StyledH2>
+            <Text element="h1" variant="h2" align="center">
               {intl.formatMessage(messages.stepTwoResendTitle)}
-            </StyledH2>
+            </Text>
             <p>
               {intl.formatMessage(messages.resentSMS, {
                 number: mobileNumber
@@ -96,9 +91,11 @@ export function StepTwoContainer() {
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <StyledH2>{intl.formatMessage(messages.stepTwoTitle)}</StyledH2>
+            <Text element="h1" variant="h2" align="center">
+              {intl.formatMessage(messages.stepTwoTitle)}
+            </Text>
 
-            <Text variant="reg16" element="p">
+            <Text variant="reg16" align="center" element="p">
               {intl.formatMessage(messages.stepTwoInstruction, {
                 number: mobileNumber
               })}
@@ -144,13 +141,14 @@ export function StepTwoContainer() {
                   {intl.formatMessage(messages.verify)}
                 </Button>
 
-                <Link
+                <Button
+                  size="small"
+                  type="tertiary"
                   onClick={() => dispatch(actions.resendSMS())}
                   id="login-mobile-resend"
-                  type="button"
                 >
                   {intl.formatMessage(messages.resend)}
-                </Link>
+                </Button>
               </Stack>
             </FormWrapper>
           )}

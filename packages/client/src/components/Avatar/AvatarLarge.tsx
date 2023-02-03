@@ -33,8 +33,8 @@ export function AvatarLarge({ name, avatar, ...props }: IProps) {
   if (!error && (name || avatar)) {
     return (
       <AvatarImage
-        width={132}
-        height={132}
+        width={96}
+        height={96}
         src={
           avatar
             ? avatar.data

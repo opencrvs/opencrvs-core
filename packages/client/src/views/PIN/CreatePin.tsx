@@ -31,19 +31,6 @@ type IProps = IntlShapeProps & {
   offlineCountryConfiguration: IOfflineData
 }
 
-export const StyledTitle = styled(Text).attrs({
-  variant: 'h3',
-  element: 'h3'
-})`
-  text-align: center;
-`
-
-export const ConfirmPinDescription = styled(Text).attrs({
-  variant: 'bold21',
-  element: 'p'
-})`
-  text-align: center;
-`
 class CreatePinComponent extends React.Component<IProps> {
   pinKeyRef: any
 
@@ -124,9 +111,9 @@ class CreatePinComponent extends React.Component<IProps> {
           </LogoContainer>
           {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
             <>
-              <StyledTitle id="title-text">
+              <Text element="h1" variant="h2" align="center" id="title-text">
                 {intl.formatMessage(messages.createTitle)}
-              </StyledTitle>
+              </Text>
 
               <Text element="p" variant="reg16">
                 {intl.formatMessage(messages.createDescription)}
@@ -152,9 +139,9 @@ class CreatePinComponent extends React.Component<IProps> {
           )}
           {pinHasSeqDigits && (
             <>
-              <StyledTitle id="title-text">
+              <Text element="h1" variant="h2" align="center" id="title-text">
                 {intl.formatMessage(messages.createTitle)}
-              </StyledTitle>
+              </Text>
               <Text element="p" variant="reg16" id="description-text">
                 {intl.formatMessage(messages.createDescription)}
               </Text>
@@ -175,9 +162,9 @@ class CreatePinComponent extends React.Component<IProps> {
           )}
           {pinHasSameDigits && (
             <>
-              <StyledTitle id="title-text">
+              <Text element="h1" variant="h2" align="center" id="title-text">
                 {intl.formatMessage(messages.createTitle)}
-              </StyledTitle>
+              </Text>
               <Text element="p" variant="reg16" id="description-text">
                 {intl.formatMessage(messages.createDescription)}
               </Text>
@@ -199,12 +186,17 @@ class CreatePinComponent extends React.Component<IProps> {
           )}
           {pin && (
             <>
-              <StyledTitle id="title-text">
+              <Text element="h1" variant="h2" align="center" id="title-text">
                 {intl.formatMessage(messages.reEnterTitle)}
-              </StyledTitle>
-              <ConfirmPinDescription id="description-text">
+              </Text>
+              <Text
+                element="p"
+                variant="reg16"
+                align="center"
+                id="description-text"
+              >
                 ....
-              </ConfirmPinDescription>
+              </Text>
 
               <PINKeypad
                 ref={(elem: any) => (this.pinKeyRef = elem)}
