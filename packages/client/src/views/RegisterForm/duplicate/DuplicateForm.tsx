@@ -187,7 +187,7 @@ export const DuplicateForm = (props: IProps) => {
                   setSelectedTrackingId(val)
                 }}
                 options={props.declaration.duplicates?.map((id) => ({
-                  value: id.compositionId,
+                  value: id.trackingId,
                   label: id.trackingId
                 }))}
               />
