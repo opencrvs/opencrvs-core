@@ -34,7 +34,6 @@ import {
 import { Toast } from '@opencrvs/components'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
-import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 
@@ -76,18 +75,23 @@ export function StepTwoContainer() {
     <Container id="login-step-two-box">
       <Box id="Box">
         <LogoContainer>
-          <CountryLogo src={logo} />
+          <CountryLogo size="small" src={logo} />
         </LogoContainer>
         {resentSMS ? (
           <React.Fragment>
             <Text element="h1" variant="h2" align="center">
               {intl.formatMessage(messages.stepTwoResendTitle)}
             </Text>
-            <p>
+            <Text
+              variant="reg16"
+              align="center"
+              color="supportingCopy"
+              element="p"
+            >
               {intl.formatMessage(messages.resentSMS, {
                 number: mobileNumber
               })}
-            </p>
+            </Text>
           </React.Fragment>
         ) : (
           <React.Fragment>
@@ -95,7 +99,12 @@ export function StepTwoContainer() {
               {intl.formatMessage(messages.stepTwoTitle)}
             </Text>
 
-            <Text variant="reg16" align="center" element="p">
+            <Text
+              variant="reg16"
+              align="center"
+              color="supportingCopy"
+              element="p"
+            >
               {intl.formatMessage(messages.stepTwoInstruction, {
                 number: mobileNumber
               })}

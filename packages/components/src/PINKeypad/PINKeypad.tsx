@@ -32,6 +32,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   outline: none;
+  margin-top: 32px;
 `
 
 const DotFilled = styled.span`

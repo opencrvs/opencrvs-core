@@ -127,7 +127,7 @@ export function StepOneContainer() {
     <Container id="login-step-one-box">
       <Box id="Box">
         <LogoContainer>
-          <CountryLogo src={logo} />
+          <CountryLogo size="small" src={logo} />
         </LogoContainer>
         <Form
           onSubmit={(values: IAuthenticationData) =>
