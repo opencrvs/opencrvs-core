@@ -9,46 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_MONGO_URL } from '@metrics/constants'
-import { logger } from '@metrics/logger'
-import { subMinutes } from 'date-fns'
-import { MongoClient } from 'mongodb'
 
-let currentUpdate: boolean = false
+/*
+ * This migration changes "practitioner" references to the person who
+ * registered the record from whomever was the first to touch it
+ */
 
-export async function refresh() {
-  if (currentUpdate) {
-    logger.info('Analytics materialised views already being refreshed')
-    return
-  }
-  logger.info('Refreshing analytics materialised views')
-  const client = new MongoClient(HEARTH_MONGO_URL)
-  try {
-    currentUpdate = true
-    await client.connect()
-    await refreshAnalyticsMaterialisedViews(client)
-    logger.info('Analytics materialised views refreshed')
-  } catch (error) {
-    logger.error(`Error refreshing analytics materialised views ${error}`)
-  } finally {
-    currentUpdate = false
-    await client.close()
-  }
-}
-
-async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
-  const db = client.db(client.options.dbName)
-
-  const lastUpdatedAt = subMinutes(new Date(), 5).toISOString()
+export const up = async (db, client) => {
   await db
     .collection('Task')
     .aggregate(
       [
-        {
-          $match: {
-            'meta.lastUpdated': { $gte: lastUpdatedAt }
-          }
-        },
         { $unwind: '$businessStatus.coding' },
         {
           $match: {
@@ -517,6 +488,7 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
             createdAt: {
               $dateFromString: { dateString: '$firstTask.lastModified' }
             },
+            practitionerRole: 1,
             status: '$latestTask.businessStatus.coding.code',
             childsAgeInDaysAtDeclaration: 1,
             birthType: '$birthTypeObservation.valueQuantity.value',
@@ -533,313 +505,9 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
           }
         },
         {
-          $merge: {
-            into: { db: 'analytics', coll: 'registrations' },
-            on: '_id',
-            whenMatched: 'replace',
-            whenNotMatched: 'insert'
-          }
-        }
-      ],
-      { allowDiskUse: true }
-    )
-    .toArray()
-
-  await db
-    .collection('Task')
-    .aggregate(
-      [
-        {
-          $unionWith: 'Task_history'
-        },
-        {
-          $match: {
-            'meta.lastUpdated': { $gte: lastUpdatedAt },
-            'extension.url':
-              'http://opencrvs.org/specs/extension/requestCorrection'
-          }
-        },
-        {
-          $addFields: {
-            compositionId: {
-              $arrayElemAt: [{ $split: ['$focus.reference', '/'] }, 1]
-            },
-            extensionsObject: {
-              $arrayToObject: {
-                $map: {
-                  input: '$extension',
-                  as: 'el',
-                  in: [
-                    {
-                      $replaceOne: {
-                        input: '$$el.url',
-                        find: 'http://opencrvs.org/specs/extension/',
-                        replacement: ''
-                      }
-                    },
-                    {
-                      $arrayElemAt: [
-                        { $split: ['$$el.valueReference.reference', '/'] },
-                        1
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        {
-          $lookup: {
-            from: 'Composition',
-            localField: 'compositionId',
-            foreignField: 'id',
-            as: 'composition'
-          }
-        },
-        { $unwind: '$composition' },
-        {
-          $addFields: {
-            extensions: {
-              $arrayToObject: {
-                $map: {
-                  input: '$composition.section',
-                  as: 'el',
-                  in: [
-                    {
-                      $let: {
-                        vars: {
-                          firstElement: {
-                            $arrayElemAt: ['$$el.code.coding', 0]
-                          }
-                        },
-                        in: '$$firstElement.code'
-                      }
-                    },
-                    {
-                      $let: {
-                        vars: {
-                          firstElement: { $arrayElemAt: ['$$el.entry', 0] }
-                        },
-                        in: {
-                          $arrayElemAt: [
-                            { $split: ['$$firstElement.reference', '/'] },
-                            1
-                          ]
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        {
-          $lookup: {
-            from: 'Patient',
-            localField: 'extensions.child-details',
-            foreignField: 'id',
-            as: 'child'
-          }
-        },
-        { $unwind: '$child' },
-        {
-          $lookup: {
-            from: 'Location',
-            localField: 'extensionsObject.regLastOffice',
-            foreignField: 'id',
-            as: 'office'
-          }
-        },
-        { $unwind: '$office' },
-        {
-          $addFields: {
-            'office.lga': {
-              $arrayElemAt: [{ $split: ['$office.partOf.reference', '/'] }, 1]
-            }
-          }
-        },
-        {
-          $lookup: {
-            from: 'Location',
-            localField: 'office.lga',
-            foreignField: 'id',
-            as: 'lga'
-          }
-        },
-        { $unwind: '$lga' },
-        {
-          $addFields: {
-            'lga.state': {
-              $arrayElemAt: [{ $split: ['$lga.partOf.reference', '/'] }, 1]
-            }
-          }
-        },
-        {
-          $lookup: {
-            from: 'Location',
-            localField: 'lga.state',
-            foreignField: 'id',
-            as: 'state'
-          }
-        },
-        { $unwind: '$state' },
-        {
-          $project: {
-            gender: '$child.gender',
-            reason: '$reason.text',
-            extensions: '$extensions',
-            officeName: '$office.name',
-            lgaName: '$lga.name',
-            stateName: '$state.name',
-            event: 'Birth',
-            createdAt: {
-              $dateFromString: { dateString: '$lastModified' }
-            }
-          }
-        },
-        {
-          $merge: {
-            into: { db: 'analytics', coll: 'corrections' },
-            on: '_id',
-            whenMatched: 'replace',
-            whenNotMatched: 'insert'
-          }
-        }
-      ],
-      { allowDiskUse: true }
-    )
-    .toArray()
-
-  await db
-    .collection('Location')
-    .aggregate(
-      [
-        { $match: { 'identifier.1.value': 'STATE' } },
-        {
-          $addFields: {
-            extensionsObject: {
-              $arrayToObject: {
-                $map: {
-                  input: '$extension',
-                  as: 'el',
-                  in: [
-                    {
-                      $replaceOne: {
-                        input: '$$el.url',
-                        find: 'http://opencrvs.org/specs/id/',
-                        replacement: ''
-                      }
-                    },
-                    {
-                      $function: {
-                        body: `function (jsonString) {
-                          return JSON.parse(jsonString)
-                        }`,
-                        args: ['$$el.valueString'],
-                        lang: 'js'
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        { $unwind: '$extensionsObject.statistics-crude-birth-rates' },
-        {
-          $project: {
-            name: 1,
-
-            populations: {
-              $reduce: {
-                input: {
-                  $map: {
-                    input: '$extensionsObject.statistics-total-populations',
-                    as: 'kv',
-                    in: {
-                      $map: {
-                        input: { $objectToArray: '$$kv' },
-                        as: 'kv2',
-                        in: {
-                          year: '$$kv2.k',
-                          value: '$$kv2.v'
-                        }
-                      }
-                    }
-                  }
-                },
-                initialValue: [],
-                in: { $concatArrays: ['$$value', '$$this'] }
-              }
-            },
-            cbr: {
-              $map: {
-                input: {
-                  $objectToArray:
-                    '$extensionsObject.statistics-crude-birth-rates'
-                },
-                as: 'kv',
-                in: {
-                  year: '$$kv.k',
-                  cbr: '$$kv.v'
-                }
-              }
-            }
-          }
-        },
-        { $unwind: '$cbr' },
-        {
-          $addFields: {
-            daysInYear: {
-              $function: {
-                body: `function (row) {
-                  function daysInYear(year) {
-                    return (year % 4 === 0 && year % 100 > 0) || year % 400 == 0
-                      ? 366
-                      : 365
-                  }
-                  const year = row.cbr.year
-                  const date = new Date(row.cbr.year, 1, 1)
-                  const population = row.populations.find(
-                    (p) => p.year === year
-                  )
-                  if (!population) {
-                    return []
-                  }
-                  const totalDays = daysInYear(year)
-                  return Array.from({ length: totalDays }, (value, index) => {
-                    date.setDate(date.getDate() + 1)
-                    return {
-                      date: date.toISOString(),
-                      estimatedNumberOfBirths:
-                        ((population.value / 1000) * row.cbr.cbr) / totalDays
-                    }
-                  })
-                }`,
-                args: ['$$ROOT'],
-                lang: 'js'
-              }
-            }
-          }
-        },
-        { $unwind: '$daysInYear' },
-        {
-          $project: {
-            _id: { $concat: [{ $toString: '$name' }, '$daysInYear.date'] },
-            name: 1,
-            date: { $dateFromString: { dateString: '$daysInYear.date' } },
-            estimatedNumberOfBirths: '$daysInYear.estimatedNumberOfBirths',
-            event: 'Birth'
-          }
-        },
-        {
-          $merge: {
-            into: { db: 'analytics', coll: 'populationEstimatesPerDay' },
-            on: '_id',
-            whenMatched: 'replace',
-            whenNotMatched: 'insert'
+          $out: {
+            db: 'analytics',
+            coll: 'registrations'
           }
         }
       ],
@@ -847,3 +515,5 @@ async function refreshAnalyticsMaterialisedViews(client: MongoClient) {
     )
     .toArray()
 }
+
+export const down = async (db, client) => {}
