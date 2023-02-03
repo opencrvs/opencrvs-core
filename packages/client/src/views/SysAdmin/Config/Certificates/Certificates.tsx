@@ -22,7 +22,7 @@ import {
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { LinkButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -121,6 +121,7 @@ interface State {
   imageUploading: boolean
   imageLoadingError: string
   showNotification: boolean
+  notificationForPrinting: NOTIFICATION_STATUS
   showPrompt: boolean
   eventName: string
   previewImage: IAttachmentValue | null
@@ -130,7 +131,6 @@ interface State {
     birth: boolean
     death: boolean
   }
-  notificationMessages: NOTIFICATION_STATUS
 }
 
 interface ICertification {
@@ -224,6 +224,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       imageUploading: false,
       imageLoadingError: '',
       showNotification: false,
+      notificationForPrinting: NOTIFICATION_STATUS.IDLE,
       showPrompt: false,
       eventName: '',
       previewImage: null,
@@ -235,8 +236,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       allowPrinting: {
         birth: this.props.offlineResources.config.BIRTH.PRINT_IN_ADVANCE,
         death: this.props.offlineResources.config.DEATH.PRINT_IN_ADVANCE
-      },
-      notificationMessages: NOTIFICATION_STATUS.IDLE
+      }
     }
   }
 
@@ -270,13 +270,12 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         }
       })
       this.setState({
-        notificationMessages: NOTIFICATION_STATUS.IN_PROGRESS
+        notificationForPrinting: NOTIFICATION_STATUS.SUCCESS
       })
     } catch (err) {
       this.setState({
-        notificationMessages: NOTIFICATION_STATUS.ERROR
+        notificationForPrinting: NOTIFICATION_STATUS.ERROR
       })
-      console.log(err)
     }
   }
 
@@ -457,6 +456,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       offlineResources.templates.certificates?.birth.fileName
     const deathCertFileName =
       offlineResources.templates.certificates?.death.fileName
+
+    // console.log(offlineResources.templates.certificates?.birth)
 
     const birthLastModified =
       offlineResources.templates.certificates?.birth.lastModifiedDate
@@ -678,6 +679,38 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               />
             </Toast>
           )}
+
+          {this.state.notificationForPrinting !== NOTIFICATION_STATUS.IDLE && (
+            <Toast
+              id="allow-printing-notification"
+              type={
+                this.state.notificationForPrinting ===
+                NOTIFICATION_STATUS.SUCCESS
+                  ? 'success'
+                  : this.state.notificationForPrinting ===
+                    NOTIFICATION_STATUS.IN_PROGRESS
+                  ? 'loading'
+                  : this.state.notificationForPrinting ===
+                    NOTIFICATION_STATUS.ERROR
+                  ? 'error'
+                  : 'warning'
+              }
+              onClose={() =>
+                this.setState({
+                  notificationForPrinting: NOTIFICATION_STATUS.IDLE
+                })
+              }
+            >
+              {this.state.notificationForPrinting ===
+              NOTIFICATION_STATUS.IN_PROGRESS
+                ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+                : this.state.notificationForPrinting ===
+                  NOTIFICATION_STATUS.SUCCESS
+                ? intl.formatMessage(messages.updateAllowPrintingNotification)
+                : intl.formatMessage(messages.applicationConfigChangeError)}
+            </Toast>
+          )}
+
           <ResponsiveModal
             id="withoutVerificationPrompt"
             show={showPrompt}

@@ -641,7 +641,12 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.certificate.printDescription',
     defaultMessage:
       'This is the content describing what this configuration option is...',
-    description: 'Description of allowing printing'
+    description: 'Allowing printing'
+  },
+  updateAllowPrintingNotification: {
+    id: 'config.certificate.allowPrintingNotification',
+    defaultMessage: 'Allow printing in advance of issuance updated',
+    description: 'Message for allowing printing notification'
   }
 }
 
