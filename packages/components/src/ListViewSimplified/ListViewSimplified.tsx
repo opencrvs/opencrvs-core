@@ -125,7 +125,7 @@ const MobileActionsContainer = styled.div`
 `
 
 export interface IListViewItemSimplifiedProps {
-  key?: string
+  key?: number | string
   image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
