@@ -12,42 +12,39 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
-export interface INavigationItemProps
+
+export interface INavigationGroupTitleProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: () => React.ReactNode
   label: string
-  count?: number
   isSelected?: boolean
   expandableIcon?: () => React.ReactNode
   children?: React.ReactNode
 }
 
 const ItemContainer = styled.button<{ isSelected?: boolean }>`
-  width: 100%;
-  height: 36px;
+  height: 24px;
+  margin: 4px 0px;
   cursor: pointer;
   border: 0;
   outline: none;
   border-radius: 4px;
   background-color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bold14};
+  ${({ theme }) => theme.fonts.bold12};
   color: ${({ theme, isSelected }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
   svg {
     stroke-width: 2.5px;
   }
   &:hover {
-    background-color: ${({ theme }) => theme.colors.grey100};
     color: ${({ theme }) => theme.colors.grey600};
   }
 
   &:active {
-    background-color: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.grey600};
   }
 
   &:focus-visible {
-    ${({ theme }) => theme.fonts.bold14};
+    ${({ theme }) => theme.fonts.bold12};
     background-color: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.grey600};
     svg {
@@ -57,52 +54,34 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
 `
 const ItemContentContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-flow: row;
   align-items: center;
-  padding-right: 8px;
 `
 const LabelContainer = styled.span`
-  margin-left: 6px;
-  margin-right: 4px;
+  text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-left: 3px;
 `
 
 const ValueContainer = styled.span`
-  margin-left: auto;
-  ${({ theme }) => theme.fonts.bold12};
-`
-
-const ExpandContainer = styled.span`
   display: flex;
-  width: 10px;
-  justify-content: center;
-  ${({ theme }) => theme.fonts.bold12};
+  align-items: center;
 `
 
-const IconContainer = styled.div`
-  width: 24px;
-  display: flex;
-  justify-content: center;
-`
-
-export const NavigationItem = ({
-  icon,
+export const NavigationGroupTitle = ({
   label,
-  count,
   isSelected,
   expandableIcon,
   children,
   ...otherProps
-}: INavigationItemProps) => {
+}: INavigationGroupTitleProps) => {
   return (
     <ItemContainer isSelected={isSelected} {...otherProps}>
       <ItemContentContainer>
-        <ExpandContainer>{expandableIcon && expandableIcon()}</ExpandContainer>
-        {icon && <IconContainer>{icon()}</IconContainer>}
+        <ValueContainer>{expandableIcon && expandableIcon()}</ValueContainer>
         <LabelContainer>{label}</LabelContainer>
-        <ValueContainer>{count && count !== 0 ? count : null}</ValueContainer>
       </ItemContentContainer>
       {isSelected && children}
     </ItemContainer>

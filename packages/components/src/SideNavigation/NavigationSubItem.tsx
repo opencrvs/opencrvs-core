@@ -36,7 +36,10 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
 `
 
 export const LabelContainer = styled.div`
-  padding-left: 34px;
+  margin-left: 50px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-align: left;
 `
 

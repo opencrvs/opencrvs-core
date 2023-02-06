@@ -38,7 +38,7 @@ const config = {
   grey200: '#E8E8E8', // dividers, hover
   grey300: '#CCCCCC', // disabled state, borders
   grey400: '#959595', // placeholder copy
-  grey500: '#5B5B5B', // supporting copy
+  grey500: '#727272', // supporting copy
   grey600: '#222222', // copy
 
   // Opacity
@@ -47,7 +47,7 @@ const config = {
 
   // Alternative definitions
   copy: '#222222', // grey600
-  supportingCopy: '#5B5B5B', // grey500
+  supportingCopy: '#727272', // grey500
   placeholderCopy: '#959595', // grey400
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5', // grey100

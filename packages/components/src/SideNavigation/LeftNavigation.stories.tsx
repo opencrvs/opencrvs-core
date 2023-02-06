@@ -14,14 +14,136 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { LeftNavigation, ILeftNavigationProps } from './LeftNavigation'
 import { NavigationGroup } from './NavigationGroup'
-import { groupDeclaration, groupSetting } from './NavigationGroup.stories'
+import { NavigationGroupTitle } from './NavigationGroupTitle'
+import { NavigationItem } from './NavigationItem'
+import { NavigationSubItem } from './NavigationSubItem'
+import { DeclarationIconSmall } from '../icons/DeclarationIconSmall'
+import { Icon } from '../Icon'
+import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 
-const Template: Story<ILeftNavigationProps> = (args) => (
-  <LeftNavigation {...args}>
-    <NavigationGroup {...groupDeclaration.args} />
-    <NavigationGroup {...groupSetting.args} />
-  </LeftNavigation>
-)
+const { useState } = React
+
+const Template: Story<ILeftNavigationProps> = (args) => {
+  const [isExpanded, setExpanded] = useState(true)
+  const [is2Expanded, set2Expanded] = useState(true)
+  const [is3Expanded, set3Expanded] = useState(false)
+  const [is4Expanded, set4Expanded] = useState(false)
+
+  return (
+    <LeftNavigation {...args}>
+      <NavigationGroup>
+        <NavigationGroupTitle
+          label="RECORDS"
+          onClick={() => setExpanded(!isExpanded)}
+          expandableIcon={() =>
+            isExpanded ? <Expandable selected={true} /> : <Expandable />
+          }
+        />
+
+        {isExpanded && (
+          <>
+            <NavigationItem
+              label="In progress"
+              icon={() => <DeclarationIconSmall color={'purple'} />}
+              count={1}
+            />
+            <NavigationItem
+              label="Ready for review"
+              icon={() => <DeclarationIconSmall color={'orange'} />}
+              count={1}
+            />
+            <NavigationItem
+              label="Ready to print"
+              icon={() => <DeclarationIconSmall color={'green'} />}
+              count={1}
+            />
+          </>
+        )}
+      </NavigationGroup>
+      <NavigationGroup>
+        <NavigationGroupTitle
+          label="PERFORMANCE"
+          onClick={() => set2Expanded(!is2Expanded)}
+          expandableIcon={() =>
+            is2Expanded ? <Expandable selected={true} /> : <Expandable />
+          }
+        />
+        {is2Expanded && (
+          <>
+            <NavigationItem
+              label="Registrations"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+              count={1}
+            />
+            <NavigationItem
+              label="Statistics"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+              count={1}
+            />
+            <NavigationItem
+              label="Leaderboards"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+              onClick={() => set3Expanded(!is3Expanded)}
+              expandableIcon={() =>
+                is3Expanded ? <Expandable selected={true} /> : <Expandable />
+              }
+            />
+            {is3Expanded && (
+              <>
+                <NavigationSubItem label="SubItem" />
+              </>
+            )}
+          </>
+        )}
+      </NavigationGroup>
+      <NavigationGroup>
+        <NavigationGroupTitle
+          label="CONFIGURATION"
+          onClick={() => set4Expanded(!is4Expanded)}
+          expandableIcon={() =>
+            is4Expanded ? <Expandable selected={true} /> : <Expandable />
+          }
+        />
+        {is4Expanded && (
+          <>
+            <NavigationItem
+              label="Application"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+            />
+            <NavigationItem
+              label="Declaration forms"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+            />
+            <NavigationItem
+              label="Certificates"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+              onClick={() => set3Expanded(!is3Expanded)}
+            />
+            <NavigationItem
+              label="User roles"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+              onClick={() => set3Expanded(!is3Expanded)}
+            />
+          </>
+        )}
+      </NavigationGroup>
+    </LeftNavigation>
+  )
+}
 
 export const leftNavigationView = Template.bind({})
 
