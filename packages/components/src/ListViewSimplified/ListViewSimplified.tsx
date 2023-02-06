@@ -12,10 +12,18 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Grid = styled.div<{ bottomBorder: boolean }>`
+export type IRowListViewSize = 'small' | 'medium'
+
+const Grid = styled.div<{
+  bottomBorder: boolean
+  rowHeight?: IRowListViewSize
+}>`
   display: grid;
   grid-template-columns: auto 1fr auto;
-  grid-auto-rows: minmax(56px, auto);
+  ${({ rowHeight }) =>
+    rowHeight === 'medium' && 'grid-auto-rows: minmax(56px, auto);'}
+  ${({ rowHeight }) =>
+    rowHeight === 'small' && 'grid-auto-rows: minmax(48px, auto);'}
   ${({ bottomBorder }) => bottomBorder && 'border-bottom: 1px solid'};
   border-color: ${({ theme }) => theme.colors.grey200};
   > div:not(:nth-last-child(-n + 4)) {
@@ -187,15 +195,22 @@ export function ListViewSimplified({
   className,
   bottomBorder = false,
   children,
-  id
+  id,
+  rowHeight = 'medium'
 }: {
   bottomBorder?: boolean
   className?: string
   children: React.ReactNode
   id?: string
+  rowHeight?: IRowListViewSize
 }) {
   return (
-    <Grid id={id} bottomBorder={bottomBorder} className={className}>
+    <Grid
+      id={id}
+      bottomBorder={bottomBorder}
+      rowHeight={rowHeight}
+      className={className}
+    >
       {children}
     </Grid>
   )
