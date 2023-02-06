@@ -94,7 +94,7 @@ jobs:
           MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
-          yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:staging --host=farajaland-staging.opencrvs.org --version=${{ env.CORE_VERSION }} --country_config_version=${{ env.COUNTRY_CONFIG_VERSION }} --country_config_path=opencrvs-farajaland --replicas=1
       - name: Summarise deployment
         run: echo "### Staging deployment\nCore version **$CORE_VERSION**\nFarajaland version **$COUNTRY_CONFIG_VERSION**" >> $GITHUB_STEP_SUMMARY
       - name: Run Cypress tests

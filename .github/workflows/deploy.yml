@@ -155,7 +155,7 @@ jobs:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         run: |
-          yarn deploy:qa farajaland-qa.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:qa --host=farajaland-qa.opencrvs.org --version=${{ env.CORE_VERSION }} --country_config_version=${{ env.COUNTRY_CONFIG_VERSION }} --country_config_path=opencrvs-farajaland --replicas=1
 
       - name: Deploy to production
         if: ${{ inputs.environment == 'production' }}
@@ -178,7 +178,7 @@ jobs:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         run: |
-          yarn deploy:demo farajaland.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 3
+          yarn deploy:demo --host=farajaland.opencrvs.org --version=${{ env.CORE_VERSION }} --country_config_version=${{ env.COUNTRY_CONFIG_VERSION }} --country_config_path=opencrvs-farajaland --replicas=3
 
       - name: Deploy to staging
         if: ${{ inputs.environment == 'staging' }}
@@ -198,7 +198,7 @@ jobs:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         run: |
-          yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:staging --host=farajaland-staging.opencrvs.org --version=${{ env.CORE_VERSION }} --country_config_version=${{ env.COUNTRY_CONFIG_VERSION }} --country_config_path=opencrvs-farajaland --replicas=1
 
       - name: Deploy to config
         if: ${{ inputs.environment == 'config' }}
@@ -218,7 +218,7 @@ jobs:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         run: |
-          yarn deploy:config farajaland-config.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:config --host=farajaland-config.opencrvs.org --version=${{ env.CORE_VERSION }} --country_config_version=${{ env.COUNTRY_CONFIG_VERSION }} --country_config_path=opencrvs-farajaland --replicas=1
 
       - name: Deploy to migrate
         if: ${{ github.event.inputs.environment == 'migrate' }}
@@ -238,4 +238,4 @@ jobs:
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         run: |
-          yarn deploy:prod farajaland-migrate.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:prod --host=farajaland-migrate.opencrvs.org --version=${{ env.CORE_VERSION }} --country_config_version=${{ env.COUNTRY_CONFIG_VERSION }} --country_config_path=opencrvs-farajaland --replicas=1
