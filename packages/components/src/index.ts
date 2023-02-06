@@ -73,6 +73,7 @@ export * from './VerticalBar'
 export * from './ViewData'
 export * from './WarningMessage'
 export * from './Workqueue'
+export * from './ComparisonListView'
 
 export * from './colors'
 export * from './fonts'

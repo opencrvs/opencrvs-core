@@ -21,7 +21,10 @@ import {
 import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { client } from '@client/utils/apolloClient'
-import { getBirthMutation } from '@client/views/DataProvider/birth/mutations'
+import {
+  getBirthMutation,
+  MARK_EVENT_AS_DUPLICATE
+} from '@client/views/DataProvider/birth/mutations'
 import { Event } from '@client/utils/gateway'
 import { getDeathMutation } from '@client/views/DataProvider/death/mutations'
 import {
@@ -120,7 +123,24 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             })
           )
         }
-      } else if (submissionAction === SubmissionAction.REJECT_DECLARATION) {
+      } else if (
+        [
+          SubmissionAction.REJECT_DECLARATION,
+          SubmissionAction.ARCHIVE_DECLARATION
+        ].includes(submissionAction)
+      ) {
+        if (
+          declaration.payload?.reason === 'duplicate' &&
+          SubmissionAction.ARCHIVE_DECLARATION === submissionAction
+        ) {
+          await client.mutate({
+            mutation: MARK_EVENT_AS_DUPLICATE,
+            variables: {
+              ...declaration.payload
+            }
+          })
+        }
+
         await client.mutate({
           mutation,
           variables: {

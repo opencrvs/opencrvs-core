@@ -173,7 +173,12 @@ type Mutation {
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
-  markEventAsArchived(id: String!): ID!
+  markEventAsArchived(
+    id: String!
+    reason: String
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
@@ -192,6 +197,12 @@ type Mutation {
     details: DeathRegistrationInput!
   ): ID!
   markEventAsUnassigned(id: String!): ID!
+  markEventAsDuplicate(
+    id: String!
+    reason: String!
+    comment: String
+    duplicateTrackingId: String
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -841,7 +852,7 @@ type Registration {
   inCompleteFields: String
   attachments: [Attachment]
   certificates: [Certificate]
-  duplicates: [ID]
+  duplicates: [DuplicatesInfo]
 }
 
 type RelatedPerson {
@@ -907,6 +918,7 @@ type History {
   output: [InputOutput]
   certificates: [Certificate]
   signature: Signature
+  duplicateOf: String
 }
 
 enum MannerOfDeath {
@@ -1431,6 +1443,11 @@ type Certificate {
   data: String
 }
 
+type DuplicatesInfo {
+  compositionId: ID
+  trackingId: String
+}
+
 enum RegAction {
   ASSIGNED
   UNASSIGNED
@@ -1438,6 +1455,7 @@ enum RegAction {
   REQUESTED_CORRECTION
   DOWNLOADED
   VIEWED
+  MARKED_AS_DUPLICATE
 }
 
 type StatusReason {

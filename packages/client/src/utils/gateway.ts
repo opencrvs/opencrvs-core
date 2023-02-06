@@ -218,6 +218,7 @@ export type ApplicationConfiguration = {
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: Maybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: Maybe<Scalars['Boolean']>
+  LOGIN_BACKGROUND?: Maybe<LoginBackground>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
 }
@@ -236,6 +237,7 @@ export type ApplicationConfigurationInput = {
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE?: InputMaybe<Scalars['Boolean']>
   INFORMANT_SIGNATURE_REQUIRED?: InputMaybe<Scalars['Boolean']>
+  LOGIN_BACKGROUND?: InputMaybe<LoginBackgroundInput>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
 }
@@ -746,6 +748,12 @@ export type Dummy = {
   dummy: Scalars['String']
 }
 
+export type DuplicatesInfo = {
+  __typename?: 'DuplicatesInfo'
+  compositionId?: Maybe<Scalars['ID']>
+  trackingId?: Maybe<Scalars['String']>
+}
+
 export enum EducationType {
   FirstStageTertiaryIsced_5 = 'FIRST_STAGE_TERTIARY_ISCED_5',
   LowerSecondaryIsced_2 = 'LOWER_SECONDARY_ISCED_2',
@@ -921,6 +929,7 @@ export type History = {
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
   dhis2Notification?: Maybe<Scalars['Boolean']>
+  duplicateOf?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
   location?: Maybe<Location>
@@ -982,6 +991,11 @@ export type IdentityType = {
   id?: Maybe<Scalars['ID']>
   otherType?: Maybe<Scalars['String']>
   type?: Maybe<IdentityIdType>
+}
+
+export enum ImageFit {
+  Fill = 'FILL',
+  Tile = 'TILE'
 }
 
 export enum InformantType {
@@ -1088,6 +1102,19 @@ export type LocationWiseEstimationMetric = {
   withinTarget: Scalars['Int']
 }
 
+export type LoginBackground = {
+  __typename?: 'LoginBackground'
+  backgroundColor?: Maybe<Scalars['String']>
+  backgroundImage?: Maybe<Scalars['String']>
+  imageFit?: Maybe<ImageFit>
+}
+
+export type LoginBackgroundInput = {
+  backgroundColor?: InputMaybe<Scalars['String']>
+  backgroundImage?: InputMaybe<Scalars['String']>
+  imageFit?: InputMaybe<ImageFit>
+}
+
 export enum MannerOfDeath {
   Accident = 'ACCIDENT',
   Homicide = 'HOMICIDE',
@@ -1179,6 +1206,7 @@ export type Mutation = {
   markDeathAsValidated?: Maybe<Scalars['ID']>
   markDeathAsVerified?: Maybe<DeathRegistration>
   markEventAsArchived: Scalars['ID']
+  markEventAsDuplicate: Scalars['ID']
   markEventAsReinstated?: Maybe<Reinstated>
   markEventAsUnassigned: Scalars['ID']
   markEventAsVoided: Scalars['ID']
@@ -1317,7 +1345,17 @@ export type MutationMarkDeathAsVerifiedArgs = {
 }
 
 export type MutationMarkEventAsArchivedArgs = {
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
   id: Scalars['String']
+  reason?: InputMaybe<Scalars['String']>
+}
+
+export type MutationMarkEventAsDuplicateArgs = {
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
+  id: Scalars['String']
+  reason: Scalars['String']
 }
 
 export type MutationMarkEventAsReinstatedArgs = {
@@ -1830,6 +1868,7 @@ export type QuestionnaireQuestionInput = {
 export enum RegAction {
   Assigned = 'ASSIGNED',
   Downloaded = 'DOWNLOADED',
+  MarkedAsDuplicate = 'MARKED_AS_DUPLICATE',
   Reinstated = 'REINSTATED',
   RequestedCorrection = 'REQUESTED_CORRECTION',
   Unassigned = 'UNASSIGNED',
@@ -1882,7 +1921,7 @@ export type Registration = {
   contactPhoneNumber?: Maybe<Scalars['String']>
   contactRelationship?: Maybe<Scalars['String']>
   draftId?: Maybe<Scalars['String']>
-  duplicates?: Maybe<Array<Maybe<Scalars['ID']>>>
+  duplicates?: Maybe<Array<Maybe<DuplicatesInfo>>>
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<InformantType>
@@ -3118,6 +3157,8 @@ export type MarkEventAsVoidedMutation = {
 
 export type MarkEventAsArchivedMutationVariables = Exact<{
   id: Scalars['String']
+  reason?: InputMaybe<Scalars['String']>
+  comment?: InputMaybe<Scalars['String']>
 }>
 
 export type MarkEventAsArchivedMutation = {
@@ -3142,6 +3183,18 @@ export type SubmitMutationMutationVariables = Exact<{
 export type SubmitMutationMutation = {
   __typename?: 'Mutation'
   markEventAsUnassigned: string
+}
+
+export type MarkEventAsDuplicateMutationVariables = Exact<{
+  id: Scalars['String']
+  reason: Scalars['String']
+  comment?: InputMaybe<Scalars['String']>
+  duplicateTrackingId?: InputMaybe<Scalars['String']>
+}>
+
+export type MarkEventAsDuplicateMutation = {
+  __typename?: 'Mutation'
+  markEventAsDuplicate: string
 }
 
 export type FetchBirthRegistrationForReviewQueryVariables = Exact<{
@@ -3297,11 +3350,15 @@ export type FetchBirthRegistrationForReviewQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
-      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
       mosipAid?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
@@ -3358,6 +3415,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       reason?: string | null
+      duplicateOf?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3963,10 +4021,14 @@ export type FetchDeathRegistrationForReviewQuery = {
       otherInformantType?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
-      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      duplicates?: Array<{
+        __typename?: 'DuplicatesInfo'
+        compositionId?: string | null
+        trackingId?: string | null
+      } | null> | null
       attachments?: Array<{
         __typename?: 'Attachment'
         data?: string | null
@@ -5521,10 +5583,14 @@ export type FetchDeclarationShortInfoQuery = {
           id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
-          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
+          } | null> | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
           } | null> | null
           assignment?: {
             __typename?: 'AssignmentData'
@@ -5553,10 +5619,14 @@ export type FetchDeclarationShortInfoQuery = {
           id?: string | null
           type?: RegistrationType | null
           trackingId?: string | null
-          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
+          } | null> | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
           } | null> | null
           assignment?: {
             __typename?: 'AssignmentData'
@@ -5637,6 +5707,12 @@ export type UpdateApplicationConfigMutation = {
     INFORMANT_SIGNATURE_REQUIRED?: boolean | null
     ADDRESSES?: number | null
     ADMIN_LEVELS?: number | null
+    LOGIN_BACKGROUND?: {
+      __typename?: 'LoginBackground'
+      backgroundColor?: string | null
+      backgroundImage?: string | null
+      imageFit?: ImageFit | null
+    } | null
     COUNTRY_LOGO?: {
       __typename?: 'CountryLogo'
       fileName?: string | null
@@ -6490,11 +6566,15 @@ export type FetchViewRecordByCompositionQuery = {
           contact?: string | null
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
-          duplicates?: Array<string | null> | null
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
           mosipAid?: string | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
+          } | null> | null
           attachments?: Array<{
             __typename?: 'Attachment'
             data?: string | null
@@ -6772,11 +6852,15 @@ export type FetchViewRecordByCompositionQuery = {
           contact?: string | null
           contactRelationship?: string | null
           contactPhoneNumber?: string | null
-          duplicates?: Array<string | null> | null
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
           mosipAid?: string | null
+          duplicates?: Array<{
+            __typename?: 'DuplicatesInfo'
+            compositionId?: string | null
+            trackingId?: string | null
+          } | null> | null
           attachments?: Array<{
             __typename?: 'Attachment'
             data?: string | null

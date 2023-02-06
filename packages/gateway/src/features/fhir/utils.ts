@@ -61,7 +61,8 @@ import {
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  MARKED_AS_DUPLICATE
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -975,6 +976,8 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.REINSTATED
   } else if (findExtension(VIEWED_EXTENSION_URL, extensions)) {
     return GQLRegAction.VIEWED
+  } else if (findExtension(MARKED_AS_DUPLICATE, extensions)) {
+    return GQLRegAction.MARKED_AS_DUPLICATE
   }
   return null
 }
@@ -1448,4 +1451,9 @@ export function isBase64FileString(str: string) {
   }
   const strSplit = str.split(':')
   return strSplit.length > 0 && strSplit[0] === 'data'
+}
+
+export async function fetchTaskByCompositionIdFromHearth(id: string) {
+  const task = await fetchFromHearth(`/Task?focus=Composition/${id}`)
+  return task
 }

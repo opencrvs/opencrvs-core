@@ -77,6 +77,7 @@ export interface GQLMutation {
   markDeathAsCertified: string
   requestDeathRegistrationCorrection: string
   markEventAsUnassigned: string
+  markEventAsDuplicate: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -722,7 +723,7 @@ export interface GQLRegistration {
   inCompleteFields?: string
   attachments?: Array<GQLAttachment | null>
   certificates?: Array<GQLCertificate | null>
-  duplicates?: Array<string | null>
+  duplicates?: Array<GQLDuplicatesInfo | null>
 }
 
 export interface GQLRelatedPerson {
@@ -788,6 +789,7 @@ export interface GQLHistory {
   output?: Array<GQLInputOutput | null>
   certificates?: Array<GQLCertificate | null>
   signature?: GQLSignature
+  duplicateOf?: string
 }
 
 export const enum GQLMannerOfDeath {
@@ -1334,13 +1336,19 @@ export interface GQLCertificate {
   data?: string
 }
 
+export interface GQLDuplicatesInfo {
+  compositionId?: string
+  trackingId?: string
+}
+
 export const enum GQLRegAction {
   ASSIGNED = 'ASSIGNED',
   UNASSIGNED = 'UNASSIGNED',
   REINSTATED = 'REINSTATED',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   DOWNLOADED = 'DOWNLOADED',
-  VIEWED = 'VIEWED'
+  VIEWED = 'VIEWED',
+  MARKED_AS_DUPLICATE = 'MARKED_AS_DUPLICATE'
 }
 
 export interface GQLStatusReason {
@@ -1892,6 +1900,7 @@ export interface GQLResolver {
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
+  DuplicatesInfo?: GQLDuplicatesInfoTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
@@ -2597,6 +2606,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
   markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
+  markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2798,6 +2808,9 @@ export interface MutationToMarkEventAsReinstatedResolver<
 
 export interface MutationToMarkEventAsArchivedArgs {
   id: string
+  reason?: string
+  comment?: string
+  duplicateTrackingId?: string
 }
 export interface MutationToMarkEventAsArchivedResolver<
   TParent = any,
@@ -2945,6 +2958,24 @@ export interface MutationToMarkEventAsUnassignedResolver<
   (
     parent: TParent,
     args: MutationToMarkEventAsUnassignedArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkEventAsDuplicateArgs {
+  id: string
+  reason: string
+  comment?: string
+  duplicateTrackingId?: string
+}
+export interface MutationToMarkEventAsDuplicateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkEventAsDuplicateArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -5162,6 +5193,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   output?: HistoryToOutputResolver<TParent>
   certificates?: HistoryToCertificatesResolver<TParent>
   signature?: HistoryToSignatureResolver<TParent>
+  duplicateOf?: HistoryToDuplicateOfResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -5239,6 +5271,10 @@ export interface HistoryToCertificatesResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToSignatureResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToDuplicateOfResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -6172,6 +6208,25 @@ export interface CertificateToPaymentsResolver<TParent = any, TResult = any> {
 }
 
 export interface CertificateToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLDuplicatesInfoTypeResolver<TParent = any> {
+  compositionId?: DuplicatesInfoToCompositionIdResolver<TParent>
+  trackingId?: DuplicatesInfoToTrackingIdResolver<TParent>
+}
+
+export interface DuplicatesInfoToCompositionIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DuplicatesInfoToTrackingIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -27,13 +27,17 @@ import {
   isRadioGroupWithNestedField,
   getSelectedRadioOptionWithNestedFields
 } from '@client/forms/utils'
-import { IDeclaration } from '@client/declarations'
+import { IDeclaration, IDuplicates } from '@client/declarations'
 import { hasFieldChanged } from '@client/views/CorrectionForm/utils'
 import { get } from 'lodash'
 import { sectionTransformer } from '@client/forms/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
 import { IUserDetails } from '@client/utils/userUtils'
-import { EventRegistration, EventSearchSet } from '@client/utils/gateway'
+import {
+  EventRegistration,
+  EventSearchSet,
+  DuplicatesInfo
+} from '@client/utils/gateway'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -405,7 +409,16 @@ export const gqlToDraftTransformer = (
 export function getPotentialDuplicateIds(
   eventRegistration: EventRegistration | EventSearchSet | null
 ) {
-  return eventRegistration?.registration?.duplicates?.filter(
-    (duplicate): duplicate is string => !!duplicate
-  )
+  const duplicates = eventRegistration?.registration?.duplicates
+  if (duplicates && duplicates[0] && typeof duplicates[0] === 'object') {
+    return (eventRegistration?.registration?.duplicates as DuplicatesInfo[])
+      .filter(
+        (duplicate): duplicate is IDuplicates => !!duplicate.compositionId
+      )
+      .map(({ compositionId }) => compositionId)
+  } else if (duplicates && typeof duplicates[0] === 'string') {
+    return (eventRegistration?.registration?.duplicates as string[]).filter(
+      (duplicate): duplicate is string => !!duplicate
+    )
+  }
 }

@@ -20,7 +20,7 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Event, Query } from '@client/utils/gateway'
+import { DuplicatesInfo, Event, Query } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -74,6 +74,7 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
+import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
@@ -192,10 +193,15 @@ export interface ITaskHistory {
   rejectComment?: string
 }
 
+export interface IDuplicates {
+  compositionId: string
+  trackingId: string
+}
+
 export interface IDeclaration {
   id: string
   data: IFormData
-  duplicates?: string[]
+  duplicates?: IDuplicates[]
   originalData?: IFormData
   savedOn?: number
   createdAt?: string
@@ -290,7 +296,7 @@ type Payment = {
 
 interface IArchiveDeclarationAction {
   type: typeof ARCHIVE_DECLARATION
-  payload: { declarationId: string }
+  payload: { declarationId: string; reason?: string; comment?: string }
 }
 
 interface IStoreDeclarationAction {
@@ -489,7 +495,7 @@ export function createReviewDeclaration(
   formData: IFormData,
   event: Event,
   status?: string,
-  duplicates?: string[]
+  duplicates?: IDuplicates[]
 ): IDeclaration {
   return {
     id: declarationId,
@@ -552,9 +558,14 @@ export const getStorageDeclarationsFailed =
   })
 
 export function archiveDeclaration(
-  declarationId: string
+  declarationId: string,
+  reason?: string,
+  comment?: string
 ): IArchiveDeclarationAction {
-  return { type: ARCHIVE_DECLARATION, payload: { declarationId } }
+  return {
+    type: ARCHIVE_DECLARATION,
+    payload: { declarationId, reason, comment }
+  }
 }
 
 export function deleteDeclaration(
@@ -933,6 +944,7 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
+      await fetchAllDuplicateDeclarations(data.data as Query)
       await fetchAllMinioUrlsInAttachment(data.data as Query)
       resolve({ data, store, client })
     } catch (error) {
@@ -955,6 +967,26 @@ async function fetchAllMinioUrlsInAttachment(queryResultData: Query) {
     .map((a) => a && fetch(`${window.config.MINIO_URL}${a.data}`))
 
   return Promise.all(urlsWithMinioPath)
+}
+
+async function fetchAllDuplicateDeclarations(queryResultData: Query) {
+  const registration =
+    queryResultData.fetchBirthRegistration?.registration ||
+    queryResultData.fetchDeathRegistration?.registration
+
+  const duplicateCompositionIds = registration?.duplicates?.map(
+    (duplicate) => duplicate?.compositionId
+  )
+
+  if (!duplicateCompositionIds || !duplicateCompositionIds?.length) {
+    return
+  }
+
+  const fetchAllDuplicates = duplicateCompositionIds.map((id) =>
+    ViewRecordQueries.fetchDeclarationForViewing(id as string)
+  )
+
+  return Promise.all(fetchAllDuplicates)
 }
 
 function getDataKey(declaration: IDeclaration) {
@@ -1349,7 +1381,9 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           transData,
           downloadingDeclaration.event,
           downloadedAppStatus,
-          getPotentialDuplicateIds(eventData)
+          eventData?.registration?.duplicates?.filter(
+            (duplicate: IDuplicates) => !!duplicate
+          )
         )
       newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
@@ -1559,7 +1593,11 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
           action: SubmissionAction.ARCHIVE_DECLARATION,
-          payload: { id: declaration.id }
+          payload: {
+            id: declaration.id,
+            reason: action.payload.reason || '',
+            comment: action.payload.comment || ''
+          }
         }
         return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
       }

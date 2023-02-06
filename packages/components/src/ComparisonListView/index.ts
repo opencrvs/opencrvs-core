@@ -9,14 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IStoreState } from '@opencrvs/client/src/store'
-import { IRejectState } from '@opencrvs/client/src/review/reducer'
-
-const getPartialState = (store: IStoreState): IRejectState => store.reject
-
-function getKey<K extends keyof IRejectState>(store: IStoreState, key: K) {
-  return getPartialState(store)[key]
-}
-
-export const getRejectForm = (store: IStoreState): IRejectState['rejectForm'] =>
-  getKey(store, 'rejectForm')
+export * from './ComparisonListView'
