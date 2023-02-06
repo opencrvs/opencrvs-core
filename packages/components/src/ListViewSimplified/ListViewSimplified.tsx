@@ -125,6 +125,7 @@ const MobileActionsContainer = styled.div`
 `
 
 export interface IListViewItemSimplifiedProps {
+  key?: number | string
   image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
@@ -137,6 +138,7 @@ export interface IListViewItemSimplifiedProps {
  * Use the list view to summarise information, for example a user’s responce at the declaration form or for showing performance data
  */
 export function ListViewItemSimplified({
+  key,
   image,
   label,
   value,
@@ -145,7 +147,7 @@ export function ListViewItemSimplified({
   compactLabel
 }: IListViewItemSimplifiedProps) {
   return (
-    <>
+    <React.Fragment key={key}>
       {image && (
         <ImageContainer className={className} data-test-id="list-view-image">
           {image}
@@ -179,7 +181,7 @@ export function ListViewItemSimplified({
         <MobileActionsContainer>{actions}</MobileActionsContainer>
         {value && <MobileValueContainer>{value}</MobileValueContainer>}
       </MobileContainer>
-    </>
+    </React.Fragment>
   )
 }
 

@@ -114,6 +114,7 @@ interface IConfigMessages
   systemRoles: MessageDescriptor
   role: MessageDescriptor
   roleUpdateInstruction: MessageDescriptor
+  systemRoleSuccessMsg: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -632,6 +633,11 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.userRoles.systemRoles',
     defaultMessage: 'SYSTEM ROLES',
     description: 'ListViewSimplified header for system roles'
+  },
+  systemRoleSuccessMsg: {
+    id: 'config.userRoles.systemRoleSuccessMsg',
+    defaultMessage: 'System role Updated successfully',
+    description: 'Label for System role Updated success message'
   },
   role: {
     id: 'config.userRoles.role',

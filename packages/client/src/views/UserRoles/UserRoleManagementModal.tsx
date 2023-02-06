@@ -34,6 +34,7 @@ const StyledTextInput = styled(TextInput)`
   height: 40px;
   border: solid 1px ${({ theme }) => theme.colors.grey600};
   align-self: center;
+
   :disabled {
     border-color: ${({ theme }) => theme.colors.grey300};
     color: ${({ theme }) => theme.colors.grey500};
@@ -52,13 +53,16 @@ interface IProps {
 const LanguageSelect = styled(Select)`
   width: 175px;
   border-radius: 2px;
+
   .react-select__control {
     max-height: 32px;
     min-height: 32px;
   }
+
   .react-select__value-container {
     display: block;
   }
+
   div {
     ${({ theme }) => theme.fonts.reg14};
     color: ${({ theme }) => theme.colors.primaryDark};
@@ -98,7 +102,7 @@ export function UserRoleManagementModal(props: IProps) {
   )
 
   const isRoleUpdateValid = () => {
-    if (_.isEqual(userRoles, props.systemRole.roles)) {
+    if (_.isEqual(userRoles, stripTypenameFromRoles(props.systemRole.roles))) {
       return false
     }
     const inCompleteRoleEntries = userRoles.filter((role) => {
@@ -116,8 +120,41 @@ export function UserRoleManagementModal(props: IProps) {
     return true
   }
 
+  const updateRole = () => {
+    const newUserRoles = userRoles.map((userRole) => {
+      return {
+        ...userRole,
+        labels: userRole.labels.map((label) => {
+          if (label.lang === currentLanguage) {
+            return { ...label }
+          }
+          return label
+        })
+      }
+    })
+
+    const newLabels = availableLangs.map((lang) => {
+      if (lang === currentLanguage) {
+        return {
+          lang: currentLanguage,
+          label: currentClipBoard
+        }
+      }
+      return { lang: lang, label: '' }
+    })
+
+    newUserRoles.push({
+      labels: newLabels
+    })
+    setUserRoles(newUserRoles)
+    setCurrentClipBoard('')
+    const newActiveItems = new Array(userRoles.length).fill(false)
+    setActives(newActiveItems)
+  }
+
   return (
     <ResponsiveModal
+      key={props.systemRole.id}
       title={
         getUserSystemRole({ systemRole: props.systemRole.value }, intl) || ''
       }
@@ -171,6 +208,7 @@ export function UserRoleManagementModal(props: IProps) {
           return (
             <Stack justifyContent="flex-start">
               <StyledTextInput
+                id="roleNameInput"
                 value={
                   item.labels.find((e) => e.lang === currentLanguage)?.label ||
                   ''
@@ -199,6 +237,7 @@ export function UserRoleManagementModal(props: IProps) {
               />
               {actives[index] && (
                 <Button
+                  id="editButton"
                   type="icon"
                   onClick={() => {
                     const newActiveItems = new Array(userRoles.length).fill(
@@ -223,41 +262,7 @@ export function UserRoleManagementModal(props: IProps) {
               setCurrentClipBoard(e.target.value)
             }}
           />
-          <Button
-            disabled={!currentClipBoard}
-            type="icon"
-            onClick={() => {
-              const newUserRoles = userRoles.map((userRole) => {
-                return {
-                  ...userRole,
-                  labels: userRole.labels.map((label) => {
-                    if (label.lang === currentLanguage) {
-                      return { ...label }
-                    }
-                    return label
-                  })
-                }
-              })
-
-              const newLabels = availableLangs.map((lang) => {
-                if (lang === currentLanguage) {
-                  return {
-                    lang: currentLanguage,
-                    label: currentClipBoard
-                  }
-                }
-                return { lang: lang, label: '' }
-              })
-
-              newUserRoles.push({
-                labels: newLabels
-              })
-              setUserRoles(newUserRoles)
-              setCurrentClipBoard('')
-              const newActiveItems = new Array(userRoles.length).fill(false)
-              setActives(newActiveItems)
-            }}
-          >
+          <Button disabled={!currentClipBoard} type="icon" onClick={updateRole}>
             <Icon name="Plus" color="primary" />
           </Button>
         </Stack>

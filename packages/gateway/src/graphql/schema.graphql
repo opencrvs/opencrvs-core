@@ -1313,6 +1313,7 @@ input SignatureInput {
 }
 
 input RoleInput {
+  _id: ID
   labels: [LabelInput!]!
 }
 
