@@ -58,6 +58,13 @@ beforeEach(async () => {
                   ON_TIME: 10,
                   DELAYED: 15
                 }
+              },
+              MARRIAGE: {
+                REGISTRATION_TARGET: 10,
+                FEE: {
+                  ON_TIME: 10,
+                  DELAYED: 15
+                }
               }
             }
           }

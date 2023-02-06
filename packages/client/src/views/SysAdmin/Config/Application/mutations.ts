@@ -56,6 +56,13 @@ const applicationConfigMutation = gql`
           DELAYED
         }
       }
+      MARRIAGE {
+        REGISTRATION_TARGET
+        FEE {
+          ON_TIME
+          DELAYED
+        }
+      }
     }
   }
 `
