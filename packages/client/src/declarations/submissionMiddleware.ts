@@ -16,7 +16,8 @@ import {
   deleteDeclaration,
   IDeclaration,
   modifyDeclaration,
-  writeDeclaration
+  writeDeclaration,
+  ICertificate
 } from '@client/declarations'
 import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -52,7 +53,7 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.CERTIFYING,
   [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
     SUBMISSION_STATUS.CERTIFYING,
-  [SubmissionAction.ISSUE_CERTIFICATE]: SUBMISSION_STATUS.ISSUING,
+  [SubmissionAction.ISSUE_DECLARATION]: SUBMISSION_STATUS.ISSUING,
   [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING
 } as const
 
@@ -93,6 +94,12 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       ...declaration,
       submissionStatus: STATUS_CHANGE_MAP[submissionAction]
     })
+
+    if (declaration.data.registration.certificates) {
+      delete (declaration.data.registration.certificates as ICertificate[])?.[0]
+        .payments
+    }
+
     const gqlDetails = getGqlDetails(
       getRegisterForm(getState())[event],
       declaration
@@ -116,6 +123,27 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             ...declaration.payload
           }
         })
+      } else if (
+        submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
+      ) {
+        if (declaration.data.registration.certificates) {
+          delete (
+            declaration.data.registration.certificates as ICertificate[]
+          )?.[0].data
+        }
+        await client.mutate({
+          mutation,
+          variables: {
+            id: declaration.id,
+            details: gqlDetails
+          }
+        })
+        updateDeclaration(dispatch, {
+          ...declaration,
+          action: SubmissionAction.ISSUE_DECLARATION,
+          submissionStatus: SUBMISSION_STATUS.READY_TO_ISSUE
+        })
+        return
       } else {
         await client.mutate({
           mutation,

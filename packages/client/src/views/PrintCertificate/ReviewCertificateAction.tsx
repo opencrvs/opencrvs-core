@@ -141,32 +141,18 @@ class ReviewCertificateActionComponent extends React.Component<
     })
   }
 
-  readyToCertify = () => {
+  readyToCertifyAndIssueOrCertify = () => {
     const { draft } = this.props
+    const isPrintInAdvanced = isCertificateForPrintInAdvance(draft)
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
-    draft.action = SubmissionAction.CERTIFY_DECLARATION
+    draft.action = isPrintInAdvanced
+      ? SubmissionAction.CERTIFY_DECLARATION
+      : SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
 
     const registeredDate = getRegisteredDate(draft.data)
     const certificate = draft.data.registration.certificates[0]
     const eventDate = getEventDate(draft.data, draft.event)
-    let submittableCertificate
-    if (isCertificateForPrintInAdvance(draft)) {
-      const paymentAmount = calculatePrice(
-        draft.event,
-        eventDate,
-        registeredDate,
-        this.props.offlineCountryConfig
-      )
-      submittableCertificate = {
-        payments: {
-          type: 'MANUAL' as const,
-          total: Number(paymentAmount),
-          amount: Number(paymentAmount),
-          outcome: 'COMPLETED' as const,
-          date: Date.now()
-        }
-      }
-    } else {
+    if (!isPrintInAdvanced) {
       if (
         isFreeOfCost(
           draft.event,
@@ -182,16 +168,29 @@ class ReviewCertificateActionComponent extends React.Component<
           outcome: 'COMPLETED' as const,
           date: Date.now()
         }
+      } else {
+        const paymentAmount = calculatePrice(
+          draft.event,
+          eventDate,
+          registeredDate,
+          this.props.offlineCountryConfig
+        )
+        certificate.payments = {
+          type: 'MANUAL' as const,
+          total: Number(paymentAmount),
+          amount: Number(paymentAmount),
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
+        }
       }
-      submittableCertificate = certificate
     }
+
     draft.data.registration = {
       ...draft.data.registration,
       certificates: [
         {
-          ...submittableCertificate,
-          data:
-            this.state.certificatePdf === null ? '' : this.state.certificatePdf
+          ...certificate,
+          data: this.state.certificatePdf || ''
         }
       ]
     }
@@ -292,11 +291,7 @@ class ReviewCertificateActionComponent extends React.Component<
               {intl.formatMessage(buttonMessages.cancel)}
             </CustomTertiaryButton>,
             <PrimaryButton
-              onClick={() => {
-                if (isPrintInAdvanced) {
-                  this.readyToCertify()
-                }
-              }}
+              onClick={this.readyToCertifyAndIssueOrCertify}
               id="print-certificate"
             >
               {intl.formatMessage(buttonMessages.print)}

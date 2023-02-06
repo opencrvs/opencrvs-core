@@ -84,7 +84,7 @@ export enum SubmissionAction {
   REJECT_DECLARATION = 'reject',
   ARCHIVE_DECLARATION = 'archive',
   REQUEST_CORRECTION_DECLARATION = 'request correction',
-  ISSUE_CERTIFICATE = 'issue certificate',
+  ISSUE_DECLARATION = 'issue certificate',
   CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration'
 }
 
