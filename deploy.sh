@@ -9,66 +9,106 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
 
+# Reading Names parameters
+for i in "$@"; do
+    case $i in
+    --clear_data=*)
+        CLEAR_DATA="${i#*=}"
+        shift
+        ;;
+    --restore_metadata=*)
+        RESTORE_METADATA="${i#*=}"
+        shift
+        ;;        
+    --host=*)
+        HOST="${i#*=}"
+        shift
+        ;;
+    --environment=*)
+        ENV="${i#*=}"
+        shift
+        ;;
+    --version=*)
+        VERSION="${i#*=}"
+        shift
+        ;;    
+    --country_config_version=*)
+        COUNTRY_CONFIG_VERSION="${i#*=}"
+        shift
+        ;;
+    --country_config_path=*)
+        COUNTRY_CONFIG_PATH="${i#*=}"
+        shift
+        ;;
+    --replicas=*)
+        REPLICAS="${i#*=}"
+        shift
+        ;;    
+    *) ;;
+
+    esac
+done
+
 # Read environment variable file for the environment
 # .env.qa
 # .env.development
 # .env.production
-if [ -f .env.$3 ]
+if [ -f .env.$environment ]
 then
-    export $(cat .env.$3 | sed 's/#.*//g' | xargs)
+    export $(cat .env.$environment | sed 's/#.*//g' | xargs)
 fi
 
 print_usage_and_exit () {
-    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH REPLICAS'
-    echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
-    echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
-    echo "  ENV can be 'production' or 'development' or 'qa' or 'demo'"
-    echo '  HOST    is the server to deploy to'
-    echo "  VERSION can be any OpenCRVS Core docker image tag or 'latest'"
-    echo "  COUNTRY_CONFIG_VERSION can be any OpenCRVS Country Configuration docker image tag or 'latest'"
-    echo "  COUNTRY_CONFIG_PATH path to where your resources package is located"
-    echo "  REPLICAS number of supported mongo databases in your replica set.  Can be 1, 3 or 5"
+    echo 'Usage: ./deploy.sh --clear_data=yes|no --restore_metadata=yes|no --host --environment --version --country_config_version --country_config_path --replicas'
+    echo "  --clear_data must have a value of 'yes' or 'no' set e.g. --clear_data=yes"
+    echo "  --restore_metadata must have a value of 'yes' or 'no' set e.g. --restore_metadata=yes"
+    echo "  --environment can be 'production' or 'development' or 'qa' or 'demo'"
+    echo '  --host    is the server to deploy to'
+    echo "  --version can be any OpenCRVS Core docker image tag or 'latest'"
+    echo "  --country_config_version can be any OpenCRVS Country Configuration docker image tag or 'latest'"
+    echo "  --country_config_path path to where your resources package is located"
+    echo "  --replicas number of supported mongo databases in your replica set.  Can be 1, 3 or 5"
     exit 1
 }
 
-if [ -z "$1" ] || { [ $1 != '--clear-data=no' ] && [ $1 != '--clear-data=yes' ] ;} ; then
-    echo 'Error: Argument --clear-data is required in position 1.'
+if [ -z "$CLEAR_DATA" ] || { [ $CLEAR_DATA != 'no' ] && [ $CLEAR_DATA != 'yes' ] ;} ; then
+    echo 'Error: Argument --clear_data is required & must be either yes or no.'
     print_usage_and_exit
 fi
 
-if [ -z "$2" ] || { [ $2 != '--restore-metadata=no' ] && [ $2 != '--restore-metadata=yes' ] ;} ; then
-    echo 'Error: Argument --restore-metadata is required in position 2.'
+if [ -z "$RESTORE_METADATA" ] || { [ $RESTORE_METADATA != 'no' ] && [ $RESTORE_METADATA != 'yes' ] ;} ; then
+    echo 'Error: Argument --restore_metadata is required & must be either yes or no.'
     print_usage_and_exit
 fi
 
-if [ -z "$3" ] ; then
-    echo 'Error: Argument ENV is required in position 3.'
+if [ -z "$ENV" ] ; then
+    echo 'Error: Argument --environment is required.'
     print_usage_and_exit
 fi
 
-if [ -z "$4" ] ; then
-    echo 'Error: Argument HOST is required in position 4.'
+if [ -z "$HOST" ] ; then
+    echo 'Error: Argument --host is required'
     print_usage_and_exit
 fi
 
-if [ -z "$5" ] ; then
-    echo 'Error: Argument VERSION is required in position 5.'
+if [ -z "$VERSION" ] ; then
+    echo 'Error: Argument --version is required.'
     print_usage_and_exit
 fi
 
 
-if [ -z "$6" ] ; then
-    echo 'Error: Argument COUNTRY_CONFIG_VERSION is required in position 6.'
+if [ -z "$COUNTRY_CONFIG_VERSION" ] ; then
+    echo 'Error: Argument --country_config_version is required.'
     print_usage_and_exit
 fi
 
-if [ -z "$7" ] ; then
-    echo 'Error: Argument COUNTRY_CONFIG_PATH is required in position 7.'
+if [ -z "$COUNTRY_CONFIG_PATH" ] ; then
+    echo 'Error: Argument --country_config_path is required.'
     print_usage_and_exit
 fi
 
-if [ -z "$8" ] ; then
-    echo 'Error: Argument REPLICAS is required in position 8.'
+if [ -z "$REPLICAS" ] ; then
+    echo 'Error: Argument --replicas is required in position 8.'
     print_usage_and_exit
 fi
 
@@ -157,12 +197,6 @@ if [ -z "$TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD" ] ; then
     TOKENSEEDER_CRYPTO_SIGNATURE__SIGN_P12_FILE_PASSWORD=''
 fi
 
-ENV=$3
-HOST=$4
-VERSION=$5
-COUNTRY_CONFIG_VERSION=$6
-COUNTRY_CONFIG_PATH=$7
-REPLICAS=$8
 SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
@@ -295,7 +329,7 @@ get_docker_tags_from_compose_files() {
 split_and_join() {
    separator_for_splitting=$1
    separator_for_joining=$2
-   text=$3
+   text=$ENV
    SPLIT=$(echo $text | sed -e "s/$separator_for_splitting/$separator_for_joining/g")
    echo $SPLIT
 }
@@ -405,7 +439,7 @@ echo
 sleep 120
 
 
-if [ $1 == "--clear-data=yes" ] ; then
+if [ $CLEAR_DATA == "yes" ] ; then
     echo
     echo "Clearing all existing data..."
     echo
@@ -417,7 +451,7 @@ if [ $1 == "--clear-data=yes" ] ; then
         /opt/opencrvs/infrastructure/clear-all-data.sh $REPLICAS $ENV"
 fi
 
-if [ $2 == "--restore-metadata=yes" ] ; then
+if [ $RESTORE_METADATA == "yes" ] ; then
     echo
     echo "Restoring metadata..."
     echo
