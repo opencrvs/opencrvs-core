@@ -182,56 +182,27 @@ export const userSectionFormType: ISerializedFormSection = {
           conditionals: []
         },
         {
-          name: 'systemRole',
-          type: SELECT_WITH_OPTIONS,
-          label: userFormMessages.systemRole,
-          required: true,
-          initialValue: '',
-          validate: [],
-          options: [
-            {
-              value: 'FIELD_AGENT',
-              label: userMessages.FIELD_AGENT
-            },
-            {
-              value: 'REGISTRATION_AGENT',
-              label: userMessages.REGISTRATION_AGENT
-            },
-            {
-              value: 'LOCAL_REGISTRAR',
-              label: userMessages.LOCAL_REGISTRAR
-            },
-            {
-              value: 'LOCAL_SYSTEM_ADMIN',
-              label: userMessages.LOCAL_SYSTEM_ADMIN
-            },
-            {
-              value: 'NATIONAL_SYSTEM_ADMIN',
-              label: userMessages.NATIONAL_SYSTEM_ADMIN
-            },
-            {
-              value: 'PERFORMANCE_MANAGEMENT',
-              label: userMessages.PERFORMANCE_MANAGEMENT
-            },
-            {
-              value: 'NATIONAL_REGISTRAR',
-              label: userMessages.NATIONAL_REGISTRAR
-            }
-          ]
-        },
-        {
           name: 'role',
-          type: SELECT_WITH_DYNAMIC_OPTIONS,
+          type: SELECT_WITH_OPTIONS,
           label: userFormMessages.role,
           required: true,
           initialValue: '',
           validate: [],
-          dynamicOptions: {
-            dependency: 'systemRole',
-            options: {}
-          },
+          options: [],
           conditionals: []
         },
+        {
+          name: 'systemRole',
+          type: TEXT,
+          label: userFormMessages.systemRole,
+          required: false,
+          hidden: true,
+          hideValueInPreview: true,
+          initialValue: '',
+          validate: [],
+          conditionals: []
+        },
+
         {
           name: 'device',
           type: TEXT,

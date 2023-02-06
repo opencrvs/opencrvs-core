@@ -14,6 +14,7 @@ import {
   IFormSection,
   IFormSectionData,
   ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOptions,
   ISelectOption,
   UserSection
 } from '@client/forms'
@@ -250,13 +251,25 @@ export interface IUserFormState {
   userAuditForm: IUserAuditForm
 }
 
-const fetchRoles = async () => {
+export const fetchRoles = async () => {
   const roles = await roleQueries.fetchRoles()
   return roles.data.getSystemRoles
 }
 
+export const getRoleWiseSystemRoles = async () => {
+  const roles = await fetchRoles()
+  const roleMap: Record<string, string> = {}
+  roles.forEach((systemRole: SystemRole) => {
+    systemRole.roles.forEach((role: Role) => {
+      roleMap[String(role._id)] = systemRole.value
+    })
+  })
+
+  return roleMap
+}
+
 export const generateLabelKey = (systemRole: SystemRole, role: Role) => {
-  return `${systemRole.value}.role.${role._id}`
+  return `role.${role._id}`
 }
 
 const generateIntlObject = (
@@ -274,30 +287,27 @@ const generateIntlObject = (
 }
 
 const optionsGenerator = (systemRoles: SystemRole[]) => {
-  const options: { [key: string]: ISelectOption[] } = {}
+  const typeList: ISelectOption[] = []
   systemRoles.forEach((systemRole: SystemRole) => {
-    const generateRolesBySystemRole: ISelectOption[] = []
-
     systemRole.roles.forEach((role: Role) => {
-      generateRolesBySystemRole.push(generateIntlObject(systemRole, role))
+      typeList.push(generateIntlObject(systemRole, role))
     })
-    options[systemRole.value] = generateRolesBySystemRole
   })
 
-  return options
+  return typeList
 }
 
 const generateUserFormWithRoles = (
   form: IForm,
-  mutateOptions: { [key: string]: ISelectOption[] }
+  mutateOptions: ISelectOption[]
 ) => {
   const section = form.sections.find((section) => section.id === 'user')!
   const group = section.groups.find((group) => group.id === 'user-view-group')!
   const field = group.fields.find(
     (field) => field.name === 'role'
-  ) as ISelectFormFieldWithDynamicOptions
+  ) as ISelectFormFieldWithOptions
 
-  field.dynamicOptions.options = mutateOptions
+  field.options = mutateOptions
 }
 
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (

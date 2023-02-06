@@ -32,7 +32,11 @@ import {
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
+import {
+  clearUserFormData,
+  getRoleWiseSystemRoles,
+  modifyUserFormData
+} from '@client/user/userReducer'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormikTouched, FormikValues } from 'formik'
@@ -128,12 +132,16 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     this.props.goBack()
   }
 
-  modifyData = (values: any) => {
+  modifyData = async (values: any) => {
     const { formData } = this.props
     if (
       values['registrationOffice'] !== '0' &&
       values['registrationOffice'] !== ''
     ) {
+      if (values.role) {
+        const getSystemRoles = await getRoleWiseSystemRoles()
+        values.systemRole = getSystemRoles[values.role]
+      }
       this.props.modifyUserFormData({ ...formData, ...values })
       this.setState({
         disableContinueOnLocation: false

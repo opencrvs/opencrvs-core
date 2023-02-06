@@ -253,7 +253,7 @@ class UserReviewFormComponent extends React.Component<
           ? intl.formatMessage(userMessages[formData.systemRole as string])
           : field.name === 'role'
           ? intl.formatMessage({
-              id: `${formData.systemRole}.role.${formData.role}`
+              id: `role.${formData.role}`
             })
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label
