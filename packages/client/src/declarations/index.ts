@@ -282,7 +282,7 @@ type PaymentType = 'MANUAL'
 
 type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 
-type Payment = {
+export type Payment = {
   paymentId?: string
   type: PaymentType
   total: number

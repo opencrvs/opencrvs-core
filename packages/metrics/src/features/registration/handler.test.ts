@@ -1330,7 +1330,6 @@ describe('When an existing declaration is marked certified', () => {
       const declarationEventPoint =
         influxClient.writePoints.mock.calls[1][0].find(
           ({ measurement }: { measurement: string }) => {
-            console.log('measurement', measurement)
             return measurement === 'certification'
           }
         )

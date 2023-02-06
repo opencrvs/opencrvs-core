@@ -168,10 +168,12 @@ class PaymentComponent extends React.Component<IFullProps> {
           <Content title={intl.formatMessage(messages.payment)}>
             <Summary id="summary">
               <Summary.Row
+                id="service"
                 label={intl.formatMessage(messages.receiptService)}
                 value={serviceMessage}
               />
               <Summary.Row
+                id="amountDue"
                 label={intl.formatMessage(messages.amountDue)}
                 value={
                   <Currency

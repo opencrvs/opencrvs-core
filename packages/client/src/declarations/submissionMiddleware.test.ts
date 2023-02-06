@@ -124,6 +124,31 @@ describe('Submission middleware', () => {
   Object.values(Event).forEach((event) => {
     Object.values(SubmissionAction).forEach((submissionAction) => {
       it(`should handle ${ACTION_STATUS_MAP[submissionAction]} ${event} declarations`, async () => {
+        mockDeclarationData.registration.certificates[0] = {
+          collector: {
+            relationship: 'OTHER',
+            affidavit: {
+              contentType: 'image/jpg',
+              data: 'data:image/png;base64,2324256'
+            },
+            individual: {
+              name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+              identifier: [{ id: '123456', type: 'PASSPORT' }]
+            }
+          },
+          hasShowedVerifiedDocument: true,
+          payments: [
+            {
+              paymentId: '1234',
+              type: 'MANUAL',
+              total: 50,
+              amount: 50,
+              outcome: 'COMPLETED',
+              date: '2018-10-22'
+            }
+          ],
+          data: 'data:image/png;base64,2324256'
+        }
         const action = declarationReadyForStatusChange({
           id: 'mockDeclaration',
           data: mockDeclarationData,
@@ -134,7 +159,21 @@ describe('Submission middleware', () => {
         await middleware(action)
         expect(mutateSpy.mock.calls.length).toBe(1)
         expect(dispatch.mock.calls.length).toBe(4)
-        expect(dispatch.mock.calls[3][0].type).toContain('DELETE')
+        if (
+          submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
+        ) {
+          expect(
+            dispatch.mock.calls[3][0].payload.declaration.data.registration
+              .certificates
+          ).not.toHaveProperty('data')
+          expect(
+            dispatch.mock.calls[3][0].payload.declaration.data.registration
+              .certificates
+          ).not.toHaveProperty('payments')
+          expect(dispatch.mock.calls[3][0].type).toContain('WRITE_DRAFT')
+        } else {
+          expect(dispatch.mock.calls[3][0].type).toContain('DELETE')
+        }
       })
     })
   })
