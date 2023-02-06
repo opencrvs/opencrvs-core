@@ -37,6 +37,7 @@ export const CERTIFICATE_CORRECTION_REVIEW =
   '/correction/:declarationId/:pageId/:groupId'
 
 export const VERIFY_CORRECTOR = '/correction/:declarationId/verify/:corrector'
+export const VERIFY_DETAILS = '/verify-certificate/:id'
 
 export const SAVED_REGISTRATION = '/saved'
 export const REJECTED_REGISTRATION = '/rejected'

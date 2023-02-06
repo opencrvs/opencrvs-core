@@ -29,6 +29,9 @@ import {
 import { callingCountries } from 'country-data'
 import { cloneDeep, get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
+import QRCode from 'qrcode'
+import { formatUrl } from '@client/navigation'
+import { VERIFY_DETAILS } from '@client/navigation/routes'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -327,4 +330,22 @@ export const registrarSignatureUserTransformer = (
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
   ] = history?.signature?.data as string
+}
+export const QRCodeTransformerTransformer = async (
+  transformedData: IFormData,
+  queryData: { id: string },
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData
+) => {
+  transformedData[targetSectionId || sectionId][targetFieldName || 'qrCode'] =
+    await QRCode.toDataURL(
+      `${window.location.protocol}//${window.location.host}${formatUrl(
+        VERIFY_DETAILS,
+        {
+          id: queryData.id
+        }
+      )}`
+    )
 }

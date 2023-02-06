@@ -578,6 +578,10 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrarNameUserTransformer'
             },
             {
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
+            },
+            {
               fieldName: 'role',
               operation: 'roleUserTransformer'
             },
@@ -3170,6 +3174,10 @@ export const registerForms: IDefaultRegisterForms = {
             {
               fieldName: 'registrationNumber',
               operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
             },
             {
               fieldName: 'certificateDate',
