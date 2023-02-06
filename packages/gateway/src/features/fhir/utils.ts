@@ -1139,6 +1139,36 @@ export const postAdvancedSearch = (
     })
 }
 
+type DuplicateSearchBody = {
+  childFirstNames?: string
+  childFamilyName?: string
+  childDoB?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+}
+export const findDuplicates = (
+  authHeader: IAuthHeader,
+  criteria: DuplicateSearchBody
+) => {
+  return fetch(`${SEARCH_URL}search/duplicates`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(criteria)
+  })
+    .then((response) => {
+      return response.json()
+    })
+    .catch((error) => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
 export const getMetrics = (
   prefix: string,
   params: IMetricsParam,

@@ -13,13 +13,14 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@search/logger'
 import { internal } from '@hapi/boom'
 import { removeDuplicate } from '@search/features/registration/deduplicate/service'
+import { client } from '@search/elasticsearch/client'
 
 export async function deduplicateHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    await removeDuplicate(request.payload as fhir.Bundle)
+    await removeDuplicate(request.payload as fhir.Bundle, client)
   } catch (error) {
     logger.error(`Search/searchDeclarationHandler: error: ${error}`)
     return internal(error)

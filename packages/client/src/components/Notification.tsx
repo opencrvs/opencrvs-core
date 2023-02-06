@@ -18,6 +18,7 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Toast } from '@opencrvs/components/lib/Toast'
+import { Link } from '@opencrvs/components/lib/Link'
 import {
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification,
@@ -29,10 +30,12 @@ import {
   ShowUnassignedPayload,
   hideUnassignedModal,
   hideCreateUserErrorToast,
-  hideUserReconnectedToast
+  hideUserReconnectedToast,
+  hideDuplicateRecordsToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
+import { goToDeclarationRecordAudit } from '@client/navigation'
 
 type NotificationProps = {
   language?: string
@@ -42,6 +45,9 @@ type NotificationProps = {
   submitFormErrorToast: string | null
   userAuditSuccessToast: NotificationState['userAuditSuccessToast']
   showPINUpdateSuccess: boolean
+  showDuplicateRecordsToast: boolean
+  duplicateCompositionId: string | null
+  duplicateTrackingId: string | null
   downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
   unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
@@ -56,10 +62,12 @@ type DispatchProps = {
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
   hideUserAuditSuccessToast: typeof hideUserAuditSuccessToast
   hidePINUpdateSuccessToast: typeof hidePINUpdateSuccessToast
+  hideDuplicateRecordsToast: typeof hideDuplicateRecordsToast
   hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
   hideUnassignedModal: typeof hideUnassignedModal
   hideCreateUserErrorToast: typeof hideCreateUserErrorToast
   hideUserReconnectedToast: typeof hideUserReconnectedToast
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
 class Component extends React.Component<
@@ -105,10 +113,14 @@ class Component extends React.Component<
       submitFormErrorToast,
       userAuditSuccessToast,
       showPINUpdateSuccess,
+      showDuplicateRecordsToast,
+      duplicateTrackingId,
+      duplicateCompositionId,
       downloadDeclarationFailedToast,
       unassignedModal,
       userCreateDuplicateMobileFailedToast,
-      userReconnectedToast
+      userReconnectedToast,
+      goToDeclarationRecordAudit
     } = this.props
 
     return (
@@ -185,6 +197,32 @@ class Component extends React.Component<
             {intl.formatMessage(messages.updatePINSuccess)}
           </Toast>
         )}
+        {showDuplicateRecordsToast && duplicateCompositionId && (
+          <Toast
+            id="duplicateRecordsToast"
+            type="error"
+            onClose={this.props.hideDuplicateRecordsToast}
+          >
+            {intl.formatMessage(messages.duplicateRecord, {
+              trackingId: (
+                <Link
+                  underline
+                  color="white"
+                  element="button"
+                  onClick={() =>
+                    this.props.hideDuplicateRecordsToast() &&
+                    goToDeclarationRecordAudit(
+                      'reviewTab',
+                      duplicateCompositionId
+                    )
+                  }
+                >
+                  {duplicateTrackingId}
+                </Link>
+              )
+            })}
+          </Toast>
+        )}
         {downloadDeclarationFailedToast && (
           <Toast
             id="PINUpdateSuccessToast"
@@ -233,6 +271,9 @@ const mapStateToProps = (store: IStoreState) => {
     submitFormErrorToast: store.notification.submitFormErrorToast,
     userAuditSuccessToast: store.notification.userAuditSuccessToast,
     showPINUpdateSuccess: store.notification.showPINUpdateSuccess,
+    showDuplicateRecordsToast: store.notification.showDuplicateRecordsToast,
+    duplicateCompositionId: store.notification.duplicateCompositionId,
+    duplicateTrackingId: store.notification.duplicateTrackingId,
     downloadDeclarationFailedToast:
       store.notification.downloadDeclarationFailedToast,
     unassignedModal: store.notification.unassignedModal,
@@ -250,9 +291,11 @@ export const NotificationComponent = withRouter(
     toggleDraftSavedNotification,
     hideUserAuditSuccessToast,
     hidePINUpdateSuccessToast,
+    hideDuplicateRecordsToast,
     hideDownloadDeclarationFailedToast,
     hideUnassignedModal,
     hideCreateUserErrorToast,
-    hideUserReconnectedToast
+    hideUserReconnectedToast,
+    goToDeclarationRecordAudit
   })(injectIntl(Component))
 )

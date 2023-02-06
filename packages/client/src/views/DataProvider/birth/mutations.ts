@@ -18,6 +18,7 @@ export const SUBMIT_BIRTH_DECLARATION = gql`
     createBirthRegistration(details: $details) {
       trackingId
       compositionId
+      isPotentiallyDuplicate
     }
   }
 `

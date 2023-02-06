@@ -11,7 +11,10 @@
  */
 import { OPENHIM_URL } from '@workflow/constants'
 import { isUserAuthorized } from '@workflow/features/events/auth'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import {
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL
+} from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
   hasDeathRegistrationNumber,
@@ -94,16 +97,19 @@ function detectEvent(request: Hapi.Request): Events {
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
   ) {
-    if (
-      fhirBundle.entry &&
-      fhirBundle.entry[0] &&
-      fhirBundle.entry[0].resource
-    ) {
-      const firstEntry = fhirBundle.entry[0].resource
+    const firstEntry = fhirBundle.entry?.[0]?.resource
+    if (firstEntry) {
+      const isNewEntry = !firstEntry.id
       if (firstEntry.resourceType === 'Composition') {
+        const composition = firstEntry as fhir.Composition
+        const isADuplicate = composition?.extension?.find(
+          (ext) =>
+            ext.url === `${OPENCRVS_SPECIFICATION_URL}duplicate` &&
+            ext.valueBoolean
+        )
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
-          if (firstEntry.id) {
+          if (!isNewEntry) {
             if (!hasBirthRegistrationNumber(fhirBundle)) {
               if (hasValidateScope(request)) {
                 return Events.BIRTH_MARK_VALID
@@ -123,6 +129,10 @@ function detectEvent(request: Hapi.Request): Events {
             }
           } else {
             if (hasRegisterScope(request)) {
+              if (isADuplicate) {
+                return Events.BIRTH_NEW_DEC
+              }
+
               return Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
             }
 
@@ -135,7 +145,7 @@ function detectEvent(request: Hapi.Request): Events {
               : Events.BIRTH_NEW_DEC
           }
         } else if (eventType === EVENT_TYPE.DEATH) {
-          if (firstEntry.id) {
+          if (!isNewEntry) {
             if (!hasDeathRegistrationNumber(fhirBundle)) {
               if (hasValidateScope(request)) {
                 return Events.DEATH_MARK_VALID
@@ -168,7 +178,7 @@ function detectEvent(request: Hapi.Request): Events {
           }
         }
       }
-      if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+      if (firstEntry.resourceType === 'Task' && !isNewEntry) {
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
           if (hasValidateScope(request)) {
