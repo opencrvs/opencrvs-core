@@ -267,8 +267,9 @@ export const resolvers: GQLResolver = {
       try {
         const record = await fetchFHIR(`/Composition/${id}`, authHeader)
         if (!record) {
-          await Promise.reject(new Error('Something Went Wrong'))
+          await Promise.reject(new Error('Invalid QrCode'))
         }
+        return record
       } catch (e) {
         await Promise.reject(new Error('Something Went Wrong'))
       }
