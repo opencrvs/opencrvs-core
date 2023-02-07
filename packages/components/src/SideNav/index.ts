@@ -11,5 +11,6 @@
  */
 export * from './SideNav'
 export * from './NavigationGroup'
+export * from './NavigationGroupTitle'
 export * from './NavigationItem'
 export * from './NavigationSubItem'

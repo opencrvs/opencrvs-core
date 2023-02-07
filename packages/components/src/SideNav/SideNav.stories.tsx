@@ -19,7 +19,7 @@ import { NavigationItem } from './NavigationItem'
 import { NavigationSubItem } from './NavigationSubItem'
 import { DeclarationIconSmall } from '../icons/DeclarationIconSmall'
 import { Icon } from '../Icon'
-import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
+import { Expandable } from '../icons/Expandable'
 
 const { useState } = React
 
