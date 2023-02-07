@@ -39,6 +39,11 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   &:active {
     color: ${({ theme }) => theme.colors.grey600};
   }
+
+  &:focus-visible {
+    background-color: ${({ theme }) => theme.colors.yellow};
+    color: ${({ theme }) => theme.colors.grey600};
+  }
 `
 
 export const LabelContainer = styled.div`
