@@ -329,7 +329,7 @@ get_docker_tags_from_compose_files() {
 split_and_join() {
    separator_for_splitting=$1
    separator_for_joining=$2
-   text=$ENV
+   text=$3
    SPLIT=$(echo $text | sed -e "s/$separator_for_splitting/$separator_for_joining/g")
    echo $SPLIT
 }
