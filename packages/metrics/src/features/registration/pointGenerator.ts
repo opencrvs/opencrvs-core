@@ -331,7 +331,7 @@ const generatePointLocations = async (
   locations.locationLevel5 = locationLevel5
   let locationID: string = locations.locationLevel5
 
-  for (let index = 4; index > 1; index--) {
+  for (let index = 4; index > 0; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)
     if (!locationID || locationID === 'Location/0') {
       break

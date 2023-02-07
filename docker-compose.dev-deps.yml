@@ -49,8 +49,8 @@ services:
     volumes:
       - './data/influxdb:/var/lib/influxdb'
       - './data/backups/influxdb:/data/backups/influxdb'
-
-  # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
+      - './infrastructure/influxdb.conf:/etc/influxdb/influxdb.conf'
+      # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
   hearth:
     environment:
       - logger__level=warn

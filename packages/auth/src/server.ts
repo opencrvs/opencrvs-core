@@ -63,9 +63,7 @@ import sendUserNameHandler, {
 import {
   authenticateSystemClientHandler,
   requestSchema as reqSystemSchema,
-  responseSchema as resSystemSchema,
-  registerSystemClient,
-  registerRquestSchema
+  responseSchema as resSystemSchema
 } from '@auth/features/system/handler'
 import { logger } from '@auth/logger'
 import { getPublicKey } from '@auth/features/authenticate/service'
@@ -348,18 +346,6 @@ export async function createServer() {
       },
       response: {
         schema: resSystemSchema
-      }
-    }
-  })
-
-  server.route({
-    method: 'POST',
-    path: '/registerSystemClient',
-    handler: registerSystemClient,
-    options: {
-      tags: ['api'],
-      validate: {
-        payload: registerRquestSchema
       }
     }
   })

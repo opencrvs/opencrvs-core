@@ -85,7 +85,8 @@ export async function getLoginConfigHandler(
   const refineConfigResponse = pick(loginConfig, [
     'APPLICATION_NAME',
     'COUNTRY_LOGO',
-    'PHONE_NUMBER_PATTERN'
+    'PHONE_NUMBER_PATTERN',
+    'LOGIN_BACKGROUND'
   ])
   return { config: refineConfigResponse }
 }
@@ -149,5 +150,14 @@ export const updateApplicationConfig = Joi.object({
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),
   NID_NUMBER_PATTERN: Joi.string(),
-  ADDRESSES: Joi.number().valid(...[1, 2])
+  ADDRESSES: Joi.number().valid(...[1, 2]),
+  INFORMANT_SIGNATURE: Joi.boolean(),
+  DATE_OF_BIRTH_UNKNOWN: Joi.boolean(),
+  INFORMANT_SIGNATURE_REQUIRED: Joi.boolean(),
+  ADMIN_LEVELS: Joi.number().valid(...[1, 2, 3, 4, 5]),
+  LOGIN_BACKGROUND: Joi.object({
+    backgroundColor: Joi.string().allow('').optional(),
+    backgroundImage: Joi.string().allow('').optional(),
+    imageFit: Joi.string().allow('').optional()
+  })
 })

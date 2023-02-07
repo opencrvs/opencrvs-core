@@ -65,6 +65,8 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
+import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -226,8 +228,17 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
+                                            path={routes.INFORMANT_NOTIFICATION}
+                                            component={InformantNotification}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
                                               Roles.LOCAL_REGISTRAR,
-                                              Roles.REGISTRATION_AGENT
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.NATIONAL_REGISTRAR
                                             ]}
                                             path={routes.ADVANCED_SEARCH}
                                             component={AdvancedSearchConfig}
@@ -236,7 +247,8 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             roles={[
                                               Roles.LOCAL_REGISTRAR,
-                                              Roles.REGISTRATION_AGENT
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.NATIONAL_REGISTRAR
                                             ]}
                                             path={routes.ADVANCED_SEARCH_RESULT}
                                             component={AdvancedSearchResult}
@@ -421,6 +433,19 @@ export class App extends React.Component<IAppProps> {
                                               routes.PERFORMANCE_REGISTRATIONS_LIST
                                             }
                                             component={RegistrationList}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.ORGANISATIONS_INDEX}
+                                            component={AdministrativeLevels}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

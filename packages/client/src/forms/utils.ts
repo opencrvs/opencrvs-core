@@ -341,7 +341,7 @@ export const getFieldOptions = (
     }
     return generateOptions(
       Object.values(locations).filter((location: ILocation) => {
-        return location.partOf === partOf
+        return location.partOf === partOf && location.status === 'active'
       }),
       'location'
     )
@@ -563,6 +563,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   // set some constants that are used in conditionals
   const selectedInformantAndContactType =
     getSelectedInformantAndContactType(draftData)
+
   // eslint-disable-next-line no-unused-vars
   const mothersDetailsExistBasedOnContactAndInformant =
     selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||

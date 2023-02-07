@@ -333,7 +333,7 @@ const DeathSection = () => {
         {intl.formatMessage(messages.advancedSearchInstruction)}
       </Text>
       <Accordion
-        name={birthSearchRegistrationSection.id}
+        name={deathSearchRegistrationSection.id}
         label={intl.formatMessage(
           advancedSearchFormMessages.registrationDetails
         )}
@@ -342,12 +342,12 @@ const DeathSection = () => {
         expand={accordionActiveStateMap[deathSearchRegistrationSection.id]}
       >
         <FormFieldGenerator
-          id={birthSearchRegistrationSection.id}
+          id={deathSearchRegistrationSection.id}
           onChange={(values) => {
             setFormState({ ...formState, ...values })
           }}
           setAllFieldsDirty={false}
-          fields={birthSearchRegistrationSection.fields}
+          fields={deathSearchRegistrationSection.fields}
           initialValues={pick(formState, [
             'placeOfRegistration',
             'dateOfRegistration',

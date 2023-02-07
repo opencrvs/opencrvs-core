@@ -24,30 +24,38 @@ export interface IPillProps {
 }
 
 const heightMap: Record<IPillSize, string> = {
-  small: '24px',
-  medium: '32px'
-}
-
-const colorMap: Record<IPillType, string> = {
-  active: 'rgba(73, 183, 141, 0.3)',
-  default: 'rgba(222, 229, 242, 1)',
-  inactive: 'rgba(245, 209, 209, 1)',
-  pending: 'rgba(252, 236, 217, 1)'
+  small: '28px',
+  medium: '36px'
 }
 
 const fontMap: Record<IPillSize, IFont> = {
-  small: 'bold12',
-  medium: 'bold14'
+  small: 'bold14',
+  medium: 'bold16'
 }
 
 const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
-  display: inline-flex;
-  padding: 0 0.85em;
-  background-color: ${({ type }) => colorMap[type]};
+  --background-color: ${({ type, theme }) => `
+    ${type === 'active' ? theme.colors.greenLighter : ''}
+    ${type === 'inactive' ? theme.colors.redLighter : ''}
+    ${type === 'pending' ? theme.colors.orangeLighter : ''}
+    ${type === 'default' ? theme.colors.primaryLighter : ''}
+  `};
+
+  --color: ${({ type, theme }) => `
+  ${type === 'active' ? theme.colors.positiveDarker : ''}
+  ${type === 'inactive' ? theme.colors.negativeDarker : ''}
+  ${type === 'pending' ? theme.colors.neutralDarker : ''}
+  ${type === 'default' ? theme.colors.primaryDarker : ''}
+`};
+
+  color: var(--color);
+  background: var(--background-color);
   height: ${({ size }) => heightMap[size]};
+  ${({ size, theme }) => theme.fonts[fontMap[size]]}
+  display: inline-flex;
+  padding: 0 0.8em;
   align-items: center;
   border-radius: 100px;
-  ${({ size, theme }) => theme.fonts[fontMap[size]]}
 `
 
 export function Pill({

@@ -28,6 +28,7 @@ import { resolvers as applicationRootResolvers } from '@gateway/features/applica
 import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as formDatasetResolvers } from '@gateway/features/formDataset/root-resolver'
+import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -35,7 +36,6 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   getUser,
-  getUserId,
   getTokenPayload,
   getSystem
 } from '@gateway/features/user/utils'
@@ -48,6 +48,7 @@ import { GraphQLSchema } from 'graphql'
 import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
+import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -79,7 +80,9 @@ const resolvers: StringIndexed<IResolvers> = merge(
   integrationResolver as IResolvers,
   formDatasetResolvers as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  formDatasetResolvers as IResolvers
+  formDatasetResolvers as IResolvers,
+  informantSMSNotificationResolvers as IResolvers,
+  informantSMSNotiTypeResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
@@ -104,26 +107,28 @@ export const getApolloConfig = (): Config => {
     introspection: true,
     context: async ({ request, h }) => {
       try {
-        const userId = getUserId({
-          Authorization: request.headers.authorization
-        })
-        let user: IUserModelData | ISystemModelData
-        user = await getUser(
-          { userId },
-          { Authorization: request.headers.authorization }
+        const tokenPayload = getTokenPayload(
+          request.headers.authorization.split(' ')[1]
         )
-        if (!user) {
+        const userId = tokenPayload.sub
+        let user: IUserModelData | ISystemModelData
+        const isSystemUser = tokenPayload.scope.indexOf('recordsearch') > -1
+        if (isSystemUser) {
           user = await getSystem(
             { systemId: userId },
             { Authorization: request.headers.authorization }
           )
+        } else {
+          user = await getUser(
+            { userId },
+            { Authorization: request.headers.authorization }
+          )
         }
+
         if (!user || !['active', 'pending'].includes(user.status)) {
           throw new AuthenticationError('Authentication failed')
         }
-        const tokenPayload = getTokenPayload(
-          request.headers.authorization.split(' ')[1]
-        )
+
         if (tokenPayload && !isEqual(tokenPayload.scope, user.scope)) {
           throw new AuthenticationError('Authentication failed')
         }
@@ -134,7 +139,8 @@ export const getApolloConfig = (): Config => {
       return {
         Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
-        'x-real-ip': request.info?.remoteAddress,
+        'x-real-ip':
+          request.headers['x-real-ip'] || request.info?.remoteAddress,
         'x-real-user-agent': request.headers['user-agent']
       }
     }

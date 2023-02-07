@@ -11,7 +11,6 @@
  */
 import React, { useState } from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
-import { CheckboxGroup } from './CheckboxGroup'
 import { Checkbox } from './Checkbox'
 
 export default {
@@ -27,50 +26,22 @@ export default {
   }
 } as ComponentMeta<typeof Checkbox>
 
-export const Default: ComponentStory<typeof Checkbox> = (args) => (
-  <Checkbox {...args} />
-)
-Default.args = {
-  name: 'Banana',
-  label: 'Banana',
-  value: 'banana',
-  selected: true
-}
-
-export const Group: ComponentStory<typeof CheckboxGroup> = () => {
-  const [selectedItems, setSelectedItems] = useState(['bananas'])
+export const Default: ComponentStory<typeof Checkbox> = (args) => {
+  const [isChecked, setChecked] = useState(false)
 
   return (
-    <CheckboxGroup
-      id="test-checkbox-group1"
-      options={[
-        {
-          label: 'Bananas',
-          value: 'bananas'
-        },
-        {
-          label: 'Oranges',
-          value: 'oranges'
-        }
-      ]}
-      name="test-checkbox-group1"
-      value={selectedItems}
-      onChange={(newValue) => setSelectedItems(newValue)}
+    <Checkbox
+      {...args}
+      id="default-checkbox"
+      selected={isChecked}
+      onChange={() => setChecked(!isChecked)}
     />
   )
 }
-
-Group.args = {
-  options: [
-    {
-      label: 'Bananas',
-      value: 'bananas'
-    },
-    {
-      label: 'Oranges',
-      value: 'oranges'
-    }
-  ],
-  name: 'test-checkbox-group1',
-  value: ['bananas']
+Default.args = {
+  name: 'CRVS options',
+  label: 'The gold standard for digital civil registration',
+  value: 'The gold standard for digital civil registration',
+  selected: true,
+  size: 'small'
 }

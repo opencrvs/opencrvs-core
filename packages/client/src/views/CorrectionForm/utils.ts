@@ -380,6 +380,55 @@ export const renderValue = (
   language: string
 ) => {
   const value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
+
+  if (
+    [
+      'statePrimary',
+      'districtPrimary',
+      'internationalStatePrimary',
+      'internationalDistrictPrimary',
+      'stateSecondary',
+      'districtSecondary',
+      'internationalStateSecondary',
+      'internationalDistrictSecondary'
+    ].includes(field.name)
+  ) {
+    const sectionData = draftData[sectionId]
+
+    if (sectionData.countryPrimary === window.config.COUNTRY) {
+      const dynamicOption: IDynamicOptions = {
+        resource: 'locations',
+        initialValue: 'agentDefault'
+      }
+
+      if (field.name.includes('Secondary')) {
+        dynamicOption.dependency = [
+          'internationalStateSecondary',
+          'stateSecondary'
+        ].includes(field.name)
+          ? 'countrySecondary'
+          : 'stateSecondary'
+      } else {
+        dynamicOption.dependency = [
+          'internationalStatePrimary',
+          'statePrimary'
+        ].includes(field.name)
+          ? 'countryPrimary'
+          : 'statePrimary'
+      }
+
+      return renderSelectDynamicLabel(
+        value,
+        dynamicOption,
+        sectionData,
+        intl,
+        offlineResources,
+        language
+      )
+    }
+    return value
+  }
+
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }

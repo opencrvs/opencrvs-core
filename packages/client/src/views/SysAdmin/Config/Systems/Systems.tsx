@@ -216,7 +216,7 @@ export function SystemList() {
   }
 
   const sysType = {
-    HEALTH: intl.formatMessage(integrationMessages.healthSystem),
+    HEALTH: intl.formatMessage(integrationMessages.eventNotification),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalID),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook)
@@ -242,7 +242,11 @@ export function SystemList() {
       <Content
         title={intl.formatMessage(integrationMessages.pageTitle)}
         topActionButtons={[
-          <Button type="secondary" onClick={() => setShowModal(true)}>
+          <Button
+            type="secondary"
+            id="createClientButton"
+            onClick={() => setShowModal(true)}
+          >
             <Icon name="Plus" />
             {intl.formatMessage(integrationMessages.createClient)}
           </Button>
@@ -357,7 +361,7 @@ export function SystemList() {
           }}
           title={toggleKeyModal.selectedClient?.name ?? ''}
         >
-          <Text variant="reg16" element="p">
+          <Text variant="reg16" element="p" id="revealKeyId">
             {intl.formatMessage(integrationMessages.uniqueKeysDescription)}
           </Text>
 
@@ -440,6 +444,7 @@ export function SystemList() {
                   {intl.formatMessage(buttonMessages.cancel)}
                 </Link>,
                 <Button
+                  id="submitClientForm"
                   disabled={
                     !newSystemType ||
                     newClientName === EMPTY_STRING ||
@@ -467,8 +472,9 @@ export function SystemList() {
           registerSystemData?.registerSystem?.system.name ??
           intl.formatMessage(integrationMessages.createClient)
         }
+        id="createClientModal"
       >
-        <Text variant="reg16" element="p">
+        <Text variant="reg16" element="p" id="uniqueKeyId">
           {!registerSystemData && !registerSystemLoading
             ? intl.formatMessage(integrationMessages.newIntegrationDescription)
             : intl.formatMessage(integrationMessages.uniqueKeysDescription)}
@@ -513,7 +519,7 @@ export function SystemList() {
                   options={[
                     {
                       label: intl.formatMessage(
-                        integrationMessages.healthNotification
+                        integrationMessages.eventNotification
                       ),
                       value: SystemType.Health
                     },
@@ -637,7 +643,7 @@ export function SystemList() {
                       />
                       {selectedTab === Event.Birth ? (
                         <CheckboxGroup
-                          id="test-checkbox-group1"
+                          id="birthCheckboxGroup"
                           options={[
                             {
                               label: intl.formatMessage(
@@ -678,7 +684,7 @@ export function SystemList() {
                         />
                       ) : (
                         <CheckboxGroup
-                          id="test-checkbox-group2"
+                          id="deathCheckboxGroup"
                           options={[
                             {
                               label: intl.formatMessage(

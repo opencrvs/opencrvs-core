@@ -79,6 +79,7 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { Hamburger } from './Hamburger'
+import { Event } from '@client/utils/gateway'
 
 type IStateProps = {
   userDetails: IUserDetails | null
@@ -292,8 +293,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         return {
           mobileLeft: [
             {
-              icon: () => <ArrowBack />,
-              handler: () => window.history.back()
+              icon: () => <HistoryNavigator hideForward />,
+              handler: () => {}
             }
           ],
           mobileBody: this.renderSearchInput(this.props, true)
@@ -433,7 +434,12 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
         return (
           (locationId &&
-            goToPerformanceHomeAction(undefined, undefined, locationId)) ||
+            goToPerformanceHomeAction(
+              undefined,
+              undefined,
+              Event.Birth,
+              locationId
+            )) ||
           goToPerformanceHomeAction()
         )
       }

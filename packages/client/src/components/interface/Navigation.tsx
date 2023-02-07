@@ -35,7 +35,9 @@ import {
   goToFormConfigHome,
   goToApplicationConfig,
   goToAdvancedSearchResult,
-  goToVSExport
+  goToVSExport,
+  goToOrganisationView,
+  goToInformantNotification
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -84,12 +86,15 @@ export const WORKQUEUE_TABS = {
   vsexports: 'vsexports',
   team: 'team',
   config: 'config',
+  organisation: 'organisation',
   application: 'application',
   certificate: 'certificate',
   systems: 'integration',
   settings: 'settings',
+  declarationForms: 'form',
   logout: 'logout',
-  declarationForms: 'form'
+  communications: 'communications',
+  informantNotification: 'informantnotification'
 } as const
 
 const GROUP_ID = {
@@ -119,6 +124,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.sentForApproval,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -130,6 +136,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -141,6 +148,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -152,6 +160,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
@@ -160,6 +169,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   ],
   LOCAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     GROUP_ID.menuGroup
   ],
@@ -167,7 +177,10 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.vsexports,
+    WORKQUEUE_TABS.communications,
+    WORKQUEUE_TABS.informantNotification,
     GROUP_ID.menuGroup
   ],
   PERFORMANCE_MANAGEMENT: [WORKQUEUE_TABS.performance, GROUP_ID.menuGroup]
@@ -210,10 +223,12 @@ interface IDispatchProps {
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
+  goToOrganisationViewAction: typeof goToOrganisationView
   goToSystemViewAction: typeof goToSystemList
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
+  goToInformantNotification: typeof goToInformantNotification
 }
 
 interface IStateProps {
@@ -291,6 +306,7 @@ export const NavigationView = (props: IFullProps) => {
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
     setAdvancedSearchParam,
+    goToInformantNotification,
     className
   } = props
   const tabId = deselectAllTabs
@@ -306,11 +322,20 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.declarationForms,
     WORKQUEUE_TABS.systems
   ]
-
+<<<<<<< HEAD
+  const conmmunicationTab: string[] = [WORKQUEUE_TABS.informantNotification]
   const [isRecordExpanded, setIsRecordExpanded] = React.useState(true)
   const [isPerformanceExpanded, setIsPerformanceExpanded] = React.useState(true)
   const [isOrgExpanded, setIsOrgExpanded] = React.useState(true)
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(true)
+  const [isCommunationExpanded, setIsCommunationExpanded] =
+  React.useState(false)
+=======
+  const conmmunicationTab: string[] = [WORKQUEUE_TABS.informantNotification]
+  const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
+  const [isCommunationExpanded, setIsCommunationExpanded] =
+    React.useState(false)
+>>>>>>> bb56c85965d8858348a01eb784cb14e3cec073d4
 
   const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -450,9 +475,6 @@ export const NavigationView = (props: IFullProps) => {
               </>
             )}
           </NavigationGroup>
-          {menuCollapse && (
-            <NavigationGroup>{getSettingsAndLogout(props)}</NavigationGroup>
-          )}
         </>
       ) : (
         <>
@@ -710,35 +732,41 @@ export const NavigationView = (props: IFullProps) => {
                           label={intl.formatMessage(
                             navigationMessages[WORKQUEUE_TABS.vsexports]
                           )}
-                          onClick={goToVSExportsAction}
-                          isSelected={
-                            enableMenuSelection &&
-                            activeMenuItem === WORKQUEUE_TABS.vsexports
-                          }
-                        />
+                      onClick={goToVSExportsAction}
+                      isSelected={
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TABS.vsexports
+                      }
+                    />
+                  )}
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.organisation
+                  ) && (
+                    <NavigationItem
+                      icon={() => <Icon name="List" size="small" />}
+                      id={`navigation_${WORKQUEUE_TABS.organisation}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.organisation]
                       )}
-                    {userDetails?.role &&
-                      USER_SCOPE[userDetails.role].includes(
-                        WORKQUEUE_TABS.team
-                      ) && (
-                        <NavigationItem
-                          icon={() => (
-                            <Icon
-                              color="currentColor"
-                              name="Users"
-                              size="small"
-                            />
-                          )}
-                          id={`navigation_${WORKQUEUE_TABS.team}`}
-                          label={intl.formatMessage(
-                            navigationMessages[WORKQUEUE_TABS.team]
-                          )}
-                          onClick={() => props.goToTeamViewAction(userDetails)}
-                          isSelected={
-                            enableMenuSelection &&
-                            activeMenuItem === WORKQUEUE_TABS.team
-                          }
-                        />
+                      onClick={() =>
+                        props.goToOrganisationViewAction(userDetails)
+                      }
+                      isSelected={
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TABS.organisation
+                      }
+                    />
+                  )}
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.team
+                  ) && (
+                    <NavigationItem
+                      icon={() => <Users />}
+                      id={`navigation_${WORKQUEUE_TABS.team}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.team]
                       )}
                   </>
                 )}
@@ -748,6 +776,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) && (
                     <>
                       <NavigationItem
+<<<<<<< HEAD
                         icon={() => (
                           <Icon
                             color="currentColor"
@@ -755,6 +784,9 @@ export const NavigationView = (props: IFullProps) => {
                             size="small"
                           />
                         )}
+=======
+                        icon={() => <Icon name="Compass" size="small" />}
+>>>>>>> bb56c85965d8858348a01eb784cb14e3cec073d4
                         id={`navigation_${WORKQUEUE_TABS.config}_main`}
                         label={intl.formatMessage(
                           navigationMessages[WORKQUEUE_TABS.config]
@@ -827,12 +859,103 @@ export const NavigationView = (props: IFullProps) => {
                       )}
                     </>
                   )}
-                {menuCollapse && getSettingsAndLogout(props)}
+
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.communications
+                  ) && (
+                    <>
+                      <NavigationItem
+                        icon={() => <Icon name="MessageCircle" size="small" />}
+                        id={`navigation_${WORKQUEUE_TABS.communications}_main`}
+                        label={intl.formatMessage(
+                          navigationMessages[WORKQUEUE_TABS.communications]
+                        )}
+                        onClick={() =>
+                          setIsCommunationExpanded(!isCommunationExpanded)
+                        }
+                        isSelected={
+                          enableMenuSelection &&
+                          conmmunicationTab.includes(activeMenuItem)
+                        }
+                        expandableIcon={() =>
+                          isCommunationExpanded ||
+                          conmmunicationTab.includes(activeMenuItem) ? (
+                            <Expandable selected={true} />
+                          ) : (
+                            <Expandable />
+                          )
+                        }
+                      />
+                      {(isCommunationExpanded ||
+                        conmmunicationTab.includes(activeMenuItem)) && (
+                        <>
+                          <NavigationSubItem
+                            label={intl.formatMessage(
+                              navigationMessages[
+                                WORKQUEUE_TABS.informantNotification
+                              ]
+                            )}
+                            id={`navigation_${WORKQUEUE_TABS.informantNotification}`}
+                            onClick={goToInformantNotification}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem ===
+                                WORKQUEUE_TABS.informantNotification
+                            }
+                          />
+                        </>
+                      )}
+                    </>
+                  )}
               </NavigationGroup>
             )}
         </>
       )}
+<<<<<<< HEAD
     </SideNav>
+=======
+      <NavigationGroup>
+        {userDetails?.searches && userDetails?.searches.length > 0 ? (
+          userDetails?.searches.map((bookmarkResult, index) => {
+            return (
+              <NavigationItem
+                icon={() => (
+                  <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
+                )}
+                id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
+                label={bookmarkResult.name}
+                disabled={
+                  advancedSearchParams.searchId === bookmarkResult.searchId &&
+                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                }
+                onClick={() => {
+                  const filteredParam = omit(
+                    bookmarkResult.parameters,
+                    '__typename'
+                  ) as IAdvancedSearchParamState
+                  setAdvancedSearchParam({
+                    ...filteredParam,
+                    searchId: bookmarkResult.searchId
+                  })
+                  goToAdvancedSearchResultAction()
+                }}
+                isSelected={
+                  advancedSearchParams.searchId === bookmarkResult.searchId &&
+                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                }
+              />
+            )
+          })
+        ) : (
+          <></>
+        )}
+      </NavigationGroup>
+      <NavigationGroup>
+        {menuCollapse && getSettingsAndLogout(props)}
+      </NavigationGroup>
+    </LeftNavigation>
+>>>>>>> bb56c85965d8858348a01eb784cb14e3cec073d4
   )
 }
 
@@ -859,22 +982,24 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     storedDeclarations: state.declarationsState.declarations,
     userDetails: getUserDetails(state),
     advancedSearchParams: getAdvancedSearchParamsState(state),
-    activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
+    activeMenuItem: window.location.href.endsWith(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
-      : window.location.href.includes(WORKQUEUE_TABS.team)
+      : window.location.href.endsWith(WORKQUEUE_TABS.team)
       ? WORKQUEUE_TABS.team
-      : window.location.href.includes(WORKQUEUE_TABS.vsexports)
+      : window.location.href.endsWith(WORKQUEUE_TABS.vsexports)
       ? WORKQUEUE_TABS.vsexports
-      : window.location.href.includes(WORKQUEUE_TABS.application)
+      : window.location.href.endsWith(WORKQUEUE_TABS.application)
       ? WORKQUEUE_TABS.application
-      : window.location.href.includes(WORKQUEUE_TABS.settings)
+      : window.location.href.endsWith(WORKQUEUE_TABS.settings)
       ? WORKQUEUE_TABS.settings
-      : window.location.href.includes(WORKQUEUE_TABS.certificate)
+      : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
       ? WORKQUEUE_TABS.certificate
-      : window.location.href.includes(WORKQUEUE_TABS.declarationForms)
+      : window.location.href.endsWith(WORKQUEUE_TABS.declarationForms)
       ? WORKQUEUE_TABS.declarationForms
-      : window.location.href.includes(WORKQUEUE_TABS.systems)
+      : window.location.href.endsWith(WORKQUEUE_TABS.systems)
       ? WORKQUEUE_TABS.systems
+      : window.location.href.endsWith(WORKQUEUE_TABS.informantNotification)
+      ? WORKQUEUE_TABS.informantNotification
       : ''
   }
 }
@@ -892,12 +1017,14 @@ export const Navigation = connect<
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
+  goToOrganisationViewAction: goToOrganisationView,
   goToTeamViewAction: goToTeamView,
   goToSystemViewAction: goToSystemList,
   redirectToAuthentication,
   goToSettings,
   updateRegistrarWorkqueue,
-  setAdvancedSearchParam
+  setAdvancedSearchParam,
+  goToInformantNotification
 })(injectIntl(withRouter(NavigationView)))
 
 /** @deprecated since the introduction of `<Frame>` */

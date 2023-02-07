@@ -85,31 +85,18 @@ export function findEntry(
 export async function addEventLocation(
   body: IBirthCompositionBody | IDeathCompositionBody,
   code: string,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
+  composition: fhir.Composition
 ) {
   let data
   let location: fhir.Location | undefined
 
-  if (bundleEntries) {
-    data = findEntry(code, composition, bundleEntries) as
-      | fhir.Encounter
-      | undefined
+  const encounterSection = findCompositionSection(code, composition)
+  if (encounterSection && encounterSection.entry) {
+    data = await getFromFhir(
+      `/Encounter/${encounterSection.entry[0].reference}`
+    )
     if (data && data.location && data.location[0].location) {
-      location = findEntryResourceByUrl(
-        data.location[0].location.reference,
-        bundleEntries
-      ) as fhir.Location | undefined
-    }
-  } else {
-    const encounterSection = findCompositionSection(code, composition)
-    if (encounterSection && encounterSection.entry) {
-      data = await getFromFhir(
-        `/Encounter/${encounterSection.entry[0].reference}`
-      )
-      if (data && data.location && data.location[0].location) {
-        location = await getFromFhir(`/${data.location[0].location.reference}`)
-      }
+      location = await getFromFhir(`/${data.location[0].location.reference}`)
     }
   }
 

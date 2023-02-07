@@ -215,7 +215,7 @@ const fetchSystemPermissions = async (
   try {
     const response = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
       method: 'POST',
-      body: JSON.stringify({ client_id }),
+      body: JSON.stringify({ clientId: client_id }),
       headers: {
         'Content-Type': 'application/json',
         ...authHeader

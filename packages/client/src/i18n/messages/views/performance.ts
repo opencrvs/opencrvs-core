@@ -51,8 +51,14 @@ const messagesToDefine = {
   },
   performanceApplicationSourcesHeader: {
     id: 'performance.reports.header.applicationSources',
-    defaultMessage: 'Sources of applications',
-    description: 'Header for sources of applications'
+    defaultMessage: 'Sources of registrations',
+    description: 'Header for sources of registrations'
+  },
+  performanceApplicationSourcesSubHeader: {
+    id: 'performance.reports.subHeader.applicationSources',
+    defaultMessage:
+      'The number and percentage of declarations started by each system role that has been registered',
+    description: 'Subheader for sources of registrations'
   },
   performanceTotalLabel: {
     id: 'performance.values.labels.total',
@@ -164,17 +170,6 @@ const messagesToDefine = {
     id: 'team.header.sysadmin.home',
     defaultMessage: 'Search for an office',
     description: 'Header for system admin team home page'
-  },
-  noResultForLocation: {
-    id: 'performance.reports.noResultForLocation',
-    defaultMessage:
-      'No data for {searchedLocation}. We are currently piloting for following areas:',
-    description: 'Message to show if no data is found for a location'
-  },
-  noResultForLocationWithoutPilotAreas: {
-    id: 'performance.reports.noResultInPilot',
-    defaultMessage: 'No data for {searchedLocation}.',
-    description: 'Message to show if no data is found for a location'
   },
   operational: {
     id: 'performance.reports.select.item.operational',
@@ -336,11 +331,6 @@ const messagesToDefine = {
     id: 'performance.fieldAgents.showMore',
     defaultMessage: 'Show next {pageSize}',
     description: 'Label for show more link'
-  },
-  pilotAreaListHeader: {
-    id: 'performance.pilotArea.header',
-    defaultMessage: 'Pilot Areas',
-    description: 'Label for pilot area list header'
   },
   stats: {
     id: 'performance.stats.header',

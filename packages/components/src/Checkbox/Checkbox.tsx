@@ -14,34 +14,37 @@ import styled from 'styled-components'
 import { Tick, TickLarge } from '../icons'
 
 const Wrapper = styled.li`
-  padding-top: 5px;
-  padding-bottom: 5px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   list-style-type: none;
   display: flex;
   align-items: center;
+  position: relative;
 `
 
 const Label = styled.label`
   position: relative;
-  margin-left: 16px;
+  cursor: pointer;
+  padding-left: 20px;
+  margin-left: -5px; /* This is to increase hitbox on the label, to allow clicking the borders of the checkbox */
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
 `
 
 const Check = styled.span<{ size?: string }>`
   display: inline-block;
+  border-radius: 4px;
   background: ${({ theme }) => theme.colors.copy};
   ${({ size }) =>
     size === 'large'
       ? `height: 40px;
     width: 40px;`
-      : ` height: 20px;
-    width: 20px;`}
+      : ` height: 24px;
+    width: 24px;`}
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   position: relative;
   color: ${({ theme }) => theme.colors.copy};
-  z-index: 1;
   &::after {
     position: absolute;
     content: '';
@@ -50,13 +53,14 @@ const Check = styled.span<{ size?: string }>`
       size === 'large'
         ? `height: 36px;
     width: 36px;`
-        : ` height: 16px;
-    width: 16px;`}
+        : ` height: 20px;
+    width: 20px;`}
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     transition: background 0.25s linear;
     -webkit-transition: background 0.25s linear;
+    border-radius: 2px;
   }
   &:focus {
     ${({ size }) =>
@@ -83,13 +87,32 @@ const Input = styled.input`
   opacity: 0;
   z-index: 2;
   cursor: pointer;
+
+  &:active ~ ${Check} {
+    &::after {
+      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
+      width: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
+    }
+  }
+
   &:focus ~ ${Check} {
-    box-shadow: ${({ theme, disabled }) => theme.colors.yellow} 0 0 0 3px;
+    &::after {
+      box-sizing: content-box;
+      border: 4px solid ${({ theme }) => theme.colors.grey600};
+      box-shadow: ${({ theme }) => theme.colors.yellow} 0 0 0 3px;
+      width: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
+      height: ${({ size }) => `max(16px, ${(size ?? 0) - 6}px)`};
+    }
+  }
+  &:hover ~ ${Check} {
+    box-shadow: ${({ theme }) => theme.colors.grey300} 0 0 0 8px;
   }
 `
 type Size = 'large' | 'small'
 
-interface ICheckbox extends React.OptionHTMLAttributes<{}> {
+export interface CheckboxProps extends React.OptionHTMLAttributes<{}> {
   name: string
   label: string
   value: string
@@ -98,7 +121,7 @@ interface ICheckbox extends React.OptionHTMLAttributes<{}> {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export class Checkbox extends React.Component<ICheckbox> {
+export class Checkbox extends React.Component<CheckboxProps> {
   render() {
     const {
       name,
