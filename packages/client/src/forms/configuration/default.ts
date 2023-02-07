@@ -561,6 +561,10 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'registrationNumberTransformer'
             },
             {
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
+            },
+            {
               fieldName: 'mosipAid',
               operation: 'mosipAidTransformer'
             },
@@ -2982,6 +2986,10 @@ export const registerForms: IDefaultRegisterForms = {
             {
               fieldName: 'registrationNumber',
               operation: 'registrationNumberTransformer'
+            },
+            {
+              fieldName: 'qrCode',
+              operation: 'QRCodeTransformerTransformer'
             },
             {
               fieldName: 'certificateDate',
