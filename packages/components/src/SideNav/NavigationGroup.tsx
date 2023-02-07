@@ -19,9 +19,6 @@ export interface INavigationGroup
 const NavigationGroupContainer = styled.div`
   padding: 8px;
   box-shadow: 0px 8px 1px -8px ${({ theme }) => theme.colors.grey300};
-  &:last-child {
-    box-shadow: none;
-  }
 `
 
 interface IProps {
