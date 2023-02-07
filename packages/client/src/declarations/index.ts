@@ -73,6 +73,7 @@ import {
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { UserDetails } from '@client/utils/userUtils'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -374,7 +375,7 @@ interface IDownloadDeclarationSuccess {
     }
     client: ApolloClient<{}>
     offlineData?: IOfflineData
-    userDetails?: User
+    userDetails?: UserDetails
   }
 }
 
@@ -594,7 +595,7 @@ async function getCurrentUserRole(): Promise<string> {
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as User).role || ''
+  return (JSON.parse(userDetails) as UserDetails).role || ''
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -603,7 +604,7 @@ export async function getCurrentUserID(): Promise<string> {
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as User).userMgntUserID || ''
+  return (JSON.parse(userDetails) as UserDetails).userMgntUserID || ''
 }
 
 export async function getUserData(userId: string) {
@@ -983,7 +984,7 @@ function downloadDeclarationSuccess({
       form,
       client,
       offlineData: getOfflineData(store),
-      userDetails: getUserDetails(store) as User
+      userDetails: getUserDetails(store) as UserDetails
     }
   }
 }

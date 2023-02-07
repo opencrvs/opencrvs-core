@@ -22,8 +22,7 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
-import { getUserLocation } from '@client/utils/userUtils'
-import { User } from '@client/utils/gateway'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import {
   GQLEventSearchSet,
@@ -206,7 +205,7 @@ function mergeWorkQueueData(
 
 async function getWorkqueueData(
   state: IStoreState,
-  userDetails: User,
+  userDetails: UserDetails,
   workqueuePaginationParams: IWorkqueuePaginationParams
 ) {
   const registrationLocationId =
@@ -290,7 +289,7 @@ export async function writeRegistrarWorkqueueByUser(
   workqueuePaginationParams: IWorkqueuePaginationParams
 ): Promise<string> {
   const state = getState()
-  const userDetails = getUserDetails(state) as User
+  const userDetails = getUserDetails(state) as UserDetails
 
   const workqueue = await getWorkqueueData(
     state,

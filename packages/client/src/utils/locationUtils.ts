@@ -10,11 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
-import { Location, Identifier, User } from '@client/utils/gateway'
+import { Location, Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
 import { countries } from '@client/forms/countries'
+import { UserDetails } from './userUtils'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -39,7 +40,7 @@ export function filterLocations(
   return filteredLocations
 }
 
-export function getLocation(userDetails: User, locationKey: string) {
+export function getLocation(userDetails: UserDetails, locationKey: string) {
   if (!userDetails.catchmentArea) {
     throw Error('The user has no catchment area')
   }

@@ -54,6 +54,7 @@ import { useQuery } from '@apollo/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { UserDetails } from '@client/utils/userUtils'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -104,7 +105,7 @@ const transformUserQueryResult = (
         : EMPTY_STRING,
     practitionerId: userData.practitionerId,
     locationId:
-      getJurisdictionLocationIdFromUserDetails(userData as User) || '0',
+      getJurisdictionLocationIdFromUserDetails(userData as UserDetails) || '0',
     avatar: userData.avatar || undefined,
     device: userData.device
   }

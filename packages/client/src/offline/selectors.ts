@@ -11,9 +11,9 @@
  */
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
-import { User } from '@client/utils/gateway'
 import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { merge } from 'lodash'
+import { UserDetails } from '@client/utils/userUtils'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline
@@ -38,7 +38,7 @@ export function isOfflineDataLoaded(
   return isOfflineDataLoaded
 }
 
-export function isSystemAdmin(userDetails: User | undefined) {
+export function isSystemAdmin(userDetails: UserDetails | undefined) {
   return (
     userDetails &&
     userDetails.role &&
@@ -46,7 +46,7 @@ export function isSystemAdmin(userDetails: User | undefined) {
   )
 }
 
-export function isNationalSystemAdmin(userDetails: User | undefined) {
+export function isNationalSystemAdmin(userDetails: UserDetails | undefined) {
   return (
     userDetails &&
     userDetails.role &&

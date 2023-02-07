@@ -370,7 +370,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.role as RoleType | undefined,
+  userRole: state.profile.userDetails?.role,
   userId: state.profile.userDetails?.userMgntUserID
 })
 

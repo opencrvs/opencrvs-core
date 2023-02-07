@@ -19,9 +19,10 @@ import {
 } from '@client/pdfRenderer/transformer/types'
 import { userMessages } from '@client/i18n/messages'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { User, HumanName, LocalRegistrar } from '@client/utils/gateway'
+import { HumanName, LocalRegistrar } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
-export function getUserName(userDetails: Pick<User | LocalRegistrar, 'name'>) {
+export function getUserName(userDetails: Pick<UserDetails | LocalRegistrar, 'name'>) {
   const nameObj =
     userDetails.name &&
     (userDetails.name.find((storedName: HumanName | null) => {

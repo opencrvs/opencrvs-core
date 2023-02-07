@@ -12,7 +12,7 @@
 
 import { RouterAction } from 'connected-react-router'
 import { ApolloQueryResult } from '@apollo/client'
-import { User, FetchUserQuery } from '@client/utils/gateway'
+import { FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
 export const CHECK_AUTH = 'PROFILE/CHECK_AUTH' as const

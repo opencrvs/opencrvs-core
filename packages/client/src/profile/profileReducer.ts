@@ -18,7 +18,6 @@ import {
   removeUserDetails,
   UserDetails
 } from '@client/utils/userUtils'
-import { User } from '@client/utils/gateway'
 import {
   getTokenPayload,
   ITokenPayload,
@@ -178,7 +177,7 @@ export const profileReducer: LoopReducer<
       )
     case actions.GET_USER_DETAILS_SUCCESS:
       const userDetailsString = action.payload
-      const userDetailsCollection: User | null = JSON.parse(
+      const userDetailsCollection: UserDetails | null = JSON.parse(
         userDetailsString ? userDetailsString : 'null'
       )
       // if the user detail cannot be found or they don't match the user specified in the token

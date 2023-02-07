@@ -37,7 +37,7 @@ import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { User, Event } from '@client/utils/gateway'
+import { Event } from '@client/utils/gateway'
 import { IAttachmentValue, IForm } from '@client/forms'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import {
@@ -136,7 +136,7 @@ export const printDummyCertificate = async (
   event: string,
   registerForm: { birth: IForm; death: IForm },
   intl: IntlShape,
-  userDetails: User,
+  userDetails: UserDetails,
   offlineData: IOfflineData
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
@@ -226,7 +226,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             event,
             this.props.registerForm,
             intl,
-            this.props.userDetails as User,
+            this.props.userDetails as UserDetails,
             this.props.offlineResources
           )
         }
