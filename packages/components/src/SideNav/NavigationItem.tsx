@@ -34,9 +34,6 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme, isSelected }) =>
     isSelected ? theme.colors.copy : theme.colors.grey500};
-  svg {
-    stroke-width: 2.5px;
-  }
   &:hover {
     background-color: ${({ theme }) => theme.colors.grey100};
     color: ${({ theme }) => theme.colors.grey600};
@@ -51,7 +48,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
     background-color: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.grey600};
     svg {
-      stroke-width: 2.5px;
+      color: ${({ theme }) => theme.colors.grey600};
     }
   }
 `
@@ -62,6 +59,7 @@ const ItemContentContainer = styled.div`
   align-items: center;
 `
 const LabelContainer = styled.span`
+  align-text: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
