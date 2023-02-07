@@ -9,15 +9,5 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { ClearText } from './ClearText'
 
-export default {
-  title: 'Deprecated/Icons/ClearText',
-  component: ClearText
-} as Meta
-
-const Template: Story<{}> = () => <ClearText />
-
-export const ClearTextView = Template.bind({})
+export * from './Breadcrumb'
