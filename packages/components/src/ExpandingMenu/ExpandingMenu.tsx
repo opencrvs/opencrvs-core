@@ -52,8 +52,9 @@ const NavigationContainer = styled.div`
     }
   }
   display: flex;
+  padding: 8px;
   flex-direction: column;
-  background: ${({ theme }) => theme.colors.grey100};
+  background: ${({ theme }) => theme.colors.white};
   width: 320px;
   height: 100vh;
   animation: 300ms ease-out 0s 1 slideInFromLeft;
