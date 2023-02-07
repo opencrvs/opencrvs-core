@@ -72,6 +72,7 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -251,7 +252,7 @@ class UserReviewFormComponent extends React.Component<
           ? intl.formatMessage(userMessages[formData.systemRole as string])
           : field.name === 'role'
           ? intl.formatMessage({
-              id: `role.${formData.role}`
+              id: getUserRoleIntlKey(formData.role as string)
             })
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label

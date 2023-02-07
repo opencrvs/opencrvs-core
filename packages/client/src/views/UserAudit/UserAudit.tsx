@@ -24,10 +24,7 @@ import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Button } from '@opencrvs/components/lib/Button'
-import {
-  getUserSystemRole,
-  getUserType
-} from '@client/views/SysAdmin//Team/utils'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin//Team/utils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
@@ -140,8 +137,8 @@ export const UserAudit = () => {
     GetUserQueryVariables
   >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
-  const userRole = user && getUserSystemRole(user, intl)
-  const userType = user && getUserType(user)
+  const userType =
+    user && intl.formatMessage({ id: getUserRoleIntlKey(user.role._id) })
 
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
@@ -326,12 +323,8 @@ export const UserAudit = () => {
                 }
               />
               <Summary.Row
-                label={
-                  (userType &&
-                    intl.formatMessage(userSetupMessages.roleType)) ||
-                  intl.formatMessage(userFormMessages.labelRole)
-                }
-                value={(userType && `${userRole} / ${userType}`) || userRole}
+                label={intl.formatMessage(userFormMessages.labelRole)}
+                value={userType}
               />
               <Summary.Row
                 label={intl.formatMessage(userFormMessages.userDevice)}

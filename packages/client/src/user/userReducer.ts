@@ -39,6 +39,7 @@ import { roleQueries } from '@client/forms/user/query/queries'
 import { Role, SystemRole } from '@client/utils/gateway'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -271,10 +272,6 @@ export const getRoleWiseSystemRoles = (systemRoles: SystemRole[]) => {
   return roleMap
 }
 
-export const generateLabelKey = (systemRole: SystemRole, role: Role) => {
-  return `role.${role._id}`
-}
-
 const generateIntlObject = (
   systemRole: SystemRole,
   role: Role
@@ -282,7 +279,7 @@ const generateIntlObject = (
   return {
     value: role._id,
     label: {
-      id: generateLabelKey(systemRole, role),
+      id: getUserRoleIntlKey(role._id),
       description: '',
       defaultMessage: role.labels[0].label
     }
@@ -416,7 +413,6 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const form = deserializeForm(createUserForm)
       const mutateOptions = optionsGenerator(systemRoles)
 
-      console.log(getSystemRoleMap)
       generateUserFormWithRoles(form, mutateOptions)
       return {
         ...state,

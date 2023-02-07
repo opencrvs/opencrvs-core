@@ -38,7 +38,10 @@ import {
 } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { UserStatus } from '@client/views/SysAdmin/Team/utils'
+import {
+  getUserRoleIntlKey,
+  UserStatus
+} from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -605,11 +608,9 @@ function UserListComponent(props: IProps) {
                     LANG_EN
                   ] as string))) ||
               ''
-            const role =
-              (user.systemRole &&
-                intl.formatMessage(userMessages[user.systemRole])) ||
-              '-'
-
+            const role = intl.formatMessage({
+              id: getUserRoleIntlKey(user.role._id)
+            })
             const avatar = user.avatar
 
             return {
