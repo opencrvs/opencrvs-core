@@ -42,7 +42,6 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   }
 
   &:active {
-    background-color: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.grey600};
   }
 
@@ -76,7 +75,7 @@ const ValueContainer = styled.span`
 
 const ExpandContainer = styled.span`
   display: flex;
-  width: 10px;
+  width: 12px;
   justify-content: center;
   ${({ theme }) => theme.fonts.bold12};
 `
@@ -100,7 +99,7 @@ export const NavigationItem = ({
     <ItemContainer isSelected={isSelected} {...otherProps}>
       <ItemContentContainer>
         <ExpandContainer>{expandableIcon && expandableIcon()}</ExpandContainer>
-        {icon && <IconContainer>{icon()}</IconContainer>}
+        <IconContainer>{icon && icon()}</IconContainer>
         <LabelContainer>{label}</LabelContainer>
         <ValueContainer>{count && count !== 0 ? count : null}</ValueContainer>
       </ItemContentContainer>

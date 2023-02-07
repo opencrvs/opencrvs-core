@@ -13,7 +13,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-export interface ILeftNavigationProps {
+export interface ISideNavProps {
   applicationName: string
   children?: React.ReactNode
   navigationWidth?: number
@@ -25,7 +25,7 @@ export interface ILeftNavigationProps {
   applicationVersion: string
   buildVersion: string
 }
-const LeftNavigationContainer = styled.div<{
+const SideNavContainer = styled.div<{
   navigationWidth?: number
 }>`
   position: relative;
@@ -96,9 +96,9 @@ const Version = styled.div`
   }
 `
 
-export const LeftNavigation = (props: ILeftNavigationProps) => {
+export const SideNav = (props: ISideNavProps) => {
   return (
-    <LeftNavigationContainer
+    <SideNavContainer
       navigationWidth={props.navigationWidth}
       className={props.className}
     >
@@ -116,6 +116,6 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
         <span>OpenCRVS {props.applicationVersion}</span>
         <span>: {props.buildVersion}</span>
       </Version>
-    </LeftNavigationContainer>
+    </SideNavContainer>
   )
 }

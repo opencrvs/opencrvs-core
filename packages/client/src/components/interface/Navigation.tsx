@@ -19,7 +19,7 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
-import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
+import { SideNav } from '@opencrvs/components/lib/SideNavigation/SideNav'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { NavigationSubItem } from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
@@ -358,7 +358,7 @@ export const NavigationView = (props: IFullProps) => {
   }
 
   return (
-    <LeftNavigation
+    <SideNav
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       applicationVersion={runningVer}
       buildVersion={import.meta.env.VITE_APP_VERSION ?? 'Development'}
@@ -757,7 +757,7 @@ export const NavigationView = (props: IFullProps) => {
       ) : (
         <></>
       )}
-    </LeftNavigation>
+    </SideNav>
   )
 }
 

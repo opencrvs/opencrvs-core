@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { LeftNavigation, ILeftNavigationProps } from './LeftNavigation'
+import { SideNav, ISideNavProps } from './SideNav'
 import { NavigationGroup } from './NavigationGroup'
 import { NavigationGroupTitle } from './NavigationGroupTitle'
 import { NavigationItem } from './NavigationItem'
@@ -23,14 +23,14 @@ import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 
 const { useState } = React
 
-const Template: Story<ILeftNavigationProps> = (args) => {
+const Template: Story<ISideNavProps> = (args) => {
   const [isExpanded, setExpanded] = useState(true)
   const [is2Expanded, set2Expanded] = useState(true)
   const [is3Expanded, set3Expanded] = useState(false)
   const [is4Expanded, set4Expanded] = useState(false)
 
   return (
-    <LeftNavigation {...args}>
+    <SideNav {...args}>
       <NavigationGroup>
         <NavigationGroupTitle
           label="RECORDS"
@@ -129,31 +129,29 @@ const Template: Story<ILeftNavigationProps> = (args) => {
               icon={() => (
                 <Icon color="currentColor" name="Globe" size="small" />
               )}
-              onClick={() => set3Expanded(!is3Expanded)}
             />
             <NavigationItem
               label="User roles"
               icon={() => (
                 <Icon color="currentColor" name="Globe" size="small" />
               )}
-              onClick={() => set3Expanded(!is3Expanded)}
             />
           </>
         )}
       </NavigationGroup>
-    </LeftNavigation>
+    </SideNav>
   )
 }
 
-export const leftNavigationView = Template.bind({})
+export const Default = Template.bind({})
 
-leftNavigationView.args = {
+Default.args = {
   applicationName: 'OpenCRVS',
   applicationVersion: '1.1.0',
   buildVersion: 'Development'
 }
 
 export default {
-  title: 'Layout/Side navigation/Side navigation',
-  component: LeftNavigation
+  title: 'Layout/Side Nav',
+  component: SideNav
 } as Meta
