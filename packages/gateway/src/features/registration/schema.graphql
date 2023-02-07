@@ -525,6 +525,8 @@ type Reinstated {
   registrationStatus: RegStatus
 }
 
+union RecordDetails = BirthRegistration | DeathRegistration
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
@@ -550,6 +552,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchRecordsDetailsByCompositionId(id: ID): RecordDetails
 }
 
 type Mutation {

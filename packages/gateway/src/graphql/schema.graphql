@@ -30,6 +30,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
+  fetchRecordsDetailsByCompositionId(id: ID): RecordDetails
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
@@ -344,6 +345,8 @@ type RegistrationCountResult {
   results: [StatusWiseRegistrationCount]!
   total: Int!
 }
+
+union RecordDetails = BirthRegistration | DeathRegistration
 
 type Location {
   id: ID!

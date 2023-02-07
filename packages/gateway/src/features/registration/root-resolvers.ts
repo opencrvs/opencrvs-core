@@ -262,6 +262,16 @@ export const resolvers: GQLResolver = {
           new Error('User does not have enough scope')
         )
       }
+    },
+    async fetchRecordsDetailsByCompositionId(_, { id }, authHeader) {
+      try {
+        const record = await fetchFHIR(`/Composition/${id}`, authHeader)
+        if (!record) {
+          await Promise.reject(new Error('Something Went Wrong'))
+        }
+      } catch (e) {
+        await Promise.reject(new Error('Something Went Wrong'))
+      }
     }
   },
 

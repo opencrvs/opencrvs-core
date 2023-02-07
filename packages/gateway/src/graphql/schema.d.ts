@@ -25,6 +25,7 @@ export interface GQLQuery {
   fetchRegistrationForViewing?: GQLEventRegistration
   queryPersonByNidIdentifier?: GQLPerson
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
+  fetchRecordsDetailsByCompositionId?: GQLRecordDetails
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   hasChildLocation?: GQLLocation
@@ -213,6 +214,19 @@ export interface GQLEventRegistrationNameMap {
 export interface GQLRegistrationCountResult {
   results: Array<GQLStatusWiseRegistrationCount | null>
   total: number
+}
+
+export type GQLRecordDetails = GQLBirthRegistration | GQLDeathRegistration
+
+/** Use this to resolve union type RecordDetails */
+export type GQLPossibleRecordDetailsTypeNames =
+  | 'BirthRegistration'
+  | 'DeathRegistration'
+
+export interface GQLRecordDetailsNameMap {
+  RecordDetails: GQLRecordDetails
+  BirthRegistration: GQLBirthRegistration
+  DeathRegistration: GQLDeathRegistration
 }
 
 export interface GQLLocation {
@@ -1745,6 +1759,10 @@ export interface GQLResolver {
   }
 
   RegistrationCountResult?: GQLRegistrationCountResultTypeResolver
+  RecordDetails?: {
+    __resolveType: GQLRecordDetailsTypeResolver
+  }
+
   Location?: GQLLocationTypeResolver
   User?: GQLUserTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
@@ -1860,6 +1878,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchRegistrationForViewing?: QueryToFetchRegistrationForViewingResolver<TParent>
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
+  fetchRecordsDetailsByCompositionId?: QueryToFetchRecordsDetailsByCompositionIdResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
@@ -2095,6 +2114,21 @@ export interface QueryToFetchRegistrationCountByStatusResolver<
   (
     parent: TParent,
     args: QueryToFetchRegistrationCountByStatusArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToFetchRecordsDetailsByCompositionIdArgs {
+  id?: string
+}
+export interface QueryToFetchRecordsDetailsByCompositionIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchRecordsDetailsByCompositionIdArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3739,6 +3773,12 @@ export interface RegistrationCountResultToTotalResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLRecordDetailsTypeResolver<TParent = any> {
+  (parent: TParent, context: any, info: GraphQLResolveInfo):
+    | 'BirthRegistration'
+    | 'DeathRegistration'
+    | Promise<'BirthRegistration' | 'DeathRegistration'>
+}
 export interface GQLLocationTypeResolver<TParent = any> {
   id?: LocationToIdResolver<TParent>
   _fhirID?: LocationTo_fhirIDResolver<TParent>
