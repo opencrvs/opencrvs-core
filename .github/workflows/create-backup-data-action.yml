@@ -49,7 +49,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Create backup data in given environment and copy it over to the backup environment
-        run: ssh root@$SRC_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD ELASTICSEARCH_ADMIN_USER=$ELASTICSEARCH_ADMIN_USER ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_ADMIN_PASSWORD /opt/opencrvs/infrastructure/emergency-backup-metadata.sh root $BACKUP_HOST 22 $SRC_HOST $REMOTE_DIR $REPLICAS $VERSION_LABEL"
+        run: ssh root@$SRC_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD ELASTICSEARCH_ADMIN_USER=$ELASTICSEARCH_ADMIN_USER ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_ADMIN_PASSWORD /opt/opencrvs/infrastructure/emergency-backup-metadata.sh --ssh_user=root --ssh_host=$BACKUP_HOST --ssh_port=22 --production_ip=$SRC_HOST --remote_dir=$REMOTE_DIR --replicas=$REPLICAS --version=$VERSION_LABEL"
         env:
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
           MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}

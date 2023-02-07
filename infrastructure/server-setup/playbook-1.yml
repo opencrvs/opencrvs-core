@@ -91,7 +91,7 @@
         name: 'backup opencrvs'
         minute: '0'
         hour: '0'
-        job: 'cd / && bash /opt/opencrvs/infrastructure/emergency-backup-metadata.sh {{ external_backup_server_user }} {{ external_backup_server_ip }} {{ external_backup_server_ssh_port }} {{ manager_production_server_ip }} {{ external_backup_server_remote_directory }} 1 >> /var/log/opencrvs-backup.log 2>&1'
+        job: 'cd / && bash /opt/opencrvs/infrastructure/emergency-backup-metadata.sh --ssh_user={{ external_backup_server_user }} --ssh_host={{ external_backup_server_ip }} --ssh_port={{ external_backup_server_ssh_port }} --production_ip={{ manager_production_server_ip }} --remote_dir={{ external_backup_server_remote_directory }} --replicas=1 >> /var/log/opencrvs-backup.log 2>&1'
       when: external_backup_server_ip is defined
 
     - name: Copy MongoDB replication security key file to nodes
