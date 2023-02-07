@@ -248,7 +248,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
   async allowPrintMutationHandler() {
     try {
-      const res = await configApplicationMutations.mutateApplicationConfig({
+      await configApplicationMutations.mutateApplicationConfig({
         BIRTH: {
           REGISTRATION_TARGET: this.offlineConfig.BIRTH.REGISTRATION_TARGET,
           LATE_REGISTRATION_TARGET:
@@ -456,8 +456,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       offlineResources.templates.certificates?.birth.fileName
     const deathCertFileName =
       offlineResources.templates.certificates?.death.fileName
-
-    // console.log(offlineResources.templates.certificates?.birth)
 
     const birthLastModified =
       offlineResources.templates.certificates?.birth.lastModifiedDate
