@@ -61,6 +61,14 @@ const StyledLink = styled.button<{
           }
         `}
 
+  &:hover,
+  &:active {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    ${({ $color }) => `text-decoration-color: ${colors[$color]};`}
+  }
+
   &:focus-visible {
     background: ${({ theme }) => theme.colors.yellow};
     box-shadow: 0 -2px ${({ theme }) => theme.colors.yellow},
