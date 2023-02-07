@@ -103,7 +103,7 @@ const messagesToDefine: INavigationMessages = {
   },
   organisation: {
     defaultMessage: 'Organisation',
-    description: 'List of organisations',
+    description: 'Organisations label in navigation',
     id: 'navigation.organisation'
   },
   completenessRates: {
