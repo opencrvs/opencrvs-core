@@ -34,7 +34,7 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import {
   clearUserFormData,
-  getRoleWiseSystemRoles,
+  ISystemRolesMap,
   modifyUserFormData
 } from '@client/user/userReducer'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -48,6 +48,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { Content } from '@opencrvs/components/lib/Content'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
+import { selectSystemRoleMap } from '@client/views/SysAdmin/Team/selectors'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -68,6 +69,7 @@ type IProps = {
   nextSectionId: string
   nextGroupId: string
   offlineCountryConfig: IOfflineData
+  systemRoleMap: ISystemRolesMap
 }
 
 type IState = {
@@ -139,7 +141,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
       values['registrationOffice'] !== ''
     ) {
       if (values.role) {
-        const getSystemRoles = await getRoleWiseSystemRoles()
+        const getSystemRoles = this.props.systemRoleMap
         values.systemRole = getSystemRoles[values.role]
       }
       this.props.modifyUserFormData({ ...formData, ...values })
@@ -206,8 +208,9 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
 const mapStateToProps = (
   state: IStoreState
-): { offlineCountryConfig: IOfflineData } => {
+): { offlineCountryConfig: IOfflineData; systemRoleMap: ISystemRolesMap } => {
   return {
+    systemRoleMap: selectSystemRoleMap(state),
     offlineCountryConfig: getOfflineData(state)
   }
 }

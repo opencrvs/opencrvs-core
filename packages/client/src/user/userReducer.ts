@@ -13,7 +13,6 @@ import {
   IForm,
   IFormSection,
   IFormSectionData,
-  ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
   ISelectOption,
   UserSection
@@ -64,7 +63,8 @@ const initialState: IUserFormState = {
   submitting: false,
   loadingRoles: false,
   submissionError: false,
-  userAuditForm
+  userAuditForm,
+  systemRoleMap: {}
 }
 
 export interface IRoleMessagesLoadedAction {
@@ -241,6 +241,9 @@ type UserFormAction =
   | ReturnType<typeof showSubmitFormSuccessToast>
   | ReturnType<typeof showSubmitFormErrorToast>
 
+export interface ISystemRolesMap {
+  [key: string]: string
+}
 export interface IUserFormState {
   userForm: IForm | null
   userFormData: IFormSectionData
@@ -249,6 +252,7 @@ export interface IUserFormState {
   loadingRoles: boolean
   submissionError: boolean
   userAuditForm: IUserAuditForm
+  systemRoleMap: ISystemRolesMap
 }
 
 export const fetchRoles = async () => {
@@ -256,12 +260,11 @@ export const fetchRoles = async () => {
   return roles.data.getSystemRoles
 }
 
-export const getRoleWiseSystemRoles = async () => {
-  const roles = await fetchRoles()
-  const roleMap: Record<string, string> = {}
-  roles.forEach((systemRole: SystemRole) => {
+export const getRoleWiseSystemRoles = (systemRoles: SystemRole[]) => {
+  const roleMap: ISystemRolesMap = {}
+  systemRoles.forEach((systemRole: SystemRole) => {
     systemRole.roles.forEach((role: Role) => {
-      roleMap[String(role._id)] = systemRole.value
+      roleMap[role._id] = systemRole.value
     })
   })
 
@@ -335,7 +338,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case CLEAR_USER_FORM_DATA:
       return {
         ...initialState,
-        userForm: state.userForm
+        userForm: state.userForm,
+        systemRoleMap: state.systemRoleMap
       }
 
     case SUBMIT_USER_FORM_DATA:
@@ -408,14 +412,18 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 
     case ROLES_LOADED:
       const { systemRoles } = action.payload
+      const getSystemRoleMap = getRoleWiseSystemRoles(systemRoles)
       const form = deserializeForm(createUserForm)
       const mutateOptions = optionsGenerator(systemRoles)
+
+      console.log(getSystemRoleMap)
       generateUserFormWithRoles(form, mutateOptions)
       return {
         ...state,
         userForm: {
           ...form
-        }
+        },
+        systemRoleMap: getSystemRoleMap
       }
     case FETCH_USER_DATA:
       const {
