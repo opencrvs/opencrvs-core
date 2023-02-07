@@ -96,6 +96,12 @@ const Template: Story<ISideNavProps> = (args) => {
               )}
             />
             <NavigationItem
+              label="Vital Statistics Export"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+            />
+            <NavigationItem
               label="Reports"
               icon={() => (
                 <Icon color="currentColor" name="Globe" size="small" />

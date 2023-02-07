@@ -16,12 +16,10 @@ import styled from 'styled-components'
 export interface INavigationGroupTitleProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string
-  isSelected?: boolean
   expandableIcon?: () => React.ReactNode
-  children?: React.ReactNode
 }
 
-const ItemContainer = styled.button<{ isSelected?: boolean }>`
+const ItemContainer = styled.button`
   height: 24px;
   margin: 4px 0px;
   cursor: pointer;
@@ -31,8 +29,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   border-radius: 4px;
   background-color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.bold12};
-  color: ${({ theme, isSelected }) =>
-    isSelected ? theme.colors.copy : theme.colors.grey500};
+  color: ${({ theme }) => theme.colors.grey500};
   svg {
     stroke-width: 2.5px;
   }
@@ -73,18 +70,15 @@ const ValueContainer = styled.span`
 
 export const NavigationGroupTitle = ({
   label,
-  isSelected,
   expandableIcon,
-  children,
   ...otherProps
 }: INavigationGroupTitleProps) => {
   return (
-    <ItemContainer isSelected={isSelected} {...otherProps}>
+    <ItemContainer {...otherProps}>
       <ItemContentContainer>
         <ValueContainer>{expandableIcon && expandableIcon()}</ValueContainer>
         <LabelContainer>{label}</LabelContainer>
       </ItemContentContainer>
-      {isSelected && children}
     </ItemContainer>
   )
 }

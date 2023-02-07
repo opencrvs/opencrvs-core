@@ -22,9 +22,6 @@ export interface INavigationSubItemProps
 export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   border: 0;
   background-color: ${({ theme }) => theme.colors.white};
-  :hover {
-    background-color: ${({ theme }) => theme.colors.grey100};
-  }
   outline: none;
   border-radius: 4px;
   cursor: pointer;
@@ -33,6 +30,15 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   color: ${({ isSelected, theme }) =>
     isSelected ? theme.colors.grey600 : theme.colors.grey500};
   ${({ theme }) => theme.fonts.reg14};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.grey100};
+    color: ${({ theme }) => theme.colors.grey600};
+  }
+
+  &:active {
+    color: ${({ theme }) => theme.colors.grey600};
+  }
 `
 
 export const LabelContainer = styled.div`
