@@ -29,6 +29,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   border: 0;
   outline: none;
   border-radius: 4px;
+  padding: 0 8px;
   background-color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme, isSelected }) =>
@@ -57,12 +58,10 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
 const ItemContentContainer = styled.div`
   display: flex;
   flex-direction: row;
+  gap: 4px;
   align-items: center;
-  padding-right: 8px;
 `
 const LabelContainer = styled.span`
-  margin-left: 6px;
-  margin-right: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -98,7 +97,9 @@ export const NavigationItem = ({
   return (
     <ItemContainer isSelected={isSelected} {...otherProps}>
       <ItemContentContainer>
-        <ExpandContainer>{expandableIcon && expandableIcon()}</ExpandContainer>
+        {expandableIcon && (
+          <ExpandContainer>{expandableIcon()}</ExpandContainer>
+        )}
         <IconContainer>{icon && icon()}</IconContainer>
         <LabelContainer>{label}</LabelContainer>
         <ValueContainer>{count && count !== 0 ? count : null}</ValueContainer>

@@ -27,6 +27,7 @@ const ItemContainer = styled.button<{ isSelected?: boolean }>`
   cursor: pointer;
   border: 0;
   outline: none;
+  padding: 2px;
   border-radius: 4px;
   background-color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.bold12};

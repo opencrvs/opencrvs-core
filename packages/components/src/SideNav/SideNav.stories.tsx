@@ -62,7 +62,7 @@ const Template: Story<ISideNavProps> = (args) => {
       </NavigationGroup>
       <NavigationGroup>
         <NavigationGroupTitle
-          label="PERFORMANCE"
+          label="VITAL STATISTICS"
           onClick={() => set2Expanded(!is2Expanded)}
           expandableIcon={() =>
             is2Expanded ? <Expandable selected={true} /> : <Expandable />
@@ -75,20 +75,6 @@ const Template: Story<ISideNavProps> = (args) => {
               icon={() => (
                 <Icon color="currentColor" name="Globe" size="small" />
               )}
-              count={1}
-            />
-            <NavigationItem
-              label="Statistics"
-              icon={() => (
-                <Icon color="currentColor" name="Globe" size="small" />
-              )}
-              count={1}
-            />
-            <NavigationItem
-              label="Leaderboards"
-              icon={() => (
-                <Icon color="currentColor" name="Globe" size="small" />
-              )}
               onClick={() => set3Expanded(!is3Expanded)}
               expandableIcon={() =>
                 is3Expanded ? <Expandable selected={true} /> : <Expandable />
@@ -96,9 +82,25 @@ const Template: Story<ISideNavProps> = (args) => {
             />
             {is3Expanded && (
               <>
-                <NavigationSubItem label="SubItem" />
+                <NavigationSubItem label="Births" />
+                <NavigationSubItem label="Deaths" />
+                <NavigationSubItem label="Marriages" />
+                <NavigationSubItem label="Divorce" />
+                <NavigationSubItem label="Adoption" />
               </>
             )}
+            <NavigationItem
+              label="Leaderboards"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+            />
+            <NavigationItem
+              label="Reports"
+              icon={() => (
+                <Icon color="currentColor" name="Globe" size="small" />
+              )}
+            />
           </>
         )}
       </NavigationGroup>
