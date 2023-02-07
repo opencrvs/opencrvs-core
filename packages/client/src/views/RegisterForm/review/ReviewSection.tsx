@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { useState, useRef, useEffect } from 'react'
 import {
   LinkButton,
   TertiaryButton,
@@ -20,7 +21,8 @@ import {
   ImageUploader,
   InputField,
   ISelectOption as SelectComponentOptions,
-  TextArea
+  TextArea,
+  ErrorText
 } from '@opencrvs/components/lib/'
 
 import { Alert } from '@opencrvs/components/lib/Alert'
@@ -97,7 +99,8 @@ import {
 import {
   buttonMessages,
   constantsMessages,
-  formMessageDescriptors
+  formMessageDescriptors,
+  formMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
@@ -284,6 +287,9 @@ const SignaturePreview = styled.img`
   max-width: 50%;
   display: block;
 `
+const ErrorMessage = styled.div`
+  margin-top: 16px;
+`
 
 function SignCanvas({
   value,
@@ -292,11 +298,11 @@ function SignCanvas({
   value?: string
   onChange: (value: string) => void
 }) {
-  const [canvasWidth, setCanvasWidth] = React.useState(300)
-  const canvasContainerRef = React.useRef<HTMLDivElement>(null)
-  const canvasRef = React.useRef<SignatureCanvas>(null)
+  const [canvasWidth, setCanvasWidth] = useState(300)
+  const canvasContainerRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<SignatureCanvas>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     function handleResize() {
       if (canvasContainerRef.current) {
         setCanvasWidth(canvasContainerRef.current.offsetWidth)
@@ -310,7 +316,7 @@ function SignCanvas({
     return () => window.removeEventListener('resize', handleResize)
   }, [canvasContainerRef])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (canvasRef.current && value) {
       canvasRef.current.fromDataURL(value)
     }
@@ -353,6 +359,7 @@ type SignatureInputProps = {
   id?: string
   value?: string
   onChange: (value: string) => void
+  disabled?: boolean
 }
 
 const SignatureDescription = styled.p`
@@ -361,11 +368,17 @@ const SignatureDescription = styled.p`
   color: ${({ theme }) => theme.colors.grey500};
 `
 
-function SignatureInput({ id, value, onChange }: SignatureInputProps) {
-  const [signatureDialogOpen, setSignatureDialogOpen] = React.useState(false)
-  const [signatureValue, setSignatureValue] = React.useState('')
-
+function SignatureInput({
+  id,
+  value,
+  onChange,
+  disabled
+}: SignatureInputProps) {
+  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
+  const [signatureValue, setSignatureValue] = useState('')
+  const [signatureError, setSignatureError] = useState('')
   const intl = useIntl()
+  const allowedSignatureFormat = ['image/png']
 
   function apply() {
     setSignatureDialogOpen(false)
@@ -377,17 +390,37 @@ function SignatureInput({ id, value, onChange }: SignatureInputProps) {
       <SignatureDescription>
         {intl.formatMessage(messages.signatureDescription)}
       </SignatureDescription>
+      <ErrorMessage id="signature-upload-error">
+        {signatureError && <ErrorText>{signatureError}</ErrorText>}
+      </ErrorMessage>
       {!value && (
         <>
-          <SecondaryButton onClick={() => setSignatureDialogOpen(true)}>
+          <SecondaryButton
+            onClick={() => setSignatureDialogOpen(true)}
+            disabled={disabled}
+          >
             {intl.formatMessage(messages.signatureOpenSignatureInput)}
           </SecondaryButton>
           <CustomImageUpload
             id="signature-file-upload"
             title="Upload"
             handleFileChange={async (file) => {
+              if (!allowedSignatureFormat.includes(file.type)) {
+                setSignatureError(
+                  intl.formatMessage(formMessages.fileUploadError, {
+                    type: allowedSignatureFormat
+                      .map((signatureFormat) =>
+                        signatureFormat.split('/').pop()
+                      )
+                      .join(', ')
+                  })
+                )
+                return
+              }
               onChange((await getBase64String(file)).toString())
+              setSignatureError('')
             }}
+            disabled={disabled}
           />
         </>
       )}
@@ -2002,7 +2035,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       required={window.config.INFORMANT_SIGNATURE_REQUIRED}
                       label={intl.formatMessage(messages.informantsSignature)}
                     >
-                      <SignatureInput {...signatureInputProps} />
+                      <SignatureInput
+                        {...signatureInputProps}
+                        disabled={viewRecord}
+                      />
                     </InputField>
                   </InputWrapper>
                 )}

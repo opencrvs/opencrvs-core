@@ -56,6 +56,7 @@ import {
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
   PERFORMANCE_REGISTRATIONS_LIST,
+  ORGANISATIONS_INDEX,
   INFORMANT_NOTIFICATION
 } from '@client/navigation/routes'
 import {
@@ -252,6 +253,10 @@ export function goToTeamUserList(id: string) {
       locationId: id
     })
   })
+}
+
+export function goToOrganizationList(locationId?: string | undefined | null) {
+  return push(formatUrl(ORGANISATIONS_INDEX, { locationId: locationId ?? '' }))
 }
 
 export function goToSystemList() {
@@ -658,6 +663,10 @@ export function goToTeamView(userDetails: UserDetails) {
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
     )
   }
+}
+
+export function goToOrganisationView(userDetails: IUserDetails) {
+  return goToOrganizationList()
 }
 
 export type INavigationState = undefined

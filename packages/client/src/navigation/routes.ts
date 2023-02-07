@@ -97,3 +97,4 @@ export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
 export const USER_PROFILE = '/userProfile/:userId'
 
 export const VIEW_RECORD = '/:declarationId/viewRecord'
+export const ORGANISATIONS_INDEX = '/organisation/:locationId?'
