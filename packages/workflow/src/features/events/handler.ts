@@ -19,7 +19,7 @@ import {
   hasBirthRegistrationNumber,
   hasDeathRegistrationNumber,
   forwardToHearth,
-  updateHearthWithExtension
+  forwardEntriesToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   createRegistrationHandler,
@@ -432,7 +432,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(event, request.payload, request.headers)
       break
     case Events.EVENT_NOT_DUPLICATE:
-      response = await updateHearthWithExtension(request, h)
+      response = await forwardEntriesToHearth(request, h)
       await triggerEvent(
         Events.EVENT_NOT_DUPLICATE,
         request.payload,

@@ -428,7 +428,7 @@ export async function mergePatientIdentifier(bundle: fhir.Bundle) {
   }
 }
 
-export async function updateHearthWithExtension(
+export async function forwardEntriesToHearth(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {

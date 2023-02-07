@@ -81,8 +81,14 @@ export const ARCHIVE_DEATH_DECLARATION = gql`
     $id: String!
     $reason: String
     $comment: String
+    $duplicateTrackingId: String
   ) {
-    markEventAsArchived(id: $id, reason: $reason, comment: $comment)
+    markEventAsArchived(
+      id: $id
+      reason: $reason
+      comment: $comment
+      duplicateTrackingId: $duplicateTrackingId
+    )
   }
 `
 
