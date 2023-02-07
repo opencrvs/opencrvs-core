@@ -33,7 +33,10 @@ import {
 } from '@client/transformer'
 import { Dispatch } from 'redux'
 import { IForm, SubmissionAction } from '@client/forms'
-import { showUnassigned } from '@client/notification/actions'
+import {
+  showDuplicateRecordsToast,
+  showUnassigned
+} from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { ApolloError } from '@apollo/client'
 import { NOT_A_DUPLICATE } from '@client/views/DataProvider/mutation'
@@ -127,12 +130,23 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         : getDeathMutation(submissionAction)
     try {
       if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
-        await client.mutate({
+        const response = await client.mutate({
           mutation,
           variables: {
             details: gqlDetails
           }
         })
+        const { isPotentiallyDuplicate, trackingId, compositionId } =
+          response?.data?.createBirthRegistration ?? {}
+
+        if (isPotentiallyDuplicate) {
+          dispatch(
+            showDuplicateRecordsToast({
+              trackingId,
+              compositionId
+            })
+          )
+        }
       } else if (
         [
           SubmissionAction.REJECT_DECLARATION,

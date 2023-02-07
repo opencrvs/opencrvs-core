@@ -10,19 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
-import {
-  searchByCompositionId,
-  searchComposition
-} from '@search/elasticsearch/dbhelper'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
   findName,
   findNameLocale,
   findTaskExtension,
   getFromFhir
 } from '@search/features/fhir/fhir-utils'
-import { ISearchResponse } from '@search/elasticsearch/client'
-import { ApiResponse } from '@elastic/elasticsearch'
+import { client, ISearchResponse } from '@search/elasticsearch/client'
+
 import fetch from 'node-fetch'
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -93,6 +91,11 @@ export interface ICompositionBody {
   childFirstNames?: string
   childFamilyName?: string
   childFirstNamesLocal?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  motherIdentifier?: string
+  childDoB?: string
   createdBy?: string
   updatedBy?: string
   createdAt?: string
@@ -166,19 +169,19 @@ export async function detectDuplicates(
   compositionId: string,
   body: IBirthCompositionBody
 ) {
-  const searchResponse = await searchComposition(body)
+  const searchResponse = await searchForDuplicates(body, client)
   const duplicates = findDuplicateIds(compositionId, searchResponse)
   return duplicates
 }
 
 export async function getCreatedBy(compositionId: string) {
-  const results = await searchByCompositionId(compositionId)
+  const results = await searchByCompositionId(compositionId, client)
   const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
   return result?.createdBy
 }
 
 export const getStatus = async (compositionId: string) => {
-  const results = await searchByCompositionId(compositionId)
+  const results = await searchByCompositionId(compositionId, client)
   const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
   return result?.operationHistories as IOperationHistory[]
 }
@@ -260,129 +263,14 @@ function isNotification(body: ICompositionBody): boolean {
 
 function findDuplicateIds(
   compositionIdentifier: string,
-  results: ApiResponse<ISearchResponse<any>> | null
+  results: ISearchResponse<IBirthCompositionBody>['hits']['hits']
 ) {
-  const hits = (results && results.body.hits.hits) || []
-  return hits
+  return results
     .filter(
       (hit) =>
         hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
     )
     .map((hit) => hit._id)
-}
-
-export function buildQuery(body: IBirthCompositionBody) {
-  const must = []
-  const should = []
-
-  if (body.childFirstNames) {
-    must.push({
-      match: {
-        childFirstNames: { query: body.childFirstNames, fuzziness: 'AUTO' }
-      }
-    })
-  }
-
-  if (body.childFamilyName) {
-    must.push({
-      match: {
-        childFamilyName: { query: body.childFamilyName, fuzziness: 'AUTO' }
-      }
-    })
-  }
-
-  if (body.gender) {
-    must.push({
-      term: {
-        gender: body.gender
-      }
-    })
-  }
-
-  if (body.childDoB) {
-    must.push({
-      term: {
-        childDoB: body.childDoB
-      }
-    })
-  }
-
-  if (body.motherFirstNames) {
-    should.push({
-      match: {
-        motherFirstNames: { query: body.motherFirstNames, fuzziness: 'AUTO' }
-      }
-    })
-  }
-
-  if (body.motherFamilyName) {
-    should.push({
-      match: {
-        motherFamilyName: { query: body.motherFamilyName, fuzziness: 'AUTO' }
-      }
-    })
-  }
-
-  if (body.motherDoB) {
-    should.push({
-      term: {
-        motherDoB: body.motherDoB
-      }
-    })
-  }
-
-  if (body.motherIdentifier) {
-    should.push({
-      term: {
-        motherIdentifier: {
-          value: body.motherIdentifier,
-          boost: 2
-        }
-      }
-    })
-  }
-
-  if (body.fatherFirstNames) {
-    should.push({
-      match: {
-        fatherFirstNames: { query: body.fatherFirstNames, fuzziness: 'AUTO' }
-      }
-    })
-  }
-
-  if (body.fatherFamilyName) {
-    should.push({
-      match: {
-        fatherFamilyName: { query: body.fatherFamilyName, fuzziness: 'AUTO' }
-      }
-    })
-  }
-
-  if (body.fatherDoB) {
-    should.push({
-      term: {
-        fatherDoB: body.fatherDoB
-      }
-    })
-  }
-
-  if (body.fatherIdentifier) {
-    should.push({
-      term: {
-        fatherIdentifier: {
-          value: body.fatherIdentifier,
-          boost: 2
-        }
-      }
-    })
-  }
-
-  return {
-    bool: {
-      must,
-      should
-    }
-  }
 }
 
 export async function getUser(practitionerId: string, authHeader: any) {

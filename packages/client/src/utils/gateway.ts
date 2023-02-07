@@ -596,6 +596,7 @@ export type CountryLogoInput = {
 export type CreatedIds = {
   __typename?: 'CreatedIds'
   compositionId?: Maybe<Scalars['String']>
+  isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
   registrationNumber?: Maybe<Scalars['String']>
   trackingId?: Maybe<Scalars['String']>
 }
@@ -3075,6 +3076,7 @@ export type CreateBirthRegistrationMutation = {
     __typename?: 'CreatedIds'
     trackingId?: string | null
     compositionId?: string | null
+    isPotentiallyDuplicate?: boolean | null
   }
 }
 

@@ -15,12 +15,17 @@ import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
 import { client } from '@search/elasticsearch/client'
-import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
+import {
+  ICompositionBody,
+  EVENT,
+  IBirthCompositionBody
+} from '@search/elasticsearch/utils'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
 import { RouteScope } from '@search/config/routes'
+import { searchForDuplicates } from '@search/features/registration/deduplicate/service'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -32,7 +37,7 @@ export async function searchAssignment(
 ) {
   const payload = request.payload as IAssignmentPayload
   try {
-    const results = await searchByCompositionId(payload.compositionId)
+    const results = await searchByCompositionId(payload.compositionId, client)
     const result = results?.body?.hits?.hits[0]?._source as
       | ICompositionBody
       | undefined
@@ -188,5 +193,21 @@ export async function advancedRecordSearch(
   } catch (err) {
     logger.error(`Search/searchDeclarationHandler: error: ${err}`)
     return badRequest(err.message)
+  }
+}
+
+export async function searchDuplicates(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const result = await searchForDuplicates(
+      request.payload as IBirthCompositionBody,
+      client
+    )
+    return h.response(result).code(200)
+  } catch (error) {
+    logger.error(`Search/searchForDuplicates: error: ${error}`)
+    return internal(error)
   }
 }

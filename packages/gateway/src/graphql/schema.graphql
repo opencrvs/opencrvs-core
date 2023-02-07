@@ -635,6 +635,7 @@ type CreatedIds {
   compositionId: String
   trackingId: String
   registrationNumber: String
+  isPotentiallyDuplicate: Boolean
 }
 
 input BirthRegistrationInput {

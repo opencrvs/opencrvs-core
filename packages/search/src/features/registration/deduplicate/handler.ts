@@ -13,6 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@search/logger'
 import { internal } from '@hapi/boom'
 import { removeDuplicate } from '@search/features/registration/deduplicate/service'
+import { client } from '@search/elasticsearch/client'
 
 export async function deduplicateHandler(
   request: Hapi.Request,
@@ -25,7 +26,8 @@ export async function deduplicateHandler(
     )
 
     await removeDuplicate(
-      composition?.resource as fhir.Composition & { id: string }
+      composition?.resource as fhir.Composition & { id: string },
+      client
     )
   } catch (error) {
     logger.error(`Search/searchDeclarationHandler: error: ${error}`)
