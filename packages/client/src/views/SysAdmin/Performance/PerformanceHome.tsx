@@ -717,7 +717,7 @@ function mapStateToProps(
       ),
     timeEnd:
       (timeEnd && new Date(timeEnd)) ||
-      new Date(new Date(Date.now()).setHours(0, 0, 0, 0)),
+      new Date(new Date(Date.now()).setHours(23, 59, 59)),
     event: event || Event.Birth,
     selectedLocation,
     offices: offlineCountryConfiguration.offices,

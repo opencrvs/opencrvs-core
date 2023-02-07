@@ -27,7 +27,7 @@ function getQueriesToPrefetch(locationId: string, officeSelected: boolean) {
   const defaultTimeStart = new Date(
     startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
   )
-  const defaultTimeEnd = new Date(new Date(Date.now()).setHours(0, 0, 0, 0))
+  const defaultTimeEnd = new Date(new Date(Date.now()).setHours(23, 59, 59))
 
   return [
     {
@@ -45,7 +45,7 @@ function getQueriesToPrefetch(locationId: string, officeSelected: boolean) {
         populationYear: new Date().getFullYear(),
         officeSelected
       },
-      fetchPolicy: 'cache-first'
+      fetchPolicy: 'cache-and-network'
     },
     {
       query: PERFORMANCE_METRICS,
@@ -55,7 +55,7 @@ function getQueriesToPrefetch(locationId: string, officeSelected: boolean) {
         timeStart: defaultTimeStart,
         timeEnd: defaultTimeEnd
       },
-      fetchPolicy: 'cache-first'
+      fetchPolicy: 'cache-and-network'
     },
     {
       query: CORRECTION_TOTALS,
@@ -65,7 +65,7 @@ function getQueriesToPrefetch(locationId: string, officeSelected: boolean) {
         timeStart: defaultTimeStart,
         timeEnd: defaultTimeEnd
       },
-      fetchPolicy: 'cache-first'
+      fetchPolicy: 'cache-and-network'
     }
   ]
 }
