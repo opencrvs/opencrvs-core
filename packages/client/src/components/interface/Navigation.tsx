@@ -21,6 +21,7 @@ import { IStoreState } from '@opencrvs/client/src/store'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { SideNav } from '@opencrvs/components/lib/SideNav'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNav/NavigationGroup'
+import { NavigationGroupTitle } from '@opencrvs/components/lib/SideNav/NavigationGroupTitle'
 import { NavigationItem } from '@opencrvs/components/lib/SideNav/NavigationItem'
 import { NavigationSubItem } from '@opencrvs/components/lib/SideNav/NavigationSubItem'
 import { connect } from 'react-redux'
@@ -302,7 +303,12 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.declarationForms,
     WORKQUEUE_TABS.systems
   ]
-  const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
+
+  const [isRecordExpanded, setIsRecordExpanded] = React.useState(true)
+  const [isPerformanceExpanded, setIsPerformanceExpanded] = React.useState(true)
+  const [isOrgExpanded, setIsOrgExpanded] = React.useState(true)
+  const [isConfigExpanded, setIsConfigExpanded] = React.useState(true)
+
   const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
     data,
@@ -370,60 +376,76 @@ export const NavigationView = (props: IFullProps) => {
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>
           <NavigationGroup>
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'purple'} />}
-              id={`navigation_${WORKQUEUE_TABS.inProgress}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.inProgress]
-              )}
-              count={props.draftDeclarations.length}
-              isSelected={tabId === WORKQUEUE_TABS.inProgress}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.inProgress)
-                menuCollapse && menuCollapse()
-              }}
+            <NavigationGroupTitle
+              label="RECORDS"
+              onClick={() => setIsRecordExpanded(!isRecordExpanded)}
+              expandableIcon={() =>
+                isRecordExpanded ? (
+                  <Expandable selected={true} />
+                ) : (
+                  <Expandable />
+                )
+              }
             />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
-              id={`navigation_${WORKQUEUE_TABS.sentForReview}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.sentForReview]
-              )}
-              count={declarationCount.readyForReview}
-              isSelected={tabId === WORKQUEUE_TABS.sentForReview}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.sentForReview)
-                menuCollapse && menuCollapse()
-              }}
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'red'} />}
-              id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.requiresUpdate]
-              )}
-              count={declarationCount.requiresUpdate}
-              isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
-                menuCollapse && menuCollapse()
-              }}
-            />
-            <NavigationItem
-              icon={() => (
-                <Icon color="currentColor" name="Send" size="small" />
-              )}
-              id={`navigation_${WORKQUEUE_TABS.outbox}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.outbox]
-              )}
-              count={declarationCount.outbox}
-              isSelected={tabId === WORKQUEUE_TABS.outbox}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.outbox)
-                menuCollapse && menuCollapse()
-              }}
-            />
+
+            {isRecordExpanded && (
+              <>
+                <NavigationItem
+                  icon={() => <DeclarationIconSmall color={'purple'} />}
+                  id={`navigation_${WORKQUEUE_TABS.inProgress}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.inProgress]
+                  )}
+                  count={props.draftDeclarations.length}
+                  isSelected={tabId === WORKQUEUE_TABS.inProgress}
+                  onClick={() => {
+                    props.goToHomeTab(WORKQUEUE_TABS.inProgress)
+                    menuCollapse && menuCollapse()
+                  }}
+                />
+                <NavigationItem
+                  icon={() => <DeclarationIconSmall color={'orange'} />}
+                  id={`navigation_${WORKQUEUE_TABS.sentForReview}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.sentForReview]
+                  )}
+                  count={declarationCount.readyForReview}
+                  isSelected={tabId === WORKQUEUE_TABS.sentForReview}
+                  onClick={() => {
+                    props.goToHomeTab(WORKQUEUE_TABS.sentForReview)
+                    menuCollapse && menuCollapse()
+                  }}
+                />
+                <NavigationItem
+                  icon={() => <DeclarationIconSmall color={'red'} />}
+                  id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.requiresUpdate]
+                  )}
+                  count={declarationCount.requiresUpdate}
+                  isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
+                  onClick={() => {
+                    props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
+                    menuCollapse && menuCollapse()
+                  }}
+                />
+                <NavigationItem
+                  icon={() => (
+                    <Icon color="currentColor" name="Send" size="small" />
+                  )}
+                  id={`navigation_${WORKQUEUE_TABS.outbox}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.outbox]
+                  )}
+                  count={declarationCount.outbox}
+                  isSelected={tabId === WORKQUEUE_TABS.outbox}
+                  onClick={() => {
+                    props.goToHomeTab(WORKQUEUE_TABS.outbox)
+                    menuCollapse && menuCollapse()
+                  }}
+                />
+              </>
+            )}
           </NavigationGroup>
           {menuCollapse && (
             <NavigationGroup>{getSettingsAndLogout(props)}</NavigationGroup>
@@ -436,131 +458,194 @@ export const NavigationView = (props: IFullProps) => {
               GROUP_ID.declarationGroup
             ) && (
               <NavigationGroup>
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
-                    WORKQUEUE_TABS.inProgress
-                  ) && (
-                    <NavigationItem
-                      icon={() => <DeclarationIconSmall color={'purple'} />}
-                      id={`navigation_${WORKQUEUE_TABS.inProgress}`}
-                      label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.inProgress]
+                <NavigationGroupTitle
+                  label="RECORDS"
+                  onClick={() => setIsRecordExpanded(!isRecordExpanded)}
+                  expandableIcon={() =>
+                    isRecordExpanded ? (
+                      <Expandable selected={true} />
+                    ) : (
+                      <Expandable />
+                    )
+                  }
+                />
+
+                {isRecordExpanded && (
+                  <>
+                    {userDetails?.role &&
+                      USER_SCOPE[userDetails.role].includes(
+                        WORKQUEUE_TABS.outbox
+                      ) && (
+                        <NavigationItem
+                          icon={() => (
+                            <Icon
+                              color="currentColor"
+                              name="Send"
+                              size="small"
+                            />
+                          )}
+                          id={`navigation_${WORKQUEUE_TABS.outbox}`}
+                          label={intl.formatMessage(
+                            navigationMessages[WORKQUEUE_TABS.outbox]
+                          )}
+                          count={declarationCount.outbox}
+                          isSelected={tabId === WORKQUEUE_TABS.outbox}
+                          onClick={() => {
+                            props.goToHomeTab(WORKQUEUE_TABS.outbox)
+                            menuCollapse && menuCollapse()
+                          }}
+                        />
                       )}
-                      count={declarationCount.inProgress}
-                      isSelected={tabId === WORKQUEUE_TABS.inProgress}
-                      onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.inProgress)
-                        menuCollapse && menuCollapse()
-                      }}
-                    />
-                  )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
-                    WORKQUEUE_TABS.readyForReview
-                  ) && (
-                    <NavigationItem
-                      icon={() => <DeclarationIconSmall color={'orange'} />}
-                      id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
-                      label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.readyForReview]
+
+                    {userDetails?.role &&
+                      USER_SCOPE[userDetails.role].includes(
+                        WORKQUEUE_TABS.inProgress
+                      ) && (
+                        <NavigationItem
+                          icon={() => <DeclarationIconSmall color={'purple'} />}
+                          id={`navigation_${WORKQUEUE_TABS.inProgress}`}
+                          label={intl.formatMessage(
+                            navigationMessages[WORKQUEUE_TABS.inProgress]
+                          )}
+                          count={declarationCount.inProgress}
+                          isSelected={tabId === WORKQUEUE_TABS.inProgress}
+                          onClick={() => {
+                            props.goToHomeTab(WORKQUEUE_TABS.inProgress)
+                            menuCollapse && menuCollapse()
+                          }}
+                        />
                       )}
-                      count={declarationCount.readyForReview}
-                      isSelected={tabId === WORKQUEUE_TABS.readyForReview}
-                      onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
-                        menuCollapse && menuCollapse()
-                      }}
-                    />
-                  )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
-                    WORKQUEUE_TABS.requiresUpdate
-                  ) && (
-                    <NavigationItem
-                      icon={() => <DeclarationIconSmall color={'red'} />}
-                      id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
-                      label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.requiresUpdate]
+                    {userDetails?.role &&
+                      USER_SCOPE[userDetails.role].includes(
+                        WORKQUEUE_TABS.readyForReview
+                      ) && (
+                        <NavigationItem
+                          icon={() => <DeclarationIconSmall color={'orange'} />}
+                          id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
+                          label={intl.formatMessage(
+                            navigationMessages[WORKQUEUE_TABS.readyForReview]
+                          )}
+                          count={declarationCount.readyForReview}
+                          isSelected={tabId === WORKQUEUE_TABS.readyForReview}
+                          onClick={() => {
+                            props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+                            menuCollapse && menuCollapse()
+                          }}
+                        />
                       )}
-                      count={declarationCount.requiresUpdate}
-                      isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
-                      onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
-                        menuCollapse && menuCollapse()
-                      }}
-                    />
-                  )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
-                    WORKQUEUE_TABS.sentForApproval
-                  ) && (
-                    <NavigationItem
-                      icon={() => <DeclarationIconSmall color={'grey'} />}
-                      id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
-                      label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.sentForApproval]
+                    {userDetails?.role &&
+                      USER_SCOPE[userDetails.role].includes(
+                        WORKQUEUE_TABS.requiresUpdate
+                      ) && (
+                        <NavigationItem
+                          icon={() => <DeclarationIconSmall color={'red'} />}
+                          id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
+                          label={intl.formatMessage(
+                            navigationMessages[WORKQUEUE_TABS.requiresUpdate]
+                          )}
+                          count={declarationCount.requiresUpdate}
+                          isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
+                          onClick={() => {
+                            props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
+                            menuCollapse && menuCollapse()
+                          }}
+                        />
                       )}
-                      count={declarationCount.sentForApproval}
-                      isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
-                      onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
-                        menuCollapse && menuCollapse()
-                      }}
-                    />
-                  )}
-                {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
-                  <NavigationItem
-                    icon={() => <DeclarationIconSmall color={'teal'} />}
-                    id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
-                    label={intl.formatMessage(
-                      navigationMessages[WORKQUEUE_TABS.externalValidation]
+                    {userDetails?.role &&
+                      USER_SCOPE[userDetails.role].includes(
+                        WORKQUEUE_TABS.sentForApproval
+                      ) && (
+                        <NavigationItem
+                          icon={() => <DeclarationIconSmall color={'grey'} />}
+                          id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
+                          label={intl.formatMessage(
+                            navigationMessages[WORKQUEUE_TABS.sentForApproval]
+                          )}
+                          count={declarationCount.sentForApproval}
+                          isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
+                          onClick={() => {
+                            props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+                            menuCollapse && menuCollapse()
+                          }}
+                        />
+                      )}
+                    {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
+                      <NavigationItem
+                        icon={() => <DeclarationIconSmall color={'teal'} />}
+                        id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
+                        label={intl.formatMessage(
+                          navigationMessages[WORKQUEUE_TABS.externalValidation]
+                        )}
+                        count={declarationCount.externalValidation}
+                        isSelected={tabId === WORKQUEUE_TABS.externalValidation}
+                        onClick={() => {
+                          props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
+                          menuCollapse && menuCollapse()
+                        }}
+                      />
                     )}
-                    count={declarationCount.externalValidation}
-                    isSelected={tabId === WORKQUEUE_TABS.externalValidation}
-                    onClick={() => {
-                      props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
-                      menuCollapse && menuCollapse()
-                    }}
-                  />
+                    {userDetails?.role &&
+                      USER_SCOPE[userDetails.role].includes(
+                        WORKQUEUE_TABS.readyToPrint
+                      ) && (
+                        <NavigationItem
+                          icon={() => <DeclarationIconSmall color={'green'} />}
+                          id={`navigation_${WORKQUEUE_TABS.readyToPrint}`}
+                          label={intl.formatMessage(
+                            navigationMessages[WORKQUEUE_TABS.readyToPrint]
+                          )}
+                          count={declarationCount.readyToPrint}
+                          isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
+                          onClick={() => {
+                            props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+                            menuCollapse && menuCollapse()
+                          }}
+                        />
+                      )}
+                  </>
                 )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
-                    WORKQUEUE_TABS.readyToPrint
-                  ) && (
-                    <NavigationItem
-                      icon={() => <DeclarationIconSmall color={'green'} />}
-                      id={`navigation_${WORKQUEUE_TABS.readyToPrint}`}
-                      label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.readyToPrint]
-                      )}
-                      count={declarationCount.readyToPrint}
-                      isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
-                      onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
-                        menuCollapse && menuCollapse()
-                      }}
-                    />
-                  )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
-                    WORKQUEUE_TABS.outbox
-                  ) && (
-                    <NavigationItem
-                      icon={() => (
-                        <Icon color="currentColor" name="Send" size="small" />
-                      )}
-                      id={`navigation_${WORKQUEUE_TABS.outbox}`}
-                      label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.outbox]
-                      )}
-                      count={declarationCount.outbox}
-                      isSelected={tabId === WORKQUEUE_TABS.outbox}
-                      onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.outbox)
-                        menuCollapse && menuCollapse()
-                      }}
-                    />
-                  )}
+
+                {userDetails?.searches && userDetails?.searches.length > 0 ? (
+                  userDetails?.searches.map((bookmarkResult, index) => {
+                    return (
+                      <NavigationItem
+                        icon={() => (
+                          <Icon
+                            size={'small'}
+                            name={'Star'}
+                            color={'yellow'}
+                            fill={'yellow'}
+                          ></Icon>
+                        )}
+                        id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
+                        label={bookmarkResult.name}
+                        disabled={
+                          advancedSearchParams.searchId ===
+                            bookmarkResult.searchId &&
+                          props.location.pathname === ADVANCED_SEARCH_RESULT
+                        }
+                        onClick={() => {
+                          const filteredParam = omit(
+                            bookmarkResult.parameters,
+                            '__typename'
+                          ) as IAdvancedSearchParamState
+                          setAdvancedSearchParam({
+                            ...filteredParam,
+                            searchId: bookmarkResult.searchId
+                          })
+                          goToAdvancedSearchResultAction()
+                        }}
+                        isSelected={
+                          advancedSearchParams.searchId ===
+                            bookmarkResult.searchId &&
+                          props.location.pathname === ADVANCED_SEARCH_RESULT
+                        }
+                      />
+                    )
+                  })
+                ) : (
+                  <></>
+                )}
               </NavigationGroup>
             )}
           {userDetails?.role &&
@@ -719,41 +804,6 @@ export const NavigationView = (props: IFullProps) => {
               </NavigationGroup>
             )}
         </>
-      )}
-
-      {userDetails?.searches && userDetails?.searches.length > 0 ? (
-        userDetails?.searches.map((bookmarkResult, index) => {
-          return (
-            <NavigationItem
-              icon={() => (
-                <Icon name={'Star'} color={'yellow'} fill={'yellow'}></Icon>
-              )}
-              id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
-              label={bookmarkResult.name}
-              disabled={
-                advancedSearchParams.searchId === bookmarkResult.searchId &&
-                props.location.pathname === ADVANCED_SEARCH_RESULT
-              }
-              onClick={() => {
-                const filteredParam = omit(
-                  bookmarkResult.parameters,
-                  '__typename'
-                ) as IAdvancedSearchParamState
-                setAdvancedSearchParam({
-                  ...filteredParam,
-                  searchId: bookmarkResult.searchId
-                })
-                goToAdvancedSearchResultAction()
-              }}
-              isSelected={
-                advancedSearchParams.searchId === bookmarkResult.searchId &&
-                props.location.pathname === ADVANCED_SEARCH_RESULT
-              }
-            />
-          )
-        })
-      ) : (
-        <></>
       )}
     </SideNav>
   )
