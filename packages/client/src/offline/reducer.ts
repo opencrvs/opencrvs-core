@@ -75,7 +75,7 @@ export interface IOfflineData {
     logo: string
   }
   systems: System[]
-  config: IApplicationConfig
+  config: Partial<IApplicationConfig>
   formConfig: IFormConfig
 }
 
@@ -297,6 +297,15 @@ function reducer(
         state,
         Cmd.list([getDataLoadingCommands(), updateGlobalConfig()])
       )
+    }
+    case actions.ANONYMOUS_USER_OFFLINE_CONFIG: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          ...action.payload
+        }
+      }
     }
     case actions.GET_OFFLINE_DATA_SUCCESS: {
       const offlineDataString = action.payload

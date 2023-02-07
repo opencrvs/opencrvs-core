@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig } from '@client/forms'
-import { ILanguage } from '@client/i18n/reducer'
-import { ILocation } from '@client/offline/reducer'
-import { getToken } from '@client/utils/authUtils'
-import { Event, System } from '@client/utils/gateway'
-import { questionsTransformer } from '@client/forms/questionConfig'
+import {IFormConfig} from '@client/forms'
+import {ILanguage} from '@client/i18n/reducer'
+import {ILocation} from '@client/offline/reducer'
+import {getToken} from '@client/utils/authUtils'
+import {Event, System} from '@client/utils/gateway'
+import {questionsTransformer} from '@client/forms/questionConfig'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -113,6 +113,20 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   )
 
   return response
+}
+
+async function loadConfigAnonymousUser(): Promise<
+  Partial<IApplicationConfigResponse>
+> {
+  const url = `${window.config.CONFIG_API_URL}/publicConfig`
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+  return await res.json()
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -243,5 +257,6 @@ export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadContent,
-  loadConfig
+  loadConfig,
+  loadConfigAnonymousUser
 }

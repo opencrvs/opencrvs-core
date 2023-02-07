@@ -84,6 +84,10 @@ export const selectCountryLogo = (store: IStoreState) => {
   return getKey(store, 'offlineData').config?.COUNTRY_LOGO?.file
 }
 
+export function selectApplicationName(store: IStoreState) {
+  return getKey(store, 'offlineData').config?.APPLICATION_NAME
+}
+
 export const getOfflineLoadingError = (
   store: IStoreState
 ): IOfflineDataState['loadingError'] => getKey(store, 'loadingError')
