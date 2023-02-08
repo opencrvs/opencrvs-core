@@ -417,8 +417,8 @@ export function getStatusLabel(
   if (
     regStatus === RegStatus.Declared &&
     performedBy?.id === loggedInUser?.userMgntUserID &&
-    loggedInUser?.role &&
-    FIELD_AGENT_ROLES.includes(loggedInUser.role)
+    loggedInUser?.systemRole &&
+    FIELD_AGENT_ROLES.includes(loggedInUser.systemRole)
   ) {
     return intl.formatMessage(recordAuditMessages.sentNotification)
   }

@@ -9,23 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { model, Schema, Document } from 'mongoose'
+import { model, Schema, Document, Types } from 'mongoose'
 
-interface IRole {
-  title: string
+interface ISystemRole {
   value: string
-  types: string[]
+  roles: Types.ObjectId[]
   active: boolean
   creationDate: number
 }
-export interface IRoleModel extends IRole, Document {}
 
-const roleSchema = new Schema({
-  title: String,
+export interface ISystemRoleModel extends ISystemRole, Document {}
+
+const systemRoleSchema = new Schema({
   value: String,
-  types: [String],
+  roles: [{ type: Schema.Types.ObjectId, ref: 'UserRole' }],
   active: { type: Boolean, default: true },
   creationDate: { type: Number, default: Date.now }
 })
 
-export default model<IRoleModel>('Role', roleSchema)
+export default model<ISystemRoleModel>('SystemRole', systemRoleSchema)

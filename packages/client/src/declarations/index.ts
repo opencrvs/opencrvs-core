@@ -596,7 +596,7 @@ async function getCurrentUserRole(): Promise<string> {
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as IUserDetails).role || ''
+  return (JSON.parse(userDetails) as IUserDetails).systemRole || ''
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -1339,7 +1339,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           userDetails?.practitionerId,
           10,
           Boolean(
-            userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+            userDetails?.systemRole &&
+              FIELD_AGENT_ROLES.includes(userDetails.systemRole)
           )
         )
 

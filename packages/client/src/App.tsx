@@ -67,6 +67,7 @@ import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearc
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
+import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -248,6 +249,12 @@ export function App(props: IAppProps) {
                                           roles={[Roles.NATIONAL_SYSTEM_ADMIN]}
                                           path={routes.APPLICATION_CONFIG}
                                           component={ApplicationConfig}
+                                        />
+                                        <ProtectedRoute
+                                          exact
+                                          roles={[Roles.NATIONAL_SYSTEM_ADMIN]}
+                                          path={routes.USER_ROLES_CONFIG}
+                                          component={UserRoles}
                                         />
                                         <ProtectedRoute
                                           exact
