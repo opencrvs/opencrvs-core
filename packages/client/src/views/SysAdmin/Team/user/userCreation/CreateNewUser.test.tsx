@@ -552,7 +552,7 @@ describe('edit user tests', () => {
     const field = group.fields.find(
       (field) => field.name === 'role'
     ) as ISelectFormFieldWithDynamicOptions
-    expect(field.dynamicOptions.options).not.toEqual({})
+    expect(field.hideValueInPreview).not.toEqual(true)
   })
 
   describe('when user is in update form page', () => {

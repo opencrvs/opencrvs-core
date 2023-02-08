@@ -47,8 +47,7 @@ import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdm
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { Content } from '@opencrvs/components/lib/Content'
-import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { selectSystemRoleMap } from '@client/views/SysAdmin/Team/selectors'
+import { selectSystemRoleMap } from '@client/user/selectors'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -134,7 +133,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     this.props.goBack()
   }
 
-  modifyData = async (values: any) => {
+  modifyData = (values: any) => {
     const { formData } = this.props
     if (
       values['registrationOffice'] !== '0' &&

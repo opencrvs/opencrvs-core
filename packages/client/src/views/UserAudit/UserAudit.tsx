@@ -137,7 +137,7 @@ export const UserAudit = () => {
     GetUserQueryVariables
   >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
-  const userType =
+  const userRole =
     user && intl.formatMessage({ id: getUserRoleIntlKey(user.role._id) })
 
   const toggleUserActivationModal = () => {
@@ -324,7 +324,7 @@ export const UserAudit = () => {
               />
               <Summary.Row
                 label={intl.formatMessage(userFormMessages.labelRole)}
-                value={userType}
+                value={userRole}
               />
               <Summary.Row
                 label={intl.formatMessage(userFormMessages.userDevice)}
