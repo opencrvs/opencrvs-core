@@ -173,13 +173,13 @@ type Mutation {
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   markEventAsReinstated(id: String!): Reinstated
+  markEventAsNotDuplicate(id: String!): ID!
   markEventAsArchived(
     id: String!
     reason: String
     comment: String
     duplicateTrackingId: String
   ): ID!
-  notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsVerified(
@@ -1456,6 +1456,7 @@ enum RegAction {
   DOWNLOADED
   VIEWED
   MARKED_AS_DUPLICATE
+  MARKED_AS_NOT_DUPLICATE
 }
 
 type StatusReason {

@@ -221,6 +221,7 @@ export interface IDeclaration {
   timeLoggedMS?: number
   writingDraft?: boolean
   operationHistories?: ITaskHistory[]
+  isNotDuplicate?: boolean
 }
 
 type Relation =
@@ -296,7 +297,12 @@ type Payment = {
 
 interface IArchiveDeclarationAction {
   type: typeof ARCHIVE_DECLARATION
-  payload: { declarationId: string; reason?: string; comment?: string }
+  payload: {
+    declarationId: string
+    reason?: string
+    comment?: string
+    duplicateTrackingId?: string
+  }
 }
 
 interface IStoreDeclarationAction {
@@ -560,11 +566,12 @@ export const getStorageDeclarationsFailed =
 export function archiveDeclaration(
   declarationId: string,
   reason?: string,
-  comment?: string
+  comment?: string,
+  duplicateTrackingId?: string
 ): IArchiveDeclarationAction {
   return {
     type: ARCHIVE_DECLARATION,
-    payload: { declarationId, reason, comment }
+    payload: { declarationId, reason, comment, duplicateTrackingId }
   }
 }
 
@@ -1596,7 +1603,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           payload: {
             id: declaration.id,
             reason: action.payload.reason || '',
-            comment: action.payload.comment || ''
+            comment: action.payload.comment || '',
+            duplicateTrackingId: action.payload.duplicateTrackingId || ''
           }
         }
         return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))

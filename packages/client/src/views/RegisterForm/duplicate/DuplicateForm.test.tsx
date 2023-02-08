@@ -122,5 +122,18 @@ describe('when in device of large viewport', () => {
         ).toBeFalsy()
       })
     })
+
+    describe('mark not a duplicate button test', () => {
+      it('mark not a duplicate button clicked', async () => {
+        duplicateFormComponent
+          .find('#not-a-duplicate')
+          .hostNodes()
+          .first()
+          .simulate('click')
+        expect(
+          duplicateFormComponent.find('#not-duplicate-modal').hostNodes()
+        ).toHaveLength(1)
+      })
+    })
   })
 })

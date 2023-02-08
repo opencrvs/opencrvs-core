@@ -1207,11 +1207,11 @@ export type Mutation = {
   markDeathAsVerified?: Maybe<DeathRegistration>
   markEventAsArchived: Scalars['ID']
   markEventAsDuplicate: Scalars['ID']
+  markEventAsNotDuplicate: Scalars['ID']
   markEventAsReinstated?: Maybe<Reinstated>
   markEventAsUnassigned: Scalars['ID']
   markEventAsVoided: Scalars['ID']
   modifyDraftStatus?: Maybe<FormDraft>
-  notADuplicate: Scalars['ID']
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
@@ -1358,6 +1358,10 @@ export type MutationMarkEventAsDuplicateArgs = {
   reason: Scalars['String']
 }
 
+export type MutationMarkEventAsNotDuplicateArgs = {
+  id: Scalars['String']
+}
+
 export type MutationMarkEventAsReinstatedArgs = {
   id: Scalars['String']
 }
@@ -1374,11 +1378,6 @@ export type MutationMarkEventAsVoidedArgs = {
 
 export type MutationModifyDraftStatusArgs = {
   formDraft: FormDraftStatusModifyInput
-}
-
-export type MutationNotADuplicateArgs = {
-  duplicateId: Scalars['String']
-  id: Scalars['String']
 }
 
 export type MutationReactivateSystemArgs = {
@@ -1869,6 +1868,7 @@ export enum RegAction {
   Assigned = 'ASSIGNED',
   Downloaded = 'DOWNLOADED',
   MarkedAsDuplicate = 'MARKED_AS_DUPLICATE',
+  MarkedAsNotDuplicate = 'MARKED_AS_NOT_DUPLICATE',
   Reinstated = 'REINSTATED',
   RequestedCorrection = 'REQUESTED_CORRECTION',
   Unassigned = 'UNASSIGNED',
@@ -3713,6 +3713,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       dhis2Notification?: boolean | null
       reason?: string | null
       otherReason?: string | null
+      duplicateOf?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4086,6 +4087,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       reason?: string | null
+      duplicateOf?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4361,6 +4363,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
+      duplicateOf?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -4443,6 +4446,15 @@ export type FetchDeathRegistrationForCertificationQuery = {
       } | null> | null
     } | null> | null
   } | null
+}
+
+export type MarkEventAsNotDuplicateMutationVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type MarkEventAsNotDuplicateMutation = {
+  __typename?: 'Mutation'
+  markEventAsNotDuplicate: string
 }
 
 type EventSearchFields_BirthEventSearchSet_Fragment = {

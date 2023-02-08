@@ -62,7 +62,8 @@ import {
   UNASSIGNED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
-  MARKED_AS_DUPLICATE
+  MARKED_AS_DUPLICATE,
+  MARKED_AS_NOT_DUPLICATE
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -978,6 +979,8 @@ export function getActionFromTask(task: fhir.Task) {
     return GQLRegAction.VIEWED
   } else if (findExtension(MARKED_AS_DUPLICATE, extensions)) {
     return GQLRegAction.MARKED_AS_DUPLICATE
+  } else if (findExtension(MARKED_AS_NOT_DUPLICATE, extensions)) {
+    return GQLRegAction.MARKED_AS_NOT_DUPLICATE
   }
   return null
 }
@@ -1007,24 +1010,30 @@ export function getMaritalStatusCode(fieldValue: string) {
   }
 }
 
-export function removeDuplicatesFromComposition(
+export async function removeDuplicatesFromComposition(
   composition: fhir.Composition,
   compositionId: string,
-  duplicateId: string
+  duplicateId?: string
 ) {
-  const removeAllDuplicates = compositionId === duplicateId
-  const updatedRelatesTo =
-    composition.relatesTo &&
-    composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
-      return (
-        relatesTo.code !== 'duplicate' ||
-        (!removeAllDuplicates &&
-          relatesTo.targetReference &&
-          relatesTo.targetReference.reference !== `Composition/${duplicateId}`)
-      )
-    })
-  composition.relatesTo = updatedRelatesTo
-  return composition
+  if (duplicateId) {
+    const removeAllDuplicates = compositionId === duplicateId
+    const updatedRelatesTo =
+      composition.relatesTo &&
+      composition.relatesTo.filter((relatesTo: fhir.CompositionRelatesTo) => {
+        return (
+          relatesTo.code !== 'duplicate' ||
+          (!removeAllDuplicates &&
+            relatesTo.targetReference &&
+            relatesTo.targetReference.reference !==
+              `Composition/${duplicateId}`)
+        )
+      })
+    composition.relatesTo = updatedRelatesTo
+    return composition
+  } else {
+    composition.relatesTo = []
+    return composition
+  }
 }
 
 export const fetchFHIR = <T = any>(

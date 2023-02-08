@@ -164,7 +164,7 @@ async function indexAndSearchComposition(
 
   await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body, client)
-  if (body.type !== 'IN_PROGRESS') {
+  if (body.type !== 'IN_PROGRESS' && body.type !== 'WAITING_VALIDATION') {
     await detectAndUpdateDuplicates(compositionId, composition, body)
   }
 }

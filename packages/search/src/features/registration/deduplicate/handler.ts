@@ -20,7 +20,15 @@ export async function deduplicateHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    await removeDuplicate(request.payload as fhir.Bundle, client)
+    const payload = request.payload as fhir.Bundle
+    const composition = payload.entry?.find(
+      (e) => e.resource?.resourceType === 'Composition'
+    )
+
+    await removeDuplicate(
+      composition?.resource as fhir.Composition & { id: string },
+      client
+    )
   } catch (error) {
     logger.error(`Search/searchDeclarationHandler: error: ${error}`)
     return internal(error)

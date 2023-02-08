@@ -31,6 +31,7 @@ export const REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL = `${OPENCRVS_SPECIFI
 export const REQUESTING_INDIVIDUAL = `${OPENCRVS_SPECIFICATION_URL}extension/requestingIndividual`
 export const HAS_SHOWED_VERIFIED_DOCUMENT = `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`
 export const VIEWED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regViewed`
+export const MARKED_AS_NOT_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsNotDuplicate`
 export const MARKED_AS_DUPLICATE = `${OPENCRVS_SPECIFICATION_URL}extension/markedAsDuplicate`
 export const DUPLICATE_TRACKING_ID = `${OPENCRVS_SPECIFICATION_URL}extension/duplicateTrackingId`
 

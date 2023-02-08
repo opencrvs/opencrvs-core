@@ -19,6 +19,7 @@ import { useIntl } from 'react-intl'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { useDispatch } from 'react-redux'
+import { updateDeclaration } from '@client/declarations/submissionMiddleware'
 import {
   ResponsiveModal,
   Select,
@@ -64,7 +65,8 @@ export const DuplicateForm = (props: IProps) => {
   const compositionId = props.declaration.id
   const dispatch = useDispatch()
   const { data } = props.declaration
-  const trackingIds = props.declaration.duplicates
+  const { duplicates, ...withoutDuplicates } = props.declaration
+  const trackingIds = duplicates
     ?.map((duplicate) => duplicate.trackingId)
     .join(', ')
 
@@ -83,11 +85,17 @@ export const DuplicateForm = (props: IProps) => {
     setComment(event.target.value)
   }
 
+  const [toggleNotDuplicate, setToggleNotDuplicate] = React.useState(false)
+
+  const toggleNotDuplicateModal = () => {
+    setToggleNotDuplicate((prevValue) => !prevValue)
+  }
+
   const notADuplicateButton = (
     <Button
       id="not-a-duplicate"
       onClick={() => {
-        alert('Not a duplicate')
+        toggleNotDuplicateModal()
       }}
       type="positive"
     >
@@ -118,6 +126,7 @@ export const DuplicateForm = (props: IProps) => {
         })}
         subtitle={intl.formatMessage(
           duplicateMessages.duplicateContentSubtitle,
+
           {
             trackingIds
           }
@@ -147,7 +156,12 @@ export const DuplicateForm = (props: IProps) => {
             onClick={() => {
               if (Boolean(selectedTrackingId)) {
                 dispatch(
-                  archiveDeclaration(compositionId, selectedTrackingId, comment)
+                  archiveDeclaration(
+                    compositionId,
+                    'duplicate',
+                    comment,
+                    selectedTrackingId
+                  )
                 )
                 dispatch(goToHome())
               }
@@ -173,7 +187,7 @@ export const DuplicateForm = (props: IProps) => {
                   setSelectedTrackingId(val)
                 }}
                 options={props.declaration.duplicates?.map((id) => ({
-                  value: id.compositionId,
+                  value: id.trackingId,
                   label: id.trackingId
                 }))}
               />
@@ -190,6 +204,45 @@ export const DuplicateForm = (props: IProps) => {
           </>
         }
       </ResponsiveModal>
+      <ResponsiveModal
+        id="not-duplicate-modal"
+        show={toggleNotDuplicate}
+        autoHeight={true}
+        responsive={false}
+        titleHeightAuto={true}
+        handleClose={() => toggleNotDuplicateModal()}
+        title={intl.formatMessage(
+          duplicateMessages.notDuplicateContentConfirmationTitle,
+          {
+            name: getName(),
+            trackingId: String(data.registration.trackingId)
+          }
+        )}
+        actions={[
+          <Button
+            type="tertiary"
+            id="not-duplicate-cancel"
+            key="not-duplicateRegistration-cancel"
+            onClick={() => toggleNotDuplicateModal()}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </Button>,
+          <Button
+            type="primary"
+            id="not-duplicate-confirm"
+            key="not-duplicateRegistration-confirm"
+            onClick={() => {
+              if (duplicates) {
+                withoutDuplicates.isNotDuplicate = true
+                updateDeclaration(dispatch, withoutDuplicates)
+              }
+              toggleNotDuplicateModal()
+            }}
+          >
+            {intl.formatMessage(buttonMessages.confirm)}
+          </Button>
+        ]}
+      ></ResponsiveModal>
     </>
   )
 }

@@ -18,7 +18,6 @@ import {
   IBirthCompositionBody,
   ICompositionBody
 } from '@search/elasticsearch/utils'
-
 import { get } from 'lodash'
 import { ISearchResponse } from '@search/elasticsearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
@@ -27,7 +26,7 @@ import { subYears, addYears, subMonths, addMonths } from 'date-fns'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 export const removeDuplicate = async (
-  bundle: fhir.Bundle,
+  bundle: fhir.Composition & { id: string },
   client: elasticsearch.Client
 ) => {
   const compositionId = bundle.id
@@ -41,12 +40,11 @@ export const removeDuplicate = async (
   await updateComposition(compositionId, body, client)
 }
 
-const extractRelatesToIDs = (bundle: fhir.Bundle) => {
+const extractRelatesToIDs = (bundle: fhir.Composition & { id: string }) => {
   const relatesToBundle = get(bundle, 'relatesTo') || []
 
   return relatesToBundle.map(
-    (item: { targetReference: { reference: string } }) =>
-      item.targetReference.reference.replace('Composition/', '')
+    (item) => item.targetReference?.reference?.replace('Composition/', '') ?? ''
   )
 }
 

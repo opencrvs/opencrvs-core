@@ -27,6 +27,7 @@ enum RegAction {
   DOWNLOADED
   VIEWED
   MARKED_AS_DUPLICATE
+  MARKED_AS_NOT_DUPLICATE
 }
 
 enum BirthRegType {
@@ -583,13 +584,13 @@ type Mutation {
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
+  markEventAsNotDuplicate(id: String!): ID! # removes duplicates from composition
   markEventAsArchived(
     id: String!
     reason: String
     comment: String
     duplicateTrackingId: String
   ): ID! # updates status to 'archived'
-  notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!

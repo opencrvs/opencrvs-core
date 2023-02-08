@@ -19,6 +19,7 @@ import {
   REQUEST_CORRECTION_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
   OPENCRVS_SPECIFICATION_URL,
+  MARKED_AS_NOT_DUPLICATE,
   MARKED_AS_DUPLICATE,
   DUPLICATE_TRACKING_ID
 } from '@gateway/features/fhir/constants'
@@ -49,7 +50,7 @@ import {
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
+import { COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { UnassignError } from '@gateway/utils/unassignError'
 import { UserInputError } from 'apollo-server-hapi'
 import {
@@ -388,6 +389,7 @@ export const resolvers: GQLResolver = {
       )
 
       await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(newTaskBundle))
+
       // return the taskId
       return taskEntry.resource.id
     },
@@ -467,44 +469,35 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async notADuplicate(_, { id, duplicateId }, authHeader) {
+    async markEventAsNotDuplicate(_, { id }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
       ) {
-        const composition = await fetchFHIR(
+        const composition: fhir.Composition = await fetchFHIR(
           `/Composition/${id}`,
           authHeader,
           'GET'
         )
-        removeDuplicatesFromComposition(composition, id, duplicateId)
+        await removeDuplicatesFromComposition(composition, id)
+        const compositionEntry: fhir.BundleEntry = {
+          resource: composition
+        }
 
-        await fetch(`${SEARCH_URL}/events/not-duplicate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/fhir+json',
-            ...authHeader
-          },
-          body: JSON.stringify(composition)
-        }).catch((error) => {
-          return Promise.reject(
-            new Error(`Search request failed: ${error.message}`)
-          )
-        })
+        const taskEntry = await getTaskEntry(id, authHeader)
 
-        await fetch(`${FHIR_URL}/Composition/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/fhir+json',
-            ...authHeader
-          },
-          body: JSON.stringify(composition)
-        }).catch((error) => {
-          return Promise.reject(
-            new Error(`FHIR request failed: ${error.message}`)
-          )
-        })
-
+        const extension: fhir.Extension = { url: MARKED_AS_NOT_DUPLICATE }
+        const taskBundle = taskBundleWithExtension(taskEntry, extension)
+        const payloadBundle: fhir.Bundle = {
+          ...taskBundle,
+          entry: [compositionEntry, ...taskBundle.entry]
+        }
+        await fetchFHIR(
+          '/Task',
+          authHeader,
+          'PUT',
+          JSON.stringify(payloadBundle)
+        )
         return composition.id
       } else {
         return await Promise.reject(
@@ -680,9 +673,9 @@ async function markEventAsRegistered(
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
-  const res = await fetchFHIR(`/Composition/${id}`, authHeader)
+  const composition = await fetchFHIR(`/Composition/${id}`, authHeader, 'GET')
 
-  return res
+  return composition
 }
 
 async function markEventAsCertified(
@@ -705,6 +698,7 @@ const ACTION_EXTENSIONS = [
   REINSTATED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
+  MARKED_AS_NOT_DUPLICATE,
   MARKED_AS_DUPLICATE,
   DUPLICATE_TRACKING_ID
 ]
