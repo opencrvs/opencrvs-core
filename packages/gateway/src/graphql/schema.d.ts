@@ -168,6 +168,8 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   history?: Array<GQLHistory | null>
 }
 
+export type GQLRecordDetails = GQLBirthRegistration | GQLDeathRegistration
+
 export interface GQLPerson {
   id?: string
   _fhirID?: string
