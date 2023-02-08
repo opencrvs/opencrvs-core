@@ -192,7 +192,7 @@ interface ICount {
 
 interface IUserInfo {
   name: string
-  systemRole: string
+  role: string
   avatar: JSX.Element
 }
 
@@ -381,7 +381,7 @@ export const NavigationView = (props: IFullProps) => {
       buildVersion={import.meta.env.VITE_APP_VERSION ?? 'Development'}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
-      role={userInfo && userInfo.systemRole}
+      role={userInfo && userInfo.role}
       avatar={() => userInfo && userInfo.avatar}
       warning={isMobileDevice() ? <></> : <UnpublishedWarning compact={true} />}
       className={className}
