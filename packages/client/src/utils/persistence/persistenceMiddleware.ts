@@ -56,7 +56,7 @@ function getQueriesToPrefetch(locationId: string, officeSelected: boolean) {
         populationYear: new Date().getFullYear(),
         officeSelected
       },
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'network-only'
     },
     {
       query: PERFORMANCE_METRICS,
@@ -66,7 +66,7 @@ function getQueriesToPrefetch(locationId: string, officeSelected: boolean) {
         timeStart: defaultTimeStart,
         timeEnd: defaultTimeEnd
       },
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'network-only'
     },
     {
       query: CORRECTION_TOTALS,
@@ -76,7 +76,7 @@ function getQueriesToPrefetch(locationId: string, officeSelected: boolean) {
         timeStart: defaultTimeStart,
         timeEnd: defaultTimeEnd
       },
-      fetchPolicy: 'cache-and-network'
+      fetchPolicy: 'network-only'
     }
   ]
 }
@@ -85,6 +85,7 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
   (next) =>
   async (action: Action) => {
     next(action)
+    if (import.meta.env.MODE === 'test') return
     if (action.type === USER_DETAILS_AVAILABLE) {
       const userDetails = getState().profile.userDetails
       if (!isFieldAgent(userDetails!)) {
