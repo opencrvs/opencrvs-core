@@ -91,8 +91,8 @@ const deathSchema = new Schema<IDeath>({
 const marriageSchema = new Schema<IMarriage>({
   REGISTRATION_TARGET: { type: Number, default: 45 },
   FEE: {
-    ON_TIME: Number,
-    DELAYED: Number
+    ON_TIME: { type: Number, default: 10 },
+    DELAYED: { type: Number, default: 45 }
   }
 })
 
