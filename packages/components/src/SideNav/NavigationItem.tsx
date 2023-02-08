@@ -81,6 +81,7 @@ const IconContainer = styled.div`
   width: 24px;
   display: flex;
   justify-content: center;
+  flex-shrink: 0;
 `
 
 export const NavigationItem = ({

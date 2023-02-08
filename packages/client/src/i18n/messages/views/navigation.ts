@@ -82,7 +82,7 @@ const messagesToDefine: INavigationMessages = {
     id: 'navigation.performance'
   },
   team: {
-    defaultMessage: 'Team',
+    defaultMessage: 'Offices',
     description: 'Team label in navigation',
     id: 'navigation.team'
   },
@@ -102,8 +102,8 @@ const messagesToDefine: INavigationMessages = {
     id: 'navigation.reports'
   },
   organisation: {
-    defaultMessage: 'Organisation',
-    description: 'Organisations label in navigation',
+    defaultMessage: 'Administrations',
+    description: 'Admin label in navigation',
     id: 'navigation.organisation'
   },
   completenessRates: {

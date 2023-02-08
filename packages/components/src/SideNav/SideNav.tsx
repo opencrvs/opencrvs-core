@@ -25,12 +25,7 @@ export interface ISideNavProps {
   applicationVersion: string
   buildVersion: string
 }
-<<<<<<< HEAD:packages/components/src/SideNav/SideNav.tsx
 const SideNavContainer = styled.div<{
-=======
-
-const LeftNavigationContainer = styled.div<{
->>>>>>> bb56c85965d8858348a01eb784cb14e3cec073d4:packages/components/src/SideNavigation/LeftNavigation.tsx
   navigationWidth?: number
 }>`
   top: 0;
@@ -82,64 +77,42 @@ const ApplicationName = styled.div`
   text-overflow: ellipsis;
 `
 
-const Version = styled.div`
-  color: ${({ theme }) => theme.colors.grey400};
-  ${({ theme }) => theme.fonts.reg14};
-  height: auto;
-  padding: 16px;
+export const SideNav = (props: ISideNavProps) => {
+  const SideNavHeader = styled.div`
+    flex: 0 0 auto;
+  `
 
-  span:last-child {
-    display: none;
-  }
+  const NavItems = styled.div`
+    flex: 1 1 auto;
+    overflow-y: auto;
+  `
 
-  :hover {
-    span:first-child {
+  const SideNavFooter = styled.div`
+    color: ${({ theme }) => theme.colors.grey400};
+    ${({ theme }) => theme.fonts.reg14};
+    height: auto;
+    padding: 16px;
+
+    span:last-child {
       display: none;
     }
 
-    span:last-child {
-      display: inline;
+    :hover {
+      span:first-child {
+        display: none;
+      }
+
+      span:last-child {
+        display: inline;
+      }
     }
-  }
-`
-
-<<<<<<< HEAD:packages/components/src/SideNav/SideNav.tsx
-export const SideNav = (props: ISideNavProps) => {
-=======
-const Container = styled.div`
-  flex: 0 0 auto;
-`
-
-const MenuItem = styled.div`
-  flex: 1 1 auto;
-  overflow-y: auto;
-`
-
-export const LeftNavigation = (props: ILeftNavigationProps) => {
->>>>>>> bb56c85965d8858348a01eb784cb14e3cec073d4:packages/components/src/SideNavigation/LeftNavigation.tsx
+  `
   return (
     <SideNavContainer
       navigationWidth={props.navigationWidth}
       className={props.className}
     >
-<<<<<<< HEAD:packages/components/src/SideNav/SideNav.tsx
-      <ApplicationNameContainer>
-        <ApplicationName>{props.applicationName}</ApplicationName>
-      </ApplicationNameContainer>
-      <UserInfo>
-        {props.avatar && props.avatar()}
-        <UserName>{props.name && props.name}</UserName>
-        <Role>{props.role && props.role}</Role>
-      </UserInfo>
-      {props.children && props.children}
-      <Version>
-        {props.warning}
-        <span>OpenCRVS {props.applicationVersion}</span>
-        <span>: {props.buildVersion}</span>
-      </Version>
-    </SideNavContainer>
-=======
-      <Container>
+      <SideNavHeader>
         <ApplicationNameContainer>
           <ApplicationName>{props.applicationName}</ApplicationName>
         </ApplicationNameContainer>
@@ -150,16 +123,13 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
             <Role>{props.role && props.role}</Role>
           </>
         </UserInfo>
-      </Container>
-      <MenuItem>{props.children && props.children}</MenuItem>
-      <Container>
-        <Version>
-          {props.warning}
-          <span>OpenCRVS {props.applicationVersion}</span>
-          <span>: {props.buildVersion}</span>
-        </Version>
-      </Container>
-    </LeftNavigationContainer>
->>>>>>> bb56c85965d8858348a01eb784cb14e3cec073d4:packages/components/src/SideNavigation/LeftNavigation.tsx
+      </SideNavHeader>
+      <NavItems>{props.children && props.children}</NavItems>
+      <SideNavFooter>
+        {props.warning}
+        <span>OpenCRVS {props.applicationVersion}</span>
+        <span>: {props.buildVersion}</span>
+      </SideNavFooter>
+    </SideNavContainer>
   )
 }
