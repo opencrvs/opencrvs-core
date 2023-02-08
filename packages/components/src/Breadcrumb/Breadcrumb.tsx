@@ -16,7 +16,7 @@ import { Text } from '../Text'
 import styled from 'styled-components'
 
 const Container = styled.div`
-  font-size: 14px !important;
+  ${({ theme }) => theme.fonts.reg14};
 `
 
 export interface IBreadCrumbData {
