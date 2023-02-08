@@ -16,7 +16,7 @@ import { Text } from '../Text'
 import styled from 'styled-components'
 
 const Container = styled.div`
-  font-size: 14px !important;
+  ${({ theme }) => theme.fonts.reg14};
 `
 
 export interface IBreadCrumbData {
@@ -35,7 +35,7 @@ export const BreadCrumb = ({ items = [], onSelect }: IBreadCrumbProps) => {
   }
 
   return (
-    <Container >
+    <Container>
       <Stack gap={4} direction="row" wrap>
         {items.length > 0 &&
           items.map((x, idx) => {
