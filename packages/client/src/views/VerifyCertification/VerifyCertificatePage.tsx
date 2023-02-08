@@ -34,7 +34,7 @@ import {
 } from '@client/offline/selectors'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Spinner, Stack } from '@opencrvs/components'
-import {Toast} from "@opencrvs/components/lib/Toast/Toast";
+import { Toast } from '@opencrvs/components/lib/Toast/Toast'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -97,6 +97,45 @@ const StyledSpinner = styled(Spinner)`
   height: 30px;
 `
 
+const fakeData = [
+  {
+    id: 'da3b3969-2f94-4e9d-bcbd-78790c9d96e9',
+    child: {
+      id: '2540185c-a776-11ed-afa1-0242ac120002',
+      identifier: [
+        {
+          type: 'NATIONAL_ID'
+        }
+      ],
+      name: [
+        {
+          firstNames: 'Ronald',
+          familyName: 'Ndi'
+        }
+      ],
+      gender: 'MALE',
+      birthDate: '2013-06-03'
+    }
+  }
+]
+
+// mother: Person # -> .section(code='mother-details').entry.reference
+// father: Person # -> .section(code='father-details').entry.reference
+// informant: RelatedPerson # -> .section(code='informant-details').entry.reference
+// eventLocation: Location
+// birthType: BirthType # -> Observation.valueInteger
+// questionnaire: [QuestionnaireQuestion]
+// weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
+// attendantAtBirth: AttendantType # -> Observation.valueString
+// otherAttendantAtBirth: String
+// birthRegistrationType: BirthRegType # -> Observation.valueString
+// childrenBornAliveToMother: Int # -> Observation.valueInteger
+// foetalDeathsToMother: Int # -> Observation.valueInteger
+// lastPreviousLiveBirth: Date # -> Observation.valueDateTime
+// createdAt: Date # -> .date($first)
+// updatedAt: Date # -> .date
+// history: [History]
+
 export function VerifyCertificatePage() {
   const intl = useIntl()
 
@@ -135,7 +174,7 @@ export function VerifyCertificatePage() {
         constantsMessages.skipToMainContent
       )}
     >
-      <Container size={ContentSize.NORMAL} checking={fetchData}>
+      <Container size={ContentSize.NORMAL} checking={fetchData || timeOut}>
         <LogoDiv>
           <CountryLogo src={logo} />
         </LogoDiv>
