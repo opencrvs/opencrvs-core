@@ -81,12 +81,15 @@ beforeEach(async () => {
 })
 
 describe('application config page test', () => {
-  it('should shows birth, and death tab button', async () => {
+  it('should shows birth, death and marriage tab button', async () => {
     expect(testComponent.find('#tab_general').hostNodes().text()).toBe(
       'General'
     )
     expect(testComponent.find('#tab_birth').hostNodes().text()).toBe('Birth')
     expect(testComponent.find('#tab_death').hostNodes().text()).toBe('Death')
+    expect(testComponent.find('#tab_marriage').hostNodes().text()).toBe(
+      'Marriage'
+    )
   })
 })
 
@@ -855,5 +858,164 @@ describe('country logo update test', () => {
     testComponent.update()
     await flushPromises()
     expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
+  })
+})
+
+describe('application marriage registration target test', () => {
+  it('should show the application marriage late registration target change modal of click on change', async () => {
+    testComponent.find('#tab_marriage').hostNodes().first().simulate('click')
+    testComponent
+      .find('#MARRIAGE_REGISTRATION_TARGET')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    expect(
+      testComponent.find('#MARRIAGE_REGISTRATION_TARGETModal').hostNodes()
+    ).toHaveLength(1)
+  })
+
+  it('should change the marriage registration target days if click on apply', async () => {
+    testComponent.find('#tab_marriage').hostNodes().first().simulate('click')
+    testComponent
+      .find('#MARRIAGE_REGISTRATION_TARGET')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#applicationMarriageRegTarget')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'applicationMarriageRegTarget', value: 10 }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    testComponent.update()
+    await flushPromises()
+    expect(
+      testComponent
+        .find('#MARRIAGE_REGISTRATION_TARGET_value')
+        .hostNodes()
+        .first()
+        .text()
+    ).toContain('10')
+  })
+
+  it('should show success notification if appliction config change', async () => {
+    testComponent.find('#tab_marriage').hostNodes().first().simulate('click')
+    testComponent
+      .find('#MARRIAGE_REGISTRATION_TARGET')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#applicationMarriageRegTarget')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'applicationMarriageRegTarget', value: 5 }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    testComponent.update()
+    await flushPromises()
+    expect(
+      testComponent
+        .find('#MARRIAGE_REGISTRATION_TARGET_notification')
+        .hostNodes()
+        .text()
+    ).toBe('Marriage registration target days updated')
+  })
+})
+
+describe('application marriage registration fee test', () => {
+  it('should change the marriage registration on time fee if click on apply', async () => {
+    testComponent.find('#tab_marriage').hostNodes().first().simulate('click')
+    testComponent
+      .find('#MARRIAGE_ON_TIME_FEE')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#applicationMarriageOnTimeFee')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'applicationMarriageOnTimeFee', value: 10 }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    testComponent.update()
+    await flushPromises()
+    expect(
+      testComponent
+        .find('#MARRIAGE_ON_TIME_FEE_value')
+        .hostNodes()
+        .first()
+        .text()
+    ).toContain('10')
+  })
+
+  it('should show success notification if appliction config change', async () => {
+    testComponent.find('#tab_marriage').hostNodes().first().simulate('click')
+    testComponent
+      .find('#MARRIAGE_ON_TIME_FEE')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#applicationMarriageOnTimeFee')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'applicationMarriageOnTimeFee', value: 10 }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    testComponent.update()
+    await flushPromises()
+    expect(
+      testComponent
+        .find('#MARRIAGE_ON_TIME_FEE_notification')
+        .hostNodes()
+        .text()
+    ).toBe('Marriage on time fee updated')
+  })
+
+  it('should change the marriage registration delayed fee if click on apply', async () => {
+    testComponent.find('#tab_marriage').hostNodes().first().simulate('click')
+    testComponent
+      .find('#MARRIAGE_DELAYED_FEE')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#applicationMarriageDelayedFee')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'applicationMarriageDelayedFee', value: 15 }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    testComponent.update()
+    await flushPromises()
+    expect(
+      testComponent.find('#MARRIAGE_DELAYED_FEE_value').hostNodes().at(1).text()
+    ).toContain('15')
+  })
+
+  it('should show success notification if appliction config change', async () => {
+    testComponent.find('#tab_marriage').hostNodes().first().simulate('click')
+    testComponent
+      .find('#MARRIAGE_DELAYED_FEE')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#applicationMarriageDelayedFee')
+      .hostNodes()
+      .simulate('change', {
+        target: { id: 'applicationMarriageDelayedFee', value: 15 }
+      })
+    testComponent.find('#apply_change').hostNodes().simulate('click')
+    testComponent.update()
+    await flushPromises()
+    expect(
+      testComponent
+        .find('#MARRIAGE_DELAYED_FEE_notification')
+        .hostNodes()
+        .text()
+    ).toBe('Marriage delayed fee updated')
   })
 })

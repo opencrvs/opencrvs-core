@@ -159,7 +159,7 @@ export function MarriageFeeOnTime() {
                   )}
                 </span>
                 <HalfWidthInput
-                  id="applicationDeathOnTimeFee"
+                  id="applicationMarriageOnTimeFee"
                   type="text"
                   error={false}
                   value={marriageOnTimeFee}
