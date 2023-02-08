@@ -43,7 +43,7 @@ const messagesToDefine = {
   },
   signatureInputDescription: {
     defaultMessage:
-      'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Nigeria.',
+      'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.',
     description: 'Description awknowledging the correctness of the declaration',
     id: 'review.signature.input.description'
   },
