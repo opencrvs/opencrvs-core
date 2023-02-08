@@ -121,18 +121,6 @@ export function UserRoleManagementModal(props: IProps) {
   }
 
   const updateRole = () => {
-    const newUserRoles = userRoles.map((userRole) => {
-      return {
-        ...userRole,
-        labels: userRole.labels.map((label) => {
-          if (label.lang === currentLanguage) {
-            return { ...label }
-          }
-          return label
-        })
-      }
-    })
-
     const newLabels = availableLangs.map((lang) => {
       if (lang === currentLanguage) {
         return {
@@ -143,13 +131,9 @@ export function UserRoleManagementModal(props: IProps) {
       return { lang: lang, label: '' }
     })
 
-    newUserRoles.push({
-      labels: newLabels
-    })
-    setUserRoles(newUserRoles)
+    setUserRoles([...userRoles, { labels: newLabels }])
     setCurrentClipBoard('')
-    const newActiveItems = new Array(userRoles.length).fill(false)
-    setActives(newActiveItems)
+    setActives(new Array(userRoles.length).fill(false))
   }
 
   return (
@@ -230,10 +214,9 @@ export function UserRoleManagementModal(props: IProps) {
                   })
                   setUserRoles(newUserRoles)
                 }}
-                onBlur={() => {
-                  const newActiveItems = [...userRoles.map((e) => true)]
-                  setActives(newActiveItems)
-                }}
+                onBlur={() =>
+                  setActives(new Array(userRoles.length).fill(true))
+                }
               />
               {actives[index] && (
                 <Button

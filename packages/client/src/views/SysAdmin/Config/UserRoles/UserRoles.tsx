@@ -51,7 +51,6 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useModal } from '@client/hooks/useModal'
 import { UserRoleManagementModal } from '@client/views/UserRoles/UserRoleManagementModal'
 import { offlineDataReady } from '@client/offline/actions'
-import { mockOfflineDataDispatch } from '@client/tests/util'
 import { getOfflineData } from '@client/offline/selectors'
 
 export type RolesInput = (Omit<Role, '_id'> & { _id?: string })[]
@@ -59,13 +58,6 @@ export type RolesInput = (Omit<Role, '_id'> & { _id?: string })[]
 export type ISystemRole = NonNullable<
   GetSystemRolesQuery['getSystemRoles']
 >[number]
-
-export type IRoles = Array<{
-  labels: Array<{
-    lang: string
-    label: string
-  }> | null
-}>
 
 const UserRoles = () => {
   const intl = useIntl()
@@ -179,12 +171,9 @@ const UserRoles = () => {
                     value={
                       <Value id={`${systemRole?.value}_value`}>
                         <Stack direction="column" alignItems="stretch" gap={2}>
-                          {getUserRole(
-                            language,
-                            systemRole?.roles as IRoles
-                          ).map((role) => {
-                            return <span>{role}</span>
-                          })}
+                          {systemRole.roles.map((role) => (
+                            <span>{getUserRole(language, role)}</span>
+                          ))}
                         </Stack>
                       </Value>
                     }
