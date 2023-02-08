@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import React from 'react'
+
 import styled from '@client/styledComponents'
 import {
   GQLLocation,
@@ -19,7 +21,6 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
 import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
-import React from 'react'
 import { getPercentage } from '@client/utils/data-formatting'
 import { FormattedNumber, IntlShape } from 'react-intl'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'

@@ -45,7 +45,8 @@ import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAudit
 import {
   GetUserQuery,
   GetUserQueryVariables,
-  HumanName
+  HumanName,
+  User
 } from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -345,7 +346,7 @@ export const UserAudit = () => {
           </>
           <UserAuditActionModal
             show={modalVisible}
-            user={data.getUser!}
+            user={data.getUser! as User}
             onClose={() => toggleUserActivationModal()}
             onConfirmRefetchQueries={[
               {

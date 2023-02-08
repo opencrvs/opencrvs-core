@@ -55,7 +55,9 @@ import {
   VS_EXPORTS,
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST
+  PERFORMANCE_REGISTRATIONS_LIST,
+  ORGANISATIONS_INDEX,
+  INFORMANT_NOTIFICATION
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
@@ -174,6 +176,11 @@ export function goToHome() {
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
+
+export function goToInformantNotification() {
+  return push(INFORMANT_NOTIFICATION)
+}
+
 export function goToVSExport() {
   return push(VS_EXPORTS)
 }
@@ -225,12 +232,14 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
 export function goToPerformanceHome(
   timeStart: Date = startOfMonth(subMonths(new Date(Date.now()), 11)),
   timeEnd: Date = new Date(Date.now()),
+  event?: Event,
   locationId?: string
 ) {
   return push({
     pathname: PERFORMANCE_HOME,
     search: stringify({
       locationId,
+      event,
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString()
     })
@@ -244,6 +253,10 @@ export function goToTeamUserList(id: string) {
       locationId: id
     })
   })
+}
+
+export function goToOrganizationList(locationId?: string | undefined | null) {
+  return push(formatUrl(ORGANISATIONS_INDEX, { locationId: locationId ?? '' }))
 }
 
 export function goToSystemList() {
@@ -639,6 +652,7 @@ export function goToPerformanceView(userDetails: IUserDetails) {
   return goToPerformanceHome(
     undefined,
     undefined,
+    undefined,
     getDefaultPerformanceLocationId(userDetails)
   )
 }
@@ -649,6 +663,10 @@ export function goToTeamView(userDetails: IUserDetails) {
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
     )
   }
+}
+
+export function goToOrganisationView(userDetails: IUserDetails) {
+  return goToOrganizationList()
 }
 
 export type INavigationState = undefined

@@ -21,12 +21,19 @@ export interface ICountryLogo {
   fileName: string
   file: string
 }
+
+export interface ILoginBackground {
+  backgroundColor: string
+  backgroundImage: string
+  imageFit: string
+}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
   SENTRY: string
   LOGROCKET: string
+  LOGIN_BACKGROUND: ILoginBackground
 }
 
 export interface IApplicationConfigResponse {
@@ -86,7 +93,7 @@ export function request<T>(options: AxiosRequestConfig) {
 
 const getApplicationConfig = () => {
   return request<IApplicationConfigResponse>({
-    url: resolve(window.config.CONFIG_API_URL, '/loginConfig'),
+    url: resolve(window.config.CONFIG_API_URL, '/publicConfig'),
     method: 'GET'
   })
 }

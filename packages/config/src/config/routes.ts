@@ -40,12 +40,18 @@ import {
   modifyDraftStatusHandler,
   requestSchema as modifyFormDraftReqSchema
 } from '@config/handlers/formDraft/updateFormDraft/handler'
-
 import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
 import {
   deleteFormDraftHandler,
   requestSchema as deleteFormDraftReqSchema
 } from '@config/handlers/formDraft/deleteFormDraft/handler'
+import createInformantSMSNotificationHandler, {
+  requestSchema as createInformantSMSNotificationReqSchema
+} from '@config/handlers/informantSMSNotifications/createInformantSMSNotification/handler'
+import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
+import updateInformantSMSNotificationHandler, {
+  requestSchema as updateInformantSMSNotificationReqSchema
+} from '@config/handlers/informantSMSNotifications/updateInformantSMSNotification/handler'
 import getSystems from '@config/handlers/system/systemHandler'
 import {
   createFormDatasetHandler,
@@ -102,7 +108,7 @@ export default function getRoutes() {
     },
     {
       method: 'GET',
-      path: '/loginConfig',
+      path: '/publicConfig',
       handler: getLoginConfigHandler,
       config: {
         auth: false,
@@ -347,6 +353,54 @@ export default function getRoutes() {
         },
         validate: {
           payload: formDatasetSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/informantSMSNotification',
+      handler: createInformantSMSNotificationHandler,
+      config: {
+        tags: ['api'],
+        description: 'Creates informantSMSNotifications',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: createInformantSMSNotificationReqSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/informantSMSNotification',
+      handler: getInformantSMSNotificationsHandler,
+      config: {
+        tags: ['api'],
+        description: 'Get informantSMSNotifications',
+        auth: {
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.VALIDATE
+          ]
+        }
+      }
+    },
+    {
+      method: 'PUT',
+      path: '/informantSMSNotification',
+      handler: updateInformantSMSNotificationHandler,
+      config: {
+        tags: ['api'],
+        description: 'Update informantSMSNotification',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateInformantSMSNotificationReqSchema
         }
       }
     }

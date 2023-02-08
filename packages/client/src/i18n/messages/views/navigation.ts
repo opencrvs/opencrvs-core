@@ -22,6 +22,7 @@ interface INavigationMessages
   print: MessageDescriptor
   application: MessageDescriptor
   performance: MessageDescriptor
+  organisation: MessageDescriptor
   team: MessageDescriptor
   vsexports: MessageDescriptor
   config: MessageDescriptor
@@ -29,6 +30,9 @@ interface INavigationMessages
   completenessRates: MessageDescriptor
   form: MessageDescriptor
   integration: MessageDescriptor
+  communications: MessageDescriptor
+  informantnotification: MessageDescriptor
+  outbox: MessageDescriptor
 }
 
 const messagesToDefine: INavigationMessages = {
@@ -97,6 +101,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Reports label in navigation',
     id: 'navigation.reports'
   },
+  organisation: {
+    defaultMessage: 'Organisation',
+    description: 'List of organisations',
+    id: 'navigation.organisation'
+  },
   completenessRates: {
     defaultMessage: 'Completeness rates',
     description: 'Completeness rates in navigation',
@@ -111,6 +120,16 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Integrations',
     description: 'Integration forms label in navigation',
     id: 'navigation.integration'
+  },
+  communications: {
+    defaultMessage: 'Communications',
+    description: 'Communications label in navigation',
+    id: 'navigation.communications'
+  },
+  informantnotification: {
+    defaultMessage: 'Informant notifications',
+    description: 'Informant notifications label in navigation',
+    id: 'navigation.informantNotification'
   },
   outbox: {
     defaultMessage: 'Outbox',
