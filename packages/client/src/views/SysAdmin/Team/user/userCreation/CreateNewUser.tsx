@@ -23,9 +23,7 @@ import styled from '@client/styledComponents'
 import { GET_USER } from '@client/user/queries'
 import {
   clearUserFormData,
-  fetchAndStoreUserData,
-  storeUserFormData,
-  processRoles
+  fetchAndStoreUserData
 } from '@client/user/userReducer'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
@@ -39,8 +37,8 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
+import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 
 interface IMatchParams {
   userId?: string
@@ -63,10 +61,8 @@ type IUserProps = {
 
 interface IDispatchProps {
   goBack: typeof goBack
-  storeUserFormData: typeof storeUserFormData
   clearUserFormData: typeof clearUserFormData
   fetchAndStoreUserData: typeof fetchAndStoreUserData
-  processRoles: typeof processRoles
 }
 
 export type Props = RouteComponentProps<IMatchParams> &
@@ -108,9 +104,10 @@ class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
         userId
       })
     }
-    if (this.props.match.params.locationId) {
-      this.props.processRoles(this.props.match.params.locationId)
-    }
+  }
+
+  async componentWillUnmount() {
+    this.props.clearUserFormData()
   }
 
   renderLoadingPage = () => {
@@ -277,8 +274,6 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
 
 export const CreateNewUser = connect(mapStateToProps, {
   goBack,
-  storeUserFormData,
   clearUserFormData,
-  fetchAndStoreUserData,
-  processRoles
+  fetchAndStoreUserData
 })(injectIntl(withApollo<Props>(CreateNewUserComponent)))

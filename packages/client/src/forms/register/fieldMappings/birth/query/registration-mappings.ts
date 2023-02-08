@@ -106,6 +106,11 @@ export function getBirthRegistrationSectionTransformer(
       sectionId
     )
   }
+
+  if (queryData[sectionId].informantsSignature) {
+    transformedData[sectionId].informantsSignature =
+      queryData[sectionId].informantsSignature
+  }
 }
 
 export function registrationNumberTransformer(
@@ -278,8 +283,8 @@ export const roleUserTransformer = (
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
-    history?.user?.role
-      ? (userMessages[history.user.role] as MessageDescriptor &
+    history?.user?.systemRole
+      ? (userMessages[history.user.systemRole] as MessageDescriptor &
           Record<string, string>)
       : ''
 }

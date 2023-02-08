@@ -35,6 +35,7 @@ import {
   goToApplicationConfig,
   goToAdvancedSearchResult,
   goToVSExport,
+  goToUserRolesConfig,
   goToOrganisationView,
   goToInformantNotification
 } from '@client/navigation'
@@ -44,7 +45,6 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
-import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
@@ -91,6 +91,7 @@ export const WORKQUEUE_TABS = {
   application: 'application',
   certificate: 'certificate',
   systems: 'integration',
+  userRoles: 'userroles',
   settings: 'settings',
   declarationForms: 'form',
   logout: 'logout',
@@ -178,6 +179,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.communications,
+    WORKQUEUE_TABS.userRoles,
     WORKQUEUE_TABS.informantNotification,
     GROUP_ID.menuGroup
   ],
@@ -216,6 +218,7 @@ interface IDispatchProps {
   goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
   goToFormConfigAction: typeof goToFormConfigHome
+  goToUserRolesConfigAction: typeof goToUserRolesConfig
   goToApplicationConfigAction: typeof goToApplicationConfig
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
@@ -290,6 +293,7 @@ export const NavigationView = (props: IFullProps) => {
     loadWorkqueueStatuses = true,
     activeMenuItem,
     goToCertificateConfigAction,
+    goToUserRolesConfigAction,
     goToVSExportsAction,
     goToFormConfigAction,
     goToSystemViewAction,
@@ -318,7 +322,8 @@ export const NavigationView = (props: IFullProps) => {
     WORKQUEUE_TABS.application,
     WORKQUEUE_TABS.certificate,
     WORKQUEUE_TABS.declarationForms,
-    WORKQUEUE_TABS.systems
+    WORKQUEUE_TABS.systems,
+    WORKQUEUE_TABS.userRoles
   ]
   const conmmunicationTab: string[] = [WORKQUEUE_TABS.informantNotification]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
@@ -339,7 +344,7 @@ export const NavigationView = (props: IFullProps) => {
     updateRegistrarWorkqueue(
       userDetails.practitionerId,
       10, // Page size shouldn't matter here as we're only interested in totals
-      userDetails.role === 'FIELD_AGENT'
+      userDetails.systemRole === 'FIELD_AGENT'
     )
   }, [userDetails, updateRegistrarWorkqueue, loadWorkqueueStatuses])
 
@@ -389,7 +394,7 @@ export const NavigationView = (props: IFullProps) => {
       warning={isMobileDevice() ? <></> : <UnpublishedWarning compact={true} />}
       className={className}
     >
-      {userDetails?.role === 'FIELD_AGENT' ? (
+      {userDetails?.systemRole === 'FIELD_AGENT' ? (
         <>
           <NavigationGroup>
             <NavigationItem
@@ -448,13 +453,13 @@ export const NavigationView = (props: IFullProps) => {
         </>
       ) : (
         <>
-          {userDetails?.role &&
-            USER_SCOPE[userDetails.role].includes(
+          {userDetails?.systemRole &&
+            USER_SCOPE[userDetails.systemRole].includes(
               GROUP_ID.declarationGroup
             ) && (
               <NavigationGroup>
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.inProgress
                   ) && (
                     <NavigationItem
@@ -471,8 +476,8 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.readyForReview
                   ) && (
                     <NavigationItem
@@ -489,8 +494,8 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.requiresUpdate
                   ) && (
                     <NavigationItem
@@ -507,8 +512,8 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.sentForApproval
                   ) && (
                     <NavigationItem
@@ -540,8 +545,8 @@ export const NavigationView = (props: IFullProps) => {
                     }}
                   />
                 )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.readyToPrint
                   ) && (
                     <NavigationItem
@@ -558,8 +563,8 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.outbox
                   ) && (
                     <NavigationItem
@@ -578,11 +583,11 @@ export const NavigationView = (props: IFullProps) => {
                   )}
               </NavigationGroup>
             )}
-          {userDetails?.role &&
-            USER_SCOPE[userDetails.role].includes(GROUP_ID.menuGroup) && (
+          {userDetails?.systemRole &&
+            USER_SCOPE[userDetails.systemRole].includes(GROUP_ID.menuGroup) && (
               <NavigationGroup>
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.performance
                   ) && (
                     <NavigationItem
@@ -600,8 +605,8 @@ export const NavigationView = (props: IFullProps) => {
                       }
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.vsexports
                   ) && (
                     <NavigationItem
@@ -617,8 +622,8 @@ export const NavigationView = (props: IFullProps) => {
                       }
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.organisation
                   ) && (
                     <NavigationItem
@@ -636,8 +641,8 @@ export const NavigationView = (props: IFullProps) => {
                       }
                     />
                   )}
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.team
                   ) && (
                     <NavigationItem
@@ -654,8 +659,8 @@ export const NavigationView = (props: IFullProps) => {
                     />
                   )}
 
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.config
                   ) && (
                     <>
@@ -729,13 +734,25 @@ export const NavigationView = (props: IFullProps) => {
                               activeMenuItem === WORKQUEUE_TABS.systems
                             }
                           />
+
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.userRoles}`}
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.userRoles]
+                            )}
+                            onClick={goToUserRolesConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.userRoles
+                            }
+                          />
                         </>
                       )}
                     </>
                   )}
 
-                {userDetails?.role &&
-                  USER_SCOPE[userDetails.role].includes(
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.communications
                   ) && (
                     <>
@@ -870,6 +887,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.systems
       : window.location.href.endsWith(WORKQUEUE_TABS.informantNotification)
       ? WORKQUEUE_TABS.informantNotification
+      : window.location.href.endsWith(WORKQUEUE_TABS.userRoles)
+      ? WORKQUEUE_TABS.userRoles
       : ''
   }
 }
@@ -883,6 +902,7 @@ export const Navigation = connect<
   goToHomeTab,
   goToCertificateConfigAction: goToCertificateConfig,
   goToFormConfigAction: goToFormConfigHome,
+  goToUserRolesConfigAction: goToUserRolesConfig,
   goToApplicationConfigAction: goToApplicationConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,

@@ -114,6 +114,12 @@ interface IConfigMessages
   registrationSMS: MessageDescriptor
   rejectionSMS: MessageDescriptor
   informantNotificationUpdatingMessage: MessageDescriptor
+  userRoles: MessageDescriptor
+  userRolesSubtitle: MessageDescriptor
+  systemRoles: MessageDescriptor
+  role: MessageDescriptor
+  roleUpdateInstruction: MessageDescriptor
+  systemRoleSuccessMsg: MessageDescriptor
 }
 
 const messagesToDefine: IConfigMessages = {
@@ -644,6 +650,38 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.informantNotification.success',
     defaultMessage: 'Informant notifications updated',
     description: 'Notification for informant update success'
+  },
+  userRoles: {
+    id: 'config.userRoles.title',
+    defaultMessage: 'User roles',
+    description: 'The title for user roles'
+  },
+  userRolesSubtitle: {
+    id: 'config.userRoles.subtitle',
+    defaultMessage:
+      'Map user roles to each system role so that specific permissions and privileges are correctly assigned. To learn more about the different system roles see ... {link}',
+    description: 'Subtile for informant sms notification'
+  },
+  systemRoles: {
+    id: 'config.userRoles.systemRoles',
+    defaultMessage: 'SYSTEM ROLES',
+    description: 'ListViewSimplified header for system roles'
+  },
+  systemRoleSuccessMsg: {
+    id: 'config.userRoles.systemRoleSuccessMsg',
+    defaultMessage: 'System role updated successfully',
+    description: 'Label for System role updated success message'
+  },
+  role: {
+    id: 'config.userRoles.role',
+    defaultMessage: 'ROLE',
+    description: 'ListViewSimplified header for role'
+  },
+  roleUpdateInstruction: {
+    id: 'config.userRoles.roleUpdateInstruction',
+    defaultMessage:
+      'Add the roles to be assigned the system role of {systemRole}',
+    description: 'Instruction for adding/updating role in role management modal'
   }
 }
 

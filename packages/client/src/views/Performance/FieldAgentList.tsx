@@ -53,7 +53,7 @@ interface SortMap {
   rawName: SORT_ORDER
   startMonth: SORT_ORDER
   avgCompleteDeclarationTime: SORT_ORDER
-  type: SORT_ORDER
+  role: SORT_ORDER
   officeName: SORT_ORDER
   inProgressDeclarations: SORT_ORDER
   rejectedDeclarations: SORT_ORDER
@@ -63,7 +63,7 @@ const INITIAL_SORT_MAP = {
   rawName: SORT_ORDER.ASCENDING,
   startMonth: SORT_ORDER.ASCENDING,
   avgCompleteDeclarationTime: SORT_ORDER.ASCENDING,
-  type: SORT_ORDER.ASCENDING,
+  role: SORT_ORDER.ASCENDING,
   officeName: SORT_ORDER.ASCENDING,
   inProgressDeclarations: SORT_ORDER.ASCENDING,
   rejectedDeclarations: SORT_ORDER.ASCENDING
@@ -221,13 +221,13 @@ function FieldAgentListComponent(props: IProps) {
         isSorted: columnToBeSort === 'rawName' ? true : false
       },
       {
-        key: 'type',
+        key: 'role',
         label: intl.formatMessage(messages.typeColumnHeader),
         width: 12,
         isSortable: true,
-        sortFunction: () => toggleSort('type'),
-        icon: columnToBeSort === 'type' ? <SortArrow active={true} /> : <></>,
-        isSorted: columnToBeSort === 'type' ? true : false
+        sortFunction: () => toggleSort('role'),
+        icon: columnToBeSort === 'role' ? <SortArrow active={true} /> : <></>,
+        isSorted: columnToBeSort === 'role' ? true : false
       },
       {
         key: 'officeName',
@@ -315,8 +315,8 @@ function FieldAgentListComponent(props: IProps) {
     ]
   }
 
-  function getFieldAgentTypeLabel(type: string) {
-    return userMessages[type] ? intl.formatMessage(userMessages[type]) : type
+  function getFieldAgentTypeLabel(role: string) {
+    return userMessages[role] ? intl.formatMessage(userMessages[role]) : role
   }
 
   function getContent(data?: GQLSearchFieldAgentResult) {
@@ -327,7 +327,7 @@ function FieldAgentListComponent(props: IProps) {
         if (row === null) {
           return {
             name: '',
-            type: '',
+            role: '',
             officeName: '',
             startMonth: '',
             totalDeclarations: '',
@@ -342,7 +342,7 @@ function FieldAgentListComponent(props: IProps) {
         return {
           name: getNameWithAvatar(row.fullName || '', row.avatar),
           rawName: row.fullName || '',
-          type: (row.type && getFieldAgentTypeLabel(row.type)) || '',
+          role: (row.role && getFieldAgentTypeLabel(row.role)) || '',
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
           totalDeclarations: String(row.totalNumberOfDeclarationStarted),

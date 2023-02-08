@@ -40,7 +40,7 @@ describe('User root resolvers', () => {
           passwordHash:
             'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
           salt: '12345',
-          role: 'FIELD_AGENT',
+          systemRole: 'FIELD_AGENT',
           status: 'active',
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -109,7 +109,7 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'FIELD_AGENT',
+        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -135,7 +135,7 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'FIELD_AGENT',
+        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -161,7 +161,7 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'LOCAL_REGISTRAR',
+        systemRole: 'LOCAL_REGISTRAR',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -219,7 +219,7 @@ describe('User root resolvers', () => {
           username: 'mohammad.ashraful',
           mobile: '+8801733333333',
           email: 'test@test.org',
-          role: 'LOCAL_REGISTRAR',
+          systemRole: 'LOCAL_REGISTRAR',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           locationId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
@@ -282,8 +282,8 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'FIELD_AGENT',
-        type: 'HA',
+        systemRole: 'FIELD_AGENT',
+        role: 'HA',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -306,11 +306,11 @@ describe('User root resolvers', () => {
         username: 'mdariful.islam',
         mobile: '+8801740012994',
         email: 'test@test.org',
-        type: 'HA',
+        role: 'HA',
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        role: 'FIELD_AGENT',
+        systemRole: 'FIELD_AGENT',
         status: 'pending',
         practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -357,7 +357,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          type: 'HA',
+          role: 'HA',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -369,7 +369,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
           fullName: 'Md. Ariful Islam',
-          type: 'HA',
+          role: 'HA',
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
@@ -414,7 +414,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          type: 'HA',
+          role: 'HA',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -426,7 +426,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
           fullName: 'Md. Ariful Islam',
-          type: 'HA',
+          role: 'HA',
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
@@ -494,7 +494,7 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          type: 'HA',
+          role: 'HA',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -945,8 +945,8 @@ describe('User root resolvers', () => {
       username: 'mohammad.ashraful',
       mobile: '+8801733333333',
       email: 'test@test.org',
-      role: 'LOCAL_REGISTRAR',
-      type: 'HOSPITAL',
+      systemRole: 'LOCAL_REGISTRAR',
+      role: 'HOSPITAL',
       status: 'active',
       primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
     }

@@ -426,8 +426,8 @@ function RecordAuditBody({
   if (
     (declaration.status === SUBMISSION_STATUS.DECLARED ||
       declaration.status === SUBMISSION_STATUS.VALIDATED) &&
-    userDetails?.role &&
-    !FIELD_AGENT_ROLES.includes(userDetails.role)
+    userDetails?.systemRole &&
+    !FIELD_AGENT_ROLES.includes(userDetails.systemRole)
   ) {
     actions.push(
       ShowReviewButton({
@@ -450,8 +450,8 @@ function RecordAuditBody({
     declaration.status === SUBMISSION_STATUS.DRAFT ||
     ((declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
       declaration.status === SUBMISSION_STATUS.REJECTED) &&
-      userDetails?.role &&
-      !FIELD_AGENT_ROLES.includes(userDetails.role))
+      userDetails?.systemRole &&
+      !FIELD_AGENT_ROLES.includes(userDetails.systemRole))
   ) {
     actions.push(
       ShowUpdateButton({

@@ -48,8 +48,8 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String!
-  role: RoleType!
-  type: String
+  systemRole: RoleType!
+  role: String
   email: String
   primaryOffice: String
   catchmentArea: [String]
@@ -87,8 +87,8 @@ type User {
   name: [HumanName!]! # -> .name
   username: String
   mobile: String!
-  role: RoleType!
-  type: String
+  systemRole: RoleType!
+  role: Role!
   email: String
   status: Status!
   underInvestigation: Boolean
@@ -121,7 +121,7 @@ type SearchFieldAgentResult {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  type: String
+  role: String
   status: Status
   avatar: Avatar
   primaryOfficeId: String
@@ -152,7 +152,7 @@ type Query {
     username: String
     mobile: String
     status: String
-    role: String
+    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int

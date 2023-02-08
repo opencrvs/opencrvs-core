@@ -32,6 +32,8 @@
     "clean": "rimraf lib",
     "start": "concurrently 'start-storybook --ci --quiet -p 6060' 'tsc -w'",
     "build": "yarn clean && tsc",
+    "lint": "yarn lint:css",
+    "test": "tsc",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "build:clean": "rm -rf lib",
     "storybook": "start-storybook -p 6060",
