@@ -93,7 +93,8 @@ export const WORKQUEUE_TABS = {
   declarationForms: 'form',
   logout: 'logout',
   communications: 'communications',
-  informantNotification: 'informantnotification'
+  informantNotification: 'informantnotification',
+  readyToIssue: 'readyToIssue'
 } as const
 
 const GROUP_ID = {
@@ -111,6 +112,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.sentForReview,
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
@@ -122,6 +124,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -133,6 +136,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -144,6 +148,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -156,12 +161,14 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
   LOCAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.readyToIssue,
     GROUP_ID.menuGroup
   ],
   NATIONAL_SYSTEM_ADMIN: [
@@ -185,6 +192,7 @@ interface ICount {
   sentForApproval?: number
   externalValidation?: number
   readyToPrint?: number
+  readyToIssue?: number
 }
 
 interface IUserInfo {
@@ -549,12 +557,32 @@ export const NavigationView = (props: IFullProps) => {
                       }}
                     />
                   )}
+
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.readyToIssue
+                  ) && (
+                    <NavigationItem
+                      icon={() => <DeclarationIconSmall color={'green'} />}
+                      id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.readyToIssue]
+                      )}
+                      count={0}
+                      isSelected={tabId === WORKQUEUE_TABS.readyToIssue}
+                      onClick={() => {
+                        props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)
+                        menuCollapse && menuCollapse()
+                      }}
+                    />
+                  )}
+
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
                     WORKQUEUE_TABS.outbox
                   ) && (
                     <NavigationItem
-                      icon={() => <PaperPlane />}
+                      icon={() => <DeclarationIconSmall color={'green'} />}
                       id={`navigation_${WORKQUEUE_TABS.outbox}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.outbox]

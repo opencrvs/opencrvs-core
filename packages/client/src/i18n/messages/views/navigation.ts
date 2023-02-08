@@ -129,6 +129,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Outbox',
     description: 'Label for navigation item outbox',
     id: 'navigation.outbox'
+  },
+  readyToIssue: {
+    defaultMessage: 'Ready to issue',
+    description: 'Ready to issue label in navigation',
+    id: 'navigation.readyToIssue'
   }
 }
 
