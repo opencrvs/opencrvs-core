@@ -14,7 +14,6 @@ import {
   FIELD_GROUP_TITLE,
   IAttachmentValue,
   IFormField,
-  IFormFieldValue,
   IFormSection,
   IFormSectionData,
   LOCATION_SEARCH_INPUT,
@@ -47,10 +46,7 @@ import {
   modifyUserFormData,
   submitUserFormData
 } from '@client/user/userReducer'
-import {
-  Action,
-  FormTitle
-} from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
+import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import {
   PrimaryButton,
   SuccessButton,
@@ -76,6 +72,7 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -143,7 +140,9 @@ class UserReviewFormComponent extends React.Component<
       this.props.formData
     ).forEach((group) => {
       group.fields.forEach((field: IFormField, idx) => {
-        if (field.type == SUBSECTION) {
+        if (field.hideValueInPreview) {
+          return
+        } else if (field.type === SUBSECTION) {
           return
         } else if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
@@ -253,7 +252,7 @@ class UserReviewFormComponent extends React.Component<
           ? intl.formatMessage(userMessages[formData.systemRole as string])
           : field.name === 'role'
           ? intl.formatMessage({
-              id: `${formData.systemRole}.role.${formData.role}`
+              id: getUserRoleIntlKey(formData.role as string)
             })
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label

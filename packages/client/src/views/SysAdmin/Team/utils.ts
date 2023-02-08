@@ -108,12 +108,14 @@ export function getUserAuditDescription(
 ): MessageDescriptor | undefined {
   return AuditDescriptionMapping[status] || undefined
 }
+
 export function checkExternalValidationStatus(status?: string | null): boolean {
   return !(
     !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
     status === 'WAITING_VALIDATION'
   )
 }
+
 export function checkIfLocalLanguageProvided() {
   return window.config.LANGUAGES.split(',').length > 1
 }
@@ -148,4 +150,8 @@ export function getUserType(user: { role?: IUserRole }): string | undefined {
   } else {
     return undefined
   }
+}
+
+export const getUserRoleIntlKey = (_roleId: string) => {
+  return `role.${_roleId}`
 }

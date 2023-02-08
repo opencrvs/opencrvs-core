@@ -22,10 +22,10 @@ import {
   IRoleMessagesLoadedAction,
   IRoleLoadedAction,
   rolesMessageAddData,
-  ROLES_LOADED,
-  generateLabelKey
+  ROLES_LOADED
 } from '@client/user/userReducer'
 import { SystemRole } from '@client/utils/gateway'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 
 export interface IntlMessages {
   [key: string]: string
@@ -128,7 +128,7 @@ export const formatRoleLanguageState = (
     systemRole.roles.forEach((role) => {
       role.labels.forEach((label) => {
         if (transformedLanguages[label.lang]) {
-          const generatedLabel = generateLabelKey(systemRole, role)
+          const generatedLabel = getUserRoleIntlKey(role._id)
           transformedLanguages[label.lang] = {
             ...transformedLanguages[label.lang],
             messages: {
@@ -218,6 +218,7 @@ export const intlReducer: LoopReducer<IntlState, any> = (
       return loop(
         {
           ...state,
+          messages: getNextMessages(state.language, languageWithRoles),
           languages: languageWithRoles
         },
 

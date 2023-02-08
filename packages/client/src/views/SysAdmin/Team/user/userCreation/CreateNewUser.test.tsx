@@ -21,6 +21,7 @@ import {
   mockCompleteFormData,
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
+  mockRoles,
   mockOfflineDataDispatch
 } from '@client/tests/util'
 import { modifyUserFormData } from '@client/user/userReducer'
@@ -31,180 +32,11 @@ import {
   REVIEW_USER_FORM,
   REVIEW_USER_DETAILS
 } from '@client/navigation/routes'
-import { ISelectFormFieldWithDynamicOptions, UserSection } from '@client/forms'
+import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
-
-export const mockRoles = {
-  data: {
-    getSystemRoles: [
-      {
-        value: 'FIELD_AGENT',
-        roles: [
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'Healthcare Worker'
-              },
-              {
-                lang: 'fr',
-                label: 'Professionnel de Santé'
-              }
-            ]
-          },
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'Police Officer'
-              },
-              {
-                lang: 'fr',
-                label: 'Agent de Police'
-              }
-            ]
-          },
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'Social Worker'
-              },
-              {
-                lang: 'fr',
-                label: 'Travailleur Social'
-              }
-            ]
-          },
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local Leader'
-              },
-              {
-                lang: 'fr',
-                label: 'Leader Local'
-              }
-            ]
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'REGISTRATION_AGENT',
-        roles: [
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'Registration Agent'
-              },
-              {
-                lang: 'fr',
-                label: "Agent d'enregistrement"
-              }
-            ]
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'LOCAL_REGISTRAR',
-        roles: [
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local Registrar'
-              },
-              {
-                lang: 'fr',
-                label: 'Registraire local'
-              }
-            ]
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'LOCAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local System_admin'
-              },
-              {
-                lang: 'fr',
-                label: 'Administrateur système local'
-              }
-            ]
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'NATIONAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'National System_admin'
-              },
-              {
-                lang: 'fr',
-                label: 'Administrateur système national'
-              }
-            ]
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'PERFORMANCE_MANAGEMENT',
-        roles: [
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'Performance Management'
-              },
-              {
-                lang: 'fr',
-                label: 'Gestion des performances'
-              }
-            ]
-          }
-        ],
-        active: true
-      },
-      {
-        value: 'NATIONAL_REGISTRAR',
-        roles: [
-          {
-            labels: [
-              {
-                lang: 'en',
-                label: 'National Registrar'
-              },
-              {
-                lang: 'fr',
-                label: 'Registraire national'
-              }
-            ]
-          }
-        ],
-        active: true
-      }
-    ]
-  }
-}
 
 export const mockUsers = {
   data: {
@@ -551,8 +383,8 @@ describe('edit user tests', () => {
     )!
     const field = group.fields.find(
       (field) => field.name === 'role'
-    ) as ISelectFormFieldWithDynamicOptions
-    expect(field.dynamicOptions.options).not.toEqual({})
+    ) as ISelectFormFieldWithOptions
+    expect(field.options).not.toEqual([])
   })
 
   describe('when user is in update form page', () => {
