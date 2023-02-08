@@ -91,8 +91,8 @@ export const userTransformers: IFunctionTransformer = {
     templateData: TemplateTransformerData,
     intl: IntlShape
   ) => {
-    return templateData.userDetails.role
-      ? intl.formatMessage(userMessages[templateData.userDetails.role])
+    return templateData.userDetails.systemRole
+      ? intl.formatMessage(userMessages[templateData.userDetails.systemRole])
       : ''
   },
 

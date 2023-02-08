@@ -148,7 +148,7 @@ export const hasAccessToRoute = (
   roles: Roles[],
   userDetails: IUserDetails
 ): boolean => {
-  const userRole = userDetails.role as Roles
+  const userRole = userDetails.systemRole as Roles
   if (roles.includes(userRole)) {
     return true
   }

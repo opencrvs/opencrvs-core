@@ -42,12 +42,20 @@ export interface IAvatar {
   data: string
 }
 
+type Label = {
+  lang: string
+  label: string
+}
+export interface IUserRole {
+  labels: Label[]
+}
+
 export interface IUserDetails {
   userMgntUserID?: string
   practitionerId?: string
   mobile?: string
-  role?: string
-  type?: string
+  systemRole?: string
+  role?: IUserRole
   status?: string
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
@@ -68,7 +76,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     name,
     mobile,
     role,
-    type,
+    systemRole,
     status,
     userMgntUserID,
     practitionerId,
@@ -95,8 +103,8 @@ export function getUserDetails(user: GQLUser): IUserDetails {
   if (role) {
     userDetails.role = role
   }
-  if (type) {
-    userDetails.type = type
+  if (systemRole) {
+    userDetails.systemRole = systemRole
   }
   if (status) {
     userDetails.status = status

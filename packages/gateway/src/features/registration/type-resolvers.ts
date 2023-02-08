@@ -863,7 +863,12 @@ export const typeResolvers: GQLResolver = {
           it.resource?.meta?.lastUpdated <= task.lastModified!
       )?.resource as fhir.PractitionerRole | undefined
 
-      const role = result?.code?.[0]?.coding?.[0]?.code
+      const targetCode = result?.code?.find((element) => {
+        return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
+      })
+
+      const role = targetCode?.coding?.[0].code
+
       const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
         method: 'POST',
         body: JSON.stringify({
@@ -877,7 +882,18 @@ export const typeResolvers: GQLResolver = {
       const userResponse: IUserModelData = await res.json()
       return {
         ...userResponse,
-        role: role ?? userResponse.role
+        role: {
+          ...userResponse.role,
+          labels: [
+            {
+              lang: 'en',
+              label:
+                role ??
+                userResponse.role.labels.find((label) => label.lang === 'en')
+                  ?.label
+            }
+          ]
+        }
       }
     },
     system: async (task: fhir.Task, _: any, authHeader) => {
