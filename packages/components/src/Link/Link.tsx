@@ -51,15 +51,21 @@ const StyledLink = styled.button<{
   overflow: hidden;
   max-width: 100%;
 
-  ${({ $underline }) =>
+  ${({ $underline, $color }) =>
     $underline
       ? underlineStyles
       : css`
           &:hover,
           &:active {
             ${underlineStyles}
+            text-decoration-color: ${colors[$color]};
           }
         `}
+  &:hover,
+  &:active {
+    ${underlineStyles}
+    ${({ $color }) => `text-decoration-color: ${colors[$color]};`}
+  }
 
   &:focus-visible {
     background: ${({ theme }) => theme.colors.yellow};

@@ -126,6 +126,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           compositionId
           trackingId
         }
+        informantsSignature
         attachments {
           data
           type
@@ -372,6 +373,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        informantsSignature
         status {
           comments {
             comment

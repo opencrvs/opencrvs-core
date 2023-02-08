@@ -143,6 +143,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           compositionId
           trackingId
         }
+        informantsSignature
         attachments {
           data
           type
@@ -408,6 +409,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         otherInformantType
         contact
         contactPhoneNumber
+        informantsSignature
         status {
           comments {
             comment
