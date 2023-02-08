@@ -35,8 +35,9 @@ import {
   goToApplicationConfig,
   goToAdvancedSearchResult,
   goToVSExport,
-  goToInformantNotification,
-  goToUserRolesConfig
+  goToUserRolesConfig,
+  goToOrganisationView,
+  goToInformantNotification
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -44,7 +45,6 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
-import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
@@ -87,6 +87,7 @@ export const WORKQUEUE_TABS = {
   vsexports: 'vsexports',
   team: 'team',
   config: 'config',
+  organisation: 'organisation',
   application: 'application',
   certificate: 'certificate',
   systems: 'integration',
@@ -122,6 +123,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.sentForApproval,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -133,6 +135,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -144,6 +147,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
@@ -155,6 +159,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.outbox,
@@ -163,6 +168,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   ],
   LOCAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.team,
     GROUP_ID.menuGroup
   ],
@@ -170,6 +176,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
     WORKQUEUE_TABS.config,
+    WORKQUEUE_TABS.organisation,
     WORKQUEUE_TABS.vsexports,
     WORKQUEUE_TABS.communications,
     WORKQUEUE_TABS.userRoles,
@@ -217,6 +224,7 @@ interface IDispatchProps {
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
+  goToOrganisationViewAction: typeof goToOrganisationView
   goToSystemViewAction: typeof goToSystemList
   goToSettings: typeof goToSettings
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
@@ -616,6 +624,25 @@ export const NavigationView = (props: IFullProps) => {
                   )}
                 {userDetails?.systemRole &&
                   USER_SCOPE[userDetails.systemRole].includes(
+                    WORKQUEUE_TABS.organisation
+                  ) && (
+                    <NavigationItem
+                      icon={() => <Icon name="List" size="small" />}
+                      id={`navigation_${WORKQUEUE_TABS.organisation}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.organisation]
+                      )}
+                      onClick={() =>
+                        props.goToOrganisationViewAction(userDetails)
+                      }
+                      isSelected={
+                        enableMenuSelection &&
+                        activeMenuItem === WORKQUEUE_TABS.organisation
+                      }
+                    />
+                  )}
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.team
                   ) && (
                     <NavigationItem
@@ -880,6 +907,7 @@ export const Navigation = connect<
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
+  goToOrganisationViewAction: goToOrganisationView,
   goToTeamViewAction: goToTeamView,
   goToSystemViewAction: goToSystemList,
   redirectToAuthentication,

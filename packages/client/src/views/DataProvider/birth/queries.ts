@@ -139,6 +139,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        informantsSignature
         duplicates
         attachments {
           data
@@ -410,6 +411,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         otherInformantType
         contact
         contactPhoneNumber
+        informantsSignature
         status {
           comments {
             comment

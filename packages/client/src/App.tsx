@@ -65,6 +65,7 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 
@@ -441,6 +442,19 @@ export class App extends React.Component<IAppProps> {
                                               routes.PERFORMANCE_REGISTRATIONS_LIST
                                             }
                                             component={RegistrationList}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
+                                            path={routes.ORGANISATIONS_INDEX}
+                                            component={AdministrativeLevels}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
