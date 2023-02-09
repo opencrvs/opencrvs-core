@@ -79,96 +79,87 @@ import {
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
 }
+enum Event {
+  BIRTH = 'birth',
+  DEATH = 'death'
+}
 
 export const getRoutes = () => {
   const routes = [
     // In progress declaration
     {
       method: 'POST',
-      path: '/events/birth/in-progress-declaration',
+      path: '/events/{event}/in-progress-declaration',
       handler: inProgressHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/in-progress-declaration',
-      handler: inProgressHandler,
-      config: {
-        tags: ['api']
+        auth: false,
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(Event))
+          })
+        }
       }
     },
 
     // New declaration
     {
       method: 'POST',
-      path: '/events/birth/new-declaration',
+      path: '/events/{event}/new-declaration',
       handler: newDeclarationHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/new-declaration',
-      handler: newDeclarationHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(Event))
+          })
+        }
       }
     },
 
     // Request for registrar validation
     {
       method: 'POST',
-      path: '/events/birth/request-for-registrar-validation',
+      path: '/events/{event}/request-for-registrar-validation',
       handler: requestForRegistrarValidationHandler,
       config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/request-for-registrar-validation',
-      handler: requestForRegistrarValidationHandler,
-      config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(Event))
+          })
+        }
       }
     },
 
     // Waiting external resource validation
     {
       method: 'POST',
-      path: '/events/birth/waiting-external-resource-validation',
+      path: '/events/{event}/waiting-external-resource-validation',
       handler: waitingExternalValidationHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(Event))
+          })
+        }
       }
     },
     {
       method: 'POST',
-      path: '/events/death/waiting-external-resource-validation',
-      handler: waitingExternalValidationHandler,
-      config: {
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/registrar-registration-waiting-external-resource-validation',
+      path: '/events/{event}/registrar-registration-waiting-external-resource-validation',
       handler: registrarRegistrationWaitingExternalValidationHandler,
       config: {
-        tags: ['api']
+        tags: ['api'],
+        validate: {
+          params: Joi.object({
+            event: Joi.string().valid(...Object.values(Event))
+          })
+        }
       }
     },
-    {
-      method: 'POST',
-      path: '/events/death/registrar-registration-waiting-external-resource-validation',
-      handler: registrarRegistrationWaitingExternalValidationHandler,
-      config: {
-        tags: ['api']
-      }
-    },
+
     {
       method: 'POST',
       path: '/events/birth/new-registration',
