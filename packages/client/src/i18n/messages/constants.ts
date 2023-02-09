@@ -157,6 +157,7 @@ interface IConstantsMessages
   date: MessageDescriptor
   totalFileSizeExceed: MessageDescriptor
   refresh: MessageDescriptor
+  regNumber: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -558,6 +559,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Record',
     description: 'Label for header table header Record',
     id: 'constants.record'
+  },
+  regNumber: {
+    defaultMessage: 'Reg no.',
+    description: 'Label for registered number',
+    id: 'constants.registrationNumber'
   },
   requestReason: {
     defaultMessage: 'Reason for request',

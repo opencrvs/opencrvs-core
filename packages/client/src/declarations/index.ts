@@ -1764,6 +1764,10 @@ export function filterProcessingDeclarationsFromQuery(
     externalValidationTab: filterProcessingDeclarations(
       queryData.externalValidationTab,
       processingDeclarationIds
+    ),
+    issueTab: filterProcessingDeclarations(
+      queryData.issueTab,
+      processingDeclarationIds
     )
   }
 }

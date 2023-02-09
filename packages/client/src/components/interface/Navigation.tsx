@@ -43,7 +43,6 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
-import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
@@ -563,7 +562,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.readyToIssue
                   ) && (
                     <NavigationItem
-                      icon={() => <DeclarationIconSmall color={'green'} />}
+                      icon={() => <DeclarationIconSmall />}
                       id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.readyToIssue]
@@ -582,7 +581,7 @@ export const NavigationView = (props: IFullProps) => {
                     WORKQUEUE_TABS.outbox
                   ) && (
                     <NavigationItem
-                      icon={() => <DeclarationIconSmall color={'green'} />}
+                      icon={() => <PaperPlane />}
                       id={`navigation_${WORKQUEUE_TABS.outbox}`}
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.outbox]
