@@ -22,7 +22,9 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { HumanName, LocalRegistrar } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
-export function getUserName(userDetails: Pick<UserDetails | LocalRegistrar, 'name'>) {
+export function getUserName(
+  userDetails: Pick<UserDetails | LocalRegistrar, 'name'>
+) {
   const nameObj =
     userDetails.name &&
     (userDetails.name.find((storedName: HumanName | null) => {
@@ -92,8 +94,8 @@ export const userTransformers: IFunctionTransformer = {
     templateData: TemplateTransformerData,
     intl: IntlShape
   ) => {
-    return templateData.userDetails.role
-      ? intl.formatMessage(userMessages[templateData.userDetails.role])
+    return templateData.userDetails.systemRole
+      ? intl.formatMessage(userMessages[templateData.userDetails.systemRole])
       : ''
   },
 

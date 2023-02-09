@@ -14,7 +14,7 @@ import {
   CorrectionSection,
   IFormSection,
   IFormSectionGroup,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
+  RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 

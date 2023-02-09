@@ -216,7 +216,9 @@ export function getPrimaryLocationIdOfOffice(
   return location.id
 }
 
-export function getJurisdictionLocationIdFromUserDetails(userDetails: UserDetails) {
+export function getJurisdictionLocationIdFromUserDetails(
+  userDetails: UserDetails
+) {
   const location =
     userDetails.catchmentArea &&
     userDetails.catchmentArea.find((location) => {

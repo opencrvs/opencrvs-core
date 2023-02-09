@@ -283,14 +283,22 @@ describe('archiveDeclaration tests', () => {
       declarations: [declaration]
     }
 
-    const currentUserDetails: UserDetails = {
+    const currentUserDetails: Partial<UserDetails> = {
       userMgntUserID: '123',
       id: '123',
       practitionerId: '123',
       status: 'active' as Status,
       creationDate: '2133213212',
       mobile: '09123433',
-      role: 'FIELD_AGENT' as RoleType,
+      role: {
+        _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+        labels: [
+          {
+            lang: 'en',
+            label: 'Field Agent'
+          }
+        ]
+      },
       name: [],
       localRegistrar: { name: [], role: 'FIELD_AGENT' as RoleType }
     }

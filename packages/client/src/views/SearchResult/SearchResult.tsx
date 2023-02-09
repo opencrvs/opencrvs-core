@@ -352,7 +352,7 @@ export class SearchResultView extends React.Component<
                             RoleType.LocalRegistrar,
                             RoleType.NationalRegistrar,
                             RoleType.RegistrationAgent
-                          ].includes(userDetails.role as RoleType)
+                          ].includes(userDetails.systemRole)
                             ? getUserLocation(userDetails).id
                             : ''
                       },
@@ -462,7 +462,7 @@ export class SearchResultView extends React.Component<
                     RoleType.LocalRegistrar,
                     RoleType.NationalRegistrar,
                     RoleType.RegistrationAgent
-                  ].includes(userDetails.role as RoleType)
+                  ].includes(userDetails.systemRole)
                     ? getUserLocation(userDetails).id
                     : '',
                 trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',

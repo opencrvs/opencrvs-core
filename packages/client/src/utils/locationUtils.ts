@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
-import { Location, Identifier } from '@client/utils/gateway'
+import { Identifier } from '@client/utils/gateway'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
@@ -44,20 +44,18 @@ export function getLocation(userDetails: UserDetails, locationKey: string) {
   if (!userDetails.catchmentArea) {
     throw Error('The user has no catchment area')
   }
-  const filteredArea: Location[] = userDetails.catchmentArea.filter(
-    (area: Location) => {
-      if (area.identifier) {
-        const relevantIdentifier: Identifier[] = area.identifier.filter(
-          (identifier: Identifier) => {
-            return identifier.value === locationKey
-          }
-        )
-        return relevantIdentifier[0] ? area : false
-      } else {
-        throw Error('The catchment area has no identifier')
-      }
+  const filteredArea = userDetails.catchmentArea.filter((area) => {
+    if (area.identifier) {
+      const relevantIdentifier: Identifier[] = area.identifier.filter(
+        (identifier: Identifier) => {
+          return identifier.value === locationKey
+        }
+      )
+      return relevantIdentifier[0] ? area : false
+    } else {
+      throw Error('The catchment area has no identifier')
     }
-  )
+  })
   return filteredArea[0] ? filteredArea[0].id : ''
 }
 

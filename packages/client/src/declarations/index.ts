@@ -20,7 +20,7 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Event, Query, User, RoleType } from '@client/utils/gateway'
+import { Event, Query, RoleType } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -589,13 +589,13 @@ export function writeDeclarationFailed(): IWriteDeclarationFailedAction {
   return { type: WRITE_DECLARATION_FAILED }
 }
 
-async function getCurrentUserRole(): Promise<string> {
+async function getCurrentUserSystemRole(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
 
   if (!userDetails) {
     return ''
   }
-  return (JSON.parse(userDetails) as UserDetails).role || ''
+  return (JSON.parse(userDetails) as UserDetails).systemRole || ''
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -641,7 +641,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
     return JSON.stringify({ declarations: [] })
   }
 
-  const currentUserRole = await getCurrentUserRole()
+  const currentUserRole = await getCurrentUserSystemRole()
   const currentUserID = await getCurrentUserID()
 
   const allUserData = JSON.parse(storageTable) as IUserData[]
@@ -1338,7 +1338,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           userDetails?.practitionerId,
           10,
           Boolean(
-            userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+            userDetails?.systemRole &&
+              FIELD_AGENT_ROLES.includes(userDetails.systemRole)
           )
         )
 

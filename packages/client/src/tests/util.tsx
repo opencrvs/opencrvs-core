@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { App } from '@client/App'
-import { Event, RoleType, Status, User } from '@client/utils/gateway'
+import { Event, RoleType, Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -54,7 +54,7 @@ import { mockOfflineData } from './mock-offline-data'
 import { Section, SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { vi } from 'vitest'
-import { getRolesQuery } from '@client/forms/user/query/queries'
+import { getSystemRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
@@ -1274,7 +1274,16 @@ export const userDetails: UserDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  role: 'FIELD_AGENT' as RoleType,
+  systemRole: RoleType.FieldAgent,
+  role: {
+    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    labels: [
+      {
+        lang: 'en',
+        label: 'ENTREPENEUR'
+      }
+    ]
+  },
   mobile: '01677701431',
   primaryOffice: {
     id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
@@ -1475,7 +1484,7 @@ export const mockUserResponse = {
           }
         ]
       },
-      role: 'LOCAL_REGISTRAR'
+      systemRole: 'LOCAL_REGISTRAR'
     }
   }
 }
@@ -1540,7 +1549,7 @@ export const mockLocalSysAdminUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      role: 'LOCAL_SYSTEM_ADMIN',
+      systemRole: 'LOCAL_SYSTEM_ADMIN',
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -1624,7 +1633,7 @@ export const mockRegistrarUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      role: 'LOCAL_REGISTRAR',
+      systemRole: 'LOCAL_REGISTRAR',
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -2201,8 +2210,16 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          role: RoleType.FieldAgent,
-          type: 'CHA',
+          systemRole: RoleType.FieldAgent,
+          role: {
+            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+            labels: [
+              {
+                lang: 'en',
+                label: 'CHA'
+              }
+            ]
+          },
           status: Status.Active,
           name: [
             {
@@ -2282,43 +2299,320 @@ export function createRouterProps<
   return { location, history, match }
 }
 
+export const mockRoles = {
+  data: {
+    getSystemRoles: [
+      {
+        value: 'FIELD_AGENT',
+        roles: [
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'Healthcare Worker'
+              },
+              {
+                lang: 'fr',
+                label: 'Professionnel de Santé'
+              }
+            ]
+          },
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'Police Officer'
+              },
+              {
+                lang: 'fr',
+                label: 'Agent de Police'
+              }
+            ]
+          },
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'Social Worker'
+              },
+              {
+                lang: 'fr',
+                label: 'Travailleur Social'
+              }
+            ]
+          },
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'Local Leader'
+              },
+              {
+                lang: 'fr',
+                label: 'Leader Local'
+              }
+            ]
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'REGISTRATION_AGENT',
+        roles: [
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'Registration Agent'
+              },
+              {
+                lang: 'fr',
+                label: "Agent d'enregistrement"
+              }
+            ]
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'LOCAL_REGISTRAR',
+        roles: [
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'Local Registrar'
+              },
+              {
+                lang: 'fr',
+                label: 'Registraire local'
+              }
+            ]
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'LOCAL_SYSTEM_ADMIN',
+        roles: [
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'Local System_admin'
+              },
+              {
+                lang: 'fr',
+                label: 'Administrateur système local'
+              }
+            ]
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'NATIONAL_SYSTEM_ADMIN',
+        roles: [
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'National System_admin'
+              },
+              {
+                lang: 'fr',
+                label: 'Administrateur système national'
+              }
+            ]
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'PERFORMANCE_MANAGEMENT',
+        roles: [
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'Performance Management'
+              },
+              {
+                lang: 'fr',
+                label: 'Gestion des performances'
+              }
+            ]
+          }
+        ],
+        active: true
+      },
+      {
+        value: 'NATIONAL_REGISTRAR',
+        roles: [
+          {
+            labels: [
+              {
+                lang: 'en',
+                label: 'National Registrar'
+              },
+              {
+                lang: 'fr',
+                label: 'Registraire national'
+              }
+            ]
+          }
+        ],
+        active: true
+      }
+    ]
+  }
+}
+
 export const mockFetchRoleGraphqlOperation = {
   request: {
-    query: getRolesQuery,
+    query: getSystemRolesQuery,
     variables: {}
   },
   result: {
     data: {
-      getRoles: [
+      getSystemRoles: [
         {
-          title: 'Field Agent',
           value: 'FIELD_AGENT',
-          types: ['HOSPITAL', 'CHA']
+          roles: [
+            {
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Healthcare Worker'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Professionnel de Santé'
+                }
+              ]
+            },
+            {
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Police Officer'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Agent de Police'
+                }
+              ]
+            },
+            {
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Social Worker'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Travailleur Social'
+                }
+              ]
+            },
+            {
+              labels: [
+                {
+                  lang: 'en',
+                  label: 'Local Leader'
+                },
+                {
+                  lang: 'fr',
+                  label: 'Leader Local'
+                }
+              ]
+            }
+          ],
+          active: true
         },
         {
-          title: 'Registration Agent',
           value: 'REGISTRATION_AGENT',
-          types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Registration Agent'
+            },
+            {
+              lang: 'fr',
+              label: "Agent d'enregistrement"
+            }
+          ],
+          active: true
         },
         {
-          title: 'Registrar',
           value: 'LOCAL_REGISTRAR',
-          types: ['SECRETARY', 'CHAIRMAN', 'MAYOR']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Local Registrar'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire local'
+            }
+          ],
+          active: true
         },
         {
-          title: 'System admin (local)',
           value: 'LOCAL_SYSTEM_ADMIN',
-          types: ['LOCAL_SYSTEM_ADMIN']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Local System_admin'
+            },
+            {
+              lang: 'fr',
+              label: 'Administrateur système local'
+            }
+          ],
+          active: true
         },
         {
-          title: 'System admin (national)',
           value: 'NATIONAL_SYSTEM_ADMIN',
-          types: ['NATIONAL_SYSTEM_ADMIN']
+          roles: [
+            {
+              lang: 'en',
+              label: 'National System_admin'
+            },
+            {
+              lang: 'fr',
+              label: 'Administrateur système national'
+            }
+          ],
+          active: true
         },
         {
-          title: 'Performance Management',
           value: 'PERFORMANCE_MANAGEMENT',
-          types: ['HEALTH_DIVISION', 'ORG_DIVISION']
+          roles: [
+            {
+              lang: 'en',
+              label: 'Performance Management'
+            },
+            {
+              lang: 'fr',
+              label: 'Gestion des performances'
+            }
+          ],
+          active: true
+        },
+        {
+          value: 'NATIONAL_REGISTRAR',
+          roles: [
+            {
+              lang: 'en',
+              label: 'National Registrar'
+            },
+            {
+              lang: 'fr',
+              label: 'Registraire national'
+            }
+          ],
+          active: true
         }
       ]
     }
@@ -2336,8 +2630,8 @@ export const mockCompleteFormData = {
   nid: '123456789',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'FIELD_AGENT',
-  type: 'HOSPITAL',
+  systemRole: 'FIELD_AGENT',
+  role: 'HOSPITAL',
   userDetails: '',
   username: ''
 }
@@ -2586,7 +2880,7 @@ export const mockUserGraphqlOperation = {
                     validate: []
                   },
                   {
-                    name: 'role',
+                    name: 'systemRole',
                     type: 'SELECT_WITH_OPTIONS',
                     label: {
                       defaultMessage: 'Role',
@@ -2599,7 +2893,7 @@ export const mockUserGraphqlOperation = {
                     options: []
                   },
                   {
-                    name: 'type',
+                    name: 'role',
                     type: 'SELECT_WITH_DYNAMIC_OPTIONS',
                     label: {
                       defaultMessage: 'Type',
@@ -2611,7 +2905,7 @@ export const mockUserGraphqlOperation = {
                     initialValue: '',
                     validate: [],
                     dynamicOptions: {
-                      dependency: 'role',
+                      dependency: 'systemRole',
                       options: {}
                     }
                   },
@@ -2640,7 +2934,7 @@ export const mockUserGraphqlOperation = {
                   {
                     action: 'hide',
                     expression:
-                      'values.role!=="LOCAL_REGISTRAR" && values.role!=="REGISTRATION_AGENT"'
+                      'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="REGISTRATION_AGENT"'
                   }
                 ],
                 fields: [
@@ -2719,8 +3013,8 @@ export const mockDataWithRegistarRoleSelected = {
   nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'LOCAL_REGISTRAR',
-  type: 'SECRETARY',
+  systemRole: 'LOCAL_REGISTRAR',
+  role: 'SECRETARY',
   userDetails: '',
   username: '',
   signature: {

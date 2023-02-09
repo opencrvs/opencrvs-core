@@ -65,6 +65,7 @@ declaration.data.history = [
     user: {
       id: userDetails.userMgntUserID,
       name: userDetails.name,
+      systemRole: userDetails.systemRole,
       role: userDetails.role
     },
     office: userDetails.primaryOffice,

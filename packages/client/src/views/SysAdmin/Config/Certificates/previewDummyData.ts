@@ -13,6 +13,7 @@ import { gqlToDraftTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
 import { RoleType, Status } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 const dummyBirthRegistrationResponse = {
   _fhirIDMap: {
@@ -1264,8 +1265,7 @@ const mockOfflineData: Partial<IOfflineData> = {
     }
   }
 }
-const mockUserDetails = {
-  language: 'en',
+const mockUserDetails: UserDetails = {
   id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
   creationDate: '2022-03-25T12:30:34.597+00:00',
   localRegistrar: {
@@ -1295,16 +1295,24 @@ const mockUserDetails = {
     }
   ],
   mobile: '+260921111111',
-  role: 'NATIONAL_SYSTEM_ADMIN' as RoleType,
-  type: 'NATIONAL_SYSTEM_ADMIN',
-  status: 'active' as Status
-  /*primaryOffice: {
+  systemRole: RoleType.NationalSystemAdmin,
+  role: {
+    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+    labels: [
+      {
+        lang: 'en',
+        label: 'NATIONAL_SYSTEM_ADMIN'
+      }
+    ]
+  },
+  status: Status.Active,
+  primaryOffice: {
     id: '4bf3e2ac-99f5-468c-b974-966f725aaab0',
     name: 'Ibombo District Office',
     alias: ['Ibombo District Office'],
     status: 'active'
-  }*/
-  /*catchmentArea: [
+  },
+  catchmentArea: [
     {
       id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
       name: 'Ibombo',
@@ -1337,7 +1345,7 @@ const mockUserDetails = {
         }
       ]
     }
-  ]*/
+  ]
 }
 
 export const getDummyDeclarationData = (

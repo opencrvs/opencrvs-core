@@ -257,7 +257,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
-        (assignment?.userId != userId ||
+        (assignment?.userId !== userId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
         (downloadConfigs.declarationStatus !== 'VALIDATED' ||
           userRole !== ROLE_REGISTRATION_AGENT) &&
@@ -338,7 +338,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       >
         {status === DOWNLOAD_STATUS.DOWNLOADED ? (
           <Downloaded />
-        ) : assignment && assignment.userId != userId ? (
+        ) : assignment && assignment.userId !== userId ? (
           <AvatarVerySmall
             avatar={{
               data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
@@ -370,7 +370,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.role,
+  userRole: state.profile.userDetails?.systemRole,
   userId: state.profile.userDetails?.userMgntUserID
 })
 

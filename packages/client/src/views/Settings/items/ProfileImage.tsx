@@ -56,7 +56,9 @@ export function ProfileImage() {
 
   const englishName = useUserName()
 
-  const userDetails = useSelector<IStoreState, UserDetails | null>(getUserDetails)
+  const userDetails = useSelector<IStoreState, UserDetails | null>(
+    getUserDetails
+  )
   const dispatch = useDispatch()
 
   const changeAvatar = React.useCallback(

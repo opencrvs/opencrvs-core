@@ -143,7 +143,8 @@ export const GetHistory = ({
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
-    userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+    userDetails?.systemRole &&
+    FIELD_AGENT_ROLES.includes(userDetails.systemRole)
       ? true
       : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
@@ -171,7 +172,7 @@ export const GetHistory = ({
         id: userDetails.userMgntUserID,
         name: userDetails.name,
         avatar: userDetails.avatar,
-        role: userDetails.role
+        systemRole: userDetails.systemRole
       },
       office: userDetails.primaryOffice,
       comments: [],
@@ -242,11 +243,11 @@ export const GetHistory = ({
         )}
       </>
     ),
-    type: intl.formatMessage(
-      isSystemInitiated(item) || !item.user?.role
-        ? getSystemType(item.system?.type)
-        : userMessages[item.user.role]
-    ),
+    role:
+      isSystemInitiated(item) || !item.user?.systemRole
+        ? intl.formatMessage(getSystemType(item.system?.type))
+        : item.user.role.labels.find((label) => label.lang === 'en')?.label,
+
     location: isSystemInitiated(item) ? null : isFieldAgent ? (
       <>{item.office?.name}</>
     ) : (
@@ -280,9 +281,9 @@ export const GetHistory = ({
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
     },
     {
-      label: intl.formatMessage(constantsMessages.type),
+      label: intl.formatMessage(constantsMessages.labelRole),
       width: 15,
-      key: 'type'
+      key: 'role'
     },
     {
       label: intl.formatMessage(constantsMessages.location),

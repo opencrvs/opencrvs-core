@@ -11,7 +11,7 @@
  */
 
 import { UserSection, CorrectionSection, WizardSection } from '@client/forms'
-import { Event, User } from '@client/utils/gateway'
+import { Event } from '@client/utils/gateway'
 import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
@@ -56,6 +56,7 @@ import {
   VIEW_RECORD,
   ADVANCED_SEARCH_RESULT,
   PERFORMANCE_REGISTRATIONS_LIST,
+  USER_ROLES_CONFIG,
   ORGANISATIONS_INDEX,
   INFORMANT_NOTIFICATION
 } from '@client/navigation/routes'
@@ -175,6 +176,10 @@ export function goToHome() {
 
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+
+export function goToUserRolesConfig() {
+  return push(USER_ROLES_CONFIG)
 }
 
 export function goToInformantNotification() {
@@ -630,7 +635,7 @@ export function goToPage(
 }
 
 export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
-  const role = userDetails?.role
+  const role = userDetails?.systemRole
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
     if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
@@ -658,14 +663,14 @@ export function goToPerformanceView(userDetails: UserDetails) {
 }
 
 export function goToTeamView(userDetails: UserDetails) {
-  if (userDetails && userDetails.role) {
+  if (userDetails && userDetails.systemRole) {
     return goToTeamUserList(
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
     )
   }
 }
 
-export function goToOrganisationView(userDetails: IUserDetails) {
+export function goToOrganisationView(userDetails: UserDetails) {
   return goToOrganizationList()
 }
 

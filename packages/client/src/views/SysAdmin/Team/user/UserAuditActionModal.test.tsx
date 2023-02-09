@@ -33,7 +33,7 @@ const users: UserDetails[] = [
       }
     ],
     username: 'r.tagore',
-    role: RoleType.RegistrationAgent,
+    systemRole: RoleType.RegistrationAgent,
     localRegistrar: {
       name: [
         {
@@ -45,7 +45,15 @@ const users: UserDetails[] = [
       role: RoleType.LocalRegistrar,
       signature: undefined
     },
-    type: 'ENTREPENEUR',
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'ENTREPENEUR'
+        }
+      ]
+    },
     status: Status.Active,
     creationDate: '2022-10-03T10:42:46.920Z',
     userMgntUserID: '5eba726866458970cf2e23c2',
@@ -82,8 +90,16 @@ const users: UserDetails[] = [
       }
     ],
     username: 'np.huq',
-    role: RoleType.LocalRegistrar,
-    type: 'MAYOR',
+    systemRole: RoleType.LocalRegistrar,
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'MAYOR'
+        }
+      ]
+    },
     status: Status.Deactivated,
     localRegistrar: {
       name: [

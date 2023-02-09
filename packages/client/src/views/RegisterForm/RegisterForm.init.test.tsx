@@ -47,7 +47,7 @@ describe('when user logs in', () => {
     declarations: [draft3]
   }
 
-  const currentUserDetails: UserDetails = {
+  const currentUserDetails: Partial<UserDetails> = {
     userMgntUserID: 'shakib75',
     id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
     creationDate: '2022-03-25T12:30:34.597+00:00',
@@ -61,8 +61,16 @@ describe('when user logs in', () => {
       }
     ],
     mobile: '+260921111111',
-    role: 'NATIONAL_SYSTEM_ADMIN' as RoleType,
-    type: 'NATIONAL_SYSTEM_ADMIN',
+    systemRole: RoleType.NationalSystemAdmin,
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'National System Admin'
+        }
+      ]
+    },
     status: 'active' as Status,
     localRegistrar: { name: [], role: 'FIELD_AGENT' as RoleType }
   }

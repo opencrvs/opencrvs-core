@@ -616,7 +616,10 @@ export function getInitialValueForSelectDynamicValue(
   return fieldInitialValue
 }
 
-const mapFieldsToValues = (fields: IFormField[], userDetails: UserDetails | null) =>
+const mapFieldsToValues = (
+  fields: IFormField[],
+  userDetails: UserDetails | null
+) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 

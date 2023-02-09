@@ -46,9 +46,7 @@ import {
   modifyUserFormData,
   submitUserFormData
 } from '@client/user/userReducer'
-import {
-  Action,
-} from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
+import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import {
   PrimaryButton,
   SuccessButton,
@@ -74,6 +72,7 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -109,10 +108,6 @@ const Container = styled.div`
   }
 `
 
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-bottom: 16px;
-`
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
   width: 100%;
@@ -141,7 +136,9 @@ class UserReviewFormComponent extends React.Component<
       this.props.formData
     ).forEach((group) => {
       group.fields.forEach((field: IFormField, idx) => {
-        if (field.type == SUBSECTION) {
+        if (field.hideValueInPreview) {
+          return
+        } else if (field.type === SUBSECTION) {
           return
         } else if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
@@ -191,7 +188,7 @@ class UserReviewFormComponent extends React.Component<
               actions:
                 !(
                   field.name === 'registrationOffice' &&
-                  this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
+                  this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
                 ) && !field.readonly ? (
                   <LinkButton
                     id={`btn_change_${field.name}`}
@@ -247,10 +244,12 @@ class UserReviewFormComponent extends React.Component<
 
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
-        ? field.name === 'role'
-          ? intl.formatMessage(userMessages[formData.role as string])
-          : field.name === 'type'
-          ? intl.formatMessage(userMessages[formData.type as string])
+        ? field.name === 'systemRole'
+          ? intl.formatMessage(userMessages[formData.systemRole as string])
+          : field.name === 'role'
+          ? intl.formatMessage({
+              id: getUserRoleIntlKey(formData.role as string)
+            })
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label
       : ''
@@ -293,8 +292,8 @@ class UserReviewFormComponent extends React.Component<
         <SuccessButton
           id="submit-edit-user-form"
           disabled={
-            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
-              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
+            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
+              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -310,8 +309,8 @@ class UserReviewFormComponent extends React.Component<
         <PrimaryButton
           id="submit_user_form"
           disabled={
-            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
-              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
+            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
+              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}

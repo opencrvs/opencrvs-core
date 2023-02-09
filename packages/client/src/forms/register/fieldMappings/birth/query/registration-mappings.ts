@@ -248,7 +248,7 @@ export const registrarNameUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -268,7 +268,7 @@ export const roleUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return
@@ -280,8 +280,8 @@ export const roleUserTransformer = (
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
-    history?.user?.role
-      ? (userMessages[history.user.role] as MessageDescriptor &
+    history?.user?.systemRole
+      ? (userMessages[history.user.systemRole] as MessageDescriptor &
           Record<string, string>)
       : ''
 }
@@ -314,7 +314,7 @@ export const registrarSignatureUserTransformer = (
   sectionId: string,
   targetSectionId?: string,
   targetFieldName?: string,
-  __?: IOfflineData,
+  __?: IOfflineData
 ) => {
   if (!_.history) {
     return

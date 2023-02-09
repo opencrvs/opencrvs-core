@@ -67,6 +67,7 @@ import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { RoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
+import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -266,6 +267,14 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              RoleType.NationalSystemAdmin
+                                            ]}
+                                            path={routes.USER_ROLES_CONFIG}
+                                            component={UserRoles}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={routes.FORM_CONFIG_WIZARD}
                                             component={FormConfigWizard}
                                           />
@@ -440,12 +449,12 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             roles={[
-                                              Roles.REGISTRATION_AGENT,
-                                              Roles.LOCAL_REGISTRAR,
-                                              Roles.LOCAL_SYSTEM_ADMIN,
-                                              Roles.NATIONAL_SYSTEM_ADMIN,
-                                              Roles.PERFORMANCE_MANAGEMENT,
-                                              Roles.NATIONAL_REGISTRAR
+                                              RoleType.RegistrationAgent,
+                                              RoleType.LocalRegistrar,
+                                              RoleType.LocalSystemAdmin,
+                                              RoleType.NationalSystemAdmin,
+                                              RoleType.PerformanceManagement,
+                                              RoleType.NationalRegistrar
                                             ]}
                                             path={routes.ORGANISATIONS_INDEX}
                                             component={AdministrativeLevels}
