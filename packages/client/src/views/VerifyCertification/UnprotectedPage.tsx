@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react'
+import React, { ReactNode } from 'react'
 import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components'
 import { useDispatch } from 'react-redux'
