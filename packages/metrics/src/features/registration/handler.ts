@@ -506,7 +506,7 @@ export async function declarationViewedHandler(
   await createUserAuditPointFromFHIR('VIEWED', request)
   return h.response().code(200)
 }
-export async function birthDeclarationArchivedHandler(
+export async function birthOrDeathDeclarationArchivedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -539,7 +539,7 @@ export async function birthDeclarationReinstatedHandler(
 
   return h.response().code(200)
 }
-export async function deathDeclarationReinstatedHandler(
+export async function birthOrDeathDeclarationReinstatedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
