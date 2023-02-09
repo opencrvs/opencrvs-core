@@ -32,6 +32,7 @@ import {
   getActionFromTask,
   getTask
 } from '@metrics/features/registration/fhirUtils'
+import { EventType } from '@metrics/config/routes'
 
 export async function waitingExternalValidationHandler(
   request: Hapi.Request,
@@ -241,6 +242,20 @@ export async function markRejectedHandler(
   return h.response().code(200)
 }
 
+export async function newEventRegistrationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const event = request.params.event as EventType
+  if (event === EventType.BIRTH) {
+    return newBirthRegistrationHandler(request, h)
+  } else if (event === EventType.DEATH) {
+    return newDeathRegistrationHandler(request, h)
+  }
+
+  return h.response().code(200)
+}
+
 export async function newBirthRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -268,6 +283,19 @@ export async function newBirthRegistrationHandler(
     return internal(err)
   }
 
+  return h.response().code(200)
+}
+
+export async function markEventRegistererHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const event = request.params.event as EventType
+  if (event === EventType.BIRTH) {
+    return markBirthRegisteredHandler(request, h)
+  } else if (event === EventType.DEATH) {
+    return markDeathRegisteredHandler(request, h)
+  }
   return h.response().code(200)
 }
 

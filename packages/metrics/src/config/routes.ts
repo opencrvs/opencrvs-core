@@ -29,13 +29,9 @@ import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEve
 
 import {
   inProgressHandler,
-  markBirthRegisteredHandler,
   markCertifiedHandler,
-  markDeathRegisteredHandler,
   markRejectedHandler,
   markValidatedHandler,
-  newBirthRegistrationHandler,
-  newDeathRegistrationHandler,
   newDeclarationHandler,
   registrarRegistrationWaitingExternalValidationHandler,
   requestCorrectionHandler,
@@ -47,7 +43,9 @@ import {
   declarationDownloadedHandler,
   birthOrDeathDeclarationArchivedHandler,
   birthOrDeathDeclarationReinstatedHandler,
-  declarationUpdatedHandler
+  declarationUpdatedHandler,
+  markEventRegistererHandler,
+  newEventRegistrationHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -77,7 +75,7 @@ import {
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
 }
-enum Event {
+export enum EventType {
   BIRTH = 'birth',
   DEATH = 'death'
 }
@@ -94,7 +92,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -109,7 +107,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -124,7 +122,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -139,7 +137,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -152,7 +150,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -161,25 +159,12 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/new-registration',
-      handler: newBirthRegistrationHandler,
+      handler: newEventRegistrationHandler,
       config: {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
-          })
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/{event}/new-registration',
-      handler: newDeathRegistrationHandler,
-      config: {
-        tags: ['api'],
-        validate: {
-          params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -194,7 +179,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -204,30 +189,17 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-registered',
-      handler: markBirthRegisteredHandler,
+      handler: markEventRegistererHandler,
       config: {
+        auth: false,
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
     },
-    {
-      method: 'POST',
-      path: '/events/{event}/mark-registered',
-      handler: markDeathRegisteredHandler,
-      config: {
-        tags: ['api'],
-        validate: {
-          params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
-          })
-        }
-      }
-    },
-
     // Mark certified
     {
       method: 'POST',
@@ -237,7 +209,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -252,7 +224,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -288,7 +260,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -327,7 +299,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
@@ -340,7 +312,7 @@ export const getRoutes = () => {
         tags: ['api'],
         validate: {
           params: Joi.object({
-            event: Joi.string().valid(...Object.values(Event))
+            event: Joi.string().valid(...Object.values(EventType))
           })
         }
       }
