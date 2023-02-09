@@ -14,6 +14,7 @@ import styled from 'styled-components'
 
 const Logo = styled.img<{ size: ISize }>`
   max-height: ${({ size }) => (size === 'small' ? 104 : 128)}px;
+  max-width: 100%;
 `
 
 type ISize = 'small' | 'medium'
