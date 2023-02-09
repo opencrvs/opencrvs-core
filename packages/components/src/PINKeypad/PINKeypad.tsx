@@ -11,6 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import * as ReactDOM from 'react-dom'
 import { userMessages } from '@opencrvs/client/src/i18n/messages'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
@@ -34,6 +35,9 @@ const Container = styled.div`
   outline: none;
   margin-top: 32px;
 `
+const StyledInput = styled.input`
+  opacity: 0;
+`
 
 const DotFilled = styled.span`
   height: 18px;
@@ -55,8 +59,12 @@ const DotUnfilled = styled.span`
 
 export class PINKeypad extends React.Component<IProps, IState> {
   state = { pin: this.props.pin || '' }
+  pinInput: any
 
-  pinInput = React.createRef<HTMLInputElement>()
+  componentDidMount() {
+    this.pinInput &&
+      (ReactDOM.findDOMNode(this.pinInput) as HTMLElement)?.focus()
+  }
 
   keyPress = (key: number) => {
     const { pin } = this.state
@@ -107,6 +115,11 @@ export class PINKeypad extends React.Component<IProps, IState> {
     }
   }
 
+  onBlur = () => {
+    this.pinInput &&
+      (ReactDOM.findDOMNode(this.pinInput) as HTMLElement)?.focus()
+  }
+
   render() {
     const { pin } = this.state
     return (
@@ -118,12 +131,12 @@ export class PINKeypad extends React.Component<IProps, IState> {
       >
         <div>
           <div>
-            <input
-              hidden
+            <StyledInput
               type="number"
               onKeyDown={this.keyDown}
               id="pin-input"
-              ref={this.pinInput}
+              ref={(elem: any) => (this.pinInput = elem)}
+              onBlur={this.onBlur}
             />
           </div>
           <div
