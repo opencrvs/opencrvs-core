@@ -2191,7 +2191,7 @@ export interface QueryToFetchRegistrationCountByStatusResolver<
 }
 
 export interface QueryToFetchRecordsDetailsByCompositionIdArgs {
-  id?: string
+  id: string
 }
 export interface QueryToFetchRecordsDetailsByCompositionIdResolver<
   TParent = any,

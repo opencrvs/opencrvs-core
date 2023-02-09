@@ -55,6 +55,13 @@ import {
 } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
+  RecordDetails: {
+    __resolveType(obj): any {
+      if (obj.type.text == 'Birth Declaration') return 'BirthRegistration'
+      if (obj.type.text == 'Death Declaration') return 'DeathRegistration'
+      return null
+    }
+  },
   Query: {
     async searchBirthRegistrations(_, { fromDate, toDate }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
