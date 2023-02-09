@@ -12,7 +12,7 @@
 import { gqlToDraftTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
-import { RoleType, Status } from '@client/utils/gateway'
+import { SystemRoleType, Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
 const dummyBirthRegistrationResponse = {
@@ -1277,7 +1277,7 @@ const mockUserDetails: UserDetails = {
         // __typename: 'HumanName'
       }
     ],
-    role: 'LOCAL_REGISTRAR' as RoleType,
+    role: 'LOCAL_REGISTRAR' as SystemRoleType,
     signature: {
       type: 'image/png'
       // __typename: 'Signature'
@@ -1295,7 +1295,7 @@ const mockUserDetails: UserDetails = {
     }
   ],
   mobile: '+260921111111',
-  systemRole: RoleType.NationalSystemAdmin,
+  systemRole: SystemRoleType.NationalSystemAdmin,
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [

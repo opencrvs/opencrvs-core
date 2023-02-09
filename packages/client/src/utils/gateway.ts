@@ -1025,7 +1025,7 @@ export type LabelInput = {
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
-  role: RoleType
+  role: SystemRoleType
   signature?: Maybe<Signature>
 }
 
@@ -2035,16 +2035,6 @@ export type RoleLabel = {
   lang: Scalars['String']
 }
 
-export enum RoleType {
-  FieldAgent = 'FIELD_AGENT',
-  LocalRegistrar = 'LOCAL_REGISTRAR',
-  LocalSystemAdmin = 'LOCAL_SYSTEM_ADMIN',
-  NationalRegistrar = 'NATIONAL_REGISTRAR',
-  NationalSystemAdmin = 'NATIONAL_SYSTEM_ADMIN',
-  PerformanceManagement = 'PERFORMANCE_MANAGEMENT',
-  RegistrationAgent = 'REGISTRATION_AGENT'
-}
-
 export type SmsNotification = {
   __typename?: 'SMSNotification'
   createdAt: Scalars['String']
@@ -2144,7 +2134,7 @@ export type SystemRole = {
   active: Scalars['Boolean']
   id: Scalars['ID']
   roles: Array<Role>
-  value: RoleType
+  value: SystemRoleType
 }
 
 export type SystemRoleInput = {
@@ -2152,6 +2142,16 @@ export type SystemRoleInput = {
   id: Scalars['ID']
   roles?: InputMaybe<Array<RoleInput>>
   value?: InputMaybe<Scalars['String']>
+}
+
+export enum SystemRoleType {
+  FieldAgent = 'FIELD_AGENT',
+  LocalRegistrar = 'LOCAL_REGISTRAR',
+  LocalSystemAdmin = 'LOCAL_SYSTEM_ADMIN',
+  NationalRegistrar = 'NATIONAL_REGISTRAR',
+  NationalSystemAdmin = 'NATIONAL_SYSTEM_ADMIN',
+  PerformanceManagement = 'PERFORMANCE_MANAGEMENT',
+  RegistrationAgent = 'REGISTRATION_AGENT'
 }
 
 export type SystemSecret = {
@@ -2229,7 +2229,7 @@ export type User = {
   searches?: Maybe<Array<BookmarkedSeachItem>>
   signature?: Maybe<Signature>
   status: Status
-  systemRole: RoleType
+  systemRole: SystemRoleType
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID: Scalars['ID']
   username?: Maybe<Scalars['String']>
@@ -2281,7 +2281,7 @@ export type UserInput = {
   primaryOffice?: InputMaybe<Scalars['String']>
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
-  systemRole: RoleType
+  systemRole: SystemRoleType
   username?: InputMaybe<Scalars['String']>
 }
 
@@ -2463,7 +2463,7 @@ export type GetSystemRolesQuery = {
   getSystemRoles?: Array<{
     __typename?: 'SystemRole'
     id: string
-    value: RoleType
+    value: SystemRoleType
     roles: Array<{
       __typename?: 'Role'
       _id: string
@@ -2699,7 +2699,7 @@ export type FetchUserQuery = {
     username?: string | null
     practitionerId: string
     mobile: string
-    systemRole: RoleType
+    systemRole: SystemRoleType
     status: Status
     role: {
       __typename?: 'Role'
@@ -2733,7 +2733,7 @@ export type FetchUserQuery = {
     } | null
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
-      role: RoleType
+      role: SystemRoleType
       name: Array<{
         __typename?: 'HumanName'
         use?: string | null
@@ -2969,7 +2969,7 @@ export type SearchUsersQuery = {
       __typename?: 'User'
       id: string
       username?: string | null
-      systemRole: RoleType
+      systemRole: SystemRoleType
       mobile: string
       status: Status
       underInvestigation?: boolean | null
@@ -3035,7 +3035,7 @@ export type GetUserQuery = {
     id: string
     username?: string | null
     mobile: string
-    systemRole: RoleType
+    systemRole: SystemRoleType
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
@@ -3153,7 +3153,7 @@ export type MarkBirthAsRegisteredMutation = {
         user?: {
           __typename?: 'User'
           id: string
-          systemRole: RoleType
+          systemRole: SystemRoleType
           name: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -3450,7 +3450,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: RoleType
+        systemRole: SystemRoleType
         role: {
           __typename?: 'Role'
           _id: string
@@ -3748,7 +3748,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: RoleType
+        systemRole: SystemRoleType
         role: {
           __typename?: 'Role'
           _id: string
@@ -3866,7 +3866,7 @@ export type MarkDeathAsRegisteredMutation = {
         user?: {
           __typename?: 'User'
           id: string
-          systemRole: RoleType
+          systemRole: SystemRoleType
           name: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -4118,7 +4118,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: RoleType
+        systemRole: SystemRoleType
         role: {
           __typename?: 'Role'
           _id: string
@@ -4394,7 +4394,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: RoleType
+        systemRole: SystemRoleType
         role: {
           __typename?: 'Role'
           _id: string
@@ -5699,7 +5699,7 @@ export type GetUserByMobileQuery = {
     id: string
     username?: string | null
     mobile: string
-    systemRole: RoleType
+    systemRole: SystemRoleType
     status: Status
     role: { __typename?: 'Role'; _id: string }
   } | null
@@ -6221,7 +6221,7 @@ export type GetEventsWithProgressQuery = {
       } | null
       startedBy?: {
         __typename?: 'User'
-        systemRole: RoleType
+        systemRole: SystemRoleType
         name: Array<{
           __typename?: 'HumanName'
           use?: string | null
@@ -6279,7 +6279,7 @@ export type GetRegistrationsListByFilterQuery = {
           registrarPractitioner?: {
             __typename?: 'User'
             id: string
-            systemRole: RoleType
+            systemRole: SystemRoleType
             primaryOffice?: {
               __typename?: 'Location'
               name: string
@@ -6633,7 +6633,7 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            systemRole: RoleType
+            systemRole: SystemRoleType
             role: { __typename?: 'Role'; _id: string }
             name: Array<{
               __typename?: 'HumanName'
@@ -6911,7 +6911,7 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            systemRole: RoleType
+            systemRole: SystemRoleType
             role: { __typename?: 'Role'; _id: string }
             name: Array<{
               __typename?: 'HumanName'

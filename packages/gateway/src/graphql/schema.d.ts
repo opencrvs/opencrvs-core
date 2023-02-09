@@ -245,7 +245,7 @@ export interface GQLUser {
   name: Array<GQLHumanName>
   username?: string
   mobile: string
-  systemRole: GQLRoleType
+  systemRole: GQLSystemRoleType
   role: GQLRole
   email?: string
   status: GQLStatus
@@ -427,7 +427,7 @@ export interface GQLEventProgressResultSet {
 
 export interface GQLSystemRole {
   id: string
-  value: GQLRoleType
+  value: GQLSystemRoleType
   roles: Array<GQLRole>
   active: boolean
 }
@@ -561,7 +561,7 @@ export interface GQLUserInput {
   identifier?: Array<GQLUserIdentifierInput | null>
   username?: string
   mobile: string
-  systemRole: GQLRoleType
+  systemRole: GQLSystemRoleType
   role?: string
   email?: string
   primaryOffice?: string
@@ -921,7 +921,7 @@ export const enum GQLLocationType {
   OTHER = 'OTHER'
 }
 
-export const enum GQLRoleType {
+export const enum GQLSystemRoleType {
   FIELD_AGENT = 'FIELD_AGENT',
   REGISTRATION_AGENT = 'REGISTRATION_AGENT',
   LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
@@ -945,7 +945,7 @@ export const enum GQLStatus {
 
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
-  role: GQLRoleType
+  role: GQLSystemRoleType
   signature?: GQLSignature
 }
 

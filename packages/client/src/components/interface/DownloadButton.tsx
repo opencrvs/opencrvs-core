@@ -24,7 +24,7 @@ import {
   deleteDeclaration as deleteDeclarationAction
 } from '@client/declarations'
 import { Action } from '@client/forms'
-import { Event, RoleType } from '@client/utils/gateway'
+import { Event, SystemRoleType } from '@client/utils/gateway'
 import {
   ApolloClient,
   InternalRefetchQueriesInclude,
@@ -64,7 +64,7 @@ interface DownloadButtonProps {
 }
 
 interface IConnectProps {
-  userRole?: RoleType
+  userRole?: SystemRoleType
   userId?: string
 }
 interface IDispatchProps {
@@ -112,7 +112,7 @@ function getAssignModalOptions(
     onUnassign: () => void
     onCancel: () => void
   },
-  userRole?: RoleType,
+  userRole?: SystemRoleType,
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
   const assignAction: IModalAction = {
@@ -142,8 +142,8 @@ function getAssignModalOptions(
     }
   } else if (assignment) {
     if (
-      userRole === RoleType.LocalRegistrar ||
-      userRole === RoleType.NationalRegistrar
+      userRole === SystemRoleType.LocalRegistrar ||
+      userRole === SystemRoleType.NationalRegistrar
     ) {
       return {
         title: conflictsMessages.unassignTitle,

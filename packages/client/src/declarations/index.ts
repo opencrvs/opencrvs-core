@@ -20,7 +20,7 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Event, Query, RoleType } from '@client/utils/gateway'
+import { Event, Query, SystemRoleType } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -662,7 +662,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   let currentUserDeclarations: IDeclaration[] =
     (currentUserData && currentUserData.declarations) || []
 
-  if (RoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
+  if (SystemRoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
     currentUserDeclarations = currentUserData.declarations.filter((d) => {
       if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
         const history = d.originalData?.history as unknown as IDynamicValues

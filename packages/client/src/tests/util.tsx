@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { App } from '@client/App'
-import { Event, RoleType, Status } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -1274,7 +1274,7 @@ export const userDetails: UserDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  systemRole: RoleType.FieldAgent,
+  systemRole: SystemRoleType.FieldAgent,
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [
@@ -1362,7 +1362,7 @@ export const userDetails: UserDetails = {
     }
   ],
   localRegistrar: {
-    role: 'LOCAL_REGISTRAR' as RoleType,
+    role: 'LOCAL_REGISTRAR' as SystemRoleType,
     signature: {
       data: `data:image/png;base64,${validImageB64String}`,
       type: 'image/png'
@@ -2210,7 +2210,7 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          systemRole: RoleType.FieldAgent,
+          systemRole: SystemRoleType.FieldAgent,
           role: {
             _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             labels: [
@@ -2256,7 +2256,7 @@ export function loginAsFieldAgent(store: AppStore) {
                 familyName: 'Ashraful'
               }
             ],
-            role: RoleType.LocalRegistrar,
+            role: SystemRoleType.LocalRegistrar,
             signature: undefined
           }
         }

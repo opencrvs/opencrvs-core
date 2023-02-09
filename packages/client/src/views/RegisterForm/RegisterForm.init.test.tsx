@@ -28,7 +28,7 @@ import {
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { vi } from 'vitest'
 
-import { Event, RoleType, Status } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status } from '@client/utils/gateway'
 import { storage } from '@client/storage'
 import { UserDetails } from '@client/utils/userUtils'
 describe('when user logs in', () => {
@@ -61,7 +61,7 @@ describe('when user logs in', () => {
       }
     ],
     mobile: '+260921111111',
-    systemRole: RoleType.NationalSystemAdmin,
+    systemRole: SystemRoleType.NationalSystemAdmin,
     role: {
       _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
       labels: [
@@ -72,7 +72,7 @@ describe('when user logs in', () => {
       ]
     },
     status: 'active' as Status,
-    localRegistrar: { name: [], role: 'FIELD_AGENT' as RoleType }
+    localRegistrar: { name: [], role: 'FIELD_AGENT' as SystemRoleType }
   }
 
   const indexedDB = {

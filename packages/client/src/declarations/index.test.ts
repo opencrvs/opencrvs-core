@@ -18,7 +18,7 @@ import {
   filterProcessingDeclarations,
   filterProcessingDeclarationsFromQuery
 } from '.'
-import { Event, RoleType, Status } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status } from '@client/utils/gateway'
 import { AppStore, createStore } from '@client/store'
 import { mockDeclarationData, flushPromises } from '@client/tests/util'
 import { storage } from '@client/storage'
@@ -300,7 +300,7 @@ describe('archiveDeclaration tests', () => {
         ]
       },
       name: [],
-      localRegistrar: { name: [], role: 'FIELD_AGENT' as RoleType }
+      localRegistrar: { name: [], role: 'FIELD_AGENT' as SystemRoleType }
     }
 
     indexedDB = {

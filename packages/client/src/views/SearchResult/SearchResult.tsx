@@ -51,7 +51,7 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
-import { SearchEventsQuery, RoleType } from '@client/utils/gateway'
+import { SearchEventsQuery, SystemRoleType } from '@client/utils/gateway'
 
 import {
   ColumnContentAlignment,
@@ -349,9 +349,9 @@ export class SearchResultView extends React.Component<
                         declarationLocationId:
                           userDetails &&
                           ![
-                            RoleType.LocalRegistrar,
-                            RoleType.NationalRegistrar,
-                            RoleType.RegistrationAgent
+                            SystemRoleType.LocalRegistrar,
+                            SystemRoleType.NationalRegistrar,
+                            SystemRoleType.RegistrationAgent
                           ].includes(userDetails.systemRole)
                             ? getUserLocation(userDetails).id
                             : ''
@@ -459,9 +459,9 @@ export class SearchResultView extends React.Component<
                 declarationLocationId:
                   userDetails &&
                   ![
-                    RoleType.LocalRegistrar,
-                    RoleType.NationalRegistrar,
-                    RoleType.RegistrationAgent
+                    SystemRoleType.LocalRegistrar,
+                    SystemRoleType.NationalRegistrar,
+                    SystemRoleType.RegistrationAgent
                   ].includes(userDetails.systemRole)
                     ? getUserLocation(userDetails).id
                     : '',
