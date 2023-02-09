@@ -12,16 +12,16 @@
 import * as Hapi from '@hapi/hapi'
 import { writePoints } from '@metrics/influxdb/client'
 import {
-  generateInCompleteFieldPoints,
   generateBirthRegPoint,
-  generateDeathRegPoint,
-  generateEventDurationPoint,
-  generatePaymentPoint,
-  generateDeclarationStartedPoint,
-  generateTimeLoggedPoint,
-  generateRejectedPoints,
+  generateCertificationPoint,
   generateCorrectionReasonPoint,
-  generateCertificationPoint
+  generateDeathRegPoint,
+  generateDeclarationStartedPoint,
+  generateEventDurationPoint,
+  generateInCompleteFieldPoints,
+  generatePaymentPoint,
+  generateRejectedPoints,
+  generateTimeLoggedPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
@@ -308,6 +308,7 @@ export async function markBirthRegisteredHandler(
 
   return h.response().code(200)
 }
+
 export async function newDeathRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -337,6 +338,7 @@ export async function newDeathRegistrationHandler(
 
   return h.response().code(200)
 }
+
 export async function markDeathRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -485,6 +487,7 @@ export async function declarationAssignedHandler(
   await createUserAuditPointFromFHIR('ASSIGNED', request)
   return h.response().code(200)
 }
+
 export async function declarationUnassignedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -492,6 +495,7 @@ export async function declarationUnassignedHandler(
   await createUserAuditPointFromFHIR('UNASSIGNED', request)
   return h.response().code(200)
 }
+
 export async function declarationDownloadedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -499,6 +503,7 @@ export async function declarationDownloadedHandler(
   await createUserAuditPointFromFHIR('RETRIEVED', request)
   return h.response().code(200)
 }
+
 export async function declarationViewedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -506,6 +511,7 @@ export async function declarationViewedHandler(
   await createUserAuditPointFromFHIR('VIEWED', request)
   return h.response().code(200)
 }
+
 export async function birthOrDeathDeclarationArchivedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -513,32 +519,7 @@ export async function birthOrDeathDeclarationArchivedHandler(
   await createUserAuditPointFromFHIR('ARCHIVED', request)
   return h.response().code(200)
 }
-export async function deathDeclarationArchivedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  await createUserAuditPointFromFHIR('ARCHIVED', request)
-  return h.response().code(200)
-}
-export async function birthDeclarationReinstatedHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const bundle = request.payload as fhir.Bundle
-  const task = getTask(bundle)
-  const previousAction = getActionFromTask(task!)
-  if (previousAction === 'IN_PROGRESS') {
-    await createUserAuditPointFromFHIR('REINSTATED_IN_PROGRESS', request)
-  }
-  if (previousAction === 'DECLARED') {
-    await createUserAuditPointFromFHIR('REINSTATED_DECLARED', request)
-  }
-  if (previousAction === 'REJECTED') {
-    await createUserAuditPointFromFHIR('REINSTATED_REJECTED', request)
-  }
 
-  return h.response().code(200)
-}
 export async function birthOrDeathDeclarationReinstatedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -557,6 +538,7 @@ export async function birthOrDeathDeclarationReinstatedHandler(
   }
   return h.response().code(200)
 }
+
 export async function declarationUpdatedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
