@@ -12,6 +12,7 @@ graphic logo are (registered/a) trademark(s) of Plan International.
 const {
   upsertChannel,
   removeChannel
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
 } = require('../../utils/openhim-helpers.cjs')
 
 const newChannel = {
@@ -68,7 +69,7 @@ exports.up = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await upsertChannel(db, newChannel)
+      await upsertChannel(db, newChannel, session)
     })
   } finally {
     await session.endSession()
@@ -79,7 +80,7 @@ exports.down = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await removeChannel(db, newChannel)
+      await removeChannel(db, newChannel, session)
     })
   } finally {
     await session.endSession()

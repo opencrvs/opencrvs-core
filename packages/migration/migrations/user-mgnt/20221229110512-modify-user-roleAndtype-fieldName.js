@@ -154,23 +154,28 @@ export const up = async (db, client) => {
   try {
     /* ==============Create a new userroles collection============== */
 
-    await db.createCollection('userroles')
+    await db.createCollection('userroles', { session })
 
     const userRolesResult = await db.collection('userroles').insertMany(
       UserRoles.map((userRole) => ({
         ...userRole,
         createdAt: Date.now().toString(),
         updatedAt: Date.now().toString()
-      }))
+      })),
+      { session }
     )
 
     /* ==============Migration for "users" Collection============== */
 
-    const totalUserCount = await getTotalDocCountByCollectionName(db, 'users')
+    const totalUserCount = await getTotalDocCountByCollectionName(
+      db,
+      'users',
+      session
+    )
 
     while (totalUserCount > processedDocCount) {
-      const userCursor = await getUserCursor(db, limit, skip)
-      const count = await userCursor.count()
+      const userCursor = await getUserCursor(db, limit, skip, session)
+      const count = await userCursor.count({ session })
       // eslint-disable-next-line no-console
       console.log(
         `Migration Up - User role & Type :: Processing ${
@@ -190,7 +195,8 @@ export const up = async (db, client) => {
                 ]
               ]
             }
-          }
+          },
+          { session }
         )
       }
 
@@ -206,9 +212,11 @@ export const up = async (db, client) => {
     //rename 'role' field to 'systemRole' for all 'users' collection documents
     await db
       .collection('users')
-      .updateMany({}, { $rename: { role: 'systemRole' } })
+      .updateMany({}, { $rename: { role: 'systemRole' } }, { session })
     //rename 'type' field to 'role' for all 'users' collection documents
-    await db.collection('users').updateMany({}, { $rename: { type: 'role' } })
+    await db
+      .collection('users')
+      .updateMany({}, { $rename: { type: 'role' } }, { session })
 
     /* ==============Migration for "roles" Collection============== */
 
@@ -222,15 +230,20 @@ export const up = async (db, client) => {
                 ? Object.values(userRolesResult.insertedIds).slice(0, 4)
                 : [userRolesResult.insertedIds[UserRolesIndex[role.value]]]
           }
-        }
+        },
+        { session }
       )
     }
     //rename 'types' field to 'roles' for all 'roles' collection documents
-    await db.collection('roles').updateMany({}, { $rename: { types: 'roles' } })
+    await db
+      .collection('roles')
+      .updateMany({}, { $rename: { types: 'roles' } }, { session })
     //remove 'title' field from all 'roles' collection documents
-    await db.collection('roles').updateMany({}, { $unset: { title: 1 } })
+    await db
+      .collection('roles')
+      .updateMany({}, { $unset: { title: 1 } }, { session })
     //rename 'roles' collection name to 'systemroles'
-    await db.collection('roles').rename('systemroles')
+    await db.collection('roles').rename('systemroles', { session })
   } finally {
     await session.endSession()
   }
@@ -241,35 +254,40 @@ export const down = async (db, client) => {
   try {
     /* ==============Drop collection userroles============== */
 
-    await db.dropCollection('userroles')
+    await db.dropCollection('userroles', { session })
 
     /* ==============Migration for "users" Collection============== */
 
     //revert role to type
-    await db.collection('users').updateMany({}, { $rename: { role: 'type' } })
+    await db
+      .collection('users')
+      .updateMany({}, { $rename: { role: 'type' } }, { session })
     //revert systemRole to role
     await db
       .collection('users')
-      .updateMany({}, { $rename: { systemRole: 'role' } })
+      .updateMany({}, { $rename: { systemRole: 'role' } }, { session })
 
     for await (const user of db.collection('users').find()) {
       await db.collection('users').updateOne(
         { username: user.username },
         {
           $set: { type: user.role === 'FIELD_AGENT' ? 'HEALTHCARE_WORKER' : '' }
-        }
+        },
+        { session }
       )
     }
     /* ==============Migration for "roles" Collection============== */
 
     //rename 'systemroles' collection name to 'roles'
-    await db.collection('systemroles').rename('roles')
+    await db.collection('systemroles').rename('roles', { session })
 
     //rename 'roles' field to 'types' for all 'roles' collection documents
-    await db.collection('roles').updateMany({}, { $rename: { roles: 'types' } })
+    await db
+      .collection('roles')
+      .updateMany({}, { $rename: { roles: 'types' } }, { session })
 
     //revert 'types' field of 'roles' collection
-    for await (const role of db.collection('roles').find()) {
+    for await (const role of db.collection('roles').find({}, { session })) {
       await db.collection('roles').updateOne(
         { _id: role._id },
         {
@@ -279,7 +297,8 @@ export const down = async (db, client) => {
                 ? Object.keys(UserRolesIndex).slice(0, 4)
                 : []
           }
-        }
+        },
+        { session }
       )
     }
   } finally {
@@ -287,10 +306,14 @@ export const down = async (db, client) => {
   }
 }
 
-export async function getTotalDocCountByCollectionName(db, collectionName) {
-  return await db.collection(collectionName).count()
+export async function getTotalDocCountByCollectionName(
+  db,
+  collectionName,
+  session
+) {
+  return await db.collection(collectionName).count({ session })
 }
 
-export async function getUserCursor(db, limit = 50, skip = 0) {
-  return db.collection('users').find({}, { limit, skip })
+export async function getUserCursor(db, limit = 50, skip = 0, session) {
+  return db.collection('users').find({}, { limit, skip, session })
 }

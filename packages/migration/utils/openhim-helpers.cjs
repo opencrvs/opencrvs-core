@@ -9,32 +9,39 @@ OpenCRVS is also distributed under the terms of the Civil Registration
 Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 graphic logo are (registered/a) trademark(s) of Plan International.
 */
-exports.upsertChannel = async (db, channel) => {
+exports.upsertChannel = async (db, channel, session) => {
   await db.collection('channels').updateOne(
     { name: channel.name },
     { $set: channel },
     {
-      upsert: true
+      upsert: true,
+      session
     }
   )
 }
 
-exports.removeChannel = async (db, channel) => {
-  await db.collection('channels').deleteOne({ name: channel.name })
+exports.removeChannel = async (db, channel, session) => {
+  await db.collection('channels').deleteOne({ name: channel.name }, { session })
 }
 
-exports.addRouteToChannel = async (db, channelName, route) => {
+exports.addRouteToChannel = async (db, channelName, route, session) => {
   await db
     .collection('channels')
-    .updateOne({ name: channelName }, { $push: { routes: route } })
+    .updateOne({ name: channelName }, { $push: { routes: route } }, { session })
 }
 
-exports.removeRouteFromChannel = async (db, channelName, routeName) => {
+exports.removeRouteFromChannel = async (
+  db,
+  channelName,
+  routeName,
+  session
+) => {
   await db
     .collection('channels')
     .updateOne(
       { name: channelName },
-      { $pull: { routes: { name: routeName } } }
+      { $pull: { routes: { name: routeName } } },
+      { session }
     )
 }
 

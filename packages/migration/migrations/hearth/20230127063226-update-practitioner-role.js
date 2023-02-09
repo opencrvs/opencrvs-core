@@ -19,15 +19,17 @@ export const up = async (db, client) => {
     await session.withTransaction(async () => {
       const totalPractitionerRoleCount = await getTotalDocCountByCollectionName(
         db,
-        'PractitionerRole'
+        'PractitionerRole',
+        session
       )
       while (totalPractitionerRoleCount > processedDocCount) {
         const practitionerRoleCursor = await getPractitionerRoleCursor(
           db,
           limit,
-          skip
+          skip,
+          session
         )
-        const count = await practitionerRoleCursor.count()
+        const count = await practitionerRoleCursor.count({ session })
         // eslint-disable-next-line no-console
         console.log(
           `Migration Up - PractitionerRole :: Processing ${
@@ -86,7 +88,8 @@ export const up = async (db, client) => {
               .collection('PractitionerRole')
               .updateOne(
                 { id: practitionerRole.id },
-                { $set: { 'code.1.coding.0.code': titleCase(typeCode) } }
+                { $set: { 'code.1.coding.0.code': titleCase(typeCode) } },
+                { session }
               )
           } else {
             await db.collection('PractitionerRole').updateOne(
@@ -104,7 +107,8 @@ export const up = async (db, client) => {
                     ]
                   }
                 }
-              }
+              },
+              { session }
             )
           }
         }
@@ -134,15 +138,17 @@ export const down = async (db, client) => {
     await session.withTransaction(async () => {
       const totalPractitionerRoleCount = await getTotalDocCountByCollectionName(
         db,
-        'PractitionerRole'
+        'PractitionerRole',
+        session
       )
       while (totalPractitionerRoleCount > processedDocCount) {
         const practitionerRoleCursor = await getPractitionerRoleCursor(
           db,
           limit,
-          skip
+          skip,
+          session
         )
-        const count = await practitionerRoleCursor.count()
+        const count = await practitionerRoleCursor.count({ session })
         // eslint-disable-next-line no-console
         console.log(
           `Migration Down - PractitionerRole :: Processing ${
@@ -180,7 +186,8 @@ export const down = async (db, client) => {
               .collection('PractitionerRole')
               .updateOne(
                 { id: practitionerRole.id },
-                { $set: { 'code.1.coding.0.code': roleCode } }
+                { $set: { 'code.1.coding.0.code': roleCode } },
+                { session }
               )
           }
         }
@@ -201,10 +208,19 @@ export const down = async (db, client) => {
   }
 }
 
-export async function getPractitionerRoleCursor(db, limit = 50, skip = 0) {
-  return db.collection('PractitionerRole').find({}, { limit, skip })
+export async function getPractitionerRoleCursor(
+  db,
+  limit = 50,
+  skip = 0,
+  session
+) {
+  return db.collection('PractitionerRole').find({}, { limit, skip, session })
 }
 
-export async function getTotalDocCountByCollectionName(db, collectionName) {
-  return await db.collection(collectionName).count()
+export async function getTotalDocCountByCollectionName(
+  db,
+  collectionName,
+  session
+) {
+  return await db.collection(collectionName).countDocuments({}, { session })
 }

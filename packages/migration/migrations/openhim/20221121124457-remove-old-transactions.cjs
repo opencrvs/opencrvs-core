@@ -14,23 +14,32 @@ exports.up = async (db, client) => {
   try {
     const count = await db
       .collection('transactions')
-      .find({
-        'request.timestamp': {
-          $lt: new Date(new Date() - 1000 * 60 * 60 * 720)
-        }
-      })
-      .count()
+      .find(
+        {
+          'request.timestamp': {
+            $lt: new Date(new Date() - 1000 * 60 * 60 * 720)
+          }
+        },
+        { session }
+      )
+      .count({ session })
 
+    // eslint-disable-next-line no-console
     console.log('OLD OPENHIM TRANSACTIONS COUNT: ', count)
 
     if (count > 0) {
       // Delete all openhim-transactions older than 30 days in order to save disk space
+      // eslint-disable-next-line no-console
       console.log('DELETING OLD OPENHIM TRANSACTIONS')
-      await db.collection('transactions').remove({
-        'request.timestamp': {
-          $lt: new Date(new Date() - 1000 * 60 * 60 * 720)
-        }
-      })
+      await db.collection('transactions').remove(
+        {
+          'request.timestamp': {
+            $lt: new Date(new Date() - 1000 * 60 * 60 * 720)
+          }
+        },
+        { session }
+      )
+      // eslint-disable-next-line no-console
       console.log('DELETED')
     }
   } finally {

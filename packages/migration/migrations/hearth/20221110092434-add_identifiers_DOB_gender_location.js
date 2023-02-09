@@ -15,11 +15,13 @@ import {
   getCompositionCursor,
   getCollectionDocuments,
   getTotalDocCountByCollectionName
+  // eslint-disable-next-line import/no-relative-parent-imports
 } from '../../utils/hearth-helper.js'
 
 import {
   updateComposition,
   updateFieldNameByCompositionId
+  // eslint-disable-next-line import/no-relative-parent-imports
 } from '../../utils/elasticsearch-helper.js'
 
 export const up = async (db, client) => {
@@ -40,8 +42,13 @@ export const up = async (db, client) => {
       )
 
       while (totalCompositionCount > processedDocCount) {
-        const compositionCursor = await getCompositionCursor(db, limit, skip)
-        const count = await compositionCursor.count()
+        const compositionCursor = await getCompositionCursor(
+          db,
+          limit,
+          skip,
+          session
+        )
+        const count = await compositionCursor.count({ session })
         // eslint-disable-next-line no-console
         console.log(
           `Migration - ElasticSearch :: Processing ${processedDocCount + 1} - ${

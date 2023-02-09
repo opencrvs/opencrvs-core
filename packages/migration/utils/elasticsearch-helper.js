@@ -31,6 +31,7 @@ export const updateComposition = async (id, body) => {
       }
     })
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(`updateComposition: error: ${e}`)
   }
 
@@ -62,6 +63,7 @@ export const updateFieldNameByCompositionId = async (
     })
     return response
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(`searchByCompositionId: error: ${err}`)
     return null
   }

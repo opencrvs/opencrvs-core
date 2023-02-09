@@ -20,6 +20,7 @@ graphic logo are (registered/a) trademark(s) of Plan International.
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const baseConfig = require('./openhim-base-config-v1.0.1.json')
 
 exports.up = async (db, client) => {
@@ -32,7 +33,8 @@ exports.up = async (db, client) => {
           { name: channel.name },
           { $set: channel },
           {
-            upsert: true
+            upsert: true,
+            session
           }
         )
       }
@@ -43,12 +45,5 @@ exports.up = async (db, client) => {
 }
 
 exports.down = async (db, client) => {
-  const session = client.startSession()
-  try {
-    await session.withTransaction(async () => {
-      await db.collection('channels').remove({})
-    })
-  } finally {
-    await session.endSession()
-  }
+  await db.collection('channels').remove({})
 }

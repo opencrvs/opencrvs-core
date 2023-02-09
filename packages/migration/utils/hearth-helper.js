@@ -23,41 +23,54 @@ export const COLLECTION_NAMES = {
 export async function getBirthEncounterCompositionCursor(
   db,
   limit = 50,
-  skip = 0
+  skip = 0,
+  session
 ) {
   return db.collection(COLLECTION_NAMES.COMPOSITION).find(
     {
       'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
     },
-    { limit, skip }
+    { limit, skip, session }
   )
 }
 
-export async function getBirthEncounterCompositionCount(db) {
+export async function getBirthEncounterCompositionCount(db, session) {
   return db
     .collection(COLLECTION_NAMES.COMPOSITION)
-    .find({
-      'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
-    })
-    .count()
+    .find(
+      {
+        'section.code.coding': { $elemMatch: { code: 'birth-encounter' } }
+      },
+      { session }
+    )
+    .count({ session })
 }
 
-export async function getCompositionCursor(db, limit = 50, skip = 0) {
-  return db.collection(COLLECTION_NAMES.COMPOSITION).find({}, { limit, skip })
+export async function getCompositionCursor(db, limit = 50, skip = 0, session) {
+  return db
+    .collection(COLLECTION_NAMES.COMPOSITION)
+    .find({}, { limit, skip, session })
 }
-export async function getTotalDocCountByCollectionName(db, collectionName) {
-  return await db.collection(collectionName).count()
+export async function getTotalDocCountByCollectionName(
+  db,
+  collectionName,
+  session
+) {
+  return await db.collection(collectionName).count({ session })
 }
 
-export async function getCollectionDocuments(db, collectionName, ids) {
+export async function getCollectionDocuments(db, collectionName, ids, session) {
   if (ids.length > 0) {
     return await db
       .collection(collectionName)
-      .find({
-        id: { $in: ids }
-      })
+      .find(
+        {
+          id: { $in: ids }
+        },
+        { session }
+      )
       .toArray()
   } else {
-    return await db.collection(collectionName).find().toArray()
+    return await db.collection(collectionName).find({}, { session }).toArray()
   }
 }

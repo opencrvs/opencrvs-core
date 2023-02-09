@@ -17,27 +17,23 @@ import {
 } from '../../utils/resource-helper.js'
 
 export const up = async (db, client) => {
-  const session = client.startSession()
   const notificationContentData = getNotificationContent()
   try {
-    await session.withTransaction(async () => {
-      await db
-        .collection(INFORMANT_SMS_NOTIFICATION_COLLECTION)
-        .insertMany(notificationContentData)
-    })
+    await db
+      .collection(INFORMANT_SMS_NOTIFICATION_COLLECTION)
+      .insertMany(notificationContentData)
   } finally {
+    // eslint-disable-next-line no-console
     console.log(`Migration - INFORMANT_SMS_NOTIFICATION : Done. `)
     await session.endSession()
   }
 }
 
 export const down = async (db, client) => {
-  const session = client.startSession()
   try {
-    await session.withTransaction(async () => {
-      await db.collection(INFORMANT_SMS_NOTIFICATION_COLLECTION).drop()
-    })
+    await db.collection(INFORMANT_SMS_NOTIFICATION_COLLECTION).drop()
   } finally {
+    // eslint-disable-next-line no-console
     console.log(`Migration - DOWN - INFORMANT_SMS_NOTIFICATION - DONE `)
     await session.endSession()
   }

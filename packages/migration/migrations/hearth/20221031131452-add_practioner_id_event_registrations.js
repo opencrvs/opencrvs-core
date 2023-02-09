@@ -9,25 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+// eslint-disable-next-line import/no-relative-parent-imports
 import { query, writePoints } from './../../utils/influx-helper.js'
 
 export const up = async (db, client) => {
   const session = client.startSession()
   await session.withTransaction(async () => {
-    await migrateRegistrations('birth_registration', db)
-    await migrateRegistrations('death_registration', db)
+    await migrateRegistrations('birth_registration', db, session)
+    await migrateRegistrations('death_registration', db, session)
   })
 }
 
 const LIMIT = 100
 
-async function migrateRegistrations(measurement, db) {
+async function migrateRegistrations(measurement, db, session) {
   const result = await query(
     `SELECT COUNT(compositionId) as total FROM ${measurement} WHERE registrarPractitionerId = ''`
   )
 
   const totalCount = result[0]?.total ?? 0
 
+  // eslint-disable-next-line no-console
   console.log(
     `Migration - InfluxDB :: Total points found for measurement ${measurement}: ${totalCount}`
   )
@@ -38,12 +40,18 @@ async function migrateRegistrations(measurement, db) {
     const registrations = await query(
       `SELECT * FROM ${measurement} WHERE registrarPractitionerId = '' LIMIT ${LIMIT}`
     )
+    // eslint-disable-next-line no-console
     console.log(
       `Migration - InfluxDB :: Processing ${measurement}, ${processed + 1}-${
         processed + registrations.length
       }`
     )
-    const updatedPoints = await getUpdatedPoints(registrations, measurement, db)
+    const updatedPoints = await getUpdatedPoints(
+      registrations,
+      measurement,
+      db,
+      session
+    )
 
     await writePoints(updatedPoints)
 
@@ -54,6 +62,7 @@ async function migrateRegistrations(measurement, db) {
     await query(deleteQuery)
 
     processed += registrations.length
+    // eslint-disable-next-line no-console
     console.log(
       `Migration - InfluxDB :: Processing done: ${(
         (processed / totalCount) *
@@ -63,7 +72,7 @@ async function migrateRegistrations(measurement, db) {
   }
 }
 
-const getUpdatedPoints = async (registrations, measurement, db) => {
+const getUpdatedPoints = async (registrations, measurement, db, session) => {
   return Promise.all(
     registrations.map(
       async ({
@@ -75,20 +84,26 @@ const getUpdatedPoints = async (registrations, measurement, db) => {
         deathDays,
         ...tags
       }) => {
-        let task = await db.collection('Task').findOne({
-          focus: {
-            reference: `Composition/${compositionId}`
-          },
-          'businessStatus.coding.code': 'REGISTERED'
-        })
-
-        if (!task) {
-          task = await db.collection('Task_history').findOne({
+        let task = await db.collection('Task').findOne(
+          {
             focus: {
               reference: `Composition/${compositionId}`
             },
             'businessStatus.coding.code': 'REGISTERED'
-          })
+          },
+          { session }
+        )
+
+        if (!task) {
+          task = await db.collection('Task_history').findOne(
+            {
+              focus: {
+                reference: `Composition/${compositionId}`
+              },
+              'businessStatus.coding.code': 'REGISTERED'
+            },
+            { session }
+          )
         }
 
         const practitionerExtension = task.extension.find(
@@ -108,7 +123,9 @@ const getUpdatedPoints = async (registrations, measurement, db) => {
           fields.ageInYears = ageInYears
         }
 
-        const practitioner = await db.collection('Practitioner').findOne({ id })
+        const practitioner = await db
+          .collection('Practitioner')
+          .findOne({ id }, { session })
 
         return {
           measurement,

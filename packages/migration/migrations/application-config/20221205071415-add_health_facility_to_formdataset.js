@@ -27,7 +27,8 @@ export const up = async (db, client) => {
           }
         },
         {
-          upsert: true
+          upsert: true,
+          session
         }
       )
 
@@ -44,7 +45,8 @@ export const up = async (db, client) => {
           }
         },
         {
-          upsert: true
+          upsert: true,
+          session
         }
       )
 
@@ -61,7 +63,8 @@ export const up = async (db, client) => {
           }
         },
         {
-          upsert: true
+          upsert: true,
+          session
         }
       )
 
@@ -78,7 +81,8 @@ export const up = async (db, client) => {
           }
         },
         {
-          upsert: true
+          upsert: true,
+          session
         }
       )
 
@@ -95,7 +99,8 @@ export const up = async (db, client) => {
           }
         },
         {
-          upsert: true
+          upsert: true,
+          session
         }
       )
 
@@ -112,7 +117,8 @@ export const up = async (db, client) => {
           }
         },
         {
-          upsert: true
+          upsert: true,
+          session
         }
       )
     })

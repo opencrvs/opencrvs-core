@@ -25,11 +25,17 @@ export const up = async (db, client) => {
     await session.withTransaction(async () => {
       const totalCompositionCount = await getTotalDocCountByCollectionName(
         db,
-        'DocumentReference'
+        'DocumentReference',
+        session
       )
       while (totalCompositionCount > processedDocCount) {
-        const documentCursor = await getDocumentReferenceCursor(db, limit, skip)
-        const count = await documentCursor.count()
+        const documentCursor = await getDocumentReferenceCursor(
+          db,
+          limit,
+          skip,
+          session
+        )
+        const count = await documentCursor.count({ session })
         // eslint-disable-next-line no-console
         console.log(
           `Migration - Minio :: Processing ${processedDocCount + 1} - ${
@@ -46,7 +52,8 @@ export const up = async (db, client) => {
                 .collection('DocumentReference')
                 .updateOne(
                   { id: document.id },
-                  { $set: { 'content.0.attachment.data': refUrl } }
+                  { $set: { 'content.0.attachment.data': refUrl } },
+                  { session }
                 )
             }
           }
@@ -68,10 +75,19 @@ export const up = async (db, client) => {
 
 export const down = async (db, client) => {}
 
-export async function getDocumentReferenceCursor(db, limit = 50, skip = 0) {
-  return db.collection('DocumentReference').find({}, { limit, skip })
+export async function getDocumentReferenceCursor(
+  db,
+  limit = 50,
+  skip = 0,
+  session
+) {
+  return db.collection('DocumentReference').find({}, { limit, skip, session })
 }
 
-export async function getTotalDocCountByCollectionName(db, collectionName) {
-  return await db.collection(collectionName).count()
+export async function getTotalDocCountByCollectionName(
+  db,
+  collectionName,
+  session
+) {
+  return await db.collection(collectionName).count({ session })
 }

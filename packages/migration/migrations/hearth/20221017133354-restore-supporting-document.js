@@ -22,14 +22,18 @@ export const up = async (db, client) => {
   let processedDocCount = 0
   try {
     await session.withTransaction(async () => {
-      const totalCompositionCount = await getBirthEncounterCompositionCount(db)
+      const totalCompositionCount = await getBirthEncounterCompositionCount(
+        db,
+        session
+      )
       while (totalCompositionCount > processedDocCount) {
         const compositionCursor = await getBirthEncounterCompositionCursor(
           db,
           limit,
-          skip
+          skip,
+          session
         )
-        const count = await compositionCursor.count()
+        const count = await compositionCursor.count({ session })
         // eslint-disable-next-line no-console
         console.log(
           `Migration - SupportingDocuments :: Processing ${
@@ -42,9 +46,12 @@ export const up = async (db, client) => {
           const composition = await compositionCursor.next()
           const compositionHistory = await db
             .collection('Composition_history')
-            .find({
-              id: composition.id
-            })
+            .find(
+              {
+                id: composition.id
+              },
+              { session }
+            )
             .toArray()
           compositionHistory.push(composition)
           const correctionIndex = compositionHistory.findIndex(
@@ -64,7 +71,8 @@ export const up = async (db, client) => {
               .collection('Composition')
               .updateOne(
                 { id: compositionHistory[correctionIndex].id },
-                { $push: { section: hasDocumentSection } }
+                { $push: { section: hasDocumentSection } },
+                { session }
               )
           }
         }

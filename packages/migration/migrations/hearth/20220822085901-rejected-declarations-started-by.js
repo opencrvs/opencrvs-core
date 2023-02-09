@@ -49,7 +49,8 @@ export const up = async (db) => {
 
   const startedByMap = await getCompositionIdToStartedByMap(
     db,
-    rejectedPoints.map(({ compositionId }) => compositionId)
+    rejectedPoints.map(({ compositionId }) => compositionId),
+    session
   )
 
   const rejectedPointsWithCorrectStartedBy = rejectedPoints.map(
@@ -66,9 +67,9 @@ export const up = async (db) => {
   await influx.writePoints(rejectedPointsWithCorrectStartedBy)
 }
 
-async function getCompositionIdToStartedByMap(db, compositionIds) {
+async function getCompositionIdToStartedByMap(db, compositionIds, session) {
   const extractId = (reference) => reference.split('/')[1]
-  const cursor = await getTaskCursor(db, compositionIds)
+  const cursor = await getTaskCursor(db, compositionIds, session)
   const startedByMap = new Map()
   await cursor.forEach((task) => {
     const compositionId = extractId(task.focus.reference)
@@ -81,7 +82,7 @@ async function getCompositionIdToStartedByMap(db, compositionIds) {
   return startedByMap
 }
 
-function getTaskCursor(db, compositionIds) {
+function getTaskCursor(db, compositionIds, session) {
   const query = {
     $match: {
       'businessStatus.coding.code': {
@@ -114,7 +115,9 @@ function getTaskCursor(db, compositionIds) {
     }
   }
   const sort = { $sort: { 'meta.lastUpdated': 1 } }
-  return db.collection('Task_history').aggregate([query, projection, sort])
+  return db
+    .collection('Task_history')
+    .aggregate([query, projection, sort], { session })
 }
 
 export const down = async () => {}

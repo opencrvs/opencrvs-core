@@ -15,6 +15,7 @@ const {
   upsertChannel,
   removeChannel,
   newChannelTemplate
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
 } = require('../../utils/openhim-helpers.cjs')
 
 const eventDownloadedChannel = {
@@ -87,94 +88,124 @@ exports.up = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await addRouteToChannel(db, 'Event Assignment', {
-        type: 'http',
-        status: 'enabled',
-        forwardAuthHeader: true,
-        name: 'Metrics -> Event Assignment',
-        secured: false,
-        host: 'metrics',
-        port: 1050,
-        path: '',
-        pathTransform: '',
-        primary: false,
-        username: '',
-        password: ''
-      })
-      await addRouteToChannel(db, 'Event Unassignment', {
-        type: 'http',
-        status: 'enabled',
-        forwardAuthHeader: true,
-        name: 'Metrics -> Event Unassignment',
-        secured: false,
-        host: 'metrics',
-        port: 1050,
-        path: '',
-        pathTransform: '',
-        primary: false,
-        username: '',
-        password: ''
-      })
-      await addRouteToChannel(db, 'Birth Archive', {
-        type: 'http',
-        status: 'enabled',
-        forwardAuthHeader: true,
-        name: 'Metrics -> Birth Archive',
-        secured: false,
-        host: 'metrics',
-        port: 1050,
-        path: '',
-        pathTransform: '',
-        primary: false,
-        username: '',
-        password: ''
-      })
-      await addRouteToChannel(db, 'Birth Reinstate', {
-        type: 'http',
-        status: 'enabled',
-        forwardAuthHeader: true,
-        name: 'Metrics -> Birth Reinstate',
-        secured: false,
-        host: 'metrics',
-        port: 1050,
-        path: '',
-        pathTransform: '',
-        primary: false,
-        username: '',
-        password: ''
-      })
-      await addRouteToChannel(db, 'Death Archive', {
-        type: 'http',
-        status: 'enabled',
-        forwardAuthHeader: true,
-        name: 'Metrics -> Death Archive',
-        secured: false,
-        host: 'metrics',
-        port: 1050,
-        path: '',
-        pathTransform: '',
-        primary: false,
-        username: '',
-        password: ''
-      })
-      await addRouteToChannel(db, 'Death Reinstate', {
-        type: 'http',
-        status: 'enabled',
-        forwardAuthHeader: true,
-        name: 'Metrics -> Death Reinstate',
-        secured: false,
-        host: 'metrics',
-        port: 1050,
-        path: '',
-        pathTransform: '',
-        primary: false,
-        username: '',
-        password: ''
-      })
+      await addRouteToChannel(
+        db,
+        'Event Assignment',
+        {
+          type: 'http',
+          status: 'enabled',
+          forwardAuthHeader: true,
+          name: 'Metrics -> Event Assignment',
+          secured: false,
+          host: 'metrics',
+          port: 1050,
+          path: '',
+          pathTransform: '',
+          primary: false,
+          username: '',
+          password: ''
+        },
+        session
+      )
+      await addRouteToChannel(
+        db,
+        'Event Unassignment',
+        {
+          type: 'http',
+          status: 'enabled',
+          forwardAuthHeader: true,
+          name: 'Metrics -> Event Unassignment',
+          secured: false,
+          host: 'metrics',
+          port: 1050,
+          path: '',
+          pathTransform: '',
+          primary: false,
+          username: '',
+          password: ''
+        },
+        session
+      )
+      await addRouteToChannel(
+        db,
+        'Birth Archive',
+        {
+          type: 'http',
+          status: 'enabled',
+          forwardAuthHeader: true,
+          name: 'Metrics -> Birth Archive',
+          secured: false,
+          host: 'metrics',
+          port: 1050,
+          path: '',
+          pathTransform: '',
+          primary: false,
+          username: '',
+          password: ''
+        },
+        session
+      )
+      await addRouteToChannel(
+        db,
+        'Birth Reinstate',
+        {
+          type: 'http',
+          status: 'enabled',
+          forwardAuthHeader: true,
+          name: 'Metrics -> Birth Reinstate',
+          secured: false,
+          host: 'metrics',
+          port: 1050,
+          path: '',
+          pathTransform: '',
+          primary: false,
+          username: '',
+          password: ''
+        },
+        session
+      )
+      await addRouteToChannel(
+        db,
+        'Death Archive',
+        {
+          type: 'http',
+          status: 'enabled',
+          forwardAuthHeader: true,
+          name: 'Metrics -> Death Archive',
+          secured: false,
+          host: 'metrics',
+          port: 1050,
+          path: '',
+          pathTransform: '',
+          primary: false,
+          username: '',
+          password: ''
+        },
+        session
+      )
+      await addRouteToChannel(
+        db,
+        'Death Reinstate',
+        {
+          type: 'http',
+          status: 'enabled',
+          forwardAuthHeader: true,
+          name: 'Metrics -> Death Reinstate',
+          secured: false,
+          host: 'metrics',
+          port: 1050,
+          path: '',
+          pathTransform: '',
+          primary: false,
+          username: '',
+          password: ''
+        },
+        session
+      )
 
-      await upsertChannel(db, eventDownloadedChannel)
-      await upsertChannel(db, eventViewedChannel)
-      await upsertChannel(db, declarationUpdatedChannel)
+      await upsertChannel(db, eventDownloadedChannel, session)
+      await upsertChannel(db, eventViewedChannel, session)
+      await upsertChannel(db, declarationUpdatedChannel, session)
     })
   } finally {
     await session.endSession()
@@ -188,37 +219,43 @@ exports.down = async (db, client) => {
       await removeRouteFromChannel(
         db,
         'Event Assignment',
-        'Metrics -> Event Assignment'
+        'Metrics -> Event Assignment',
+        session
       )
       await removeRouteFromChannel(
         db,
         'Event Unassignment',
-        'Metrics -> Event Unassignment'
+        'Metrics -> Event Unassignment',
+        session
       )
     })
     await removeRouteFromChannel(
       db,
       'Birth Archive',
-      'Metrics -> Birth Archive'
+      'Metrics -> Birth Archive',
+      session
     )
     await removeRouteFromChannel(
       db,
       'Birth Reinstate',
-      'Metrics -> Birth Reinstate'
+      'Metrics -> Birth Reinstate',
+      session
     )
     await removeRouteFromChannel(
       db,
       'Death Archive',
-      'Metrics -> Death Archive'
+      'Metrics -> Death Archive',
+      session
     )
     await removeRouteFromChannel(
       db,
       'Death Reinstate',
-      'Metrics -> Death Reinstate'
+      'Metrics -> Death Reinstate',
+      session
     )
-    await removeChannel(db, eventDownloadedChannel)
-    await removeChannel(db, eventViewedChannel)
-    await removeChannel(db, declarationUpdatedChannel)
+    await removeChannel(db, eventDownloadedChannel, session)
+    await removeChannel(db, eventViewedChannel, session)
+    await removeChannel(db, declarationUpdatedChannel, session)
   } finally {
     await session.endSession()
   }
