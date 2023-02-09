@@ -333,6 +333,8 @@ export const NavigationView = (props: IFullProps) => {
     ? activeMenuItem
     : 'review'
 
+  const [isNewDeclarationExpanded, setIsNewDeclarationExpanded] =
+    React.useState(true)
   const [isRecordExpanded, setIsRecordExpanded] = React.useState(true)
   const [isPerformanceExpanded, setIsPerformanceExpanded] = React.useState(true)
   const [isOrganisationExpanded, setIsOrganisationExpanded] =
@@ -404,6 +406,71 @@ export const NavigationView = (props: IFullProps) => {
       warning={isMobileDevice() ? <></> : <UnpublishedWarning compact={true} />}
       className={className}
     >
+      {/* NEW EVENT*/}
+
+      <NavigationGroup>
+        <NavigationGroupTitle
+          label="NEW EVENT"
+          onClick={() => setIsNewDeclarationExpanded(!isNewDeclarationExpanded)}
+          expandableIcon={() =>
+            isNewDeclarationExpanded ? (
+              <Expandable selected={true} />
+            ) : (
+              <Expandable />
+            )
+          }
+        />
+        {isNewDeclarationExpanded && (
+          <>
+            <NavigationItem
+              icon={() => (
+                <Icon color="currentColor" name="Plus" size="small" />
+              )}
+              id={''}
+              label="Birth"
+              isSelected={''}
+              onClick={''}
+            />
+            <NavigationItem
+              icon={() => (
+                <Icon color="currentColor" name="Plus" size="small" />
+              )}
+              id={''}
+              label="Death"
+              isSelected={''}
+              onClick={''}
+            />
+            <NavigationItem
+              icon={() => (
+                <Icon color="currentColor" name="Plus" size="small" />
+              )}
+              id={''}
+              label="Marriage"
+              isSelected={''}
+              onClick={''}
+            />
+            <NavigationItem
+              icon={() => (
+                <Icon color="currentColor" name="Plus" size="small" />
+              )}
+              id={''}
+              label="Divorce"
+              isSelected={''}
+              onClick={''}
+            />
+            <NavigationItem
+              icon={() => (
+                <Icon color="currentColor" name="Plus" size="small" />
+              )}
+              id={''}
+              label="Adoption"
+              isSelected={''}
+              onClick={''}
+            />
+          </>
+        )}
+      </NavigationGroup>
+
       {/* RECORDS MENU*/}
 
       {userDetails?.role &&
