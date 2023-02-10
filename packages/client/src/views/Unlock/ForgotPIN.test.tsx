@@ -23,7 +23,7 @@ import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
-import { RoleType, Status } from '@client/utils/gateway'
+import { SystemRoleType, Status } from '@client/utils/gateway'
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper
@@ -48,7 +48,7 @@ describe('ForgotPIN tests', () => {
             userMgntUserID: '5eba726866458970cf2e23c2',
             practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             mobile: '+8801711111111',
-            systemRole: RoleType.FieldAgent,
+            systemRole: SystemRoleType.FieldAgent,
             role: {
               _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
               labels: [
@@ -90,7 +90,7 @@ describe('ForgotPIN tests', () => {
                   familyName: 'Ashraful'
                 }
               ],
-              role: RoleType.LocalRegistrar,
+              role: SystemRoleType.LocalRegistrar,
               signature: undefined
             }
           }

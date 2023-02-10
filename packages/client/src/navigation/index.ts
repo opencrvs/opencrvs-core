@@ -67,7 +67,6 @@ import {
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
@@ -83,6 +82,7 @@ import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
+import { UserDetails } from '@client/utils/userUtils'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -634,7 +634,7 @@ export function goToPage(
   }
 }
 
-export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
+export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
   const role = userDetails?.systemRole
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
@@ -653,7 +653,7 @@ export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
   )
 }
 
-export function goToPerformanceView(userDetails: IUserDetails) {
+export function goToPerformanceView(userDetails: UserDetails) {
   return goToPerformanceHome(
     undefined,
     undefined,
@@ -662,7 +662,7 @@ export function goToPerformanceView(userDetails: IUserDetails) {
   )
 }
 
-export function goToTeamView(userDetails: IUserDetails) {
+export function goToTeamView(userDetails: UserDetails) {
   if (userDetails && userDetails.systemRole) {
     return goToTeamUserList(
       (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
@@ -670,7 +670,7 @@ export function goToTeamView(userDetails: IUserDetails) {
   }
 }
 
-export function goToOrganisationView(userDetails: IUserDetails) {
+export function goToOrganisationView(userDetails: UserDetails) {
   return goToOrganizationList()
 }
 

@@ -57,8 +57,8 @@ declaration.data.registration = {
   }
 }
 
-// @ts-ignore
 declaration.data.history = [
+  // @ts-ignore
   {
     date: new Date().toString(),
     regStatus: 'STARTED',

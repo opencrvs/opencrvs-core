@@ -39,7 +39,7 @@ import {
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { ApolloClient, InternalRefetchQueriesInclude } from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
-import { User } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
 const { useState, useEffect } = React
 
@@ -56,7 +56,7 @@ interface ToggleUserActivationModalProps
   extends WrappedComponentProps,
     ConnectProps,
     DispatchProps {
-  user: User | null
+  user: UserDetails | null
   show: boolean
   onConfirmRefetchQueries?: InternalRefetchQueriesInclude
   onClose: () => void

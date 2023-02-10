@@ -33,7 +33,6 @@ import { PerformanceSelect } from '@client/views/SysAdmin/Performance/Performanc
 import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
 import {
   CORRECTION_TOTALS,
@@ -77,6 +76,7 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Layout = styled.div`
   display: flex;
@@ -220,7 +220,7 @@ interface IDispatchProps {
 type Props = WrappedComponentProps &
   IDispatchProps &
   IOnlineStatusProps &
-  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
+  RouteComponentProps & { userDetails: UserDetails | null } & IConnectProps & {
     theme: ITheme
   }
 

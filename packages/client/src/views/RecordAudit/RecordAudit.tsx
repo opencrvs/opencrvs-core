@@ -82,7 +82,12 @@ import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { CorrectionSection, IForm } from '@client/forms'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import {
+  MarkEventAsReinstatedMutation,
+  MarkEventAsReinstatedMutationVariables,
+  Event,
+  History
+} from '@client/utils/gateway'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
@@ -107,12 +112,6 @@ import { getPotentialDuplicateIds } from '@client/transformer/index'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { Mutation } from '@apollo/client/react/components'
 import {
-  MarkEventAsReinstatedMutation,
-  MarkEventAsReinstatedMutationVariables,
-  Event,
-  History
-} from '@client/utils/gateway'
-import {
   REINSTATE_BIRTH_DECLARATION,
   REINSTATE_DEATH_DECLARATION
 } from './mutations'
@@ -122,6 +121,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { Button } from '@opencrvs/components/lib/Button'
+import { UserDetails } from '@client/utils/userUtils'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -165,7 +165,7 @@ const DesktopDiv = styled.div`
 `
 
 interface IStateProps {
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   language: string
   resources: IOfflineData
   scope: Scope | null
@@ -305,7 +305,7 @@ function RecordAuditBody({
   duplicates?: string[]
   intl: IntlShape
   scope: Scope | null
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
   tab: IRecordAuditTabs

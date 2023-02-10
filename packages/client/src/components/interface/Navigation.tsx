@@ -41,7 +41,7 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import { User } from '@client/utils/gateway'
 import { Activity, Users, PaperPlane } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -67,6 +67,7 @@ import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer
 import { omit } from 'lodash'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
+import { UserDetails } from '@client/utils/userUtils'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -235,7 +236,7 @@ interface IDispatchProps {
 interface IStateProps {
   draftDeclarations: IDeclaration[]
   declarationsReadyToSend: IDeclaration[]
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   advancedSearchParams: IAdvancedSearchParamState
   activeMenuItem: string
   workqueue: IWorkqueue
@@ -803,9 +804,10 @@ export const NavigationView = (props: IFullProps) => {
             )}
         </>
       )}
+
       <NavigationGroup>
-        {userDetails?.searches && userDetails?.searches.length > 0 ? (
-          userDetails?.searches.map((bookmarkResult, index) => {
+        {userDetails?.searches && userDetails.searches.length > 0 ? (
+          userDetails.searches.map((bookmarkResult) => {
             return (
               <NavigationItem
                 icon={() => (
@@ -824,7 +826,7 @@ export const NavigationView = (props: IFullProps) => {
                   ) as IAdvancedSearchParamState
                   setAdvancedSearchParam({
                     ...filteredParam,
-                    searchId: bookmarkResult.searchId
+                    searchId: bookmarkResult?.searchId
                   })
                   goToAdvancedSearchResultAction()
                 }}

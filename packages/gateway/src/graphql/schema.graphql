@@ -355,13 +355,13 @@ type RegistrationCountResult {
 type Location {
   id: ID!
   _fhirID: ID
-  identifier: [Identifier]
-  status: String
-  name: String
-  alias: [String]
+  identifier: [Identifier!]
+  status: String!
+  name: String!
+  alias: [String!]!
   description: String
-  partOf: String
-  type: LocationType
+  partOf: String!
+  type: LocationType!
   telecom: [ContactPoint]
   address: Address
   longitude: Float
@@ -377,20 +377,20 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String!
-  systemRole: RoleType!
+  systemRole: SystemRoleType!
   role: Role!
   email: String
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location
-  catchmentArea: [Location]
+  catchmentArea: [Location!]
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
   creationDate: String!
   avatar: Avatar
   device: String
-  searches: [BookmarkedSeachItem]
+  searches: [BookmarkedSeachItem!]
 }
 
 type SearchUserResult {
@@ -546,7 +546,7 @@ type EventProgressResultSet {
 
 type SystemRole {
   id: ID!
-  value: String!
+  value: SystemRoleType!
   roles: [Role!]!
   active: Boolean!
 }
@@ -680,7 +680,7 @@ input UserInput {
   identifier: [UserIdentifierInput]
   username: String
   mobile: String!
-  systemRole: RoleType!
+  systemRole: SystemRoleType!
   role: String
   email: String
   primaryOffice: String
@@ -1040,7 +1040,7 @@ enum LocationType {
   OTHER
 }
 
-enum RoleType {
+enum SystemRoleType {
   FIELD_AGENT
   REGISTRATION_AGENT
   LOCAL_REGISTRAR
@@ -1064,7 +1064,7 @@ enum Status {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: RoleType!
+  role: SystemRoleType!
   signature: Signature
 }
 
