@@ -80,8 +80,9 @@ export function updateDeclaration(
 }
 
 function updateWorkqueue(store: IStoreState, dispatch: Dispatch) {
-  const role = store.offline.userDetails?.role
-  const isFieldAgent = role && FIELD_AGENT_ROLES.includes(role) ? true : false
+  const systemRole = store.offline.userDetails?.systemRole
+  const isFieldAgent =
+    systemRole && FIELD_AGENT_ROLES.includes(systemRole) ? true : false
   const userId = store.offline.userDetails?.practitionerId
   dispatch(updateRegistrarWorkqueue(userId, 10, isFieldAgent))
 }

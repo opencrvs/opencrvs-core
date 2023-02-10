@@ -24,7 +24,8 @@ import {
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
   mockEncounterResponse,
-  mockLocationResponse
+  mockLocationResponse,
+  mockUserModelResponse
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
@@ -57,6 +58,7 @@ describe('Verify handlers', () => {
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
       mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -65,7 +67,7 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockCompositionResponse), { status: 200 }],
         [JSON.stringify(mockCompositionEntry), { status: 200 }],
@@ -105,6 +107,7 @@ describe('Verify handlers', () => {
       )
       mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [
           JSON.stringify({ partOf: { reference: 'Location/123' } }),
           { status: 200 }
@@ -113,7 +116,7 @@ describe('Verify handlers', () => {
           JSON.stringify({ partOf: { reference: 'Location/0' } }),
           { status: 200 }
         ],
-        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockCompositionResponse), { status: 200 }],
         [JSON.stringify(mockCompositionEntry), { status: 200 }],

@@ -24,7 +24,7 @@ import {
   deleteDeclaration as deleteDeclarationAction
 } from '@client/declarations'
 import { Action } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, SystemRoleType } from '@client/utils/gateway'
 import {
   ApolloClient,
   InternalRefetchQueriesInclude,
@@ -45,7 +45,6 @@ import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import ReactTooltip from 'react-tooltip'
-import { Roles } from '@client/utils/authUtils'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -65,7 +64,7 @@ interface DownloadButtonProps {
 }
 
 interface IConnectProps {
-  userRole?: Roles
+  userRole?: SystemRoleType
   userId?: string
 }
 interface IDispatchProps {
@@ -113,7 +112,7 @@ function getAssignModalOptions(
     onUnassign: () => void
     onCancel: () => void
   },
-  userRole?: Roles,
+  userRole?: SystemRoleType,
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
   const assignAction: IModalAction = {
@@ -143,8 +142,8 @@ function getAssignModalOptions(
     }
   } else if (assignment) {
     if (
-      userRole === Roles.LOCAL_REGISTRAR ||
-      userRole === Roles.NATIONAL_REGISTRAR
+      userRole === SystemRoleType.LocalRegistrar ||
+      userRole === SystemRoleType.NationalRegistrar
     ) {
       return {
         title: conflictsMessages.unassignTitle,
@@ -258,7 +257,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
-        (assignment?.userId != userId ||
+        (assignment?.userId !== userId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
         (downloadConfigs.declarationStatus !== 'VALIDATED' ||
           userRole !== ROLE_REGISTRATION_AGENT) &&
@@ -339,7 +338,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       >
         {status === DOWNLOAD_STATUS.DOWNLOADED ? (
           <Downloaded />
-        ) : assignment && assignment.userId != userId ? (
+        ) : assignment && assignment.userId !== userId ? (
           <AvatarVerySmall
             avatar={{
               data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
@@ -371,7 +370,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.role as Roles | undefined,
+  userRole: state.profile.userDetails?.systemRole,
   userId: state.profile.userDetails?.userMgntUserID
 })
 

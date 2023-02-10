@@ -21,12 +21,61 @@ describe('Role type resolvers', () => {
     _id: 'ba7022f0ff4822',
     title: 'Field Agent',
     value: 'FIELD_AGENT',
-    types: ['Hospital', 'CHA'],
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Healthcare Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Professionnel de Santé'
+          }
+        ]
+      },
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Police Officer'
+          },
+          {
+            lang: 'fr',
+            label: 'Agent de Police'
+          }
+        ]
+      },
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Social Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Travailleur Social'
+          }
+        ]
+      },
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Local Leader'
+          },
+          {
+            lang: 'fr',
+            label: 'Leader Local'
+          }
+        ]
+      }
+    ],
     active: true,
     creationDate: 1559054406433
   }
   it('return id type', () => {
-    const res = roleTypeResolvers.Role.id(mockResponse)
+    const res = roleTypeResolvers.SystemRole.id(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
   })
 })

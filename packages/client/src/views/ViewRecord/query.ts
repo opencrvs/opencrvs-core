@@ -74,8 +74,10 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         }
         user {
           id
-          type
-          role
+          role {
+            _id
+          }
+          systemRole
           name {
             firstNames
             familyName
