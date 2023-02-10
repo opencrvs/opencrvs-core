@@ -57,7 +57,6 @@ import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
-import { Roles } from '@client/utils/authUtils'
 import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
@@ -65,6 +64,7 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { SystemRoleType } from '@client/utils/gateway'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import UserRoles from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
@@ -214,22 +214,26 @@ export function App(props: IAppProps) {
                                         />
                                         <ProtectedRoute
                                           exact
-                                          roles={[Roles.NATIONAL_SYSTEM_ADMIN]}
+                                          roles={[
+                                            SystemRoleType.NationalSystemAdmin
+                                          ]}
                                           path={routes.CERTIFICATE_CONFIG}
                                           component={CertificatesConfig}
                                         />
                                         <ProtectedRoute
                                           exact
-                                          roles={[Roles.NATIONAL_SYSTEM_ADMIN]}
+                                          roles={[
+                                            SystemRoleType.NationalSystemAdmin
+                                          ]}
                                           path={routes.INFORMANT_NOTIFICATION}
                                           component={InformantNotification}
                                         />
                                         <ProtectedRoute
                                           exact
                                           roles={[
-                                            Roles.LOCAL_REGISTRAR,
-                                            Roles.REGISTRATION_AGENT,
-                                            Roles.NATIONAL_REGISTRAR
+                                            SystemRoleType.LocalRegistrar,
+                                            SystemRoleType.RegistrationAgent,
+                                            SystemRoleType.NationalRegistrar
                                           ]}
                                           path={routes.ADVANCED_SEARCH}
                                           component={AdvancedSearchConfig}
@@ -237,22 +241,26 @@ export function App(props: IAppProps) {
                                         <ProtectedRoute
                                           exact
                                           roles={[
-                                            Roles.LOCAL_REGISTRAR,
-                                            Roles.REGISTRATION_AGENT,
-                                            Roles.NATIONAL_REGISTRAR
+                                            SystemRoleType.LocalRegistrar,
+                                            SystemRoleType.RegistrationAgent,
+                                            SystemRoleType.NationalRegistrar
                                           ]}
                                           path={routes.ADVANCED_SEARCH_RESULT}
                                           component={AdvancedSearchResult}
                                         />
                                         <ProtectedRoute
                                           exact
-                                          roles={[Roles.NATIONAL_SYSTEM_ADMIN]}
+                                          roles={[
+                                            SystemRoleType.NationalSystemAdmin
+                                          ]}
                                           path={routes.APPLICATION_CONFIG}
                                           component={ApplicationConfig}
                                         />
                                         <ProtectedRoute
                                           exact
-                                          roles={[Roles.NATIONAL_SYSTEM_ADMIN]}
+                                          roles={[
+                                            SystemRoleType.NationalSystemAdmin
+                                          ]}
                                           path={routes.USER_ROLES_CONFIG}
                                           component={UserRoles}
                                         />
@@ -323,11 +331,11 @@ export function App(props: IAppProps) {
                                         <ProtectedRoute
                                           exact
                                           roles={[
-                                            Roles.REGISTRATION_AGENT,
-                                            Roles.LOCAL_REGISTRAR,
-                                            Roles.LOCAL_SYSTEM_ADMIN,
-                                            Roles.NATIONAL_SYSTEM_ADMIN,
-                                            Roles.PERFORMANCE_MANAGEMENT
+                                            SystemRoleType.RegistrationAgent,
+                                            SystemRoleType.LocalRegistrar,
+                                            SystemRoleType.LocalSystemAdmin,
+                                            SystemRoleType.NationalSystemAdmin,
+                                            SystemRoleType.PerformanceManagement
                                           ]}
                                           path={routes.TEAM_SEARCH}
                                           component={TeamSearch}
@@ -370,12 +378,12 @@ export function App(props: IAppProps) {
                                         <ProtectedRoute
                                           exact
                                           roles={[
-                                            Roles.REGISTRATION_AGENT,
-                                            Roles.LOCAL_REGISTRAR,
-                                            Roles.LOCAL_SYSTEM_ADMIN,
-                                            Roles.NATIONAL_SYSTEM_ADMIN,
-                                            Roles.PERFORMANCE_MANAGEMENT,
-                                            Roles.NATIONAL_REGISTRAR
+                                            SystemRoleType.RegistrationAgent,
+                                            SystemRoleType.LocalRegistrar,
+                                            SystemRoleType.LocalSystemAdmin,
+                                            SystemRoleType.NationalSystemAdmin,
+                                            SystemRoleType.PerformanceManagement,
+                                            SystemRoleType.NationalRegistrar
                                           ]}
                                           path={routes.PERFORMANCE_HOME}
                                           component={PerformanceHome}
@@ -383,8 +391,8 @@ export function App(props: IAppProps) {
                                         <ProtectedRoute
                                           exact
                                           roles={[
-                                            Roles.NATIONAL_SYSTEM_ADMIN,
-                                            Roles.NATIONAL_REGISTRAR
+                                            SystemRoleType.NationalSystemAdmin,
+                                            SystemRoleType.NationalRegistrar
                                           ]}
                                           path={routes.VS_EXPORTS}
                                           component={VSExport}
@@ -426,12 +434,12 @@ export function App(props: IAppProps) {
                                         <ProtectedRoute
                                           exact
                                           roles={[
-                                            Roles.REGISTRATION_AGENT,
-                                            Roles.LOCAL_REGISTRAR,
-                                            Roles.LOCAL_SYSTEM_ADMIN,
-                                            Roles.NATIONAL_SYSTEM_ADMIN,
-                                            Roles.PERFORMANCE_MANAGEMENT,
-                                            Roles.NATIONAL_REGISTRAR
+                                            SystemRoleType.RegistrationAgent,
+                                            SystemRoleType.LocalRegistrar,
+                                            SystemRoleType.LocalSystemAdmin,
+                                            SystemRoleType.NationalSystemAdmin,
+                                            SystemRoleType.PerformanceManagement,
+                                            SystemRoleType.NationalRegistrar
                                           ]}
                                           path={routes.ORGANISATIONS_INDEX}
                                           component={AdministrativeLevels}

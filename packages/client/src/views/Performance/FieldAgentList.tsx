@@ -39,7 +39,7 @@ import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { IAvatar } from '@client/utils/userUtils'
+import { Avatar } from '@client/utils/gateway'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { userMessages } from '@client/i18n/messages'
 
@@ -111,7 +111,7 @@ const NameAvatar = styled.div`
   }
 `
 
-function getNameWithAvatar(userName: string, avatar?: IAvatar) {
+function getNameWithAvatar(userName: string, avatar?: Avatar) {
   return (
     <NameAvatar>
       <AvatarSmall name={userName} avatar={avatar} />

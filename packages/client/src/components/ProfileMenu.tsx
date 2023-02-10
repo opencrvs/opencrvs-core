@@ -24,14 +24,13 @@ import {
 import { SettingsBlack, LogoutBlack } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
-import { IUserDetails, getIndividualNameObj } from '@client/utils/userUtils'
+import { UserDetails, getIndividualNameObj } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { goToSettings } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
 import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
-import { Role } from '@client/utils/gateway'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -47,7 +46,7 @@ const UserRole = styled.div`
 
 interface IProps {
   language: string
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   goToSettings: typeof goToSettings
 }
@@ -74,10 +73,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     return items
   }
 
-  getUserName = (
-    language: string,
-    userDetails: IUserDetails | null
-  ): string => {
+  getUserName = (language: string, userDetails: UserDetails | null): string => {
     let userName = ''
 
     if (userDetails && userDetails.name) {
@@ -93,12 +89,12 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
 
   getMenuHeader = (
     language: string,
-    userDetails: IUserDetails | null
+    userDetails: UserDetails | null
   ): JSX.Element => {
     const userName = this.getUserName(language, userDetails)
     // let's remove this type assertion after #4458 merges in
     const userRole =
-      userDetails?.role && getUserRole(language, userDetails.role as Role)
+      userDetails?.role && getUserRole(language, userDetails.role)
 
     return (
       <>

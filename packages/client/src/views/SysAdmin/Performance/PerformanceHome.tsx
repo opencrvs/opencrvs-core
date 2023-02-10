@@ -33,7 +33,6 @@ import { PerformanceSelect } from '@client/views/SysAdmin/Performance/Performanc
 import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
 import {
   CORRECTION_TOTALS,
@@ -78,6 +77,7 @@ import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
 import startOfMonth from 'date-fns/startOfMonth'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Layout = styled.div`
   display: flex;
@@ -221,7 +221,7 @@ interface IDispatchProps {
 type Props = WrappedComponentProps &
   IDispatchProps &
   IOnlineStatusProps &
-  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
+  RouteComponentProps & { userDetails: UserDetails | null } & IConnectProps & {
     theme: ITheme
   }
 
@@ -239,7 +239,7 @@ interface ICorrectionsQueryResult {
 
 class PerformanceHomeComponent extends React.Component<Props, State> {
   transformPropsToState(props: Props) {
-    const { selectedLocation, locations, offices } = props
+    const { selectedLocation } = props
     return {
       toggleStatus: false,
       officeSelected: this.isOfficeSelected(selectedLocation),
@@ -313,7 +313,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
         />
         <PerformanceSelect
           onChange={(option) => {
-            const { timeStart, timeEnd, selectedLocation } = this.props
+            const { timeStart, timeEnd } = this.props
             this.props.goToPerformanceHome(
               timeStart,
               timeEnd,
@@ -388,7 +388,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   render() {
     const { intl, isOnline } = this.props
-    const { toggleStatus, officeSelected, isAccessibleOffice } = this.state
+    const { toggleStatus, officeSelected } = this.state
     const { timeStart, timeEnd, event, selectedLocation } = this.props
 
     const queryVariablesWithoutLocationId = {

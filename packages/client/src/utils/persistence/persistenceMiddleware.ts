@@ -18,7 +18,7 @@ import {
 } from '@client/views/SysAdmin/Performance/metricsQuery'
 import { Action, Middleware } from 'redux'
 import { getDefaultPerformanceLocationId } from '@client/navigation'
-import { IUserDetails } from '@client/utils/userUtils'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   FIELD_AGENT_ROLES,
   NATIONAL_REGISTRAR_ROLES,
@@ -28,14 +28,13 @@ import { client } from '@client/utils/apolloClient'
 import { READY } from '@client/offline/actions'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
-import { RoleType } from '@client/utils/gateway'
 
-const isUserOfNationalScope = (userDetails: IUserDetails) =>
+const isUserOfNationalScope = (userDetails: UserDetails) =>
   [...NATIONAL_REGISTRAR_ROLES, ...NATL_ADMIN_ROLES].includes(
-    userDetails.systemRole as RoleType
+    userDetails.systemRole
   )
-const isFieldAgent = (userDetails: IUserDetails) =>
-  FIELD_AGENT_ROLES.includes(userDetails.systemRole as RoleType)
+const isFieldAgent = (userDetails: UserDetails) =>
+  FIELD_AGENT_ROLES.includes(userDetails.systemRole)
 
 function getQueriesToPrefetch(locationId: string, officeSelected: boolean) {
   const defaultTimeStart = new Date(
