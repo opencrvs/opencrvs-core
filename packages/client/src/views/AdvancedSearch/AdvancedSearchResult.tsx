@@ -32,7 +32,6 @@ import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
 import {
-  ADVANCED_SEARCH_TEXT,
   BRN_DRN_TEXT,
   EMPTY_STRING,
   NAME_TEXT,
@@ -48,7 +47,8 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Redirect, RouteComponentProps } from 'react-router'
@@ -62,7 +62,6 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
-import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { Query } from '@client/components/Query'
 import { SEARCH_EVENTS } from '@client/search/queries'
@@ -108,7 +107,7 @@ interface IBaseSearchResultProps {
   language: string
   scope: Scope | null
   goToEvents: typeof goToEventsAction
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction

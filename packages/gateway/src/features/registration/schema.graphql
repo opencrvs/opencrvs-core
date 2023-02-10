@@ -275,8 +275,8 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
-  createdAt: Date!
-  updatedAt: Date!
+  createdAt: Date
+  updatedAt: Date
 }
 
 type BirthRegistration implements EventRegistration { # -> Composition
@@ -384,6 +384,7 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantsSignature: String # -> extension(url='http://opencrvs.org/specs/extension/informants-signature').valueString
   informantType: InformantType # -> Observation.valueString
   otherInformantType: String
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
@@ -416,6 +417,7 @@ type Registration { # -> Task
   assignment: AssignmentData # -> extension(url='http://opencrvs.org/specs/extension/regAssigned')
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
+  informantsSignature: String # -> extension(url='http://opencrvs.org/specs/extension/informants-signature').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code

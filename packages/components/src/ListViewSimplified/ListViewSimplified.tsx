@@ -12,10 +12,18 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Grid = styled.div<{ bottomBorder: boolean }>`
+export type IRowListViewSize = 'small' | 'medium'
+
+const Grid = styled.div<{
+  bottomBorder: boolean
+  rowHeight?: IRowListViewSize
+}>`
   display: grid;
   grid-template-columns: auto 1fr auto;
-  grid-auto-rows: minmax(56px, auto);
+  ${({ rowHeight }) =>
+    rowHeight === 'medium' && 'grid-auto-rows: minmax(56px, auto);'}
+  ${({ rowHeight }) =>
+    rowHeight === 'small' && 'grid-auto-rows: minmax(48px, auto);'}
   ${({ bottomBorder }) => bottomBorder && 'border-bottom: 1px solid'};
   border-color: ${({ theme }) => theme.colors.grey200};
   > div:not(:nth-last-child(-n + 4)) {
@@ -125,6 +133,7 @@ const MobileActionsContainer = styled.div`
 `
 
 export interface IListViewItemSimplifiedProps {
+  key?: number | string
   image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
@@ -137,6 +146,7 @@ export interface IListViewItemSimplifiedProps {
  * Use the list view to summarise information, for example a user’s responce at the declaration form or for showing performance data
  */
 export function ListViewItemSimplified({
+  key,
   image,
   label,
   value,
@@ -145,7 +155,7 @@ export function ListViewItemSimplified({
   compactLabel
 }: IListViewItemSimplifiedProps) {
   return (
-    <>
+    <React.Fragment key={key}>
       {image && (
         <ImageContainer className={className} data-test-id="list-view-image">
           {image}
@@ -179,7 +189,7 @@ export function ListViewItemSimplified({
         <MobileActionsContainer>{actions}</MobileActionsContainer>
         {value && <MobileValueContainer>{value}</MobileValueContainer>}
       </MobileContainer>
-    </>
+    </React.Fragment>
   )
 }
 
@@ -187,15 +197,22 @@ export function ListViewSimplified({
   className,
   bottomBorder = false,
   children,
-  id
+  id,
+  rowHeight = 'medium'
 }: {
   bottomBorder?: boolean
   className?: string
   children: React.ReactNode
   id?: string
+  rowHeight?: IRowListViewSize
 }) {
   return (
-    <Grid id={id} bottomBorder={bottomBorder} className={className}>
+    <Grid
+      id={id}
+      bottomBorder={bottomBorder}
+      rowHeight={rowHeight}
+      className={className}
+    >
       {children}
     </Grid>
   )

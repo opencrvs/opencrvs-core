@@ -134,10 +134,24 @@ export async function fetchLocationHandler(
   let response
 
   if (locationId) {
-    response = await fetchFromHearth(`/Location/${locationId}`)
+    response = await fetchFromHearth<fhir.Bundle>(`/Location/${locationId}`)
   } else {
-    response = await fetchFromHearth(`/Location${searchParam}`)
+    response = await fetchFromHearth<fhir.Bundle>(`/Location${searchParam}`)
   }
+
+  response.link = response.link?.map((link) => ({
+    ...link,
+    url: link.url
+      .replace(link.url.split('/Location')[0], `${request.url.origin}`)
+      .replace('Location', 'location')
+  }))
+
+  response.entry = response.entry?.map((entry) => ({
+    ...entry,
+    fullUrl: entry.fullUrl
+      ?.replace(entry.fullUrl.split('/Location')[0], `${request.url.origin}`)
+      .replace('Location', 'location')
+  }))
 
   return response
 }

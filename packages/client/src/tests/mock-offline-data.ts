@@ -156,7 +156,7 @@ export const mockConditionals = {
   },
   isRegistrarRoleSelected: {
     action: 'hide',
-    expression: 'values.role!=="LOCAL_REGISTRAR"'
+    expression: 'values.systemRole!=="LOCAL_REGISTRAR"'
   },
   isOfficePreSelected: {
     action: 'hide',
@@ -734,6 +734,11 @@ export const mockOfflineData = {
       fileName: 'logo.png',
       file: `data:image;base64,${validImageB64String}`
     },
+    LOGIN_BACKGROUND: {
+      backgroundColor: 'FFF',
+      backgroundImage: '',
+      imageFit: 'FILL'
+    },
     CURRENCY: {
       isoCode: 'ZMW',
       languagesAndCountry: ['en-ZM']
@@ -745,6 +750,9 @@ export const mockOfflineData = {
     SENTRY: 'https://sentry.com',
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
     ADDRESSES: 1,
+    DATE_OF_BIRTH_UNKNOWN: true,
+    INFORMANT_SIGNATURE: false,
+    INFORMANT_SIGNATURE_REQUIRED: false,
     ADMIN_LEVELS: 2
   },
   formConfig,

@@ -19,7 +19,7 @@ import changeAvatarHandler, {
   changeAvatarRequestSchema
 } from '@user-mgnt/features/changeAvatar/handler'
 import createUser from '@user-mgnt/features/createUser/handler'
-import getRoles, {
+import getSystemRoles, {
   searchRoleSchema
 } from '@user-mgnt/features/getRoles/handler'
 import getUser, {
@@ -96,6 +96,10 @@ import {
 import resetPasswordSMSHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
+import updateRole, {
+  systemRoleResponseSchema,
+  systemRolesRequestSchema
+} from '@user-mgnt/features/updateRole/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -402,8 +406,8 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/getRoles',
-      handler: getRoles,
+      path: '/getSystemRoles',
+      handler: getSystemRoles,
       config: {
         auth: {
           scope: [RouteScope.SYSADMIN]
@@ -706,6 +710,25 @@ export const getRoutes = () => {
         },
         response: {
           schema: SystemSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateRole',
+      handler: updateRole,
+      config: {
+        tags: ['api'],
+        description: 'Update user role for particular system role',
+        notes: 'This is responsible for update userRole',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: systemRolesRequestSchema
+        },
+        response: {
+          schema: systemRoleResponseSchema
         }
       }
     }

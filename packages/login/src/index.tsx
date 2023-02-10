@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import * as Sentry from '@sentry/react'
 import * as LogRocket from 'logrocket'
 import { App } from '@login/App'
@@ -66,8 +66,9 @@ if (
   }
 }
 const { store, history } = createStore()
-ReactDOM.render(
-  <App store={store} history={history} />,
-  document.getElementById('root')
-)
+
+const container = document.getElementById('root')
+const root = createRoot(container!)
+root.render(<App store={store} history={history} />)
+
 registerServiceWorker()

@@ -9,17 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import React from 'react'
+
 import styled from '@client/styledComponents'
 import {
   GQLLocation,
   GQLIdentifier,
   GQLPaymentMetric
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IUserDetails } from '@client/utils/userUtils'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
 import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
-import React from 'react'
 import { getPercentage } from '@client/utils/data-formatting'
 import { FormattedNumber, IntlShape } from 'react-intl'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
@@ -33,7 +35,6 @@ import {
   PERFORMANCE_STATS,
   CORRECTION_TOTALS
 } from '@client/views/SysAdmin/Performance/metricsQuery'
-import { Event } from '@client/utils/gateway'
 import {
   GET_TOTAL_CERTIFICATIONS,
   GET_TOTAL_PAYMENTS
@@ -191,7 +192,7 @@ export function getJurisidictionType(location: GQLLocation): string | null {
 export function isUnderJurisdictionOfUser(
   locations: { [key: string]: ILocation },
   locationId: string,
-  jurisdictionLocation: string | undefined
+  jurisdictionLocation: string | undefined | null
 ) {
   if (!jurisdictionLocation) return false
 
@@ -216,16 +217,16 @@ export function getPrimaryLocationIdOfOffice(
 }
 
 export function getJurisdictionLocationIdFromUserDetails(
-  userDetails: IUserDetails
+  userDetails: UserDetails
 ) {
   const location =
     userDetails.catchmentArea &&
     userDetails.catchmentArea.find((location) => {
       const jurisdictionTypeIdentifier =
-        location.identifier &&
-        location.identifier.find(
+        location?.identifier &&
+        location?.identifier.find(
           (identifier) =>
-            identifier.system ===
+            identifier?.system ===
             'http://opencrvs.org/specs/id/jurisdiction-type'
         )
       return (

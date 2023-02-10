@@ -11,7 +11,6 @@
  */
 import React, { useState } from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
-import { CheckboxGroup } from './CheckboxGroup'
 import { Checkbox } from './Checkbox'
 
 export default {
@@ -27,12 +26,22 @@ export default {
   }
 } as ComponentMeta<typeof Checkbox>
 
-export const Default: ComponentStory<typeof Checkbox> = (args) => (
-  <Checkbox {...args} />
-)
+export const Default: ComponentStory<typeof Checkbox> = (args) => {
+  const [isChecked, setChecked] = useState(false)
+
+  return (
+    <Checkbox
+      {...args}
+      id="default-checkbox"
+      selected={isChecked}
+      onChange={() => setChecked(!isChecked)}
+    />
+  )
+}
 Default.args = {
-  name: 'Banana',
-  label: 'Banana',
-  value: 'banana',
-  selected: true
+  name: 'CRVS options',
+  label: 'The gold standard for digital civil registration',
+  value: 'The gold standard for digital civil registration',
+  selected: true,
+  size: 'small'
 }

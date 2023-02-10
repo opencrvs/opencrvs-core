@@ -9,20 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { DarkPageContainer, PageContainer } from '@login/common/PageContainer'
+import { PageContainer } from '@login/common/PageContainer'
 import { ErrorBoundary } from '@login/ErrorBoundary'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
 import * as routes from '@login/navigation/routes'
-import { createStore, AppStore } from '@login/store'
+import { AppStore, createStore } from '@login/store'
 import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
-import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { History } from 'history'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router'
 import { ConnectedRouter } from 'connected-react-router'
-import { ThemeProvider, createGlobalStyle } from 'styled-components'
+import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { ForgottenItem } from './views/resetCredentialsForm/forgottenItemForm'
 import { ResetCredentialsSuccessPage } from './views/resetCredentialsForm/resetCredentialsSuccessPage'
 import { PhoneNumberVerification } from './views/resetCredentialsForm/phoneNumberVerificationForm'
@@ -30,7 +29,8 @@ import { RecoveryCodeEntry } from './views/resetCredentialsForm/recoveryCodeEntr
 import { SecurityQuestion } from './views/resetCredentialsForm/securityQuestionForm'
 import { UpdatePassword } from './views/resetCredentialsForm/updatePasswordForm'
 import { Page } from './Page'
-import { LanguageSelect } from './i18n/components/LanguageSelect'
+import { LoginBackgroundWrapper } from '@login/common/LoginBackgroundWrapper'
+import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 
 export const { store, history } = createStore()
 
@@ -60,16 +60,14 @@ export class App extends React.Component<IAppProps> {
                 <Page>
                   <Switch>
                     <Route exact path={routes.STEP_ONE}>
-                      <LanguageSelect>
-                        <DarkPageContainer>
-                          <StepOneContainer />
-                        </DarkPageContainer>
-                      </LanguageSelect>
+                      <LoginBackgroundWrapper>
+                        <StepOneContainer />
+                      </LoginBackgroundWrapper>
                     </Route>
                     <Route exact path={routes.STEP_TWO}>
-                      <DarkPageContainer>
+                      <LoginBackgroundWrapper>
                         <StepTwoContainer />
-                      </DarkPageContainer>
+                      </LoginBackgroundWrapper>
                     </Route>
                     <Route exact path={routes.FORGOTTEN_ITEM}>
                       <PageContainer>

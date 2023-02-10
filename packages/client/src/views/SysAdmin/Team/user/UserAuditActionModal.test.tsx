@@ -19,9 +19,10 @@ import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
-import { RoleType, Status } from '@client/utils/gateway'
+import { SystemRoleType, Status } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 
-const users = [
+const users: UserDetails[] = [
   {
     id: '5d08e102542c7a19fc55b790',
     name: [
@@ -32,7 +33,7 @@ const users = [
       }
     ],
     username: 'r.tagore',
-    role: RoleType.RegistrationAgent,
+    systemRole: SystemRoleType.RegistrationAgent,
     localRegistrar: {
       name: [
         {
@@ -41,10 +42,18 @@ const users = [
           familyName: 'Huq'
         }
       ],
-      role: RoleType.LocalRegistrar,
+      role: SystemRoleType.LocalRegistrar,
       signature: undefined
     },
-    type: 'ENTREPENEUR',
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'ENTREPENEUR'
+        }
+      ]
+    },
     status: Status.Active,
     creationDate: '2022-10-03T10:42:46.920Z',
     userMgntUserID: '5eba726866458970cf2e23c2',
@@ -67,7 +76,8 @@ const users = [
     primaryOffice: {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
       name: 'Kaliganj Union Sub Center',
-      status: 'active'
+      status: 'active',
+      alias: ['Central']
     }
   },
   {
@@ -80,8 +90,16 @@ const users = [
       }
     ],
     username: 'np.huq',
-    role: RoleType.LocalRegistrar,
-    type: 'MAYOR',
+    systemRole: SystemRoleType.LocalRegistrar,
+    role: {
+      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+      labels: [
+        {
+          lang: 'en',
+          label: 'MAYOR'
+        }
+      ]
+    },
     status: Status.Deactivated,
     localRegistrar: {
       name: [
@@ -91,7 +109,7 @@ const users = [
           familyName: 'Islam'
         }
       ],
-      role: RoleType.LocalRegistrar,
+      role: SystemRoleType.LocalRegistrar,
       signature: undefined
     },
     creationDate: '2022-10-03T10:42:46.920Z',
@@ -115,7 +133,8 @@ const users = [
     primaryOffice: {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
       name: 'Kaliganj Union Sub Center',
-      status: 'active'
+      status: 'active',
+      alias: ['Central']
     }
   }
 ]
@@ -256,10 +275,10 @@ describe('user audit action modal tests', () => {
           '#deactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
-        await flushPromises()
-        expect(
-          store.getState().notification.userAuditSuccessToast.visible
-        ).toBe(true)
+        waitFor(
+          () =>
+            store.getState().notification.userAuditSuccessToast.visible === true
+        )
       })
     })
   })
@@ -288,9 +307,10 @@ describe('user audit action modal tests', () => {
 
       it('clicking confirm action dispatches error notification action', async () => {
         component.find('#deactivate-action').hostNodes().simulate('click')
-        await flushPromises()
-        expect(store.getState().notification.submitFormErrorToast).toBe(
-          'userFormFail'
+        waitFor(
+          () =>
+            store.getState().notification.submitFormErrorToast ===
+            'userFormFail'
         )
       })
     })

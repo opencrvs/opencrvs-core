@@ -55,6 +55,12 @@ const bold18 = `
   font-size: 18px;
   line-height: 140%;
 `
+const bold21 = `
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 140%;
+`
 
 const reg16 = `
   font-family: ${family};
@@ -104,6 +110,7 @@ export const fonts = {
   h2,
   h3,
   h4,
+  bold21,
   bold18,
   bold16,
   bold14,

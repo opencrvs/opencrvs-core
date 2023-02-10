@@ -29,17 +29,17 @@ export const mockFetchLocations = {
   link: [
     {
       relation: 'self',
-      url: 'http://localhost:3447/fhir/Location?type=ADMIN_STRUCTURE&_count=0&status=active'
+      url: 'http://localhost:7070/location?type=ADMIN_STRUCTURE&_count=0&status=active'
     },
     {
       relation: 'next',
-      url: 'http://localhost:3447/fhir/Location?type=ADMIN_STRUCTURE&_count=0&status=active&_getpagesoffset=0'
+      url: 'http://localhost:7070/location?type=ADMIN_STRUCTURE&_count=0&status=active&_getpagesoffset=0'
     }
   ],
   entry: [
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/7dbf10a9-23d9-4038-8b1c-9f6547ab4877/_history/39d24680-f610-45bd-8d74-2becd7defea2',
+        'http://localhost:7070/location/7dbf10a9-23d9-4038-8b1c-9f6547ab4877/_history/39d24680-f610-45bd-8d74-2becd7defea2',
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -118,7 +118,7 @@ export const mockFetchLocations = {
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/8fe4b15b-b5d0-4ff7-9f24-ec24f5d33811/_history/5e9b7837-2958-411c-a62a-582c033605f4',
+        'http://localhost:7070/location/8fe4b15b-b5d0-4ff7-9f24-ec24f5d33811/_history/5e9b7837-2958-411c-a62a-582c033605f4',
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -230,17 +230,17 @@ export const mockFetchOffices = {
   link: [
     {
       relation: 'self',
-      url: 'http://localhost:3447/fhir/Location?type=CRVS_OFFICE&_count=0&status=active'
+      url: 'http://localhost:7070/location?type=CRVS_OFFICE&_count=0&status=active'
     },
     {
       relation: 'next',
-      url: 'http://localhost:3447/fhir/Location?type=CRVS_OFFICE&_count=0&status=active&_getpagesoffset=0'
+      url: 'http://localhost:7070/location?type=CRVS_OFFICE&_count=0&status=active&_getpagesoffset=0'
     }
   ],
   entry: [
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/b3de59a0-835d-4c62-b91b-bc86e312d08e/_history/b052793e-87b7-4bf7-9dd3-119cb2cb62a4',
+        'http://localhost:7070/location/b3de59a0-835d-4c62-b91b-bc86e312d08e/_history/b052793e-87b7-4bf7-9dd3-119cb2cb62a4',
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -291,7 +291,7 @@ export const mockFetchOffices = {
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/964d9765-dc96-4c7e-81ec-0a5572d4ea68/_history/fcb6da4e-b574-48c1-9709-7396fd521b6c',
+        'http://localhost:7070/location/964d9765-dc96-4c7e-81ec-0a5572d4ea68/_history/fcb6da4e-b574-48c1-9709-7396fd521b6c',
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -354,17 +354,17 @@ export const mockFetchFacilities = {
   link: [
     {
       relation: 'self',
-      url: 'http://localhost:3447/fhir/Location?type=HEALTH_FACILITY&_count=0&status=active'
+      url: 'http://localhost:7070/location?type=HEALTH_FACILITY&_count=0&status=active'
     },
     {
       relation: 'next',
-      url: 'http://localhost:3447/fhir/Location?type=HEALTH_FACILITY&_count=0&status=active&_getpagesoffset=0'
+      url: 'http://localhost:7070/location?type=HEALTH_FACILITY&_count=0&status=active&_getpagesoffset=0'
     }
   ],
   entry: [
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/3ab39ce5-6d03-4149-8ae2-9f4f0baeadf8/_history/05149216-4084-434c-97e2-2f0a8f1c65df',
+        'http://localhost:7070/location/3ab39ce5-6d03-4149-8ae2-9f4f0baeadf8/_history/05149216-4084-434c-97e2-2f0a8f1c65df',
       resource: {
         resourceType: 'Location',
         identifier: [
@@ -413,7 +413,7 @@ export const mockFetchFacilities = {
     },
     {
       fullUrl:
-        'http://localhost:3447/fhir/Location/7599ea22-0df3-4cd9-9d15-8868487deb4d/_history/c541a21c-82cd-42d2-ad1d-060d176e0766',
+        'http://localhost:7070/location/7599ea22-0df3-4cd9-9d15-8868487deb4d/_history/c541a21c-82cd-42d2-ad1d-060d176e0766',
       resource: {
         resourceType: 'Location',
         identifier: [

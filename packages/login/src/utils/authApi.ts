@@ -21,12 +21,19 @@ export interface ICountryLogo {
   fileName: string
   file: string
 }
+
+export interface ILoginBackground {
+  backgroundColor: string
+  backgroundImage: string
+  imageFit: string
+}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
   SENTRY: string
   LOGROCKET: string
+  LOGIN_BACKGROUND: ILoginBackground
 }
 
 export interface IApplicationConfigResponse {
