@@ -626,6 +626,25 @@ export async function generateRejectedPoints(
   }
 }
 
+export async function generateMarriageRegPoint(
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader,
+  regStatus: string
+): Promise<IRejectedPoints> {
+  //TODO implement logic here
+  const tags = {}
+  const fields = {
+    compositionId: 'compositionId'
+  }
+
+  return {
+    measurement: 'marriage_registration',
+    tags: tags,
+    fields: fields,
+    timestamp: 234234
+  }
+}
+
 export const generateAuditPoint = (
   practitionerId: string,
   action: string,

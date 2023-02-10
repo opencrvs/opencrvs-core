@@ -41,8 +41,8 @@ import {
   waitingExternalValidationHandler,
   declarationViewedHandler,
   declarationDownloadedHandler,
-  birthOrDeathDeclarationArchivedHandler,
-  birthOrDeathDeclarationReinstatedHandler,
+  declarationArchivedHandler,
+  declarationReinstatedHandler,
   declarationUpdatedHandler,
   markEventRegistererHandler,
   newEventRegistrationHandler
@@ -77,7 +77,8 @@ const enum RouteScope {
 }
 export enum EventType {
   BIRTH = 'birth',
-  DEATH = 'death'
+  DEATH = 'death',
+  MARRIAGE = 'marriage'
 }
 
 export const getRoutes = () => {
@@ -294,7 +295,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-archived',
-      handler: birthOrDeathDeclarationArchivedHandler,
+      handler: declarationArchivedHandler,
       config: {
         tags: ['api'],
         validate: {
@@ -307,7 +308,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-reinstated',
-      handler: birthOrDeathDeclarationReinstatedHandler,
+      handler: declarationReinstatedHandler,
       config: {
         tags: ['api'],
         validate: {

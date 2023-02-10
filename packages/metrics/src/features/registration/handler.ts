@@ -19,6 +19,7 @@ import {
   generateDeclarationStartedPoint,
   generateEventDurationPoint,
   generateInCompleteFieldPoints,
+  generateMarriageRegPoint,
   generatePaymentPoint,
   generateRejectedPoints,
   generateTimeLoggedPoint
@@ -251,6 +252,8 @@ export async function newEventRegistrationHandler(
     return newBirthRegistrationHandler(request, h)
   } else if (event === EventType.DEATH) {
     return newDeathRegistrationHandler(request, h)
+  } else if (event === EventType.MARRIAGE) {
+    return newMarriageRegistrationHandler(request, h)
   }
 
   return h.response().code(200)
@@ -295,6 +298,8 @@ export async function markEventRegistererHandler(
     return markBirthRegisteredHandler(request, h)
   } else if (event === EventType.DEATH) {
     return markDeathRegisteredHandler(request, h)
+  } else if (event === EventType.MARRIAGE) {
+    return markMarriageRegisteredHandler(request, h)
   }
   return h.response().code(200)
 }
@@ -540,7 +545,7 @@ export async function declarationViewedHandler(
   return h.response().code(200)
 }
 
-export async function birthOrDeathDeclarationArchivedHandler(
+export async function declarationArchivedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -548,7 +553,7 @@ export async function birthOrDeathDeclarationArchivedHandler(
   return h.response().code(200)
 }
 
-export async function birthOrDeathDeclarationReinstatedHandler(
+export async function declarationReinstatedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -572,5 +577,94 @@ export async function declarationUpdatedHandler(
   h: Hapi.ResponseToolkit
 ) {
   await createUserAuditPointFromFHIR('DECLARATION_UPDATED', request)
+  return h.response().code(200)
+}
+
+export async function newMarriageRegistrationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const points = []
+
+  await createUserAuditPointFromFHIR('DECLARED', request)
+
+  try {
+    points.push(
+      await generateMarriageRegPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        },
+        Events.NEW_DEC
+      )
+    )
+
+    points.push(
+      await generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        }
+      )
+    )
+
+    points.push(
+      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      })
+    )
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function markMarriageRegisteredHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  await createUserAuditPointFromFHIR('REGISTERED', request)
+
+  try {
+    const bundle = await populateBundleFromPayload(
+      request.payload as fhir.Bundle | fhir.Task,
+      request.headers.authorization
+    )
+
+    const points = await Promise.all([
+      generateEventDurationPoint(
+        bundle,
+        ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        }
+      ),
+      generateMarriageRegPoint(
+        bundle,
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        },
+        'mark-existing-declaration-registered'
+      ),
+      generateTimeLoggedPoint(bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      })
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
   return h.response().code(200)
 }
