@@ -135,14 +135,17 @@ export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
   return trackingIdentifier.value
 }
 
-export function getBirthRegistrationNumber(taskResource: fhir.Task) {
+export function getRegistrationNumber(
+  taskResource: fhir.Task,
+  eventType: EVENT_TYPE
+) {
   const brnIdentifier =
     taskResource &&
     taskResource.identifier &&
     taskResource.identifier.find((identifier) => {
       return (
         identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+        `${OPENCRVS_SPECIFICATION_URL}id/${eventType.toLowerCase()}-registration-number`
       )
     })
   if (!brnIdentifier || !brnIdentifier.value) {
@@ -150,39 +153,89 @@ export function getBirthRegistrationNumber(taskResource: fhir.Task) {
   }
   return brnIdentifier.value
 }
-export function getDeathRegistrationNumber(taskResource: fhir.Task) {
-  const drnIdentifier =
-    taskResource &&
-    taskResource.identifier &&
-    taskResource.identifier.find((identifier) => {
-      return (
-        identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/death-registration-number`
-      )
-    })
-  if (!drnIdentifier || !drnIdentifier.value) {
-    throw new Error("Didn't find any identifier for death registration number")
-  }
-  return drnIdentifier.value
-}
 
-export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
+// export function getBirthRegistrationNumber(taskResource: fhir.Task) {
+//   const brnIdentifier =
+//     taskResource &&
+//     taskResource.identifier &&
+//     taskResource.identifier.find((identifier) => {
+//       return (
+//         identifier.system ===
+//         `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
+//       )
+//     })
+//   if (!brnIdentifier || !brnIdentifier.value) {
+//     throw new Error("Didn't find any identifier for birth registration number")
+//   }
+//   return brnIdentifier.value
+// }
+// export function getDeathRegistrationNumber(taskResource: fhir.Task) {
+//   const drnIdentifier =
+//     taskResource &&
+//     taskResource.identifier &&
+//     taskResource.identifier.find((identifier) => {
+//       return (
+//         identifier.system ===
+//         `${OPENCRVS_SPECIFICATION_URL}id/death-registration-number`
+//       )
+//     })
+//   if (!drnIdentifier || !drnIdentifier.value) {
+//     throw new Error("Didn't find any identifier for death registration number")
+//   }
+//   return drnIdentifier.value
+// }
+// export function getMarriageRegistrationNumber(taskResource: fhir.Task) {
+//   const drnIdentifier =
+//     taskResource &&
+//     taskResource.identifier &&
+//     taskResource.identifier.find((identifier) => {
+//       return (
+//         identifier.system ===
+//         `${OPENCRVS_SPECIFICATION_URL}id/marriage-registration-number`
+//       )
+//     })
+//   if (!drnIdentifier || !drnIdentifier.value) {
+//     throw new Error(
+//       "Didn't find any identifier for marriage registration number"
+//     )
+//   }
+//   return drnIdentifier.value
+// }
+export function hasRegistrationNumber(
+  fhirBundle: fhir.Bundle,
+  eventType: EVENT_TYPE
+) {
   try {
-    getBirthRegistrationNumber(getTaskResource(fhirBundle))
+    getRegistrationNumber(getTaskResource(fhirBundle), eventType)
     return true
   } catch (error) {
     return false
   }
 }
-export function hasDeathRegistrationNumber(fhirBundle: fhir.Bundle) {
-  try {
-    getDeathRegistrationNumber(getTaskResource(fhirBundle))
-    return true
-  } catch (error) {
-    return false
-  }
-}
-
+// export function hasBirthRegistrationNumber(fhirBundle: fhir.Bundle) {
+//   try {
+//     getBirthRegistrationNumber(getTaskResource(fhirBundle))
+//     return true
+//   } catch (error) {
+//     return false
+//   }
+// }
+// export function hasDeathRegistrationNumber(fhirBundle: fhir.Bundle) {
+//   try {
+//     getDeathRegistrationNumber(getTaskResource(fhirBundle))
+//     return true
+//   } catch (error) {
+//     return false
+//   }
+// }
+// export function hasMarriageRegistrationNumber(fhirBundle: fhir.Bundle) {
+//   try {
+//     getMarriageRegistrationNumber(getTaskResource(fhirBundle))
+//     return true
+//   } catch (error) {
+//     return false
+//   }
+// }
 export function getPaperFormID(taskResource: fhir.Task) {
   const paperFormIdentifier =
     taskResource &&

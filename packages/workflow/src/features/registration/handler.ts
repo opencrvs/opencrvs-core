@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { HEARTH_URL, VALIDATING_EXTERNALLY } from '@workflow/constants'
-import { Events, triggerEvent } from '@workflow/features/events/handler'
 import {
   markBundleAsCertified,
   markBundleAsValidated,
@@ -52,15 +51,39 @@ import {
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
   BIRTH_REG_NUMBER_SYSTEM,
-  DEATH_REG_NUMBER_SYSTEM
+  DEATH_REG_NUMBER_SYSTEM,
+  MARRIAGE_REG_NUMBER_SYSTEM,
+  BRIDE_SECTION_CODE,
+  GROOM_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { triggerEvent } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
   registrationNumber: string
   error: string
 }
+
+const SECTION_CODE: Record<EVENT_TYPE, string[]> = {
+  [EVENT_TYPE.BIRTH]: [CHILD_SECTION_CODE],
+  [EVENT_TYPE.DEATH]: [DECEASED_SECTION_CODE],
+  [EVENT_TYPE.MARRIAGE]: [GROOM_SECTION_CODE, BRIDE_SECTION_CODE]
+}
+
+const REG_NUMBER_SYSTEM: Record<EVENT_TYPE, string> = {
+  [EVENT_TYPE.BIRTH]: BIRTH_REG_NUMBER_SYSTEM,
+  [EVENT_TYPE.DEATH]: DEATH_REG_NUMBER_SYSTEM,
+  [EVENT_TYPE.MARRIAGE]: MARRIAGE_REG_NUMBER_SYSTEM
+}
+
+const MARK_REG: Record<EVENT_TYPE, Events> = {
+  [EVENT_TYPE.BIRTH]: Events.BIRTH_MARK_REG,
+  [EVENT_TYPE.DEATH]: Events.DEATH_MARK_REG,
+  [EVENT_TYPE.MARRIAGE]: Events.MARRIAGE_MARK_REG
+}
+
 async function sendBundleToHearth(
   payload: fhir.Bundle,
   count = 1
@@ -300,18 +323,19 @@ export async function markEventAsRegisteredCallbackHandler(
       getToken(request)
     )
 
-    /** pushing registrationNumber on related person's identifier */
-    let patient = await updatePatientIdentifierWithRN(
+    /** pushing registrationNumber on related person's identifier
+     *  taking patients as an array because MARRIAGE Event has two types of patient
+     */
+    const patients: fhir.Patient[] = await updatePatientIdentifierWithRN(
       composition,
-      event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE,
-      event === EVENT_TYPE.BIRTH
-        ? BIRTH_REG_NUMBER_SYSTEM
-        : DEATH_REG_NUMBER_SYSTEM,
+      SECTION_CODE[event],
+      REG_NUMBER_SYSTEM[event],
       registrationNumber
     )
 
     if (event === EVENT_TYPE.DEATH) {
-      patient = await validateDeceasedDetails(patient, {
+      /** using first patient because for death event there is only one patient */
+      patients[0] = await validateDeceasedDetails(patients[0], {
         Authorization: request.headers.authorization
       })
     }
@@ -319,8 +343,9 @@ export async function markEventAsRegisteredCallbackHandler(
     //** Making sure db automicity */
     const bundle = generateEmptyBundle()
     bundle.entry?.push({ resource: task })
-    bundle.entry?.push({ resource: patient })
-
+    for (const patient of patients) {
+      bundle.entry?.push({ resource: patient })
+    }
     await sendBundleToHearth(bundle)
 
     const phoneNo = await getPhoneNo(task, event)
@@ -354,9 +379,7 @@ export async function markEventAsRegisteredCallbackHandler(
     }
     // Trigger an event for the registration
     await triggerEvent(
-      event === EVENT_TYPE.BIRTH
-        ? Events.BIRTH_MARK_REG
-        : Events.DEATH_MARK_REG,
+      MARK_REG[event],
       { resourceType: 'Bundle', entry: [{ resource: task }] },
       request.headers
     )

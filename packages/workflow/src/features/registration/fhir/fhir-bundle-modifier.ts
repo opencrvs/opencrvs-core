@@ -592,31 +592,37 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
 
 export async function updatePatientIdentifierWithRN(
   composition: fhir.Composition,
-  sectionCode: string,
+  sectionCodes: string[],
   identifierType: string,
   registrationNumber: string
-): Promise<fhir.Patient> {
-  const section = getSectionEntryBySectionCode(composition, sectionCode)
-  const patient: fhir.Patient = await getFromFhir(`/${section.reference}`)
-  if (!patient.identifier) {
-    patient.identifier = []
-  }
-  const rnIdentifier = patient.identifier.find(
-    (identifier) => identifier.type === identifierType
-  )
-  if (rnIdentifier) {
-    rnIdentifier.value = registrationNumber
-  } else {
-    patient.identifier.push({
-      // @ts-ignore
-      // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
-      // type should have CodeableConcept instead of string
-      // Need to fix in both places together along with a script for legacy data update
-      type: identifierType,
-      value: registrationNumber
+): Promise<fhir.Patient[]> {
+  const patients: fhir.Patient[] = []
+  await Promise.all(
+    sectionCodes.map(async (sectionCode) => {
+      const section = getSectionEntryBySectionCode(composition, sectionCode)
+      const patient = await getFromFhir(`/${section.reference}`)
+      if (!patient.identifier) {
+        patient.identifier = []
+      }
+      const rnIdentifier = patient.identifier.find(
+        (identifier: { type: string }) => identifier.type === identifierType
+      )
+      if (rnIdentifier) {
+        rnIdentifier.value = registrationNumber
+      } else {
+        patient.identifier.push({
+          // @ts-ignore
+          // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
+          // type should have CodeableConcept instead of string
+          // Need to fix in both places together along with a script for legacy data update
+          type: identifierType,
+          value: registrationNumber
+        })
+      }
+      patients.push(patient)
     })
-  }
-  return patient
+  )
+  return patients
 }
 
 interface Integration {

@@ -21,8 +21,7 @@ import {
   getInformantName,
   getTrackingId,
   getCRVSOfficeName,
-  getBirthRegistrationNumber,
-  getDeathRegistrationNumber,
+  getRegistrationNumber,
   concatenateName
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
@@ -32,7 +31,7 @@ import {
   BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
   DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
-import { Events } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 
@@ -98,6 +97,9 @@ export async function sendEventNotification(
   const informantSMSNotifications = (await getInformantSMSNotification(
     authHeader.Authorization
   )) as IInformantSMSNotification[] | []
+
+  const eventType = getEventType(fhirBundle)
+
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       if (
@@ -154,8 +156,9 @@ export async function sendEventNotification(
           {
             name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
             trackingId: getTrackingId(fhirBundle),
-            registrationNumber: getBirthRegistrationNumber(
-              getTaskResource(fhirBundle)
+            registrationNumber: getRegistrationNumber(
+              getTaskResource(fhirBundle),
+              eventType
             )
           }
         )
@@ -234,8 +237,9 @@ export async function sendEventNotification(
           {
             name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
             trackingId: getTrackingId(fhirBundle),
-            registrationNumber: getDeathRegistrationNumber(
-              getTaskResource(fhirBundle)
+            registrationNumber: getRegistrationNumber(
+              getTaskResource(fhirBundle),
+              eventType
             )
           }
         )
