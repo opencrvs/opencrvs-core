@@ -9,16 +9,5 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from '@hapi/hapi'
-import { countUsersByLocation } from '@user-mgnt/features/countUsersByLocation/service'
-
-type Payload = {
-  role: string
-  locationId?: string
-}
-
-export async function countUsersByLocationHandler(request: Hapi.Request) {
-  const { locationId, role } = request.payload as Payload
-
-  return countUsersByLocation(role, locationId)
-}
+export * from './persistenceMapper'
+export * from './persistLink'

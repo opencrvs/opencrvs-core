@@ -37,9 +37,8 @@ import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
-import { IAttachmentValue, IForm } from '@client/forms'
 import { Event } from '@client/utils/gateway'
+import { IAttachmentValue, IForm } from '@client/forms'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import {
   getDummyCertificateTemplateData,
@@ -60,6 +59,7 @@ import {
   Field
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { UserDetails } from '@client/utils/userUtils'
 
 const ListViewContainer = styled.div`
   margin-top: 24px;
@@ -79,7 +79,7 @@ export enum SVGFile {
 }
 
 type Props = WrappedComponentProps & {
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   scope: Scope | null
   offlineResources: IOfflineData
   registerForm: {
@@ -136,7 +136,7 @@ export const printDummyCertificate = async (
   event: string,
   registerForm: { birth: IForm; death: IForm },
   intl: IntlShape,
-  userDetails: IUserDetails,
+  userDetails: UserDetails,
   offlineData: IOfflineData
 ) => {
   const data = getDummyDeclarationData(event, registerForm)
@@ -226,7 +226,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             event,
             this.props.registerForm,
             intl,
-            this.props.userDetails as IUserDetails,
+            this.props.userDetails as UserDetails,
             this.props.offlineResources
           )
         }

@@ -43,13 +43,13 @@ enum LocationType {
 type Location { # -> Location (mostly the same property name except:)
   id: ID!
   _fhirID: ID # -> .id
-  identifier: [Identifier]
-  status: String
-  name: String
-  alias: [String]
+  identifier: [Identifier!]
+  status: String!
+  name: String!
+  alias: [String!]!
   description: String
-  partOf: String
-  type: LocationType
+  partOf: String!
+  type: LocationType!
   telecom: [ContactPoint]
   address: Address
   longitude: Float # -> position.longitude

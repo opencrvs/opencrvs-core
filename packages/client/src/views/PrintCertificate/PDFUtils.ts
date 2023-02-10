@@ -12,15 +12,15 @@
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
-import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   OptionalData,
   IPDFTemplate
 } from '@client/pdfRenderer/transformer/types'
-import { Content, PageSize } from 'pdfmake/interfaces'
+import { PageSize } from 'pdfmake/interfaces'
 import { certificateBaseTemplate } from '@client/templates/register'
 import * as Handlebars from 'handlebars'
+import { UserDetails } from '@client/utils/userUtils'
 
 function isMessageDescriptor(
   obj: Record<string, unknown>
@@ -73,7 +73,7 @@ export function executeHandlebarsTemplate(
 export async function previewCertificate(
   intl: IntlShape,
   declaration: IDeclaration,
-  userDetails: IUserDetails | null,
+  userDetails: UserDetails | null,
   offlineResource: IOfflineData,
   callBack: (pdf: string) => void,
   optionalData?: OptionalData,
@@ -98,7 +98,7 @@ export async function previewCertificate(
 export function printCertificate(
   intl: IntlShape,
   declaration: IDeclaration,
-  userDetails: IUserDetails | null,
+  userDetails: UserDetails | null,
   offlineResource: IOfflineData,
   optionalData?: OptionalData,
   pageSize: PageSize = 'A4'

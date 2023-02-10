@@ -34,17 +34,17 @@ import {
 } from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { IUserDetails } from '@client/utils/userUtils'
+import { SystemRoleType } from '@client/utils/gateway'
 import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
-import { Roles } from '@client/utils/authUtils'
+import { UserDetails } from '@client/utils/userUtils'
 
 export type CMethodParams = {
   declaration: IDeclarationData
   intl: IntlShape
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   draft: IDeclaration | null
   clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
   goToPage?: typeof goToPage
@@ -60,7 +60,7 @@ export const ShowDownloadButton = ({
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 }) => {
   const { id, type } = declaration || {}
 
@@ -76,8 +76,8 @@ export const ShowDownloadButton = ({
 
   if (
     declaration.assignment &&
-    (userDetails?.systemRole === Roles.LOCAL_REGISTRAR ||
-      userDetails?.systemRole === Roles.NATIONAL_REGISTRAR)
+    (userDetails?.systemRole === SystemRoleType.LocalRegistrar ||
+      userDetails?.systemRole === SystemRoleType.NationalRegistrar)
   ) {
     refetchQueries = [
       { query: FETCH_DECLARATION_SHORT_INFO, variables: { id: declaration.id } }

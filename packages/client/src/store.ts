@@ -64,6 +64,7 @@ import {
   advancedSearchParamReducer,
   IAdvancedSearchParamState
 } from '@client/search/advancedSearch/reducer'
+import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
 
 export interface IStoreState {
   profile: ProfileState
@@ -114,6 +115,7 @@ export const createStore = <T>(
   const enhancer = compose(
     applyMiddleware(submissionMiddleware),
     install(config),
+    applyMiddleware(persistenceMiddleware),
     applyMiddleware(routerMiddleware(history)),
     // @ts-ignore types are not correct for this module yet
     applyMiddleware(createSentryMiddleware(Sentry)),
