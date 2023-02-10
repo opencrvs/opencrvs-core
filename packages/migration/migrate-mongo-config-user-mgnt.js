@@ -11,7 +11,9 @@
  */
 const config = {
   mongodb: {
-    url: process.env.USER_MGNT_MONGO_URL || 'mongodb://localhost/user-mgnt',
+    url:
+      process.env.USER_MGNT_MONGO_URL ||
+      'mongodb://localhost/user-mgnt?replicaSet=rs0',
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
       useUnifiedTopology: true // removes a deprecating warning when connecting
