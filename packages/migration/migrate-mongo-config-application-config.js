@@ -13,7 +13,7 @@ const config = {
   mongodb: {
     url:
       process.env.APPLICATION_CONFIG_MONGO_URL ||
-      'mongodb://localhost/application-config',
+      'mongodb://localhost/application-config?replicaSet=rs0',
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
       useUnifiedTopology: true // removes a deprecating warning when connecting

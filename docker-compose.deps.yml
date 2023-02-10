@@ -32,7 +32,7 @@ services:
   hearth:
     image: opencrvs/hearth:1.1.0
     environment:
-      - mongodb__url=mongodb://mongo1/hearth-dev
+      - mongodb__url=mongodb://mongo1/hearth-dev?replicaSet=rs0
       - logger__level=warn
       - authentication__type=disabled
       - idGenerator=uuidv4
@@ -44,8 +44,8 @@ services:
   openhim-core:
     image: jembi/openhim-core:7
     environment:
-      - mongo_url=mongodb://mongo1/openhim-dev
-      - mongo_atnaUrl=mongodb://mongo1/openhim-dev
+      - mongo_url=mongodb://mongo1/openhim-dev?replicaSet=rs0
+      - mongo_atnaUrl=mongodb://mongo1/openhim-dev?replicaSet=rs0
       - logger_level=error
       - router_timeout=180000
     depends_on:

@@ -93,8 +93,8 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - CONFIG_API_URL=http://config:2021
       - FHIR_URL=http://openhim-core:5001/fhir
-      - MONGO_URL=mongodb://mongo1/metrics
-      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
+      - MONGO_URL=mongodb://mongo1/metrics?replicaSet=rs0
+      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev?replicaSet=rs0
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - DOCUMENTS_URL=http://documents:9050
@@ -126,7 +126,7 @@ services:
       dockerfile: ./packages/user-mgnt/Dockerfile
     restart: unless-stopped
     environment:
-      - MONGO_URL=mongodb://mongo1/user-mgnt
+      - MONGO_URL=mongodb://mongo1/user-mgnt?replicaSet=rs0
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
@@ -139,7 +139,7 @@ services:
     restart: unless-stopped
     environment:
       - REDIS_HOST=redis://redis:6379
-      - MONGO_URL=mongodb://mongo1/webhooks
+      - MONGO_URL=mongodb://mongo1/webhooks?replicaSet=rs0
       - AUTH_URL=http://auth:4040
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - FHIR_URL=http://openhim-core:5001/fhir
@@ -166,7 +166,7 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - HOST=0.0.0.0
       - PORT=2021
-      - MONGO_URL=mongodb://mongo1/application-config
+      - MONGO_URL=mongodb://mongo1/application-config?replicaSet=rs0
       - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
@@ -180,10 +180,10 @@ services:
       dockerfile: ./packages/migration/Dockerfile
     restart: unless-stopped
     environment:
-      - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
-      - APPLICATION_CONFIG_MONGO_URL=mongodb://mongo1/application-config
-      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
-      - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
+      - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt?replicaSet=rs0
+      - APPLICATION_CONFIG_MONGO_URL=mongodb://mongo1/application-config?replicaSet=rs0
+      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev?replicaSet=rs0
+      - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev?replicaSet=rs0
       - ES_HOST=elasticsearch:9200
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086

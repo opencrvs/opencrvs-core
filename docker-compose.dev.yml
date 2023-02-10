@@ -77,7 +77,7 @@ services:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-      - MONGO_URL=mongodb://mongo1/user-mgnt
+      - MONGO_URL=mongodb://mongo1/user-mgnt?replicaSet=rs0
       - NODE_ENV=development
       - FHIR_URL=http://hearth:3447/fhir
       - AUTH_URL=http://auth:4040
