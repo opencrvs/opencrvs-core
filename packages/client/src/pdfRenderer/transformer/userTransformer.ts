@@ -18,7 +18,6 @@ import {
   ILocationPayload
 } from '@client/pdfRenderer/transformer/types'
 import { userMessages } from '@client/i18n/messages'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { HumanName, LocalRegistrar } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
@@ -27,10 +26,10 @@ export function getUserName(
 ) {
   const nameObj =
     userDetails.name &&
-    (userDetails.name.find((storedName: HumanName | null) => {
+    userDetails.name.find((storedName: HumanName | null) => {
       const name = storedName as HumanName
       return name.use === 'en' // TODO should be replaced with 'intl.locale' when userDetails will have proper data
-    }) as GQLHumanName)
+    })
 
   return nameObj
     ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
