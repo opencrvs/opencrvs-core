@@ -14,6 +14,7 @@ import styled from 'styled-components'
 import { ITextInputProps, IRef, TextInput } from './TextInput'
 import { InputLabel } from './InputField/InputLabel'
 import { Omit } from '../omit'
+import isValid from '../utils/date'
 
 const DateWrapper = styled.div`
   width: 100%;
@@ -47,13 +48,15 @@ const DateSegment = styled(TextInput)<{ hideYear?: boolean }>`
   &:first-of-type {
     margin-left: 0;
   }
-  ${({ hideYear }) => hideYear ? '' : `
+  ${({ hideYear }) =>
+    hideYear
+      ? ''
+      : `
     &:last-of-type {
       margin-right: 0;
       width: 80px;
     }
-  `
-  }
+  `}
 `
 
 export class DateField extends React.Component<IDateFieldProps, IState> {
@@ -115,8 +118,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           }
           if (val.length > 1 && this.dd.current && hideYear) {
             this.dd.current.focusField()
-          }
-          else if (val.length > 1 && this.yyyy.current && !hideYear) {
+          } else if (val.length > 1 && this.yyyy.current && !hideYear) {
             this.yyyy.current.focusField()
           }
           break
@@ -142,9 +144,10 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             ) {
               this.props.onChange('')
             } else {
-              this.props.onChange(
-                `${this.state.yyyy}-${this.state.mm}-${this.state.dd}`
-              )
+              const dateStr = `${this.state.yyyy}-${this.state.mm}-${this.state.dd}`
+              if (isValid(new Date(dateStr))) {
+                this.props.onChange(dateStr)
+              }
             }
           }
         }
@@ -153,8 +156,15 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
   }
 
   render() {
-    const { id, meta, focusInput, notice, hideYear, ignorePlaceHolder, ...props } =
-      this.props
+    const {
+      id,
+      meta,
+      focusInput,
+      notice,
+      hideYear,
+      ignorePlaceHolder,
+      ...props
+    } = this.props
 
     const daysField = (
       <DateSegment
@@ -215,18 +225,20 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
         onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
           event.currentTarget.blur()
         }}
-        />
+      />
     )
 
     return (
       <>
-        <DateWrapper id={id} >
+        <DateWrapper id={id}>
           {notice && (
             <NoticeWrapper>
               <InputLabel id={`${id}_notice`}>{notice}</InputLabel>
             </NoticeWrapper>
           )}
-          { hideYear ? [monthsField, daysField]: [daysField, monthsField, yearsField] }
+          {hideYear
+            ? [monthsField, daysField]
+            : [daysField, monthsField, yearsField]}
         </DateWrapper>
       </>
     )
