@@ -143,11 +143,14 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
               this.state.dd === ''
             ) {
               this.props.onChange('')
-            } else {
-              const dateStr = `${this.state.yyyy}-${this.state.mm}-${this.state.dd}`
-              if (isValid(new Date(dateStr))) {
-                this.props.onChange(dateStr)
-              }
+            } else if (
+              this.state.dd.length > 0 &&
+              this.state.mm.length > 0 &&
+              this.state.yyyy.length === 4
+            ) {
+              this.props.onChange(
+                `${this.state.yyyy}-${this.state.mm}-${this.state.dd}`
+              )
             }
           }
         }
