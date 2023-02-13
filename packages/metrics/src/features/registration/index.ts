@@ -31,6 +31,11 @@ export interface IUserAuditFields extends IPoint {
   ipAddress: string
 }
 
+export interface IMarriageRegistrationFields extends IPoint {
+  compositionId: string
+  daysAfterEvent: number | undefined
+}
+
 export interface IPoint {
   time?: string
 }
@@ -65,6 +70,22 @@ export interface IBirthRegistrationTags {
   locationLevel4?: string
   locationLevel3?: string
   locationLevel2?: string
+}
+
+export interface IMarriageRegistrationTags {
+  regStatus: string
+  gender: string | undefined
+  timeLabel: string | undefined
+  dateLabel: string | undefined
+  registrarPractitionerId: string
+  practitionerRole: string
+  eventLocationType: string
+  officeLocation?: string
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
+  locationLevel1?: string
 }
 
 export interface IUserAuditTags {
