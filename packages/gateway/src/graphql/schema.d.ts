@@ -25,7 +25,7 @@ export interface GQLQuery {
   fetchRegistrationForViewing?: GQLEventRegistration
   queryPersonByNidIdentifier?: GQLPerson
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
-  fetchRecordsDetailsByCompositionId?: GQLRecordDetails
+  fetchRecordsDetailsByCompositionId: GQLRecordDetails
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   hasChildLocation?: GQLLocation
@@ -233,6 +233,11 @@ export interface GQLRecordDetailsNameMap {
   DeathRegistration: GQLDeathRegistration
 }
 
+export const enum GQLAuthorizationStatus {
+  ANONYMOUS = 'ANONYMOUS',
+  USER = 'USER'
+}
+
 export interface GQLLocation {
   id: string
   _fhirID?: string
@@ -322,11 +327,6 @@ export interface GQLTotalVSExport {
 export interface GQLPaymentMetric {
   total: number
   paymentType: string
-}
-
-export const enum GQLAuthorizationStatus {
-  ANONYMOUS = 'ANONYMOUS',
-  USER = 'USER'
 }
 
 export interface GQLCertificationMetric {

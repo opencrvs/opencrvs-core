@@ -526,6 +526,13 @@ type Reinstated {
   taskEntryResourceID: ID!
   registrationStatus: RegStatus
 }
+enum Role {
+  ANONYMOUS
+}
+
+directive @auth(
+  requires: Role!
+) on FIELD_DEFINITION
 
 union RecordDetails = BirthRegistration | DeathRegistration
 
@@ -554,7 +561,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
-  fetchRecordsDetailsByCompositionId(id: String!): RecordDetails
+  fetchRecordsDetailsByCompositionId(id: String!): RecordDetails! @auth(requires: ANONYMOUS)
 }
 
 type Mutation {
