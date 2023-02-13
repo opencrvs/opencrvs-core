@@ -90,6 +90,7 @@ describe('getUser tests', () => {
     mockingoose.resetAll()
   })
   it('Successfully returns user with user id', async () => {
+    User.schema.path('role', Object)
     mockingoose(User).toReturn(dummyUser, 'findOne')
 
     const res = await server.server.inject({

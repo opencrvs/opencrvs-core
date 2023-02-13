@@ -113,7 +113,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
             firstNames
             familyName
           }
-          role
+          systemRole
         }
         startedByFacility
         startedAt
@@ -158,7 +158,7 @@ export const FETCH_REGISTRATIONS = gql`
           delayed
           registrarPractitioner {
             id
-            role
+            systemRole
             primaryOffice {
               name
               id
@@ -229,7 +229,7 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
       results {
         practitionerId
         fullName
-        type
+        role
         status
         avatar {
           type

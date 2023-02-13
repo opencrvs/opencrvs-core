@@ -38,10 +38,12 @@ import {
 } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { UserStatus } from '@client/views/SysAdmin/Team/utils'
+import {
+  getUserRoleIntlKey,
+  UserStatus
+} from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
-import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   AddUser,
@@ -84,6 +86,7 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query as QueryType, User } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
@@ -213,7 +216,7 @@ type IOnlineStatusProps = {
 type BaseProps = {
   theme: ITheme
   offlineOffices: ILocation[]
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
   goToCreateNewUser: typeof goToCreateNewUser
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
@@ -290,8 +293,8 @@ function UserListComponent(props: IProps) {
     offlineCountryConfig,
     location: { search }
   } = props
-  const isNatlSysAdmin = userDetails?.role
-    ? NATL_ADMIN_ROLES.includes(userDetails.role)
+  const isNatlSysAdmin = userDetails?.systemRole
+    ? NATL_ADMIN_ROLES.includes(userDetails.systemRole)
       ? true
       : false
     : false
@@ -509,22 +512,22 @@ function UserListComponent(props: IProps) {
 
   function getViewOnly(
     locationId: string,
-    userDetails: IUserDetails | null,
+    userDetails: UserDetails | null,
     onlyNational: boolean
   ) {
     if (
       userDetails &&
-      userDetails.role &&
+      userDetails.systemRole &&
       userDetails.primaryOffice &&
-      SYS_ADMIN_ROLES.includes(userDetails.role) &&
+      SYS_ADMIN_ROLES.includes(userDetails.systemRole) &&
       locationId === userDetails.primaryOffice.id &&
       !onlyNational
     ) {
       return false
     } else if (
       userDetails &&
-      userDetails.role &&
-      NATL_ADMIN_ROLES.includes(userDetails.role)
+      userDetails.systemRole &&
+      NATL_ADMIN_ROLES.includes(userDetails.systemRole)
     ) {
       return false
     } else {
@@ -551,7 +554,7 @@ function UserListComponent(props: IProps) {
       status,
       underInvestigation
     }: {
-      userDetails: IUserDetails | null
+      userDetails: UserDetails | null
       locationId: string
       user: User
       index: number
@@ -559,8 +562,8 @@ function UserListComponent(props: IProps) {
       underInvestigation?: boolean
     }) {
       const canEditUserDetails =
-        userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
-        (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
+        userDetails?.systemRole === 'NATIONAL_SYSTEM_ADMIN' ||
+        (userDetails?.systemRole === 'LOCAL_SYSTEM_ADMIN' &&
           userDetails?.primaryOffice?.id === locationId)
           ? true
           : false
@@ -586,7 +589,7 @@ function UserListComponent(props: IProps) {
     function generateUserContents(
       data: QueryType,
       locationId: string,
-      userDetails: IUserDetails | null
+      userDetails: UserDetails | null
     ) {
       if (!data || !data.searchUsers || !data.searchUsers.results) {
         return []
@@ -605,9 +608,9 @@ function UserListComponent(props: IProps) {
                     LANG_EN
                   ] as string))) ||
               ''
-            const role =
-              (user.role && intl.formatMessage(userMessages[user.role])) || '-'
-
+            const role = intl.formatMessage({
+              id: getUserRoleIntlKey(user.role._id)
+            })
             const avatar = user.avatar
 
             return {
@@ -666,7 +669,7 @@ function UserListComponent(props: IProps) {
 
   const LocationButton = (
     locationId: string,
-    userDetails: IUserDetails | null,
+    userDetails: UserDetails | null,
     onlyNational: boolean
   ) => {
     const buttons: React.ReactElement[] = []
@@ -693,7 +696,7 @@ function UserListComponent(props: IProps) {
     }: {
       data: any
       locationId: string
-      userDetails: IUserDetails | null
+      userDetails: UserDetails | null
     }) {
       const totalData =
         (data && data.searchUsers && data.searchUsers.totalItems) || 0

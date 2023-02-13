@@ -18,12 +18,12 @@ import {
   filterProcessingDeclarations,
   filterProcessingDeclarationsFromQuery
 } from '.'
-import { Event } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status } from '@client/utils/gateway'
 import { AppStore, createStore } from '@client/store'
 import { mockDeclarationData, flushPromises } from '@client/tests/util'
-import { IUserDetails } from '@client/utils/userUtils'
 import { storage } from '@client/storage'
 import { vi } from 'vitest'
+import { UserDetails } from '@client/utils/userUtils'
 
 describe('query result filtering tests', () => {
   describe('.filterProcessingDeclarations()', () => {
@@ -283,9 +283,24 @@ describe('archiveDeclaration tests', () => {
       declarations: [declaration]
     }
 
-    const currentUserDetails: IUserDetails = {
+    const currentUserDetails: Partial<UserDetails> = {
       userMgntUserID: '123',
-      localRegistrar: { name: [] }
+      id: '123',
+      practitionerId: '123',
+      status: 'active' as Status,
+      creationDate: '2133213212',
+      mobile: '09123433',
+      role: {
+        _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
+        labels: [
+          {
+            lang: 'en',
+            label: 'Field Agent'
+          }
+        ]
+      },
+      name: [],
+      localRegistrar: { name: [], role: 'FIELD_AGENT' as SystemRoleType }
     }
 
     indexedDB = {
