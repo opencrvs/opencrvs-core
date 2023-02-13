@@ -30,7 +30,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
-  fetchRecordsDetailsByCompositionId(id: ID): RecordDetails
+  fetchRecordsDetailsByCompositionId(id: String!): RecordDetails
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location

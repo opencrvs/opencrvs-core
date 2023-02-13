@@ -68,7 +68,7 @@ import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
 import { VerifyCertificatePage } from '@client/views/VerifyCertification/VerifyCertificatePage'
-import UnprotectedPage from "@client/views/VerifyCertification/UnprotectedPage";
+import { UnprotectedRoute } from '@client/components/UnprotectedRoute'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -108,13 +108,11 @@ export class App extends React.Component<IAppProps> {
                       <SessionExpireConfirmation />
                       <NotificationComponent>
                         <Switch>
-                          <UnprotectedPage>
-                            <Route
-                              exact
-                              path={routes.VIEW_VERIFY_CERTIFICATE}
-                              component={VerifyCertificatePage}
-                            />
-                          </UnprotectedPage>
+                          <UnprotectedRoute
+                            exact
+                            path={routes.VIEW_VERIFY_CERTIFICATE}
+                            component={VerifyCertificatePage}
+                          />
                           <Route>
                             <Page>
                               <MainSection>
