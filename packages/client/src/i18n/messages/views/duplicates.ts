@@ -36,7 +36,7 @@ const messagesToDefine: IDuplicateDeclarationMessages = {
   duplicateContentSubtitle: {
     id: 'duplicates.content.subtitle',
     defaultMessage:
-      'This record was flagged as a potential duplicate with: {trackingIds}. Please review these existing records and confirm if this record is a duplicate',
+      'This record was flagged as a potential duplicate of: {trackingIds}. Please review these by clicking on each tracking ID in the tab section to view a side-by-side comparison below, and confirm if this record is a duplicate.',
     description: 'Duplicates content subtitle message'
   },
   notDuplicateButton: {
