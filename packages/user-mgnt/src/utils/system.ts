@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { NATIONAL_ID_OPENID_CONNECT_URL } from '@user-mgnt/constants'
+import {
+  NATIONAL_ID_OPENID_CONNECT_CLIENT_ID,
+  NATIONAL_ID_OPENID_CONNECT_BASE_URL
+} from '@user-mgnt/constants'
 import { ISystemModel } from '@user-mgnt/model/system'
 import { pick } from 'lodash'
 import { Types } from 'mongoose'
@@ -25,8 +28,13 @@ type MongooseQueriedSystem = ISystemModel & { _id: Types.ObjectId }
 
 const pickSettings = (system: MongooseQueriedSystem) => {
   const openIdConnectUrl =
-    system.type === 'NATIONAL_ID' && NATIONAL_ID_OPENID_CONNECT_URL
-      ? { openIdConnectUrl: NATIONAL_ID_OPENID_CONNECT_URL }
+    system.type === 'NATIONAL_ID' &&
+    NATIONAL_ID_OPENID_CONNECT_CLIENT_ID &&
+    NATIONAL_ID_OPENID_CONNECT_BASE_URL
+      ? {
+          openIdConnectAuthorizeUrl: NATIONAL_ID_OPENID_CONNECT_BASE_URL,
+          openIdConnectClientId: NATIONAL_ID_OPENID_CONNECT_CLIENT_ID
+        }
       : {}
 
   return { ...openIdConnectUrl }
