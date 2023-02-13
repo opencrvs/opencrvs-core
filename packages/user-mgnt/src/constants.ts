@@ -27,3 +27,5 @@ export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const DEFAULT_TIMEOUT = 600000
 export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
+export const NATIONAL_ID_OPENID_CONNECT_URL =
+  process.env.NATIONAL_ID_OPENID_CONNECT_URL || null

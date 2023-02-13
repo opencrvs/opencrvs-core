@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { model, Schema, Document } from 'mongoose'
-import { statuses, types } from '@user-mgnt/utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
+import { types } from '@user-mgnt/utils/system'
 
 export interface ISystem {
   name: string
@@ -28,7 +29,7 @@ export interface ISystem {
     webhook: WebHook[]
   }
   creationDate?: number
-  type: string
+  type: keyof typeof types
 }
 
 export enum EventType {

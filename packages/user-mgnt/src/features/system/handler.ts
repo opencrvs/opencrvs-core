@@ -25,11 +25,10 @@ import System, {
 } from '@user-mgnt/model/system'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
+import { pickSystem, types } from '@user-mgnt/utils/system'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
-import { statuses, systemScopeMapping, types } from '@user-mgnt/utils/userUtils'
+import { statuses, systemScopeMapping } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
-import { pick } from 'lodash'
-import { Types } from 'mongoose'
 import * as uuid from 'uuid/v4'
 
 export enum EventType {
@@ -50,19 +49,6 @@ interface IRegisterSystemPayload {
   }
   type: string
 }
-
-/** Returns a curated System with only the params we want to expose */
-const pickSystem = (system: ISystemModel & { _id: Types.ObjectId }) => ({
-  ...pick(system, ['name', 'status', 'type']),
-  // TODO: client_id and sha_secret should be camelCased in the Mongoose-model
-  _id: system._id.toString(),
-  shaSecret: system.sha_secret,
-  clientId: system.client_id,
-  settings: system.settings.webhook.map((ite) => ({
-    event: ite.event,
-    permissions: ite.permissions
-  }))
-})
 
 export async function registerSystem(
   request: Hapi.Request,
@@ -371,11 +357,6 @@ export async function getSystemHandler(
     type: system.type,
     settings: system.settings
   }
-}
-
-export async function getAllSystemsHandler() {
-  const systems = await System.find()
-  return systems.map((system) => pickSystem(system))
 }
 
 export const getSystemRequestSchema = Joi.object({
