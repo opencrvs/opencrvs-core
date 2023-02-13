@@ -95,8 +95,6 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   componentDidMount() {
     this.screenLockTimer()
-    document.addEventListener('mouseup', this.handleClick, false)
-    this.focusKeypad()
   }
 
   showErrorMessage() {
@@ -196,29 +194,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     this.props.redirectToAuthentication()
   }
 
-  componentDidUpdate = () => this.focusKeypad()
-
-  componentWillUnmount() {
-    document.removeEventListener('mouseup', this.handleClick, false)
-  }
-
-  handleClick = (e: Event) => {
-    this.focusKeypad()
-  }
-
-  focusKeypad = () => {
-    const node =
-      this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
-    if (node) {
-      node.focus()
-    }
-  }
-
   render() {
     const { userDetails } = this.props
     return (
       <BackgroundWrapper id="unlockPage">
-        <Box id="Box" onClick={this.focusKeypad}>
+        <Box id="Box">
           <LogoutButton type="icon" onClick={this.logout} id="logout">
             <Icon name="LogOut" />
           </LogoutButton>

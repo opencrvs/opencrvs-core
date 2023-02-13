@@ -56,15 +56,33 @@ const DotUnfilled = styled.span`
   display: inline-block;
   margin: 0 8px;
 `
+const DotsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
 
 export class PINKeypad extends React.Component<IProps, IState> {
   state = { pin: this.props.pin || '' }
   pinInput: any
 
   componentDidMount() {
+    this.focusKeyInput()
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', this.handleClick, false)
+  }
+
+  handleClick = (e: Event) => {
+    this.focusKeyInput()
+  }
+
+  focusKeyInput = () => {
     this.pinInput &&
       (ReactDOM.findDOMNode(this.pinInput) as HTMLElement)?.focus()
   }
+  componentDidUpdate = () => this.focusKeyInput()
 
   keyPress = (key: number) => {
     const { pin } = this.state
@@ -116,8 +134,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
   }
 
   onBlur = () => {
-    this.pinInput &&
-      (ReactDOM.findDOMNode(this.pinInput) as HTMLElement)?.focus()
+    this.focusKeyInput()
   }
 
   render() {
@@ -129,7 +146,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
         onKeyDown={this.keyDown}
         {...this.props}
       >
-        <div>
+        <DotsContainer>
           <div>
             <StyledInput
               type="number"
@@ -152,7 +169,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
             ))}
           </div>
           {this.props.forgotPinComponent}
-        </div>
+        </DotsContainer>
       </Container>
     )
   }

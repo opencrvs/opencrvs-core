@@ -224,29 +224,6 @@ class CreatePinComponent extends React.Component<IProps> {
       </BackgroundWrapper>
     )
   }
-
-  componentDidUpdate = () => this.focusKeypad()
-
-  componentDidMount = () => {
-    document.addEventListener('mouseup', this.handleClick, false)
-    this.focusKeypad()
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('mouseup', this.handleClick, false)
-  }
-
-  handleClick = (e: Event) => {
-    this.focusKeypad()
-  }
-
-  focusKeypad = () => {
-    const node =
-      this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
-    if (node) {
-      node.focus()
-    }
-  }
 }
 
 export const CreatePin = connect((store: IStoreState) => ({
