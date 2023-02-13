@@ -208,7 +208,7 @@ type Query {
     timeEnd: String!
     locationId: String
     event: String!
-  ): [PaymentMetric!]
+  ): [PaymentMetric!] @auth(requires: ANONYMOUS)
   getTotalCertifications(
     timeStart: String!
     timeEnd: String!

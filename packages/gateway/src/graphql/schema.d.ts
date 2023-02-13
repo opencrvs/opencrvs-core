@@ -324,6 +324,11 @@ export interface GQLPaymentMetric {
   paymentType: string
 }
 
+export const enum GQLAuthorizationStatus {
+  ANONYMOUS = 'ANONYMOUS',
+  USER = 'USER'
+}
+
 export interface GQLCertificationMetric {
   total: number
   eventType: string
