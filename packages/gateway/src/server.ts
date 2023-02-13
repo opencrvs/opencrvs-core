@@ -95,10 +95,6 @@ export async function createServer() {
       app,
       route: {
         auth: {
-          // This option will determine what HapiJS will do with your default strategy.
-          // Try means it will tty to authenticate, but on failure it won't block the request.
-          // By passing the request object into your context, you can access it inside of your resolvers
-          // and check the request.auth object for authentication properties.
           mode: 'try'
         }
       },

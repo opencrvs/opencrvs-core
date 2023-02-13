@@ -36,11 +36,7 @@ import {
   IUserModelData,
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
-import {
-  getUser,
-  getTokenPayload,
-  getSystem
-} from '@gateway/features/user/utils'
+import { getUser, getSystem } from '@gateway/features/user/utils'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 import { loadSchemaSync } from '@graphql-tools/load'
 import {
@@ -53,8 +49,6 @@ import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
-import { validateFunc } from '@gateway/../../commons/build/dist'
-import { AUTH_URL, CHECK_INVALID_TOKEN } from '@gateway/constants'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -123,24 +117,11 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
           return resolve(source, args, context, info)
         }
 
-        if (!context.request.headers.authorization) {
-          throw new AuthenticationError('Authentication failed')
+        if (!context.request.auth.isAuthenticated) {
+          throw new AuthenticationError('Unauthorized')
         }
 
-        const tokenPayload = getTokenPayload(
-          context.request.headers.authorization.split(' ')[1]
-        )
-
-        const { isValid, credentials } = await validateFunc(
-          tokenPayload,
-          context.request,
-          CHECK_INVALID_TOKEN,
-          AUTH_URL
-        )
-
-        if (!isValid) {
-          throw new AuthenticationError('Authentication failed')
-        }
+        const credentials = context.request.auth.credentials
 
         try {
           const userId = credentials.sub
