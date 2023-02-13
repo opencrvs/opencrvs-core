@@ -273,9 +273,8 @@ export const resolvers: GQLResolver = {
     },
     async fetchRecordsDetailsByCompositionId(_, { id }) {
       try {
-        const token = await generateToken()
         const record = await fetchFHIR(`/Composition/${id}`, {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${await generateToken()}`
         })
         if (!record) {
           await Promise.reject(new Error('Invalid QrCode'))
