@@ -14,7 +14,6 @@ import styled from 'styled-components'
 import { ITextInputProps, IRef, TextInput } from './TextInput'
 import { InputLabel } from './InputField/InputLabel'
 import { Omit } from '../omit'
-import isValid from '../utils/date'
 
 const DateWrapper = styled.div`
   width: 100%;
