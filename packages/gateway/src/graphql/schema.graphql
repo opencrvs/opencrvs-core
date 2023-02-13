@@ -432,13 +432,6 @@ type PaymentMetric {
   paymentType: String!
 }
 
-enum AuthorizationStatus {
-  ANONYMOUS
-  USER
-}
-
-directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION
-
 type CertificationMetric {
   total: Float!
   eventType: String!
