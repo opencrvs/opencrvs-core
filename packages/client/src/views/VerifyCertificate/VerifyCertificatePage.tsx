@@ -16,6 +16,7 @@ import {
   userMessages as messages
 } from '@client/i18n/messages'
 
+import { messageToDefine } from '@client/i18n/messages/views/verifyCertificate'
 import { Box } from '@opencrvs/components/lib/Box'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
@@ -248,7 +249,7 @@ export function VerifyCertificatePage() {
             <StyledSpinner id="appSpinner" />
           </SpinnerContainer>
           <Text variant={'reg16'} element={'h4'}>
-            Verifying certificate
+            {intl.formatMessage(messageToDefine.loadingState)}
           </Text>
         </Stack>
       </CheckingContainer>
@@ -260,11 +261,11 @@ export function VerifyCertificatePage() {
       <>
         <Alert onActionClick={() => {}} type="error">
           <Text variant={'bold16'} element={'span'} color={'redDark'}>
-            Invalid QR code
+            {intl.formatMessage(messageToDefine.errorAlertTitle)}
           </Text>{' '}
           <br />
           <Text variant={'reg16'} element={'span'} color={'redDark'}>
-            The certificate is a potential forgery please...
+            {intl.formatMessage(messageToDefine.errorAlertMessage)}
           </Text>
         </Alert>
       </>
@@ -278,7 +279,7 @@ export function VerifyCertificatePage() {
           <Stack alignItems="center" direction="column">
             <SpaceDiv />
             <Text variant={'reg16'} element={'h4'}>
-              You been timed out
+              {intl.formatMessage(messageToDefine.timeOutState)}
             </Text>
             <SpaceDiv />
           </Stack>
@@ -325,8 +326,10 @@ export function VerifyCertificatePage() {
   }
 
   const getGender = (data: any) => {
-    if (data.registration?.type === 'BIRTH') return data.child.gender
-    if (data.registration?.type === 'DEATH') return data.deceased.gender
+    if (data.registration?.type === RegistrationType.Birth)
+      return data.child.gender
+    if (data.registration?.type === RegistrationType.Death)
+      return data.deceased.gender
   }
 
   const getLocation = (data: any) => {
@@ -392,18 +395,17 @@ export function VerifyCertificatePage() {
               <>
                 <Alert type="success">
                   <Text variant={'bold16'} element={'span'} color={'greenDark'}>
-                    Valid QR code
+                    {intl.formatMessage(messageToDefine.successAlertTitle)}
                   </Text>{' '}
                   <br />
                   <Text variant={'reg16'} element={'span'} color={'greenDark'}>
-                    Compare the partial details of the record below against
-                    those against those recorded on the certificate
+                    {intl.formatMessage(messageToDefine.successAlertMessage)}
                   </Text>
                 </Alert>
                 <SpaceDiv />
                 <Alert type="success" customIcon={<Icon name={'Lock'} />}>
                   <Text variant={'bold16'} element={'span'} color={'greenDark'}>
-                    URL Vérification
+                    {intl.formatMessage(messageToDefine.successUrlValidation)}
                   </Text>{' '}
                   <br />
                   <Text variant={'reg16'} element={'span'} color={'greenDark'}>
@@ -416,8 +418,12 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          {currentData?.registration?.type === 'BIRTH' && 'BRN'}
-                          {currentData?.registration?.type === 'DEATH' && 'DRN'}
+                          {currentData?.registration?.type ===
+                            RegistrationType.Birth &&
+                            intl.formatMessage(messageToDefine.brn)}
+                          {currentData?.registration?.type ===
+                            RegistrationType.Death &&
+                            intl.formatMessage(messageToDefine.drn)}
                         </Text>
                       }
                       value={
@@ -429,7 +435,7 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          Full name
+                          {intl.formatMessage(messageToDefine.fullName)}
                         </Text>
                       }
                       value={
@@ -441,10 +447,12 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          {currentData?.registration?.type === 'BIRTH' &&
-                            'Date of birth'}
-                          {currentData?.registration?.type === 'DEATH' &&
-                            'Date of death'}
+                          {currentData?.registration?.type ===
+                            RegistrationType.Birth &&
+                            intl.formatMessage(messageToDefine.dateOfBirth)}
+                          {currentData?.registration?.type ===
+                            RegistrationType.Death &&
+                            intl.formatMessage(messageToDefine.dateOfDeath)}
                         </Text>
                       }
                       value={
@@ -456,7 +464,7 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          Sex
+                          {intl.formatMessage(messageToDefine.sex)}
                         </Text>
                       }
                       value={
@@ -468,10 +476,12 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          {currentData?.registration?.type === 'BIRTH' &&
-                            'Place of birth'}
-                          {currentData?.registration?.type === 'DEATH' &&
-                            'Place of death'}
+                          {currentData?.registration?.type ===
+                            RegistrationType.Birth &&
+                            intl.formatMessage(messageToDefine.placeOfBirth)}
+                          {currentData?.registration?.type ===
+                            RegistrationType.Death &&
+                            intl.formatMessage(messageToDefine.placeOfDeath)}
                         </Text>
                       }
                       value={
@@ -483,7 +493,9 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          Registration center
+                          {intl.formatMessage(
+                            messageToDefine.registrationCenter
+                          )}
                         </Text>
                       }
                       value={
@@ -495,7 +507,7 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          Name of Registar
+                          {intl.formatMessage(messageToDefine.registar)}
                         </Text>
                       }
                       value={
@@ -508,7 +520,7 @@ export function VerifyCertificatePage() {
                     <ListViewItemSimplified
                       label={
                         <Text variant={'bold16'} element={'span'}>
-                          Date of certification
+                          {intl.formatMessage(messageToDefine.createdAt)}
                         </Text>
                       }
                       value={
@@ -529,7 +541,7 @@ export function VerifyCertificatePage() {
       </Container>
       {closeWindow && (
         <Toast type={'info'} onClose={closeWindowAction} duration={null}>
-          After verifying the certificate, please close the browser window
+          {intl.formatMessage(messageToDefine.toastMessage)}
         </Toast>
       )}
     </Frame>
