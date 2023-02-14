@@ -53,7 +53,7 @@ import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments
 } from '@gateway/utils/validators'
-// import { generateToken } from '@gateway/utils/generateToken'
+
 
 export const resolvers: GQLResolver = {
   RecordDetails: {

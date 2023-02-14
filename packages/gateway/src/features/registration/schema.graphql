@@ -526,6 +526,7 @@ type Reinstated {
   taskEntryResourceID: ID!
   registrationStatus: RegStatus
 }
+
 enum Role {
   ANONYMOUS
 }

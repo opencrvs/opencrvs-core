@@ -67,7 +67,7 @@ import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearc
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
-import { VerifyCertificatePage } from '@client/views/VerifyCertification/VerifyCertificatePage'
+import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { UnprotectedRoute } from '@client/components/UnprotectedRoute'
 
 interface IAppProps {
