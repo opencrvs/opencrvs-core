@@ -175,8 +175,7 @@ export const getApolloConfig = (): Config => {
     context: async ({ request, h }) => {
       return {
         request,
-        Authorization:
-          request.headers?.authorization || (await generateToken()),
+        Authorization: request.headers?.authorization || generateToken(),
         'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
         'x-real-ip':
           request.headers['x-real-ip'] || request.info?.remoteAddress,

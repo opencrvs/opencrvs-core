@@ -53,14 +53,14 @@ import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments
 } from '@gateway/utils/validators'
-import { generateToken } from '@gateway/utils/generateToken'
+// import { generateToken } from '@gateway/utils/generateToken'
 
 export const resolvers: GQLResolver = {
   RecordDetails: {
     __resolveType(obj): any {
+      if (!obj?.type?.text) return 'BirthRegistration'
       if (obj.type.text == 'Birth Declaration') return 'BirthRegistration'
       if (obj.type.text == 'Death Declaration') return 'DeathRegistration'
-      return null
     }
   },
   Query: {
@@ -271,10 +271,10 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRecordsDetailsByCompositionId(_, { id }) {
+    async fetchRecordDetailsForVerification(_, { id }, context) {
       try {
         const record = await fetchFHIR(`/Composition/${id}`, {
-          Authorization: `Bearer ${await generateToken()}`
+          Authorization: `Bearer ${context['Authorization']}`
         })
         if (!record) {
           await Promise.reject(new Error('Invalid QrCode'))
