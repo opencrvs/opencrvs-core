@@ -1224,6 +1224,7 @@ export interface GQLBirth {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
   FEE?: GQLBirthFee
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLCountryLogo {
@@ -1239,6 +1240,7 @@ export interface GQLCurrency {
 export interface GQLDeath {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFee
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLLoginBackground {
@@ -1251,6 +1253,7 @@ export interface GQLBirthInput {
   REGISTRATION_TARGET?: number
   LATE_REGISTRATION_TARGET?: number
   FEE?: GQLBirthFeeInput
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLCountryLogoInput {
@@ -1266,6 +1269,7 @@ export interface GQLCurrencyInput {
 export interface GQLDeathInput {
   REGISTRATION_TARGET?: number
   FEE?: GQLDeathFeeInput
+  PRINT_IN_ADVANCE?: boolean
 }
 
 export interface GQLLoginBackgroundInput {
@@ -6031,6 +6035,7 @@ export interface GQLBirthTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: BirthToREGISTRATION_TARGETResolver<TParent>
   LATE_REGISTRATION_TARGET?: BirthToLATE_REGISTRATION_TARGETResolver<TParent>
   FEE?: BirthToFEEResolver<TParent>
+  PRINT_IN_ADVANCE?: BirthToPRINT_IN_ADVANCEResolver<TParent>
 }
 
 export interface BirthToREGISTRATION_TARGETResolver<
@@ -6048,6 +6053,10 @@ export interface BirthToLATE_REGISTRATION_TARGETResolver<
 }
 
 export interface BirthToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -6083,6 +6092,7 @@ export interface CurrencyToLanguagesAndCountryResolver<
 export interface GQLDeathTypeResolver<TParent = any> {
   REGISTRATION_TARGET?: DeathToREGISTRATION_TARGETResolver<TParent>
   FEE?: DeathToFEEResolver<TParent>
+  PRINT_IN_ADVANCE?: DeathToPRINT_IN_ADVANCEResolver<TParent>
 }
 
 export interface DeathToREGISTRATION_TARGETResolver<
@@ -6093,6 +6103,10 @@ export interface DeathToREGISTRATION_TARGETResolver<
 }
 
 export interface DeathToFEEResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathToPRINT_IN_ADVANCEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

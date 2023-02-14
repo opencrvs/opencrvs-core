@@ -65,7 +65,8 @@ import {
   getEventDate,
   getRegisteredDate,
   isFreeOfCost,
-  isCertificateForPrintInAdvance
+  isCertificateForPrintInAdvance,
+  filterPrintInAdvancedOption
 } from '@client/views/PrintCertificate/utils'
 import { StyledSpinner } from '@client/views/OfficeHome/OfficeHome'
 // eslint-disable-next-line no-restricted-imports
@@ -495,6 +496,11 @@ const mapStateToProps = (
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
   const clonedFormSection = cloneDeep(formSection)
+  const isAllowPrintInAdvance =
+    event === Event.Birth
+      ? getOfflineData(state).config.BIRTH.PRINT_IN_ADVANCE
+      : getOfflineData(state).config.DEATH.PRINT_IN_ADVANCE
+
   if (event === Event.Birth && groupId === 'certCollector') {
     const declarationData = declaration && declaration.data
     let motherDataExist: boolean | undefined
@@ -538,9 +544,13 @@ const mapStateToProps = (
       )
     }
   }
-  const formGroup =
-    clonedFormSection.groups.find((group) => group.id === groupId) ||
-    clonedFormSection.groups[0]
+  const formGroup = isAllowPrintInAdvance
+    ? clonedFormSection.groups.find((group) => group.id === groupId) ||
+      clonedFormSection.groups[0]
+    : filterPrintInAdvancedOption(
+        clonedFormSection.groups.find((group) => group.id === groupId) ||
+          clonedFormSection.groups[0]
+      )
 
   /**
    * As the field defintions are hard-coded in core, finding
