@@ -29,7 +29,8 @@ import {
   CHILD_SECTION_CODE,
   DECEASED_SECTION_CODE,
   BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-  DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE
+  DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
+  MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/utils'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
@@ -70,12 +71,10 @@ export enum FHIR_RESOURCE_TYPE {
   PATIENT = 'Patient'
 }
 
-export function generateBirthTrackingId(): string {
-  return generateTrackingId('B')
-}
-
-export function generateDeathTrackingId(): string {
-  return generateTrackingId('D')
+export function generateTrackingIdForEvents(eventType: Events): string {
+  // using first letter of eventType for prefix
+  // TODO: for divorce, need to think about prefix as Death & Divorce prefix is same 'D'
+  return generateTrackingId(eventType[0])
 }
 
 function generateTrackingId(prefix: string): string {
@@ -88,6 +87,7 @@ export function convertStringToASCII(str: string): string {
     .reduce((acc, v) => acc.concat(v))
 }
 
+// TODO: refactor after getting appropiate sms message for marriage & divorce (also need to modify getInformantName() )
 export async function sendEventNotification(
   fhirBundle: fhir.Bundle,
   event: Events,
@@ -323,6 +323,12 @@ async function sendNotification(
   }
 }
 
+const DETECT_EVENT: Record<string, EVENT_TYPE> = {
+  ['birth-declaration' || 'birth-notification']: EVENT_TYPE.BIRTH,
+  ['death-declaration' || 'death-notification']: EVENT_TYPE.DEATH,
+  ['marriage-declaration' || 'marriage-notification']: EVENT_TYPE.MARRIAGE
+}
+
 export function getCompositionEventType(compoition: fhir.Composition) {
   const eventType =
     compoition &&
@@ -330,11 +336,7 @@ export function getCompositionEventType(compoition: fhir.Composition) {
     compoition.type.coding &&
     compoition.type.coding[0].code
 
-  if (eventType === 'death-declaration' || eventType === 'death-notification') {
-    return EVENT_TYPE.DEATH
-  } else {
-    return EVENT_TYPE.BIRTH
-  }
+  return eventType && DETECT_EVENT[eventType]
 }
 
 export function getEventType(fhirBundle: fhir.Bundle) {
@@ -360,7 +362,8 @@ export function hasCorrectionEncounterSection(
     if (section.code?.coding?.[0]?.code) {
       return [
         BIRTH_CORRECTION_ENCOUNTERS_SECTION_CODE,
-        DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE
+        DEATH_CORRECTION_ENCOUNTERS_SECTION_CODE,
+        MARRIAGE_CORRECTION_ENCOUNTERS_SECTION_CODE
       ].includes(section.code.coding[0].code)
     }
     return false
@@ -411,8 +414,10 @@ export function isEventNonNotifiable(event: Events) {
     [
       Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
       Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.MARRIAGE_WAITING_EXTERNAL_RESOURCE_VALIDATION,
       Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
-      Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+      Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ].indexOf(event) >= 0
   )
 }

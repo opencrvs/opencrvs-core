@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Events } from '@workflow/features/events/handler'
+import { Events } from '@workflow/features/events/utils'
 import { USER_SCOPE } from '@workflow/utils/authUtils'
 
 function getEventToScopeMap() {

@@ -32,6 +32,7 @@ import {
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@workflow/logger'
 import { unionBy } from 'lodash'
+import { SECTION_CODE } from '@workflow/features/events/utils'
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -449,34 +450,33 @@ export async function fetchExistingRegStatusCode(taskId: string | undefined) {
 export async function mergePatientIdentifier(bundle: fhir.Bundle) {
   const event = getEventType(bundle)
   const composition = getComposition(bundle)
-  const section = getSectionEntryBySectionCode(
-    composition,
-    event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE
-  )
-  const patient = getPatientBySection(bundle, section)
-  const patientFromFhir: fhir.Patient = await getFromFhir(
-    `/Patient/${patient?.id}`
-  )
-  if (patientFromFhir) {
-    bundle.entry =
-      bundle &&
-      bundle.entry &&
-      bundle.entry.map((entry) => {
-        if (entry.resource?.id === patientFromFhir.id) {
-          return {
-            ...entry,
-            resource: {
-              ...entry.resource,
-              identifier: unionBy(
-                (entry.resource as fhir.Patient).identifier,
-                patientFromFhir.identifier,
-                'type'
-              )
+  SECTION_CODE[event].map(async (sectionCode: string) => {
+    const section = getSectionEntryBySectionCode(composition, sectionCode)
+    const patient = getPatientBySection(bundle, section)
+    const patientFromFhir: fhir.Patient = await getFromFhir(
+      `/Patient/${patient?.id}`
+    )
+    if (patientFromFhir) {
+      bundle.entry =
+        bundle &&
+        bundle.entry &&
+        bundle.entry.map((entry) => {
+          if (entry.resource?.id === patientFromFhir.id) {
+            return {
+              ...entry,
+              resource: {
+                ...entry.resource,
+                identifier: unionBy(
+                  (entry.resource as fhir.Patient).identifier,
+                  patientFromFhir.identifier,
+                  'type'
+                )
+              }
             }
+          } else {
+            return entry
           }
-        } else {
-          return entry
-        }
-      })
-  }
+        })
+    }
+  })
 }

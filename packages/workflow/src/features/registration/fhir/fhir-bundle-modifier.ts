@@ -27,8 +27,7 @@ import {
   mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  generateBirthTrackingId,
-  generateDeathTrackingId,
+  generateTrackingIdForEvents,
   getEventType,
   getMosipUINToken,
   isEventNotification,
@@ -55,6 +54,7 @@ import {
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 import { REQUEST_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import { EVENT } from '@workflow/features/task/fhir/utils'
 export interface ITaskBundleEntry extends fhir.BundleEntry {
   resource: fhir.Task
 }
@@ -319,15 +319,13 @@ export async function touchBundle(
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
-  let trackingId: string
-  let trackingIdFhirName: string
+  let trackingId = ''
+  let trackingIdFhirName = ''
   const eventType = getEventType(fhirBundle)
-  if (eventType === EVENT_TYPE.BIRTH) {
-    trackingId = generateBirthTrackingId()
-    trackingIdFhirName = 'birth-tracking-id'
-  } else {
-    trackingId = generateDeathTrackingId()
-    trackingIdFhirName = 'death-tracking-id'
+
+  if (eventType === EVENT[eventType]) {
+    trackingId = generateTrackingIdForEvents(eventType)
+    trackingIdFhirName = `${eventType.toLowerCase()}-tracking-id`
   }
 
   if (

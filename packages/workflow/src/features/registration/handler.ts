@@ -194,18 +194,22 @@ export async function createRegistrationHandler(
       token
     )
     if (
-      event ===
-        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||
-      event ===
-        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      [
+        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+        Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      ].includes(event)
     ) {
       payload = await markBundleAsWaitingValidation(
         payload as fhir.Bundle,
         token
       )
     } else if (
-      event === Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION ||
-      event === Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION
+      [
+        Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION,
+        Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION,
+        Events.MARRIAGE_REQUEST_FOR_REGISTRAR_VALIDATION
+      ].includes(event)
     ) {
       payload = await markBundleAsValidated(payload as fhir.Bundle, token)
     }
@@ -213,10 +217,11 @@ export async function createRegistrationHandler(
     populateCompositionWithID(payload, resBundle)
 
     if (
-      event ===
-        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||
-      event ===
-        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      [
+        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+        Events.REGISTRAR_MARRIAGE_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
+      ].includes(event)
     ) {
       // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
       // validate registration with resource service and set resulting registration number
