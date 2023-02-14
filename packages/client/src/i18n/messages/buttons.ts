@@ -362,7 +362,7 @@ const messagesToDefine: IButtonsMessages = {
   },
   editRecord: {
     id: 'buttons.editRecord',
-    defaultMessage: 'Correct record',
+    defaultMessage: 'No, make correction',
     description: 'Correct record button text on review certificate'
   },
   makeCorrection: {
