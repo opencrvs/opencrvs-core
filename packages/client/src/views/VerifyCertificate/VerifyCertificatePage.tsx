@@ -11,10 +11,7 @@
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import {
-  constantsMessages,
-  userMessages as messages
-} from '@client/i18n/messages'
+import { constantsMessages } from '@client/i18n/messages'
 
 import { messageToDefine } from '@client/i18n/messages/views/verifyCertificate'
 import { Box } from '@opencrvs/components/lib/Box'
@@ -63,6 +60,7 @@ const Container = styled.div<{ size: string; checking: boolean }>`
     max-width: 100%;
     padding: 16px;
     ${({ checking }) => !checking && 'background: white;'}
+  }
 `
 
 const LogoDiv = styled.div`
