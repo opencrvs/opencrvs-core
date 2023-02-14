@@ -49,7 +49,6 @@ export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
 export const VERIFY_COLLECTOR =
   '/print/check/:registrationId/:eventType/:collector'
-export const VERIFY_DETAILS = '/verify-certificate/:id'
 export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
 
 export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
