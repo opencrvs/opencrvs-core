@@ -4,16 +4,14 @@ exports[`When an existing declaration is marked certified a birth declaration wr
 Object {
   "fields": Object {
     "compositionId": "1744fc19-95be-434b-8bc9-a76d6b81551b",
-    "total": 50,
   },
-  "measurement": "payment",
+  "measurement": "certification",
   "tags": Object {
     "eventType": "BIRTH",
     "locationLevel5": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
     "officeLocation": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
-    "paymentType": "certification",
   },
-  "timestamp": undefined,
+  "timestamp": 1570613507216000000,
 }
 `;
 

@@ -17,6 +17,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  ISSUED
 }
 
 enum RegAction {
@@ -569,6 +570,7 @@ type Mutation {
     details: BirthRegistrationInput!
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
+  markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   requestBirthRegistrationCorrection(
     id: ID!
     details: BirthRegistrationInput!
@@ -591,6 +593,7 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
+  markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
   requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!

@@ -1844,7 +1844,8 @@ export enum RegStatus {
   Registered = 'REGISTERED',
   Rejected = 'REJECTED',
   Validated = 'VALIDATED',
-  WaitingValidation = 'WAITING_VALIDATION'
+  WaitingValidation = 'WAITING_VALIDATION',
+  Issued = 'ISSUED'
 }
 
 export type RegWorkflow = {
