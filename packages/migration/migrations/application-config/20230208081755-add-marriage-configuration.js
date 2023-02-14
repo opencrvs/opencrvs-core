@@ -11,21 +11,40 @@
  */
 
 export const up = async (db, client) => {
-  await db.collection('configs').updateMany(
-    {},
-    {
-      $set: {
-        MARRIAGE: {
-          REGISTRATION_TARGET: 45,
-          FEE: {
-            ON_TIME: 10,
-            DELAYED: 45
+  const session = client.startSession()
+  try {
+    await session.withTransaction(async () => {
+      await db.collection('configs').updateMany(
+        {},
+        {
+          $set: {
+            MARRIAGE: {
+              REGISTRATION_TARGET: 45,
+              FEE: {
+                ON_TIME: 10,
+                DELAYED: 45
+              }
+            }
           }
         }
-      }
-    }
-  )
+      )
+    })
+  } finally {
+    console.log(`Migration - Add Marriage Configuration : Done. `)
+    await session.endSession()
+  }
 }
+
 export const down = async (db, client) => {
-  await db.collection('configs').updateMany({}, { $unset: { MARRIAGE: '' } })
+  const session = client.startSession()
+  try {
+    await session.withTransaction(async () => {
+      await db
+        .collection('configs')
+        .updateMany({}, { $unset: { MARRIAGE: '' } })
+    })
+  } finally {
+    console.log(`Migration - DOWN - Add Marriage Configuration - DONE `)
+    await session.endSession()
+  }
 }
