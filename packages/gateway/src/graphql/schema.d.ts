@@ -25,7 +25,7 @@ export interface GQLQuery {
   fetchRegistrationForViewing?: GQLEventRegistration
   queryPersonByNidIdentifier?: GQLPerson
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
-  fetchRecordsDetailsByCompositionId: GQLRecordDetails
+  fetchRecordDetailsForVerification?: GQLRecordDetails
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   hasChildLocation?: GQLLocation
@@ -231,11 +231,6 @@ export interface GQLRecordDetailsNameMap {
   RecordDetails: GQLRecordDetails
   BirthRegistration: GQLBirthRegistration
   DeathRegistration: GQLDeathRegistration
-}
-
-export const enum GQLAuthorizationStatus {
-  ANONYMOUS = 'ANONYMOUS',
-  USER = 'USER'
 }
 
 export interface GQLLocation {
@@ -1953,7 +1948,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchRegistrationForViewing?: QueryToFetchRegistrationForViewingResolver<TParent>
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<TParent>
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
-  fetchRecordsDetailsByCompositionId?: QueryToFetchRecordsDetailsByCompositionIdResolver<TParent>
+  fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
@@ -2195,16 +2190,16 @@ export interface QueryToFetchRegistrationCountByStatusResolver<
   ): TResult
 }
 
-export interface QueryToFetchRecordsDetailsByCompositionIdArgs {
+export interface QueryToFetchRecordDetailsForVerificationArgs {
   id: string
 }
-export interface QueryToFetchRecordsDetailsByCompositionIdResolver<
+export interface QueryToFetchRecordDetailsForVerificationResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: QueryToFetchRecordsDetailsByCompositionIdArgs,
+    args: QueryToFetchRecordDetailsForVerificationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

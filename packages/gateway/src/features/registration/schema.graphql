@@ -526,6 +526,7 @@ type Reinstated {
   taskEntryResourceID: ID!
   registrationStatus: RegStatus
 }
+
 enum Role {
   ANONYMOUS
 }
@@ -561,7 +562,7 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
-  fetchRecordsDetailsByCompositionId(id: String!): RecordDetails! @auth(requires: ANONYMOUS)
+  fetchRecordDetailsForVerification(id: String!): RecordDetails
 }
 
 type Mutation {
