@@ -10,15 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  fetchLocation,
   fetchChildLocationsByParentId,
+  countRegistrarsByLocation,
+  totalOfficesInCountry,
   fetchLocationsByType,
-  countUsersByLocation,
-  ICountByLocation,
-  fetchAllChildLocationsByParentId
+  fetchLocation
 } from '@metrics/api'
-import { getPopulation, getLocationType } from '@metrics/features/metrics/utils'
+import { getPopulation } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
+import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 
 interface ILocationStatisticsResponse {
   registrars: number
@@ -26,69 +26,116 @@ interface ILocationStatisticsResponse {
   offices: number
 }
 
-async function getAdminLocationStatistics(
-  location: fhir.Location,
-  registrarsCountByLocation: Array<ICountByLocation>,
-  populationYear: number,
-  authHeader: IAuthHeader,
-  cumulativeResult: ILocationStatisticsResponse = {
-    population: 0,
-    offices: 0,
-    registrars: 0
-  }
-): Promise<ILocationStatisticsResponse> {
-  if (!cumulativeResult.population) {
-    cumulativeResult.population = getPopulation(location, populationYear)
-  }
+type Location = fhir.Location & { id: string }
 
-  const childLocations = await fetchAllChildLocationsByParentId(
-    location.id as string,
-    authHeader
+type LocationsMap = Record<string, Location | undefined>
+
+const OFFICE_COUNT_CACHE: Record<string, number | undefined> = {}
+
+function dfs(
+  locationsMap: LocationsMap,
+  currentLocation: Location,
+  adjacency: Record<string, string[] | undefined>
+): number {
+  if (
+    OFFICE_COUNT_CACHE[currentLocation.id] &&
+    OFFICE_COUNT_CACHE[currentLocation.id] !== -1
+  ) {
+    return OFFICE_COUNT_CACHE[currentLocation.id] as number
+  }
+  let offices = 0
+  adjacency[currentLocation.id]?.forEach((childLocationId) => {
+    const childLocation = locationsMap[childLocationId]
+    /*
+     * The offices are not present in the locationsMap
+     * so when the child location is undefined, it means
+     * that we have found an office
+     */
+    if (!childLocation) {
+      offices++
+      return
+    }
+    offices += dfs(locationsMap, childLocation, adjacency)
+  })
+  OFFICE_COUNT_CACHE[currentLocation.id] = offices
+  return offices
+}
+
+async function cacheOfficeCount(authHeader: IAuthHeader) {
+  const [locations, offices] = await Promise.all([
+    fetchLocationsByType('ADMIN_STRUCTURE', authHeader),
+    fetchLocationsByType('CRVS_OFFICE', authHeader)
+  ])
+  locations.forEach(({ id }) => (OFFICE_COUNT_CACHE[id] = -1))
+  const locationsMap = locations.reduce<LocationsMap>(
+    (locationsMap, location) => ({
+      ...locationsMap,
+      [location.id]: location
+    }),
+    {}
   )
+  const adjacency: Record<string, string[] | undefined> = {}
+  ;[...offices, ...locations].forEach((location) => {
+    const partOf = location.partOf?.reference?.split('/')[1]
+    const parentLocation = locationsMap[partOf ?? '']
+    if (parentLocation) {
+      adjacency[parentLocation.id] = [
+        ...(adjacency[parentLocation.id] ?? []),
+        location.id
+      ]
+    }
+  })
+  /*
+   *  Run dfs from the top level locations
+   */
+  locations
+    .filter(({ partOf }) => partOf?.reference?.split('/')[1] === '0')
+    .forEach((location) => dfs(locationsMap, location, adjacency))
+}
 
-  for (const each of childLocations) {
-    if (getLocationType(each) === 'CRVS_OFFICE') {
-      cumulativeResult.offices += 1
-      cumulativeResult.registrars +=
-        registrarsCountByLocation.find(
-          ({ locationId }) => locationId === each.id
-        )?.total || 0
-    } else {
-      await getAdminLocationStatistics(
-        each,
-        registrarsCountByLocation,
-        populationYear,
-        authHeader,
-        cumulativeResult
-      )
+function isOffice(location: Location) {
+  return (
+    location.type?.coding?.find(
+      ({ system }) => system === `${OPENCRVS_SPECIFICATION_URL}location-type`
+    )?.code === 'CRVS_OFFICE'
+  )
+}
+
+async function getAdminLocationStatistics(
+  location: Location,
+  registrars: number,
+  populationYear: number,
+  authHeader: IAuthHeader
+): Promise<ILocationStatisticsResponse> {
+  if (isOffice(location)) {
+    return {
+      population: 0,
+      offices: 1,
+      registrars
     }
   }
-
-  return cumulativeResult
+  if (!OFFICE_COUNT_CACHE[location.id]) {
+    await cacheOfficeCount(authHeader)
+  }
+  return {
+    population: getPopulation(location, populationYear),
+    offices: OFFICE_COUNT_CACHE[location.id] ?? 0,
+    registrars
+  }
 }
 
 async function getCountryWideLocationStatistics(
   populationYear: number,
-  registrarsCountByLocation: Array<ICountByLocation>,
+  registrars: number,
   authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
   let population = 0
-  let offices = 0
-  let registrars = 0
-  const childLocations = await fetchChildLocationsByParentId(
-    'Location/0',
-    authHeader
-  )
+  const [childLocations, offices] = await Promise.all([
+    fetchChildLocationsByParentId('Location/0', authHeader),
+    totalOfficesInCountry(authHeader)
+  ])
   for (const each of childLocations) {
     population += getPopulation(each, populationYear) || 0
-  }
-  const locationOffices = await fetchLocationsByType('CRVS_OFFICE', authHeader)
-  for (const office of locationOffices) {
-    offices += 1
-    registrars +=
-      registrarsCountByLocation.find(
-        ({ locationId }) => locationId === office.id
-      )?.total || 0
   }
   return {
     population,
@@ -102,22 +149,21 @@ export async function getLocationStatistics(
   populationYear: number,
   authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
-  const registrarsCountByLocation = await countUsersByLocation(
-    { role: 'LOCAL_REGISTRAR' },
-    authHeader
-  )
+  locationId = locationId?.split('/')[1]
+  const { registrars } = await countRegistrarsByLocation(authHeader, locationId)
+
   if (locationId) {
     const location = await fetchLocation(locationId, authHeader)
     return getAdminLocationStatistics(
       location,
-      registrarsCountByLocation,
+      registrars,
       populationYear,
       authHeader
     )
   } else {
     return getCountryWideLocationStatistics(
       populationYear,
-      registrarsCountByLocation,
+      registrars,
       authHeader
     )
   }

@@ -36,7 +36,7 @@ export function HistoryNavigator({
   const history = useHistory()
   const dispatch = useDispatch()
   const userDetails = useSelector(getUserDetails)
-  const role = userDetails && userDetails.role
+  const role = userDetails && userDetails.systemRole
   const location = history.location.pathname
   const isLandingPage = () => {
     if (

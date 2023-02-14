@@ -122,6 +122,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        informantsSignature
         duplicates
         attachments {
           data
@@ -198,8 +199,14 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName
@@ -368,6 +375,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        informantsSignature
         status {
           comments {
             comment
@@ -439,8 +447,14 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         user {
           id
-          type
-          role
+          role {
+            _id
+            labels {
+              lang
+              label
+            }
+          }
+          systemRole
           name {
             firstNames
             familyName

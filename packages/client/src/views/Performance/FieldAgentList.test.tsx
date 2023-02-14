@@ -68,7 +68,7 @@ describe('Field agent list tests', () => {
                 {
                   practitionerId: '1',
                   fullName: 'Sakib Al Hasan',
-                  type: 'HA',
+                  role: 'HA',
                   status: 'active',
                   primaryOfficeId: '1',
                   creationDate: '1488076708000',
@@ -80,7 +80,7 @@ describe('Field agent list tests', () => {
                 {
                   practitionerId: '2',
                   fullName: 'Naeem Hossain',
-                  type: 'HA',
+                  role: 'HA',
                   status: 'active',
                   primaryOfficeId: '1',
                   creationDate: '1487076708000',

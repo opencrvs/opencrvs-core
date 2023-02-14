@@ -49,6 +49,8 @@ import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/u
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { ProfileMenu } from '@client/components/ProfileMenu'
+
 const ToggleWrapper = styled.div`
   margin-left: 24px;
 `
@@ -238,6 +240,7 @@ const InformantNotification = () => {
         header={
           <AppBar
             desktopLeft={<HistoryNavigator />}
+            desktopRight={<ProfileMenu key="profileMenu" />}
             mobileLeft={<HistoryNavigator hideForward />}
           />
         }

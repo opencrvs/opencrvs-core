@@ -26,7 +26,6 @@ import {
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@client/styledComponents'
-import { IUserDetails } from '@client/utils/userUtils'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -42,6 +41,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -81,7 +81,7 @@ interface IProps {
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
   goToHomeTab: typeof goToHomeTab
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
 }
 

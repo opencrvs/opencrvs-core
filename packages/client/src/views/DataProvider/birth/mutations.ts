@@ -41,7 +41,7 @@ export const REGISTER_BIRTH_DECLARATION = gql`
               firstNames
               familyName
             }
-            role
+            systemRole
           }
           location {
             id
