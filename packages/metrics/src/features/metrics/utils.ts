@@ -62,7 +62,8 @@ export interface IMonthRangeFilter {
 
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
-  DEATH = 'DEATH'
+  DEATH = 'DEATH',
+  MARRIAGE = 'MARRIAGE'
 }
 
 export type Location = fhir.Location & { id: string }

@@ -678,7 +678,7 @@ export async function generateMarriageRegPoint(
       (marriageExtension.valueString &&
         (await getTimeLabel(
           Number(marriageExtension?.valueString),
-          EVENT_TYPE.BIRTH,
+          EVENT_TYPE.MARRIAGE,
           authHeader.Authorization
         ))) ||
       undefined,

@@ -44,7 +44,7 @@ import {
   declarationArchivedHandler,
   declarationReinstatedHandler,
   declarationUpdatedHandler,
-  markEventRegistererHandler,
+  markEventRegisteredHandler,
   newEventRegistrationHandler
 } from '@metrics/features/registration/handler'
 import {
@@ -89,7 +89,6 @@ export const getRoutes = () => {
       path: '/events/{event}/in-progress-declaration',
       handler: inProgressHandler,
       config: {
-        auth: false,
         tags: ['api'],
         validate: {
           params: Joi.object({
@@ -190,9 +189,8 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/{event}/mark-registered',
-      handler: markEventRegistererHandler,
+      handler: markEventRegisteredHandler,
       config: {
-        auth: false,
         tags: ['api'],
         validate: {
           params: Joi.object({

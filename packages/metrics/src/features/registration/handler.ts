@@ -289,7 +289,7 @@ export async function newBirthRegistrationHandler(
   return h.response().code(200)
 }
 
-export async function markEventRegistererHandler(
+export async function markEventRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
