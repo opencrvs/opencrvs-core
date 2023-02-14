@@ -24,6 +24,7 @@ import {
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
+import { marriageEventHandler } from '@search/features/registration/marriage/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -91,6 +92,16 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/death/{eventType}',
       handler: deathEventHandler,
+      config: {
+        tags: ['api'],
+        description:
+          'Handles indexing a new declaration or updating an existing declaration'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/marriage/{eventType}',
+      handler: marriageEventHandler,
       config: {
         tags: ['api'],
         description:
