@@ -64,14 +64,10 @@ const DotsContainer = styled.div`
 
 export class PINKeypad extends React.Component<IProps, IState> {
   state = { pin: this.props.pin || '' }
-  pinInput: any
+  pinInput: React.RefObject<HTMLInputElement> = React.createRef()
 
   componentDidMount() {
     this.focusKeyInput()
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('mouseup', this.handleClick, false)
   }
 
   handleClick = (e: Event) => {
@@ -79,8 +75,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
   }
 
   focusKeyInput = () => {
-    this.pinInput &&
-      (ReactDOM.findDOMNode(this.pinInput) as HTMLElement)?.focus()
+    this.pinInput?.current?.focus()
   }
   componentDidUpdate = () => this.focusKeyInput()
 
@@ -147,7 +142,7 @@ export class PINKeypad extends React.Component<IProps, IState> {
               type="number"
               onKeyDown={this.keyDown}
               id="pin-input"
-              ref={(elem: any) => (this.pinInput = elem)}
+              ref={this.pinInput}
               onBlur={this.onBlur}
               autoFocus={true}
             />
