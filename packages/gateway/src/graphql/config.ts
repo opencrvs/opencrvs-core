@@ -49,6 +49,7 @@ import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
+import { Request } from '@hapi/hapi'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -157,7 +158,15 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
   })
 }
 
-export const getApolloConfig = (): Config => {
+type Context = {
+  request: Request
+  Authorization: string
+  'x-correlation-id': string
+  'x-real-ip': string
+  'x-real-user-agent': string
+}
+
+export const getApolloConfig = (): Config<Context> => {
   const typeDefs = gql`
     ${readFileSync(graphQLSchemaPath, 'utf8')}
   `
@@ -171,10 +180,10 @@ export const getApolloConfig = (): Config => {
   return {
     schema,
     introspection: true,
-    context: async ({ request, h }) => {
+    context: async ({ request }) => {
       return {
         request,
-        Authorization: request.headers?.authorization,
+        Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
         'x-real-ip':
           request.headers['x-real-ip'] || request.info?.remoteAddress,
