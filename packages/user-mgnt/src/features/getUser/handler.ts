@@ -12,7 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
-import User, { IUserModel } from '@user-mgnt/model/user'
+import User, { IUserRole } from '@user-mgnt/model/user'
 
 interface IVerifyPayload {
   userId: string
@@ -35,7 +35,9 @@ export default async function getUser(
   if (mobile) {
     criteria = { ...criteria, mobile }
   }
-  const user: IUserModel | null = await User.findOne(criteria)
+  const user = await User.findOne(criteria).populate<{
+    role: IUserRole
+  }>('role')
   if (!user) {
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()

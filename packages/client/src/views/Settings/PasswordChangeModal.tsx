@@ -20,13 +20,13 @@ import { userMessages as messages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import styled from '@client/styledComponents'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
 import { gql } from '@apollo/client'
 import { get } from 'lodash'
 import * as React from 'react'
 import { Mutation } from '@apollo/client/react/components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -133,7 +133,7 @@ interface IProps {
   showPasswordChange: boolean
   togglePasswordChangeModal: () => void
   passwordChanged: () => void
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 }
 type IFullProps = IProps & IntlShapeProps
 

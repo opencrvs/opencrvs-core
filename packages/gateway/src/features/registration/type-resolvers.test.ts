@@ -433,7 +433,7 @@ describe('Registration type resolvers', () => {
         null,
         {}
       )
-      expect(user.role).toBe(mockUser.role)
+      expect(user.role.labels).toEqual(mockUser.role.labels)
     })
 
     it('Should return location', async () => {
@@ -1132,7 +1132,7 @@ describe('Registration type resolvers', () => {
 
       expect(comments).toHaveLength(1)
       expect(comment).toBe('Comment')
-      expect(user.role).toBe(mockUser.role)
+      expect(user.role.labels).toEqual(mockUser.role.labels)
       expect(time).toBe('2016-10-31T09:45:05+10:00')
     })
 

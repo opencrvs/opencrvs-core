@@ -44,6 +44,7 @@ const StyledLink = styled.button<{ $font: IFont; $color: IColor }>`
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 4px;
+    ${({ $color }) => `text-decoration-color: ${colors[$color]};`}
   }
 
   &:focus-visible {

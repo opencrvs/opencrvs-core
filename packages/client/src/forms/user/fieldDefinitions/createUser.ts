@@ -11,13 +11,13 @@
  */
 import {
   FIELD_GROUP_TITLE,
+  ISerializedFormSection,
   LOCATION_SEARCH_INPUT,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SIMPLE_DOCUMENT_UPLOADER,
   TEXT,
-  UserSection,
-  ISerializedFormSection
+  UserSection
 } from '@client/forms/index'
 import { NATIONAL_ID } from '@client/forms/identity'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
@@ -184,59 +184,25 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'role',
           type: SELECT_WITH_OPTIONS,
-          label: userFormMessages.labelRole,
+          label: userFormMessages.role,
           required: true,
           initialValue: '',
           validate: [],
-          options: [
-            {
-              value: 'FIELD_AGENT',
-              label: userMessages.FIELD_AGENT
-            },
-            {
-              value: 'REGISTRATION_AGENT',
-              label: userMessages.REGISTRATION_AGENT
-            },
-            {
-              value: 'LOCAL_REGISTRAR',
-              label: userMessages.LOCAL_REGISTRAR
-            },
-            {
-              value: 'LOCAL_SYSTEM_ADMIN',
-              label: userMessages.LOCAL_SYSTEM_ADMIN
-            },
-            {
-              value: 'NATIONAL_SYSTEM_ADMIN',
-              label: userMessages.NATIONAL_SYSTEM_ADMIN
-            },
-            {
-              value: 'PERFORMANCE_MANAGEMENT',
-              label: userMessages.PERFORMANCE_MANAGEMENT
-            },
-            {
-              value: 'NATIONAL_REGISTRAR',
-              label: userMessages.NATIONAL_REGISTRAR
-            }
-          ]
+          options: [],
+          conditionals: []
         },
         {
-          name: 'type',
-          type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: userFormMessages.type,
-          required: true,
+          name: 'systemRole',
+          type: TEXT,
+          label: userFormMessages.systemRole,
+          required: false,
+          hidden: true,
+          hideValueInPreview: true,
           initialValue: '',
           validate: [],
-          dynamicOptions: {
-            dependency: 'role',
-            options: {}
-          },
-          conditionals: [
-            {
-              action: 'hide',
-              expression: '(values.role!="FIELD_AGENT")'
-            }
-          ]
+          conditionals: []
         },
+
         {
           name: 'device',
           type: TEXT,
@@ -254,7 +220,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           action: 'hide',
           expression:
-            'values.role!=="LOCAL_REGISTRAR" && values.role!=="NATIONAL_REGISTRAR"'
+            'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="NATIONAL_REGISTRAR"'
         }
       ],
       fields: [

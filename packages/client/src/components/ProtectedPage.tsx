@@ -16,7 +16,7 @@ import { storage } from '@client/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
-import { USER_DETAILS, IUserDetails } from '@client/utils/userUtils'
+import { USER_DETAILS, UserDetails } from '@client/utils/userUtils'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@client/declarations'
 import * as LogRocket from 'logrocket'
@@ -102,7 +102,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     } else {
       newState.pinExists = false
     }
-    const userDetails: IUserDetails = JSON.parse(
+    const userDetails: UserDetails = JSON.parse(
       (await storage.getItem(USER_DETAILS)) || '{}'
     )
     if (userDetails && userDetails.status && userDetails.status === 'pending') {

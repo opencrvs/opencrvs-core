@@ -276,7 +276,13 @@ export class LocationSearch extends React.Component<IProps, IState> {
               autoComplete="off"
               onFocus={this.onFocus}
               onBlur={this.onBlurHandler}
-              onClick={() => document.addEventListener('click', this.handler)}
+              onClick={() =>
+                //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
+                setTimeout(
+                  () => document.addEventListener('click', this.handler),
+                  0
+                )
+              }
               value={this.state.selectedText || ''}
               onChange={this.onChangeHandler}
               error={this.props.error}
