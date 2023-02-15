@@ -325,11 +325,14 @@ export function goToPrintCertificate(
   )
 }
 
-export function goToIssueCertificate(registrationId: string, groupId?: string) {
+export function goToIssueCertificate(
+  registrationId: string,
+  pageId = 'collector'
+) {
   return push(
     formatUrl(ISSUE_COLLECTOR, {
       registrationId: registrationId.toString(),
-      groupId: groupId || 'certCollector'
+      pageId: pageId
     })
   )
 }

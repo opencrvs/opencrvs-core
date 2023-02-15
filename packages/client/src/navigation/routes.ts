@@ -47,7 +47,7 @@ export const MY_DRAFTS = '/my-drafts'
 export const CONFIRMATION_SCREEN = '/confirm'
 export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'
-export const ISSUE_COLLECTOR = '/issue/:registrationId/:groupId'
+export const ISSUE_COLLECTOR = '/issue/:registrationId/:pageId'
 export const ISSUE_VERIFY_COLLECTOR =
   '/issue/check/:registrationId/:eventType/:collector'
 export const VERIFY_COLLECTOR =

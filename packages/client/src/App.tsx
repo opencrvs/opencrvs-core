@@ -66,7 +66,7 @@ import { UserAudit } from './views/UserAudit/UserAudit'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
 import { RegistrationList } from '@client/views/Performance/RegistrationsList'
 import InformantNotification from '@client/views/SysAdmin/InformantSMSNotification/InformantSMSNotification'
-import { IssueCollectorForm } from './views/IssueCertificate/IssueCollectorForm/IssueCollectorForm'
+import { IssueCertificate } from './views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from './views/OfficeHome/readyToIssue/IssuePayment'
 
 interface IAppProps {
@@ -294,7 +294,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.ISSUE_COLLECTOR}
-                                            component={IssueCollectorForm}
+                                            component={IssueCertificate}
                                           />
                                           <ProtectedRoute
                                             exact
