@@ -9,19 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import * as ReactDOM from 'react-dom'
-import { userMessages } from '@opencrvs/client/src/i18n/messages'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 interface IProps {
   id?: string
   onComplete: (pin: string) => void
   forgotPinComponent?: React.ReactNode
   pin?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ref?: any
 }
 
 interface IState {
@@ -36,6 +31,7 @@ const Container = styled.div`
   margin-top: 32px;
 `
 const StyledInput = styled.input`
+  position: absolute;
   opacity: 0;
 `
 
@@ -57,6 +53,7 @@ const DotUnfilled = styled.span`
   margin: 0 8px;
 `
 const DotsContainer = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -67,10 +64,6 @@ export class PINKeypad extends React.Component<IProps, IState> {
   pinInput: React.RefObject<HTMLInputElement> = React.createRef()
 
   componentDidMount() {
-    this.focusKeyInput()
-  }
-
-  handleClick = (e: Event) => {
     this.focusKeyInput()
   }
 
@@ -137,25 +130,23 @@ export class PINKeypad extends React.Component<IProps, IState> {
     return (
       <Container id="pin-keypad-container" tabIndex={0} {...this.props}>
         <DotsContainer>
-          <div>
-            <StyledInput
-              type="number"
-              onKeyDown={this.keyDown}
-              id="pin-input"
-              ref={this.pinInput}
-              onBlur={this.onBlur}
-              autoFocus={true}
-            />
-          </div>
+          <StyledInput
+            type="number"
+            onKeyDown={this.keyDown}
+            id="pin-input"
+            ref={this.pinInput}
+            onBlur={this.onBlur}
+            autoFocus
+          />
           <div
             onClick={() => {
               this.pinInput?.current?.focus()
             }}
           >
-            {new Array(pin.length).fill('').map((e, i) => (
+            {new Array(pin.length).fill('').map((_, i) => (
               <DotFilled key={`dot-filled-${i}`} />
             ))}
-            {new Array(4 - pin.length).fill('').map((e, i) => (
+            {new Array(4 - pin.length).fill('').map((_, i) => (
               <DotUnfilled key={`dot-unfilled-${i}`} />
             ))}
           </div>

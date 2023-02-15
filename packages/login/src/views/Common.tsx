@@ -11,14 +11,10 @@
  */
 
 import styled from 'styled-components'
-import { Text } from '@opencrvs/components/lib/Text/Text'
 
 export const FormWrapper = styled.form`
   width: 100%;
   padding: 16px 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-top: 48px;
-  }
 `
 
 export const LogoContainer = styled.div`

@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import * as ReactDOM from 'react-dom'
+import React from 'react'
 import styled from 'styled-components'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { messages } from '@client/i18n/messages/views/pin'
@@ -81,8 +80,6 @@ export const EnterPinLabel = () => {
 }
 
 class UnlockView extends React.Component<IFullProps, IFullState> {
-  pinKeyRef: any
-
   constructor(props: IFullProps) {
     super(props)
     this.state = {
@@ -211,7 +208,6 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
             <EnterPinLabel />
             <Stack direction="column" gap={16} justifyContent="flex-start">
               <PINKeypad
-                ref={(elem: any) => (this.pinKeyRef = elem)}
                 onComplete={this.onPinProvided}
                 pin={this.state.pin}
                 key={this.state.resetKey}
