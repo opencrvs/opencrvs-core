@@ -50,6 +50,13 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
+export interface IApplicationConfigAnonymous {
+  APPLICATION_NAME: string
+  COUNTRY_LOGO: ICountryLogo
+  LOGIN_BACKGROUND: ILoginBackground
+  PHONE_NUMBER_PATTERN: RegExp
+}
+
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {

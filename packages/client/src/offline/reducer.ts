@@ -21,7 +21,11 @@ import {
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
+import {
+  IApplicationConfig,
+  IApplicationConfigAnonymous,
+  referenceApi
+} from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { IFormConfig } from '@client/forms'
@@ -75,7 +79,8 @@ export interface IOfflineData {
     logo: string
   }
   systems: System[]
-  config: Partial<IApplicationConfig>
+  config: IApplicationConfig
+  anonymousConfig: IApplicationConfigAnonymous
   formConfig: IFormConfig
 }
 

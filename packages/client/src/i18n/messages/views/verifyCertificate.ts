@@ -131,6 +131,16 @@ const messagesToDefine: IVerifyCertificateMessages = {
     defaultMessage:
       'After verifying the certificate, please close the browser window',
     description: 'Message for the toast when time spend 1 minute'
+  },
+  female: {
+    defaultMessage: 'Female',
+    description: 'Option for form field: Sex name',
+    id: 'verifyCertificate.sexFemale'
+  },
+  male: {
+    defaultMessage: 'Male',
+    description: 'Option for form field: Sex name',
+    id: 'verifyCertificate.sexMale'
   }
 }
 

@@ -467,7 +467,11 @@ export function VerifyCertificatePage() {
                       }
                       value={
                         <Text variant={'reg16'} element={'span'}>
-                          {getChildOrDeceasedData(currentData).gender}
+                          {intl.formatMessage(
+                            messageToDefine[
+                              getChildOrDeceasedData(currentData).gender
+                            ]
+                          )}
                         </Text>
                       }
                     />

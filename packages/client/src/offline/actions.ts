@@ -17,7 +17,7 @@ import {
   IContentResponse,
   IApplicationConfigResponse,
   IApplicationConfig,
-  ICertificateTemplateData
+  ICertificateTemplateData, IApplicationConfigAnonymous
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
@@ -95,7 +95,7 @@ export const ANONYMOUS_USER_OFFLINE_CONFIG =
   'OFFLINE/ANONYMOUS_USER_OFFLINE_CONFIG' as const
 export type ApplicationConfigAnonymousUserAction = {
   type: typeof ANONYMOUS_USER_OFFLINE_CONFIG
-  payload: { config: Partial<IApplicationConfig> }
+  payload: { anonymousConfig: IApplicationConfigAnonymous }
 }
 
 export const UPDATE_OFFLINE_SYSTEMS = 'OFFLINE/UPDATE_OFFLINE_SYSTEMS' as const
@@ -205,7 +205,7 @@ export const configLoaded = (
 })
 
 export const configAnonymousUserLoaded = (payload: {
-  config: Partial<IApplicationConfig>
+  anonymousConfig: IApplicationConfig
 }): ApplicationConfigAnonymousUserAction => ({
   type: ANONYMOUS_USER_OFFLINE_CONFIG,
   payload: payload
