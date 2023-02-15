@@ -20,6 +20,7 @@ enum RegStatus {
 }
 
 enum RegAction {
+  VERIFIED
   ASSIGNED
   UNASSIGNED
   REINSTATED
@@ -232,6 +233,7 @@ type History {
   user: User
   date: Date
   regStatus: RegStatus
+  ipAddress: String
   action: RegAction
   statusReason: StatusReason
   reason: String
@@ -530,9 +532,7 @@ enum Role {
   ANONYMOUS
 }
 
-directive @auth(
-  requires: Role!
-) on FIELD_DEFINITION
+directive @auth(requires: Role!) on FIELD_DEFINITION
 
 union RecordDetails = BirthRegistration | DeathRegistration
 
@@ -561,7 +561,8 @@ type Query {
     locationId: String
     event: String
   ): RegistrationCountResult
-  fetchRecordsDetailsByCompositionId(id: String!): RecordDetails! @auth(requires: ANONYMOUS)
+  fetchRecordsDetailsByCompositionId(id: String!): RecordDetails!
+    @auth(requires: ANONYMOUS)
 }
 
 type Mutation {

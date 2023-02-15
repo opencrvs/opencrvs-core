@@ -41,8 +41,8 @@ export async function createToken(
 
 export const generateToken = async () =>
   await createToken(
-    '63a02c66e6d4bd1155b615d2',
-    ['register', 'performance', 'certify', 'demo'],
+    'ANONYMOUS_USER_FOR_VERI',
+    ['register', 'performance', 'certify', 'demo', 'verify'],
     [
       'opencrvs:auth-user',
       'opencrvs:user-mgnt-user',

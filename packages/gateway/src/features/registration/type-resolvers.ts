@@ -825,6 +825,16 @@ export const typeResolvers: GQLResolver = {
     },
     regStatus: (task: fhir.Task) => getStatusFromTask(task),
     action: (task) => getActionFromTask(task),
+    ipAddress: (task) => {
+      const verifiedExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regVerified`,
+        task.extension as fhir.Extension[]
+      )
+      if (!verifiedExtension || !verifiedExtension.valueString) {
+        return null
+      }
+      return verifiedExtension.valueString
+    },
     statusReason: (task: fhir.Task) => task.statusReason || null,
     reason: (task: fhir.Task) => task.reason?.text || null,
     otherReason: (task: fhir.Task) => {

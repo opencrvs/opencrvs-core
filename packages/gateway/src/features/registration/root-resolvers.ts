@@ -17,7 +17,8 @@ import {
   ASSIGNED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL
+  VIEWED_EXTENSION_URL,
+  VERIFIED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -271,11 +272,22 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRecordsDetailsByCompositionId(_, { id }) {
+    async fetchRecordsDetailsByCompositionId(_, { id }, context) {
       try {
-        const record = await fetchFHIR(`/Composition/${id}`, {
-          Authorization: `Bearer ${await generateToken()}`
+        const token = await generateToken()
+        context.Authorization = `Bearer ${token}`
+        const authHeader = {
+          Authorization: context.Authorization
+        }
+        const taskEntry = await getTaskEntry(id, authHeader)
+
+        const taskBundle = taskBundleWithExtension(taskEntry, {
+          url: VERIFIED_EXTENSION_URL,
+          valueString: context['x-real-ip']
         })
+        await fetchFHIR('/Task', authHeader, 'PUT', JSON.stringify(taskBundle))
+
+        const record = await fetchFHIR(`/Composition/${id}`, authHeader)
         if (!record) {
           await Promise.reject(new Error('Invalid QrCode'))
         }
@@ -651,6 +663,7 @@ async function markEventAsCertified(
 
 const ACTION_EXTENSIONS = [
   ASSIGNED_EXTENSION_URL,
+  VERIFIED_EXTENSION_URL,
   UNASSIGNED_EXTENSION_URL,
   DOWNLOADED_EXTENSION_URL,
   REINSTATED_EXTENSION_URL,

@@ -791,6 +791,7 @@ export interface GQLHistory {
   user?: GQLUser
   date?: GQLDate
   regStatus?: GQLRegStatus
+  ipAddress?: string
   action?: GQLRegAction
   statusReason?: GQLStatusReason
   reason?: string
@@ -1353,6 +1354,7 @@ export interface GQLCertificate {
 }
 
 export const enum GQLRegAction {
+  VERIFIED = 'VERIFIED',
   ASSIGNED = 'ASSIGNED',
   UNASSIGNED = 'UNASSIGNED',
   REINSTATED = 'REINSTATED',
@@ -5183,6 +5185,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   user?: HistoryToUserResolver<TParent>
   date?: HistoryToDateResolver<TParent>
   regStatus?: HistoryToRegStatusResolver<TParent>
+  ipAddress?: HistoryToIpAddressResolver<TParent>
   action?: HistoryToActionResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
@@ -5209,6 +5212,10 @@ export interface HistoryToDateResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToRegStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToIpAddressResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

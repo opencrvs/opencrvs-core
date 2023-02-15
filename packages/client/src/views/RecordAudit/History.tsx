@@ -19,7 +19,8 @@ import {
   getFormattedDate,
   getPageItems,
   getStatusLabel,
-  isSystemInitiated
+  isSystemInitiated,
+  isVerifiedAction
 } from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { CMethodParams } from './ActionButtons'
@@ -31,7 +32,12 @@ import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
 import { v4 as uuid } from 'uuid'
-import { History, RegStatus, SystemType } from '@client/utils/gateway'
+import {
+  History,
+  RegAction,
+  RegStatus,
+  SystemType
+} from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 
@@ -217,7 +223,9 @@ export const GetHistory = ({
     ),
     user: (
       <>
-        {isSystemInitiated(item) ? (
+        {isVerifiedAction(item) ? (
+          <div />
+        ) : isSystemInitiated(item) ? (
           <HealthSystemUser name={item.system?.name} />
         ) : isFieldAgent ? (
           <GetNameWithAvatar
@@ -242,12 +250,18 @@ export const GetHistory = ({
         )}
       </>
     ),
-    type: intl.formatMessage(
-      isSystemInitiated(item) || !item.user?.role
-        ? getSystemType(item.system?.type)
-        : userMessages[item.user.role]
+    type: isVerifiedAction(item) ? (
+      <div />
+    ) : (
+      intl.formatMessage(
+        isSystemInitiated(item) || !item.user?.role
+          ? getSystemType(item.system?.type)
+          : userMessages[item.user.role]
+      )
     ),
-    location: isSystemInitiated(item) ? null : isFieldAgent ? (
+    location: isVerifiedAction(item) ? (
+      <div />
+    ) : isSystemInitiated(item) ? null : isFieldAgent ? (
       <>{item.office?.name}</>
     ) : (
       <Link

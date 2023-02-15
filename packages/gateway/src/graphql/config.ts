@@ -49,7 +49,6 @@ import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
 import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
-import { generateToken } from '@gateway/utils/generateToken'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -175,8 +174,7 @@ export const getApolloConfig = (): Config => {
     context: async ({ request, h }) => {
       return {
         request,
-        Authorization:
-          request.headers?.authorization || (await generateToken()),
+        Authorization: request.headers?.authorization,
         'x-correlation-id': request.headers['x-correlation-id'] || uniqueId(),
         'x-real-ip':
           request.headers['x-real-ip'] || request.info?.remoteAddress,
