@@ -531,7 +531,7 @@ export const resolvers: GQLResolver = {
 
 function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
   const userPayload: IUserPayload = {
-    name: (user.name as GQLHumanNameInput[]).map((name: GQLHumanNameInput) => ({
+    name: user.name.map((name: GQLHumanNameInput) => ({
       use: name.use as string,
       family: name.familyName as string,
       given: (name.firstNames || '').split(' ') as string[]

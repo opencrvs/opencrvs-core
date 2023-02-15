@@ -76,15 +76,15 @@ export const nameToFieldTransformer =
       selectedName =
         queryData[selectSectionId] &&
         queryData[selectSectionId][nestedField].name &&
-        (queryData[selectSectionId][nestedField].name as GQLHumanName[]).find(
-          (name) => name.use === language
+        queryData[selectSectionId][nestedField].name.find(
+          (name: GQLHumanName) => name.use === language
         )
     } else {
       selectedName =
         queryData[selectSectionId] &&
         queryData[selectSectionId].name &&
-        (queryData[selectSectionId].name as GQLHumanName[]).find(
-          (name) => name.use === language
+        queryData[selectSectionId].name.find(
+          (name: GQLHumanName) => name.use === language
         )
     }
 

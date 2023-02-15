@@ -37,7 +37,7 @@ export function transformStatusData(
   const registrationStatus =
     statusData &&
     statusData.find((status) => {
-      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      return status.type && status.type === 'REGISTERED'
     })
   transformedData[sectionId] = {
     ...transformedData[sectionId],
@@ -99,11 +99,7 @@ export function getBirthRegistrationSectionTransformer(
   }
 
   if (queryData[sectionId].status) {
-    transformStatusData(
-      transformedData,
-      queryData[sectionId].status as GQLRegWorkflow[],
-      sectionId
-    )
+    transformStatusData(transformedData, queryData[sectionId].status, sectionId)
   }
 
   if (queryData[sectionId].informantsSignature) {
@@ -293,11 +289,11 @@ export const registrationLocationUserTransformer = (
   targetSectionId?: string,
   targetFieldName?: string
 ) => {
-  const statusData = queryData[REGISTRATION_SECTION].status as GQLRegWorkflow[]
+  const statusData: GQLRegWorkflow[] = queryData[REGISTRATION_SECTION].status
   const registrationStatus =
     statusData &&
     statusData.find((status) => {
-      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+      return status.type && status.type === 'REGISTERED'
     })
   const officeName = registrationStatus?.office?.name || ''
   const officeAddressLevel3 =
