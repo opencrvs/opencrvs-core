@@ -13380,7 +13380,7 @@
             "deprecationReason": null
           },
           {
-            "name": "fetchRecordsDetailsByCompositionId",
+            "name": "fetchRecordDetailsForVerification",
             "description": null,
             "args": [
               {
