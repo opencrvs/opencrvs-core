@@ -458,14 +458,16 @@ export async function anonymousActionEventHandler(
   try {
     const payload = request.payload as fhir.Bundle
     const anonymousPayload = makeTaskAnonymous(payload)
+
     const taskResource = anonymousPayload.entry?.[0].resource as fhir.Task
-    return await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
+    const res = await fetch(`${HEARTH_URL}/Task/${taskResource.id}`, {
       method: 'PUT',
       body: JSON.stringify(taskResource),
       headers: {
         'Content-Type': 'application/fhir+json'
       }
     })
+    return res
   } catch (error) {
     logger.error(`Workflow/actionEventHandler(${event}): error: ${error}`)
     throw new Error(error)

@@ -885,6 +885,7 @@ export const typeResolvers: GQLResolver = {
         }
       })
       const userResponse: IUserModelData = await res.json()
+
       return {
         ...userResponse,
         role: role ?? userResponse.role
