@@ -158,7 +158,7 @@ describe('Certificate root resolvers', () => {
       )
     })
 
-    it('should throw error when /createUser sends anything but 201', async () => {
+    it('should throw error when /{action}certificate sends anything but 201', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           statusCode: '201'

@@ -24,11 +24,10 @@ import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Button } from '@opencrvs/components/lib/Button'
-import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
+import { getUserRoleIntlKey } from '@client/views/SysAdmin//Team/utils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { IUserDetails } from '@client/utils/userUtils'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useDispatch, useSelector } from 'react-redux'
@@ -55,6 +54,7 @@ import { useQuery } from '@apollo/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
+import { UserDetails } from '@client/utils/userUtils'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -93,8 +93,8 @@ const transformUserQueryResult = (
     name:
       createNamesMap(userData.name as HumanName[])[locale] ||
       createNamesMap(userData.name as HumanName[])[LANG_EN],
+    systemRole: userData.systemRole,
     role: userData.role,
-    type: userData.type,
     number: userData.mobile,
     status: userData.status,
     underInvestigation: userData.underInvestigation,
@@ -105,7 +105,7 @@ const transformUserQueryResult = (
         : EMPTY_STRING,
     practitionerId: userData.practitionerId,
     locationId:
-      getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) || '0',
+      getJurisdictionLocationIdFromUserDetails(userData as UserDetails) || '0',
     avatar: userData.avatar || undefined,
     device: userData.device
   }
@@ -137,8 +137,8 @@ export const UserAudit = () => {
     GetUserQueryVariables
   >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
-  const userRole = user && getUserRole(user, intl)
-  const userType = user && getUserType(user, intl)
+  const userRole =
+    user && intl.formatMessage({ id: getUserRoleIntlKey(user.role._id) })
 
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
@@ -323,12 +323,8 @@ export const UserAudit = () => {
                 }
               />
               <Summary.Row
-                label={
-                  (userType &&
-                    intl.formatMessage(userSetupMessages.roleType)) ||
-                  intl.formatMessage(userFormMessages.labelRole)
-                }
-                value={(userType && `${userRole} / ${userType}`) || userRole}
+                label={intl.formatMessage(userFormMessages.labelRole)}
+                value={userRole}
               />
               <Summary.Row
                 label={intl.formatMessage(userFormMessages.userDevice)}
@@ -340,7 +336,7 @@ export const UserAudit = () => {
               <UserAuditHistory
                 practitionerId={user.practitionerId}
                 practitionerName={user.name}
-                loggedInUserRole={userDetails!.role}
+                loggedInUserRole={userDetails!.systemRole}
               />
             )}
           </>

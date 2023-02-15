@@ -34,17 +34,17 @@ import {
 } from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { IUserDetails } from '@client/utils/userUtils'
+import { SystemRoleType } from '@client/utils/gateway'
 import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
-import { Roles } from '@client/utils/authUtils'
+import { UserDetails } from '@client/utils/userUtils'
 
 export type CMethodParams = {
   declaration: IDeclarationData
   intl: IntlShape
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
   draft: IDeclaration | null
   clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
   goToPage?: typeof goToPage
@@ -60,7 +60,7 @@ export const ShowDownloadButton = ({
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
-  userDetails: IUserDetails | null
+  userDetails: UserDetails | null
 }) => {
   const { id, type } = declaration || {}
 
@@ -69,15 +69,15 @@ export const ShowDownloadButton = ({
   const downloadStatus = draft?.downloadStatus || undefined
   let refetchQueries: InternalRefetchQueriesInclude = []
   if (
-    userDetails?.role === 'FIELD_AGENT' &&
+    userDetails?.systemRole === 'FIELD_AGENT' &&
     draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
   )
     return <></>
 
   if (
     declaration.assignment &&
-    (userDetails?.role === Roles.LOCAL_REGISTRAR ||
-      userDetails?.role === Roles.NATIONAL_REGISTRAR)
+    (userDetails?.systemRole === SystemRoleType.LocalRegistrar ||
+      userDetails?.systemRole === SystemRoleType.NationalRegistrar)
   ) {
     refetchQueries = [
       { query: FETCH_DECLARATION_SHORT_INFO, variables: { id: declaration.id } }
@@ -116,9 +116,9 @@ export const ShowUpdateButton = ({
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
-  const role = userDetails ? userDetails.role : ''
-  const showActionButton = role
-    ? FIELD_AGENT_ROLES.includes(role)
+  const systemRole = userDetails ? userDetails.systemRole : ''
+  const showActionButton = systemRole
+    ? FIELD_AGENT_ROLES.includes(systemRole)
       ? false
       : true
     : false
@@ -152,9 +152,11 @@ export const ShowUpdateButton = ({
   }
 
   if (
-    role &&
+    systemRole &&
     type &&
-    updateButtonRoleStatusMap[role].includes(declaration?.status as string)
+    updateButtonRoleStatusMap[systemRole].includes(
+      declaration?.status as string
+    )
   ) {
     let PAGE_ROUTE: string, PAGE_ID: string
 
@@ -207,9 +209,9 @@ export const ShowPrintButton = ({
   clearCorrectionAndPrintChanges
 }: CMethodParams) => {
   const { id, type } = declaration || {}
-  const role = userDetails ? userDetails.role : ''
-  const showActionButton = role
-    ? FIELD_AGENT_ROLES.includes(role)
+  const systemRole = userDetails ? userDetails.systemRole : ''
+  const showActionButton = systemRole
+    ? FIELD_AGENT_ROLES.includes(systemRole)
       ? false
       : true
     : false
@@ -237,10 +239,12 @@ export const ShowPrintButton = ({
   }
 
   if (
-    role &&
+    systemRole &&
     type &&
-    role in printButtonRoleStatusMap &&
-    printButtonRoleStatusMap[role].includes(declaration?.status as string) &&
+    systemRole in printButtonRoleStatusMap &&
+    printButtonRoleStatusMap[systemRole].includes(
+      declaration?.status as string
+    ) &&
     showActionButton
   ) {
     if (!isDownloaded) {
@@ -284,9 +288,9 @@ export const ShowReviewButton = ({
   const { id, type } = declaration || {}
 
   const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
-  const role = userDetails ? userDetails.role : ''
-  const showActionButton = role
-    ? FIELD_AGENT_ROLES.includes(role)
+  const systemRole = userDetails ? userDetails.systemRole : ''
+  const showActionButton = systemRole
+    ? FIELD_AGENT_ROLES.includes(systemRole)
       ? false
       : true
     : false
@@ -300,10 +304,12 @@ export const ShowReviewButton = ({
   }
 
   if (
-    role &&
+    systemRole &&
     type &&
-    role in reviewButtonRoleStatusMap &&
-    reviewButtonRoleStatusMap[role].includes(declaration?.status as string) &&
+    systemRole in reviewButtonRoleStatusMap &&
+    reviewButtonRoleStatusMap[systemRole].includes(
+      declaration?.status as string
+    ) &&
     showActionButton
   ) {
     if (!isDownloaded) {
